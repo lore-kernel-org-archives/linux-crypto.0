@@ -1,64 +1,62 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4125C488742
-	for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2026 12:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDF2489FCE
+	for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2026 12:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789044161; cv=none; b=lEMO1uT0vX9BgQtNTlyRND3EoyFL4a4wMGg1zD5wqp6fCnTArlj/GTw//cohd899wjiD4dIOZIfqWlALZTYCM56h5kvwAHCGyAuFv+m68HPNW3eBwSM7sCOADgCNh5mWgwXww5Abpqmm3BPEoiKW/5RaRm559+UtTDSlXSvMIvo=
+	t=1789044163; cv=none; b=GAVlLAf5fUih2k4geTGXbVVD2wjI7hDiLXWloAgiF1XMWAE5ftvUpUOBFaKnE4U1r+ZUnOcdBBNGK7ufChPYuzK//wh1wBjT9hnmQFlGSGA9y2wAiVgwqjTf8bC5AISRfmwva5WTUCre72DLvEsHT6Y2r+IySiRgELjiq5rKjW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789044161; c=relaxed/simple;
-	bh=GNqEgrb/+sZ74TXSrcPeteUL+J+8OTzaBVlLilJkm0o=;
+	s=arc-20240116; t=1789044163; c=relaxed/simple;
+	bh=YRlrtKyXwLbw4eW7KpPvW3BJocezw5keC+TIN5TBhrc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dumSV5NwK6j/8uXclNk3X/sqhg04AuVHyoln0d5tekF/VHINcVRLX7nd5Unb8PfjV3oZt5gN059dhzqEanxU8m72Sqgv3r1OSTmI0rbGBTsHpiSeDBwQnxMmOvt7Rtzc8vIulUC9p6P5X4ijTGNVy6uOP6fH8nUJv4w0G2+WPH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hiy5thmy; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=VjnJOKeymYGkjqVEcF2BuhyXF4qblg/AihylL7RMpWeteU0xHNVomFJrrUc2Agz8Y8JV5HpCp2ECm95LrlZcUSqIR8VbgI5IC4zOBjYPQAb8hGU0JRSkpYnYhWrxqlOfGv8j3isjQ6wpDxbaJa4xOXNqwFqyDBIDCWiILAp5S9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=delt5dnu; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hiy5thmy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="delt5dnu"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789044159;
+	s=mimecast20190719; t=1789044160;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DzI3o5Wk9Ztm1nJZ2Q+wYHNX0B3JnIKhbrRiMd/8awY=;
-	b=Hiy5thmyzG51Wgxg+bc4J81MjByUWyxSIRfvT+eUqlz6AlLpKdbwvvWQQwLfniYmudg3At
-	A4I6MMqIouhvakjtKABripv76klvyDDdj89Lmtf7qrQ3JyNPBGokV0UiHdvS0pEhAMvoRV
-	Pd55yLV4Iw4bukg9kCb9kOabhC0riY0=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=yb4CuTUSxfTCYuQhpYM23905HoUYR/P0WubB8WL7ZiU=;
+	b=delt5dnuLHDVmv328tzszuRFFu27Ev3UvE7cB4nqjLd6pOZOWoq7ctrbl8XzgOTbPofntn
+	3jtBBUsFzErqqGnm4qOQuvAr1ezu9dtjCri+Oh6Efy5hX7LaCorB/nuJdJCxf9IZQ5y9QE
+	GxWp7rYfqVw4keWOTkegDq8uX6vq6iY=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-341-5y99giTJN72VaU_wBkbq0g-1; Thu,
- 10 Sep 2026 08:42:32 -0400
-X-MC-Unique: 5y99giTJN72VaU_wBkbq0g-1
-X-Mimecast-MFC-AGG-ID: 5y99giTJN72VaU_wBkbq0g_1789044151
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-622-_xpFKxjYN-2IpseRsyZXhw-1; Thu,
+ 10 Sep 2026 08:42:36 -0400
+X-MC-Unique: _xpFKxjYN-2IpseRsyZXhw-1
+X-Mimecast-MFC-AGG-ID: _xpFKxjYN-2IpseRsyZXhw_1789044155
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A830D1800678;
-	Thu, 10 Sep 2026 12:42:30 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D508D1954123;
+	Thu, 10 Sep 2026 12:42:34 +0000 (UTC)
 Received: from thuth-p1g4.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9891E3000239;
-	Thu, 10 Sep 2026 12:42:26 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 710A530002C4;
+	Thu, 10 Sep 2026 12:42:31 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Eric Biggers <ebiggers@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	Thomas Gleixner <tglx@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
 	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v3 10/13] x86/purgatory: Compile purgatory.c with -D__NO_FORTIFY
-Date: Thu, 10 Sep 2026 14:41:29 +0200
-Message-ID: <20260910124138.417439-11-thuth@redhat.com>
+	Dave Hansen <dave.hansen@linux.intel.com>
+Subject: [PATCH v3 11/13] lib/crypto: sha2: Provide functions for zeroizing SHA2 hmac_sha* structures
+Date: Thu, 10 Sep 2026 14:41:30 +0200
+Message-ID: <20260910124138.417439-12-thuth@redhat.com>
 In-Reply-To: <20260910124138.417439-1-thuth@redhat.com>
 References: <20260910124138.417439-1-thuth@redhat.com>
 Precedence: bulk
@@ -70,32 +68,158 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-A subsequent patch will add #include <linux/string.h> to <crypto/sha2.h>
-to use memzero_explicit() there. This will introduce a conflict with the
-purgatory code: purgatory.c includes both, the <crypto/sha2.h> header and
-the arch/x86/boot/string.h header. The latter provides its own prototypes
-for a lot of string functions which clash with the fortified macros
-from <linux/string.h>. To avoid the problem, compile the code in
-purgatory.c with -D__NO_FORTIFY, so <linux/string.h> can properly be
-included from <crypto/sha2.h> in the purgatory, too.
+In certain cases crypto code functions need to zeroize their local SHA2
+hmac_sha*_key or hmac_sha*_ctx structures after use to avoid leaking
+sensitive material on the stack.
+Provide hmac_sha*_zeroize_key() and hmac_sha*_zeroize_ctx() helper
+functions that can be used with __cleanup() to automatically zeroize
+the structure when it goes out of scope.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- arch/x86/purgatory/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ include/crypto/sha2.h | 73 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-diff --git a/arch/x86/purgatory/Makefile b/arch/x86/purgatory/Makefile
-index 5ce1d42630000..9191e3cffc30b 100644
---- a/arch/x86/purgatory/Makefile
-+++ b/arch/x86/purgatory/Makefile
-@@ -12,6 +12,7 @@ $(obj)/sha256.o: $(srctree)/lib/crypto/sha256.c FORCE
- 	$(call if_changed_rule,cc_o_c)
+diff --git a/include/crypto/sha2.h b/include/crypto/sha2.h
+index 7bb8fe169daf2..22fbc37ae8407 100644
+--- a/include/crypto/sha2.h
++++ b/include/crypto/sha2.h
+@@ -7,6 +7,7 @@
+ #define _CRYPTO_SHA2_H
  
- CFLAGS_sha256.o := -D__DISABLE_EXPORTS -D__NO_FORTIFY
-+CFLAGS_purgatory.o += -D__NO_FORTIFY
+ #include <linux/types.h>
++#include <linux/string.h>
  
- # When profile-guided optimization is enabled, llvm emits two different
- # overlapping text sections, which is not supported by kexec. Remove profile
+ #define SHA224_DIGEST_SIZE	28
+ #define SHA224_BLOCK_SIZE	64
+@@ -210,6 +211,15 @@ struct hmac_sha224_key {
+ 	struct __hmac_sha256_key key;
+ };
+ 
++/**
++ * hmac_sha224_zeroize_key() - Zeroize an hmac_sha224_key structure
++ * @key: The hmac_sha224_key to zeroize
++ */
++static inline void hmac_sha224_zeroize_key(struct hmac_sha224_key *key)
++{
++	memzero_explicit(key, sizeof(*key));
++}
++
+ /**
+  * struct hmac_sha224_ctx - Context for computing HMAC-SHA224 of a message
+  * @ctx: private
+@@ -218,6 +228,15 @@ struct hmac_sha224_ctx {
+ 	struct __hmac_sha256_ctx ctx;
+ };
+ 
++/**
++ * hmac_sha224_zeroize_ctx() - Zeroize an hmac_sha224_ctx structure
++ * @ctx: The hmac_sha224_ctx context to zeroize
++ */
++static inline void hmac_sha224_zeroize_ctx(struct hmac_sha224_ctx *ctx)
++{
++	memzero_explicit(ctx, sizeof(*ctx));
++}
++
+ /**
+  * hmac_sha224_preparekey() - Prepare a key for HMAC-SHA224
+  * @key: (output) the key structure to initialize
+@@ -414,6 +433,15 @@ struct hmac_sha256_key {
+ 	struct __hmac_sha256_key key;
+ };
+ 
++/**
++ * hmac_sha256_zeroize_key() - Zeroize an hmac_sha256_key structure
++ * @key: The hmac_sha256_key to zeroize
++ */
++static inline void hmac_sha256_zeroize_key(struct hmac_sha256_key *key)
++{
++	memzero_explicit(key, sizeof(*key));
++}
++
+ /**
+  * struct hmac_sha256_ctx - Context for computing HMAC-SHA256 of a message
+  * @ctx: private
+@@ -422,6 +450,15 @@ struct hmac_sha256_ctx {
+ 	struct __hmac_sha256_ctx ctx;
+ };
+ 
++/**
++ * hmac_sha256_zeroize_ctx() - Zeroize an hmac_sha256_ctx structure
++ * @ctx: The hmac_sha256_ctx context to zeroize
++ */
++static inline void hmac_sha256_zeroize_ctx(struct hmac_sha256_ctx *ctx)
++{
++	memzero_explicit(ctx, sizeof(*ctx));
++}
++
+ /**
+  * hmac_sha256_preparekey() - Prepare a key for HMAC-SHA256
+  * @key: (output) the key structure to initialize
+@@ -623,6 +660,15 @@ struct hmac_sha384_key {
+ 	struct __hmac_sha512_key key;
+ };
+ 
++/**
++ * hmac_sha384_zeroize_key() - Zeroize an hmac_sha384_key structure
++ * @key: The hmac_sha384_key to zeroize
++ */
++static inline void hmac_sha384_zeroize_key(struct hmac_sha384_key *key)
++{
++	memzero_explicit(key, sizeof(*key));
++}
++
+ /**
+  * struct hmac_sha384_ctx - Context for computing HMAC-SHA384 of a message
+  * @ctx: private
+@@ -631,6 +677,15 @@ struct hmac_sha384_ctx {
+ 	struct __hmac_sha512_ctx ctx;
+ };
+ 
++/**
++ * hmac_sha384_zeroize_ctx() - Zeroize an hmac_sha384_ctx structure
++ * @ctx: The hmac_sha384_ctx context to zeroize
++ */
++static inline void hmac_sha384_zeroize_ctx(struct hmac_sha384_ctx *ctx)
++{
++	memzero_explicit(ctx, sizeof(*ctx));
++}
++
+ /**
+  * hmac_sha384_preparekey() - Prepare a key for HMAC-SHA384
+  * @key: (output) the key structure to initialize
+@@ -798,6 +853,15 @@ struct hmac_sha512_key {
+ 	struct __hmac_sha512_key key;
+ };
+ 
++/**
++ * hmac_sha512_zeroize_key() - Zeroize an hmac_sha512_key structure
++ * @key: The hmac_sha512_key to zeroize
++ */
++static inline void hmac_sha512_zeroize_key(struct hmac_sha512_key *key)
++{
++	memzero_explicit(key, sizeof(*key));
++}
++
+ /**
+  * struct hmac_sha512_ctx - Context for computing HMAC-SHA512 of a message
+  * @ctx: private
+@@ -806,6 +870,15 @@ struct hmac_sha512_ctx {
+ 	struct __hmac_sha512_ctx ctx;
+ };
+ 
++/**
++ * hmac_sha512_zeroize_ctx() - Zeroize an hmac_sha512_ctx structure
++ * @ctx: The hmac_sha512_ctx context to zeroize
++ */
++static inline void hmac_sha512_zeroize_ctx(struct hmac_sha512_ctx *ctx)
++{
++	memzero_explicit(ctx, sizeof(*ctx));
++}
++
+ /**
+  * hmac_sha512_preparekey() - Prepare a key for HMAC-SHA512
+  * @key: (output) the key structure to initialize
 -- 
 2.55.0
 
