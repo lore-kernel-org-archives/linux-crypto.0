@@ -1,101 +1,77 @@
-Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B90D235358;
-	Thu, 10 Sep 2026 03:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F003AFD0E;
+	Thu, 10 Sep 2026 08:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789011233; cv=none; b=SA823bCacqyN9vnurS8GiS+IRGCoK8scyu9jJZbVIdsTOtwdg0u4PeoxZ/TgaTzdFDkUAdU582kw80Gv24A5FpqDG1JPAg8+OYlXFuFhe4STjEBq0lTC0Wzy5yd5fZVbo7KmztKKxrvosRHn1NLonAt4Igon5AdDj0wODe5igdw=
+	t=1789029498; cv=none; b=sH7xiNrq7g9ud1zeYolQ/xJwtMBeggRFoGrcITumNHwdl+qfv9apdM7PnclCmHtCIo3nhCg4XcOFJiG6ViT3XF4LqcJY/NVSGAdNZ7l8UaC5bxLaTMdd/s1TPb58QewpUyEcVV4JjTNXIPtZsF2pKmhivjy4tEbJGlYp6xEUW5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789011233; c=relaxed/simple;
-	bh=OSmlZrTtowYwV7CqDLWVt9GCCCLsHOffm7LbDvdbciM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T8CSBBRAUzwHJODZNxUOnVMkMqETejnLhX4aDBDmxaVrPm0k3zISw0a53fXaSk9jqa+mH2SDqJLfgHHnylAZjdcSx/+tFWidl03Z9qf0DO61lu52b+/5DN6JUxypjfm34DFXxVukdUuEbLsufn4BfUq44LU1sgFbnLQ3i5w5VTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=HMl5re/5; arc=none smtp.client-ip=129.153.194.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
+	s=arc-20240116; t=1789029498; c=relaxed/simple;
+	bh=zK73mQCE7eL25giVjETkO1jHrD9oIHRwKKp1VRgnYrk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sPZmyVxZ9I9uh7ZKOCRwk347kEkLXxik/JrqHVtGPz0BzUDwbZGAoaY6dAa3m0I1Gy7VAxhnqynOPkAZST/r5p8WbdlZwn7Ioj7oJARXBYJi1GUb55m57UxJ1Ifb/bR62p3v8yUFsv7V8x4P7BfRf7+If8VUj3f5Kyp/f78XuJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eJEcYmwb; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="HMl5re/5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
-	t=1789010683; bh=OSmlZrTtowYwV7CqDLWVt9GCCCLsHOffm7LbDvdbciM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=HMl5re/5pdfhQrloFTxpSn/Wk9I1N8fBDHCI6Ld7/Mg7K+E2nnE8xYPUFEzyE2KRY
-	 u0NV9bNtzXgBAKx7ZRR/FsDbpZQSYHWx42SDjwhEVFbr5ylQBqcMCSPLFX1L/lmv7Y
-	 hh8iWN+Zr6v1wDM9hD/iSLa73K00w4EJyM2tWF9xB8oFOQhiM5KWtY6do013FIdpCJ
-	 kYTfsi+G219Xs1QFuj6tTQ8O3qPSzJDAvaqNj4I5zwDc0/JnoNhHN+/ZxhsgRzIuYF
-	 RrKLLKluVok3nHmgNN18D5yI59CfAFvWCbdZcPLR4dq78IoP2vuAAMECDfYLSGEKXw
-	 yg5zRNbaS8t3A==
-Message-ID: <83d09aa1-729a-47a2-a8e9-381c74e92f42@jvdsn.com>
-Date: Wed, 9 Sep 2026 22:24:42 -0500
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eJEcYmwb"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=mG/4AGN6tjfd63G18lYs6f5vejXgChWS/qvpHpogEEE=; b=eJEcYmwbeaU9Von9rzUqN922Y8
+	/LYSnBHA1uZsh91UEF2DJYRHPrVy6B3UjC1uMfbSG/lv5mtiTb6822MmMms6UJOEgFw+3SQmSLxOQ
+	gTlmt4Ie9xzj3O60Eu+hEM0VlmsLaEyW+OBlBB33IkfTG85xxvnoYRCrrf2SfDWmmU48b1NkProQ+
+	3AUxJZ/JMOZre/1eZRS8kr96tLtZSXxE9WiXuoA5swejH8Qx8FpzP5awusmh0mlCYhHJExWjM5ih/
+	9pcwde1UfS8NSNe1H5bwiI7sac7PnJPz+UDBPcoiT/upywFCOkNt9tzc9T/xq9TpaU7/Fo5s5G44y
+	DPP6Sxnw==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.99.2 #2 (Red Hat Linux))
+	id 1x4aIF-00000002CmU-1F4p;
+	Thu, 10 Sep 2026 08:38:03 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id B502E30056B; Thu, 10 Sep 2026 10:38:01 +0200 (CEST)
+Date: Thu, 10 Sep 2026 10:38:01 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: x86@kernel.org, linux-um@lists.infradead.org,
+	linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v5 6/8] x86/fpu: Remove cpu_has_xfeatures()
+Message-ID: <20260910083801.GU4121339@noisy.programming.kicks-ass.net>
+References: <20260901145740.42337-1-ebiggers@kernel.org>
+ <20260901145740.42337-7-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] crypto: testmgr - block Crypto API xxhash64 in FIPS mode
-To: Thomas Huth <thuth@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- linux-crypto@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-References: <20260303060509.246038-1-git@jvdsn.com>
- <abTuFto8Tc3mhRRe@gondor.apana.org.au>
- <64592fee-1956-4a70-a751-9ac3335cfc27@jvdsn.com>
- <9926908a-5f08-43ba-99dd-b83c7067d52b@redhat.com>
-From: Joachim Vandersmissen <joachim@jvdsn.com>
-Content-Language: en-US
-In-Reply-To: <9926908a-5f08-43ba-99dd-b83c7067d52b@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260901145740.42337-7-ebiggers@kernel.org>
 
-Hi Thomas,
+On Tue, Sep 01, 2026 at 07:57:38AM -0700, Eric Biggers wrote:
+> The only remaining caller of cpu_has_xfeatures() is
+> print_xstate_features(), which uses it only to check and get the name of
+> a single feature.
+> 
+> Remove it and just inline the needed code into print_xstate_features().
+> 
+> This also makes the "unknown xstate feature" entry at index XFEATURE_MAX
+> of xfeature_names[] unnecessary, so remove that too.
+> 
+> Acked-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
 
-On 9/9/26 9:36 AM, Thomas Huth wrote:
-> On 15/03/2026 01.43, Joachim Vandersmissen wrote:
->> Hi Herbert,
->>
->> I don't think this one can be applied yet since dm-integrity still 
->> uses xxhash64 through the crypto API. This would break fips=1 systems 
->> that use it.
->
-> Out of curiosity: Wouldn't such a system be FIPS-incompliant anyway? 
-> If xxhash64 isn't FIPS-compliant, nobody should use it for 
-> dm-integrity there, right? So I doubt that there are any systems out 
-> there that use fips=1 and use xxhash64 at the same time?
+Turns out there are a few new ones in tip/perf/core, so if you merge
+tip/x86/fpu and tip/perf/core things no longer build.
 
-There is a risk that users may not know that xxhash64 is not FIPS 
-compliant and would still use it. Especially considering it was marked 
-as "fips_allowed = 1" for a while.
+I'm not entirely sure how to go about fixing this. Some seem trivial
+enough, but others, like XFEATURE_MASK_OPMASK I don't readily see a
+replacement for.
 
-Distributions that actually need FIPS validation will probably apply 
-this patch anyway and deal with the breakage if it happens.
-
->
->  Thomas
->
->>
->> On 3/14/26 12:11 AM, Herbert Xu wrote:
->>> On Tue, Mar 03, 2026 at 12:05:09AM -0600, Joachim Vandersmissen wrote:
->>>> xxhash64 is not a cryptographic hash algorithm, but is offered in the
->>>> same API (shash) as actual cryptographic hash algorithms such as
->>>> SHA-256. The Cryptographic Module Validation Program (CMVP), managing
->>>> FIPS certification, believes that this could cause confusion. xxhash64
->>>> must therefore be blocked in FIPS mode.
->>>>
->>>> The only usage of xxhash64 in the kernel is btrfs. Commit fe11ac191ce0
->>>> ("btrfs: switch to library APIs for checksums") recently modified the
->>>> btrfs code to use the lib/crypto API, avoiding the Kernel 
->>>> Cryptographic
->>>> API. Consequently, the removal of xxhash64 from the Crypto API in FIPS
->>>> mode should now have no impact on btrfs usage.
->>>>
->>>> Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
->>>> ---
->>>>   crypto/testmgr.c | 1 -
->>>>   1 file changed, 1 deletion(-)
->>> Patch applied.  Thanks.
->>
->
+Boris, can you have a look? For now I'm reverting this patch locally.
