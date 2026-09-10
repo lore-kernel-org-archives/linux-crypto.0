@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73777488204
-	for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2026 12:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187C648987E
+	for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2026 12:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789044130; cv=none; b=DAiMiobrlkEtNNzzUnx5Ig6lLbpHDC4u9a2QgLF/8nNmY+q9TnzG4gq4pOaJMr/zlQ13jaxZMNcmoT5V9kMAAeZDz3Vb5vmHA/GvomugFDj4MmoO63AIWTX3emkU0jBPRzn+rd/i+j7D98GirTwoIAWlJd7ZfDbmwK6lwJPQ0Bs=
+	t=1789044134; cv=none; b=mvOXXMKvAtF/QxYarDLTqO3pKaM93NunfDsKTgvxqOUL1PDI2LNHl/p4kTErUmMVO9X2wP8tzIa5W2L7aRH5AYyNg7C0YUDEH8OOiRIy7EIDDIu613Mk3bJLDLGMi+mq5kYj1KcyjBASLsyotbciextX7GiNLxx5W1A6D83s7X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789044130; c=relaxed/simple;
-	bh=Gauuyu1weASDOCUOi0niAJFHae1GpPUEFg2Emc3mczQ=;
+	s=arc-20240116; t=1789044134; c=relaxed/simple;
+	bh=d+vwqEhO/lD2ctFXZn1C2/2N9oPMH8AXcVR0UYYn2jM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PxTvUMj5aEjcxYj5jlwlBiddKEcm7AGUQbZ6zqDJKVKhFGq92qXZzhrXR/3Zqxxo2H+ipl7XT2Jt3cbGalRgmWIZ3cbCDMhOHFfE0NZ5JmIwMSBwPsnZ5yWDDbC3FEUXv9Er5n3gsyy8Uc4k6kgwSZDfKTjnsK+2mEu4aaLkZKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IfLCbV60; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=e3zG/IEHU1cLmtCyTyOeb9CFdrAANB7VNUotHh8oVA01lt9TO050yH2LBi4qfUByvEM58SXYusDIpXFhTJv34Ky9MjqBrcPlZNNjYEn+3qKIfCx1tSjKKkzh0BwSEDFJwMAfIlWaXs/8g1iD6fkFy1kKSE8husMwfWHJU8scYMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dV2yRZnR; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IfLCbV60"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dV2yRZnR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789044127;
+	s=mimecast20190719; t=1789044130;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/X0DqhKQVgSWZ6Kwg3nu2S/S85i2kZoDTzqHkKw8Nxs=;
-	b=IfLCbV60XtTrkAeP+wFiyJm6Zyg6WOqsKRrIUZBLXS49jLBKHhJmO55x6sn9JH0pj3HiNC
-	Jl34vzyG++OpeNBjmPyjxPADiDOCuIAm2xzRpj/64ckjJZaVu36HK1j/oqIar1IyLZANCM
-	MgdjYMiu+uEEeb4gKxmNeE8blyLqRfY=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=+JeEBAQDGBfdd7h6R58FOX2X8OCTMKwsL/hKMH91GAo=;
+	b=dV2yRZnRWubqQTuzZYQ9jpUVHQgpYFX4W3LVZuW9WMlwSuClpKjSRNOsVaEi1NZuWst85n
+	fMdndJs+InH5rcfoN8HPasvJqnFT9AP3MYg/ny7BLPDr0EneRNXTp4IF7dRT6witdC9Wx7
+	J0zUYwLXuPUrvdvX9rGc7MTsnU8YwWg=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-577-JaQbsh4fNKmp_eeiQqOyVw-1; Thu,
- 10 Sep 2026 08:42:04 -0400
-X-MC-Unique: JaQbsh4fNKmp_eeiQqOyVw-1
-X-Mimecast-MFC-AGG-ID: JaQbsh4fNKmp_eeiQqOyVw_1789044122
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-634-RFfZgVnAPJ6f1eycoc9NYA-1; Thu,
+ 10 Sep 2026 08:42:07 -0400
+X-MC-Unique: RFfZgVnAPJ6f1eycoc9NYA-1
+X-Mimecast-MFC-AGG-ID: RFfZgVnAPJ6f1eycoc9NYA_1789044126
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D3275195606C;
-	Thu, 10 Sep 2026 12:42:01 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DDC6E1800632;
+	Thu, 10 Sep 2026 12:42:05 +0000 (UTC)
 Received: from thuth-p1g4.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B42D230001A2;
-	Thu, 10 Sep 2026 12:41:58 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C77FF30001A2;
+	Thu, 10 Sep 2026 12:42:02 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Eric Biggers <ebiggers@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -54,9 +54,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Ingo Molnar <mingo@redhat.com>,
 	Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>
-Subject: [PATCH v3 04/13] lib/crypto: aes-ccm: Provide functions for zeroizing aes_ccm* structures
-Date: Thu, 10 Sep 2026 14:41:23 +0200
-Message-ID: <20260910124138.417439-5-thuth@redhat.com>
+Subject: [PATCH v3 05/13] lib/crypto: md5: Provide a function for zeroizing hmac_md5 structures
+Date: Thu, 10 Sep 2026 14:41:24 +0200
+Message-ID: <20260910124138.417439-6-thuth@redhat.com>
 In-Reply-To: <20260910124138.417439-1-thuth@redhat.com>
 References: <20260910124138.417439-1-thuth@redhat.com>
 Precedence: bulk
@@ -68,108 +68,79 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-In certain cases crypto code needs to zeroize their local aes_ccm_key
-or aes_ccm_ctx structures after use to avoid leaking sensitive material.
-Provide aes_ccm_zeroize_key() and aes_ccm_zeroize_ctx() helper functions
-that e.g. can be used with __cleanup() to automatically zeroize the
-structures when they go out of scope.
+In certain cases crypto code functions need to zeroize their local
+hmac_md5_key or hmac_md5_ctx structures after use to avoid leaking
+sensitive material on the stack.
+Provide hmac_md5_zeroize_key() and hmac_md5_zeroize_ctx() helper
+functions that e.g. can be used with __cleanup() to automatically
+zeroize the structure when it goes out of scope.
 
-While we're at it, replace the related memzero_explicit() calls in
-lib/crypto/aes.c with calls to the new helper functions.
+While we're at it, replace the related memzero_explicit() call in
+lib/crypto/md5.c with a call to the new helper function.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/crypto/aes-ccm.h | 22 ++++++++++++++++++++--
- lib/crypto/aes.c         |  8 +++-----
- 2 files changed, 23 insertions(+), 7 deletions(-)
+ include/crypto/md5.h | 19 +++++++++++++++++++
+ lib/crypto/md5.c     |  2 +-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/include/crypto/aes-ccm.h b/include/crypto/aes-ccm.h
-index 8b00859ac4d6b..c52982dd91d2c 100644
---- a/include/crypto/aes-ccm.h
-+++ b/include/crypto/aes-ccm.h
-@@ -18,6 +18,15 @@ struct aes_ccm_key {
- 	size_t authtag_len; /* Length of authentication tags in bytes */
+diff --git a/include/crypto/md5.h b/include/crypto/md5.h
+index c47aedfe67ecd..1ed89c15b662c 100644
+--- a/include/crypto/md5.h
++++ b/include/crypto/md5.h
+@@ -4,6 +4,7 @@
+ 
+ #include <crypto/hash.h>
+ #include <linux/types.h>
++#include <linux/string.h>
+ 
+ #define MD5_DIGEST_SIZE		16
+ #define MD5_HMAC_BLOCK_SIZE	64
+@@ -98,6 +99,15 @@ struct hmac_md5_key {
+ 	struct md5_block_state ostate;
  };
  
 +/**
-+ * aes_ccm_zeroize_key() - Zeroize an aes_ccm_key structure
-+ * @key: The aes_ccm_key to zeroize
++ * hmac_md5_zeroize_key() - Zeroize an hmac_md5_key structure
++ * @key: The hmac_md5_key to zeroize
 + */
-+static inline void aes_ccm_zeroize_key(struct aes_ccm_key *key)
++static inline void hmac_md5_zeroize_key(struct hmac_md5_key *key)
 +{
 +	memzero_explicit(key, sizeof(*key));
 +}
 +
  /**
-  * struct aes_ccm_ctx - Context for incrementally en/decrypting a message
-  */
-@@ -50,6 +59,15 @@ struct aes_ccm_ctx {
- 	bool ad_padded;
+  * struct hmac_md5_ctx - Context for computing HMAC-MD5 of a message
+  * @hash_ctx: private
+@@ -108,6 +118,15 @@ struct hmac_md5_ctx {
+ 	struct md5_block_state ostate;
  };
  
 +/**
-+ * aes_ccm_zeroize_ctx() - Zeroize an aes_ccm_ctx structure
-+ * @ctx: The aes_ccm_ctx to zeroize
++ * hmac_md5_zeroize_ctx() - Zeroize an hmac_md5_ctx structure
++ * @ctx: The hmac_md5_ctx context to zeroize
 + */
-+static inline void aes_ccm_zeroize_ctx(struct aes_ccm_ctx *ctx)
++static inline void hmac_md5_zeroize_ctx(struct hmac_md5_ctx *ctx)
 +{
 +	memzero_explicit(ctx, sizeof(*ctx));
 +}
 +
  /**
-  * aes_ccm_preparekey() - Prepare a key for AES-CCM encryption and decryption
-  * @key: (output) The key structure to initialize
-@@ -58,8 +76,8 @@ struct aes_ccm_ctx {
-  * @authtag_len: Length of the authentication tag in bytes:
-  *		 4, 6, 8, 10, 12, 14, or 16.  16 is recommended.
-  *
-- * Users should use memzero_explicit() to zeroize the key struct at the end of
-- * its lifetime.  (But if this function fails, zeroization is unnecessary.)
-+ * Users should use aes_ccm_zeroize_key() to zeroize the key struct at the end
-+ * of its lifetime.  (But if this function fails, zeroization is unnecessary.)
-  *
-  * Context: Any context.
-  * Return:
-diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-index 0cb5d7355926e..2d29adca79532 100644
---- a/lib/crypto/aes.c
-+++ b/lib/crypto/aes.c
-@@ -2011,7 +2011,7 @@ void aes_ccm_encrypt_final(struct aes_ccm_ctx *ctx, u8 *authtag)
- 	if (ctx->partial_len)
- 		aes_encrypt(&ctx->key->aes, ctx->mac, ctx->mac);
- 	crypto_xor_cpy(authtag, ctx->mac, ctx->s0, ctx->key->authtag_len);
--	memzero_explicit(ctx, sizeof(*ctx));
-+	aes_ccm_zeroize_ctx(ctx);
- }
- EXPORT_SYMBOL_GPL(aes_ccm_encrypt_final);
+  * hmac_md5_preparekey() - Prepare a key for HMAC-MD5
+  * @key: (output) the key structure to initialize
+diff --git a/lib/crypto/md5.c b/lib/crypto/md5.c
+index 3d2b017a0525a..a8ee57600012d 100644
+--- a/lib/crypto/md5.c
++++ b/lib/crypto/md5.c
+@@ -271,7 +271,7 @@ void hmac_md5_final(struct hmac_md5_ctx *ctx, u8 out[MD5_DIGEST_SIZE])
+ 	cpu_to_le32_array(ctx->ostate.h, ARRAY_SIZE(ctx->ostate.h));
+ 	memcpy(out, ctx->ostate.h, MD5_DIGEST_SIZE);
  
-@@ -2032,7 +2032,7 @@ int aes_ccm_decrypt_final(struct aes_ccm_ctx *ctx, const u8 *authtag)
- 		      -EBADMSG :
- 		      0;
- out:
 -	memzero_explicit(ctx, sizeof(*ctx));
-+	aes_ccm_zeroize_ctx(ctx);
- 	return err;
++	hmac_md5_zeroize_ctx(ctx);
  }
- EXPORT_SYMBOL_GPL(aes_ccm_decrypt_final);
-@@ -2084,7 +2084,7 @@ static void __init aes_ccm_fips_test(void)
- 	const size_t data_len = sizeof(fips_test_data);
- 	const size_t nonce_len = 13;
- 	u8 buf[sizeof(fips_test_data) + AES_BLOCK_SIZE];
--	struct aes_ccm_key key;
-+	struct aes_ccm_key key __cleanup(aes_ccm_zeroize_key);
- 	int err;
+ EXPORT_SYMBOL_GPL(hmac_md5_final);
  
- 	if (aes_ccm_preparekey(&key, fips_test_key, sizeof(fips_test_key),
-@@ -2106,8 +2106,6 @@ static void __init aes_ccm_fips_test(void)
- 		panic("aes: CCM FIPS self-test failed (decryption failed)\n");
- 	if (memcmp(fips_test_data, buf, data_len) != 0)
- 		panic("aes: CCM FIPS self-test failed (wrong plaintext)\n");
--
--	memzero_explicit(&key, sizeof(key));
- }
- #else /* CONFIG_CRYPTO_LIB_AES_CCM */
- static inline void aes_ccm_fips_test(void)
 -- 
 2.55.0
 
