@@ -1,165 +1,101 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE0E395ACB
-	for <linux-crypto@vger.kernel.org>; Wed,  9 Sep 2026 21:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B90D235358;
+	Thu, 10 Sep 2026 03:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788988343; cv=none; b=uvqGOdc8tKdKdjAqkzq8DYA19oo/yTM1gZ1lTfbCDa3p2x7VjAVrbskLsxt/zAaVmJLrSg1kUEB9emH+zOdyu1mMw9Ak1HpKuHs2f7E36m2d9C6VRkaqsBD/yFsAhq6fmr2P4QoClpWnEwD7X4QIT/pLXlvL6JgrWnQCX0DMR8c=
+	t=1789011233; cv=none; b=SA823bCacqyN9vnurS8GiS+IRGCoK8scyu9jJZbVIdsTOtwdg0u4PeoxZ/TgaTzdFDkUAdU582kw80Gv24A5FpqDG1JPAg8+OYlXFuFhe4STjEBq0lTC0Wzy5yd5fZVbo7KmztKKxrvosRHn1NLonAt4Igon5AdDj0wODe5igdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788988343; c=relaxed/simple;
-	bh=lsJH/m1wwMGY3Tdn1zmWxqy3WlMlbk6ChjZYpxUGVoY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XjcY988UksNjvhcwJvzNraGYRRlbYdUJDe1HV8ufZ6mYKLl3w4H0n6QEDYEQmednVhpNE4fTmGw4g6Ba/Jr+wZHrAVUE3xPPkGmY+RXZGG+2CXqxScKilRV4bxGYoMgrrEIDw/noXdKc4DKIiEuz5uD/BqyjcEF4MbU0ve5CV6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s5Trg4VS; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789011233; c=relaxed/simple;
+	bh=OSmlZrTtowYwV7CqDLWVt9GCCCLsHOffm7LbDvdbciM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T8CSBBRAUzwHJODZNxUOnVMkMqETejnLhX4aDBDmxaVrPm0k3zISw0a53fXaSk9jqa+mH2SDqJLfgHHnylAZjdcSx/+tFWidl03Z9qf0DO61lu52b+/5DN6JUxypjfm34DFXxVukdUuEbLsufn4BfUq44LU1sgFbnLQ3i5w5VTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=HMl5re/5; arc=none smtp.client-ip=129.153.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s5Trg4VS"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-cc147d86bebso387813a12.0
-        for <linux-crypto@vger.kernel.org>; Wed, 09 Sep 2026 14:12:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788988341; x=1789593141; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=u495ibL0ejeSjktkIJ/W4ElwT//FuX3YHoHh4p8PAXg=;
-        b=s5Trg4VSzO5/hVmDqRO/N5qJpuYhhB7yql21kib/w71oEqY8cHVZ0s3rqgW1MmoSoI
-         q5OqM9mc8vS9xA2r26zrp0+l/FBTvi86xw7L0OFV1JFR2dn71vXVmSUXJedyvOI3pGXk
-         CX/PgLPu+/J+CAjqhc9DCzPiVoB6oD4QRrg9zKIAScgfwHsznUxxhmLG4PFkELkYm5Az
-         xQcEQJ/qb/oQK5u4AcmWTjoZzRl5Z3oNCewBz0cMFRE/gDgVxzvO/ETq8tyNGhMp/7R+
-         bsKoL/ALutNci89O5QzyoTKOavAuzYvehlps0metk8CqVfKoGS/f2WYrlRovt58AP0J8
-         fxkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788988341; x=1789593141;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=u495ibL0ejeSjktkIJ/W4ElwT//FuX3YHoHh4p8PAXg=;
-        b=nKO/zqWNufEJ8nFl+vfbhRLZvEOSBK0jyppDL+Ug+MI9jEg668ws3jevvmuJPZUa74
-         8DoFOv+UXzqy2K8UmFqtq7aMZFnKbxI7kFvq2Rc2rMKHf+PQouwKs/Sm1SsSv+amFk/x
-         ihtHcYnkIT33FpYogAumB4uiHRO6DIlNqjht5lT0N6gylb80+0n3qMX3x76JHHxsaXu8
-         7ZKvD42jafCBheNNOrdbmsFwWNBFIAUioj7D4FQIPuOZoS3MZK+7qjHi42NC8ZbuNVR/
-         PuCSFDQVwL5D1hccy2vLG94FO4kI1YzFpLUB/5SU+IRelcndmVoUlJzXPo2D2h2ounOk
-         H8Jw==
-X-Gm-Message-State: AFuF++nCAacREQOcIiyj5Fep7j5cPnVXhRfaSTWWs/OdkuOLhXPm0Mke
-	u2zzAO+hBHjMJFbsFbV44qK2ema+ArRhppX2lv8Oq9N7ea1ZM/4XhMKDR5FhEA==
-X-Gm-Gg: AYBFou2QwqEWAmpa4N9us9Wjw8jnE+sMQZSrSDf4dKOqSghhUoYvB4IhM3CCXS5noAi
-	bcYVfylzXGzOSApLd1VreG9TpV9vV3wCz9eaPkdREdB+yFKdxEzHCJFobYaRHV2Dsm7q880URSO
-	5GXtHdnkvxH4Tq4P4eeuS2ftub2oQzSmVJouvomM5Xt3WYXbJ3FFekdf6rhgWsdoyc77yFP7xMe
-	QfGOk/tKyQb3nhlPWnCEO5C49qeyqKvROOxofJHMaBtzTrjUVT4iqOnW4w1oMRtQFXkcRHfiHJf
-	RhqCcly5jgyk9b2qCSHhw2YYjYCXfLFo1uwhBY2N6gGte5SEJOfbm65EbNrrhxcIdxIlk1MWe6f
-	ItC6D47a+QxEDL9dX3jVLdIWoYky7EdLqywDMvShT75S+8a/mcm7X4VdmmSiv2Xwu66RwmLQ5zr
-	7NO7jEo8twyFdvWex9poeEITwksKTPjgai4p1tIK1RpmTU3hD0eRb0I267RI+Gl4TJ+O8UJgT3w
-	CvnY6RALVWRmeFriGdapf1l904z1M8gG7Mdz5RbrJUrSo178T5Ynx4dSigZabTrXDGuBXuKFKOQ
-	vf4Avg6U9Yrsu+TL8MLvxo4Bp8JssPb753IZPRW7SX+xxOkT
-X-Received: by 2002:a05:6a20:258b:b0:3bf:b7e8:68ab with SMTP id adf61e73a8af0-3dad26bda32mr1323463637.2.1788988341177;
-        Wed, 09 Sep 2026 14:12:21 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e35])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc46b4cd51esm6000615a12.2.2026.09.09.14.12.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 14:12:20 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: eip93: fix IRQ teardown ordering in remove path
-Date: Wed,  9 Sep 2026 14:12:18 -0700
-Message-ID: <20260909211218.15388-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="HMl5re/5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+	t=1789010683; bh=OSmlZrTtowYwV7CqDLWVt9GCCCLsHOffm7LbDvdbciM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=HMl5re/5pdfhQrloFTxpSn/Wk9I1N8fBDHCI6Ld7/Mg7K+E2nnE8xYPUFEzyE2KRY
+	 u0NV9bNtzXgBAKx7ZRR/FsDbpZQSYHWx42SDjwhEVFbr5ylQBqcMCSPLFX1L/lmv7Y
+	 hh8iWN+Zr6v1wDM9hD/iSLa73K00w4EJyM2tWF9xB8oFOQhiM5KWtY6do013FIdpCJ
+	 kYTfsi+G219Xs1QFuj6tTQ8O3qPSzJDAvaqNj4I5zwDc0/JnoNhHN+/ZxhsgRzIuYF
+	 RrKLLKluVok3nHmgNN18D5yI59CfAFvWCbdZcPLR4dq78IoP2vuAAMECDfYLSGEKXw
+	 yg5zRNbaS8t3A==
+Message-ID: <83d09aa1-729a-47a2-a8e9-381c74e92f42@jvdsn.com>
+Date: Wed, 9 Sep 2026 22:24:42 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH] crypto: testmgr - block Crypto API xxhash64 in FIPS mode
+To: Thomas Huth <thuth@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ linux-crypto@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20260303060509.246038-1-git@jvdsn.com>
+ <abTuFto8Tc3mhRRe@gondor.apana.org.au>
+ <64592fee-1956-4a70-a751-9ac3335cfc27@jvdsn.com>
+ <9926908a-5f08-43ba-99dd-b83c7067d52b@redhat.com>
+From: Joachim Vandersmissen <joachim@jvdsn.com>
+Content-Language: en-US
+In-Reply-To: <9926908a-5f08-43ba-99dd-b83c7067d52b@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Switch from devm_request_threaded_irq() to request_threaded_irq() so
-that free_irq() can be called at the correct position in the remove
-path.  Move the IRQ registration after tasklet_init() in probe to
-ensure the tasklet is ready before the handler can fire.
+Hi Thomas,
 
-Reorder eip93_cleanup() to:
-  1. disable device interrupts (HW)
-  2. free_irq() - synchronizes and removes the handler
-  3. tasklet_kill() - safe, no new IRQs can arrive
+On 9/9/26 9:36 AM, Thomas Huth wrote:
+> On 15/03/2026 01.43, Joachim Vandersmissen wrote:
+>> Hi Herbert,
+>>
+>> I don't think this one can be applied yet since dm-integrity still 
+>> uses xxhash64 through the crypto API. This would break fips=1 systems 
+>> that use it.
+>
+> Out of curiosity: Wouldn't such a system be FIPS-incompliant anyway? 
+> If xxhash64 isn't FIPS-compliant, nobody should use it for 
+> dm-integrity there, right? So I doubt that there are any systems out 
+> there that use fips=1 and use xxhash64 at the same time?
 
-The previous order (tasklet_kill before interrupt disable) could race:
-an IRQ arriving after tasklet_kill() would schedule the already-killed
-tasklet.  With devm_request_threaded_irq(), free_irq() ran after the
-remove callback returned, leaving the handler registered while device
-state was being torn down.
+There is a risk that users may not know that xxhash64 is not FIPS 
+compliant and would still use it. Especially considering it was marked 
+as "fips_allowed = 1" for a while.
 
-Assisted-by: opencode:big-pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- .../crypto/inside-secure/eip93/eip93-main.c   | 27 ++++++++++++-------
- 1 file changed, 18 insertions(+), 9 deletions(-)
+Distributions that actually need FIPS validation will probably apply 
+this patch anyway and deal with the breakage if it happens.
 
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
-index e62785952b0d..4cfddfd1935b 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-main.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
-@@ -395,12 +395,16 @@ static int eip93_desc_init(struct eip93_device *eip93)
- 
- static void eip93_cleanup(struct eip93_device *eip93)
- {
--	tasklet_kill(&eip93->ring->done_task);
--
--	/* Clear/ack all interrupts before disable all */
-+	/* Stop HW from asserting IRQ first */
- 	eip93_irq_clear(eip93, EIP93_INT_ALL);
- 	eip93_irq_disable(eip93, EIP93_INT_ALL);
- 
-+	/* Synchronize and unregister the IRQ handler */
-+	free_irq(eip93->irq, eip93);
-+
-+	/* No new IRQs can arrive - safe to kill the tasklet */
-+	tasklet_kill(&eip93->ring->done_task);
-+
- 	writel(0, eip93->base + EIP93_REG_PE_CLOCK_CTRL);
- 
- 	eip93_desc_free(eip93);
-@@ -430,12 +434,6 @@ static int eip93_crypto_probe(struct platform_device *pdev)
- 	if (eip93->irq < 0)
- 		return eip93->irq;
- 
--	ret = devm_request_threaded_irq(eip93->dev, eip93->irq, eip93_irq_handler,
--					NULL, IRQF_ONESHOT,
--					dev_name(eip93->dev), eip93);
--	if (ret)
--		return ret;
--
- 	ret = eip93_desc_init(eip93);
- 	if (ret)
- 		return ret;
-@@ -448,6 +446,11 @@ static int eip93_crypto_probe(struct platform_device *pdev)
- 	spin_lock_init(&eip93->ring->idr_lock);
- 	idr_init(&eip93->ring->crypto_async_idr);
- 
-+	ret = request_threaded_irq(eip93->irq, eip93_irq_handler, NULL,
-+				   IRQF_ONESHOT, dev_name(eip93->dev), eip93);
-+	if (ret)
-+		goto err_free_tasklet;
-+
- 	algo_flags = readl(eip93->base + EIP93_REG_PE_OPTION_1);
- 
- 	eip93_initialize(eip93, algo_flags);
-@@ -472,6 +475,12 @@ static int eip93_crypto_probe(struct platform_device *pdev)
- 		 readl(eip93->base + EIP93_REG_PE_OPTION_0));
- 
- 	return 0;
-+
-+err_free_tasklet:
-+	idr_destroy(&eip93->ring->crypto_async_idr);
-+	tasklet_kill(&eip93->ring->done_task);
-+	eip93_desc_free(eip93);
-+	return ret;
- }
- 
- static void eip93_crypto_remove(struct platform_device *pdev)
--- 
-2.55.0
-
+>
+>  Thomas
+>
+>>
+>> On 3/14/26 12:11 AM, Herbert Xu wrote:
+>>> On Tue, Mar 03, 2026 at 12:05:09AM -0600, Joachim Vandersmissen wrote:
+>>>> xxhash64 is not a cryptographic hash algorithm, but is offered in the
+>>>> same API (shash) as actual cryptographic hash algorithms such as
+>>>> SHA-256. The Cryptographic Module Validation Program (CMVP), managing
+>>>> FIPS certification, believes that this could cause confusion. xxhash64
+>>>> must therefore be blocked in FIPS mode.
+>>>>
+>>>> The only usage of xxhash64 in the kernel is btrfs. Commit fe11ac191ce0
+>>>> ("btrfs: switch to library APIs for checksums") recently modified the
+>>>> btrfs code to use the lib/crypto API, avoiding the Kernel 
+>>>> Cryptographic
+>>>> API. Consequently, the removal of xxhash64 from the Crypto API in FIPS
+>>>> mode should now have no impact on btrfs usage.
+>>>>
+>>>> Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+>>>> ---
+>>>>   crypto/testmgr.c | 1 -
+>>>>   1 file changed, 1 deletion(-)
+>>> Patch applied.  Thanks.
+>>
+>
