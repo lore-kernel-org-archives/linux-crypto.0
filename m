@@ -1,83 +1,74 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C7149BD74;
-	Thu, 10 Sep 2026 14:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C9F379EFF;
+	Thu, 10 Sep 2026 14:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789050212; cv=none; b=XjlI6Ew1ZckaHU+uMRa4B39ori134ROXnE69XvvTXRdNmM7a4DndUkGNk+dMu6CBAfv0LvHmioq4cNW5DrJWxYjtBaVSR3ErEWOsRONlcoc9VVMoXFQZR5KVKKHx2FRLY+Pq9tLyi7w5218lVEo8IdrBrTzsTtg0ESXPc5AOspw=
+	t=1789050705; cv=none; b=kEXMfGVOA7ySzbWRIsrcwb/T14zFzOD64gbX75dCKzMXjFuutzNGAKPoL9h3isVA7JSCUfngC0XjEBRn1YVmGZuvU/yKbVHn+uad426lb5uT4qFX/zoPLwH+eeayDK99BLAqLVbmhP0blN7+/Eagr062gNDwxgtxZEeBNAZIyYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789050212; c=relaxed/simple;
-	bh=oQLfe0josw0afgf5qbypjfJkfaRgUMkwMRxthXux920=;
+	s=arc-20240116; t=1789050705; c=relaxed/simple;
+	bh=81unJ+xQyS1OZb5YmgrJ3wNJT2SEsGfgy/M5SCM83tU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fOgLqTAVkn1YkUS/ednn6pYe4iUQ/udGHmJV9uQkB/Z4dOYeOmrckf+l6cjHb+CGudBrjp9K1r8POi2kXCmtkBHg+b+njxf3BLBd3Rcqz0gdNox2hgkxQPrTMAI32i4O/t8DfmNhq2aOSXuHuMv94MDDdmrC9Azp+DP6h2OE3p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=D1meaicj; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=qapP86diSyswiSj1Rt5skSeLppj5wW9MwrlA72PvkJNcYLIbTsXHrKSyA7+NCaFoe89yOUODDmV2B51+saWOOPSpd4As4WrdmULy0xFnAOFaOyXe7QYctHMyuA8kZICpbkz5qN5NG00TgqrruyXqN8rMWK+WvXWEE/9RC6Xt0T0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AbHucjfl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="D1meaicj"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 60AA540E01DD;
-	Thu, 10 Sep 2026 14:23:25 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id JlEgMq8cfcwl; Thu, 10 Sep 2026 14:23:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1789050195; bh=oazBnerJKBXfynp5uGUgQGCP5CJIKWsROgSUMUbl4yM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D1meaicjse+es/+8OSM9lXaQVJ22Ma8RICYFH+AKCVCVtmrIEV50ALRE1EIaKXaaO
-	 zUz983449jzmJzwfllrEDiPSDk+NDzDt+n1J1sBFavIj4kDdN+zE1YnIgBs7H2P9d9
-	 mcpPTfbPDTeZhklPoT7pWxFmOlGoT2vOzbv3eajeBP9g5rNGK7Fi7UKYqB5a1Dqps4
-	 TJfhj9EJoZj0FXuAyFeuAW+NCHjPB+CS3YcAOkioiBkz2YiABsTfCueSf+mW+SXIRx
-	 qd3em2EQ7l9u8pSKrzT5Bqv2ho1agTxx1RoeUrWB2BV2RUMg0ebjNa17HUu3ON6e7d
-	 nVQ02h/1AaLAfriIgs+TNjHxHc+VY+GYOnoJlk9GHbPu7kJ9EIo9C9aXnVgb6PMn5I
-	 TKLe8CXssgvuYzAeUvwc7XpkVWQhlNr6WtXZQ6zPvxC3czTysE75mmR9JgLSludc01
-	 1jfcf4ruW7Sj6u1EXYE6F7d6I/nXg2uAX21EqH7q/0TjlUrFh9mNPOlWGo2XQaEgBf
-	 VVRYB/lMQNCa0cxitws60mOodDHxp3zYn2kXrIdPVxWA9YtML9eXV8QLl0rAjh0pOi
-	 Nix2IeAnQJxv2yvHcIHqSV6yddrGQEXRc186uIkRWFaEwGdEqRt8KtrIDHxe1wse9W
-	 jiiPVvzzi4wMbo+xQmcAma3s=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::3a])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C01DB40E00E8;
-	Thu, 10 Sep 2026 14:23:05 +0000 (UTC)
-Date: Thu, 10 Sep 2026 07:23:01 -0700
-From: Borislav Petkov <bp@alien8.de>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Eric Biggers <ebiggers@kernel.org>, x86@kernel.org,
-	linux-um@lists.infradead.org, linux-raid@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v5 6/8] x86/fpu: Remove cpu_has_xfeatures()
-Message-ID: <20260910142301.GAaqK9RVdjjmpwX876@fat_crate.local>
-References: <20260901145740.42337-1-ebiggers@kernel.org>
- <20260901145740.42337-7-ebiggers@kernel.org>
- <20260910083801.GU4121339@noisy.programming.kicks-ass.net>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AbHucjfl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E7591F000FF;
+	Thu, 10 Sep 2026 14:31:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789050703;
+	bh=IHpQOlYMRC0zl6HC0wXJzTXHYh3YXpTlJwbTQW1CZSU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=AbHucjfl82yRXnxQtW1Hovmw/+O4DJ0t/9Bo8dOZvngq/2Q5XoVD7WBB+GEOh7DA4
+	 U55kTpyd2DiJ1R6E/kxkBNN1P72RJiWBxJmCI7U0ksxMdEt5i25KvE6A44zYgxo4Rm
+	 PB6RHFKcyeOQWKYqaQzbCUsLVx5GVWBUkPlk1cd1BRcNitLKApD0iIVqQcgoykzkto
+	 Zc8ltAJkIY9PTJuUUKeWeJ8I/HZWkT+0yG+dJL8oY4Mr27lLTJOCnTz42Ms7vCF87K
+	 FzrJLbSQFf9zuIybQkJrdXMHAXgoZjR8+DGj+D59wcmItS5dmmlxSvvVUhvFzMcI9Q
+	 WZhqgDv3GDJGA==
+Date: Thu, 10 Sep 2026 09:31:40 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Stanimir Varbanov <svarbanov@mm-sol.com>,
+	Eneas U de Queiroz <cotequeiroz@gmail.com>,
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+	Demi Marie Obenour <demiobenour@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, brgl@kernel.org
+Subject: Re: [PATCH v7 09/12] crypto: qce - remove the BROKEN label
+Message-ID: <20260910143140.GA5719@quark>
+References: <20260910-qce-fix-self-tests-v7-0-cdbd2718af14@oss.qualcomm.com>
+ <20260910-qce-fix-self-tests-v7-9-cdbd2718af14@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260910083801.GU4121339@noisy.programming.kicks-ass.net>
+In-Reply-To: <20260910-qce-fix-self-tests-v7-9-cdbd2718af14@oss.qualcomm.com>
 
-On Thu, Sep 10, 2026 at 10:38:01AM +0200, Peter Zijlstra wrote:
-> Boris, can you have a look? For now I'm reverting this patch locally.
+On Thu, Sep 10, 2026 at 03:00:50PM +0200, Bartosz Golaszewski wrote:
+> All self-tests now pass.
 
-Yeah, I'll zap it from the x86/fpu lineup and then we can see how to fix up
-everything later.
+Have the other bugs that were reported been fixed?  For example:
+https://lore.kernel.org/linux-crypto/20260723202704.GB110634@quark/
+https://lore.kernel.org/linux-crypto/20260723183438.GB93534@quark/
+https://lore.kernel.org/linux-crypto/20260723205342.GC110634@quark/
 
-Thx.
+>  	help
+>  	  This driver supports Qualcomm crypto engine accelerator
 
--- 
-Regards/Gruss,
-    Boris.
+As this patch would make the kconfig option visible again and would
+result in everyone running "make oldconfig" being asked about it, it
+needs to be fixed to accurately document why anyone would want to enable
+this option.  As you've stated, it's actually just for "testing".  The
+false claim that it's an "accelerator" also needs to go.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+- Eric
