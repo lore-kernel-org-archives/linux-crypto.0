@@ -1,70 +1,60 @@
-Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC7A471D04
-	for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2026 11:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DC74BFE9F
+	for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2026 12:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789039467; cv=none; b=HAn8NQfbTQB+XwFYMhyzxRsPdFLfqJI5+60wJ54k1YQ0s4O6shIAlJ10HObTP7+AN5kcOr/DMKWRyq2SU48Yxt1kScMJtE8ZvY1O+EDV1E+elzS/LQdhDCFrpuUQ9CyVPkXRlYdIwLTIEImZz0LDZbQrH/BYdcCELhFaMZ7UAgM=
+	t=1789044113; cv=none; b=KnJE8Jjgh/dLQHeBCfTLkvEh3NpLsFSo25Nrc3GwRsP4ABRPMXmhVDoJ+h1yriKz5zPJOVbmeB3ipdiG9oMOYKtKkUh0KMAa4biAc4MDP4tqwCI6poJwES0yHDG0hsF41h0DnVK5byaQx83uoAPLR7SEngkhsf20B2sNHrnRjlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789039467; c=relaxed/simple;
-	bh=uLHDkONy+KiNWUq7mE9L8IgwyvZNTO3uaZUoWwWk3C4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LNXwU8JeoguMqaRa0bU7tJ9jrvj9Nf5XCSvQ1oJN5yUsMacNsEyPrH5LsNs/RStXkoLlb19/1H/dCeBpuDYNWdcVBK8xwPZr+lHnGKP2nCOcrk5dPSIKF93sBdIFARQO4G/kdgZVyFJAkJkkDJBxXn9GhehWvE1KQAMG2f9SbbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LsRRv3lP; arc=none smtp.client-ip=74.125.227.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789044113; c=relaxed/simple;
+	bh=4vxzKrnv2JllHNizh3Y1G1b9R2X7Bo68Ih31K/fl/EU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aJX6tNaumyrriovx/rRvajSDt1dIuD/YQ0eU9lI2SdsFmHs1d+aqlo7PGl1br2pGWxgzBQccvO0wk+VUEYXY/6tlS8tAAWkbAizEPiaw/5JGDW66bT6UXkLv/JTvZRJ0QW41Kl1jjsNjJvDOYXZ+73DDJA6r8MqWahalqLfEV6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CgAKFeXh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LsRRv3lP"
-Received: by mail-pj2-f12.google.com with SMTP id d9443c01a7336-2d747eb79f7so9032595ad.1
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Sep 2026 04:24:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789039465; x=1789644265; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=0qWBsl55Jcuvgx7Kq+dRwJ1UDbnv4Oi/wL4tnPnY7Gw=;
-        b=LsRRv3lPqNljkSRiTeZSw7fHHiQpWHJBmSM4aHI6/7ai4B6ydkcPFZfc7yDQiLl0OI
-         jx9gyg4i6Xs4EjRbXOFeEFfH59UaIuuqvPS+3ET0iY5d5BQduO+REA/VPOlv1GtZMIZT
-         D05ESvuU9RkPBC0suDLSqqmbo2swX3awkuE7Z0i9trblbTrZ5naTP9kPCmjrlKZXQjkT
-         0StcAdFZXmpLzT46TyL75Zv5gFV8uVbZaAI2IMvblPlnrZPn8I4KA2rNHOmMGkFtcpOV
-         QMZxc3CxKjKrg3K2r8ViF4tCDYYUO4FMYlM8tZKIU41AQ7c+XJAxx2dXPd+n2B7pP3Pu
-         Z5eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789039465; x=1789644265;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=0qWBsl55Jcuvgx7Kq+dRwJ1UDbnv4Oi/wL4tnPnY7Gw=;
-        b=iqTmAmsqXbl2fDoB5RIjO+M8KPYPN6dTawZQQvPwPoNQcTBIAtEzAGJfYTN0frzeLm
-         7w5uY0JWdacYK6hhLrGKTsteC8xvDAdElcjkExDGiSuuzqc2gLElfhv34EglKlqSjLIe
-         jmfyuGvMowenY+219NxOI4d2lmHW4l0RXXBy1pKriicnM2ym0IPT1vHJgo64gYLjo/lk
-         3f2MTsgZLRv90XrPd7pZk7GQO+49zrxjY47peE7dGcswqcGWCSFxZNTXXqziDYUvLjXn
-         YXwddcSiIsb1JgtBq4x5oW10vbzpDnfy7GdOla9Qx1AZO8baLzo7Q3rSKHHap7J4YaPS
-         S7cg==
-X-Gm-Message-State: AFuF++llCmXdns/qgzDKxJhSA2HpEWY1y3G/PbUNDBlWoCQOAYNv3z9y
-	leLxhInlUslwCmXHLYty3wuj1ErUf7ykNTUtuq11exojqw8p1GmnxM7AVjaYlS7N
-X-Gm-Gg: AYBFou2GcqwBjJeT3KTjG2YSTChSiGD9QzMCQQgJoIbjgJghpUPQMXa+VjciEapiCGH
-	I6gjTV+QKui5SP+VnExeA13zI13BC9vxEZNUShFVkC/AV3ma07EK2duAhQeTGiLyaRsfD/51ScF
-	ZdeUMxLnaSYPR/x40WPokPEI0KgPnc0Kw7oPu6ZtleQFIHOZL9euyAdoUfDHbJPq5tUPmZ9zpb3
-	6oK3k1EZ9vo1Dm4csCRV0KO2Xa04J7NIeTc2+rYuGhRZB6U3xZbdMwZRHPANiGPXrzc8rRTSpKH
-	7tn6Dpz3K1hsl7W/p1C0735dM7Bfup9Z4ij9vFh/2LEf5hadDL8uh6vDGmVryjUiyAKHM+GPJSZ
-	+fWOydAt3QOh1ZADTyVtHmvd2LDswNz7sAbR+bblVZbDs4+aEmw+aUoLxemt2xSvAo1d6VJcRR8
-	zVUUQOijSHSJtYSymC3zbRH/WZT/G36xZJEArXkZGfyOSqEmcp0vR30qVb4zfzqe2AI/cptpHRF
-	wZ2yK0O7aNRhgAmOyx79EKqU8H69rR11xshYAQxAg==
-X-Received: by 2002:a17:903:3c24:b0:2d9:33d4:a910 with SMTP id d9443c01a7336-2dd0780d87cmr107860155ad.4.1789039465487;
-        Thu, 10 Sep 2026 04:24:25 -0700 (PDT)
-Received: from FLYINGPENG-MC2.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2db2bbcc0c5sm73122895ad.53.2026.09.10.04.24.23
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 10 Sep 2026 04:24:24 -0700 (PDT)
-From: Peng Hao <flyingpenghao@gmail.com>
-X-Google-Original-From: Peng Hao <flyingpeng@tencent.com>
-To: dsaxena@plexity.net,
-	olivia@selenic.com
-Cc: linux-crypto@vger.kernel.org
-Subject: [PATCH] hwrng: omap - fix runtime PM and clock leak on EPROBE_DEFER in probe
-Date: Thu, 10 Sep 2026 19:24:21 +0800
-Message-ID: <20260910112421.39372-1-flyingpeng@tencent.com>
-X-Mailer: git-send-email 2.47.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgAKFeXh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1789044110;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sj/7Juy6QvKAcHbVPloSfwE//2kWf08qu5nTC4cFTmM=;
+	b=CgAKFeXh/ceNUkgbEouY9/mj6hOlI+MGnbN5hUKksc+T0G5kaJAj5/tOFblKoOdA5pwiZi
+	hOm3FgF0UePTbBmAripEV3kOsPiEwsQDB5bAIucBvDYnKizn+sA7TwALm0SrkVLikRVtTa
+	ZeJ3gbpCJv8mKnGndCDKTT4DCChfj9g=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-137-q2ZTHy4RM0C4TtrRqq4IIQ-1; Thu,
+ 10 Sep 2026 08:41:46 -0400
+X-MC-Unique: q2ZTHy4RM0C4TtrRqq4IIQ-1
+X-Mimecast-MFC-AGG-ID: q2ZTHy4RM0C4TtrRqq4IIQ_1789044105
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D40151954238;
+	Thu, 10 Sep 2026 12:41:43 +0000 (UTC)
+Received: from thuth-p1g4.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A9F3E30001A2;
+	Thu, 10 Sep 2026 12:41:39 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Subject: [PATCH v3 00/13] libcrypto: Provide more __cleanup functions for zeroizing data
+Date: Thu, 10 Sep 2026 14:41:19 +0200
+Message-ID: <20260910124138.417439-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -72,58 +62,91 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-omap_rng_probe() calls pm_runtime_enable() and pm_runtime_resume_and_get()
-before requesting the optional "reg"/functional clocks. When either
-devm_clk_get() returns -EPROBE_DEFER, the probe bails out with a bare
-"return -EPROBE_DEFER;", bypassing the err_register cleanup that does
-pm_runtime_put_sync() + pm_runtime_disable() (and clk_disable_unprepare()).
+Code that uses crypto-related structures (containing keys or context data)
+should zeroize their local structures on the stack after use to avoid
+leaking this sensitive material via the stack when the function returns.
+Using the __cleanup() marker is a very elegant way to assert that the
+data is zeroized without having to painfully verify that each early return
+in a function might miss it.
 
-As a result every probe deferral leaks a runtime PM usage count and leaves
-runtime PM enabled; the next probe attempt then hits an unbalanced
-pm_runtime_enable(). The second deferral point additionally leaks the
-already-enabled functional clock.
+Thus this series introduces zeroization functions for many crypto-related
+structures that can be used with __cleanup(). The series focuses on the
+introduction of the functions - most call sights will be adjusted to use
+these new functions in separate patch series later (since each subsystem
+needs separate review from the corresponding maintainer).
 
-Redirect both -EPROBE_DEFER paths to err_register. clk_disable_unprepare()
-is a no-op for the NULL/ERR_PTR clocks on these early paths, so the cleanup
-is safe.
+Note there is one minor ugliness in the patch "Compile purgatory.c with
+-D__NO_FORTIFY":  Since sha2.h is also used in the x86 purgatory code,
+and that code ships with its own implementation of string functions, we
+have to compile the purgatory.c file with -D__NO_FORTIFY now to be able
+to include <linux/string.h> in sha2.h. I hope that solution is OK
+(especially since the sha256.c file in the same folder gets that treatment
+already, too), if not - I'm certainly open for other suggestions here!
 
-Fixes: b166be004491 ("hwrng: omap - Fix clock resource by adding a register clock")
-Signed-off-by: Peng Hao <flyingpeng@tencent.com>
----
- drivers/char/hw_random/omap-rng.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+v3:
+- Don't put function names into ``quotes`` in the last patch, so the
+  cross-references will be generated right now.
+- Added a missing #include <linux/string.h> in the sm3 patch
 
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index 5e8b50f15db7..84e2542c570b 100644
---- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -459,8 +459,10 @@ static int omap_rng_probe(struct platform_device *pdev)
- 	}
- 
- 	priv->clk = devm_clk_get(&pdev->dev, NULL);
--	if (PTR_ERR(priv->clk) == -EPROBE_DEFER)
--		return -EPROBE_DEFER;
-+	if (PTR_ERR(priv->clk) == -EPROBE_DEFER) {
-+		ret = -EPROBE_DEFER;
-+		goto err_register;
-+	}
- 	if (!IS_ERR(priv->clk)) {
- 		ret = clk_prepare_enable(priv->clk);
- 		if (ret) {
-@@ -471,8 +473,10 @@ static int omap_rng_probe(struct platform_device *pdev)
- 	}
- 
- 	priv->clk_reg = devm_clk_get(&pdev->dev, "reg");
--	if (PTR_ERR(priv->clk_reg) == -EPROBE_DEFER)
--		return -EPROBE_DEFER;
-+	if (PTR_ERR(priv->clk_reg) == -EPROBE_DEFER) {
-+		ret = -EPROBE_DEFER;
-+		goto err_register;
-+	}
- 	if (!IS_ERR(priv->clk_reg)) {
- 		ret = clk_prepare_enable(priv->clk_reg);
- 		if (ret) {
+v2:
+- Dropped some patches that have been picked up elsewhere already
+- Merged the patches that introduce the zeroization functions and
+  that update the callsites in lib/crypto/ - I think reviewing is
+  easier this way
+- Add more patches to zeroize structs that weren't handled in v1 yet
+- Keep the kerneldoc comments simple and add a final patch for the
+  Documentation folder instead that describes the zeroization needs.
+
+Thomas Huth (13):
+  lib/crypto: aes: Provide functions for zeroizing aes_key and
+    aes_enckey
+  lib/crypto: aes-xts: Provide function for zeroizing aes_xts_key
+  lib/crypto: aes-gcm: Provide functions for zeroizing aes_gcm*
+    structures
+  lib/crypto: aes-ccm: Provide functions for zeroizing aes_ccm*
+    structures
+  lib/crypto: md5: Provide a function for zeroizing hmac_md5 structures
+  lib/crypto: sm3: Provide a function for zeroizing the sm3_ctx
+    structure
+  lib/crypto: blake2: Provide functions for zeroizing blake2*_ctx
+    structures
+  lib/crypto: sha1: Provide functions for zeroizing hmac_sha1 structures
+  security: keys: trusted: always clear the hmac_sha1_ctx before
+    returning
+  x86/purgatory: Compile purgatory.c with -D__NO_FORTIFY
+  lib/crypto: sha2: Provide functions for zeroizing SHA2 hmac_sha*
+    structures
+  smb: client: Use hmac_sha256_zeroize_ctx function to clear
+    hmac_sha256_ctx
+  lib/crypto: Add documentation about zeroization of key and context
+    data
+
+ .../crypto/libcrypto-zeroization.rst          | 129 ++++++++++++++++++
+ Documentation/crypto/libcrypto.rst            |   1 +
+ arch/x86/purgatory/Makefile                   |   1 +
+ fs/smb/client/smb2transport.c                 |   3 +-
+ include/crypto/aes-ccm.h                      |  22 ++-
+ include/crypto/aes-gcm.h                      |  22 ++-
+ include/crypto/aes-xts.h                      |  13 +-
+ include/crypto/aes.h                          |  18 +++
+ include/crypto/blake2b.h                      |   9 ++
+ include/crypto/blake2s.h                      |   9 ++
+ include/crypto/md5.h                          |  19 +++
+ include/crypto/sha1.h                         |  19 +++
+ include/crypto/sha2.h                         |  73 ++++++++++
+ include/crypto/sm3.h                          |  10 ++
+ lib/crypto/aes.c                              |  28 ++--
+ lib/crypto/blake2b.c                          |   2 +-
+ lib/crypto/blake2s.c                          |   2 +-
+ lib/crypto/md5.c                              |   2 +-
+ lib/crypto/sha1.c                             |   2 +-
+ lib/crypto/sm3.c                              |   2 +-
+ security/keys/trusted-keys/trusted_tpm1.c     |   2 +-
+ 21 files changed, 358 insertions(+), 30 deletions(-)
+ create mode 100644 Documentation/crypto/libcrypto-zeroization.rst
+
 -- 
-2.43.7
+2.55.0
 
