@@ -1,31 +1,31 @@
 Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A9826982C;
-	Fri, 11 Sep 2026 06:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1266403B1E;
+	Fri, 11 Sep 2026 06:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.238.236.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789107426; cv=none; b=c5ie2HOZtPf8Hxd8On6VgGyUCsaUiJW8GVDr6+dtFFyfSGMtjKXUNjGJdMOlm3PVROhffnUgFTDvalJ2jCmkzdPsq7mJonpefoqC9cu6bwHHJKOIKRw6R/srMDvi6FlFGSqZ1IMbDxD00UwZfWOyr2mURERA4Cpl99OLuTPzSU8=
+	t=1789107868; cv=none; b=c8ocBNO97MkQyAwHIJZPgqqQGZOkkWgf4Vl07BsLrIWpcOwITI4n+dxIRCMgemgjifPWNT4KzmsmGtzDPXPmcff81ywEKCJUG+DpvMqmKytGVRkOz8rRML0BhYs701uA7FNbzEzhazYutNiF71uhYp25MbhX5mOxXJ4brVtjui8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789107426; c=relaxed/simple;
-	bh=ts7gkvtDKZ+x1wHsvYBS9NbAWzo6fLziQrOLz9oQK+8=;
+	s=arc-20240116; t=1789107868; c=relaxed/simple;
+	bh=cnt50FePNe+Jk/w3vIOgLk7hE8kpsmUFeZEwLkEm/Sc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i/MSis3UVB94eHUmD0DQ1NEZVHWQnLVKIJGy/D4uoPYhJ9X+Jugtn5KOCFZaytWeelF/o7l2HEZ/Uf84XBh+CTb7MIrUXkPRAyXtdn09WjgnqQqf7cQopHSLdjdFn3nQFdmPMP3HMMsN3bgDoFp8F2g4NWwFLbMr2CAWd+CbriE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=f4Ij8LH4; arc=none smtp.client-ip=178.238.236.174
+	 MIME-Version:Content-Type; b=BuIy69hRetwkI6WvKk/HQjwAdXbLgp9naqQ6xE781nyHuKXr/QPMD3+Rz8vglps7UNeX20uG+IiJZdAVrKi/OMhxa3rx0k+srTxPvyRSyeLOTCxIb3aQcpHi80Z98x5Ku08k5fY2UU7109Wb0Kz0lVfstC+Yyy4Xw52/sEEQA+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=R4Wnqk/V; arc=none smtp.client-ip=178.238.236.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="f4Ij8LH4"
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="R4Wnqk/V"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=kemnade.info; s=20220719; h=References:In-Reply-To:Subject:Cc:To:From:
 	Reply-To:Content-ID:Content-Description;
-	bh=lGj6tD8S75FkNAQospxrl1Av+QZr5tEfZgtcYlCahP8=; t=1789107425; x=1790317025; 
-	b=f4Ij8LH4564DAF0BK/5ZUJNaxkpXqZfXxmOaovRqpm0Xal7JHY/4rkDrdM7u/ThrhzjK7lhVYhd
-	57kajzcpYwLr4Rc72u7fMaAV/8V8VGvl+mOFSvB+RdlcHOcxzLgB6HMsRmDWWXon8opIJCiFA3Ksa
-	SK0EovC7dTV1i0lXvuMNhakqI1O0vfntlyIC2b94gaMGjmLe4qogbqzxsk0V6fxTd8Gh4lQpFf/9M
-	93bCrUNg0AI9CmrB8Iaa+UsBLO7h5FCYZXWQIg9NBjUN1mEMGS9IPWaNRXB401KqzE6SRoX3zozSS
-	MovAF/0WzOmC55qFR1vcHP8AjweY8uUPQRFw==;
-Date: Fri, 11 Sep 2026 08:15:47 +0200
+	bh=tNI0SH70ZtDdmVS2JUVOZmi2MDCOhm5iayYFnH6g5I8=; t=1789107860; x=1790317460; 
+	b=R4Wnqk/VlLzPnu1Ur4o+4PYyBzvORrtbEPDWmFxxAhhfDPKXqtZh7PP8Nd6ia6HBTaU4HWBB8zm
+	l7RBDOrWq8Tn0Zalx+IEmRhdqMCL1xurOHYx1ctsfH2XGta2gO/XhqpaFJ2RwEd3DQ2Mbh6s3V83X
+	YT38fPK8WjYjckFL3p7lu0qQXjhYyYe9bWbq7GexC5nXBM3mf8nIeNPRZ2XaK8zxKYuRL4l/be6vh
+	oOEYlAj9DjxtWx04tYsP2XeYAT8TR+bAkv6Wc33Wf61O4qA5FR6n95eBQlOEpYuUBbm9FLlZJYXjP
+	ORAU9tPIjySdhyqXhJVi+0qjrd+ynEiykkmw==;
+Date: Fri, 11 Sep 2026 08:24:06 +0200
 From: Andreas Kemnade <andreas@kemnade.info>
 To: Bhargav Joshi <j.bhargav.u@gmail.com>
 Cc: Aaro Koskinen <aaro.koskinen@iki.fi>, Kevin Hilman
@@ -36,12 +36,12 @@ Cc: Aaro Koskinen <aaro.koskinen@iki.fi>, Kevin Hilman
  Animesh Agarwal <animeshagarwal28@gmail.com>, linux-omap@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/2] ARM: dts: ti: omap: dra7: Remove clocks from crypto
- nodes
-Message-ID: <20260911081547.400ac521@kemnade.info>
-In-Reply-To: <20260911-ti-dra7-omap-sham-fix-v1-1-c430f01b4e13@gmail.com>
+Subject: Re: [PATCH 2/2] dt-bindings: crypto: ti,omap-sham: Add OMAP3
+ compatible and deprecate ti,hwmods
+Message-ID: <20260911082406.05e2a212@kemnade.info>
+In-Reply-To: <20260911-ti-dra7-omap-sham-fix-v1-2-c430f01b4e13@gmail.com>
 References: <20260911-ti-dra7-omap-sham-fix-v1-0-c430f01b4e13@gmail.com>
-	<20260911-ti-dra7-omap-sham-fix-v1-1-c430f01b4e13@gmail.com>
+	<20260911-ti-dra7-omap-sham-fix-v1-2-c430f01b4e13@gmail.com>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; aarch64-unknown-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -52,65 +52,54 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 11 Sep 2026 03:41:57 +0530
+On Fri, 11 Sep 2026 03:41:58 +0530
 Bhargav Joshi <j.bhargav.u@gmail.com> wrote:
 
-> The omap-sham and omap-aes crypto drivers do not use "clocks" and
-> "clock-names" properties. Clock management is handled by the ti-sysc
-> interconnect parent wrapper. The dt-bindings for ti,omap-sham and
-> ti,omap-aes don't define these clock properties. Having them in the
-> child nodes causes dtbs_check warnings.
+> The OMAP SHAM driver supports OMAP3 SoCs, and "ti,omap3-sham" is
+> actively used in existing dts. However, it was previously missing from
+> binding. Add "ti,omap3-sham" to the list of valid compatibles.
 > 
-> Remove the "clocks" and "clock-names" properties from the sham and aes
-> nodes.
+> The legacy "ti,hwmods" property is no longer needed as TI OMAP mirgrated
+> to "ti-sysc". Mark it as deprecated and remove it from the required
+> properties.
 > 
 > Signed-off-by: Bhargav Joshi <j.bhargav.u@gmail.com>
 
-Reviewed-by: Andreas Kemnade <andreas@kemnade.info>
+What about also removing ti,hwmods usage while you are deprecating it?
 
+Regards,
+Andreas
 > ---
->  arch/arm/boot/dts/ti/omap/dra7.dtsi | 8 --------
->  1 file changed, 8 deletions(-)
+>  Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm/boot/dts/ti/omap/dra7.dtsi b/arch/arm/boot/dts/ti/omap/dra7.dtsi
-> index 711ce4c31bb1..0784c6d9cbe4 100644
-> --- a/arch/arm/boot/dts/ti/omap/dra7.dtsi
-> +++ b/arch/arm/boot/dts/ti/omap/dra7.dtsi
-> @@ -1012,8 +1012,6 @@ aes1: aes@0 {
->  				interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
->  				dmas = <&edma_xbar 111 0>, <&edma_xbar 110 0>;
->  				dma-names = "tx", "rx";
-> -				clocks = <&l3_iclk_div>;
-> -				clock-names = "fck";
->  			};
->  		};
+> diff --git a/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> index d69b50228009..3ef05890e13a 100644
+> --- a/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> @@ -13,6 +13,7 @@ properties:
+>    compatible:
+>      enum:
+>        - ti,omap2-sham
+> +      - ti,omap3-sham
+>        - ti,omap4-sham
+>        - ti,omap5-sham
 >  
-> @@ -1043,8 +1041,6 @@ aes2: aes@0 {
->  				interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
->  				dmas = <&edma_xbar 114 0>, <&edma_xbar 113 0>;
->  				dma-names = "tx", "rx";
-> -				clocks = <&l3_iclk_div>;
-> -				clock-names = "fck";
->  			};
->  		};
+> @@ -32,6 +33,7 @@ properties:
+>      description: Name of the hwmod associated with the SHAM module
+>      $ref: /schemas/types.yaml#/definitions/string
+>      enum: [sham]
+> +    deprecated: true
 >  
-> @@ -1073,8 +1069,6 @@ sham1: sham@0 {
->  				interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
->  				dmas = <&edma_xbar 119 0>;
->  				dma-names = "rx";
-> -				clocks = <&l3_iclk_div>;
-> -				clock-names = "fck";
->  			};
->  		};
+>  dependencies:
+>    dmas: [dma-names]
+> @@ -40,7 +42,6 @@ additionalProperties: false
 >  
-> @@ -1103,8 +1097,6 @@ sham2: sham@0 {
->  				interrupts = <GIC_SPI 163 IRQ_TYPE_LEVEL_HIGH>;
->  				dmas = <&edma_xbar 165 0>;
->  				dma-names = "rx";
-> -				clocks = <&l3_iclk_div>;
-> -				clock-names = "fck";
->  			};
->  		};
+>  required:
+>    - compatible
+> -  - ti,hwmods
+>    - reg
+>    - interrupts
 >  
 > 
 
