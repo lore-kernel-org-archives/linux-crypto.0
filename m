@@ -1,48 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28F12F7EE4;
-	Fri, 11 Sep 2026 05:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAB52931C1;
+	Fri, 11 Sep 2026 05:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789104647; cv=none; b=HZGwMRoSQB2qpotUTiqXQ6u3RAmX6UuyGFvK0aDseZaSwgfeKjeKYsfHESl79/G3s7HXrF8W7QRc5POPfvmxgWkghFpALxC8CHa38RZJdaBzYXjoYY7pGkEnzuoq4syDJuIwVGC8fiyTgPy8AXr1MbNo3QBJA3zL+V+KzLlmJ0A=
+	t=1789104698; cv=none; b=mbDTEqT7rCiw7vrt1NqaFVgJSDUj7ORne2juN4BR01wQDXzgI6EZARmjui33S/JSQ35rEzUcyZ7Y4fpaM1Bq08pwYM393PK06JyNeGynXxJHHSrer7Wq7ias5siooduUY8QcYoYne2aZn7gluvf0ek6fzNWrN2STOuyA6NZeq60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789104647; c=relaxed/simple;
-	bh=kqLOW4vPBYyD7OU6mGwgBc1GuUJkM5GEZ5s6moopCSI=;
+	s=arc-20240116; t=1789104698; c=relaxed/simple;
+	bh=eUhMviTe7l/Z8IvO5Kc1ail4fuwGDVlQbuEFnbOvzGU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pzRTU0r/XYQIwAyVotv3Wl0ZiGpnR03rCOUpcrKy9KJNE+Kx2Xe2FlfNqkdQ+bL/P6TGmSy1JUofTB3ivs6UQJ9nAiFDPVBxa8GHzTiX04JvDjZtKGfgX1q+NYal/7Hr0J+6vN1bovmL4cP1v7wa2LuwCLzFZITWLSIivqdutIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Let7sX4q; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=J18s7MFBtMjX0nlfPW23BXykDw4BlPecTllc4r+5c0F2dO5HaPQ26/CeDi/Pnl6+3cDtmrw2HVvBGeRemtcqY231HXRg/Kw9djY673siJqYSmwKkAO4GpK7qFbKJkhinRydits5WkkuRE0EWbMV8mhyqMkDe9ix6HYMCJ9XFixU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rdzIC/ri; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Let7sX4q"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rdzIC/ri"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=rgJozweawLpWUJj1d7YiUL9Emkn589aJkBOuWhRLNx0=; 
-	b=Let7sX4qt9HjiuqCfTJ64/c11W+w5Zgm0wUOEs9tadrWnxu1Y9jv8S0XaT0jQwCiWzmEd6XUBbj
-	U/ICqd5/gNGF3w89nLfvRdcBLKXGDRvioH4iF9gOEuS35EtlrS+f8wWZV3y9BUecn+xvrAWigmHYs
-	APgBPK5CmbUDH4YtYiqnW5Su+voMyMse36GHQwbjB3EPrr0MCcL10klvxLGS6VuHWSAqfazLdWlth
-	qg9Ol3UYxfA5uMACWfHeTi5Qxs4IDW/xe3NFaYEiK29lWDV/WNTAu2o6+XsXeKO7s7ic50xuNKvDq
-	zqk4ZionA+AWMm2My/1zun2BtB2prmIGTgew==;
+	from:content-type:reply-to; bh=yJnrdlNp2yV1IsgL/qbAsqaCjof1te0wIYaB1HGeSsY=; 
+	b=rdzIC/riHxd85MWw2u11qRs1G/qiY4QHyTd6t77T4sBtguWSwxJZhYBdOJdRFiuZ9yrOaQSKFXB
+	jV1cZmDrksafdxP4GdLNxva/9XdcDBDFMeHR1Eh1CfPeZqicWQ/VZuz6WDTVusn6rvNYmQESN8s3Q
+	2lRwoYrgLJHPAtAHiiN9K409KFjE0G0fXrILlMaI1zgfVff3dtm5EYeMd4LjeEd0gfTMiOk8pefLF
+	G33U/JPosQBDhoxsrlt7C99Zeqsi0Clmrx0GbVRbaYGZJGqO4HtW/h7ZVwqrJzFDGKtlh9zJGaabQ
+	LcFgSEBul0X4UFQZrwUJTJcPMTKUHqnsGbMg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x4tqN-0000000CuB5-2nhO;
-	Fri, 11 Sep 2026 13:30:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2026 15:30:35 +1000
-Date: Fri, 11 Sep 2026 15:30:35 +1000
+	id 1x4trI-0000000CuBK-2VWS;
+	Fri, 11 Sep 2026 13:31:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2026 15:31:32 +1000
+Date: Fri, 11 Sep 2026 15:31:32 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: Haren Myneni <haren@us.ibm.com>, Dan Streetman <ddstreet@ieee.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <david@davidgow.net>, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 0/3] lib/842: reject malformed streams before invalid
- memory accesses
-Message-ID: <aqOR-_Q_citLLJqQ@gondor.apana.org.au>
-References: <cover.1787978627.git.kmehltretter@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH] crypto: lskcipher - preserve state across unaligned
+ chunks
+Message-ID: <aqOSNPrFCFtXO-N5@gondor.apana.org.au>
+References: <20260829194314.42685-1-kmehltretter@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,70 +47,61 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1787978627.git.kmehltretter@gmail.com>
+In-Reply-To: <20260829194314.42685-1-kmehltretter@gmail.com>
 
-On Sat, Aug 29, 2026 at 11:18:48AM +0200, Karl Mehltretter wrote:
-> sw842_decompress() backs the crypto 842 algorithm, the NX-842 software
-> fallback and zram's 842 backend. Two malformed-stream checks are missing:
+On Sat, Aug 29, 2026 at 09:43:14PM +0200, Karl Mehltretter wrote:
+> crypto_lskcipher_crypt_unaligned() splits a request into page-sized
+> chunks but never sets CRYPTO_LSKCIPHER_FLAG_CONT, so a stateful algorithm
+> restarts from its keyed state at every page boundary. It also marks every
+> chunk CRYPTO_LSKCIPHER_FLAG_FINAL, which is wrong but harmless: chunks are
+> trimmed to a multiple of the chunk size, so the trailing partial block that
+> FINAL guards against is caught after the loop instead.
 > 
->   - indexed and short-data templates can write beyond the caller's stated
->     output capacity; and
->   - a repeat after one to seven bytes of short data reads before the
->     output buffer.
+> ARC4 is the only lskcipher with internal state, and cbc, the other
+> in-tree user of the direct API, never passes more than one block, so
+> this went unnoticed. bpf_crypto_crypt() however hands
+> __bpf_dynptr_data() to crypto_lskcipher_encrypt() unchecked, leaving
+> both alignment and length to the BPF program. An 8192-byte ARC4 request
+> offset by one byte comes back with its second page identical to its
+> first: the keystream is reused.
 > 
-> The first underflows the unsigned remaining length, so every later capacity
-> check passes. The decoder keeps writing past the destination and can
-> return success with an output length the caller will trust.
+> Set FINAL only on the last chunk and CONT after the first, mirroring the
+> progression used by crypto_lskcipher_crypt_sg().
 > 
-> The decoder already returns errors for format, capacity and CRC problems;
-> these two cases perform invalid accesses instead.
+> Fixes: 0ae4dcc1ebf6 ("crypto: skcipher - Add internal state support")
+> Assisted-by: LLM
+> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> ---
+> Reproduced on a Raspberry Pi 400 (Cortex-A72) with a BPF program that
+> creates a "skcipher"/"arc4" context, takes a dynptr over an 8192-byte map
+> value, offsets it by one with bpf_dynptr_adjust() and calls
+> bpf_crypto_encrypt(). Unpatched, the second page of the output equals the
+> first; patched, it matches an aligned run exactly, final state included.
 > 
-> Patches 1 and 2 add the checks. After them every output write site is
-> capacity-checked, repeat cannot read before the output, and all input reads
-> stay bounded. Patch 3 adds KUnit cases for the three malformed streams and
-> for three valid streams at the exact acceptance boundaries, so the new
-> rejections cannot regress into off-by-one.
+> Rebuilding that needs two programs: bpf_crypto_ctx_create() is KF_SLEEPABLE
+> and only available to BPF_PROG_TYPE_SYSCALL, bpf_crypto_encrypt() only to
+> SCHED_CLS/SCHED_ACT/XDP, so the context passes between them as a kptr.
 > 
-> The KMSAN reports from
-> syzbot+e774233ff687aada969e and syzbot+8f77ff6144a73f0cf71b are unrelated.
-> They trace poison from uninitialized swapped-page storage, not these bounds
-> failures.
+> With CONFIG_CRYPTO_ARC4=m, load arc4 first: arc4.ko advertises only the
+> legacy "ecb(arc4)" alias, so a cold create with algo "arc4" fails with
+> -EOPNOTSUPP before reaching this path. CONFIG_CRYPTO_ARC4=y also works.
 > 
-> KUnit under QEMU 10.2.1 TCG, two vCPUs:
+> ecb(aes), cbc(aes) and cbc(camellia) were checked the same way before and
+> after at several lengths and misalignments and are unchanged; with generic
+> ciphers they have alignmask 0 and never enter the helper.
 > 
->                   baseline      fixed
->   i386              3/6          6/6
->   x86_64            3/6          6/6
+> The helper is not dead code, in case removing it looks tempting: ecb() and
+> cbc() inherit the wrapped cipher's alignmask (crypto/ecb.c), and geode-aes,
+> padlock-aes and sparc64 camellia still declare one, so those instances use
+> it today. They are all stateless, hence unaffected by the flag handling.
 > 
-> Baseline runs applied patch 3 alone: the three boundary cases pass, the
-> three malformed streams wrongly return success. A fixed x86_64 lockdep
-> kernel also passes 6/6.
+> Not an unprivileged surface: the crypto kfuncs need CAP_BPF, and
+> bpf_crypto_encrypt() additionally CAP_NET_ADMIN.
 > 
-> Separately, an x86_64 KASAN QEMU run exercised all three malformed cases
-> through zram's compressed writeback path by corrupting the backing-disk
-> contents after writeback. The baseline reported two out-of-bounds writes
-> and one out-of-bounds read; fixed readback returned -EIO in all three cases
-> without a KASAN report.
-> 
-> Karl Mehltretter (3):
->   lib/842: reject output overflows from index and short data
->   lib/842: require a complete history block for repeat templates
->   lib/842: add KUnit tests for the decompressor
-> 
->  MAINTAINERS                      |   1 +
->  lib/842/842_decompress.c         |   7 +-
->  lib/Kconfig.debug                |  15 ++++
->  lib/tests/842_decompress_kunit.c | 144 +++++++++++++++++++++++++++++++
->  lib/tests/Makefile               |   1 +
->  5 files changed, 167 insertions(+), 1 deletion(-)
->  create mode 100644 lib/tests/842_decompress_kunit.c
-> 
-> 
-> base-commit: cf72cbb39da84b6f02f90c07f33b102fc10b16f0
-> -- 
-> 2.53.0
+>  crypto/lskcipher.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
