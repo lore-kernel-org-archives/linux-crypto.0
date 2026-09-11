@@ -1,33 +1,33 @@
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A3542BE93;
-	Fri, 11 Sep 2026 10:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A33B443C18;
+	Fri, 11 Sep 2026 10:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789122593; cv=none; b=mghXhG/IA6Dqy/ohKbusrEZY0z8cs5CaZrF/3UopjHj5JW5IQkF+BfQkRYl0PbmbQ/c4XxyB0Z/BuBJGeeVLYnpYfWGBXkAMlOU0VOJKc5eL9jaZwcYmmcKKkpUAeJkscaB5W68+loWbUAQP2UwN2OczPN51CFD2DqH98IHiq3g=
+	t=1789122598; cv=none; b=ijOKNL93h3tvMyNzILq5Cfpr40QN6dij3Y2koeLaNa1DU4LmGttYpvdLBs5RJQ/1JPjK1mhbzYrSXs1Et6ZgtWZSyGiN6Y6Mvu/5scUH9U2H3fN7KY4M5fCY4Cjl2L69xjDwUNHbJfluFNPuYbN+bCbBcBZJGLch9Wa4h6nqYeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789122593; c=relaxed/simple;
-	bh=6+yM8RyY0lple2vyuGGrfcoOL61ZK5XFYhTCEXNR6qk=;
+	s=arc-20240116; t=1789122598; c=relaxed/simple;
+	bh=WCL7uOgiifywLHFHGRoos098dzPPZCj55DHJwok+QIM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DDiOcB+uiUWxscPjLDvJCLF4fyQDAqBvRJv1wY7PxZFPFu2KfV2BogSG5XlWNT6JO/ZUEWOT3dXRlvFOowOI60S+4Adc9CXXytyQ/9wtO9kKSbD8jdGXNnZdD/yRLBtuB+JxP/CoWCvcSazzVgSIpG12C8g8vEM9Nm6JBMTudS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=5jnA4dq9; arc=none smtp.client-ip=113.46.200.216
+	 MIME-Version:Content-Type; b=lEjX59ZpamzjkAAoqDpyAEsmRxbuqVz1bv4isMLpesdtSJCo/EZSlZHrVrcn/gC6nzAEiA3B8OZBWbnetMkrelp4Wa3v+uvNQQ2qSQBDa5BdZl5qw7CPwDEki40WqHCQ0tgHrXWhI+EvvIalLoGqHLq+BWOXGbne1/XQ9ouYKxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=FyAl8mkp; arc=none smtp.client-ip=113.46.200.217
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="5jnA4dq9"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="FyAl8mkp"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=1vC1dipBzi5VPWTFrtqb/gr0BglC0lgOI2GhnaEr1Zs=;
-	b=5jnA4dq9VaC1/snZXKcsPc//A28fFhigwffGtmTHC4SVVKeORkDhZ24Ar1CghN83oHQ5lXzoT
-	VABzjh5VI7i0rxPa6/moKL0cEoXEDJrkkOvSEU8x4sdNWQEPH1dlqWAW5uQxSHTCHCqRctO+PMv
-	Tyw5GU+b7OEiDr2dxJl5B+A=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4hh9VD52pVz1T4Mc;
-	Fri, 11 Sep 2026 18:18:12 +0800 (CST)
+	bh=P7dbQrqU/eRsFN4xEwuK1Epg9+fUboCEIZ8/RgquGGI=;
+	b=FyAl8mkpi1hcDJ+bLHLahXURkoEwRycZww4ZSWqJbJEN99dLst7TKXP8iG4i10NYVMGHX/JSq
+	HMvh1LJqicT0yXDGHmwE+6ttHcVvE9v0hDuNOucHAA3NQqPU4dNDg7giWz+u1ITA2MlgAh4UJSZ
+	nftOiGP7CeQhTTNqVmKCKZs=
+Received: from mail.maildlp.com (unknown [172.19.162.197])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4hh9Vs4cbqzcb3G;
+	Fri, 11 Sep 2026 18:18:45 +0800 (CST)
 Received: from whupemk200001.china.huawei.com (unknown [7.152.184.93])
-	by mail.maildlp.com (Postfix) with ESMTPS id 212C8202E6;
+	by mail.maildlp.com (Postfix) with ESMTPS id E716340579;
 	Fri, 11 Sep 2026 18:29:47 +0800 (CST)
 Received: from localhost.localdomain (10.50.163.32) by
  whupemk200001.china.huawei.com (7.152.184.93) with Microsoft SMTP Server
@@ -38,9 +38,9 @@ To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<liulongfang@huawei.com>, <qianweili@huawei.com>, <wangzhou1@hisilicon.com>,
 	<linwenkai6@hisilicon.com>
-Subject: [PATCH 3/4] crypto: hisilicon/qm - fix memory leak in hisi_qm_sort_devices
-Date: Fri, 11 Sep 2026 18:29:41 +0800
-Message-ID: <20260911102942.387778-4-huangchenghai2@huawei.com>
+Subject: [PATCH 4/4] crypto: hisilicon/qm - fix GFP flag inconsistency in hisi_qm_memory_init
+Date: Fri, 11 Sep 2026 18:29:42 +0800
+Message-ID: <20260911102942.387778-5-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260911102942.387778-1-huangchenghai2@huawei.com>
 References: <20260911102942.387778-1-huangchenghai2@huawei.com>
@@ -57,42 +57,35 @@ X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
 
 From: Wenkai Lin <linwenkai6@hisilicon.com>
 
-hisi_qm_sort_devices() allocates a struct hisi_qm_resource for each
-QM device and inserts it into one of two local lists (non_full_list
-or full_list).  If kzalloc() fails mid-loop, the function returns
--ENOMEM immediately without freeing the resources already inserted
-into the local lists.
+hisi_qm_memory_init() is called from hisi_qm_init() (process context)
+but uses GFP_ATOMIC for dma_alloc_coherent().  The equivalent
+allocation in qm_alloc_xqc_dma() uses GFP_KERNEL.
 
-Because the splice into the caller's @head list happens only after
-the loop completes, the caller's free_list(&head) cannot reclaim
-them, so the already-allocated res entries are lost.
+GFP_ATOMIC cannot reclaim or compact memory, so it fails more easily
+under memory pressure even though sleeping is allowed here.  Switch
+to GFP_KERNEL, which is safe in process context and consistent with
+qm_alloc_xqc_dma().
 
-Fix by freeing both local lists before returning -ENOMEM.
-
-Fixes: 2a75decec119 ("crypto: hisilicon/qm - optimize device selection priority based on queue ref count and NUMA distance")
+Fixes: 5308f6600a39 ("crypto: hisilicon - QM memory management optimization")
 Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index e915cacef5c0..0448c68dbde4 100644
+index 0448c68dbde4..a5593ee3889c 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -3846,8 +3846,11 @@ static int hisi_qm_sort_devices(int node, struct list_head *head,
- 			dev_node = 0;
- 
- 		res = kzalloc_obj(*res);
--		if (!res)
-+		if (!res) {
-+			free_list(&non_full_list);
-+			free_list(&full_list);
- 			return -ENOMEM;
-+		}
- 
- 		res->qm = qm;
- 		res->distance = node_distance(dev_node, node);
+@@ -6067,7 +6067,7 @@ static int hisi_qm_memory_init(struct hisi_qm *qm)
+ 			QMC_ALIGN(sizeof(struct qm_sqc) * qm->qp_num) +
+ 			QMC_ALIGN(sizeof(struct qm_cqc) * qm->qp_num);
+ 	qm->qdma.va = dma_alloc_coherent(dev, qm->qdma.size, &qm->qdma.dma,
+-					 GFP_ATOMIC);
++					 GFP_KERNEL);
+ 	dev_dbg(dev, "allocate qm dma buf size=%zx)\n", qm->qdma.size);
+ 	if (!qm->qdma.va) {
+ 		ret = -ENOMEM;
 -- 
 2.43.0
 
