@@ -1,125 +1,77 @@
-Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB0149E150;
-	Fri, 11 Sep 2026 02:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BD12F5A0E;
+	Fri, 11 Sep 2026 04:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789095213; cv=none; b=svygimq0ZwuHuldxVQcTfnk7A9CtxvPySla5YbA1cisjCQLbONH4fdy2B+vHR1Js9VZWiDRowM3ypLax29zEi6oHXUaeNHzkvzDFex+w5oAd+EygAB3psdxZ3W6do69V8qbV63QD0i2JTtoNdmwpCqfxTM0lEgjdCXVv9QLp/Rk=
+	t=1789101128; cv=none; b=j++8IlKfal9VpCh19YB0+wFw60sRzUlPwdDhZSM/oFue/TFVdB5sFTyQkXXtmL2qM/YZM0tNGKqEUQA5DiZbpua0hW6F7jNvqpbvatqSh/gxEnnbBfK3vyabLfZYyQuT97pssWV/wQxW0DUjGnv40wCzu8/fmcd9EvGqz6Qej28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789095213; c=relaxed/simple;
-	bh=1RhRGsA/+i354nq29SKiIHFX5cjaUHf/p/lQTaN2tk8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NVnOIO/MoG//pPaHQIdnHLhvPuCnf3ddYl3F5UJLwJmM+ZdtwL8mAABMTOZ2uTiEh2lyz38qHYxPthRd/QyQBaTWErRHL1XYmrTzTgqRzTttcR/rFdynlUS6snw4PrYiWz+hN8l7y0Kc+T08qj+LXTidP+9BPQWW/cm1zmryXHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=4/pB/uEY; arc=none smtp.client-ip=129.153.194.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
+	s=arc-20240116; t=1789101128; c=relaxed/simple;
+	bh=cEScVFGDdkbeR+3r7iH2a8OUoRNNEg4QrEzRNMPhI3k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bJk4ECCR9GIIqVCFqFs1z2z0uOX9MnYxkXws42ZekQ+4HM/+EU3keiVnVHp7SED2q62Fi8QtIb5xlqGARETAgfYsJWFuDbeVUB5WO7ICBPg4J75EvaSPvDq5S2DOa/EpLvvQD3kVdwHmKWYc/+VOCRor4jCaF+9R9L79V0I2OkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=f4AKmI0S; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="4/pB/uEY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
-	t=1789095211; bh=1RhRGsA/+i354nq29SKiIHFX5cjaUHf/p/lQTaN2tk8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=4/pB/uEYmTrLXPTvO0NmuWhXOUuRYJE0IWF9Re4C1MJhW80WoYEXPuSxueOCTWbFx
-	 Sb3ghS3L4wanuWcb987JOWi5s/AEzDSn2NIo+zsqsNJUzqZYvetdpCfyzi0m7e8bp1
-	 plSkHrBIcgArcQKVXl2j4m+6FEZJbuD+66NWdVA5cga/LmxaqhSrsV2kxE2bLzlZ10
-	 Bcs2k/m9xNYxBLO2/F+caD7bZcr3HekTYiuzqg7k56rdeEuSTOFJEKcTljDp3PiqFM
-	 dbr4ECVl4qm2PwplC9QnTulbMoOHFGYDrxxqgcOqVTOxg4yl1LGvFs/A/oV0JDKLXq
-	 f4/8+iQv5TG9g==
-Message-ID: <e1d45f87-de65-4ff2-903a-80fd2c0b3861@jvdsn.com>
-Date: Thu, 10 Sep 2026 21:53:30 -0500
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="f4AKmI0S"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=YKpfvW0m7fMGPwroikXgrjlEkqn9S1O/EG9PiSNdpjs=; 
+	b=f4AKmI0SRdE8F+kpVQXiub5fRB7v/nIJ2L3G5tkE0IFsgd3K5CaDIQI3l0p6UZbJ2mO3DjrYlbi
+	mwMOSsi1YjJvikFFyKFw84u7aOz8+H3rMWlPaKAxz6HCbmXt6Ks7qZfJyo/9beOxaupITxz4wWd54
+	j2YL0NVc9k8WR4GaxdmtC9sUVr/uqoFmjw63bokCWOsuCmOTimCzaqm6zyJFLcH1qWw9BprNSOn41
+	XtLLUsVM8HzahjPISNGoNcffLAgI4iKEBcI61DQnEo3QcG9qnDnm5rG7I0BmJ7ej8pNVX5IXlAWyJ
+	qIwseeWShWs2Q0+zzrLpuBeXusz+FN1H6SPQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x4svP-0000000CtQw-0BeT;
+	Fri, 11 Sep 2026 12:31:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2026 14:31:43 +1000
+Date: Fri, 11 Sep 2026 14:31:43 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Alex Ousherovitch <aousherovitch@rambus.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>,
+	Shuah Khan <shuah@kernel.org>, Alexandre Ghiti <alex@ghiti.fr>,
+	devicetree@vger.kernel.org,
+	Joel Wittenauer <Joel.Wittenauer@cryptography.com>,
+	linux-api@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Thi Nguyen <thin@rambus.com>
+Subject: Re: [PATCH v4 04/19] crypto: cmh - add SHA-2/SHA-3/SHAKE ahash
+Message-ID: <aqOEL-YUVFuThcmf@gondor.apana.org.au>
+References: <20260825221539.255951-1-aousherovitch@rambus.com>
+ <20260825221539.255951-5-aousherovitch@rambus.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] crypto: testmgr - block Crypto API xxhash64 in FIPS mode
-To: Eric Biggers <ebiggers@kernel.org>, Thomas Huth <thuth@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-References: <20260303060509.246038-1-git@jvdsn.com>
- <abTuFto8Tc3mhRRe@gondor.apana.org.au>
- <64592fee-1956-4a70-a751-9ac3335cfc27@jvdsn.com>
- <9926908a-5f08-43ba-99dd-b83c7067d52b@redhat.com>
- <83d09aa1-729a-47a2-a8e9-381c74e92f42@jvdsn.com>
- <48f12b65-428d-4809-9735-18876b09e759@redhat.com>
- <20260910141456.GA1936@quark>
-From: Joachim Vandersmissen <joachim@jvdsn.com>
-Content-Language: en-US
-In-Reply-To: <20260910141456.GA1936@quark>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260825221539.255951-5-aousherovitch@rambus.com>
 
-Hi Eric,
-
-On 9/10/26 9:14 AM, Eric Biggers wrote:
-> On Thu, Sep 10, 2026 at 10:57:32AM +0200, Thomas Huth wrote:
->> On 10/09/2026 05.24, Joachim Vandersmissen wrote:
->>> Hi Thomas,
->>>
->>> On 9/9/26 9:36 AM, Thomas Huth wrote:
->>>> On 15/03/2026 01.43, Joachim Vandersmissen wrote:
->>>>> Hi Herbert,
->>>>>
->>>>> I don't think this one can be applied yet since dm-integrity
->>>>> still uses xxhash64 through the crypto API. This would break
->>>>> fips=1 systems that use it.
->>>> Out of curiosity: Wouldn't such a system be FIPS-incompliant anyway?
->>>> If xxhash64 isn't FIPS-compliant, nobody should use it for
->>>> dm-integrity there, right? So I doubt that there are any systems out
->>>> there that use fips=1 and use xxhash64 at the same time?
->>> There is a risk that users may not know that xxhash64 is not FIPS
->>> compliant and would still use it. Especially considering it was marked
->>> as "fips_allowed = 1" for a while.
->> So isn't that a very bad situation? They think they are FIPS compliant, but
->> actually they are not since they use an unapproved algorithm by accident.
->> Maybe it would be better to include this patch so that they are aware of the
->> mistake? If there is really somebody running into this issue, they could
->> boot once with fips=0, fix their system, reboot again with fips=1 and
->> finally be really compliant. Sounds like the better solution to me. WDYT?
-> As described in the dm-integrity documentation, dm-integrity supports
-> non-cryptographic checksums for protection from accidental corruption.
-> That use case is no different from any other use case of a checksum.
+On Tue, Aug 25, 2026 at 03:15:23PM -0700, Alex Ousherovitch wrote:
 >
-> It's also no different from using crc32 or crc32c, which similarly have
-> fips_allowed=1 and this patch completely ignores.
->
-> The solution is not banning checksums or making any other code change,
-> but rather just doing what it seems everyone has already been doing:
-> documenting in their FIPS security policy that checksums are only for
-> use cases that are not "security functions".
+> +/*
+> + * .update -- buffer incoming data, submit full blocks to HW.
 
-Unfortunately, this is not an option anymore due to the opinion of the 
-CMVP that was issued back in March. If you have an account (you can sign 
-up for free), you can read it in full here: 
-https://cmuf-workspace.org/Products/Projects/Messages.aspx?prjID=3&id=559. 
-I can also send a copy of the PDF file privately, if necessary.
+Please drop block buffering in new drivers.  The Crypto API handles
+this for you.  Take a look at the aspeed driver for an example.
 
-The relevant text is:
-
-     1.a. Can xxhash64 be used in approved mode as non-security function 
-without any further action (in this case FIPS IG 2.4.A will not be 
-applicable)?
-
-     Answer: No, xxhash64 cannot be understood as a non-security 
-function because:
-     1) It is offered as an equivalent hash alternative to approved hash 
-algorithms (i.e., SHA) using the same interface/API and therefore 
-appears to an operator that it can provide cryptographic protection 
-(i.e., security).
-     2) Its return value (i.e., mode indicator) is the same as for 
-approved cryptographic functions that provide security.
-     3) It is accessed by an interface/API that has “crypto” in the name 
-and thus implies security.
-     4) It is an available hash function (i.e. PRF) of HMAC, which is a 
-keyed algorithm that implies security.
-
-crc32 and crc32c were not explicitly called out in the resolution, which 
-is why this patch didn't target them. Though following the same 
-rationale, they should also be disabled.
-
->
-> - Eric
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
