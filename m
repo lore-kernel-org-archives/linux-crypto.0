@@ -1,46 +1,49 @@
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C557382281;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106AD340A7F;
 	Fri, 11 Sep 2026 10:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789122590; cv=none; b=sT6Vww33Fk1OcTiLMuBk04HtxFnggagxKqTpMt0WzJxPUwgm0EwCAkwK9gfkMrz9F3f0nJ1ZQsz7QU1NecKQdTRPgmEoqiy8wUEe42ik32iKu4JNQ8VPb33wqVY9V1yqOmWkuGbcd2m5LWVIItmJfoRG5vTSQzzNuBkaIJNFUPE=
+	t=1789122591; cv=none; b=GsbTESLi5AmaSLEW0f4hDY6FyMasyCT5liVjNiQss69j9Xzm21zqm8BdApGqsjBENXFpXwdSfsK/TIntvfIu3HTp0yySH8nou1NomguN2fpk21F10/Ung7ULu9kMkL7hi41eODmYjWJyYRVC9h4zIBO8EQgGCmvx0XfXLCtEK/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789122590; c=relaxed/simple;
-	bh=hLV7xBANGBQ/DcLKzZk/NdxrWFVmyLTlJGr1J/AI/Fs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NPl0oGxzczsoUF+8wwJo24EJVut10A0f//Tom1iH3JA5ir5XFO9FkLmQMzb9CipDDu3ZCgYSY/hA9YNoqdt0BGFhYesyd6RJVvYylrKSkZpgnwkDHN3bd2T9mPkXnTQX3eOW5iO5ZsN2KjzMOpUIOlL/klaGXExDZSE2k14OFrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=3S1q+UsA; arc=none smtp.client-ip=113.46.200.225
+	s=arc-20240116; t=1789122591; c=relaxed/simple;
+	bh=IrKWIJ7QMNC5hE6Fm3l0kETZfyC10H9hmqoDCwbKpQo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y1gKPCIvhQO2GY03fMC5VAiQuyooBsJIix+tDV1JGbhO7PngQVgYi0i4o65PT1/3Gh5HqYY7ibRW19pDR2GlADUc9v+LpXb20PzHCC5/9QMIm3uBWdVbAhBGVE6nj2E5XwpfsUZviuzx4FS+vykxrLOXUKNX4NlnHMg47Ff2CGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=M7XkN2OI; arc=none smtp.client-ip=113.46.200.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="3S1q+UsA"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="M7XkN2OI"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=/k4OmrOFXoiWgy/kuZkPHRmLdVosCfYbRhJ8oVYFLic=;
-	b=3S1q+UsAC9aO9gQt9G9MINO9Kjqw2piAVYNs+88/zsQJUDkN0EBznThVBXzTZlhv38nDnqHkm
-	ocKPI3/4xdw35MpdyQTeAQWWUeuaAVeTCo764NriVdWQarjBxrKpTdaLjqqlkvmUBeaH5LMFytB
-	fe0ZLkX2wGmpt07rf6cb7sY=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4hh9Vw6qXzz1K96s;
-	Fri, 11 Sep 2026 18:18:48 +0800 (CST)
+	bh=mB3uXMOP0bJMj505X9gNfPZ7qfnx0MMTWbOtcjOZDJA=;
+	b=M7XkN2OIYLEeMAaNj394Z1UhR7g86SFkIEjYmOKXsIpaIBqzhDRn24jv2gjW6sgYbkW/GwXiP
+	zDopKVaDYzRUNFNT4P4EQH1GenmOh2y1a+mMOBzWO4nnSTe/sSXN5jdY4H/3OPOONOuNz77RwSg
+	iH2hzwTNC/u679LSdmyDQbg=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4hh9W01qRJzRhQs;
+	Fri, 11 Sep 2026 18:18:52 +0800 (CST)
 Received: from whupemk200001.china.huawei.com (unknown [7.152.184.93])
-	by mail.maildlp.com (Postfix) with ESMTPS id AF21C40563;
-	Fri, 11 Sep 2026 18:29:44 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 821A840537;
+	Fri, 11 Sep 2026 18:29:45 +0800 (CST)
 Received: from localhost.localdomain (10.50.163.32) by
  whupemk200001.china.huawei.com (7.152.184.93) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Fri, 11 Sep 2026 18:29:43 +0800
+ 15.2.2562.45; Fri, 11 Sep 2026 18:29:44 +0800
 From: Chenghai Huang <huangchenghai2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<liulongfang@huawei.com>, <qianweili@huawei.com>, <wangzhou1@hisilicon.com>,
 	<linwenkai6@hisilicon.com>
-Subject: [PATCH 0/4] crypto: hisilicon - fix several issues in QM and SEC drivers
-Date: Fri, 11 Sep 2026 18:29:38 +0800
-Message-ID: <20260911102942.387778-1-huangchenghai2@huawei.com>
+Subject: [PATCH 1/4] crypto: hisilicon/qm - fix devm_kcalloc argument order
+Date: Fri, 11 Sep 2026 18:29:39 +0800
+Message-ID: <20260911102942.387778-2-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260911102942.387778-1-huangchenghai2@huawei.com>
+References: <20260911102942.387778-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,27 +55,31 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  whupemk200001.china.huawei.com (7.152.184.93)
 
-This series fixes several issues in the Hisilicon QM and SEC drivers:
+From: Wenkai Lin <linwenkai6@hisilicon.com>
 
-1.fix the devm_kcalloc() argument order in qm_pre_store_caps().
-2.fix scheduling while atomic in the SEC AEAD soft fallback, which is
-reachable with the backlog spinlock held.
-3.fix a memory leak in hisi_qm_sort_devices() on the kzalloc() failure
-path.
-4.use GFP_KERNEL instead of GFP_ATOMIC in hisi_qm_memory_init(), which
-runs in process context.
+The n and size arguments of devm_kcalloc in qm_pre_store_caps() are
+swapped. Fix the order to match the kcalloc(n, size, flags) convention.
 
-Wenkai Lin (4):
-  crypto: hisilicon/qm - fix devm_kcalloc argument order
-  crypto: hisilicon/sec2 - fix scheduling while atomic in aead soft
-    fallback
-  crypto: hisilicon/qm - fix memory leak in hisi_qm_sort_devices
-  crypto: hisilicon/qm - fix GFP flag inconsistency in
-    hisi_qm_memory_init
+Fixes: 7c234e138c67 ("crypto: hisilicon/qm - replace devm_kzalloc with devm_kcalloc")
+Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+---
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- drivers/crypto/hisilicon/qm.c              | 9 ++++++---
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 2 +-
- 2 files changed, 7 insertions(+), 4 deletions(-)
-
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index c01966a4a33f..e915cacef5c0 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -5732,7 +5732,7 @@ static int qm_pre_store_caps(struct hisi_qm *qm)
+ 	size_t i, size;
+ 
+ 	size = ARRAY_SIZE(qm_cap_query_info);
+-	qm_cap = devm_kcalloc(&pdev->dev, sizeof(*qm_cap), size, GFP_KERNEL);
++	qm_cap = devm_kcalloc(&pdev->dev, size, sizeof(*qm_cap), GFP_KERNEL);
+ 	if (!qm_cap)
+ 		return -ENOMEM;
+ 
 -- 
 2.43.0
+
