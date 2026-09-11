@@ -1,365 +1,163 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B9846AA91;
-	Fri, 11 Sep 2026 09:03:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7CE39768F;
+	Fri, 11 Sep 2026 09:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789117414; cv=none; b=qTgHyAe2sxmFIAFk8wmLFkJeeZgLuVtyHPr89SPS4ZHoNiHJ/wFOwa37KupfjYqJ9xNBIzyJhDlsiTp2sgEH/KDl8rA27gvR/k+hVBFKIdSo25zFD1nRR2x45FzapDeIJqmyWjL6ydA9f4FuL8UjWfMiNxRNw0e1JY/GuRJmf0U=
+	t=1789119489; cv=none; b=Ga0b24vCLW0SAwgWQddX5y3wxwP9TGyeCbIjYYTVSM7T6orBfVE1XawxkcW85MkOGMRDX+sRaCbuux1s3Wij5zz8NQOTMitdYosOOPoy4YFfkh6Ty71EW0AzaHQYteWI8o3El+wiBMpTTdfMWM3UyL0hM49kVohQtGtURokA9n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789117414; c=relaxed/simple;
-	bh=TcKWNaNhN0+I5VPpUJNE+2tROXpzxpbBZkauphfRpnc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gexziIgm1jIif/ZQEPPy9dyz93zofUUwQVrURIy8jftdeRUzZRdlJXYj5ZLVEt3w/xcM0FQ0IFkVqAuDrj9v3wmDniT7lTlLjOsQh0BPiqX8D2pRirYRz/ysKj95SzU5sIMZku8c1xP4iATBPQ3lKPIrIKxzOz801vEkMGQ/x2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=P5ptKNtq; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1789119489; c=relaxed/simple;
+	bh=sb6ClNqSQhPq2ZVhuU+8klKUwkLjODKU96QOOaqi6Cw=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=hAUe8WxEDOonDVIo3OzRL4HImhO1d9ZMNENjjmVvPvvBOWhgL/4+yoLeJvbuXs1Gi4mQniwFw2zCFZEKJvztZAIZGanE87Hpi/xZ+hPZHD83ANL9tfk6TIRhOrFsxBv3coqpUogi0VCHfz1Yt8OODoWE1335oAWZFtCRiXYIWHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DM9yb6wk; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="P5ptKNtq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=1Y
-	4zU6kUUQR4F1ihZt2fHR04+NDuRyDO2tsD8y6dyVg=; b=P5ptKNtq5CH/kJyqZ7
-	85GKU2JsLgFAjq0i6stpslL1g5h96pV+MhHPEUA7kTTDOE5YbxV/Kruw7JePTMez
-	fNZRhj8ZyDPgTo6sVjPpSdDKcqHGpvoFkJjnNaezj3UOwBqwKhIR7/S+lTE9otm5
-	ICaJOZN234c9V4IS41BTwXx9E=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgDnjyvCw6Nq5PUqRA--.58051S4;
-	Fri, 11 Sep 2026 17:03:04 +0800 (CST)
-From: Qunqin Zhao <zhaoqunqin@163.com>
-To: lee@kernel.org,
-	zhaoqunqin@loongson.cn
-Cc: chenhuacai@kernel.org,
-	linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-crypto@vger.kernel.org,
-	mfd@lists.linux.dev
-Subject: [PATCH v7 2/2] mfd: loongson-se: Fix miscellaneous issues
-Date: Fri, 11 Sep 2026 17:02:56 +0800
-Message-Id: <20260911090256.7834-3-zhaoqunqin@163.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20260911090256.7834-1-zhaoqunqin@163.com>
-References: <20260911090256.7834-1-zhaoqunqin@163.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DM9yb6wk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1789119488; x=1820655488;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version:content-id;
+  bh=sb6ClNqSQhPq2ZVhuU+8klKUwkLjODKU96QOOaqi6Cw=;
+  b=DM9yb6wkIw6H/4OUaxjgfsWqnlyifFSzuJm4auThBBtBwc0mV354yWRx
+   XtVaPKQt14wWQTHxwmAuXrNtLuI74H7+XGOopmobWMGCbssTFCTgK70GN
+   xPc/0fvgWUsW06yKDHuGJmgGIjUvm1V7dS7+MPTBjbLpMhgWAOSeQFKK8
+   CXvQwBVdRUh7PB3vVnm8I4Hbb6wYWM1MRgDUtsgLsesnWkjK2NOk6/5wg
+   tMkfigA95OrdDDeQGjA0+DXpjVm+sYk7WNYD5sMczGNu5j/1W9HF8+vvK
+   A11b1psKdcGb9tZV65ASr1A+m9roMLitbGJqHxiKH0mDnGtQeJfczTkfU
+   w==;
+X-CSE-ConnectionGUID: lv8LjnQ/RM2Ip6FtGVq2QA==
+X-CSE-MsgGUID: o8V6DDF0TnKqW/TDijK+BA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11901"; a="115120614"
+X-IronPort-AV: E=Sophos;i="6.27,97,1787036400"; 
+   d="scan'208";a="115120614"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2026 02:38:07 -0700
+X-CSE-ConnectionGUID: SRo+o97pTgCUDHnSfx1bsQ==
+X-CSE-MsgGUID: d5IlSxrWQfGb/hpk+vV9Sw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,97,1787036400"; 
+   d="scan'208";a="296857533"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.158])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2026 02:37:41 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Fri, 11 Sep 2026 12:37:38 +0300 (EEST)
+To: Juergen Gross <jgross@suse.com>
+cc: LKML <linux-kernel@vger.kernel.org>, x86@kernel.org, 
+    linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+    kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+    linux-edac@vger.kernel.org, linux-pci@vger.kernel.org, 
+    linux-pm@vger.kernel.org, linux-coco@lists.linux.dev, 
+    linux-acpi@vger.kernel.org, linux-ide@vger.kernel.org, 
+    dri-devel@lists.freedesktop.org, linux-crypto@vger.kernel.org, 
+    linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+    linux-mtd@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
+    linux-fbdev@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>, 
+    Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+    Dave Hansen <dave.hansen@linux.intel.com>, 
+    "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
+    Arnaldo Carvalho de Melo <acme@kernel.org>, 
+    Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+    Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+    Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
+    Adrian Hunter <adrian.hunter@intel.com>, 
+    James Clark <james.clark@linaro.org>, 
+    "K. Y. Srinivasan" <kys@microsoft.com>, 
+    Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+    Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
+    Sean Christopherson <seanjc@google.com>, 
+    Paolo Bonzini <pbonzini@redhat.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
+    Alexey Makhalov <alexey.makhalov@broadcom.com>, 
+    Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+    Josh Poimboeuf <jpoimboe@kernel.org>, 
+    Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Pu Wen <puwen@hygon.cn>, 
+    Tony Luck <tony.luck@intel.com>, 
+    Reinette Chatre <reinette.chatre@intel.com>, 
+    Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>, 
+    Babu Moger <babu.moger@amd.com>, Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>, 
+    Vitaly Kuznetsov <vkuznets@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+    Bjorn Helgaas <bhelgaas@google.com>, 
+    "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@kernel.org>, 
+    Kiryl Shutsemau <kas@kernel.org>, 
+    Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+    Boris Ostrovsky <boris.ostrovsky@oracle.com>, Len Brown <lenb@kernel.org>, 
+    Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+    David Airlie <airlied@redhat.com>, Olivia Mackall <olivia@selenic.com>, 
+    Herbert Xu <herbert@gondor.apana.org.au>, 
+    Viresh Kumar <viresh.kumar@linaro.org>, Huang Rui <ray.huang@amd.com>, 
+    Mario Limonciello <mario.limonciello@amd.com>, 
+    Perry Yuan <perry.yuan@amd.com>, K Prateek Nayak <kprateek.nayak@amd.com>, 
+    Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
+    Yazen Ghannam <yazen.ghannam@amd.com>, Linus Walleij <linusw@kernel.org>, 
+    Bartosz Golaszewski <brgl@kernel.org>, Guenter Roeck <linux@roeck-us.net>, 
+    Artem Bityutskiy <artem.bityutskiy@linux.intel.com>, 
+    Artem Bityutskiy <dedekind1@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Miquel Raynal <miquel.raynal@bootlin.com>, 
+    Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
+    Ashok Raj <ashok.raj.linux@gmail.com>, Hans de Goede <hansg@kernel.org>, 
+    Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>, 
+    Xi Pardee <xi.pardee@linux.intel.com>, 
+    Daniel Lezcano <daniel.lezcano@kernel.org>, 
+    Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>, 
+    Helge Deller <deller@gmx.de>, xen-devel@lists.xenproject.org, 
+    linux-geode@lists.infradead.org, Michael Kelley <mhklinux@outlook.com>
+Subject: Re: [PATCH v3 12/13] treewide: convert rdmsrq() from a macro to an
+ inline function
+In-Reply-To: <20260911074530.3140830-13-jgross@suse.com>
+Message-ID: <b2baa471-0f6b-84e8-bda1-ae0964b72b04@linux.intel.com>
+References: <20260911074530.3140830-1-jgross@suse.com> <20260911074530.3140830-13-jgross@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCgvCgDnjyvCw6Nq5PUqRA--.58051S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW3tw1rur48Zw1DWrWrZr1DKFg_yoWDKF1fpF
-	4YkayYkr4qqr48CwsxJr98ZFy3ZrZ5tr9rCa93tw4xAF1kJ34rWFy5KFyUWayrurWDtF17
-	XFWkKFWru3WrC3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07b0KsbUUUUU=
-X-CM-SenderInfo: 52kd01pxqtx0i6rwjhhfrp/xtbC7gmm5Wqjw8mlfAAA3+
+Content-Type: multipart/mixed; BOUNDARY="8323328-1162080221-1789119116=:1171"
+Content-ID: <b9134b99-a885-4c62-2abd-7195415a52e3@linux.intel.com>
 
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Address multiple historical driver issues discovered by the Sashiko
-Automation system within the loongson_se_probe() initialization flow
-and the driver's interrupt service routines [1].
+--8323328-1162080221-1789119116=:1171
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-ID: <085b47bf-864b-9802-2915-a51186e45c40@linux.intel.com>
 
-- Add an explicit bounds check in se_irq_handler() before accessing
-  the engines array to prevent an out-of-bounds memory access.
+On Fri, 11 Sep 2026, Juergen Gross wrote:
 
-- Validate the id argument in loongson_se_init_engine() and reject
-  engine 0, whose data buffer is reused for the command buffers of all
-  other engines, to prevent out-of-bounds accesses and overlapping DMA
-  buffers.
+> Today rdmsrq() is a macro using its second parameter as the target for
+> storing the read MSR value.
+>=20
+> Convert rdmsrq() to an inline function returning the MSR value.
+>=20
+> The users have been converted using the following semantic patch:
+>=20
+>   // Options: --include-headers
+>=20
+>   virtual patch
+>   virtual report
+>=20
+>   @@
+>   expression msr, val;
+>   @@
+>   (
+>   - rdmsrq(msr,val)
+>   + val =3D rdmsrq(msr)
+>   )
+>=20
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> Acked-by: Damien Le Moal <dlemoal@kernel.org>      # ATA
 
-- Switch from devm_kmalloc() to devm_kzalloc() and initialize all
-  engine completion structures in probe(), dropping the redundant
-  init_completion() in loongson_se_init_engine().
+Acked-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>=09=09# pdx86
 
-- Introduce loongson_se_reinit_completion() to mask the target
-  interrupt, clear any pending status, and reset the completion under
-  dev_lock before a command is issued, then re-enable the interrupt
-  under the same lock after the command has been triggered.  This
-  closes the race where a stale interrupt from a previously
-  interrupted command could complete the current command's completion.
-  A new poll_lock serializes the trigger and poll busy-wait so
-  interrupts are not disabled for up to 10 ms.
+What is the plan for merging this?
 
-- Wait for controller command completion with a bounded
-  non-interruptible wait so a pending signal cannot leave the
-  controller running while its DMA buffers are being torn down, and a
-  wedged controller cannot hang the kernel indefinitely.
+> Reviewed-by: Michael Kelley <mhklinux@outlook.com> # Hyper-V
 
-- Fix EPROBE_DEFER handling: propagate the error directly from
-  platform_irq_count() instead of overwriting it with ENODEV so that
-  probe deferral works when the interrupt provider is not yet ready.
-
-- Validate dmam_size from firmware against the minimum required size
-  to keep the command buffers of all engines within engine 0's data
-  region and prevent overlapping DMA buffers.
-
-- Return the error code from devm_request_irq() instead of silently
-  continuing to prevent an indefinite hang.
-
-- Add a loongson_se_stop() cleanup handler registered with
-  devm_add_action_or_reset() before loongson_se_init() so that a
-  failed init still stops the controller and masks all interrupts via
-  devres, preventing DMA access to freed memory.
-
-- Zero-initialize the local controller command structures in
-  loongson_se_init() and loongson_se_init_engine() to prevent
-  uninitialized stack data from being written to device registers.
-
-- Add the SE_CMD_STOP command definition.
-
-Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/ [1]
-Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip controller")
-Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
----
- drivers/mfd/loongson-se.c       | 112 ++++++++++++++++++++++++++++----
- include/linux/mfd/loongson-se.h |   1 +
- 2 files changed, 102 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-index 7f552a8ee..18075d4fa 100644
---- a/drivers/mfd/loongson-se.c
-+++ b/drivers/mfd/loongson-se.c
-@@ -23,6 +23,8 @@
- struct loongson_se {
- 	void __iomem *base;
- 	spinlock_t dev_lock;
-+	/* Synchronizes command submission between users of different engines */
-+	spinlock_t poll_lock;
- 	struct completion cmd_completion;
- 
- 	void *dmam_base;
-@@ -42,7 +44,7 @@ static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
- 	u32 status;
- 	int err;
- 
--	spin_lock_irq(&se->dev_lock);
-+	spin_lock(&se->poll_lock);
- 
- 	/* Notify the controller that the engine needs to be started */
- 	writel(int_bit, se->base + SE_L2SINT_SET);
-@@ -52,17 +54,51 @@ static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
- 						!(status & int_bit),
- 						1, LOONGSON_ENGINE_CMD_TIMEOUT_US);
- 
-+	spin_unlock(&se->poll_lock);
-+
-+	spin_lock_irq(&se->dev_lock);
-+	/*
-+	 * Re-enable the interrupt that loongson_se_reinit_completion() masked.
-+	 * The hardware guarantees that once the interrupt is re-enabled, only
-+	 * interrupts for the command just issued can arrive, so a stale
-+	 * interrupt from a previously interrupted command can never complete
-+	 * this command's completion.
-+	 */
-+	writel(int_bit | readl(se->base + SE_S2LINT_EN), se->base + SE_S2LINT_EN);
-+
- 	spin_unlock_irq(&se->dev_lock);
- 
- 	return err;
- }
- 
-+/*
-+ * Prepare a completion for a new command: mask the corresponding interrupt,
-+ * clear any pending interrupt status, and reset the completion.  This runs
-+ * under dev_lock so that the IRQ handler cannot race with it.  The interrupt
-+ * is re-enabled in loongson_se_poll() after the command has been issued.
-+ */
-+static void loongson_se_reinit_completion(struct loongson_se *se,
-+					  struct completion *completion, u32 int_bit)
-+{
-+	spin_lock_irq(&se->dev_lock);
-+
-+	writel(readl(se->base + SE_S2LINT_EN) & ~int_bit, se->base + SE_S2LINT_EN);
-+
-+	writel(int_bit, se->base + SE_S2LINT_CL);
-+
-+	reinit_completion(completion);
-+
-+	spin_unlock_irq(&se->dev_lock);
-+}
-+
- static int loongson_se_send_controller_cmd(struct loongson_se *se,
- 					   struct loongson_se_controller_cmd *cmd)
- {
- 	u32 *send_cmd = (u32 *)cmd;
- 	int err, i;
- 
-+	loongson_se_reinit_completion(se, &se->cmd_completion, SE_INT_CONTROLLER);
-+
- 	for (i = 0; i < SE_SEND_CMD_REG_LEN; i++)
- 		writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
- 
-@@ -70,17 +106,31 @@ static int loongson_se_send_controller_cmd(struct loongson_se *se,
- 	if (err)
- 		return err;
- 
--	return wait_for_completion_interruptible(&se->cmd_completion);
-+	/*
-+	 * Wait for the controller to complete the command.  Use a bounded
-+	 * non-interruptible wait: a pending signal must not leave the
-+	 * controller running while its DMA buffers are being torn down.
-+	 * One second is far more than any controller command should take,
-+	 * while still bounding the wait if the hardware wedges.
-+	 */
-+	if (!wait_for_completion_timeout(&se->cmd_completion, HZ))
-+		return -ETIMEDOUT;
-+
-+	return 0;
- }
- 
- int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
- {
-+	int err;
-+
-+	loongson_se_reinit_completion(engine->se, &engine->completion, BIT(engine->id));
-+
- 	/*
- 	 * After engine initialization, the controller already knows
- 	 * where to obtain engine commands from. Now all we need to
- 	 * do is notify the controller that the engine needs to be started.
- 	 */
--	int err = loongson_se_poll(engine->se, BIT(engine->id));
-+	err = loongson_se_poll(engine->se, BIT(engine->id));
- 
- 	if (err)
- 		return err;
-@@ -92,12 +142,17 @@ EXPORT_SYMBOL_GPL(loongson_se_send_engine_cmd);
- struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id)
- {
- 	struct loongson_se *se = dev_get_drvdata(dev);
--	struct loongson_se_engine *engine = &se->engines[id];
--	struct loongson_se_controller_cmd cmd;
-+	struct loongson_se_engine *engine;
-+	struct loongson_se_controller_cmd cmd = {0};
-+
-+	/* Engine 0 does not exist and its data buffer is reused for commands */
-+	if (id <= 0 || id >= SE_ENGINE_MAX)
-+		return NULL;
-+
-+	engine = &se->engines[id];
- 
- 	engine->se = se;
- 	engine->id = id;
--	init_completion(&engine->completion);
- 
- 	/* Divide DMA memory equally among all engines */
- 	engine->buffer_size = se->dmam_size / SE_ENGINE_MAX;
-@@ -155,7 +210,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
- 	/* For engines */
- 	while (int_status) {
- 		id = __ffs(int_status);
--		complete(&se->engines[id].completion);
-+		if (id < SE_ENGINE_MAX)
-+			complete(&se->engines[id].completion);
- 		int_status &= ~BIT(id);
- 		writel(BIT(id), se->base + SE_S2LINT_CL);
- 	}
-@@ -167,7 +223,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
- 
- static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
- {
--	struct loongson_se_controller_cmd cmd;
-+	struct loongson_se_controller_cmd cmd = {0};
- 	int err;
- 
- 	cmd.command_id = SE_CMD_START;
-@@ -188,6 +244,17 @@ static const struct mfd_cell engines[] = {
- 	{ .name = "tpm_loongson" },
- };
- 
-+static void loongson_se_stop(void *data)
-+{
-+	struct loongson_se *se = data;
-+	struct loongson_se_controller_cmd cmd = {0};
-+
-+	cmd.command_id = SE_CMD_STOP;
-+	loongson_se_send_controller_cmd(se, &cmd);
-+
-+	writel(0, se->base + SE_S2LINT_EN);
-+}
-+
- static int loongson_se_probe(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
-@@ -195,19 +262,34 @@ static int loongson_se_probe(struct platform_device *pdev)
- 	int nr_irq, irq, err, i;
- 	dma_addr_t paddr;
- 
--	se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
-+	se = devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
- 	if (!se)
- 		return -ENOMEM;
- 
- 	dev_set_drvdata(dev, se);
- 	init_completion(&se->cmd_completion);
- 	spin_lock_init(&se->dev_lock);
-+	spin_lock_init(&se->poll_lock);
- 	mutex_init(&se->engine_init_lock);
- 
-+	for (i = 0; i < SE_ENGINE_MAX; i++)
-+		init_completion(&se->engines[i].completion);
-+
- 	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
- 	if (device_property_read_u32(dev, "dmam_size", &se->dmam_size))
- 		return -ENODEV;
- 
-+	/*
-+	 * Engine 0 does not exist and its data buffer is reused as the command
-+	 * buffer for the other engines.  The command buffers of all engines
-+	 * therefore must fit within engine 0's data region, i.e.
-+	 * dmam_size / SE_ENGINE_MAX >= SE_ENGINE_MAX * 2 * SE_ENGINE_CMD_SIZE.
-+	 * Enforce this to keep each engine's data and command buffers from
-+	 * overlapping.
-+	 */
-+	if ((se->dmam_size / SE_ENGINE_MAX) < (SE_ENGINE_MAX * 2 * SE_ENGINE_CMD_SIZE))
-+		return -EINVAL;
-+
- 	se->dmam_base = dmam_alloc_coherent(dev, se->dmam_size, &paddr, GFP_KERNEL);
- 	if (!se->dmam_base)
- 		return -ENOMEM;
-@@ -217,20 +299,28 @@ static int loongson_se_probe(struct platform_device *pdev)
- 		return PTR_ERR(se->base);
- 
- 	nr_irq = platform_irq_count(pdev);
--	if (nr_irq <= 0)
-+	if (nr_irq == 0)
- 		return -ENODEV;
-+	if (nr_irq < 0)
-+		return nr_irq;
- 
- 	writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
- 
- 	for (i = 0; i < nr_irq; i++) {
- 		irq = platform_get_irq(pdev, i);
- 		err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
--		if (err)
-+		if (err) {
- 			dev_err(dev, "failed to request IRQ: %d\n", irq);
-+			return err;
-+		}
- 	}
- 
- 	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
- 
-+	err = devm_add_action_or_reset(dev, loongson_se_stop, se);
-+	if (err)
-+		return err;
-+
- 	err = loongson_se_init(se, paddr, se->dmam_size);
- 	if (err)
- 		return err;
-diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
-index 07afa0c25..8237ccab7 100644
---- a/include/linux/mfd/loongson-se.h
-+++ b/include/linux/mfd/loongson-se.h
-@@ -9,6 +9,7 @@
- #define SE_SEND_CMD_REG_LEN		0x8
- /* Controller command ID */
- #define SE_CMD_START			0x0
-+#define SE_CMD_STOP			0x1
- #define SE_CMD_SET_DMA			0x3
- #define SE_CMD_SET_ENGINE_CMDBUF	0x4
- 
--- 
-2.47.2
-
+--=20
+ i.
+--8323328-1162080221-1789119116=:1171--
