@@ -1,142 +1,235 @@
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435A8485CE6
-	for <linux-crypto@vger.kernel.org>; Fri, 11 Sep 2026 13:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F23037DEA2
+	for <linux-crypto@vger.kernel.org>; Fri, 11 Sep 2026 14:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789132968; cv=none; b=pKlmczaPyFtYNHqptMAH8ONhFekQr7vHEfdAw14uYiNqRnRY4sfpeijb7PotNBV6K9W7ly+E21nCy1HwE3mOEhKyKOOMUMpl3V404sqJmRiQN+KMRNzT6aQbVR5DqA8uHsc7u86+RIcVqmHMl+nOjBvRSj6MiFEENCkWgBveSfE=
+	t=1789138041; cv=none; b=e2Rjx3dxff0gmYYUyOAxHSL2c3xKiQvkarQnOspTY9uR5yzcFNeNBVpDY3fiBDFdGMvXO0FU99qshLGSGhXXPXnYJQGD0oOAL8yXjTF+nOi7olMNM+aj3zFX9V3yLIZ6YZvKNDLC9ZC1payrOpXUukOBBZ7Wl2WtVf50s+mT7gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789132968; c=relaxed/simple;
-	bh=T/e2vgzi/yX3haBVonSYMOMOZ1YJ8sxvxQcGMOKmPKs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bjy/TQl7Inu4D+lkTvNVUi8CPrKK3kUBFnP/MPHlp/cFdmHFfz9+Ovz4zlnUgwy2QER1RBlxcOIj04DfeX7aU0j1J4ebJwFGTox1+lFHB7eq7Jh6vv0wDkc4M1YH7sZVP0s6+P/vKawxMiKI+Pk1yDiJIDAzXBzeJgwgU93EtRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RLwvSvK3; arc=none smtp.client-ip=209.85.216.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1789138041; c=relaxed/simple;
+	bh=EOE0s7qJFK2MKJG007c+RD21gWRMCgKsjpIAFEfYs6Y=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ofeZUzOX4JHbrjg3zfGoiHxqxgPuvyS6bg4IBpszMu068GludkJHun9mI6QIgb4tgAVXh3vwQHQM11VI8sEDw41E65sk5jiJmwtSD3l9XXsORI+lxp94VEZL10fwpTYyJeHD91ioEcfeD+lodG6QhcvO/HsP8O6cfYrTk+YPmyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=rSBkZcp0; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RLwvSvK3"
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-396638f9a18so1537304a91.2
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Sep 2026 06:22:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789132963; x=1789737763; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=kqAHaS5fsv9ERkHKe2Kmet0fUHotC014bD2kFqqX4to=;
-        b=RLwvSvK31Nx6W5e5cWd1Zwn3GrqgUoi6AhS072W/uylcwVwZ3gpe+kx6GEa9rIFlk0
-         FYF4erl5BDuLlexOocQCSN41l6ccwOOPma6v34CdMIG5khIVZqkDirlCdqv964QjHzjX
-         wPzKEn407qRm3Embbs+yCBCiSEJTY3Js8tzzleFdo1mBTOxt2yTNnE2xosV20WkoMQvM
-         wIayUAwD/BVN9hgLYwfzEr+DeuhSbiV33KL8FX8Bmqy/2DX9ttcVZLG7uRr6EAwczGFk
-         ZiDQLDEUQiAQ8XVcZzOaCJECezVH/N/QfYRIjvdt+E3bJGSQdWRG09uKOPUwfNDqFGFJ
-         twjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789132963; x=1789737763;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=kqAHaS5fsv9ERkHKe2Kmet0fUHotC014bD2kFqqX4to=;
-        b=i+Y8XiE8Ua3y8iPsok8LhsfwWwjvrWe76QXsuXu5IA/Iz2cw864mgn1+KZs/Xt0DIS
-         C1Jw2Sk2uX1AF+3uKtXB/buOiv/R+Ot314ErTM2X8tYbcHZMNCDWPi23MBH+/9g2KzoQ
-         1OLUT6fXm0EVCD20BxxHLuL5lQxouAwZekBc48JpWEaRknDe2+3xVGFEoEUtnuutauUd
-         d9BxS3ADGnt9Rp6nh4M0VWBBm7vyxo/up5Q0JahDYcZZDZHEEN0fVWQEfbazIGxPMboY
-         1zwjVKyc0/javmKKhQJbjqqGM55wCDtMyDXmlwOM9r3bgM9lmn6DwvJzRmGHdvWMFBm/
-         DR/A==
-X-Forwarded-Encrypted: i=1; AKwUvBzXYoOAhkFA6JyVNjVpB9OeHUQg+4KiOIbj2gmyTXa+i509c89TWIw0SkoJny4RE2kg/PlihUgCXIjRyvA=@vger.kernel.org
-X-Gm-Message-State: AFuF++ma+vJnAViZUrEUcEFtbfz+1/7G8jXQqiRSJu+e+JrACvlxjM0O
-	UMqd59oUlRNXzf2bFKCgCDuJBKmoz89KqdIlI+3+pb6vICdPgQA6u7MhBNjDy70KsbLg6BlrErD
-	7gxcpAA==
-X-Received: from pjbmv13.prod.google.com ([2002:a17:90b:198d:b0:39d:8dae:7e6d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c89:b0:398:e46e:ade3
- with SMTP id 98e67ed59e1d1-39d9c39625dmr7169956a91.23.1789132962606; Fri, 11
- Sep 2026 06:22:42 -0700 (PDT)
-Date: Fri, 11 Sep 2026 06:22:41 -0700
-In-Reply-To: <20260911074530.3140830-13-jgross@suse.com>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="rSBkZcp0"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 942714E401EF;
+	Fri, 11 Sep 2026 14:47:16 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 6837F601DE;
+	Fri, 11 Sep 2026 14:47:16 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DC09011C7AFA5;
+	Fri, 11 Sep 2026 16:47:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1789138035; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=Ubqa7IwAwQIarmLSD0RSgMy2LcVHRHavKEquDkrruK0=;
+	b=rSBkZcp0A8uHU/USPAyDKc9aOmUlGSz+ZbtAvaKJpiphE768IqQtVomMF1Gg6QNr/vGrrw
+	wiq7A8YP13S0j2TW1FlQ+iJKxx0CJF7zOkhPTIqoqnkG0IURN0FQjP/rE4iG445H6LxmzU
+	wZpn3UQWTgBmByPEEthPt/alclZLRgaZG/+/s5fGxAZkTw2lmFU2BRdmiHfHgatpaUyvYF
+	Usjy0w7T8050tpTpDE+3GQjH9PZvYp13AZpPxLDBiZYnLRB0C6SrSEwkEu6Gk41N9pg1a9
+	be6jg4SieHPb5CkS4t1jcXDqgxko8Yp8jIPt6W8jvy8NUDTKyCGU+ydZpcaj6A==
+From: Paul Louvel <paul.louvel@bootlin.com>
+Subject: [PATCH v6 00/19] crypto: talitos - Driver cleanup
+Date: Fri, 11 Sep 2026 16:46:17 +0200
+Message-Id: <20260911-7-3-rc2_talitos_cleanup-v6-0-4215f347c97a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260911074530.3140830-1-jgross@suse.com> <20260911074530.3140830-13-jgross@suse.com>
-Message-ID: <aqQAodJCAEZyeQ1k@google.com>
-Subject: Re: [PATCH v3 12/13] treewide: convert rdmsrq() from a macro to an
- inline function
-From: Sean Christopherson <seanjc@google.com>
-To: Juergen Gross <jgross@suse.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-edac@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-acpi@vger.kernel.org, linux-ide@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-crypto@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-mtd@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
-	linux-fbdev@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	James Clark <james.clark@linaro.org>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
-	Alexey Makhalov <alexey.makhalov@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Pu Wen <puwen@hygon.cn>, Tony Luck <tony.luck@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Dave Martin <Dave.Martin@arm.com>, 
-	James Morse <james.morse@arm.com>, Babu Moger <babu.moger@amd.com>, 
-	Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@kernel.org>, Kiryl Shutsemau <kas@kernel.org>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Len Brown <lenb@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
-	David Airlie <airlied@redhat.com>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Huang Rui <ray.huang@amd.com>, Mario Limonciello <mario.limonciello@amd.com>, 
-	Perry Yuan <perry.yuan@amd.com>, K Prateek Nayak <kprateek.nayak@amd.com>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Yazen Ghannam <yazen.ghannam@amd.com>, 
-	Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, Guenter Roeck <linux@roeck-us.net>, 
-	Artem Bityutskiy <artem.bityutskiy@linux.intel.com>, Artem Bityutskiy <dedekind1@gmail.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Ashok Raj <ashok.raj.linux@gmail.com>, 
-	Hans de Goede <hansg@kernel.org>, 
-	"Ilpo =?utf-8?B?SsOkcnZpbmVu?=" <ilpo.jarvinen@linux.intel.com>, 
-	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>, Xi Pardee <xi.pardee@linux.intel.com>, 
-	Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>, 
-	Lukasz Luba <lukasz.luba@arm.com>, Helge Deller <deller@gmx.de>, xen-devel@lists.xenproject.org, 
-	linux-geode@lists.infradead.org, Michael Kelley <mhklinux@outlook.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQqDMBBA0avIrDuQTmnEXqUUielERyRKJkpBv
+ HvTunyL/3dQTsIKj2qHxJuozLHAXirwg4s9o7yLgQxZ01wN1njD5KnNbpI8a+sndnFdkGu2Dd2
+ 7YAJBqZfEQT7/8/N1WtduZJ9/OziOL12crwJ7AAAA
+X-Change-ID: 20260910-7-3-rc2_talitos_cleanup-e7e6925bf0f2
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: Paul Louvel <paul.louvel@bootlin.com>, linux-crypto@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Christophe Leroy <chleroy@kernel.org>, 
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1789138028; l=7705;
+ i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
+ bh=EOE0s7qJFK2MKJG007c+RD21gWRMCgKsjpIAFEfYs6Y=;
+ b=HZIYRWjHPzzws1VZ+2tQum6/4qDAm5F0r+RBe2NKtcA7CesNuZzHCqZuujohr2r66x7vP5hdG
+ 7eMI9zPdvSRAFmMv0IFo50ubA9Xg9kalFucjQ0UAkq0lFmYUcOvb0sH
+X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
+ pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, Sep 11, 2026, Juergen Gross wrote:
-> Today rdmsrq() is a macro using its second parameter as the target for
-> storing the read MSR value.
-> 
-> Convert rdmsrq() to an inline function returning the MSR value.
-> 
-> The users have been converted using the following semantic patch:
-> 
->   // Options: --include-headers
-> 
->   virtual patch
->   virtual report
-> 
->   @@
->   expression msr, val;
->   @@
->   (
->   - rdmsrq(msr,val)
->   + val = rdmsrq(msr)
->   )
-> 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> Acked-by: Damien Le Moal <dlemoal@kernel.org>      # ATA
-> Reviewed-by: Michael Kelley <mhklinux@outlook.com> # Hyper-V
-> ---
+The Freescale Integrated Security Engine (SEC) aka "Talitos" driver
+implementation is a monolithic ~3800-line file that mixes SEC1 and SEC2
+hardware variants with hash, skcipher, aead and hwrng algorithm.
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+This series reorganises the driver to improve readability and
+maintainability:
+
+- Split the driver into a dedicated directory with separate files for
+  hash, skcipher, aead, and hwrng implementations.
+
+- Modernise the crypto API usage: adopt {init,exit}_tfm (deprecated
+  cra_init/cra_exit), use CRYPTO_AHASH_ALG_BLOCK_ONLY to eliminate
+  manual partial-block buffering, and use macros to deduplicate
+  algorithm definitions.
+
+- Introduce a is_sec1() helper to get rid of is_sec1 variables /
+  parameters.
+
+- Define descriptor/pointer structures for each hardware version,
+  instead of using a single structure and anonymous union.
+
+No functional changes are intended except for patch 1.
+
+This series depends on the "crypto: talitos - bug fixes" series :
+https://patch.msgid.link/20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com
+
+Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
+---
+Changes in v6:
+
+- v5 could not be applied by Sashiko because I forgot re-parenting this
+  series with a newer release.
+
+- Link to v5:
+  https://patch.msgid.link/20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com
+
+Changes in v5:
+- Patch 1: compute the SEC1 software padding length in little endian for
+  MD5. Update message_size only once the hardware has accepted the
+  request, so a failed submission no longer updates the message length.
+  A note on Sashiko third comment [1]:
+
+  - If the current digest operation errors out because the driver
+    returned -EAGAIN, it indeed clears the partial block buffer in the
+    core with CRYPTO_AHASH_ALG_BLOCK_ONLY.
+
+    Looking at how the API handles it, it means for me that the entire
+    digest operation must be restarted, not just the current chunk of
+    data currently being processed with .update() or .finup(). In this
+    case, no need to keep the partial block buffer.
+
+    If I am mistaken, how should this be handled?
+
+- Patch 4: rename the module target to crypto-talitos to remove the
+  circular dependency in the Makefile.
+
+- Patch 5: make __map_single_talitos_ptr() static inline to avoid
+  unused-function warnings.
+
+- Patches 6, 7 and 8: register algorithms from a copy of the templates
+  instead of modifying the global arrays. Make the algorithm template
+  arrays const.
+
+- Patch 12: keep the "hmac-<hash>-talitos" driver names in the hash
+  macros.
+
+- Patches 12/13/14: added a driver_name parameter to the algorithm
+  macros. The driver name is built from driver_name"-talitos" instead
+  of name"-talitos", so the old dash separated format survives
+  ("cbc-aes-talitos" rather than "cbc(aes)-talitos"). Sashiko flagged
+  this in the v4 review as a userspace ABI break.
+
+- Patch 15: move before the macro conversion patches, and set the
+  properties that do not depend on runtime features in the templates.
+  This patch is now patch 12 in the series.
+
+- Link to v4:
+  https://patch.msgid.link/20260722-7-1-rc1_talitos_cleanup-v4-0-81d1ed2ad911@bootlin.com
+
+Changes in v4:
+- The modification I did in v3 in PATCH 1 was incomplete. message_size
+  was not initialized in ahash_init(), and not incremented in
+  ahash_process_req().
+- Link to v3: https://patch.msgid.link/20260721-7-1-rc1_talitos_cleanup-v3-0-7c71a2b77c83@bootlin.com
+
+Changes in v3:
+- Upon Herbert's remark on FINAL_NONZERO flag not working with algorithms
+  like md5, I removed the flag entirely for all algorithms.
+  Only the SEC1 revision is buggy when sending 0 byte descriptor
+  : the hardware yield an error. On the SEC2, this bug is not present
+  and can accept zero byte descriptor if the hardware auto-pad.
+  This bug is mitigated for SEC1 with software padding in
+  talitos_handle_buggy_hash().
+  It had to be slightly change in PATCH 1 because of the removal of
+  FINAL_NONZERO : the message length in bits was always zero. Now, a
+  zero byte request can happen after a handful of non-zero byte
+  requests.
+  Keep track of the message length in the request context, and put the
+  message length in bits as a 64-bit big endian integer at the end of
+  the padding.
+  Allocate a buffer per ahash request instead of using a static buffer,
+  since it is now written to.
+- Link to v2: https://patch.msgid.link/20260611-7-1-rc1_talitos_cleanup-v2-0-aa4a813ce69b@bootlin.com
+
+Changes in v2:
+- Fixed compilation warnings and errors.
+- Instead of using ops to dispatch SEC1/SEC2 variants, keep the small
+  helpers, and introduce is_sec1() inline function that can use static
+  key branching in case both hardware version are compiled.
+- Dropped the SEC1/SEC2 function variants inside the core driver file.
+- Reworded the cover letter for clarity.
+- Link to v1: https://patch.msgid.link/20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com
+
+References:
+
+[1]: https://sashiko.dev/#/patchset/20260722-7-1-rc1_talitos_cleanup-v4-0-81d1ed2ad911%40bootlin.com?part=1
+
+To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
+
+---
+Paul Louvel (19):
+      crypto: talitos/hash - Use CRYPTO_AHASH_BLOCK_ONLY API
+      crypto: talitos - Move driver into dedicated directory
+      crypto: talitos - Add missing includes to driver header file
+      crypto: talitos/hwrng - Move into separate file
+      crypto: talitos - Prepare crypto implementation file splitting
+      crypto: talitos/hash - Move into separate file
+      crypto: talitos/skcipher - Move into separate file
+      crypto: talitos/aead - Move into separate file
+      crypto: talitos/hash - Convert to {init,exit}_tfm type-specific API
+      crypto: talitos/skcipher - Convert to {init,exit}_tfm type-specific API
+      crypto: talitos/aead - Convert to {init,exit}_tfm type-specific API
+      crypto: talitos - Remove alg settings in talitos_register_common()
+      crypto: talitos/hash - Use macro for algorithm definitions
+      crypto: talitos/skcipher - Use macro for algorithm definitions
+      crypto: talitos/aead - Use macro for algorithm definitions
+      crypto: talitos - Introduce is_sec1() helper with static key support
+      crypto: talitos - Replace has_ftr_sec1() with is_sec1() static key helper
+      crypto: talitos - Introduce per-SEC-version descriptor and pointer structures
+      crypto: talitos - Remove TALITOS_DESC_SIZE macro
+
+ drivers/crypto/Kconfig                    |   38 +-
+ drivers/crypto/Makefile                   |    2 +-
+ drivers/crypto/talitos.c                  | 3635 -----------------------------
+ drivers/crypto/talitos/Kconfig            |   36 +
+ drivers/crypto/talitos/Makefile           |    3 +
+ drivers/crypto/talitos/talitos-aead.c     |  680 ++++++
+ drivers/crypto/talitos/talitos-hash.c     |  705 ++++++
+ drivers/crypto/talitos/talitos-rng.c      |   93 +
+ drivers/crypto/talitos/talitos-skcipher.c |  359 +++
+ drivers/crypto/talitos/talitos.c          | 1335 +++++++++++
+ drivers/crypto/{ => talitos}/talitos.h    |  316 ++-
+ 11 files changed, 3501 insertions(+), 3701 deletions(-)
+---
+base-commit: 317cdd0bb81c505ac42700258732e551c4f75a53
+change-id: 20260910-7-3-rc2_talitos_cleanup-e7e6925bf0f2
+
+Best regards,
+--  
+Paul Louvel, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
