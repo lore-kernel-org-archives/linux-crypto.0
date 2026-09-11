@@ -1,43 +1,50 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A5230568B;
-	Fri, 11 Sep 2026 05:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E06F3148CF;
+	Fri, 11 Sep 2026 05:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789104553; cv=none; b=HxmCwrQRYlKO5bSQSTSM8RG5pMS0+PAAUO1f/ApmB7guRjPlVxTiMze8qfJ6VtUKDYJrOIqAYVrGnn9Otqi5WOMlH+ZHDuZIkar4DYRTBk8SDaxAetVdKc/n1QPcB3jxlKvJVVHn2BUpGTDMaJF+xjs5wjRw2WuLa7hAh4s4f9I=
+	t=1789104586; cv=none; b=uKr3R1qvPNhJOSMYt9e1Gyk6wMQD2T1QdZ0Vm4EerRt7I85Kl5lGzSYeAfLpP10Vdu0P/YI+gW0kGQLsEUy/XRoVugXRfoh35/9r0rVdeViEhSF13nNc4SRCdfjjAbzCVQDUES1nirwpyTW/LqfDCA4hu1icjJGtXq/iYK4+DNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789104553; c=relaxed/simple;
-	bh=rfrNpKUYbzYS7IwoD4XAYIrdcbAI/9C7NA/5jshBnr8=;
+	s=arc-20240116; t=1789104586; c=relaxed/simple;
+	bh=UVm3UijNZnei1xaCdiJpBw7KE0glJ7jNnfs5WbGloeg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qVlmPiznOlxd0YcVGDz8O1elX2rBSFFkycTjw74QzN0y0IWFj3Y29/lYFiEKzkgCSw497HMNoZhnheuE+H6X0kYU9ASFsqtqImd52VVaiQKsPAhBmziq01BtZCRl6jVokCaf4PULnaom9GDu27k/6S+SycZaNj3o5W5tqnmJ3Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=MwKHQWjt; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=GhZm07oJGMIM4RrN7CSszQA8bYnupnOzFhelHNx/VmNgrW3BpgA6xBJS6XV6K866AxwUe8+rIc5wUzn3xctRRmrD/dCwi0oL1EVJcPPucabtSFVpULrDsSqxHMaP80ea4V13xOxtoawUq+3vRl09q0tJDF2dcJkHi/5QnlcL/TU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ONLiLJSp; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="MwKHQWjt"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ONLiLJSp"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=r/kpvgt06+Pjpn+SeyFEb08MN3NDfZr5FTUrPxAEqJU=; 
-	b=MwKHQWjtSmAmtLsCV+pOlLRvujKGPRJqWSYS3TsDKFHliLe9UyGsWAxOF2G/eD6P95ftohY7/xJ
-	v4cQYfRSCVOM3zmDYWAUjokBedtHABTpb7xEvohu69z7u5eahcNj60tZgOA5acVojJw6ZTF3utfkQ
-	DcAgIbIFOTmw3tFbJP6t1fATq4PGkMgxwmjOJGUgAyRasC1xzPmZabTwU1DTYHqTqz71Df1LeP9oR
-	mBSvTZkhOa4JJRkW9mky1TrZooh/m57iDms4XG//hl6LEEMkU7KxnYoidXVTdzrGil17/owt+CFa1
-	w48HFYUixlskpTNHY/zS0dk+Q2vnB3zAzl3A==;
+	from:content-type:reply-to; bh=eAkmSFxEapr/OWEzeHTZRFq6RfOULXKfw/VYTwth8bI=; 
+	b=ONLiLJSpewQtgDqGoRdoeaEzn8YVSOLdeighfjbG+T89vBc31mRvWLbfFIZPAzRFoHBUXfB8Zyf
+	UlPhyM+XKIDWd/J5vHH32HZIsxSmPgec5qsA51QPtmAXmbt+Xb9SZv4LLbu5u88+FS90O5y+Pz3UH
+	1L+vdRr32OIIPfHu7XDnIx9R76ySqMgLSFUyQnldk8j7VLZWpRSYv5bteaIdDBj8P49stHCwRHmD7
+	uQXEzr98lb3CvYCDElxaBX34f65ehze2za4z834EAN241Y+O0t1uY4r+fpWEAticm4tqMYyx+YwZ1
+	YMt7lAziwlfIzLtDV55CaUeP6KRsnVqhES4A==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x4tow-0000000Cu82-3erJ;
-	Fri, 11 Sep 2026 13:29:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2026 15:29:06 +1000
-Date: Fri, 11 Sep 2026 15:29:06 +1000
+	id 1x4tpP-0000000Cu8A-2TFC;
+	Fri, 11 Sep 2026 13:29:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2026 15:29:35 +1000
+Date: Fri, 11 Sep 2026 15:29:35 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Li Youhong <dayou5941@163.com>
-Cc: olivia@selenic.com, linux-crypto@vger.kernel.org, imx@lists.linux.dev,
-	Li Youhong <liyouhong@kylinos.cn>
-Subject: Re: [PATCH] hwrng: imx-rngc: check clk_prepare_enable() return value
-Message-ID: <aqORonlmX7cTyz9m@gondor.apana.org.au>
-References: <20260828025423.2149304-1-dayou5941@163.com>
+To: Linmao Li <lilinmao@kylinos.cn>
+Cc: "David S. Miller" <davem@davemloft.net>, Frank Li <Frank.Li@nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Leonard Crestez <cdleonard@gmail.com>,
+	Radu Solea <radu.solea@nxp.com>,
+	Franck LENORMAND <franck.lenormand@nxp.com>,
+	linux-crypto@vger.kernel.org, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: mxs-dcp: handle zero-length skcipher requests
+Message-ID: <aqORv0iyPUE2qKep@gondor.apana.org.au>
+References: <20260828093209.3179074-1-lilinmao@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,20 +53,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260828025423.2149304-1-dayou5941@163.com>
+In-Reply-To: <20260828093209.3179074-1-lilinmao@kylinos.cn>
 
-On Fri, Aug 28, 2026 at 10:54:23AM +0800, Li Youhong wrote:
-> From: Li Youhong <liyouhong@kylinos.cn>
+On Fri, Aug 28, 2026 at 05:32:09PM +0800, Linmao Li wrote:
+> Zero-length skcipher requests are valid no-ops, but MXS-DCP queues them.
+> When such a request reaches the worker, last_out_len remains zero. The
+> CBC completion path then subtracts AES_BLOCK_SIZE from this unsigned
+> value when updating the IV, causing the offset to underflow. On
+> decryption, the resulting source address precedes aes_in_buf.
 > 
-> The driver ignored clk_prepare_enable() failures during probe and
-> resume.  If enabling the RNG clock fails, subsequent register accesses
-> or resume after system sleep may not work while the driver still reports
-> success.
+> Return success before enqueueing zero-length requests. This avoids the
+> invalid source access and leaves the IV unchanged for a no-op.
 > 
-> Signed-off-by: Li Youhong <liyouhong@kylinos.cn>
+> Fixes: fadd7a6e616b ("crypto: mxs-dcp - Fix AES issues")
+> Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
 > ---
->  drivers/char/hw_random/imx-rngc.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  drivers/crypto/mxs-dcp.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
 Patch applied.  Thanks.
 -- 
