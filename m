@@ -1,97 +1,125 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lr2-f10.google.com (mail-lr2-f10.google.com [74.125.230.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703874252A0;
-	Fri, 11 Sep 2026 11:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE7D47606B
+	for <linux-crypto@vger.kernel.org>; Fri, 11 Sep 2026 12:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789127816; cv=none; b=AAwjtUGmcKi73pEFtdpKnWJTDMCYdAPsBnJBtsqsPrgNTzyHrb/ORZkB2qwFk6jp1h3N+X1PqaJ3eCc9MeM+rsyW0ochj3bKMGydHrr8sHiMwtOKdynGVgsdjZ5EtczQlwQLCAIK6R6kZFIaNFzfZlw4fsgsWgyn370G9epz7sQ=
+	t=1789129930; cv=none; b=MMdWr06ctLKpmVuSApBdVIVGqYX8hf+UphhVWf/Tbw9oK4QrEA9PjDwzVlplhWzTP+D5FqD3Y5KI5QZukcYXgy/DUiOZCsi2NvQRE5GuUu4XQIejoDr0V4RGLYqDAqpDuKnnaZ6j1r7HOMie7+KEItSTaVXIOBMfn74q+wyYzF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789127816; c=relaxed/simple;
-	bh=mxZAv8+PTWz5o5uQFlYfiCNTyxtxBErqqt2XZxLnyrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ki8ZgCzXbmXtrMc9c4y4971Z1k/97VMHFzEliRUfI/PXKkcoq6vUolmi+ID37rESqa7i8JpptwcmPO7oGcygLz1QuhgEMKY1zaW8DRH11Ulzm0ckAD3D8MLO/EapPfM4bwQeQhV6tEZam3OizlgM1Cf5bndiQNcjkfVeLor5bH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rwH8xx/n; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1789129930; c=relaxed/simple;
+	bh=A2CvdhG7/vIyoUeGkv5E4Ugr/imarWjFKS/kJBdETX0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aeGYlhifGdMaZ4oxFieEgnul6WHuwMSN/SIOuPQ6GtfzZkaqQ1EQbwp5Q3ExYLxf6PMokFYc9hpaRkFYfBOKs1ZSw7Ci7dsccukHeR/Y9RadUqOlvuUDnx0RUiLnBaM5sYFKSUfvLKx8H5RVe5Af3uNnZ/+Psc/6WsUIeAcw2gQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OTeLwa6L; arc=none smtp.client-ip=74.125.230.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rwH8xx/n"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=ZGW7E+Tnw6q8TDdm+/hSy8nooSWRajnqZj0uPKL4Ndw=; 
-	b=rwH8xx/nP7/e5uXP3JORcsr/z5rUYUKHjdiQo98qvix4U7Jaukcjc5PxaVqLxJcgZngkr9fUYkJ
-	BfqliF6RXelAztVafosxYjl4kVgPhBJXLMHT4ALScWfeRaB204ismCLs86QFKfs0EIsl+khPAcLZZ
-	+c7W1FqF0xmNY2OMCYYZFX6/91ezD9GNa5TnbdWP5aMyTYppOX+u5E8lrGRD7lUXNlnhKCQXTqU2J
-	Z1Ka3tUKRRHhrjcC2Dheu7sOGUt4ARGvP93hZDC+4OqccdAUgMBok3JclYBo8w+z9J1tkXMviEbc9
-	y61zYx66c2awo0Li6Cd/2GSAD4iYC4NqmmhQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x4zs1-0000000D1Jv-2iDp;
-	Fri, 11 Sep 2026 19:56:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Sep 2026 21:56:41 +1000
-Date: Fri, 11 Sep 2026 21:56:41 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org, kadlec@netfilter.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH nf-next v4 01/13] rhashtable: add
- rhashtable_flush_and_free helper
-Message-ID: <aqPsedZD85-zXob3@gondor.apana.org.au>
-References: <20260904185321.30313-2-fw@strlen.de>
- <aqDdwKMbvd9aErLy@gondor.apana.org.au>
- <aqFw-_Y4JGRF-0Za@strlen.de>
- <aqJ0QDwEIZg5sDql@gondor.apana.org.au>
- <aqKJUOQYHEGWKgCn@strlen.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OTeLwa6L"
+Received: by mail-lr2-f10.google.com with SMTP id 38308e7fff4ca-3a46d5c5bd7so5098151fa.1
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Sep 2026 05:32:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789129917; x=1789734717; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=QnJBFBfRn5myQJHTDGn3pEafZ8mzs7RtDdyu8ZdsQwo=;
+        b=OTeLwa6LRDrdvM0CXgSsIkzWuO2Yf5+q1U55b8O8Qqd/AbLK4k7enyrGV2/RqenOEj
+         V9X4RUQ7ELDWdYi02ArPQOXtf7XB1Swm1Tjjtl/T3a3/AJcHiy6BZUXTrcrmvlVFu84L
+         zhBpIqa6SvG4eOvh0F+gBATF25vOkt7PqBn4rEa3fNpybAEuuOTVD0iPnfMRlK0D2uvb
+         zaFiUABMEH8xSwsqxzg1ZQK/YdfX2ph38IynUMdFBGcO2VgRgJJgzBpBJ4pgpQjFu5QI
+         cKLspNb4tk0W2qlQDl8Vsx/8NRZZoRz+GGCdz7LzTWseo6QZrlLbmfUeq8Tpv9lgYSgv
+         vdeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789129917; x=1789734717;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=QnJBFBfRn5myQJHTDGn3pEafZ8mzs7RtDdyu8ZdsQwo=;
+        b=cWHWLDjXJmcp3CUDTljGfa0wLTBONNiuj0tJhL8UpYrwvMF32j2sLSNfDBKDtJIGLw
+         9gd7av33syaXB2qrzdQL6w7JZ5d9/0pEJoo+DMPj7xTcqCC5MqVJN4MBoRqaMXucaI7i
+         wfmbX1u12N8Aq92V/DU6J/C8cwaqnlizT2l8ponm+ZFTaS3TrhVhLgXuGjX1wqLDzLQW
+         EKl93qSdObuhJToE8MHDbWD7ompVnTRKGawJNAGGX3Jch7Keya+Q0t3yK4z74b0nxNB1
+         08dRCpr7Ur61uAW8BKYYR6hn+T7Ek4Q2nCdfzPzatfiXc6dpvoopoARzJ2JL1KpF5CqU
+         vPOg==
+X-Forwarded-Encrypted: i=1; AKwUvBxtQJ8x9vZ97n+egplus9Vk5aNScyXIfyxPQTvSuH3GGZzRBX12UYOmfugmiyzdIQRZQduiVHTX9GdGpbs=@vger.kernel.org
+X-Gm-Message-State: AFuF++lLgutFApMqCWH/whd4kEUQV+p2wLfRK9G54hSFXn14CnXp4by6
+	GmKoIcovv5rmFCMAoow2pA6c2GjZpvySHCLAd1SXVU0qRpI8RoQZBFdu
+X-Gm-Gg: AYBFou1DbnZC8JP3HyuWJja5SLAXWJ7sGZkLUS2gTOc4Z0Qy8JiJJ1uqsSGI4TVllR+
+	hPqyu/tA6QYWDieLDgk/XcFNCi4NZj6SicrRSIVa7n1u2pgS/JzAAFGBECEIlXsj7tPEmW5oejc
+	OtGdv2CPXcDxAmXwVvIlbMg9L61zRq8arrtvHZvUE2bbuhgMyBXKkp6QVzzLrneJhXhbEYNyblA
+	g1XrjDvm8veLrW0foUlxi4z4U124Zs4ZZH3WN5kQ24H+cKL/T/wchgWo3H8rC41kG7eWEp5lD1w
+	DRT6aGZnY2rrtz1omAOSYUNN8VZD1IKLQKNXbdRwtS0gQeQZdDgoH7hxstOEF4kFeIhvASxhInC
+	iXIgQOCf5UKq2TCjlE0i2RxPI/yEAkbhSzWb3Bxr+COtK/knCkhDhOMn9PQD8fuEJOe/UNj1AqG
+	ZwbnhSjqPTUvsHcOcbQWWDgegmsr0ydf2t2wePhxJhwWAXhJl98TiWCkQsF10DNBgAi+Xv8Bfzf
+	sIrj4c/4SLFWE7PXrbhkaZRGN0=
+X-Received: by 2002:a05:6512:3f25:b0:5b6:1a7c:20 with SMTP id 2adb3069b0e04-5b8a032c8abmr874241e87.35.1789129916639;
+        Fri, 11 Sep 2026 05:31:56 -0700 (PDT)
+Received: from localhost.localdomain ([78.40.184.2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5b8a033149fsm576697e87.0.2026.09.11.05.31.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2026 05:31:56 -0700 (PDT)
+From: Roman Demidov <roman.demidov.nn@gmail.com>
+To: stable@vger.kernel.org
+Cc: Roman Demidov <roman.demidov.nn@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Joachim Vandersmissen <git@jvdsn.com>
+Subject: [PATCH 5.10] crypto: ecdh - explicitly zeroize private_key
+Date: Fri, 11 Sep 2026 15:31:37 +0300
+Message-ID: <20260911123140.137198-1-roman.demidov.nn@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aqKJUOQYHEGWKgCn@strlen.de>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 10, 2026 at 12:41:27PM +0200, Florian Westphal wrote:
->
-> What problems do you see?  Shouldn't a rehash be a no-op, since it
-> can't see anything in the hashtable once the flusher releases the
-> mutex post replace_pointer() call?
+From: Joachim Vandersmissen <git@jvdsn.com>
 
-The problem is that the rehash is just a deferred work which carries
-no state.  So it doesn't know why it was triggered.
+commit 73e5984e540a76a2ee1868b91590c922da8c24c9 upstream.
 
-If we go with the atomic replacement, the issue then comes down
-to the fact that if a rehash was triggered before replacement
-then it should do nothing, while if a rehash was triggered after
-replacement then it should do something.  However, because the
-rehash doesn't have state it doesn't know.
+private_key is overwritten with the key parameter passed in by the
+caller (if present), or alternatively a newly generated private key.
+However, it is possible that the caller provides a key (or the newly
+generated key) which is shorter than the previous key. In that
+scenario, some key material from the previous key would not be
+overwritten. The easiest solution is to explicitly zeroize the entire
+private_key array first.
 
-If you do a rehash when it shouldn't be done, you may end up with
-spurious EBUSY errors because it thinks the hashtable is under
-attack.  While if you skip a rehash when it should've be done,
-then it could leave the hashtable in a suboptimal state.  But
-this should correct itself eventually, so perhaps this would be
-the easiest solution.
+Note that this patch slightly changes the behavior of this function:
+previously, if the ecc_gen_privkey failed, the old private_key would
+remain. Now, the private_key is always zeroized. This behavior is
+consistent with the case where params.key is set and ecc_is_key_valid
+fails.
+
+Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+[ Roman: The zeroing is performed before ecdh_supported_curve() which is
+not present in upstream but this does not change the fix's logic. ]
+Signed-off-by: Roman Demidov <roman.demidov.nn@gmail.com>
+---
+Backport fix for BDU:2025-00987
+
+ crypto/ecdh.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+index 96f80c8f8e30..2e7acfc42155 100644
+--- a/crypto/ecdh.c
++++ b/crypto/ecdh.c
+@@ -43,6 +43,8 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	    params.key_size > sizeof(ctx->private_key))
+ 		return -EINVAL;
  
-> > It would be a lot simpler if you added the restriction that the
-> > caller must not call insert/remove before the flush call returned.
-> 
-> How to assert that?  Or should that be an 'external' requirement?
-
-It's certainly not easy to detect this from within rhashtable.
-
-> That will, at least afaics, defeat rhashtables purpose, I'd have to
-> either serialize by external single lock, or add a flag that would
-> 'eat' new insertions while the flush is running.
-
-If there is no natural way of expressing it in the caller, then
-we might as well add the complexity to rhashtable.  Let me look
-into this.
-
-Cheers,
++	memset(ctx->private_key, 0, sizeof(ctx->private_key));
++
+ 	ndigits = ecdh_supported_curve(params.curve_id);
+ 	if (!ndigits)
+ 		return -EINVAL;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.53.0
+
