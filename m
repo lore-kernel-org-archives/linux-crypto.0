@@ -1,143 +1,153 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11022081.outbound.protection.outlook.com [40.107.209.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFD33DDAFB
-	for <linux-crypto@vger.kernel.org>; Fri, 11 Sep 2026 18:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789153026; cv=none; b=sQRL7m0smly/ri7Mv8Tuole94nSw9giG/hQY/hsfeftKzJ7S8xrwikgCC8fFEATP9tqdfjovIc+TuvLw58KAzlA6QuptB1lmPCHUJfIjlZmFDbWLLEAFHtw0Vf5nw+SooYWL27JBk7OgqTA9iqwvZ05BXo265Wb71nlTKw6jcwQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789153026; c=relaxed/simple;
-	bh=L6rh7PbU0UFjpOX2cNRwoGSW2b55d7SIpmhWyxZe2jU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EBzMSNcpvALZwHi/UsLRuwbRgkrSL0hrubrU+pk5nC6LY0tZKTlpkZaH+6UwidDFSshJAUt6Xku98OvEe0qAMyh41hvXs5u8RYHiSMz5wJUiqAC1/GvTxdBVC5roZ7Tnx1hiqoaenTwOztEHsmIkDtzoNz3VfJwBEcGu1qFbWJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=jnWmsfDH; arc=none smtp.client-ip=74.125.225.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75274BA1F4;
+	Fri, 11 Sep 2026 21:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789162151; cv=fail; b=txw/WP2Md0Bqkm/yvG9Z/dlPAIh/9CmKFICBxX6HFns3SQBHBTRS0HKhXcih8Zm16hlyAJ5b6YYrz5QJaK6GwgAM3WUTun5YulRsAG784YqnMeGgt35G+LBGu4EprlIEcSOfAq+3i0wop2xpr9+oQc0NTqL39d5q7h2d6xXRia4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789162151; c=relaxed/simple;
+	bh=zxxiHFeoTFgxoc0spEtnWDt7lbs3P+gGcOlYkyel8+I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NS4jQ96R2er264idXeLCwZleuZRTyPXARLI4iGtkKGCDd5ztESPIrkhfWGpOF5slepJhWAd5iE0HQPjeeN13vwppE+F2h+GwXL6pUvcqCz9RC35Wxl3a7xM1TkfZlYAEO+eUao81+o/aK28m41/WD4VXThpd0ewMW3icjAhOBog=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com; spf=fail smtp.mailfrom=rambus.com; dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b=JSm1wBdy; arc=fail smtp.client-ip=40.107.209.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=rambus.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="jnWmsfDH"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-484366874b0so98103f8f.2
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Sep 2026 11:57:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1789153022; x=1789757822; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Hh4sVlhxU5dBVP/3K7psJppy2n4LZjrwVn2yp2aqAe0=;
-        b=jnWmsfDHjbwFsI/w5LaETScW3g2GoWP8DH3MNQ39LInxEQ45K9gykyqpHXNMDCvNdn
-         oK1+M1kU+Dkx8M6mvJydhJqeupXg2bCK/j7tZdrpxAzZwwcefG0mho6WaSD8FKW7OEaI
-         5HMu2LlpfcBle6t2IDRZ0q1Qs0bhBXsgxm0OsZzrLanVQgSaNIpAeW3pstCN466taBDI
-         faEQp/aYTkWnBarQnFww1JSwnLD8r9dFs59GCVpH4calW7DzRgi5g47aRzOcbKNAG3uB
-         8+T+5ArgFk9NgnfiV0XumTkidaW1eDExFDJxSG0qBHLQ6STsymzLfJJc0gK6updgxX1I
-         OGtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789153022; x=1789757822;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Hh4sVlhxU5dBVP/3K7psJppy2n4LZjrwVn2yp2aqAe0=;
-        b=I7EdPXtpN9ImaNhE0tX5YRtFylckLsU8TcHDs2OWoEp+Mbi0Tr1Ie+X81maLje4g2v
-         9Vs/LDqMoa9nX4FBzzlvlSADa//CPXwqstR71rLU2u/H3tMrJM7GMB1e5Ss/EmSMyG6w
-         ogt1VKojqMjjz+fg2SX0T6jh+3Ezfu5kd9QR/rFkmOTbKDsJ4wL550XLxuoDLTdRxTsB
-         Nnk1eUdYd6BS72sBddGPMNwpZv2d15hIbPLOJmKx9L14gZBoeNNUIK0if+AF1d6rCF6R
-         fDiupRrp0FqVfrvQWVkIwVxegLSc1D8Jv15hJJyYotTAA8cbjsTi1W2HhPd6+Un/NYae
-         K9+A==
-X-Forwarded-Encrypted: i=1; AKwUvBzO+hZYuyrIeSl9U5czhyLpLh897pdAhi2IsjWTZr4GiJ88pg7RVzj4uY7WJngNKV2sC9KRYuWKnSIUfXA=@vger.kernel.org
-X-Gm-Message-State: AFuF++n9erdQqj+zs7UhRxF5LsEf9Hq3n/Mk67FeaySy2zCOxMvc8dTc
-	1pDAWkfX7TJSMSUy+thIJPCaNMMoamCz3APPRyXop/AfogGSqb8piI+4d/8hJKAtOIQ=
-X-Gm-Gg: AYBFou3H43VF/faOSRw2R7XfX2NlTKuIBVv+hSFuz/s6wW67nncK32bPXdJy6Z1OONZ
-	BZ49rbEtOkX3NZjmIb4eVgeEO1bvL9LPD4tQdOLFhmN9ys/p2vzkTILJWthHAyH18vSqaRU4Us3
-	Uk8Nc3NrPZNZlUYGrOB5Rr4Lqw+Ir6mZBe7yf1NRIWslUNKnXd3fsJbRsk4kgBFyZRngoru8vvB
-	SepcG7CGGrJqIUX8f13WNtmcMWJfHCJRE3SZVaS3Er5eNwlxBSWMLaG+4v4IDYkKWo1SIDjvcUa
-	iNxoOoBPhAUqpHWtJhcQ/f7C7s/VZhzdF9unAaIgPIeAOwpDZHB/kvxaEs7zO06D9IDosFvVRpN
-	Q9eTxbgtQ9+C6lG04iV4DGS4ttR0ELCgzFcT/iwW2ShUQW9lSMzjquYL0CJ2HXyaRZCzIAlUlyW
-	S5VJPTytl0IqqkMB5f+9erqog6aF7aCgc8XNiwhCsedZ5DrhqerNyhatBP+zUrCD8ZAPuP8simu
-	VUy
-X-Received: by 2002:a5d:5f49:0:b0:485:b169:54fd with SMTP id ffacd0b85a97d-486eb1d388cmr12205373f8f.4.1789153022414;
-        Fri, 11 Sep 2026 11:57:02 -0700 (PDT)
-Received: from localhost ([2a02:8071:56d1:2de0:1d24:d58d:2b65:c291])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-486eb2ed0fbsm7924090f8f.3.2026.09.11.11.57.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Sep 2026 11:57:01 -0700 (PDT)
-Date: Fri, 11 Sep 2026 20:57:00 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Stanimir Varbanov <svarbanov@mm-sol.com>, Eneas U de Queiroz <cotequeiroz@gmail.com>, 
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, Eric Biggers <ebiggers@kernel.org>, 
-	Demi Marie Obenour <demiobenour@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, brgl@kernel.org
-Subject: Re: [PATCH v7 11/12] soc: qcom: add core driver for the Qualcomm
- Crypto Engine
-Message-ID: <aqRNEJt5Wec4AeH4@monoceros>
-References: <20260910-qce-fix-self-tests-v7-0-cdbd2718af14@oss.qualcomm.com>
- <20260910-qce-fix-self-tests-v7-11-cdbd2718af14@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b="JSm1wBdy"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JwTEebsCniZ2ROnBBac5lsh+Cd1e3GMzVooq4AwS/fpVEwJkkEFL9yuSHNe6XCh3lDhwXTxHm4WFFM8JcdjKizqXZUhWRJ3E0nv4ZMYs4fT24QCSe3XIj21/g6qoMoEqyFDExBAy+4ywYoYysS9VMzDsYG9z5gxrW0KtezE2GmSoL9OPV/v1HhRLEtEFMgvqB5SY+r+KzkqLUjnytcmOapi1PlKFk4KxRJEH9FhJeVfSj6uTWj7uG5+isdtUIvpgeLbXGt1pPogtUsRXUE605iXVyCrLGoOwW0eN5r/35mBIluOEzFtznbkFb84cLfUVYKKI9ToXlA+wL9sIs4untw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QVB56YhnglpNFEROeYGpD4J4uZsyLLIQMC7gA4CtWCU=;
+ b=J3FiXjlVdvbBXZcfKpuTyJjOt4sOCQ75QK8mCiTUpTtNfFEp4hYuhTO1laUWCSo2zbJHuEr5bPLNKpvKrGPeg7E6kLPE0bZEHQVoGzqH4pBvPnXlM6R0pIYmFOF/NfLtFdutgKN9/eJeyNDyRKI210jMGNkAvT5CfYJyHg770Qc7agm5KQl1l5IN4KSIxFDWZZy0kTwXyNqr0yLtFcZ8JSdBUGNiRi2FR2vpWdMek/zigUPA6thsq34ZnCe4HinlcWZ1bQ2TQZzu+F5+aF4nsRtJO93jcnlF/HB1VWvsziHU9A3DoEnvpWr8NerdFPmzYRHT+maphQ/7wFH2Le3aHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=rambus.com; dmarc=pass action=none header.from=rambus.com;
+ dkim=pass header.d=rambus.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QVB56YhnglpNFEROeYGpD4J4uZsyLLIQMC7gA4CtWCU=;
+ b=JSm1wBdyTJ0aV55Qlm2W45gpYT0fgTDYGlg6O0VdPXG3O1DMUFv83DnzV4KVtT+6RkQvys9SWzzVbayobcz0jLzYusGSPmdEu0U8bgaTiw6k0h1uKXq2u/fIBiAYcD5wkUtfoJ75NfzOqHx35M70KOLY1RHywT07YH1TqLOhb2UYc+9+AJuCzWAMXYGhDZ9zmNtPnpAL74EOz//3vlITd6JqMNLsTCYLIZxMZjfVCRiOuw5LEXgiUcSrzxQH0LYknD8YZgmMsKJTJoLf8S2uXePVvKBvz0Wu95Bkbj5iTF0nX3brkm6/4RBcXSZMqf9eFL7LQGST33m2rw9GHampgQ==
+Received: from SA3PR04MB9001.namprd04.prod.outlook.com (2603:10b6:806:398::17)
+ by BY5PR04MB6836.namprd04.prod.outlook.com (2603:10b6:a03:21b::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.10; Fri, 11 Sep
+ 2026 21:29:06 +0000
+Received: from SA3PR04MB9001.namprd04.prod.outlook.com
+ ([fe80::3da3:45d7:8860:e196]) by SA3PR04MB9001.namprd04.prod.outlook.com
+ ([fe80::3da3:45d7:8860:e196%4]) with mapi id 15.21.0406.007; Fri, 11 Sep 2026
+ 21:29:06 +0000
+From: "Ousherovitch, Alex" <aousherovitch@rambus.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Palmer Dabbelt
+	<palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, Rob Herring
+	<robh@kernel.org>, "Krishnamoorthy, Saravanakrishnan"
+	<skrishnamoorthy@rambus.com>, Shuah Khan <shuah@kernel.org>, Alexandre Ghiti
+	<alex@ghiti.fr>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Wittenauer, Joel" <Joel.Wittenauer@cryptography.com>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, Shuah
+ Khan <skhan@linuxfoundation.org>, "Nguyen, Thi" <thin@rambus.com>
+Subject: RE: [PATCH v4 04/19] crypto: cmh - add SHA-2/SHA-3/SHAKE ahash
+Thread-Topic: [PATCH v4 04/19] crypto: cmh - add SHA-2/SHA-3/SHAKE ahash
+Thread-Index: AQHdNN9iaUPmaZ+DjEW1WtISsJVxD7bI4yWAgAEbzvA=
+Date: Fri, 11 Sep 2026 21:29:06 +0000
+Message-ID:
+ <SA3PR04MB900105B881F46FD7B90F7E3BD7BE2@SA3PR04MB9001.namprd04.prod.outlook.com>
+References: <20260825221539.255951-1-aousherovitch@rambus.com>
+ <20260825221539.255951-5-aousherovitch@rambus.com>
+ <aqOEL-YUVFuThcmf@gondor.apana.org.au>
+In-Reply-To: <aqOEL-YUVFuThcmf@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=rambus.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR04MB9001:EE_|BY5PR04MB6836:EE_
+x-ms-office365-filtering-correlation-id: ec3da269-a28c-4916-f681-08df104bb573
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|23010399003|366016|7416014|376014|1800799024|10067099003|4143699003|11063799006|56012099006|18002099003|22082099003|38070700021;
+x-microsoft-antispam-message-info:
+ K62nuIPoWtqRidPJAkIkPf1vKJPKZrr8zvO7O5qmhpMEcNIsURiMSC4IselObxhka3JAWnHwSPaFjeWVKBK9z3AaDAH/vH9PWwu8kpZydsKweS5i8ZU833oUQQnuye0I6lG0IwyYAaOJV8noX4YH4Q+3EVcmJD6i0HSV34KXUWoZF0p2LrTbaPU1iTN00FxEFmcBRwLPHTu+sKOp4PtYEFHD1gC2XNFtgkKKLb79e/IRfc6isg8PXR1HZR7z6stFjPPDNaK9y+lTepWuERo1D82KvIrSqjqkVcD39OGdlOcY9E8eb2JngVm+SAKbuc0WA47NWt+ZlnJzRaD4IfFr9wYi7Q4Y0o9VLwhtdInJgoKvfHU0s2gDDazKWjZM1GEdAf26T9SR/AadRql2NYPnw1dYsB0blWf875R45h9Lbe75gH3ul8odxfIjLX9JA1WCX+laQZFQONpb5KAx9Sv/Bt8FNKSU+S1KvoUV0EUKJazygckdqXrzUj7n+Zxsr9crSGcpMsi2tSDDpSS0lBfdtpr4m3N7OOH9fpOrCBQ9HpZS5RzQLGBpdePtXfygv8DUoMS26iSkmCAP02v+s+lBrnxaJykPCTowqH8Ku1u7Ta/R+GOipUSrCfNOYH86uYSXZKF2uwEEuCVdOQrfvBe6+f5oNG+7+XFRwyAefhZitujNosT3v+sbV2nCVBdeKEtCicGXJO/pQ2Ku0etV6w1FKpdhXAsqayLztR5rK+9km94=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR04MB9001.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(7416014)(376014)(1800799024)(10067099003)(4143699003)(11063799006)(56012099006)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?bBhwwm/bI6NcnbMZwkGILQFqR/cwZYge3EBtrSZ1Z8HwEz79YlXDXAd8PdSZ?=
+ =?us-ascii?Q?hnXQQw1ytS2C75xWXklZnkmi+C6PBL/fRsY9PuP5NtowT5MRe8wWI6mTtGx5?=
+ =?us-ascii?Q?9zux4TM9aqFZlFCMoNJR6q5JwgFpZo6WlxYfZ/r+e2XkHpux96M95mvjFBzq?=
+ =?us-ascii?Q?x8B+No5WKQPBhByJ2JObfsoejGUFd7NZuTFq8/gTPlgp59ZnI3CrvXgFB8Nx?=
+ =?us-ascii?Q?kNIQQVwg0JrVbLmBHF9Iuj2Un+cmcicaZdffkISMHeQ2iVpODw31JsQ+m7sO?=
+ =?us-ascii?Q?OHCnX5yGBKJRUmSeiim4sr7g3uLpeFa7uJ4G9GxfY1tY6GWCOUtIgPJrq2dG?=
+ =?us-ascii?Q?JQZC9wU3heVRUSYcH8qVZP/Bx/Rr3KWUqiKW/6YCtUr6Qshn7HbAYdklEInD?=
+ =?us-ascii?Q?f9WP7thkLHDHkKF8zbWICtVAg2RofkEJrpQAAjaX1Me0H2GTsno0wqwxqE+Y?=
+ =?us-ascii?Q?2SjBQR3L9wJvbrIe6Zzo5Y1SPM6/IhD8piOHRvKvT07zJn8K/hoxxJ2ajduT?=
+ =?us-ascii?Q?98ej7hjW1tdThiM/N4NG32EX6BtLzFOve9bainvr4w4YkJ5xw4KeStvo2B9+?=
+ =?us-ascii?Q?uzPznL815vQsUKo4mYxulhi3Pt+gnDm8PBzVdlsP7x31aMppG68287J7SqzA?=
+ =?us-ascii?Q?V5PSarZAiN7t6qChswRkQfaz6ILQzbkLajCZs8H7m2jUEb4Ozol8yGSkt+Cy?=
+ =?us-ascii?Q?MEcuwJSHYqzK+boJ1/Ra43zVJA70ikEGEx1kYC5Pqsqxu1CLzWUfck2z8m3w?=
+ =?us-ascii?Q?h19fN3IRtnWkS/oyOoBs5dDg9IYQEjd4vv/CQN/vZiX7fqRbLf5o3kHOM2un?=
+ =?us-ascii?Q?2KDCPPxs8V84MUcoWNPdTA3mWFuuidDPntwz7SH8LfFK3uekiPer1dmaz13V?=
+ =?us-ascii?Q?C/Z5XRkN1j67Ptf1pYSZNuu7RyVwHsdwKcLHzwWFkOkLAJ4q75owyDkzS67F?=
+ =?us-ascii?Q?NHucn0oFp2KuP2H+MjDeQztO6sjl1JU09oL2PrmDOQkrF4RGZaEWnYrVttAx?=
+ =?us-ascii?Q?G4cZnHNu0ycLwORuSfRS6HCq4y9Ke+JorNUxW21y56LNG+dQ+wyDl1ygy2Mx?=
+ =?us-ascii?Q?Vm5O06O5gshAYNmHFTTu/WWAzErUw3+fmSWPIbou4b/v3KgbZyM2YQwzOUeS?=
+ =?us-ascii?Q?N/C+u66Tk7IIxtDOc/gW8/vWaON6TwNnDfaOMJGa7oim9iwukUIBfFEE5Rmo?=
+ =?us-ascii?Q?7bbjBaZNSiT+EohnI/xk8EQPQCI8vgDxduJDfD4lCZSLXShVaQUnCJx1wcr8?=
+ =?us-ascii?Q?206onyq90oacmam2TDD/3jxymS9y/uLyzg/u6uXLy6NBa06879qRY/VMjjJR?=
+ =?us-ascii?Q?DlpuXUUS5o/eykdc/y5/VL1tP8o0JAMu/hz3+boJuGLtNke89ly4uRwUMyxL?=
+ =?us-ascii?Q?z5AYZenl1iy4AKcpvFT+lmaX6qhqrVnxXcLuYAecK1QwESi9I41RoFjnsrZq?=
+ =?us-ascii?Q?sQxmX5IbhjSI/t6MKGAH4ylAmvqg8E4IHUgfYmuuY2QSwglZIWVuSgi5kAM8?=
+ =?us-ascii?Q?/lZTOy8857q7IFybyV+kHDsVyEUX7NBT3glvfd8wHBI4VABbPDgYVENb2flS?=
+ =?us-ascii?Q?JRA6C8NhON/veiiAjHxzaa3Xjyttcy8ObwDxLbkHGfOgG1mHZ9I0g964yH0i?=
+ =?us-ascii?Q?UABbDGR1BiGOy0fVhSaYTWoYNbtkD/CJ8MzHJgQr+kQpDwBPiRXuYXQ3N3g0?=
+ =?us-ascii?Q?r551MDeDD/1ZjgIhwLyQ1uql1qBKNGs0nVmxPlfNFP+viVcUBWdbWgCyU6+7?=
+ =?us-ascii?Q?PpLnnUf7nA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="joivlbaqnu5rwgfx"
-Content-Disposition: inline
-In-Reply-To: <20260910-qce-fix-self-tests-v7-11-cdbd2718af14@oss.qualcomm.com>
+X-OriginatorOrg: rambus.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR04MB9001.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec3da269-a28c-4916-f681-08df104bb573
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2026 21:29:06.2137
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: utTWSI8OSUGXLBt894sZh2rit7D8lJbLq7CqLyuEREJ9CGGIsR/R72EAoMfT4DR8pchHYyn3R9hvIzWDJ9NmIXRSUWhe+792Ni7n9GdltS4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6836
 
+On Fri, Sep 11, 2026 at 02:31:43PM +1000, Herbert Xu wrote:
+> Please drop block buffering in new drivers.  The Crypto API handles
+> this for you.  Take a look at the aspeed driver for an example.
 
---joivlbaqnu5rwgfx
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH v7 11/12] soc: qcom: add core driver for the Qualcomm
- Crypto Engine
-MIME-Version: 1.0
+Done for v5.  The SHA-2/SHA-3/SHAKE, SM3 and cSHAKE ahash drivers now
+set CRYPTO_AHASH_ALG_BLOCK_ONLY and let the Crypto API buffer partial
+blocks (modelled on drivers/crypto/aspeed).  The hand-rolled holdback
+is gone.
+Since BLOCK_ONLY's buffering is scatterlist-based, these drivers also
+drop CRYPTO_ALG_REQ_VIRT.
+cSHAKE stays cra_blocksize 1 as an XOF, so the HC core buffers the
+sub-rate remainder across its context save/restore.
 
-Hello Bart,
-
-On Thu, Sep 10, 2026 at 03:00:52PM +0200, Bartosz Golaszewski wrote:
-> +#include <linux/mod_devicetable.h>
-> +#include <linux/platform_device.h>
-
-Please don't add new includes for <linux/mod_devicetable.h>. Either rely
-on <linux/platform_device.h> to provide of_device_id (my preference), or
-include <linux/device-id/of.h>.
-
-> [...]
-> +static const struct of_device_id qce_core_of_match[] = {
-> +	{ .compatible = "qcom,crypto-v5.1", },
-> +	{ .compatible = "qcom,crypto-v5.4", },
-> +	{ .compatible = "qcom,qce", },
-> +	{}
-
-Please drop the commas for before the closing }. Also in my cleanups
-around these device_id structs I used { } with a space in-between the
-braces. Just today I got some opposition to that[1], but in combination
-with the spacing in the non-empty initializers I still prefer { } over
-{}.
-
-> +};
-> +MODULE_DEVICE_TABLE(of, qce_core_of_match);
-
-Best regards
-Uwe
-
-[1] https://lore.kernel.org/all/45a04396-c6c1-41f4-ace8-0ee0ccbc50ad@acm.org/
-
---joivlbaqnu5rwgfx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmqkTvoACgkQj4D7WH0S
-/k5B8ggArcjj6bNgFKC+jk74PuEqWNqnxp83hYq4YhCQ4nkN5btdBCTUHpvce57Y
-tBLNeoqp+ogRIJDvTqZwBjB+3Gpn7Xaz5G0oW7tfOPbfQYrS02tXJbN4iR5v85Sd
-9PrXSAOEjomDiJ5iCToEvNzs/NHzabEZ+IH721yYfCBsiUvd+nLYePUdzq9ICGij
-zaKxkNLMiyiV5WtnuF19WfPsemVF8etJYThIiGfQ9vzFWAIRU2fgEW1XghxIC2/C
-vVzujCNLI5VkWqgZDuB1UtSlLshJ+ZtT87nGphi1LWV9KVabXtsfPTdTFnHHyx8U
-aAQtSnfF0SdPJaeWJMLNMGNHWcvaeg==
-=3iTu
------END PGP SIGNATURE-----
-
---joivlbaqnu5rwgfx--
+Thanks,
+Alex
