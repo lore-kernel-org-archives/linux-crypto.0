@@ -1,80 +1,103 @@
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0513647CA60
-	for <linux-crypto@vger.kernel.org>; Sat, 12 Sep 2026 18:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55A6378828;
+	Sat, 12 Sep 2026 19:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789237978; cv=none; b=BsCwBIV55vGAYi3kKkVWpVoKXo48cLNnRo1mr/Nr1kxyWFKZeIsCgGr8wP3oa3YlIJWuEl+3/eQZWImSAc2FA/DjJwCfugwFC4oETNRsKfD03FvzQb5pWC5aZ5FjRNqF0Qpq8ZB8vr7YJPWdvP4opQ3Z0a6TRjyhZZl5wVCVdnA=
+	t=1789242347; cv=none; b=GUyFB6S+ltZ1JziWFQHWKCcKuH4lmxZkB9V+bSle+RxDobLjli17qfMnY4SSGQ+3dQolF1UjkuLuzdSgA9lyM1h0SDNwT/c9EpiAPGWRX+fHnE5QgFIiWmHSL8oDeCTsNFpnLD0KU9zFRP3Ik1hcfSYK2DxiYro8C7CLG5l+8gU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789237978; c=relaxed/simple;
-	bh=yCdDdZ1nOCl+3Vkvo5RC/C0R7QieddoPbUQTZOQw5X0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XIybNOVHdSs4Le76ICjcSpUKgPXinNkELLwdLvw9Pf6QIzVg7+go7YpDOepc4hUGPanXN3LTlseojg3iLhIqXNGVtwiVSWYs8xrmV2nad9VYPjM7U8PbNxrD0LlseSYYRLBLmdn4wHBkv29b6kcg5mUzxpiS1R+69T2wiMzk46c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 40AA3602A9; Sat, 12 Sep 2026 20:32:48 +0200 (CEST)
-Date: Sat, 12 Sep 2026 20:32:44 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: kadlec@netfilter.org, linux-crypto@vger.kernel.org
-Subject: Re: [v2 PATCH] rhashtable: Add rhashtable_flush_and_free helper
-Message-ID: <aqWazNYddvTO5Sjn@strlen.de>
-References: <aqUmlWEzhR3pKYuP@gondor.apana.org.au>
+	s=arc-20240116; t=1789242347; c=relaxed/simple;
+	bh=eacxHEiiD3OVk2ISYPxyNt85eeFxKLOAzOSnClH+eZc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sUR10VKOyrjuU+0j/53+R4cO7n95UrfR1nqqFJ+8nd/2olN3t245D8NBmJkItvvXuKWE8FfGPcAmTO2IVf2B/l2xPSI+Lz3WBBy5HlZmYw9ePi8wrxZfjiMJa92imjUNFIC9Jc7cLu4UOFVMG54OysXhZ3mkP9rVsbB4khgfGXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=eETlsfsJ; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="eETlsfsJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 468C41F000FF;
+	Sat, 12 Sep 2026 19:45:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1789242345;
+	bh=P0npoEzA/E1dwbBlIIcBhCDU2XQtggnjslJY3gEdvsc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=eETlsfsJS/BaGARZE3zB8hHhC8GFNKnfvZlGioAAAK2Llgtwwhl1xGLc31MpSlmWt
+	 GsngaCrg47xLI0y0yASdIWg8KeNoye+pyiq06XtQ968Uh/cmxO4RveVdUE4qJ5eVOy
+	 GmFZ+IUt9LQO1CZXnIp4OrKnAN8JiuK/bAIXSrlM=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Tudor Ambarus <tudor.ambarus@microchip.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Ludovic Desroches <ludovic.desroches@microchip.com>,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Lee Jones <lee.jones@linaro.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.10 370/798] crypto: atmel-ecc - Struct headers need to start with keyword struct
+Date: Sat, 12 Sep 2026 08:59:58 +0200
+Message-ID: <20260912065525.637006230@linuxfoundation.org>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260912065516.948645775@linuxfoundation.org>
+References: <20260912065516.948645775@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aqUmlWEzhR3pKYuP@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> This patch adds the helper rhashtable_flush_and_free and its
-> rhltable counter-part.  The intended user is netfilter:
-> 
-> https://sashiko.dev/#/patchset/20260828152256.8759-1-fw%40strlen.de
+5.10-stable review patch.  If anyone has any objections, please let me know.
 
-Thanks for working on this.
+------------------
 
-> The hash table will briefly become NULL during the flush call,
-> in order to avoid race conditions against concurrent insertions
-> and removals which may schedule new rehashes.
+From: Lee Jones <lee.jones@linaro.org>
 
-When you send next version, could you elaborate a bit why this is
-required?  rht_deferred_worker grabs the ht mutex, so I don't understand
-this problem.  Worst case is a single,
-"useless" rehash of a most likely empty (or at least mostly empty) table.
+[ Upstream commit 71057841feaa6c1b5a80959013e588b2cdf9aef1 ]
 
-I don't see why the
+Fixes the following W=1 kernel build warning(s):
 
-mutex_lock(&ht->mutex);
-old_tbl = rcu_replace_pointer(ht->tbl, new_tbl, lockdep_rht_mutex_is_held(ht));
+ drivers/crypto/atmel-ecc.c:41: warning: cannot understand function prototype: 'struct atmel_ecdh_ctx '
 
-is bad.  It avoids the NULL checks and concurrent insertions will work.
+Cc: Tudor Ambarus <tudor.ambarus@microchip.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Stable-dep-of: f240f9b588f4 ("crypto: atmel-ecc - reject hardware ECDH without a public key")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/atmel-ecc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-From your previous comments, there are two cases:
+diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+index 5dd3e37f6715a..004d87cbfa221 100644
+--- a/drivers/crypto/atmel-ecc.c
++++ b/drivers/crypto/atmel-ecc.c
+@@ -26,7 +26,7 @@
+ static struct atmel_ecc_driver_data driver_data;
+ 
+ /**
+- * atmel_ecdh_ctx - transformation context
++ * struct atmel_ecdh_ctx - transformation context
+  * @client     : pointer to i2c client device
+  * @fallback   : used for unsupported curves or when user wants to use its own
+  *               private key.
+-- 
+2.53.0
 
-1. rehash gets queued, then flush was called (before worker runs).
-   This result in a "useless" rehash of a mostly empty table, but
-   I don't see the problem with this (flushes are rare).
 
-2. flush -> table replaced with empty one; *then* a rehash gets queued
-   (e.g. because of parallel mass insert into the new, now
-    not-so-empty-anymore table).
 
-In this second case, the behaviour is the same as if no flush would
-have happened.
-
--EBUSY is always possible regardless of a flush happening or not. Also,
-a possible "wrong" -EBUSY is certainly better than guaranteed
--EBUSY during the synchronize_rcu() call?
-
-That said, if it is really needed then this "guarenteed -EBUSY" is fine
-for my use case: for insertions from kernel/(iptables -j SET target),
-failure is already tolerated / acceptable, and insertions from userspace
-serialize on the same netlink mutex as the flush request.
