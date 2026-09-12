@@ -1,445 +1,115 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E040042885F
-	for <linux-crypto@vger.kernel.org>; Sat, 12 Sep 2026 10:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D670A35C6A7
+	for <linux-crypto@vger.kernel.org>; Sat, 12 Sep 2026 14:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789208233; cv=none; b=W+/o2iCFxdacvcCtfiQ3+XPVXs5818XnlVdGbL1Q9/H1Fv05RWuJ872gDwRwGBRO4IyFngVSd8QaofBzQRweoycD1oIJbJZpWUaMVrjB40BukxzJ+9LGwl2plNp1jA45gqN9Flt47TXHFT8QWu+os9TmyXSZa5k2l9jNB4Nx02o=
+	t=1789224093; cv=none; b=aCZLV6pu2627FD+Socv123Q8oSTf75H8Q+xyBqZC43HNnq0qpVPN3AxJ3O7DarXW4XE5j9Xc+83k6WOrIBModu0ugX1uSCENto2RgtOWux533P+F2xPGaKlJMlEUWWkGhrc7lOsbOos0d77WqpsiK2373ifhsUfhhsWg7nrLskI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789208233; c=relaxed/simple;
-	bh=I+SDLifoRG4d6Iswr9NuDcRzVQ5u5nSuRQCrFeQ1rIU=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZHHL38ibDHekzN3pOiWEkeoH6BvvPTG6P+EP//fhXxSNBFbUz6TISPucSe9JP4OrDjP+DlBDvoCX6X2kgN/ZuNkaolZkHejv83Wpobaf2W0NobHMKaQh4xTGsOSXZBps8Nq1b1WaZH7CblWMMIPOVlmPC/w19dkutaGEpaZKJBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=QcgAjbEu; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1789224093; c=relaxed/simple;
+	bh=jJUwvssp7BgAozkd0V89n4c6un4uRRFWxtfNl6AYC6g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uz39yM2/TgT52TGLMa1uep79IWa24T2pjwBrZLz1cXXNjDVZHrUF9S4mejvZrddVmoUeNhJy8QLzIiHupE1Y/oIsRj85ObJbWd1XFI8ECIMMSjtT7asYN1+fe2yW3a9xl3Nokzjm75YOrqzh9OjO1wWrRlNj3rDx8TlUsOum2Sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nQ/rLwO4; arc=none smtp.client-ip=74.125.227.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="QcgAjbEu"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
-	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=N5pbAzcNmov+z2asl1F+4AXVwzdZ4InXCzYVUDPMtG0=; b=QcgAj
-	bEuT8tnMf/cnBNab+mJl9a29ED8e3YnaZYBgUS4HYQxgbIKbjxC4+WDi6PHxN+TloDdcF2l9AGF0n
-	c5CrebUMNzxVe1A2Ocl7cgRjunyDtcz9a/ZrxY487FZuCjTaV8STe3y2bUoiZDx+4G4FdvcKQtd+G
-	/e7/mE1IJmhsvugPFKE6s5g3AK9+8UqwZ8EvVZVwCwhY+WrHw6qSWrKY2L4sfvSg68bxX9iEbNGe5
-	QvH0hyLU0qUM4NGuS8w52t2Om/FEJAabeZ8aHy2iSWKYPEV3jt4JfGNJ81YpXPlUk+jSQASh3Yab2
-	/+0NYZEuNt/T4J37y3oL5rFHZS+vg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x5Kmz-0000000DJCT-1Pep;
-	Sat, 12 Sep 2026 18:16:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 12 Sep 2026 20:16:53 +1000
-Date: Sat, 12 Sep 2026 20:16:53 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Florian Westphal <fw@strlen.de>, kadlec@netfilter.org,
-	linux-crypto@vger.kernel.org
-Subject: [v2 PATCH] rhashtable: Add rhashtable_flush_and_free helper
-Message-ID: <aqUmlWEzhR3pKYuP@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nQ/rLwO4"
+Received: by mail-pj2-f13.google.com with SMTP id 98e67ed59e1d1-396ccafb752so753897a91.0
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Sep 2026 07:41:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789224088; x=1789828888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=iIsKkBRVqKHVlP9edUOYmG2b5QsoU5qyf6y8sJGrYtM=;
+        b=nQ/rLwO43nAkQ9uAZK9C0K0P+lmIPrA9Y50Ghd+6vzT2l6dtVZzxA9bidBPftsb2a1
+         QfpvaQBFddJ/mo8HKUxIhRltiqhZYKI6MxDF7aCUR8uHDU0VAkpqxudhlaUQjQe2mM70
+         bO6Sli5m7RsEhB12bgDJSjobxDeVHMm/4QAII3beruf88NnV5j89VWo5aXAWpy+v10vh
+         L6GihFzxHlzNiWU/l59EVkQiuOAJr0Sw2aXgEyzKcAyFzJbBKGKnzsmSFbL20oqaO7bC
+         D5/aIvS6p8Y0QcuRaDH+KOw/emot6O76mZzv5+l8L5aExBx2dTpXl+nM9XMpJQWmmYmh
+         LYsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789224088; x=1789828888;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=iIsKkBRVqKHVlP9edUOYmG2b5QsoU5qyf6y8sJGrYtM=;
+        b=gGA1Cf8EIEbfcnfXpheDE6cDyDO/t0gMgERIenNeOZg8IOCloeEKyqkvseA8gnIPtg
+         wt0C+jVXz/bto/E/yj4waKaY35LsRX3TP4NrhbLWMoeTrNDuvfzlFD2iVzgbnf4C7Bm6
+         C1gLjqlbGDa84eInQp0tJYvAwwQ2oEg9iFpHGjA7Opolko2S7FqaEbbteI/93/zZEIh0
+         83JAUrFzWlMYwi4dZGlcjYLK0e5lfMFTT4OZWhjD2WLxEEHZL/JWDUFjToVrneOkeLit
+         gzx2B57SgqIDJEbW/bkxMhmozOW3m0ljPORqU5DcGi27eXxcnbjRa0i9/d1nBha850jQ
+         5vew==
+X-Forwarded-Encrypted: i=1; AKwUvBwBsE09Cr5o/idAXemDf41o1fUCDT9lnq2raYrsvm+qIbXSG/kOeb8w/IO8JJtF/wpa5JSpIh+JhLwefG0=@vger.kernel.org
+X-Gm-Message-State: AFuF++lmEO8dDSh/75L11aQWsMMT2lPEbIYtYWm94JCZhldEg5Y6qJIc
+	0reyMka72QDZinBUn4901jGU+JFWatOhP95aF38lpu/KlLrnxcXnr1U6
+X-Gm-Gg: AYBFou0g3XM+c3hqzsToPr+hVR2WOUXCok10+4pOotCMRNmuADfvoWErO/4oCaCzPQ2
+	yfLidBaqKrt0MgSqjk75jtssrQtV2dL5A9RC1C+vKnbozVpKrrtFHt40oehU2IK077yciw1nM43
+	HsNXcHeFkVBe3RKACPSsyuzF16H05qoSD0y2Jap0V9pvfcNGcaYO7wbRpF9eYTuHxjW8ieH5aYv
+	jRMKVqwwbRNkU5VQPRjAw0EeHlM6NOlWt4rkj/3dPSm1usWOHut4dlng96zbAejHunHAUTox+/u
+	TyO/WsJykwgQ6IqvTIAaumiX5XmL5QsYZ1xYPUtXfPbIdgWeoHiE/cOmLgNiX1jjBMe6nq3yN3L
+	RjWFqOFlRGPZlCl42tbqAGVxAo93It1scbMfAaAf76OZemNae+u8cjj+rK3HS18kTL5kehlqoj0
+	d3OiWM0miAVgSpaeL73nOiTsJ5ZOl1sSc9CfSG3BYRyrUrZrgISkqbkg==
+X-Received: by 2002:a17:90b:548f:b0:392:b509:b1a5 with SMTP id 98e67ed59e1d1-39d9c1db3d4mr16333966a91.14.1789224087801;
+        Sat, 12 Sep 2026 07:41:27 -0700 (PDT)
+Received: from lgs.. ([2001:250:5800:1002::de93])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39d98e60484sm10380257a91.4.2026.09.12.07.41.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Sep 2026 07:41:27 -0700 (PDT)
+From: Guangshuo Li <lgs201920130244@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Guangshuo Li <lgs201920130244@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] crypto: omap-des: fix crypto engine cleanup
+Date: Sat, 12 Sep 2026 22:41:16 +0800
+Message-ID: <20260912144116.993932-1-lgs201920130244@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-This patch adds the helper rhashtable_flush_and_free and its
-rhltable counter-part.  The intended user is netfilter:
+omap_des_probe() allocates and starts a crypto engine, but the remove
+path does not call the matching crypto_engine_exit(). The probe failure
+path already performs this cleanup.
 
-https://sashiko.dev/#/patchset/20260828152256.8759-1-fw%40strlen.de
+crypto_engine_alloc_init() creates a kthread worker for processing
+requests. Without crypto_engine_exit() during driver removal, the
+worker is left running after the device is removed.
 
-The hash table will briefly become NULL during the flush call,
-in order to avoid race conditions against concurrent insertions
-and removals which may schedule new rehashes.
+Call crypto_engine_exit() after unregistering the algorithms and before
+tearing down the remaining request handling resources. This stops the
+engine and destroys its worker.
 
-The rest of the code has been updated to handle ht->tbl being
-NULL.
+This issue was found by manual code inspection.
 
-In order to ensure that rehashes are fully disabled during the
-flush, the self-rearming in rht_deferred_worker is moved inside
-the mutex.
+Fixes: f1b77aaca85a ("crypto: omap-des - Integrate with the crypto engine framework")
+Cc: stable@vger.kernel.org
+Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+---
+ drivers/crypto/omap-des.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Incidentally this allows the removal of the special hack where
-it had to bypass the IRQ work.  However, as the existing
-rhashtable_free_and_destroy helper does not set the hash table
-to NULL, change it so that it uses disable_work_sync instead.
-
-If concurrent insertions and removals hit the old table during
-the call, they will act directly on the old table.
-
-If they see a NULL ht->tbl they shall fail immediately.
-
-Concurrent insertions and removals that see the new table will
-act on it.
-
-After setting ht->tbl to NULL, the new helper will wait for
-concurrent insertions and removals on the old ht->tbl to
-complete, and then cancel existing rehashes.
-
-Once rehashes are completely gone, the new table will be
-installed.
-
-Finally entries in the old table are freed.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
-index 6c5e6d9accba..edff647303bb 100644
---- a/include/linux/rhashtable.h
-+++ b/include/linux/rhashtable.h
-@@ -255,6 +255,11 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
- 				 void *arg);
- void rhashtable_destroy(struct rhashtable *ht);
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index 3b7104cb4487..4b5a8d13f505 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -1082,6 +1082,8 @@ static void omap_des_remove(struct platform_device *pdev)
  
+ 	omap_des_unregister_algs(dd->pdata);
+ 
++	crypto_engine_exit(dd->engine);
 +
-+void rhashtable_flush_and_free(struct rhashtable *ht,
-+			       void (*free_fn)(void *ptr, void *arg),
-+			       void *arg);
-+
- struct rhash_lock_head __rcu **rht_bucket_nested(
- 	const struct bucket_table *tbl, unsigned int hash);
- struct rhash_lock_head __rcu **__rht_bucket_nested(
-@@ -621,6 +626,9 @@ static __always_inline struct rhash_head *__rhashtable_lookup(
- 
- 	BUILD_BUG_ON(!__builtin_constant_p(freq));
- 	tbl = rht_dereference_rcu(ht->tbl, ht);
-+	if (!tbl)
-+		goto out;
-+
- restart:
- 	hash = rht_key_hashfn(ht, tbl, key, params);
- 	bkt = rht_bucket(tbl, hash);
-@@ -644,6 +652,7 @@ static __always_inline struct rhash_head *__rhashtable_lookup(
- 	if (unlikely(tbl))
- 		goto restart;
- 
-+out:
- 	return NULL;
- }
- 
-@@ -763,12 +772,15 @@ static __always_inline void *__rhashtable_insert_fast(
- 	struct rhash_head *head;
- 	unsigned long flags;
- 	unsigned int hash;
-+	void *data = NULL;
- 	int elasticity;
--	void *data;
- 
- 	rcu_read_lock();
- 
- 	tbl = rht_dereference_rcu(ht->tbl, ht);
-+	if (!tbl)
-+		goto out;
-+
- 	hash = rht_head_hashfn(ht, tbl, obj, params);
- 	elasticity = RHT_ELASTICITY;
- 	bkt = rht_bucket_insert(ht, tbl, hash);
-@@ -1127,11 +1139,13 @@ static __always_inline int __rhashtable_remove_fast(
- 	const struct rhashtable_params params, bool rhlist)
- {
- 	struct bucket_table *tbl;
--	int err;
-+	int err = -ENOENT;
- 
- 	rcu_read_lock();
- 
- 	tbl = rht_dereference_rcu(ht->tbl, ht);
-+	if (!tbl)
-+		goto out;
- 
- 	/* Because we have already taken (and released) the bucket
- 	 * lock in old_tbl, if we find that future_tbl is not yet
-@@ -1143,6 +1157,7 @@ static __always_inline int __rhashtable_remove_fast(
- 	       (tbl = rht_dereference_rcu(tbl->future_tbl, ht)))
- 		;
- 
-+out:
- 	rcu_read_unlock();
- 
- 	return err;
-@@ -1262,11 +1277,13 @@ static __always_inline int rhashtable_replace_fast(
- 	const struct rhashtable_params params)
- {
- 	struct bucket_table *tbl;
--	int err;
-+	int err = -ENOENT;
- 
- 	rcu_read_lock();
- 
- 	tbl = rht_dereference_rcu(ht->tbl, ht);
-+	if (!tbl)
-+		goto out;
- 
- 	/* Because we have already taken (and released) the bucket
- 	 * lock in old_tbl, if we find that future_tbl is not yet
-@@ -1278,6 +1295,7 @@ static __always_inline int rhashtable_replace_fast(
- 	       (tbl = rht_dereference_rcu(tbl->future_tbl, ht)))
- 		;
- 
-+out:
- 	rcu_read_unlock();
- 
- 	return err;
-@@ -1331,4 +1349,19 @@ static inline void rhltable_destroy(struct rhltable *hlt)
- 	rhltable_free_and_destroy(hlt, NULL, NULL);
- }
- 
-+/**
-+ * rhltable_flush_and_free - unlink and free all elements in the hash list table
-+ * @hlt:	the hash list table to destroy
-+ * @free_fn:	callback to release resources of element
-+ * @arg:	pointer passed to free_fn
-+ *
-+ * See documentation for rhashtable_flush_and_free.
-+ */
-+static inline void rhltable_flush_and_free(struct rhltable *hlt,
-+					   void (*free_fn)(void *ptr,
-+							   void *arg),
-+					   void *arg)
-+{
-+	rhashtable_flush_and_free(&hlt->ht, free_fn, arg);
-+}
- #endif /* _LINUX_RHASHTABLE_H */
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 5da0e53a8d42..cf44e30f92cd 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -435,6 +435,9 @@ static void rht_deferred_worker(struct work_struct *work)
- 	mutex_lock_nested(&ht->mutex, 1);
- 
- 	tbl = rht_dereference(ht->tbl, ht);
-+	if (!tbl)
-+		goto out;
-+
- 	tbl = rhashtable_last_table(ht, tbl);
- 
- 	if (rht_grow_above_75(ht, tbl))
-@@ -451,18 +454,11 @@ static void rht_deferred_worker(struct work_struct *work)
- 		err = err ?: nerr;
- 	}
- 
--	mutex_unlock(&ht->mutex);
--
--	/*
--	 * Re-arm via @run_work, not @run_irq_work.
--	 * rhashtable_free_and_destroy() drains async work as irq_work_sync()
--	 * followed by cancel_work_sync(). If this site queued irq_work while
--	 * cancel_work_sync() was waiting for us, irq_work_sync() would already
--	 * have returned and the stale irq_work could fire post-teardown.
--	 * cancel_work_sync() natively handles self-requeue on @run_work.
--	 */
- 	if (err)
--		schedule_work(&ht->run_work);
-+		irq_work_queue(&ht->run_irq_work);
-+
-+out:
-+	mutex_unlock(&ht->mutex);
- }
- 
- /*
-@@ -489,6 +485,8 @@ static int rhashtable_insert_rehash(struct rhashtable *ht,
- 	int err;
- 
- 	old_tbl = rht_dereference_rcu(ht->tbl, ht);
-+	if (!old_tbl)
-+		return -EAGAIN;
- 
- 	size = tbl->size;
- 
-@@ -636,6 +634,8 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
- 	void *data;
- 
- 	new_tbl = rcu_dereference(ht->tbl);
-+	if (!new_tbl)
-+		return NULL;
- 
- 	do {
- 		tbl = new_tbl;
-@@ -779,6 +779,8 @@ void *rhashtable_next_key(struct rhashtable *ht, const void *prev_key)
- 		return ERR_PTR(-EOPNOTSUPP);
- 
- 	tbl = rht_dereference_rcu(ht->tbl, ht);
-+	if (!tbl)
-+		return NULL;
- 	do {
- 		he = __rhashtable_next_in_table(ht, tbl, prev_key);
- 		if (!IS_ERR_OR_NULL(he))
-@@ -820,13 +822,15 @@ void rhashtable_walk_enter(struct rhashtable *ht, struct rhashtable_iter *iter)
- 	iter->p = NULL;
- 	iter->slot = 0;
- 	iter->skip = 0;
--	iter->end_of_table = 0;
- 
- 	spin_lock(&ht->lock);
- 	iter->walker.tbl =
- 		rcu_dereference_protected(ht->tbl, lockdep_is_held(&ht->lock));
--	list_add(&iter->walker.list, &iter->walker.tbl->walkers);
-+	if (iter->walker.tbl)
-+		list_add(&iter->walker.list, &iter->walker.tbl->walkers);
- 	spin_unlock(&ht->lock);
-+
-+	iter->end_of_table = !iter->walker.tbl;
- }
- EXPORT_SYMBOL_GPL(rhashtable_walk_enter);
- 
-@@ -880,6 +884,10 @@ int rhashtable_walk_start_check(struct rhashtable_iter *iter)
- 		return 0;
- 	if (!iter->walker.tbl) {
- 		iter->walker.tbl = rht_dereference_rcu(ht->tbl, ht);
-+		if (!iter->walker.tbl) {
-+			iter->end_of_table = true;
-+			return 0;
-+		}
- 		iter->slot = 0;
- 		iter->skip = 0;
- 		iter->p = NULL;
-@@ -1276,45 +1284,12 @@ static void rhashtable_free_one(struct rhashtable *ht, struct rhash_head *obj,
- 	} while (list);
- }
- 
--/**
-- * rhashtable_free_and_destroy - free elements and destroy hash table
-- * @ht:		the hash table to destroy
-- * @free_fn:	callback to release resources of element
-- * @arg:	pointer passed to free_fn
-- *
-- * Stops an eventual async resize. If defined, invokes free_fn for each
-- * element to releasal resources. Please note that RCU protected
-- * readers may still be accessing the elements. Releasing of resources
-- * must occur in a compatible manner. Then frees the bucket array.
-- *
-- * This function will eventually sleep to wait for an async resize
-- * to complete. The caller is responsible that no further write operations
-- * occurs in parallel.
-- *
-- * After cancel_work_sync() has returned, the deferred rehash worker is
-- * quiesced and, per the contract above, no other concurrent access to the
-- * rhashtable is possible. The tables are therefore owned exclusively by
-- * this function and can be walked without ht->mutex held.
-- */
--void rhashtable_free_and_destroy(struct rhashtable *ht,
--				 void (*free_fn)(void *ptr, void *arg),
--				 void *arg)
-+static void rhashtable_free(struct rhashtable *ht, struct bucket_table *tbl,
-+			    void (*free_fn)(void *ptr, void *arg), void *arg)
- {
--	struct bucket_table *tbl, *next_tbl;
-+	struct bucket_table *next_tbl;
- 	unsigned int i;
- 
--	irq_work_sync(&ht->run_irq_work);
--	cancel_work_sync(&ht->run_work);
--
--	/*
--	 * Do NOT take ht->mutex here. The rehash worker establishes
--	 * ht->mutex -> fs_reclaim via GFP_KERNEL bucket allocation under
--	 * the mutex; callers on the reclaim path (e.g. simple_xattr_ht_free()
--	 * from evict() under the dcache shrinker for shmem/kernfs/pidfs
--	 * inodes) would otherwise close a circular dependency
--	 * fs_reclaim -> ht->mutex.
--	 */
--	tbl = rcu_dereference_raw(ht->tbl);
- restart:
- 	if (free_fn) {
- 		for (i = 0; i < tbl->size; i++) {
-@@ -1339,6 +1314,36 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
- 		goto restart;
- 	}
- }
-+
-+/**
-+ * rhashtable_free_and_destroy - free elements and destroy hash table
-+ * @ht:		the hash table to destroy
-+ * @free_fn:	callback to release resources of element
-+ * @arg:	pointer passed to free_fn
-+ *
-+ * Stops an eventual async resize. If defined, invokes free_fn for each
-+ * element to releasal resources. Please note that RCU protected
-+ * readers may still be accessing the elements. Releasing of resources
-+ * must occur in a compatible manner. Then frees the bucket array.
-+ *
-+ * This function will eventually sleep to wait for an async resize
-+ * to complete. The caller is responsible that no further write operations
-+ * occurs in parallel.
-+ *
-+ * After disable_work_sync() has returned, the deferred rehash worker is
-+ * quiesced and, per the contract above, no other concurrent access to the
-+ * rhashtable is possible. The tables are therefore owned exclusively by
-+ * this function and can be walked without ht->mutex held.
-+ */
-+void rhashtable_free_and_destroy(struct rhashtable *ht,
-+				 void (*free_fn)(void *ptr, void *arg),
-+				 void *arg)
-+{
-+	disable_work_sync(&ht->run_work);
-+	irq_work_sync(&ht->run_irq_work);
-+
-+	rhashtable_free(ht, rcu_dereference_raw(ht->tbl), free_fn, arg);
-+}
- EXPORT_SYMBOL_GPL(rhashtable_free_and_destroy);
- 
- void rhashtable_destroy(struct rhashtable *ht)
-@@ -1415,3 +1420,55 @@ struct rhash_lock_head __rcu **rht_bucket_nested_insert(
- 
- }
- EXPORT_SYMBOL_GPL(rht_bucket_nested_insert);
-+
-+/**
-+ * rhashtable_flush_and_free - detach and discard all current elements
-+ * @ht:		the hash table to flush
-+ * @free_fn:	callback to release resources of an element, may be %NULL
-+ * @arg:	pointer passed to free_fn
-+ *
-+ * Swaps the bucket table backing @ht for a new, empty table.
-+ *
-+ * The detached table is then walked and every element found is
-+ * unlinked, and, if @free_fn is given, handed to it for release.
-+ *
-+ * Unlike rhashtable_destroy(), @ht is left fully initialized and may
-+ * continue to be used for lookups, insertions, and removals.
-+ *
-+ * This function may sleep, it cannot be called from atomic context or
-+ * RCU read-side critical sections.
-+ *
-+ * The caller must not make concurrent rhashtable_flush_and_free calls.
-+ * That is, a subsequent call can only be made once the first call has
-+ * returned.
-+ */
-+void rhashtable_flush_and_free(struct rhashtable *ht,
-+			       void (*free_fn)(void *ptr, void *arg),
-+			       void *arg)
-+{
-+	struct bucket_table *old_tbl, *new_tbl;
-+
-+	new_tbl = bucket_table_alloc(ht, rounded_hashtable_size(&ht->p),
-+				     GFP_KERNEL);
-+	if (!new_tbl)
-+		new_tbl = bucket_table_alloc(ht, ht->p.min_size,
-+					     GFP_KERNEL | __GFP_NOFAIL);
-+
-+	mutex_lock(&ht->mutex);
-+	old_tbl = rht_dereference(ht->tbl, ht);
-+	RCU_INIT_POINTER(ht->tbl, NULL);
-+	mutex_unlock(&ht->mutex);
-+
-+	/* Wait for insertions/removals on the old ht->tbl to complete. */
-+	synchronize_rcu();
-+
-+	/* Cancel resizes/rehashes. */
-+	irq_work_sync(&ht->run_irq_work);
-+	cancel_work_sync(&ht->run_work);
-+
-+	/* No need for mutex as rehashes have all stopped. */
-+	rcu_assign_pointer(ht->tbl, new_tbl);
-+
-+	rhashtable_free(ht, old_tbl, free_fn, arg);
-+}
-+EXPORT_SYMBOL_GPL(rhashtable_flush_and_free);
-
-Cheers,
+ 	cancel_work_sync(&dd->done_task);
+ 	omap_des_dma_cleanup(dd);
+ 	pm_runtime_disable(dd->dev);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.43.0
+
