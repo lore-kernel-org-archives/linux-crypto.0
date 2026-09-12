@@ -1,103 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55A6378828;
-	Sat, 12 Sep 2026 19:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A6B346AE3
+	for <linux-crypto@vger.kernel.org>; Sat, 12 Sep 2026 23:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789242347; cv=none; b=GUyFB6S+ltZ1JziWFQHWKCcKuH4lmxZkB9V+bSle+RxDobLjli17qfMnY4SSGQ+3dQolF1UjkuLuzdSgA9lyM1h0SDNwT/c9EpiAPGWRX+fHnE5QgFIiWmHSL8oDeCTsNFpnLD0KU9zFRP3Ik1hcfSYK2DxiYro8C7CLG5l+8gU=
+	t=1789255667; cv=none; b=HxUZMYkHEOpl2pojjI73/W/DziRucfPBTI+6il9ezCxsEuR4XXWq99c1CGVdn7HWWv7z8X4/JjP46co5MiEfwGQJH+sf9tjqSB/b5+eGPqNic6DQ4kKWMLsKsv4zh3BaJsSN0h7//K1UKFlUnW3sb2UWs7TnSqvp3Xze77jqemk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789242347; c=relaxed/simple;
-	bh=eacxHEiiD3OVk2ISYPxyNt85eeFxKLOAzOSnClH+eZc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sUR10VKOyrjuU+0j/53+R4cO7n95UrfR1nqqFJ+8nd/2olN3t245D8NBmJkItvvXuKWE8FfGPcAmTO2IVf2B/l2xPSI+Lz3WBBy5HlZmYw9ePi8wrxZfjiMJa92imjUNFIC9Jc7cLu4UOFVMG54OysXhZ3mkP9rVsbB4khgfGXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=eETlsfsJ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789255667; c=relaxed/simple;
+	bh=8YJTlE6IhQgqjDywt2N04MGW8EWwPd1rPdt5eaJtM4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GIKoSJHxgKB5pVL3IchmI1GfrjWb7alEgwPcDRbg4F5C+RGnUlqepW27th7PT1jwx/fvla8KpMMQHLyaaR7tGGLC3/IxUqbTtcppQxfGuY/It61qOg0ELAdKOHxIg5GPGA/yr0nvvT5Us0aX40KFaG3elTNCPapqKILIyiEX7iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=iTnr/wE+; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="eETlsfsJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 468C41F000FF;
-	Sat, 12 Sep 2026 19:45:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1789242345;
-	bh=P0npoEzA/E1dwbBlIIcBhCDU2XQtggnjslJY3gEdvsc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=eETlsfsJS/BaGARZE3zB8hHhC8GFNKnfvZlGioAAAK2Llgtwwhl1xGLc31MpSlmWt
-	 GsngaCrg47xLI0y0yASdIWg8KeNoye+pyiq06XtQ968Uh/cmxO4RveVdUE4qJ5eVOy
-	 GmFZ+IUt9LQO1CZXnIp4OrKnAN8JiuK/bAIXSrlM=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Tudor Ambarus <tudor.ambarus@microchip.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Ludovic Desroches <ludovic.desroches@microchip.com>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Lee Jones <lee.jones@linaro.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10 370/798] crypto: atmel-ecc - Struct headers need to start with keyword struct
-Date: Sat, 12 Sep 2026 08:59:58 +0200
-Message-ID: <20260912065525.637006230@linuxfoundation.org>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260912065516.948645775@linuxfoundation.org>
-References: <20260912065516.948645775@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="iTnr/wE+"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=glC9/HEDmoh1+wwdWnLEvC2Vp7ZpsQizI/B+a0GJMJg=; 
+	b=iTnr/wE+dy/L/N+tHZzYecB4R1jWEpQkcLd327BBQy6ZcYEkElvxfyzteiZwBsirABePYjBPRK3
+	m7FRKFpJS/G1WwAkocyihxsK5esnaK/a9nsCYbsYIJdbK/Ooi3oW76aXvNakTFU3T56+nre/Kyo3O
+	K1UbF3OIZd4MZJh2ev8uxqMhOtN+XBYcxWPysNgu0pvH+LBl79GwU3u0x5r/COqixxY3/Nc8MnDJN
+	e7dfBkbGOo7SYMke+u5dw9RPEhcivgPvILICrD5+Zaua3TeDR1WVqwIZn7IBUIklKYq4cuefUUNsW
+	KytUr/M8IbntsTOhwXBfYNuKyReyTYDOEwVQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x5X87-0000000DQMf-03y3;
+	Sun, 13 Sep 2026 07:27:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 13 Sep 2026 09:27:31 +1000
+Date: Sun, 13 Sep 2026 09:27:31 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Florian Westphal <fw@strlen.de>
+Cc: kadlec@netfilter.org, linux-crypto@vger.kernel.org
+Subject: Re: [v2 PATCH] rhashtable: Add rhashtable_flush_and_free helper
+Message-ID: <aqXf46iXp4BhuPud@gondor.apana.org.au>
+References: <aqUmlWEzhR3pKYuP@gondor.apana.org.au>
+ <aqWazNYddvTO5Sjn@strlen.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aqWazNYddvTO5Sjn@strlen.de>
 
-5.10-stable review patch.  If anyone has any objections, please let me know.
+On Sat, Sep 12, 2026 at 08:32:44PM +0200, Florian Westphal wrote:
+>
+> When you send next version, could you elaborate a bit why this is
+> required?  rht_deferred_worker grabs the ht mutex, so I don't understand
+> this problem.  Worst case is a single,
+> "useless" rehash of a most likely empty (or at least mostly empty) table.
 
-------------------
+You're right.  I mistakenly thought that a scheduled rehash may
+cause a rehash without resizing the table, but that's not how it
+works since only insertions can trigger a direct rehash, and that
+doesn't even happen in the delayed worker.
 
-From: Lee Jones <lee.jones@linaro.org>
+Let me see if I can simplify this.
 
-[ Upstream commit 71057841feaa6c1b5a80959013e588b2cdf9aef1 ]
-
-Fixes the following W=1 kernel build warning(s):
-
- drivers/crypto/atmel-ecc.c:41: warning: cannot understand function prototype: 'struct atmel_ecdh_ctx '
-
-Cc: Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
-Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Stable-dep-of: f240f9b588f4 ("crypto: atmel-ecc - reject hardware ECDH without a public key")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/atmel-ecc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 5dd3e37f6715a..004d87cbfa221 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -26,7 +26,7 @@
- static struct atmel_ecc_driver_data driver_data;
- 
- /**
-- * atmel_ecdh_ctx - transformation context
-+ * struct atmel_ecdh_ctx - transformation context
-  * @client     : pointer to i2c client device
-  * @fallback   : used for unsupported curves or when user wants to use its own
-  *               private key.
+Thanks,
 -- 
-2.53.0
-
-
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
