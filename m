@@ -1,44 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA41114AD0D
-	for <linux-crypto@vger.kernel.org>; Sun, 13 Sep 2026 00:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4A4266581
+	for <linux-crypto@vger.kernel.org>; Sun, 13 Sep 2026 01:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789258375; cv=none; b=QQVKPRJoUBnRaOMOEQPNHyYWYI+WkS3FVbZFBdGkdhRw1Oznq+5FG3hLXbdjpusHNfci6dq4UWrA3X3Ei8mrvXXR0hVD4/BsmkryuQN4Lhz0Dj2V4smpzrXh/0e3sQmjyUqZd6xOldealKSwcp6CU89wGTWmmvbuLVgi+HnoMyk=
+	t=1789263266; cv=none; b=EptsquaXNKhQ5xuYfZ1Heuyjv6mZmeAYg3mXzGvMI8DkJYgvY1owJ87ucof1rGDr8dfM69NgS88j/kzG/r4Wreikre6azGFcLe5VpJv/t5dAsi+bucLpCH+fAqhQXVIakpncBIuI2J8miQfiKjwhkT57gEkGEGC+01SbVg6Yxv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789258375; c=relaxed/simple;
-	bh=vAHNzXmK8lKmMZ1qRddDI3ZrsrqTaJ5rAWl+qNbOaHk=;
+	s=arc-20240116; t=1789263266; c=relaxed/simple;
+	bh=9zwp3oi7098R+Snk1I1TAK5a7LYGpVf6KLDF4veYrhw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ter7aFa6L8H8XlBLCTzO/GI0x2joDF7iUx7lN7Drst1BgHInx6RLHT0mX1Jxeqh+Hdr4x1/9GCqCWlStDwKrFXWmveyvDrOKsS/hzjJa1hybRKkepra7R2RsCN2De9SlnG5fQdKsjsGGPiVmG4LBshIGDb+5YbW9zMz8JJJk3kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=gid2tiy3; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=U/sPBqZ1eQXUTE/+XsaSloXlwyV3W61mtMls9Pucz5n3jDc4IisWSvIkB5eBpJzIeVdh2CciqN2f8eCSegWJwqvfKeGeTEcYGdkG2hAOpUl9p81v6RrwKgaaZgfLOF8qmTbGCs7JNblFQaxgk8CWINAg4OLWFaOqde+pI0Z3yKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=lLgelXD6; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="gid2tiy3"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="lLgelXD6"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=A1//LbbCQUNH2QkbGckToky4LAM8b75EesR5Pg8mhtg=; 
-	b=gid2tiy39ZIL6LtlhK0+UMbD89T0+1Dsqwbts9vOhT+h9ZOyNJ3Q/1s64mZfEjfdPJA+NqroXuQ
-	GZbi+hxYhnbjz5wV/WpcGcjPkguh7/LQRrJsUAIZz9Ow3rZOrbKW/D27TGXMXgWBDLbCse8d5RChe
-	oIqU5nqzu7rXyB+cwYqh1RM3Gben5qG7H9kDwAyAXdP1Aq2KdmbdEyZOX27I7l8WZ9QWhReFNGLzp
-	5cX+FHhuXkCh/dv4eeE4u8RiK2oV5ayDlpeZPQTAkSRmz42qH4pNXvzerMf9LgMaLCIuCbddIZk1d
-	iFWVHm7nEqeQjC6dkYqSNdp1m3Uf8noF0v+g==;
+	from:content-type:reply-to; bh=PBqph7RwliAwTTlSUpsQ4DnvxGz2ZsccuGEor9yQVdU=; 
+	b=lLgelXD6cO0CrseR+5J00GmmdsGO8CoV+nerXIJRbf06fCr0712ZRSrfITO0mqYd38/QpPaTVQZ
+	rbgivWPhaPbKjxpLIg9iysRkbgDu0TQqot/4lIyJPHgsyftFQyIk9u5mpErmgd4X7JP20IbKwVoZS
+	CNKDpucUKP4/Bqvje9feeBlBxuPKSPKUWhL1PrRK81mrN/U7/Rv6LS9KJvcs65+qKdMJt1a5WeTJz
+	wsqpOIf5IQBjRm3hHY+BeF2IC4OA5GGcp015MvrQbMIz6h8c/wNVPNX1vrswpt/lKgba0giBIArCU
+	Eic4NiBQBBrBcHF2yu0/YosbE2I1etsN9Ldw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x5Xpu-0000000DQcr-0NJC;
-	Sun, 13 Sep 2026 08:12:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 13 Sep 2026 10:12:46 +1000
-Date: Sun, 13 Sep 2026 10:12:46 +1000
+	id 1x5Z6l-0000000DR8M-0X2v;
+	Sun, 13 Sep 2026 09:34:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 13 Sep 2026 11:34:15 +1000
+Date: Sun, 13 Sep 2026 11:34:15 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Florian Westphal <fw@strlen.de>
 Cc: kadlec@netfilter.org, linux-crypto@vger.kernel.org
-Subject: [v3 PATCH] rhashtable: Add rhashtable_flush_and_free helper
-Message-ID: <aqXqftkCP3Jv1CXK@gondor.apana.org.au>
+Subject: [v4 PATCH] rhashtable: Add rhashtable_flush_and_free helper
+Message-ID: <aqX9l6vIJdzBSiUE@gondor.apana.org.au>
 References: <aqUmlWEzhR3pKYuP@gondor.apana.org.au>
  <aqWazNYddvTO5Sjn@strlen.de>
  <aqXf46iXp4BhuPud@gondor.apana.org.au>
+ <aqXqftkCP3Jv1CXK@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,21 +48,12 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aqXf46iXp4BhuPud@gondor.apana.org.au>
+In-Reply-To: <aqXqftkCP3Jv1CXK@gondor.apana.org.au>
 
-v3 makes the following changes:
+v4 makes the following changes:
 
-- Return -ESTALE when insertion sees a NULL ht->tbl so the entry doesn't leak.
-- Reset nelems to zero before publishing new ht->tbl.
-- Detach all walkers from bucket table before freeing.
-
-Note that I've kept the two-stage ht->tbl update, because even
-though it's not required for rehashing, I can't find a way to
-reset nelems properly without doing this.
-
-The issue is again that insertions occur locklessly and it updates
-nelems.  So we must quiesce existing insertions before we can
-update nelems.
+- Set iter->p to NULL when detaching walkers.
+- Wait for another RCU grace period after detaching walkers.
 
 ---8<---
 This patch adds the helper rhashtable_flush_and_free and its
@@ -105,14 +97,13 @@ the old table are freed.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
-index 6c5e6d9accba..43d6e2cc8be2 100644
+index 6c5e6d9accba..9b31ebd340e3 100644
 --- a/include/linux/rhashtable.h
 +++ b/include/linux/rhashtable.h
-@@ -255,6 +255,11 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
+@@ -255,6 +255,10 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
  				 void *arg);
  void rhashtable_destroy(struct rhashtable *ht);
  
-+
 +void rhashtable_flush_and_free(struct rhashtable *ht,
 +			       void (*free_fn)(void *ptr, void *arg),
 +			       void *arg);
@@ -120,7 +111,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
  struct rhash_lock_head __rcu **rht_bucket_nested(
  	const struct bucket_table *tbl, unsigned int hash);
  struct rhash_lock_head __rcu **__rht_bucket_nested(
-@@ -621,6 +626,9 @@ static __always_inline struct rhash_head *__rhashtable_lookup(
+@@ -621,6 +625,9 @@ static __always_inline struct rhash_head *__rhashtable_lookup(
  
  	BUILD_BUG_ON(!__builtin_constant_p(freq));
  	tbl = rht_dereference_rcu(ht->tbl, ht);
@@ -130,7 +121,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
  restart:
  	hash = rht_key_hashfn(ht, tbl, key, params);
  	bkt = rht_bucket(tbl, hash);
-@@ -644,6 +652,7 @@ static __always_inline struct rhash_head *__rhashtable_lookup(
+@@ -644,6 +651,7 @@ static __always_inline struct rhash_head *__rhashtable_lookup(
  	if (unlikely(tbl))
  		goto restart;
  
@@ -138,7 +129,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
  	return NULL;
  }
  
-@@ -759,16 +768,19 @@ static __always_inline void *__rhashtable_insert_fast(
+@@ -759,16 +767,19 @@ static __always_inline void *__rhashtable_insert_fast(
  	};
  	struct rhash_lock_head __rcu **bkt;
  	struct rhash_head __rcu **pprev;
@@ -159,7 +150,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
  	hash = rht_head_hashfn(ht, tbl, obj, params);
  	elasticity = RHT_ELASTICITY;
  	bkt = rht_bucket_insert(ht, tbl, hash);
-@@ -1127,11 +1139,13 @@ static __always_inline int __rhashtable_remove_fast(
+@@ -1127,11 +1138,13 @@ static __always_inline int __rhashtable_remove_fast(
  	const struct rhashtable_params params, bool rhlist)
  {
  	struct bucket_table *tbl;
@@ -174,7 +165,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
  
  	/* Because we have already taken (and released) the bucket
  	 * lock in old_tbl, if we find that future_tbl is not yet
-@@ -1143,6 +1157,7 @@ static __always_inline int __rhashtable_remove_fast(
+@@ -1143,6 +1156,7 @@ static __always_inline int __rhashtable_remove_fast(
  	       (tbl = rht_dereference_rcu(tbl->future_tbl, ht)))
  		;
  
@@ -182,7 +173,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
  	rcu_read_unlock();
  
  	return err;
-@@ -1262,11 +1277,13 @@ static __always_inline int rhashtable_replace_fast(
+@@ -1262,11 +1276,13 @@ static __always_inline int rhashtable_replace_fast(
  	const struct rhashtable_params params)
  {
  	struct bucket_table *tbl;
@@ -197,7 +188,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
  
  	/* Because we have already taken (and released) the bucket
  	 * lock in old_tbl, if we find that future_tbl is not yet
-@@ -1278,6 +1295,7 @@ static __always_inline int rhashtable_replace_fast(
+@@ -1278,6 +1294,7 @@ static __always_inline int rhashtable_replace_fast(
  	       (tbl = rht_dereference_rcu(tbl->future_tbl, ht)))
  		;
  
@@ -205,7 +196,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
  	rcu_read_unlock();
  
  	return err;
-@@ -1331,4 +1349,19 @@ static inline void rhltable_destroy(struct rhltable *hlt)
+@@ -1331,4 +1348,19 @@ static inline void rhltable_destroy(struct rhltable *hlt)
  	rhltable_free_and_destroy(hlt, NULL, NULL);
  }
  
@@ -226,7 +217,7 @@ index 6c5e6d9accba..43d6e2cc8be2 100644
 +}
  #endif /* _LINUX_RHASHTABLE_H */
 diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 5da0e53a8d42..a1616ec9905c 100644
+index 5da0e53a8d42..6f39fdce0233 100644
 --- a/lib/rhashtable.c
 +++ b/lib/rhashtable.c
 @@ -435,6 +435,9 @@ static void rht_deferred_worker(struct work_struct *work)
@@ -318,7 +309,7 @@ index 5da0e53a8d42..a1616ec9905c 100644
  		iter->slot = 0;
  		iter->skip = 0;
  		iter->p = NULL;
-@@ -1276,46 +1284,24 @@ static void rhashtable_free_one(struct rhashtable *ht, struct rhash_head *obj,
+@@ -1276,45 +1284,12 @@ static void rhashtable_free_one(struct rhashtable *ht, struct rhash_head *obj,
  	} while (list);
  }
  
@@ -349,7 +340,6 @@ index 5da0e53a8d42..a1616ec9905c 100644
 +			    void (*free_fn)(void *ptr, void *arg), void *arg)
  {
 -	struct bucket_table *tbl, *next_tbl;
-+	struct rhashtable_walker *walker;
 +	struct bucket_table *next_tbl;
  	unsigned int i;
  
@@ -366,20 +356,9 @@ index 5da0e53a8d42..a1616ec9905c 100644
 -	 */
 -	tbl = rcu_dereference_raw(ht->tbl);
  restart:
-+	spin_lock(&ht->lock);
-+	list_for_each_entry(walker, &tbl->walkers, list) {
-+		struct rhashtable_iter *iter;
-+
-+		walker->tbl = NULL;
-+		iter = container_of(walker, struct rhashtable_iter, walker);
-+		iter->end_of_table = true;
-+	}
-+	spin_unlock(&ht->lock);
-+
  	if (free_fn) {
  		for (i = 0; i < tbl->size; i++) {
- 			struct rhash_head *pos, *next;
-@@ -1339,6 +1325,36 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
+@@ -1339,6 +1314,36 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
  		goto restart;
  	}
  }
@@ -416,7 +395,7 @@ index 5da0e53a8d42..a1616ec9905c 100644
  EXPORT_SYMBOL_GPL(rhashtable_free_and_destroy);
  
  void rhashtable_destroy(struct rhashtable *ht)
-@@ -1415,3 +1431,57 @@ struct rhash_lock_head __rcu **rht_bucket_nested_insert(
+@@ -1415,3 +1420,78 @@ struct rhash_lock_head __rcu **rht_bucket_nested_insert(
  
  }
  EXPORT_SYMBOL_GPL(rht_bucket_nested_insert);
@@ -446,7 +425,8 @@ index 5da0e53a8d42..a1616ec9905c 100644
 +			       void (*free_fn)(void *ptr, void *arg),
 +			       void *arg)
 +{
-+	struct bucket_table *old_tbl, *new_tbl;
++	struct bucket_table *tbl, *old_tbl, *new_tbl;
++	struct rhashtable_walker *walker;
 +
 +	new_tbl = bucket_table_alloc(ht, rounded_hashtable_size(&ht->p),
 +				     GFP_KERNEL);
@@ -470,6 +450,26 @@ index 5da0e53a8d42..a1616ec9905c 100644
 +
 +	/* No need for mutex as rehashes have all stopped. */
 +	rcu_assign_pointer(ht->tbl, new_tbl);
++
++	/* Detach walkers from the old hash table. */
++	tbl = old_tbl;
++	spin_lock(&ht->lock);
++	do {
++		list_for_each_entry(walker, &tbl->walkers, list) {
++			struct rhashtable_iter *iter = container_of(
++				walker, struct rhashtable_iter, walker);
++
++			walker->tbl = NULL;
++			iter->end_of_table = true;
++			iter->p = NULL;
++		}
++
++		tbl = rcu_dereference_raw(tbl->future_tbl);
++	} while (tbl);
++	spin_unlock(&ht->lock);
++
++	/* Wait for walkers on old table to complete. */
++	synchronize_rcu();
 +
 +	rhashtable_free(ht, old_tbl, free_fn, arg);
 +}
