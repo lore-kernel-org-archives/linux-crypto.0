@@ -1,158 +1,416 @@
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013038.outbound.protection.outlook.com [52.101.83.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8851632DD;
-	Mon, 14 Sep 2026 04:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.38
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789359290; cv=fail; b=g/X29AWdEY5jDsG0mEQH+/SJIujCKFZqT3XWHOJYERKHQ+oBT03FRcxjmWWnx9vQPAmNUp3LHnc+f5cKFk2FTXR5ejbNRViEYQVNTxvaPTesRkLldb8R1Ec0cmd3nLqJ5NJNkXuhJ63c507eEeCU0QJkmUsHZh5/UoLSKY8dL0A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789359290; c=relaxed/simple;
-	bh=mk5G6HP2MRQGInjO+vieTSrbKC/Guj2J7CVXSX8WBQo=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=C4d1R3R6+yJvq5PyiT4lu6S4aJbUMvskcwscuJz23cRsbD1Kay6ksnJBlA7S7MiaXERgAG7bP75T39egKdXXpa+NfcXBstZ0H6QtBSqWpYqK1r6MUdFchA03pfkQ7d9AnAYkSenyNwQrNBgjahPKu50KiIODq1/sxTOcJVDYA60=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=h/odShjU; arc=fail smtp.client-ip=52.101.83.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0731C3F4859
+	for <linux-crypto@vger.kernel.org>; Mon, 14 Sep 2026 07:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789371392; cv=none; b=lE0F0yT8gvMYbvQhA+xAM3f+PxcdG19KbeZJkvGWUIWVK9HxaXZIvzbptDKxJ59N3r2isGjMLajhNmZdNOVWy6YLbKn2Z+VK97fs7BSGzLrF5CEgZJEmR4YV9RRbs5DUJsZh+Pc2l+crmhicDY3LlCKHcf8ecDXGMBsW9wnwva0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789371392; c=relaxed/simple;
+	bh=hEm/bEks3irY7+02kfdkjDPhk7yQ+7iNnmO2cR5K+R8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PbzRmJFvRPwJcTdxSPWrkh1cm0Q9SR8coWP5zET6iHu9+9nkJiPLDDGEWnIpoWlizWip1c+YUG+9vedsHLOdBV+FCoMcyIYFUK2XWGNO1quLToiAlO7ZsIg02JKPaaBK/uB4V0viL+VJmJ0fQytJ9+P0u1i2uuufgFgA4ZlrL9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8HKUh7K; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="h/odShjU"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mWmmuzBSjWRlauejTyG0VqoQxM4hN05VWhliw5ok6JsB33Mn3oJSWoi3gzuq+AiWbyk6JH74tZMh7KPGDeDggUMAX9A2eUTMKzXxNi+qJQP/d0hVCufnbZfysd6I2x+qnd9aJcoxA83KUXEj5Kfj9N4AnW74wlbqMwdZQZtGthSRKnxOFhUApUvuAEvT3kvO2xGTYP1g/mQvoWFbKjx824PavWl0fUlSnwz+JdTacX2ZQKFWoN6gi/AUlJTsRgHzJBp/0bkF/S1k/wNZTp/GCpqidp8wTPYA1i0p2nqn7oWAdBzrkZh+2kibb3sZkr/gTCbWFqtL7lw9PsfdXV/E6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7Kzfy/eX4WxXZs/USimvIu3Jo2+tuMIZXA/427xm6Pw=;
- b=Gd9lUiq2Hf2RCY7qlNL81jOoQFEB8/CKxB/0Q2BawLiNXD5IBRCM4oEETFzTH8JGV+NjNWHCvb0R0H3ktSaa4+kQLsbZO3d2oGskIAnNE17cLFBu+I9HHYTUWTumAJZmwSOuyhT1bzrOoxkoKcgfzIsmyYHkQT+bm/iJe+Xb5ODYJmxt0uj35z+g8ctkVKHynM8tQhgpIQsTqzB1jL7HF1uBr024z/mFCymauEB+Et7e9Ac55mqJJKleYqNAu5LdFXrczEyUbcSskEuLZweyPSt2mNKaaugrTNDdaxwVSxR1i1nOvcsWZGooljVXZfE+jmIKtfW9XZwzU2jKL97xDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7Kzfy/eX4WxXZs/USimvIu3Jo2+tuMIZXA/427xm6Pw=;
- b=h/odShjUaf2GlzAVF4iSHuHTUguKAHC3zvcIm3mlGfOj2dgXFplaBvjVwXQrPfjFHCq9DErNMF8D9H3spBi6Q0ZaL9sKwQQadgcoU/sEx7jfBekgYIjDd6xlcp7yGWuMOUN9/DYXqjODqEgIwkj8qtS8U3UOueuU4epVruAwz6gRis7b9Hux2IfH6JAnsSQk37VTv0pzKWX/Q6Ku5b6CX0SKvl5T385oeOSP0Cyb48HDNrAN5mogBgZ8NEjXl1IRlO3N22S94YN2lsEVXhdGcgYo9StYQmZ3XG36PWoeAla1H2db/Y0/IXRA511lvYRQNoUAgMdZgJ28L83rjej0kw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from AS1PR04MB9358.eurprd04.prod.outlook.com (2603:10a6:20b:4dc::19)
- by VI2PR04MB11273.eurprd04.prod.outlook.com (2603:10a6:800:296::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.12; Mon, 14 Sep
- 2026 04:14:45 +0000
-Received: from AS1PR04MB9358.eurprd04.prod.outlook.com
- ([fe80::677:d5bf:c3ce:3ad4]) by AS1PR04MB9358.eurprd04.prod.outlook.com
- ([fe80::677:d5bf:c3ce:3ad4%4]) with mapi id 15.21.0406.007; Mon, 14 Sep 2026
- 04:14:45 +0000
-From: sahil.malhotra@oss.nxp.com
-To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sahil Malhotra <sahil.malhotra@oss.nxp.com>,
-	Varun Sethi <v.sethi@nxp.com>,
-	Sahil Malhotra <sahil.malhotra@nxp.com>
-Subject: [PATCH] MAINTAINERS: update caam crypto driver maintainers list
-Date: Mon, 14 Sep 2026 06:14:36 +0200
-Message-ID: <20260914041436.3910000-1-sahil.malhotra@oss.nxp.com>
-X-Mailer: git-send-email 2.43.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AS4P195CA0041.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:20b:65a::13) To AS1PR04MB9358.eurprd04.prod.outlook.com
- (2603:10a6:20b:4dc::19)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8HKUh7K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9125D1F0089C
+	for <linux-crypto@vger.kernel.org>; Mon, 14 Sep 2026 07:36:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789371389;
+	bh=iieWhL4+NDVY5pvVLQHdGLRs9vjEjFm1op0rBHnDsvg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=K8HKUh7Kwa+c+t+xaa+26eldeQDTIZjvbrnIlXkgbjKdcUW84gLPrLIrY3E9B8LJ3
+	 TWzAvv1BJCSAO0sYRxnVzNFWxkWBGNVvGLSnBpQLUXJhimg+VxZIF5yLK0v1gSpYpU
+	 VMZ22DFtf5etuMFSomEmDX2unX9G2cXzGMaBZpVGp7vdlnB48oaXyzI0RMpLNbVqJA
+	 gvNW9wyzm1Vm5m0nN9OeCDglS71RRJ41I58Qy/ahMqai0bFVKjo1ohOHClBWZqsOJL
+	 sV8nz6S0CNPdlLpRLKFjeX2MnygOCwoTaA9gWA/h+gPhPmOgzHzYNhCAaHjlCO001I
+	 eX+RWnnMGB05Q==
+Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a67fa7a64eso3085752a12.1
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Sep 2026 00:36:29 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByj+cPRnZY2t98K4/0POGBzJdizB/K15Va256oglm+Ic8elml5Azz/S5y1ohDtbHVjpewHPSTHV7zIjVV0=@vger.kernel.org
+X-Gm-Message-State: AFuF++neV9di8t7QkjnEXkMD3lhIgnYs5HaoHsXX6bmN8zA8+XSsRWnf
+	YQeXvxbmcXv8qDYG70uFSSXXymtTxR4mwo/NgV4LQhg3RY3WuUNAh+GsY52PZqxUMrcKm9BprjD
+	M4TmA2XBrv7VCUAeGqBW4MK8RoNk9Kh0=
+X-Received: by 2002:a05:6402:24d9:b0:6a9:ce09:dbc1 with SMTP id
+ 4fb4d7f45d1cf-6a9f6227995mr664006a12.5.1789371388125; Mon, 14 Sep 2026
+ 00:36:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS1PR04MB9358:EE_|VI2PR04MB11273:EE_
-X-MS-Office365-Filtering-Correlation-Id: 378719e4-be2a-45d8-dfe1-08df1216b588
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|366016|19092799006|23010399003|18002099003|11063799006|10067099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	1btLP1N6+zo768i2jR5NNvWby71fM9UhPPpQnDGyzkv6SvhiTUOLkBt3LCHMj37F+sCBOtAZ2pLxLvkdTVoM+HyqBvBON79VGIuxjomqIxrk1bzTX+QhZDWFp9nJjDpl47aQMGQcL4JA5lMctjj9W497Tl9qwOjq2bNQQmB4Q6ZxHKGxnYV3OngGS4Ivd7hU+ecGuTQkW9/djlgDDTjYUinAvQOchvVzaTkOPZLwQu5D4U/a/W9qwmzgVU3zPwsdzhAp65vqNfE7lYAwO9EFD89r+fRRfRvF7GsW3Bllr/QauO1hJ3oA5Lr7F2QFh1pyB6xbue2kwPFBaPOzAVbnitXOA74GPwEQz1di+cR9GrKa0ggx4Ovw3pBEIxW7S3VROTX3n3FEospdxDIJnEH5yoM5V3eNn/ho6nzAx+XuhCwu++x31G6qxik458NPO0b833byjJm8a/yafWD8yZ9bGxwyykF/ekeON3pv+VdaqCSC0yqwLCOxxOmRDJFdyYNHwDw3aPGMuUTyn/H1ESsAP1Mp4tutum11IHoaSc4B/x9+I053/rOZrxqHkxDDCgp8WilmONeMawue6pI2d6PWPqxq8SRujNP9W0XS4iWORepI+bq/R8HbTEAVzAbf6DMXSZW+E4Y7P8Gxl3v4DgJCxZ8HG0GPAgTjskTtTiqaO98=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR04MB9358.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(19092799006)(23010399003)(18002099003)(11063799006)(10067099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TDdqZUpLa25mTEVSR09WbDh0TVRjK3YrZzE0UWlrSk9DWGh3cXE5RlFQUkNG?=
- =?utf-8?B?Wmc5c1U0d0JIVHI0TUx0aG45Nzl6R0w0bTlQUnJ4a2poZHBYbFhqbndkNUVN?=
- =?utf-8?B?VVB1Z2ZmYmJOb3BzcGRMeWVDdFpJdEtjR2d4RGdQM3ZOVlZoQnJNaWFCa1M5?=
- =?utf-8?B?Rlp1aXBKeXFSYUV4YXMwcWZSVnI5WndFTlFMWVFjbmtlNE5oZjRNbS9sY0w4?=
- =?utf-8?B?bi9UUGVDWEZwUWJBMlNUZ0lmTEJxcWs2emhZc1VIUFJOck8yU2hNVEF0VENM?=
- =?utf-8?B?K2s1cSsxV0JqNmh2dGtxOE82WlFHTkhTU3htNzA1ZC8xOGJFZElZblFUWjU2?=
- =?utf-8?B?a05qYjNSL1o3K3lnTHROeEcyNlpNbnBGa2s4d3ViaDNKaVRPRFdVUXN1UWhD?=
- =?utf-8?B?YVh2NVpFWTVuOGJuQW1yQWVlcWJoMEZpeWR2UXZLc1B6OWJjSk1jOFBwYndY?=
- =?utf-8?B?bzArdDZxVGpmNGV5U2FwRlFqeGtMaDE2TjQwa3RVVm13ODVKbjVCWDVNeW1J?=
- =?utf-8?B?cHVQeGJ0cUxIeDVoTFlvbWIxN0NwMTlXdHVNTldKRVd6blR5aEFTK1VERDZy?=
- =?utf-8?B?Q1NnVENqeWVsSUpXL2RmZzJMUjZ5YjR0VDFUVXlMZnZUWUFnUWpaeThDV0J3?=
- =?utf-8?B?dk9ud3VMRDgydXJnTVFDcHRqT3RQN2dER0d4MkdDa05FYmQ0MExFbTRkYnJB?=
- =?utf-8?B?WHo4MGprRy90cWQ1RmhXUjd2M0RKOWorUXkxZDlMa3h2aUh0KzFKeGpYckd4?=
- =?utf-8?B?TUlTQmlCWEx5K2RkejBEY1NCUi82RWhlYUZFMXRnUVZwSVRqamJDZ2hjUDFQ?=
- =?utf-8?B?QTB2K01oa2ZaMkZGRkJKcThNYml3aWlBNzZ2b1l4UEJSYitPL3lpTTRMU1hN?=
- =?utf-8?B?UXFOY3pyd3dGc1ZvQ0ZyTjZkN3lXTlNBbjlHSkVUaEpxclRVRmVYY0xPVFQ4?=
- =?utf-8?B?NGRUS3NzWG1VYm42KzdydUtuRlNhM3RwcGNmQnRoclRZSUN6NEJKc0xYc1l5?=
- =?utf-8?B?TTBlZDd3VTFKQmM3Q08xcVkrb3FvcFVkU21waTVCclArM0JvMVNOMzlieWNV?=
- =?utf-8?B?dGJkVFdkRnl0QjEzM2txNXJXenBmZkRVM0UwczZia3k2c3krcnV5ZlMzczNY?=
- =?utf-8?B?WTFOZnlBeDRzSUdYMko3Wi9MN3pod0lyZjRoYXpXT3hDenVvazg4dkxCd0lh?=
- =?utf-8?B?aWxhclliODl0UGlmWFFOQWlMT2JqaUZNU3MvYW1jUHFoY0U3ZWk4eE02MGx4?=
- =?utf-8?B?dmVENjhaMlZZOUI3R2ZMa0s1d3lmeG9yUmMydFBkdjBzSnVWWUlmWmlLamUx?=
- =?utf-8?B?eG9yRFZldTlMUFhtczJSd0x5L3VHZ1RNYnBrTXZybnlnR01yVzQxTjVTT2FU?=
- =?utf-8?B?c3BDb3huNTB1R3NCZTdKK3R5ako4d0VtbmhqdDRuczVGWm56YkZuendDYmFi?=
- =?utf-8?B?cXB0ZGI2ODlLOUJEMlNrZ0JQeEsxTWp5WDA4RFVoZkJtUzBXSlZLbkxrUGU5?=
- =?utf-8?B?cHFNVGc0Mm1SamcxbGhlaVUwZHFMb2VETjlyNHlpOHU4dUVVaE9yUE4zM0pG?=
- =?utf-8?B?Vm5WcW1jMDd3ZnFDSHY3U2VIQkgybWxISFY4ZkEvNjJEbkhYa0JudVpBQVZ1?=
- =?utf-8?B?MmRhSlpLaWJ3aFc1OHVITEJWSVVMKzhvUm9MTTdxZHFzL1k1Q1dDQU1BMzlP?=
- =?utf-8?B?MkhVRGFJQUZKLzU4M1loVk95NlExZGhUN1F3OG1uMjVRajJnZzlzSHJmRjh0?=
- =?utf-8?B?VWJNcDFBYjJBYWw3UWtMWWY1Q29FQjZIOFFHc3d2Q1dDUWhlZHFHSVpMWklJ?=
- =?utf-8?B?R0hWblFVMFBWUlVBaTlHR3dwOU9wZkN1MWRLaEhLeE5HK3o3MVAyWWZJYlhK?=
- =?utf-8?B?eWl2Qmw4VlMrOEUwZ2pDYkRTR0d2ZzRTUnY0L011VzJXdEpsVW9jVHpidDd5?=
- =?utf-8?B?NnBxeERQR2lJdHgwMlVCK1Ewd1JsdmNEVHkvcU5EWnVTSlZPRm1TclR4aDJa?=
- =?utf-8?B?MUJzZ2NsNENOL2NPbjc1RldwcmJUNmdkZ0cyOSt2Zm5hSWJBVGJ0UC9DeGJG?=
- =?utf-8?B?QVNYanpBUG5EQjNWcUc5MW9lSDRJd0pxVEFTNUp3M2hhOVluekc3VzByai9q?=
- =?utf-8?B?bEtRY2xpS3ErQTRLTE03TXlhYVpJcE1XWnBlZFJ4ekhiK21rMTNpRXQ0Mmlu?=
- =?utf-8?B?aTEza1pSRXM2WTFTS01pV2xIYXd5WVhHdHVlUURrbDVCS01nZGlJeUwvOWNx?=
- =?utf-8?B?d2NiUm90VGxibmF2djJpZG1Wb29reW42VjdQUVdNT1A2SU5lQmYyRUowV3pW?=
- =?utf-8?B?Uy9FMFZvK2l5dmYzM2g3WnpPOHRPa1FpcFNhTXdVSjZ4QXN3M2tNU0VPdGc0?=
- =?utf-8?Q?53eS+ev+j/b+rF1M+gh0LKi/oTXSLXyIk+Hp5?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 378719e4-be2a-45d8-dfe1-08df1216b588
-X-MS-Exchange-CrossTenant-AuthSource: AS1PR04MB9358.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2026 04:14:45.5386
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gh26G2Xtyf53VRGU3fEffMtKBta31hG/IdqSc+8Iz7gdHnA2oo7Z1RWJFEaI02IN18O0nlX2Dcsx/5mJNcCPEZ//XF+yI1hXZZNsymzkrQY0vVZpzGHRxxsDD2lV6Z13
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB11273
+References: <20260911090256.7834-1-zhaoqunqin@163.com> <20260911090256.7834-3-zhaoqunqin@163.com>
+In-Reply-To: <20260911090256.7834-3-zhaoqunqin@163.com>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Mon, 14 Sep 2026 15:36:15 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H4VEtZJAoYBz24=ab37fdpLL_kSS92vxMn61Rcq0C33aQ@mail.gmail.com>
+X-Gm-Features: AcwNN1W4J0VXunkboYJGsDo05xNt8zCnA_A78X63I9pY7tbgd8CpbxBMHPTJSJI
+Message-ID: <CAAhV-H4VEtZJAoYBz24=ab37fdpLL_kSS92vxMn61Rcq0C33aQ@mail.gmail.com>
+Subject: Re: [PATCH v7 2/2] mfd: loongson-se: Fix miscellaneous issues
+To: Qunqin Zhao <zhaoqunqin@163.com>
+Cc: lee@kernel.org, zhaoqunqin@loongson.cn, linux-kernel@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, mfd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Sahil Malhotra <sahil.malhotra@nxp.com>
+Hi, Qunqin,
 
-Adding Sahil Malhotra as caam maintainer and removing Gaurav Jain.
+On Fri, Sep 11, 2026 at 5:03=E2=80=AFPM Qunqin Zhao <zhaoqunqin@163.com> wr=
+ote:
+>
+> From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+>
+> Address multiple historical driver issues discovered by the Sashiko
+> Automation system within the loongson_se_probe() initialization flow
+> and the driver's interrupt service routines [1].
+>
+> - Add an explicit bounds check in se_irq_handler() before accessing
+>   the engines array to prevent an out-of-bounds memory access.
+>
+> - Validate the id argument in loongson_se_init_engine() and reject
+>   engine 0, whose data buffer is reused for the command buffers of all
+>   other engines, to prevent out-of-bounds accesses and overlapping DMA
+>   buffers.
+>
+> - Switch from devm_kmalloc() to devm_kzalloc() and initialize all
+>   engine completion structures in probe(), dropping the redundant
+>   init_completion() in loongson_se_init_engine().
+>
+> - Introduce loongson_se_reinit_completion() to mask the target
+>   interrupt, clear any pending status, and reset the completion under
+>   dev_lock before a command is issued, then re-enable the interrupt
+>   under the same lock after the command has been triggered.  This
+>   closes the race where a stale interrupt from a previously
+>   interrupted command could complete the current command's completion.
+>   A new poll_lock serializes the trigger and poll busy-wait so
+>   interrupts are not disabled for up to 10 ms.
+The locking of this driver is more and more complicated, I doubt
+whether AI's review is really correct here. For me, the existing
+locking code is just fine and simple.
 
-Signed-off-by: Sahil Malhotra <sahil.malhotra@nxp.com>
----
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Huacai
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index da3e42d2d190..52c9c0bdc1eb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10349,7 +10349,7 @@ F:	include/video/
- FREESCALE CAAM (Cryptographic Acceleration and Assurance Module) DRIVER
- M:	Horia Geantă <horia.geanta@nxp.com>
- M:	Pankaj Gupta <pankaj.gupta@nxp.com>
--M:	Gaurav Jain <gaurav.jain@nxp.com>
-+M:	Sahil Malhotra <sahil.malhotra@nxp.com>
- L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/crypto/fsl,sec-v4.0*
--- 
-2.43.0
-
+>
+> - Wait for controller command completion with a bounded
+>   non-interruptible wait so a pending signal cannot leave the
+>   controller running while its DMA buffers are being torn down, and a
+>   wedged controller cannot hang the kernel indefinitely.
+>
+> - Fix EPROBE_DEFER handling: propagate the error directly from
+>   platform_irq_count() instead of overwriting it with ENODEV so that
+>   probe deferral works when the interrupt provider is not yet ready.
+>
+> - Validate dmam_size from firmware against the minimum required size
+>   to keep the command buffers of all engines within engine 0's data
+>   region and prevent overlapping DMA buffers.
+>
+> - Return the error code from devm_request_irq() instead of silently
+>   continuing to prevent an indefinite hang.
+>
+> - Add a loongson_se_stop() cleanup handler registered with
+>   devm_add_action_or_reset() before loongson_se_init() so that a
+>   failed init still stops the controller and masks all interrupts via
+>   devres, preventing DMA access to freed memory.
+>
+> - Zero-initialize the local controller command structures in
+>   loongson_se_init() and loongson_se_init_engine() to prevent
+>   uninitialized stack data from being written to device registers.
+>
+> - Add the SE_CMD_STOP command definition.
+>
+> Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/ [1=
+]
+> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip =
+controller")
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> ---
+>  drivers/mfd/loongson-se.c       | 112 ++++++++++++++++++++++++++++----
+>  include/linux/mfd/loongson-se.h |   1 +
+>  2 files changed, 102 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+> index 7f552a8ee..18075d4fa 100644
+> --- a/drivers/mfd/loongson-se.c
+> +++ b/drivers/mfd/loongson-se.c
+> @@ -23,6 +23,8 @@
+>  struct loongson_se {
+>         void __iomem *base;
+>         spinlock_t dev_lock;
+> +       /* Synchronizes command submission between users of different eng=
+ines */
+> +       spinlock_t poll_lock;
+>         struct completion cmd_completion;
+>
+>         void *dmam_base;
+> @@ -42,7 +44,7 @@ static int loongson_se_poll(struct loongson_se *se, u32=
+ int_bit)
+>         u32 status;
+>         int err;
+>
+> -       spin_lock_irq(&se->dev_lock);
+> +       spin_lock(&se->poll_lock);
+>
+>         /* Notify the controller that the engine needs to be started */
+>         writel(int_bit, se->base + SE_L2SINT_SET);
+> @@ -52,17 +54,51 @@ static int loongson_se_poll(struct loongson_se *se, u=
+32 int_bit)
+>                                                 !(status & int_bit),
+>                                                 1, LOONGSON_ENGINE_CMD_TI=
+MEOUT_US);
+>
+> +       spin_unlock(&se->poll_lock);
+> +
+> +       spin_lock_irq(&se->dev_lock);
+> +       /*
+> +        * Re-enable the interrupt that loongson_se_reinit_completion() m=
+asked.
+> +        * The hardware guarantees that once the interrupt is re-enabled,=
+ only
+> +        * interrupts for the command just issued can arrive, so a stale
+> +        * interrupt from a previously interrupted command can never comp=
+lete
+> +        * this command's completion.
+> +        */
+> +       writel(int_bit | readl(se->base + SE_S2LINT_EN), se->base + SE_S2=
+LINT_EN);
+> +
+>         spin_unlock_irq(&se->dev_lock);
+>
+>         return err;
+>  }
+>
+> +/*
+> + * Prepare a completion for a new command: mask the corresponding interr=
+upt,
+> + * clear any pending interrupt status, and reset the completion.  This r=
+uns
+> + * under dev_lock so that the IRQ handler cannot race with it.  The inte=
+rrupt
+> + * is re-enabled in loongson_se_poll() after the command has been issued=
+.
+> + */
+> +static void loongson_se_reinit_completion(struct loongson_se *se,
+> +                                         struct completion *completion, =
+u32 int_bit)
+> +{
+> +       spin_lock_irq(&se->dev_lock);
+> +
+> +       writel(readl(se->base + SE_S2LINT_EN) & ~int_bit, se->base + SE_S=
+2LINT_EN);
+> +
+> +       writel(int_bit, se->base + SE_S2LINT_CL);
+> +
+> +       reinit_completion(completion);
+> +
+> +       spin_unlock_irq(&se->dev_lock);
+> +}
+> +
+>  static int loongson_se_send_controller_cmd(struct loongson_se *se,
+>                                            struct loongson_se_controller_=
+cmd *cmd)
+>  {
+>         u32 *send_cmd =3D (u32 *)cmd;
+>         int err, i;
+>
+> +       loongson_se_reinit_completion(se, &se->cmd_completion, SE_INT_CON=
+TROLLER);
+> +
+>         for (i =3D 0; i < SE_SEND_CMD_REG_LEN; i++)
+>                 writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
+>
+> @@ -70,17 +106,31 @@ static int loongson_se_send_controller_cmd(struct lo=
+ongson_se *se,
+>         if (err)
+>                 return err;
+>
+> -       return wait_for_completion_interruptible(&se->cmd_completion);
+> +       /*
+> +        * Wait for the controller to complete the command.  Use a bounde=
+d
+> +        * non-interruptible wait: a pending signal must not leave the
+> +        * controller running while its DMA buffers are being torn down.
+> +        * One second is far more than any controller command should take=
+,
+> +        * while still bounding the wait if the hardware wedges.
+> +        */
+> +       if (!wait_for_completion_timeout(&se->cmd_completion, HZ))
+> +               return -ETIMEDOUT;
+> +
+> +       return 0;
+>  }
+>
+>  int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
+>  {
+> +       int err;
+> +
+> +       loongson_se_reinit_completion(engine->se, &engine->completion, BI=
+T(engine->id));
+> +
+>         /*
+>          * After engine initialization, the controller already knows
+>          * where to obtain engine commands from. Now all we need to
+>          * do is notify the controller that the engine needs to be starte=
+d.
+>          */
+> -       int err =3D loongson_se_poll(engine->se, BIT(engine->id));
+> +       err =3D loongson_se_poll(engine->se, BIT(engine->id));
+>
+>         if (err)
+>                 return err;
+> @@ -92,12 +142,17 @@ EXPORT_SYMBOL_GPL(loongson_se_send_engine_cmd);
+>  struct loongson_se_engine *loongson_se_init_engine(struct device *dev, i=
+nt id)
+>  {
+>         struct loongson_se *se =3D dev_get_drvdata(dev);
+> -       struct loongson_se_engine *engine =3D &se->engines[id];
+> -       struct loongson_se_controller_cmd cmd;
+> +       struct loongson_se_engine *engine;
+> +       struct loongson_se_controller_cmd cmd =3D {0};
+> +
+> +       /* Engine 0 does not exist and its data buffer is reused for comm=
+ands */
+> +       if (id <=3D 0 || id >=3D SE_ENGINE_MAX)
+> +               return NULL;
+> +
+> +       engine =3D &se->engines[id];
+>
+>         engine->se =3D se;
+>         engine->id =3D id;
+> -       init_completion(&engine->completion);
+>
+>         /* Divide DMA memory equally among all engines */
+>         engine->buffer_size =3D se->dmam_size / SE_ENGINE_MAX;
+> @@ -155,7 +210,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_=
+id)
+>         /* For engines */
+>         while (int_status) {
+>                 id =3D __ffs(int_status);
+> -               complete(&se->engines[id].completion);
+> +               if (id < SE_ENGINE_MAX)
+> +                       complete(&se->engines[id].completion);
+>                 int_status &=3D ~BIT(id);
+>                 writel(BIT(id), se->base + SE_S2LINT_CL);
+>         }
+> @@ -167,7 +223,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_=
+id)
+>
+>  static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int=
+ size)
+>  {
+> -       struct loongson_se_controller_cmd cmd;
+> +       struct loongson_se_controller_cmd cmd =3D {0};
+>         int err;
+>
+>         cmd.command_id =3D SE_CMD_START;
+> @@ -188,6 +244,17 @@ static const struct mfd_cell engines[] =3D {
+>         { .name =3D "tpm_loongson" },
+>  };
+>
+> +static void loongson_se_stop(void *data)
+> +{
+> +       struct loongson_se *se =3D data;
+> +       struct loongson_se_controller_cmd cmd =3D {0};
+> +
+> +       cmd.command_id =3D SE_CMD_STOP;
+> +       loongson_se_send_controller_cmd(se, &cmd);
+> +
+> +       writel(0, se->base + SE_S2LINT_EN);
+> +}
+> +
+>  static int loongson_se_probe(struct platform_device *pdev)
+>  {
+>         struct device *dev =3D &pdev->dev;
+> @@ -195,19 +262,34 @@ static int loongson_se_probe(struct platform_device=
+ *pdev)
+>         int nr_irq, irq, err, i;
+>         dma_addr_t paddr;
+>
+> -       se =3D devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+> +       se =3D devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
+>         if (!se)
+>                 return -ENOMEM;
+>
+>         dev_set_drvdata(dev, se);
+>         init_completion(&se->cmd_completion);
+>         spin_lock_init(&se->dev_lock);
+> +       spin_lock_init(&se->poll_lock);
+>         mutex_init(&se->engine_init_lock);
+>
+> +       for (i =3D 0; i < SE_ENGINE_MAX; i++)
+> +               init_completion(&se->engines[i].completion);
+> +
+>         dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+>         if (device_property_read_u32(dev, "dmam_size", &se->dmam_size))
+>                 return -ENODEV;
+>
+> +       /*
+> +        * Engine 0 does not exist and its data buffer is reused as the c=
+ommand
+> +        * buffer for the other engines.  The command buffers of all engi=
+nes
+> +        * therefore must fit within engine 0's data region, i.e.
+> +        * dmam_size / SE_ENGINE_MAX >=3D SE_ENGINE_MAX * 2 * SE_ENGINE_C=
+MD_SIZE.
+> +        * Enforce this to keep each engine's data and command buffers fr=
+om
+> +        * overlapping.
+> +        */
+> +       if ((se->dmam_size / SE_ENGINE_MAX) < (SE_ENGINE_MAX * 2 * SE_ENG=
+INE_CMD_SIZE))
+> +               return -EINVAL;
+> +
+>         se->dmam_base =3D dmam_alloc_coherent(dev, se->dmam_size, &paddr,=
+ GFP_KERNEL);
+>         if (!se->dmam_base)
+>                 return -ENOMEM;
+> @@ -217,20 +299,28 @@ static int loongson_se_probe(struct platform_device=
+ *pdev)
+>                 return PTR_ERR(se->base);
+>
+>         nr_irq =3D platform_irq_count(pdev);
+> -       if (nr_irq <=3D 0)
+> +       if (nr_irq =3D=3D 0)
+>                 return -ENODEV;
+> +       if (nr_irq < 0)
+> +               return nr_irq;
+>
+>         writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
+>
+>         for (i =3D 0; i < nr_irq; i++) {
+>                 irq =3D platform_get_irq(pdev, i);
+>                 err =3D devm_request_irq(dev, irq, se_irq_handler, IRQF_S=
+HARED, "loongson-se", se);
+> -               if (err)
+> +               if (err) {
+>                         dev_err(dev, "failed to request IRQ: %d\n", irq);
+> +                       return err;
+> +               }
+>         }
+>
+>         writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+>
+> +       err =3D devm_add_action_or_reset(dev, loongson_se_stop, se);
+> +       if (err)
+> +               return err;
+> +
+>         err =3D loongson_se_init(se, paddr, se->dmam_size);
+>         if (err)
+>                 return err;
+> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson=
+-se.h
+> index 07afa0c25..8237ccab7 100644
+> --- a/include/linux/mfd/loongson-se.h
+> +++ b/include/linux/mfd/loongson-se.h
+> @@ -9,6 +9,7 @@
+>  #define SE_SEND_CMD_REG_LEN            0x8
+>  /* Controller command ID */
+>  #define SE_CMD_START                   0x0
+> +#define SE_CMD_STOP                    0x1
+>  #define SE_CMD_SET_DMA                 0x3
+>  #define SE_CMD_SET_ENGINE_CMDBUF       0x4
+>
+> --
+> 2.47.2
+>
