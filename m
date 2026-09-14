@@ -1,217 +1,158 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013038.outbound.protection.outlook.com [52.101.83.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0289336197F
-	for <linux-crypto@vger.kernel.org>; Sun, 13 Sep 2026 15:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8851632DD;
+	Mon, 14 Sep 2026 04:14:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.38
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789312610; cv=pass; b=RLebtjidULka/ZmfpqBanezLWwA+iG0ca8Q0ijD8fPkp75eekj7gd9c2invUToubYOgr8TUkEZCA/ZQ8CthBKDx6gAQj5vDu0FXrEdxP8G/W/IU++r21+QHz27Qd3+zOfRFo5feT8z3LlZSWAiJtbbZNEWbKP1PSq3uTwcSsNh0=
+	t=1789359290; cv=fail; b=g/X29AWdEY5jDsG0mEQH+/SJIujCKFZqT3XWHOJYERKHQ+oBT03FRcxjmWWnx9vQPAmNUp3LHnc+f5cKFk2FTXR5ejbNRViEYQVNTxvaPTesRkLldb8R1Ec0cmd3nLqJ5NJNkXuhJ63c507eEeCU0QJkmUsHZh5/UoLSKY8dL0A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789312610; c=relaxed/simple;
-	bh=aTTMCVnrzErNo3gjfBn1PksZY0Pj3ZNQwgpIX9uxXUo=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=PwaTh3q/f76VzuO+3ybraq28eKbMFalmRBl5at9f0496tyjAS/c1jELmVcSV8Bf06Owc7/U5kUhI/9Z9Uvo2vzHZGtNjbrNsmizHDW6uxNt46d4eT6AWCRF7yX9X2WqzIn1JvEE8LKkJoOCD0J5tii27QKznHYVr1TU03ViLbcI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jN4pRQ/K; arc=pass smtp.client-ip=74.125.228.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789359290; c=relaxed/simple;
+	bh=mk5G6HP2MRQGInjO+vieTSrbKC/Guj2J7CVXSX8WBQo=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=C4d1R3R6+yJvq5PyiT4lu6S4aJbUMvskcwscuJz23cRsbD1Kay6ksnJBlA7S7MiaXERgAG7bP75T39egKdXXpa+NfcXBstZ0H6QtBSqWpYqK1r6MUdFchA03pfkQ7d9AnAYkSenyNwQrNBgjahPKu50KiIODq1/sxTOcJVDYA60=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=h/odShjU; arc=fail smtp.client-ip=52.101.83.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jN4pRQ/K"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c254fa663bfso233650466b.1
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Sep 2026 08:16:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789312606; cv=none;
-        d=google.com; s=arc-20260327;
-        b=OzFwDczaI9YJPLuZRJ0qpBxPovL3Qatz01W/srsk8NfOR5I1eTXk1BVYQy6MgkAnzR
-         bZsj6GNIG4FFHwBBf2As4JcrfWHgHJgLm2dnOyzLnB//PC2q6oFySAViJXjn+SuD05IX
-         axFbbgnR8LFihrIQxF4v98pIJa5wTB0NFeE3l0yV9QO6qoHhoqVex+EvFfQLOxlLy+Ep
-         KhBjhu/r4MFnts77Lh8KfkDAGcXBkFu5CyeAfrnVYZDpYpiH14OtIh2qG98YOxZa8xv9
-         RbLTTmWi2uJJslc5LBf1BNgbwVQW/u7j9KaGbSJObKubFUyqCCl6+T3DPRqeZ5lGgf9F
-         nRoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=aTTMCVnrzErNo3gjfBn1PksZY0Pj3ZNQwgpIX9uxXUo=;
-        fh=dVa4OajLyrOENmjD1WIzyzD4Bf4cb6CnysCq17SnKzg=;
-        b=Mmh6rD7aWYRrxfYZ4SLmBeby7hSYnnuOTbwyTkmXzKksi3bMk6KrNpaFcQSHTvtAHn
-         gleXShDZV5x0VNFxqJf4MFgPYlV8yGnJ9aw8iDQM1p0dLsRwBw2sdKmT9bLAeKQg8VdS
-         42Vt3lluZJusHXfjGcgnA4SYAwyOE56rKFqSZswd2eycHZ3j30v0PZkxZOybuvyeQmlJ
-         QXCf5QheJ8vfKQRSP7I+TFSaW511n02iFQxzQZnxS4ohckwlHGOtjneB1k4gBg33rC4y
-         ENEn2gj67yVi3ZTcQJnYJwyiM2Pte8VNE6yW9pPng76KHMs4sLbUFPPDI1m1ijczyI19
-         JQrA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789312606; x=1789917406; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=aTTMCVnrzErNo3gjfBn1PksZY0Pj3ZNQwgpIX9uxXUo=;
-        b=jN4pRQ/K7WGpaaevX9Rd6IgHowJ5DvXdaDUrCOLhMigPN4a7v802MVayWc+ed7eKNV
-         axmi5mll4Q8uzf3QlWF2Dsr7Fj8+LnncJudXqrfB8S/q9wSrgziZf0lI/KI9f9SZhHr8
-         fSaw40C4IB6uHmG3pwgIlSRbpaiJq5nFnmlzJ4yJrmmnuVMhR7HwVUMmR7ARr7fMBcaH
-         XZdN4VrXB6VhydefCfNMREyZAJkJBHBQWXSTfsuFA0VAV1dPmiBMM4ZIP0qT3Oa6Tf81
-         20iBo0iu1n5RLp27WVUrebSjSxRXOISHlDs2PziWZssKwLDkxnaP+PdwIZMQe85LhKVz
-         yiEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789312606; x=1789917406;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=aTTMCVnrzErNo3gjfBn1PksZY0Pj3ZNQwgpIX9uxXUo=;
-        b=elq6tD92LAno4t59DhlRc0MVxplNOWp1opLW0uug0P9+z4nQn8gwlVRVG6wz3DuH4S
-         fRFGbpv0tLNC8zxraUSBSlqd5n4rrSDCgt0VMirKAW6fr5AxjyYi150LwM9WWYY89gEI
-         iPmWpcnibT7BcLodrjwVUW7h5BA0Abs9E4L97lvhTR2JShgWTnQK8QbRz/MvBhWJm8Ha
-         Kv6/Xfm6S/pOHSpeFe2wh0cBHaH+m/oyTHk39GNG5LxEW7xtn1+CbD5tKbQlOZHuKBHx
-         moMFG8xXjbrvKbeiVVZYOTBJfDLM/8wNq2JMQCFlZWm4fPDmEj02cqbEVbt7y79yhyU4
-         p7GA==
-X-Gm-Message-State: AFuF++nfJUz8AU+rJiNF1cqw0Nzu8QI2SmHUNF7gvP++xyECpswONmNq
-	7zLPrkmO9B3FhosAaaX4qcZt0eY+mao9E7ukAZ/5D2G2WGiCE7k7W/jo0T/O4DmhkC2FT4CSu3q
-	CZ/QHT5EHrijpj54a6evZxQcpdaCI2DU=
-X-Gm-Gg: AYBFou3ytugmF2vLzPdy04f+unNfYXeTQOvnM28pJoS3xcF5BoHHJBVlWLB3Hb0x1Uw
-	rZkwFLRN24q8IoK1qCJtNA++NmNlEKX9vJDa09inNVSGN6oJKmCAk8Kl6yZVzSHMWxntI1TErJd
-	llvHbOmO2DL9DjCbUofGY5eTO8C3ZtHLrKzLMcaJ+y/ISC/nliMvAql5UhEJ1SYgMVU69XGdb6k
-	8OzTr6VE2w6WqTJe3aERU//PMVGocfnEZsnxMT1bClno5dAYQHoZWJWNb2SfUAipAW943Ob4raG
-	4uJkLs/ZZbSk2XNGDgOC1aGiQBKxYFq03uc0OQ2ozzJRRiH32CUdBqfa7bBZab40terO64P3SVj
-	5jCTDQ1Y6Q2oY+UFD+JDfQ1MvHlOSrxp/KRkaqqBb+OTqIlJNGXVMqN98yATiwqavrDqRokCdnQ
-	pibj/zdEH2r5BeB3o6Ym+AUm1EbuuJ1nY=
-X-Received: by 2002:a17:907:e895:b0:c20:1bc5:7002 with SMTP id
- a640c23a62f3a-c29665414f1mr1196956866b.3.1789312605638; Sun, 13 Sep 2026
- 08:16:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="h/odShjU"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mWmmuzBSjWRlauejTyG0VqoQxM4hN05VWhliw5ok6JsB33Mn3oJSWoi3gzuq+AiWbyk6JH74tZMh7KPGDeDggUMAX9A2eUTMKzXxNi+qJQP/d0hVCufnbZfysd6I2x+qnd9aJcoxA83KUXEj5Kfj9N4AnW74wlbqMwdZQZtGthSRKnxOFhUApUvuAEvT3kvO2xGTYP1g/mQvoWFbKjx824PavWl0fUlSnwz+JdTacX2ZQKFWoN6gi/AUlJTsRgHzJBp/0bkF/S1k/wNZTp/GCpqidp8wTPYA1i0p2nqn7oWAdBzrkZh+2kibb3sZkr/gTCbWFqtL7lw9PsfdXV/E6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7Kzfy/eX4WxXZs/USimvIu3Jo2+tuMIZXA/427xm6Pw=;
+ b=Gd9lUiq2Hf2RCY7qlNL81jOoQFEB8/CKxB/0Q2BawLiNXD5IBRCM4oEETFzTH8JGV+NjNWHCvb0R0H3ktSaa4+kQLsbZO3d2oGskIAnNE17cLFBu+I9HHYTUWTumAJZmwSOuyhT1bzrOoxkoKcgfzIsmyYHkQT+bm/iJe+Xb5ODYJmxt0uj35z+g8ctkVKHynM8tQhgpIQsTqzB1jL7HF1uBr024z/mFCymauEB+Et7e9Ac55mqJJKleYqNAu5LdFXrczEyUbcSskEuLZweyPSt2mNKaaugrTNDdaxwVSxR1i1nOvcsWZGooljVXZfE+jmIKtfW9XZwzU2jKL97xDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7Kzfy/eX4WxXZs/USimvIu3Jo2+tuMIZXA/427xm6Pw=;
+ b=h/odShjUaf2GlzAVF4iSHuHTUguKAHC3zvcIm3mlGfOj2dgXFplaBvjVwXQrPfjFHCq9DErNMF8D9H3spBi6Q0ZaL9sKwQQadgcoU/sEx7jfBekgYIjDd6xlcp7yGWuMOUN9/DYXqjODqEgIwkj8qtS8U3UOueuU4epVruAwz6gRis7b9Hux2IfH6JAnsSQk37VTv0pzKWX/Q6Ku5b6CX0SKvl5T385oeOSP0Cyb48HDNrAN5mogBgZ8NEjXl1IRlO3N22S94YN2lsEVXhdGcgYo9StYQmZ3XG36PWoeAla1H2db/Y0/IXRA511lvYRQNoUAgMdZgJ28L83rjej0kw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AS1PR04MB9358.eurprd04.prod.outlook.com (2603:10a6:20b:4dc::19)
+ by VI2PR04MB11273.eurprd04.prod.outlook.com (2603:10a6:800:296::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.12; Mon, 14 Sep
+ 2026 04:14:45 +0000
+Received: from AS1PR04MB9358.eurprd04.prod.outlook.com
+ ([fe80::677:d5bf:c3ce:3ad4]) by AS1PR04MB9358.eurprd04.prod.outlook.com
+ ([fe80::677:d5bf:c3ce:3ad4%4]) with mapi id 15.21.0406.007; Mon, 14 Sep 2026
+ 04:14:45 +0000
+From: sahil.malhotra@oss.nxp.com
+To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sahil Malhotra <sahil.malhotra@oss.nxp.com>,
+	Varun Sethi <v.sethi@nxp.com>,
+	Sahil Malhotra <sahil.malhotra@nxp.com>
+Subject: [PATCH] MAINTAINERS: update caam crypto driver maintainers list
+Date: Mon, 14 Sep 2026 06:14:36 +0200
+Message-ID: <20260914041436.3910000-1-sahil.malhotra@oss.nxp.com>
+X-Mailer: git-send-email 2.43.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS4P195CA0041.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:20b:65a::13) To AS1PR04MB9358.eurprd04.prod.outlook.com
+ (2603:10a6:20b:4dc::19)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?B?2K3Zhtin2YYg2KfZhNmF2LfZitix2Yo=?= <ha2020anan@gmail.com>
-Date: Sun, 13 Sep 2026 18:16:34 +0300
-X-Gm-Features: AcwNN1WOf4qSQfH2HT5Ui-EqT0KiK-mgj0fgM__SNKx8e4sV2XVVIPyfTLlmLhk
-Message-ID: <CANai08PJ9bKRn3JkgUP7SFHn+qXLoE_JDerRv-UtMkELZXu-wg@mail.gmail.com>
-Subject: [PATCH] crypto: jitterentropy - add fast hardware jitter mixer extension
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR04MB9358:EE_|VI2PR04MB11273:EE_
+X-MS-Office365-Filtering-Correlation-Id: 378719e4-be2a-45d8-dfe1-08df1216b588
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|366016|19092799006|23010399003|18002099003|11063799006|10067099003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	1btLP1N6+zo768i2jR5NNvWby71fM9UhPPpQnDGyzkv6SvhiTUOLkBt3LCHMj37F+sCBOtAZ2pLxLvkdTVoM+HyqBvBON79VGIuxjomqIxrk1bzTX+QhZDWFp9nJjDpl47aQMGQcL4JA5lMctjj9W497Tl9qwOjq2bNQQmB4Q6ZxHKGxnYV3OngGS4Ivd7hU+ecGuTQkW9/djlgDDTjYUinAvQOchvVzaTkOPZLwQu5D4U/a/W9qwmzgVU3zPwsdzhAp65vqNfE7lYAwO9EFD89r+fRRfRvF7GsW3Bllr/QauO1hJ3oA5Lr7F2QFh1pyB6xbue2kwPFBaPOzAVbnitXOA74GPwEQz1di+cR9GrKa0ggx4Ovw3pBEIxW7S3VROTX3n3FEospdxDIJnEH5yoM5V3eNn/ho6nzAx+XuhCwu++x31G6qxik458NPO0b833byjJm8a/yafWD8yZ9bGxwyykF/ekeON3pv+VdaqCSC0yqwLCOxxOmRDJFdyYNHwDw3aPGMuUTyn/H1ESsAP1Mp4tutum11IHoaSc4B/x9+I053/rOZrxqHkxDDCgp8WilmONeMawue6pI2d6PWPqxq8SRujNP9W0XS4iWORepI+bq/R8HbTEAVzAbf6DMXSZW+E4Y7P8Gxl3v4DgJCxZ8HG0GPAgTjskTtTiqaO98=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR04MB9358.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(19092799006)(23010399003)(18002099003)(11063799006)(10067099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TDdqZUpLa25mTEVSR09WbDh0TVRjK3YrZzE0UWlrSk9DWGh3cXE5RlFQUkNG?=
+ =?utf-8?B?Wmc5c1U0d0JIVHI0TUx0aG45Nzl6R0w0bTlQUnJ4a2poZHBYbFhqbndkNUVN?=
+ =?utf-8?B?VVB1Z2ZmYmJOb3BzcGRMeWVDdFpJdEtjR2d4RGdQM3ZOVlZoQnJNaWFCa1M5?=
+ =?utf-8?B?Rlp1aXBKeXFSYUV4YXMwcWZSVnI5WndFTlFMWVFjbmtlNE5oZjRNbS9sY0w4?=
+ =?utf-8?B?bi9UUGVDWEZwUWJBMlNUZ0lmTEJxcWs2emhZc1VIUFJOck8yU2hNVEF0VENM?=
+ =?utf-8?B?K2s1cSsxV0JqNmh2dGtxOE82WlFHTkhTU3htNzA1ZC8xOGJFZElZblFUWjU2?=
+ =?utf-8?B?a05qYjNSL1o3K3lnTHROeEcyNlpNbnBGa2s4d3ViaDNKaVRPRFdVUXN1UWhD?=
+ =?utf-8?B?YVh2NVpFWTVuOGJuQW1yQWVlcWJoMEZpeWR2UXZLc1B6OWJjSk1jOFBwYndY?=
+ =?utf-8?B?bzArdDZxVGpmNGV5U2FwRlFqeGtMaDE2TjQwa3RVVm13ODVKbjVCWDVNeW1J?=
+ =?utf-8?B?cHVQeGJ0cUxIeDVoTFlvbWIxN0NwMTlXdHVNTldKRVd6blR5aEFTK1VERDZy?=
+ =?utf-8?B?Q1NnVENqeWVsSUpXL2RmZzJMUjZ5YjR0VDFUVXlMZnZUWUFnUWpaeThDV0J3?=
+ =?utf-8?B?dk9ud3VMRDgydXJnTVFDcHRqT3RQN2dER0d4MkdDa05FYmQ0MExFbTRkYnJB?=
+ =?utf-8?B?WHo4MGprRy90cWQ1RmhXUjd2M0RKOWorUXkxZDlMa3h2aUh0KzFKeGpYckd4?=
+ =?utf-8?B?TUlTQmlCWEx5K2RkejBEY1NCUi82RWhlYUZFMXRnUVZwSVRqamJDZ2hjUDFQ?=
+ =?utf-8?B?QTB2K01oa2ZaMkZGRkJKcThNYml3aWlBNzZ2b1l4UEJSYitPL3lpTTRMU1hN?=
+ =?utf-8?B?UXFOY3pyd3dGc1ZvQ0ZyTjZkN3lXTlNBbjlHSkVUaEpxclRVRmVYY0xPVFQ4?=
+ =?utf-8?B?NGRUS3NzWG1VYm42KzdydUtuRlNhM3RwcGNmQnRoclRZSUN6NEJKc0xYc1l5?=
+ =?utf-8?B?TTBlZDd3VTFKQmM3Q08xcVkrb3FvcFVkU21waTVCclArM0JvMVNOMzlieWNV?=
+ =?utf-8?B?dGJkVFdkRnl0QjEzM2txNXJXenBmZkRVM0UwczZia3k2c3krcnV5ZlMzczNY?=
+ =?utf-8?B?WTFOZnlBeDRzSUdYMko3Wi9MN3pod0lyZjRoYXpXT3hDenVvazg4dkxCd0lh?=
+ =?utf-8?B?aWxhclliODl0UGlmWFFOQWlMT2JqaUZNU3MvYW1jUHFoY0U3ZWk4eE02MGx4?=
+ =?utf-8?B?dmVENjhaMlZZOUI3R2ZMa0s1d3lmeG9yUmMydFBkdjBzSnVWWUlmWmlLamUx?=
+ =?utf-8?B?eG9yRFZldTlMUFhtczJSd0x5L3VHZ1RNYnBrTXZybnlnR01yVzQxTjVTT2FU?=
+ =?utf-8?B?c3BDb3huNTB1R3NCZTdKK3R5ako4d0VtbmhqdDRuczVGWm56YkZuendDYmFi?=
+ =?utf-8?B?cXB0ZGI2ODlLOUJEMlNrZ0JQeEsxTWp5WDA4RFVoZkJtUzBXSlZLbkxrUGU5?=
+ =?utf-8?B?cHFNVGc0Mm1SamcxbGhlaVUwZHFMb2VETjlyNHlpOHU4dUVVaE9yUE4zM0pG?=
+ =?utf-8?B?Vm5WcW1jMDd3ZnFDSHY3U2VIQkgybWxISFY4ZkEvNjJEbkhYa0JudVpBQVZ1?=
+ =?utf-8?B?MmRhSlpLaWJ3aFc1OHVITEJWSVVMKzhvUm9MTTdxZHFzL1k1Q1dDQU1BMzlP?=
+ =?utf-8?B?MkhVRGFJQUZKLzU4M1loVk95NlExZGhUN1F3OG1uMjVRajJnZzlzSHJmRjh0?=
+ =?utf-8?B?VWJNcDFBYjJBYWw3UWtMWWY1Q29FQjZIOFFHc3d2Q1dDUWhlZHFHSVpMWklJ?=
+ =?utf-8?B?R0hWblFVMFBWUlVBaTlHR3dwOU9wZkN1MWRLaEhLeE5HK3o3MVAyWWZJYlhK?=
+ =?utf-8?B?eWl2Qmw4VlMrOEUwZ2pDYkRTR0d2ZzRTUnY0L011VzJXdEpsVW9jVHpidDd5?=
+ =?utf-8?B?NnBxeERQR2lJdHgwMlVCK1Ewd1JsdmNEVHkvcU5EWnVTSlZPRm1TclR4aDJa?=
+ =?utf-8?B?MUJzZ2NsNENOL2NPbjc1RldwcmJUNmdkZ0cyOSt2Zm5hSWJBVGJ0UC9DeGJG?=
+ =?utf-8?B?QVNYanpBUG5EQjNWcUc5MW9lSDRJd0pxVEFTNUp3M2hhOVluekc3VzByai9q?=
+ =?utf-8?B?bEtRY2xpS3ErQTRLTE03TXlhYVpJcE1XWnBlZFJ4ekhiK21rMTNpRXQ0Mmlu?=
+ =?utf-8?B?aTEza1pSRXM2WTFTS01pV2xIYXd5WVhHdHVlUURrbDVCS01nZGlJeUwvOWNx?=
+ =?utf-8?B?d2NiUm90VGxibmF2djJpZG1Wb29reW42VjdQUVdNT1A2SU5lQmYyRUowV3pW?=
+ =?utf-8?B?Uy9FMFZvK2l5dmYzM2g3WnpPOHRPa1FpcFNhTXdVSjZ4QXN3M2tNU0VPdGc0?=
+ =?utf-8?Q?53eS+ev+j/b+rF1M+gh0LKi/oTXSLXyIk+Hp5?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 378719e4-be2a-45d8-dfe1-08df1216b588
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR04MB9358.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2026 04:14:45.5386
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gh26G2Xtyf53VRGU3fEffMtKBta31hG/IdqSc+8Iz7gdHnA2oo7Z1RWJFEaI02IN18O0nlX2Dcsx/5mJNcCPEZ//XF+yI1hXZZNsymzkrQY0vVZpzGHRxxsDD2lV6Z13
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB11273
 
-This patch introduces a fast custom hardware jitter mixer extension for the
-jitterentropy subsystem. It utilizes high-precision cycle counters combined
-with memory pointer attributes to disturb the branch prediction unit
-and hardware
-prefetcher dynamically. This creates pure architectural micro-entropy
-by exploiting
-execution timing variations (CPU jitter) without relying on
-floating-point operations,
-ensuring compatibility within the kernel space.
+From: Sahil Malhotra <sahil.malhotra@nxp.com>
 
-Tested on x86 architectures using standard high-precision macros.
+Adding Sahil Malhotra as caam maintainer and removing Gaurav Jain.
 
-Signed-off-by: Tamim N. Almutairi <tamimdevlopment@hotmail.com>
+Signed-off-by: Sahil Malhotra <sahil.malhotra@nxp.com>
 ---
-diff --git a/crypto/jitterentropy-mixer.c b/crypto/jitterentropy-mixer.c
-new file mode 100644
-index 0000000..1234567
---- /dev/null
-+++ b/crypto/jitterentropy-mixer.c
-@@ -0,0 +1,105 @@
-+/*
-+ * Jitter Entropy Fast Mixer Extension
-+ * Copyright (C) 2026 Tamim N. Almutairi <tamimdevlopment@hotmail.com>
-+ * Author: Tamim N. Almutairi
-+ */
-+
-+#include <linux/types.h>
-+#include <asm/timex.h>
-+#include <linux/sched.h>
-+#include <linux/math64.h>
-+#include <asm/unaligned.h>
-+
-+#define JENT_MIX_CONST_1 0x9e3779b97f4a7c15ULL
-+#define JENT_MIX_CONST_2 0xff51afd7ed558ccdULL
-+#define JENT_MIX_CONST_3 0xc4ceb9fe1a85ec53ULL
-+
-+struct rand_data {
-+ uint64_t data;
-+ uint64_t prev_time;
-+};
-+
-+static inline uint64_t jent_custom_mixer(uint64_t rdtsc1)
-+{
-+ uint64_t var1 = rdtsc1 * 2;
-+ uint64_t var2 = rdtsc1 * 3;
-+ uint64_t x, ti;
-+ int max_loops, i;
-+
-+ var1 = ((var1 ^ (var1 * (1000000 ^ (var1 & 0xFFFF))) * JENT_MIX_CONST_1));
-+ var2 = ((var2 ^ (var2 * (1000000 ^ (var2 & 0xFFFF))) * JENT_MIX_CONST_1));
-+
-+ x = (var1 >> 20) ^ (var2 << 32);
-+ ti = mul_u64_u64_shr(x, 100, 64);
-+ max_loops = (int)(ti & 0x3F);
-+
-+ for (i = 1; i <= max_loops; i++) {
-+ uint64_t y = (uint64_t)get_cycles() * i;
-+ x ^= ((ti + 1) ^ (y * (ti & 0xFFFF)));
-+ x = (x ^ (y ^ rdtsc1)) * (ti + 1);
-+ barrier();
-+ }
-+
-+ x ^= x >> 33;
-+ x *= JENT_MIX_CONST_2;
-+ x ^= x >> 33;
-+ x *= JENT_MIX_CONST_3;
-+ x ^= x >> 33;
-+
-+ return x;
-+}
-+
-+static inline uint64_t jent_gen_random_not_for_crypto(void)
-+{
-+ uint64_t x = 1;
-+ int i;
-+
-+ for (i = 1; i <= 5; i++) {
-+ x *= (jent_custom_mixer((uint64_t)get_cycles()) * i);
-+ x ^= (jent_custom_mixer((uint64_t)get_cycles()) * (i * 2));
-+ }
-+ x *= (jent_custom_mixer((uint64_t)get_cycles()) * 25);
-+ return x;
-+}
-+
-+int jent_read_entropy(struct rand_data *ec, unsigned char *data,
-unsigned int len)
-+{
-+ unsigned int i, j;
-+ unsigned int words = len / sizeof(uint64_t);
-+ unsigned int tail = len % sizeof(uint64_t);
-+ uint64_t word_data;
-+
-+ if (!ec || !data || len == 0)
-+ return -1;
-+
-+ for (i = 0; i < words; i++) {
-+ word_data = jent_gen_random_not_for_crypto();
-+ put_unaligned_le64(word_data, data + (i * sizeof(uint64_t)));
-+ }
-+
-+ for (i = 0; i < 26; i++) {
-+ cond_resched();
-+ for (j = 0; j < words; j++) {
-+ word_data = get_unaligned_le64(data + (j * sizeof(uint64_t)));
-+ word_data *= (jent_gen_random_not_for_crypto() * ((i + 1) * 2));
-+ word_data ^= (jent_gen_random_not_for_crypto() * ((i + 1) * 3));
-+
-+ if (j > 0) {
-+ word_data ^= get_unaligned_le64(data + ((j - 1) * sizeof(uint64_t)))
-* JENT_MIX_CONST_3;
-+ } else if (words > 1) {
-+ word_data ^= get_unaligned_le64(data + ((words - 1) *
-sizeof(uint64_t))) * JENT_MIX_CONST_2;
-+ }
-+ put_unaligned_le64(word_data, data + (j * sizeof(uint64_t)));
-+ }
-+ }
-+
-+ if (tail > 0) {
-+ word_data = jent_gen_random_not_for_crypto();
-+ for (i = 0; i < tail; i++) {
-+ data[(words * sizeof(uint64_t)) + i] = (unsigned char)(word_data >> (i * 8));
-+ }
-+ }
-+
-+ return 0;
-+}
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index da3e42d2d190..52c9c0bdc1eb 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10349,7 +10349,7 @@ F:	include/video/
+ FREESCALE CAAM (Cryptographic Acceleration and Assurance Module) DRIVER
+ M:	Horia Geantă <horia.geanta@nxp.com>
+ M:	Pankaj Gupta <pankaj.gupta@nxp.com>
+-M:	Gaurav Jain <gaurav.jain@nxp.com>
++M:	Sahil Malhotra <sahil.malhotra@nxp.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/devicetree/bindings/crypto/fsl,sec-v4.0*
+-- 
+2.43.0
+
