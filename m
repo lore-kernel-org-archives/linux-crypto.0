@@ -1,102 +1,113 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1091A4749C6
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 09:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736FB440634
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 09:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789465351; cv=none; b=bsyqQ9rqlwf3V8iraG5mSbWT9P0xDeDYcQPAM084yhp8mCfc3dTFsBLwgxAOVdbt78N5SPWdGJettXl80WpG45Ccs8em3iRmnKDH6mof55cuLOG6UJJEATQfLDfEQ4fqbWU5Z06McUjgjyOuiAlwOJyu3+fzM+DwYUHDpE7ySs0=
+	t=1789465566; cv=none; b=ec0UFv8vXU9Gf++lTL7RokXgYYdQEfhMZHVHUolBymu85pJiPChssTjuejqQXU0Ba29JEPvMzFjEAXJo+1sXbmNWN4ur1WesRZhxbEUkv6eB0fODHrmrFYGZRKJgCojB6fRWuyxdD50AlfGJuTfRETRgmFePotyl8yV3rKbxho8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789465351; c=relaxed/simple;
-	bh=Dtsw2jRRFQXkxa7dgV6KxVRgcUhLSW62NygQfZL0d/0=;
+	s=arc-20240116; t=1789465566; c=relaxed/simple;
+	bh=TYjlm49BcWGKYpnUBnCMfZXgukHwMwdEfFaJhxbKT68=;
 	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dgUIE8mQPkNhar/AObgpNMcned84R4lQxiaKaueHNIKqjuewFiRf/t7+2fQ7bJkp1NlRljF960u2jlKD+c5hjM+xkNrWdX1uZFjshhbqxC62/dBsdC/+AMCgQUzPdoxHZnRe/L8mITb+lCWSZ2a3zyQu35//jPkNiQ1kJWyVCIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OSurg9qL; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=YnIsSrex72KfCiogRxv4Jy6UkXDGdiAK9CSqBtlcyxo7GdpPSrNGTqVoMBN3eaHB34GwEnNWy/UTAFqWo5Ciu1B6DinvEgBIDrcOepMoQOHLIq4K89ovoEmS8PNUi3T17/y07JLWbU0uVslGnmIyfNzF9+Rclh0MGpp5fFYbPsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oyfnwXLX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OSurg9qL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D093C1F0089B
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 09:42:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oyfnwXLX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 349551F00898
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 09:46:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789465349;
-	bh=IAWcs2+jgJniRfPcDxguAhr6z0wCyj+/raYf2jcKofs=;
+	s=k20260515; t=1789465565;
+	bh=xStObR1AHBg+HAP7HHBUo5VDjO6oJ/f1Z1Tj8oztVU4=;
 	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=OSurg9qLd4v0JVaP//W+MeArgk2xkRmh7fVqp4guE1SEE5nB9R2LyEFv//rzhjlgb
-	 79Fam3g4l++WgMO/nzuvJl1HDwkWM7Y/e1tVPLB5YKyKsWMFpk2uhoQrY7r08AaqFz
-	 +B/09RQ2YXis8iKdcZLuLcLUGzjE1x7EQj8KpsQfA16UUi/rqfxXac1MhJf/nyWwZb
-	 6cXmouIxVXiqnpR0uhR6Oxn0kv7omkVFHy2MQjkpIZ6nERCKKVHaxuCdeHyBW2s2P6
-	 rNCvWZdEPSq4tBkptfOctvTp5sv8ZOYWT1pcU1VgqkKVdwTdMXFBguJGskO88MC74H
-	 fmGmTYCPttMGQ==
-Received: by mail-lf2-f12.google.com with SMTP id 2adb3069b0e04-5b5e4f15b7aso3364518e87.3
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 02:42:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwb1p4wVLHn1Za71J6nC79BhZWgzkvw3s+42mzlyXzuUeatoTwVQ90tfuss5rI0hSYhUXIGQWK07PAWF2o=@vger.kernel.org
-X-Gm-Message-State: AFuF++kelq7b97+iZWit6jfrllKKymOch17PpmDOtycvev9yKXmCUp8q
-	tPsPXjwB387puFgXLNJHA3IuO3GUGuFZyBE8fV9Obics9p/vVJGS0OGfDlat8gdIbRvr+AIQW0y
-	wFb+96kFqgA8Kup9IdqFSjCR/9BgBlO105MH3PPNkhg==
-X-Received: by 2002:a05:6512:3c87:b0:5b6:421:a8fe with SMTP id
- 2adb3069b0e04-5b8ae8a71eemr3220367e87.30.1789465348346; Tue, 15 Sep 2026
- 02:42:28 -0700 (PDT)
+	b=oyfnwXLX48RQwrS1wsfWxQwmFFFAH0izC6vi9efX6StFqPtqfK7nB+twLT/kIDZwB
+	 5r9YhH2t3a0BBMv7zPc0TsCX6H7ooHhXrdZiWelsWgzy7ICWlL8ktNWIx3Xh0J2DeY
+	 urldKxypsr7wEjiCmKn9yzws5061Tzxk8kWbgJdSFhdEHkTPvqgZhhhTZe9MKvySnf
+	 mizJwZQgR57exQUy0aN5DikXTxe+ZAsjQwtFzp9xg7/FqZ/cYg3X9IzwwNZyfr4Z+4
+	 6AR+OKCMSVe8fvE+BDWs6IiYtS083UTETU0RjPvGeRuyRrMHHFcvAb6Bn1iuhwe38J
+	 NxZfqH+tnPCEA==
+Received: by mail-lr2-f12.google.com with SMTP id 38308e7fff4ca-3a59fa3112cso762061fa.3
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 02:46:05 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxhx2/gW4TJAzF+yM/OA2/Z75Cy42aA8Z3XP88HFYC1b5tFhj+jAriEVMpD2FDcu1iBd24V3o7tfeq4I58=@vger.kernel.org
+X-Gm-Message-State: AFuF++k+KfSgkf6GFa5RjuYhic3frJc/T6bOZ2tVZpYnX72TE+QvSmG+
+	5Em2dWuDUZheFF/bzzaazPndPJgMwO5WOT2YMlCgWnykcUQEZ/GE1z1p2X/EB1xaR704K7X6HUE
+	TjmcYN3o48QKjQ3WU69H2Z/m0kka06iGfIFSy9pxTcg==
+X-Received: by 2002:a05:651c:1508:b0:3a3:7680:67fa with SMTP id
+ 38308e7fff4ca-3a5d854ea14mr822991fa.25.1789465563847; Tue, 15 Sep 2026
+ 02:46:03 -0700 (PDT)
 Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 15 Sep 2026 05:42:26 -0400
+ HTTPREST; Tue, 15 Sep 2026 04:46:02 -0500
 Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 15 Sep 2026 05:42:26 -0400
+ HTTPREST; Tue, 15 Sep 2026 04:46:02 -0500
 From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <7e1b4800-258b-4410-8e88-2ce49505689e@gmail.com>
+In-Reply-To: <c08519bb-b912-4d34-a164-5a9d65162716@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260910-qce-fix-self-tests-v7-0-cdbd2718af14@oss.qualcomm.com> <7e1b4800-258b-4410-8e88-2ce49505689e@gmail.com>
-Date: Tue, 15 Sep 2026 05:42:26 -0400
-X-Gmail-Original-Message-ID: <CAMRc=Mdd-_t4HniR0k-xhyS4aMD1gnqJPYgS2cEY81b0dwDZGA@mail.gmail.com>
-X-Gm-Features: AcwNN1WFu7OKIWnYNDJOJ45qVWn6DlSRIE6IYiW9ZjvE6EJLrN4IQn3AQpsM5Js
-Message-ID: <CAMRc=Mdd-_t4HniR0k-xhyS4aMD1gnqJPYgS2cEY81b0dwDZGA@mail.gmail.com>
-Subject: Re: [PATCH v7 00/12] crypto: qce - Fix crypto self-test failures
+References: <20260910-qce-fix-self-tests-v7-0-cdbd2718af14@oss.qualcomm.com>
+ <20260910-qce-fix-self-tests-v7-9-cdbd2718af14@oss.qualcomm.com>
+ <20260910143140.GA5719@quark> <CAMRc=McDHXWRfYTwRasdBCXMnoVkXK9T7RB+gBNgCsGof-euyg@mail.gmail.com>
+ <c08519bb-b912-4d34-a164-5a9d65162716@gmail.com>
+Date: Tue, 15 Sep 2026 04:46:02 -0500
+X-Gmail-Original-Message-ID: <CAMRc=Mf6A98R_NxFaBiMp+N8JuzwZsSdfowwe0XvkMsUCZCL5A@mail.gmail.com>
+X-Gm-Features: AcwNN1V4irG-4tqXUxafIvp3ue4djdPcZGWZ9wnurkMI_vMMG3_EP65uAHzLt8c
+Message-ID: <CAMRc=Mf6A98R_NxFaBiMp+N8JuzwZsSdfowwe0XvkMsUCZCL5A@mail.gmail.com>
+Subject: Re: [PATCH v7 09/12] crypto: qce - remove the BROKEN label
 To: Demi Marie Obenour <demiobenour@gmail.com>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+Cc: Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
 	"David S. Miller" <davem@davemloft.net>, Stanimir Varbanov <svarbanov@mm-sol.com>, 
 	Eneas U de Queiroz <cotequeiroz@gmail.com>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, brgl@kernel.org, 
-	stable@vger.kernel.org
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Eric Biggers <ebiggers@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 11 Sep 2026 20:34:39 +0200, Demi Marie Obenour
+On Fri, 11 Sep 2026 20:35:58 +0200, Demi Marie Obenour
 <demiobenour@gmail.com> said:
-> On 9/10/26 09:00, Bartosz Golaszewski wrote:
->> This iteration - in addition to the previous fixes - proposes to split
->> the QCE driver into a core part necessary to bind to the QCE DT node and
->> enable runtime power management in order to allow to drop the
->> interconnect votes, and the crypto part registering the crypto
->> algorithms. The core module is then enabled in arm64 defconfig while the
->> crypto part stays disabled by default.
+> On 9/11/26 07:14, Bartosz Golaszewski wrote:
+>> On Thu, 10 Sep 2026 16:31:40 +0200, Eric Biggers <ebiggers@kernel.org> said:
+>>> On Thu, Sep 10, 2026 at 03:00:50PM +0200, Bartosz Golaszewski wrote:
+>>>> All self-tests now pass.
+>>>
+>>> Have the other bugs that were reported been fixed?  For example:
+>>> https://lore.kernel.org/linux-crypto/20260723202704.GB110634@quark/
+>>> https://lore.kernel.org/linux-crypto/20260723183438.GB93534@quark/
+>>> https://lore.kernel.org/linux-crypto/20260723205342.GC110634@quark/
+>>>
 >>
->> The QCE hardware crypto engine has several limitations that cause it to
->> produce incorrect results or stall on certain inputs. This series fixes
->> several bugs and adds workaround allowing the deiver to pass crypto
->> self-tests.
+>> I will get to these too. For now, the series allows the self-tests to pass,
+>> I assume it it's enough to not keep the BROKEN label.
+>
+> Personally, I think the driver should stay BROKEN until all the
+> known bugs have been fixed.  The self-tests aren't enough for HW
+> crypto drivers.
+>
+>>>>  	help
+>>>>  	  This driver supports Qualcomm crypto engine accelerator
+>>>
+>>> As this patch would make the kconfig option visible again and would
+>>> result in everyone running "make oldconfig" being asked about it, it
 >>
->> The failures addressed are:
+>> I don't mind changing the symbol if you prefer it to avoid any accidental
+>> `make oldconfig` carry-overs.
 >>
->> - HMAC self-test failures for empty messages
->> - AES-XTS returning success on zero-length input (should be -EINVAL)
->> - AES-CTR: partial final block causes the engine to stall, output IV
->>   derivation was incorrect
->> - AES-XTS with key1 == key2 is not supported by the CE
->> - AES-CCM: partial final block and fragmented payload both stall the
->>   engine
+>>> needs to be fixed to accurately document why anyone would want to enable
+>>> this option.  As you've stated, it's actually just for "testing".  The
+>>> false claim that it's an "accelerator" also needs to go.
+>>>
 >>
->> All fixes were tested on an SM8650 QRD board with
->> CONFIG_CRYPTO_SELFTESTS=y and CONFIG_CRYPTO_SELFTESTS_FULL=y.
->>
->> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> For stable, would it be better to not register the algorithms, thus
-> preventing their use?  Another option would be to replace the whole
-> driver with an always-on stub driver that just does power management.
+>> "Offloader" for lack of a better word?
+> Could it be called a "decelerator"?  That would give users an idea
+> of what to expect from the driver.  Maybe explicitly mention that
+> you will take at least a 50x performance hit?
+> --
 
-A module parameter called: really_register_algos that's disabled by default?
+Yeah, very funny. Jokes aside: "Offloader" says what it both *aims* to do and
+really *does* without claiming it *accelerates* anything.
 
 Bart
