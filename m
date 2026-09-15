@@ -1,140 +1,150 @@
-Received: from mta0.migadu.com (out-24.mta0.migadu.com [91.218.175.24])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F6C4B1263
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 12:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44394184524
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 12:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789474558; cv=none; b=sAXWWr8W6zqZ03gOD07vw0uPqcw/n6PeCwf4yJzB2mHEPP32KOXzeo0xzRMFiXAy8YU8HCp70f2U+xfnP+7zUt6KagdIM0825dHP4PLVaVsjTn2Zc/lXFdPxNRmID7WQGWxzi6aEJO6Evz1oQ4bZEnLp+v8AhKGrZFAVqG2QFLg=
+	t=1789477090; cv=none; b=Ig7lnK17g7dkG+/hN02iJ4LVzw2VrtA7+5I7yNhUclXxK+xGDPFcLv465x0//vVySvTMmvOXkGovwC9h/+vBTHrtsXdJjLeN4/SGSXyZshwKi0m1INYousGBRvQlDy5Y12WzGs2jFiufMBSgnWLUHe5LjXOuGFvYOOOAajGZeto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789474558; c=relaxed/simple;
-	bh=yD/VKUzBUPe8qzu3tI1cnR3m5pe15RIsxpBEfPbnlJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MLDByNaSOQ9/ao2aNPcxQvAt9HkPLPlUpolFCBv8zd0OEPwZhyuN73DyMDyhLGJ87119SKN+XKAPBKjCc0kBLG5Ji0Lk8WgoGANDyXWbDJvA1D5B0uGJFLwuSJnQ6wMPdyry/FrD2+g0zE2n7yDa9pJ5LEpExG/tu+svlJnLiww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ssXzO2oV; arc=none smtp.client-ip=91.218.175.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ssXzO2oV"
-X-Envelope-To: linux-crypto@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=yD/VKUzBUPe8qzu3tI1cnR3m5pe15RIsxpBEfPbnlJQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789474554; v=1; x=1790079354;
- b=ssXzO2oVjImJ50MjxUQp/U/1ZrYs/HXKf6JcsZ0M81Bycnes5FHjQyKbH+iosWxn/byxMpXt
- GiSWBVvRGFp3zeZqHFwipz9g12x39wJKNcPw4rRVn7XtRKEuAIO9VmIsHLiwn9I2g1Vg7VoKvc2
- KCvR8fzs+dGhroItVvRGnNyI=
-X-Envelope-To: linux-crypto@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 511656c09317b8de;
-	Tue, 15 Sep 2026 12:15:44 +0000
-X-Mizu-Trace-ID: 511656c09317b8de
-X-Migadu-Flow: FLOW_OUT
-Date: Tue, 15 Sep 2026 14:15:38 +0200
-From: Richard Leitner <richard.leitner@linux.dev>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: linux-crypto@vger.kernel.org, 
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>, 
-	Gaurav Jain <gaurav.jain@nxp.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: caam: map job ring registers without claiming
- region
-Message-ID: <aqk1cesWMScL4-uL@bombadil>
-References: <20260901203736.13248-1-rosenp@gmail.com>
- <ap7ZnqCqpfRTLfUF@bombadil>
+	s=arc-20240116; t=1789477090; c=relaxed/simple;
+	bh=BRxd8wSlB7E2SQMnKygjHENZYzxvB1TF13r/v+CPDeg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Lv2l6U57d75d5bbpP1Bws9ZuAAPzL2d4lKnLkN1YEqaVVX0tSNSgvEba2V3+aTjNWWyIRLLY1GNdkRAsMvVw/QJTAwVakKmk3u4+qXLIAKcoZ3jZbUDTpenK6M0fGOBkZKigh4hzy6Ee9TaMYqC3AfY09vPwd/hRJ1rErFCdOTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5c83fbd23a5so733399e0c.1
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 05:58:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789477087; x=1790081887;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=IgE9SQeMzyYPYC75O9wUrB+kCn+Vwoe0FuhgCIRqcx4=;
+        b=A/zFDw23S/Q8KS/BeQuf7Om8cSaJuRKl3DWd2eFvHMiEsm0pVU1I7e/kg8y9wyR3y/
+         AlAp8AWJ9HkNkWowORiOrJMWaBtJ9WtqW0cNx6Ksa5I4x9OelY+RJNVe1pmNEUvr9YwP
+         +0a4tyr+6skV520i1IJr3RBbkNVkOrOl0thvPLy4kSdy6sqGTeJyQ1LVLhFqOpm3yLAH
+         wZCGljOXI7lg3ozWMaS/7CU4iVH7m+jaR/IfDwOJr5MN5S5GXiZkjIuvNIEFr4SScj9k
+         /xTMcskoSEkH6GjM2ZLedcCSICe1BOrrJo5eKq15lA11nK8VSrG7HTvu1CuIua3QZ0qK
+         U81A==
+X-Forwarded-Encrypted: i=1; AKwUvBw+kBovST4dAPGGsfi9iSc3iVDkcPmhg66d+Hnu0o+7LFTQTxUSx3NZRt1pQ/lMBiIfb9CN62XvxTWD4wk=@vger.kernel.org
+X-Gm-Message-State: AFuF++miCXGw+fSnYdcFeOuuDIRXyizgfv++I6+Z5fuVt/PuaXFYvAbo
+	WS4Fi172igVBdur/4Ee78auBINErp3QAXZajGLUUCoCaPSSkn0Jr1dDjOhuMzJXz
+X-Gm-Gg: AYBFou3pbqaWlbussEwNxohu51tEw+f3dklWbJNuUtj2M5ydiwJONj86nG83s5rP9ws
+	WF9pAsF77sILAvFJK9KGObJbC0rEB+DfxvuJ/Z+jIvKOkOROVT0NxMHB0YHoBTI8XpE6zYgbRGi
+	wSTzMXr5iUUjiOFzmZ+HfWux3Wtpu/9YCetkJ5/gDqq+JPTAckbe0YDHX+iboAFveOlJabuDW30
+	XH6yt3xdbNZg0mGHNkkeddyDk/nFXt5gldZtxKNdRVsfieV8BvksutIWYIxTA8Vc+LcJAzGtVlk
+	XtAECCCsqdgE6rNHh8m8DfpZ/WDsWSvNvnkJyKBaN8e8iE9ATGtGZOsVyrYH0XpfTL9XVyI2CqW
+	KzdrQrb8MaZD080ELB0SCFySW3lNDuRupyQZzYASRifwkCmPXcfunOA+brlgTvUs6rIyGqZApNx
+	0FxqYRRF6eOSiNX7DG7aBtsgN8hExkr6s9CMymRLOXp0WvG6E8DGsQt+FUvwtq4ynvS02bJ9uwO
+	jGmTkDufv/Hgm3huWIPUrzWqBMu5mTUBK2Q
+X-Received: by 2002:a05:6122:d17:b0:5c7:c898:9817 with SMTP id 71dfb90a1353d-5c98a4ff3b4mr1624013e0c.7.1789477087081;
+        Tue, 15 Sep 2026 05:58:07 -0700 (PDT)
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com. [209.85.222.45])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c847122e2dsm15616412e0c.14.2026.09.15.05.58.06
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Sep 2026 05:58:06 -0700 (PDT)
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-97cc700fcf5so590729241.0
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 05:58:06 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByU+6dRNjWyJU+fMnY4GVmCzqkhY0gMDhnJSoRwZLoB3HV4ywOxOpdI63UZ8zB2h0jMMaVc9ayTBEjlOlk=@vger.kernel.org
+X-Received: by 2002:a67:fd97:0:b0:744:d517:b0b0 with SMTP id
+ ada2fe7eead31-79d2757b2e3mr1341211137.10.1789477086677; Tue, 15 Sep 2026
+ 05:58:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ap7ZnqCqpfRTLfUF@bombadil>
+References: <cover.1787978627.git.kmehltretter@gmail.com> <e9659617ce2f1466f227d562f47b961f340ab3c7.1787978627.git.kmehltretter@gmail.com>
+In-Reply-To: <e9659617ce2f1466f227d562f47b961f340ab3c7.1787978627.git.kmehltretter@gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 15 Sep 2026 14:57:55 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVcZ5cV4-HrjLYfFKh6UshiVxq5eXCNyp0Z1k_SMAvF5g@mail.gmail.com>
+X-Gm-Features: AcwNN1We6JvHroelTMDgiuev4qCnhIIlzUn7-aK8UKQI_PPoPrsqy0x60B6d-t0
+Message-ID: <CAMuHMdVcZ5cV4-HrjLYfFKh6UshiVxq5eXCNyp0Z1k_SMAvF5g@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] lib/842: add KUnit tests for the decompressor
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Haren Myneni <haren@us.ibm.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Dan Streetman <ddstreet@ieee.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <david@davidgow.net>, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi everybody,
+Hi Karl,
 
-just a friendly reminder that this patch is now on the mailing list for
-14 days and was not included in the 2 rc's which were released since then.
+On Sun, 30 Aug 2026 at 05:05, Karl Mehltretter <kmehltretter@gmail.com> wrote:
+> Add table-driven tests for the 842 decompressor's output and history
+> validation.
+>
+> Three malformed streams cover an indexed copy larger than the remaining
+> output, short data larger than the remaining output, and a repeat after
+> fewer than eight output bytes. Every case checks the return value, output
+> length and fixed guard bands on both sides of the output. Successful cases
+> also check complete contents from a poison-filled destination. The repeat
+> vector's CRC includes the leading guard byte, so the unfixed decoder
+> successfully validates the CRC after reading before the buffer.
+>
+> Three valid streams cover the same boundaries at equality: an I8 index
+> consuming the final eight bytes, five short-data bytes consuming the final
+> five, and a repeat with exactly one block of history.
+>
+> On an unmodified baseline the malformed cases fail and the boundary cases
+> pass; with the preceding fixes all six pass.
+>
+> Assisted-by: LLM
+> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
 
-As this essentially breaks CAAM on multiple i.MX SoC variants, is there
-any possibility to get this included in v7.3-rc4?
+Thanks for your patch, which is now commit cca072cb1423191c
+("lib/842: add KUnit tests for the decompressor") in crypto/master
 
-Would be great :-)
+> ---
+> Review notes:
+>
+>   - CONFIG_842_DECOMPRESS_KUNIT_TEST=m selects 842_DECOMPRESS=m.
+>   - A fixed x86_64 CONFIG_PROVE_LOCKING=y run passes all six cases without
+>     a lockdep report.
 
-Thanks!
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -2225,6 +2225,21 @@ menuconfig RUNTIME_TESTING_MENU
+>
+>  if RUNTIME_TESTING_MENU
+>
+> +config 842_DECOMPRESS_KUNIT_TEST
+> +       tristate "KUnit tests for the 842 decompressor" if !KUNIT_ALL_TESTS
+> +       depends on KUNIT
+> +       select 842_DECOMPRESS
 
-regards;rl
+Enabling a (modular) test should not silently enable additional kernel
+functionality, as that may increase the attack vector for a product.
+
+> +       default KUNIT_ALL_TESTS
+> +       help
+> +         Enable stream-validation and boundary tests for the software 842
+> +         decompressor. The tests exercise indexed copies, short data and
+> +         repeat operations at valid and invalid output or history boundaries.
+> +
+> +         For more information on KUnit and unit tests in general, refer to
+> +         Documentation/dev-tools/kunit/.
+> +
+> +         If unsure, say N.
+> +
+>  config TEST_DHRY
+>         tristate "Dhrystone benchmark test"
+>         help
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 
-On Mon, Sep 07, 2026 at 05:35:51PM +0200, Richard Leitner wrote:
-> Hi Rosen,
-> 
-> On Tue, Sep 01, 2026 at 01:37:36PM -0700, Rosen Penev wrote:
-> > devm_platform_ioremap_resource() ends up calling request_mem_region(),
-> > which fails with -EBUSY on i.MX SoCs:
-> > 
-> > There the job rings are modelled as sub-regions of their parent
-> > fsl,sec-v4.0 register window, and caam_probe() already reserves the
-> > whole window exclusively via devm_of_iomap() before the children are
-> > populated.  Every job ring therefore collides with its own parent and
-> > fails to probe, taking the hardware RNG offline (seen on i.MX6, i.MX7
-> > and i.MX8 boards such as colibri-imx7 and verdin-imx8mp).
-> > 
-> > Map the job ring registers with devm_ioremap() instead, which does not
-> > claim the (already owned) region.
-> > 
-> > Fixes: 9a955c0a7d11 ("crypto: caam - simplify probe resource and IRQ handling")
-> > Assisted-by: opencode:big-pickle
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> 
-> thanks for that fix!
-> 
-> Tested-by: Richard Leitner <richard.leitner@linux.dev> # i.MX8MP
-> 
-> regards;rl
-> 
-> > ---
-> >  drivers/crypto/caam/jr.c | 23 ++++++++++++++++++++---
-> >  1 file changed, 20 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> > index f9e029945b51..2ed8229d4733 100644
-> > --- a/drivers/crypto/caam/jr.c
-> > +++ b/drivers/crypto/caam/jr.c
-> > @@ -583,12 +583,29 @@ static int caam_jr_probe(struct platform_device *pdev)
-> >  	struct caam_drv_private_jr *jrpriv;
-> >  	static int total_jobrs;
-> >  	void __iomem *ctrl;
-> > +	struct resource *r;
-> >  	int error;
-> >  	int irq;
-> >  
-> > -	ctrl = devm_platform_ioremap_resource(pdev, 0);
-> > -	if (IS_ERR(ctrl))
-> > -		return PTR_ERR(ctrl);
-> > +	/*
-> > +	 * The job rings live inside the register window of their parent
-> > +	 * fsl,sec-v4.0 node, which caam_probe() already reserves (and maps)
-> > +	 * via devm_of_iomap().  A requested region that overlaps that
-> > +	 * reservation, e.g. from devm_platform_ioremap_resource(), would
-> > +	 * therefore fail with -EBUSY, so map the registers without claiming
-> > +	 * the region here.
-> > +	 */
-> > +	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> > +	if (!r) {
-> > +		dev_err(&pdev->dev, "platform_get_resource() failed\n");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	ctrl = devm_ioremap(&pdev->dev, r->start, resource_size(r));
-> > +	if (!ctrl) {
-> > +		dev_err(&pdev->dev, "devm_ioremap() failed\n");
-> > +		return -ENOMEM;
-> > +	}
-> >  
-> >  	irq = platform_get_irq(pdev, 0);
-> >  	if (irq < 0)
-> > -- 
-> > 2.55.0
-> > 
-> > 
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
