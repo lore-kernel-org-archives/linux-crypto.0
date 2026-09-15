@@ -1,69 +1,69 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+Received: from mail-pz2-f42.google.com (mail-pz2-f42.google.com [74.125.228.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CC13B0595
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 21:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6213AEF4F
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 21:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789506042; cv=none; b=J9AsOA0eXZR50kQ2DTz4Rzs14+pdEMWxREyTf2qfEHx9v6qxI+BC1E6UNXHe2OzrvwuOlevIOJkpl0yz9EIyQ0Jq6H8IQZ//toluJV5wMi+p2ZB3qorTzIQPr+R8Rj+/mxj8zxVzDk0uUfaZmDxG7AHptcWPzzgSxThrHnqKNRw=
+	t=1789506054; cv=none; b=nc+xUI16pUMrZsPJZ+qFlP3LiRLqgwVRhmsGOI7dZOESEfa0QoGzbQZem+fSF07WW3i/0WbAKMco+NICvxUWPJGED2By6I20l+DQQ5vOQxD6+m/Yd3t75rGoeuJr9hSLymwNjtzrZ6XWdc+aIHc1DX8KCEwo/rlrPPkY5NORqKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789506042; c=relaxed/simple;
-	bh=3NlwmlgeR9UStztzEJOa5XxE0OKSg9rGXxb09yHnIZY=;
+	s=arc-20240116; t=1789506054; c=relaxed/simple;
+	bh=rfMWPtcSIAIJGdrg7gkea6Scilcnn7TJdjakZa4mvTI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EKzrchqheT1fcMQUE2E0YFrc8Qeyvio+6QxtyPbEl9QG1dKkRAV/v6fTWg1dvY3wHEMAyzDZf5fxxvtwb1NLY75PiGLeN1GZj6dpeb6XgC6uP37pgvQG42z0oN/A94vywui4sSN8btMR9ntFc3/dnHgnwaO65noo4RIuA9H6ziE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OIMvNrJX; arc=none smtp.client-ip=74.125.228.12
+	 In-Reply-To:To:Cc; b=poP6e4Kr9LhtKi4SS4qMYI40PbAjTHcxGiYVkKc1LoGzsnR/xsn5KRwaAAgJo4/qLPnc/9HrUG6mWs2speH+bL1J46aZjQ4SlnIzS09lVbw9U24EJrI/a97BNjcp/NsbdSSa9QtURZMvup2rSB2JYcr8lA0wYlegf5FLDhsvs6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hJGf+s9T; arc=none smtp.client-ip=74.125.228.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OIMvNrJX"
-Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc42c773d05so18157a12.3
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 14:00:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hJGf+s9T"
+Received: by mail-pz2-f42.google.com with SMTP id 41be03b00d2f7-cc1ab18b3e6so25580a12.1
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 14:00:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789506039; x=1790110839; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789506052; x=1790110852; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=wnvNRJTUsdTr1CADcV3hYsbAspY/4YujciextqHo7XU=;
-        b=OIMvNrJXZTiWrkry1QwhcUj3CbDaE2vZUvx7LmScDOlSaexeFtFd007VOergZTEC7l
-         OSEfLRXo66pbbmwIJylTCksYSuAvh7TBQJaUdx1J33tSLE2+c1ikSqWJbxI1A5BMkXoQ
-         P5iTifbtP/kazNhc/NwVxP/Do/j1lMQtcG4yLKwKFDL3yKe0SMx4R9mrWOf0CDaPFyCX
-         7lcmS7kPX/XT6VqcJfsWKXyFVI5S7Lw2b3MfWB1dqnx1bBkV8xyXOz44lHlLea/ywiqq
-         g0VAh4sx0RDTPh48aXlhNXsFxwDWvwXcOZ/d5STDyoEeuQTX7R+io+/MUiPgDVv2Rybn
-         74nA==
+        bh=7laVkgHRi16E4ELzl2jg8fUQVb6gDweW/ylOjj6oIsc=;
+        b=hJGf+s9T7QRZJLQL3qORFaGVY6G+AwlaTvpLP2jX8Ouxs8JD+seYoldw5xNR0/F8BW
+         9WWYnTKI2cwDrZwfRNpdziy0bAX4e1mAxx+Fd2nZyh7uxDP0xA5pVIwhVDD+VccEESaR
+         cxk2ewc2bzB/ai4zmy2cicbGm0rQi5+wV6uf4PxLWvn+oC7nTQs1o4NadBp9TTfHkOil
+         zT7awGsCNVs/urRkD7c7yrYfHGBaSfbz0Kk6iA+H2YVm9N/tokF6cUDMe8pA8ruRz9e4
+         R6ddQeKN0bWOFPW+I8aU3uq6vDrma4cYtEApbBT+A2HbThD3xut6tOJ5c+k2nVZkvUpz
+         BGkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789506039; x=1790110839;
+        d=1e100.net; s=20260707; t=1789506052; x=1790110852;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=wnvNRJTUsdTr1CADcV3hYsbAspY/4YujciextqHo7XU=;
-        b=l/3bjogXI++gXamDrR6Z+2UnO/chp1uBWbqw+MsvVomMeZ6y1g+9lDXeRrJISzPDuW
-         ObPiV7U64L+De5BVsCE3U9AK3zJTYhBYeLt4SaudqbY1prnx5H1i9H92nahhxt2HR4tp
-         LaAix7f+PvlpD9kc3CiQTrMZeeBj+ywpK7nzIoP/mkgsAVlodC1b3HDoZgUcBBHzA0UF
-         1jxofbVOdl21JkaZsL+TaiS3VNDPLbYW4/LUGPy8QUB1Fuzh3C2jq+V6ZYK/NGgg4VJc
-         GgLscds+LjC8BmGYIgwoqaEdV1CkU0iNPK4M9O5mcGYi00FfKTItENVt81j3WeGineiS
-         E2jg==
-X-Forwarded-Encrypted: i=1; AKwUvBy29VGId0SRqS8tho7M/mbU0HiyVykYt+7hePAya9bEd28Jffsr4w0c9xhoRrKdGsV09iqy9icE6RXChDE=@vger.kernel.org
-X-Gm-Message-State: AFuF++kkpX5OkSElwOij0z5SXOrPi8REla0j4Y4o6VYrp70H076tNGx3
-	D5lczrUSNWdN+4U77KvGE3yRKhjHCIvhqI4YA2kr4DOPLC/4WijKbtkK
-X-Gm-Gg: AYBFou2x8++HF0THJReIrLNualm50H8W3N8oHraRA4fpv9OwW8D/KKe4oY1qKeB49i/
-	ke5w7wAJsGf6MjApqZ8mH1ptIRZTP3Ae8fpdM85FGa3g1jfb9hHi/S6+F44Y9p+BnER9cWL2XuX
-	QIdqtE3J6aa2cfsNfhi0DuSTLfLbk6ap/JwNNC41j0fvk4+HD81DquWukBm2oG1fBjFTo6PqA5H
-	Vj7VhQmS+e4RBrqBKZFFBfPaaF9Xb+DuCprItXx+AZLSBtTNrOxcSPq51rFo3lUiFzHWDW61uAB
-	uHHcU7kqJeAi42m2qeEJJkVWRwfVT3xC9eQTe1AnExyT8B7lUnv/RFegaVOdQHrkS4+Y73TA0mJ
-	Nu5TIEoYcYnEuir0bpT4I8h2gb+WiKNPmceYuspmPTOMi92XCo/sdwiYFFjWwprTXY05hmufzSP
-	Pu8qXc6ea2x/IjRfmBeWft0DuYF8XtoK+6vW6qcnZHpu51rP/FefNCSl3QKdT6b6cst9fpicIwu
-	nHeyzI3saY=
-X-Received: by 2002:a17:90b:2250:b0:39d:e1f2:3400 with SMTP id 98e67ed59e1d1-39e1e5285d8mr118300a91.5.1789506039587;
-        Tue, 15 Sep 2026 14:00:39 -0700 (PDT)
+        bh=7laVkgHRi16E4ELzl2jg8fUQVb6gDweW/ylOjj6oIsc=;
+        b=RwNyvng+HMbWi/s+hYS/jw/umJ/1AocgzUi/A6z0NYAnoVizT3heR/hLqp1FLn4pJg
+         gP7LTjs5Y7d2cx/yd65th8CKGt5CCT/4ThkxEOKW7qobDTESxhboZeW5MB6VG/mmd8Xx
+         kUJnSriKct56157phEf+zZx5TSet8RKjDwt9ZoUpBWZddcieQA7/CSgKSUonlqF+nXEU
+         ncfkqF2I0B6J7VCa7cXTDB5mCQ0cr0BEDSshEqM22Ilz5qP3PdSNbvaB9AxbQCPgc4vk
+         l/TCWyuuiXKdT2/Wi4C+v62pAOAXkaKlcuWmdih+jQOxp9469WukJTk7MUs14Z9x0RIM
+         gskw==
+X-Forwarded-Encrypted: i=1; AKwUvBwBv9+jfN1oh/x+YBT4t6Y3CYjK0zhcb/QeU7JMNOa5KXe5izvT6YwHd3uok3F2LZGnSgvqRcpmtQQq/QA=@vger.kernel.org
+X-Gm-Message-State: AFuF++n1yEz4N7XDdIwcWodZL71wYoI39OKHvPsXWN/j3E5GFq6u21J6
+	/MMbfig6T+sqQlwj7sjJQE4EmBcHRZtetiLkgXVxW8X7Dk9QPEkda7yT
+X-Gm-Gg: AYBFou0F3TIt9EczAtbbp0hvmcW5d6UKpJ+gvO0rbzOL2mZAUG9OYGPMDitxmqOx0h/
+	PwY3SP7a1Uq6AFGszaxI7HUD+zhhV9amZhSdf1pDBPkSLOWcsHI3ynBZ8M65tMjmQE/+76NHUK+
+	lhMuSKtJHgDYcD05SaSCqxIYulHibLG/q7DqW9FthqIog+Rlol7nH8ZU4kGZAhcj7kJL427BS6t
+	wA7Fw2XN5i4xn8XsCdC9kiR/Pa3epdlHCV9AXuHSienyRuY0hcCZc8HhKQp/RxJ8c+3c6bLGBfT
+	A17pnwiTe7A5e5e9Mu2JGD5Csr/UU5saDptSBVL/CsseAO1Bs/Rri8waygfjhmgFWZX3dj8Q14k
+	WM1UCm6yBL6CDrAoohu0DOeZxozmA26+WIAnMz7VSk+rwZan6sKOd4m4ihDtOzP0XQvS8a61xOl
+	JJEJZ3YSjLvBUuS0BpsJ/oSGfMi0vezTM/3he7gAXVcmqojW3hPVDBU0gBbqnuQ5TTgY111n1r0
+	X3Qo3osE65Z
+X-Received: by 2002:a05:6a20:549d:b0:3c3:7f50:fc39 with SMTP id adf61e73a8af0-3dd5f0808abmr276964637.0.1789506051685;
+        Tue, 15 Sep 2026 14:00:51 -0700 (PDT)
 Received: from [10.107.92.252] ([2409:40c2:5413:87f7:9fa7:eb18:a8e7:30a7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc50abb1483sm465432a12.26.2026.09.15.14.00.26
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc50abb1483sm465432a12.26.2026.09.15.14.00.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 14:00:39 -0700 (PDT)
+        Tue, 15 Sep 2026 14:00:51 -0700 (PDT)
 From: Bhargav Joshi <j.bhargav.u@gmail.com>
-Date: Wed, 16 Sep 2026 02:29:40 +0530
-Subject: [PATCH v2 3/4] dt-bindings: crypto: ti,omap-sham: Add OMAP3
- compatible and deprecate ti,hwmods
+Date: Wed, 16 Sep 2026 02:29:41 +0530
+Subject: [PATCH v2 4/4] dt-bindings: crypto: ti,omap: Fix missing
+ subdirectory in $id path
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -72,7 +72,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260916-ti-dra7-omap-sham-fix-v2-3-4eadb60081e5@gmail.com>
+Message-Id: <20260916-ti-dra7-omap-sham-fix-v2-4-4eadb60081e5@gmail.com>
 References: <20260916-ti-dra7-omap-sham-fix-v2-0-4eadb60081e5@gmail.com>
 In-Reply-To: <20260916-ti-dra7-omap-sham-fix-v2-0-4eadb60081e5@gmail.com>
 To: Aaro Koskinen <aaro.koskinen@iki.fi>, 
@@ -87,55 +87,51 @@ Cc: linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
  j.bhargav.u@gmail.com
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1789505986; l=1381;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1789505986; l=1640;
  i=j.bhargav.u@gmail.com; h=from:subject:message-id;
- bh=3NlwmlgeR9UStztzEJOa5XxE0OKSg9rGXxb09yHnIZY=;
- b=ZXwjniFsJyTCSkhGvIbLpRhULkdgCB1/C4/QtgW1ponKnqrQv+R+rEN+sSL8c9Q+PWN93nCPH
- 5czedkWgtzcDcn6Jf6cbKfzpFYJPQpyBOOEkwg929QDKmLqi8guHMLK
+ bh=rfMWPtcSIAIJGdrg7gkea6Scilcnn7TJdjakZa4mvTI=;
+ b=lEoeEdchCi0ox9ZpRBIC2oxd/dKgaGOWHkFsUI27sQyb+Kv9Sr0jv/s7FcF39KlU8Pk6k5j1o
+ z0mndXDNZNWDcqZkBce+bjL6WLUsSHFT4MU/JdlrDSh1CJ1t8Kbi9Eq
 X-Developer-Key: i=j.bhargav.u@gmail.com; a=ed25519;
  pk=IqNDwUZKECEA+n8wXctFLBbYL9NhFstZNbOznm/nX1k=
 
-The OMAP SHAM driver supports OMAP3 SoCs, and "ti,omap3-sham" is
-actively used in existing dts. However, it was previously missing from
-binding. Add "ti,omap3-sham" to the list of valid compatibles.
+The $id fields in the omap2-aes and omap4-des schemas are missing the
+crypto/ subdirectory in their paths.
 
-The legacy "ti,hwmods" property is no longer needed as TI OMAP mirgrated
-to "ti-sysc". Mark it as deprecated and remove it from the required
-properties.
+Add the missing crypto/ to $id.
 
 Signed-off-by: Bhargav Joshi <j.bhargav.u@gmail.com>
 ---
- Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Documentation/devicetree/bindings/crypto/ti,omap2-aes.yaml | 2 +-
+ Documentation/devicetree/bindings/crypto/ti,omap4-des.yaml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
-index d69b50228009..3ef05890e13a 100644
---- a/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
-+++ b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
-@@ -13,6 +13,7 @@ properties:
-   compatible:
-     enum:
-       - ti,omap2-sham
-+      - ti,omap3-sham
-       - ti,omap4-sham
-       - ti,omap5-sham
+diff --git a/Documentation/devicetree/bindings/crypto/ti,omap2-aes.yaml b/Documentation/devicetree/bindings/crypto/ti,omap2-aes.yaml
+index 90e92050ad2e..54e1d6c9bfdf 100644
+--- a/Documentation/devicetree/bindings/crypto/ti,omap2-aes.yaml
++++ b/Documentation/devicetree/bindings/crypto/ti,omap2-aes.yaml
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+ %YAML 1.2
+ ---
+-$id: http://devicetree.org/schemas/ti,omap2-aes.yaml#
++$id: http://devicetree.org/schemas/crypto/ti,omap2-aes.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
  
-@@ -32,6 +33,7 @@ properties:
-     description: Name of the hwmod associated with the SHAM module
-     $ref: /schemas/types.yaml#/definitions/string
-     enum: [sham]
-+    deprecated: true
+ title: OMAP SoC AES crypto Module
+diff --git a/Documentation/devicetree/bindings/crypto/ti,omap4-des.yaml b/Documentation/devicetree/bindings/crypto/ti,omap4-des.yaml
+index 2ed6f77583d4..3e7eed297c81 100644
+--- a/Documentation/devicetree/bindings/crypto/ti,omap4-des.yaml
++++ b/Documentation/devicetree/bindings/crypto/ti,omap4-des.yaml
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+ %YAML 1.2
+ ---
+-$id: http://devicetree.org/schemas/ti,omap4-des.yaml#
++$id: http://devicetree.org/schemas/crypto/ti,omap4-des.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
  
- dependencies:
-   dmas: [dma-names]
-@@ -40,7 +42,6 @@ additionalProperties: false
- 
- required:
-   - compatible
--  - ti,hwmods
-   - reg
-   - interrupts
- 
+ title: OMAP4 DES crypto Module
 
 -- 
 2.55.0
