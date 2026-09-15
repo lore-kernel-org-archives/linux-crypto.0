@@ -1,255 +1,382 @@
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012059.outbound.protection.outlook.com [52.101.53.59])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B783DD50D;
-	Tue, 15 Sep 2026 21:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789506283; cv=fail; b=Sz7JHk8qzAzELKQRC31lQ8q34muS5i/rbbqgK9nSFccyauAXqSGsyddDQxAxLvPbPVxwsPCN2HrA2cS6AB7rm6GVkhqoGfM6xNvnXQqCdFbBb9DkzIEG7HVa5OVgLGoeK8gkaZl4s6guPhpoQUDyvJaaq7qV9wTjjMFAJzgDkPc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789506283; c=relaxed/simple;
-	bh=rgt3gdslVYSys+qBTH5jVmLp5vEgI+pMEnh8xEzJvgk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZwOEHRksFawzhveeyGLrQBLqchRKSKyYOsWPiJ2eZBRkiJpsddlYG+QumI1YkRh6SzFZelsEriikUGd9CQw1q2Cq2NPQjpMbm+ca68dV+7vAdDyXRDvJ7NXrsJ6UtDo0Q+6UVRH4b/HC3hwtcxTJCx6QaBThv9MGSJYlwKNqJeM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hHquTlD5; arc=fail smtp.client-ip=52.101.53.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3789B3B0590;
+	Tue, 15 Sep 2026 21:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789506393; cv=none; b=Ly9Srj13PbvHZiG28v9EwadOIhAmLz2KBb6zqUIFPtAoYUAWCcXpuhHVo1TGR+LwHa58w6i6wy3nx4fzUgHqri/+Gz5hRwFBrvjHGUl94paKGIlzUttO8CVsAbGsA3N2u0IV4ow5/Qh5SykIf8kpnFkrciTYi5+wI2e5OqNs0t0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789506393; c=relaxed/simple;
+	bh=g3K+lfhUgnaE/mezC2FggeKY+3skAs7DftoJWFLXh1w=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=cHy07d2dj9v9jkNFX+waYqFAN/Ogzh0Sa6wqrUUOnmyTISB63BP2YaJKmkAmVW8o22EiEQslgdrn9fXoKrsS0wXfuLG/ZZzcGQM14kkq5ctIad7vd8JO+o/Iql7fZtOTNCbIaNdc6dbsApN2VLbGjKF0c/Ld26DfTIfL613hkao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=CgGIkxKc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=abZOEX13; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hHquTlD5"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TpeRS3MkMC7B9ZGHFoPi8kGnDqgoAIgODIFyDKSvXlOQBpH2wYqghi4MaU3q3MyaPhSChzxO4B3Ozf1r0d6TxQlwflWJUxHyjNI89BnhSyy2BfE78B/u8DYvtY45YYQRsW94S4EHOk6SYLREBd339oA5oz4uZhNzJXNWnIcqPloUMML6Ufw/PROci7+xapdj8svVicfybZurGnlRvTAsYWG4dEm3gLIgbrmX9KTNUtiKV72bIv0Z51jziDOqiUa46iw6SOxOG1QLF2yno/xw3jNAf4RfGLOFeRVK/IQWw1u5hTPMmEGVIBFK+c9gYUdZW23RivI4qyUBsz5hZljjrg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TiX36A1XQmyZBdx7b7nyDCaARc2QGUUOCd03V01rdVs=;
- b=fj2h8k+YsBngbKwcDOCyLOJUP/QUJEqWJUZg1r+runasTdXa6WLlptxY30FPIU7WRT+1XTPCp+9PMCaJcmsybFEFsvewdbO2lpGO2zvZ+JvYA/0vXTbYz45EUaRWPBn6rLq5RblL0q9X2VQr7q0YFp6Y/vibct8C9ZM2lBfQiLkr2BAdg7O//90m2+PxgHnCvA0aLRBnqjIBu3db+yCGJ9Aa49Spqu0sDfUEjqrKnt4W4CcMMOsD1IE7dDBjIEgGnwnwFSALqHxssK5QBWomRKCDGH7/RueDMwZUgS7LumQu8LgTsS6FLGiMUSqA3gK/wBKiLgXEd0xA/vkaFYdS5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TiX36A1XQmyZBdx7b7nyDCaARc2QGUUOCd03V01rdVs=;
- b=hHquTlD5kx/MoipfASh+mhh/fkul/bPzyFJ00QYYDezFdFKUWvdGZVbVHqUykDAJ6yFqe69uwfZCXk9UYIooOZiOvTdWM1WksXuu0XUxalOpaowbvyAcbB8+uKW0yEzlmX+NSZcJFxTlhua+W69Lz9QbXKFZpybN4esBKew/6TI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by SN7PR12MB8770.namprd12.prod.outlook.com (2603:10b6:806:34b::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.9; Tue, 15 Sep
- 2026 21:04:36 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad%5]) with mapi id 15.21.0428.008; Tue, 15 Sep 2026
- 21:04:36 +0000
-Message-ID: <1c3d9841-eef8-4c94-9b2c-a7ed92a68260@amd.com>
-Date: Tue, 15 Sep 2026 16:04:31 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 4/5] x86/sev: Perform RMP optimizations asynchronously
-To: Borislav Petkov <bp@alien8.de>
-Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
- thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- ardb@kernel.org, pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
- rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, darwi@linutronix.de, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1788984053.git.ashish.kalra@amd.com>
- <1e3d0edb6b275e33fa6f76b0c31db9e999d9a270.1788984053.git.ashish.kalra@amd.com>
- <20260912015336.GJaqSwoBGnp4Zl-jC4@fat_crate.local>
- <279595c8-30bb-4c01-8203-95619bab3d47@amd.com>
- <20260914231546.GAaqiAIsjGUdsK3MAq@fat_crate.local>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-Autocrypt: addr=ashish.kalra@amd.com; keydata=
- xsFNBGnyeG8BEADrp4EWc3KHI3tz7Lnw4HgRJRG6U+IJKAp6EBnQA5uimlJspSAr+jf23I2a
- T0mr1uiTnZG0JkfgFpTgwBYcR+d8J96WP9LDeId9z6R7b5jyB64fhYqX8Hpich3lon2Woijn
- azEZ++sSUtAU75m2j9ZE6lkkPM2Ti9YWSBsSg92KDVVROXLO9n6U80lzudJrKAKHE0/PagzV
- D5gjV/s7lb9PX8khKVK3ockGRuy97lw2mAcw17EV8GE5cuToOOzpP8ESXBt1g7xoXVcbHYol
- yuX1ljHEfqy7cCtTsBk1+LzPuhZ7532MIfVmFtDcNUSwCGeGgwNRZno7lAJ9xd6fLkZPTEZ4
- UNsaViyzmJ22P7xMiZqXWQWSk1LohnGhZZdTaIwidWT12c8RX+qVUCzesaFXGqKt0PNTipTp
- L39iEZO8m/+lC1BmTo0EoYtsNfrlngwNPsSU7rtd/t00RuW4YHhXALT2JUbulLCHGK1w9isH
- E7dJXprYjUiZRVF3SaeTF4zg5AzkWRB+0yL2KzWQPumDx1gscLNFev8J1EbdrYClcpUuNxKG
- MMG95wPqWtZm/HaNyG08alXDZcnq8hhxA7AbJLnPYpqWd108p0qp3Vr0UrvuekBKZ6Y7be+m
- Hb4A1xRX3hE2kB971lsVp0lXSEGFHB9TJw7FH/S8paITH58y4wARAQABzSNBc2hpc2ggS2Fs
- cmEgPGFzaGlzaC5rYWxyYUBhbWQuY29tPsLBkQQTAQoAOxYhBOnNssdBmZnznITYhaE6KKJw
- lji/BQJp8nhvAhsDBQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJEKE6KKJwlji/q7AP
- +wfg5wOWq+f7eB3uh0agX5Ax/o5r5hlK0EMyl+srJ4jc+NmNKKuVPwx0EwZEpuEcbDLlQuO3
- JIyi13wm6n6FvIBOCfWjvndpaci1QGTMtZDnxueXM8UeFST3KjIEWFXbvgiAyiZBE+lHaSBp
- 7UfAL19icIomKdCVCRtnqOsTvv7mcyPL8qs+OAOu8akvp3NlGsqLrkSB/YTEBKmh8oOR0aXz
- 4VBIHpfTIppIu+F5l5PxOQGwNv/AfQ/oN+Aeo+o8i3s57gViqP8uVlVcI/vi1S4hngmc87Ah
- 3p7KdbrxxPzahD+p1fMXsCwEf0dyJIRduDgAkpktmSLoRzBGkjtOX5nvs75QgA3r0WsvcfxF
- zly+nnhu2GsptY+uu/ZzW6PCz6p0pHMiDfPAL1cfizY8eTMFJN5fnOW9rwXvKbM+DHbowfkw
- NtF0DecH3qjmqAzGg2srE9XJxwOotS1JgeBp1TZsah8pXBaY+Z7s1iaY58H2TrdiDbz88DD+
- TGX4ZHPjocpqeUuwxn7gTCKQq3K1fjt6IKY0A1ocxQEK33pjQMRTJ8lwy4z37V6EohmvCs9w
- 5qyvI9D1gnMnFrqpbry1Jz7z1HB4sFFYxIxyMh86uOcUxGmHRrCiII3YqiSmzizvq4aUmHxd
- YE1Wy+pKx2HVobhnuKIKoSJj2JgYV0+O5dk6zsFNBGnyeG8BEAC+BGciGUt4ODNq38ouK/6E
- jlkJPpnxlksBhlhwce/p1vvARFceifVbawkM8ePHyIXrzxho0PUDjteGFFDjP1o/N0rQzgbf
- 0INfkbJpHME+SYETxrkm+j9oe8DiHXZhdatY5rupZoypodNQJDD1G/HoT7bBQxPj6xDBgHWH
- OyZbg1jjQXSWESgVX118uiQ5M9RdO+gc/YGLt5FDvN892uWs8899QBm804SdSlwkZGMKXZXv
- 12qKw+swQoVzBdCqSLOOtIhGevkl6Ul5+N8iT7xeKMVZffAxkz7DF1yDovhJhrYtgKyUMQqW
- qCINhtp9wHvPt+wfutzYsCLVJvVLMIj3fPtfYBSPXQu2FP0z2Nx6oUxQR/LjilP4UezSdXt9
- WWpb+mvDLmelNuoA7WUxRauQBKu6tR1zoFl3zTdW4ZiSqZRgKInSfaVhINUMv8gqcLlAzkVS
- seOwRrwNDUosSW3gVwj28m/T9JSfGR62i58WmH0sFQG42yuIbq/uE4crf2oQDrpFNzTJgx6+
- Ede711weViGHEQz5vsgERmQrJDddRTgl/SlGtkAYNpVFJgYV2N/jYjiz98hgE2MYgZ2Kd8WL
- T8dvswsQguvkDMpWJZ2BunYhRLGIpyVDhepu05qyFuNYA50GX/qcj7POBSEx/6mBaIQC7oXI
- ffsirWGyL5WEVQARAQABwsF2BBgBCgAgFiEE6c2yx0GZmfOchNiFoTooonCWOL8FAmnyeG8C
- GwwACgkQoTooonCWOL/tdA//RIcNr6dB4ZZaKWDe5SSw0KD7hKExIIiBkxIv5XILcazPK21x
- LlDbXUHxWWaG+9wezceRRBe3GjRo2aKEpQzuAOgR5Ix5tRe5yJAFozO/CCGixiBzQ2I2TGIv
- rp8xZqqvmgogckqz3RE9Rx5VF7bqKriuGbF+WciPU6+YSuN1rH+esS40yoFu2skbYAMfm+Av
- AvEMDAmkR1o+weVZZAZMjm+2ZpCm2xXk5bjAqPQ+GoH70x/kPVv+TXjTN68xIjmP6gwA7c1P
- qozwWzaA2Q2HO5D76clT3tmHbtzMuYt3cfwbWbCpNaqycaHvktATiRjy60Bz9FvRL8cMt0+4
- jumtJoa0nAEmx88QzaMOK3QDW6KoDKzV8bqAHBPtrwH+jhOKId07yHmWCZxIGJAkhwqsdEx8
- bXpP3nTer40r1tvds54lxhKxOlVvf5iBoxa3kC8f6cTNJeGm5ettvD5iFSR+fwAUDEyZEtxQ
- f3Brs3CLkBfijS0zCw9rWqlZJGSst5xwV8UdfppsPWkU9lAUR8UZFsO+g1xCxtBc0nucygzh
- O+mvU01WFeZGTnW7INdP+eDIvj4XYmVSjwCSNvDphJkPccAn2KFcPxYh8PJAqCDw++nfNDrc
- BXA1uh2XzCnnzbc62A+AjwXB89wvlctBLptKlnKBVtrsKEFIoLugtmfIsa4=
-In-Reply-To: <20260914231546.GAaqiAIsjGUdsK3MAq@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PH0PR07CA0043.namprd07.prod.outlook.com
- (2603:10b6:510:e::18) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="CgGIkxKc";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="abZOEX13"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id 17D99EC0E47;
+	Tue, 15 Sep 2026 17:06:27 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Tue, 15 Sep 2026 17:06:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm1; t=
+	1789506387; x=1789592787; bh=pSGhn5yb2ykQHa2+aS4x0aFSjk4p7/mwMgu
+	lDmeHEfI=; b=CgGIkxKcPckL2520PVEYtzWYJetiw5vFeYlNNv2vp5Mfb22pxYH
+	Z3AeutYDYz64s+5TK1RqBcmA7RbBREX8wPxvh0584SPPYew3QgpjBlPo2/dhmZgT
+	mTBOasxxH9hAwXvde0rydO48NfddKivQLtx56ZwL7Iz1gXzFRod4tNozprjoXIGo
+	9mpXIvxQ3cO/HdQb/TETSh+JQKks6rL1i/18pQOl6vJn2eWcICSZ56wTx5PQKJBF
+	HC+XLRRzPVok8DzJEs2ARwLoBKwD16bUKgD8449V/5qSKZHxdhMwpg2s0KWpXyJ4
+	7Ce0hxV9e+jfjB7/VGOZBkK6nB0WQB9xJwQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1789506387; x=
+	1789592787; bh=pSGhn5yb2ykQHa2+aS4x0aFSjk4p7/mwMgulDmeHEfI=; b=a
+	bZOEX13veVaxfTH9bLCCccEDlmcfsW+SWN7V0AGCUl/u0pgbbhYhgWYCS6fmUYHq
+	oC7hUo+tUXrM7xhiwtXRGCwujKPeYxNOt27vlaDZ+9URcD/CQ/A2RuM7B+Y9DmRK
+	YLaq853LOAnvCGxb3570NqstfkkmXTHeov9gt2Xbvf4SxpSNz3s5uMlNzVL2YP0O
+	zWlwcLEltPsbZcpPLa2iMTXaPou7GaPNmZdwFmgfL8Wa+CVf8/l4th6cas1euomi
+	sLSCZfnlGTEl6f3K4pUqzTW9vUDLEbOU2P4AbGhMoquTQ/3AuO8vrODQ5bOfKuXg
+	3GmqEOFube8t0WXZA5Bxw==
+X-ME-Sender: <xms:UbOparFGbSXihTaj0SLZ6yYMKW7RA2xkA36-P3YSOKl-itdh0OZAMg>
+    <xme:UbOpavR8GdsKOZsh3fxLA59J8vYUUrFCKR6qbyM8laze54yY7_wUQSg3NscupXVBk
+    7yd9yaFSm1ulNvNjniFNf7lQC5aYVsCztGgeLN_itTbOhWwkQ>
+X-ME-Received: <xmr:UbOpaiO-_KpZOlsKebvR0-rsMkr2DNIRjVhVaoZ293TZj5QbzEcYhTKY_s2fyWbpmg>
+X-ME-Proxy-Cause: dmFkZTGla0jEqEOCi/nzNPCoo0ScIh2JaZoq/4ebKgNohM8wDfdyIavrkNjshsND0P8tAs
+    YhtJcgxY8ykXaMgTLV/PAPKJBCPJIZajcIR5EweJMqjOb2vZSnR4CeIgVRzxWmJX/xFJn7
+    1a4tUOzgCBFodCqSJZaKfGFB6cgCAYzxBzIwS63QgFT6wWVOBcy9MDzMapV05p1KdzDuei
+    j95DMmwaNUq7OLYkcjLYuUzH5HXYPbN7fSaJSeC8pvuikyYJkizg+ZIgbsAxuNyEKs8hFp
+    WBrrz0c1CjdAGYnAIwfX5V7HPHVKo17fBEA3/JW5/KyDlNhLH7gvRkzZhrP1FhlvukvsqI
+    ZJr5IQgxcnkpH6PeJTjjIg0oXlGXXkgjB13qbSnrrgppM61DAq1jmz15SmDbdLzhSILo6G
+    32KR8G+HesNpe+GCrZb8WvmDpiXfpJ2kv4NUy+SdqWyAhWsYNrVN7m9KyrJWkiTLSp4xCe
+    cKTabAmHjfZmAKKJRR44NmeaSKN4MlpmYoGYRFbJR44ZIC+5rVQDqWFOoEvA4/Wzqa4oNn
+    sYDwXvRPqdHIhqFKIZNR3bIrvTS/IBtFf75SfzaHkirF4Thyhe7ujZ7RBdXkwtXUghdgqC
+    VZMXofDt33LkpijoWqrkvU0sk2xgnbY295PQnKCGfdY8d4uQ7Q5c/BeGAsRA
+X-ME-Proxy: <xmx:UbOpagOfaqcQ-p9_U2E_Bv59vZp6XZHuDujeIgGZbIFCODBdt4HLXQ>
+    <xmx:UbOpasFaZV5WbjePIApkS6hC5XK4LZl1rpuQ7wEXrmZzV2qYR5m1ow>
+    <xmx:UbOpaqPhbsXQPsPmLDVCFXjBp5nxyOsYRA2_Qmtx1-sSRITQWLnneA>
+    <xmx:UbOpauvMfj7bSQ-vW5v9T23uRHHxzrYkPZPPp4oc6yipNh9Lgz-XHA>
+    <xmx:U7OpalEEvf1Cb9epx-tleNX3emopc13DaR9ZdGM8ccS9zbAaf7Y8qtDp>
+Feedback-ID: i9d664b8f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 15 Sep 2026 17:06:20 -0400 (EDT)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|SN7PR12MB8770:EE_
-X-MS-Office365-Filtering-Correlation-Id: 411d87ef-9ae1-4821-e7e3-08df136cf2e2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|7416014|11063799006|5023799004|56012099006|4143699003|10067099003|22082099003|18002099003|3023799007;
-X-Microsoft-Antispam-Message-Info:
-	zIa58k3dsFRCEXAXZcAGLXAZ533+UTLuAwvwKcJ3lxuFsjKEQKU/nwUiKDSgweAuCnuVOc4W6xq8pGV/89yYlNCJ0QuUR0QTZt9/lFcbnVhgrMerQEo6zg+/ZdC88vA2RtWdi+1/DreKN7aQocPN2sEs5Z+cON+P8nLPGxxisXbutQCnuysN4lwcgUbhoDTovdN551ONyzZ+/agSUdeheWZgw37Jh7y39by/XbPi5MqlTI1SxeOn+czPEDxwvR+u1eEKllUxYZ99lb04L/fRq8ePVvnV5Y1+lfXrbzMNWwmY46udBlkX0ulmcJd7uwRCTFyTwtjWTDM+MY+SiBS33ko8PFYQnHc9zFiUUiAMWK6UeKuafWC4DhLkZeDJkxd6QXeJTmPBX0bVBM1X27hSMcYpJ7KIy+bxKB3hoZ2x7YxSBzIfI8dHI1l6/PjnrvWy6HkorIv534uj+IWUUv/NYEsJ2IfpJZ6jx0UVM3aoLb9gNlvm69QLOHuL+fphew/76qLmGz5GkUztLVPG4GsLq1BJUcge/8vubpLtC4ujeH5Sxjy0FC3vFx/eDBIo7XPh288cySAWxrhhtds0hRf6HgxkJUSS0eHiB+3qRWgYYkF9kovGdxW/tBX5nFqOAAeTeTUBlnP/S+X3A+B156t0weBC28VbP7I7ydUKWjuhvhg=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(7416014)(11063799006)(5023799004)(56012099006)(4143699003)(10067099003)(22082099003)(18002099003)(3023799007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Qnl3TTRHSVNJY3JEajhRM2FIUjRJbmZsSkgyYzZ6R09PRGpYRU94Y3VjMUx3?=
- =?utf-8?B?YlpFUU5lY2ozaFJDWEpaenRqelRpaW1hdHpVUm94dE5PNnRJT0hjTEQyTUc0?=
- =?utf-8?B?N25QRm1nRTVsOE9BbkhxVGVLUUl2SXdaU2hUaGlMRDJpa2NzOEd6aUkwSm94?=
- =?utf-8?B?eFhJRnphenBhMFBuWTE2a0hQZG11WmVvelJUUmJzSE42UW1qM1g3TzNzRjJI?=
- =?utf-8?B?VHVRRGxmaGlYdHpFT1FsZ1dqbDcyTW5Ca1ZRSEdvaHdXRXVNTFQrM0RYOS9u?=
- =?utf-8?B?b2JNb2xGNE5Tanh2Zm9RZG9VWTBZM0tqNnJLQVhtNkJmb1I2ZW9mVTZBVHJB?=
- =?utf-8?B?Z2MzSW82T0N5K1ZySHhWRUw4WEJNOFdESk1BMEdnM3BaeW9WMHZMVmNENUlh?=
- =?utf-8?B?ckZDeEZLQ3dEK0NBcFhwVlhrUGlNZ0pZTGRsT3hlb1ZzL2x3MldmeFRZYTJY?=
- =?utf-8?B?emFGejY1c0FWTGhKN0hXYW92ZUJnZm05a0kwTUI0RC9ub3AzVzRvb3FoWkF6?=
- =?utf-8?B?WnZtN1pRaW1XV1V3SkVxRU1xRmo4NmFCTzRiUkRtZHBQb1h4L1VmSC8ybUlO?=
- =?utf-8?B?Y2ZFNEdvOVc2Q0tIWGU1cEIrR1hUOGpmTmtzTmFlWXE1VXVWUTF6a1NDV3l6?=
- =?utf-8?B?SVA0Z1VQVXJhaUVtVzNLTVo0UFdmNlJndzZZeXd5OXlMYzNWMlFIWjVDanY3?=
- =?utf-8?B?UEtxeGpKQVpvb1RBQkNKQkZPN0dXczFqSWJyREtDNTV0VmIrY3VuaTB4NVJk?=
- =?utf-8?B?SllEUDUwNHc5QlRVajNlT2czUHdkUjgzZkRWNUJZczlaY1dRTlFHenlmYzdj?=
- =?utf-8?B?WldGL1VVSDNLZllEZTl6NzV0aDFWeHJ5cVVwUDJ3YmZTanlBSTJhb2k0eGY3?=
- =?utf-8?B?V28waWZIMUpZSFhtUUZobWRqR212S0JtOGtxRXdjT29hSUpsb1ZJZkhpblZy?=
- =?utf-8?B?TkN5OWZTUFRxY2RSVHNqWXIyLzBPYTFvK0JUVUpKRll0RWRNQW5FclR4Slgw?=
- =?utf-8?B?eHAxSThUUWxwNUUrMGFuWDBYL2MrMExLd2VTRWlWM0RibW9mcXI2RTJqVlBx?=
- =?utf-8?B?cjI3MlhHcE1xU2FjL3Q3MW9wSzZDc2RiNHBQeDBsbXhxVE1pWXY3cWduMmZE?=
- =?utf-8?B?Si9rbEJDR3p2OUNsakQ4VWlEU1VtbmpTOVVWTGlDRi9Nb0pEYStQbTdrVDFM?=
- =?utf-8?B?YlE1ZVlZWkVWQnV4aHJJZEd4RU1qc2M1a1JXT0dzTG4rcGc3TDRTM3RyTUVy?=
- =?utf-8?B?N0x2ZkxySmkrYXUyT2RJYmxMbHRmZHNnaEplQ0FOT0huT2dZVFkvWllHN2Qz?=
- =?utf-8?B?aFhodFh3bk1sYXR3M08rcURjUW5YdHJVTlRHUkZTeW4wSWFiOUh1OGtlVTFJ?=
- =?utf-8?B?TWlhK1Zqd3VOR3lES1NBT2ZYOVhxUlRNQ2FDT0dCSHU0RTl5Y3J3cEt1TVpQ?=
- =?utf-8?B?QUx0Y05HNDN5TVEwczQzNmlGaHpZZjMyVEp4WVcwV3ZFVkVGZURvOElxem5L?=
- =?utf-8?B?RmdvdStvNUVMd1RSaVdhMG5RV0tEdnlYWitGK3lzMlNmLzJxYndvcmVuRkJH?=
- =?utf-8?B?b3lPTElMeHY0THFVRFEzMGk2aUFIcm1oWFozQnpzYXl1V3Z6bVJOMFV5U21M?=
- =?utf-8?B?Z0ZnOGxpTENnWnI0aDdDOEVhdzZNaDlZOHZVMlhQUFZqZlJsK0Njd2w5R0dE?=
- =?utf-8?B?MGh3NkZ4aWZ5MzROeVpTRzBDZ0wzdkZvVk0rNEdRTGlEN3ZjVFBIQW50cnYy?=
- =?utf-8?B?dStxNUg4bXRRbllPaXFDZHVvVGsxTjI1SS9xUHFtNkFVSktWa2FPMERUQXNk?=
- =?utf-8?B?Z0RSVDI4SzM4M3Nnem8rejVIVEF2RWZQbzlMNk9NVThVTkV0V1dCdXNJOWZJ?=
- =?utf-8?B?NjQyT1Zla3o3UDdvblk1Z1pmN01LMjV1ZGtUNkJSaTM3ZWM3SXpyVW90dENU?=
- =?utf-8?B?V0FqUjJYK1BCeDJnK2p0aTJHeXBGK0N6SVpGb29jUnVyRjlmakIvMXgrZVdI?=
- =?utf-8?B?elIrQWFVQm1mMHZUY1hqcHBwU25WWnluc0FmNktTejdBaWpJQlJLeTI2b2s2?=
- =?utf-8?B?SDYxRTlEa1NpMnNKOTVKaDRhcXd3QW94VkZsZnppbTZOeXVUY3paZkdIRTNX?=
- =?utf-8?B?V2VwbTF4amVTTms4a1BwSkU4UWYrWU1oWU54R2d6S3M3a25ZQlkzTjBkbCto?=
- =?utf-8?B?am9kdzJzRTM4UElLYldocUpPN0E1V0FoQ29YWFg5blNrVGlkblluTHRUYUVu?=
- =?utf-8?B?MWdJR3c4djVCeWUvYlUxcUhwTCtJS0xENEpuWEQ2S2N2N3NMdktianVrYTNO?=
- =?utf-8?B?SkJLOEJ0cDdGcXpwTG0wbVIvNkY3NUE1d20rdkpYeWE4TzVhMjBvUT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 411d87ef-9ae1-4821-e7e3-08df136cf2e2
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2026 21:04:36.4179
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: N7Au+zZhEFMtPFGcEidtrwsAtBCsvg0vLb/5SbuDP9O+5iiHj+KqRZqgk0LuBsVmdxJJLychr5FfxdnIerWgQA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8770
+From: NeilBrown <neilb@ownmail.net>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Cc: "Eric Dumazet" <edumazet@google.com>,
+ "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>,
+ "syzbot" <syzbot+4d0e4d2db6dfde01b52f@syzkaller.appspotmail.com>,
+ bridge@lists.linux.dev, davem@davemloft.net, horms@kernel.org,
+ idosch@nvidia.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, razor@blackwall.org,
+ steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com,
+ "Thomas Graf" <tgraf@suug.ch>, linux-crypto@vger.kernel.org,
+ "quanyeyang" <quanyemostima@gmail.com>
+Subject: Re: [PATCH] rhashtable: Use separate lockdep keys for each lock
+In-reply-to: <aqjf7LNmE6InABpw@gondor.apana.org.au>
+References: <6aa5fcf6.f2639fcc.29487d.0048.GAE@google.com>
+  <aqi7fpazv2KDDdvn@shinmob>
+  <CANn89iJd0QnoDo0tjrFED2myec38U8joyqR05d6BVnJ-sX=NVg@mail.gmail.com>
+  <aqjf7LNmE6InABpw@gondor.apana.org.au>
+Date: Wed, 16 Sep 2026 07:06:16 +1000
+Message-id: <178950637640.207413.1725604371084195628@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-Hello Boris,
+On Tue, 15 Sep 2026, Herbert Xu wrote:
+> On Mon, Sep 14, 2026 at 09:06:49PM -0700, Eric Dumazet wrote:
+> >
+> > Try to revert 4333ab90aaae ("rhashtable: use private lockdep class for
+> > all locks.")
+>=20
+> Yes this is indeed buggy.  I know nothing about lockdep but Gemini
+> reckons that it should use separate keys instead of different
+> depths which seems fair enough:
+>=20
+> ---8<---
+> Use separate lockdep keys for the different types of locks in
+> rhashtable (mutex, spin lock, and bucket locks).  They are
+> separate and not normally nested with respect to each other.
+>=20
+> Also move the rhashtable_init/rhltable_init kdoc to the header
+> file as that's where the macros are defined.
+>=20
+> Fixes: 4333ab90aaae ("rhashtable: use private lockdep class for all locks.")
+> Reported-by: syzbot+4d0e4d2db6dfde01b52f@syzkaller.appspotmail.com
+> Assisted-by: Gemini:gemini-3.6-flash
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-On 9/14/2026 6:15 PM, Borislav Petkov wrote:
-> On Mon, Sep 14, 2026 at 03:00:04PM -0500, Kalra, Ashish wrote:
->> Thanks, Boris. Splitting setup from start and collapsing to a single export makes sense — a couple of constraints from the RMPOPT
->> spec shape how it has to be done.
->>
->> RMPOPT_BASE can only be written (RMPOPT_EN set) when SYSCFG[SnpEn] and RMP_CFG[SegmentedRmpEn] are both 1; otherwise the access
->> #GP(0)s. So the MSR programming can't run from an init‑time initcall — SnpEn is 0 then and it would #GP. The software setup can,
->> though, so the split becomes:
->>
->>   - an initcall in this file does the software setup — allocate the workqueue and INIT_DELAYED_WORK(), no export;
->>   - snp_enable_rmpopt() (the single export) programs RMPOPT_BASE on the primary threads and queues the pass. ccp calls it after it
->>   has enabled SNP, and kvm‑amd calls it on teardown.
-> 
-> This programming sure sounds like something we don't need to repeat each time
-> we enable RMPOPT...
-> 
-> rmpopt_pa_start is practically static so I'd love it if those MSRs are written
-> once and that's it. The question is, do they keep their value when we disable
-> SNP?
-> 
-> And I can basically imagine the answer from hw folks: "yeah, yeah, maybe, but
-> to be on the safe side, you should always write them after having enabled
-> SNP."
-> 
-> Because if not, I'd be perfectly fine with us setting them on the *first* SNP
-> init and not touching them again.
-> 
-> IOW, this pseudo:
-> 
-> 	if (!rdmsr(RMPOPT_BASE))
-> 		wrmsr(RMPOPT_BASE, ...):
-> 
-> This should probably be in the snp_enable_rmpopt() function anyway as it
-> should do what we want.
-> 
->> The same spec text makes that single entry point safe to call repeatedly: RMPOPT_BASE_ADDR is read‑only once RMPOPT_EN is 1 (and
->> RMPOPT_EN can't be cleared while SnpEn is 1), so a later call's write is a probably a no‑op rather than a reprogram. If we want
->> to avoid even the redundant IPIs, snp_enable_rmpopt() can read RMPOPT_BASE and skip programming when RMPOPT_EN is already set — a
->> hardware‑state check instead of an if (rmpopt_wq).
-> 
-> Yap, or that. Sounds ok to me if it works.
-> 
->> On clearing X86_FEATURE_RMPOPT when the allocation fails: that hits the problem we ran into in earlier revisions — the workqueue
->> allocation is at initcall time, after alternatives are patched, where setup_clear_cpu_cap() isn't reliable (static_cpu_has() is
->> already baked in), so clearing the cap won't flip rmpopt_capable(). The setup/enable split removes most of the if (rmpopt_wq)
->> checks anyway; the only one left is a single guard in snp_enable_rmpopt() for the (rare) allocation‑failure case, which I will
->> probably like to keep rather than rely on clearing the feature.
-> 
-> Or, you can introduce that bool rmpopt_enabled and clear it and test it in
-> rmpopt_capable(). As long as it stays a static var, only visible in this
-> compilation unit and not exported, that's good enough.
-> 
->> I'll respin as v15 with the setup/enable split once we settle the feature‑clear question and the RMPOPT_BASE MSR programming
->> question (i.e., skipping it if RMPOPT_EN is already set).
-> 
-> Thx.
-> 
-> Btw, you can respin the last two patches only and send them as a reply to that
-> thread - I have applied the first 3 already so no need to resend them again.
-> 
+That's a much better approach - thanks for that.
 
-One thing to sort out first, since you've already applied p1‑p3: the setup/enable rework reshapes a few things that landed
-in p3 — snp_setup_rmpopt() becomes the single snp_enable_rmpopt() export, rmpopt_capable() now uses the rmpopt_enabled
-guard, and the ccp caller in sev-dev.c changes with the rename. I can carry all of that as deltas in the respun p4 (i.e.
-p3 adds snp_setup_rmpopt() and p4 renames/reworks it right after), but if you'd rather it land cleanly I can refresh p3
-too so it introduces the final shape. Which would you prefer — p4 deltas over what's applied, or a refreshed p3 as well?
+Reviewed-by: NeilBrown <neil@brown.name>
 
 Thanks,
-Ashish
+NeilBrown
+
+
+>=20
+> diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-ty=
+pes.h
+> index 0e1b172a4f6c..afbc12ba71f5 100644
+> --- a/include/linux/rhashtable-types.h
+> +++ b/include/linux/rhashtable-types.h
+> @@ -70,6 +70,14 @@ struct rhashtable_params {
+>  	rht_obj_cmpfn_t		obj_cmpfn;
+>  };
+> =20
+> +struct rhashtable_lockdep_keys {
+> +#ifdef CONFIG_LOCKDEP
+> +	struct lock_class_key lock_key;
+> +	struct lock_class_key mutex_key;
+> +	struct lock_class_key bucket_key;
+> +#endif
+> +};
+> +
+>  /**
+>   * struct rhashtable - Hash table handle
+>   * @tbl: Bucket table
+> @@ -141,24 +149,77 @@ struct rhashtable_iter {
+> =20
+>  int __rhashtable_init_noprof(struct rhashtable *ht,
+>  		    const struct rhashtable_params *params,
+> -		    struct lock_class_key *key);
+> +		    struct rhashtable_lockdep_keys *keys);
+>  #define rhashtable_init_noprof(ht, params)				\
+>  ({									\
+> -	static struct lock_class_key __key;				\
+> +	static struct rhashtable_lockdep_keys __keys;			\
+>  									\
+> -	__rhashtable_init_noprof(ht, params, &__key);			\
+> +	__rhashtable_init_noprof(ht, params, &__keys);			\
+>  })
+> +
+> +/**
+> + * rhashtable_init - initialize a new hash table
+> + * @ht:		hash table to be initialized
+> + * @params:	configuration parameters
+> + *
+> + * Initializes a new hash table based on the provided configuration
+> + * parameters. A table can be configured either with a variable or
+> + * fixed length key:
+> + *
+> + * Configuration Example 1: Fixed length keys
+> + * struct test_obj {
+> + *	int			key;
+> + *	void *			my_member;
+> + *	struct rhash_head	node;
+> + * };
+> + *
+> + * struct rhashtable_params params =3D {
+> + *	.head_offset =3D offsetof(struct test_obj, node),
+> + *	.key_offset =3D offsetof(struct test_obj, key),
+> + *	.key_len =3D sizeof(int),
+> + *	.hashfn =3D jhash,
+> + * };
+> + *
+> + * Configuration Example 2: Variable length keys
+> + * struct test_obj {
+> + *	[...]
+> + *	struct rhash_head	node;
+> + * };
+> + *
+> + * u32 my_hash_fn(const void *data, u32 len, u32 seed)
+> + * {
+> + *	struct test_obj *obj =3D data;
+> + *
+> + *	return [... hash ...];
+> + * }
+> + *
+> + * struct rhashtable_params params =3D {
+> + *	.head_offset =3D offsetof(struct test_obj, node),
+> + *	.hashfn =3D jhash,
+> + *	.obj_hashfn =3D my_hash_fn,
+> + * };
+> + */
+>  #define rhashtable_init(...)	alloc_hooks(rhashtable_init_noprof(__VA_ARGS_=
+_))
+> =20
+>  int __rhltable_init_noprof(struct rhltable *hlt,
+>  		  const struct rhashtable_params *params,
+> -		  struct lock_class_key *key);
+> +		  struct rhashtable_lockdep_keys *keys);
+>  #define rhltable_init_noprof(hlt, params)				\
+>  ({									\
+> -	static struct lock_class_key __key;				\
+> +	static struct rhashtable_lockdep_keys __keys;			\
+>  									\
+> -	__rhltable_init_noprof(hlt, params, &__key);			\
+> +	__rhltable_init_noprof(hlt, params, &__keys);			\
+>  })
+> +
+> +/**
+> + * rhltable_init - initialize a new hash list table
+> + * @hlt:	hash list table to be initialized
+> + * @params:	configuration parameters
+> + *
+> + * Initializes a new hash list table.
+> + *
+> + * See documentation for rhashtable_init.
+> + */
+>  #define rhltable_init(...)	alloc_hooks(rhltable_init_noprof(__VA_ARGS__))
+> =20
+>  #endif /* _LINUX_RHASHTABLE_TYPES_H */
+> diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+> index 6c5e6d9accba..ec853c1b9af3 100644
+> --- a/include/linux/rhashtable.h
+> +++ b/include/linux/rhashtable.h
+> @@ -328,8 +328,7 @@ static inline unsigned long rht_lock_nested(struct buck=
+et_table *tbl,
+> =20
+>  	local_irq_save(flags);
+>  	bit_spin_lock(0, (unsigned long *)bucket);
+> -	/* subclass 0 is used for ->lock and 1 for ->mutex. 2+ for bitlocks */
+> -	lock_acquire_exclusive(&tbl->dep_map, subclass+2, 0, NULL, _THIS_IP_);
+> +	lock_acquire_exclusive(&tbl->dep_map, subclass, 0, NULL, _THIS_IP_);
+>  	return flags;
+>  }
+> =20
+> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+> index 5da0e53a8d42..918f15a2ac69 100644
+> --- a/lib/rhashtable.c
+> +++ b/lib/rhashtable.c
+> @@ -432,7 +432,7 @@ static void rht_deferred_worker(struct work_struct *wor=
+k)
+>  	int err =3D 0;
+> =20
+>  	ht =3D container_of(work, struct rhashtable, run_work);
+> -	mutex_lock_nested(&ht->mutex, 1);
+> +	mutex_lock(&ht->mutex);
+> =20
+>  	tbl =3D rht_dereference(ht->tbl, ht);
+>  	tbl =3D rhashtable_last_table(ht, tbl);
+> @@ -1122,51 +1122,9 @@ static u32 rhashtable_jhash2(const void *key, u32 le=
+ngth, u32 seed)
+>  	return jhash2(key, length, seed);
+>  }
+> =20
+> -/**
+> - * rhashtable_init - initialize a new hash table
+> - * @ht:		hash table to be initialized
+> - * @params:	configuration parameters
+> - *
+> - * Initializes a new hash table based on the provided configuration
+> - * parameters. A table can be configured either with a variable or
+> - * fixed length key:
+> - *
+> - * Configuration Example 1: Fixed length keys
+> - * struct test_obj {
+> - *	int			key;
+> - *	void *			my_member;
+> - *	struct rhash_head	node;
+> - * };
+> - *
+> - * struct rhashtable_params params =3D {
+> - *	.head_offset =3D offsetof(struct test_obj, node),
+> - *	.key_offset =3D offsetof(struct test_obj, key),
+> - *	.key_len =3D sizeof(int),
+> - *	.hashfn =3D jhash,
+> - * };
+> - *
+> - * Configuration Example 2: Variable length keys
+> - * struct test_obj {
+> - *	[...]
+> - *	struct rhash_head	node;
+> - * };
+> - *
+> - * u32 my_hash_fn(const void *data, u32 len, u32 seed)
+> - * {
+> - *	struct test_obj *obj =3D data;
+> - *
+> - *	return [... hash ...];
+> - * }
+> - *
+> - * struct rhashtable_params params =3D {
+> - *	.head_offset =3D offsetof(struct test_obj, node),
+> - *	.hashfn =3D jhash,
+> - *	.obj_hashfn =3D my_hash_fn,
+> - * };
+> - */
+>  int __rhashtable_init_noprof(struct rhashtable *ht,
+> -		    const struct rhashtable_params *params,
+> -		    struct lock_class_key *key)
+> +			     const struct rhashtable_params *params,
+> +			     struct rhashtable_lockdep_keys *keys)
+>  {
+>  	struct bucket_table *tbl;
+>  	size_t size;
+> @@ -1176,13 +1134,11 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
+>  		return -EINVAL;
+> =20
+>  	memset(ht, 0, sizeof(*ht));
+> -	/* mutex_lock must use nesting level 1 */
+> -	mutex_init_with_key(&ht->mutex, key);
+> +	mutex_init_with_key(&ht->mutex, &keys->mutex_key);
+>  	spin_lock_init(&ht->lock);
+> -	/* spin_lock can use nesting level 0 */
+> -	lockdep_set_class(&ht->lock, key);
+> +	lockdep_set_class(&ht->lock, &keys->lock_key);
+>  #ifdef CONFIG_LOCKDEP
+> -	ht->lockdep_key =3D key;
+> +	ht->lockdep_key =3D &keys->bucket_key;
+>  #endif
+>  	memcpy(&ht->p, params, sizeof(*params));
+> =20
+> @@ -1236,22 +1192,13 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
+>  }
+>  EXPORT_SYMBOL_GPL(__rhashtable_init_noprof);
+> =20
+> -/**
+> - * rhltable_init - initialize a new hash list table
+> - * @hlt:	hash list table to be initialized
+> - * @params:	configuration parameters
+> - *
+> - * Initializes a new hash list table.
+> - *
+> - * See documentation for rhashtable_init.
+> - */
+>  int __rhltable_init_noprof(struct rhltable *hlt,
+>  			   const struct rhashtable_params *params,
+> -			   struct lock_class_key *key)
+> +			   struct rhashtable_lockdep_keys *keys)
+>  {
+>  	int err;
+> =20
+> -	err =3D __rhashtable_init_noprof(&hlt->ht, params, key);
+> +	err =3D __rhashtable_init_noprof(&hlt->ht, params, keys);
+>  	hlt->ht.rhlist =3D true;
+>  	return err;
+>  }
+> diff --git a/lib/test_rhashtable.c b/lib/test_rhashtable.c
+> index 85a615e74591..b767a38a74f9 100644
+> --- a/lib/test_rhashtable.c
+> +++ b/lib/test_rhashtable.c
+> @@ -477,7 +477,7 @@ static unsigned int __init print_ht(struct rhltable *rh=
+lt)
+> =20
+>  	ht =3D &rhlt->ht;
+>  	/* Take the mutex to avoid RCU warning */
+> -	mutex_lock_nested(&ht->mutex, 1);
+> +	mutex_lock(&ht->mutex);
+>  	tbl =3D rht_dereference(ht->tbl, ht);
+>  	for (i =3D 0; i < tbl->size; i++) {
+>  		struct rhash_head *pos, *next;
+> --=20
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>=20
+
