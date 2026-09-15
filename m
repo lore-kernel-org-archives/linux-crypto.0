@@ -1,105 +1,175 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
+Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9EF54A8FD8
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 18:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789496935; cv=none; b=S0IC5kQfw5AsTlo0nOlPTUatzFoqLJ2pHq28JYMIsWTohoJhFgyVsMdI7JmbgVs0bQePd2L5dHwFgOMTBQXQvYH1ZVmCwuGVxqs7V8F9/42nfMkdQ0S+FMM40l9HjBAQXMJa2O7+d9mVh+PHZ9bn/70a4TzNB1FB/u2bv1TxUqk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789496935; c=relaxed/simple;
-	bh=ExaSFTGuyajSGkffCmNiiOT5gX4RugpQ5HKd+MnvrqY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=STkW+Hd2eKFsxaZ7rqwbCOf1qaJRow65ekTEFS+aAUAXISN9cnnkINlPij0reshcg0+o0xkCmFSzilsrVJjLrOXBOKPt6LHiC+nCPBkhn4Uo6joqepISCHjjQpysa1UHX6VGiidWZga8eTDNjnECdTixSKttk5y8r8mqszXsVdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jh54XB8Y; arc=none smtp.client-ip=74.125.225.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAE144E05B
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 20:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.140
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789503358; cv=pass; b=PLvmsqW4ZFehpXtgz5xaaOtR2mD0Fd52aOOAB2Omz0lFmk9YISSFi8shsoc9ywMJ7mR3J3K+jCZ4JhAim7Vq6o+zb7L/ILqPWtGkV8/Ww2JL9VpGPXbPEbGCxNgBFU5QN61vsNDU4Ce5xl4b/WBo95oS4LVCYMmJ1RDwqqOhexk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789503358; c=relaxed/simple;
+	bh=tIo4II1d9ForEs6449DJ6tBTc4LuD50qTRo8+K+5e2M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WuR/nnHQmcCljo3v7lhEVg36Kgr/q0imeNK0kDVKoAhUT9utxF6vWwoD/Al1D844IgtQHEEra6vUFI7P3OX0kGsYp6bD+abO4gGF2UPaGEFQsSCZje9bU9ougP6N5NeCviJb5RlPx+07rUNuhv7bLwil7jLb/DRbz5N/3wSoF5A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kMFK/xdh; arc=pass smtp.client-ip=74.125.228.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jh54XB8Y"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-48437356d60so8322f8f.3
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 11:28:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kMFK/xdh"
+Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c25bf832368so3624166b.0
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 13:15:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789503350; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ooVKOFGJskkWkNmRtXx9uYvRPmzv6JKORvtLwVDE9Ar0fNRiwWANhh0+axNl1YPsTf
+         3NdRf6fZTcCweqRpDtXbjhapiaD2EsZ2IKRavJMpXS3zIXAEDasW/RiVUccqk/yNCI+f
+         fy8jUc8H2d000i4YzmUS/FPCiIgpMrMcDP4G8T5nhW39YMWtBTyJu/3shAuzlB+xcBsv
+         0H1kT7AmZ326YB9Js5dFh0ql8rbKX86TfMJKcvBecmJgj7j0hC+B3u834eNRoagXp112
+         i9nl1byb9bRzYNHmbLbvV2dgSD/4o+J7e/IXjG/UPHqjy3aYr/IWdLnPQk9u4XkKM1XC
+         0q8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=EMk9jyFcs1z/vsVIU7tgrrT3h1+jFXhNZlrTV/0Lq28=;
+        fh=GDjv41AQkDrC3SQWr3dbfi+96OAM1lezN9isdmCbTGw=;
+        b=kbYQ+WGepfZcle0VHu0sH7hKzmXJl83wJniUfvCo7l3fNmbpoppjjeuH90eLCyRw7i
+         D0ITt5T/fr7kV3mcTz6TPhv5iSvDCf6BsO9DUMhvW3xXmOvqt7oPFpz2NAjRnXe3hPq2
+         ZprcYdO3pC7hF4HfyHWiHBJnAbex+MxrgdXoMqhBCpYQseH7Wy8SJ6rTWqfG2O9OBZXp
+         ftmyND0U9DsYve9FBHzFJ+Z0qZEeWAaG2M3WJmQy1rHAOtjrI9JbF5viAJ/Ll5Y3QicV
+         IJ8s8TXKEYMw6SxKKvGaVr67fVaUmCKtt+s6BrTQqm1Ge8rVdfbm/bJ0rU6T2kquZn/I
+         wZMw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789496931; x=1790101731; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20251104; t=1789503350; x=1790108150; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=2OVh9TORSOFM2eLBFL8+9fGSDQsNIFtP4Ssj+M+8PKU=;
-        b=jh54XB8YWCe1aiMSLkQdoBxdEiOsF67lTi+047bm/pHMz+mYRwDd33G8uIgxpNCm/4
-         DQbRGkukQDu5Tz4RsHIVbiMmaKe27za/IegnbSbl5jE7E0NNo5QiG4Q1nLR5SyBVHqX4
-         AWu6+I1d/vcDZH5OmIZK2+rWDHDcn3QTX2GZ8shYKqParQ5C/H1YHGodOc7IyrHhEgL4
-         lDyFUZZH1RhY/BSmwLYORiaPe4KvZ2DJaZ0sjUaBz8/2hIjmacg9uQ7ow4HbBGX90cCD
-         ieWbBJjc4dNm9gxAe5kDBgfmZedaVM/8v5ktwn9TSwwRfrdFM3x3AoscqG3ahlh8NDUC
-         AZMw==
+        bh=EMk9jyFcs1z/vsVIU7tgrrT3h1+jFXhNZlrTV/0Lq28=;
+        b=kMFK/xdhuVPYWFau0SVnAOI0dP1+C/ya4QEGqAnK+/WVuj4My0qAoQvVI+BKoY1ZwI
+         NNABdWF+rnRpE/BFKhqhZ/72374Gy9eqKQpfsepDHKgixJYqiLHKeF7uqSuwRIr+AFw7
+         8JTPpKKSxCJQVvxWu8uSG9skZAQ2M3M9ggXG2ixYT19P0Ks5ehXSvpBZtpa4O59JsnUE
+         AEmjUlBrtixnd++kPKKOnZG0n0ogjzJEPniFUASQttiJrfpK73sW0IsgwVTbUlIwDL83
+         B8pt1JK0UJ20OQjry6Fy4j7Drm8AoJ0UIWSLyNEBfmWDCEDeQ0whVitGHVB5nO2aKI8B
+         vaZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789496931; x=1790101731;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20260707; t=1789503350; x=1790108150;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=2OVh9TORSOFM2eLBFL8+9fGSDQsNIFtP4Ssj+M+8PKU=;
-        b=tKGIqIpQjP3ddUaKLyqtYmtGBqTePOe2hJPXrXJN+iFczEZY0tdM6OutTvZXCEdX7V
-         ImTBvj/xqQ5elQKiBQmdsgWdrmzjKOHHuCg927rwvdYN5xCch8TYCs/xPG/KxQy0avro
-         09pgE2SRfYvDdhtNjrg7QWDb8QwwqBrE1TXrkSdICyQ5jgfqv+422EbDz+op2qlAoRlF
-         HNy5jbwKezxBmYQdmhwRi2y4Jgzw68trzEoJYYQZw3XfFoNgqchkOuqANbk/aAjkepO7
-         GHnShqULlcYiTQR7dEKc10eQfr9Io5YyiWrtqFizvJrBe3WLzeCRe279yC9tjly6gKMG
-         WnHA==
-X-Forwarded-Encrypted: i=1; AKwUvBwxWU07bJ5dSHfbmsf9PWft/1nPZLJOWW3qlN/OPf9d5sZuQmYBBDtGWxBfGJi1M6daPXcKpOVzLoABVbA=@vger.kernel.org
-X-Gm-Message-State: AFuF++kPl3lDi0Rq+FCrZvNybg96gjRfKd/EGhovlnmtdUiEL9QQqijf
-	AUIT5zI77TDLaZCq9xMip7nQ2xUJmo6r+XQpvKfB4gpgmJHnsxVzTdDc
-X-Gm-Gg: AYBFou2UVWTsEJrh9uT7/uqC069FKL7NkZqjlEUQzGxVxeNnEG6qqt9H+CoQwAB0GDB
-	iHS+0cANhDvhS3sorYIcVQRj1ngfWs0yw8pW4PxfvYn0b6iXjlQXc/vVITXrezS9bdbv/BOmI69
-	UCC6iTbyDxPDQ8C8WhkVELSKuZ81jKaFRGQnSZpc68cFIc2GMhXm6Swytvp8+p6JmuIFXA6v48R
-	l9VIBC8mpkbk/TZk6qeDMJ4GXUPhO2Vao/6+ca1VVtL5J3EW/kFWooMvKaZr/4nwn4CIKfuK3NF
-	AG5QYL7xekUkVc4AC4o6BhvkvMfpDsiMm/BU8dimeGy9MDiIOy7wSfYvAXBgKmpoQT2RNuW3M4q
-	LmPV6zZUZ/boFUne2LXDSdG48BSzcza69zF6anM+sVF5HytNA5NkIZemdVuhTNFbJitpMNv62fN
-	564Qsa7pM/pxzuulQtrmCexZedjmiTGMZOv1inNfOG2ZUQyHhSl9Jhb7nzZTnsjFUMq6wj1tWHK
-	1Wn3TDdqkNuiVURy2yXBmLpksFw+GgUVdo4XCxdR+30G8efPSkW0eNN9ZIyQOGBXB2ocbWuXg7B
-	buZll1Zxyh4g1eHdsuQBRMDE8SjtuUYjA4veD5iqHWtijHPxaSefPD+ug/UUhWWvQvuhTJdDgfz
-	D1JZ6WX+1jvXL4SdftUwEEg==
-X-Received: by 2002:a05:6000:184a:b0:487:bef:31a8 with SMTP id ffacd0b85a97d-4870bef3228mr766622f8f.0.1789496930649;
-        Tue, 15 Sep 2026 11:28:50 -0700 (PDT)
-Received: from MBP-von-Karl.localdomain (dynamic-2a02-3100-afd5-c801-ec9e-1a2a-2fc8-3f88.310.pool.telefonica.de. [2a02:3100:afd5:c801:ec9e:1a2a:2fc8:3f88])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4870bf1fe7esm805784f8f.6.2026.09.15.11.28.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 11:28:50 -0700 (PDT)
-Date: Tue, 15 Sep 2026 20:28:47 +0200
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Haren Myneni <haren@us.ibm.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Dan Streetman <ddstreet@ieee.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
-	David Gow <david@davidgow.net>, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 3/3] lib/842: add KUnit tests for the decompressor
-Message-ID: <aqmN7Wt4f-DXGEhn@gmail.com>
-References: <cover.1787978627.git.kmehltretter@gmail.com>
- <e9659617ce2f1466f227d562f47b961f340ab3c7.1787978627.git.kmehltretter@gmail.com>
- <CAMuHMdVcZ5cV4-HrjLYfFKh6UshiVxq5eXCNyp0Z1k_SMAvF5g@mail.gmail.com>
+        bh=EMk9jyFcs1z/vsVIU7tgrrT3h1+jFXhNZlrTV/0Lq28=;
+        b=EsEK7gArBLo8tDG9hTzll5h/Cx1X7QHY+OL/uGsmHO3zDwHFCufoSJwqhrT/HaMN9v
+         5tylpFb2plWaA91efoQxo2val2/nez2WaHGLHE05a5waP7JEqnPu9lbqlX7yECtHJl7b
+         fjl6AFwJC80b1yTUumfkXhiYez8d5BhFl4p72KTPFxo8+SdIiDPaBW0DiGpjTmYzwE7H
+         lnaQYbz76oF893gRy9MRdVH+3tQlNdCquehNN7zKFyc/fSd7aqwsxYZrsyAAhez6BO+m
+         F3XjBAJUZ4As8t5DoZ0cRsx6MeK0pnbgYbI0LqKRbIOvfEm4OPzifGuVXBcgRlCo5IoI
+         0mmw==
+X-Forwarded-Encrypted: i=1; AKwUvBw3hzqpL/hR1X0ckazXcyt6NC+vvW5XZtjn1wu8Nhi0si8NV2edNn75+sjsbkkgDMJmH/GoFfw2gZR9jo0=@vger.kernel.org
+X-Gm-Message-State: AFuF++kEubJLCPSsViDW7ty4amkcczJ2tQHCqvleCtCjp76orDohJxsk
+	C4whbdCC+rytOgepnpxV43PGbr7tkLHdkvV9GYFfjOyCMaShDYi2jKBJZdfjVtmAwY4KPVrxRcQ
+	iG8LZ2X4gjozQm+zhnAkSfp34CGgJIKQ=
+X-Gm-Gg: AYBFou12MU5LItj3AjR8z/FNzGixzw3RUcc8qj8QtqtHqtvWWDVylVZ+UpQW0adBZIo
+	E0+hGmwR3B4gm6uvFkwXaFqG25HTqsdWZp8BnjX94EJuJJp8Mzmf64pONCllZvZ5WORdY2VzuWb
+	Cot7ejd6pd4+kTnrrj8aZBMMfDRwPTwk4M4V1taKtXvlGBaqGqgjaYVFZfQBfmMK4YsISMPLATG
+	ZB8RjoPFsXKKfKdzkpc3a2iK0Nb1o6oyiEO2qLL52YO3qOsYTUeGMhbKIIZFeW8qSfYH9wxldzk
+	gqv/xAb2jYZa660WEznIuuvPpfFraaMa0EEhN1DWu+xvsDy+3VfVPx8=
+X-Received: by 2002:a17:907:94c1:b0:c21:7bf1:2c88 with SMTP id
+ a640c23a62f3a-c29b86f6a30mr608631966b.2.1789503349926; Tue, 15 Sep 2026
+ 13:15:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdVcZ5cV4-HrjLYfFKh6UshiVxq5eXCNyp0Z1k_SMAvF5g@mail.gmail.com>
+References: <20260911-ti-dra7-omap-sham-fix-v1-0-c430f01b4e13@gmail.com>
+ <20260911-ti-dra7-omap-sham-fix-v1-2-c430f01b4e13@gmail.com> <20260911082406.05e2a212@kemnade.info>
+In-Reply-To: <20260911082406.05e2a212@kemnade.info>
+From: Bhargav Joshi <j.bhargav.u@gmail.com>
+Date: Wed, 16 Sep 2026 01:45:37 +0530
+X-Gm-Features: AcwNN1WHlqVruIX69u_0BS3IFoNFccfPURE_yLQbZJm0y0g2wehRCyWKILewqPs
+Message-ID: <CAOWyW_5s++Sz6EFEX+zGTca_-xZvK29B88UzoEzsaP+QavF6CA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] dt-bindings: crypto: ti,omap-sham: Add OMAP3
+ compatible and deprecate ti,hwmods
+To: Andreas Kemnade <andreas@kemnade.info>
+Cc: Aaro Koskinen <aaro.koskinen@iki.fi>, Kevin Hilman <khilman@baylibre.com>, 
+	Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Animesh Agarwal <animeshagarwal28@gmail.com>, linux-omap@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 15, 2026 at 02:57:55PM +0100, Geert Uytterhoeven wrote:
-> > +config 842_DECOMPRESS_KUNIT_TEST
-> > +       tristate "KUnit tests for the 842 decompressor" if !KUNIT_ALL_TESTS
-> > +       depends on KUNIT
-> > +       select 842_DECOMPRESS
-> 
-> Enabling a (modular) test should not silently enable additional kernel
-> functionality, as that may increase the attack vector for a product.
-> 
+On Fri, Sep 11, 2026 at 11:54=E2=80=AFAM Andreas Kemnade <andreas@kemnade.i=
+nfo> wrote:
+>
+> On Fri, 11 Sep 2026 03:41:58 +0530
+> Bhargav Joshi <j.bhargav.u@gmail.com> wrote:
+>
+> > The OMAP SHAM driver supports OMAP3 SoCs, and "ti,omap3-sham" is
+> > actively used in existing dts. However, it was previously missing from
+> > binding. Add "ti,omap3-sham" to the list of valid compatibles.
+> >
+> > The legacy "ti,hwmods" property is no longer needed as TI OMAP mirgrate=
+d
+> > to "ti-sysc". Mark it as deprecated and remove it from the required
+> > properties.
+> >
+> > Signed-off-by: Bhargav Joshi <j.bhargav.u@gmail.com>
+>
+> What about also removing ti,hwmods usage while you are deprecating it?
 
-Hi Geert,
+Omap 4, 5 and dra7 already use ti,sysc wrapper and don't actually use ti,hw=
+mods.
+but legacy omap 2 and 3 still use ti,hwmods but I don't have hardware
+to test changes.
 
-Wow, good catch, thank you! I'll prepare a follow-up to fix it.
+Since omap 4,5 etc don't use it,hwmods keeping it in required causes warnin=
+gs,
+Deprecating it and removing it from "required" fixes the warnings for
+modern SoCs without
+breaking the legacy ones.
 
-I also found a few other KUnit tests using the same select pattern,
-so I'll look into fixing those as well.
+Best Regards,
+Bhargav
 
-Karl
+>
+> Regards,
+> Andreas
+> > ---
+> >  Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml=
+ b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> > index d69b50228009..3ef05890e13a 100644
+> > --- a/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> > +++ b/Documentation/devicetree/bindings/crypto/ti,omap-sham.yaml
+> > @@ -13,6 +13,7 @@ properties:
+> >    compatible:
+> >      enum:
+> >        - ti,omap2-sham
+> > +      - ti,omap3-sham
+> >        - ti,omap4-sham
+> >        - ti,omap5-sham
+> >
+> > @@ -32,6 +33,7 @@ properties:
+> >      description: Name of the hwmod associated with the SHAM module
+> >      $ref: /schemas/types.yaml#/definitions/string
+> >      enum: [sham]
+> > +    deprecated: true
+> >
+> >  dependencies:
+> >    dmas: [dma-names]
+> > @@ -40,7 +42,6 @@ additionalProperties: false
+> >
+> >  required:
+> >    - compatible
+> > -  - ti,hwmods
+> >    - reg
+> >    - interrupts
+> >
+> >
+>
