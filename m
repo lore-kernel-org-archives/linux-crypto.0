@@ -1,81 +1,114 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95014B1B38;
-	Wed, 16 Sep 2026 09:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528474E3EEE;
+	Wed, 16 Sep 2026 10:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789552739; cv=none; b=ihoTSu76gXsSU7vw920B9WUu60c1KLvOZhFPrDFoR9tztUd9TpZjnqItMgvd82ZdCgh3fEkg5baUZpzu3doU3xbdNPgmY7dW+gKJUYnZbluLcmYEADD44RgoovpO6/wLgiyG7sQGQxZEFZQqHvsgroi42aq2kf9DV4rLLUbJoNU=
+	t=1789554285; cv=none; b=DN1ewTRsKbWXZDmMSkJh8qVn/D9GaoMELttwMQHKTxT6RGIVCQOEgGMWEU+pe0rRYLor8jt4bUDx9WBBzn8Xn1b2abQa44ciZUTOgoUh3oRJxom+x1vhAGqaO1R4KYzN5PA7KbbRFFg6Vt3zxHgzvfD2YeR6qgxBOIpCChQ+eIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789552739; c=relaxed/simple;
-	bh=BaDvoADEk7NhvncuNIzYQnDIx5WcKPfabx66vRA+ryg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W6CZPp473Ke+dg6IOsyZSp4cmT5BOqDvabdZa35J55MSAtOJ4JGvsCLOgu6RQ1OXsWYSaKlTFPULDwRGdIreTmTZ9q3wpNomdH+8gCWJJlHvIOZoxk/EauMJjoyJPultoEltplewbAzs5gH74X/dpAZ5jbX6uPfQ6g2jdE9UZYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Zmti8x/f; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1789554285; c=relaxed/simple;
+	bh=CAFwzG14G8lE38ZHp/ZNgWiY9OzUz61TY9T4d8a2jXk=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Ra3gM+/ESYESJ6miK6WI3/tTA92+Mezt3zUq/3MiwCeYdxrRCEUDxAEtxFwcN7d9I1EH5GkrpAtqFGcLAn+abfA4BNsg+u5QLEWCS+vUd0IXpbEaWjOtShzVf52ximcrwaSacCbkq3ApTbBR4ZS72TFw0FIWZYrp7hbxgWf/nt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZNr7b8+T; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Zmti8x/f"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=t5cztt9MKZtPqdYlO4baTEO5Vle2tuGE6mKsXLkovOw=; 
-	b=Zmti8x/f2YPXRY6k+t57/GEttI0I/6nuqJAo6/ZT9VXm8qbgNhmo1HsqrakIWi8UR4jTRnDDU64
-	5EcQ9aaOyQrhz7wu8l4dKs+H/ScCEs2XosydmBhELkn4fmU8aqYonYPbx38V+tUCPHla+S/3Oz29c
-	nPm35IgLKFZY7ObkM2zASsPSotJdqHb6Tc0SNSimOyS8ToqsFGH5ITy22pRMuGhNbX3phEz0xoyDb
-	tJB7Yx/hJs15P+geDmgbV+D1bPlnuPbgvjeWOKa+QIzj7juafVEy/lddAG7ChYdOZBPshFKca+eU3
-	dbDgyGuKPKt836HZpSqo6lin4+W8+DDaRbgQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x6mPd-0000000EZCZ-0sil;
-	Wed, 16 Sep 2026 17:58:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 19:58:45 +1000
-Date: Wed, 16 Sep 2026 19:58:45 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: linux-crypto@vger.kernel.org,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: caam: map job ring registers without claiming
- region
-Message-ID: <aqpoVeecg-ObBUzQ@gondor.apana.org.au>
-References: <20260901203736.13248-1-rosenp@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZNr7b8+T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA7EA1F00893;
+	Wed, 16 Sep 2026 10:24:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789554268;
+	bh=/8KFOagu2ENcQCp8QY4nI5XKHph2UK8Vkc307vgiZoE=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=ZNr7b8+T2n5UB/xLF1JyrGAxqHINHmTyET0UHrtU1mZR1qSoiOAXljDx02S0v6/A5
+	 tV3ohsaYgR5bD3wWjJqFqmBJHb33QIEjDiG89PWaTmhiaW7/pZsC5fffi8D9FOB1UE
+	 XdIi3ZYxmqHiWbD1uJJJRCP1A/f596VcWuJ9jMIASN69kcakdRRy22i8VXe2qsLkMb
+	 gKmBvggI3Q8JPpa6yTwWVSiWCKSGUKbtpafGT4B3LqdVhlWgY7QTJidbvre0CN9iF/
+	 TbPP9Xl1jJXJCcQou/I/ZcshdwMhll2nE17RLYEfG3RRD3nqWF+UfYpB5DSJ6ZAB8l
+	 q1iTMGWuVgnhg==
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 5C7FE198003A;
+	Wed, 16 Sep 2026 06:24:25 -0400 (EDT)
+Received: from ams-imap-11 ([10.64.2.31])
+  by ams-compute-02.internal (MEProxy); Wed, 16 Sep 2026 06:24:25 -0400
+X-ME-Sender: <xms:Vm6qatHUCx2TAkNxviyEAJJzADOXy4L1Vyv29BLxYrB0KFd837xPnA>
+    <xme:Vm6qatI2eElCEMu6O3vufPHuinfdQ0HFfn5W5rTM_3dsiy_FACtTL7OIt1P9xt4qV
+    cxOuX_9olbv6xBS6TXF_Z9SK5tEF_PPEOSRsJQST42vcpfrwDCMO3Y>
+X-ME-Proxy-Cause: dmFkZTGK+vKUpRZP/PjGOSOsca6vga2HCB0cn/adgVCawoeih5dxrjPEYysN7hknm/kTqW
+    yO/dNMgXdPdaxuAai+nGFaE3nS1Vya9aYKmvwLEKoKcXFwfI9uA/mpFOm5hpTr05kdN5ZX
+    fkFNIawIWHslpzH19voOYNEyDMBG0SWkjz2807wRtp1FZraQ3apZ608LRk6tmDo0gIj7Y8
+    YiwgT7xncQJx11QZck3yIWFBafUDdHtRClWVTjlI/f0hZwM0hpdrZV6PPWu6nD2ZO9kmRt
+    d5GdO1uXNlBexM/pOz57zNEGcmBH1CPKsV0U2H37Wdyumc8Mo13nfMtV5KFbNI7wQe+UCh
+    zWCQsyrY2wUsThV20iJLhKjd5d95p/6w09A7NbRxtTcjxYcB+UT7v3giuuoRUD6yEB/6sK
+    xs/zIumIIX54lv7ohu2Ml6MduWdWXDpW+wErQsJl/ql0ZIcR+YQeHtWch33EAYM0CmNV59
+    WyAYqWLS4w49LyF/U10CUTVfjja5H1ejxE2nmzXC1GJ+fRPhHPNgY9QiffQfwdIsE+i5iB
+    uAPL0JdIpRNVTQQl4L7HKqns1qbVZUI/F5dlhPtJPvpzEJ9dN4XEVpXXRTJFV7EIUj4hpe
+    zb1+CTyO9O0yWgSnCtjXjjng+KF/YW20p3lpfskcXHdPq2DbmVQsnrCWWDwQ
+X-ME-Proxy: <xmx:WW6qag-gDPKnzFFkzKpJdTQSnqbG0fkTJA-UXHAGmo3--EePbplQgQ>
+    <xmx:WW6qaoTfH5UOXHXmmQrnH2cTjaVDmcmj5NAX3f0NXSBEn_fTNwmVag>
+    <xmx:WW6qaqVWjolNQmuRvR6baq0bkURVj4-D4527VS6UHr0TbOaxhWpopg>
+    <xmx:WW6qai-ib6qztNBcrCsGojuJujNDxzbJypp_6uAGQrzTOtcd5zalLw>
+    <xmx:WW6qai3ZTWXYu_cBBLB9fYg7BsUQM9sNNGLJTzmP1FwVeQ6jScDegsdC>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 7B5EAF8007E; Wed, 16 Sep 2026 06:24:22 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260901203736.13248-1-rosenp@gmail.com>
+Date: Wed, 16 Sep 2026 12:24:02 +0200
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Thomas Huth" <thuth@redhat.com>, "Borislav Petkov" <bp@alien8.de>
+Cc: "Eric Biggers" <ebiggers@kernel.org>,
+ "Jason A . Donenfeld" <Jason@zx2c4.com>, "Thomas Gleixner" <tglx@kernel.org>,
+ "Ingo Molnar" <mingo@redhat.com>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "H . Peter Anvin" <hpa@zytor.com>
+Message-Id: <9c9e3958-865c-4be3-8f52-be91e090f2ae@app.fastmail.com>
+In-Reply-To: <7d373eca-c23c-4f79-9391-29d75bd5a53f@redhat.com>
+References: <20260813134953.979481-1-thuth@redhat.com>
+ <20260813134953.979481-11-thuth@redhat.com>
+ <20260814152457.GBan8zSeYlWd_1oWkz@fat_crate.local>
+ <7d373eca-c23c-4f79-9391-29d75bd5a53f@redhat.com>
+Subject: Re: [PATCH 10/11] x86/purgatory: Compile purgatory.c with -D__NO_FORTIFY
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 01, 2026 at 01:37:36PM -0700, Rosen Penev wrote:
-> devm_platform_ioremap_resource() ends up calling request_mem_region(),
-> which fails with -EBUSY on i.MX SoCs:
-> 
-> There the job rings are modelled as sub-regions of their parent
-> fsl,sec-v4.0 register window, and caam_probe() already reserves the
-> whole window exclusively via devm_of_iomap() before the children are
-> populated.  Every job ring therefore collides with its own parent and
-> fails to probe, taking the hardware RNG offline (seen on i.MX6, i.MX7
-> and i.MX8 boards such as colibri-imx7 and verdin-imx8mp).
-> 
-> Map the job ring registers with devm_ioremap() instead, which does not
-> claim the (already owned) region.
-> 
-> Fixes: 9a955c0a7d11 ("crypto: caam - simplify probe resource and IRQ handling")
-> Assisted-by: opencode:big-pickle
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  drivers/crypto/caam/jr.c | 23 ++++++++++++++++++++---
->  1 file changed, 20 insertions(+), 3 deletions(-)
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+On Tue, 18 Aug 2026, at 10:53, Thomas Huth wrote:
+...
+
+> Maybe I should rather change the patch to add -D__NO_FORTIFY unconditionally 
+> to generic PURGATORY_CFLAGS there? Something like:
+>
+> diff --git a/arch/x86/purgatory/Makefile b/arch/x86/purgatory/Makefile
+> --- a/arch/x86/purgatory/Makefile
+> +++ b/arch/x86/purgatory/Makefile
+> @@ -11,7 +11,7 @@ $(obj)/string.o: 
+> $(srctree)/arch/x86/boot/compressed/string.c FORCE
+>   $(obj)/sha256.o: $(srctree)/lib/crypto/sha256.c FORCE
+>          $(call if_changed_rule,cc_o_c)
+>
+> -CFLAGS_sha256.o := -D__DISABLE_EXPORTS -D__NO_FORTIFY
+> +CFLAGS_sha256.o := -D__DISABLE_EXPORTS
+>
+>   # When profile-guided optimization is enabled, llvm emits two different
+>   # overlapping text sections, which is not supported by kexec. Remove profile
+> @@ -37,6 +37,7 @@ PURGATORY_CFLAGS := -mcmodel=small -ffreestanding 
+> -fno-zero-initialized-in-bss -
+>   PURGATORY_CFLAGS += -fpic -fvisibility=hidden
+>   PURGATORY_CFLAGS += $(DISABLE_KSTACK_ERASE) -DDISABLE_BRANCH_PROFILING
+>   PURGATORY_CFLAGS += -fno-stack-protector
+> +PURGATORY_CFLAGS +=  -D__NO_FORTIFY
+>
+>   # Default KBUILD_CFLAGS can have -pg option set when FTRACE is enabled. That
+>   # in turn leaves some undefined symbols like __fentry__ in purgatory and not
+>
+
+This seems like the right solution to me.
