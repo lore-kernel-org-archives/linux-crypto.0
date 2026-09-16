@@ -1,165 +1,195 @@
-Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445D2286D4D
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 04:56:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D07B43F4AA;
+	Wed, 16 Sep 2026 07:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789534564; cv=none; b=fF7bXtlqVmZdc88NYB5TkhN4NKx8Wq5/1yGZlc3Y5/1fNIHve2PJhrDuTxi+pvzhkh8iiAsATWf7le8E4phLTCoaCN8gSzJOursLUFu/S6elZ8QZ37PmKWEM4VEGYMEr95nv7UbfWoNNwah44i/AHvVTnH3sp8JANWNrF2OOWyI=
+	t=1789545360; cv=none; b=VrWxI3OZTX40K/OrImwx6UO5vBNv3cL/iTPypUwWdtYYi7uno4mMyeSFrPH2CsYzLyev+INq/46sfgsdv2ITShSL24DxNfzLk5mIJQ+D/9OQhs/7PR7qiP62woTR/qSdddFchadkygkdu03AAEBjn+Qerw0hAj3u5j4fU68P76c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789534564; c=relaxed/simple;
-	bh=/y3E593iRUA37jO7B38pBXA7r37+dX3kgWb6Dllnr30=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c1jlel8HWpEOMQqW8BXar/TLgO30zrIN9m3d5NIECExISluMaE3JnULTtuSOEdeghb70xwwnN6eYPzUpbp5bJy6ma8+iEBDp/gWUYG4L5yZlVrqm1nthSPVaIptuIPFxatUfG/qLGToZZxm7gcgYqkNbYqSuHm8bvN2DkxhkdXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dw7jm/qO; arc=none smtp.client-ip=74.125.227.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789545360; c=relaxed/simple;
+	bh=XBBONHfl4IjnRSNasfx5ax9/pFvU396KZ3iIK2ZniTc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bnlr4KZDOfRNQ4kK9G2Aim3l9JL8ELntEgp8LyZdJ2tkc/XVowT0m41Hv2KIly37CEc2g+1rr8TMW1+v++lkEZFa99mvOdp/Vs+TXBs82fRQ17cLa8Kpw/FXiCgWWx+MV0YXhbx9O0taG+9wERCIwczB1/BOvnYx2SxwfiENrZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FgGzJaBj; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dw7jm/qO"
-Received: by mail-pj2-f13.google.com with SMTP id d9443c01a7336-2d747ee1f38so4913355ad.2
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Sep 2026 21:56:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789534562; x=1790139362; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=NH5SR9jg7eNT12/RBDArov96uanRr4HR7KrIlDgUX+4=;
-        b=dw7jm/qOs+Zdasl6A5QzGg89Jluc1GsMiN3uCNh4DUsqJhagQh6gabpmqlyS4vTMyF
-         kXQXxPlM6IU66Pctwrxbwanvrv2pRXI4uSU/kINNH6zFKUGcQiAr+hfXojoif/xRTpZB
-         XwTHrG5+XbxSWmF4CkRZj2gKV/MD3tXHinD4lgLLjX2eujiLC+1CGFVXvq2JqN640M6H
-         0LAV4DJneQFVCJEuaCAk3UlF/WqA+zEpEBP9zQtoNZWRE0mFQTt9dMhwcxr4WuF+voKt
-         nGALsx8JvOl3cTmpBD0Jf3Zq2mLoHZSIOjnGKygG2ghcgYsS57mSiYQ0EhEwmSWp+46s
-         YhSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789534562; x=1790139362;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=NH5SR9jg7eNT12/RBDArov96uanRr4HR7KrIlDgUX+4=;
-        b=jwMpB8290uSLwJco0snmVDzHRYAeWQh8WUanoASdULLVKhfMowmaedKSJQPUCOtjwg
-         9BNOPksu0JrSKv36aKvP+nx7BegOMFbMIDk2Xc2+Z/Runz46jQTuqH9F7ktlb+GXDFGZ
-         a7dh2+LPv4XRS2kNlTkS/kM+w8IxN9Zy3LGyytbqUr2RAT2yhh9q1MIIvAUcVEYyU680
-         gcSa+UyiteSoAhE5ZLMYYtXH/eiHXzoYQ+wEPO0IcK4cvsZcEyXsocjKwRm+zSEbE5nV
-         vWaOFClgyHbSwokzYyld13UNlRzxNQf+f3/42eXOVku5pjcjczrGZ+OPEAndQDcS/VQL
-         kyzQ==
-X-Gm-Message-State: AFuF++kM4Qt/s43BcvDLKZlIscI510egFtlY0TCkNbkLKFwwoCqjBIWm
-	2Hg8xpKOOo1RMqs8ZnmgHU2lCeh52iSmpkofpTw8p6mdMKhg0198/kW3
-X-Gm-Gg: AYBFou03yhwBRHGz4Rrrmi8F+mMqfRUxa9FTmGgqaNrospJ7A5T4XImtjNTJuBr3qCM
-	13TwDc6npFb+ZyvQufeyNPvJqumnBydumUypH94x4rq9/AbAZ9U7ZZl4tmbqfx7rh7NJwGeyYwM
-	dAhADoFrucZDSX8uCavkWp7+wJnoA9lE89GAvvWY3wMtDGMbxWyg9ehWtt0qdJgr9kby3hDR4r1
-	a5CPFltWO8ZlZDuw4NQ8H4FIkU4u44T+AHHpw69pVA8mJcfN1cJuZVWyKQkBXcp0kZHx2tVcQLC
-	TbIWbFuWV0wr4bRqPgJn++SdDg6LJ9aHtu1TLhjXA4xnf5fuoAahkw4l4sbLMelAbEZ0pB/oH+G
-	r3nb/HmAs/jXKlT5tDCYOY/iZsfftIeBhX7WiGcpVseHdP7vvbxf7d61sphq7WPtgBRRcnaVhVi
-	G8eUrAJzgye46qTbtvI4IaWKpelx0iftbsdVs+n2TgBllPohtSX9FCafwQFDqDEx4htzMvgWwPn
-	R9ZyxWDoYMc8vjn9g==
-X-Received: by 2002:a17:903:2f91:b0:2dd:9112:c4c9 with SMTP id d9443c01a7336-2dd9112ca94mr10220955ad.7.1789534562517;
-        Tue, 15 Sep 2026 21:56:02 -0700 (PDT)
-Received: from kernel ([45.251.35.123])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33bf5aee8b0sm9261930eec.23.2026.09.15.21.55.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Sep 2026 21:56:01 -0700 (PDT)
-Date: Wed, 16 Sep 2026 10:25:54 +0530
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: clabbe@baylibre.com, herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-	jkoolstra@xs4all.nl, lkp@intel.com
-Subject: Re: [PATCH v2] crypto/amlogic: Use devm APIs for clock management
-Message-ID: <aqohWhV8HLW_J9AY@kernel>
-References: <20260901024302.5407-1-raizudeen.kerneldev@gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FgGzJaBj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1789545346; x=1821081346;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XBBONHfl4IjnRSNasfx5ax9/pFvU396KZ3iIK2ZniTc=;
+  b=FgGzJaBjC77prA7Ez6tiv22MRnrCwLW6biLnslC/VMpPIhboae1ouRCP
+   U7gy2hiVLuW55aCO8/j7Uv7sR40j3lWbKV1zWXdfcn1z0ftpDriax6Y6e
+   QTFrO/xwO+m5GrIQoifAoigBXLJLS/1e8Kv+QYbgpDFY+3BPvU9P1bt9K
+   iEZxVX8uE6eoS4+KYj2HA5AwXHEmtjF+n2gSfrkQZSGhaCKB5LtNiaFGW
+   w79YYPzTg1iq00jl0kmP8XG2ESZYxaSVuz6GKhKjvgixH/+9fdOhiwebG
+   dwO02wH0aNDNiIDr1pufCDNAuM6v1A9YCGAjVz7V3TSdFn15A3UOmORDx
+   Q==;
+X-CSE-ConnectionGUID: 28HwBOK+ToSAfXzEjA8oSA==
+X-CSE-MsgGUID: 4GnQOwFKRl6mtJr9cuRjEg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="90128060"
+X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
+   d="scan'208";a="90128060"
+Received: from fmviesa011.fm.intel.com ([10.60.135.151])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2026 00:55:42 -0700
+X-CSE-ConnectionGUID: cN0I8x6jQaO/kUIVZ02JUw==
+X-CSE-MsgGUID: yPZ5olTpSMefGlUy4ZzjYQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
+   d="scan'208";a="1491290"
+Received: from dmr-bkc.iind.intel.com ([10.49.111.58])
+  by fmviesa011.fm.intel.com with ESMTP; 16 Sep 2026 00:55:40 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
+	stable@vger.kernel.org,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Ahsan Atta <ahsan.atta@intel.com>
+Subject: [PATCH] crypto: qat - fix error source for QAT GEN6 transmit interface faults
+Date: Wed, 16 Sep 2026 07:55:36 +0000
+Message-ID: <20260916075536.1361895-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260901024302.5407-1-raizudeen.kerneldev@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 01, 2026 at 08:12:52AM +0530, Mohamad Raizudeen wrote:
-> The driver currently gets the core clock and manually enables it using
-> clk_prepare_enable(). This requires matching calls to
-> clk_disable_unprepare() in the error paths and remove function.
-> 
-> Switch to devm_clk_get_enabled() instead. This lets the kernel handle
-> enabling and disabling the clock automatically, which allow us to drop
-> the manual cleanup code and keeps the probe function simple.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202608310329.QgxCCMs1-lkp@intel.com/
-> Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-> ---
-> Changes in v2:
-> - Dropped the devm_crypto_engine_alloc_init() change due to build
->   failure reported by the kernel test robot.
-> - Kept the devm_clk_get_enabled() clock cleanup as the sole focus of
->   this patch.
-> - Link to v1: https://lore.kernel.org/linux-crypto/20260821151303.8150-1-raizudeen.kerneldev@gmail.com/T/#u
-> 
->  drivers/crypto/amlogic/amlogic-gxl-core.c | 16 +++-------------
->  1 file changed, 3 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> index 169c6eeb51e5..6f4c62ddaf89 100644
-> --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-> +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> @@ -243,10 +243,10 @@ static int meson_crypto_probe(struct platform_device *pdev)
->  	if (IS_ERR(mc->base))
->  		return PTR_ERR(mc->base);
->  
-> -	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
-> +	mc->busclk = devm_clk_get_enabled(&pdev->dev, "blkmv");
->  	if (IS_ERR(mc->busclk)) {
->  		err = PTR_ERR(mc->busclk);
-> -		dev_err(&pdev->dev, "Cannot get core clock err=%d\n", err);
-> +		dev_err(&pdev->dev, "Cannot get/enable core clock err=%d\n", err);
->  		return err;
->  	}
->  
-> @@ -261,15 +261,9 @@ static int meson_crypto_probe(struct platform_device *pdev)
->  			return err;
->  	}
->  
-> -	err = clk_prepare_enable(mc->busclk);
-> -	if (err != 0) {
-> -		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
-> -		return err;
-> -	}
-> -
->  	err = meson_allocate_chanlist(mc);
->  	if (err)
-> -		goto error_flow;
-> +		return err;
->  
->  	err = meson_register_algs(mc);
->  	if (err)
-> @@ -290,8 +284,6 @@ static int meson_crypto_probe(struct platform_device *pdev)
->  error_alg:
->  	meson_unregister_algs(mc);
->  	meson_free_chanlist(mc, MAXFLOW - 1);
-> -error_flow:
-> -	clk_disable_unprepare(mc->busclk);
->  	return err;
->  }
->  
-> @@ -306,8 +298,6 @@ static void meson_crypto_remove(struct platform_device *pdev)
->  	meson_unregister_algs(mc);
->  
->  	meson_free_chanlist(mc, MAXFLOW - 1);
-> -
-> -	clk_disable_unprepare(mc->busclk);
->  }
->  
->  static const struct of_device_id meson_crypto_of_match_table[] = {
-> -- 
-> 2.53.0
->
-Hi, 
+TI_CD_PAR_STS faults were being decoded under ERRSOU1, which is
+incorrect for QAT GEN6 devices. They are actually raised on ERRSOU3.
 
-Just following up on this patch. Please let me know if you have any
-feedback or if further changes are needed.
+Move the handling of TI_CD_PAR_STS faults as part of the ERRSOU3 logic
+and split the status bits by their actual source:
 
-Thanks,
-Mohamad Raizudeen
+ - Bits 0-18 (TI_INT_ERR_DEVHALT) handled when a DEVHALT is signalled
+   and are counted once as ADF_RAS_FATAL.
+ - Bit 19 (TIMISCSTS) handled separately and counted as ADF_RAS_UNCORR.
+
+Previously, a TI_INT_ERR_DEVHALT fault also incremented ADF_RAS_UNCORR
+in addition to ADF_RAS_FATAL. Since a DEVHALT is already fatal, remove
+the redundant increment.
+
+Bits 20-25 of TI_CD_PAR_STS are unused/reserved on QAT GEN6. Remove them
+from the mask.
+
+Cc: stable@vger.kernel.org
+Fixes: 7f3401d0a506 ("crypto: qat - enable RAS support for GEN6 devices")
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
+---
+ .../intel/qat/qat_common/adf_gen6_ras.c       | 20 +++++++++++++---
+ .../intel/qat/qat_common/adf_gen6_ras.h       | 24 ++++++++++---------
+ 2 files changed, 30 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c b/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c
+index 967253082a98..902c4b1a23e3 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c
+@@ -323,14 +323,26 @@ static void adf_handle_ti_cd_par_sts(struct adf_accel_dev *accel_dev, void __iom
+ 	u32 ti_cd_par_sts;
+ 
+ 	ti_cd_par_sts = ADF_CSR_RD(csr, ADF_GEN6_TI_CD_PAR_STS);
+-	ti_cd_par_sts &= ADF_GEN6_TI_CD_PAR_STS_MASK;
++	ti_cd_par_sts &= ADF_GEN6_TI_CD_PAR_STS_TI_INT_ERR_DEVHALT_MASK;
+ 	if (ti_cd_par_sts) {
+ 		dev_err(&GET_DEV(accel_dev), "TI CD parity error: %#x\n", ti_cd_par_sts);
+-		ADF_RAS_ERR_CTR_INC(accel_dev->ras_errors, ADF_RAS_UNCORR);
+ 		ADF_CSR_WR(csr, ADF_GEN6_TI_CD_PAR_STS, ti_cd_par_sts);
+ 	}
+ }
+ 
++static void adf_handle_ti_misc_cd_par_sts(struct adf_accel_dev *accel_dev, void __iomem *csr)
++{
++	u32 ti_misc_cd_par_sts;
++
++	ti_misc_cd_par_sts = ADF_CSR_RD(csr, ADF_GEN6_TI_CD_PAR_STS);
++	ti_misc_cd_par_sts &= ADF_GEN6_TI_CD_PAR_STS_TI_MISC_MASK;
++	if (ti_misc_cd_par_sts) {
++		dev_err(&GET_DEV(accel_dev), "TI MISC CD parity error: %#x\n", ti_misc_cd_par_sts);
++		ADF_RAS_ERR_CTR_INC(accel_dev->ras_errors, ADF_RAS_UNCORR);
++		ADF_CSR_WR(csr, ADF_GEN6_TI_CD_PAR_STS, ti_misc_cd_par_sts);
++	}
++}
++
+ static void adf_handle_ti_trnsb_par_sts(struct adf_accel_dev *accel_dev, void __iomem *csr)
+ {
+ 	u32 ti_trnsb_par_sts;
+@@ -367,7 +379,6 @@ static void adf_handle_ti_err(struct adf_accel_dev *accel_dev, void __iomem *csr
+ 	adf_handle_ti_ci_par_sts(accel_dev, csr);
+ 	adf_handle_ti_pullfub_par_sts(accel_dev, csr);
+ 	adf_handle_ti_pushfub_par_sts(accel_dev, csr);
+-	adf_handle_ti_cd_par_sts(accel_dev, csr);
+ 	adf_handle_ti_trnsb_par_sts(accel_dev, csr);
+ 	adf_handle_iosfp_cmd_parerr(accel_dev, csr);
+ }
+@@ -591,6 +602,8 @@ static void adf_handle_timiscsts(struct adf_accel_dev *accel_dev, void __iomem *
+ 	if (!(errsou & ADF_GEN6_ERRSOU3_TIMISCSTS_BIT))
+ 		return;
+ 
++	adf_handle_ti_misc_cd_par_sts(accel_dev, csr);
++
+ 	timiscsts = ADF_CSR_RD(csr, ADF_GEN6_TIMISCSTS);
+ 	if (timiscsts) {
+ 		dev_err(&GET_DEV(accel_dev), "Fatal error in transmit interface: %#x\n",
+@@ -730,6 +743,7 @@ static void adf_handle_ti_int_err_devhalt(struct adf_accel_dev *accel_dev, void
+ 	if (!(errsou & ADF_GEN6_ERRSOU3_TI_INT_ERR_DEVHALT_BIT))
+ 		return;
+ 
++	adf_handle_ti_cd_par_sts(accel_dev, csr);
+ 	dev_err(&GET_DEV(accel_dev), "DEVHALT due to a TI internal memory error\n");
+ 	ADF_RAS_ERR_CTR_INC(accel_dev->ras_errors, ADF_RAS_FATAL);
+ }
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h b/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h
+index 66ced271d173..11f7b2986f56 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h
+@@ -170,23 +170,25 @@ struct adf_ras_ops;
+ #define ADF_GEN6_TI_CD_PAR_ERR_MASK			0x500638
+ 
+ /*
+- * TI CD parity status mask
++ * TI CD parity status mask - TI_INT_ERR_DEVHALT bits
+  * BIT(0) - BIT(15) - CtxMdRam[0:15]_sts parity status
+  * BIT(16) - Leaf2ClusterRam_sts parity status
+  * BIT(17) - BIT(18) - Ring2LeafRam[0:1]_sts parity status
+- * BIT(19) - VirtualQ_sts parity status
+- * BIT(20) - DtRdQ_sts parity status
+- * BIT(21) - DtWrQ_sts parity status
+- * BIT(22) - RiCmdQ_sts parity status
+- * BIT(23) - BypassQ_sts parity status
+- * BIT(24) - DtRdQ_sc_sts parity status
+- * BIT(25) - DtWrQ_sc_sts parity status
+  */
+-#define ADF_GEN6_TI_CD_PAR_STS_MASK \
++#define ADF_GEN6_TI_CD_PAR_STS_TI_INT_ERR_DEVHALT_MASK \
+ 	(BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5) | BIT(6) | \
+ 	 BIT(7) | BIT(8) | BIT(9) | BIT(10) | BIT(11) | BIT(12) | BIT(13) | \
+-	 BIT(14) | BIT(15) | BIT(16) | BIT(17) | BIT(18) | BIT(19) | BIT(20) | \
+-	 BIT(21) | BIT(22) | BIT(23) | BIT(24) | BIT(25))
++	 BIT(14) | BIT(15) | BIT(16) | BIT(17) | BIT(18))
++
++/*
++ * TI CD parity status mask - TIMISCSTS bit
++ * BIT(19) - VirtualQ_sts parity status
++ */
++#define ADF_GEN6_TI_CD_PAR_STS_TI_MISC_MASK		BIT(19)
++
++#define ADF_GEN6_TI_CD_PAR_STS_MASK \
++	(ADF_GEN6_TI_CD_PAR_STS_TI_INT_ERR_DEVHALT_MASK | \
++	 ADF_GEN6_TI_CD_PAR_STS_TI_MISC_MASK)
+ 
+ /* TI TRNSB parity status */
+ #define ADF_GEN6_TI_TRNSB_PAR_STS			0x500648
+
+base-commit: af8be97e74cd57ea3a5699bc03a0c79096fd907b
+-- 
+2.52.0
+
