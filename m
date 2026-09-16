@@ -1,86 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBB84EE86E
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 10:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0B24E3EED
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 11:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789555342; cv=none; b=gR6GylNV8VpejlMqgRy9WbdG31VtfdbijL3AchgIfc/DP3zZ9JAUpnuG/AqQDfhxPr+1zAsorN3uY1AdTAeEjr/7NJ2KiCsUNOiCcj+c9aS/hgbrBY2oUK68xLcAb+6djiZdo1v/qv48BSdmvcf7IEW5CMHi1se09zkAjTbLIMg=
+	t=1789556811; cv=none; b=gq+/MeHhKU2G7Joz0opPiKsp3N8naBCP5EYgVzJ8s5DFOTgf74FMY5MrglbCFCcBMUT8J/ovK+WqLlAzxFZsjjV+wwhjvHiFBCLyv0Z6pomqWZnX2tV1OPgXotoZ0Kw1gI7vCvtv1pNoqRXy5O6vs+zemBSHDlT0ehUPr8Ynchg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789555342; c=relaxed/simple;
-	bh=eVJoUUu1vh+Q4rpBKcndq3rAbbsf+tdm2+nwKfuQxQ4=;
+	s=arc-20240116; t=1789556811; c=relaxed/simple;
+	bh=gwIUkktuidCGPHldmjcD3ZAPK4UHd/SoWIdHNcjBeL8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IVgLAUTdCNnMbvpI9KelnP7e+pAd0wraS6qIQKXpuFTvz370Lm5GgPV9JJ0aOnN4ajADCnBYji/YkhduUSrlzbtv9Tbe5kuO68MrdQlDZLSV9z5ZD8uPiSjuN5xbc9R0PtFqH0AcylRu9mzbNcRIlesXlGknEoj820WFU8sk6ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AeP7BmWv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rzn+AlcJ; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=J0qn+4g7V39c1zfOXsGQBS0Xu8+s5SlpviE/4Oa2DRBHjmf/l/627eNtPBssY4LQMYpcJH76Vh9Gpug0p2Liz1AfJfjjh/0shA1qSIZGgBB30yrFhV1FFToGN/aH6f8A284MUT7M3t0pw7gcXTodu3hVPbyD8Ka8VUX2d6Tdsqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jPCfSzTH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=h6VQXH+k; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AeP7BmWv";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rzn+AlcJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPCfSzTH";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6VQXH+k"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789555330;
+	s=mimecast20190719; t=1789556803;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CHL1OjpjiRGJmzanwLT/SWwl4lrAjZJOnbpjxXj7sXU=;
-	b=AeP7BmWvQuCIpHxKVe41v1tCAkc9S8Q1nBGqOKzdeO6PkHDouSjpE+Bh4aqnJOn0VIwgyb
-	S53RBxJFjZv17AP607bqY8FwNEK4Tl72AnYMBdfLmCzK0Aewuqzq1nRr1Y1w8Qx5Lb0nHA
-	RcTAfWT61TPFMehEcxybVEcJ83xayrE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Wa6WV+kYrjlESTUxvQTqQFxS+ZtQm6NsZYg9SHCkmJo=;
+	b=jPCfSzTH+6qFwOvcnBBrT6XkaxPkTPREnlURF/Z9Rx9CaAO5WXt86C63m3bS+lnYbS7OS4
+	0y4t/+dNu/BEXIWOJ+oi+5zpuSWYGwLPpDtwOO4DoCIkhqWAQjQAt4C3sY6Kk52T89QwLh
+	WItEeceWfSkLzWurWhgMEIlvzox33OM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-9yIocot8MOume11zoO0EQg-1; Wed, 16 Sep 2026 06:42:09 -0400
-X-MC-Unique: 9yIocot8MOume11zoO0EQg-1
-X-Mimecast-MFC-AGG-ID: 9yIocot8MOume11zoO0EQg_1789555328
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-490a767c7dcso45105945e9.2
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 03:42:09 -0700 (PDT)
+ us-mta-690-iJRMCaWWMCe1ZWLnjTW__A-1; Wed, 16 Sep 2026 07:06:41 -0400
+X-MC-Unique: iJRMCaWWMCe1ZWLnjTW__A-1
+X-Mimecast-MFC-AGG-ID: iJRMCaWWMCe1ZWLnjTW__A_1789556801
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4870487e33aso685622f8f.1
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 04:06:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1789555328; x=1790160128; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1789556800; x=1790161600; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=CHL1OjpjiRGJmzanwLT/SWwl4lrAjZJOnbpjxXj7sXU=;
-        b=Rzn+AlcJXj3mOtbYuGlEztXUckDlBkDlPz/Ujj/tcnEgzTIt4cm8qL3G5wBV5175Go
-         iyOkT2pjXwKK0MALhdLYNriCFL04JlebuOC+yv1UGtTLp6HSK/Xi81S5F86zubWgltKa
-         DjkL5z92FmZHSmMzQ6rlhM1y6e08fB+Mvno/9MZvRlxV/pEgejqR7uAL9c+eDEwxzsLP
-         MdZd01CbT+uEMZ7yPdMKTQkiT7diLDkijZl7haMjWbjxN/jo75287Ts7OnJuxyiadhjN
-         d0rQmFKqt/iXBbjn5NbJDNoWKpqMwgxfzS8cMZ3Jo9kfrF/qkFlJbSmcHLCIT2XH9POg
-         R7nQ==
+        bh=Wa6WV+kYrjlESTUxvQTqQFxS+ZtQm6NsZYg9SHCkmJo=;
+        b=h6VQXH+kE3Q1IM9nCd8s+jZ1Ma5X6ElOcR+tiOx1cyBfDccwn6JcdsiaQzqZrSjmpG
+         XaZwg1309hegeT/TMcSP2fn+/2Me7S5yt6YvcUr2DDsf2f00dbXPXo2kC9Px7D1T1A7i
+         dNknp7zqWUGJdAkQViWEPW3rjVap3HzKNEf1w41/mOl3QtYP5X/OJzBxHoo+AK2GAyie
+         4Ecsh9cxX90uovUn8bujPthkDXCufVcR6/i3VP/LC/qc8LH2LDq0nVOc/y2gz861FfUk
+         CPuGufuX9gajfwzol9+0/Z2jp9rLiLXgpweT6uUy4fZbM78SHzofmXAxI7c9eR5lyliY
+         bUKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789555328; x=1790160128;
+        d=1e100.net; s=20260707; t=1789556800; x=1790161600;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=CHL1OjpjiRGJmzanwLT/SWwl4lrAjZJOnbpjxXj7sXU=;
-        b=GMA4XeOkdMjFClCCrm5Bv/CUjxlB2XQXYZj9a13fqmVJs0ohwnkzcdLpLCQEoe+ShZ
-         SI6wS+qI/BvNSJ6YV778xFzpDtu++ZqC5MrpiqeC2N4Hvn+AtmnegPigGntw8u0aZkBv
-         F4iN/B6z+dNz7UftJTF7F/WgCOmmy+iIEXhpJBhCN3UlIf50d7aoyqqbs3j08MlcWIWL
-         4L5b5BaI4VbEPBqjhgMEiJl3Ovdirn3yd7RmcgTmliYRTSrYKo+hrDInS4tJMWg9i8eh
-         JM7BytRB9y3EQl739ELJyvhhM2u1vGp3Zep5mG5UgS+KWjsGikB2PlW5xuMMsF0tnRmn
-         b2ow==
-X-Forwarded-Encrypted: i=1; AKwUvBynkcw6Q2eirRCUkNDEQK2ZautS3BKAo4WoCtzDfHjh5MmHFhqnz6toGTlr+00sfcrxgDz6MZJZ1SNbFIU=@vger.kernel.org
-X-Gm-Message-State: AFuF++kUBOqtiDhEcD6M/ulYSmdHcu2Tq/sRZGe+KN0iIi0pc55anOI1
-	IjRRcn4zAz1vsL+rmuy6PMzV3Zuspb28D33ojfNq8xf+PbtDbUuvkMxhNHjw19eMqqFWrHtQ1jx
-	o63WfMHSSke3sT/AHKupBdauaX2EKAKQF/gxn76t6JKGCGIB1mN5LiDmv0pRGo7CBKQ==
-X-Gm-Gg: AYBFou20kP3FCpcmz4ruXj42Itc4sd880ntHGpqWGk2LzKe8pm4qZmeluyunihf/Z+v
-	/tLVxhboCIDMzUxDZb4Sl90HObjGEGWnOfioyIX/dTp9CtkdQWZXHoWAEhhkp/t0MUXyq+Mh91m
-	tEPxgrdPE2zy5g7NVceYbWNcme64Eslgfs4ZzybPhJoe75aS63r6SCJYNhHqlYjMPmJTgFqS6QK
-	f+xnAPcJt5rdPeL/uuh03bA2U2be8aNFRUf5tiyA3F6AQRfdkufsM6BorBFtxIOOk+F3/yV6Fbb
-	7Nbkuu7VebHw4utGszqXyNglbTZKVNgmccoqa1c8hurPiFJ96LonNR2HOmtr5y7AWwCK3KJtGT/
-	pIL2dlj2I8PQG8EKXv0PmHaPBvdNu
-X-Received: by 2002:a05:600c:540e:b0:49c:fc6c:be03 with SMTP id 5b1f17b1804b1-49eb732c347mr20435435e9.26.1789555328275;
-        Wed, 16 Sep 2026 03:42:08 -0700 (PDT)
-X-Received: by 2002:a05:600c:540e:b0:49c:fc6c:be03 with SMTP id 5b1f17b1804b1-49eb732c347mr20435155e9.26.1789555327919;
-        Wed, 16 Sep 2026 03:42:07 -0700 (PDT)
+        bh=Wa6WV+kYrjlESTUxvQTqQFxS+ZtQm6NsZYg9SHCkmJo=;
+        b=UtaUQ1frHud3pz0O+N93zsSidMYMc+D61CXoDzSvFELRZmGLeRqTdmac60HZ2yFZCd
+         LFIkS4/5j6nceVKQ+s70zhoySrEDTFTYZQH1IgcWTD7T49y3sXJRinh7IY2rE9DePx3S
+         uXmCs9e9sqhy5a6t+Bx77ZzO+uppEigxuxHA7l1fxFCWNSpmwNs/XLOKRlPo4wX2rdoZ
+         F/oRPCFsgOAizDySeQhq0xRa02lWvJuomxwXP1/VxawAGdh4NBYv3YoqgL4cpWinNA2x
+         lnhhV4UKrb+D8jM2sK98QQGWl9mivDnSBL84Cb6UZsW04LmMvF6Y/6Jlz9fGHMW91uCy
+         Dbng==
+X-Forwarded-Encrypted: i=1; AKwUvBwr/nKo1dUnQlB8DJRJvP7v5KEfqH/53d2j38atV1/A5xDJ08U/D+9kUaQJvlyPAHi4gAhltu3Qh4JmWQM=@vger.kernel.org
+X-Gm-Message-State: AFuF++nLVE2ORwab5tzTOe3rqTNw9rkvJpXrHWAIbF8C1i0rgb0UfYv0
+	rRR1DhPI/BwkPBFW/3PFUStp2qzEovrAK4h1aY+AT/SSZ9a2TJ0gMh1JP8U02VC/sTijIaMsqdY
+	HJ3EMlBPWLSek0+hQ81zwpyKxy6VawNSTOSkdHhogNNQM/6HRUh7MKBAQMxfNTf/P+w==
+X-Gm-Gg: AYBFou3Po09rCi7PfZFAaxVb486pzyoTlrhBr3TajP7UPHc+33ScYzDqZaIX+Pu+CIN
+	5qKuA6JoGqozR6n5aLn8W/Q3xTKEKHFSzS4Js1jDWXTRua6nYfMN1eehYc539FCK2t5uJZzHdz/
+	LO271gLrtqxK1lC8VzW9PH+UK0VnVdPZ45lIBFEoDrFngZ+CUe23Gm1AQ2LCHfFlYDSOlJDwPar
+	sW09I/S44rXF4lIGpqwppLJqZ+QqsdACcSPmVEaxYKfqdmZkAk15nWiP2emUHm1SiRL5X6eAnbb
+	gMzcv78L6fpxEbtH8BwVY93EKJsHnXiDmaKT0cTP6Byu3wL+HhIKWtnWAsdJKU/2CKSTwRUF0Qv
+	1U+bOeYKn2Rv3nVMMBPukumSJUz1C
+X-Received: by 2002:a05:6000:60e:b0:486:e901:e59 with SMTP id ffacd0b85a97d-4870d05a86emr2951058f8f.31.1789556800622;
+        Wed, 16 Sep 2026 04:06:40 -0700 (PDT)
+X-Received: by 2002:a05:6000:60e:b0:486:e901:e59 with SMTP id ffacd0b85a97d-4870d05a86emr2951010f8f.31.1789556800204;
+        Wed, 16 Sep 2026 04:06:40 -0700 (PDT)
 Received: from [192.168.0.9] (ip-109-41-176-3.web.vodafone.de. [109.41.176.3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e83fb4d24sm27031155e9.1.2026.09.16.03.42.06
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4870bef7659sm6964448f8f.3.2026.09.16.04.06.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Sep 2026 03:42:07 -0700 (PDT)
-Message-ID: <97eda9ef-5480-4705-af47-895b2c4527f1@redhat.com>
-Date: Wed, 16 Sep 2026 12:42:05 +0200
+        Wed, 16 Sep 2026 04:06:39 -0700 (PDT)
+Message-ID: <4fb988c5-3dc7-49b2-aca8-45f23e71bad3@redhat.com>
+Date: Wed, 16 Sep 2026 13:06:37 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -88,21 +88,16 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/11] x86/purgatory: Compile purgatory.c with
- -D__NO_FORTIFY
-To: Borislav Petkov <bp@alien8.de>
-Cc: Eric Biggers <ebiggers@kernel.org>, "Jason A. Donenfeld"
- <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-References: <20260813134953.979481-1-thuth@redhat.com>
- <20260813134953.979481-11-thuth@redhat.com>
- <20260814152457.GBan8zSeYlWd_1oWkz@fat_crate.local>
- <7d373eca-c23c-4f79-9391-29d75bd5a53f@redhat.com>
- <20260916022705.GKaqn-eQ9zuCk5tYgR@fat_crate.local>
+Subject: Re: [PATCH 1/2] gpu: host1x: Allow entries in BO caches to be freed
+To: Mikko Perttunen <mperttunen@nvidia.com>
+Cc: dri-devel@lists.freedesktop.org, linux-tegra@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ Thierry Reding <thierry.reding@gmail.com>, David Airlie <airlied@gmail.com>,
+ Jonathan Hunter <jonathanh@nvidia.com>, Aaron Kling <webgeek1234@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Simona Vetter <simona@ffwll.ch>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Akhil R <akhilrajeev@nvidia.com>
+References: <20260515-host1x-bocache-leak-v1-0-a0375f68aeab@nvidia.com>
+ <20260515-host1x-bocache-leak-v1-1-a0375f68aeab@nvidia.com>
 Content-Language: en-US
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -147,32 +142,68 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260916022705.GKaqn-eQ9zuCk5tYgR@fat_crate.local>
+In-Reply-To: <20260515-host1x-bocache-leak-v1-1-a0375f68aeab@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16/09/2026 04.27, Borislav Petkov wrote:
-> On Tue, Aug 18, 2026 at 10:53:53AM +0200, Thomas Huth wrote:
->> @@ -37,6 +37,7 @@ PURGATORY_CFLAGS := -mcmodel=small -ffreestanding
->> -fno-zero-initialized-in-bss -
->>   PURGATORY_CFLAGS += -fpic -fvisibility=hidden
->>   PURGATORY_CFLAGS += $(DISABLE_KSTACK_ERASE) -DDISABLE_BRANCH_PROFILING
->>   PURGATORY_CFLAGS += -fno-stack-protector
->> +PURGATORY_CFLAGS +=  -D__NO_FORTIFY
->>
->>   # Default KBUILD_CFLAGS can have -pg option set when FTRACE is enabled. That
->>   # in turn leaves some undefined symbols like __fentry__ in purgatory and not
->>
->> WDYT?
+On 15/05/2026 04.34, Mikko Perttunen wrote:
+> When a buffer object is pinned via host1x_bo_pin() with a cache, the
+> resulting mapping is kept in the cache so it can be reused on subsequent
+> pins. Each mapping held a reference to the underlying host1x_bo (taken
+> in tegra_bo_pin / gather_bo_pin), so as long as a mapping was cached,
+> the bo itself could not be freed.
 > 
-> I guess... I probably don't care too much about string checks in the
-> purgatory thing...
+> However, the only way to remove the cached mapping was through the free
+> path of the buffer object. This meant that if a bo got cached, it could
+> never get freed again.
 > 
-> But please explain in more detail in the commit message what "compilation
-> problems" are avoided by disabling those additional string checks.
-Thanks, I've updated the patch now accordingly in v4:
+> Resolve the circularity by holding a weak reference to the bo from the
+> cache side. This is done by having the .pin callbacks not bump the bo's
+> refcount -- instead the common Host1x bo code does so, except for the
+> cache reference.
+> 
+> Also move the remove-cache-mapping-on-free code into a common function
+> inside Host1x code. This is only called from the TegraDRM GEM buffers
+> since those are the only ones that can be cached at the moment.
+> 
+> Reported-by: Aaron Kling <webgeek1234@gmail.com>
+> Fixes: 1f39b1dfa53c ("drm/tegra: Implement buffer object cache")
+> Signed-off-by: Mikko Perttunen <mperttunen@nvidia.com>
+> ---
+...
+> diff --git a/include/linux/host1x.h b/include/linux/host1x.h
+> index 5e7a63143a4a..d8f052a85b75 100644
+> --- a/include/linux/host1x.h
+> +++ b/include/linux/host1x.h
+> @@ -143,6 +143,12 @@ static inline struct host1x_bo_mapping *to_host1x_bo_mapping(struct kref *ref)
+>   	return container_of(ref, struct host1x_bo_mapping, ref);
+>   }
+>   
+> +/**
+> + * struct host1x_bo_ops - operations implemented by a host1x_bo provider
+> + *
+> + * @pin: create a DMA mapping. Implementation must not touch the bo's refcount.
+> + * @unpin: destroy a DMA mapping. Implementation must not touch the bo's refcount.
+> + */
+>   struct host1x_bo_ops {
+>   	struct host1x_bo *(*get)(struct host1x_bo *bo);
+>   	void (*put)(struct host1x_bo *bo);
 
-  https://lore.kernel.org/all/20260916095022.604354-11-thuth@redhat.com/
+  Hi Mikko!
 
-  Thomas
+FYI, this now causes some warnings during "make htmldocs":
+
+WARNING: .../linux/include/linux/host1x.h:159 struct member 'get' not 
+described in 'host1x_bo_ops'
+WARNING: .../linux/include/linux/host1x.h:159 struct member 'put' not 
+described in 'host1x_bo_ops'
+WARNING: .../linux/include/linux/host1x.h:159 struct member 'mmap' not 
+described in 'host1x_bo_ops'
+WARNING: .../linux/include/linux/host1x.h:159 struct member 'munmap' not 
+described in 'host1x_bo_ops'
+
+If you've got some spare time, could you maybe send a patch to fix it?
+
+  Thanks,
+   Thomas
 
