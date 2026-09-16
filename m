@@ -1,46 +1,46 @@
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012064.outbound.protection.outlook.com [40.107.200.64])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012014.outbound.protection.outlook.com [52.101.48.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF593DB32B;
-	Wed, 16 Sep 2026 12:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC60338736E;
+	Wed, 16 Sep 2026 12:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789560202; cv=fail; b=fByIU9eg6C00lZeaCPD70BPqg+d6iw+fjr1i9fsZ+wEAUIjNNo2KZNFCaskthQy7ipJ6qUIiq5dg9vgiROT1xAonAxBJLqgG8xr0ee5NxAu7rI3H+ANQjB/zrK8P008dKtubueaVl/D41I9KBbcyIVsWy3oem5YAKfyWfFMy/5A=
+	t=1789560231; cv=fail; b=jjZ6exUTPzAeNITtIbCBLY+X/RE6PSHB3yCWdeJANkJe/atPlODBX3WMo+P3RDJD7IDnMZZYuAdYDC0r24KKcclZ/rL9IqoDtfxv1bl3HHv6YQ0C02bN1GD8i9iGnQypGSv6xmvNUwZF2Bw8hkkSANl7t5hSKBb7yC/3J/0GSfE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789560202; c=relaxed/simple;
-	bh=pB1hVU4YwMrkOgLM5EKDTDk1VGxEvuUfUpnoyrdRwig=;
+	s=arc-20240116; t=1789560231; c=relaxed/simple;
+	bh=wSb8CRmnG6Q/1UzYGP8aZ70xLkoLJr1eGfoeWFRwexs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ATVo3SDo1at8s9rMS3zNZ/l6T0NJyvL10Cu3NGyyc4/wBgcQR48hpFcFaxUrVROVtoc+rqTjR4JWOEbd69ZQrUv0rB38VD2/H/g2/Ki6xsEAN7qVx1KolODsBVQjDyFA3Nrj7pvVmqT8BvlwXw0Afa16WRW94EtaHhypRqP/9EE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dEagLY+Q; arc=fail smtp.client-ip=40.107.200.64
+	 MIME-Version:Content-Type; b=m/JoaJiAHRwVLmL9UIVbYkjqTMBksQF0wQF29RQU6Gr0W08HPz/KfRAu6J5JMbm4YiLtp9O9F/VbyY3ywiE9smO/BbZDoG3pVDpWOvyKBRkGZnaZCIjPx0FxSyv7Ha+ACCMEgoPE3g/hOV1jv7MwDb7H0lJ2OuF1l5tpme0C+5Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pEkxIe6W; arc=fail smtp.client-ip=52.101.48.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dEagLY+Q"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pEkxIe6W"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wz0IlNnPvJv+NQAGKSxKEz9M9Zu3liuLwku0ioqfSTQ6l+zxOZoVJ0Co91tG+SSf5sNCiNLxQktZ4JtQaJKg7yawDJfN9Q7k0396HYkuGICsRWGbwYttSz7q5z/GcFw1s2SqTgMoCXyEC3GTTTiSA5f6W//nmzXn0XhMer9rCSgPY1d718e/fCkjyvAorsXdGLmF4+MC6hn7jzzfXCPRd7YakXH/gmxT/YwwLrYZW81/FvM62ZthtuizjcoqeY5fGn9CJndIankLG4xBii7ykgiFg+B7hjaIUuDVli6ZzNctIxXwVKs7cPIOwX8/La6ozlyFR3CbROBdwjcTbpkLJQ==
+ b=sdWZGPM/zgWMCChuh52X0kMji/qLxyRnue0l4weppikfIskSxwetWJztFG0+vdh/yuym1d0rd0z3AfQTJLfwN5/s3ttZPOvbaFGTaPbhJkkXfTU7wIDgO0fbrwAc5JCaaTsidDHnutfF/OQFVv1XYn98HJ1W3xvnmWScIDfCUT3K14TyKd7PASinbA8Sk8PoFypDZP5fTlvlv72O+U9SMCcK8jxp/mNUydtEyYrHwfGavd0ucS7VnvEy4x6T/JOxc0I/y7m7k1tEp9FGYw6ZAGvqpO1pnvZy8VTszGO7n/Vrl6+0g9/VY2DU6OMEWRU0tw/CWyETpjwPpA/MYywJ6A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hhr24ObJOq7bbaHkOTfqjQthzL33Uot6iWXZUXcZvPs=;
- b=C3riSyFLxEVKfOLplH1eesMG6rtOSW/nYQi/teGYPwUwjp2FTN6PPIAPa5kQnNFfNnhHNzDUyFXfXjg5Di3qrtT2BEDt0TOpWfqaSFvIjGZgtWKWWv7PFuFcw+cB6PRhtY63vsoKSy+pnz3rwX+Fd9eRBU1CmV933ZKNnoq2Gqrl86HY10c9k72I7QqFdaGu9dYGx60JfeI4OyOKqmreXgpQnVPoSceJdaeOQc9Wx4I3orBJaST5k9KniRmBQRgMBnZG5FDWwevTFsgx1naDh+SOKbhm7oGA+8OlbrErb3s04XT7gape9znrm/9SLM2MF2HUu69+pPaZ81xwc952Lw==
+ bh=WNgXfa5En712+eAspMOEbd4EbM4QDl/vkmtEAEeJtpw=;
+ b=LSYNh5pVts8gPMPMedX0JXjgMQiXo3cpgEMoWw+mHa2iEZwEuZAKy3JVH8sIV7pIGmPmhp1Pdii9dBGHYWUfDaV0yH1y3hpCRTFtVJhCc0K+PedFf69YdzoqYzT2HqGmzRSs9uVXsmJ0xPZOKeqPmEvBxX77/wEC+/CFR0QNoj1/Bv6PYR5S5yWrBIsn+h+41pGYwwPOoqAGPvhk62KHw7QAI0K0wqRibfEVgjss5cLb4NuliWck4voL2FcQcwdG7v/OtNPkoKmw0VmNAxi9FfEkUd6wHZVObbXkDVnCjSrM89ghLFpoHG8o9WNsZ6W0mO4hvtvv3dAyLMTEF37LHA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hhr24ObJOq7bbaHkOTfqjQthzL33Uot6iWXZUXcZvPs=;
- b=dEagLY+Q3BlZMFubhFKDxlq/VNvHhtoadVYQRpEkP8iywVjbqSaNYxEKsk2CCsd+MrIc+y2wuFiPJJp5DmsVQ/aBXX0/gtkpRi+NCfLn5sGDLixNm5X64cghILOT8DAoUpxwQi3Q1MOkdKZ2KgRt9yUkPQp77HoPLvYG9eAWgf8=
-Received: from SJ0PR05CA0149.namprd05.prod.outlook.com (2603:10b6:a03:33d::34)
- by DS5PPF5A66AFD1C.namprd12.prod.outlook.com (2603:10b6:f:fc00::64d) with
+ bh=WNgXfa5En712+eAspMOEbd4EbM4QDl/vkmtEAEeJtpw=;
+ b=pEkxIe6WPh1OzcaBTJT4DVHOZUiIH9fM8UC0vHozp9wjEJKN7cTc8RQ2oJN5lIT/WKvmxpwTk90fQw7tTftPmDuF5diikQVG431OJLdqT9rnfRqfjeWMxJu4oTNAbxUZyI+8bsbwvSOuw7uEzI8tt4Fqr8NUiKxBtub7JpwIGes=
+Received: from SJ0PR05CA0148.namprd05.prod.outlook.com (2603:10b6:a03:33d::33)
+ by PH7PR12MB5758.namprd12.prod.outlook.com (2603:10b6:510:1d1::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.9; Wed, 16 Sep
- 2026 12:02:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.11; Wed, 16 Sep
+ 2026 12:03:24 +0000
 Received: from SJ5PEPF00000209.namprd05.prod.outlook.com
- (2603:10b6:a03:33d:cafe::6d) by SJ0PR05CA0149.outlook.office365.com
- (2603:10b6:a03:33d::34) with Microsoft SMTP Server (version=TLS1_3,
+ (2603:10b6:a03:33d:cafe::6c) by SJ0PR05CA0148.outlook.office365.com
+ (2603:10b6:a03:33d::33) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.8 via Frontend Transport; Wed, 16
- Sep 2026 12:02:48 +0000
+ Sep 2026 12:03:24 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -50,11 +50,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from satlexmb07.amd.com (165.204.84.17) by
  SJ5PEPF00000209.mail.protection.outlook.com (10.167.244.42) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.428.7 via Frontend Transport; Wed, 16 Sep 2026 12:02:48 +0000
+ 15.21.428.7 via Frontend Transport; Wed, 16 Sep 2026 12:03:24 +0000
 Received: from aiemdee.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Wed, 16 Sep
- 2026 07:02:24 -0500
+ 2026 07:03:01 -0500
 From: Alexey Kardashevskiy <aik@amd.com>
 To: <x86@kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
@@ -107,9 +107,9 @@ CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
 	Santosh Shukla <santosh.shukla@amd.com>, "Pratik R . Sampat"
 	<prsampat@amd.com>, Scott Soule Cheloha <scott.cheloha@amd.com>, Ackerley Tng
 	<ackerleytng@google.com>, Fuad Tabba <tabba@google.com>
-Subject: [RFC PATCH kernel 16/17] x86/sev: Enable secure MMIO (phase2)
-Date: Wed, 16 Sep 2026 21:51:56 +1000
-Message-ID: <20260916115159.1938195-17-aik@amd.com>
+Subject: [RFC PATCH kernel 17/17] x86/sev: Flush IOMMU TLB for trusted devices
+Date: Wed, 16 Sep 2026 21:51:57 +1000
+Message-ID: <20260916115159.1938195-18-aik@amd.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260916115159.1938195-1-aik@amd.com>
 References: <20260916115159.1938195-1-aik@amd.com>
@@ -125,582 +125,242 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF00000209:EE_|DS5PPF5A66AFD1C:EE_
-X-MS-Office365-Filtering-Correlation-Id: 192fdd71-d3ad-437f-84a5-08df13ea6d18
+X-MS-TrafficTypeDiagnostic: SJ5PEPF00000209:EE_|PH7PR12MB5758:EE_
+X-MS-Office365-Filtering-Correlation-Id: 21ea1d17-cfda-4c2c-c170-08df13ea82d3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700016|32650700020|23010399003|7416014|376014|10067099003|10063799003|22082099003|18002099003|56012099006|11063799006;
+	BCL:0;ARA:13230040|7416014|36860700016|82310400026|23010399003|376014|1800799024|32650700020|11063799006|56012099006|6133799003|18002099003|22082099003|3023799007|10067099003;
 X-Microsoft-Antispam-Message-Info:
-	rAYJ1ZEaPMY4ebXUUanmtjH5GEDkJnfh2oL7uP/UlnwngJ8+9U59pjrgkf4l5QSbrf8ozYU5eoQwHQTrO5/idOTclo6MIV0wNKOdmHaQZ3INkfDB/XAtTJ4OoqtNPEdJVgzbQMl7CWpSOWXIPrNmyNwJMxi5D4mSrZ0J3e17RhpZDokMYuXqz0mAdKKtqOJd81i+Nd+rcjnx9SKXoi/6JyrpU5X6EvICFAyCThuCOubkPovwahz6YmYcUrkTk663y+v8gXZV8ZcWu6ZJSWtilEg8mj8jjL8+ngQb0DhrBTKcTJeJCq42g8/CMZ7tY817KvogenvedaZ6al+bXS2RjD96VUaawgJhZtZWPSI3g2zh+YS4PbnxVGrHVt2lL/k8UVaVg1Z/fZxYWrpgceiAAa2rV2vBtjAUuJgA5irKPhCsdI5OwiLaYFjxq7/SSUwls1yHzAZnGM44o76zKT4v17sbL2hO+vIjQdAB+dIUqiPoCqSrNhfZzzIDeFT6tYZgfFBbtLA4WcIlG9+zfQN1D6a235f2BCUQBrtMK8/5aI0ICuhL0M9ugvbjzKf1MWvj/dNnqlwGPN5ufUEsx7bSYOj+SOGXTi9bUK1971DWPtqt0iHU/lyofxH40zJH7dJzDUW6842JtzdwvMmsSOZvngAMGq2jaz09qWMm4vJ2joSeGqY4IoDS7lmWYf2HbjTeEmjIDkqTQZuyWDIBP/ufkw==
+	yu/3328I801SY6FsYLc9CmvUZeEctUSSIDcyqxwUJ2hyVwt1WwcikhhyEMaqjVoj9tup6Xs7JzO2JsFAwueqDHDuLJ4UJeD/Cqr0S/gwkM/VbD2cofhYFX+DGMcg8giesVcXkUaTcZfLys+XRE2GX0TEknqjsrq8h+KJMRLuv9azyIRAHjLcNOetKEeY/l3SK+Zl6nQaWCi2uBgCZm871matcHCgw8YPx771yvaq3lo372oXL6vbba3D+LqRDMjyGQXtjXjQ2kEqFmGqfdaiaI24BeoAKNt4T4lsp8YxyrpYck0xZC8v2YQWbWtd2ZjGgUZdlW8WfxK7kNLFYHLfq1OsmitoWZ5nLJKkI5SlgjZ5Y1b6ytdTP9v1b5oOHAKJ/TeeWP3hRt4xn56FdReJnGnJ6Mfx1xjAhoFl16ZwQ25h/RSTrPwtNSOwF0tNev+u2W1ADCXmLBjsw6yfT18W86V2LNNt4b+fRE23l5h0xhIYXcOsWPSB+Y3F5SDGmWere2xqvjMP/gQfj8rpcZxpYarVEjV+OFEKpCid77UcNu/fAGh7619VZIwl2bovx9wB
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700016)(32650700020)(23010399003)(7416014)(376014)(10067099003)(10063799003)(22082099003)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(36860700016)(82310400026)(23010399003)(376014)(1800799024)(32650700020)(11063799006)(56012099006)(6133799003)(18002099003)(22082099003)(3023799007)(10067099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	DCCVrm9p8t6eZOOk4GJCUS43Z8KcgmvI3YzmmAcBE7ZahABBe4I8M2kGS3XT+z98XTu8RWiszsGk3RkVlxAeionzj0+s/hzFqaXr95aBLKliNb8Vy9gGHiv1ty1VW6NMqgGCcwMJbmRWBIUuaOZvGJFmugcuex7+5Se0MrloxwhfaqOgqOuY59lt4SiIc33tTxHRbxS/qKYztBXkCL41CR8p21ARH5RkDUxUEE04b+DGQFcWgLSrWLlV2449Buir2O7ku6XuIGkixZGFshjeWbMuO7z7oGdzhztZoJA9wLBwN3ho9S3/7CytKu7bbicVhiLxJYobMswAmpOBPDSUnOsIYVQ2KkbVc3P/MhbnkmLiXAwltHY6MIAvEvvR6Z6AIOEwTejP0cZtr46zUvlvdMl0g5s22S2HsMxTYOuWxHmn4M2fpWp4MFdvBX+eYvQO
+	cb7bK2cEQmHcr0JP49cyQs52un826U+ce5HZh0WUKLP+NxrD8AcCzH5bePkXMGpnA3ymANrzpOSs6nrnYlJPrhKvhMt+HtLVqqmS/E6++vt5OAdCWcjsBtHKJ+QIvM/bunvTX7sQKQ/2dns2Gc45uni/M6nHqDzJVC8R0Po21vRlnjJa+CcTk0dJZ3HbQ5zUPHsM1WIk9XQj39DDho1cKopgzakVdo/TZNycLzBfRVOk8LuI1piyvQ5BRbAzLqWH76tpNQKNERneQPauhw+yjtUPl1rqfN8chlrueV970xK4gUAPXQ2sMffAzL/zncSCVYK1Hwdgvut4Qb3FsjbJ3ufmR1Vfxlf8u1T+0W2JcqtSsasf0M/f6hxoC+oUKHN+NZI6VVyVLetXy4sdmL6/faQmDdYbLkXxVyvkuVeH1fivn8YnzvYNkPGf8gVbJJcV
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2026 12:02:48.2468
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2026 12:03:24.6817
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 192fdd71-d3ad-437f-84a5-08df13ea6d18
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21ea1d17-cfda-4c2c-c170-08df13ea82d3
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	SJ5PEPF00000209.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS5PPF5A66AFD1C
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5758
 
-In order to enable secure MMIO, RMP needs to be updated. Unlike RAM
-(where PVALIDATE validate the RMP entry), MMIO RMP entries require
-assistance from the PSP.
+IOMMU performs RMP checks when SNP is enabled, the results are
+cached along with the IOMMU translations. When a VM lowers permission
+of a mapped page (moves to a lower VMPL level or from read+write to
+read-only or private to shared), the cached RMP check results require
+invalidation.
 
-Add TDI_INFO TIO guest request command. Request the TDI interface report
-from the PSP. Use the report to validate MMIO ranges reported as non-NonTEE
-(i.e. encrypted). The TSM subsystem notifies the PCI subsystem to
-automatically map validated MMIO ranges as encrypted.
+At the moment the only way to invalidate IOMMU cache is the RMPUPDATE
+instruction which flushes all IOMMU TLBs. It is a host privileged
+instruction so a VM needs a way to ensure the host has done it.
+Note that the guest's RMPADJUST/PVALIDATE do not flush IOMMU TLBs.
 
-Since for MMIO the TSM driver needs TDISP report, add shared memory buffers
-for receiving the device evidence. Use DMA SWIOTLB for these buffers,
-explicitly, by forcing 32bit DMA mask.
+The host implements a new "IOMMU TLB Flush" VMGEXIT code which is
+advertised via bit#11 in the GHCB Hypervisor capabilities.
+
+Use RMPUPDATE in the following way:
+- allocate a page per VCPU (to allow lockless flushing);
+- When invalidation is needed, copy two patterns (A and B) to the page;
+- invalidate the page so the host can make it shared;
+- use new GHCB call to request RMPUPDATE on the host;
+- the host makes the page shared;
+- the host clears pattern A;
+- the host makes the page private again;
+- the host returns to the guest;
+- check if pattern A has changed and pattern B has not;
+- if the above failed, panic().
+
+The patterns are located far enough to not hit the same cache line to
+work with the cipher text hiding feature.
+
+The host can choose to not execute the request, WARN_ON if this
+is the case. Further patches will attempt to handle this in other way.
 
 Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 ---
- include/uapi/linux/sev-guest.h     |  12 +
- drivers/virt/coco/sev-guest/core.c |   3 +-
- drivers/virt/coco/sev-guest/tio.c  | 394 +++++++++++++++++++-
- 3 files changed, 400 insertions(+), 9 deletions(-)
+ arch/x86/include/asm/sev-common.h |  2 +
+ arch/x86/include/uapi/asm/svm.h   |  3 +
+ arch/x86/coco/sev/core.c          | 92 ++++++++++++++++++++
+ 3 files changed, 97 insertions(+)
 
-diff --git a/include/uapi/linux/sev-guest.h b/include/uapi/linux/sev-guest.h
-index fcdfea767fca..28db79886ca5 100644
---- a/include/uapi/linux/sev-guest.h
-+++ b/include/uapi/linux/sev-guest.h
-@@ -13,6 +13,7 @@
- #define __UAPI_LINUX_SEV_GUEST_H_
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index ff763c3c5d63..51abf8d061fa 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -138,6 +138,7 @@ enum psc_op {
+ #define GHCB_HV_FT_SNP_AP_CREATION	BIT_ULL(1)
+ #define GHCB_HV_FT_SNP_MULTI_VMPL	BIT_ULL(5)
+ #define GHCB_HV_FT_SNP_SEV_TIO		BIT_ULL(7)
++#define GHCB_HV_FT_SNP_IOMMU_TLB_FLUSH	BIT_ULL(11)
  
- #include <linux/types.h>
-+#include <linux/uuid.h>
+ /*
+  * SNP Page State Change NAE event
+@@ -210,6 +211,7 @@ struct snp_psc_desc {
+ #define GHCB_TERM_SECURE_TSC		10	/* Secure TSC initialization failed */
+ #define GHCB_TERM_SVSM_CA_REMAP_FAIL	11	/* SVSM is present but CA could not be remapped */
+ #define GHCB_TERM_SAVIC_FAIL		12	/* Secure AVIC-specific failure */
++#define GHCB_TERM_IOMMUTLB_FLUSH	13	/* IOMMUTLB flush failed for SEV-TIO device */
  
- #define SNP_REPORT_USER_DATA_SIZE 64
+ #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
  
-@@ -96,4 +97,15 @@ struct snp_ext_report_req {
- #define SNP_GUEST_VMM_ERR_INVALID_LEN	1
- #define SNP_GUEST_VMM_ERR_BUSY		2
+diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
+index 93597ad492bf..269050942c8e 100644
+--- a/arch/x86/include/uapi/asm/svm.h
++++ b/arch/x86/include/uapi/asm/svm.h
+@@ -160,6 +160,8 @@
+ #define SVM_VMGEXIT_SEV_TIO_OP_UNBIND	1
+ #define SVM_VMGEXIT_SEV_TIO_OP_RUN	2
+ #define SVM_VMGEXIT_SEV_TIO_OP_STOP	3
++#define SVM_VMGEXIT_IOMMU_TLB_FLUSH		0x80000022ull
++#define SVM_VMGEXIT_IOMMU_TLB_FLUSH_NO_ACTION	1
+ #define SVM_VMGEXIT_HV_FEATURES			0x8000fffdull
+ #define SVM_VMGEXIT_TERM_REQUEST		0x8000fffeull
+ #define SVM_VMGEXIT_TERM_REASON(reason_set, reason_code)	\
+@@ -285,6 +287,7 @@
+ 	{ SVM_VMGEXIT_AP_CREATION,	"vmgexit_ap_creation" }, \
+ 	{ SVM_VMGEXIT_SEV_TIO_GR,	"vmgexit_sev_tio_guest_request" }, \
+ 	{ SVM_VMGEXIT_SEV_TIO_OP,	"vmgexit_sev_tio_op" }, \
++	{ SVM_VMGEXIT_IOMMU_TLB_FLUSH, "vmgexit_sev_tio_iommu_tlb_flush" }, \
+ 	{ SVM_VMGEXIT_HV_FEATURES,	"vmgexit_hypervisor_feature" }, \
+ 	{ SVM_EXIT_ERR,         "invalid_guest_state" }
  
-+/* Optional Certificates/measurements/report data from TIO_GUEST_REQUEST */
-+struct tio_blob_table_entry {
-+	guid_t guid;
-+	__u32 offset;
-+	__u32 length;
-+} __packed;
+diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+index ed0e4546d5e5..aa5a3abb4796 100644
+--- a/arch/x86/coco/sev/core.c
++++ b/arch/x86/coco/sev/core.c
+@@ -44,6 +44,7 @@
+ #include <asm/cpuid/api.h>
+ #include <asm/cmdline.h>
+ #include <asm/msr.h>
++#include <asm/archrandom.h>
+ 
+ #include "internal.h"
+ 
+@@ -103,6 +104,36 @@ static unsigned long snp_tsc_freq_khz __ro_after_init;
+ 
+ DEFINE_PER_CPU(struct sev_es_runtime_data*, runtime_data);
+ DEFINE_PER_CPU(struct sev_es_save_area *, sev_vmsa);
++DEFINE_PER_CPU(u8 *, iommu_tlb_flush_ghcb_page);
++static atomic_t sev_tio_devices_num;
 +
-+/* Attestation report: 70dc5b0e-0cc0-4cd5-97bb-ff0ba25bf320 */
-+#define TIO_GUID_REPORT \
-+	GUID_INIT(0x70dc5b0e, 0x0cc0, 0x4cd5, 0x97, 0xbb, 0xff, 0x0b, 0xa2, 0x5b, 0xf3, 0x20)
-+
- #endif /* __UAPI_LINUX_SEV_GUEST_H_ */
-diff --git a/drivers/virt/coco/sev-guest/core.c b/drivers/virt/coco/sev-guest/core.c
-index 8448c123ab1e..8710c41daed6 100644
---- a/drivers/virt/coco/sev-guest/core.c
-+++ b/drivers/virt/coco/sev-guest/core.c
-@@ -23,6 +23,7 @@
- #include <linux/uuid.h>
- #include <linux/configfs.h>
- #include <linux/mm.h>
-+#include <linux/dma-mapping.h>
- #include <uapi/linux/sev-guest.h>
- #include <uapi/linux/psp-sev.h>
- 
-@@ -677,7 +678,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
- 	if (!sev_hv_features_ptr || !(*sev_hv_features_ptr & GHCB_HV_FT_SNP_SEV_TIO))
- 		tsm_enable = false;
- 
--	if (tsm_enable)
-+	if (tsm_enable && !dma_set_mask(&pdev->dev, DMA_BIT_MASK(32)))
- 		sev_guest_tsm_set_ops(true, snp_dev);
- 
- 	return 0;
-diff --git a/drivers/virt/coco/sev-guest/tio.c b/drivers/virt/coco/sev-guest/tio.c
-index 99ff2b9c872a..06addbb3a9ad 100644
---- a/drivers/virt/coco/sev-guest/tio.c
-+++ b/drivers/virt/coco/sev-guest/tio.c
-@@ -22,15 +22,71 @@ MODULE_PARM_DESC(tsm_vtom, "SEV TIO vTOM value");
- #define pdev_to_tdi(p)		container_of((p)->tsm, struct tio_guest_tdi, ds.base_tsm)
- #define ghcb_tio_sbdfn(pdev)	((pci_domain_nr((pdev)->bus) << 16) | pci_dev_id(pdev))
- 
-+#define TIO_DATA_PAGES	(SZ_32K >> PAGE_SHIFT)
-+#define SPDM_MEASUREMENTS_NONCE_LEN 32
-+
-+static void sev_free_shared_pages(struct device *dev, void *buf,
-+				  unsigned long npages, dma_addr_t dma_handle)
++static int alloc_iommu_tlb_flush_ghcb_pages(void)
 +{
-+	dma_free_coherent(dev, npages << PAGE_SHIFT, buf, dma_handle);
-+}
++	unsigned int cpu;
++	struct page *pg;
++	void *p;
 +
-+static void *sev_alloc_shared_pages(struct device *dev, unsigned long npages,
-+				    dma_addr_t *dma_handle)
-+{
-+	return dma_alloc_coherent(dev, npages << PAGE_SHIFT, dma_handle, GFP_KERNEL);
-+}
++	/*
++	 * Allocate per CPU pages while encrypted DMA is not happening yet
++	 * and smashing is cheap.
++	 */
++	for_each_possible_cpu(cpu) {
++		if (per_cpu(iommu_tlb_flush_ghcb_page, cpu))
++			continue;
 +
- struct tio_guest_tdi {
- 	struct pci_tsm_devsec ds;
- 	struct snp_guest_dev *snp_dev;
- 	u64 tdi_id; /* Runtime FW generated TDI id */
- };
- 
-+static void device_evidence_object_clear(struct device_evidence_object *obj)
-+{
-+	if (!obj)
-+		return;
++		pg = alloc_pages_node(cpu_to_node(cpu), GFP_KERNEL, 0);
++		if (!pg)
++			return -ENOMEM;
 +
-+	kfree(obj->digest);
-+	kfree(obj->data);
-+	obj->data = NULL;
-+	obj->len = 0;
-+	obj->digest = NULL;
-+}
++		p = page_to_virt(pg);
++		/* Trigger psmash in the host os now to avoid psmash race later */
++		snp_set_memory_shared((unsigned long)p, 1);
++		snp_set_memory_private((unsigned long)p, 1);
++		per_cpu(iommu_tlb_flush_ghcb_page, cpu) = p;
++	}
 +
-+static int device_evidence_object_assign(struct device_evidence_object *obj,
-+					 const void *src, size_t len)
-+{
-+	void *copy;
-+
-+	device_evidence_object_clear(obj);
-+	if (!len || !src)
-+		return 0;
-+
-+	copy = kmemdup(src, len, GFP_KERNEL);
-+	if (!copy)
-+		return -ENOMEM;
-+
-+	obj->data = copy;
-+	obj->len = len;
 +	return 0;
 +}
-+
-+static void device_evidence_release(struct device_evidence *evidence)
-+{
-+	unsigned int i;
-+
-+	if (!evidence)
-+		return;
-+
-+	for (i = 0; i <= DEVICE_EVIDENCE_TYPE_MAX; i++)
-+		device_evidence_object_clear(&evidence->obj[i]);
-+}
-+
- static int handle_tio_guest_request(struct snp_guest_dev *snp_dev, u8 type,
- 				    void *req_buf, size_t req_sz, void *resp_buf, u32 resp_sz,
--				    u64 *bdfn, u64 *param, u64 *fw_err)
-+				    void *pt, u64 *npages, u64 *bdfn, u64 *param, u64 *fw_err)
- {
- 	struct snp_msg_desc *mdesc = snp_dev->msg_desc;
- 	struct snp_guest_req req = {
-@@ -52,6 +108,10 @@ static int handle_tio_guest_request(struct snp_guest_dev *snp_dev, u8 type,
- 		goto error_exit;
- 	}
  
-+	if (pt && npages) {
-+		req.certs_data = pt;
-+		req.input.data_npages = *npages;
+ int sev_tio_op(u32 guest_rid, unsigned int op, u64 *fw_err, u64 *tdi_id)
+ {
+@@ -111,6 +142,24 @@ int sev_tio_op(u32 guest_rid, unsigned int op, u64 *fw_err, u64 *tdi_id)
+ 	struct ghcb *ghcb;
+ 	int ret;
+ 
++	if (!(sev_hv_features & GHCB_HV_FT_SNP_SEV_TIO))
++		return -EPERM;
++
++	if (op == SVM_VMGEXIT_SEV_TIO_OP_RUN || op == SVM_VMGEXIT_SEV_TIO_OP_STOP) {
++		if (!(sev_hv_features & GHCB_HV_FT_SNP_IOMMU_TLB_FLUSH))
++			return -EPERM;
++
++		if (op == SVM_VMGEXIT_SEV_TIO_OP_RUN) {
++			if (atomic_inc_return(&sev_tio_devices_num) == 1) {
++				ret = alloc_iommu_tlb_flush_ghcb_pages();
++				if (ret)
++					return ret;
++			}
++		} else if (atomic_dec_return(&sev_tio_devices_num) == 0) {
++			/* Do cleanup or leave it like this? */
++		}
 +	}
- 	if (bdfn) {
- 		req.input.guest_rid = *bdfn & 0xFFFFFFFF;
- 		req.input.npages = *bdfn >> 32;
-@@ -71,6 +131,69 @@ static int handle_tio_guest_request(struct snp_guest_dev *snp_dev, u8 type,
++
+ 	/* __sev_get_ghcb() needs IRQs disabled because it uses per-CPU GHCB. */
+ 	guard(irqsave)();
+ 
+@@ -347,6 +396,42 @@ static int vmgexit_psc(struct ghcb *ghcb, struct snp_psc_desc *desc)
  	return ret;
  }
  
-+static int guest_request_tio_data(struct snp_guest_dev *snp_dev, u8 type,
-+				  void *req_buf, size_t req_sz, void *resp_buf, u32 resp_sz,
-+				  u64 bdfn, struct device_evidence_object *report,
-+				  u64 *fw_err)
++static int ghcb_flush_iommu_tlb(struct ghcb *ghcb)
 +{
-+	u64 npages = TIO_DATA_PAGES, param = 0;
-+	struct tio_blob_table_entry *pt;
-+	dma_addr_t dh = 0;
-+	int rc;
++	/* AES encrypts with 16 byte blocks */
++	unsigned long s1[BITS_TO_LONGS(128)], s2[BITS_TO_LONGS(128)];
++	void *p = this_cpu_read(iommu_tlb_flush_ghcb_page), *p2;
++	struct es_em_ctxt ctxt;
++	int ret;
 +
-+	pt = sev_alloc_shared_pages(snp_dev->dev, TIO_DATA_PAGES, &dh);
-+	if (!pt)
++	if (!p)
 +		return -ENOMEM;
 +
-+	if (report)
-+		param |= SVM_VMGEXIT_SEV_TIO_GR_INFO_REPORT;
++	/* Keep patterns apart far enough to not share the same cache line */
++	p2 = (u8 *) p + 2048;
 +
-+	rc = handle_tio_guest_request(snp_dev, type, req_buf, req_sz, resp_buf, resp_sz,
-+				      pt, &npages, &bdfn, &param, fw_err);
-+	if (npages > TIO_DATA_PAGES) {
-+		sev_free_shared_pages(snp_dev->dev, pt, TIO_DATA_PAGES, dh);
-+		pt = sev_alloc_shared_pages(snp_dev->dev, npages, &dh);
-+		if (!pt)
-+			return -ENOMEM;
++	vc_ghcb_invalidate(ghcb);
 +
-+		rc = handle_tio_guest_request(snp_dev, type, req_buf, req_sz, resp_buf, resp_sz,
-+					      pt, &npages, &bdfn, &param, fw_err);
-+	}
-+	if (rc)
-+		goto out_free_pt;
++	BUILD_BUG_ON(ARRAY_SIZE(s1) != 2);
++	if (!rdrand_long(s1) || !rdrand_long(s1 + 1) ||
++	    !rdrand_long(s2) || !rdrand_long(s2 + 1))
++		return -EFAULT;
 +
-+	if (report)
-+		device_evidence_object_clear(report);
++	memcpy(p, s1, sizeof(s1));
++	memcpy(p2, s2, sizeof(s2));
 +
-+	for (unsigned int i = 0; i < 3; ++i) {
-+		u8 *ptr = ((u8 *)pt) + pt[i].offset;
-+		size_t len = pt[i].length;
++	pvalidate((unsigned long) p, RMP_PG_SIZE_4K, false);
++	ret = sev_es_ghcb_hv_call(ghcb, &ctxt, SVM_VMGEXIT_IOMMU_TLB_FLUSH, __pa(p), 0);
++	pvalidate((unsigned long) p, RMP_PG_SIZE_4K, true);
 +
-+		if (guid_is_null(&pt[i].guid))
-+			break;
++	/* Ensure that the host change is visible */
++	smp_mb();
 +
-+		if (!len)
-+			continue;
-+
-+		if (guid_equal(&pt[i].guid, &TIO_GUID_REPORT) && report)
-+			rc = device_evidence_object_assign(report, ptr, len);
-+		else
-+			continue;
-+		if (rc)
-+			goto out_clear_blobs;
-+	}
-+	sev_free_shared_pages(snp_dev->dev, pt, npages, dh);
-+
-+	return 0;
-+
-+out_clear_blobs:
-+	if (report)
-+		device_evidence_object_clear(report);
-+out_free_pt:
-+	sev_free_shared_pages(snp_dev->dev, pt, npages, dh);
-+	return rc;
-+}
-+
- struct tio_msg_tdi_info_req {
- 	u64 tdi_id;
- 	u8 reserved[8];
-@@ -107,6 +230,224 @@ struct tio_msg_tdi_info_rsp {
- 	u64 reserved4;
- } __packed;
- 
-+static int tio_tdi_status(struct pci_dev *pdev, struct snp_guest_dev *snp_dev,
-+			  struct tsm_tdi_status *ts, uint64_t tdi_id,
-+			  struct device_evidence_object *report)
-+{
-+	size_t resp_len = sizeof(struct tio_msg_tdi_info_rsp) + AUTHTAG_LEN;
-+	struct tio_msg_tdi_info_rsp *rsp __free(kfree_sensitive) = kzalloc(resp_len, GFP_KERNEL);
-+	struct tio_msg_tdi_info_req req = {
-+		.tdi_id = tdi_id,
-+	};
-+	u64 fw_err = 0;
-+	int rc;
-+
-+	pci_notice(pdev, "TDI info");
-+	if (!rsp)
-+		return -ENOMEM;
-+
-+	rc = guest_request_tio_data(snp_dev, TIO_MSG_TDI_INFO_REQ, &req,
-+				    sizeof(req), rsp, resp_len,
-+				    ghcb_tio_sbdfn(pdev), report, &fw_err);
-+	if (rc)
-+		return rc;
-+
-+	ts->tdi_id = rsp->tdi_id;
++	if (!memcmp(p, s1, sizeof(s1)) || memcmp(p2, s2, sizeof(s2)))
++		return -EFAULT;
 +
 +	return 0;
 +}
-+
-+struct tio_msg_mmio_validate_req {
-+	u64 tdi_id;
-+	u8 reserved2[8];
-+	u64 subrange_base;
-+	u32 subrange_page_count;
-+	u32 range_offset;
-+
-+	u16 validated:1; /* Desired value to set RMP.Validated for the range */
-+	/*
-+	 * Force validated:
-+	 * 0: If subrange does not have RMP.Validated set uniformly, fail.
-+	 * 1: If subrange does not have RMP.Validated set uniformly, force
-+	 *    to requested value
-+	 */
-+	u16 force_validated:1;
-+	u16 reserved3:14;
-+
-+	u16 range_id;
-+	u8 reserved4[12];
-+} __packed;
-+
-+/* Status codes from TIO_MSG_MMIO_VALIDATE_REQ */
-+enum mmio_validate_status {
-+	MMIO_VALIDATE_SUCCESS = 0,
-+	MMIO_VALIDATE_INVALID_TDI = 1,
-+	MMIO_VALIDATE_TDI_UNBOUND = 2,
-+	MMIO_VALIDATE_NOT_ASSIGNED = 3, /* At least one page is not assigned to the guest */
-+	MMIO_VALIDATE_NOT_IO = 4,	/* At least one page is not an I/O page */
-+	MMIO_VALIDATE_NOT_UNIFORM = 5,  /* Validated bit is not uniformly set for range */
-+	MMIO_VALIDATE_NOT_IMMUTABLE = 6,/* >=1 page does not have immutable bit set */
-+	MMIO_VALIDATE_NOT_MAPPED = 7,   /* At least one page is not mapped to the expected GPA */
-+	MMIO_VALIDATE_NOT_REPORTED = 8, /* Range ID is not reported in TDI report */
-+	MMIO_VALIDATE_OUT_OF_RANGE = 9, /* Subrange is out the MMIO range in TDI report */
-+	MMIO_VALIDATE_NOT_4K = 10,	/* >=1 page is not 4K page size */
-+};
-+
-+struct tio_msg_mmio_validate_rsp {
-+	u64 tdi_id;
-+	u16 status; /* MMIO_VALIDATE_xxx */
-+	u8 reserved1[6];
-+	u64 subrange_base;
-+	u32 subrange_page_count;
-+	u32 range_offset;
-+
-+	u16 changed:1; /* Validated bit has changed due to this operation */
-+	u16 reserved2:15;
-+
-+	u16 range_id;
-+	u8 reserved3[12];
-+} __packed;
-+
-+static int mmio_validate_range(struct snp_guest_dev *snp_dev, struct pci_dev *pdev,
-+			       uint64_t tdi_id, unsigned int range_id,
-+			       resource_size_t start, resource_size_t size,
-+			       bool invalidate, u64 *fw_err, u16 *status)
-+{
-+	size_t resp_len = sizeof(struct tio_msg_mmio_validate_rsp) + AUTHTAG_LEN;
-+	struct tio_msg_mmio_validate_rsp *rsp __free(kfree_sensitive) =
-+			kzalloc(resp_len, GFP_KERNEL);
-+	struct tio_msg_mmio_validate_req req = {
-+		.tdi_id = tdi_id,
-+		.subrange_base = start >> 12,
-+		.subrange_page_count = size >> 12,
-+		.range_offset = 0,
-+		.validated = !invalidate, /* Desired value to set RMP.Validated for the range */
-+		.force_validated = 0,
-+		.range_id = range_id,
-+	};
-+	u64 num_bdfn = SVM_VMGEXIT_SEV_TIO_GR_MMIO_MK_NUM_BDFN(size >> 12, ghcb_tio_sbdfn(pdev));
-+	u64 mmio_val = SVM_VMGEXIT_SEV_TIO_GR_MMIO_MK_VALIDATE(start, !invalidate);
-+	int rc;
-+
-+	if (!rsp)
-+		return -ENOMEM;
-+
-+	rc = handle_tio_guest_request(snp_dev, TIO_MSG_MMIO_VALIDATE_REQ,
-+				      &req, sizeof(req), rsp, resp_len,
-+				      NULL, NULL, &num_bdfn, &mmio_val, fw_err);
-+	if (rc || *fw_err || rsp->status != MMIO_VALIDATE_SUCCESS) {
-+		pci_err(pdev, "MMIO validate failed with rc=%d, fwerr=0x%llx, status=%x\n",
-+			rc, *fw_err, rsp->status);
-+		if (!rc)
-+			return -EFAULT;
-+		return rc;
-+	}
-+
-+	*status = rsp->status;
-+
-+	return 0;
-+}
-+
-+static void tio_tdi_mmio_invalidate(struct pci_dev *pdev, struct snp_guest_dev *snp_dev,
-+				    uint64_t tdi_id)
-+{
-+	struct pci_tsm *tsm = pdev->tsm;
-+	u16 mmio_status;
-+	u64 fw_err = 0;
-+	int i = 0, rc = 0;
-+	struct pci_tsm_devsec *devsec_tsm = to_pci_tsm_devsec(tsm);
-+	struct pci_tsm_mmio *mmio = devsec_tsm->mmio;
-+
-+	if (!mmio)
-+		return;
-+
-+	pci_notice(pdev, "MMIO invalidate");
-+
-+	for (i = 0; i < mmio->nr; ++i) {
-+		struct pci_tsm_mmio_entry *entry = pci_tsm_mmio_entry(mmio, i);
-+		struct resource *res = &entry->res;
-+		unsigned int range_id = entry->range_id;
-+
-+		if (range_id >= PCI_NUM_RESOURCES ||
-+		    !resource_contains(pci_resource_n(pdev, range_id), res)) {
-+			pci_info(pdev, "Skipping MMIO [%d] %pr: no BAR %u window\n",
-+				 i, res, range_id);
-+			continue;
-+		}
-+
-+		mmio_status = 0;
-+		rc = mmio_validate_range(snp_dev, pdev, tdi_id, range_id,
-+					 res->start, resource_size(res), true, &fw_err,
-+					 &mmio_status);
-+		if (rc || fw_err != SEV_RET_SUCCESS || mmio_status != MMIO_VALIDATE_SUCCESS) {
-+			pci_err(pdev, "MMIO #%d %llx..%llx validation failed 0x%llx %d\n",
-+				range_id, res->start, res->end, fw_err, mmio_status);
-+			continue;
-+		}
-+
-+		pci_notice(pdev, "MMIO #%d %llx..%llx invalidated\n",
-+			   range_id, res->start, res->end);
-+	}
-+
-+	pci_tsm_mmio_teardown(devsec_tsm->mmio);
-+	kfree(devsec_tsm->mmio);
-+	devsec_tsm->mmio = NULL;
-+}
-+
-+static int tio_tdi_mmio_validate(struct pci_dev *pdev, struct snp_guest_dev *snp_dev,
-+				 uint64_t tdi_id)
-+{
-+	struct pci_tsm *tsm = pdev->tsm;
-+	u16 mmio_status;
-+	u64 fw_err = 0;
-+	int i, rc = 0;
-+	struct pci_tsm_mmio *mmio __free(kfree) = pci_tsm_mmio_alloc(pdev);
-+
-+	if (!mmio)
-+		return -ENOMEM;
-+
-+	pci_notice(pdev, "MMIO validate");
-+
-+	for (i = 0; i < mmio->nr; ++i) {
-+		struct pci_tsm_mmio_entry *entry = pci_tsm_mmio_entry(mmio, i);
-+		struct resource *res = &entry->res;
-+		unsigned int range_id = entry->range_id;
-+
-+		if (range_id >= PCI_NUM_RESOURCES ||
-+		    !resource_contains(pci_resource_n(pdev, range_id), res)) {
-+			pci_info(pdev,
-+				 "Skipping MMIO [%d] %pr: no BAR %u window\n",
-+				 i, res, range_id);
-+			continue;
-+		}
-+
-+		mmio_status = 0;
-+		rc = mmio_validate_range(snp_dev, pdev, tdi_id, range_id, res->start,
-+					 resource_size(res), false, &fw_err, &mmio_status);
-+		if (rc || fw_err != SEV_RET_SUCCESS || mmio_status != MMIO_VALIDATE_SUCCESS) {
-+			pci_err(pdev, "MMIO #%d %llx..%llx validation failed 0x%llx %d\n",
-+				range_id, res->start, res->end, fw_err, mmio_status);
-+			continue;
-+		}
-+
-+		pci_notice(pdev, "MMIO #%d %llx..%llx validated\n", range_id, res->start, res->end);
-+	}
-+
-+	if (!rc) {
-+		rc = pci_tsm_mmio_setup(pdev, mmio);
-+		if (!rc) {
-+			struct pci_tsm_devsec *devsec_tsm = to_pci_tsm_devsec(tsm);
-+
-+			devsec_tsm->mmio = no_free_ptr(mmio);
-+		}
-+	}
-+
-+	if (rc)
-+		tio_tdi_mmio_invalidate(pdev, snp_dev, tdi_id);
-+
-+	return rc;
-+}
-+
- struct sdte {
- 	u64 v                  : 1;
- 	u64 reserved           : 3;
-@@ -216,7 +557,7 @@ static int tio_tdi_sdte_write(struct pci_dev *pdev, struct snp_guest_dev *snp_de
- 
- 	rc = handle_tio_guest_request(snp_dev, TIO_MSG_SDTE_WRITE_REQ,
- 				      &req, sizeof(req), rsp, resp_len,
--				      &bdfn, &flags, &fw_err);
-+				      NULL, NULL, &bdfn, &flags, &fw_err);
- 	if (rc || fw_err || rsp->status != SDTE_WRITE_SUCCESS) {
- 		pci_err(pdev, "SDTE write failed with rc=%d, fwerr=0x%llx, status=%x\n",
- 			rc, fw_err, rsp->status);
-@@ -233,6 +574,7 @@ static int tio_tdi_sdte_write(struct pci_dev *pdev, struct snp_guest_dev *snp_de
- static struct pci_tsm *sev_guest_lock(struct tsm_dev *tsmdev, struct pci_dev *pdev)
+ static unsigned long __set_pages_state(struct snp_psc_desc *data, unsigned long vaddr,
+ 				       unsigned long vaddr_end, int op)
  {
- 	struct tio_guest_tdi *gtdi __free(kfree) = kzalloc(sizeof(*gtdi), GFP_KERNEL);
-+	struct tsm_tdi_status ts = {};
- 	u64 fw_err = 0, tdi_id = 0;
- 	int rc;
+@@ -404,6 +489,13 @@ static unsigned long __set_pages_state(struct snp_psc_desc *data, unsigned long
+ 	if (!ghcb || vmgexit_psc(ghcb, data))
+ 		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_PSC);
  
-@@ -258,11 +600,21 @@ static struct pci_tsm *sev_guest_lock(struct tsm_dev *tsmdev, struct pci_dev *pd
- 	}
- 	pci_dbg(pdev, "New TDI ID=%llx\n", tdi_id);
- 
--	struct device_evidence *evidence = device_evidence_create(0, HASH_ALGO_SHA384);
--	if (!evidence)
-+	struct device_evidence *ev = device_evidence_create(0, HASH_ALGO_SHA384);
-+	if (!ev)
- 		return ERR_PTR(-ENOMEM);
--	gtdi->ds.base_tsm.evidence = evidence;
- 
-+	rc = tio_tdi_status(pdev, gtdi->snp_dev, &ts, tdi_id,
-+			    &ev->obj[DEVICE_EVIDENCE_TYPE_REPORT]);
-+	if (rc)
-+		return ERR_PTR(rc);
++	if (atomic_read(&sev_tio_devices_num)) {
++		int ret = ghcb_flush_iommu_tlb(ghcb);
 +
-+	if (!ev->obj[DEVICE_EVIDENCE_TYPE_REPORT].data) {
-+		device_evidence_release(ev);
-+		return ERR_PTR(-ENODEV);
++		if (ret)
++			sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_IOMMUTLB_FLUSH);
 +	}
 +
-+	gtdi->ds.base_tsm.evidence = ev;
- 	gtdi->tdi_id = tdi_id;
+ 	__sev_put_ghcb(&state);
  
- 	return &no_free_ptr(gtdi)->ds.base_tsm;
-@@ -271,19 +623,33 @@ static struct pci_tsm *sev_guest_lock(struct tsm_dev *tsmdev, struct pci_dev *pd
- static void sev_guest_unlock(struct pci_tsm *tsm)
- {
- 	struct pci_dev *pdev = tsm->pdev;
-+	struct tio_guest_tdi *gtdi = pdev_to_tdi(pdev);
-+	struct snp_guest_dev *snp_dev = gtdi->snp_dev;
- 	u64 fw_err = 0;
- 
--	sev_tio_op(ghcb_tio_sbdfn(pdev), SVM_VMGEXIT_SEV_TIO_OP_UNBIND, &fw_err, NULL);
-+	tio_tdi_mmio_invalidate(pdev, snp_dev, gtdi->tdi_id);
- 
- 	/* Quiesce DMA */
- 	sev_tio_op(ghcb_tio_sbdfn(pdev), SVM_VMGEXIT_SEV_TIO_OP_STOP, &fw_err, NULL);
- 
--	tsm->pdev->tsm = NULL;
-+	/*
-+	 * Up until now the VMM has been blocking clearing of BME and the device may
-+	 * not be able to recover without BME going via 0, do it now.
-+	 * Note that the device reset is still needed, leave to the userspace to
-+	 * decide on that.
-+	 */
-+	pci_disable_device(pdev);
-+
-+	sev_tio_op(ghcb_tio_sbdfn(pdev), SVM_VMGEXIT_SEV_TIO_OP_UNBIND, &fw_err, NULL);
-+
-+	device_evidence_release(tsm->evidence);
- 	kvfree(tsm);
- }
- 
- static int sev_guest_accept(struct pci_dev *pdev)
- {
-+	struct tio_guest_tdi *gtdi = pdev_to_tdi(pdev);
-+	struct snp_guest_dev *snp_dev = gtdi->snp_dev;
- 	struct pci_tsm *tsm = pdev->tsm;
- 	u64 fw_err = 0;
- 
-@@ -296,7 +662,19 @@ static int sev_guest_accept(struct pci_dev *pdev)
- 	if (ret)
- 		return ret;
- 
--	return sev_tio_op(ghcb_tio_sbdfn(pdev), SVM_VMGEXIT_SEV_TIO_OP_RUN, &fw_err, NULL);
-+	ret = sev_tio_op(ghcb_tio_sbdfn(pdev), SVM_VMGEXIT_SEV_TIO_OP_RUN, &fw_err, NULL);
-+	if (ret)
-+		return ret;
-+
-+	ret = tio_tdi_mmio_validate(pdev, snp_dev, gtdi->tdi_id);
-+	if (ret)
-+		goto stop_tdi;
-+
-+	return 0;
-+
-+stop_tdi:
-+	sev_tio_op(ghcb_tio_sbdfn(pdev), SVM_VMGEXIT_SEV_TIO_OP_STOP, &fw_err, NULL);
-+	return ret;
- }
- 
- static int sev_guest_enable_dma(struct pci_dev *pdev)
+ 	local_irq_restore(flags);
 -- 
 2.55.0
 
