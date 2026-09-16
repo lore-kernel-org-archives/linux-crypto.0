@@ -1,46 +1,46 @@
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010062.outbound.protection.outlook.com [52.101.201.62])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013017.outbound.protection.outlook.com [40.107.201.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247534D0A17;
-	Wed, 16 Sep 2026 11:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3B84F054A;
+	Wed, 16 Sep 2026 11:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789559945; cv=fail; b=NuJgvdzdDOY1eN4WynpdzZlz6pC9v3GdvMLTRiWoY42SUdoWjcLTMU673nOfTr+9teKMWy2TmyI+6kz5FKxbKtJPxDYhChviZZVNaXxOrNfqQRQo3hR1AM10Yr8Nt86i2b8xOSXhKAvouyvq3EEEBDuhzNWpmh2uHoZU36GedHg=
+	t=1789559982; cv=fail; b=ZWJ/L0+iqxNpfer1P2XH8Qbniw27rTh790w/wlUAwDAMKFVub4ojP+RTivkT1oDTRRxLryxcRKzQfOIBsdRQN4uWheb29PY1DEkXPx/ZvfJdEGG1oGmiYNkpIzZEiM6UWSNmlBREQcsc4nisYK06XDQ7OWc0unO3WiWcH1bQWEE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789559945; c=relaxed/simple;
-	bh=cZxmKiA5gDpfrJnfuh7RgK6F6OQKyYMp7I2eA4Y1c/Q=;
+	s=arc-20240116; t=1789559982; c=relaxed/simple;
+	bh=g4H1pNgGx6egUXkOADkTsOJXNS1+Ro10K3szeLspJBg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f+2BfbDpfjdyD4p3AGDlPzZMwFNM7iK9h06TjPqpwBORId/1CIDwHN06BX0uriJjErNMQlds4DeTmWbqpuL4pzP3QD9+KpANiv/ZHW2Qf4BWNF7Xic2oyeV35JkpNNYwMLSXTzi5pRtPytCJtf8cFwisKgUcbS96B9J1M/xtvNQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=KNHRx1/u; arc=fail smtp.client-ip=52.101.201.62
+	 MIME-Version:Content-Type; b=AcCy+4B2tdSfIRyf10CppOMqsLeLS9o8IYuKapanM4rI0lbRtie1QsVsMFCkP+SLpGR0z9kIwt2a/8OWaqN9Z44V5SmidJWe4UuEse44s/gTTDkm3cN7uMY3aHJyQUR9GtL9q16R+hBj3hxxJOhNHKEztBHnJM4y6k8W81lCp9M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wzwC6nfw; arc=fail smtp.client-ip=40.107.201.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="KNHRx1/u"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wzwC6nfw"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=seol/ZRYlk9PRV/AE/0igGP4M475B8bTrWiYjR7Z5NVQdKgQ8Snt2Iybu43auxQTLklLTDj+/czXGPucm0VRfzcuHZnrtWsnzt9fa564LGCuzyXYB2wboIBU0JiXD2tXbkUw4vznR7ZJdYwkqjhER+nCBLKlLXXLD77GbCUVxF55cBM98geU4KyUAbObpDwGwPlX7OUjvnyQ/ErVPhnYwe35LYF2lgl5JKmTc092duqdYS/xqXIz44O5hNx1ujjZtaQrsdxqobZsO6EZPAGhyMogjMHX3oHd0JDOqY35plSg988uH9TBWL1tdirm3lgBThESwB5WN07dH7u6fQsegQ==
+ b=ofOgEZt5/WvZL398DiMP4cnJu+bAOQ7ChdryDjdv6oc3B+1IqZ5xoCor8N7Ik69lXihL8DalFNN9z171VyKvjWP7qM0DDXR3yLwNOmXuBqCv86Gbl8ba8tHqsafdCNrPxltMrbLTHvsJAE5IbcIcl+RldZJlImHm7npnTIGIzJJ1QMcy8I+eqcBMS9ZZqprVDYX2C05fuBYoOpwyswLPdGLbxffVcsQm3S+lV4Mtf7YbMTeFB9fehnnY8S4cHnUSdXF5aINmNiKz7F17iSKPebMKZAIN0MpN0ypjqkW2E4BYk1eFRto289kn9r4R9JwcoGJZ4lcE9S2+Jgiy17XQSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uN3TtTwM+bwTehqyvzEhtWdo/9tbU5sGc+GO4ttJXns=;
- b=XlTCsuXfh6cbbhbZNEiVEITWSHaHxkZnjq0bBeBSI5S9g72kOw6XGGLeK+K4EWewm32H7VlSEd4nr9nUOHdWNETpfESYKdGCr2rAYiTPH207To88lFcUGwNjCbRT5kfB/PfJJXyvT9Em+8pJ3/kxdg7x61bbkpD3JT9YQtyIVXR5ilk5oujw/aNZ0uubZrZfPpO/N0oLeVTV7PmLE9i4C+BeEl2/6Slm/wxe2mDrFRJf9rojTe83MvrKt2jeWQn8nrZyd2tWkH35wRnCkyEjLproJIrPBR1lP5u2c2UEo9YQu/qPilPg/lGoa9Pjy7GmzZv5ehcBcrlNaEp9KYwiZA==
+ bh=qTsg1utTkplWuARlA0qswoeLICanNrYPE/18/PBEUNY=;
+ b=rmoiGjoh+6GgaL646m2gMAgAeOVhpofkBX3f/ONIo6agDbJ3NudbMju58xl+C1BXMLqHJHo/SJLgCu6OfZ6ClRdQOK+hdd+xThXKfg0ZOf8ObPpFogMdFYwFsuEVQyDlOqpg6yNgukAg4WRCIldL4HVzAGdtQX2nPGDjHKo/+CXnz1CXQERwq5BbbujDJTMzsYKKk4HZj6Q0ZmvdBb7+OwZZswtvWAkI3jaCClT3FPSNqo8ZTMgGcp9Xw0Zxm0nnnymV0tycimCtTkLIwfYtp4uFWIZo/SDWyrbE3/S4DfvtntmL3XIUE/P/cTKwfr6stSp1zjl52cvPMVYQHPKRMw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uN3TtTwM+bwTehqyvzEhtWdo/9tbU5sGc+GO4ttJXns=;
- b=KNHRx1/uIQrLP/p1OqbUtpLgVwCk7UVtvYLpPsa2/jtKdsR4Vjqm3gQm0t1vp4EhK906ZcAgkkSaNp5GN9OT1xi2nBN7sRrVepy7neCrEzBcLk6mtscazitXsKE123nz5ng2gI1C17BYkbYjzOdNlcc5U03fFb1OlKx8D9A4k+g=
-Received: from BN9PR03CA0782.namprd03.prod.outlook.com (2603:10b6:408:13f::7)
- by SJ2PR12MB8111.namprd12.prod.outlook.com (2603:10b6:a03:4fe::17) with
+ bh=qTsg1utTkplWuARlA0qswoeLICanNrYPE/18/PBEUNY=;
+ b=wzwC6nfwNmFtjgfk9sDcnKOMQ04jGfMzMCsC94PMwXHTyprnLafBJ/OMhSdIIZT7e1gKWt5OaYurLNADb4gi+KaWK8d7Qz3Dv4f9nx3JwyUsO5xKzntXU9YygO+pNZBzDvE9YfRcVfyBpz6mQnPpD2GxVC7juJ3ZzS7smUM8JKs=
+Received: from SJ2P220CA0004.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:5da::11)
+ by SJ0PR12MB6832.namprd12.prod.outlook.com (2603:10b6:a03:47e::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.11; Wed, 16 Sep
- 2026 11:58:47 +0000
-Received: from BN1PEPF0001854A.namprd05.prod.outlook.com
- (2603:10b6:408:13f:cafe::37) by BN9PR03CA0782.outlook.office365.com
- (2603:10b6:408:13f::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.11; Wed, 16 Sep
+ 2026 11:59:24 +0000
+Received: from SJ5PEPF00000208.namprd05.prod.outlook.com
+ (2603:10b6:a03:5da:cafe::ab) by SJ2P220CA0004.outlook.office365.com
+ (2603:10b6:a03:5da::11) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.11 via Frontend Transport; Wed,
- 16 Sep 2026 11:58:46 +0000
+ 16 Sep 2026 11:59:24 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- BN1PEPF0001854A.mail.protection.outlook.com (10.167.248.9) with Microsoft
+ SJ5PEPF00000208.mail.protection.outlook.com (10.167.244.41) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.428.7 via Frontend Transport; Wed, 16 Sep 2026 11:58:46 +0000
+ 15.21.428.7 via Frontend Transport; Wed, 16 Sep 2026 11:59:23 +0000
 Received: from aiemdee.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Wed, 16 Sep
- 2026 06:58:23 -0500
+ 2026 06:58:59 -0500
 From: Alexey Kardashevskiy <aik@amd.com>
 To: <x86@kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
@@ -106,11 +106,10 @@ CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
 	<linux-mm@kvack.org>, Alexey Kardashevskiy <aik@amd.com>, <aik@ozlabs.ru>,
 	Santosh Shukla <santosh.shukla@amd.com>, "Pratik R . Sampat"
 	<prsampat@amd.com>, Scott Soule Cheloha <scott.cheloha@amd.com>, Ackerley Tng
-	<ackerleytng@google.com>, Fuad Tabba <tabba@google.com>, Dan Williams
-	<dan.j.williams@intel.com>
-Subject: [RFC PATCH kernel 10/17] x86, dma: Allow accepted devices to map private memory
-Date: Wed, 16 Sep 2026 21:51:50 +1000
-Message-ID: <20260916115159.1938195-11-aik@amd.com>
+	<ackerleytng@google.com>, Fuad Tabba <tabba@google.com>
+Subject: [RFC PATCH kernel 11/17] tsm/core: Add TDI status
+Date: Wed, 16 Sep 2026 21:51:51 +1000
+Message-ID: <20260916115159.1938195-12-aik@amd.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260916115159.1938195-1-aik@amd.com>
 References: <20260916115159.1938195-1-aik@amd.com>
@@ -120,76 +119,137 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF0001854A:EE_|SJ2PR12MB8111:EE_
-X-MS-Office365-Filtering-Correlation-Id: c49f70c9-81ce-478f-dac0-08df13e9dd27
+X-MS-TrafficTypeDiagnostic: SJ5PEPF00000208:EE_|SJ0PR12MB6832:EE_
+X-MS-Office365-Filtering-Correlation-Id: d8ed4718-0d0d-4492-fba9-08df13e9f352
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|376014|36860700016|7416014|82310400026|32650700020|11063799006|10067099003|56012099006|22082099003|18002099003;
+	BCL:0;ARA:13230040|1800799024|82310400026|7416014|32650700020|376014|23010399003|36860700016|18002099003|22082099003|10067099003|56012099006|11063799006;
 X-Microsoft-Antispam-Message-Info:
-	1bJ49a9trfumDwoyn9MewgHhdhH/vcO7H1vXItEBAR2GcC7Oz87Mn2l/avJzWfkRSChnShOjFI7hXwvbMP4FfIal/XfkCyAQO06jw07jp3OKH8Fv14GY6YOHfTvUSlnHRxfsxtpJfmrCwkr9GnKg5GXYolHH8kdXZuVQtH+PnHROr5jB+rRKZUZkw+jMKi6EB5sMFZve0dHPB2LyTXPZfcqQSwRzRnMa9JPAmrYk6BmjpPlY/zGIZMRL4ogIwgoaoBWgr2X3fJECn8xofhkS/dPlWE1gm4LGMM32AysHf5mzmXFzDVjFx/CzkJpupwN0nH8TVL9pWKTlpIbIQXDjaLx+FkjqAMfx3fzEL7R4946H7Hyse1Woyyf1+rbrQX6IFOCMqIQA75eNFofO3sWviWdOBrpPfr3KmGpt74PsgqnSShJAKfS1rBPn1YyDMZkLp8IRElEVCiFMgecxLvI7J7mj2+8+4z5F1jrSmVH0Pm+vouATGQfb5p4qKwJd5g31NtCxqwjL3sFapbwogiTa2xbrqJegMhJ+hMbhT1MYg0hV+Xn4w7KKLhnAON+dlxkAOXrgjAYJhDrg6VqYsK3x1ZmsmutuwzCbubbgs27aDBSaTnor7fzVXyE4z3gIdRZrtCPFmFIGs1Lxt9GqNBFoPs+7N5a4otqlL9gf7mHsWsJ4fS9vrcN8OM8srKTIfIU3IRe3qhs521WNeSWpaqmQQg==
+	1gjrxiOzZs++uLN/08CsbVuU5pzivX1w5sGfokhVo62HhTqsZAyt2altg4jQKy61YsFa5Q4JpAePEy56dZ2EtjTCeKjExL81JRYHJiYMY2uEiMnekm+X4HfnK61KTogTrUDOSWqYPac0RXsqXDF4wcWCECweQL2O+qrasaKF9Ob2twna6aAPVekdisRqgLeJlZeWB+Pyy3Bj167PJL09ZDmneWPqJ/nWbZ0cNzIZ9Uqu+TxE79xdf2uWrFfFyctA02oysbQLQg7NUfSUI+121Lh84kpVXJKbsCp4RX8FM8vKws3J3lHABQArpnrkiLAf2KQseddH0TJq+Gv/qJeo3ppTVrTxG+l8MATdtE6Ao3U3P+6gT3P9M6R6/DAw+GSzx5a/5muRGjOlLBCzMMiMgoy/exC0T3bXU9lf4eS/7wyQMhaEBz721jzLwZwa2Dv1PivZYIiWNzz8ZjfwLrQbmMk5/p8DJ5F9/KW0TMkedGokdgxIMOBxpzKrj0WOPNZTSFL2PdgqRRvebRWS/tn5JkJTmIfnpT4wVrU/EEANzAHAwcREbazlGn77NGogt+eYeQ5dt8vAtItGg7Je1OTdf7apf9IzPoCJmzfouuIh9OdDINS2GF86XJJkhSUJfr/0LPVLQjFXnrujzmzz+zKMX+LG2m67WgXyvo8/Y0n5DPWZ4ATFg4mJDgroef2p5B6hrmxaAbtQhopAI4TWgp6URw==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(36860700016)(7416014)(82310400026)(32650700020)(11063799006)(10067099003)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(7416014)(32650700020)(376014)(23010399003)(36860700016)(18002099003)(22082099003)(10067099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	qK/f3bcE1ASam6x2JuApZeSzxgwli4lwEhb+EPtO5GlbcvqWi2n0k+nCmOHidWa9c57wxnSKyVw6rpTH9uNaDmg3oJNXlIBXvGR1R/KFN/gP+3nnPsanWwrd57y/UdARYtTQx0oclZLQ0BGPI91gFjNkAlX5ujD1fxxig+qClAg8/i1f9m8YX9y28sjNZGmBEwP33TPzxrpHnN+hFi9AJNhz+zn1fgjuz4xCrtBlZIiJKBNAa55ix5MqPrc/Hp0hNMUb1/YlmECGfzThwtN1CwLiUVLLQlBKO1fcb1JIi5Qgv+5uPUz+SYTP5gl8NeH5pRlAUwiBM8wDq7PFX6NC37IA+rMpo1xfWlWcVjunL8MiE56oFApW110XZtgRGjDSOijBETZIzUKDFueWDJ8SMcnlpUO0wFZzFrYSoIR3W1JjxXGiUODmzMgF+4duPdAm
+	Fw53La2fWg2oO27psEqX3jIivEE3n3gbx3/xjn+KQHm1lz4FNVBajz48hTuLTPBt6uG2tVEbRRVvKQr7qSZv/THDK5/fsPRLILmlZp0+sWXWEMlp25tRTvdUlkvhgDpQhBBk7Xpw2/WNTNcciwCV4ENZvJuvlLVUt1sTm2llbK9DDNN55pWfltlQswjlh2XFTQbM3dBdqqt+eTE/9bviiGOC+WUEncGgm0s5E9hPqxwtrOEHu++p+E6DTbn76h4jtwoev54pqgHFtv9qpZ3UnUOsoBgI/lRE0iX1qfId86tWTOyfo3im62f04xW5+LNlhm5i3d1Ohcu/n4ZPM6reeV5E+Yufduo2+SyugUAxp87dhY4NTuBXalrrqjLQ46tVhj9YCY3Hk8coI/nSAbVxEzdI6mbCYS8c/Eerz4Y0bR2xhA+W8KI8DfNb2knsosaa
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2026 11:58:46.8022
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2026 11:59:23.9209
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c49f70c9-81ce-478f-dac0-08df13e9dd27
+X-MS-Exchange-CrossTenant-Network-Message-Id: d8ed4718-0d0d-4492-fba9-08df13e9f352
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF0001854A.namprd05.prod.outlook.com
+	SJ5PEPF00000208.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8111
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6832
 
-From: Dan Williams <dan.j.williams@intel.com>
+Define a structure with all info about a TDI such as TDISP status,
+bind state, used START_INTERFACE options and the report digest.
 
-With the arrival of "accepted" devices, devices that have been enabled to
-DMA to private encrypted memory, coherent DMA allocation no longer requires
-page conversion. Update force_dma_unencrypted() to skip accepted devices.
-
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Thomas Gleixner <tglx@kernel.org>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: x86@kernel.org
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Signed-off-by: Dan Williams <dan.j.williams@intel.com>
-[aik: re-added device_cc_accepted()]
 Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 ---
- arch/x86/mm/mem_encrypt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ include/linux/pci-tsm.h | 69 ++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index 95bae74fdab2..805800ddbd79 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -20,10 +20,11 @@
- bool force_dma_unencrypted(struct device *dev)
- {
- 	/*
--	 * For SEV, all DMA must be to unencrypted addresses.
-+	 * Require unencrypted DMA unless the device has been "accepted",
-+	 * enabled by a TSM driver to DMA to private encrypted memory.
- 	 */
- 	if (cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
--		return true;
-+		return !__device_cc_accepted(dev);
+diff --git a/include/linux/pci-tsm.h b/include/linux/pci-tsm.h
+index 9b34304d9a1f..2ca577e2a37e 100644
+--- a/include/linux/pci-tsm.h
++++ b/include/linux/pci-tsm.h
+@@ -11,6 +11,7 @@
+ struct pci_tsm;
+ struct tsm_dev;
+ struct kvm;
++struct tsm_tdi_status;
+ enum pci_tsm_req_scope;
  
- 	/*
- 	 * For SME, all DMA must be to unencrypted addresses if the
+ /*
+@@ -88,6 +89,7 @@ struct pci_tsm_ops {
+ 
+ 	int (*refresh_evidence)(struct pci_tsm *tsm, const void *nonce,
+ 				size_t nonce_len);
++	int (*tdi_status)(struct pci_dev *pdev, struct tsm_tdi_status *ts);
+ };
+ 
+ /**
+@@ -331,4 +333,71 @@ static inline ssize_t pci_tsm_guest_req(struct pci_dev *pdev,
+ 	return -ENXIO;
+ }
+ #endif
++
++/* private: */
++
++enum tsm_tdisp_state {
++	TDISP_STATE_CONFIG_UNLOCKED = 0,
++	TDISP_STATE_CONFIG_LOCKED = 1,
++	TDISP_STATE_RUN = 2,
++	TDISP_STATE_ERROR = 3,
++};
++
++enum tsm_tdisp_status {
++	TDISP_STATE_BOUND = 0,
++	TDISP_STATE_INVALID = 1,
++	TDISP_STATE_UNBOUND = 2,
++};
++
++/*
++ * struct tdisp_interface_id - TDISP INTERFACE_ID Definition
++ *
++ * @function_id: Identifies the function of the device hosting the TDI
++ *   15:0: @rid: Requester ID
++ *   23:16: @rseg: Requester Segment (Reserved if Requester Segment Valid is Clear)
++ *   24: @rseg_valid: Requester Segment Valid
++ *   31:25 – Reserved
++ * 8B - Reserved
++ */
++#define TSM_TDISP_IID_REQUESTER_ID      GENMASK(15, 0)
++#define TSM_TDISP_IID_RSEG              GENMASK(23, 16)
++#define TSM_TDISP_IID_RSEG_VALID        BIT(24)
++
++struct tdisp_interface_id {
++	__u32 function_id; /* TSM_TDISP_IID_xxxx */
++	__u8 reserved[8];
++} __packed;
++
++struct tsm_tdi_status {
++	__u8 status; /* enum tsm_tdisp_status */
++	__u8 state; /* enum tsm_tdisp_state */
++	__u8 meas_digest_fresh;
++	__u8 meas_digest_valid;
++	__u8 all_request_redirect;
++	__u8 bind_p2p;
++	__u8 lock_msix;
++	__u8 no_fw_update;
++	__u16 cache_line_size;
++	__u64 spdm_algos; /* Bitmask of TSM_SPDM_ALGOS */
++	__u8 certs_digest[48];
++	__u8 meas_digest[48];
++	__u8 interface_report_digest[48];
++	__u64 intf_report_counter;
++	struct tdisp_interface_id id;
++	__u64 tdi_id;
++} __packed;
++
++enum tsm_spdm_algos {
++	TSM_SPDM_ALGOS_DHE_SECP256R1,
++	TSM_SPDM_ALGOS_DHE_SECP384R1,
++	TSM_SPDM_ALGOS_AEAD_AES_128_GCM,
++	TSM_SPDM_ALGOS_AEAD_AES_256_GCM,
++	TSM_SPDM_ALGOS_ASYM_TPM_ALG_RSASSA_3072,
++	TSM_SPDM_ALGOS_ASYM_TPM_ALG_ECDSA_ECC_NIST_P256,
++	TSM_SPDM_ALGOS_ASYM_TPM_ALG_ECDSA_ECC_NIST_P384,
++	TSM_SPDM_ALGOS_HASH_TPM_ALG_SHA_256,
++	TSM_SPDM_ALGOS_HASH_TPM_ALG_SHA_384,
++	TSM_SPDM_ALGOS_KEY_SCHED_SPDM_KEY_SCHEDULE,
++};
++
+ #endif /*__PCI_TSM_H */
 -- 
 2.55.0
 
