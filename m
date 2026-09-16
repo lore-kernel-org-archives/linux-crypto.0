@@ -1,83 +1,173 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0934AA566;
-	Wed, 16 Sep 2026 09:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11524AF667
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 09:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789552205; cv=none; b=uFm0+VbBlLpIi/xPqtUN71o5OKbiwOUpYUBHqob/tq2gkMROY6kCSpbOPpTkrv/kWrxgTo4FGmTT4GLKL0YGafH9JD4UfrjVy8QoHGjnWzOg4m6pteRfQrWeovCF1FA7vkShNorCLuDs+KuJ6ThnqhcbtINpnkwBudGhgg6NO2c=
+	t=1789552263; cv=none; b=kwZsj242I6w7yJmYSjnRxANi3hphWwEv8rS09/z9r7625vYx+LV7SQdpqWIdp3C9r9IAUD7BrBv0IVjd4FWhxOzBoNVNe6QGt6mD575ubSnWzFqoQD9DdEPteo1IYhS4pg/OX50Ug1On4iiDvdYeNWoeKxtjlMO/By1uHtTI1kY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789552205; c=relaxed/simple;
-	bh=lcClBkjB32WNcDeTmu1ogtDrNFhEcfQ916rGE/SAyaA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pPfKET7kkGQ4alARqmkgn3Hn5h8TmSiGlqxSftj6ttXHUTHxOEBMkG16k2VPiurcvYZiA4E+rYaqHtKcbYtesLhzabsxXmT0wYkq3VPwMY+7+mY9v5MLaWa879EPALjilXk5DiAixCYnvBtlWcecjmWrwxDwtjJUfc7zf0XEF64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=NetxLrsx; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1789552263; c=relaxed/simple;
+	bh=qyoMQLJeiLB3R3jNlUUwjIL2eoxPZ7NoHL4nW+PB7jk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PJPUsFxQGslJynySsZdFdSvGIy54Ntf/7nDv9bGn7Nva0xofHmDbeDmDLsmYRpsQuEW9WA1r+mPaI9nl2HGgmPFFV5mxkjrkSQjW89uIhVydDURpaQUB4qG1bbhv6x6PlpBuJwpLMY3+DwE6fgYFqTBoebbDn+rrk5wVWQwSbJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rl3i4T5u; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="NetxLrsx"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=njikc4nORIsTPxlkCFcPQm3BO/kRWtHCUlB4reb5W0w=; 
-	b=NetxLrsx/2fBWdXmzAZ44G444i0SA0dSDU6XvfWx6LY9NeKda8ptCKgQ0fTVgPwKcOJnIO0rxkJ
-	wWmbTCu/15PZVHNApw6jkFEozSWa4KLcNS6OtPLgjOn69LBn5xv6LIRfNSwKv8GsoFrps7mnFwxTB
-	dYm9vsv+TZqk2o6CVAK2cVSk4bJgBKDsGLMi3QPlpOHfrFULTuNrZdCJT7qreP5smQtnjKCXXYBVG
-	xlrcbl1LJ/JqLTx4CEtlBg7YTFgPURsqjTIwg44CW2ObZA4ca+Gh2C3fne+PfBheL1iYer0tXmzBI
-	xiSACKUIijQnwlojV/kbYlOB8Ru+HNgZti7Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x6mGx-0000000EYyY-0Ta6;
-	Wed, 16 Sep 2026 17:49:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 19:49:47 +1000
-Date: Wed, 16 Sep 2026 19:49:47 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-Cc: clabbe@baylibre.com, davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org, jkoolstra@xs4all.nl, lkp@intel.com
-Subject: Re: [PATCH v2] crypto/amlogic: Use devm APIs for clock management
-Message-ID: <aqpmOzURNFOm78ls@gondor.apana.org.au>
-References: <20260901024302.5407-1-raizudeen.kerneldev@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rl3i4T5u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1789552241;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w8OQ5sTROvl8un9Vo1lqJ9fpMZcWAu8IoU4XAMbOsgU=;
+	b=Rl3i4T5uF+F4dejke/99pQvFZ3VyPHogLBCW8gE6ZkkmgVhQeK2daABzlx6YjD1IgzC0Od
+	i22Se/3/unsSfxVDkEgMIQhj+xNrl0jiaFrunz1UKkochbvtMnLESCtp4682oyNkt9jnwl
+	JR/kJ9p854BZqrze7JBcNIMKnFcQ/bw=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-139-SEUGIpghOP278deey_Amgg-1; Wed,
+ 16 Sep 2026 05:50:35 -0400
+X-MC-Unique: SEUGIpghOP278deey_Amgg-1
+X-Mimecast-MFC-AGG-ID: SEUGIpghOP278deey_Amgg_1789552233
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 30BA21955E75;
+	Wed, 16 Sep 2026 09:50:33 +0000 (UTC)
+Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1D43B1800446;
+	Wed, 16 Sep 2026 09:50:28 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Borislav Petkov <bp@alien8.de>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Subject: [PATCH v4 01/13] lib/crypto: aes: Provide functions for zeroizing aes_key and aes_enckey
+Date: Wed, 16 Sep 2026 11:50:03 +0200
+Message-ID: <20260916095022.604354-2-thuth@redhat.com>
+In-Reply-To: <20260916095022.604354-1-thuth@redhat.com>
+References: <20260916095022.604354-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260901024302.5407-1-raizudeen.kerneldev@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Sep 01, 2026 at 08:12:52AM +0530, Mohamad Raizudeen wrote:
-> The driver currently gets the core clock and manually enables it using
-> clk_prepare_enable(). This requires matching calls to
-> clk_disable_unprepare() in the error paths and remove function.
-> 
-> Switch to devm_clk_get_enabled() instead. This lets the kernel handle
-> enabling and disabling the clock automatically, which allow us to drop
-> the manual cleanup code and keeps the probe function simple.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202608310329.QgxCCMs1-lkp@intel.com/
-> Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-> ---
-> Changes in v2:
-> - Dropped the devm_crypto_engine_alloc_init() change due to build
->   failure reported by the kernel test robot.
-> - Kept the devm_clk_get_enabled() clock cleanup as the sole focus of
->   this patch.
-> - Link to v1: https://lore.kernel.org/linux-crypto/20260821151303.8150-1-raizudeen.kerneldev@gmail.com/T/#u
-> 
->  drivers/crypto/amlogic/amlogic-gxl-core.c | 16 +++-------------
->  1 file changed, 3 insertions(+), 13 deletions(-)
+Some crypto functions need to zeroize their local aes_key or aes_enckey
+structures after use to avoid leaking sensitive material on the stack.
+Provide aes_zeroize_key() and aes_zeroize_enckey() helper functions that
+can be used with __cleanup() to automatically zeroize the structs when
+they go out of scope.
 
-Please take a look at
+While we're at it, replace the memzero_explicit() calls in lib/crypto/aes.c
+with the new helper functions.
 
-https://sashiko.dev/#/patchset/20260901024302.5407-1-raizudeen.kerneldev%40gmail.com
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ include/crypto/aes.h | 18 ++++++++++++++++++
+ lib/crypto/aes.c     | 10 +++++-----
+ 2 files changed, 23 insertions(+), 5 deletions(-)
 
-Thanks,
+diff --git a/include/crypto/aes.h b/include/crypto/aes.h
+index 3279cfa546085..9fe868161e1d3 100644
+--- a/include/crypto/aes.h
++++ b/include/crypto/aes.h
+@@ -101,6 +101,15 @@ struct aes_enckey {
+ 	union aes_enckey_arch k;
+ };
+ 
++/**
++ * aes_zeroize_enckey() - Zeroize an aes_enckey structure
++ * @key: The aes_enckey to zeroize
++ */
++static inline void aes_zeroize_enckey(struct aes_enckey *key)
++{
++	memzero_explicit(key, sizeof(*key));
++}
++
+ /**
+  * struct aes_key - An AES key prepared for encryption and decryption
+  * @aes_enckey: Common fields and the key prepared for encryption
+@@ -115,6 +124,15 @@ struct aes_key {
+ 	union aes_invkey_arch inv_k;
+ };
+ 
++/**
++ * aes_zeroize_key() - Zeroize an aes_key structure
++ * @key: The aes_key to zeroize
++ */
++static inline void aes_zeroize_key(struct aes_key *key)
++{
++	memzero_explicit(key, sizeof(*key));
++}
++
+ /*
+  * Please ensure that the first two fields are 16-byte aligned
+  * relative to the start of the structure, i.e., don't move them!
+diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+index f1549839b3de0..07c1d912ac365 100644
+--- a/lib/crypto/aes.c
++++ b/lib/crypto/aes.c
+@@ -539,7 +539,7 @@ static void __init aes_fips_test(void)
+ 	if (memcmp(fips_test_data, data, sizeof(data)) != 0)
+ 		panic("aes: FIPS self-test failed (wrong plaintext)\n");
+ 
+-	memzero_explicit(&key, sizeof(key));
++	aes_zeroize_key(&key);
+ }
+ 
+ #if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_CBC_MACS)
+@@ -827,7 +827,7 @@ static void __init aes_ecb_fips_test(void)
+ 	if (memcmp(fips_test_data, data, sizeof(data)) != 0)
+ 		panic("aes: ECB FIPS self-test failed (wrong plaintext)\n");
+ 
+-	memzero_explicit(&key, sizeof(key));
++	aes_zeroize_key(&key);
+ }
+ #else /* CONFIG_CRYPTO_LIB_AES_ECB */
+ static inline void aes_ecb_fips_test(void)
+@@ -1040,7 +1040,7 @@ static void __init aes_cbc_fips_test(void)
+ 	if (memcmp(fips_test_data, data, sizeof(data)) != 0)
+ 		panic("aes: CBC FIPS self-test failed (wrong plaintext)\n");
+ 
+-	memzero_explicit(&key, sizeof(key));
++	aes_zeroize_key(&key);
+ }
+ 
+ /* FIPS cryptographic algorithm self-test for AES-CBC-CTS */
+@@ -1069,7 +1069,7 @@ static void __init aes_cbc_cts_fips_test(void)
+ 	if (memcmp(ptext, data, data_len) != 0)
+ 		panic("aes: CBC-CTS FIPS self-test failed (wrong plaintext)\n");
+ 
+-	memzero_explicit(&key, sizeof(key));
++	aes_zeroize_key(&key);
+ }
+ #else /* CONFIG_CRYPTO_LIB_AES_CBC */
+ static inline void aes_cbc_fips_test(void)
+@@ -1194,7 +1194,7 @@ static void __init aes_ctr_fips_test(void)
+ 	if (memcmp(fips_test_data, data, sizeof(data)) != 0)
+ 		panic("aes: CTR FIPS self-test failed (wrong plaintext)\n");
+ 
+-	memzero_explicit(&key, sizeof(key));
++	aes_zeroize_enckey(&key);
+ }
+ #else /* CONFIG_CRYPTO_LIB_AES_CTR */
+ static inline void aes_ctr_fips_test(void)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.55.0
+
