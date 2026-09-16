@@ -1,53 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A54043F081;
-	Wed, 16 Sep 2026 08:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD00948C8D9;
+	Wed, 16 Sep 2026 09:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789548424; cv=none; b=G9Y/e7BmRGB/G+8Rmeqx92cHEe/1OWQtReBFWaxaVqvTE4zEgb+dAiMujnLtDd+0LuKA/gjPCdmGBALrwmd5y6T88bzPWSJLWAHLP9GL5z0E4JiHP0m7nT8F3NZCQdfsY0bie5MP/m73GbtZhhQESqgBv23YdvurZrhnw39Td10=
+	t=1789549279; cv=none; b=gfO0UvWH/G3vwBYxRk+4SIb8NVf4EAZbp+dpexVL8dGyWkwo1UX0mD0eEb7ZDXWp3MiWVizoD7rbPzU77nkfft63eR7FOWiw0aItyM34uj5tHprgrsoae+vaIA/wA8UHIWlDhnfnuhvj4PEqs9A5nYUdrIh86vaB0izOBTGqRY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789548424; c=relaxed/simple;
-	bh=ef8r6iNKtiuyWv9pF/ARFCKTa67ITV2QiZm4JghR5tk=;
+	s=arc-20240116; t=1789549279; c=relaxed/simple;
+	bh=lsUiaPqrnhcbNGhDA5AkfzMAi/7X+7ytnA2kFDnU2Yk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RRkmDtlqwcO/PVU0Q0pcfSd10k00Uj6mv3pNX3T0iXXKRD7ohtH0SDdux8A509zsqayGnKdqjye72dmKbiZa1H0GZYG1CObqEkq8cbf0BmJ1bIcTXPWNTdyVRx8ky5yjsBSedTCYevocfaIxvS6t/R5YlAOXuH0+GFZqTu7MKS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=gyj8zxzC; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=GKmnwEDFUDdw7R3QQzyvZub6QJe8xnTihjm3QJI/D5nUBdhD2ni6+RS3pdhvtBAjWSPe6/i/I3iny5T70FhHeg2UFHSxBusolSswujtDrtwCFhGLQG0Ua0hbnFiZADLWB02xArHfs73EIoWqKBKNXf79+LBkr8kmpTit7CjXT6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=JkINH3do; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="gyj8zxzC"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="JkINH3do"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=sDCNX+YHSUydGAM1LFcKIBAhx2ROKqYXaCwJyhIsMj4=; 
-	b=gyj8zxzC9zn3rkb6cV3v0k4Z9ga+6HujbaYMNS1UrTsUnd3X2HOGd+//CmpoewR3tFo63gJHKJD
-	hfwR+WU3yw8zVWyw2i8fC+HR8yoaogm2ZSDZiN97rT/HIlJ2VFcQxNLovij9wUUC1epyyEwxogNLh
-	gUZC96iDbtPO+XZeFAYnyZwG/Qxv5t+zK2CuzWMzpcwg1z2+w0JmN9CEzjIAPiENKdIT3sW8djG2V
-	6ArDMd1u/QZm4zSXO5PRa6fIVlgP9lXWadzmVUca2aiHu+zejGADn8u+26US0nkgpoPbsMhfhxgdT
-	2NZV/yHzY/SHTtOklOtBHk/5ns9p3fv5+9Tg==;
+	from:content-type:reply-to; bh=J62InCrimYMZ27rtw0DoyvxPBEcbtBLFfYYmokblwpU=; 
+	b=JkINH3do7MiMnIXbrkujMQRH5H2i3PZ3JEmMIsui0B0s2bRuosH1yJszQudAirDRQVCTBxr+u8a
+	m3sgzUGtu/x/YpPrutnHstLhdH0vkG7VSmSESHrD4ogUrXfxNOam0hybPNy8YPfuFdR25A7r4tTCp
+	vw4QhF/5XTHe29zU6VHyqf0oRWWjzMViiKfnrMLxW2pZi5IQvr/qpFfVMLb2sEFpwdJnDOzkAvKCe
+	RFWeX6CpxHDmoXzhmFDg4brNaqgJ4JPU5x/kJkWlT5OPFD0bxuyERP8Z9QPHn/MDJGH81d97m5Q8H
+	ugqEsfJ0wXHdjRO7Piqu8Paq941hrSNUBwTw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x6lHs-0000000EXi8-3WFL;
-	Wed, 16 Sep 2026 16:46:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 18:46:40 +1000
-Date: Wed, 16 Sep 2026 18:46:40 +1000
+	id 1x6lVY-0000000EY4g-46rE;
+	Wed, 16 Sep 2026 17:00:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 19:00:48 +1000
+Date: Wed, 16 Sep 2026 19:00:48 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	syzbot <syzbot+4d0e4d2db6dfde01b52f@syzkaller.appspotmail.com>,
-	davem@davemloft.net, horms@kernel.org, idosch@nvidia.com,
-	kuba@kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
-	razor@blackwall.org, steffen.klassert@secunet.com,
-	syzkaller-bugs@googlegroups.com, Thomas Graf <tgraf@suug.ch>,
-	linux-crypto@vger.kernel.org, NeilBrown <neilb@ownmail.net>,
-	quanyeyang <quanyemostima@gmail.com>
-Subject: [v3 PATCH] rhashtable: Use separate lockdep keys for each lock
-Message-ID: <aqpXcMuAChVSxoaz@gondor.apana.org.au>
-References: <6aa5fcf6.f2639fcc.29487d.0048.GAE@google.com>
- <aqi7fpazv2KDDdvn@shinmob>
- <CANn89iJd0QnoDo0tjrFED2myec38U8joyqR05d6BVnJ-sX=NVg@mail.gmail.com>
- <aqjf7LNmE6InABpw@gondor.apana.org.au>
- <aqpMjQn0g6XxXtyq@gondor.apana.org.au>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: davem@davemloft.net, stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com
+Subject: Re: [PATCH v2] crypto: sa2ul - Fix stack overflow in
+ sa_prepare_iopads
+Message-ID: <aqpawGagrSvRkpTi@gondor.apana.org.au>
+References: <20260831055141.1632832-1-s-vadapalli@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,269 +48,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aqpMjQn0g6XxXtyq@gondor.apana.org.au>
+In-Reply-To: <20260831055141.1632832-1-s-vadapalli@ti.com>
 
-v3 removes an obsolete comment regarding the use of nesting level 2 or more.
+On Mon, Aug 31, 2026 at 11:21:38AM +0530, Siddharth Vadapalli wrote:
+>
+> Since crypto_shash_export() writes 105 bytes into this 104-byte union, it
+> overflows by one byte into the adjacent stack frame.
 
----8<---
-Use separate lockdep keys for the different types of locks in
-rhashtable (mutex, spin lock, and bucket locks).  They are
-separate and not normally nested with respect to each other.
+This should be converted to crypto_shash_export_core which exports
+just the hash state without the partial block buffer.
+ 
+> Changes since v1:
+> - Propagated error from sa_prepare_iopads throughout the call chain.
+> - Added missing check for authentication key size being within limits.
+> Above changes are based on Sashiko review of the v1 patch at:
+> https://sashiko.dev/#/patchset/20260819142357.3950463-1-s-vadapalli%40ti.com
 
-Also move the rhashtable_init/rhltable_init kdoc to the header
-file as that's where the macros are defined.
+Looks like Sashiko is still not happy:
 
-Fixes: 4333ab90aaae ("rhashtable: use private lockdep class for all locks.")
-Reported-by: syzbot+4d0e4d2db6dfde01b52f@syzkaller.appspotmail.com
-Assisted-by: Gemini:gemini-3.6-flash
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Reviewed-by: NeilBrown <neil@brown.name>
+https://sashiko.dev/#/patchset/20260831055141.1632832-1-s-vadapalli%40ti.com
 
-diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-types.h
-index 0e1b172a4f6c..3576b8f08aff 100644
---- a/include/linux/rhashtable-types.h
-+++ b/include/linux/rhashtable-types.h
-@@ -70,6 +70,12 @@ struct rhashtable_params {
- 	rht_obj_cmpfn_t		obj_cmpfn;
- };
- 
-+struct rhashtable_lockdep_keys {
-+	struct lock_class_key lock_key;
-+	struct lock_class_key mutex_key;
-+	struct lock_class_key bucket_key;
-+};
-+
- /**
-  * struct rhashtable - Hash table handle
-  * @tbl: Bucket table
-@@ -141,24 +147,77 @@ struct rhashtable_iter {
- 
- int __rhashtable_init_noprof(struct rhashtable *ht,
- 		    const struct rhashtable_params *params,
--		    struct lock_class_key *key);
-+		    struct rhashtable_lockdep_keys *keys);
- #define rhashtable_init_noprof(ht, params)				\
- ({									\
--	static struct lock_class_key __key;				\
-+	static struct rhashtable_lockdep_keys __keys;			\
- 									\
--	__rhashtable_init_noprof(ht, params, &__key);			\
-+	__rhashtable_init_noprof(ht, params, &__keys);			\
- })
-+
-+/**
-+ * rhashtable_init - initialize a new hash table
-+ * @ht:		hash table to be initialized
-+ * @params:	configuration parameters
-+ *
-+ * Initializes a new hash table based on the provided configuration
-+ * parameters. A table can be configured either with a variable or
-+ * fixed length key:
-+ *
-+ * Configuration Example 1: Fixed length keys
-+ * struct test_obj {
-+ *	int			key;
-+ *	void *			my_member;
-+ *	struct rhash_head	node;
-+ * };
-+ *
-+ * struct rhashtable_params params = {
-+ *	.head_offset = offsetof(struct test_obj, node),
-+ *	.key_offset = offsetof(struct test_obj, key),
-+ *	.key_len = sizeof(int),
-+ *	.hashfn = jhash,
-+ * };
-+ *
-+ * Configuration Example 2: Variable length keys
-+ * struct test_obj {
-+ *	[...]
-+ *	struct rhash_head	node;
-+ * };
-+ *
-+ * u32 my_hash_fn(const void *data, u32 len, u32 seed)
-+ * {
-+ *	struct test_obj *obj = data;
-+ *
-+ *	return [... hash ...];
-+ * }
-+ *
-+ * struct rhashtable_params params = {
-+ *	.head_offset = offsetof(struct test_obj, node),
-+ *	.hashfn = jhash,
-+ *	.obj_hashfn = my_hash_fn,
-+ * };
-+ */
- #define rhashtable_init(...)	alloc_hooks(rhashtable_init_noprof(__VA_ARGS__))
- 
- int __rhltable_init_noprof(struct rhltable *hlt,
- 		  const struct rhashtable_params *params,
--		  struct lock_class_key *key);
-+		  struct rhashtable_lockdep_keys *keys);
- #define rhltable_init_noprof(hlt, params)				\
- ({									\
--	static struct lock_class_key __key;				\
-+	static struct rhashtable_lockdep_keys __keys;			\
- 									\
--	__rhltable_init_noprof(hlt, params, &__key);			\
-+	__rhltable_init_noprof(hlt, params, &__keys);			\
- })
-+
-+/**
-+ * rhltable_init - initialize a new hash list table
-+ * @hlt:	hash list table to be initialized
-+ * @params:	configuration parameters
-+ *
-+ * Initializes a new hash list table.
-+ *
-+ * See documentation for rhashtable_init.
-+ */
- #define rhltable_init(...)	alloc_hooks(rhltable_init_noprof(__VA_ARGS__))
- 
- #endif /* _LINUX_RHASHTABLE_TYPES_H */
-diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
-index 6c5e6d9accba..ec853c1b9af3 100644
---- a/include/linux/rhashtable.h
-+++ b/include/linux/rhashtable.h
-@@ -328,8 +328,7 @@ static inline unsigned long rht_lock_nested(struct bucket_table *tbl,
- 
- 	local_irq_save(flags);
- 	bit_spin_lock(0, (unsigned long *)bucket);
--	/* subclass 0 is used for ->lock and 1 for ->mutex. 2+ for bitlocks */
--	lock_acquire_exclusive(&tbl->dep_map, subclass+2, 0, NULL, _THIS_IP_);
-+	lock_acquire_exclusive(&tbl->dep_map, subclass, 0, NULL, _THIS_IP_);
- 	return flags;
- }
- 
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 5da0e53a8d42..a3a4a1f7751e 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -207,7 +207,6 @@ static struct bucket_table *bucket_table_alloc(struct rhashtable *ht,
- 		return NULL;
- 
- #ifdef CONFIG_LOCKDEP
--	/* bitlocks must use nesting level 2 or more */
- 	lockdep_init_map(&tbl->dep_map, "rhashtable_bucket", ht->lockdep_key, 0);
- #endif
- 
-@@ -432,7 +431,7 @@ static void rht_deferred_worker(struct work_struct *work)
- 	int err = 0;
- 
- 	ht = container_of(work, struct rhashtable, run_work);
--	mutex_lock_nested(&ht->mutex, 1);
-+	mutex_lock(&ht->mutex);
- 
- 	tbl = rht_dereference(ht->tbl, ht);
- 	tbl = rhashtable_last_table(ht, tbl);
-@@ -1122,51 +1121,9 @@ static u32 rhashtable_jhash2(const void *key, u32 length, u32 seed)
- 	return jhash2(key, length, seed);
- }
- 
--/**
-- * rhashtable_init - initialize a new hash table
-- * @ht:		hash table to be initialized
-- * @params:	configuration parameters
-- *
-- * Initializes a new hash table based on the provided configuration
-- * parameters. A table can be configured either with a variable or
-- * fixed length key:
-- *
-- * Configuration Example 1: Fixed length keys
-- * struct test_obj {
-- *	int			key;
-- *	void *			my_member;
-- *	struct rhash_head	node;
-- * };
-- *
-- * struct rhashtable_params params = {
-- *	.head_offset = offsetof(struct test_obj, node),
-- *	.key_offset = offsetof(struct test_obj, key),
-- *	.key_len = sizeof(int),
-- *	.hashfn = jhash,
-- * };
-- *
-- * Configuration Example 2: Variable length keys
-- * struct test_obj {
-- *	[...]
-- *	struct rhash_head	node;
-- * };
-- *
-- * u32 my_hash_fn(const void *data, u32 len, u32 seed)
-- * {
-- *	struct test_obj *obj = data;
-- *
-- *	return [... hash ...];
-- * }
-- *
-- * struct rhashtable_params params = {
-- *	.head_offset = offsetof(struct test_obj, node),
-- *	.hashfn = jhash,
-- *	.obj_hashfn = my_hash_fn,
-- * };
-- */
- int __rhashtable_init_noprof(struct rhashtable *ht,
--		    const struct rhashtable_params *params,
--		    struct lock_class_key *key)
-+			     const struct rhashtable_params *params,
-+			     struct rhashtable_lockdep_keys *keys)
- {
- 	struct bucket_table *tbl;
- 	size_t size;
-@@ -1176,13 +1133,11 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
- 		return -EINVAL;
- 
- 	memset(ht, 0, sizeof(*ht));
--	/* mutex_lock must use nesting level 1 */
--	mutex_init_with_key(&ht->mutex, key);
-+	mutex_init_with_key(&ht->mutex, &keys->mutex_key);
- 	spin_lock_init(&ht->lock);
--	/* spin_lock can use nesting level 0 */
--	lockdep_set_class(&ht->lock, key);
-+	lockdep_set_class(&ht->lock, &keys->lock_key);
- #ifdef CONFIG_LOCKDEP
--	ht->lockdep_key = key;
-+	ht->lockdep_key = &keys->bucket_key;
- #endif
- 	memcpy(&ht->p, params, sizeof(*params));
- 
-@@ -1236,22 +1191,13 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
- }
- EXPORT_SYMBOL_GPL(__rhashtable_init_noprof);
- 
--/**
-- * rhltable_init - initialize a new hash list table
-- * @hlt:	hash list table to be initialized
-- * @params:	configuration parameters
-- *
-- * Initializes a new hash list table.
-- *
-- * See documentation for rhashtable_init.
-- */
- int __rhltable_init_noprof(struct rhltable *hlt,
- 			   const struct rhashtable_params *params,
--			   struct lock_class_key *key)
-+			   struct rhashtable_lockdep_keys *keys)
- {
- 	int err;
- 
--	err = __rhashtable_init_noprof(&hlt->ht, params, key);
-+	err = __rhashtable_init_noprof(&hlt->ht, params, keys);
- 	hlt->ht.rhlist = true;
- 	return err;
- }
-diff --git a/lib/test_rhashtable.c b/lib/test_rhashtable.c
-index 85a615e74591..b767a38a74f9 100644
---- a/lib/test_rhashtable.c
-+++ b/lib/test_rhashtable.c
-@@ -477,7 +477,7 @@ static unsigned int __init print_ht(struct rhltable *rhlt)
- 
- 	ht = &rhlt->ht;
- 	/* Take the mutex to avoid RCU warning */
--	mutex_lock_nested(&ht->mutex, 1);
-+	mutex_lock(&ht->mutex);
- 	tbl = rht_dereference(ht->tbl, ht);
- 	for (i = 0; i < tbl->size; i++) {
- 		struct rhash_head *pos, *next;
+Let's split this up.  Just do a one-liner to switch shash_export
+to shash_export_core, that should fix the stack overrun.  Then
+fix the long key issue in a separate patch.
+
+I think you should support long keys properly by hashing them as
+crypto/hmac.c does.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
