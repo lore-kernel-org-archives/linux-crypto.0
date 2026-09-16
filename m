@@ -1,195 +1,316 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D07B43F4AA;
-	Wed, 16 Sep 2026 07:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231AC4657C2;
+	Wed, 16 Sep 2026 08:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789545360; cv=none; b=VrWxI3OZTX40K/OrImwx6UO5vBNv3cL/iTPypUwWdtYYi7uno4mMyeSFrPH2CsYzLyev+INq/46sfgsdv2ITShSL24DxNfzLk5mIJQ+D/9OQhs/7PR7qiP62woTR/qSdddFchadkygkdu03AAEBjn+Qerw0hAj3u5j4fU68P76c=
+	t=1789545667; cv=none; b=rLITZPpYSMG2jS4SJH8moW5qSBaboafQ+JAs0dUYLtFbxnWX+TsOSH6JM4MKDW9EqZi5yD4mic4mQmQz0QSCnH6meZoVnHyF9KIwGaQF4m0HWwO2oVilzPZV3tCQksFmNp08DtYpeaXvoAjKom0fPykgh1dNe2U4lvCPjCIt554=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789545360; c=relaxed/simple;
-	bh=XBBONHfl4IjnRSNasfx5ax9/pFvU396KZ3iIK2ZniTc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bnlr4KZDOfRNQ4kK9G2Aim3l9JL8ELntEgp8LyZdJ2tkc/XVowT0m41Hv2KIly37CEc2g+1rr8TMW1+v++lkEZFa99mvOdp/Vs+TXBs82fRQ17cLa8Kpw/FXiCgWWx+MV0YXhbx9O0taG+9wERCIwczB1/BOvnYx2SxwfiENrZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FgGzJaBj; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1789545667; c=relaxed/simple;
+	bh=X2HYGeuUKB12XxpK+2EoNkBbLVSv5vhtjIeQKkGddsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CmkHiM+Ov+dk+BSv7725kxCUSjmDAYaJrI9eLUczed++YuR8AG61LwAqlETZ5dQdWacDPRqMB/GrAzSsjTDfSH/JZNnX7gkbLYS/gcT1ZwwbI3tFBDM8LLEJrQ9egjkbK1iIrf0YW6dJhS9eICFNEUraaiq9vcMf9Ruq4AxXzq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=IObwYS9m; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FgGzJaBj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1789545346; x=1821081346;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XBBONHfl4IjnRSNasfx5ax9/pFvU396KZ3iIK2ZniTc=;
-  b=FgGzJaBjC77prA7Ez6tiv22MRnrCwLW6biLnslC/VMpPIhboae1ouRCP
-   U7gy2hiVLuW55aCO8/j7Uv7sR40j3lWbKV1zWXdfcn1z0ftpDriax6Y6e
-   QTFrO/xwO+m5GrIQoifAoigBXLJLS/1e8Kv+QYbgpDFY+3BPvU9P1bt9K
-   iEZxVX8uE6eoS4+KYj2HA5AwXHEmtjF+n2gSfrkQZSGhaCKB5LtNiaFGW
-   w79YYPzTg1iq00jl0kmP8XG2ESZYxaSVuz6GKhKjvgixH/+9fdOhiwebG
-   dwO02wH0aNDNiIDr1pufCDNAuM6v1A9YCGAjVz7V3TSdFn15A3UOmORDx
-   Q==;
-X-CSE-ConnectionGUID: 28HwBOK+ToSAfXzEjA8oSA==
-X-CSE-MsgGUID: 4GnQOwFKRl6mtJr9cuRjEg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11905"; a="90128060"
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="90128060"
-Received: from fmviesa011.fm.intel.com ([10.60.135.151])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2026 00:55:42 -0700
-X-CSE-ConnectionGUID: cN0I8x6jQaO/kUIVZ02JUw==
-X-CSE-MsgGUID: yPZ5olTpSMefGlUy4ZzjYQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,103,1787036400"; 
-   d="scan'208";a="1491290"
-Received: from dmr-bkc.iind.intel.com ([10.49.111.58])
-  by fmviesa011.fm.intel.com with ESMTP; 16 Sep 2026 00:55:40 -0700
-From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
-	stable@vger.kernel.org,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>
-Subject: [PATCH] crypto: qat - fix error source for QAT GEN6 transmit interface faults
-Date: Wed, 16 Sep 2026 07:55:36 +0000
-Message-ID: <20260916075536.1361895-1-suman.kumar.chakraborty@intel.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="IObwYS9m"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=WLNAyvP+QD8ea/Tnf8D9sJnJMpR7dCNm6r63iCCX2VA=; 
+	b=IObwYS9mLC2CtR52O1UDJ5dnZ2ffx6t854U1P9bKjnNdRltBQkSdSnPlXdmm4lFEJRHZ3WQlUSZ
+	kZzkXmBdpEunqVpbEU1K2tiMDNzBFeVRk3dGlVBBprW71ndaskVDCN8y7ddJw49hr5UElssCv2aiO
+	5ZdSH7+++RJaFCTm1xgV4d7HpSGFE99k6pcjUP14gnxo+3rx8tiMSgaVEkIel91rnY9+kp3jjEHoV
+	XT1kiHcMg0MWig+tvOeLqnJwQGwfyBCS3AFm6NLOiJNv5FxQCOmyjmKaaaTQ8lPVzXJ8kSnxtfTGF
+	iLEA9e94QE1j8sVP+uXT4C2eVXB8gdwX5WHQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x6kYv-0000000EWV6-33XD;
+	Wed, 16 Sep 2026 16:00:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 18:00:13 +1000
+Date: Wed, 16 Sep 2026 18:00:13 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	syzbot <syzbot+4d0e4d2db6dfde01b52f@syzkaller.appspotmail.com>,
+	davem@davemloft.net, horms@kernel.org, idosch@nvidia.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
+	razor@blackwall.org, steffen.klassert@secunet.com,
+	syzkaller-bugs@googlegroups.com, Thomas Graf <tgraf@suug.ch>,
+	linux-crypto@vger.kernel.org, NeilBrown <neilb@ownmail.net>,
+	quanyeyang <quanyemostima@gmail.com>
+Subject: [v2 PATCH] rhashtable: Use separate lockdep keys for each lock
+Message-ID: <aqpMjQn0g6XxXtyq@gondor.apana.org.au>
+References: <6aa5fcf6.f2639fcc.29487d.0048.GAE@google.com>
+ <aqi7fpazv2KDDdvn@shinmob>
+ <CANn89iJd0QnoDo0tjrFED2myec38U8joyqR05d6BVnJ-sX=NVg@mail.gmail.com>
+ <aqjf7LNmE6InABpw@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aqjf7LNmE6InABpw@gondor.apana.org.au>
 
-TI_CD_PAR_STS faults were being decoded under ERRSOU1, which is
-incorrect for QAT GEN6 devices. They are actually raised on ERRSOU3.
-
-Move the handling of TI_CD_PAR_STS faults as part of the ERRSOU3 logic
-and split the status bits by their actual source:
-
- - Bits 0-18 (TI_INT_ERR_DEVHALT) handled when a DEVHALT is signalled
-   and are counted once as ADF_RAS_FATAL.
- - Bit 19 (TIMISCSTS) handled separately and counted as ADF_RAS_UNCORR.
-
-Previously, a TI_INT_ERR_DEVHALT fault also incremented ADF_RAS_UNCORR
-in addition to ADF_RAS_FATAL. Since a DEVHALT is already fatal, remove
-the redundant increment.
-
-Bits 20-25 of TI_CD_PAR_STS are unused/reserved on QAT GEN6. Remove them
-from the mask.
-
-Cc: stable@vger.kernel.org
-Fixes: 7f3401d0a506 ("crypto: qat - enable RAS support for GEN6 devices")
-Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
----
- .../intel/qat/qat_common/adf_gen6_ras.c       | 20 +++++++++++++---
- .../intel/qat/qat_common/adf_gen6_ras.h       | 24 ++++++++++---------
- 2 files changed, 30 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c b/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c
-index 967253082a98..902c4b1a23e3 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.c
-@@ -323,14 +323,26 @@ static void adf_handle_ti_cd_par_sts(struct adf_accel_dev *accel_dev, void __iom
- 	u32 ti_cd_par_sts;
+v2 fixes the build failure when LOCKDEP is disabled.
  
- 	ti_cd_par_sts = ADF_CSR_RD(csr, ADF_GEN6_TI_CD_PAR_STS);
--	ti_cd_par_sts &= ADF_GEN6_TI_CD_PAR_STS_MASK;
-+	ti_cd_par_sts &= ADF_GEN6_TI_CD_PAR_STS_TI_INT_ERR_DEVHALT_MASK;
- 	if (ti_cd_par_sts) {
- 		dev_err(&GET_DEV(accel_dev), "TI CD parity error: %#x\n", ti_cd_par_sts);
--		ADF_RAS_ERR_CTR_INC(accel_dev->ras_errors, ADF_RAS_UNCORR);
- 		ADF_CSR_WR(csr, ADF_GEN6_TI_CD_PAR_STS, ti_cd_par_sts);
- 	}
- }
+---8<---
+Use separate lockdep keys for the different types of locks in
+rhashtable (mutex, spin lock, and bucket locks).  They are
+separate and not normally nested with respect to each other.
+
+Also move the rhashtable_init/rhltable_init kdoc to the header
+file as that's where the macros are defined.
+
+Fixes: 4333ab90aaae ("rhashtable: use private lockdep class for all locks.")
+Reported-by: syzbot+4d0e4d2db6dfde01b52f@syzkaller.appspotmail.com
+Assisted-by: Gemini:gemini-3.6-flash
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Reviewed-by: NeilBrown <neil@brown.name>
+
+diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-types.h
+index 0e1b172a4f6c..3576b8f08aff 100644
+--- a/include/linux/rhashtable-types.h
++++ b/include/linux/rhashtable-types.h
+@@ -70,6 +70,12 @@ struct rhashtable_params {
+ 	rht_obj_cmpfn_t		obj_cmpfn;
+ };
  
-+static void adf_handle_ti_misc_cd_par_sts(struct adf_accel_dev *accel_dev, void __iomem *csr)
-+{
-+	u32 ti_misc_cd_par_sts;
++struct rhashtable_lockdep_keys {
++	struct lock_class_key lock_key;
++	struct lock_class_key mutex_key;
++	struct lock_class_key bucket_key;
++};
 +
-+	ti_misc_cd_par_sts = ADF_CSR_RD(csr, ADF_GEN6_TI_CD_PAR_STS);
-+	ti_misc_cd_par_sts &= ADF_GEN6_TI_CD_PAR_STS_TI_MISC_MASK;
-+	if (ti_misc_cd_par_sts) {
-+		dev_err(&GET_DEV(accel_dev), "TI MISC CD parity error: %#x\n", ti_misc_cd_par_sts);
-+		ADF_RAS_ERR_CTR_INC(accel_dev->ras_errors, ADF_RAS_UNCORR);
-+		ADF_CSR_WR(csr, ADF_GEN6_TI_CD_PAR_STS, ti_misc_cd_par_sts);
-+	}
-+}
-+
- static void adf_handle_ti_trnsb_par_sts(struct adf_accel_dev *accel_dev, void __iomem *csr)
- {
- 	u32 ti_trnsb_par_sts;
-@@ -367,7 +379,6 @@ static void adf_handle_ti_err(struct adf_accel_dev *accel_dev, void __iomem *csr
- 	adf_handle_ti_ci_par_sts(accel_dev, csr);
- 	adf_handle_ti_pullfub_par_sts(accel_dev, csr);
- 	adf_handle_ti_pushfub_par_sts(accel_dev, csr);
--	adf_handle_ti_cd_par_sts(accel_dev, csr);
- 	adf_handle_ti_trnsb_par_sts(accel_dev, csr);
- 	adf_handle_iosfp_cmd_parerr(accel_dev, csr);
- }
-@@ -591,6 +602,8 @@ static void adf_handle_timiscsts(struct adf_accel_dev *accel_dev, void __iomem *
- 	if (!(errsou & ADF_GEN6_ERRSOU3_TIMISCSTS_BIT))
- 		return;
+ /**
+  * struct rhashtable - Hash table handle
+  * @tbl: Bucket table
+@@ -141,24 +147,77 @@ struct rhashtable_iter {
  
-+	adf_handle_ti_misc_cd_par_sts(accel_dev, csr);
+ int __rhashtable_init_noprof(struct rhashtable *ht,
+ 		    const struct rhashtable_params *params,
+-		    struct lock_class_key *key);
++		    struct rhashtable_lockdep_keys *keys);
+ #define rhashtable_init_noprof(ht, params)				\
+ ({									\
+-	static struct lock_class_key __key;				\
++	static struct rhashtable_lockdep_keys __keys;			\
+ 									\
+-	__rhashtable_init_noprof(ht, params, &__key);			\
++	__rhashtable_init_noprof(ht, params, &__keys);			\
+ })
 +
- 	timiscsts = ADF_CSR_RD(csr, ADF_GEN6_TIMISCSTS);
- 	if (timiscsts) {
- 		dev_err(&GET_DEV(accel_dev), "Fatal error in transmit interface: %#x\n",
-@@ -730,6 +743,7 @@ static void adf_handle_ti_int_err_devhalt(struct adf_accel_dev *accel_dev, void
- 	if (!(errsou & ADF_GEN6_ERRSOU3_TI_INT_ERR_DEVHALT_BIT))
- 		return;
- 
-+	adf_handle_ti_cd_par_sts(accel_dev, csr);
- 	dev_err(&GET_DEV(accel_dev), "DEVHALT due to a TI internal memory error\n");
- 	ADF_RAS_ERR_CTR_INC(accel_dev->ras_errors, ADF_RAS_FATAL);
- }
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h b/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h
-index 66ced271d173..11f7b2986f56 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen6_ras.h
-@@ -170,23 +170,25 @@ struct adf_ras_ops;
- #define ADF_GEN6_TI_CD_PAR_ERR_MASK			0x500638
- 
- /*
-- * TI CD parity status mask
-+ * TI CD parity status mask - TI_INT_ERR_DEVHALT bits
-  * BIT(0) - BIT(15) - CtxMdRam[0:15]_sts parity status
-  * BIT(16) - Leaf2ClusterRam_sts parity status
-  * BIT(17) - BIT(18) - Ring2LeafRam[0:1]_sts parity status
-- * BIT(19) - VirtualQ_sts parity status
-- * BIT(20) - DtRdQ_sts parity status
-- * BIT(21) - DtWrQ_sts parity status
-- * BIT(22) - RiCmdQ_sts parity status
-- * BIT(23) - BypassQ_sts parity status
-- * BIT(24) - DtRdQ_sc_sts parity status
-- * BIT(25) - DtWrQ_sc_sts parity status
-  */
--#define ADF_GEN6_TI_CD_PAR_STS_MASK \
-+#define ADF_GEN6_TI_CD_PAR_STS_TI_INT_ERR_DEVHALT_MASK \
- 	(BIT(0) | BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5) | BIT(6) | \
- 	 BIT(7) | BIT(8) | BIT(9) | BIT(10) | BIT(11) | BIT(12) | BIT(13) | \
--	 BIT(14) | BIT(15) | BIT(16) | BIT(17) | BIT(18) | BIT(19) | BIT(20) | \
--	 BIT(21) | BIT(22) | BIT(23) | BIT(24) | BIT(25))
-+	 BIT(14) | BIT(15) | BIT(16) | BIT(17) | BIT(18))
-+
-+/*
-+ * TI CD parity status mask - TIMISCSTS bit
-+ * BIT(19) - VirtualQ_sts parity status
++/**
++ * rhashtable_init - initialize a new hash table
++ * @ht:		hash table to be initialized
++ * @params:	configuration parameters
++ *
++ * Initializes a new hash table based on the provided configuration
++ * parameters. A table can be configured either with a variable or
++ * fixed length key:
++ *
++ * Configuration Example 1: Fixed length keys
++ * struct test_obj {
++ *	int			key;
++ *	void *			my_member;
++ *	struct rhash_head	node;
++ * };
++ *
++ * struct rhashtable_params params = {
++ *	.head_offset = offsetof(struct test_obj, node),
++ *	.key_offset = offsetof(struct test_obj, key),
++ *	.key_len = sizeof(int),
++ *	.hashfn = jhash,
++ * };
++ *
++ * Configuration Example 2: Variable length keys
++ * struct test_obj {
++ *	[...]
++ *	struct rhash_head	node;
++ * };
++ *
++ * u32 my_hash_fn(const void *data, u32 len, u32 seed)
++ * {
++ *	struct test_obj *obj = data;
++ *
++ *	return [... hash ...];
++ * }
++ *
++ * struct rhashtable_params params = {
++ *	.head_offset = offsetof(struct test_obj, node),
++ *	.hashfn = jhash,
++ *	.obj_hashfn = my_hash_fn,
++ * };
 + */
-+#define ADF_GEN6_TI_CD_PAR_STS_TI_MISC_MASK		BIT(19)
-+
-+#define ADF_GEN6_TI_CD_PAR_STS_MASK \
-+	(ADF_GEN6_TI_CD_PAR_STS_TI_INT_ERR_DEVHALT_MASK | \
-+	 ADF_GEN6_TI_CD_PAR_STS_TI_MISC_MASK)
+ #define rhashtable_init(...)	alloc_hooks(rhashtable_init_noprof(__VA_ARGS__))
  
- /* TI TRNSB parity status */
- #define ADF_GEN6_TI_TRNSB_PAR_STS			0x500648
-
-base-commit: af8be97e74cd57ea3a5699bc03a0c79096fd907b
+ int __rhltable_init_noprof(struct rhltable *hlt,
+ 		  const struct rhashtable_params *params,
+-		  struct lock_class_key *key);
++		  struct rhashtable_lockdep_keys *keys);
+ #define rhltable_init_noprof(hlt, params)				\
+ ({									\
+-	static struct lock_class_key __key;				\
++	static struct rhashtable_lockdep_keys __keys;			\
+ 									\
+-	__rhltable_init_noprof(hlt, params, &__key);			\
++	__rhltable_init_noprof(hlt, params, &__keys);			\
+ })
++
++/**
++ * rhltable_init - initialize a new hash list table
++ * @hlt:	hash list table to be initialized
++ * @params:	configuration parameters
++ *
++ * Initializes a new hash list table.
++ *
++ * See documentation for rhashtable_init.
++ */
+ #define rhltable_init(...)	alloc_hooks(rhltable_init_noprof(__VA_ARGS__))
+ 
+ #endif /* _LINUX_RHASHTABLE_TYPES_H */
+diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+index 6c5e6d9accba..ec853c1b9af3 100644
+--- a/include/linux/rhashtable.h
++++ b/include/linux/rhashtable.h
+@@ -328,8 +328,7 @@ static inline unsigned long rht_lock_nested(struct bucket_table *tbl,
+ 
+ 	local_irq_save(flags);
+ 	bit_spin_lock(0, (unsigned long *)bucket);
+-	/* subclass 0 is used for ->lock and 1 for ->mutex. 2+ for bitlocks */
+-	lock_acquire_exclusive(&tbl->dep_map, subclass+2, 0, NULL, _THIS_IP_);
++	lock_acquire_exclusive(&tbl->dep_map, subclass, 0, NULL, _THIS_IP_);
+ 	return flags;
+ }
+ 
+diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+index 5da0e53a8d42..918f15a2ac69 100644
+--- a/lib/rhashtable.c
++++ b/lib/rhashtable.c
+@@ -432,7 +432,7 @@ static void rht_deferred_worker(struct work_struct *work)
+ 	int err = 0;
+ 
+ 	ht = container_of(work, struct rhashtable, run_work);
+-	mutex_lock_nested(&ht->mutex, 1);
++	mutex_lock(&ht->mutex);
+ 
+ 	tbl = rht_dereference(ht->tbl, ht);
+ 	tbl = rhashtable_last_table(ht, tbl);
+@@ -1122,51 +1122,9 @@ static u32 rhashtable_jhash2(const void *key, u32 length, u32 seed)
+ 	return jhash2(key, length, seed);
+ }
+ 
+-/**
+- * rhashtable_init - initialize a new hash table
+- * @ht:		hash table to be initialized
+- * @params:	configuration parameters
+- *
+- * Initializes a new hash table based on the provided configuration
+- * parameters. A table can be configured either with a variable or
+- * fixed length key:
+- *
+- * Configuration Example 1: Fixed length keys
+- * struct test_obj {
+- *	int			key;
+- *	void *			my_member;
+- *	struct rhash_head	node;
+- * };
+- *
+- * struct rhashtable_params params = {
+- *	.head_offset = offsetof(struct test_obj, node),
+- *	.key_offset = offsetof(struct test_obj, key),
+- *	.key_len = sizeof(int),
+- *	.hashfn = jhash,
+- * };
+- *
+- * Configuration Example 2: Variable length keys
+- * struct test_obj {
+- *	[...]
+- *	struct rhash_head	node;
+- * };
+- *
+- * u32 my_hash_fn(const void *data, u32 len, u32 seed)
+- * {
+- *	struct test_obj *obj = data;
+- *
+- *	return [... hash ...];
+- * }
+- *
+- * struct rhashtable_params params = {
+- *	.head_offset = offsetof(struct test_obj, node),
+- *	.hashfn = jhash,
+- *	.obj_hashfn = my_hash_fn,
+- * };
+- */
+ int __rhashtable_init_noprof(struct rhashtable *ht,
+-		    const struct rhashtable_params *params,
+-		    struct lock_class_key *key)
++			     const struct rhashtable_params *params,
++			     struct rhashtable_lockdep_keys *keys)
+ {
+ 	struct bucket_table *tbl;
+ 	size_t size;
+@@ -1176,13 +1134,11 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
+ 		return -EINVAL;
+ 
+ 	memset(ht, 0, sizeof(*ht));
+-	/* mutex_lock must use nesting level 1 */
+-	mutex_init_with_key(&ht->mutex, key);
++	mutex_init_with_key(&ht->mutex, &keys->mutex_key);
+ 	spin_lock_init(&ht->lock);
+-	/* spin_lock can use nesting level 0 */
+-	lockdep_set_class(&ht->lock, key);
++	lockdep_set_class(&ht->lock, &keys->lock_key);
+ #ifdef CONFIG_LOCKDEP
+-	ht->lockdep_key = key;
++	ht->lockdep_key = &keys->bucket_key;
+ #endif
+ 	memcpy(&ht->p, params, sizeof(*params));
+ 
+@@ -1236,22 +1192,13 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
+ }
+ EXPORT_SYMBOL_GPL(__rhashtable_init_noprof);
+ 
+-/**
+- * rhltable_init - initialize a new hash list table
+- * @hlt:	hash list table to be initialized
+- * @params:	configuration parameters
+- *
+- * Initializes a new hash list table.
+- *
+- * See documentation for rhashtable_init.
+- */
+ int __rhltable_init_noprof(struct rhltable *hlt,
+ 			   const struct rhashtable_params *params,
+-			   struct lock_class_key *key)
++			   struct rhashtable_lockdep_keys *keys)
+ {
+ 	int err;
+ 
+-	err = __rhashtable_init_noprof(&hlt->ht, params, key);
++	err = __rhashtable_init_noprof(&hlt->ht, params, keys);
+ 	hlt->ht.rhlist = true;
+ 	return err;
+ }
+diff --git a/lib/test_rhashtable.c b/lib/test_rhashtable.c
+index 85a615e74591..b767a38a74f9 100644
+--- a/lib/test_rhashtable.c
++++ b/lib/test_rhashtable.c
+@@ -477,7 +477,7 @@ static unsigned int __init print_ht(struct rhltable *rhlt)
+ 
+ 	ht = &rhlt->ht;
+ 	/* Take the mutex to avoid RCU warning */
+-	mutex_lock_nested(&ht->mutex, 1);
++	mutex_lock(&ht->mutex);
+ 	tbl = rht_dereference(ht->tbl, ht);
+ 	for (i = 0; i < tbl->size; i++) {
+ 		struct rhash_head *pos, *next;
 -- 
-2.52.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
