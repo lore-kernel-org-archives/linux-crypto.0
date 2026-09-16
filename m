@@ -1,92 +1,83 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDA63D75C7;
-	Wed, 16 Sep 2026 09:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0934AA566;
+	Wed, 16 Sep 2026 09:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789550782; cv=none; b=UU7pR8lA14hse6ZIviaDXVwuRA9STDboNUCtzq6LMoC0wGsxWraGs8dq/QmEsFgWuURgbZgW/egzXx5Xo/4GEt6nPzTPR8SlKCTyeNwv4MkL+J2OjOWSNTggc1/QPyyq3NrmaPyxGo9CM2QMKZnif0q4BngZKg7o/LoCaQR2QJ0=
+	t=1789552205; cv=none; b=uFm0+VbBlLpIi/xPqtUN71o5OKbiwOUpYUBHqob/tq2gkMROY6kCSpbOPpTkrv/kWrxgTo4FGmTT4GLKL0YGafH9JD4UfrjVy8QoHGjnWzOg4m6pteRfQrWeovCF1FA7vkShNorCLuDs+KuJ6ThnqhcbtINpnkwBudGhgg6NO2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789550782; c=relaxed/simple;
-	bh=jIpzuMcqCIYamBi5LXfs6jJ2WngZrWskV0CEuytkRpY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mLlIfK04VvTHTlbLQI3FrCsOM+o6LeY7i2JeUlXH2ntZTwYC9FjLYcmoH9IWLtV+YXA2xA7HJBot/RpOIvlKs6peWRL0E87i6zMarjj+7js9KomV7Fl1csG76B3ytm3ZTm98blfBcH6rLTYSPPxlEgV37CgaNVbQBaLRQpTttR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-03 (Coremail) with SMTP id rQCowABnbDqjYKpqxU3gBw--.41694S2;
-	Wed, 16 Sep 2026 17:25:55 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: ayush.sawal@chelsio.com
-Cc: davem@davemloft.net,
-	harsh@chelsio.com,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] crypto: chelsio - Fix wrcount leak in chcr_aes_encrypt()
-Date: Wed, 16 Sep 2026 09:25:27 +0000
-Message-Id: <20260916092527.2002187-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1789552205; c=relaxed/simple;
+	bh=lcClBkjB32WNcDeTmu1ogtDrNFhEcfQ916rGE/SAyaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pPfKET7kkGQ4alARqmkgn3Hn5h8TmSiGlqxSftj6ttXHUTHxOEBMkG16k2VPiurcvYZiA4E+rYaqHtKcbYtesLhzabsxXmT0wYkq3VPwMY+7+mY9v5MLaWa879EPALjilXk5DiAixCYnvBtlWcecjmWrwxDwtjJUfc7zf0XEF64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=NetxLrsx; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="NetxLrsx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=njikc4nORIsTPxlkCFcPQm3BO/kRWtHCUlB4reb5W0w=; 
+	b=NetxLrsx/2fBWdXmzAZ44G444i0SA0dSDU6XvfWx6LY9NeKda8ptCKgQ0fTVgPwKcOJnIO0rxkJ
+	wWmbTCu/15PZVHNApw6jkFEozSWa4KLcNS6OtPLgjOn69LBn5xv6LIRfNSwKv8GsoFrps7mnFwxTB
+	dYm9vsv+TZqk2o6CVAK2cVSk4bJgBKDsGLMi3QPlpOHfrFULTuNrZdCJT7qreP5smQtnjKCXXYBVG
+	xlrcbl1LJ/JqLTx4CEtlBg7YTFgPURsqjTIwg44CW2ObZA4ca+Gh2C3fne+PfBheL1iYer0tXmzBI
+	xiSACKUIijQnwlojV/kbYlOB8Ru+HNgZti7Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x6mGx-0000000EYyY-0Ta6;
+	Wed, 16 Sep 2026 17:49:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 19:49:47 +1000
+Date: Wed, 16 Sep 2026 19:49:47 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+Cc: clabbe@baylibre.com, davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org, jkoolstra@xs4all.nl, lkp@intel.com
+Subject: Re: [PATCH v2] crypto/amlogic: Use devm APIs for clock management
+Message-ID: <aqpmOzURNFOm78ls@gondor.apana.org.au>
+References: <20260901024302.5407-1-raizudeen.kerneldev@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABnbDqjYKpqxU3gBw--.41694S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJr1rCFWDWw47XFWUAF1rCrg_yoW8Xr43pF
-	s8CFZ5C3s5Jw43Ga4ktw4rWa43ZwsxZrWSkrW0yw4UAwnxtrWfZ39xXFWjvr1fJF1rJayD
-	W3909w15ua4DXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r
-	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AK
-	xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8
-	JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
-	khL5UUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRUMA2qqP4eNbAAAsK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260901024302.5407-1-raizudeen.kerneldev@gmail.com>
 
-chcr_aes_encrypt() increments the device inflight count with
-chcr_inc_wrcount() before building the work request, but when
-process_cipher() fails or returns no skb the request is simply
-abandoned with the inflight count still elevated. The count is only
-dropped on the queue-full error path and by the completion handlers,
-so every failed request permanently skews the count and eventually
-blocks the device from being detached, with the detach worker warning
-"CHCR:request Still Pending".
+On Tue, Sep 01, 2026 at 08:12:52AM +0530, Mohamad Raizudeen wrote:
+> The driver currently gets the core clock and manually enables it using
+> clk_prepare_enable(). This requires matching calls to
+> clk_disable_unprepare() in the error paths and remove function.
+> 
+> Switch to devm_clk_get_enabled() instead. This lets the kernel handle
+> enabling and disabling the clock automatically, which allow us to drop
+> the manual cleanup code and keeps the probe function simple.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202608310329.QgxCCMs1-lkp@intel.com/
+> Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+> ---
+> Changes in v2:
+> - Dropped the devm_crypto_engine_alloc_init() change due to build
+>   failure reported by the kernel test robot.
+> - Kept the devm_clk_get_enabled() clock cleanup as the sole focus of
+>   this patch.
+> - Link to v1: https://lore.kernel.org/linux-crypto/20260821151303.8150-1-raizudeen.kerneldev@gmail.com/T/#u
+> 
+>  drivers/crypto/amlogic/amlogic-gxl-core.c | 16 +++-------------
+>  1 file changed, 3 insertions(+), 13 deletions(-)
 
-Jump to the existing error label that calls chcr_dec_wrcount() so the
-inflight count is dropped when the request fails.
+Please take a look at
 
-Fixes: fef4912b66d6 ("crypto: chelsio - Handle PCI shutdown event")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/crypto/chelsio/chcr_algo.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+https://sashiko.dev/#/patchset/20260901024302.5407-1-raizudeen.kerneldev%40gmail.com
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 6dec42282768..eece1ac1085a 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -1359,7 +1359,7 @@ static int chcr_aes_encrypt(struct skcipher_request *req)
- 	err = process_cipher(req, u_ctx->lldi.rxq_ids[reqctx->rxqidx],
- 			     &skb, CHCR_ENCRYPT_OP);
- 	if (err || !skb)
--		return  err;
-+		goto error;
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, reqctx->txqidx);
- 	chcr_send_wr(skb);
+Thanks,
 -- 
-2.34.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
