@@ -1,46 +1,46 @@
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013059.outbound.protection.outlook.com [40.107.201.59])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010050.outbound.protection.outlook.com [52.101.61.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF98D4DF4C7;
-	Wed, 16 Sep 2026 11:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F175481FDF;
+	Wed, 16 Sep 2026 11:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789559653; cv=fail; b=oNzMn2yEbxKtyMWl4N4YyxaJcL31kUaK3Sn/osBqSYJj5h74ShKROkZDsp/UFQfGHaVUuIf57GKOxE4z3HyQa1N3frOFG9NB5JUoA94Wz5H+9xV7ZNVWlMpH9ikV4ynt0mCDOPKHwN1FiTRKiSOvlBg5KllzhS912Fl5/VPvbVo=
+	t=1789559692; cv=fail; b=CmZOWwnefQaMOqRotzwNYBP6GhWOJ6W8xR7eMi2umk4iLUpxLmOrXCZPPn4Cr9J4wtI2oBwqWXmTOsMDW+LpU/WpRSWwO/tjDLH8GxkQJlEl3c5g//mDgZ7T/8iKWQCAaU9q4FVyf+pCMV4awffj0yWABv+dti5afovanCRP9A4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789559653; c=relaxed/simple;
-	bh=vKKNcciu+XigrA8ST5cD8AnZku7frkhCALu7hlmai+o=;
+	s=arc-20240116; t=1789559692; c=relaxed/simple;
+	bh=TLz8I2wQFg+t9Z4CzbXwzBL8FcLjxiJB0k6NXG4SrRQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qzb82fdc5M90zm5138af7gHWrTVc4q6TA6PxlEJyfRzAes98NivESF7vdtkSllRPZN/sX9UkvZh1ocjFtDgElvVzdDBKX5Z8WHF3TnPlV0spNKklfhKZk3/5Xyt5zfUIwuQcZfYV3TukPCirwitJeomOFOw12858Yks6iRp5wgc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fUWyDB4d; arc=fail smtp.client-ip=40.107.201.59
+	 MIME-Version:Content-Type; b=N8jJr68lmFX2G1uJpsPfg/iSrqLZVIYVGkS+QlW0dvTcWtSUvFaEJ7gcnhTfrSGjQVk7ai5FnyiaMjsFXqL/y/mUGlFDpfvG7RNxzT0CE7QtK8y1UnpaL6kH4mFNWXpvoeFDMOrvKSEYkCP/4SrqZJkqRQKnZTLi9oA+UCBDgAs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=H4qYp44q; arc=fail smtp.client-ip=52.101.61.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fUWyDB4d"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="H4qYp44q"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VTzZkWUgFSGTYEdYEZpPOMaVLEQhmQGq7QBUMCbWzotJQ27rAtQmjDP+9McdJ3+Qz/sUzSQQjoEminnXngDsnhUJLlmos9CTi9EOAycBw3LsUI+zk3luYdwCLlE+Oe7i+JYlp2ZQ14EDq4im4zIzlwZSdkGOSWlwn2CLRDnBfcKqUrE85+Vpfz/lUKwLFpYRmN3IsBcsTUPU7RDHs26AlbBReDMo7zlSilA6XdxPsEmUjOsJ9BjIhgNMQ7YcmrlnoW31AYHYVzKdK2MnDutinTdg19jp+cYj5iqut87RGiOdLEHW98ZsbKc93pfB3xGks/qX24tShdXW/8QwrsEmcQ==
+ b=Urn84h68Kv1NiW1kUjFhGSLpejB7pKDouEqo54M/qmMxqqUURd6ehj7mM9xpJoyNrMOyUCwditYWutF0X2+l0E9N6rbyp7n7T93fYm75aTFSiMm3PWzBQ+EzDba/ohbFoxZMLDEtYQ1KMmI8f5qJucPcqUgzNSHQSRCwKOJghCsJdwF34jAnX0AJGV7mjpTDuVJ835sAoA+8mt2dLoBHWmWxVbsPI9P5Pn6LMSuK6og9lrcTYvcgozQynqSEb07n+m9GO1XMQ/tOeOWdpd9q73+IScNGeTdee02ynit+Phwjbohxr+Vsj9onyxl/yw6v5FMtv8Fn2PQ7QgGYuWBOaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xdXMPNC37iRVDCMXKNEKZ2ifmpdSeHtP/V7TZt/SDC8=;
- b=Fe+LOHyb0f3R9Z0gTpvD88qAkXG6x4cnFREewCHQdG4dkhPWd65F27J0tmrFme+Pj8b7EvY9Ah38aOWwEVXKzeI7NsVBKxTw+RqBShVu20bRGfJLBgcMUI6CJIzS7pfFAX19ogoeC4kRD8ddrwPJ0gxbMEQBE1XJlIOAqIiRrZf92UAd8DVrGVBwVDbmzDPd1F6jBZSUc1JC2ZXBtsRM5n7mmDHgTE9TB5K3Ch17IfAYpmnPTUk20P50+CFRkOFzvR5PsJIF5KavfoU+KbFr/zuPtUs19Ot/k0oMD5Z5PTQbaHrjjM5qCOzl1L87SNMqYSplg1BH8YuVyrECFZm+MQ==
+ bh=OKUdPqVU6vcP8IIVfw9k2l6nR9BJplx9o3NZa4hjOck=;
+ b=EDrGQU+zjyMIoBNBObg/r6jTe0H5NY8XWxArKdQBcDcekZYrh0UbRIh0tmCOcCfHp+dP6Wztd+oV40oofWIb4PFbFrxaTyiu/fxvMKTsdJyfUDuQBzh63awmNCIlzw2kxvb5izGceKhpYEkaujCzyL/utidKOJh+2vZjiyRqmTUXA9/cQePrUksl8uf6C0grj3ZJTzNp5u8EZzpUEviQPAjjmdTPZeGYvt8v8f/WO3Xzv8VITj5VSvEuFuOEads2rBd6M5Dm/XYx0+tsXPMX9v/5O/KZVSEJUGfxZpb+NPctjB7Uw3AuYXTo9rForv4T9S6RWtJhg4NX8Ej5WJRPrQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xdXMPNC37iRVDCMXKNEKZ2ifmpdSeHtP/V7TZt/SDC8=;
- b=fUWyDB4dKMWU3pNQM64UZ9R1E/1jXAdN/6P/dqK4FcokxpkI+zEkkScVU2SfrKYX32Vo9B8woMqS4wyNWcYEpzYehswUcnIGfjkhWsaszP7Jkdgt7lWY6ANDt4/u0I2m5bxDYCjb+gap9sRWg6r/Xii3Tt1llCKdN/HIt+bP8fs=
-Received: from CH2PR14CA0052.namprd14.prod.outlook.com (2603:10b6:610:56::32)
- by CY5PR12MB6250.namprd12.prod.outlook.com (2603:10b6:930:22::10) with
+ bh=OKUdPqVU6vcP8IIVfw9k2l6nR9BJplx9o3NZa4hjOck=;
+ b=H4qYp44qyY8gpvkWf1Ci8lBKgSKe4gGnaL0LZRKfWPHAKK1lwWWi+ubOgacGhxO5O1FzaozHGsrB/86eOm8Ue4BleHqQnDCWrO2eOb1cPtrNH5hsFjJTDNBzzppowIKl9d0/tzYyGSbtYSUiVlSk/3S/fYLmtLs6HF6Luzu27Rw=
+Received: from BN9PR03CA0556.namprd03.prod.outlook.com (2603:10b6:408:138::21)
+ by CH3PR12MB9124.namprd12.prod.outlook.com (2603:10b6:610:1a7::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.9; Wed, 16 Sep
- 2026 11:53:49 +0000
-Received: from CH2PEPF00000142.namprd02.prod.outlook.com
- (2603:10b6:610:56:cafe::45) by CH2PR14CA0052.outlook.office365.com
- (2603:10b6:610:56::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.11 via Frontend Transport; Wed,
- 16 Sep 2026 11:53:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.12; Wed, 16 Sep
+ 2026 11:54:31 +0000
+Received: from BN1PEPF0001854C.namprd05.prod.outlook.com
+ (2603:10b6:408:138:cafe::7b) by BN9PR03CA0556.outlook.office365.com
+ (2603:10b6:408:138::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.406.9 via Frontend Transport; Wed, 16
+ Sep 2026 11:54:31 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- CH2PEPF00000142.mail.protection.outlook.com (10.167.244.75) with Microsoft
+ BN1PEPF0001854C.mail.protection.outlook.com (10.167.248.11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.428.7 via Frontend Transport; Wed, 16 Sep 2026 11:53:49 +0000
+ 15.21.428.7 via Frontend Transport; Wed, 16 Sep 2026 11:54:31 +0000
 Received: from aiemdee.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Wed, 16 Sep
- 2026 06:53:26 -0500
+ 2026 06:54:07 -0500
 From: Alexey Kardashevskiy <aik@amd.com>
 To: <x86@kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
@@ -107,9 +107,9 @@ CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
 	Santosh Shukla <santosh.shukla@amd.com>, "Pratik R . Sampat"
 	<prsampat@amd.com>, Scott Soule Cheloha <scott.cheloha@amd.com>, Ackerley Tng
 	<ackerleytng@google.com>, Fuad Tabba <tabba@google.com>
-Subject: [RFC PATCH kernel 02/17] pci/tsm: Fix stale comment about TDI report range start
-Date: Wed, 16 Sep 2026 21:51:42 +1000
-Message-ID: <20260916115159.1938195-3-aik@amd.com>
+Subject: [RFC PATCH kernel 03/17] tsm/core: Store range_id in pci_tsm_mmio_entry
+Date: Wed, 16 Sep 2026 21:51:43 +1000
+Message-ID: <20260916115159.1938195-4-aik@amd.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260916115159.1938195-1-aik@amd.com>
 References: <20260916115159.1938195-1-aik@amd.com>
@@ -125,53 +125,82 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000142:EE_|CY5PR12MB6250:EE_
-X-MS-Office365-Filtering-Correlation-Id: 368ef6c3-44c2-4fa8-6d72-08df13e92c0e
+X-MS-TrafficTypeDiagnostic: BN1PEPF0001854C:EE_|CH3PR12MB9124:EE_
+X-MS-Office365-Filtering-Correlation-Id: d59d45d3-0f08-439b-d6d0-08df13e944b8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|32650700020|36860700016|7416014|82310400026|376014|23010399003|10067099003|56012099006|11063799006|18002099003|22082099003;
+	BCL:0;ARA:13230040|36860700016|23010399003|32650700020|7416014|376014|1800799024|82310400026|56012099006|10067099003|11063799006|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	ty7fn9JOkvoiU24GPVZ/rmNQytrpaC2dhfMBHPhdzS00TZxP9WBKw5etuOyR9/ZWu2XQfWBGWkSaF7tmlvVKeZVMvFiZkVZMV4lOH00MqJdO9voSL4Z68EVgz+FY7R2pGsVQXtFvURVAFu3q8u+dl2exxvwB4eVgYe7crcTdoV8lr4hd6eN6HnmO51qX7eyzMRPLXQXQNpURKRaHOF99KIKMRwPmtBUm8LcvkLDBJiroyx0MJkncpp/0my7FU0IeQifDlirZuH0gXAkKO+gAG4rN5DP0MqzLs0MQvLlj0h6ezg+H7sF2QWO/jlQe8YyxBU4kitrVIvjdpTkls/SMRn1Ct6sKSCcHdHNzUeaf4cJFSEHdTirh/hwtT3jZv83FslMpXDnVmgKLD42MZqWNV7/fhFliSMJmd/KwGx7MD/i5gAUminPfEZJpsqoA/LtMtA2aeOCPpy2vdix3tbhjTEnASLqkdwmlM1tE3izZ6lEYqRwHCMepvS355O5VwM5KrvZTyuWEWSkAxSwuk96DQY1xxl/Mztr7El8q3VdfsPesBTpZpg869xG0kx9Sb3vMBVcI64R0d6UN+AkUINSbNwiCwk1oRSqtT1yx4UK0CpSEK3b2ZSK1WkVzcVSFu+JFKuS9aivdEPiiJ4QjM1bBZ/Nimxhbpia/x+La9XIjb+wOKtwQzkEnCmwTnYNLIKN1LLzOs8Ia79FoXUsN8zAgpw==
+	rI3FUyxtUsFrikLPRCWOe3jkIJpu8Ayez//FbHvA7EZPaqMJ28NzEM4VhJ4uFsUfHOrPAJb/7UHnkmYOiZsZByETBO7LqwDolMkGk+NuIkrgD4qgEv4RzEDqahiEUr6RmoqLOB4/nnuarOms1DULPJLjrKyDmeOUAEEoyYHWB5A273Gc3ieXPZf/pG8FYsRMtuGwuUM0kd2jypZAIucOFIPlseEW6Tidon+1+G+qvbnitCdEbepShhBJZCMdJvcbi2vS4qERdzgmPEUsJ3ylIy1Ob5JKPPqLHOQxCE0Qe2/CCLBuIYsjqzVwfGEXXNSuZ2BN207i2oGm20r9eqcOgEt3kaOz34+dHkchUmel6U3bjs2AQ+EvxIjcvZ+I/wsFwRJXZHaO71FmXafnt71PBAcdJEK6qVYfgqy2v5S3Uj+vyR+1IKmg6Rfr4z3YMDSg+ptuH+K9bmzONBteIzA0bli1GHUAA4BrfnH2iDkYHuBxYRfVK9Xxfa3cxTwYqdojQDJQ4wX9c/N0NYNBfz8h9ph3umCHa0RhWXWwSESKEBn+FZY+jNWIHHce+uQnoGNf7r5KtJkpLdjT8wtA4XS8UGoRQZRBGqToFDemJKAzlXlGC45dacLPHVyAKBXcIcQK1KSkr1cjUWaUbUoGTGzCb1wvFKZUGANi+ZFG81a1RXGumrPU+cxRi4EFst/iIx9UAMPQNzjE4joretksZWLINw==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(32650700020)(36860700016)(7416014)(82310400026)(376014)(23010399003)(10067099003)(56012099006)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(23010399003)(32650700020)(7416014)(376014)(1800799024)(82310400026)(56012099006)(10067099003)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	1EwaPy9VnUgtfRgZAzstYDIfAgiTyXKXlbJfuTIyKOwSN5Prp96/PGgZjfYrQj9CaYl+G7vqsaWOQ7FjVnIRoOEruayIAheJjkTsvujYuDKm3S69YPRakGGFruhoAQfg0sSGIyUf3X4ekMEq/dKreWVi2JuGOz+xy4UzjtJYPwmKb4TdsKkd5b/9XT/YuYhcEbT5JWftmCA0MB/ESbaAT0fma4wtJw6R/G8hNQMqCdAbxjQIUDXCTbd/73hpaexsaV8I1m5M11Ady04jbTZNDw1S2tNDcqky+Ufo0UenqmrqC0cVkZaRmr3LOy4h4AIHj1e6qnbhY8WVC5YGb2ZgrAmw/V1aB93n1bLO4VB1r+zul35eBo4BtftZbYjuuVXsTS9AtyCrVvVX7Y9yJ8LxKnHqEtHB2RNplComEIpjTGDwUzE/bRbIoJZwe3qv6nwP
+	3PXzb1uIYISSNMY+R0m2gI1Golc9yZxyHNjo9mqcVW1iX+W8QOAgaw0Jx0+Ta1VKAjQN4QvuQJSWrTEiqdmnJWGdsiX9SXLTV7KsO1jkKL+RbUtl3rM6lse+vVwlHmd+IzaKPKUqMnAJwfSIsMv+aCwgqXOJHqF/H7s5tLLKw2PLKZUtD1ZyNYccxLICbLJnupx7vGu1T6MszIipxPfFngv9Ym+30x0Q2ajKbHjL0uPDpj7E5wgANp2xo3ZVGlO1/icucw65fAYiw3XHyAOEuraigI/3+qS1j8myjEMuJ4CLxEAyULrUad8gSQ6vE9GGBcTDKo8iENf0+SwfAW4PoJeJq0iP70PPpGHtspLqITaJWMzTVVn3E+S6NBglTQqsv+5r2fAzrn5fFPMMl+5p05yA4VJJHiI+sj+qmhIWaBwI9YGSh9HQT9Re3VgfsDTs
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2026 11:53:49.6782
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2026 11:54:31.0614
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 368ef6c3-44c2-4fa8-6d72-08df13e92c0e
+X-MS-Exchange-CrossTenant-Network-Message-Id: d59d45d3-0f08-439b-d6d0-08df13e944b8
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000142.namprd02.prod.outlook.com
+	BN1PEPF0001854C.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6250
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9124
 
-The PCIe spec r6 and later defines the MMIO range start in 4K units which
-was not the intention. The upcoming change makes it a byte address.
-The structure is already fixed to match the new definition but the comment
-is stale, fix it.
+The pci_tsm_mmio struct represent a parsed TDI report which platform
+TSM driver will apply at the TDI accept step.
+
+On top of what the existing structure stores already, the AMD TSM driver
+is going to need a range ID for the PSP communication.
+
+Instead of calculating it in the platform TSM driver, just pass it along.
+
+While at this, set the flag as resource_contains() checks for the type
+when pci_tsm_mmio_setup() inserts the range.
 
 Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 ---
- drivers/pci/tsm/core.c | 1 -
- 1 file changed, 1 deletion(-)
 
+Not quite sure if IORESOURCE_MEM deserves a separate fix;
+also if it is just me who hit this.
+---
+ include/linux/pci-tsm.h | 2 ++
+ drivers/pci/tsm/core.c  | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/include/linux/pci-tsm.h b/include/linux/pci-tsm.h
+index 6d5fadd79360..9b34304d9a1f 100644
+--- a/include/linux/pci-tsm.h
++++ b/include/linux/pci-tsm.h
+@@ -161,10 +161,12 @@ struct pci_tsm_pf0 {
+  * @res: MMIO address range (typically Guest Physical Address, GPA)
+  * @tsm_offset: Host Physical Address, HPA obfuscation offset added by the TSM.
+  *		Translates report addresses to GPA.
++ * @range_id: PCI BAR index for this range
+  */
+ struct pci_tsm_mmio_entry {
+ 	struct resource res;
+ 	u64 tsm_offset;
++	unsigned char range_id;
+ };
+ 
+ struct pci_tsm_mmio {
 diff --git a/drivers/pci/tsm/core.c b/drivers/pci/tsm/core.c
-index 9ac216ad896d..2a18be5be56e 100644
+index 2a18be5be56e..a197d56edbfb 100644
 --- a/drivers/pci/tsm/core.c
 +++ b/drivers/pci/tsm/core.c
-@@ -623,7 +623,6 @@ EXPORT_SYMBOL_GPL(pci_tsm_mmio_teardown);
- #define PCI_TSM_DEVIF_REPORT_MMIO_ATTR_IS_UPDATABLE BIT(3)
- #define PCI_TSM_DEVIF_REPORT_MMIO_ATTR_RANGE_ID GENMASK(31, 16)
+@@ -746,6 +746,8 @@ struct pci_tsm_mmio *pci_tsm_mmio_alloc(struct pci_dev *pdev)
  
--/* An interface report 'pfn' is 4K in size */
- struct pci_tsm_devif_mmio {
- 	__le64 phys;
- 	__le32 nr_pfns;
+ 		entry->res.start = range.start;
+ 		entry->res.end = range.end;
++		entry->res.flags = IORESOURCE_MEM;
++		entry->range_id = bar;
+ 		entry->tsm_offset = tsm_offset;
+ 		mmio->nr++;
+ 	}
 -- 
 2.55.0
 
