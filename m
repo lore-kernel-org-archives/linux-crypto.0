@@ -1,36 +1,36 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231AC4657C2;
-	Wed, 16 Sep 2026 08:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A54043F081;
+	Wed, 16 Sep 2026 08:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789545667; cv=none; b=rLITZPpYSMG2jS4SJH8moW5qSBaboafQ+JAs0dUYLtFbxnWX+TsOSH6JM4MKDW9EqZi5yD4mic4mQmQz0QSCnH6meZoVnHyF9KIwGaQF4m0HWwO2oVilzPZV3tCQksFmNp08DtYpeaXvoAjKom0fPykgh1dNe2U4lvCPjCIt554=
+	t=1789548424; cv=none; b=G9Y/e7BmRGB/G+8Rmeqx92cHEe/1OWQtReBFWaxaVqvTE4zEgb+dAiMujnLtDd+0LuKA/gjPCdmGBALrwmd5y6T88bzPWSJLWAHLP9GL5z0E4JiHP0m7nT8F3NZCQdfsY0bie5MP/m73GbtZhhQESqgBv23YdvurZrhnw39Td10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789545667; c=relaxed/simple;
-	bh=X2HYGeuUKB12XxpK+2EoNkBbLVSv5vhtjIeQKkGddsY=;
+	s=arc-20240116; t=1789548424; c=relaxed/simple;
+	bh=ef8r6iNKtiuyWv9pF/ARFCKTa67ITV2QiZm4JghR5tk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CmkHiM+Ov+dk+BSv7725kxCUSjmDAYaJrI9eLUczed++YuR8AG61LwAqlETZ5dQdWacDPRqMB/GrAzSsjTDfSH/JZNnX7gkbLYS/gcT1ZwwbI3tFBDM8LLEJrQ9egjkbK1iIrf0YW6dJhS9eICFNEUraaiq9vcMf9Ruq4AxXzq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=IObwYS9m; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=RRkmDtlqwcO/PVU0Q0pcfSd10k00Uj6mv3pNX3T0iXXKRD7ohtH0SDdux8A509zsqayGnKdqjye72dmKbiZa1H0GZYG1CObqEkq8cbf0BmJ1bIcTXPWNTdyVRx8ky5yjsBSedTCYevocfaIxvS6t/R5YlAOXuH0+GFZqTu7MKS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=gyj8zxzC; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="IObwYS9m"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="gyj8zxzC"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=WLNAyvP+QD8ea/Tnf8D9sJnJMpR7dCNm6r63iCCX2VA=; 
-	b=IObwYS9mLC2CtR52O1UDJ5dnZ2ffx6t854U1P9bKjnNdRltBQkSdSnPlXdmm4lFEJRHZ3WQlUSZ
-	kZzkXmBdpEunqVpbEU1K2tiMDNzBFeVRk3dGlVBBprW71ndaskVDCN8y7ddJw49hr5UElssCv2aiO
-	5ZdSH7+++RJaFCTm1xgV4d7HpSGFE99k6pcjUP14gnxo+3rx8tiMSgaVEkIel91rnY9+kp3jjEHoV
-	XT1kiHcMg0MWig+tvOeLqnJwQGwfyBCS3AFm6NLOiJNv5FxQCOmyjmKaaaTQ8lPVzXJ8kSnxtfTGF
-	iLEA9e94QE1j8sVP+uXT4C2eVXB8gdwX5WHQ==;
+	from:content-type:reply-to; bh=sDCNX+YHSUydGAM1LFcKIBAhx2ROKqYXaCwJyhIsMj4=; 
+	b=gyj8zxzC9zn3rkb6cV3v0k4Z9ga+6HujbaYMNS1UrTsUnd3X2HOGd+//CmpoewR3tFo63gJHKJD
+	hfwR+WU3yw8zVWyw2i8fC+HR8yoaogm2ZSDZiN97rT/HIlJ2VFcQxNLovij9wUUC1epyyEwxogNLh
+	gUZC96iDbtPO+XZeFAYnyZwG/Qxv5t+zK2CuzWMzpcwg1z2+w0JmN9CEzjIAPiENKdIT3sW8djG2V
+	6ArDMd1u/QZm4zSXO5PRa6fIVlgP9lXWadzmVUca2aiHu+zejGADn8u+26US0nkgpoPbsMhfhxgdT
+	2NZV/yHzY/SHTtOklOtBHk/5ns9p3fv5+9Tg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x6kYv-0000000EWV6-33XD;
-	Wed, 16 Sep 2026 16:00:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 18:00:13 +1000
-Date: Wed, 16 Sep 2026 18:00:13 +1000
+	id 1x6lHs-0000000EXi8-3WFL;
+	Wed, 16 Sep 2026 16:46:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 18:46:40 +1000
+Date: Wed, 16 Sep 2026 18:46:40 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Eric Dumazet <edumazet@google.com>
 Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
@@ -41,12 +41,13 @@ Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
 	syzkaller-bugs@googlegroups.com, Thomas Graf <tgraf@suug.ch>,
 	linux-crypto@vger.kernel.org, NeilBrown <neilb@ownmail.net>,
 	quanyeyang <quanyemostima@gmail.com>
-Subject: [v2 PATCH] rhashtable: Use separate lockdep keys for each lock
-Message-ID: <aqpMjQn0g6XxXtyq@gondor.apana.org.au>
+Subject: [v3 PATCH] rhashtable: Use separate lockdep keys for each lock
+Message-ID: <aqpXcMuAChVSxoaz@gondor.apana.org.au>
 References: <6aa5fcf6.f2639fcc.29487d.0048.GAE@google.com>
  <aqi7fpazv2KDDdvn@shinmob>
  <CANn89iJd0QnoDo0tjrFED2myec38U8joyqR05d6BVnJ-sX=NVg@mail.gmail.com>
  <aqjf7LNmE6InABpw@gondor.apana.org.au>
+ <aqpMjQn0g6XxXtyq@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,10 +56,10 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aqjf7LNmE6InABpw@gondor.apana.org.au>
+In-Reply-To: <aqpMjQn0g6XxXtyq@gondor.apana.org.au>
 
-v2 fixes the build failure when LOCKDEP is disabled.
- 
+v3 removes an obsolete comment regarding the use of nesting level 2 or more.
+
 ---8<---
 Use separate lockdep keys for the different types of locks in
 rhashtable (mutex, spin lock, and bucket locks).  They are
@@ -189,10 +190,18 @@ index 6c5e6d9accba..ec853c1b9af3 100644
  }
  
 diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 5da0e53a8d42..918f15a2ac69 100644
+index 5da0e53a8d42..a3a4a1f7751e 100644
 --- a/lib/rhashtable.c
 +++ b/lib/rhashtable.c
-@@ -432,7 +432,7 @@ static void rht_deferred_worker(struct work_struct *work)
+@@ -207,7 +207,6 @@ static struct bucket_table *bucket_table_alloc(struct rhashtable *ht,
+ 		return NULL;
+ 
+ #ifdef CONFIG_LOCKDEP
+-	/* bitlocks must use nesting level 2 or more */
+ 	lockdep_init_map(&tbl->dep_map, "rhashtable_bucket", ht->lockdep_key, 0);
+ #endif
+ 
+@@ -432,7 +431,7 @@ static void rht_deferred_worker(struct work_struct *work)
  	int err = 0;
  
  	ht = container_of(work, struct rhashtable, run_work);
@@ -201,7 +210,7 @@ index 5da0e53a8d42..918f15a2ac69 100644
  
  	tbl = rht_dereference(ht->tbl, ht);
  	tbl = rhashtable_last_table(ht, tbl);
-@@ -1122,51 +1122,9 @@ static u32 rhashtable_jhash2(const void *key, u32 length, u32 seed)
+@@ -1122,51 +1121,9 @@ static u32 rhashtable_jhash2(const void *key, u32 length, u32 seed)
  	return jhash2(key, length, seed);
  }
  
@@ -255,7 +264,7 @@ index 5da0e53a8d42..918f15a2ac69 100644
  {
  	struct bucket_table *tbl;
  	size_t size;
-@@ -1176,13 +1134,11 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
+@@ -1176,13 +1133,11 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
  		return -EINVAL;
  
  	memset(ht, 0, sizeof(*ht));
@@ -272,7 +281,7 @@ index 5da0e53a8d42..918f15a2ac69 100644
  #endif
  	memcpy(&ht->p, params, sizeof(*params));
  
-@@ -1236,22 +1192,13 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
+@@ -1236,22 +1191,13 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
  }
  EXPORT_SYMBOL_GPL(__rhashtable_init_noprof);
  
