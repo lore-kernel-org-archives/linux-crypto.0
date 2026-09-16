@@ -1,178 +1,160 @@
-Received: from mail-pz2-f42.google.com (mail-pz2-f42.google.com [74.125.228.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD964BD35E
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 17:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBEB3C09E7;
+	Wed, 16 Sep 2026 17:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789580572; cv=none; b=LkqAkkeMIoe7w1jvrWCDT4s7lbrHXvBbE4JEX0zD74I7VX18FjTucSjnUjQvlvqaTmkMvmGqe0KShg1p/nMQ1T7yb/WWvdcHqammX/R9tODb9NxRr5P8Y1URhuSDFqz/SnSZym4tY7487NX4uqRKKtQcOx4WmMuTnWmyDLXYCPc=
+	t=1789581088; cv=none; b=ZFjSKJMzT+g8cIlgQGKpvvsMl9o8bGnnP8Q0w2kQ9WISQ8vMmNt/dryLWusiHFrRWbEKMdt1UtXlePkXzKUenVttlh0ALf18mEb1NVvy0G9zKiGwtUskki6F/2rOYlq5BQLE3U4sh//bqubnPZZzD56Fo80BwDNckC0izDzDLSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789580572; c=relaxed/simple;
-	bh=HGNIvqMsniyjFCXq9xFvhYDTLciJsYL/vhVQM3VfuYg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YgwxRkPXPGXaVyKMq/bEOM1YDu8194JhgOtRt5nG2NeNUev/LV0YRO2/x4p18d299IPMhpbilyVzq3Q/krXSt0mSPlyEGAEeAfqsMTatDY+7A269oqy2iI/rzbwl+QrrdfLVmoV3QNEBC9aOWssYWyL0Py/vaFVVJoEd6lkjVkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lChBWklq; arc=none smtp.client-ip=74.125.228.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789581088; c=relaxed/simple;
+	bh=ipTJmkF3/zpr+sbsZHP7u7xHksn9daIAXHVrXTmWyRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S6KDlYO3X/wPuFlzi9B+Z2uYSKNkTSHaZkG1c0DHywAJ5qIIBUYUcIlSW81hcScgq3Amhd8AqfTsHilUlD5fGj99gyRhSn/6QJ+gfdDG6CRuwt/dC1AANvW9eUQRTO/4CyZ1V84wRDYPecZJ6RTH40WxWOul27rEsUzpdoDOx9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=E7FjhsZ1; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lChBWklq"
-Received: by mail-pz2-f42.google.com with SMTP id 41be03b00d2f7-cc4c3304784so1004922a12.3
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 10:42:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789580557; x=1790185357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=SwgEhBXTngR3El+sf5PzSxyA5w4YUY1fd7mrK0Hv9aA=;
-        b=lChBWklqhZnPDIkS75OXdgTL0BppdLUvkYjbFLlxGTn9qVv4Zy9AurKhEhblJDVI9O
-         ypPAtT7kEEMldnLt59tT2x6flloPkI1wA0kvt//u1cIhqpCV9XIICakY8UF0SuL3Cz1l
-         juYcQNGOTynGBC5NoRJVIDVGISAW9mqeKQhzyEgfy9Z55AKym8qvgm6Qx3RaXzMDPY+T
-         cKoP8dppyLHgWNmArfqaG/nrkXg43l+VSuI3BnYKe6Zj0DqXsKxdu/8gf5cJzD+xVl6T
-         M00skWPRBa/HKmo8Sd7XggiIpN5BuVQx73b8yVK4Ra16KT770Fxa4xZhThdPgsFnUUb6
-         k8Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789580557; x=1790185357;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=SwgEhBXTngR3El+sf5PzSxyA5w4YUY1fd7mrK0Hv9aA=;
-        b=wiDVxVIGHCNqBDL6b8Pc97rAxiKV4jArqRRz/Ke10V9ECQanXgFHtK6P0W7ZR2M2PL
-         sLxfhOCUcOfySFnJc0R6xdsSSLT6tmDVsdKavKzmf7SDl4nBEw73Xsy+o9C2YpqETsHv
-         Pv7BciV/ukr5EVpBoXX4St7H/RpuJnmrgjYGkNjCZBH6FlXPBKHmeVeUYEkcd8XI0VCZ
-         dkG/cE6bQUzAdginqc0p5MaUAkqNAVbfcpW1AF6hquW/h1IJbHIdtLKfHlm7JDgo1Sz8
-         I+DFl0fswHL3IXA9qAW5IM4iN71CAitdHVkj+eIII3X5dOqvOC+eYrX9Fi8NlEk1+v07
-         lwpw==
-X-Gm-Message-State: AFuF++mq2l51+mvg86YQ++rWu1jjXGHxruimUSPBtFZsQSip8aGgQaFv
-	RGv8h0aU81mWCvcBpuD5W2n9ig8Ix7betrZ8FfY/j8wfgyyluSb41vOR
-X-Gm-Gg: AYBFou3bR8LQM1l3AfhLEkZ9kjXR4x+Q/no2sW60YWrg+2oPuAhroDiqsWfkTXlG3xx
-	VcnqkP2YYyL9sp9gsONpynbJX66hLIZWNyiWi5vCWlexMdRnAL+D2WWq0ZMl5ga+WQuNQGTnI6q
-	AEQ1C+XZkEb4EjOjf8suwYi9FsSZHkQzn35wktaJBhteNOeMMBzMSb+Th6zKI7SCIKQpRllr9bz
-	NOOwCTRWCok61DPalxe2lHAusLAxbmN536FWYZAWNAp1c3yFlMVL0CAxqCBAp6TEkpKWoohQV2C
-	UOLwW9G1P7FRr7OuK8bRF1qr4c/inr4qT7oBkbN6t7ZamBF4zdYjf1eLqi6X+EmCM+WMMsvA5LV
-	bgRfZalxOk5of4pw6UQAX1yYhfTm6dT9ZrNrN3rIUhG8DknHGcaUTfVm8lcoYrGfa/JLxckcA4T
-	4Pt0o4Io6nrXZcTXu/jAn2v6gzqBcR6T/oj1Ah2mRRKaW/6l/O/0RJsUrV7+8CuacnbmUMR0rIR
-	re98YQDVaIjeJjDyQ==
-X-Received: by 2002:a17:90b:582c:b0:39d:f18c:1ad1 with SMTP id 98e67ed59e1d1-39e1e2501e6mr10461602a91.3.1789580557234;
-        Wed, 16 Sep 2026 10:42:37 -0700 (PDT)
-Received: from kernel ([45.251.35.123])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-14395d4cbc9sm7286360c88.11.2026.09.16.10.42.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2026 10:42:36 -0700 (PDT)
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: herbert@gondor.apana.org.au,
-	clabbe@baylibre.com,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	jkoolstra@xs4all.nl,
-	lkp@intel.com,
-	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-Subject: [PATCH v4] crypto/amlogic: Use devm APIs for clock management
-Date: Wed, 16 Sep 2026 23:12:27 +0530
-Message-ID: <20260916174227.5581-1-raizudeen.kerneldev@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="E7FjhsZ1"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 99E4540E00E8;
+	Wed, 16 Sep 2026 17:51:09 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 9zV9muLWubjt; Wed, 16 Sep 2026 17:51:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1789581064; bh=or2++1LeeipZYCb3G9WRgyA4slOHEhMs91sMxm37PrE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E7FjhsZ1898C+iRkHA2e9itQoyiqH/Ch3CRAiwQscnU0CXAU1B3A58i/8qF7CWRQh
+	 G9fmEyLGGIFdYQql64Uc91Gneuv+SDG6aDTZnURc3lGHscWFc5r5ZPh1vPnn+mqjo9
+	 KFHhO1O53B1kflUQZ5pwBl1X+TZ/YeOf6S4ukWau6F9Oy2bvc2AkWVFtpJFZA/d20Q
+	 giWI8kOs24tcni/YN9qyJ2ifRbE9E3/xTzGmQUWsiuXTEhyoEZljOUczoL/sJ+VORm
+	 Jkvi5hPfZD2JyHdgx2JTUeJM+9EfC5lNAKlo3wpXrtxjuZdy0HbqzBa/nrDlGGXUEB
+	 T6ChTVHnrHjzueQm9iG6UjvNvWs1Ci2nBGXVxdIW5G0N5g5YvMPiyWBQmN/KIt+8BJ
+	 4nMWbx4zbda4r5Pe4F71yKd9gdBn5WVrThXpykty5Y9ZS6rxK/Zy/4imk+qiuwIQBK
+	 +J/Y7B2Xd/vbfAw0NWAJZRMYwlCrFpuzM/A8ynROZCZpyn7YbI8CMVxBS6k2Zrpwya
+	 T6Y4mlUo4kZxEKXRc1Vy6jsORFjfP4A+DtCjZKq1wSzIccfVVxpJX103Kp6LkYYPGE
+	 WV11UFcMReR+2ndH81MYlmJrtQ8QF3VCSlMJid4YqIKWMK9eHGy2UwsKc4B1bjlrvo
+	 ZcjWPKxqQS0jjFQdEECxxF+M=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::a])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6DA8240E00B9;
+	Wed, 16 Sep 2026 17:49:32 +0000 (UTC)
+Date: Wed, 16 Sep 2026 10:49:29 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	David Hildenbrand <david@kernel.org>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	"Liam R. Howlett" <liam@infradead.org>,
+	Vlastimil Babka <vbabka@kernel.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jini Susan George <jinisusan.george@amd.com>,
+	Kees Cook <kees@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Kim Phillips <kim.phillips@amd.com>, Joerg Roedel <jroedel@suse.de>,
+	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	"Tycho Andersen (AMD)" <tycho@kernel.org>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Michael Kerrisk <mtk.manpages@gmail.com>,
+	Suresh Siddha <suresh.b.siddha@intel.com>,
+	Xiaotian Feng <dfeng@redhat.com>,
+	Venkatesh Pallipadi <venkatesh.pallipadi@intel.com>,
+	Andi Kleen <ak@linux.intel.com>, Kiryl Shutsemau <kas@kernel.org>,
+	Tony Luck <tony.luck@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Carlos =?utf-8?B?TMOzcGV6?= <clopez@suse.de>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Jori Koolstra <jkoolstra@xs4all.nl>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
+	Ian Campbell <ian.campbell@citrix.com>,
+	Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>,
+	Petr Tesarik <ptesarik@suse.com>,
+	David Howells <dhowells@redhat.com>,
+	Haavard Skinnemoen <hskinnemoen@atmel.com>,
+	Kenji Kaneshige <kaneshige.kenji@jp.fujitsu.com>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Michael Kelley <mhklinux@outlook.com>,
+	Ilias Stamatis <ilstam@amazon.com>,
+	Sumanth Korikkar <sumanthk@linux.ibm.com>,
+	Simona Vetter <simona.vetter@ffwll.ch>,
+	Toshi Kani <toshi.kani@hp.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Jiang Liu <jiang.liu@linux.intel.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Kefeng Wang <wangkefeng.wang@huawei.com>,
+	Palmer Dabbelt <palmerdabbelt@google.com>,
+	linux-coco@lists.linux.dev, xen-devel@lists.xenproject.org,
+	iommu@lists.linux.dev, linux-mm@kvack.org, aik@ozlabs.ru,
+	Santosh Shukla <santosh.shukla@amd.com>,
+	"Pratik R . Sampat" <prsampat@amd.com>,
+	Scott Soule Cheloha <scott.cheloha@amd.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [RFC PATCH kernel 01/17] pci/dma/tsm: Call disable DMA bus hook
+ on cleanup
+Message-ID: <20260916174929.GCaqrWqZ1fIhi4Rgbn@fat_crate.local>
+References: <20260916115159.1938195-1-aik@amd.com>
+ <20260916115159.1938195-2-aik@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260916115159.1938195-2-aik@amd.com>
 
-The driver currently gets the core clock and manually enables it using
-clk_prepare_enable(). This requires matching calls to
-clk_disable_unprepare() in the error paths and remove function.
+On Wed, Sep 16, 2026 at 09:51:41PM +1000, Alexey Kardashevskiy wrote:
+> +	if (device_tcb_trusted(dev))
 
-Switch to devm_clk_get_enabled() instead. This lets the kernel handle
-enabling and disabling the clock automatically, which allow us to drop
-the manual cleanup code and keeps the probe function simple.
+Where is that function and the rest of the gunk needed for me to apply before
+I review those?
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202608310329.QgxCCMs1-lkp@intel.com/
-Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
----
-Changes in v4:
-- Fix typo in meson_allocate_chanlist() function name.
-- Add error_chanlist label to properly free chanlist if IRQ requests
-  fail, preventing a memory leak.
+The patches on that branch:
 
-Link to v3: https://lore.kernel.org/all/20260916154941.7254-1-raizudeen.kerneldev@gmail.com/T/
-Link to v2: https://lore.kernel.org/all/20260901024302.5407-1-raizudeen.kerneldev@gmail.com/T/
-Link to separate IRQ fix patch [1]: https://lore.kernel.org/all/20260908160120.4805-1-raizudeen.kerneldev@gmail.com/T/
+https://github.com/AMDESE/linux-kvm/commits/tsm-next
 
- drivers/crypto/amlogic/amlogic-gxl-core.c | 31 +++++++++--------------
- 1 file changed, 12 insertions(+), 19 deletions(-)
+which come before those here are enough?
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 169c6eeb51e5..f292bb25674f 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -243,34 +243,30 @@ static int meson_crypto_probe(struct platform_device *pdev)
- 	if (IS_ERR(mc->base))
- 		return PTR_ERR(mc->base);
- 
--	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
-+	mc->busclk = devm_clk_get_enabled(&pdev->dev, "blkmv");
- 	if (IS_ERR(mc->busclk)) {
- 		err = PTR_ERR(mc->busclk);
--		dev_err(&pdev->dev, "Cannot get core clock err=%d\n", err);
-+		dev_err(&pdev->dev, "Cannot get/enable core clock err=%d\n", err);
- 		return err;
- 	}
- 
-+	err = meson_allocate_chanlist(mc);
-+	if (err)
-+		return err;
-+
- 	for (i = 0; i < MAXFLOW; i++) {
- 		mc->irqs[i] = platform_get_irq(pdev, i);
--		if (mc->irqs[i] < 0)
--			return mc->irqs[i];
-+		if (mc->irqs[i] < 0) {
-+			err = mc->irqs[i];
-+			goto error_chanlist;
-+		}
- 
- 		err = devm_request_irq(&pdev->dev, mc->irqs[i], meson_irq_handler, 0,
- 				       "gxl-crypto", mc);
- 		if (err < 0)
--			return err;
--	}
--
--	err = clk_prepare_enable(mc->busclk);
--	if (err != 0) {
--		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
--		return err;
-+			goto error_chanlist;
- 	}
- 
--	err = meson_allocate_chanlist(mc);
--	if (err)
--		goto error_flow;
--
- 	err = meson_register_algs(mc);
- 	if (err)
- 		goto error_alg;
-@@ -289,9 +285,8 @@ static int meson_crypto_probe(struct platform_device *pdev)
- 	return 0;
- error_alg:
- 	meson_unregister_algs(mc);
-+error_chanlist:
- 	meson_free_chanlist(mc, MAXFLOW - 1);
--error_flow:
--	clk_disable_unprepare(mc->busclk);
- 	return err;
- }
- 
-@@ -306,8 +301,6 @@ static void meson_crypto_remove(struct platform_device *pdev)
- 	meson_unregister_algs(mc);
- 
- 	meson_free_chanlist(mc, MAXFLOW - 1);
--
--	clk_disable_unprepare(mc->busclk);
- }
- 
- static const struct of_device_id meson_crypto_of_match_table[] = {
+Thx.
+
 -- 
-2.53.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
