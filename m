@@ -1,47 +1,57 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C594438911B;
-	Wed, 16 Sep 2026 12:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E33E3B7B7B;
+	Wed, 16 Sep 2026 12:53:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789563215; cv=none; b=D7AB8ri3t6PkP3YI2GT6v3lTLoEkB4abcHD9zfIv6RuNWCs+VIoj//EJJpuFtPNr/kuljFLMI/2D7j8eIrovbYeRr5iMcaDEMPUlP323UnACID1w+/RxUVXKVhOIYoVRVWY6A82GXPip7qu5MnTO/zD/LcWh07l/PXJjMUOnV3c=
+	t=1789563238; cv=none; b=s5G9hu7f9wviCU4wCp5MsfsQ7wzp6TCvfzf3G/bbXaNNSeFpnsYaYrXCiObqpaakI27dGzR4ZHq7jC2Lup/DbKBKRSYM6gTQaPPhWkl+9BMsmKIiiJCpQsCxlk9F3dfilZfSYw9lb2saAJp+G8o6Djxgc6bXEOJ1E0BeLRWplQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789563215; c=relaxed/simple;
-	bh=TbLRaXkDrq80hEWcR1PWe6s0di669QdnDK40nHuJWF8=;
+	s=arc-20240116; t=1789563238; c=relaxed/simple;
+	bh=SMgzNYx5VatGkXZ1gT4DF7kHMDMRw80erbXnSQxCoWk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sERO8IVmcFd8DeKvoFR5UmaUyrD6Aw48AvrnH1HosB8le8pOJp3m7AHjncWcss6zrhdFdGy02sKEifUoMgu660Q1kQu8iWkdZVCCuFWoLnmpJq7OMHW764sDO+zMOBmG2rroVe01M9wbFuPm7wTiLKP7Z6+UTOOOAwLrzHTk0CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=tM1doCnj; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=CJwY/lZ1RzUNfT3q4bwx1OThf45eGoMs5m2IFD41gujAbPmn1cpsO5YP0Jaxos1+OdfyGrYFP/U4EVkMmbveD5lcCvvA3+nESNXmQwZNrERoPy7dWINIk1qZnZZQ2zTAFUZJTPibROTFTq9ldBBrFrZxp2wxEJNHVbprOJjhC2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=bA9oBbaR; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="tM1doCnj"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="bA9oBbaR"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=d86Tf0LllrXXpe+yggb0gJXtQSGuOtZBdvyxrLeFofM=; 
-	b=tM1doCnjaU5WeMhOXF7rJ8vHCR2pK2UIp4JEwU2GFPbWi89ekVLHxquWQB/ij1vIKgUvbybiwEM
-	S9FF1kV0uGkYcI29bx4aVhL5Tju4moOY09AhcKV30CXPLx2X1AE/cFjSix1BzWOk9Pw8jWRKH9Ghf
-	I06a0I/U+yCeLQiN9qWjIM9iCpKS3xrxMZ1sUZmnBLB14noURu8MP0mTDenDZ/3THFEdCixfC4dV5
-	SZnPbf3LvPAF0Fnm8OolNkxf8rsxsSnozCNB3ewEVUwfAOIudWwiH92bkm2Kirp0VLYk5pDiIdfbC
-	eqnvkdvatQn5K9pEnDQLgAGNH6ZvCIcBSYhA==;
+	from:content-type:reply-to; bh=payEqoM1tt7cXO6DPJ23pvWYjxDt/TMkkk/2jV3eSmc=; 
+	b=bA9oBbaR538zvmY75y7VkC3r6IzWRP51+euLRh29gg+M0XCrbcW+CiqSGe2bsQYeoEo0G3WweWB
+	zgWvCnFv3IHHoKGD15FI0HyMuDsfFHclEOg5Vnmj72t6Ece5z5Ny8GBZ0VGlLiCPGo8ALSnasUnO2
+	rboWcAFapExQQeII4/5XbQcj5nyM2YTX9WVUwkHAN9j2AWlujzFY/b6r9Otmz0amgYJsJA28+rZxy
+	BTDCSPu7EsDwtwRXGpACoUp5TYR9ep+CKt+x5Xhg8ijxt4fHNq2NiXYKKyptcey/hPVPt7PFbUs4+
+	aNygkQoLXABMQ4oTP2M6y9d3wGivE2hVtexw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x6p8d-0000000EcXk-3WFx;
-	Wed, 16 Sep 2026 20:53:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 22:53:23 +1000
-Date: Wed, 16 Sep 2026 22:53:23 +1000
+	id 1x6p8p-0000000EcYS-0e8d;
+	Wed, 16 Sep 2026 20:53:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Sep 2026 22:53:35 +1000
+Date: Wed, 16 Sep 2026 22:53:35 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thorsten Blum <blum@kernel.org>
+To: Hemanth Selam <hemanth.selam@gmail.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Nicolas Ferre <nicolas.ferre@microchip.com>,
 	Alexandre Belloni <alexandre.belloni@bootlin.com>,
 	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	George Cherian <gcherian@marvell.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Gilad Ben-Yossef <gilad@benyossef.com>,
+	Ayush Sawal <ayush.sawal@chelsio.com>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Vladimir Zapolskiy <vz@mleia.com>, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: atmel-tdes - simplify DMA buffer initialization
-Message-ID: <aqqRQ-vn3l2-bjWs@gondor.apana.org.au>
-References: <20260903210845.162790-2-blum@kernel.org>
+	linux-arm-msm@vger.kernel.org, linux-samsung-soc@vger.kernel.org
+Subject: Re: [PATCH] crypto: fix typos in comments
+Message-ID: <aqqRT6L16_qBpYuM@gondor.apana.org.au>
+References: <20260904114345.27509-1-hemanth.selam@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,21 +60,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260903210845.162790-2-blum@kernel.org>
+In-Reply-To: <20260904114345.27509-1-hemanth.selam@gmail.com>
 
-On Thu, Sep 03, 2026 at 11:08:46PM +0200, Thorsten Blum wrote:
-> Calculate the buffer length in a single statement and simplify the error
-> handling. Inline the dma_mapping_error() checks and return -ENOMEM from
-> the common error path. If mapping the output buffer fails, unmap the
-> previously mapped input buffer first.
+On Fri, Sep 04, 2026 at 05:13:39PM +0530, Hemanth Selam wrote:
+> Fix typos in comments, reported by scripts/checkpatch.pl using the
+> misspelling list in scripts/spelling.txt.  Only touches comments, no code
+> changes.
 > 
-> Also use dev_err() to log errors and %zu to format size_t, and clarify
-> the error messages.
-> 
-> Signed-off-by: Thorsten Blum <blum@kernel.org>
+> Assisted-by: Cursor:claude-opus-5
+> Signed-off-by: Hemanth Selam <hemanth.selam@gmail.com>
 > ---
->  drivers/crypto/atmel-tdes.c | 36 ++++++++++++------------------------
->  1 file changed, 12 insertions(+), 24 deletions(-)
+>  drivers/crypto/atmel-sha.c                       |  4 ++--
+>  drivers/crypto/cavium/cpt/cptpf_main.c           | 12 ++++++------
+>  drivers/crypto/cavium/cpt/cptvf_main.c           |  4 ++--
+>  drivers/crypto/cavium/cpt/cptvf_mbox.c           |  4 ++--
+>  drivers/crypto/cavium/nitrox/nitrox_main.c       |  2 +-
+>  drivers/crypto/ccp/ccp-dev.c                     |  2 +-
+>  drivers/crypto/ccree/cc_buffer_mgr.c             |  4 ++--
+>  drivers/crypto/chelsio/chcr_algo.c               |  2 +-
+>  drivers/crypto/hisilicon/sec/sec_algs.c          |  2 +-
+>  drivers/crypto/marvell/octeontx/otx_cptvf_mbox.c |  4 ++--
+>  drivers/crypto/omap-sham.c                       |  4 ++--
+>  drivers/crypto/qce/aead.c                        |  2 +-
+>  drivers/crypto/s5p-sss.c                         |  2 +-
+>  13 files changed, 24 insertions(+), 24 deletions(-)
 
 Patch applied.  Thanks.
 -- 
