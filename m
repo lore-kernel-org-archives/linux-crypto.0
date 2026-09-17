@@ -1,126 +1,114 @@
-Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBFB3BE165
-	for <linux-crypto@vger.kernel.org>; Thu, 17 Sep 2026 05:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37674A204D;
+	Thu, 17 Sep 2026 09:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789624619; cv=none; b=IWKWrvjDz8kWCizMutQ1F4H8+IK9dlhnK0csckUug69cums00Hge4DBwjRHibiLz6yM1Fe7+B8OIZLcD2YbGSEcWRLPcKoeZ9zRtOVdicP7RbsbaYAcc4pxCInIzdxxJBFImkw+HIsFsYIGMzkH22ylPcs5w834u+u6gYHOW5HM=
+	t=1789636396; cv=none; b=ZI+onVtlRfaVorKKxOYamjXYdXm6cKE7gX8M/eI7PZr6goc80jADw30gmbW2QQKJlJM2FVASmQzZ/Jxu4M4cCFvUwwapnDpciva9rMD88k6WIgyk0b9OlCKCuyH/v4H02c/N9ICgo4N3lPg+s0hi+WOR9gSs37mgnYa3uwvl3KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789624619; c=relaxed/simple;
-	bh=axjKGAd5Z/3bPAjXWt5In13wd/F8lTzuocyx1Fp1oag=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Nr8uur3BDwr5cJQsDytdB0CNBZfLJwSqWwNmOO560z8pm9ILw4X4GJolBT/luBEQULdMpJts9vkgGNx6gXC9vzavI4VyvkUidxuRfcbX7Wqyf687S5UrBHtoSIIfwvsFIrBzInIYsZusmJ+SK32T+3lAzUtWWrr+vNHkfrk7GN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Is5sYCTW; arc=none smtp.client-ip=74.125.225.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789636396; c=relaxed/simple;
+	bh=6tdv1fQIX48GNjkBOUbNITXfXvuQarY3qABLSJmTviM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JLNaYnWzIVm+3+4neyLJVp888YSc86u23MK/NW3yvGrgA/GDUm++FUNHfJ9jNjVv+6rgxl1pWHu2e6SSzMGtiK2fWYZM0xzE4yzXN+rLqUW3WZndF/s9vD7LeQCS7AMSwFqY5MTB9et1BOnCE3Oc12BmwQeTMlt97sIP72CebXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=K8nr4pLC; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Is5sYCTW"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b912d391aso3170545e9.2
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Sep 2026 22:56:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789624616; x=1790229416; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=TXa2jqQKkTliyGqricPHkYJ8GTisx6eCrgeiQ3lmh5M=;
-        b=Is5sYCTWeKu+bYQiM7B63cAOJ4NXKZMHIlOUp3yaK8FDUJ1KZcoqjSR1X/xWKwnM1f
-         jVroKGDczKboO785tS2sjWOQFbNE27Vamk1fuf3HV83H7xU1UTPEJnWuiEwcSi2gI+hO
-         IBfCWz7SPEcShWvkoND1vmR4cBDHVVNQhDz1JDn6eBTMKsPOhe0bFyYCKgMjMspmipwB
-         Fa+fMNzl6fijGcFfsRQ/XBNuLIYcggAY7cSPhNoXTRrMoKywa6hAUstG8EDxh2QhjM8r
-         Jv2F8MldT4XWRNOTczerGxCD4Pl8fKHSk+kB5zf0IqPMm41uHVc/NfkH/0RR2n98lSQv
-         kRYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789624616; x=1790229416;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=TXa2jqQKkTliyGqricPHkYJ8GTisx6eCrgeiQ3lmh5M=;
-        b=ynB8Yw3pKiuYAY2ofyF2VkOnXwssjhsyym/vK09QZp8t5CI9xXjbNXlHRZT3KXrSJ7
-         Lr2B8BpuJxKgvSl7jzk0MG/oE+zWiwv/19NKZcF0UY5/jkPdbCLTALRXQ3okYZPniI1q
-         kKv9hXGmzHP/4o0/5vqM1CX1kPEAaGpC98go54VBc+YZhYxjBXgpEAt2svtM6lLPYlaf
-         bqvRlE0FspwB1qEdrTq3329+Y5786y2HAlUTrAYdO6qgGUfodrDQtXxYDHWMpHgbKuwy
-         geXfYvOcyZiD8guXutrZuGWDJlg7bNLLXj0VQtDNRui98BmsjTLtvts0SxLs8djQPPr4
-         9FaA==
-X-Forwarded-Encrypted: i=1; AKwUvBwxqPkwskWQxultMxEoC55doJyUBTAq95zWWd6q7m62ZL0J0r2GjjQaqxtZmr8RP/l/0C/aK130aY2tUZ0=@vger.kernel.org
-X-Gm-Message-State: AFuF++kYJ2jlGVHt6aPJoBP809+BfCjt83fM72nBqn/Ojp2uy+QiRPwd
-	8cETMMNUOOMuorYp4HXcRXWKlndHsSRLTLaN89MphfatmIEFHkspPTUO
-X-Gm-Gg: AYBFou1XMBgE9UUl3QxGYHFRbMIb+c2lmPR/kVkC7Vcm3stIHFcJZf8zTRY2JuCUOFt
-	LQlaGQ/XTu2aVwGyDJpNDETAZgreeRUI3zwM2i0TdPbceAamGRZ2QNFrep/X1rzmvITRPfg8Dki
-	NOlMV/VrdmId57luPpbKDT4JEw4CMiRmd86qbABa4RBR3SCHxzmkdvZJutCGrFHiQUrBtYm0fe9
-	N2T68OxpjJTIoisih1By9iiERDD6Q6+u+YWq3VcaBvii2nXRudNgwOWra0FdoxQorng7F/6soIS
-	uwWYsvIPu6k4PpX9EWmanhZJhiNFbTCHIBgMXq2pPIEHguwZCNRSNf2omtMa7XX5ebG1pfJNJEz
-	TYj5/cG8qCOnpOT9RwepNwtJl+MMVopiVn34NeBj1KW2DydeKQCATRQbhmXGAOUi9rABxppmcWR
-	reGrPUaiUpalbCIx5yzhEd6G06QpP9yeNMxpoEdZkVxiu85GO48hsrSIdp3XFcZv5WNBzKJq8Sw
-	s6AjW/2xTXxLzzIzTugKPjAOx2F33JPdXUtL+MmmxsrKQBOpPqnzaHsdimPM4x4DIko27+Dwnv9
-	sYpki9718yR6Jv+8NfOeALD56YdZ9MazxBdzGWurHS84K5IUo3MN3ZWsyTlgRoeG7B/3XEMGS9o
-	I8miEcGIGAMTcshzJiDIcenb3DQ==
-X-Received: by 2002:a05:600c:c8f:b0:49c:fc6c:be15 with SMTP id 5b1f17b1804b1-49eb733c62dmr64900215e9.27.1789624616385;
-        Wed, 16 Sep 2026 22:56:56 -0700 (PDT)
-Received: from MacBook-Pro-von-Karl.localdomain (dynamic-2a02-3100-9dc6-c001-54ee-4741-4927-0a28.310.pool.telefonica.de. [2a02:3100:9dc6:c001:54ee:4741:4927:a28])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e847eab65sm76230685e9.2.2026.09.16.22.56.54
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 16 Sep 2026 22:56:55 -0700 (PDT)
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Karl Mehltretter <kmehltretter@gmail.com>,
-	Haren Myneni <haren@us.ibm.com>,
-	Dan Streetman <ddstreet@ieee.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-crypto@vger.kernel.org,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <david@davidgow.net>,
-	Rae Moar <raemoar63@gmail.com>,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] lib/842: depend on the decompressor for KUnit tests
-Date: Thu, 17 Sep 2026 07:56:45 +0200
-Message-Id: <20260917055645.26780-1-kmehltretter@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="K8nr4pLC"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68H61nsI1715746;
+	Thu, 17 Sep 2026 09:13:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=OhAZpF
+	E45Wv96b50Eo18CRHe6c/DNguzKZ+2qnW74jU=; b=K8nr4pLCwrlwFOQyWa2u+8
+	sQv1FPuUWPa2041ETdIqwyLzDzfJiQmoof+yT4dkRhAYgm8rNygYGI5uLPfBMgVJ
+	izsBsaTXz8sgSlFQo1JudlpIu2RB6L+0Uqq0F6WDXRPHQNiNUxJgvkXN86zh0odI
+	10BuSIHUcdplrrTE5dAXFh2R8/aGwE/+SdgiISDPzGFVA5ySYBAN4bWdWqsUK2WX
+	LFut74BzWAEavfHr+ZivXDCuCEVUwHnXOgHMOPWLSZ+sEHww2fUJdPiS+bTKWvjc
+	RgRC3kp/iRm87IjFGNa8YoGlYvUcxLWQ4Fgh7+WipEYXOzYrZWV2HYK8eNZ+mVRg
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gmxf59f2n-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 17 Sep 2026 09:13:10 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 68H65AKd3619060;
+	Thu, 17 Sep 2026 09:13:09 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gr7geh8qq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Sep 2026 09:13:09 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 68H9D66J46530838
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 17 Sep 2026 09:13:06 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0CB5C20043;
+	Thu, 17 Sep 2026 09:13:06 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CE73A20040;
+	Thu, 17 Sep 2026 09:13:05 +0000 (GMT)
+Received: from [9.224.91.220] (unknown [9.224.91.220])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 17 Sep 2026 09:13:05 +0000 (GMT)
+Message-ID: <5e9a75a1-54f4-4425-806d-55d27569602e@linux.ibm.com>
+Date: Thu, 17 Sep 2026 11:13:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/1] s390/crypto: Generate iintermediate chaining value
+ on export
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Vasily Gorbik
+ <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>
+Cc: Harald Freudenberger <freude@linux.ibm.com>, linux-s390@vger.kernel.org,
+        Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+        ifranzki@linux.ibm.com
+References: <20260814142010.259918-1-dengler@linux.ibm.com>
+From: Holger Dengler <dengler@linux.ibm.com>
+Content-Language: en-US, de-DE
+In-Reply-To: <20260814142010.259918-1-dengler@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: imIkWFLBH_6-GOziPcWTl2VVFtWQ1cbO
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE3MDEyMyBTYWx0ZWRfX3fl1BaZZc8P8
+ 5+e2PMhEjJ0f+UYgVCVsOTV9/nI8hAqlBxHBrHf2d4Qr5vR1ouBKiaZCnAFLqJLxP2PFeA20zl0
+ DyjyfKUUwc8J0DP5M6IyToVIlHQkiD0=
+X-Authority-Analysis: v=2.4 cv=cvgOAF4i c=1 sm=1 tr=0 ts=6aabaf26 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=6B41mUtho_lo4dOVP3MA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: imIkWFLBH_6-GOziPcWTl2VVFtWQ1cbO
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE3MDEyMyBTYWx0ZWRfX4H7Fus3ZnfQe
+ uPJN6/rp8IPC6+nacjg6Ks4GGgi/W4aGDZQkjSlgZn0dmnw9DLABLjAX8N9DY1CHZk4N99XdaGl
+ yknjAFN2QrMuaPAS5YtJHSnQMAtzuq8ZQb+1XWtw13B9V/ErQWPcnsUZibOJQg/BgUecz+EwtiQ
+ c4ii3qe08OUFyufn1ga3rG0+11Zmu1f6vCb85vK4cjuetmLzJhPWbVSSFrOSixxzPbl+Y189TQi
+ D50TiujwzHUMDMzSg55gRriXKLhvG1oq8Vg6G8OIDNwhJins0fnPgmo7lYILgJcbl9h8TB9R8Z3
+ lfm4tesv+2Ggzn+f/6WByIY69TNeu5/rrDzOvcTMWYTHfGXMWM2KahPafp0+VyKs99VZ0mBii+b
+ 50lC3qDyPpWdVLD52OT53OwhQ0GzbrmzSC0KvDtTlRbkYj5auVMnQGMebIO8YSMaaz/KZ7d1EB8
+ 2EpxFiQiBHhQzCC70Fg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-17_01,2026-09-16_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
+ suspectscore=0 bulkscore=0 impostorscore=0 phishscore=0 spamscore=0
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
+ definitions=main-2609170123
 
-842_DECOMPRESS_KUNIT_TEST selects the decompressor even when no other
-option needs it, including through KUNIT_ALL_TESTS.
-
-Depend on 842_DECOMPRESS as required by
-Documentation/dev-tools/kunit/style.rst. This also prevents the test from
-promoting a modular decompressor to built-in.
-
-Fixes: cca072cb1423 ("lib/842: add KUnit tests for the decompressor")
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Closes: https://lore.kernel.org/r/CAMuHMdVcZ5cV4-HrjLYfFKh6UshiVxq5eXCNyp0Z1k_SMAvF5g@mail.gmail.com/
-Assisted-by: LLM
-Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
----
-Follow-up to the accepted commit, based on cryptodev-2.6/master.
-
-Testing: Checked Kconfig dependency resolution for eight x86_64
-configurations before and after the change, including KUNIT_ALL_TESTS
-and modular/built-in combinations.
-
- lib/Kconfig.debug | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 48201092b3df..49f74005394b 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -2228,7 +2228,7 @@ if RUNTIME_TESTING_MENU
- config 842_DECOMPRESS_KUNIT_TEST
- 	tristate "KUnit tests for the 842 decompressor" if !KUNIT_ALL_TESTS
- 	depends on KUNIT
--	select 842_DECOMPRESS
-+	depends on 842_DECOMPRESS
- 	default KUNIT_ALL_TESTS
- 	help
- 	  Enable stream-validation and boundary tests for the software 842
-
-base-commit: 9e06d371730b841ad8fe79ebfccf0def9470201f
+Can someone please pick this series? Either via crypto or s390
+maintainers. Thx.
 -- 
-2.39.5 (Apple Git-154)
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
+
