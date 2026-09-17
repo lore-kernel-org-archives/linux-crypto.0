@@ -1,27 +1,28 @@
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020123.outbound.protection.outlook.com [52.101.46.123])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020091.outbound.protection.outlook.com [52.101.46.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B7C4AF9D3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E26B4B0481;
 	Thu, 17 Sep 2026 22:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.123
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.91
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789685983; cv=fail; b=u29uo2zgmYuX0FwfGG94IX+MRtQx8IpNNupKDNn5dTHgwXxwtE3bWIjZ6M/xMJ+1zuCS2OxH+BPeWmhJ6bHZ8+DSNtv2xGRQEO4wMFCj/WwYSZOI7BkbcWpxJraeojK7A1JY3WMpSrdEmISRsjV9B50Rd5i0tuhCogImYhqGO3I=
+	t=1789685984; cv=fail; b=qGcYz9JLloqvBSHNQDaOwB+o43v9+phbRMh0bTUlw+xkIMGYkPI4sWdMSOKAJM902/Dn01w6v75+pTKXeV4kfdbmHdx9io1Znss3T6SzAgPu4tDVz5rCVrKOwuIilvbzk2M+72G/q5zb0WqnDHGMjGqLSMCw9BCcmW9lfMYPp7c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789685983; c=relaxed/simple;
-	bh=KPid1DvbKZYJ6cuOZsaYd2mTDanxKfz4CaOu/0iEp84=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iuCnG7UVtaMSiSZHuZqptb3h1/OTisZI0dpl/OuWRAk8FjxlKtxLeXU72T4O01zPUK4DoS2sLs48y0jdTioXsOEXuq7Fh26WjvsVYUUmuvrKxOoKhYKHqimjJ+V46+SWQVWIvLNYu1SwmEAPLa9K1JmMd16IlamS1g0ehSIqBtU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com; spf=fail smtp.mailfrom=rambus.com; dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b=4mEq/oRE; arc=fail smtp.client-ip=52.101.46.123
+	s=arc-20240116; t=1789685984; c=relaxed/simple;
+	bh=evSt4A/FvkoEBAv+dzUe+LOCUW3gjCyHmNEsaYrdtsk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kuT87tLSFpC2O00qCVO1Gbd7BGJPidHTjo/r606enrb3YX0XnkDtWNHReMhpP0gXffmH5x3D90ZP6IMzL2+x7iFpCTw4Y+JG2kKCSqen1W8sVAv3kgRVrR6E5f2Inr2hso9ZxEiwp4dK73O6AhXMFYQPgdMroZjnyVPrScDBJlQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com; spf=fail smtp.mailfrom=rambus.com; dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b=gObE+Ts+; arc=fail smtp.client-ip=52.101.46.91
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=rambus.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b="4mEq/oRE"
+	dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b="gObE+Ts+"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vxZPIjd06lLNEM1j0uZN8O9Yb3hq4m0v2x81YL9RgjOBUEuYZrGIlgn/OYTw2YQWNOXN4t/vP7MJ8aNvah2cDiZ/kPpvUzq0DKGGVQoaD41w4axrGDJbeDpfNDzs+rr1c0Xik/j8fqDCC8e87PbzXxUmNPtgLKh3wQASV/Ou7N+G5xzHEiR5stQP3VQ+iDapEo4cPBXMXnfqYeWYv9l3gHF4xYR/6sgQllPx4Lydx2Egcwupq0I0B0CyZKHarbTOZAFrJO6m6Az5IsmlZJkCaA98oHSGpQFZk8jYtjmn8BgrEXx7Iddc4D9pCIU2J1wZ03t3IBaPVEhDXYqhQknO6A==
+ b=d9SuSS6cfPxZBn+evcz6kodLSBwWJ8+queg7Zy6sQ/NaYYRGjqrJANpNMzmG/mc7N3XyGLT93+iBCQrhcIH1vfD3uUf/MJrT51LQX2RstRPTkkSq4asifFWaJVLhjg9aP06UnZgSq6uhiJ7KsHpXk61x6C1179+tLm4WJTIK9YlbwthmVO1W9COFE3df/FUwwugznTYXF0rutYW4d+EjpZ+F3Rtl2+LWUiSmO5y6WfkWwySElJuygMTlQpyprkJpfAeXLmzn2hdEGcYSOD/WdeHlOjs0ra9BP/U4pGy1pKYkxB1WxCJNuoJ1NS5wN4kxgXFoiUNl7H+GZ5TkBlFwRg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O2rRE5vHcfB+4uDNq3iMXQNPfUjpQDF8HPLSPe7ddFc=;
- b=LTLOu5I9rMCQe0F3AAck026MALOZGgjZIwyTtFcYILWlqNYttlse+o1i6x4cy0itIoG+wGkCrUDA5MF6LVHBf6io5dCCM9aRkjkXh9tSVeVF1zqRa5eVbLIkWWPx97twNmoobh0VP5h+gX1hymukZJhWK2osrHodsv6s1HPqK65/IZBySMwYB2C+oA06ZPCDc1BLhU8hgTzBb/0CZYsxV7XFEmo6m/0/kwrnEO5i7YKFAatKB9g3PVOnkhwQhbedta9zl1RrvoFTQcjouontf/MjHgeQ566jRURHrA/6Xek49t2hMBYRfNroCmHRYBvPUb4fccHPx/RNPFFvN+pKPA==
+ bh=bDt7wAK5h+ciJIa07ayF73SKX4Bw7G7UKRr2NijQ5OM=;
+ b=FLXD+QE5EDzeJ0dSBCv6M31u4kCaFrH3kFyHNy/5N6QFxz87z6ecFfmjSdiHrrpZ/IJuL0GJV1O9oYmCFHQ7ZaeNd7D9QqV6/TzKx1OPRCVVKgqWIF0gbOZ+GLTkcLQa9+pzpJwxiKcxxTdElCzDMTIsO1z2SDHEUZpevvdt877StHmHZcJLMredmmPfkH+nCLVyzx/B9ht7HzwC6IDuEdfQspI+3Pun0bCdOXLIXtBSZvu9W0TlK/JVJqAy/oGXUnTD/c0AvQ84b1I98PBGHSVmAkAefqMeJMQjE31pXHpQIn1/mTnnMyk8Gllf3REExLxxq4tibIxaiKCNu+y2Tw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  192.86.86.210) smtp.rcpttodomain=cryptography.com smtp.mailfrom=rambus.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=rambus.com;
@@ -29,18 +30,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O2rRE5vHcfB+4uDNq3iMXQNPfUjpQDF8HPLSPe7ddFc=;
- b=4mEq/oREjyeKdx6/M/cddLtB2UufVY5j3zOkjcYYnVeQUhQWY8Z3MY1XcZbflfJ/R2habK4XVQ49dlS3sRGVj3J5l7E8dtBwNGNelpj43Uzg5m97Wc7h0lEIAHA9ne+gxvqBUS+TIPY5ajdafTX6ZxP4dnD/GRAQUHXpEMvF885CfPrZKfDMbj5ob1SKq2zdoUqWM3U4BnP9+5oD/lPoMVXUmqNJz1a7P7/99tA00qq7jaeydd87E2ETU9RXhKLyXhFH6J3rv8t11qBaPffgxsHvynsCDZcAaJCGis+qNB9itdPyTzGM2VAd5EScdH8eMNHM6HRlxsM+iDlAOdpRtA==
-Received: from SJ0PR03CA0034.namprd03.prod.outlook.com (2603:10b6:a03:33e::9)
- by DS0PR04MB9344.namprd04.prod.outlook.com (2603:10b6:8:1fb::19) with
+ bh=bDt7wAK5h+ciJIa07ayF73SKX4Bw7G7UKRr2NijQ5OM=;
+ b=gObE+Ts+W5bYqDoIyUP5jJ11fL/oJb2l3ll4gqEoTQfreXQaerlpGRS0bLUytKhyX4oRCuDzbAG/2+O1BTa6Ih+DDQ9hlWWdCIX4rt+PzI2Zo1XjUDrJOkoL0pkKARDkgZWX2T/PcW4sG8B2xwZ1/c03TNP9is/SVmzraj9JgLFNsL+pI6BiGWbRux+fAHG66SbzSmVorAxv2ay6O7dDxQ9HYsT5hIspV9/GjdJVAsiGBGT2qafxy59/yG0jazP6Z/W6QqHmgaxP0R4uVpuXhPXS3sWe1oYTrEbabrk/V2sMq1nZXy5BgYxD9PEzPRc1xbvhkVeKzxk6Iyi5sSjSaA==
+Received: from BLAPR03CA0022.namprd03.prod.outlook.com (2603:10b6:208:32b::27)
+ by CY5PR04MB994499.namprd04.prod.outlook.com (2603:10b6:930:12c::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.12; Thu, 17 Sep
- 2026 22:59:33 +0000
-Received: from SJ1PEPF000026C3.namprd04.prod.outlook.com
- (2603:10b6:a03:33e:cafe::55) by SJ0PR03CA0034.outlook.office365.com
- (2603:10b6:a03:33e::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.11 via Frontend Transport; Thu,
- 17 Sep 2026 22:59:32 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.13; Thu, 17 Sep
+ 2026 22:59:34 +0000
+Received: from BL6PEPF00020E66.namprd04.prod.outlook.com
+ (2603:10b6:208:32b:cafe::55) by BLAPR03CA0022.outlook.office365.com
+ (2603:10b6:208:32b::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.12 via Frontend Transport; Thu,
+ 17 Sep 2026 22:59:34 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 192.86.86.210)
  smtp.mailfrom=rambus.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=rambus.com;
@@ -48,12 +49,12 @@ Received-SPF: Pass (protection.outlook.com: domain of rambus.com designates
  192.86.86.210 as permitted sender) receiver=protection.outlook.com;
  client-ip=192.86.86.210; helo=hqxsv-psmtppxy02.rambus.com; pr=C
 Received: from hqxsv-psmtppxy02.rambus.com (192.86.86.210) by
- SJ1PEPF000026C3.mail.protection.outlook.com (10.167.244.100) with Microsoft
+ BL6PEPF00020E66.mail.protection.outlook.com (10.167.249.27) with Microsoft
  SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.451.8
- via Frontend Transport; Thu, 17 Sep 2026 22:59:31 +0000
+ via Frontend Transport; Thu, 17 Sep 2026 22:59:34 +0000
 Received: from hqxsv-cmdev3-aousherovitch.rambus.com (hqn-lb-int-float.rambus.com [10.12.20.20])
-	by hqxsv-psmtppxy02.rambus.com (Postfix) with ESMTP id A3BC01801748;
-	Thu, 17 Sep 2026 22:59:31 +0000 (UTC)
+	by hqxsv-psmtppxy02.rambus.com (Postfix) with ESMTP id 16D401801763;
+	Thu, 17 Sep 2026 22:59:32 +0000 (UTC)
 From: Alex Ousherovitch <aousherovitch@rambus.com>
 To: Albert Ou <aou@eecs.berkeley.edu>,
 	Alex Ousherovitch <aousherovitch@rambus.com>,
@@ -78,10 +79,12 @@ Cc: Alexandre Ghiti <alex@ghiti.fr>,
 	linux-riscv@lists.infradead.org,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Thi Nguyen <thin@rambus.com>
-Subject: [PATCH v5 00/19] crypto: cmh - add Rambus CryptoManager Hub driver
-Date: Thu, 17 Sep 2026 15:59:09 -0700
-Message-ID: <20260917225929.2494111-1-aousherovitch@rambus.com>
+Subject: [PATCH v5 07/19] crypto: cmh - add SM3 ahash
+Date: Thu, 17 Sep 2026 15:59:16 -0700
+Message-ID: <20260917225929.2494111-8-aousherovitch@rambus.com>
 X-Mailer: git-send-email 2.43.7
+In-Reply-To: <20260917225929.2494111-1-aousherovitch@rambus.com>
+References: <20260917225929.2494111-1-aousherovitch@rambus.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -91,393 +94,746 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000026C3:EE_|DS0PR04MB9344:EE_
+X-MS-TrafficTypeDiagnostic: BL6PEPF00020E66:EE_|CY5PR04MB994499:EE_
 Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 017cc748-e20f-4a05-e204-08df150f55d1
+X-MS-Office365-Filtering-Correlation-Id: ec77f20e-171f-476a-f68b-08df150f5762
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|7416014|36860700016|1800799024|376014|23010399003|13003099007|921020|3023799007|7136999003|11063799006|56012099006|5023799004|6133799003|18002099003|10067099003;
+	BCL:0;ARA:13230040|36860700016|82310400026|23010399003|1800799024|376014|7416014|3023799007|56012099006|10067099003|11063799006|921020|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	kPP1JKV/10yVxSDwy/YzH3K2fW8W//Ex8gD/d+/i1G/8xB3SycPR/auoFqy1qtNXCyyugs/9nQu5U2gt3jm3JcMghrVb4uuHtyKSiWR5e/nP/+YQwA2tHNO0+WesYBLzmYX5NsNmt0ydPKDMr6rlC3O+mjSQM9YtFtp6XW6QpQEN0kMWlaacbpLe/YxVG8x1ZBtg5fhg0qfwHFYWsmEcOI24rBdZAmYnMO7Km4aZehvdPJqQTyWYf1qRWUhUDB6qmyBYRKsXelKMpoynQcMPKRe5dmJZ6CQbp2UuRcYTtBextT81n2NW0qyHjAUkbVFT9HIZddDrIrd9KX3IRP/n/C1UG4HnswNsaT9uUjEaV4Uu0pFyAyYO3ExWTuhvYQBRNoNdTgahW595cSrskqGN4ge7VsVcH2ogDXnVVz2CedIppEGIdbK/adoiroR4XVRh74325Tm+/UZUGr5ZamF5GuiFSupVfB8Q8zIsC4+g7Eeaqo93kZQBOgo5LUm+1M4APySTB4oCNbXptOBQISjoMHcLQ2LnUrRgB4JoDIUX3yStpDMg/gsSleFDWpfO+w7IH2+DQU2USF+65sZ2cnz3M9UbQ3U2a+EwEDr5Rp51LykhYvc5rpN/+zOcl2YHFpXFd2SePJOWTh3Tf3LDvfS1RPb5S3wgZNB6TGXxZwyd5u87QSRyc0nP6DzzrwnIIkcN9j9qjruVlNxk9cMP4ymh4e8gageM34SSzx4c7xw02eZ9Ax12ia+cJ4XYtpc1vHpU
+	Lz4ktcXv+GHHGVvNf4LwXJ1wktbeM0c2I0Sat8TlMMJU0UA50dx7E4ueQr0gcgfxkFh7e5KManHMklEcUAH1+AEkXQZNp/ckHekYBY+IeNWWmjWzYIwRovX3/+zKdsFUA/h+aox4vyHCU5+04yzkBPo+9brA5KUT8yrT+4v909aC1wAX9a5dN8crrCGHSwGeY5UlDQuW4k4a3nY3XkziesLTHIgH+j+BumIO5Y39c3bo1ZyAi7CZZMEVpSVaT3x2kmvpq+1O1H/ye6CvACHEWzAgDwKYybbqvMCOSqHe5zaiN2JOxvlQ2k9ud3bvNmqhxRcTuYl+g8rM6fmeo7JC66yrf6EWxJAmppuZzJw6+uHRCE61c3EFOYtzz2vCJxdIdvtInvpyyUIexlU7eWnnhAxvl1y74TJAqiUZgKN1N54rnZEEvzO/6u0aiwoiNN95rbjQhkn1gbXpaE10X0c1FEmyC0TIF2s+4KjySHpp2KzxIJ1+nzwoyS6qdQ9XvmaxI/eY4oe0U8St+o1j7gPEV0yAM0ewsmktNPrU29zmlW8NyJ6huH9GKPeuwTULg1ItTaSEFFo1R5R2mNmC/IuPD4vSee/G0KhCWFJ1e6kmT4OFVGT6q0OgwvJTmQDdIZukEbYWsKtdfl2LVWyUSrwiuu6CRenoP3IhHqowHvtcGMFWA/WpUxFPUPjXAiHSRLCFYQJiebm+IDvSYYTttftzSk016vfObTftZMkljhYulDvyTUuId7PHkXCtFKKhMjTx
 X-Forefront-Antispam-Report:
-	CIP:192.86.86.210;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:hqxsv-psmtppxy02.rambus.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(36860700016)(1800799024)(376014)(23010399003)(13003099007)(921020)(3023799007)(7136999003)(11063799006)(56012099006)(5023799004)(6133799003)(18002099003)(10067099003);DIR:OUT;SFP:1102;
+	CIP:192.86.86.210;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:hqxsv-psmtppxy02.rambus.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(23010399003)(1800799024)(376014)(7416014)(3023799007)(56012099006)(10067099003)(11063799006)(921020)(22082099003)(18002099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	OOCMzQS42fXbtruupVrWIxXf0OwXSzqDUtLPDz+qeNQ+p+3SEceHFhxAIzfWjAI/Pu+RBvas1W/eikP0Qvp2PQitZ/850dHIl3sLpdk1hWDY13Ic1QafKV9omx4RB1Gl127BCoL1TDhAqKob6yd74zVfyqYo0uRKF/XAXuoCG2E901QcSIfSNSdJul4r5DV51v39E5D5OoTeoBPBq1zgXwD7VGjaanyTudaN3Kd1FSXEnB6YmOIsCmz+H+iY2H81WKLiAU4tyE37qOWEWCgzeKCqMUX4Ops+BbKMDlaFAdxSNkf62NYrjYkE+wufTaiEuVvG4s3tvlwDcVfWIWjuTEkuIeeSZwrAKzIIuu8ZN8OZwT1hrs9RmKXl3uDqOnaiDhh7Uo8Ciwkaxf6DW1zgPnl4DufywFj1buDdvCFR/vMSEv9AluT59L5lVi960DEU
+	s9IrzjqNYuwPi3uMCSQsz9dJCswuH5Bq0JmiZoI68UGbmP/er/M/IOxABVPe3vKGVfVy0fqUl7ytMKP3otUmbrjqhB9h8MkG2FRfuXZTxL2YIJVntFJ7CR5RjAHVyO1sHm7f8wHu56tahEeEvV0IyRqE4zu2dOy+PTmsE2fjRoIcIpDbsqfFi7zpyJHNzBf06i438+ovqgkTVC4g0VW7aKTeUJO+9vigkGj7Nbcryecg3NoZ+RqqrskCERNE0X2wWBybJ2FboyMnmBbAWUNxH4RRn9b6tY1RF3FqXg3F0rUF8DPwhn48WAaGjYqwufl7u3txqYj+xQE5AEr/6EGmkuLJ9FDye6I5BVPSoxQFBkAMJrnV99G97vmr3xx5fEsUD+mQWjpoGqzoqSpHeX73XJ50Ot5HS4NY8G2EtV+eERHtSNIaaQOMGkaFV/jJRGvU
 X-OriginatorOrg: rambus.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2026 22:59:31.7925
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2026 22:59:34.2354
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 017cc748-e20f-4a05-e204-08df150f55d1
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec77f20e-171f-476a-f68b-08df150f5762
 X-MS-Exchange-CrossTenant-Id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=bd0ba799-c2b9-413c-9c56-5d1731c4827c;Ip=[192.86.86.210];Helo=[hqxsv-psmtppxy02.rambus.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000026C3.namprd04.prod.outlook.com
+	BL6PEPF00020E66.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR04MB9344
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR04MB994499
 
-crypto: cmh - add Rambus CryptoManager Hub hardware crypto accelerator
+Register the SM3 ahash algorithm using the CMH SM3 core (core ID
+0x05).  Supports incremental update/finup/final and export/import.
 
-This series adds a driver for the Rambus CryptoManager Hub (CMH), a
-hardware cryptographic accelerator IP from Cryptography Research at
-Rambus Inc. (https://www.rambus.com/cryptographyresearch/).
-CMH provides a broad set of symmetric, asymmetric, and post-quantum
-cryptographic algorithms accelerated in hardware, accessed via a
-mailbox-based Virtual Command Queue (VCQ) interface.
-
-The hardware is a platform device matched via device tree
-(compatible = "rambus,cmh-v1030").  It exposes a single MMIO register
-region (SIC) with per-mailbox doorbell, status, and command registers.
-Each mailbox has DMA-coherent queue memory for VCQ command
-submission and completion.
-
-Driver architecture:
-
-  In-kernel users                       /dev/cmh_mgmt (ioctl)
-  (dm-crypt, IPsec, kTLS, fscrypt)      (key management)
-       |                                        |
-       v                                        v
-  +----------------------------------------------------+
-  |        Kernel Crypto API + hwrng (72 total)        |
-  |   ahash | skcipher | aead | akcipher | sig | kpp   |
-  +----------------------------------------------------+
-       |                                           |
-       v                                           v
-  +------------------+    +------------------------+
-  | Transaction Mgr  |--->| Key / Mgmt subsystem   |
-  | (kthread, CMQ)   |    | (datastore, ioctl ops) |
-  +------------------+    +------------------------+
-       |
-       v
-  +------------------+     +-------------------+
-  | MQI (VCQ pack,   |---->| Response Handler  |
-  |  DMA map, submit)|     | (threaded IRQ,    |
-  +------------------+     |  watchdog, unmap) |
-       |                   +-------------------+
-       v                          ^
-  +-----------+              +-----------+
-  | Hardware  |--- IRQ ----->| Hardware  |
-  | (mailbox) |              | (mailbox) |
-  +-----------+              +-----------+
-
-The transaction manager runs as a dedicated kthread that pulls
-requests from a central command queue, packs VCQ entries, maps DMA
-buffers, and submits to the least-loaded mailbox.  Completion is
-handled by per-mailbox threaded IRQs.  The driver returns
--EINPROGRESS for async crypto requests and supports the
-CRYPTO_TFM_REQ_MAY_BACKLOG flag for queue-full backpressure.
-
-Registered algorithms (72 total):
-
-  Type       Count  Algorithms
-  ---------  -----  --------------------------------------------------
-  ahash         15  SHA-{224,256,384,512}, SHA3-{224,256,384,512},
-                     SHAKE-{128,256}, cSHAKE-{128,256},
-                     KMAC-{128,256}, SM3
-  ahash(HMAC)    8  HMAC-SHA-{224,256,384,512},
-                     HMAC-SHA3-{224,256,384,512}
-  ahash(MAC)     4  CMAC(AES), CMAC(SM4), XCBC(SM4), Poly1305
-  skcipher      11  AES-{ECB,CBC,CTR,CFB,XTS},
-                     SM4-{ECB,CBC,CTR,CFB,XTS}, ChaCha20
-  aead           6  AES-{GCM,CCM}, SM4-{GCM,CCM},
-                     rfc7539(chacha20,poly1305),
-                     rfc7539esp(chacha20,poly1305)
-  akcipher       1  RSA (2048--4096 bit; 512/1024 legacy/test)
-  sig           23  ECDSA P-{256,384,521}, SM2 (verify-only),
-                     ML-DSA-{44,65,87},
-                     SLH-DSA (12 parameter sets),
-                     LMS, LMS-HSS, XMSS, XMSS-MT
-  kpp            3  ECDH P-{256,384}, X25519
-  hwrng          1  DRBG-backed /dev/hwrng
-
-The keyed MACs (HMAC, CMAC, XCBC, Poly1305) accumulate input for a
-single finalize-time submission -- the hardware has no keyed-MAC
-save/restore -- and fall back to a generic software MAC (Poly1305 uses
-the in-kernel library) once the input or a clone exceeds a 64 KB window,
-so they are not input-capped.  KMAC has no software equivalent and keeps
-the cap; the driver selects the generic MAC/hash and Poly1305-library
-configs for the fallbacks.
-
-Ioctl-only algorithms (not registered with the crypto API at all):
-  - EdDSA (Ed25519, Ed448): sign and verify
-  - ML-KEM (ML-KEM-512/768/1024): no standard kernel KEM API exists
-
-The driver also exposes /dev/cmh_mgmt, a misc device for the hardware
-key-management plane: key provisioning and hardware-held-key operations
-that the in-kernel crypto API cannot express.  Some of its ioctls name
-primitives the driver also registers; that overlap is deliberate and
-bounded (the ioctl path keeps private keys hardware-resident).  The
-"crypto: cmh - add key provisioning and management" patch explains the
-split in full.  The device requires CAP_SYS_ADMIN and is built
-conditionally on CONFIG_CRYPTO_DEV_CMH_MGMT (default n); when disabled
-the ioctl interface is absent while all kernel crypto API algorithms
-remain registered.
-
-The ML-DSA sig algorithms are registered at priority 5001.  The
-kernel's crypto/mldsa.c registers at priority 5000 with verify-only
-(sign returns -EOPNOTSUPP).  Our driver provides full HW-accelerated
-sign + verify, so the higher priority ensures the hardware
-implementation is preferred when the driver is loaded.
-
-Power management uses DEFINE_SIMPLE_DEV_PM_OPS.  On suspend the
-transaction manager drains in-flight requests (configurable 10s
-timeout, returns -ECANCELED on timeout), stops the kthread, and
-masks IRQs.  On resume it re-verifies SIC/boot status and restarts
-the kthread.
-
-Dependencies:
-  - Kernel 7.1+ minimum; developed against Herbert Xu's cryptodev-2.6
-    tree (7.3.0-rc1)
-  - sig_alg backend (upstream since 6.13)
-  - CMH eSW loaded independently by hardware before driver probe
-
-The driver registers all algorithms through the standard in-kernel
-crypto API; in-kernel users (dm-crypt, fscrypt, IPsec, etc.) consume
-them directly.  Key provisioning and hardware-held-key operations are
-exposed to user space via /dev/cmh_mgmt ioctls.
-
-Public hardware documentation:
-  Product brief: https://go.rambus.com/ch-7xx-and-cc-7xx-product-brief
-  No public datasheets are currently available.  The driver was
-  developed against the Rambus CryptoManager Hub Hardware Reference
-  Manual (Rambus Inc. confidential).  Detailed hardware reference is
-  available under NDA from Rambus Inc.; contact the maintainers listed
-  in MAINTAINERS for access during review.
-
-Tested on RISC-V and ARM64 QEMU emulation with the CMH hardware
-model (QEMU TCG, 512 MiB RAM).  Also exercised on Xilinx VMK180
-FPGA board with real CMH IP.
-
-  - testmgr: 41 CMH algorithm registrations matched by upstream
-    test vectors, all pass; 30 names report "No test for" (PQC
-    families, KMAC, cSHAKE - no upstream vectors yet).
-  - kselftest tools/testing/selftests/drivers/crypto/cmh:
-    6 pass, 0 fail.
-
-checkpatch.pl --strict: 0 errors, 0 warnings, 0 checks on all
-files (the only output is the expected per-file "does MAINTAINERS
-need updating?" reminder, satisfied by the MAINTAINERS patch).
-sparse (C=2): 0 warnings.
-W=1 -Werror: clean.
-make dt_binding_check: clean (dtschema validates the
-rambus,cmh-v1030.yaml binding).
-
-Tested with the following debug options enabled simultaneously
-(submit-checklist "Test your code" item 1):
-  CONFIG_PROVE_LOCKING, CONFIG_PROVE_RCU, CONFIG_DEBUG_LOCK_ALLOC,
-  CONFIG_DEBUG_OBJECTS_RCU_HEAD, CONFIG_SLUB_DEBUG,
-  CONFIG_DEBUG_PAGEALLOC, CONFIG_DEBUG_MUTEXES, CONFIG_DEBUG_SPINLOCK,
-  CONFIG_DEBUG_PREEMPT, CONFIG_DEBUG_ATOMIC_SLEEP.
-  Result: no lockdep warnings, no ODEBUG splats, no slab corruption.
-
-Additionally tested (separate passes - mutually exclusive configs):
-  - CONFIG_KASAN + CONFIG_UBSAN + CONFIG_DEBUG_KMEMLEAK + CONFIG_KFENCE:
-    no sanitizer findings; KMEMLEAK scan reports 0 unreferenced objects.
-  - CONFIG_KCSAN (arm64; riscv64 lacks HAVE_ARCH_KCSAN):
-    0 data-race reports attributed to the driver.
-
-Stack usage: worst-case under 1 KB on both riscv64 and arm64
-(scripts/checkstack.pl).  Hardware command buffers live in
-per-request context (heap-allocated by the crypto framework).
-
-Alex Ousherovitch (19):
-  dt-bindings: crypto: add Rambus CryptoManager Hub
-  crypto: cmh - add core platform driver
-  crypto: cmh - add key provisioning and management
-  crypto: cmh - add SHA-2/SHA-3/SHAKE ahash
-  crypto: cmh - add HMAC ahash
-  crypto: cmh - add CSHAKE/KMAC ahash
-  crypto: cmh - add SM3 ahash
-  crypto: cmh - add AES skcipher/aead/cmac
-  crypto: cmh - add SM4 skcipher/aead/cmac/xcbc
-  crypto: cmh - add ChaCha20-Poly1305
-  crypto: cmh - add DRBG hwrng
-  crypto: cmh - add RSA akcipher
-  crypto: cmh - add ECDSA/SM2 sig
-  crypto: cmh - add ECDH/X25519 kpp
-  crypto: cmh - add ML-KEM/ML-DSA (QSE)
-  crypto: cmh - add SLH-DSA/LMS/XMSS (HCQ)
-  Documentation: ioctl: add CMH ioctl documentation and register 'J'
-  selftests: crypto: cmh - add kselftest for management ioctl
-  MAINTAINERS: add Rambus CryptoManager Hub (CMH)
-
+Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
+Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
 ---
+ drivers/crypto/cmh/Makefile          |   3 +-
+ drivers/crypto/cmh/cmh_main.c        |   9 +
+ drivers/crypto/cmh/cmh_sm3.c         | 604 +++++++++++++++++++++++++++
+ drivers/crypto/cmh/include/cmh_sm3.h |  28 ++
+ 4 files changed, 643 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/cmh/cmh_sm3.c
+ create mode 100644 drivers/crypto/cmh/include/cmh_sm3.h
 
-Changes in v5:
- - dt-bindings: crypto: cmh: rework the compatible and rambus,cores per
-   the DT-bindings review -- require a SoC-specific compatible ahead of
-   the "rambus,cmh-v1030" IP fallback using the inside-secure,eip93
-   "not: {}" idiom (which forbids a bare or placeholder compatible), and
-   drop the example since none can validate until a real SoC is
-   upstreamed; switch rambus,cores from hardware core-ID integers to a
-   string-array of core names (hc/aes/sm4/sm3/hcq/qse/pke/ccp) and drop
-   the hex-ID table; keep clocks and reset-gpios optional with a
-   hardware-framed note (the management host owns clock and reset), and
-   replace the ambiguous positional clocks item list with a
-   count-bounded description.  The driver maps the names to core IDs and
-   rejects an unknown name.
- - crypto: cmh: fix transaction-manager / response-handler races -- on a
-   multi-VCQ error, FLUSH+drain instead of RESTARTing the eSW into freed
-   slots; clear the watchdog-active flag before deleting the timer;
-   serialise the mailbox TAIL doorbell against the wake re-poke; drain
-   stragglers with -ECANCELED after a management FLUSH; ABORT on a sync
-   timeout only when the request is at the mailbox HEAD; reject an
-   over-large num_vcqs; and re-check the running flag under the queue lock.
- - crypto: cmh: convert the SHA-2 / SHA-3 / SHAKE, SM3, and cSHAKE ahash
-   drivers to CRYPTO_AHASH_ALG_BLOCK_ONLY per the v4 review -- drop the
-   hand-rolled partial-block buffering and let the Crypto API hold back
-   sub-block data.  .update() hashes whole blocks and reports the leftover
-   count for the API to re-buffer, .finup() also serves .final(), and
-   export/import carry only the hardware checkpoint.  The drivers no longer
-   set CRYPTO_ALG_REQ_VIRT (BLOCK_ONLY buffering is scatterlist-based), so
-   virtual-address ahash requests are no longer accepted.
- - crypto: cmh: harden the streaming ahash drivers -- cap the bytes an
-   AF_ALG client can pin per transform (HMAC / KMAC / AES-CMAC / SM4-CMAC /
-   Poly1305) and give Poly1305 its own DMA-safe key buffer; reject an
-   over-large one-shot hash / SM3 / cSHAKE linearisation with -EMSGSIZE;
-   and make each MAC .final()/.finup() retry-safe by preserving the
-   resumable state on a synchronous submit rejection.
- - crypto: cmh: management-plane hardening -- serialise the /dev/cmh_mgmt
-   ioctls under one mutex; scrub transient and partially-created datastore
-   objects on the SM2-ECDH-hash and KIC/KEY error paths; guard the
-   added-randomness DMA unmap on the buffer and zeroise it; reject RSA key
-   sizes not a multiple of 8 bits; and allow 0-length ML-DSA messages.
- - crypto: cmh: fix a mid-function declaration in the SLH-DSA sign path.
- - Rebased onto current cryptodev-2.6 (7.3.0-rc1); no driver code changes
-   were required.  The 7.3 crypto changes (the lib/crypto AES-mode
-   refactor, the internal xts_verify_key split, and the mod_devicetable.h
-   -> device-id/ reorg) touch none of the crypto APIs the driver uses.
-
-Changes in v4:
- - dt-bindings: crypto: cmh: rename the per-mailbox child node to
-   queue@N and describe its ring geometry as plain counts rather than
-   log2 -- replace rambus,slots-log2 with rambus,num-slots (a
-   power-of-two slot count) and rambus,strides-log2 with
-   rambus,slot-stride-bytes (a power-of-two byte stride); the driver
-   converts each to the register log2 encoding.
- - crypto: cmh: convert the platform driver to module_platform_driver()
-   and dev_err_probe(), and drop the single-instance guard.
- - crypto: cmh: remove the informational dev_info() logging from the
-   probe, register, remove, suspend and resume paths.
- - crypto: cmh: drop every production module parameter -- the eSW boot
-   timeout, hwrng quality and DRBG config become built-in constants and
-   the command-queue/backlog depths move to debugfs (debug builds only);
-   only debug-gated test knobs remain under CONFIG_CRYPTO_DEV_CMH_DEBUG.
- - dt-bindings: crypto: cmh: rename the binding file to
-   rambus,cmh-v1030.yaml to match the compatible string, and trim the
-   clocks and interrupts property descriptions.
- - crypto: cmh: move the /dev/cmh_mgmt rationale (why its ioctl surface
-   does not duplicate the registered crypto-API transforms) from the
-   cover letter into the key-management patch commit message.
- - crypto: cmh: bound the KEY_NEW/KEY_NEW_RANDOM datastore object length
-   and scrub orphaned datastore objects on the management key-generation
-   error paths
- - crypto: cmh: further static-analysis error-path and input-validation
-   fixes (management DMA-unmap sentinels; reject absent randomness/context
-   pointers in the ML-KEM/ML-DSA/SLH-DSA ioctls; guard hash/sm3 finup
-   length against u32 overflow; commit RSA key state only after full
-   validation; clamp the ecdsa digit count before sizing).
- - crypto: cmh: fix transaction-manager submit races and shared-IRQ
-   setup (bound the multi-VCQ walk within vcq_data; arm the async
-   per-request timer before the doorbell to avoid a completion race;
-   de-duplicate shared mailbox virqs so probe does not fail with
-   -EBUSY on platforms that share an interrupt line).
- - crypto: cmh: fix symmetric stream and out-of-place AEAD output
-   (declare chunksize for the CTR/CFB stream modes so the crypto layer
-   buffers sub-block data instead of splitting the keystream; copy the
-   AAD verbatim into the destination for out-of-place AES/SM4 AEAD).
- - crypto: cmh: further keyed-hash and PKE hardening (validate raw NIST
-   ECDH scalars with ecc_is_key_valid; reject the unimplemented PKE_ECDH
-   DS-result mode instead of overrunning the output; defer the hash
-   holdback update until after its allocations; bound the hmac fallback
-   state to the export window; restore the management temp-dirty flag on
-   flush failure; back off the hwrng blocking read on a transient DRBG
-   error).
- - crypto: cmh: stream cSHAKE incrementally in hardware (absorb full
-   sponge rate-blocks per update via SAVE/RESTORE and hold back only the
-   sub-rate tail) instead of buffering all input in kernel memory;
-   any length, matching the plain hashes.
- - crypto: cmh: make the streaming hash/sm3/cSHAKE .update() retry-safe --
-   defer moving the sub-rate tail into the holdback until after an
-   accepted submit, so a queue-full -EAGAIN (no MAY_BACKLOG) leaves the
-   request state pristine for the caller to retry.
- - crypto: cmh: ECDH mgmt ioctl returns only the raw shared secret to
-   host; drop the unimplemented DS-result flag and result_cid from the
-   UAPI, with flags and the reserved fields rejected unless zero.
- - dt-bindings: crypto: cmh: allow clock-names subsets -- core with an
-   optionally-independent core-div2 and/or rt (oneOf) instead of a
-   positional list that could not express [core, rt].
- - crypto: cmh: register an algorithm family only when its hardware core
-   is present in CORE_ENABLE, so an absent core advertises no crypto-API
-   algorithms; the core-dispatch path also WARNs and bails on an absent
-   core type as a backstop for the /dev/cmh_mgmt ioctl path.
-
-Changes in v3:
- - dt-bindings: crypto: cmh: rework the mailbox topology per DT review --
-   mailbox@N child nodes; cores discovered from CORE_ENABLE, not the DT.
- - dt-bindings: crypto: cmh: adopt the "rambus" vendor prefix and a
-   device-specific "rambus,cmh-v1030" compatible (the IP revision) per
-   DT review; rename the per-mailbox properties to rambus,slots-log2 /
-   rambus,strides-log2 / rambus,cores and the crypto driver-name prefix
-   to rambus-cmh-*.
- - dt-bindings: crypto: cmh: describe the optional functional clocks
-   (core, core-div2, rt) and an optional host-driven reset-gpios; the
-   driver enables all supplied clocks and acquires the optional reset
-   line deasserted.
- - crypto: cmh: register the platform driver from module_init() without
-   unregistering on probe failure; propagate -EPROBE_DEFER from
-   of_irq_get().
- - crypto: cmh: harden the key-management and crypto error paths; fix
-   three transaction-manager concurrency issues found by an automated
-   kernel-style review of v2.
- - crypto: cmh: further automated kernel-style review fixes (hwrng bounce
-   buffer and short-read, truncated export state, RSA re-key unmap, MAC
-   setkey ordering, CCM fallback alignment, persistent PKE/PQC key buffer).
- - crypto: cmh: give the buffered keyed MACs (hmac, cmac, xcbc, poly1305)
-   a software fallback past the 64 KB window instead of a hard input cap;
-   KMAC keeps its hard cap and rejects export/import.
- - crypto: cmh: rfc7539(chacha20,poly1305): always issue the AAD-final
-   command, fixing -EIO on empty-AAD requests.
- - crypto: cmh: chacha20 skcipher: leave req->iv unchanged on completion,
-   matching the generic chacha20 skcipher.
- - Documentation: cmh: describe the management ioctls as a permanent
-   interface and add ioctl struct layouts; document the keyed-MAC
-   software fallback and KMAC exception.
-
-Changes in v2:
- - crypto: cmh: wait for both eSW readiness bits at probe. The probe
-   readiness gate polled SW_BOOT_STATUS for MISSION (bit 6, primary
-   VCQ engine) only, but the sidecar engine signals readiness
-   separately via MISSION2 (bit 7), asserted asynchronously. Gate on
-   both bits so an operation offloaded to the sidecar cannot race an
-   engine that is not yet up.
- - crypto: cmh: compute cmac(sm4) of a zero-length message in software.
-   The SM4 core mishandles an empty CMAC input, so -- exactly like the
-   existing xcbc(sm4) empty-message path, and per NIST SP 800-38B -- the
-   driver now derives the K2 subkey and computes the tag with a software
-   cipher. Surfaced by the testmgr fuzz comparison against the generic
-   cmac(sm4); no change for non-empty messages.
- - Documentation: link cmh_mgmt.rst into the userspace-api/ioctl index
-   toctree, fixing a "document isn't included in any toctree" htmldocs
-   warning reported on the v1 posting of patch 17.
- - crypto: cmh: carry the XTS block offset (xts_offset) inline in the
-   AES INIT command, matching the updated CMH hardware ABI that
-   retired the separate XTS_OFFSET command. Always 0 on the skcipher
-   path (data units start at block 0); no functional change.
- - MAINTAINERS: drop the internal moderated list (sipsupport@rambus.com)
-   and the T: tree line from the CMH entry, per review. The driver
-   goes through the crypto tree, so keep only linux-crypto@vger.kernel.org
-   and no T: line.
- - Rebased onto current cryptodev-2.6 (v7.2-rc1); no code changes were
-   required (the merge window touches none of the crypto APIs the driver
-   uses).
-
-v1: https://lore.kernel.org/linux-crypto/20260625173328.1140487-1-skrishnamoorthy@rambus.com/
-v2: https://lore.kernel.org/linux-crypto/20260709203037.1884436-1-skrishnamoorthy@rambus.com/
-v3: https://lore.kernel.org/linux-crypto/20260806195519.2703224-1-skrishnamoorthy@rambus.com/
-v4: https://lore.kernel.org/linux-crypto/20260825221539.255951-1-aousherovitch@rambus.com/
-
-base-commit: 9695df3b1db4ac4534274d38ee16e3b9b0bf910e
+diff --git a/drivers/crypto/cmh/Makefile b/drivers/crypto/cmh/Makefile
+index 3ab154744658..664b2a20bc19 100644
+--- a/drivers/crypto/cmh/Makefile
++++ b/drivers/crypto/cmh/Makefile
+@@ -18,7 +18,8 @@ cmh-y := \
+ 	cmh_hash.o \
+ 	cmh_hmac.o \
+ 	cmh_cshake.o \
+-	cmh_kmac.o
++	cmh_kmac.o \
++	cmh_sm3.o
+ 
+ # Management ioctl device (/dev/cmh_mgmt): key lifecycle, PKE, PQC ioctls.
+ cmh-$(CONFIG_CRYPTO_DEV_CMH_MGMT) += \
+diff --git a/drivers/crypto/cmh/cmh_main.c b/drivers/crypto/cmh/cmh_main.c
+index 474b438fc18a..4ad1500d8e49 100644
+--- a/drivers/crypto/cmh/cmh_main.c
++++ b/drivers/crypto/cmh/cmh_main.c
+@@ -35,6 +35,7 @@
+ #include "cmh_hmac.h"
+ #include "cmh_cshake.h"
+ #include "cmh_kmac.h"
++#include "cmh_sm3.h"
+ #include "cmh_mgmt.h"
+ #include "cmh_registers.h"
+ #include "cmh_debugfs.h"
+@@ -226,6 +227,11 @@ static int cmh_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_kmac_register;
+ 
++	/* Register SM3 hash algorithm */
++	ret = cmh_sm3_register();
++	if (ret)
++		goto err_sm3_register;
++
+ 	/* Register key management device (/dev/cmh_mgmt) */
+ 	ret = cmh_mgmt_register();
+ 	if (ret)
+@@ -236,6 +242,8 @@ static int cmh_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ err_mgmt_register:
++	cmh_sm3_unregister();
++err_sm3_register:
+ 	cmh_kmac_unregister();
+ err_kmac_register:
+ 	cmh_cshake_unregister();
+@@ -270,6 +278,7 @@ static void cmh_remove(struct platform_device *pdev)
+ 	cfg = &dev->config;
+ 
+ 	cmh_mgmt_unregister();
++	cmh_sm3_unregister();
+ 	cmh_kmac_unregister();
+ 	cmh_cshake_unregister();
+ 	cmh_hmac_unregister();
+diff --git a/drivers/crypto/cmh/cmh_sm3.c b/drivers/crypto/cmh/cmh_sm3.c
+new file mode 100644
+index 000000000000..a08341512e5d
+--- /dev/null
++++ b/drivers/crypto/cmh/cmh_sm3.c
+@@ -0,0 +1,604 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- SM3 Hash Driver (CORE_ID_SM3)
++ *
++ * Registers an asynchronous hash (ahash) algorithm for SM3
++ * (GB/T 32905-2016) using the CMH SM3 core.  This is a standalone
++ * driver separate from cmh_hash.c (which handles HC-based SHA-2/3/SHAKE)
++ * because SM3 runs on a different hardware core with its own command
++ * IDs and context layout.
++ *
++ * Incremental HW update model (same pattern as cmh_hash.c).  The driver
++ * sets CRYPTO_AHASH_ALG_BLOCK_ONLY, so the Crypto API buffers partial
++ * blocks and .update() only ever sees whole-block-aligned data:
++ *
++ *   .init()   -> software-only: zero per-request context
++ *   .update() -> SM3_CMD_INIT [+ RESTORE] + UPDATE + SAVE + FLUSH;
++ *                return -EINPROGRESS, completing with the leftover byte
++ *                count the API must buffer (0 when block-aligned)
++ *   .finup()  -> SM3_CMD_INIT [+ RESTORE] [+ UPDATE] + FINAL + FLUSH
++ *                (also serves .final via the API: nbytes == 0)
++ *   .digest() -> INIT + UPDATE + FINAL + FLUSH (single-shot via finup)
++ *   .export()/.import() -> software-only: copy the SM3 context
++ *                checkpoint; the API appends its own partial-block buffer
++ *
++ * This is an sg-only driver (no CRYPTO_ALG_REQ_VIRT): BLOCK_ONLY buffer
++ * prepending assumes scatterlists.
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/crypto.h>
++#include <crypto/internal/hash.h>
++#include <crypto/scatterwalk.h>
++#include <linux/scatterlist.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++
++#include "cmh_sm3.h"
++#include "cmh_vcq.h"
++#include "cmh_txn.h"
++#include "cmh_dma.h"
++
++/* Per-Request State */
++
++/*
++ * Exported SM3 state -- serialised by .export(), deserialised by
++ * .import().  This is what statesize advertises; the Crypto API
++ * appends its own partial-block buffer on top.
++ */
++struct cmh_sm3_export_state {
++	u8  checkpoint[SM3_CONTEXT_SIZE]; /* SM3 context from last SAVE */
++	u32 hw_started;                   /* non-zero if checkpoint valid */
++};
++
++#define CMH_SM3_MAX_PAYLOAD    5   /* INIT + RESTORE + UPDATE + FINAL/SAVE + FLUSH */
++#define CMH_SM3_MAX_PACKED     (CMH_SM3_MAX_PAYLOAD * 2)
++
++/*
++ * Checkpoint embedded inline: the kernel ahash API has no per-request
++ * destructor, so a heap-allocated checkpoint leaks if a request is
++ * abandoned without .final().
++ *
++ * Mapping the inline checkpoint for DMA is safe even on non-coherent
++ * platforms: it is only ever mapped DMA_TO_DEVICE and its bytes are
++ * frozen from dma_map_single() until the matching unmap (it is written
++ * solely in the completion, after the unmap).  CPU writes to adjacent
++ * fields sharing a cacheline never alter the checkpoint bytes, and a
++ * TO_DEVICE unmap performs no cache invalidate; the shared-cacheline
++ * hazard applies only to FROM_DEVICE buffers, which are kmalloc'd.
++ */
++struct cmh_sm3_reqctx {
++	int    error;
++	u32    hw_started;
++	u32    has_checkpoint;
++	u32    update_remainder; /* sub-block bytes the API must re-buffer */
++	u8     checkpoint[SM3_CONTEXT_SIZE]; /* SM3 context from last SAVE */
++	/* DMA state for current async operation */
++	dma_addr_t ckpt_dma;
++	dma_addr_t save_dma;
++	dma_addr_t data_dma;
++	dma_addr_t digest_dma;
++	u8    *save_buf;
++	u8    *data_buf;
++	u32    data_len;
++	u8    *digest_buf;
++	struct vcq_cmd packed[CMH_SM3_MAX_PACKED];
++};
++
++/* VCQ Builders -- SM3 core (CORE_ID_SM3); generic flush from cmh_vcq.h */
++
++static void vcq_add_sm3_init(struct vcq_cmd *slot, u32 core_id)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(core_id, 0, 1, SM3_CMD_INIT);
++	/* SM3 has a single algorithm -- no algo selector field */
++}
++
++static void vcq_add_sm3_update(struct vcq_cmd *slot, u32 core_id, u64 input_phys, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(core_id, 0, 1, SM3_CMD_UPDATE);
++	slot->hwc.sm3.cmd_update.input = input_phys;
++	slot->hwc.sm3.cmd_update.inlen = len;
++}
++
++static void vcq_add_sm3_final(struct vcq_cmd *slot, u32 core_id, u64 digest_phys, u32 outlen)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(core_id, 0, 1, SM3_CMD_FINAL);
++	slot->hwc.sm3.cmd_final.digest = digest_phys;
++	slot->hwc.sm3.cmd_final.outlen = outlen;
++}
++
++static void vcq_add_sm3_save(struct vcq_cmd *slot, u32 core_id, u64 output_phys, u32 outlen)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(core_id, 0, 1, SM3_CMD_SAVE);
++	slot->hwc.sm3.cmd_save.output = output_phys;
++	slot->hwc.sm3.cmd_save.outlen = outlen;
++}
++
++static void vcq_add_sm3_restore(struct vcq_cmd *slot, u32 core_id, u64 input_phys, u32 inlen)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(core_id, 0, 1, SM3_CMD_RESTORE);
++	slot->hwc.sm3.cmd_restore.input = input_phys;
++	slot->hwc.sm3.cmd_restore.inlen = inlen;
++}
++
++/* Request Context Cleanup */
++
++static void cmh_sm3_free_reqctx(struct cmh_sm3_reqctx *rctx)
++{
++	rctx->has_checkpoint = 0;
++}
++
++/* VCQ Packing + Submit */
++
++/* ahash Operations */
++
++static int cmh_sm3_init(struct ahash_request *req)
++{
++	struct cmh_sm3_reqctx *rctx = ahash_request_ctx(req);
++
++	memset(rctx, 0, sizeof(*rctx));
++	return 0;
++}
++
++/*
++ * Update completion -- takes ownership of save_buf as new checkpoint.
++ */
++static void cmh_sm3_update_complete(void *data, int error)
++{
++	struct ahash_request *req = data;
++	struct cmh_sm3_reqctx *rctx = ahash_request_ctx(req);
++
++	if (error == -EINPROGRESS) {
++		cmh_complete(&req->base, error);
++		return;
++	}
++
++	if (rctx->has_checkpoint)
++		cmh_dma_unmap_single(rctx->ckpt_dma, SM3_CONTEXT_SIZE,
++				     DMA_TO_DEVICE);
++	cmh_dma_unmap_single(rctx->save_dma, SM3_CONTEXT_SIZE,
++			     DMA_FROM_DEVICE);
++	cmh_dma_unmap_single(rctx->data_dma, rctx->data_len,
++			     DMA_TO_DEVICE);
++
++	if (!error) {
++		memcpy(rctx->checkpoint, rctx->save_buf, SM3_CONTEXT_SIZE);
++		rctx->has_checkpoint = 1;
++		kfree(rctx->save_buf);
++		rctx->save_buf = NULL;
++		rctx->hw_started = 1;
++		/* Hand the API the sub-block remainder it must re-buffer. */
++		error = rctx->update_remainder;
++	} else {
++		kfree(rctx->save_buf);
++		rctx->save_buf = NULL;
++		rctx->error = error;
++	}
++
++	kfree(rctx->data_buf);
++	rctx->data_buf = NULL;
++	rctx->data_len = 0;
++
++	cmh_complete(&req->base, error);
++}
++
++static int cmh_sm3_update(struct ahash_request *req)
++{
++	struct cmh_sm3_reqctx *rctx = ahash_request_ctx(req);
++	struct vcq_cmd cmds[CMH_SM3_MAX_PAYLOAD];
++	struct core_dispatch d;
++	u32 full_len;
++	u32 idx;
++	int ret;
++	gfp_t gfp;
++
++	if (rctx->error)
++		return rctx->error;
++
++	if (!req->nbytes)
++		return 0;
++
++	/* block size is a power of two, but modulo keeps the split exact. */
++	rctx->update_remainder = req->nbytes % CMH_SM3_BLOCK_SIZE;
++	full_len = req->nbytes - rctx->update_remainder;
++
++	gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
++	      GFP_KERNEL : GFP_ATOMIC;
++
++	/*
++	 * Reject a single update whose linearisation would exceed the largest
++	 * kmalloc: return a permanent -EMSGSIZE ("message too long") rather
++	 * than a transient -ENOMEM the client would keep retrying.  __GFP_NOWARN
++	 * keeps a borderline-large (but sub-cap) request quiet if it still
++	 * cannot be satisfied.
++	 */
++	if (full_len > KMALLOC_MAX_SIZE)
++		return -EMSGSIZE;
++
++	rctx->data_buf = kmalloc(full_len, gfp | __GFP_NOWARN);
++	if (!rctx->data_buf)
++		return -ENOMEM;
++
++	scatterwalk_map_and_copy(rctx->data_buf, req->src, 0, full_len, 0);
++
++	rctx->data_len = full_len;
++
++	rctx->save_buf = kzalloc(SM3_CONTEXT_SIZE, gfp);
++	if (!rctx->save_buf) {
++		ret = -ENOMEM;
++		goto err_free;
++	}
++
++	rctx->data_dma = cmh_dma_map_single(rctx->data_buf, full_len,
++					    DMA_TO_DEVICE);
++	if (cmh_dma_map_error(rctx->data_dma)) {
++		ret = -ENOMEM;
++		goto err_free;
++	}
++
++	rctx->save_dma = cmh_dma_map_single(rctx->save_buf, SM3_CONTEXT_SIZE,
++					    DMA_FROM_DEVICE);
++	if (cmh_dma_map_error(rctx->save_dma)) {
++		ret = -ENOMEM;
++		goto err_unmap_data;
++	}
++
++	rctx->ckpt_dma = DMA_MAPPING_ERROR;
++	if (rctx->has_checkpoint) {
++		rctx->ckpt_dma = cmh_dma_map_single(rctx->checkpoint,
++						    SM3_CONTEXT_SIZE,
++						     DMA_TO_DEVICE);
++		if (cmh_dma_map_error(rctx->ckpt_dma)) {
++			ret = -ENOMEM;
++			goto err_unmap_save;
++		}
++	}
++
++	d = cmh_core_select_instance(CMH_CORE_SM3);
++	idx = 0;
++
++	vcq_add_sm3_init(&cmds[idx++], d.core_id);
++
++	if (rctx->has_checkpoint)
++		vcq_add_sm3_restore(&cmds[idx++], d.core_id,
++				    (u64)rctx->ckpt_dma, SM3_CONTEXT_SIZE);
++
++	vcq_add_sm3_update(&cmds[idx++], d.core_id,
++			   (u64)rctx->data_dma, full_len);
++
++	vcq_add_sm3_save(&cmds[idx++], d.core_id,
++			 (u64)rctx->save_dma, SM3_CONTEXT_SIZE);
++
++	vcq_add_flush(&cmds[idx++], d.core_id);
++
++	ret = cmh_vcq_pack_and_submit_async(cmds, idx, rctx->packed,
++					    CMH_SM3_MAX_PACKED,
++					    d.mbx_idx,
++					    cmh_sm3_update_complete, req,
++					    !!(req->base.flags &
++					       CRYPTO_TFM_REQ_MAY_BACKLOG),
++					    cmh_tm_async_timeout_jiffies());
++	if (ret && ret != -EBUSY)
++		goto err_unmap_ckpt;
++
++	if (ret == -EBUSY)
++		return -EBUSY;
++	return -EINPROGRESS;
++
++err_unmap_ckpt:
++	if (rctx->has_checkpoint)
++		cmh_dma_unmap_single(rctx->ckpt_dma, SM3_CONTEXT_SIZE,
++				     DMA_TO_DEVICE);
++err_unmap_save:
++	cmh_dma_unmap_single(rctx->save_dma, SM3_CONTEXT_SIZE,
++			     DMA_FROM_DEVICE);
++err_unmap_data:
++	cmh_dma_unmap_single(rctx->data_dma, full_len, DMA_TO_DEVICE);
++err_free:
++	kfree(rctx->save_buf);
++	rctx->save_buf = NULL;
++	kfree(rctx->data_buf);
++	rctx->data_buf = NULL;
++	rctx->data_len = 0;
++	return ret;
++}
++
++static void cmh_sm3_final_complete(void *data, int error)
++{
++	struct ahash_request *req = data;
++	struct cmh_sm3_reqctx *rctx = ahash_request_ctx(req);
++
++	if (error == -EINPROGRESS) {
++		cmh_complete(&req->base, error);
++		return;
++	}
++
++	if (rctx->has_checkpoint)
++		cmh_dma_unmap_single(rctx->ckpt_dma, SM3_CONTEXT_SIZE,
++				     DMA_TO_DEVICE);
++	if (rctx->data_buf)
++		cmh_dma_unmap_single(rctx->data_dma, rctx->data_len,
++				     DMA_TO_DEVICE);
++	cmh_dma_unmap_single(rctx->digest_dma, CMH_SM3_DIGEST_SIZE,
++			     DMA_FROM_DEVICE);
++
++	if (!error)
++		memcpy(req->result, rctx->digest_buf, CMH_SM3_DIGEST_SIZE);
++
++	kfree(rctx->digest_buf);
++	rctx->digest_buf = NULL;
++	kfree(rctx->data_buf);
++	rctx->data_buf = NULL;
++	cmh_sm3_free_reqctx(rctx);
++	cmh_complete(&req->base, error);
++}
++
++static int cmh_sm3_submit_final(struct ahash_request *req,
++				u8 *data_buf, u32 data_len)
++{
++	struct cmh_sm3_reqctx *rctx = ahash_request_ctx(req);
++	struct vcq_cmd cmds[CMH_SM3_MAX_PAYLOAD];
++	struct core_dispatch d;
++	u32 idx;
++	int ret;
++	gfp_t gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
++		   GFP_KERNEL : GFP_ATOMIC;
++
++	rctx->data_buf = data_buf;
++	rctx->data_len = data_len;
++
++	rctx->digest_buf = kzalloc(CMH_SM3_DIGEST_SIZE, gfp);
++	if (!rctx->digest_buf) {
++		ret = -ENOMEM;
++		goto err_free_data;
++	}
++
++	rctx->digest_dma = cmh_dma_map_single(rctx->digest_buf,
++					      CMH_SM3_DIGEST_SIZE,
++					       DMA_FROM_DEVICE);
++	if (cmh_dma_map_error(rctx->digest_dma)) {
++		ret = -ENOMEM;
++		goto err_free_digest;
++	}
++
++	rctx->data_dma = DMA_MAPPING_ERROR;
++	if (data_buf && data_len > 0) {
++		rctx->data_dma = cmh_dma_map_single(data_buf, data_len,
++						    DMA_TO_DEVICE);
++		if (cmh_dma_map_error(rctx->data_dma)) {
++			ret = -ENOMEM;
++			goto err_unmap_digest;
++		}
++	}
++
++	rctx->ckpt_dma = DMA_MAPPING_ERROR;
++	if (rctx->has_checkpoint) {
++		rctx->ckpt_dma = cmh_dma_map_single(rctx->checkpoint,
++						    SM3_CONTEXT_SIZE,
++						     DMA_TO_DEVICE);
++		if (cmh_dma_map_error(rctx->ckpt_dma)) {
++			ret = -ENOMEM;
++			goto err_unmap_data;
++		}
++	}
++
++	d = cmh_core_select_instance(CMH_CORE_SM3);
++	idx = 0;
++
++	vcq_add_sm3_init(&cmds[idx++], d.core_id);
++
++	if (rctx->has_checkpoint)
++		vcq_add_sm3_restore(&cmds[idx++], d.core_id,
++				    (u64)rctx->ckpt_dma, SM3_CONTEXT_SIZE);
++
++	if (data_buf && data_len > 0)
++		vcq_add_sm3_update(&cmds[idx++], d.core_id,
++				   (u64)rctx->data_dma, data_len);
++
++	vcq_add_sm3_final(&cmds[idx++], d.core_id,
++			  (u64)rctx->digest_dma, CMH_SM3_DIGEST_SIZE);
++
++	vcq_add_flush(&cmds[idx++], d.core_id);
++
++	ret = cmh_vcq_pack_and_submit_async(cmds, idx, rctx->packed,
++					    CMH_SM3_MAX_PACKED,
++					    d.mbx_idx,
++					    cmh_sm3_final_complete, req,
++					    !!(req->base.flags &
++					       CRYPTO_TFM_REQ_MAY_BACKLOG),
++					    cmh_tm_async_timeout_jiffies());
++	if (ret == -EBUSY)
++		return -EBUSY;
++	if (ret)
++		goto err_unmap_ckpt;
++
++	return -EINPROGRESS;
++
++err_unmap_ckpt:
++	if (rctx->has_checkpoint)
++		cmh_dma_unmap_single(rctx->ckpt_dma, SM3_CONTEXT_SIZE,
++				     DMA_TO_DEVICE);
++err_unmap_data:
++	if (data_buf && data_len > 0)
++		cmh_dma_unmap_single(rctx->data_dma, data_len,
++				     DMA_TO_DEVICE);
++err_unmap_digest:
++	cmh_dma_unmap_single(rctx->digest_dma, CMH_SM3_DIGEST_SIZE,
++			     DMA_FROM_DEVICE);
++err_free_digest:
++	kfree(rctx->digest_buf);
++	rctx->digest_buf = NULL;
++err_free_data:
++	kfree(data_buf);
++	rctx->data_buf = NULL;
++	/*
++	 * Preserve the SM3 checkpoint on failure: a synchronous rejection is
++	 * retryable, and for a terminal error the inline checkpoint is freed
++	 * with the request context, so it never leaks.  It is cleared only in
++	 * the completion after a successful final().
++	 */
++	return ret;
++}
++
++static int cmh_sm3_finup(struct ahash_request *req);
++
++/*
++ * One-shot digest -- delegates to init + finup so that all data is
++ * linearised and mapped through cmh_dma_map_single(), which is the
++ * only DMA mapping path aware of all supported DMA backends.
++ */
++static int cmh_sm3_digest(struct ahash_request *req)
++{
++	int ret;
++
++	ret = cmh_sm3_init(req);
++	if (ret)
++		return ret;
++	return cmh_sm3_finup(req);
++}
++
++/*
++ * .finup -- hash any remaining data and finalise in one transaction.
++ * With BLOCK_ONLY the Crypto API prepends the bytes it held back, so
++ * req->src already carries the full tail.  Also serves .final (nbytes
++ * == 0).  Avoids ahash_def_finup(), which would clone via export/import.
++ */
++static int cmh_sm3_finup(struct ahash_request *req)
++{
++	struct cmh_sm3_reqctx *rctx = ahash_request_ctx(req);
++	u32 data_len = req->nbytes;
++	u8 *data_buf = NULL;
++	gfp_t gfp;
++
++	if (rctx->error)
++		return rctx->error;
++
++	if (data_len == 0)
++		return cmh_sm3_submit_final(req, NULL, 0);
++
++	/* Reject an oversized linearisation with a permanent -EMSGSIZE. */
++	if (data_len > KMALLOC_MAX_SIZE)
++		return -EMSGSIZE;
++
++	gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
++	      GFP_KERNEL : GFP_ATOMIC;
++
++	data_buf = kmalloc(data_len, gfp | __GFP_NOWARN);
++	if (!data_buf)
++		return -ENOMEM;
++
++	scatterwalk_map_and_copy(data_buf, req->src, 0, data_len, 0);
++
++	return cmh_sm3_submit_final(req, data_buf, data_len);
++}
++
++static int cmh_sm3_export(struct ahash_request *req, void *out)
++{
++	struct cmh_sm3_reqctx *rctx = ahash_request_ctx(req);
++	struct cmh_sm3_export_state *state = out;
++
++	/*
++	 * Zero the whole exported state first: the struct may carry padding,
++	 * so without this the padding would leak kernel memory to user space
++	 * through the ahash export.
++	 */
++	memset(state, 0, sizeof(*state));
++
++	if (rctx->hw_started && rctx->has_checkpoint)
++		memcpy(state->checkpoint, rctx->checkpoint, SM3_CONTEXT_SIZE);
++
++	state->hw_started = rctx->hw_started;
++
++	return 0;
++}
++
++static int cmh_sm3_import(struct ahash_request *req, const void *in)
++{
++	struct cmh_sm3_reqctx *rctx = ahash_request_ctx(req);
++	const struct cmh_sm3_export_state *state = in;
++
++	memset(rctx, 0, sizeof(*rctx));
++
++	rctx->hw_started = state->hw_started;
++
++	if (state->hw_started) {
++		memcpy(rctx->checkpoint, state->checkpoint, SM3_CONTEXT_SIZE);
++		rctx->has_checkpoint = 1;
++	}
++
++	return 0;
++}
++
++/* Registration */
++
++static struct ahash_alg cmh_sm3_ahash_alg = {
++	.init    = cmh_sm3_init,
++	.update  = cmh_sm3_update,
++	.finup   = cmh_sm3_finup,
++	.digest  = cmh_sm3_digest,
++	.export  = cmh_sm3_export,
++	.import  = cmh_sm3_import,
++
++	.halg = {
++		.digestsize = CMH_SM3_DIGEST_SIZE,
++		.statesize  = sizeof(struct cmh_sm3_export_state),
++		.base = {
++			.cra_name        = "sm3",
++			.cra_driver_name = "rambus-cmh-sm3",
++			.cra_priority    = 300,
++			.cra_flags       = CRYPTO_ALG_KERN_DRIVER_ONLY |
++					   CRYPTO_ALG_NO_FALLBACK |
++					   CRYPTO_ALG_ASYNC |
++					   CRYPTO_AHASH_ALG_BLOCK_ONLY,
++			.cra_blocksize   = CMH_SM3_BLOCK_SIZE,
++			.cra_ctxsize     = 0,
++			.cra_reqsize     = sizeof(struct cmh_sm3_reqctx),
++			.cra_module      = THIS_MODULE,
++		},
++	},
++};
++
++/**
++ * cmh_sm3_register() - Register SM3 hash algorithm with the crypto framework
++ *
++ * Return: 0 on success, negative errno on failure.
++ */
++int cmh_sm3_register(void)
++{
++	int ret;
++
++	if (!cmh_core_present(CMH_CORE_SM3))
++		return 0;
++
++	ret = crypto_register_ahash(&cmh_sm3_ahash_alg);
++	if (ret) {
++		dev_err(cmh_dev(), "sm3: failed to register cmh-sm3 (rc=%d)\n",
++			ret);
++		return ret;
++	}
++
++	return 0;
++}
++
++/**
++ * cmh_sm3_unregister() - Unregister SM3 hash algorithm from the crypto framework
++ */
++void cmh_sm3_unregister(void)
++{
++	if (!cmh_core_present(CMH_CORE_SM3))
++		return;
++
++	crypto_unregister_ahash(&cmh_sm3_ahash_alg);
++}
+diff --git a/drivers/crypto/cmh/include/cmh_sm3.h b/drivers/crypto/cmh/include/cmh_sm3.h
+new file mode 100644
+index 000000000000..962078b051b4
+--- /dev/null
++++ b/drivers/crypto/cmh/include/cmh_sm3.h
+@@ -0,0 +1,28 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- SM3 Hash Driver
++ *
++ * Registers an ahash algorithm for SM3 (GB/T 32905-2016) with the
++ * Linux crypto subsystem using the CMH SM3 core (CORE_ID_SM3).
++ * This is a CRYPTO_AHASH_ALG_BLOCK_ONLY driver (same model as
++ * cmh_hash.c), so the Crypto API buffers partial blocks and hands the
++ * driver only whole-block-aligned data:
++ *
++ *   .init()   -> software-only: zero per-request context
++ *   .update() -> SM3_CMD_INIT [+ RESTORE] + UPDATE(full blocks) + SAVE + FLUSH
++ *                (also serves final: the API calls finup with nbytes == 0)
++ *   .digest() -> INIT + UPDATE + FINAL + FLUSH (single-shot)
++ *   .export() -> software-only: copy the SM3 checkpoint
++ *   .import() -> software-only: restore the SM3 checkpoint
++ */
++
++#ifndef CMH_SM3_H
++#define CMH_SM3_H
++
++#include "cmh_config.h"
++
++int  cmh_sm3_register(void);
++void cmh_sm3_unregister(void);
++
++#endif /* CMH_SM3_H */
 -- 
 2.43.7
+
