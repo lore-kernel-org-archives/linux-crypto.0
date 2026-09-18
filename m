@@ -1,222 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CEB39EF2A;
-	Fri, 18 Sep 2026 03:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E8536683B;
+	Fri, 18 Sep 2026 04:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789702039; cv=none; b=YQVr6zhejVoOwGZN2/DIYNDesrxniPxzgc2fnvoVHOBWMeUXEkYc9t8cjEjVeL3BEA8H7K9YruuTfcFE4RCI6npRrM9pm5VIA8g9YAKM6Dr1tfMNIzxo8aMNp94eIxEM/bte9zielpaJmhP5XPbqgs06jOsTB9qX6sPqzsjscc0=
+	t=1789706570; cv=none; b=XExLUjRA0H7pzPG+kEDQMbNhFbj6LCy/R4dM9jKZK18cqeXac6aWIERfl1lbgIHt6NnGlys+pGCcM62c/mf/nxqrhQylBrm5ngyvZ+JvdcAh3zO6X3vZ+hz8TTLuR7sbity36QsgCp/+Fbr//NHkIDrlA8cU9WBZJVgtJ3R58v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789702039; c=relaxed/simple;
-	bh=HLUcEEZ1gb/be4eEzPxL2FsNqrpr+TgkKm+tLunGXYY=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=l9+uH9pRkqUswvIyp3l8c9WtzTcEKQcyEdmtoRGjDjTXYTUpQnTbtziJT3/7lOR3oDtDfcJhGwbTkTuvqigvsU0q0pHbtfNRhtBYa1u6orlF2LLgmzMviaN+0xJYjf45rrDkpiJz6axoNIqBE5e7GIzKQ1Uic4J/Cz9mQEidb/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDjFdCNZ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789706570; c=relaxed/simple;
+	bh=D4upwOpfbyrRpYXuHH8jrQqsfj7I6iDeJpXMxZ/4lBQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WHJ6j1deaFm6QVe0hTw0yeCOZSqlEvBqfauRdkwzjcNo6zFvmsthgT7najaVCudyrfMYIypceHWwKZCB+9D+S5h1FD2MGzacDa1xrMjESc3uqZVRVHQQIiCGs5oSDARCj8YNahbm6f3H/OAVHoDjY+wLYarvNk+gwon6cf0pspk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=QE+xiJh8; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDjFdCNZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 941201F00893;
-	Fri, 18 Sep 2026 03:27:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789702037;
-	bh=Dy2W1PJzpBfNsTzNUAOlpWjS58uasqukvqUM5+rueLE=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date;
-	b=fDjFdCNZmeY7S2Wb2FKHzbgj00cEAw/NAHv4mW5PxD+D/AmpzOvUB57EnaufNhEMS
-	 ckT4oAjdRbgSh3ocMAUmc4xYdQtNjn1MlwdH63u9F1A8TuBijWwVs/ElyMAQ/RQzL5
-	 0qeVHHQFwukg6oFkwqJPlyJslGuMibKT3DgLNbKs27NXjxi06hqpDBbs8Nv/5y3AM8
-	 /91ER8Dqz5oMeQNGlqgmyF23dkxNLZnW5tGeuL1lF6IaQgZRg7Z55a3A4l2wqXdq3E
-	 U1Smn1ipWEM52OZZgknferl4+ruj1iznBDZwF0T14wJ7R9XI3OFEU4gDO96/6/tL6f
-	 lGe+8OLg4+8IQ==
-Content-Type: multipart/mixed; boundary="===============8624371357129898679=="
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="QE+xiJh8"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=MDWxXMOAn28ufDEjnxDRQRbRnBgPwhCMg+M+IS6dN5w=; 
+	b=QE+xiJh8/ZERmL6lxHJE59n3ea4ANyDWC9dWxmgxyzfSR0zQZ0Lj05kIlogOsuPPaSw+ASgy1JO
+	Y4tFVdLDmLCKV71U8W9aD3jag8HCW+V1zm1/PkPcWF0ZxEsvNXIGk76uhhrDCVA7RpGuwj1kt/ElA
+	Xo56DNKfJOOkpU+QgsPcMPARW+QaeAG8BIyZ28Ri/nuJ13X/qliAYK+7SDoq22nyj4QFGqqRQA7ac
+	X85ILznCda9+cl8BfijZDUJjVX48m48J3lqMRNNNA0eKMh6E3j4n7UMEE9Klcj6qBklMy6OiXxspz
+	ncf98K+c5ft4YYmDwMUJBZYAXlwQkO0xuq3A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x7QQa-0000000FH7W-3efI;
+	Fri, 18 Sep 2026 12:42:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2026 14:42:24 +1000
+Date: Fri, 18 Sep 2026 14:42:24 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "lianfeng.ouyang" <lianfeng.ouyang@starfivetech.com>
+Cc: Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 2/2] hwrng: starfive: rework clk/reset teardown order
+ for JHB100
+Message-ID: <aqzBMBaXnIZZMX70@gondor.apana.org.au>
+References: <20260907031603.188483-1-lianfeng.ouyang@starfivetech.com>
+ <20260907031603.188483-3-lianfeng.ouyang@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <18a774a95c187e8bcc9080bf5ab32109c265e6fe28777d00f2cf624e9c23530f@mail.kernel.org>
-In-Reply-To: <20260918021744.18772-1-ebiggers@kernel.org>
-References: <20260918021744.18772-1-ebiggers@kernel.org>
-Subject: Re: [PATCH bpf-next v2] bpf: crypto: Use AES-CBC and AES-ECB libraries
-From: bot+bpf-ci@kernel.org
-To: ebiggers@kernel.org,bpf@vger.kernel.org,vadim.fedorenko@linux.dev,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com
-Cc: linux-crypto@vger.kernel.org,linux-kernel@vger.kernel.org,martin.lau@linux.dev,song@kernel.org,yonghong.song@linux.dev,jolsa@kernel.org,emil@etsalapatis.com,ihor.solodrai@linux.dev,john.fastabend@gmail.com,kmehltretter@gmail.com,ebiggers@kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
-Date: Fri, 18 Sep 2026 03:27:16 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260907031603.188483-3-lianfeng.ouyang@starfivetech.com>
 
---===============8624371357129898679==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, Sep 07, 2026 at 11:16:03AM +0800, lianfeng.ouyang wrote:
+> From: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
+> 
+> Rework the StarFive TRNG driver to address hardware-specific requirements
+>   for JHB100 SoC. To avoid reset-domain crossing glitches, the driver now
+>   ensures clocks are gated before asserting reset during teardown for
+>   JHB100, while JH7110 retains the original reset-first sequence.
+> 
+> Add per-compatible match data (struct starfive_trng_data) describing the
+>   clock/reset teardown order, a new "starfive,jhb100-trng" compatible, and
+>   select the ordering from it.
+> 
+> Fix the runtime-PM get/put balancing across the init/read/reseed/cleanup
+>   paths, manage PM and the clk/reset teardown via devm so all error paths
+>   unwind correctly, run the SEU-triggered reseed from a workqueue instead
+>   of hard IRQ, and serialise the command sequences with a mutex.
+> 
+> Signed-off-by: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
+> ---
+>  MAINTAINERS                          |   2 +-
+>  drivers/char/hw_random/jh7110-trng.c | 297 +++++++++++++++++++++------
+>  2 files changed, 239 insertions(+), 60 deletions(-)
 
-> diff --git a/kernel/bpf/Kconfig b/kernel/bpf/Kconfig
-> index d7d25477ef481..a44ecfa3e9ef5 100644
-> --- a/kernel/bpf/Kconfig
-> +++ b/kernel/bpf/Kconfig
-> @@ -91,6 +91,15 @@ config BPF_UNPRIV_DEFAULT_OFF
->
->  	  If you are unsure how to answer this question, answer Y.
->
-> +config BPF_CRYPTO
-> +	def_bool y
-> +	depends on BPF_SYSCALL
-> +	depends on CRYPTO_LIB_AES_CBC
-> +	depends on CRYPTO_LIB_AES_ECB
-> +	help
-> +	  Provide the kfuncs needed for BPF programs to encrypt and decrypt
-> +	  data. The supported algorithms are AES-CBC and AES-ECB.
-> +
->  source "kernel/bpf/preload/Kconfig"
->
->  config BPF_LSM
+Please take a look at
 
-[ ... ]
+https://sashiko.dev/#/patchset/20260907031603.188483-1-lianfeng.ouyang%40starfivetech.com
 
-> diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
-> index 9a92c348bbda6..c1f9b0d3468d3 100644
-> --- a/kernel/bpf/Makefile
-> +++ b/kernel/bpf/Makefile
-> @@ -58,9 +58,7 @@ obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
->  # semantics within pahole are revisited accordingly.
->  obj-${CONFIG_BPF_LSM} += bpf_lsm_proto.o bpf_lsm.o
->  endif
-> -ifneq ($(CONFIG_CRYPTO),)
-> -obj-$(CONFIG_BPF_SYSCALL) += crypto.o
-> -endif
-> +obj-$(CONFIG_BPF_CRYPTO) += crypto.o
->  obj-$(CONFIG_BPF_PRELOAD) += preload/
->
->  obj-$(CONFIG_BPF_SYSCALL) += relo_core.o
-
-Does this change create a mismatch with kernel/bpf/verifier.c?
-
-The build condition for kernel/bpf/crypto.o changes from CONFIG_CRYPTO to
-CONFIG_BPF_CRYPTO, but kernel/bpf/verifier.c still gates the matching BTF
-id on CONFIG_CRYPTO:
-
-    BTF_SET_START(rcu_protected_types)
-    ...
-    #ifdef CONFIG_CRYPTO
-    BTF_ID(struct, bpf_crypto_ctx)
-    #endif
-    ...
-    BTF_SET_END(rcu_protected_types)
-
-The two conditions can now diverge:
-
-1. CONFIG_CRYPTO=y/m but BPF_CRYPTO=n: struct bpf_crypto_ctx is defined
-only in kernel/bpf/crypto.c, which is no longer compiled, so
-resolve_btfids emits 'WARN: resolve_btfids: unresolved symbol
-bpf_crypto_ctx' and leaves a bogus id 0 in rcu_protected_types.
-
-2. BPF_CRYPTO=y but CONFIG_CRYPTO=n: crypto.o and its kfuncs are built,
-but the BTF_ID is compiled out, so bpf_crypto_ctx is not in
-rcu_protected_types. rcu_protected_object() then returns false, and
-btf_ld_kptr_type() tags a bpf_crypto_ctx kptr loaded from a map as
-PTR_UNTRUSTED instead of MEM_RCU. bpf_crypto_ctx_acquire() and
-bpf_crypto_encrypt/decrypt then reject that pointer, so the documented
-create -> kptr_xchg into map -> acquire pattern stops verifying.
-
-Should verifier.c's #ifdef be updated to CONFIG_BPF_CRYPTO?
-
-
-> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
-> index 51f89cecefb4d..59eaa285aacc5 100644
-> --- a/kernel/bpf/crypto.c
-> +++ b/kernel/bpf/crypto.c
-
-[ ... ]
-
-> @@ -36,94 +30,53 @@ struct bpf_crypto_params {
->  	u32 authsize;
->  };
->
-> -static LIST_HEAD(bpf_crypto_types);
-> -static DECLARE_RWSEM(bpf_crypto_types_sem);
-> +enum bpf_crypto_algo_id {
-> +	BPF_ALGO_AES_CBC,
-> +	BPF_ALGO_AES_ECB,
-> +};
-
-[ ... ]
-
->  /**
->   * struct bpf_crypto_ctx - refcounted BPF crypto context structure
-> - * @type:	The pointer to bpf crypto type
-> - * @tfm:	The pointer to instance of crypto API struct.
-> - * @siv_len:    Size of IV and state storage for cipher
-> + * @algo:	The crypto algorithm ID
-> + * @key:	The crypto key
->   * @rcu:	The RCU head used to free the crypto context with RCU safety.
->   * @usage:	Object reference counter. When the refcount goes to 0, the
->   *		memory is released back to the BPF allocator, which provides
->   *		RCU safety.
->   */
->  struct bpf_crypto_ctx {
-> -	const struct bpf_crypto_type *type;
-> -	void *tfm;
-> -	u32 siv_len;
-> +	enum bpf_crypto_algo_id algo;
-> +	union {
-> +		struct aes_key aes;
-> +	} key;
->  	struct rcu_head rcu;
->  	refcount_t usage;
->  };
-
-Does moving the AES key into struct bpf_crypto_ctx make it readable by BPF
-programs?
-
-Previously the key lived inside the crypto_lskcipher tfm, reachable only
-through void *tfm. A BPF program holding the ctx could read that field's
-numeric value but had no way to dereference it (void * yields a scalar,
-and bpf_probe_read_kernel() is gated behind perfmon_capable() and is not
-available to tc/xdp/sk_skb program types).
-
-Now the expanded key is a field of the struct: key.aes is a struct
-aes_key, whose struct aes_enckey prefix contains union aes_enckey_arch k
-(u32 rndkeys[AES_MAX_KEYLENGTH_U32], include/crypto/aes.h:97-116). The AES
-key schedule is trivially invertible, so reading those words recovers the
-original key.
-
-The read is permitted by the verifier. bpf_crypto_ctx_create() is
-KF_ACQUIRE, so R0 is PTR_TO_BTF_ID for struct bpf_crypto_ctx, and struct
-bpf_crypto_ctx is in vmlinux BTF (it is named in BTF_ID(struct,
-bpf_crypto_ctx) for the dtor list). In check_ptr_to_btf_access() the
-program-type hook that could restrict access is applied to writes only:
-
-kernel/bpf/verifier.c:6124
-    if (env->ops->btf_struct_access && !type_is_alloc(reg->type) &&
-        atype == BPF_WRITE) {
-        ...
-        ret = env->ops->btf_struct_access(...);
-    } else {
-        ...
-        ret = btf_struct_access(...);
-    }
-
-So a BPF_READ of ctx->key.aes.k.rndkeys[i] goes through the default
-btf_struct_access() (kernel/bpf/btf.c:7410), which resolves
-scalar/array members and permits the load. No field of bpf_crypto_ctx is
-marked opaque.
-
-Concrete path: bpf_crypto_ctx_create()'s kernel-doc states the ctx "must
-either be embedded in a map as a kptr, or freed with
-bpf_crypto_ctx_release()". Program A (holding the secret key) creates the
-ctx and stores it as a kptr in a pinned map; program B (e.g. SEC("tc"),
-needing only CAP_BPF+CAP_NET_ADMIN, as in
-tools/testing/selftests/bpf/progs/crypto_sanity.c:80) obtains it with
-bpf_crypto_ctx_acquire() and reads the round keys out into a ringbuf.
-
-Before this patch B could only use the ctx to encrypt/decrypt; it could
-not extract the key. The commit message does not mention key storage or
-BTF visibility. If the exposure is intentional it deserves a sentence in
-the changelog; otherwise the key needs to live behind an indirection (e.g.
-a separately-allocated struct pointed to by a void *) as it effectively
-did before.
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/35300286004
---===============8624371357129898679==--
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
