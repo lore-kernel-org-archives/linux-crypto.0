@@ -1,46 +1,46 @@
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012031.outbound.protection.outlook.com [40.107.209.31])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013038.outbound.protection.outlook.com [40.93.201.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834AD519E06;
-	Fri, 18 Sep 2026 16:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C2A51A13A;
+	Fri, 18 Sep 2026 16:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.38
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789749711; cv=fail; b=QYb8LDM87ipHctSu2tQwBuqY66tejZcelYhpcywMTJnVKe5dxoC07mAhrqvI1s9+coAp8eDYYu4ikIaM9MJ4RVw+dgm8mHjcFUMrnIVFzxMZ45QT6Vy50vdd3y13O3AcC3E2TYGcwYZzXp2rxXERYlRUv0PhLfPLG2k6jgkvZXI=
+	t=1789749731; cv=fail; b=TaWneTtb8j2ZfDDHu9kNSfpraIHWtmzk8WAwlpk+8UVTR0taheKGm9rYORO4v2iWdsejKNb50jxQKQKjHOKVlvCR7QCc82xMENEIYt5Z2Ws2CEw0qY7ESi6ABAeYfE89IHFIjsR/Rd2bD40EUnYhBdv5Oc+HQkOhpVypfWZ24YY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789749711; c=relaxed/simple;
-	bh=NK5Jw5ZEdhSU6mORn/5tpxzrywaxyi3AoLZi5RCAADY=;
+	s=arc-20240116; t=1789749731; c=relaxed/simple;
+	bh=GTlLBdeLAgc6tq3dZWi/wBPVSeyahCHz4UI98GE9JqY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ps3GGGXmCjyeyUAvqhhWOXkFXQxRaMPxjPN7zsXUDOwbs3TvqIGApBvWrfrG7MmD0ZxUVYa9wB5aGeXThxjCIelVu+Rtdd9Z1pGYqjcMTaqz8yxmXVwE/ExFcpvk2TTCmxvStczF5ymDzGKkooPT1L3JpxiZV1MGRxBdbDO3gSU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Y82jZMo4; arc=fail smtp.client-ip=40.107.209.31
+	 MIME-Version:Content-Type; b=j+VmFtJwAdHka8co8WC4D35qn9d+FQng2nFs9p+c9kgOdESKHr7AJMGoxzogSndPEXNgcQJxTQlN+s2oE5EKow7CEAhhfqPbA/eLiwWsB3mG0InMff8x4kLYSz4l47I8Q8wVbKmfE753P1TtXM7A1lCsLEGm2F4DQbe6TBuewBQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Gq5d0Y+N; arc=fail smtp.client-ip=40.93.201.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Y82jZMo4"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Gq5d0Y+N"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IgRoQAWKdLDRnptEM94YOTkzBF0j9Vyny7VzJVhsDoTaGyC6PrZA/j4jQaQXSLAX5RYWYhLDHsM/WM3BlYYKO5dV1Ro0Q3J8HXxP1bhgr7AO3i0qN4iDjw8HZsCmY+R3xUR/RdMWyfhFC+06xlhZNl8n/rQhK5FcAXkxdTF9cUHpDf5U/iut2kRrOlCJsJv365g8FJbPZq2xbWmsaCgeewtJQfW6TbrPLQ4yT5Xuy9u2WzxO6/iXKtNkxWsDIbeKbYy842pDItxO6eNcYaDHpbBzEtVb3t8lzN9n3BtCu8OzHkuy0Gen1jqXjT2aIvweQLW4wIjfJsPjrzq//my6lg==
+ b=XXdwHf4SEk6Ic587aaOnjLE0A8ELvaSA22+nROxgxZJq98VsvY+akyxr0uXzb4+wHcTLxwA0kC3A0n8S9vVunRK67S9H6gx5VLfbZWs23Kk86gCEyuh3/jqqd+rq8TfWhpLwq/icfjEG7OUD6/+g1vqtMAk2+ompogSfn/HFmJDdZItJMa6TgjSpLZpmJLE/N3rmOanR7lClppxlSezNf3yXy8Wvkhxlvrw0d07Pb/ypmGCQ+IjltfCjzeCfFmMVbYN6f8xRawQqt9wbo6xEbhsNlgR+PgYU+i430oMrr/nrfcEYER7TuhgA9OdcTrsxtRfce3TsgGbD6eC9cwwjLQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Fv0buWwAo/g+R6dCYWOlcMz+W11muRGyXpUOXytQozw=;
- b=MWDBgLbXVpoqeLU80IUpiiJZXhRuA2AVr2u7QJDjs1QNrJy9ZR+Gnr7+SndIyvv7a460Lx5bi7Ts9v0Oayau/tK/iYKukBxOBwLawHUrGjDzCcxbV5P32wE8IWdJEU60z+EXqEwRxCPh6ytvxBxRCzuI+1VzHqZd4BSRuwHMH486IdAcs+Ea4JgfcxbkbUo1+EayYO4eTCLc/R9mA0/SotT2ipdsauyZARuv5XTnkp748HdR8m/Lc0lXw+IagGs+xMyg9+/ZfGYUpRZwruPZ96L59ebBEN7wa05cAYW/drEDx/b2GhsVSDOOib6nYybWWqsPL2z4NZizD49P9FczmA==
+ bh=PSU/TK891p11aT2gEU2Zcn8LN3F1xITGAxP0LT/EZ+4=;
+ b=w6OhIFnPZspwoGctruUgZinJ5PtuCSKF0IIjZh7u76fitlJLKue4911ek2wR3M8jf6sCtlnLmerLgvDZFvtAeL3N/+jc+Y0ayJs9IVMpW3fePwnjLTn83G1qS8g9zlzpIzqwJJVun1KwIr6kTPHirCreTwUZO2eNGvPL3nbJHu1ew3rWoyyrtizgEhuba8t0pLOMWtHNJQfBu+ihdmghEZAX/T92XHcV64o+wObW+jx4xreO3OgZ6aJI9QWwIIxR05Y/4RFnROkNqMhoZ3f7OtL+t/+SiWQ/LMwq99F8abNdQoOp6c+j15Q4uBGaOVNCJT9SCrDiq9b50hd27dQkQQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Fv0buWwAo/g+R6dCYWOlcMz+W11muRGyXpUOXytQozw=;
- b=Y82jZMo4UdNNqj4VAyAbNB/st7OuDupm8blCcWu96yUiRBg+/bE/DIwivErJphmygTWRihLqikAjnpRa8xwWS9Be3cJ5gRivRiOFhFkpcpfxNn3eAhcc2qIk1J9Rc/aunwLbjq4mGTwKlhnXAr8j0ke18rrqnk9JlR+VApPS06w=
-Received: from SJ0PR03CA0362.namprd03.prod.outlook.com (2603:10b6:a03:3a1::7)
- by CH2PR12MB9493.namprd12.prod.outlook.com (2603:10b6:610:27c::6) with
+ bh=PSU/TK891p11aT2gEU2Zcn8LN3F1xITGAxP0LT/EZ+4=;
+ b=Gq5d0Y+NgO9NDavX5J92dDB5R8itwpLUW9810ywwunT3TMpsn2LZrjsgr/icQ/S9Jm9jEaoOYPYW3AH141vly+jnKqLgjJlvAjTOU0AQSC1tFv5W1eer6USMWIRBFImqoXN7lXkmAl0yNbEQnpLTYFvDlwgULPGwl8X8krldcmc=
+Received: from SJ0PR03CA0078.namprd03.prod.outlook.com (2603:10b6:a03:331::23)
+ by PH0PR12MB7815.namprd12.prod.outlook.com (2603:10b6:510:28a::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.12; Fri, 18 Sep
- 2026 16:41:29 +0000
-Received: from SJ1PEPF00001CDE.namprd05.prod.outlook.com
- (2603:10b6:a03:3a1:cafe::40) by SJ0PR03CA0362.outlook.office365.com
- (2603:10b6:a03:3a1::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.13 via Frontend Transport; Fri,
- 18 Sep 2026 16:41:25 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.9; Fri, 18 Sep
+ 2026 16:42:02 +0000
+Received: from SJ1PEPF00001CDF.namprd05.prod.outlook.com
+ (2603:10b6:a03:331:cafe::5a) by SJ0PR03CA0078.outlook.office365.com
+ (2603:10b6:a03:331::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.12 via Frontend Transport; Fri,
+ 18 Sep 2026 16:42:02 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ1PEPF00001CDE.mail.protection.outlook.com (10.167.242.6) with Microsoft
+ SJ1PEPF00001CDF.mail.protection.outlook.com (10.167.242.7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.451.8 via Frontend Transport; Fri, 18 Sep 2026 16:41:25 +0000
+ 15.21.451.8 via Frontend Transport; Fri, 18 Sep 2026 16:42:02 +0000
 Received: from speedway8455host.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Fri, 18 Sep
- 2026 11:41:22 -0500
+ 2026 11:42:00 -0500
 From: "Pratik R. Sampat" <prsampat@amd.com>
 To: <mcgrof@kernel.org>, <russ.weight@linux.dev>, <dakr@kernel.org>,
 	<ashish.kalra@amd.com>, <thomas.lendacky@amd.com>,
@@ -63,9 +63,9 @@ CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<gregkh@linuxfoundation.org>, <rafael@kernel.org>, <chao.gao@intel.com>,
 	<aik@amd.com>, <tycho@kernel.org>, <nikunj@amd.com>, <michael.roth@amd.com>,
 	<shansinha@google.com>, <prsampat@amd.com>
-Subject: [Patch v2 1/7] firmware_loader: Stop pinning modules on registration
-Date: Fri, 18 Sep 2026 16:40:55 +0000
-Message-ID: <685e3707522394f212d62ff9f1bf64c5e0cb8a23.1789749016.git.prsampat@amd.com>
+Subject: [Patch v2 4/7] crypto: ccp - Factor out the release of the SEV firmware buffers
+Date: Fri, 18 Sep 2026 16:40:58 +0000
+Message-ID: <fb9920e37b5c06fe841099331e6abe4c671a754f.1789749016.git.prsampat@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1789749016.git.prsampat@amd.com>
 References: <cover.1789749016.git.prsampat@amd.com>
@@ -81,136 +81,117 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDE:EE_|CH2PR12MB9493:EE_
-X-MS-Office365-Filtering-Correlation-Id: 012081ca-812e-45a2-2ad9-08df15a3ae2e
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDF:EE_|PH0PR12MB7815:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0d5492d6-51a7-4b6e-72c1-08df15a3c40c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|376014|1800799024|23010399003|7416014|82310400026|56012099006|11063799006|10067099003|22082099003|18002099003|13003099007;
+	BCL:0;ARA:13230040|1800799024|7416014|376014|82310400026|23010399003|36860700016|6133799003|10067099003|56012099006|5023799004|18002099003|11063799006|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	BOFpYC/+Xux21tl1kQWhC0w956oORXn/mCQ+yh/fMmddrq9ZU5n6BTn+pSKqSYp9qZNjpm8y946QZF1mUWM1WF4IG87AwiT07WtleDAbJmIKCAP09lJpDh0iAci8gcvWvdfqmpvwml9denAirQIqzU/s7KKyLRcr7Va3q7N1bfQlTECrPuvFTJXmgz832SndNsN9NFqZXyoJCninhSFRfZ8swNOk0JO6U2H1vbB+6cms1YsFpeqfCCzGa0+SxlYBRgGd8qxgOAWIxleyX+tiOqc9KhCbUOx+o+U0M6GuuR/WdWHfR0ifdtMB2a4syo4lT4gMBdXeqUGzfctMRZqEaP6wtOEABsF7GXLi/IYFWGLGmb092yo+uTd329IM59K7wsYmigwAKkhGULQnijoalRvJ1agXBvH2zkQK+vZxf16BJxMPkNg0R+U5UobPmvaSPBzeffakBaUoG/DGfcmHLqJyP2cJ8J/dYccrR1VoR2jj2NkuiBPMOodHmAUpruWA+4362lB924h2GxMAhMoyjPmnfIcGlpwGAs30K5CouKSNxYKKT9C+DNamsHnSRsnSIvY6DoDPh8xe3MUjL0zllHyfkAlODPRB4nbTYPqp4vxMYII738boGfnlww1Dc2NlGZ1VrShVS3wDP9Fd1jKJpQ==
+	n88VyRZILIimgBi2q8Ds/m+hRFVmAf9MvGkFrffIdtRmWGDyrgD6d0n4/63n2gzw/1MXtujhK3if0nAE7AqINCOfvpYVW0El6vOPq76RRa7SLDsC5TiVzjvHcNaCQobn3r2R929t+0ZZ+TwxZiUgTGIJXNNc982b77wyLyrQ7AOiSmEstQIsDDRdpAU9t2RxouNB4dHOP6XoqBoGTYoPnwpOGq1IEKjYoRA4Tcgym0TeUizpW4s7rwrRfkW4JnT+05kIyp5v6tUMKz34MS9o6MAqdmLxmRkokyi+HUSHe5tGcK47zAhNd5OyCeKMRoddubrFxe5UhwJsyY36C+UxbGarKZQ/ij2fXqO1ocV3uwmRrZ2XreSBV9OZt9d6Yt86hMM2wEX/6YlwiMLKd0IjdaJEyNK327vefk/bGvzSllQhvnNObKnmSQlbgVWP00CtDxOPeS/aenYMEKlcCaMC4o334KMFohNXR3lOhWblTYH26PqblZDHhA8ls71P1K57MMdd9tM3aokTBaXu5xli1ujt3dpzIPZu3jREoABYR+dS4IX5ntxbfm2mOY9Sa0xS83jjPBM3iTsSPoUXrAFzhsv+3Y8AljCH+JjvLZLA+ufMgFc3EOT/beYR+FkRH4HI4LssaGX0HPqIYtsKqI4p2dcyj3WSJQRlmT8SBrIWh5jQAvgkFXclw3s5Lztt+eUWsU9qv0IaFUlaliYyPd6CXg==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(376014)(1800799024)(23010399003)(7416014)(82310400026)(56012099006)(11063799006)(10067099003)(22082099003)(18002099003)(13003099007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(82310400026)(23010399003)(36860700016)(6133799003)(10067099003)(56012099006)(5023799004)(18002099003)(11063799006)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	Cjp2QA+nIhe7InQymgHa3IJbklnTLzm+J1ur/75aCAwBVrlUVspmB++fVxSTEyyMeDviy4gG7ENG0h8YAWKq4TkRsQNCF6dGIOrpLeKOumQJlQq3V+7PL/FQ6X9HerHmE+0h/9s5BQ9xunrGQK/YmaQFqZ/zkvka3Xuk/k4x1vLTDI5NdqEuqYXw/6bl/b4q+wkA8pxm8UzVodbFakSJ2IQM0j4GvfZ9RMbyMdU7QV50dcXQ/frZ5L8ajPI6++4m9Ez2aRkOYKhkT7InNpAdss8SrQf/rknC94FkRwIzZbC7Lhp3QYV4TKPdSkN7KcTbjrLU2VAZstuLrfmYo0QuAUjzkOXdV6vM3J99GeFau0QTB0qKIxKVBFOpabVJZH8mOxZ5z5n+i4WrEL4kgbIBMaQY+lMMeVSOgh+hrg3ncuFDDgfRS/1rQ4/8EQ7U7qBH
+	4TL94N6ZmGMEChKo40vvwM2ks8z6xv+r7hy4iF+ro9SDl5WX6mQ5nOJYQ+3JIhXyivmvudodyrObT+HjLJhXTZ4yCa+omsdrxHxRI9aDEibWuvvBMuGdKtmE7QVz8oL7Ip64yvFIqjaKE4qnjZBIKK2L7LlQQyaCktQyHUUFq3SinRG1zerUbGbvIY7KZpMFT/OM5wM2z9fDGivWNSxYT6iXpbtxXRUPAhablDkN9sh0RdnnSProlF9y/rFrUFvgbPnYEkZsx2oF/WU97EjGUdBKASYj6DN9yHETWIfsD8unQKBJP88dQKeCBTVqWps2jFLu2UiqZFZPRw6a0NTwUIa58Numh6kLgPe0jHIhP0IC5LoXzORuqvxkdvKknyBZULmkOnwZ8ODSnSMAf8qw5fw0lvoyxa/LSCXxHZ4rsSxCKPwsdLem+TMYD4WZ2p35
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 16:41:25.4699
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 16:42:02.1641
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 012081ca-812e-45a2-2ad9-08df15a3ae2e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d5492d6-51a7-4b6e-72c1-08df15a3c40c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CDE.namprd05.prod.outlook.com
+	SJ1PEPF00001CDF.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB9493
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7815
 
-From: Dan Williams <djbw@kernel.org>
+__sev_firmware_shutdown() reclaims and frees the TMR and the INIT_EX NV
+area once the platform has been taken down. Move that into a helper so
+that other paths which de-initialize the platform can reuse the same
+path.
 
-The module reference counting can result in callers pinning themselves in a
-circular loop. The module reference counting is unnecessary.
-firmware_upload_unregister() must be able to guarantee that all ops are
-idle at return.
+No functional change intended.
 
-All ops are either called from sysfs or the workqueue, so unregister sysfs
-to stop submissions, cancel any started transfers, flush cancelled
-transfers, and then release the device.
-
-This also solves a theoretical race of new submissions starting between
-flush_work() and device_unregister(). The module reference was not
-protecting against that race.
-
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Russ Weight <russ.weight@linux.dev>
-Cc: Danilo Krummrich <dakr@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-Reported-by: Chao Gao <chao.gao@intel.com>
-Tested-by: Chao Gao <chao.gao@intel.com>
-Closes: https://sashiko.dev/#/patchset/20260326084448.29947-1-chao.gao%40intel.com?patch=10705
-Fixes: 97730bbb242c ("firmware_loader: Add firmware-upload support")
-Signed-off-by: Dan Williams <djbw@kernel.org>
+Suggested-by: Shantanu Sinha <shansinha@google.com>
 Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
 ---
- drivers/base/firmware_loader/sysfs_upload.c | 31 ++++++++++-----------
- 1 file changed, 14 insertions(+), 17 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 55 ++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/base/firmware_loader/sysfs_upload.c b/drivers/base/firmware_loader/sysfs_upload.c
-index efc33294212f..6f2123538682 100644
---- a/drivers/base/firmware_loader/sysfs_upload.c
-+++ b/drivers/base/firmware_loader/sysfs_upload.c
-@@ -312,14 +312,9 @@ firmware_upload_register(struct module *module, struct device *parent,
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	if (!try_module_get(module))
--		return ERR_PTR(-EFAULT);
--
- 	fw_upload = kzalloc_obj(*fw_upload);
--	if (!fw_upload) {
--		ret = -ENOMEM;
--		goto exit_module_put;
--	}
-+	if (!fw_upload)
-+		return ERR_PTR(-ENOMEM);
- 
- 	fw_upload_priv = kzalloc_obj(*fw_upload_priv);
- 	if (!fw_upload_priv) {
-@@ -361,7 +356,7 @@ firmware_upload_register(struct module *module, struct device *parent,
- 	if (ret) {
- 		dev_err(fw_dev, "%s: device_register failed\n", __func__);
- 		put_device(fw_dev);
--		goto exit_module_put;
-+		return ERR_PTR(ret);
- 	}
- 
- 	return fw_upload;
-@@ -372,9 +367,6 @@ firmware_upload_register(struct module *module, struct device *parent,
- free_fw_upload:
- 	kfree(fw_upload);
- 
--exit_module_put:
--	module_put(module);
--
- 	return ERR_PTR(ret);
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index f833cb7e4da3..1ed9e61a95cc 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1881,6 +1881,35 @@ static int __sev_platform_shutdown_locked(int *error)
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(firmware_upload_register);
-@@ -386,23 +378,28 @@ EXPORT_SYMBOL_GPL(firmware_upload_register);
- void firmware_upload_unregister(struct fw_upload *fw_upload)
+ 
++static void __sev_release_firmware_buffers(bool panic)
++{
++	if (sev_es_tmr) {
++		/*
++		 * The TMR area was encrypted, flush it from the cache.
++		 *
++		 * If invoked during panic handling, local interrupts are
++		 * disabled and all CPUs are stopped, so wbinvd_on_all_cpus()
++		 * can't be used. In that case, wbinvd() is done on remote CPUs
++		 * via the NMI callback, and done for this CPU later during
++		 * SNP shutdown, so wbinvd_on_all_cpus() can be skipped.
++		 */
++		if (!panic)
++			wbinvd_on_all_cpus();
++
++		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
++					  get_order(sev_es_tmr_size),
++					  true);
++		sev_es_tmr = NULL;
++	}
++
++	if (sev_init_ex_buffer) {
++		__snp_free_firmware_pages(virt_to_page(sev_init_ex_buffer),
++					  get_order(NV_LENGTH),
++					  true);
++		sev_init_ex_buffer = NULL;
++	}
++}
++
+ static int sev_get_platform_state(int *state, int *error)
  {
- 	struct fw_sysfs *fw_sysfs = fw_upload->priv;
-+	struct device *parent = fw_sysfs->dev.parent;
- 	struct fw_upload_priv *fw_upload_priv = fw_sysfs->fw_upload_priv;
--	struct module *module = fw_upload_priv->module;
-+
-+	/* hold a parent reference while child is unregistered */
-+	get_device(parent);
-+
-+	/* shutdown the sysfs interface to block new requests */
-+	device_del(&fw_sysfs->dev);
+ 	struct sev_user_data_status data;
+@@ -2906,31 +2935,7 @@ static void __sev_firmware_shutdown(struct sev_device *sev, bool panic)
  
- 	mutex_lock(&fw_upload_priv->lock);
- 	if (fw_upload_priv->progress == FW_UPLOAD_PROG_IDLE) {
- 		mutex_unlock(&fw_upload_priv->lock);
--		goto unregister;
-+		goto release;
- 	}
+ 	__sev_platform_shutdown_locked(&error);
  
- 	fw_upload_priv->ops->cancel(fw_upload);
- 	mutex_unlock(&fw_upload_priv->lock);
- 
-+release:
- 	/* Ensure lower-level device-driver is finished */
- 	flush_work(&fw_upload_priv->work);
+-	if (sev_es_tmr) {
+-		/*
+-		 * The TMR area was encrypted, flush it from the cache.
+-		 *
+-		 * If invoked during panic handling, local interrupts are
+-		 * disabled and all CPUs are stopped, so wbinvd_on_all_cpus()
+-		 * can't be used. In that case, wbinvd() is done on remote CPUs
+-		 * via the NMI callback, and done for this CPU later during
+-		 * SNP shutdown, so wbinvd_on_all_cpus() can be skipped.
+-		 */
+-		if (!panic)
+-			wbinvd_on_all_cpus();
 -
--unregister:
--	device_unregister(&fw_sysfs->dev);
--	module_put(module);
-+	put_device(&fw_sysfs->dev);
-+	put_device(parent);
+-		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
+-					  get_order(sev_es_tmr_size),
+-					  true);
+-		sev_es_tmr = NULL;
+-	}
+-
+-	if (sev_init_ex_buffer) {
+-		__snp_free_firmware_pages(virt_to_page(sev_init_ex_buffer),
+-					  get_order(NV_LENGTH),
+-					  true);
+-		sev_init_ex_buffer = NULL;
+-	}
++	__sev_release_firmware_buffers(panic);
+ 
+ 	__sev_snp_shutdown_locked(&error, panic);
  }
- EXPORT_SYMBOL_GPL(firmware_upload_unregister);
 -- 
 2.43.0
 
