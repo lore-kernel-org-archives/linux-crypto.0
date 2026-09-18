@@ -1,398 +1,527 @@
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012039.outbound.protection.outlook.com [40.107.200.39])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61282547045;
-	Fri, 18 Sep 2026 22:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.39
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789771572; cv=fail; b=Wa2W0rrRHL5pBvKnLETuMCZ8b7bM1/AqzdfZRsGX3ce/mZa6TMORMEzdhLA1ofcvmuEefVTej1gTh5WSWkI62C5+PlcT43j6TvgjDSwIFJkRVINe1P+pNo7gCp0SxfdluL76aNDGp1qxuLKp+h99wf4pp+++TuZAEfxQYgW3Z1o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789771572; c=relaxed/simple;
-	bh=qxCSN4wNkCjrF0kDPN/W6KoTlX/CpAdfMMJIgn2GNc4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HUAqapL9gzJnMny2GfFkCKrr3JcK5PxbxdFhhaJm6/6csWMGVhaV045buv0p5wIi8k8HxpOQkn4SBTaF78Wy53oim1JZLY0s5Ir+IieEaYmNnBmAEKsgQSBIxq9QvPHEa27Bp1drHByP4bx8slQSv1sIl6CeY3GvBHvUXB2v9rg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=V7Lt8tJK; arc=fail smtp.client-ip=40.107.200.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A5F372673;
+	Fri, 18 Sep 2026 23:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789774066; cv=none; b=YKAvcpo6wMMN5994BsrPzAQp5ghtDa4CkDBi8u3pPXmMoovwsdoLlrY9Nt8qDjBCvS371cmUI7Fxt7Ucek3+RGMtgomav3UMY+bobqPhG+zz4zYKhj/b2EdWU9RVfahWZg7M6taztVFHqONFXR010VO+AEbepOccnJVrafD2ctQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789774066; c=relaxed/simple;
+	bh=nMR8tVXDHf2xR/FZgxrtztlcRHXvNk4iaGJSzaquUAk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HSsCr17q/Z5z67kd0mMzX7zvBV510ea6RuF9of7Bubrm/W0EM6dm05bwoZTk2WqGTHTgOwAKWGqD7/OGKhdY/hiW7ec7NsWir4mGXghnYtCJKYrSXEWpX2reAjtxPq1zbYzRfHdoS1ryBhdmgDcbVZ8vvus/H4Ml/hK6Ec5irmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=cDq7I4l0; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="V7Lt8tJK"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=x1vLgM76sT1OrW08QBEwrt+9MsfZz856tnEKVBpKw2jswt9A0rvOj75B4iUgfeplma4uB0IqqJ8TzGEtKiGn+KwSLT6xKpy5fucPTb3tCr3lT2+pF9CBeF2Z7zGq/YnWFPOcr0KBe43Y9rs4dpQWlW9gQjYSLzKhIu7XYeE121Rse7f92PBdZszaewJrWX0Z4rMp7cbnIVMrzZ5YJgrVy7AFarXCFdjKX3wQh20FBsSuLDhRVuIQEETMXtIfbNqbQDO7siRWbi2DqjnP7zqexpKKuM8EedTtKmcWsM+2nqy5P00EZQlaBhWNeu/rVRo1YpbXrjO5sUL3YJcB87gX3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pQT4spnfi8wwnwhTH+Bu8XuYkirwIl4C3XKb8PW/o5M=;
- b=HmUFIuMGvgWLWX2IcW5mVtkgN5lYF2gSUZ3HTzTyLOJAJ7GhqZ6Qb56b41rTq9GU7eIulJhtsMf0LEl0B8JJd15zzpniIIMSBIW+MpxWPzsCxyXtUYan9MdJY89Z3GYcHwZcMj4axZ9HwC2oYifj2lZ5rSthYj6htEoMMnSvHsTW74HBnMf553eO5UXSN8Ddc9/DRTkahPr/nxOv58wuipGLKY4tvyqNj/bJrNAJwAXlB46zRttC5wpWQ27GB6NGZ0UPJ9A5t/JohQVDU5LQGlz5wCuT0vanYVNGkxq5cYoH01nwgZD+FZauiD/yx+KO5VJ0nSKhR7H8PRWM9Bqgmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pQT4spnfi8wwnwhTH+Bu8XuYkirwIl4C3XKb8PW/o5M=;
- b=V7Lt8tJKvQ1kvr3njWRd8NUDlVeKYKcWITbg4CnRt33NhSN4lIpNcn5/Ex2Rzakl5xACBkTu5M1PkrLrH61hx3gzn2y2C00DKJwTe/XmNPlU17xRSwNtJaO5weZfA4x4UK/IR3HKewp/grLbWAl4KWVwtnSaI4wOpWmjlQYg7uY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by PH7PR12MB7426.namprd12.prod.outlook.com (2603:10b6:510:201::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.13; Fri, 18 Sep
- 2026 22:46:03 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad%4]) with mapi id 15.21.0428.011; Fri, 18 Sep 2026
- 22:46:03 +0000
-Message-ID: <49aa3713-d8af-4c9d-a67e-81c1f776a876@amd.com>
-Date: Fri, 18 Sep 2026 17:46:00 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 4/5] x86/sev: Perform RMP optimizations asynchronously
-To: Borislav Petkov <bp@alien8.de>
-Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
- thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- ardb@kernel.org, pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
- rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, darwi@linutronix.de, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1789594774.git.ashish.kalra@amd.com>
- <daa513fbe8f0672b00bc5e026e4399244be6dc72.1789594774.git.ashish.kalra@amd.com>
- <20260918222326.GBaq253l7rsV04EUpy@fat_crate.local>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-Autocrypt: addr=ashish.kalra@amd.com; keydata=
- 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
-In-Reply-To: <20260918222326.GBaq253l7rsV04EUpy@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR03CA0009.namprd03.prod.outlook.com
- (2603:10b6:806:20::14) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cDq7I4l0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=oXPS1HhvaytVgVbSDhC5/UFDpxPAgmRUlTySpL/plMA=; b=cDq7I4l0/0CJGQOFPzRgaDnU8+
+	07M/khQYRh1Gh3X3VpSkHOWQdkM1Sj8heSCMG5Z0PIhMqV+oFZVvJPxT4LoAx/NhU8Ys6CnxVxBaU
+	vH0cTY4V2Q18kAyRQ/dJuo2huAZlEW1Xndjlyk/xlu97TrEVXLdnI0rru71o1k/ztrKHPTkYrm5P4
+	BgwTdhHv1fweC07y+K4W56ThUqD/zPvnNOHxZKuAEo4gIfqfY5wr8lW6FYJouMh8rhDdUNtDOncON
+	nny2bdeb31CPqiyM3duld/mK6pTE/YoNkoxKNTzyiyichODy+CI9wp4dWOuoyq+u1S41hJbDDQJco
+	jalDkdiQ==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1x7hzW-0000000Fh98-2awY;
+	Fri, 18 Sep 2026 23:27:38 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: [PATCH v2] crypto: ccp: psp-sev.h: clean up kernel-doc warnings
+Date: Fri, 18 Sep 2026 16:27:36 -0700
+Message-ID: <20260918232736.3095763-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|PH7PR12MB7426:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2d8510d1-ba04-44a1-0824-08df15d69e46
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|23010399003|376014|7416014|1800799024|6133799003|3023799007|10067099003|4143699003|5023799004|56012099006|11063799006|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	qQsJGt+NUmJGmcm3RsCMiZTm5Yyv8LmnR4StHYCyCD/PEZq1DLaTyS4/mxomF962ugGxr+aVL67uiGKhqelS/ptQAPklkTZsFPgTzqWQ6DFmhRMfgdyWZIa4EcNt3hZakc8Okqb4pRHqM06xFQ+3LZGgeZMZ8oRdrX70ylNaxQ/FNDW4eyHs0PQyPHGotf8KPnPqpeVb4J7FKUOKWhH4NkoJQVwxH+Awmq+TK2g54x4lXOlXI70uGWK3K7jxaEQ5k3cuDEYOdISpKfT/X5xwEoWc38F7l1hfQSLu9fBwp9DYWfeg88k+gURD97cUcQus+qTgkKWB1V0vkKRwAOAzTUnvmwKWTLQVUx/VyRL6a+BnqqvcGcb4Td4Ja5OyMrVcpio/5aFTiAB2G06VjmDGFOgRj9DrPPaDbShT1whg8irmi7Tk+nAWHPWC3/U95K2QoJ2UdWi4kiQ5Gir9zj0u4YCdTsz8wsmxQ69tm3OTbnfg6/+WOHWETBmjP2aUVgs99lxZ4vujbXuAu+jLSqrUfvDRHFwxAUaCrPOTkv+JYxq3OjpYvBNCr3Rb0f5tbYI3841f8op1e+Ql6U/LlVaWWf/ZWGhEaTl5B5YEJf+YLQdF0r0SBUGs63jvrYlubItB
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(7416014)(1800799024)(6133799003)(3023799007)(10067099003)(4143699003)(5023799004)(56012099006)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Y1V2Z2wzRHUwMnZjVFM1MkE4MEdFTXU4RjMxK2UrTDZ1QlFzVzVLUWVkaXNK?=
- =?utf-8?B?Z0RwdmRzVjQzNGhxUzF5VmxCckl4NEVOOFFHLythS1RsRHFvcE5yVFlDN3Vw?=
- =?utf-8?B?QXJOUXk1UUhoelpEdUxDQ3lvNnJnamZ1SjZGL2djb2huTTBKN0JzVWRobHBI?=
- =?utf-8?B?d1RKRmxoVnRBRG9OZzF6eVBvNU92OENKemRBVFRHeXdMRXhJY2xWdWhQZDB5?=
- =?utf-8?B?WnlyeHdpZzh2dE9Sbk91WXpzakxVR3lqOUtEUlg5VG5Wd0RucmczQklJUE0x?=
- =?utf-8?B?b0V2Y3I5bFNFT1hPSEk0cTd3U284ZzhEVDIvL0pvTXV0dHM1WmlzMmpRQ3Va?=
- =?utf-8?B?ZC9aeGVkaDlldytHRDEzMDZiT1ppbTUrVTMrRmRBVUNETE0yK3JVR1ZwWnhI?=
- =?utf-8?B?WldmN3NleFB0SG0yRFplOWZFOUVVK2cwSG5vOHVwekNIanhpSzQ5aTZlTkdN?=
- =?utf-8?B?MGRudnFETTlBSFBDczd4OXBsVzA4a21KNXVKK2luY0t6aytpT0dsZ2o4VWMv?=
- =?utf-8?B?K1VUOTZ2RDdjYzRhYUY1MXAvTVFVS2d3U0xrS1pqUDZTbWdxWjU3Zmx5SXgr?=
- =?utf-8?B?ZTE4N25nU2QzR0RBdTRqVlYyZjJFMXdCMUY2TUdDMmxKZitsVTlmWmx0TU5W?=
- =?utf-8?B?UXoxa1FGVWtQd1RJZEVTb0g1Q3owaWZqbllPRXlNVG9NSlVtQlVvUTNKb3k3?=
- =?utf-8?B?aVVDaG5RYW1xZno3MWtna1dHQXNueXc2R3E0REtUV240a3BldTlxWFdYZ2Ja?=
- =?utf-8?B?b1A2bUt0OFU4YnExQ3VlMlVZbWlxZ0VJUlU4Q0V3d0Q3YkJxK2g4WFNpajVr?=
- =?utf-8?B?NklqbW44Rm44aVpvZGZHVWF3Wnl2STdTcEFnSHA3RzNoTCtMQlE2NUowb1ln?=
- =?utf-8?B?MkViNnJxMGVDdnI5TVdsbHBka0FlSVNuQlJlMHRNNzV1ck83cWxMVXZkQmR3?=
- =?utf-8?B?enpycHdTbS9pU1YrN2FpbWVvaWJyd0dKNjlwRTAzZmZIMXVkdGRlSzJmcDRI?=
- =?utf-8?B?d21GVWFyWGRqOGxWanhyMDlHWC9RcTgrdGF5UW5MZVl1QUI2ZE9XWjlabCtM?=
- =?utf-8?B?VGJtdHRxZHFGcTJBblQwVjhHUEltY29iQXJqSG5PeGRhN3Y2elVHM1R6UVBG?=
- =?utf-8?B?by83QnVnNytpdlgra3VGTFV1OGZ6ZlVCNytVeTJzNWRjaXRTVFptaWp2U3Fp?=
- =?utf-8?B?UTVZQ1U5WTFRZTBaSWRmazdaZDFyWmlJUFZicHB6eUNrUDRIWjY0dWYwQzkr?=
- =?utf-8?B?N1BEQkFtYlkyK1hLS2dkdWtuQmVIVk9qSHdjRG50dkRsb1NwN3g2WGpDRTRX?=
- =?utf-8?B?eU1JclBldXBvcHZaVFVKdjZ0M3VSRXFVeTNIVXBqV1ZlR0U3Z1Noa0VhN2VV?=
- =?utf-8?B?eG9iRVJuQUt4OVNSV3lidlI1Y3VFUGtNTjJnQ0h1aDc0Q3cxMjdrWmVzNmdl?=
- =?utf-8?B?OG9leFRvc0lsQWlQVHd0TEJIWlVFc2VCR3ZyanR3aVQyclVZZnFXNU9GZkJv?=
- =?utf-8?B?SWhiUURSRndpRTltS2pFZWVlQVo3RjdObjMvNC9HSFlHS3NKZE5rd1RoYzB1?=
- =?utf-8?B?YWZFeDZYaGZxK1hacTF6VEdnN0ZSRTY5WXNIT05uN0V6Q3lPdTBubHFpZVhD?=
- =?utf-8?B?VXVJZXhBRGFHbkwxeHZoNHFXbnVRM2hCZlllajFKelJSMWJISWxYN3orSWM3?=
- =?utf-8?B?YWh4dVNEQWFWdXU3TnI4YW9LUGowS1FISlcvcFR1c1JmQUQ0OTNocFlnM1Ir?=
- =?utf-8?B?RTM5VHkvS2tyVzQwTkZrWm9qTlk2WFZSb2lNQ1dSSzFVQy9ZZjRMNER0NTBM?=
- =?utf-8?B?RUJOV2xmWS9WSGVOR2dJSzU1ZFUyVGwwY0JBbWluUHpFWWZSMy9ubk16V3pP?=
- =?utf-8?B?TjdMTHkvbDRXZEZML1RxSWJya1RFemVwTWRVR0I1N1pGVC9qNzFBTlplOGNw?=
- =?utf-8?B?eURrZ3pRY3Nac3doMmVtMkRBTTBFcnF0ZHU3bDh3VDdwMm9Tb2ZycWM0TXNC?=
- =?utf-8?B?QXVtUVFQUlNLNEN6V2tSNFFyTmg0N2tQc0ZGMXQ0b3ZjdU1ucFArNG80SWZU?=
- =?utf-8?B?aWVpcTQzNExjbWtZTnRsam8xZUFaY3J1ZGxoRUI1UVhQbXVyeXlGTnhTb0xL?=
- =?utf-8?B?clJRbjBBOGVnZEl1MnVDUWpBSnJCZG0rYnloTnZKMnRHeDdhWURaTy9XenFR?=
- =?utf-8?B?Nmo1M2V5Q3paYWpiUWNqSFJCdHpVNXY5VC9KbTRib3hDUFFCdm9GZDBRa04w?=
- =?utf-8?B?UHVWVklhK2ZwdW00OUhZdExYZzhLTnlpY1dhY0c4aWNDNDkyRHVBbHBFbisx?=
- =?utf-8?B?ajU5UjRjVlJ0cmVHUWduYnR2a1VKVjl2cjQ1b1RpcEJDUTd1TGdEQT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d8510d1-ba04-44a1-0824-08df15d69e46
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 22:46:03.4205
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zg2ExwkFhmO3rTnaXvXMc6db2m11VA7A75RKG3l86crMhX8nlSV1ylKI0rolauQ9AfZ/V3AzllwmwU6HwSRiwQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7426
+Content-Transfer-Encoding: 8bit
 
-Hello Boris,
+Clean up kernel-doc comments to prevent warnings in both
+<linux/psp-sev.h> and <uapi/linux/psp-sev.h>.
 
-On 9/18/2026 5:23 PM, Borislav Petkov wrote:
-> On Wed, Sep 16, 2026 at 10:15:14PM +0000, Ashish Kalra wrote:
->> Changes in v15:
->> - Move the workqueue allocation and the (fixed) optimization range
->>   computation to an initcall; snp_enable_rmpopt() now only programs the
->>   RMPOPT_BASE MSRs and queues the optimization pass.
->> - Gate rmpopt_capable() on a static rmpopt_enabled bool set when the
->>   workqueue is allocated, instead of an if (rmpopt_wq) check, and drop
->>   rmpopt_wq_mutex.
->> - Queue both the initial and the teardown pass with mod_delayed_work().
->>  arch/x86/virt/svm/sev.c | 99 +++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 95 insertions(+), 4 deletions(-)
-> 
-> Some scrubbing to this one too:
-> 
-> Author: Ashish Kalra <ashish.kalra@amd.com>
-> Date:   Wed Sep 16 22:15:14 2026 +0000
-> 
->     x86/sev: Perform RMP optimizations asynchronously
->     
->     When SNP is enabled, all writes to memory are checked to ensure memory
->     integrity. This imposes performance overhead on the whole system.
->     
->     RMPOPT is a new instruction that minimizes the performance overhead of
->     RMP checks on the hypervisor and on non-SNP guests by allowing such checks to
->     be skipped for 1GB regions of memory that are known not to contain any SNP
->     guest memory.
->     
->     Add support for performing RMP optimizations asynchronously using a dedicated
->     per-CPU workqueue.  Shortly after SNP initialization, run an optimization pass
->     over all physical memory.
->     
->     As SNP guests are launched, RMPUPDATE assigns their private pages to
->     guest-owned state; when such a page falls within an optimized 1GB region, the
->     hardware clears that region's RMPOPT optimization and RMP checks resume there
->     to protect the guest memory.
->     
->     Since launching SNP guests clears these optimizations, perform them again
->     asynchronously using the dedicated workqueue.
->     
->       [ bp:
->        - Massage commit message and comments
->        - simplify code
->        - redo some of the logic ]
->     
->     Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
->     Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
->     Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->     Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
->     Link: https://patch.msgid.link/daa513fbe8f0672b00bc5e026e4399244be6dc72.1789594774.git.ashish.kalra@amd.com
-> 
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index 1fecd246ce5f..94754f2986d3 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -19,6 +19,7 @@
->  #include <linux/iommu.h>
->  #include <linux/amd-iommu.h>
->  #include <linux/nospec.h>
-> +#include <linux/workqueue.h>
->  
->  #include <asm/sev.h>
->  #include <asm/processor.h>
-> @@ -124,7 +125,27 @@ static void *rmp_bookkeeping __ro_after_init;
->  
->  static u64 probed_rmp_base, probed_rmp_size;
->  
-> -static phys_addr_t rmpopt_pa_start;
-> +static u64 rmpopt_pa_start, rmpopt_pa_end;
-> +
-> +enum rmpopt_op_type {
-> +	RMPOPT_OP_VERIFY_AND_REPORT_STATUS,
-> +	RMPOPT_OP_REPORT_STATUS
-> +};
-> +
-> +static struct workqueue_struct *rmpopt_wq;
-> +static struct delayed_work rmpopt_delayed_work;
-> +
-> +/* Software RMPOPT facilities initialized */
-> +static bool rmpopt_soft_init;
-> +
-> +/*
-> + * Delay, in milliseconds, before the RMP re-optimization pass runs after an
-> + * SNP guest is torn down. This coalesces a burst of teardowns into a single
-> + * scan and gives each guest's pages time to be converted back to the shared,
-> + * hypervisor-owned state.  The 10 second value is a heuristic trading
-> + * re-optimization latency against scanning too eagerly.
-> + */
-> +#define RMPOPT_WORK_TIMEOUT	(10 * MSEC_PER_SEC)
->  
->  static LIST_HEAD(snp_leaked_pages_list);
->  static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
-> @@ -565,6 +586,9 @@ void snp_shutdown(void)
->  	if (syscfg & MSR_AMD64_SYSCFG_SNP_EN)
->  		return;
->  
-> +	if (rmpopt_soft_init)
-> +		cancel_delayed_work_sync(&rmpopt_delayed_work);
-> +
->  	clear_rmp();
->  	on_each_cpu(mfd_reconfigure, NULL, 1);
->  
-> @@ -577,21 +601,80 @@ void snp_shutdown(void)
->  }
->  EXPORT_SYMBOL_FOR_MODULES(snp_shutdown, "ccp");
->  
-> -static bool rmpopt_capable(void)
-> +/*
-> + * RMPOPT optimizations skip RMP checks at 1GB granularity if this range of
-> + * memory does not contain any SNP guest memory.
-> + *
-> + * @pa is a system physical address; RMPOPT operates on the containing 1GB.
-> + */
-> +static void rmpopt(u64 pa)
->  {
-> -	return cpu_feature_enabled(X86_FEATURE_RMPOPT) &&
-> -	       cc_platform_has(CC_ATTR_HOST_SEV_SNP);
-> +	enum rmpopt_op_type op = RMPOPT_OP_VERIFY_AND_REPORT_STATUS;
-> +	u64 pa_start = ALIGN_DOWN(pa, SZ_1G);
-> +
-> +	/* Supported by binutils 2.48+ */
-> +	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
-> +		     :: "a" (pa_start), "c" (op)
-> +		     : "memory", "cc");
-> +}
-> +
-> +static void rmpopt_scan_range(void *arg)
-> +{
-> +	u64 pa;
-> +
-> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
-> +		rmpopt(pa);
->  }
->  
-> +static void do_rmpopt_work(struct work_struct *work)
-> +{
-> +	/*
-> +	 * Warm up the RMPOPT cache on this pinned per-CPU worker with interrupts
-> +	 * enabled, so the IRQ-disabled fan-out below only issues cache-hit RMPOPTs.
-> +	 */
-> +	rmpopt_scan_range(NULL);
-> +
-> +	on_each_cpu_mask(cpu_primary_thread_mask, rmpopt_scan_range, NULL, true);
-> +}
-> +
-> +static int __init rmpopt_init(void)
-> +{
-> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
-> +		return -ENODEV;
-> +
-> +	rmpopt_wq = alloc_workqueue("rmpopt_wq", WQ_PERCPU, 1);
-> +	if (!rmpopt_wq) {
-> +		pr_err("Failed to allocate RMPOPT workqueue\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	INIT_DELAYED_WORK(&rmpopt_delayed_work, do_rmpopt_work);
-> +
-> +	/* The optimization range is fixed at boot; compute it once. */
-> +	rmpopt_pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), SZ_1G);
-> +	rmpopt_pa_end = ALIGN(PFN_PHYS(max_pfn), SZ_1G);
-> +	if ((rmpopt_pa_end - rmpopt_pa_start) > SZ_2T)
-> +		rmpopt_pa_end = rmpopt_pa_start + SZ_2T;
-> +
-> +	rmpopt_soft_init = true;
-> +
-> +	return 0;
-> +}
-> +device_initcall(rmpopt_init);
-> +
->  void snp_enable_rmpopt(void)
->  {
->  	u64 base;
->  	int cpu;
->  
-> -	if (!rmpopt_capable())
-> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
->  		return;
->  
-> -	rmpopt_pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), SZ_1G);
-> +	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
-> +		return;
-> +
-> +	if (!rmpopt_soft_init)
-> +		return;
->  
->  	/*
->  	 * Per-CPU RMPOPT tables cover at most 2 TB.  Program each core's
-> @@ -602,6 +685,11 @@ void snp_enable_rmpopt(void)
->  		for_each_cpu(cpu, cpu_primary_thread_mask)
->  			wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE,
->  				      rmpopt_pa_start | MSR_AMD64_RMPOPT_ENABLE);
-> +
-> +	mod_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
-> +			 msecs_to_jiffies(RMPOPT_WORK_TIMEOUT));
-> +
-> +	pr_info("RMPOPT optimizations enabled\n");
+include/linux/psp-sev.h: (62 lines; edited for brevity)
+Warning: include/linux/psp-sev.h:52 This comment starts with '/**', but isn't a kernel-doc comment.
+ * SEV platform state
+Warning: include/linux/psp-sev.h:63 This comment starts with '/**', but isn't a kernel-doc comment.
+ * SEV platform and guest management commands
+Warning: include/linux/psp-sev.h:167 struct member 'reserved' not described in 'sev_data_init'
+Warning: include/linux/psp-sev.h:187 struct member 'reserved' not described in 'sev_data_init_ex'
+Warning: include/linux/psp-sev.h:216 expecting prototype for struct sev_data_cert_import. Prototype was for struct sev_data_pek_cert_import instead
+Warning: include/linux/psp-sev.h:253 struct member 'pdh_cert_address' not described in 'sev_data_pdh_cert_export'
+Warning: include/linux/psp-sev.h:253 struct member 'pdh_cert_len' not described in 'sev_data_pdh_cert_export'
+Warning: include/linux/psp-sev.h:253 struct member 'reserved' not described in 'sev_data_pdh_cert_export'
+Warning: include/linux/psp-sev.h:253 Excess struct member 'pdh_address' description in 'sev_data_pdh_cert_export' (did you mean one of: 'pdh_cert_address', 'cert_chain_address')
+Warning: include/linux/psp-sev.h:253 Excess struct member 'pdh_len' description in 'sev_data_pdh_cert_export' (did you mean one of: 'pdh_cert_len')
+Warning: include/linux/psp-sev.h:446 expecting prototype for struct sev_data_send_update. Prototype was for struct sev_data_send_update_data instead
+Warning: include/linux/psp-sev.h:469 expecting prototype for struct sev_data_send_update. Prototype was for struct sev_data_send_update_vmsa instead
+Warning: include/linux/psp-sev.h:506 struct member 'policy' not described in 'sev_data_receive_start'
+Warning: include/linux/psp-sev.h:799 struct member 'rapl_dis' not described in 'sev_data_snp_init_ex'
+Warning: include/linux/psp-sev.h:799 struct member 'ciphertext_hiding_en' not described in 'sev_data_snp_init_ex'
+Warning: include/linux/psp-sev.h:799 struct member 'tio_en' not described in 'sev_data_snp_init_ex'
+Warning: include/linux/psp-sev.h:799 struct member 'max_snp_asid' not described in 'sev_data_snp_init_ex'
+Warning: include/linux/psp-sev.h:843 missing initial short description on line:
+ * struct sev_platform_init_args
+Warning: include/linux/psp-sev.h:893 expecting prototype for struct feature_info. Prototype was for struct snp_feature_info instead
+Warning: include/linux/psp-sev.h:956 missing initial short description on line:
+ * struct sev_snp_tcb_version_genoa_milan
+Warning: include/linux/psp-sev.h:973 missing initial short description on line:
+ * struct sev_snp_tcb_version_turin
+Warning: include/linux/psp-sev.h:1053 function parameter 'filep' not described in 'sev_issue_cmd_external_user'
+Warning: include/linux/psp-sev.h:1053 function parameter 'id' not described in 'sev_issue_cmd_external_user'
+Warning: include/linux/psp-sev.h:1112 function parameter 'data' not described in 'sev_guest_decommission'
+Warning: include/linux/psp-sev.h:1112 function parameter 'error' not described in 'sev_guest_decommission'
+Warning: include/linux/psp-sev.h:1112 Excess function parameter 'decommission' description in 'sev_guest_decommission'
+Warning: include/linux/psp-sev.h:1112 Excess function parameter 'sev_ret' description in 'sev_guest_decommission'
 
-Looks good.
+include/uapi/linux/psp-sev.h:
+Warning: include/uapi/linux/psp-sev.h:18 This comment starts with '/**', but isn't a kernel-doc comment.
+ * SEV platform commands
+Warning: include/uapi/linux/psp-sev.h:39 This comment starts with '/**', but isn't a kernel-doc comment.
+ * SEV Firmware status code
+Warning: include/uapi/linux/psp-sev.h:125 struct member 'api_major' not described in 'sev_user_data_status'
+Warning: include/uapi/linux/psp-sev.h:125 struct member 'api_minor' not described in 'sev_user_data_status'
+Warning: include/uapi/linux/psp-sev.h:125 Excess struct member 'major' description in 'sev_user_data_status' (did you mean one of: 'api_major')
+Warning: include/uapi/linux/psp-sev.h:125 Excess struct member 'minor' description in 'sev_user_data_status' (did you mean one of: 'api_minor')
+Warning: include/uapi/linux/psp-sev.h:153 expecting prototype for struct sev_user_data_cert_import. Prototype was for struct sev_user_data_pek_cert_import instead
+Warning: include/uapi/linux/psp-sev.h:168 struct member 'pdh_cert_address' not described in 'sev_user_data_pdh_cert_export'
+Warning: include/uapi/linux/psp-sev.h:168 struct member 'pdh_cert_len' not described in 'sev_user_data_pdh_cert_export'
+Warning: include/uapi/linux/psp-sev.h:168 Excess struct member 'pdh_address' description in 'sev_user_data_pdh_cert_export' (did you mean one of: 'pdh_cert_address', 'cert_chain_address')
+Warning: include/uapi/linux/psp-sev.h:168 Excess struct member 'pdh_len' description in 'sev_user_data_pdh_cert_export' (did you mean one of: 'pdh_cert_len')
+Warning: include/uapi/linux/psp-sev.h:263 expecting prototype for struct sev_data_snp_vlek_load. Prototype was for struct sev_user_data_snp_vlek_load instead
+Warning: include/uapi/linux/psp-sev.h:273 expecting prototype for struct sev_user_data_snp_vlek_wrapped_vlek_hashstick. Prototype was for struct sev_user_data_snp_wrapped_vlek_hashstick instead
 
-One comment here, i originally had pr_info_once() for printing this once during SNP init, 
-if you change it to pr_info(), it will get printed again at every SNP guest teardown too,
-i am fine with it and actually it keeps the user aware that RMPOPT optimizations are
-being re-applied/re-enabled, but there may be just too many kernel messages dumped.
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+v2: don't use private: for reserved fields; just describe them in
+    kernel-doc (Tom)
 
+Cc: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
 
-Thanks,
-Ashish
+ include/linux/psp-sev.h      |   86 +++++++++++++++++++++++----------
+ include/uapi/linux/psp-sev.h |   26 ++++-----
+ 2 files changed, 73 insertions(+), 39 deletions(-)
 
->  }
->  EXPORT_SYMBOL_FOR_MODULES(snp_enable_rmpopt, "ccp");
->  
-> 
-> 
+--- linux-next-20260918.orig/include/linux/psp-sev.h
++++ linux-next-20260918/include/linux/psp-sev.h
+@@ -49,7 +49,7 @@
+ 
+ #define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
+ 
+-/**
++/*
+  * SEV platform state
+  */
+ enum sev_state {
+@@ -60,7 +60,7 @@ enum sev_state {
+ 	SEV_STATE_MAX
+ };
+ 
+-/**
++/*
+  * SEV platform and guest management commands
+  */
+ enum sev_cmd {
+@@ -157,6 +157,7 @@ enum sev_cmd {
+  * struct sev_data_init - INIT command parameters
+  *
+  * @flags: processing flags
++ * @reserved: reserved
+  * @tmr_address: system physical address used for SEV-ES
+  * @tmr_len: len of tmr_address
+  */
+@@ -174,6 +175,7 @@ struct sev_data_init {
+  * @flags: processing flags
+  * @tmr_address: system physical address used for SEV-ES
+  * @tmr_len: len of tmr_address
++ * @reserved: reserved
+  * @nv_address: system physical address used for PSP NV storage
+  * @nv_len: len of nv_address
+  */
+@@ -201,12 +203,13 @@ struct sev_data_pek_csr {
+ } __packed;
+ 
+ /**
+- * struct sev_data_cert_import - PEK_CERT_IMPORT command parameters
++ * struct sev_data_pek_cert_import - PEK_CERT_IMPORT command parameters
+  *
+- * @pek_address: PEK certificate chain
+- * @pek_len: len of PEK certificate
+- * @oca_address: OCA certificate chain
+- * @oca_len: len of OCA certificate
++ * @pek_cert_address: PEK certificate chain
++ * @pek_cert_len: len of PEK certificate
++ * @reserved: reserved
++ * @oca_cert_address: OCA certificate chain
++ * @oca_cert_len: len of OCA certificate
+  */
+ struct sev_data_pek_cert_import {
+ 	u64 pek_cert_address;			/* In */
+@@ -240,8 +243,9 @@ struct sev_data_get_id {
+ /**
+  * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
+  *
+- * @pdh_address: PDH certificate address
+- * @pdh_len: len of PDH certificate
++ * @pdh_cert_address: PDH certificate address
++ * @pdh_cert_len: len of PDH certificate
++ * @reserved: reserved
+  * @cert_chain_address: PDH certificate chain
+  * @cert_chain_len: len of PDH certificate chain
+  */
+@@ -304,6 +308,7 @@ struct sev_data_guest_status {
+  * @policy: guest launch policy
+  * @dh_cert_address: physical address of DH certificate blob
+  * @dh_cert_len: len of DH certificate blob
++ * @reserved: reserved
+  * @session_address: physical address of session parameters
+  * @session_len: len of session parameters
+  */
+@@ -321,6 +326,7 @@ struct sev_data_launch_start {
+  * struct sev_data_launch_update_data - LAUNCH_UPDATE_DATA command parameter
+  *
+  * @handle: handle of the VM to update
++ * @reserved: reserved
+  * @len: len of memory to be encrypted
+  * @address: physical address of memory region to encrypt
+  */
+@@ -335,6 +341,7 @@ struct sev_data_launch_update_data {
+  * struct sev_data_launch_update_vmsa - LAUNCH_UPDATE_VMSA command
+  *
+  * @handle: handle of the VM
++ * @reserved: reserved
+  * @address: physical address of memory region to encrypt
+  * @len: len of memory region to encrypt
+  */
+@@ -349,6 +356,7 @@ struct sev_data_launch_update_vmsa {
+  * struct sev_data_launch_measure - LAUNCH_MEASURE command parameters
+  *
+  * @handle: handle of the VM to process
++ * @reserved: reserved
+  * @address: physical address containing the measurement blob
+  * @len: len of measurement blob
+  */
+@@ -363,10 +371,13 @@ struct sev_data_launch_measure {
+  * struct sev_data_launch_secret - LAUNCH_SECRET command parameters
+  *
+  * @handle: handle of the VM to process
++ * @reserved1: reserved
+  * @hdr_address: physical address containing the packet header
+  * @hdr_len: len of packet header
++ * @reserved2: reserved
+  * @guest_address: system physical address of guest memory region
+  * @guest_len: len of guest_paddr
++ * @reserved3: reserved
+  * @trans_address: physical address of transport memory buffer
+  * @trans_len: len of transport memory buffer
+  */
+@@ -399,10 +410,13 @@ struct sev_data_launch_finish {
+  * @policy: policy information for the VM
+  * @pdh_cert_address: physical address containing PDH certificate
+  * @pdh_cert_len: len of PDH certificate
++ * @reserved1: reserved
+  * @plat_certs_address: physical address containing platform certificate
+  * @plat_certs_len: len of platform certificate
++ * @reserved2: reserved
+  * @amd_certs_address: physical address containing AMD certificate
+  * @amd_certs_len: len of AMD certificate
++ * @reserved3: reserved
+  * @session_address: physical address containing Session data
+  * @session_len: len of session data
+  */
+@@ -423,13 +437,16 @@ struct sev_data_send_start {
+ } __packed;
+ 
+ /**
+- * struct sev_data_send_update - SEND_UPDATE_DATA command
++ * struct sev_data_send_update_data - SEND_UPDATE_DATA command
+  *
+  * @handle: handle of the VM to process
++ * @reserved1: reserved
+  * @hdr_address: physical address containing packet header
+  * @hdr_len: len of packet header
++ * @reserved2: reserved
+  * @guest_address: physical address of guest memory region to send
+  * @guest_len: len of guest memory region to send
++ * @reserved3: reserved
+  * @trans_address: physical address of host memory region
+  * @trans_len: len of host memory region
+  */
+@@ -447,13 +464,15 @@ struct sev_data_send_update_data {
+ } __packed;
+ 
+ /**
+- * struct sev_data_send_update - SEND_UPDATE_VMSA command
++ * struct sev_data_send_update_vmsa - SEND_UPDATE_VMSA command
+  *
+  * @handle: handle of the VM to process
+  * @hdr_address: physical address containing packet header
+  * @hdr_len: len of packet header
++ * @reserved2: reserved
+  * @guest_address: physical address of guest memory region to send
+  * @guest_len: len of guest memory region to send
++ * @reserved3: reserved
+  * @trans_address: physical address of host memory region
+  * @trans_len: len of host memory region
+  */
+@@ -491,8 +510,10 @@ struct sev_data_send_cancel {
+  * struct sev_data_receive_start - RECEIVE_START command parameters
+  *
+  * @handle: handle of the VM to perform receive operation
++ * @policy: policy information for the VM
+  * @pdh_cert_address: system physical address containing PDH certificate blob
+  * @pdh_cert_len: len of PDH certificate blob
++ * @reserved1: reserved
+  * @session_address: system physical address containing session blob
+  * @session_len: len of session blob
+  */
+@@ -510,10 +531,13 @@ struct sev_data_receive_start {
+  * struct sev_data_receive_update_data - RECEIVE_UPDATE_DATA command parameters
+  *
+  * @handle: handle of the VM to update
++ * @reserved1: reserved
+  * @hdr_address: physical address containing packet header blob
+  * @hdr_len: len of packet header
++ * @reserved2: reserved
+  * @guest_address: system physical address of guest memory region
+  * @guest_len: len of guest memory region
++ * @reserved3: reserved
+  * @trans_address: system physical address of transport buffer
+  * @trans_len: len of transport buffer
+  */
+@@ -534,10 +558,13 @@ struct sev_data_receive_update_data {
+  * struct sev_data_receive_update_vmsa - RECEIVE_UPDATE_VMSA command parameters
+  *
+  * @handle: handle of the VM to update
++ * @reserved1: reserved
+  * @hdr_address: physical address containing packet header blob
+  * @hdr_len: len of packet header
++ * @reserved2: reserved
+  * @guest_address: system physical address of guest memory region
+  * @guest_len: len of guest memory region
++ * @reserved3: reserved
+  * @trans_address: system physical address of transport buffer
+  * @trans_len: len of transport buffer
+  */
+@@ -567,6 +594,7 @@ struct sev_data_receive_finish {
+  * struct sev_data_dbg - DBG_ENCRYPT/DBG_DECRYPT command parameters
+  *
+  * @handle: handle of the VM to perform debug operation
++ * @reserved: reserved
+  * @src_addr: source address of data to operate on
+  * @dst_addr: destination address of data to operate on
+  * @len: len of data to operate on
+@@ -583,6 +611,7 @@ struct sev_data_dbg {
+  * struct sev_data_attestation_report - SEV_ATTESTATION_REPORT command parameters
+  *
+  * @handle: handle of the VM
++ * @reserved: reserved
+  * @mnonce: a random nonce that will be included in the report.
+  * @address: physical address where the report will be copied.
+  * @len: length of the physical buffer.
+@@ -781,9 +810,14 @@ struct sev_data_snp_guest_request {
+  *
+  * @init_rmp: indicate that the RMP should be initialized.
+  * @list_paddr_en: indicate that list_paddr is valid
++ * @rapl_dis: whether RAPL is disabled
++ * @ciphertext_hiding_en: whether ciphertext hiding is enabled
++ * @tio_en: Indicates that SNP_INIT_EX initialized the RMP for SEV-TIO
+  * @rsvd: reserved
+  * @rsvd1: reserved
+  * @list_paddr: system physical address of range list
++ * @max_snp_asid: When non-zero, enable ciphertext hiding and specify the
++ *  maximum ASID that can be used for an SEV-SNP guest.
+  * @rsvd2: reserved
+  */
+ struct sev_data_snp_init_ex {
+@@ -841,7 +875,7 @@ struct sev_data_snp_shutdown_ex {
+ } __packed;
+ 
+ /**
+- * struct sev_platform_init_args
++ * struct sev_platform_init_args - parameters for sev_platform_init()
+  *
+  * @error: SEV firmware error code
+  * @probe: True if this is being called as part of CCP module probe, which
+@@ -879,12 +913,12 @@ struct sev_data_snp_feature_info {
+ } __packed;
+ 
+ /**
+- * struct feature_info - FEATURE_INFO structure
++ * struct snp_feature_info - FEATURE_INFO structure
+  *
+  * @eax: output of SNP_FEATURE_INFO command
+  * @ebx: output of SNP_FEATURE_INFO command
+  * @ecx: output of SNP_FEATURE_INFO command
+- * #edx: output of SNP_FEATURE_INFO command
++ * @edx: output of SNP_FEATURE_INFO command
+  */
+ struct snp_feature_info {
+ 	u32 eax;
+@@ -954,7 +988,7 @@ struct sev_data_snp_verify_mitigation_ds
+ } __packed;
+ 
+ /**
+- * struct sev_snp_tcb_version_genoa_milan
++ * struct sev_snp_tcb_version_genoa_milan - v1 SVN payload
+  *
+  * @boot_loader: SVN of PSP bootloader
+  * @tee: SVN of PSP operating system
+@@ -971,7 +1005,7 @@ struct sev_snp_tcb_version_genoa_milan {
+ };
+ 
+ /**
+- * struct sev_snp_tcb_version_turin
++ * struct sev_snp_tcb_version_turin - v2 SVN payload
+  *
+  * @fmc: SVN of FMC firmware
+  * @boot_loader: SVN of PSP bootloader
+@@ -1037,9 +1071,9 @@ int sev_platform_status(struct sev_user_
+  * behalf of userspace. The caller must pass a valid SEV file descriptor
+  * so that we know that it has access to SEV device.
+  *
+- * @filep - SEV device file pointer
+- * @cmd - command to issue
+- * @data - command buffer
++ * @filep: SEV device file pointer
++ * @id: command to issue
++ * @data: command buffer
+  * @error: SEV command return code
+  *
+  * Returns:
+@@ -1056,8 +1090,8 @@ int sev_issue_cmd_external_user(struct f
+ /**
+  * sev_guest_deactivate - perform SEV DEACTIVATE command
+  *
+- * @deactivate: sev_data_deactivate structure to be processed
+- * @sev_ret: sev command return code
++ * @data: sev_data_deactivate structure to be processed
++ * @error: sev command return code
+  *
+  * Returns:
+  * 0 if the sev successfully processed the command
+@@ -1071,8 +1105,8 @@ int sev_guest_deactivate(struct sev_data
+ /**
+  * sev_guest_activate - perform SEV ACTIVATE command
+  *
+- * @activate: sev_data_activate structure to be processed
+- * @sev_ret: sev command return code
++ * @data: sev_data_activate structure to be processed
++ * @error: sev command return code
+  *
+  * Returns:
+  * 0 if the sev successfully processed the command
+@@ -1086,7 +1120,7 @@ int sev_guest_activate(struct sev_data_a
+ /**
+  * sev_guest_df_flush - perform SEV DF_FLUSH command
+  *
+- * @sev_ret: sev command return code
++ * @error: sev command return code
+  *
+  * Returns:
+  * 0 if the sev successfully processed the command
+@@ -1100,8 +1134,8 @@ int sev_guest_df_flush(int *error);
+ /**
+  * sev_guest_decommission - perform SEV DECOMMISSION command
+  *
+- * @decommission: sev_data_decommission structure to be processed
+- * @sev_ret: sev command return code
++ * @data: sev_data_decommission structure to be processed
++ * @error: sev command return code
+  *
+  * Returns:
+  * 0 if the sev successfully processed the command
+--- linux-next-20260918.orig/include/uapi/linux/psp-sev.h
++++ linux-next-20260918/include/uapi/linux/psp-sev.h
+@@ -15,7 +15,7 @@
+ 
+ #include <linux/types.h>
+ 
+-/**
++/*
+  * SEV platform commands
+  */
+ enum {
+@@ -36,7 +36,7 @@ enum {
+ 	SEV_MAX,
+ };
+ 
+-/**
++/*
+  * SEV Firmware status code
+  */
+ typedef enum {
+@@ -109,8 +109,8 @@ typedef enum {
+ /**
+  * struct sev_user_data_status - PLATFORM_STATUS command parameters
+  *
+- * @major: major API version
+- * @minor: minor API version
++ * @api_major: major API version
++ * @api_minor: minor API version
+  * @state: platform state
+  * @flags: platform config flags
+  * @build: firmware build id for API version
+@@ -139,12 +139,12 @@ struct sev_user_data_pek_csr {
+ } __packed;
+ 
+ /**
+- * struct sev_user_data_cert_import - PEK_CERT_IMPORT command parameters
++ * struct sev_user_data_pek_cert_import - PEK_CERT_IMPORT command parameters
+  *
+- * @pek_address: PEK certificate chain
+- * @pek_len: length of PEK certificate
+- * @oca_address: OCA certificate chain
+- * @oca_len: length of OCA certificate
++ * @pek_cert_address: PEK certificate chain
++ * @pek_cert_len: length of PEK certificate
++ * @oca_cert_address: OCA certificate chain
++ * @oca_cert_len: length of OCA certificate
+  */
+ struct sev_user_data_pek_cert_import {
+ 	__u64 pek_cert_address;			/* In */
+@@ -156,8 +156,8 @@ struct sev_user_data_pek_cert_import {
+ /**
+  * struct sev_user_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
+  *
+- * @pdh_address: PDH certificate address
+- * @pdh_len: length of PDH certificate
++ * @pdh_cert_address: PDH certificate address
++ * @pdh_cert_len: length of PDH certificate
+  * @cert_chain_address: PDH certificate chain
+  * @cert_chain_len: length of PDH certificate chain
+  */
+@@ -248,7 +248,7 @@ struct sev_user_data_snp_config {
+ } __packed;
+ 
+ /**
+- * struct sev_data_snp_vlek_load - SNP_VLEK_LOAD structure
++ * struct sev_user_data_snp_vlek_load - SNP_VLEK_LOAD structure
+  *
+  * @len: length of the command buffer read by the PSP
+  * @vlek_wrapped_version: version of wrapped VLEK hashstick (Must be 0h)
+@@ -264,7 +264,7 @@ struct sev_user_data_snp_vlek_load {
+ } __packed;
+ 
+ /**
+- * struct sev_user_data_snp_vlek_wrapped_vlek_hashstick - Wrapped VLEK data
++ * struct sev_user_data_snp_wrapped_vlek_hashstick - Wrapped VLEK data
+  *
+  * @data: Opaque data provided by AMD KDS (as described in SEV-SNP Firmware ABI
+  *        1.54, SNP_VLEK_LOAD)
