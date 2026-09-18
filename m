@@ -1,46 +1,46 @@
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012002.outbound.protection.outlook.com [40.93.195.2])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012048.outbound.protection.outlook.com [52.101.43.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D70251A14A;
-	Fri, 18 Sep 2026 16:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA8550EC07;
+	Fri, 18 Sep 2026 16:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789749733; cv=fail; b=apR4tqKFci/Zl3Jqkd5bxuyrcyTpFYZYXa0UKr5Pzy17E7urEDkmXu+xO9704Mh+0zASZvw9l7wSFm/62LaXEsUntqJDKNyTLR3JXTQPRfF2ONc7kw4wDHwY/SuWKDXK/KSrVF83FQAENKylaSF8nZU3R2LgexzdHZ10pZJ+Zfc=
+	t=1789749749; cv=fail; b=QVj5adGH7+1kVMeXgOrUsQr41GNS4mEs7syxqGdzVB8rs5Dg69zKSwWYbtBp4axTsyU77SEJuPBo7e/7h6RiezL/ThBifQDxaIkbTYU9lU3hqtftQUKMhMZDm4r99uT6vzqbt8xmV9gW/bHfSWjNyDg99ZDZnaFyeuXvF2StEnM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789749733; c=relaxed/simple;
-	bh=ZGtXSeAJZz/yOI1vr+67nkw+LNuTcLgWxze/8OmOf3c=;
+	s=arc-20240116; t=1789749749; c=relaxed/simple;
+	bh=+6STHUGYVKtaTl6IbwFdaameYh3/Y1xs0ASxaJOxvek=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JF2rn6TocYfCQSuMdDgO/bvbI19BdaXW0hV4HAOj1UZRi9WFBwB5jCozD9bZZ+RkTvNaSoeujMzdjyq2sekh4a+mzNm4ShihrMwpQEECyh+eGkj+8N4JHu3uqReiaQQp51m3n49G5kHupDic3qIyTPfs53Yj8+9MTc7bEsnCP9Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=X1JCmhbY; arc=fail smtp.client-ip=40.93.195.2
+	 MIME-Version:Content-Type; b=JtAngZ2G6GS4Lcqs2SZSoe9dQ77vjT1brLDDkB3+8JckYmJ30LTpW+RNUZdEcRpdivBzJhyJ2P2wLqgyPQfpWsvPFVuK5cGADdzYaGJI1g51dUX55M4/acDKRmbp0d5QOjZ5FTJsKxjbaI+jrfWaYWbHzKpfzaySBARbifRK12I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=vl5DD8Tr; arc=fail smtp.client-ip=52.101.43.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="X1JCmhbY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vl5DD8Tr"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oMYtPmcKLc8E7rMPQcKgeHWh1wB1frjUtqY/b0C2Y6HiPyiXXaT7DsE3xrpO2/UclahAlJ4YLODoEszZOC0zizZh+UZQt0jVOD3c3L4bT/KS8+IGZCAXTQ+G1ZSLQLhx953hljZK1oRwvqiz1gIUIpGCwIuA0Xyx+wIV6ZuOmrPyv+W5YqBvzGvV068+bTxINgTYs7xnNVGt1Ii1O7Y3AE56KaDsbXwPM3ASPH+GGTKXVsSQTq4n1NZBE7JWkOX4aIasUbrF8L+yp4nDvFlv/eR27399Cd3N56c3Gi3C4ejwAryNDdQ7HEPO+ppPSZqAL/pU7/NAUhzTg/0w1rOyqw==
+ b=BIUNlBJzWPPr7YYLfM8kieL49DjG76DnSTHcbVJUycksksEvNZBUOx9Mo4tf84yTF6wNjXILNtCK6TvW46U9beutdNzb2dsIo0En4nLOPk4ifrXrj/AeSOa5HN4FOr6fhPf6IfFaLiRg0AAAzpWLOfk99T0GDcoI8cHAzIvZ3Nl4TK4YRdBaHA9If8zg3TSIObjdNGj1QFq6KaaA+5aSL/+qZfQ1QcHUYrVc+woSe00nMBhWAJEgkBXDMzUsskNyXQG/uKgO4iDpREf9ySrCIF8PubI0qVh+/Ki5cMT6dN/G8EKYk8yoL6c8mbLNxYMfWBc/sgdHsU/uUF6seYmjUg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4/BoV4hqRgwNw7odkh4jDkqTT6DGoZwDLnGcrR92Qn4=;
- b=FwlfncpJXN8oWig5lVNaAhWjhMewX6jZD1+evcPbcBZTKxsP9OcqTKrFYnvAU1fN4jGnazaS8kjRFdAX8Ebp6mMKNTEwztA3mpNT2/3N1xNk6YTcjEBklkp1nQtrdSqFDQ7Zm6jYyA2GUpkQ1Suxm+983IOGMkeNQBbFzMDAUsZ0PvDilb2hJ95tc78UYn57ZXeXZSFdf4y1c6dajfiRU2qArodpUUrX9CW3sikFBpQSNiZ0U/MPVw24RuJHgKKQTr3nnpwO3WtjAVf0b4kZpPyShuVUcnduc93epOiQUxjMo5aNS4rKm4n6iu3Iw8WFESrRF59OHQ+zqoeVW00X+w==
+ bh=bE7Ge1BjtRa9VzLR01DX+qnlhEI8i700n/5uL3bLjrE=;
+ b=cvBQP+0GvqTm0jSpKQNBXSm3GPF6kc/2PeoYFq/PZb+bTbyjGBDjFRTjPOjgL4nfdpINgl/Ie2OFVs/ZNq5gfTJ7xjVhsokJDZOt1tOk/9aXHr5PPK1he10ZWPXCaAvy+HW/ZBBjkq2VKCqosVr05Gaio6ygWreJFOSv5m8w3fVdlkBbzz2iVvZ3Cba1CYTxFx7AqZ8CK7sPQetJ5sFXb+F8w5HyheG8V3V3U6QjXwfBrsNrnepplWdy0T46VnIZHZi5p6VDjvyvE1mq7D4XabP4V4ZXaOYEPgYVGniNwF0ymcoo6noyG3SPqgp6I2Zx3eOkowBs+oklzcJ2cJINxA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4/BoV4hqRgwNw7odkh4jDkqTT6DGoZwDLnGcrR92Qn4=;
- b=X1JCmhbY9bx/DaL8yor4XKjJxUTEfFrcQQeQ4PpEBks3MOB3OPCq77EWpE+QV/xQinD6xWWnrTSor/WBGONqEpPnw8IwdwO7qOfzqs7SB9ibKC4NWC04qJeOEu9xp8DpqzqpmNmZojxKcOboboTIz1JT3OqRKqXgwz/tR9OF3C4=
-Received: from CH2PR02CA0006.namprd02.prod.outlook.com (2603:10b6:610:4e::16)
- by EAYPR12MB999157.namprd12.prod.outlook.com (2603:10b6:303:2bf::20) with
+ bh=bE7Ge1BjtRa9VzLR01DX+qnlhEI8i700n/5uL3bLjrE=;
+ b=vl5DD8Tr6y5XnnI7Ysh5NBY3vD/cImYmEqd0lD/Bapiy6x1dq02fiEP204kSsIWJHp1gJpBDTKEzUb12YNPr7H3xYybQbGOA67nxEe8pqmOC/XeFIFbT7NXIIXh8TDH1d503D81Ylk0Dl7CzvBORXhocYUDXJYAfs/LfKsgztlk=
+Received: from SJ0PR13CA0139.namprd13.prod.outlook.com (2603:10b6:a03:2c6::24)
+ by CY8PR12MB7124.namprd12.prod.outlook.com (2603:10b6:930:5f::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.16; Fri, 18 Sep
- 2026 16:41:51 +0000
-Received: from SJ1PEPF00001CDC.namprd05.prod.outlook.com
- (2603:10b6:610:4e:cafe::7d) by CH2PR02CA0006.outlook.office365.com
- (2603:10b6:610:4e::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.406.12 via Frontend Transport; Fri,
- 18 Sep 2026 16:41:51 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.13; Fri, 18 Sep
+ 2026 16:42:13 +0000
+Received: from SJ1PEPF00001CDD.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c6:cafe::8a) by SJ0PR13CA0139.outlook.office365.com
+ (2603:10b6:a03:2c6::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.451.9 via Frontend Transport; Fri, 18
+ Sep 2026 16:42:13 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ1PEPF00001CDC.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ SJ1PEPF00001CDD.mail.protection.outlook.com (10.167.242.5) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.451.8 via Frontend Transport; Fri, 18 Sep 2026 16:41:50 +0000
+ 15.21.451.8 via Frontend Transport; Fri, 18 Sep 2026 16:42:13 +0000
 Received: from speedway8455host.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Fri, 18 Sep
- 2026 11:41:49 -0500
+ 2026 11:42:12 -0500
 From: "Pratik R. Sampat" <prsampat@amd.com>
 To: <mcgrof@kernel.org>, <russ.weight@linux.dev>, <dakr@kernel.org>,
 	<ashish.kalra@amd.com>, <thomas.lendacky@amd.com>,
@@ -63,9 +63,9 @@ CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<gregkh@linuxfoundation.org>, <rafael@kernel.org>, <chao.gao@intel.com>,
 	<aik@amd.com>, <tycho@kernel.org>, <nikunj@amd.com>, <michael.roth@amd.com>,
 	<shansinha@google.com>, <prsampat@amd.com>
-Subject: [Patch v2 3/7] treewide: firmware_loader: Drop the unused @module argument
-Date: Fri, 18 Sep 2026 16:40:57 +0000
-Message-ID: <1db6b629d744bdb2fb98428557b4d22d27ce39a9.1789749016.git.prsampat@amd.com>
+Subject: [Patch v2 5/7] crypto: ccp - Allow SNP platform data to be queried after SNP INIT
+Date: Fri, 18 Sep 2026 16:40:59 +0000
+Message-ID: <0f67392979b8db85aacd62fe547d9e2937a93393.1789749016.git.prsampat@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1789749016.git.prsampat@amd.com>
 References: <cover.1789749016.git.prsampat@amd.com>
@@ -81,270 +81,115 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDC:EE_|EAYPR12MB999157:EE_
-X-MS-Office365-Filtering-Correlation-Id: dffc5f63-9b31-4c8a-9a36-08df15a3bd4a
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDD:EE_|CY8PR12MB7124:EE_
+X-MS-Office365-Filtering-Correlation-Id: 096bd5a2-c609-4210-7a3c-08df15a3caee
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|23010399003|30052699003|376014|7416014|1800799024|56012099006|10067099003|11063799006|22082099003|18002099003;
+	BCL:0;ARA:13230040|82310400026|7416014|376014|36860700016|23010399003|1800799024|10067099003|11063799006|56012099006|3023799007|6133799003|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	tfh8hUhPEhiXl7OXFWUD1TUMVrbdDiENHg9cjdY+6Y5xXymR2HIYT5rOHPcQJ+O/A47i0gAE0HJARduYWd3csVQRh9kIORwrTkv3I3sLYB7MzULiJ0evEXrS3tUUOcvryrCUKYfBpg1fXpJGbraj4q/T2igQBef4y/8fDC0LKXQE1yQG1OsMLtPtpcPKnrHbgZWvRpF9YtFVux5zHYAsXvamVwgP4wwUjj/fA2Z8e/OGuJI4BU0Lj7Vrv22OUtfvRMc/tgjt37hbnXdQE3eXdWqj0vIitAgGpfaOBLhY+48VINf7jvhQ2aXt0cz0wMzwn3zeOMR3+TVUkY37teEQFOMSSnFgnBuJh/yBYySA3NzMpOe5lzUMy1QRkkYflDxEeDMBzhYJCb95+/Fv//lFEwXTclrX52fHl9u8/n/3/En6vEiWwj4eY2tAEcP+1Q4Jvp8PlHwFCJ600dnsOv/VGFzciRC+vQtPuMITbPucWNt5nmAW9OkbEElGcf6Zvb4jyMtQuJd9XnBaH0+2Dw+3Gn91QUw3gvthBdqikoN4UEBoljT7XmOOEm7QMTxFDvC+Sh2mfN2/j6JEjJfu6xgdIMZkYw6C3F7bWfkEZDzJAl8JRd26nGvUSNQuUUMTEINiPeYXjJ49wSSNV7++2bu2jjiDFMeo8VGc9YV6Fu6HCiOqa0xDxXuuZijSPW5ORsvjiAv6f/yDIGVTLSRgEFPl8g==
+	8kQm7TDUjbtTClW4SMFANvieSBYMuA57wO14LZsJOwPO5hrRL5C3PIWVh9rPxe74CC0IoMmtZW9fhraE6T9CUA1Z5YIph3MotG9G+k6UpN3qyvk03bdkuF8qHe+BlZPHLTSfg0UEb1bpMPhEnUEtKXHGLlFMlfL+1HBus6eJ+AW4dJk6zFpsPPDRs1eOI/P+sIqVlz9RMkvKu7zn52TCpEU88CBfIRE4tF1Egifb9HGuk3Fnxf/O7kC9a5kaKuJJj4uD5SY28NSeebqzPpht1fZEDjuwmnaZjxLPo4LuSVtttjsZJH48Ss8ewSELD8zTbtWoQuSP8widk0e2YbRR24Cts/0TSPc4Fh6Wh7wpCxBmPpyzePxDu9XErdG70p1FmMoXy+sA2skbu5E5VASGO1bVOHoM6ZbMn0V+DjIB6EhioY8ngbJhg1BJ4RhDqMxmhsE4BClZC9H0MRg4SB3cgnWwlV9uiHk1Y9fgFqIQbj9yTDjt7LUoD08bKv6u1Uh4YJXLLvC5Rbv0QB4i9PVdnHBfLlBOQAQq8dtAFIHVZ8ob7tiaOKhFKliGpqweVPA2bygSaQB6O0xRCkeKacIa4OC5mk+8TDXmrAv693djzQNHvPbLhEQPmoQ0y1wEDr2IzOv80UJRRkVcSraC072V/O3fJ62X02qDDbNQUmL2k0wACysCFLdkW7k/OLKDAs/RZTtpDTIQ5R6AV146FH/NVg==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(23010399003)(30052699003)(376014)(7416014)(1800799024)(56012099006)(10067099003)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(36860700016)(23010399003)(1800799024)(10067099003)(11063799006)(56012099006)(3023799007)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	PBocUjFs30qXCZdeHwmTN12bI18msVIgGpLGRs7k2t8KY6W1ofTYNzMCS2/oNB+U16CqHo9Qyv1IJYoB8YzXDL32uYA0DNkh7y7VivokkIzy/3Ovwh7KuKFtGahGKUdnCqMMu6qKR4qiTeyfuLzD6lBMos3dY0lNpmaGyQ3yD3lEKKNHbRVCPdu31wdCV3BrRWI8kkUU3BqeO4b+wVGQRLWSp1DJk1Aoj+Dlq5oVu4FHwgmqlUVhdS+7LEU+Ek1dtiB9vOWmp9Hwl8gF2+kIrJxzTYXZmFRkvDzOPrK50avZJA2hNIeZ4TRoqfoav4EXE5d6PIZC/o4KmxBFPNJGiSkcYbwMNaNvVVvlk9JbViyy+EQkBU7BupYMZlzjTunzqtiyE98QhejC2P9dHAUJgrXclR3nLa6ZSU6jtU8WIHG3dt321OKknF6GRkE6VSn+
+	85iA2rXnSmXDOZNcroYT3zba0mGbGbBDIjel6BqKsOsaxVHTc0TYdvvBc3n1+Na+PS29YHjTC0werIuP+e9DU+tVOGV/qxzJcEuQykSLGyQL5NcpA+MGUQct0OoIZaPWnzmifSU8u8sEYcYQVgfOdI4/QZMlcJ6IVlvUIT/X/Jxbsu+1f53ggwnXgceTwR9c893rQRF66XeKfYS/qTBjIXwSKM1QKKpo6Z3H7/6EAIJq/i30aO6t0pWH3MclsdprMy7hDDTFVl25j3v+dm3OLxfAmpdcgJPpQzj6HNLlGurYMLmz3GOcOV7t+u6OUvE9ykvAcdlWNt/8vxtRxqtXJ2gMJi7WC4zMc7BMiyeGm5NJpQI7o28wXHN/vNQbNxVGhsN71rPrVTIGYxbVuHj57eDyk+uzhKtCVG7eRbIEcfY0QPipAv3Cswpsm1lfz/wd
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 16:41:50.8696
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 16:42:13.7670
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dffc5f63-9b31-4c8a-9a36-08df15a3bd4a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 096bd5a2-c609-4210-7a3c-08df15a3caee
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CDC.namprd05.prod.outlook.com
+	SJ1PEPF00001CDD.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: EAYPR12MB999157
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7124
 
-From: Dan Williams <djbw@kernel.org>
+In preparation for refreshing the cached SNP platform status and feature
+information after a successful firmware live update from
+DOWNLOAD_FIRMWARE_EX, allow snp_get_platform_data() to be called while
+the SNP firmware is in the INIT state.
 
-Now that the firmware loader properly ceases all operations at
-firmware_upload_unregister() and no longer takes module references, clean
-up the unused parameter.
+Once SNP is initialized the firmware requires the output page of both
+commands to be firmware-owned. sev->snp_plat_status cannot satisfy that
+as it is embedded in struct sev_device, so use
+__sev_do_snp_platform_status(), which stages the output through a
+dedicated page, and allocate the SNP_FEATURE_INFO output page with
+snp_alloc_firmware_page(), which transitions the page to firmware-owned
+when SNP is initialized. snp_free_firmware_page() reclaims it once the
+feature information has been copied out.
 
-Cc: Chao Gao <chao.gao@intel.com>
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Russ Weight <russ.weight@linux.dev>
-Cc: Danilo Krummrich <dakr@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-Signed-off-by: Dan Williams <djbw@kernel.org>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-[chao.gao@intel.com: drop leftover fw_upload_priv->module assignment
- and the unused @module field from struct fw_upload_priv]
-[prsampat@amd.com: convert the tdx-host caller added since the original
- posting]
+Co-developed-by: Tycho Andersen (AMD) <tycho@kernel.org>
+Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
 ---
- Documentation/driver-api/firmware/fw_upload.rst |  2 +-
- drivers/base/firmware_loader/sysfs_upload.c     | 10 ++++------
- drivers/base/firmware_loader/sysfs_upload.h     |  1 -
- drivers/cxl/core/memdev.c                       |  4 ++--
- drivers/firmware/microchip/mpfs-auto-update.c   |  2 +-
- drivers/fpga/intel-m10-bmc-sec-update.c         |  4 ++--
- drivers/greybus/gb-beagleplay.c                 |  2 +-
- drivers/media/i2c/thp7312.c                     |  2 +-
- drivers/net/pse-pd/pd692x0.c                    |  4 ++--
- drivers/virt/coco/tdx-host/tdx-host.c           |  4 ++--
- include/linux/firmware.h                        | 15 +++++++--------
- lib/test_firmware.c                             |  3 +--
- 12 files changed, 24 insertions(+), 29 deletions(-)
+v1..v2:
+Use snp_[alloc|free]_firmware_page() to transition pages to and from
+firmware-owned state - Tom
+---
+ drivers/crypto/ccp/sev-dev.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/Documentation/driver-api/firmware/fw_upload.rst b/Documentation/driver-api/firmware/fw_upload.rst
-index edf1d0c5e7c3..702b1ed77551 100644
---- a/Documentation/driver-api/firmware/fw_upload.rst
-+++ b/Documentation/driver-api/firmware/fw_upload.rst
-@@ -57,7 +57,7 @@ function calls firmware_upload_unregister() such as::
- 		len = (truncate) ? truncate - fw_name : strlen(fw_name);
- 		sec->fw_name = kmemdup_nul(fw_name, len, GFP_KERNEL);
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 1ed9e61a95cc..3704f52bd08d 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -131,6 +131,8 @@ static void __sev_firmware_shutdown(struct sev_device *sev, bool panic);
  
--		fwl = firmware_upload_register(THIS_MODULE, sec->dev, sec->fw_name,
-+		fwl = firmware_upload_register(sec->dev, sec->fw_name,
- 					       &m10bmc_ops, sec);
- 		if (IS_ERR(fwl)) {
- 			dev_err(sec->dev, "Firmware Upload driver failed to start\n");
-diff --git a/drivers/base/firmware_loader/sysfs_upload.c b/drivers/base/firmware_loader/sysfs_upload.c
-index 890a242a7c20..920c4b640f96 100644
---- a/drivers/base/firmware_loader/sysfs_upload.c
-+++ b/drivers/base/firmware_loader/sysfs_upload.c
-@@ -273,7 +273,6 @@ void fw_upload_free(struct fw_sysfs *fw_sysfs)
+ static int snp_shutdown_on_panic(struct notifier_block *nb,
+ 				 unsigned long reason, void *arg);
++static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
++					int *error);
  
- /**
-  * firmware_upload_register() - register for the firmware upload sysfs API
-- * @module: kernel module of this device
-  * @parent: parent device instantiating firmware upload
-  * @name: firmware name to be associated with this device
-  * @ops: pointer to structure of firmware upload ops
-@@ -285,10 +284,10 @@ void fw_upload_free(struct fw_sysfs *fw_sysfs)
-  *	Return: struct fw_upload pointer or ERR_PTR()
-  *
-  **/
--struct fw_upload *
--firmware_upload_register(struct module *module, struct device *parent,
--			 const char *name, const struct fw_upload_ops *ops,
--			 void *dd_handle)
-+struct fw_upload *firmware_upload_register(struct device *parent,
-+					   const char *name,
-+					   const struct fw_upload_ops *ops,
-+					   void *dd_handle)
+ static struct notifier_block snp_panic_notifier = {
+ 	.notifier_call = snp_shutdown_on_panic,
+@@ -1261,19 +1263,11 @@ static int snp_get_platform_data(struct sev_device *sev, int *error)
  {
- 	u32 opt_flags = FW_OPT_NOCACHE;
- 	struct fw_upload *fw_upload;
-@@ -320,7 +319,6 @@ firmware_upload_register(struct module *module, struct device *parent,
- 	fw_upload_priv->fw_upload = fw_upload;
- 	fw_upload_priv->ops = ops;
- 	mutex_init(&fw_upload_priv->lock);
--	fw_upload_priv->module = module;
- 	fw_upload_priv->name = name;
- 	fw_upload_priv->err_code = 0;
- 	fw_upload_priv->progress = FW_UPLOAD_PROG_IDLE;
-diff --git a/drivers/base/firmware_loader/sysfs_upload.h b/drivers/base/firmware_loader/sysfs_upload.h
-index 31931ff7808a..dc7ccdceb96f 100644
---- a/drivers/base/firmware_loader/sysfs_upload.h
-+++ b/drivers/base/firmware_loader/sysfs_upload.h
-@@ -26,7 +26,6 @@ enum fw_upload_prog {
+ 	struct sev_data_snp_feature_info snp_feat_info;
+ 	struct snp_feature_info *feat_info;
+-	struct sev_data_snp_addr buf;
+-	struct page *page;
+ 	int rc;
  
- struct fw_upload_priv {
- 	struct fw_upload *fw_upload;
--	struct module *module;
- 	const char *name;
- 	const struct fw_upload_ops *ops;
- 	struct mutex lock;		  /* protect data structure contents */
-diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-index b3419df586b9..ee7a97b8b2c8 100644
---- a/drivers/cxl/core/memdev.c
-+++ b/drivers/cxl/core/memdev.c
-@@ -1151,8 +1151,8 @@ int devm_cxl_setup_fw_upload(struct device *host, struct cxl_memdev_state *mds)
- 	if (!test_bit(CXL_MEM_COMMAND_ID_GET_FW_INFO, cxl_mbox->enabled_cmds))
- 		return 0;
+-	/*
+-	 * This function is expected to be called before SNP is
+-	 * initialized.
+-	 */
+-	if (sev->snp_initialized)
+-		return -EINVAL;
+-
+-	buf.address = __psp_pa(&sev->snp_plat_status);
+-	rc = sev_do_cmd(SEV_CMD_SNP_PLATFORM_STATUS, &buf, error);
++	mutex_lock(&sev_cmd_mutex);
++	rc = __sev_do_snp_platform_status(&sev->snp_plat_status, error);
++	mutex_unlock(&sev_cmd_mutex);
+ 	if (rc) {
+ 		dev_err(sev->dev, "SNP PLATFORM_STATUS command failed, ret = %d, error = %#x\n",
+ 			rc, *error);
+@@ -1297,11 +1291,10 @@ static int snp_get_platform_data(struct sev_device *sev, int *error)
+ 	 * command to ensure structure is 8-byte aligned, and does not
+ 	 * cross a page boundary.
+ 	 */
+-	page = alloc_page(GFP_KERNEL);
+-	if (!page)
++	feat_info = snp_alloc_firmware_page(GFP_KERNEL);
++	if (!feat_info)
+ 		return -ENOMEM;
  
--	fwl = firmware_upload_register(THIS_MODULE, dev, dev_name(dev),
--				       &cxl_memdev_fw_ops, mds);
-+	fwl = firmware_upload_register(dev, dev_name(dev), &cxl_memdev_fw_ops,
-+				       mds);
- 	if (IS_ERR(fwl))
- 		return PTR_ERR(fwl);
- 	return devm_add_action_or_reset(host, cxl_remove_fw_upload, fwl);
-diff --git a/drivers/firmware/microchip/mpfs-auto-update.c b/drivers/firmware/microchip/mpfs-auto-update.c
-index 1211fd8d0463..992088606204 100644
---- a/drivers/firmware/microchip/mpfs-auto-update.c
-+++ b/drivers/firmware/microchip/mpfs-auto-update.c
-@@ -437,7 +437,7 @@ static int mpfs_auto_update_probe(struct platform_device *pdev)
- 		return dev_err_probe(dev, ret,
- 				     "The current bitstream does not support auto-update\n");
+-	feat_info = page_address(page);
+ 	snp_feat_info.length = sizeof(snp_feat_info);
+ 	snp_feat_info.ecx_in = 0;
+ 	snp_feat_info.feature_info_paddr = __psp_pa(feat_info);
+@@ -1313,7 +1306,7 @@ static int snp_get_platform_data(struct sev_device *sev, int *error)
+ 		dev_err(sev->dev, "SNP FEATURE_INFO command failed, ret = %d, error = %#x\n",
+ 			rc, *error);
  
--	fw_uploader = firmware_upload_register(THIS_MODULE, dev, "mpfs-auto-update",
-+	fw_uploader = firmware_upload_register(dev, "mpfs-auto-update",
- 					       &mpfs_auto_update_ops, priv);
- 	if (IS_ERR(fw_uploader))
- 		return dev_err_probe(dev, PTR_ERR(fw_uploader),
-diff --git a/drivers/fpga/intel-m10-bmc-sec-update.c b/drivers/fpga/intel-m10-bmc-sec-update.c
-index 7d23d914df3f..3d318570faba 100644
---- a/drivers/fpga/intel-m10-bmc-sec-update.c
-+++ b/drivers/fpga/intel-m10-bmc-sec-update.c
-@@ -712,8 +712,8 @@ static int m10bmc_sec_probe(struct platform_device *pdev)
- 		goto fw_name_fail;
- 	}
+-	__free_page(page);
++	snp_free_firmware_page(feat_info);
  
--	fwl = firmware_upload_register(THIS_MODULE, sec->dev, sec->fw_name,
--				       &m10bmc_ops, sec);
-+	fwl = firmware_upload_register(sec->dev, sec->fw_name, &m10bmc_ops,
-+				       sec);
- 	if (IS_ERR(fwl)) {
- 		dev_err(sec->dev, "Firmware Upload driver failed to start\n");
- 		ret = PTR_ERR(fwl);
-diff --git a/drivers/greybus/gb-beagleplay.c b/drivers/greybus/gb-beagleplay.c
-index 244966d56c9b..a097a3b10552 100644
---- a/drivers/greybus/gb-beagleplay.c
-+++ b/drivers/greybus/gb-beagleplay.c
-@@ -1172,7 +1172,7 @@ static int gb_fw_init(struct gb_beagleplay *bg)
- 		return PTR_ERR(desc);
- 	bg->rst_gpio = desc;
- 
--	fwl = firmware_upload_register(THIS_MODULE, &bg->sd->dev, "cc1352p7",
-+	fwl = firmware_upload_register(&bg->sd->dev, "cc1352p7",
- 				       &cc1352_bootloader_ops, bg);
- 	if (IS_ERR(fwl))
- 		return PTR_ERR(fwl);
-diff --git a/drivers/media/i2c/thp7312.c b/drivers/media/i2c/thp7312.c
-index 775cfba188d8..ebbe14393c9f 100644
---- a/drivers/media/i2c/thp7312.c
-+++ b/drivers/media/i2c/thp7312.c
-@@ -1909,7 +1909,7 @@ static int thp7312_register_flash_mode(struct thp7312_device *thp7312)
- 		goto error;
- 	}
- 
--	fwl = firmware_upload_register(THIS_MODULE, dev, "thp7312-firmware",
-+	fwl = firmware_upload_register(dev, "thp7312-firmware",
- 				       &thp7312_fw_upload_ops, thp7312);
- 	if (IS_ERR(fwl)) {
- 		ret = PTR_ERR(fwl);
-diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index 209de9cec849..5bb91a0f4438 100644
---- a/drivers/net/pse-pd/pd692x0.c
-+++ b/drivers/net/pse-pd/pd692x0.c
-@@ -1841,8 +1841,8 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
- 		return dev_err_probe(dev, ret,
- 				     "failed to register PSE controller\n");
- 
--	fwl = firmware_upload_register(THIS_MODULE, dev, dev_name(dev),
--				       &pd692x0_fw_ops, priv);
-+	fwl = firmware_upload_register(dev, dev_name(dev), &pd692x0_fw_ops,
-+				       priv);
- 	if (IS_ERR(fwl))
- 		return dev_err_probe(dev, PTR_ERR(fwl),
- 				     "failed to register to the Firmware Upload API\n");
-diff --git a/drivers/virt/coco/tdx-host/tdx-host.c b/drivers/virt/coco/tdx-host/tdx-host.c
-index e8ed8dfa526e..f11a545d40cf 100644
---- a/drivers/virt/coco/tdx-host/tdx-host.c
-+++ b/drivers/virt/coco/tdx-host/tdx-host.c
-@@ -194,8 +194,8 @@ static int seamldr_init(struct device *dev)
- 	if (!supports_runtime_update())
- 		return 0;
- 
--	tdx_fwl = firmware_upload_register(THIS_MODULE, dev, "tdx_module",
--					   &tdx_fw_ops, NULL);
-+	tdx_fwl = firmware_upload_register(dev, "tdx_module", &tdx_fw_ops,
-+					   NULL);
- 	if (IS_ERR(tdx_fwl))
- 		return PTR_ERR(tdx_fwl);
- 
-diff --git a/include/linux/firmware.h b/include/linux/firmware.h
-index 0fa3b027f02f..aa0333095c10 100644
---- a/include/linux/firmware.h
-+++ b/include/linux/firmware.h
-@@ -197,20 +197,19 @@ static inline int request_partial_firmware_into_buf
- 
- #ifdef CONFIG_FW_UPLOAD
- 
--struct fw_upload *
--firmware_upload_register(struct module *module, struct device *parent,
--			 const char *name, const struct fw_upload_ops *ops,
--			 void *dd_handle);
-+struct fw_upload *firmware_upload_register(struct device *parent,
-+					   const char *name,
-+					   const struct fw_upload_ops *ops,
-+					   void *dd_handle);
- void firmware_upload_unregister(struct fw_upload *fw_upload);
- 
- #else
- 
- static inline struct fw_upload *
--firmware_upload_register(struct module *module, struct device *parent,
--			 const char *name, const struct fw_upload_ops *ops,
--			 void *dd_handle)
-+firmware_upload_register(struct device *parent, const char *name,
-+			 const struct fw_upload_ops *ops, void *dd_handle)
- {
--		return ERR_PTR(-EINVAL);
-+	return ERR_PTR(-EINVAL);
+ 	return rc;
  }
- 
- static inline void firmware_upload_unregister(struct fw_upload *fw_upload)
-diff --git a/lib/test_firmware.c b/lib/test_firmware.c
-index 7459bba65444..a77a99404fd3 100644
---- a/lib/test_firmware.c
-+++ b/lib/test_firmware.c
-@@ -1322,8 +1322,7 @@ static ssize_t upload_register_store(struct device *dev,
- 		goto free_tst;
- 	}
- 
--	fwl = firmware_upload_register(THIS_MODULE, dev, tst->name,
--				       &upload_test_ops, tst);
-+	fwl = firmware_upload_register(dev, tst->name, &upload_test_ops, tst);
- 	if (IS_ERR(fwl)) {
- 		ret = PTR_ERR(fwl);
- 		goto free_buf;
 -- 
 2.43.0
 
