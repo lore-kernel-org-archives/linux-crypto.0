@@ -1,220 +1,211 @@
-Received: from mail-ej2-f12.google.com (mail-ej2-f12.google.com [74.125.228.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012009.outbound.protection.outlook.com [52.101.43.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E50237B3F9
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Sep 2026 15:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787B6519916;
+	Fri, 18 Sep 2026 16:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.9
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789745443; cv=pass; b=S1+6BYCxphgeOYEnUzpy0f/XsKGE8Y8b0Si7ZAsUKBAD8vefcMLfAWMpjsW/leKFmBOP3QlThdZn12UGj5Gpo1nkdJtQieHuelIeYay99gEGx7KvFTY8+aNP+zpob7FkpgZG1+RMiXol3KPfhCTPkAoV47ppu1av3+RF9fzvkJg=
+	t=1789749685; cv=fail; b=C3zvakJqwFj6oh4CJoVW5tcX8e6HH3+X5v5zmarry6Ki0sXjeQKtRSnV+SeZji28qsCa9YML9gR15FnSnC7LiA32lsj6fmTsMOb3PpifFxr2H0tzHI7sWJhbb79Yy0LA8xiX4rSeSA+UlqxCs5LBX8YsB16XQbWiJyjXnFVNJ+c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789745443; c=relaxed/simple;
-	bh=G4TU/h9uky+Zuqiv7l09Ey3XMFyPJo61UDXeEKzZ08o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=moVbP2FRllLI770vvnHwkL46qKJBOZL7nSxlENMgZZdbSKCKPFYacUAKx9TSUswVeBHY+iFOBRlebCylN5dtrLm2rIARWG+q/8cogsS1H8pIWlj3jr+M52zIQone8T71Bit0FiLZsyuoC5TgJWFmJiaQMewMRi9+CuiqIU2TAhQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4Hlfxsk; arc=pass smtp.client-ip=74.125.228.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789749685; c=relaxed/simple;
+	bh=O31n/qiaNoQHcC1XCVqFrc49CLyS3netnEQMhdGTFME=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Up67iK5yUP9Yu9RfsZabCoQ67RhZJP4yDDKisE3nn2gC/7KqvAaWSxIuqFepACoszO4j+ZRiAutpZ2mF7beT6LPn56AJhnvYgr10TAZqOvAoc9uvHBK6EaRnA47gHCVq5WLQi03P+/ByHhD1iUqBXNOwk56egsEHT3voeQRD2W8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=csWSq3RA; arc=fail smtp.client-ip=52.101.43.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4Hlfxsk"
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c254f9f7dbeso108443666b.0
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Sep 2026 08:30:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789745439; cv=none;
-        d=google.com; s=arc-20260327;
-        b=TNR1XaMN/yppCPOu80RalG86kzpjPM+PWL7B6LQ6aFwYxBZ0/hCOT9+BRTCDhN/pS2
-         luVv4y8lrwunWcLf+Qd8aSePXvFI8LpXxRkHCPDK9vyfY4UNXRO2bhGYHPpZriNKZgOW
-         XWDGiDdWA87g+f5e9X8a7l2mcJrhu5ROTPr9WlKJXMVnu7l7SEX2pcR7HQivzbqq/yeN
-         puOnixszUR6fLS4tD6XSfyEpSIfzF/p7smDv/cbplipbEmtFWC53jRabn35LYh/ChqKI
-         b2z25Ne1oqTKd1C9N+AripYFgf1+zKxQKxdSSxkhkrDuZhXf0626FRm6u850pO/6xFtn
-         fO/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=1+i4rRB8CuAB4cElgVjaJ3FGf4hQNPChxEK6IRepjxY=;
-        fh=xsnm8G2UXimLIsiAyfFEAH+JQdEctNqK5MGBUeM8d48=;
-        b=mA0g26IOpwy501IGL7zkcmG3YIL18pnkojFVkIEbZgbu8voT1NZkj7mtuNVRY+QUXp
-         sAmAwR0lT0EQm2rsLDTw31jJ8Z65bq2D/lLCNZseG7AwkykyOoCdWMqwWioGg/t0lhZg
-         mM7F7hoabpbgaYHXusWZUxXUMylpfScK0r3cfXluFCYPvlnXQHyQbPsjLZI6NuwabTZL
-         neiaugNC9hah/hTqttFyjlXh3i/rFRg+SPWUeqbUIhgAgxsqO9gEpFl4nYlWzhvuFYP8
-         /xGKkBZPFu+vmQ/ePiqdF10J9h8LeRjm3AP1dkUvgzus9GUw8giCuX2I57yDtHFI7mYn
-         zdQw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789745439; x=1790350239; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=1+i4rRB8CuAB4cElgVjaJ3FGf4hQNPChxEK6IRepjxY=;
-        b=m4HlfxskE5g0rNE9t6mOlSS/ZzCPNq2Q1ZAQ6GdWUVmhz/ExfzomaO6acf0VuWNcfv
-         d9Xn7/zE9P7xhUPM9C/r+CFga+bnrNyKvF/5D9ZzXnoSvYLoXUHDHtYSIjjZXVMkv8Ze
-         fDDK9aTw3KMuuiVCaUjOcec4NbIfseBkAAzdcgDCdcGPMLdCmUx4ay1YyVTy0iv7oWim
-         UBIxChL5HExo4fUqK1joIySZVlrXJdBI65APwPA2tcnsJdzLiTVhWPIiPVlzusAfDUPU
-         57eYkhMWVens6ntpyDc+Noq9kNXcKwSyzfBv3FZKSmIixJ2XviSybwXJJz7kTTZLq0JA
-         dRMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789745439; x=1790350239;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=1+i4rRB8CuAB4cElgVjaJ3FGf4hQNPChxEK6IRepjxY=;
-        b=bqvhCgvYr0u0eNNzKmRNh7wGZdOdpsQgK45A/GXYKM6CVKc7QRr2QOjnqc2kpBzNfP
-         A5qrotcYS+ZFW4iBC95jBnMly5fLHNTGm+uKfkMtDNzi1Yu1it0t7esuuvhCucUK+br7
-         CcUCMvCpr8YI4pfH25BYslO29Nlj7QsJEjF3fK+kmDaxztIyizZTdVokDwUBu4F0tszf
-         QsKyCEaIPXRmEOLHsRVskC7ZOM/TnXaRtQly8h0Z8hwEeUP49/mvAzk6L0/9W/ZEVVrl
-         0oDErMc3Z8ig4595Vw3HyO2kgXpORbNcBwanpu2+noa1tqm6dOK8kRltSMvVHN8naYKg
-         pfBA==
-X-Gm-Message-State: AFuF++lXDhsxUVZJGPo12/HxzslmFoRrVr562q4/hgS4aCZdtsFkeb/0
-	hNeALCpxAO/wTuhwSbzNLZLZJLwF64Pk5g2J9kqZypH3C3xVAOqST7VS/c3A+eE6hzqU31i8Mri
-	Tc2rnRhi4JynNPQFi+P67xFYflMWEZXWfrhBy
-X-Gm-Gg: AYBFou0nJrc7Zaon36znGghCyzSi2kHgAWUdH2t3Smh9lPn4NsD1U9XNDA6XHZb1LNY
-	66vUsEe4+4krxjvzu/DOJuOTU8wPEMbu7uzWd88i4cZTZBcOP08YX9ALzkr8/bcO8RIk9obadi5
-	tA/rxjL4o35x2EE1JFPy0VJ+qJMtQU4HboS1JM7yhjJuhkRjbAWrX5p3jDDpKfCALNcybNmrTFb
-	XGFEOGxllbW20qyv0wWFuUwEkYHWlTXInWTLtjPrSZzlZxiRe5n5f0dJnfNvEEpyxeR1iAR8HgW
-	8D3/CM3r3CLsANr3SgXlf3SY0+NpzSNuPpP9H6eOJMqih15Cav3KrrIuirPV0YRAYvTazCJXhwm
-	yt5bQFAF6jkpaztK40Hx6i3+BRwWZyiS+i8zTXNz6SljGhbdbnpEI5Q/fukPSiI9mEvuicAluiL
-	zfK9/F2unvsF54c1T0eLKPpCOmn6rcDk0=
-X-Received: by 2002:a17:907:9810:b0:c20:1c9d:8d4b with SMTP id
- a640c23a62f3a-c2a1569a7b2mr277436066b.2.1789745439306; Fri, 18 Sep 2026
- 08:30:39 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="csWSq3RA"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nLHLmkOlvPgy3Xck9kKBmHrfAy7CxuRRaqmGX6pJRQOsNm6hdj+AcGoxCFoJD9WdvZSk0cogy392xuxKzHh3j0VFUaFFdQjTypOazTDsvchEX8VgnwfG1eP2tsimVodPRpXlELQxc7Iwj28rNqGptzreL90+bLXKLxJu7U6EpM1o8oUXFyi9g9m6rI4OYKgXvnVQocdhyRhRVxl1ZkzTqzeGroBWf1IVhqFk8C2OChc1Cm98uqIUwJGx0AMPVHNl+sUCxd2PeAMX4rJ5iSLS8mo4zduwsZFJtZI791Wd+suNTWNQD4ZwE/2fOc2qfrt+oHk11KTYXWB7YyjfkilSLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6HzfZqKUnHZv3gm1RTnUryF2Jlbsc354l+r3W+JxIgU=;
+ b=QQukXqFbHRKeYyqzFonR6k+PSRYEau0b6sJ7FRVckdU2NmFzrkKTFjYToRgj/IBGKlMyNiyyN02tfc+pfzaopm8n0NOeJA7lZwjp5SRhIOPU6CH+/Y2SmVMLD7OproycWhyy48K77WvDfBAGX725fzvL4OYEc82WZ+90nBvlgUZnO0uQFljdqVBE9AmPltAMMMQ0QrtevzC+MqyH05kLGUe8kkqk1b0kGno4U1FbwV9fyrrkncxS2jraWjBeUa9NHCzllRp0pjnkTkqiUf1vwsExDgjRk/ZQKezvCHm1vSLARPQWSGA/mUDX5ckamLU3p/Ym83XavJ2+2VA49vlNnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6HzfZqKUnHZv3gm1RTnUryF2Jlbsc354l+r3W+JxIgU=;
+ b=csWSq3RAXCMBz/TGQF7tdoPch2Pv7xqeg2lwUGvhaensgRvNpxC4haEFyQ5uirqxwSSepbtECnemla2msRcr69Cv7Xr/T0hQMMxvKuA9Kp4jneoPov/IZCurpu4+1oBoiiKrFBYQOCqp2T3LAVXpTbVSB0i0jlcM5bEYVDFG3hI=
+Received: from CH2PR02CA0018.namprd02.prod.outlook.com (2603:10b6:610:4e::28)
+ by DS0PR12MB9726.namprd12.prod.outlook.com (2603:10b6:8:226::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.13; Fri, 18 Sep
+ 2026 16:41:13 +0000
+Received: from SJ1PEPF00001CDC.namprd05.prod.outlook.com
+ (2603:10b6:610:4e:cafe::9e) by CH2PR02CA0018.outlook.office365.com
+ (2603:10b6:610:4e::28) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.406.12 via Frontend Transport; Fri,
+ 18 Sep 2026 16:41:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ1PEPF00001CDC.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.451.8 via Frontend Transport; Fri, 18 Sep 2026 16:41:12 +0000
+Received: from speedway8455host.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Fri, 18 Sep
+ 2026 11:41:11 -0500
+From: "Pratik R. Sampat" <prsampat@amd.com>
+To: <mcgrof@kernel.org>, <russ.weight@linux.dev>, <dakr@kernel.org>,
+	<ashish.kalra@amd.com>, <thomas.lendacky@amd.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<gregkh@linuxfoundation.org>, <rafael@kernel.org>, <chao.gao@intel.com>,
+	<aik@amd.com>, <tycho@kernel.org>, <nikunj@amd.com>, <michael.roth@amd.com>,
+	<shansinha@google.com>, <prsampat@amd.com>
+Subject: [Patch v2 0/7] Implement SNP live firmware update support
+Date: Fri, 18 Sep 2026 16:40:54 +0000
+Message-ID: <cover.1789749016.git.prsampat@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANai08PJ9bKRn3JkgUP7SFHn+qXLoE_JDerRv-UtMkELZXu-wg@mail.gmail.com>
- <aq0JkKUIkWApYWb_@gondor.apana.org.au>
-In-Reply-To: <aq0JkKUIkWApYWb_@gondor.apana.org.au>
-From: =?UTF-8?B?2K3Zhtin2YYg2KfZhNmF2LfZitix2Yo=?= <ha2020anan@gmail.com>
-Date: Fri, 18 Sep 2026 18:30:27 +0300
-X-Gm-Features: AcwNN1UigdTUUDtyENexBWUuKD8MVKXE7K07VKFr3K0c45oPMr3syWRT0uCaUs0
-Message-ID: <CANai08NMZTJpm1=4=09i-qzZyminPuwmv4yPn2Nu3etbqN4_8A@mail.gmail.com>
-Subject: Re: [PATCH] crypto: jitterentropy - add fast hardware jitter mixer extension
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
-Content-Type: multipart/mixed; boundary="0000000000002660e5065bc39531"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDC:EE_|DS0PR12MB9726:EE_
+X-MS-Office365-Filtering-Correlation-Id: efc10007-e561-4723-9036-08df15a3a68a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|1800799024|376014|82310400026|36860700016|23010399003|13003099007|18002099003|5023799004|11063799006|10067099003|56012099006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	m29U0ArJCCwHVg0lHdHHM8Ssbut9W3cFhPUOZKigB/zzzj8snsOn1wYUn6+A9jUACG4g/bMMcYkDiZguI0SD+//6izY9eQEKpxAk+yNBpGMxOwoPWtbhR4wxtk+WTNYqm/7x2HVl0/fbIiXtZ0KwUCsiDXBzyExh0LiSruxMCYT918PwpFa5IlO57tbk4p7xwXzbdGSkWq8m/NgZ3eu9IZc7jsrhdsMgmInpIS3Fp9ujHvGHcwk7gpBOeZnYpx7DP8ucevJytjR8OgzEtj0pXOoF8zrABBbSMaO/JtjPkYiJVWALNYgqr3gbqzJi1fhj30iHbKzOzcdoL3wyIgzvnGQ4YYFDv47fn6kReLFt/RzGWF2hAbyu2VL9MC9/VXSOEo9RwD7B42oKzDKm8TlDTEy6GCE+iZsyEpIujkyk0lRSqvPTja5AIBY6nbrsGuo5GfITNIKZNtS2/uPyipxyhuCv473Ygs6nZrccwAvr61GU4Hso9cC0Mp//mY8tkjImvfn5zZkH5hwXnfQga2nA2l+bI7EZxgKAerb2JJnvrtCACKdOdE/XiTo6EawOAjBG49EeE0VjenyjCYTE6VVTCrwgBud7isLyTg4f+qDEsSnt2s8Cyaf6Ds3nFXHaigVCcF1dM7o0cOGf6yWkrE5PNDI9J+Ix3dm8XPdKdmpyvZAk8Q20GZGxFlHkWQ+RUYal1WqEkAaB9uTYKqvQOy9+/Q==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(82310400026)(36860700016)(23010399003)(13003099007)(18002099003)(5023799004)(11063799006)(10067099003)(56012099006)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	W8JxcV6GNSXI5rnl6+Vq9EnFS9YXj16bh7b16nyJ3DHPOXdz6Dai4VrvzQnniqg2qGfYMQ9p/P6Bljnth/LuiMivYaAiBLe3Z6yHDQevBAujfpCJgh8qiJEFSx1FgQyqbGN1aX3i3C80WVaF2HRFE8fLqFiVAtKIT+VK7vgBzKzYxnYiivKUYi0p4oUSicN0kuyyy/m4bM8Y+SJS6LC2adx+rrAZIHnbT+jtzFDsgGqDeI7Pnu6pgxpg+rA0m8aV5iC376qQxjZ6yo+RQnVnnflWPk0Ia3dktfi0Me8GKp0310Mtcmd9qQ2V6is4kwk1fEqXnKZV0yBrCnF+ZoOCH9LssSYNmkMLgykazSkOS2a+Uvyi36mTq1A1Dg24nj0twp91lue09Bx7eyprqqujMJOFW3zJAm7/OFYiqL4p1OaGEQ3xXCXkz5UQQys6NY5W
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 16:41:12.7166
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: efc10007-e561-4723-9036-08df15a3a68a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CDC.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9726
 
---0000000000002660e5065bc39531
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Introducing support for live update on AMD SEV-SNP platforms via
+DOWNLOAD_FIRMWARE_EX.
 
-Dear Herbert,
+This patchset is an extension of the RFC patchset from Tycho
+Andersen.
 
-Please accept my apologies for the previous formatting issues. The
-email client automatically wrapped the lines and corrupted the diff
-formatting, which caused the patch application to fail.
+This series also fronts firmware_loader patches from Dan Williams[1]
+which majorly cleans up refcount issues so that registering the upload
+interface no longer pins the module. Without which having live firmware
+update will cause failure to reload the ccp module as well as break
+kexec.
 
-I have resolved the formatting and spacing constraints. Attached below
-is the clean, uncorrupted v2 patch file containing the fast hardware
-jitter mixer extension for the jitterentropy subsystem.
+Patches based on cryptodev-2.6
 
-Thank you for your time and patience.
+v2:
+* In snp_get_platform_data() use snp_[alloc|free]_firmware_page() to
+  transition pages to and from firmware-owned state, instead of
+  open-coding rmp_mark_pages_firmware()/snp_reclaim_pages() around the
+  SNP_FEATURE_INFO command - Tom, Sashiko
+* Claim sev->fwl atomically with xchg() in unregister_sev_fw_uploader()
+  so a concurrent module removal and sysfs unbind cannot both reach
+  firmware_upload_unregister() - Sashiko
 
-Signed-off-by: Tamim N. Almutairi <tamimdevlopment@hotmail.com>
+Responding to other Sashiko comments:
+* __sev_release_firmware_buffers() called with panic=true can cause
+  deadlock as another stopped CPU might currently hold zone->lock or
+  other page allocator locks.
+        - I think having a panic param within __snp_free_firmware_pages
+          which checks and returns before __free_pages() should resolve
+          this issue. Since this is a pre-existing issue not relevant
+          to this patchset, plan to send this as a seperate patch
+* The sev_download_firmware_ex() function is called with the lock held
+  and performs a GFP_KERNEL allocation.  Since GFP_KERNEL can trigger
+  direct memory reclaim, could this invoke SEV page reclaim operations
+  that attempt to acquire the already-held sev_cmd_mutex, resulting in
+  a deadlocked state?
+        - GFP_KERNEL may perform direct MM reclaim, but SNP page
+          reclamation is not registered as an MM shrinker or normal
+          page-reclaim callback. snp_reclaim_pages() acquires
+          sev_cmd_mutex only when explicitly called with locked=false
+* "If snp_reclaim_cmd_buf() fails and returns early, the code skips
+  resetting sev->cmd_buf_active and sev->cmd_buf_backup_active.
+  Will this permanently leak the bounce buffer slots and result in
+  future -EBUSY failures?"
+        - Since the command buffer may still be firmware owned, I think
+          declaring psp_dead = true is the way to ensure we do not make
+          it available for reuse after a failed reclaim. Pre-existing
+          issue, plan to send this as a seperate patch
 
-=E2=80=AB=D9=81=D9=8A =D8=A7=D9=84=D8=AC=D9=85=D8=B9=D8=A9=D8=8C 18 =D8=B3=
-=D8=A8=D8=AA=D9=85=D8=A8=D8=B1 2026 =D9=81=D9=8A 12:51 =D9=85 =D8=AA=D9=85=
-=D8=AA =D9=83=D8=AA=D8=A7=D8=A8=D8=A9 =D9=85=D8=A7 =D9=8A=D9=84=D9=8A =D8=
-=A8=D9=88=D8=A7=D8=B3=D8=B7=D8=A9 =E2=80=AAHerbert
-Xu=E2=80=AC=E2=80=8F <=E2=80=AAherbert@gondor.apana.org.au=E2=80=AC=E2=80=
-=8F>:=E2=80=AC
->
-> On Sun, Sep 13, 2026 at 06:16:34PM +0300, =D8=AD=D9=86=D8=A7=D9=86 =D8=A7=
-=D9=84=D9=85=D8=B7=D9=8A=D8=B1=D9=8A wrote:
-> > This patch introduces a fast custom hardware jitter mixer extension for=
- the
-> > jitterentropy subsystem. It utilizes high-precision cycle counters comb=
-ined
-> > with memory pointer attributes to disturb the branch prediction unit
-> > and hardware
-> > prefetcher dynamically. This creates pure architectural micro-entropy
-> > by exploiting
-> > execution timing variations (CPU jitter) without relying on
-> > floating-point operations,
-> > ensuring compatibility within the kernel space.
-> >
-> > Tested on x86 architectures using standard high-precision macros.
-> >
-> > Signed-off-by: Tamim N. Almutairi <tamimdevlopment@hotmail.com>
->
-> This patch doesn't apply:
->
-> https://sashiko.dev/#/patchset/CANai08PJ9bKRn3JkgUP7SFHn%2BqXLoE_JDerRv-U=
-tMkELZXu-wg%40mail.gmail.com
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+v1: https://lore.kernel.org/linux-crypto/cover.1789059391.git.prsampat@amd.com/
+ * firmware-loader patches are rebased as-is and only incorporates
+   fixes for minor build issues
+ * Dropped crypto/ccp: Hoist kernel part of SNP_PLATFORM_STATUS as that
+   patch has been merged since
+ * Dropped crypto/ccp: Reclaim command buffer when the PSP dies and
+   subsequent handling since firmware quirk is now resolved and need not be
+   handled in the OS
+ * Use guard(mutex) for the locked region, which the split makes
+   possible since sev_get_api_version() acquires sev_cmd_mutex - Maxwell
+ * Added a patch factoring out the TMR and INIT_EX teardown, so the update
+   path and __sev_firmware_shutdown() share it - Shantanu
+ * Skip the re-init when the PSP is dead, not just when a rollback is
+   outstanding - Shantanu
+ * Re-initialize the platform before refreshing the cached status -
+   Shantanu
+ * Split the monolithic .write into a locked update helper, an error
+   translation helper, and a thin .write that refreshes the cached status
+   once the lock is dropped and clean up various allocations
+ * Convert rollback required and reinit required globals to reside in
+   sev_dev struct to avoid carrying over states if manually reloaded
 
---0000000000002660e5065bc39531
-Content-Type: application/x-patch; 
-	name="0001-crypto-jitterentropy-add-fast-hardware-jitter-mixer-.patch"
-Content-Disposition: attachment; 
-	filename="0001-crypto-jitterentropy-add-fast-hardware-jitter-mixer-.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mu7470dk0>
-X-Attachment-Id: f_mu7470dk0
+RFC: https://lore.kernel.org/all/20260430160716.1120553-1-tycho@kernel.org/
 
-RnJvbSAxYTk5NGQ1MWQzNDBhMDY2NjQyMjkwYzVhOWMzNjkxOWIzMGI4NzBlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiB0YW1pbWRldmxvcG1lbnQgPHRhbWltZGV2bG9wbWVudEBob3Rt
-YWlsLmNvbT4KRGF0ZTogRnJpLCAxOCBTZXAgMjAyNiAxODoxNTo1OCArMDMwMApTdWJqZWN0OiBb
-UEFUQ0hdIGNyeXB0bzogaml0dGVyZW50cm9weSAtIGFkZCBmYXN0IGhhcmR3YXJlIGppdHRlciBt
-aXhlcgogZXh0ZW5zaW9uCgotLS0KIGNyeXB0by9qaXR0ZXJlbnRyb3B5LmMgfCAxMDUgKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogMSBmaWxl
-IGNoYW5nZWQsIDEwNSBpbnNlcnRpb25zKCspCiBjcmVhdGUgbW9kZSAxMDA2NDQgY3J5cHRvL2pp
-dHRlcmVudHJvcHkuYwoKZGlmZiAtLWdpdCBhL2NyeXB0by9qaXR0ZXJlbnRyb3B5LmMgYi9jcnlw
-dG8vaml0dGVyZW50cm9weS5jCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLmQy
-OWMxOGQKLS0tIC9kZXYvbnVsbAorKysgYi9jcnlwdG8vaml0dGVyZW50cm9weS5jCkBAIC0wLDAg
-KzEsMTA1IEBACisvKgorICogSml0dGVyIEVudHJvcHkgRmFzdCBNaXhlciBFeHRlbnNpb24KKyAq
-IENvcHlyaWdodCAoQykgMjAyNiBUYW1pbSBOLiBBbG11dGFpcmkgPHRhbWltZGV2bG9wbWVudEBo
-b3RtYWlsLmNvbT4KKyAqIEF1dGhvcjogVGFtaW0gTi4gQWxtdXRhaXJpCisgKi8KKworI2luY2x1
-ZGUgPGxpbnV4L3R5cGVzLmg+CisjaW5jbHVkZSA8YXNtL3RpbWV4Lmg+CisjaW5jbHVkZSA8bGlu
-dXgvc2NoZWQuaD4KKyNpbmNsdWRlIDxsaW51eC9tYXRoNjQuaD4KKyNpbmNsdWRlIDxhc20vdW5h
-bGlnbmVkLmg+CisKKyNkZWZpbmUgSkVOVF9NSVhfQ09OU1RfMSAweDllMzc3OWI5N2Y0YTdjMTVV
-TEwKKyNkZWZpbmUgSkVOVF9NSVhfQ09OU1RfMiAweGZmNTFhZmQ3ZWQ1NThjY2RVTEwKKyNkZWZp
-bmUgSkVOVF9NSVhfQ09OU1RfMyAweGM0Y2ViOWZlMWE4NWVjNTNVTEwKKworc3RydWN0IHJhbmRf
-ZGF0YSB7CisJdWludDY0X3QgZGF0YTsKKwl1aW50NjRfdCBwcmV2X3RpbWU7Cit9OworCitzdGF0
-aWMgaW5saW5lIHVpbnQ2NF90IGplbnRfY3VzdG9tX21peGVyKHVpbnQ2NF90IHJkdHNjMSkKK3sK
-Kwl1aW50NjRfdCB2YXIxID0gcmR0c2MxICogMjsKKwl1aW50NjRfdCB2YXIyID0gcmR0c2MxICog
-MzsKKwl1aW50NjRfdCB4LCB0aTsKKwlpbnQgbWF4X2xvb3BzLCBpOworCisJdmFyMSA9ICgodmFy
-MSBeICh2YXIxICogKDEwMDAwMDAgXiAodmFyMSAmIDB4RkZGRikpKSAqIEpFTlRfTUlYX0NPTlNU
-XzEpKTsKKwl2YXIyID0gKCh2YXIyIF4gKHZhcjIgKiAoMTAwMDAwMCBeICh2YXIyICYgMHhGRkZG
-KSkpICogSkVOVF9NSVhfQ09OU1RfMSkpOworCisJeCA9ICh2YXIxID4+IDIwKSBeICh2YXIyIDw8
-IDMyKTsKKwl0aSA9IG11bF91NjRfdTY0X3Nocih4LCAxMDAsIDY0KTsKKwltYXhfbG9vcHMgPSAo
-aW50KSh0aSAmIDB4M0YpOworCisJZm9yIChpID0gMTsgaSA8PSBtYXhfbG9vcHM7IGkrKykgewor
-CQl2b2xhdGlsZSB1aW50NjRfdCB5ID0gKHVpbnQ2NF90KWdldF9jeWNsZXMoKSAqIGk7CisJCXgg
-Xj0gKCh0aSArIDEpIF4gKHkgKiAodGkgJiAweEZGRkYpKSk7CisJCXggKj0gKCh0aSArIDEpICog
-KHkgXiByZHRzYzEpKTsKKwl9CisKKwl4IF49IHggPj4gMzM7CisJeCAqPSBKRU5UX01JWF9DT05T
-VF8yOworCXggXj0geCA+PiAzMzsKKwl4ICo9IEpFTlRfTUlYX0NPTlNUXzM7CisJeCBePSB4ID4+
-IDMzOworCisJcmV0dXJuIHg7Cit9CisKK3N0YXRpYyBpbmxpbmUgdWludDY0X3QgamVudF9nZW5f
-cmFuZG9tX25vdF9mb3JfY3J5cHRvKHZvaWQpCit7CisJdWludDY0X3QgeCA9IDE7CisJaW50IGk7
-CisKKwlmb3IgKGkgPSAxOyBpIDw9IDU7IGkrKykgeworCQl4ICo9IChqZW50X2N1c3RvbV9taXhl
-cigodWludDY0X3QpZ2V0X2N5Y2xlcygpKSAqIGkpOworCQl4IF49IChqZW50X2N1c3RvbV9taXhl
-cigodWludDY0X3QpZ2V0X2N5Y2xlcygpKSAqIChpICogMikpOworCX0KKwl4ICo9IChqZW50X2N1
-c3RvbV9taXhlcigodWludDY0X3QpZ2V0X2N5Y2xlcygpKSAqIDI1KTsKKwlyZXR1cm4geDsKK30K
-KworaW50IGplbnRfcmVhZF9lbnRyb3B5KHN0cnVjdCByYW5kX2RhdGEgKmVjLCB1bnNpZ25lZCBj
-aGFyICpkYXRhLCB1bnNpZ25lZCBpbnQgbGVuKQoreworCXVuc2lnbmVkIGludCBpLCBqOworCXVu
-c2lnbmVkIGludCB3b3JkcyA9IGxlbiAvIHNpemVvZih1aW50NjRfdCk7CisJdW5zaWduZWQgaW50
-IHRhaWwgPSBsZW4gJSBzaXplb2YodWludDY0X3QpOworCXVpbnQ2NF90IHdvcmRfZGF0YTsKKwor
-CWlmICghZWMgfHwgIWRhdGEgfHwgbGVuID09IDApCisJCXJldHVybiAtMTsKKworCWZvciAoaSA9
-IDA7IGkgPCB3b3JkczsgaSsrKSB7CisJCWNvbmRfcmVzY2hlZCgpOworCQl3b3JkX2RhdGEgPSBq
-ZW50X2dlbl9yYW5kb21fbm90X2Zvcl9jcnlwdG8oKTsKKwkJcHV0X3VuYWxpZ25lZF9sZTY0KHdv
-cmRfZGF0YSwgZGF0YSArIChpICogc2l6ZW9mKHVpbnQ2NF90KSkpOworCX0KKworCWZvciAoaSA9
-IDA7IGkgPCAyNjsgaSsrKSB7CisJCWZvciAoaiA9IDA7IGogPCB3b3JkczsgaisrKSB7CisJCQlj
-b25kX3Jlc2NoZWQoKTsKKwkJCXdvcmRfZGF0YSA9IGdldF91bmFsaWduZWRfbGU2NChkYXRhICsg
-KGogKiBzaXplb2YodWludDY0X3QpKSk7CisJCQl3b3JkX2RhdGEgKj0gKGplbnRfZ2VuX3JhbmRv
-bV9ub3RfZm9yX2NyeXB0bygpICogKChpICsgMSkgKiAyKSk7CisJCQl3b3JkX2RhdGEgXj0gKGpl
-bnRfZ2VuX3JhbmRvbV9ub3RfZm9yX2NyeXB0bygpICogKChpICsgMSkgKiAzKSk7CisKKwkJCWlm
-IChqID4gMCkgeworCQkJCXdvcmRfZGF0YSBePSBnZXRfdW5hbGlnbmVkX2xlNjQoZGF0YSArICgo
-aiAtIDEpICogc2l6ZW9mKHVpbnQ2NF90KSkpICogSkVOVF9NSVhfQ09OU1RfMzsKKwkJCX0gZWxz
-ZSBpZiAod29yZHMgPiAxKSB7CisJCQkJd29yZF9kYXRhIF49IGdldF91bmFsaWduZWRfbGU2NChk
-YXRhICsgKCh3b3JkcyAtIDEpICogc2l6ZW9mKHVpbnQ2NF90KSkpICogSkVOVF9NSVhfQ09OU1Rf
-MjsKKwkJCX0KKwkJCXB1dF91bmFsaWduZWRfbGU2NCh3b3JkX2RhdGEsIGRhdGEgKyAoaiAqIHNp
-emVvZih1aW50NjRfdCkpKTsKKwkJfQorCX0KKworCWlmICh0YWlsID4gMCkgeworCQl3b3JkX2Rh
-dGEgPSBqZW50X2dlbl9yYW5kb21fbm90X2Zvcl9jcnlwdG8oKTsKKwkJZm9yIChpID0gMDsgaSA8
-IHRhaWw7IGkrKykgeworCQkJY29uZF9yZXNjaGVkKCk7CisJCQlkYXRhWyh3b3JkcyAqIHNpemVv
-Zih1aW50NjRfdCkpICsgaV0gPSAodW5zaWduZWQgY2hhcikod29yZF9kYXRhID4+IChpICogOCkp
-OworCQl9CisJfQorCisJcmV0dXJuIDA7Cit9CistLSAKMi41MS4wLndpbmRvd3MuMQo=
---0000000000002660e5065bc39531--
+[1]: https://lore.kernel.org/lkml/20260331214726.903274-2-dan.j.williams@intel.com/
+
+Dan Williams (3):
+  firmware_loader: Stop pinning modules on registration
+  firmware_loader: Stop pinning parent device per workqueue invocation
+  treewide: firmware_loader: Drop the unused @module argument
+
+Pratik R. Sampat (4):
+  crypto: ccp - Factor out the release of the SEV firmware buffers
+  crypto: ccp - Allow SNP platform data to be queried after SNP INIT
+  crypto/ccp: Register with fw_uploader and always fail
+  crypto/ccp: Implement SNP Download Firmware EX
+
+ .../driver-api/firmware/fw_upload.rst         |   2 +-
+ drivers/base/firmware_loader/sysfs_upload.c   |  50 +--
+ drivers/base/firmware_loader/sysfs_upload.h   |   1 -
+ drivers/crypto/ccp/sev-dev.c                  | 423 ++++++++++++++++--
+ drivers/crypto/ccp/sev-dev.h                  |   4 +
+ drivers/cxl/core/memdev.c                     |   4 +-
+ drivers/firmware/microchip/mpfs-auto-update.c |   2 +-
+ drivers/fpga/intel-m10-bmc-sec-update.c       |   4 +-
+ drivers/greybus/gb-beagleplay.c               |   2 +-
+ drivers/media/i2c/thp7312.c                   |   2 +-
+ drivers/net/pse-pd/pd692x0.c                  |   4 +-
+ drivers/virt/coco/tdx-host/tdx-host.c         |   4 +-
+ include/linux/firmware.h                      |  15 +-
+ include/linux/psp-sev.h                       |  19 +
+ lib/test_firmware.c                           |   3 +-
+ 15 files changed, 446 insertions(+), 93 deletions(-)
+
+-- 
+2.43.0
+
