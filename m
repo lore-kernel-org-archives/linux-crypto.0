@@ -1,47 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544023AE6FA;
-	Fri, 18 Sep 2026 09:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E0C2931CE;
+	Fri, 18 Sep 2026 09:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789722812; cv=none; b=GmO0a0F0XhKaXjxCBkE/19i5mERiHJxx4Rb6J/2mDAzB4HLvhhbPvQizfeoShv3CNWdKJ0szLTWS+QXtmOxImdE947nLbV3Y5hG1YBYYgWoDgzwTHiRirzCFMJH0JaMZM3gWN9lU5ysRTW3khjpaEg9nTNK4OzroGsoOMuXxlOU=
+	t=1789723644; cv=none; b=WmQt360purKbBHnNpHpp56ZoiRJaIN2YXSgbd2L8oyMw6CCs4tfY0MzpJqlq6eXxuvhNx9Sl/Y88p25LPNQywNHSTwnBh5R5nij2uUcK98evHtax1zVHinyppJqjBWeUd6fhu+Pt3CRG06F5/9Xy0XdgnFplJaLEFI8U2QoI+HQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789722812; c=relaxed/simple;
-	bh=roQp6ZtuJAwWznFEYsqXd9PRQS4+tptsOWj0ORTZdbs=;
+	s=arc-20240116; t=1789723644; c=relaxed/simple;
+	bh=fernGzWNyVMwLy6NIIIvd9nVpqm/pX2fFfdvnExQfo8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TJtJ6u7tQWeWEgPakHv2sN75HfpmMttriTL+Ryluirg0XS1ERIpAEUpgn1H7g8DH/rEaZgGd5wdDeS1cDf5wn4fIabCzwHWDv+dSOFCZO2/28VVhntyvFpf9TVe22nZ828anO16wXztg//rCePxD8CrErioZoni07vkfZhMLv+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=S6WGALYz; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=jTX65rM8NPx8Ko9Rrf+DemFK+M2yC1K0EKiH/oqsAbEhMX48zF29Hk77Uo1WvJspjOFm0z1B+1THWnQuNryL9LcGiVbfe6aV5ssY3thOnHsfAb7mZUNB6UbO1sPwAf82CicJZB2HVtj7V1/jcwq5r/nzQ/DhEz5KfCEMYZfJa1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=AYpViywB; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="S6WGALYz"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="AYpViywB"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=VM9TEEKFpNgfG6OQ1DzUhmw/h6ZpmwuxRb13EkzzIDc=; 
-	b=S6WGALYzJ5wCX0syFBKOMcjy2rwP7LrwdZdg7ilt4/f58LJ3ZwBsjOU66ZROmyaYT5mV9xuFJ8K
-	9y5VBCEwKKabg4Bo3E4tty33YfcJZnR983F3WAR1ADO6tje3eLLDHYzgsfhOST8+ChOi/IDCRZJmg
-	FGkodlfF/x3YohuFs19m2axFLB7jsVNhrC7zIF/M6+QtfKCH8wmUrxID+BoiDsjZc6UOzjO9xnufu
-	SmH0QyKTldkjJMHjs6Ulo+oliBDfHW2DT/T51bL+in8wJPRZpHtyXJ2rGZgHvYfia99gSJeOHFuzg
-	gXYimoLb6nNFsWbQfF1kgcuXzrKhCZP7ExDw==;
+	from:content-type:reply-to; bh=ZFx6ggnuMXIkOpQg2S6htFhQ0923sSWYAsS4rEIjNfU=; 
+	b=AYpViywBU/6XWQ7N88IhxYEFcuQiu8ksZpBpheh5SwNh/9LDk+vS++31Y5qtfUNA+zaaNkgtcoD
+	RKlSjeYqiAoSxmkqY+Ra1ijBH8h67OA5xlwvjluwITBhtSxgL5VpNhlb2huvQr1kM9hB7TxjLWM8p
+	WZZ2rlnFtwAcmR4cIxtiNOoHpyOHj9XE13cbS3dBeeayuGfxEd0qhGEY/wMJAbAjzrWkP3uMdzveY
+	/xrkURc3iQAOWH+T5V8DYEbK3co09JuRl6BMny+7qSIVMRI/li3C9q1nDeZpDuOxzXcisqPOEgSfr
+	SgyuE5arQtmU+o6w97QnVL2UcdGpf5JWEvag==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x7Uer-0000000FL6R-0DWr;
-	Fri, 18 Sep 2026 17:13:26 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2026 19:13:25 +1000
-Date: Fri, 18 Sep 2026 19:13:25 +1000
+	id 1x7UsG-0000000FLQ2-1DNc;
+	Fri, 18 Sep 2026 17:27:17 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2026 19:27:16 +1000
+Date: Fri, 18 Sep 2026 19:27:16 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Chenghai Huang <huangchenghai2@huawei.com>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, liulongfang@huawei.com,
-	qianweili@huawei.com, wangzhou1@hisilicon.com,
-	linwenkai6@hisilicon.com
-Subject: Re: [PATCH 2/4] crypto: hisilicon/sec2 - fix scheduling while atomic
- in aead soft fallback
-Message-ID: <aq0AtfUHUw1qOD2Y@gondor.apana.org.au>
-References: <20260911102942.387778-1-huangchenghai2@huawei.com>
- <20260911102942.387778-3-huangchenghai2@huawei.com>
+To: Paul Louvel <paul.louvel@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 00/19] crypto: talitos - Driver cleanup
+Message-ID: <aq0D9KV4JQJNwZJU@gondor.apana.org.au>
+References: <20260907-7-1-rc1_talitos_cleanup-v5-0-860f43cd7317@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,44 +49,39 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260911102942.387778-3-huangchenghai2@huawei.com>
+In-Reply-To: <20260907-7-1-rc1_talitos_cleanup-v5-0-860f43cd7317@bootlin.com>
 
-On Fri, Sep 11, 2026 at 06:29:40PM +0800, Chenghai Huang wrote:
-> From: Wenkai Lin <linwenkai6@hisilicon.com>
+On Mon, Sep 07, 2026 at 03:22:34PM +0200, Paul Louvel wrote:
+>
+>   A note on Sashiko third comment [1]:
 > 
-> sec_aead_soft_crypto() allocates the sub-request with GFP_KERNEL, which
-> may sleep.  This is safe when called directly from sec_aead_crypto()
-> (process context), but the function is also reachable through the
-> backlog drain path.
+>   - If the current digest operation errors out because the driver
+>     returned -EAGAIN, it indeed clears the partial block buffer in the
+>     core with CRYPTO_AHASH_ALG_BLOCK_ONLY.
 > 
-> When an AEAD request sits in the backlog queue and qp_send_message()
-> returns a non-EBUSY error, the backlog is drained in software while
-> the backlog spinlock is still held. The GFP_KERNEL allocation inside
-> aead_request_alloc() can then schedule out, triggering scheduling
-> while atomic.
+>     Looking at how the API handles it, it means for me that the entire
+>     digest operation must be restarted, not just the current chunk of
+>     data currently being processed with .update() or .finup(). In this
+>     case, no need to keep the partial block buffer.
 > 
-> Fix it by switching the allocation to GFP_ATOMIC so it is safe in both
-> the process-context path and the spinlock-held backlog drain path.
-> 
-> Fixes: 0a2a464f8631 ("crypto: hisilicon/sec - fix the aead software fallback for engine")
-> Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
-> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
-> ---
->  drivers/crypto/hisilicon/sec2/sec_crypto.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-> index 0a2f7c8b44fc..bbb6826ab256 100644
-> --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-> +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-> @@ -2533,7 +2533,7 @@ static int sec_aead_soft_crypto(struct sec_ctx *ctx,
->  	struct aead_request *subreq;
->  	int ret;
->  
-> -	subreq = aead_request_alloc(a_ctx->fallback_aead_tfm, GFP_KERNEL);
-> +	subreq = aead_request_alloc(a_ctx->fallback_aead_tfm, GFP_ATOMIC);
+>     If I am mistaken, how should this be handled?
 
-Please use SYNC_AEAD_REQUEST_ON_STACK for the fallback.
+How does it work currently?
+
+Looking at the code briefly, it appears that it simply returns
+EAGAIN to the Crypto API.  There any error is treated as fatal
+so the entire hash operation is aborted and any subsequent attempt
+to update/finalise the hash results in a bogus hash value.
+
+Of course memory associated with the request will still be freed
+correctly.
+
+AFAICS returning EAGAIN under the new interface is identical.
+The partial buffer is cleared but that doesn't matter because
+the entire hash state in the request buffer is now irrelevant.
+
+If there is a memory corruption (not hash result corruption)
+issue then that would be a real bug but I don't see it.
 
 Thanks,
 -- 
