@@ -1,45 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A3E38947F;
-	Fri, 18 Sep 2026 09:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC10A436BC8;
+	Fri, 18 Sep 2026 09:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789725456; cv=none; b=qRb3XJztV0XD+8QXvOXYpOjLSu/G8hdzAJEZ0JJIv6dJdP+9t9RHhsAipNBH3u6Sld8DNygJzXAc8h6e50rkHnMrbDkkay9uMRu5egRpsGd8YYKEU1Bzc9zxPWrwyorEotGVuyji7gehZYFeHTVqMozhs6fl5zuYM/qgoDshuyI=
+	t=1789725534; cv=none; b=S+aWyvwYHs3DVaRhNZ2TAFhLcNSjPIGbqri5j4ZkTmBhAV6m6kUpIRAYdczc30d28iOCCxTXzQmQIT0mBjY8uCMRM+VtXjNwlZOPvEz4ykwe5OoaxWW3eUhRSqsCdDkL6FB/ikWQtD/3x/l2PAy1IoBzEYsCHSkxFCy9ZdRud1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789725456; c=relaxed/simple;
-	bh=PPmcgWAtzaNGk2cQAWCxyeyiI8hiUzFM5yKVc4tKWg0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=S22nppZaRZ0iydY8pXR3kp+qeuCiUBHWxGFnlbcm4aSr18EdfGktk95tFvz5u4fVLsvnNvd0l4tgGgcfLPlniN3UsxTaHq1HkZWoZ8qXepJ/UtZGTHZXtfgtVr/CDNABRy433mmYrPLzqzU0ZqF5Jf8WH2A/bwxcBMx2SRq8j4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=je90bFkv; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1789725534; c=relaxed/simple;
+	bh=jYd+I40jEaxIomQfyEKZUk9TFt3Otioy7dxEVuOWqRk=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Qxr53/Kg1QWc3ajYnQhZsrueItQ/tYlt8Tg6Oi5FpR/4bsQ9IKwJLszc97yWJsQC3U4YPPtxk7uOuI7nsriCJDdJIEE1hA+84Uzg9BXmEEmPeaJUEPztLEcd0ihchb3ujivlKyCLNLP0oXqkAp1aXUcj1RzosGb5+wWuyAoTRrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=f6ahu+/C; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="je90bFkv"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="f6ahu+/C"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
-	content-type:references:reply-to;
-	bh=vSVyhelhFsfegw4hVxsjPHJm1Yo/7biii+IJ3uJLRNo=; b=je90bFkvhOQrvZxbwrZZrlVKBo
-	/6CZ2ngkSPuohY6QFxZ3/GbKelfat54bngKn8uAmjXkSldlyMKu+E8xYtFjgKhLTzxu1IselZuShw
-	dCIBxavcRp4LfrhHaI/kfvfkWUjTmef8gjium8ydW6oxp1qZocfdYonoaaZfkcQGLcMe2orj55ugE
-	VyLzokIkTgjKsTEQZp4yWOGI/OrSI+ZKCLVte2hIvEa76emPoQKgx1aunyvWE7zUT9wZUpPQKOiGj
-	rFXG8ST4naS73wbJkbJ+8XwvBBL8YNy63RdjKWGSD/zIPE8DHQnM/RK+i5OHZzhVk6jjTQ42eYDrQ
-	5jfottaQ==;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=wpXzrCyVMAWXd9Llt5C5QD5boGXqJUlTQCeoAdJR38c=; b=f6ahu
+	+/CYyUPWtKlLNezumKsmCDpJnxOUsDMC8oJerU6j++wUaDDuDNZMnBw7xvnjgv1EK0BM7T+6NydKV
+	9f8A68Do3lj2/j05pMD0j2tdL9f6cGPqQmd+ZMmNYLFTYkEiz/qtQrSedT8HHYUvdk2XCf/jgH3Pw
+	2p/J0wLZwfxwAW+qIZp/CQGTmv+pKMvhExP41bMJ2ZrBqLukFRSGG8XVKu98NaY1pgSZqHXa0Quxg
+	+vQl+i1salm5i/YctbmXcrT++uFW0TPDSt2bHFz4enakI1JojagTGdtDc7RsmpIRMdPYcHu0yi3+K
+	Jp4lyQszCQjcRJMR3w2qNhEiV+X2g==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x7VLQ-0000000FM4K-3Gpm;
-	Fri, 18 Sep 2026 17:57:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2026 19:57:24 +1000
-Date: Fri, 18 Sep 2026 19:57:24 +1000
+	id 1x7VMm-0000000FM5v-1XXy;
+	Fri, 18 Sep 2026 17:58:49 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Sep 2026 19:58:48 +1000
+Date: Fri, 18 Sep 2026 19:58:48 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Slavin Liu <bolin.liu@seu.edu.cn>
-Cc: davem@davemloft.net, nicolas.ferre@microchip.com,
-	alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, bolin.liu@seu.edu.cn
-Subject: Re: [PATCH] crypto: atmel-sha: reject initialization without a device
-Message-ID: <aq0LBO6C20OuPVdE@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 7.3
+Message-ID: <aq0LWN4cVftl8r5p@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,24 +46,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260913125143.109897-1-bolin.liu@seu.edu.cn>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-Slavin Liu <bolin.liu@seu.edu.cn> wrote:
-> A transform may be initialized for the first time after the last
-> device has been removed from the driver list. Return -ENODEV when the
-> lookup is empty, before the debug message reads dd->dev.
-> 
-> Detected by static analysis and reviewed with AI-assisted source auditing.
-> 
-> Fixes: ebc82efa1cd6 ("crypto: atmel - add Atmel SHA1/SHA256 driver")
-> Assisted-by: LLM
-> Signed-off-by: Slavin Liu <bolin.liu@seu.edu.cn>
-> ---
-> drivers/crypto/atmel-sha.c | 3 +++
-> 1 file changed, 3 insertions(+)
+Hi Linus:
 
-Patch applied.  Thanks.
+The following changes since commit 60892a384aa1e65d0e703e1c513417bdf0c80777:
+
+  crypto: x86/aria - add missing vzeroupper in AVX-512 code (2026-09-04 18:45:51 +1000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.3-p4
+
+for you to fetch changes up to 53cf0f26eece095a3752642151150404bc3351cc:
+
+  crypto: caam - map job ring registers without claiming region (2026-09-16 19:55:13 +1000)
+
+----------------------------------------------------------------
+This push fixes a regression in caam.
+----------------------------------------------------------------
+
+Rosen Penev (1):
+      crypto: caam - map job ring registers without claiming region
+
+ drivers/crypto/caam/jr.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
