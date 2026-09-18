@@ -1,46 +1,46 @@
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012052.outbound.protection.outlook.com [52.101.53.52])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010070.outbound.protection.outlook.com [52.101.61.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462FF519E13;
-	Fri, 18 Sep 2026 16:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1AF51AECA;
+	Fri, 18 Sep 2026 16:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.70
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789749769; cv=fail; b=ta1Ae/AWhVssLjwWYucCPk8FL8Wcaxm720XjnnLEyT/C9roGoGmboN2qMwTqpUL4hcAvgavn6rtZnKEbel8w7qdz+TBMHbqpCjcq3VXxLz1G13t4xXQW8fDVBR41AgEP4tst4W4U3JNFST3/fG1A3D9eHQzw/wvwZif6ehpTCzA=
+	t=1789749770; cv=fail; b=WFmhvrpbLnWUmZjpXt3NTq5xqjZ4aG6vvaxlOmN/qYPvtWXQltUYhzjBvdi5XlLl0tqAW7yk6y/n9QvnSroxwl/4X4cFUJRzf90BLp2mOE967QPI3grE4VPprwtMevzGS/o3aMeam8MPeXHhXEtff3mNI4Cq4A4PUzhSC5NnZmE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789749769; c=relaxed/simple;
-	bh=a9bbHkoJbijYsc1hLVYLpa9oG3PzmH0X8LlD9zOqeZs=;
+	s=arc-20240116; t=1789749770; c=relaxed/simple;
+	bh=vXDSKZelxNCKXKbYssSyB4TbWqvFFRO5sr9P11yiqrg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G59h/nqiZ9nqaPo3M18mumX/BnZ3XQ2Otk4gMHdAevWN9KltWtKykaTVoCRmxVv5TCjj/2qcD0cL25/2odBkDlEP7vP0FTpLd4UesCp3ZvEmlg3I8TNvUvGg+/NoMP8OZvpnHg83zstwaLJAnHPf3mor+5R1A6D0UTIDTF4X1Yw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=39uYw+rN; arc=fail smtp.client-ip=52.101.53.52
+	 MIME-Version:Content-Type; b=E9m5QAk+dmQui3Ia4Zo+5wRRXIRyus1AkEu3A7Wa3rzHGR+q9ps49gUlpouJOKVUrkYRI9UKn2ZBo+vD6FsDhIZTJpo738JyVXhwHRjBVL1wjBLFRF+IV7Ti+Wp5NIO3h3BOvKy4ZZqW+zPNpk2DynN1DHiozWWu5PwVaenAdzU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hYIIyXap; arc=fail smtp.client-ip=52.101.61.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="39uYw+rN"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hYIIyXap"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xJJVFmbj+b52NIDB8yX4+yoOOfFdCtjRuJrvZ3JvKxl7XDO+3c5wW2/LEGLdBbxex8ZPo2yFl8Ln1lcjcisgw96YGUkIPWziZeLofPzXVxiPZYOWrUJM4w+o3cQPtUvWZg5o2JRFBT5ykWokhh1rFnOByV3UY1ihpWJj/QJeoT+ddflkXzb9fJApngrmwfu8bnKYY28wgURjx1Ue2eGo6wtRd9igOw27RkS/6sP5Mbr2N0PlaJL2c56x7hE4+GSwXu3i9hQFGZZg1w8Qse3/Z1JtN3cg1jYepm57qGwVNypBx/DJDRaU2HtkP38kvg0FGSnzJn7jSxpwEUDbFxXANw==
+ b=xJIxJT5fsVEArywImBkR9sHrRn4iiEyeN86l5On2WPR/8GqrnmW+y+9xHjr403lLX/RwuAfSEQ7AjlVvml7gRarA8x2WFzNkeRNfmEylPKaWhabhx3rMHnFz4mTGG+GS3+kNOLNZSi915d1CeJxNALBHipXmOn/uCMQfzbRNWfJwNHoQDxXjYWEbhzedA/MS6+2CC8JDXTbJqCmZRl/NDIY4Q8DNfHgdpiJjRIaUaVvfzf/4V2EiaINji0FBi/I8nrX44+XEkqa6TxflpdPONZZgVW0yVxvAprYOYO2PfTujR7SvMc3P++e2LPN1evni4is/0i2pXYX9QeyluAu32g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Gao897XzuaUVH6SthFszXT6PSZBfUUavfCpUBsweRsU=;
- b=blXssBnZ5sqe2WcsPdxyBQLachKcGv9RgTZ2TfAMIq4hQv/OnEoSNMgPaAKX1R6B+9e4ZIq0MrMXswh7pwptHpvZATD3HJvf7MJmS+vBNBOH1fCtRmqVOty0GSiVRMmDzZT3c+CDM0dy8u9Ry51ksi5/x05Y91AaFrSXEt4sO5mGXDS7tzU0b4I4SLorRGN2dd74MoU0phGXqel53h+OL1M4coSeCY+3dcniii/3KpHR3SiOhMj4x4Rk5wk8U/4s101sSTSN9y/vKrEVcLk214/7NpqyGMhXjeJbLIxTVh4nn99mhrCFzENIKQj/Xjo/v3eFaR/84ffcAkh4SCVHtQ==
+ bh=bFh2VopaElzfTKLt8aBDjde45autjGvJbfnUGE/+gxU=;
+ b=td7KeK/FCQnyAEGCZZciYSLeJs6ia+8vn/AhrQGzQSNcrK1M1Cd4RMB4k/orNDFuqJBJYoYLBsktj2cvXe4N8+j27eYNyElqAmmpmvzGqkDliqxw8FjwMPSsA4apGqOAfHTpq204AxSREQnmWi32nab2dtfaPMf6lbtpQZIftWSdTPBqvx4sydUAqNms3wfAlcpApkOZ0IlPdSx3o3sKpoObbFqRFBNrajDWNX1C/0B2O/bBIQVl8LJqTe3fBiaItymluXpQL3DSGoFrjxtT/lyoAvggr1NukEYx/fRsyOIZSn0eeS0ZHbeB6q8cKir7cfKGmgjnJZwIVJFIbav+LA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gao897XzuaUVH6SthFszXT6PSZBfUUavfCpUBsweRsU=;
- b=39uYw+rNqL7sCK+8/d9izwGj0OcaV9RZDULsfwmotc0z3hadFhHSQ9LOM8dEGkjh/mGGFp7PwJjY8HCbWA3GV8oKOulW5POpQ9Wtt7rc8UjHhJQhTNZ3UMIrBB88yG1HQtpi/xQIyZxnYlMbbPzZk4Rrg/7Iy8mU9eibx5frvXM=
-Received: from SJ0PR13CA0127.namprd13.prod.outlook.com (2603:10b6:a03:2c6::12)
- by MW6PR12MB8758.namprd12.prod.outlook.com (2603:10b6:303:23d::18) with
+ bh=bFh2VopaElzfTKLt8aBDjde45autjGvJbfnUGE/+gxU=;
+ b=hYIIyXapqaJYGTkvsAvPUjnEtjgEfkxjXs+/T8QGKTj0JBD4CkT5fCdC79M1p8pJZWJKwl9iyy+XgSRSMhWBhGs2eQOXB7MEFdrsQZgLRFIDIQghD/aF9EQQ+JXc0wqPUpaSy63ftIHFzg1ePRXhO1wTrXX+F+ErvEspXY4xNZo=
+Received: from CH2PR02CA0009.namprd02.prod.outlook.com (2603:10b6:610:4e::19)
+ by PH6PR12MB844058.namprd12.prod.outlook.com (2603:10b6:510:3fd::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.12; Fri, 18 Sep
- 2026 16:42:26 +0000
-Received: from SJ1PEPF00001CDD.namprd05.prod.outlook.com
- (2603:10b6:a03:2c6:cafe::39) by SJ0PR13CA0127.outlook.office365.com
- (2603:10b6:a03:2c6::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.451.8 via Frontend Transport; Fri, 18
- Sep 2026 16:42:26 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.428.13; Fri, 18 Sep
+ 2026 16:41:40 +0000
+Received: from SJ1PEPF00001CDC.namprd05.prod.outlook.com
+ (2603:10b6:610:4e:cafe::5a) by CH2PR02CA0009.outlook.office365.com
+ (2603:10b6:610:4e::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.11 via Frontend Transport; Fri,
+ 18 Sep 2026 16:41:40 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ1PEPF00001CDD.mail.protection.outlook.com (10.167.242.5) with Microsoft
+ SJ1PEPF00001CDC.mail.protection.outlook.com (10.167.242.4) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.451.8 via Frontend Transport; Fri, 18 Sep 2026 16:42:26 +0000
+ 15.21.451.8 via Frontend Transport; Fri, 18 Sep 2026 16:41:39 +0000
 Received: from speedway8455host.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.49; Fri, 18 Sep
- 2026 11:42:23 -0500
+ 2026 11:41:38 -0500
 From: "Pratik R. Sampat" <prsampat@amd.com>
 To: <mcgrof@kernel.org>, <russ.weight@linux.dev>, <dakr@kernel.org>,
 	<ashish.kalra@amd.com>, <thomas.lendacky@amd.com>,
@@ -63,9 +63,9 @@ CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<gregkh@linuxfoundation.org>, <rafael@kernel.org>, <chao.gao@intel.com>,
 	<aik@amd.com>, <tycho@kernel.org>, <nikunj@amd.com>, <michael.roth@amd.com>,
 	<shansinha@google.com>, <prsampat@amd.com>
-Subject: [Patch v2 6/7] crypto/ccp: Register with fw_uploader and always fail
-Date: Fri, 18 Sep 2026 16:41:00 +0000
-Message-ID: <7464499e7c352c1ab16c50700f9f68561f84ede5.1789749016.git.prsampat@amd.com>
+Subject: [Patch v2 2/7] firmware_loader: Stop pinning parent device per workqueue invocation
+Date: Fri, 18 Sep 2026 16:40:56 +0000
+Message-ID: <2b524f6aa24ceabc0a4b1a91d2a86f88beaa24c0.1789749016.git.prsampat@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1789749016.git.prsampat@amd.com>
 References: <cover.1789749016.git.prsampat@amd.com>
@@ -81,170 +81,95 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDD:EE_|MW6PR12MB8758:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0383d50b-d8c1-4f92-36fd-08df15a3d26c
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDC:EE_|PH6PR12MB844058:EE_
+X-MS-Office365-Filtering-Correlation-Id: dbc9bfb1-5547-4c35-1bc6-08df15a3b6ce
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700016|1800799024|23010399003|10067099003|3023799007|18002099003|22082099003|56012099006|11063799006;
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700016|23010399003|376014|7416014|56012099006|11063799006|10067099003|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	8RaPEAYoOlgya967DdJVCQU9VdURcUeeoloH7HPyoebAzvZETAB0n2+DYOiqS4aa+G42QnoE2XY9kiJ+G57fFKLNGd6PDsv6c1R8ZjYCZUIr2aC/y84rpG4YIBgf1TKDfsr8tim9cE+adHrauxdC+qLgd2acLSE1LbwObKdIoHVzhvPpUnu7NcX9mSm4d6pZiuFEbH54sFqlinSliV2DRqBaM2QoEe2vpbbhZ9ePouptZOl/sAhozl/EjfTd42Iv4EnJpzmKDpbktGoN7a5Gfozv0ub0ZplnY0YLqX+gNLLXx2inx6C+Pjzbp0hx8A6mwJdrUNb5V+bCsQOmvDtpGFdptcPAAklkJLRZaHyDWl5cfVGPW9mCR2040pUxhFR093dADn9mLs5Mm26qsfgHZMBvgJGb51vLcKg6q+HXc0O2nTB1lPZuPfRWODjKLYro/02abduHt33wnWT9wtOoZOKtWEeyX9YhT6gH9wDCHNxR8u7GiqTvMhvk1dCr0wt7FFxGU4c3EnWqzezhQ3i9ONDBBq6IMJfDMzd9N1j1cdSCFmXjf8gopmvPR0MSn43lnZAxXzXg9g5yJ3mWh0ToA50oR9gA3hcNemHEMPJvqVAmnUkiuGhWWUgG+tSHeOFh7YZcRhg8hbPsa8PiVfm9dUJRpSKcIAIx9PYbzBYg+7dwvHusS3hZ/tBEkLwSHQLBXcOUGuBLkD20O2N5dPHoyQ==
+	GLHxHcKkRQvF8fbTUsAQ0/hdtq5vN0NU0Uv4mIa9LFwCn7ZxiavBZCJq0zTStkfu3rNH7OdgqCbAihHSaWhgFDem2wkUQHCAiOoPPPICmnyCnoTQ7Puu/9B53mxWuYB8zXiy1NwRGsO0WtViu4wdXtjdnABsre+66qBO/wsWmwC0q4ckdQHJTJ44bMxaDYLQNThYzEngqa82RDTfiOJ2IZ/zMZsxkuCH/oChsxvv/Gsx68mE1m4VRCCPkmW6vCq+5sY8agEziDfjNxpEQlJXrTbtwPW6l2PnJYGf4WazcFUx/MP/ietVMOZbeTgMBJvDMBwFJ4nLt5+1mVvOmD6E9GXwU1uCD4ztytwL2SLgeyLgeB2j7+VkRHRb3qrKjZqLgZqPnx3IxnKMVJCprpliCuC26fkZ2gXe4D4dY3N2vKi1jeF+3wIllmy8nRU+uE7o+sJtRG7ytqRz2rMvzB4Et2npGi2/0X32jXYJpt2hKBlXzdnGOnPUBBT85pHgYS3ZPJ0tpyz0tgG5rxiYfWOzLyMZWdwoeYCyJ6E+7kE6A+fpxubPH79XjOICqTUX87MHUKk8g5P2URXeQAk+Yu3ZRoDjcbBb2ePndvrqRlf01Y0vJP5LxFoSYrXKgnyloqHHQm5TnnF178dfMYd1ieaHFLW0XA5vxsNCfHZPOQwFZkZwDzjR0VC4xAxP/VsWtS8VSDgHTD8uwefbgd7SgRVsVQ==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700016)(1800799024)(23010399003)(10067099003)(3023799007)(18002099003)(22082099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700016)(23010399003)(376014)(7416014)(56012099006)(11063799006)(10067099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	dFl7T8BAXQz63TAtUVhrvPcl4Q2vejtG1fr1zjJIyvGKg7AnVxBj4Z0eVbAK1ZFxuMFIaKKJqDwI2JZjyVTQz2WUAF/F73+4dM1S5By7H3tnV3b5Svtnljo5N3I+VIHosCbMBZVEeWWpdsqZ+nLMzhXKCq7l2QovHqKFxYb1M4n5wBfjMPYAAu93Ni79W7lUMVc6pR4W61ofIosKiBWFGTPxfrZIMohu+H+iPrdIJHON9oscU94fte0kJj7d17Rl7ZRKCBoogHaLfn+Ry9X+r8o17NDnEQulopLWo21Hy5DDJAOdlxG4aC56sMtbFXshy2u/OoHOhzdDTQ6jsAJNlx6qD9iFvQm8cWpB+8TxGgPxvYFMBokCGI5JU2GNpIgZFpL8TI6Sj/VtkTuQfnoAsv2IzZtI6m5B3tEjtXMcKj9MudCq4O6vQhorN8pUKcow
+	Ild9RcIG4zWxv/KDZYRMd1xOye1kVdgCNJ8Zk8SM4Qm6AH/WmOEzniIV+7YiJRKej4kmzwwMAUfrLKZXjaZhqEEq296ULSVdTmtm+r1IVAdNDXxUc+yot0DMYdFLeyfwExTCGV2xlyJxLSqnuf2Za+74AdaIH8KWVnmTdrC4j52xl8WGYCM8UI++AzEYv7Y/wwFslhQcBJYlZ8+EEWS3GKAnHQMkVujFyduqdj88gwRazdF3bPtldr36g6WExwp1tN6tkpwxM5nC87J1T2WMWguYo3hhreYMz9KEKgpfaIN0y/HeQrtTG/8nUVDzbX7JurqgA7XtDQLTDpsL2hd+qoqKZjMRHtU3Y+ZAdUBu/8FbF28F4c91Do4/3R3V6EZXp/weOcNKNKNItIN3xK2AogSjn4OqGREJxsMGXq/dNQrdCVe3mSj088PF/ldgUWZX
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 16:42:26.3368
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 16:41:39.9447
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0383d50b-d8c1-4f92-36fd-08df15a3d26c
+X-MS-Exchange-CrossTenant-Network-Message-Id: dbc9bfb1-5547-4c35-1bc6-08df15a3b6ce
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CDD.namprd05.prod.outlook.com
+	SJ1PEPF00001CDC.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8758
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH6PR12MB844058
 
-In preparation for SEV-SNP DOWNLOAD_FIRMWARE_EX live firmware update
-support, add an 'sev' firmware loader that always fails with EBUSY.
+From: Dan Williams <djbw@kernel.org>
 
-Co-developed-by: Tycho Andersen (AMD) <tycho@kernel.org>
-Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
+The device core pins parent devices while children are registered. As long
+as all usage of the parent device by the firmware_loader ends at
+firmware_upload_unregister(), no per queue_work() reference is needed.
+
+Now that firmware_upload_unregister() holds its own parent device reference
+over the child device_del() and flush_work() events, the per queue_work()
+reference can be deleted.
+
+Cc: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Russ Weight <russ.weight@linux.dev>
+Cc: Danilo Krummrich <dakr@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Dan Williams <djbw@kernel.org>
+[chao.gao@intel.com: drop unused fw_dev in fw_upload_start()]
 Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
 ---
-v1..v2:
-Use an atomic to get sev->fwl state to ensure that isn't a race possible
-while unregistering the interfaces -  Sashiko
----
- drivers/crypto/ccp/sev-dev.c | 79 ++++++++++++++++++++++++++++++++++++
- drivers/crypto/ccp/sev-dev.h |  2 +
- 2 files changed, 81 insertions(+)
+ drivers/base/firmware_loader/sysfs_upload.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 3704f52bd08d..f3714e8f5ab1 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -2208,6 +2208,79 @@ static int sev_update_firmware(struct device *dev)
- 	return ret;
- }
+diff --git a/drivers/base/firmware_loader/sysfs_upload.c b/drivers/base/firmware_loader/sysfs_upload.c
+index 6f2123538682..890a242a7c20 100644
+--- a/drivers/base/firmware_loader/sysfs_upload.c
++++ b/drivers/base/firmware_loader/sysfs_upload.c
+@@ -176,7 +176,7 @@ static void fw_upload_main(struct work_struct *work)
+ 	ret = fwlp->ops->prepare(fwl, fwlp->data, fwlp->remaining_size);
+ 	if (ret != FW_UPLOAD_ERR_NONE) {
+ 		fw_upload_set_error(fwlp, ret);
+-		goto putdev_exit;
++		goto out;
+ 	}
  
-+#ifdef CONFIG_FW_UPLOAD
-+static enum fw_upload_err sev_fw_upload_prepare(struct fw_upload *fw_upload,
-+						const u8 *data, u32 size)
-+{
-+	return FW_UPLOAD_ERR_NONE;
-+}
-+
-+static enum fw_upload_err sev_fw_upload_write(struct fw_upload *fw_upload,
-+					      const u8 *data, u32 offset,
-+					      u32 size, u32 *written)
-+{
-+	return FW_UPLOAD_ERR_BUSY;
-+}
-+
-+static enum fw_upload_err sev_fw_upload_poll_complete(struct fw_upload *fw_upload)
-+{
-+	return FW_UPLOAD_ERR_NONE;
-+}
-+
-+static void sev_fw_upload_cancel(struct fw_upload *fw_upload)
-+{
-+	/* intentional no-op */
-+}
-+
-+static const struct fw_upload_ops sev_fw_upload_ops = {
-+	.prepare = sev_fw_upload_prepare,
-+	.write = sev_fw_upload_write,
-+	.poll_complete = sev_fw_upload_poll_complete,
-+	.cancel = sev_fw_upload_cancel,
-+};
-+
-+static void register_sev_fw_uploader(struct sev_device *sev)
-+{
-+	struct fw_upload *fwl;
-+
-+	/*
-+	 * SNP firmware update is a platform-wide operation; only the master
-+	 * PSP issues firmware commands. Register a single global interface.
-+	 */
-+	if (sev->psp != psp_master || sev->fwl)
-+		return;
-+
-+	fwl = firmware_upload_register(sev->dev, "sev", &sev_fw_upload_ops,
-+				       sev);
-+	if (IS_ERR(fwl)) {
-+		dev_err(sev->dev, "SEV firmware upload registration failure: %ld\n",
-+			PTR_ERR(fwl));
-+		return;
-+	}
-+
-+	sev->fwl = fwl;
-+}
-+
-+/*
-+ * The upload ops issue PSP commands, so the interface has to be gone before
-+ * the SEV firmware is shut down and the PSP interrupt handler is cleared.
-+ * devm teardown on sev->dev runs after the driver's remove callback and is
-+ * therefore too late. Both teardown paths call this, and a module removal can
-+ * run concurrently with a sysfs unbind, so claim the pointer atomically to
-+ * keep the unregister to a single caller.
-+ */
-+static void unregister_sev_fw_uploader(struct sev_device *sev)
-+{
-+	struct fw_upload *fwl = xchg(&sev->fwl, NULL);
-+
-+	if (fwl)
-+		firmware_upload_unregister(fwl);
-+}
-+#else	/* CONFIG_FW_UPLOAD */
-+static void register_sev_fw_uploader(struct sev_device *sev) { }
-+static void unregister_sev_fw_uploader(struct sev_device *sev) { }
-+#endif	/* CONFIG_FW_UPLOAD */
-+
- static int __sev_snp_shutdown_locked(int *error, bool panic)
+ 	fw_upload_update_progress(fwlp, FW_UPLOAD_PROG_TRANSFERRING);
+@@ -205,9 +205,7 @@ static void fw_upload_main(struct work_struct *work)
+ 	if (fwlp->ops->cleanup)
+ 		fwlp->ops->cleanup(fwl);
+ 
+-putdev_exit:
+-	put_device(fw_dev->parent);
+-
++out:
+ 	/*
+ 	 * Note: fwlp->remaining_size is left unmodified here to provide
+ 	 * additional information on errors. It will be reinitialized when
+@@ -228,7 +226,6 @@ static void fw_upload_main(struct work_struct *work)
+ int fw_upload_start(struct fw_sysfs *fw_sysfs)
  {
- 	struct psp_device *psp = psp_master;
-@@ -3014,6 +3087,8 @@ void sev_dev_destroy(struct psp_device *psp)
- 	if (!sev)
- 		return;
+ 	struct fw_priv *fw_priv = fw_sysfs->fw_priv;
+-	struct device *fw_dev = &fw_sysfs->dev;
+ 	struct fw_upload_priv *fwlp;
  
-+	unregister_sev_fw_uploader(sev);
-+
- 	sev_firmware_shutdown(sev);
+ 	if (!fw_sysfs->fw_upload_priv)
+@@ -249,8 +246,6 @@ int fw_upload_start(struct fw_sysfs *fw_sysfs)
+ 		return -EBUSY;
+ 	}
  
- 	if (sev->misc)
-@@ -3077,6 +3152,8 @@ void sev_pci_init(void)
- 			 api_major, api_minor, build,
- 			 sev->api_major, sev->api_minor, sev->build);
- 
-+	register_sev_fw_uploader(sev);
-+
- 	return;
- 
- err:
-@@ -3092,6 +3169,8 @@ void sev_pci_exit(void)
- 	if (!sev)
- 		return;
- 
-+	unregister_sev_fw_uploader(sev);
-+
- 	sev_firmware_shutdown(sev);
- }
- 
-diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-index d5e596606def..7ec692e2147e 100644
---- a/drivers/crypto/ccp/sev-dev.h
-+++ b/drivers/crypto/ccp/sev-dev.h
-@@ -69,6 +69,8 @@ struct sev_device {
- 
- 	struct tsm_dev *tsmdev;
- 	struct sev_tio_status *tio_status;
-+
-+	struct fw_upload *fwl;
- };
- 
- int sev_dev_init(struct psp_device *psp);
+-	get_device(fw_dev->parent); /* released in fw_upload_main */
+-
+ 	fwlp->progress = FW_UPLOAD_PROG_RECEIVING;
+ 	fwlp->err_code = 0;
+ 	fwlp->remaining_size = fw_priv->size;
 -- 
 2.43.0
 
