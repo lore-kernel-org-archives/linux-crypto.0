@@ -1,48 +1,45 @@
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED38B4B66FB;
-	Fri, 18 Sep 2026 12:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0560025333F;
+	Fri, 18 Sep 2026 12:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789734456; cv=none; b=AkjO3TkeNWi/gIIqWAYYJ7tlueNZGE7rYGpsOH5VL8Swu+Vfrrb18SKdQ1XxV5TmSZ/qD+QilOgdz9gRJhjWP7Xz+Ih5181v4kcu57s7oZbZIVZWyiDIyZsiDz4t6q+CN2lZtCzopJ/PZqViLfpFM5Ffy8Ok4FG+iEmEpm9pZig=
+	t=1789734456; cv=none; b=EUat067O3S8Kp7Nb3mEAAxyuRs4PfgF5ovI5NA/H/n1TH9cV2O5AA+o+7DPH5DfPKtmzdcjR2DAJwBTlBBUK+qSKebCPGIYPopZwguWVvs7xrb1HKG5FfERc3a5pLP1Qee50UqYCd493bXgXvkbxS+0i74e9hCbjgHCv3P7Gfqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789734456; c=relaxed/simple;
-	bh=92jXGMKovCA19ofPyQriIYvTntbQFOLIJcDnE3C6Mk0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TI2YiC2ocIdaXbagBvsn/RFqKClQTQmg9+maQRlricqBBIp0SZBP5JgO8w9wJYleTwNgSq5tdoUUIuTJAH4uiljVHLCdXFmpMEXF4Vkw0gocyR0I7THQrCg4L1lCgkpLG3h1fUPMR1/TaWKyiTVj4Bqjj0tKyTIQHZ5043CwwTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=OM7NORuF; arc=none smtp.client-ip=113.46.200.218
+	bh=S7sjQB6Ut1Cs61lFB+wTgBy6KI8UarLRB4MUdE6TqaA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eWeHO2mtW+79JLbRvbJaSNe3tgd62ucGQVvROH5XjCVd0tUB22OlaxGjGIq6/jnsZ2luJSW0wM2GKEp3qUMhxLl4cimB7xfeYdpfK2CiRfCyU0LaOI2g58IRBt2/kh7FR6jJ2GYEtD8/26Pg1ORK+wgtjGYBVcQgyly2N7wbHZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=HJc3szw9; arc=none smtp.client-ip=113.46.200.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="OM7NORuF"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="HJc3szw9"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=yLtzeMx/3TAcS4LrB7aZaDkHiUpoWcI1JJIq7RkxACU=;
-	b=OM7NORuFf1qGpgY3gV6t/jIBfbIC1kePRFZMvdcW6LX1WLOKTELXSG0EvMMBui8h9AIt1rG8A
-	YEmPovOAtgt5A7bIvvPlrL14+lYernNWwFSzDJmvu0HSzMQV05IfkcMyexklXU+E+upiT8RsBeh
-	b036RsC2YMSbgg244pUM8UI=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4hmWmW4jVszpStW;
-	Fri, 18 Sep 2026 20:15:39 +0800 (CST)
+	bh=uVuWH1jFvfxMFOAUKKhr3vY9ZUmO0Pt9iqO8mHjT/k8=;
+	b=HJc3szw9bhgbCTU8c50z7QVUo0ILceHkEBka+bp7h6T8//QoYWEQokhh+8nGuGcA8dp4DIPJP
+	TP0v1SnUYuJrx2epzlEMpaqoTkIm6jQiIG4UeaYrnQKhD3wbiT28INEDbj+PcmQgJyCqfXjLF3G
+	NUoUrw8EnoL3/IFRfHSSxJc=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hmWnN0jZmzKm8V;
+	Fri, 18 Sep 2026 20:16:24 +0800 (CST)
 Received: from kwepemf200011.china.huawei.com (unknown [7.202.181.237])
-	by mail.maildlp.com (Postfix) with ESMTPS id EF37320333;
-	Fri, 18 Sep 2026 20:27:28 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id BE3B140586;
+	Fri, 18 Sep 2026 20:27:27 +0800 (CST)
 Received: from localhost.localdomain (10.50.163.32) by
  kwepemf200011.china.huawei.com (7.202.181.237) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.46; Fri, 18 Sep 2026 20:27:28 +0800
+ 15.2.2562.46; Fri, 18 Sep 2026 20:27:27 +0800
 From: Weili Qian <qianweili@huawei.com>
 To: <herbert@gondor.apana.org.au>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<liulongfang@huawei.com>
-Subject: [PATCH 4/7] crypto: hisilicon/hpre - fix ECDH destination DMA mapping
-Date: Fri, 18 Sep 2026 20:27:23 +0800
-Message-ID: <20260918122726.3014899-5-qianweili@huawei.com>
+Subject: [PATCH 0/7] crypto: hisilicon/hpre - misc fixes and cleanups
+Date: Fri, 18 Sep 2026 20:27:19 +0800
+Message-ID: <20260918122726.3014899-1-qianweili@huawei.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260918122726.3014899-1-qianweili@huawei.com>
-References: <20260918122726.3014899-1-qianweili@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,40 +51,24 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
  kwepemf200011.china.huawei.com (7.202.181.237)
 
-hpre_ecdh_dst_data_init() rejects valid requests whose output length
-does not equal ctx->key_sz << 1, and maps the user buffer using the
-user-provided len instead of the hardware transfer size. Drop the
-redundant length check and use ctx->key_sz << 1 for dma_map_single()
-so the whole hardware output is mapped.
+Patches 1-5 fix bugs (OOB read, dead code, wrong errno, DMA mapping
+and GFP flags) in the ECDH/RSA/DH paths; patches 6-7 are cleanups.
 
-Fixes: 05e7b906aa7c ("crypto: hisilicon/hpre - add 'ECDH' algorithm")
-Cc: stable@vger.kernel.org
-Signed-off-by: Weili Qian <qianweili@huawei.com>
----
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Weili Qian (7):
+  crypto: hisilicon/hpre - fix pointer dereference before length check
+  crypto: hisilicon/hpre - remove dma_free_coherent on NULL req->dst in
+    ECDH
+  crypto: hisilicon/hpre - return -EOVERFLOW for small ECDH output
+    buffer
+  crypto: hisilicon/hpre - fix ECDH destination DMA mapping
+  crypto: hisilicon/hpre - fix GFP flags for dma_alloc_coherent
+  crypto: hisilicon/hpre - extract clusters num into inline function
+  crypto: hisilicon/hpre - remove unused macros and struct fields
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 6dea9ce5bae2..f77c318caa35 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -1510,13 +1510,13 @@ static int hpre_ecdh_dst_data_init(struct hpre_asym_request *hpre_req,
- 	struct device *dev = ctx->dev;
- 	dma_addr_t dma;
- 
--	if (unlikely(!data || !sg_is_last(data) || len != ctx->key_sz << 1)) {
--		dev_err(dev, "data or data length is illegal!\n");
-+	if (unlikely(!data || !sg_is_last(data))) {
-+		dev_err(dev, "data is illegal!\n");
- 		return -EINVAL;
- 	}
- 
- 	hpre_req->dst = NULL;
--	dma = dma_map_single(dev, sg_virt(data), len, DMA_FROM_DEVICE);
-+	dma = dma_map_single(dev, sg_virt(data), ctx->key_sz << 1, DMA_FROM_DEVICE);
- 	if (unlikely(dma_mapping_error(dev, dma))) {
- 		dev_err(dev, "dma map data err!\n");
- 		return -ENOMEM;
+ drivers/crypto/hisilicon/hpre/hpre.h        |  1 -
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 28 ++++++++---------
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 47 +++++++++--------------------
+ 3 files changed, 28 insertions(+), 48 deletions(-)
+
 -- 
 2.43.0
-
