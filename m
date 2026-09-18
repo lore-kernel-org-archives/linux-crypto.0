@@ -1,104 +1,78 @@
-Received: from mx0a-0002e601.pphosted.com (mx0a-0002e601.pphosted.com [148.163.150.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F664E9C26;
-	Fri, 18 Sep 2026 10:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.150.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789727060; cv=fail; b=ba7quAmK4UNMWvQZsNSV21NtWVmMGPrE3L7usZCiyf5fUUWndUf9Me5Uy9fOzzlSlVBMik6i/Au2c3nuxIh3sQlJWVlz3JcfZ+PEH5hKoSCF4pQ7yO5pXYQEXEsEA3Kzklp+2b9telH/MTF0TD1LjDth5ChWTOCCuullB1bNwQ0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789727060; c=relaxed/simple;
-	bh=MmcuVvXYaMjero/AwfUHOm7TRDKEXBVAlucY5yNCKhc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rXbBKikm2+nckecjyoeOUmy7cdcGFEVV+rB+jaNnyJLCJGNNy0taNd099gTpFSHsRlPS4N1D8Nn9NuJxe7IgdD/Qm0efmKCAQL5yxbc7N/eA1hrCsGvJpRGPMdsgzpNUUTclhIQQGxCUwBaY3WHzMtWdyCs+7GM2CAeDg2+I78Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b=mTkR5O1h; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=L9yQaHRc; arc=fail smtp.client-ip=148.163.150.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207694E1C9C
+	for <linux-crypto@vger.kernel.org>; Fri, 18 Sep 2026 11:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789729524; cv=none; b=Z/DpyFYoHJsxNQwGqxaFdCfpwOtPvbVSdGQQYPdme5ipPWF3JPQu6XOPKX7yeZeLAN1Pd7GsiJ0hU9Z2bAw3K/QL09hkv0BlWjtgb/4BNKFnt9SuB3wNX3R+AhIpmxrdrUcRW1it1pa4VqbXSbWOjkJiV99Lv/KwweFiQg+TZ6M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789729524; c=relaxed/simple;
+	bh=hUcoqwH/HxxZ783HKyQpgJVCFgXZ5I76kDE2zpLnBQ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QSROixar9q5DoIGuJR79brz3N3yQxOBftz76judZd41lDHy4gDbiYTh5e/6p2SEX/GUrCLdew4bBHNVrCTHxpvjb3dyOXrTwscg+aNR6DfmiYo1OUHYSVPMbeLzVNWYk4w0suig0NEzVOkr8x4EVwX1SBoIz+eYyigsLy/ZLaP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QLi67qLz; arc=none smtp.client-ip=74.125.227.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b="mTkR5O1h";
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="L9yQaHRc"
-Received: from pps.filterd (m0384305.ppops.net [127.0.0.1])
-	by m0384305.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 68I9d91s1233779;
-	Fri, 18 Sep 2026 05:24:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	proofpoint-05-2026; bh=PqnJREAsaDSaK59bXYGlEMRqdohLFwctOvTZ9KWYh
-	A0=; b=mTkR5O1hMesHaOydy6oBhv7fVTJWgn2AWLIxVj5W6xg45Tt21HPqegz3U
-	mp00rXuu9ClFvJmuCm9N4q3hcyw0uwQq6YpOFeCK43Y9f6iAQZcBKhg4XD23tcah
-	d/FgHBNuMIJuTUpeQ7MX9TtFhKPKiPhdc4Nhk6VsycggpZaYYM5v8Gkr7oOvNQnf
-	QUD1eYfDFLK2MLrGbkx0LxhfsF5PLoiQfD+AhMBb7rkfQysoacgv7d+VKcItjATk
-	ktwpPCZSlAFQ9NQkRBOfIEQk6EoBcwtdgJ2OxmBVpK6IxsLJP7mcGDcR55TUGMuL
-	UYqOb6LkMmd0c9nGotgWyRanWdM1Q==
-Received: from bl0pr03cu003.outbound.protection.outlook.com (mail-eastusazon11012025.outbound.protection.outlook.com [52.101.53.25])
-	by m0384305.ppops.net (PPS) with ESMTPS id 4gs2ux07ew-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 18 Sep 2026 05:24:16 -0500 (CDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uyIfMJTu2c9652bsfTtGMYhaOE/krbWFx4Ayl0XwyLT0xMHR/6xbTo9v1uv9wmZe5jBOb/IMFdt+rfk1u1oS/C4OeaVpe5P9cCVX71LUghCSOH648t5EqrCuCApv+7zHUJAylDiRCtvIL/RhtYqWBH9lW1R1rablA7cWp4579Bzix/veaE4fMWSCn4makN8zKn8I+nCn/kNCvnxv47SnSSNkbgN8HTdSki+CTP+F2s8nkMrWBdEMHyllFbT1qGQ9/3dTo2E515oDpk8GoEr+FKgDOhvvKMdqAc7eE8d7FP7mEJBaj92yYMTiMloQXKl5Odbi7fyUhpiLbuTEwn+hDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PqnJREAsaDSaK59bXYGlEMRqdohLFwctOvTZ9KWYhA0=;
- b=YcrS1qnG8RVbl2lNmONQvvT7Nw+10prayP5a8yFhpI/337W+upqXMNHv7YUnQ325Wllk+A+H95lF6u0mfGXWygAhuAzxGwWktNFkM20U6Tx48Vgqas14CbHM1QYxnl59D071eukrY9tf77rt+FgA4VOJ335F5WfpyCYL6Voqlam4iyUacOFcia5plHyF0JRu4nXGx44ZIsd5R2FxFa8vfjdZn/BT1H/ATcg5m1KVCNkLp0gin+Ppx4gIQu29YnGrqD1MmfnhohNyljB9bezhGtWiQaV5/ZkX6PzgSDKPr/0rM7vk6RKyyQiDqaHv1Z7keork/mtDgsELBLK2ZxeYAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.195) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PqnJREAsaDSaK59bXYGlEMRqdohLFwctOvTZ9KWYhA0=;
- b=L9yQaHRcGWXaZcXoiK3KjsUt9/dZlWLoAhjPh9wj8e9Nr51ubnvpW5Dx584Z7PhRYhoIAcBp7Ym7Dbdv7/ga76f7Df0rq6fjH2c3dxnaoIRwyQHV5hopdCD2tQGf5LF+shyi2kAX+GdEGdixFtlB6DX4t8OngDriqxj6ADEMMWY=
-Received: from SA0PR11CA0011.namprd11.prod.outlook.com (2603:10b6:806:d3::16)
- by SJ0PR10MB7690.namprd10.prod.outlook.com (2603:10b6:a03:51a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.451.5; Fri, 18 Sep
- 2026 10:24:12 +0000
-Received: from SA2PEPF00003F67.namprd04.prod.outlook.com
- (2603:10b6:806:d3:cafe::63) by SA0PR11CA0011.outlook.office365.com
- (2603:10b6:806:d3::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.428.12 via Frontend Transport; Fri,
- 18 Sep 2026 10:24:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.21.195)
- smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
- action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.195; helo=flwvzet201.ext.ti.com; pr=C
-Received: from flwvzet201.ext.ti.com (198.47.21.195) by
- SA2PEPF00003F67.mail.protection.outlook.com (10.167.248.42) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.451.8 via Frontend Transport; Fri, 18 Sep 2026 10:24:10 +0000
-Received: from DFLE210.ent.ti.com (10.64.6.68) by flwvzet201.ext.ti.com
- (10.248.192.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Fri, 18 Sep
- 2026 05:23:33 -0500
-Received: from DFLE208.ent.ti.com (10.64.6.66) by DFLE210.ent.ti.com
- (10.64.6.68) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Fri, 18 Sep
- 2026 05:23:33 -0500
-Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DFLE208.ent.ti.com
- (10.64.6.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45 via Frontend
- Transport; Fri, 18 Sep 2026 05:23:33 -0500
-Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.53.205])
-	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 68IANWOi1534932;
-	Fri, 18 Sep 2026 05:23:32 -0500
-From: T Pratham <t-pratham@ti.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC: Sebin Francis <sebin.francis@ti.com>,
-        Manorit Chawdhry
-	<m-chawdhry@ti.com>,
-        Vishal Mahaveer <vishalm@ti.com>, Praneeth Bajjuri
-	<praneeth@ti.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v5 15/15] crypto: ti - Change lengths in AEAD to u64 to avoid potential overflows
-Date: Fri, 18 Sep 2026 15:52:45 +0530
-Message-ID: <20260918102245.2784000-16-t-pratham@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260918102245.2784000-1-t-pratham@ti.com>
-References: <20260918102245.2784000-1-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLi67qLz"
+Received: by mail-pj2-f13.google.com with SMTP id d9443c01a7336-2d747ee1f9bso4891515ad.3
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Sep 2026 04:05:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789729517; x=1790334317; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Df5rt+V5n08gio2qwrmwg+kssDbj2qjq7f0a+gBkW+g=;
+        b=QLi67qLzXQ85mrbI2AI/wwldKikbDnMDDPtKdofJ77bEJvOxOyQPrdy7YfXX6+RQfl
+         nIPEHws/7O9CHcvAeEgTHyA0OFeZHLKtITCQfdWxc5oQwRggl/sK5sNjv5d18pc3+CzA
+         V9PMqlqvPmbCGzn9VySQJRjD3tK3d4qs40tBkbNWePhML8IQsOyOJf/ijHwT+/n0ESkM
+         AxBE9uw3EBGiOVkPgbLwP41PqHNhz8KbJ0iMhMPu1HnNk5DxlHNKlQNJte8BFPoOmoCM
+         IK2eYCRoqDUCBI4C5g0MF1v7fDWNZGLiy+OwJZU2/SO54VRPi8AmsdOAQhHK4YwuMM3i
+         LkxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789729517; x=1790334317;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Df5rt+V5n08gio2qwrmwg+kssDbj2qjq7f0a+gBkW+g=;
+        b=xMb2diBaGql33NMiAuEC8C58CcU7IuP8s1bKbdiDqZo8+seB0Ae0FSke3MQRIi8bJa
+         GIOheF8d4TvAHks8Tqq8mFIVPsw2vj8dO3z5dv7e8i8kQCb9ykcQPz4VXnmQs0ESiLBA
+         +vrQdpjZyuqSc3NrEl2+hc34I11Np2BowAySCi5D6K1YRU3g2q1VxSJn5+LpU+tFYEcK
+         l6su784fsZydcUm0N3xQRRX7SasxpDDRM/EJW5xIFjE+gSSQ/brq+x4xIS3btOQGvQyX
+         pHH7Lhx05c2KSdDmPe0u6rhkYhEVg6QbFqvo90Y/Z/cwweoUsHjhGsISCHBjIZwF9bIl
+         sZcg==
+X-Forwarded-Encrypted: i=1; AKwUvBw0SOPPolH532ss77zmQlKDZZy8CMI4gkQGcMw3cMWBQEaR/Bn48YxK1d3/gQjpHKfoKqR66J9IM5FX/nE=@vger.kernel.org
+X-Gm-Message-State: AFuF++kpHDuTwlE4jWrI/GAXlOCRDVLq5el0Baj+9L/c8wEmFSaU8Hmp
+	HsNV+cAWNzWzIgOV88FugPQH25moCuM0fmJ5Aq+FhVoD+jL7/rqMHbuH
+X-Gm-Gg: AYBFou2JxRyV6DGnGJWRZKhjZQk40v99MFbPFgVoo4Y5XaajNEKPypN+pL7fjWXlZLb
+	ge9ncxKjfl2cxOIKRaKmREoY4IHpF105QsqliPgRGTALLC48a6DaxDw8oFj09TWW75NqiLi2HoN
+	l5MJpejJIRF7RJyr7z9UrUPI5DIDo/fnP2ysMlqluO91F+xb712GWpHov5+DR1EHoJwhyOEQWag
+	O3tp5rVTrk+gGpSp6WgTbjpZlp4neuBMTPnkXX6ICYqVRT0TEA4Gvhd4g3mvpXD5++JcjrdYqya
+	5mRERHYRaKN5mF5OvFhjSh+3K8eqflkC8o0rI1micu1nmaUBFNoVxBN9rzZDV3mb7EV1D72n8VX
+	a9ejFY3meKvev/8JdHL0TXvJFnrBfkzhAF77j2loom3W0AzSAJu6ohlaBT6XDQHA7KCWmnpBvIB
+	K+rSCqTxi/l1MJYX1m+fC+/cZBvljlXklI+nUdphMo/KKiA6XRDt9ZiAOUx9gsB7PBnjrsMiISG
+	/UY5p4jF3QkW4M431k=
+X-Received: by 2002:a17:903:3d06:b0:2dd:ad73:5b73 with SMTP id d9443c01a7336-2ddb1d5bd18mr43767255ad.35.1789729516398;
+        Fri, 18 Sep 2026 04:05:16 -0700 (PDT)
+Received: from kernel ([103.219.206.97])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-33c28180a4dsm4721501eec.0.2026.09.18.04.05.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Sep 2026 04:05:15 -0700 (PDT)
+From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: clabbe@baylibre.com,
+	skhan@linuxfoundation.org,
+	me@brighamcampbell.com,
+	jkoolstra@xs4all.nl,
+	linux-crypto@vger.kernel.org,
+	linux-amlogic@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] crypto: amlogic: Fix IRQ handler return value and fallthrough logic
+Date: Fri, 18 Sep 2026 16:35:04 +0530
+Message-ID: <20260918110504.7207-1-raizudeen.kerneldev@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -106,147 +80,123 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F67:EE_|SJ0PR10MB7690:EE_
-X-MS-Office365-Filtering-Correlation-Id: cfbfb855-1215-4b9b-c7e1-08df156efaa6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|82310400026|23010399003|1800799024|376014|56012099006|22082099003|18002099003|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	wWXc+21+aNOn2CrFpubB0jsSQ8ckZqoQMrLfCMHCMFKvDLtssMkUgN8zychI4rwykFFjds/XftiQujwK9Pk6RATpNB8hP5TD8FIDbyJdAbIYPBQ1jOKRgiHEJjjI1J1jirvY2ZcVtNjYS+mfDF3dq44x8+IN49GX5JGXSa4/MbtAjl65AAUn2KSiOhhdNCZtvAgtqUlmtPqGEvgNtOPMPuQJ3ntFkeHT2frBxa3aHUyr6vuUe/yCb3m4/uAeBxV+KjTBytbN89rZuh1Mxvmk6uX4s5dvrbz9zb4qCeeaZ7Sjaef0Gt5pBnHLlHgmUdz6Y9wV1axe2y4AXudGBq7rs6c1yKAby+7dDGpEa1D+JC+eWAvFU9OApKXKEamqlMw9adxJWR69fCQMNw0Xx9f7YGORyM0lURr09nPUT80BOuBetJYYQ0Jtu1uOXZwuEzQsI53lGH0oDNYZM14B6a7irKbVY4QAhpPEGRnu3PNBH2Ra/NfCc7X057QQN4OYgkgTizaZQFXrSodiAhjdf5LyR3qNnBGtw0v2foHDpDRC50xzKXvhlq0v4ZECMY+zeH+tNq04emUSLE9qPaSdObBTX6gufoZldJYOrbR+VARtvXE1/kRoHfJ/yH4fVGMvw9O0FvDjTnCA8lJwRIg6DUlqIIB/EMImRwGEqPiLt/THVQMiEQXf4DyfrJUiTAtSic+9OR1fyLzuJ+68zS5vdTE0fA==
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet201.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(23010399003)(1800799024)(376014)(56012099006)(22082099003)(18002099003)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	C7ge+P6J9cw8iVZD0LyJVHdn22SMtslsg7FcOVDVxz3AvienD+6oxedZ+fiHDDGbogLcG1umOZZJmttrKFdEbA00WChuScLI2C+P2vjZjCsJfpmAAIaXWLXf1wZOV5vXHjPzKLkciV5Z839qppPewP8p793ufrL0OiwhsmDVZdldtjn/qH+6wMt216zxaaW/4eOPIGPHbHbYPwyfraqbEn6wt5joiqCNmc9rbYEEYt58FyYEVLccoo/rOmhiVikxDqutoyu8HGpmu732bbbENglNVetTUQ9Z83pTK7ej6v2kxh+hhiT/+wrL9VO/QVVQZt7uDvnKy6CxmGNdpAaOniwaoNy7RhpdQPycDJquWkHsO3uboqfMQsazTzikspD8sH/7CThmmv9JWqpz4TYlFJQ2M7hIg7IeavV018eMj0ZITxWnwsxG/a9kEJ1Z14fJ
-X-Exchange-RoutingPolicyChecked:
-	KpwX7I3rJ5w1VnMJuBXdSLff0lJ8uiAnMhPDqEiLvVBOq6O7xPSJppG9Y23Jv2qWMdmxGT29lAFrqNbFrACsVcWuy4Z15oyBA8E6C1aN+FBbqlicDsW2AGNmU70tJ9YXeQ3NhTv4J49OIlU/11nz/XGZ8D8DNOjomFD1Iq2YwmtZEna/DXW2MTzwjcSGzSxcFB0Wd2EP4ScseIDbqFjU337tA1KMs6sUmu2QegpkLEgtwOr2p0XtRwgwz5ZW/DnJd0+1b3D6W2KGY0U4a+zTulY2yZFwLYC+wprqHG7xX4twLRd7QBJnkg02cERJ241LDaYNm74PDhNfwwXOSL63Pg==
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2026 10:24:10.5027
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cfbfb855-1215-4b9b-c7e1-08df156efaa6
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.195];Helo=[flwvzet201.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F67.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB7690
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTE4MDE0NCBTYWx0ZWRfX0sPRZ/1rORij
- FuU5M11+c0B5KMBuchobE0G1lVbwnUY1JJfEWn8e0TbOkkDBdn/fllC2pW9OIvlEU5/08xEeLv4
- A/tUAQJYGf248bPmbtL6kzhlb/kjwt6INlU07vx3gqyIX32yZGkvFgfl6nXTwKzGbTFJ6pvUAQ0
- D4XGl3Px0OlbT3aMO8uow6/OUcuJW8KD70tOptqNLhmmOVzzNl9KY7osoyl7aRf4JX5PHzJKbqy
- iDPzjOnxpBby6OQy5xoY6JBKrTZHdRHtZxKMmjjFGqcng4APolUlYlOQ/BmaTJi43cnqem9KMaq
- JegthX1dZ+2g2miBfvbSUNiULF+TOMJEYbMpblOYAONaU/tTvC2apIpZel8u5W7gH5hTEdFdBMe
- csaE4TJP0JklWXaWDt9ID9MenDtF+hD3ST37DXN11h0nXhytdCpeHwIhSzP/VeWgujsiSRdO1UT
- 9bicuns1IyvozgWuGHA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTE4MDE0NCBTYWx0ZWRfXzqcddPKdI7AS
- 9V/0LUuISQkpUleY1X9McTb1G0utJ00guTvTdFywOSDY5w5hgcbtBbwC6LcURt+5sMpTZtxk8Gk
- munKGk163hr9NEWmLgY9l3fMYE9NOR4=
-X-Proofpoint-ORIG-GUID: HmImAOYihCkcQTRFmBhReust9lNt8lk6
-X-Proofpoint-GUID: HmImAOYihCkcQTRFmBhReust9lNt8lk6
-X-Authority-Analysis: v=2.4 cv=adH0Dhot c=1 sm=1 tr=0 ts=6aad1150 cx=c_pps
- a=DkeX3LL2/Oc4yJO52xFMkw==:117 a=tJyPKKxUohctrY4NYmUjkA==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=VdqzKS8jKosA:10 a=V5UXEbMT0ywA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Z8NIEmU8O1QQgoT56wFK:22 a=taLDd7a_hP9WKsMzeGRc:22
- a=sozttTNsAAAA:8 a=W2mYDkbPwZfAYNH1kz8A:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-18_03,2026-09-16_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 clxscore=1015 spamscore=0 adultscore=0
- malwarescore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2609040000
- definitions=main-2609180144
 
-Change assoclen, cryptlen, authsize from unsigned int to u64 to avoid
-overflow when they are added (in TAG offset and padding length
-calculation)
+In meson_irq_handler(), when an interrupt matches a flow but the status
+register is empty, the driver prints an error but doesn't return. It
+falls through the loop and incorrectly prints an `unknown irq` message.
 
-Fixes: 37b902c603042 ("crypto: ti - Add support for AES-GCM in DTHEv2 driver")
-Signed-off-by: T Pratham <t-pratham@ti.com>
+Fix this by returning immediately. For empty status registers, return
+IRQ_NONE instead of IRQ_HANDLED to avoid masking spurious interrupts and
+allow the kernel to detect interrupt storms. Also use
+dev_err_ratelimited() to prevent console lockups during an interrupt
+storm.
+
+Additionally, the handler return IRQ_HANDLED for genuinely unknown
+interrupts. Return IRQ_NONE instead for unhandled interrupts.
+
+Cc: stable@vger.kernel.org
+Fixes: 48fe583fe5417 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
+Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
 ---
- drivers/crypto/ti/dthev2-aes.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+I have addressed the IRQ specific issues in this v2. The other
+pre-existing issues mentioned by Sashiko are already addressed in my
+separate patch.
 
-diff --git a/drivers/crypto/ti/dthev2-aes.c b/drivers/crypto/ti/dthev2-aes.c
-index 9b982ca4a7730..ca87aacc39c5d 100644
---- a/drivers/crypto/ti/dthev2-aes.c
-+++ b/drivers/crypto/ti/dthev2-aes.c
-@@ -756,6 +756,9 @@ static int dthe_aead_enc_get_tag(struct aead_request *req)
- 	struct dthe_tfm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
- 	struct dthe_aes_req_ctx *rctx = aead_request_ctx(req);
- 	u32 tag[AES_BLOCK_WORDS];
-+	u64 assoclen = req->assoclen;
-+	u64 cryptlen = req->cryptlen;
-+	u64 authsize = ctx->authsize;
- 	int nents;
- 	int ret;
+Changes in v2:
+- Return IRQ_NONE instead of IRQ_HANDLED when status register is empty
+  to avoid masking spurious interrupts.
+- Use dev_err_ratelimited() to prevent console lockups.
+
+ drivers/crypto/amlogic/amlogic-gxl-core.c | 38 ++++++++++-------------
+ 1 file changed, 16 insertions(+), 22 deletions(-)
+
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index 169c6eeb51e5..d5d84524c110 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -37,12 +37,13 @@ static irqreturn_t meson_irq_handler(int irq, void *data)
+ 				complete(&mc->chanlist[flow].complete);
+ 				return IRQ_HANDLED;
+ 			}
+-			dev_err(mc->dev, "%s %d Got irq for flow %d but ctrl is empty\n", __func__, irq, flow);
++			dev_err_ratelimited(mc->dev, "%s %d Got irq for flow %d but ctrl is empty\n", __func__, irq, flow);
++			return IRQ_NONE;
+ 		}
+ 	}
  
-@@ -763,12 +766,12 @@ static int dthe_aead_enc_get_tag(struct aead_request *req)
- 	if (ret)
- 		return ret;
- 
--	nents = sg_nents_for_len(req->dst, req->cryptlen + req->assoclen + ctx->authsize);
-+	nents = sg_nents_for_len(req->dst, cryptlen + assoclen + authsize);
- 	if (nents < 0)
- 		return nents;
- 
--	sg_pcopy_from_buffer(req->dst, nents, tag, ctx->authsize,
--			     req->assoclen + req->cryptlen);
-+	sg_pcopy_from_buffer(req->dst, nents, tag, authsize,
-+			     assoclen + cryptlen);
- 
- 	return 0;
+-	dev_err(mc->dev, "%s %d from unknown irq\n", __func__, irq);
+-	return IRQ_HANDLED;
++	dev_err_ratelimited(mc->dev, "%s %d from unknown irq\n", __func__, irq);
++	return IRQ_NONE;
  }
-@@ -779,6 +782,9 @@ static int dthe_aead_dec_verify_tag(struct aead_request *req)
- 	struct dthe_aes_req_ctx *rctx = aead_request_ctx(req);
- 	u32 tag_out[AES_BLOCK_WORDS];
- 	u32 tag_in[AES_BLOCK_WORDS];
-+	u64 assoclen = req->assoclen;
-+	u64 cryptlen = req->cryptlen;
-+	u64 authsize = ctx->authsize;
- 	int nents;
- 	int ret;
  
-@@ -786,14 +792,14 @@ static int dthe_aead_dec_verify_tag(struct aead_request *req)
- 	if (ret)
- 		return ret;
+ static struct meson_alg_template mc_algs[] = {
+@@ -243,34 +244,30 @@ static int meson_crypto_probe(struct platform_device *pdev)
+ 	if (IS_ERR(mc->base))
+ 		return PTR_ERR(mc->base);
  
--	nents = sg_nents_for_len(req->src, req->assoclen + req->cryptlen);
-+	nents = sg_nents_for_len(req->src, assoclen + cryptlen);
- 	if (nents < 0)
- 		return nents;
+-	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
++	mc->busclk = devm_clk_get_enabled(&pdev->dev, "blkmv");
+ 	if (IS_ERR(mc->busclk)) {
+ 		err = PTR_ERR(mc->busclk);
+-		dev_err(&pdev->dev, "Cannot get core clock err=%d\n", err);
++		dev_err(&pdev->dev, "Cannot get/enable core clock err=%d\n", err);
+ 		return err;
+ 	}
  
--	sg_pcopy_to_buffer(req->src, nents, tag_in, ctx->authsize,
--			   req->assoclen + req->cryptlen - ctx->authsize);
-+	sg_pcopy_to_buffer(req->src, nents, tag_in, authsize,
-+			   assoclen + cryptlen - authsize);
++	err = meson_allocate_chanlist(mc);
++	if (err)
++		return err;
++
+ 	for (i = 0; i < MAXFLOW; i++) {
+ 		mc->irqs[i] = platform_get_irq(pdev, i);
+-		if (mc->irqs[i] < 0)
+-			return mc->irqs[i];
++		if (mc->irqs[i] < 0) {
++			err = mc->irqs[i];
++			goto error_chanlist;
++		}
  
--	if (crypto_memneq(tag_in, tag_out, ctx->authsize))
-+	if (crypto_memneq(tag_in, tag_out, authsize))
- 		return -EBADMSG;
- 	else
- 		return 0;
-@@ -887,10 +893,10 @@ static int dthe_aead_run(struct crypto_engine *engine, void *areq)
- 	struct dthe_aes_req_ctx *rctx = aead_request_ctx(req);
- 	struct dthe_data *dev_data = rctx->dev_data;
+ 		err = devm_request_irq(&pdev->dev, mc->irqs[i], meson_irq_handler, 0,
+ 				       "gxl-crypto", mc);
+ 		if (err < 0)
+-			return err;
+-	}
+-
+-	err = clk_prepare_enable(mc->busclk);
+-	if (err != 0) {
+-		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
+-		return err;
++			goto error_chanlist;
+ 	}
  
--	unsigned int cryptlen = req->cryptlen;
--	unsigned int assoclen = req->assoclen;
--	unsigned int authsize = ctx->authsize;
--	unsigned int unpadded_cryptlen;
-+	u64 cryptlen = req->cryptlen;
-+	u64 assoclen = req->assoclen;
-+	u64 authsize = ctx->authsize;
-+	u64 unpadded_cryptlen;
- 	struct scatterlist *src = NULL;
- 	struct scatterlist *dst = NULL;
- 	struct scatterlist *aad_sg = NULL;
+-	err = meson_allocate_chanlist(mc);
+-	if (err)
+-		goto error_flow;
+-
+ 	err = meson_register_algs(mc);
+ 	if (err)
+ 		goto error_alg;
+@@ -289,9 +286,8 @@ static int meson_crypto_probe(struct platform_device *pdev)
+ 	return 0;
+ error_alg:
+ 	meson_unregister_algs(mc);
++error_chanlist:
+ 	meson_free_chanlist(mc, MAXFLOW - 1);
+-error_flow:
+-	clk_disable_unprepare(mc->busclk);
+ 	return err;
+ }
+ 
+@@ -306,8 +302,6 @@ static void meson_crypto_remove(struct platform_device *pdev)
+ 	meson_unregister_algs(mc);
+ 
+ 	meson_free_chanlist(mc, MAXFLOW - 1);
+-
+-	clk_disable_unprepare(mc->busclk);
+ }
+ 
+ static const struct of_device_id meson_crypto_of_match_table[] = {
 -- 
-2.34.1
+2.53.0
 
