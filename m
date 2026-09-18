@@ -1,217 +1,283 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE3342885A
-	for <linux-crypto@vger.kernel.org>; Fri, 18 Sep 2026 20:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.225.141
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789764930; cv=pass; b=FUFpmEV4kA7cJRURydpEMTPAa3pw3kAZ/LejMhxl5+Xu4qPIdbf2ij6vw5KwFXgR/1TEPXDSLCVagfCm2wjD+oId9lWtXxXkMc24eOZRNfdDVpTQzy8u3Orwxx5q+j8tiTswHrKhdLxz7YTTbInoOYaVmQAHxx5aDVXQhOEXZCA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789764930; c=relaxed/simple;
-	bh=luig+1o1M/fsF9vaNIsARo6CqC/xBHmV9/YvD0slYb0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ec2uw4dv8iGmqgssQUUqmZ2GwZil7CisfYY/zCP6sLYZfqTPUqvcBcLrg+2iuELM+c2lC3bYnBzQ3fDSV2KPAYzawsNvdbXGhCbLC4fZTHO4CKP6mJ6bsUMRuPbcQalpx1hPpf6L/tawR+oEmFz69Vwz+YCNBMI5zTkPAEaPXxY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QgvfrAyV; arc=pass smtp.client-ip=74.125.225.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4F93AC0DE;
+	Fri, 18 Sep 2026 22:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789770261; cv=none; b=ayXVKNk6O638vVasKaS384YfZ6Cpr2IEXjDzTieML/vJ2M0wu/BnkOGeGX7Hu0Yj7kgiLLrrIT9QkI3ucZJVOjpKOQ5UZ93EOnlyT79VyQtEJ/2YndG+tyorSLCeP5BTuZ76M5g450RLKZAarkK2gsFiLvVr7YoOnPJWrAtb/Z4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789770261; c=relaxed/simple;
+	bh=ycFJ1PRHzy0obJINie/K+YhsAOHo3J6GoleCY5EBl8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JsRrgufrt6Y5Tv0FQ9FzxnlC0NeFrJjI3uC5pvNWh0S1KZ420nSgkrLCALa+kyAzhPpURlNZ6SFigJtVARkBfld3qQzAk2rPMka6IpGceEuFi+iUKWw33U67cdbIh7/ycS50BzlpXFRibK3TbPLFrRAwtsm/LqhGL3jkJlXmpc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=e5DgYtZD; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QgvfrAyV"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49fbdc010d7so330855e9.0
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Sep 2026 13:55:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789764927; cv=none;
-        d=google.com; s=arc-20260327;
-        b=DgglhKSTHdXCEiN8tY8xbpwf3Gon6UIsdGGLlG+ew8NKVNKCdxuSfYppJ5RWub1zfg
-         vGFlgcMRGfQ2b1KwbOcPx6VrEBMizDHFD+zvZDMgIjCfylqAVgNmq+RX4j7RDi9Xr5Vi
-         Nmc9+8yMcqVwSCMC2u50/PK2btmYYDRVsIHXXv91FH1DsS3+aPbx0lwNoSeQOzzXsYMD
-         HZ3ThrogqlQMFx05HkpHPTqWozxdCUZmtYbPhVYuwnQwofAZw6SqsgoMyzIb+4ffcSpG
-         lhpHOOa+jJMyFPVXrlRRs1+0NpSKGCZzFpCCDPBNcLSAXKgMA82qK4MOgpzd3CPJFlQc
-         DXQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=sgTcRorf9vWGoUo+DaV05plknDxMZzVIVIvRR476748=;
-        fh=wiSDzc2yo011fFLH8rVCU/alWy7HqlZWy8zO2GNVNls=;
-        b=LTDNoLzHXf+CpJyBmMhSi+QRi2g4v/kmOyBOkO+s2efpnntml7uHX004ua2dyV+Aqt
-         GmrXkIwVMWIBJgrgCG4MctSFN97URkll6JIQK7dDUyt2/9onX/R91o0D0+Pc1FF5TiMD
-         S84KMfmAyf612vnSlUsRNxqZ11eE8r7/0EwhbjDJ0akEUIgOOnUgwH1IQjfnEaimDSEV
-         6HK3snEglpAZXLoszaVqwe8anir9zuW6AkrTdMERADCybu1zf7nQhDPZqMDP1ukDCAFU
-         ydFwE6fM36yx7/tX2XbQlXstU9/EctmThFw4nEFvCAGFbvCQJvXNzAFGjTC54GwPOx0u
-         GhKA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789764927; x=1790369727; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=sgTcRorf9vWGoUo+DaV05plknDxMZzVIVIvRR476748=;
-        b=QgvfrAyVtarzFii+eQWDsnHGq4Y9Hg6vLJpArY54u/yeCWeXNT0q2xiAK+xmfxKc+n
-         qvPKfSuBe9GNjYH2FOcZzMz8fKUWqpUKMg4iyLnIw7uyzZ8gGK2u2inY8qtQTrg81zw9
-         Xgx/zzo6ZneW58DnSliy5LFJFb/usXMuuHouLK3hks46uAPXmNBiMH7mIj2g2C37eiTG
-         ajbMRq0u+xFmnVnCj18FjfqFh/J6ldxPnZafjDZnxKiFvBOVUOy1wlRv0vHtLxQFZlYO
-         nF2u/0g/Rdb4oANUJRVMJMwPcmMywDEBTBqtB/iawN0WEHZStzF3tmZn40g8jYWZ1sI5
-         N6lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789764927; x=1790369727;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=sgTcRorf9vWGoUo+DaV05plknDxMZzVIVIvRR476748=;
-        b=OwvDeE6Jn2kZxLvqPCMW3DAfZVoaaGq6iElyKV9npGfZY6es4UDD1c0KamlRr2+7pJ
-         72z2jt+yHHFfkMEx8c0x9HWDN2rH+662CXjOy+eguUpJF3Mf1sz2GrQ5P9NbHrlM9iUK
-         IjH4KBr2532CZUCyZwSAEz4m7iGBL/+GnJZ675nzjsybnLHMyagw+kkwA9KlATc4fLi9
-         L3jcpZgf254x+PHC5yBJjh6NcSHTenjO3EGZAYBjFWdzqGD45AW/Nb/4tH2QuMb+m1K8
-         pOhL8fWBQrgdkur8jTXLAi8XZajUXhHdo5j28EQKJ0BVarFonKylv5LWJRD8jDgqdH9/
-         Vx4w==
-X-Forwarded-Encrypted: i=1; AKwUvBwNsMt8aBU57JSX0l3nEQ6Va75kV/V3G2WKXQ16Zeff6s3D9rstQMIcNutss+XfhgkO0TRNBjytTzFbRkU=@vger.kernel.org
-X-Gm-Message-State: AFuF++lJgRAMoUlmXNzoVCVMWodQrXwJsXtYE0y9P6Hb58pl+hgMcG9U
-	nnDK/17ozYnq0jcKmR+d//lWK3WUF1z4xg3YPMHU+jdckwlp+QFeU2nWRqRXUviyWkpAIdJKVNa
-	Yqf5RBVAHzg7rgG8oPkemz42P7bwoD/4=
-X-Gm-Gg: AYBFou12WIlbmoSDzBMjbFRovIqt3XywERNxbnxyOM0b5vFMzuFJBzC2fGfcHyl3wUh
-	/8WRHdshnux4QI/HyOiv1POEycmRqVQJTgiDWalUxukoI/WMy7dDtvPtazLCjikNmlbqj2BcQqq
-	PST52tv7BqD8mtRPhZ+QDP7fritjEK55cKbG+gD2ONJ/nJxZR890VlJYpolIly0ksTWkxeuS2c/
-	Hv0rWZaTPR5IWYosMIZz/6pcZ/0OtfmJg+yo5j7QQBq3g7811vouki1nVE7+GTMNtUmhf0pQVCU
-	iRBMDTmTbYpyCdpkIa8doj3EAmU8JzQ0cP4FGpKmpOoLyTE+QeKdZgGM4xghbYrGK3iLBCsIGGB
-	tWK/PjFx+S8Q0JnjpMi3+CMc=
-X-Received: by 2002:a17:907:d02:b0:c25:3ccf:bd9c with SMTP id
- a640c23a62f3a-c2a1a8e09e8mr331776566b.2.1789764477295; Fri, 18 Sep 2026
- 13:47:57 -0700 (PDT)
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="e5DgYtZD"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 83EAB40E00E5;
+	Fri, 18 Sep 2026 22:24:14 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 4YZYiPJ9gyOy; Fri, 18 Sep 2026 22:24:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1789770243; bh=2h3eDBdrSJuj4drNxGGe1s5X52AsdYMPIS8ImcRjdKw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e5DgYtZD5JyIUwLrkX1y5zxBtJEEt+JhIxnzCTSVxrfBg41mWKN8E+ashLykdIUSH
+	 tU/PP42NeksBx+afNG9jG7rizgpqevvYKZdvI1vK6W8TfHpOKMq9eXbcUsT4rxSdDk
+	 BfKX/6xNWCU2hNQvhvKmda89qwRXVSfHGPOm4ZnNnM5eylZUtVxeRRDhzuLEfj1qfv
+	 7FPrMk+fWiX8px7fX6isLe9cH4mFCacwAywukE4GKzrSP/ugULjevverctSNvW9w+w
+	 UwsOFfKTH8T9HqQ31WO8/P/wVWNTXZ3sZKKHMw+jtTxgeoMQ00v2d2FNqKrsszxips
+	 1CYcKHfWeu18XQr7OhdoZm30p8vtaQgi8o5+L0fNAuUgzjQG8xHRIxnPM1x6x6I3UQ
+	 Sx0uR2YkT1npGgfC1w9SRNX/X/vURLVqYLbX8tlegu89xMnZe1zpoXN0IYfh36FVNG
+	 mJAZFJjVW3aM3vdKLmDkbwhyMR28seQzlJ/SHkbaHtXbZfzhLoTnB1FASx/fPbXtej
+	 mvPu5Wt2O/ykU7itKuXIODZmcVCFiHGI7I+/n3tqBhrXNg/yazzHaDzGwtvCWhTWr1
+	 /5Yh1eZG/o4Ew3/k5Gv+TviQHKhXmeZd+bVfahtkLeIMbwOHr9CXZvncpUPJgQZECK
+	 +FS2qg/1Dy208qejJ9tzRpXg=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::48])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C962D40E01DD;
+	Fri, 18 Sep 2026 22:23:29 +0000 (UTC)
+Date: Fri, 18 Sep 2026 15:23:26 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	darwi@linutronix.de, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev
+Subject: Re: [PATCH v16 4/5] x86/sev: Perform RMP optimizations asynchronously
+Message-ID: <20260918222326.GBaq253l7rsV04EUpy@fat_crate.local>
+References: <cover.1789594774.git.ashish.kalra@amd.com>
+ <daa513fbe8f0672b00bc5e026e4399244be6dc72.1789594774.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260916-ti-dra7-omap-sham-fix-v2-0-4eadb60081e5@gmail.com>
- <20260916-ti-dra7-omap-sham-fix-v2-2-4eadb60081e5@gmail.com> <20260918144224.4dfb8515@kemnade.info>
-In-Reply-To: <20260918144224.4dfb8515@kemnade.info>
-From: Bhargav Joshi <j.bhargav.u@gmail.com>
-Date: Sat, 19 Sep 2026 02:17:44 +0530
-X-Gm-Features: AcwNN1WKvA-fdN2xNZdCXGZd1cxpuLrv71RZ7MqA3wlpHyScvRfY20wc8pzPN-Q
-Message-ID: <CAOWyW_5GU__FE25POrjKH=CmOHaeBRJPw4xS2cdodePm3LydhA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] ARM: dts: ti: omap: dra7: Remove clocks from
- crypto nodes
-To: Andreas Kemnade <andreas@kemnade.info>
-Cc: Aaro Koskinen <aaro.koskinen@iki.fi>, Kevin Hilman <khilman@baylibre.com>, 
-	Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Animesh Agarwal <animeshagarwal28@gmail.com>, linux-omap@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <daa513fbe8f0672b00bc5e026e4399244be6dc72.1789594774.git.ashish.kalra@amd.com>
 
-On Fri, Sep 18, 2026 at 6:12=E2=80=AFPM Andreas Kemnade <andreas@kemnade.in=
-fo> wrote:
->
-> On Wed, 16 Sep 2026 02:29:39 +0530
-> Bhargav Joshi <j.bhargav.u@gmail.com> wrote:
->
-> > The omap-sham, omap4-des and omap2-aes crypto drivers do not use
-> > "clocks" and "clock-names" properties. Clock management is handled by
-> > the ti-sysc interconnect parent wrapper. The dt-bindings for
-> > ti,omap-sham and ti,omap-aes don't define these clock properties. Havin=
-g
-> > them in the child nodes causes dtbs_check warnings.
-> >
-> > Remove the "clocks" and "clock-names" properties from the sham, des and
-> > aes nodes.
-> >
-> > Reviewed-by: Andreas Kemnade <andreas@kemnade.info>
-> > Signed-off-by: Bhargav Joshi <j.bhargav.u@gmail.com>
->
-> I was a bit too fast here, clocks here are different from what is
-> used in the ti-sysc block. So some more thought and argumenting is needed=
-.
-Clocking is handled by ti-sysc parent block, furthermore other dtsi
-such as omap5,
-omap4, am4372 which uses the same hardware doesn't define any clock in
-the child node.
-parent block defines a clock with clock-name: fck
-clocks =3D <&l4sec_clkctrl DRA7_L4SEC_AES2_CLKCTRL 0>;
-clock-names =3D "fck";
-and child main part as
-clocks =3D <&l3_iclk_div>;
-clock-names =3D "fck";
-If child node needs this separate clock  in child node then binding
-for aes and sham needs
-to be updated to allow clocks and clock-names leaving des binding as it is.
+On Wed, Sep 16, 2026 at 10:15:14PM +0000, Ashish Kalra wrote:
+> Changes in v15:
+> - Move the workqueue allocation and the (fixed) optimization range
+>   computation to an initcall; snp_enable_rmpopt() now only programs the
+>   RMPOPT_BASE MSRs and queues the optimization pass.
+> - Gate rmpopt_capable() on a static rmpopt_enabled bool set when the
+>   workqueue is allocated, instead of an if (rmpopt_wq) check, and drop
+>   rmpopt_wq_mutex.
+> - Queue both the initial and the teardown pass with mod_delayed_work().
+>  arch/x86/virt/svm/sev.c | 99 +++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 95 insertions(+), 4 deletions(-)
 
-Best Regards,
-Bhargav
->
-> Regards,
-> Andreas
->
-> > ---
-> >  arch/arm/boot/dts/ti/omap/dra7-l4.dtsi | 2 --
-> >  arch/arm/boot/dts/ti/omap/dra7.dtsi    | 8 --------
-> >  2 files changed, 10 deletions(-)
-> >
-> > diff --git a/arch/arm/boot/dts/ti/omap/dra7-l4.dtsi b/arch/arm/boot/dts=
-/ti/omap/dra7-l4.dtsi
-> > index a595745afe59..bca035fd7e62 100644
-> > --- a/arch/arm/boot/dts/ti/omap/dra7-l4.dtsi
-> > +++ b/arch/arm/boot/dts/ti/omap/dra7-l4.dtsi
-> > @@ -2086,8 +2086,6 @@ des: des@0 {
-> >                               interrupts =3D <GIC_SPI 77 IRQ_TYPE_LEVEL=
-_HIGH>;
-> >                               dmas =3D <&sdma_xbar 117>, <&sdma_xbar 11=
-6>;
-> >                               dma-names =3D "tx", "rx";
-> > -                             clocks =3D <&l3_iclk_div>;
-> > -                             clock-names =3D "fck";
-> >                       };
-> >               };
-> >
-> > diff --git a/arch/arm/boot/dts/ti/omap/dra7.dtsi b/arch/arm/boot/dts/ti=
-/omap/dra7.dtsi
-> > index 711ce4c31bb1..0784c6d9cbe4 100644
-> > --- a/arch/arm/boot/dts/ti/omap/dra7.dtsi
-> > +++ b/arch/arm/boot/dts/ti/omap/dra7.dtsi
-> > @@ -1012,8 +1012,6 @@ aes1: aes@0 {
-> >                               interrupts =3D <GIC_SPI 80 IRQ_TYPE_LEVEL=
-_HIGH>;
-> >                               dmas =3D <&edma_xbar 111 0>, <&edma_xbar =
-110 0>;
-> >                               dma-names =3D "tx", "rx";
-> > -                             clocks =3D <&l3_iclk_div>;
-> > -                             clock-names =3D "fck";
-> >                       };
-> >               };
-> >
-> > @@ -1043,8 +1041,6 @@ aes2: aes@0 {
-> >                               interrupts =3D <GIC_SPI 59 IRQ_TYPE_LEVEL=
-_HIGH>;
-> >                               dmas =3D <&edma_xbar 114 0>, <&edma_xbar =
-113 0>;
-> >                               dma-names =3D "tx", "rx";
-> > -                             clocks =3D <&l3_iclk_div>;
-> > -                             clock-names =3D "fck";
-> >                       };
-> >               };
-> >
-> > @@ -1073,8 +1069,6 @@ sham1: sham@0 {
-> >                               interrupts =3D <GIC_SPI 46 IRQ_TYPE_LEVEL=
-_HIGH>;
-> >                               dmas =3D <&edma_xbar 119 0>;
-> >                               dma-names =3D "rx";
-> > -                             clocks =3D <&l3_iclk_div>;
-> > -                             clock-names =3D "fck";
-> >                       };
-> >               };
-> >
-> > @@ -1103,8 +1097,6 @@ sham2: sham@0 {
-> >                               interrupts =3D <GIC_SPI 163 IRQ_TYPE_LEVE=
-L_HIGH>;
-> >                               dmas =3D <&edma_xbar 165 0>;
-> >                               dma-names =3D "rx";
-> > -                             clocks =3D <&l3_iclk_div>;
-> > -                             clock-names =3D "fck";
-> >                       };
-> >               };
-> >
-> >
->
+Some scrubbing to this one too:
+
+Author: Ashish Kalra <ashish.kalra@amd.com>
+Date:   Wed Sep 16 22:15:14 2026 +0000
+
+    x86/sev: Perform RMP optimizations asynchronously
+    
+    When SNP is enabled, all writes to memory are checked to ensure memory
+    integrity. This imposes performance overhead on the whole system.
+    
+    RMPOPT is a new instruction that minimizes the performance overhead of
+    RMP checks on the hypervisor and on non-SNP guests by allowing such checks to
+    be skipped for 1GB regions of memory that are known not to contain any SNP
+    guest memory.
+    
+    Add support for performing RMP optimizations asynchronously using a dedicated
+    per-CPU workqueue.  Shortly after SNP initialization, run an optimization pass
+    over all physical memory.
+    
+    As SNP guests are launched, RMPUPDATE assigns their private pages to
+    guest-owned state; when such a page falls within an optimized 1GB region, the
+    hardware clears that region's RMPOPT optimization and RMP checks resume there
+    to protect the guest memory.
+    
+    Since launching SNP guests clears these optimizations, perform them again
+    asynchronously using the dedicated workqueue.
+    
+      [ bp:
+       - Massage commit message and comments
+       - simplify code
+       - redo some of the logic ]
+    
+    Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
+    Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+    Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+    Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+    Link: https://patch.msgid.link/daa513fbe8f0672b00bc5e026e4399244be6dc72.1789594774.git.ashish.kalra@amd.com
+
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index 1fecd246ce5f..94754f2986d3 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -19,6 +19,7 @@
+ #include <linux/iommu.h>
+ #include <linux/amd-iommu.h>
+ #include <linux/nospec.h>
++#include <linux/workqueue.h>
+ 
+ #include <asm/sev.h>
+ #include <asm/processor.h>
+@@ -124,7 +125,27 @@ static void *rmp_bookkeeping __ro_after_init;
+ 
+ static u64 probed_rmp_base, probed_rmp_size;
+ 
+-static phys_addr_t rmpopt_pa_start;
++static u64 rmpopt_pa_start, rmpopt_pa_end;
++
++enum rmpopt_op_type {
++	RMPOPT_OP_VERIFY_AND_REPORT_STATUS,
++	RMPOPT_OP_REPORT_STATUS
++};
++
++static struct workqueue_struct *rmpopt_wq;
++static struct delayed_work rmpopt_delayed_work;
++
++/* Software RMPOPT facilities initialized */
++static bool rmpopt_soft_init;
++
++/*
++ * Delay, in milliseconds, before the RMP re-optimization pass runs after an
++ * SNP guest is torn down. This coalesces a burst of teardowns into a single
++ * scan and gives each guest's pages time to be converted back to the shared,
++ * hypervisor-owned state.  The 10 second value is a heuristic trading
++ * re-optimization latency against scanning too eagerly.
++ */
++#define RMPOPT_WORK_TIMEOUT	(10 * MSEC_PER_SEC)
+ 
+ static LIST_HEAD(snp_leaked_pages_list);
+ static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
+@@ -565,6 +586,9 @@ void snp_shutdown(void)
+ 	if (syscfg & MSR_AMD64_SYSCFG_SNP_EN)
+ 		return;
+ 
++	if (rmpopt_soft_init)
++		cancel_delayed_work_sync(&rmpopt_delayed_work);
++
+ 	clear_rmp();
+ 	on_each_cpu(mfd_reconfigure, NULL, 1);
+ 
+@@ -577,21 +601,80 @@ void snp_shutdown(void)
+ }
+ EXPORT_SYMBOL_FOR_MODULES(snp_shutdown, "ccp");
+ 
+-static bool rmpopt_capable(void)
++/*
++ * RMPOPT optimizations skip RMP checks at 1GB granularity if this range of
++ * memory does not contain any SNP guest memory.
++ *
++ * @pa is a system physical address; RMPOPT operates on the containing 1GB.
++ */
++static void rmpopt(u64 pa)
+ {
+-	return cpu_feature_enabled(X86_FEATURE_RMPOPT) &&
+-	       cc_platform_has(CC_ATTR_HOST_SEV_SNP);
++	enum rmpopt_op_type op = RMPOPT_OP_VERIFY_AND_REPORT_STATUS;
++	u64 pa_start = ALIGN_DOWN(pa, SZ_1G);
++
++	/* Supported by binutils 2.48+ */
++	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
++		     :: "a" (pa_start), "c" (op)
++		     : "memory", "cc");
++}
++
++static void rmpopt_scan_range(void *arg)
++{
++	u64 pa;
++
++	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
++		rmpopt(pa);
+ }
+ 
++static void do_rmpopt_work(struct work_struct *work)
++{
++	/*
++	 * Warm up the RMPOPT cache on this pinned per-CPU worker with interrupts
++	 * enabled, so the IRQ-disabled fan-out below only issues cache-hit RMPOPTs.
++	 */
++	rmpopt_scan_range(NULL);
++
++	on_each_cpu_mask(cpu_primary_thread_mask, rmpopt_scan_range, NULL, true);
++}
++
++static int __init rmpopt_init(void)
++{
++	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
++		return -ENODEV;
++
++	rmpopt_wq = alloc_workqueue("rmpopt_wq", WQ_PERCPU, 1);
++	if (!rmpopt_wq) {
++		pr_err("Failed to allocate RMPOPT workqueue\n");
++		return -ENOMEM;
++	}
++
++	INIT_DELAYED_WORK(&rmpopt_delayed_work, do_rmpopt_work);
++
++	/* The optimization range is fixed at boot; compute it once. */
++	rmpopt_pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), SZ_1G);
++	rmpopt_pa_end = ALIGN(PFN_PHYS(max_pfn), SZ_1G);
++	if ((rmpopt_pa_end - rmpopt_pa_start) > SZ_2T)
++		rmpopt_pa_end = rmpopt_pa_start + SZ_2T;
++
++	rmpopt_soft_init = true;
++
++	return 0;
++}
++device_initcall(rmpopt_init);
++
+ void snp_enable_rmpopt(void)
+ {
+ 	u64 base;
+ 	int cpu;
+ 
+-	if (!rmpopt_capable())
++	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
+ 		return;
+ 
+-	rmpopt_pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), SZ_1G);
++	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
++		return;
++
++	if (!rmpopt_soft_init)
++		return;
+ 
+ 	/*
+ 	 * Per-CPU RMPOPT tables cover at most 2 TB.  Program each core's
+@@ -602,6 +685,11 @@ void snp_enable_rmpopt(void)
+ 		for_each_cpu(cpu, cpu_primary_thread_mask)
+ 			wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE,
+ 				      rmpopt_pa_start | MSR_AMD64_RMPOPT_ENABLE);
++
++	mod_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
++			 msecs_to_jiffies(RMPOPT_WORK_TIMEOUT));
++
++	pr_info("RMPOPT optimizations enabled\n");
+ }
+ EXPORT_SYMBOL_FOR_MODULES(snp_enable_rmpopt, "ccp");
+ 
+
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
