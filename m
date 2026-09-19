@@ -1,148 +1,135 @@
-Received: from avas.easytechitalia.it (avas.easytechitalia.it [213.217.29.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AD930C35F
-	for <linux-crypto@vger.kernel.org>; Sat, 19 Sep 2026 18:45:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.217.29.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99C338C427
+	for <linux-crypto@vger.kernel.org>; Sat, 19 Sep 2026 19:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789843548; cv=none; b=h/XHEChNoHFvFLOT0oHRhvBmqIIfzAGNNwO7P40lNi/4ermvwD9M6xuZN4keQEgCmMuU+VIFe86y5hwYDyL7rqYf5g+2anYIItRCNCz/U25R/zZ6bB3PIn59glWUnkKsb6qAGsAuqtLfvSRh60WO9Ws9TFM9yQA7aBvpY6EX1TU=
+	t=1789845889; cv=none; b=HgAPvzCPD/7gzMfdGkK7rSGNn0+LX9Fo1FEduHipJjt94OgnPOfYZN8dxvbQJgtUjsW2q0ofIqRgjBu2/lLRg1+vluWj45t67GLwJVhFCqVbUENNmrlhaC37KA+6ejWum0CfYEnSLIPFdUf0y+tRUyf7JwQckexbv2aMZlx95/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789843548; c=relaxed/simple;
-	bh=R2Mo+UgBqV0dWzbulE+3yjKN4Ntmw2os42k+rkFPXAI=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=liTARRPEA6qi80fo90E6Dj3txjPynDo1I6RxJ68jbfQyfHZgJnk+SqAkHSeqiP5vzlOy+GaJlP8sDfMyXYn2t9Y4VsvJ3ABOBZ8+TnsBjaEZ7oZeUJLuX6LStsvBogNEl8g13Erb4xXnNyQqIaJ1D9uE1kegnxNS9IDNIAP7fxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mtsistemi.it; spf=pass smtp.mailfrom=mtsistemi.it; dkim=fail (0-bit key) header.d=mtsistemi.it header.i=@mtsistemi.it header.b=rQxOyugW reason="key not found in DNS"; arc=none smtp.client-ip=213.217.29.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mtsistemi.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mtsistemi.it
+	s=arc-20240116; t=1789845889; c=relaxed/simple;
+	bh=v8aIwwPu+ykUe2DVOsCMtMaDklWrhQYLetu6xwVJq0s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eMnaVRbqw6JdfoxbstydgMbcLBUaEq4L70DxWUSjSHFl+KvZ4AqSsjOIAOmvZzNfx41ajEtfvcXC6SypEHUVQrcegTHc+LyM1asTyYLmx3vCWJ4nIgbhERyf+AqN+EprLPQrej9j9PeOPSoC1kVkUUy406jxIk5w6trfa2xtxjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AapVF8P5; arc=none smtp.client-ip=74.125.225.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mtsistemi.it header.i=@mtsistemi.it header.b="rQxOyugW"
-X-Envelope-From: <info@mtsistemi.it>
-Received: from ngmx.easytechitalia.it (unknown [185.76.140.216])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by avas.easytechitalia.it (Postfix) with ESMTPS id 4hnJ7d5rP8zGnv5;
-	Sat, 19 Sep 2026 20:34:53 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by ngmx.easytechitalia.it (Postfix) with ESMTP id 33E4017E25E;
-	Sat, 19 Sep 2026 20:33:25 +0200 (CEST)
-Received: from ngmx.easytechitalia.it ([127.0.0.1])
- by localhost (ngmx.easytechitalia.it [127.0.0.1]) (amavis, port 10032)
- with ESMTP id MMTqyVLzRtdD; Sat, 19 Sep 2026 20:33:24 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by ngmx.easytechitalia.it (Postfix) with ESMTP id 9BF1B17ABF9;
-	Sat, 19 Sep 2026 20:33:24 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 ngmx.easytechitalia.it 9BF1B17ABF9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mtsistemi.it;
-	s=AD82E3E6-03E3-11EF-83D2-AF8217D6D3C6; t=1789842804;
-	bh=o+KwHlOthShvmiCl3k6m4C5GiY5wjp/+Zq9ttfn+FWQ=;
-	h=From:To:Date:Message-ID:MIME-Version;
-	b=rQxOyugWxwLJQpoEwAvxg6/HJXu2hTHe8X0UOwNcxTi09BCo1DvSX2ufKn58lhws4
-	 p8/MOPhLqSH2ExUQCDkWb4K2tNEVwrLTVx6cOCm56vRFUU0Xp3hQ+Nl7wdSB+uBBEB
-	 9l++IvR7cIg+pf7DP+ouS00OMlAOczjvSa6pfrAuOMnEVQIWQIs3Q7Y3PWlJvN2E8f
-	 lfCJbvLeN2Y4FK3MqTqGE99O7pWwoi6VKmpyndW9YKjCtv5mhl1S1GqBGMJXWzmRj9
-	 hzx6loenW5+T70tN2jsA4qtSK1ISp2kPnST4D0LDGyWRs7CeRBIHWBqO1zWi9b6yn2
-	 JMNBZQApJPZEQ==
-X-Virus-Scanned: amavis at ngmx.easytechitalia.it
-Received: from ngmx.easytechitalia.it ([127.0.0.1])
- by localhost (ngmx.easytechitalia.it [127.0.0.1]) (amavis, port 10026)
- with ESMTP id cvm2jRk9SHgF; Sat, 19 Sep 2026 20:33:24 +0200 (CEST)
-Received: from [192.168.56.1] (93-38-124-109.ip70.fastwebnet.it [93.38.124.109])
-	by ngmx.easytechitalia.it (Postfix) with ESMTPSA id 2134717C481;
-	Sat, 19 Sep 2026 20:33:24 +0200 (CEST)
-From: Mattia Tadini <info@mtsistemi.it>
-To: Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- David S. Miller <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/3] crypto: ccp - two PSP init fixes, and the AMD BC-250
-Date: Sat, 19 Sep 2026 20:34:50 +0200
-Message-ID: <178984289056.12336.17662860552012704364@mtsistemi.it>
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AapVF8P5"
+Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49cd38e0f79so10224445e9.3
+        for <linux-crypto@vger.kernel.org>; Sat, 19 Sep 2026 12:24:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789845886; x=1790450686; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=gf8kv8NIScq3SH2S6osm1YMVG98TGrAQ704A6bF98Zw=;
+        b=AapVF8P5dphgczHfbjROX/KkV/6lvIR/Mguec+Pjl4230fBmMwekjXd+3vobBgaUqZ
+         lwe+Avf+DPtj+x4UsJweh5KMA+coDf5QgroOhDNZcDq6Uh4Ss4xF6MRgfIDL8QBaDIMq
+         bAXLD6XmDFKgZnSzkg2WhM/oMkqpBrvAa9+DNzqfEtbJIE7M2HSLXK4y8LiIxhn7BGKy
+         wQPseBz8wJBe1KeoDXwULSbzUFHrnV8pOux0UgP+uK9l01vbcC5Gi1Ri+EHtLOCqrI9g
+         IsS6HM83K6TlF9XHSmv1fLxcAfCtMTlG7xjtX14lbA7XM6CBUjJ9HOeQQ4lI3arNMeTl
+         s4dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789845886; x=1790450686;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=gf8kv8NIScq3SH2S6osm1YMVG98TGrAQ704A6bF98Zw=;
+        b=h/M8hYKGyPBhkcj+Ttuxgo379CSTzlGnO6oNsM/8cbVxxcHdN9FgoOB3s1BGJxjV3f
+         nXFzVEeL2Ir1pdIV0cumBYzy29EZoUBDDG0Yo94W7rPDrO2qYf0bIDr6B4jdOCUQN79A
+         FciBk1SxCwhBA7PYem4bK0bVlty49/ET9wWbFtQUbZHYx6Ew7ZI6H7S1i5DCYvSnv+LQ
+         XXnZebxIiE7g98ANV5fMV9Czvo4bFRgYFyl570X4Dw0kJTdPzUb4/mCvoryfaQDpCRFt
+         n+FEOPzDV0XLJo5QGjm8VZUJhCUj4ftyawZL6HZddY94hoqIZk7xtev8vv2QxWHfKIOQ
+         rFIg==
+X-Forwarded-Encrypted: i=1; AKwUvByaDqeFuJWfW9Xcb3orlwFy8NPa5ZJ9dvfuWc5YNIzAnl+zATakJ8kOxnb2IiFVxzOnp0gKkCxl7MaTTJo=@vger.kernel.org
+X-Gm-Message-State: AFuF++lwbVB0cUeCjRPEevEbuEqGeZZ4BrFZjiWMdv2nGE5k3P3L6MDw
+	I5TQZsxn6wbYzkpNRXAakMHXUgufrigfnxyBjOG+8AP4EAztIxKj8VWg
+X-Gm-Gg: AYBFou3CsNpiCQmvpOHXL/zm5oYJlzHahtmv9D3BBf35TGaq6JXPz5VyxVZn3AZWcXJ
+	CZE5YoO5wvBX2lSoJEMTBGLUQBxARK7ydLm58MrQfGFK6PCM1BbU1PIZ926THpgCooz6pCicb9+
+	TPhnPXBDj50NNw3EYZ87rAgWR4cqTzYnz7zSkkVZAGLWoR6PODfFWSHcPFTABnCH5TbTpYVxEQb
+	i0ns/DOUgNL6TSlZkg3WDg5rkEU3Qs8TZKcSk3159eryAwRBLuZMKC+TudjOtC74r48KS7CtThb
+	+fRO0VKy5yuj9YHwiCNoRvKCVma7WxaLAQJwn3vYJmu4CsUCpMGFWam2DGOdC5juuag4rml8LuA
+	ANDOOW4cclWCM7MDELeMcyyoDI0SdJjf4EyL2hw6zkeQTrKRIQ3ST03Af368soYx/8ZpJbMlvVI
+	+cw+yEXNoB33DPRXPtpyL0prB2KPyh53oY92/abtbGLp8HPpyAnSSQWcZ/R85oSwH5v5Qo2HYox
+	xxruGaEi+amGX7addxyFxdFTWyjDv+xvai6EKz5gYxunNiunq4=
+X-Received: by 2002:a05:600c:83cf:b0:49f:ce78:3562 with SMTP id 5b1f17b1804b1-49fce783698mr26147265e9.19.1789845885850;
+        Sat, 19 Sep 2026 12:24:45 -0700 (PDT)
+Received: from fedora ([202.47.63.86])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fcd03fe55sm114499505e9.2.2026.09.19.12.24.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Sep 2026 12:24:45 -0700 (PDT)
+From: Muhammad Bilal <meatuni001@gmail.com>
+To: herbert@gondor.apana.org.au
+Cc: thomas.lendacky@amd.com,
+	john.allen@amd.com,
+	davem@davemloft.net,
+	bp@alien8.de,
+	ashish.kalra@amd.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Muhammad Bilal <meatuni001@gmail.com>
+Subject: [PATCH] crypto: ccp - fix SFS ioctl race against device teardown
+Date: Sun, 20 Sep 2026 00:24:32 +0500
+Message-ID: <20260919192432.272680-1-meatuni001@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Easytech-Libra-ESVA-Information: Please contact Easytech S.r.l. for more information
-X-Easytech-Libra-ESVA-ID: 4hnJ7d5rP8zGnv5
-X-Easytech-Libra-ESVA: No virus found
-X-Easytech-Libra-ESVA-From: info@mtsistemi.it
-X-Easytech-Libra-ESVA-Watermark: 1790447694.54802@OjOy4rxSYV1m75hqwSwamA
+Content-Transfer-Encoding: 8bit
 
-The AMD BC-250 is a Zen 2 APU board (Cyan Skillfish) sold as surplus mini=
-ng
-hardware and now used as a small desktop by a fair number of people. It c=
-arries
-an AMD Secure Processor at PCI 1022:143e that sp_pci_table[] does not mat=
-ch, so
-the device has always been left unbound with its memory windows disabled.
+sfs_ioctl() reads psp_master->sfs_data and caches it in sfs_dev before
+taking sfs_ioctl_mutex, while sfs_dev_destroy() frees sfs_dev->page
+and sfs_dev->command_buf with no locking at all and only clears
+psp->sfs_data afterwards. A call to sfs_ioctl() that reads sfs_data
+just before sfs_dev_destroy() runs will still acquire the mutex and
+go on to use the now-freed command buffer in send_sfs_cmd().
 
-Adding the ID turned out to need two fixes first, both of the same shape:=
- the
-driver decides what to bring up from the hardware capability register alo=
-ne,
-and then uses the psp_vdata pointers for those features without checking =
-that
-this device has them. On this board the two disagree, because the firmwar=
-e
-advertises a TEE whose ring never comes up.
+Have both functions take sfs_ioctl_mutex before touching
+psp->sfs_data, so a call that is already using sfs_dev completes
+before teardown can free it, and a call arriving after teardown sees
+sfs_data cleared and returns -ENODEV instead of racing it.
 
-Patch 1 is a NULL pointer dereference in the sysfs is_visible callback. I=
-t
-oopses during probe. It needs no new hardware to be reachable in principl=
-e:
-any device whose firmware sets the TEE capability bit while its psp_vdata
-carries no tee data hits it, which today means pspv1 and pspv2 parts. I h=
-ave
-only observed it on the BC-250, so I have not added a stable tag - please=
- add
-one if you think it deserves it.
+Fixes: 648dbccc03a0 ("crypto: ccp - Add AMD Seamless Firmware Servicing (SFS) driver")
+Signed-off-by: Muhammad Bilal <meatuni001@gmail.com>
+---
+ drivers/crypto/ccp/sfs.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Patch 2 stops a failed optional sub-device from taking down the rest of t=
-he
-PSP. Without it, a psp_vdata that deliberately omits TEE gets nothing at =
-all,
-platform access included.
-
-Patch 3 adds the board. The register layout was read off the device rathe=
-r
-than assumed, and the numbers are in the commit message.
-
-Tested on a BC-250 running 7.2.6. Before:
-
-  01:00.2 Encryption controller: AMD Device 143e
-          Memory at fe700000 [disabled] [size=3D1M]
-          Memory at fe884000 [disabled] [size=3D8K]
-          (no driver)
-
-After:
-
-  ccp 0000:01:00.2: enabling device (0000 -> 0002)
-  ccp 0000:01:00.2: platform access enabled
-  ccp 0000:01:00.2: psp enabled
-  # cat /sys/bus/pci/devices/0000:01:00.2/bootloader_version
-  00.1c.01.02
-
-with the platform mailbox answering commands. Dynamic boost control is pr=
-obed
-and cleanly rejected by this firmware, and HSTI reports nothing because t=
-he
-security reporting capability bit is clear. There is no CCP crypto engine
-behind this function: the version register at 0x100 reads back all ones.
-
-The series is against v7.2.6 and touches only drivers/crypto/ccp/.
-
-Mattia Tadini (3):
-  crypto: ccp - fix NULL dereference in psp_firmware_is_visible()
-  crypto: ccp - do not start PSP sub-devices without their vdata
-  crypto: ccp - add support for the AMD BC-250 secure processor
-
- drivers/crypto/ccp/psp-dev.c |  8 ++++++--
- drivers/crypto/ccp/sp-pci.c  | 24 +++++++++++++++++++++++-
- 2 files changed, 29 insertions(+), 3 deletions(-)
-
---=20
+diff --git a/drivers/crypto/ccp/sfs.c b/drivers/crypto/ccp/sfs.c
+index a4777839790b..530141f8bc74 100644
+--- a/drivers/crypto/ccp/sfs.c
++++ b/drivers/crypto/ccp/sfs.c
+@@ -111,13 +111,13 @@ static long sfs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+ 	struct sfs_device *sfs_dev;
+ 	int ret = 0;
+ 
++	guard(mutex)(&sfs_ioctl_mutex);
++
+ 	if (!psp_master || !psp_master->sfs_data)
+ 		return -ENODEV;
+ 
+ 	sfs_dev = psp_master->sfs_data;
+ 
+-	guard(mutex)(&sfs_ioctl_mutex);
+-
+ 	switch (cmd) {
+ 	case SFSIOCFWVERS:
+ 		dev_dbg(sfs_dev->dev, "in SFSIOCFWVERS\n");
+@@ -191,8 +191,11 @@ static void sfs_exit(struct kref *ref)
+ 
+ void sfs_dev_destroy(struct psp_device *psp)
+ {
+-	struct sfs_device *sfs_dev = psp->sfs_data;
++	struct sfs_device *sfs_dev;
++
++	guard(mutex)(&sfs_ioctl_mutex);
+ 
++	sfs_dev = psp->sfs_data;
+ 	if (!sfs_dev)
+ 		return;
+ 
+-- 
 2.55.0
 
