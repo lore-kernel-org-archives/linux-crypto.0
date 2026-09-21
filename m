@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2653537F8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21653537FE;
 	Mon, 21 Sep 2026 05:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789967765; cv=none; b=a6TEFlCgFpAiFpciAdVwYzNALq51oGS8BR4U0pXfLus2UKtPJ+G38SxXRQB7dxri4sFeavKE1TQ8GtbEYSZwoYMhF1hG84d2yQl5E2nhHkt0hHIKAgn0Wot6xPn958GogJotPBYrwFQVWzX3ZpHVTanWvHhMtkWKZlQl5lxaP5o=
+	t=1789967765; cv=none; b=RzKehFglIcYv3zF0kXM0sD0PNfKODH2ri2OSDoEYSzMdXobMXh5Q0VrnCJyXgcYrU38bAh+p6jfvmLcBVX4beP4L9pFIMvOfDd/K6rMEw0i43KdC9n4VOcVlJ6QMhSgmfaLJYyRlMD8QplqMNwIHjGFXJ0cPTeosNmsk3cWoWA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789967765; c=relaxed/simple;
-	bh=RwxCBj7ekpK4lIJCz+FRLVi2BM5o8rtZWYTF5vkL+eU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U4JdVz8Q8IcbvuOghCA3h9jfeUqcUFkSja8z7/OZUokTlzCybn7v1vpNgEdAsbWCVdIEmDh0CLl672v9CFp7ubxCeg4wHMuVR/TOPI3BuU1HOb2xeI8QEW1d0sdSQGew30KMxP9lgNbs9yZ7gWOkS7V8nu32BsR9Fn/LSGJmptA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SzHFdbW5; arc=none smtp.client-ip=100.103.45.18
+	bh=auzSsUIFvJG2EtKpLFfnXxHUxfbBKvMt0g7pXMc4uvk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nq7DaxoSemlYLyGeWqpnxUrcyPhgex1ojnXiUranvKBnMNWLZytEfh6pM6ZwIgzRz6nFo2xgj52IPsl/Y/1R6WM1Cza4CASZMLxzBb2nPYfvPWLFQiAfOFdDFWHM9r6Rjf1gk2AS7M+7iK2ld+m9G8Ly/6m0S7tBnw9D205MK8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzCfrKiN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SzHFdbW5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2319E1F000FF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzCfrKiN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8024D1F0089A;
 	Mon, 21 Sep 2026 05:16:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1789967763;
-	bh=qA1Ngc5R1c/XW8ryKGj2jFVjIRydVBq4U46bwGQ8ckw=;
-	h=From:To:Cc:Subject:Date;
-	b=SzHFdbW5HhOKhEH0gK7x4kemk2gUkrJzUQibnxaxO3vR04CVAhvkLwkhskDsL2tep
-	 4TJu77VCIkbRexn3pWixdiZPuP4hOngzzwCPAqvSVRhFxfqnO/SojTI9yYrfAkRgGY
-	 mTtA2K86p6HAonE/z7Dv0ba5RfqYOgxPMs3kIvjJYX5iUOU9KWFoUiiDjMk9lashYD
-	 CoXgRsOCF1GlcSiZtBgVeTvR9LGFY86q+TfLOKwCfpn3qh40r9RbRUHXJN0QtcUxqJ
-	 Lm3A+EDD9nWEzhdyuGIGsZbKN1ylnjmly1p2Y7YVQBo4MjQyR3vCnW3/wkFojQ2FDq
-	 9Ir89ZxwUXDEw==
+	bh=AmO1iCgpFBbB/kyTIAKSaYWoXnvuk8nhmmPYC4t0U3A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=KzCfrKiN5xbJknA8Z0bxouu+q1rvnE+ICUiYxL1KzsYDKbiThtDeVNj6Pug2wVWh8
+	 jvwoWf7N+iOtxzCecOjlRNAtu+GBhAlTo5I/AB//qkzjSt3+o5bRwJH9Fo6/ggqSET
+	 UWvp0IP55uxzUJugC7Gnv8xWCLhPa1UyxWMWa9fESruk15RUksMcoGCT+Y/AGDefHO
+	 gA5qf06iF45qh3WU3q3EfS0iRJtYiPwoWoAg6w1FCP1FfirkOLeOmCU4N/GjhKivxJ
+	 mfJoP1wInFh1wph6XccqJSKEgEJjAeUDLfxXvlS2VlMNGZMtq1JNLxDpFnpscTtJRi
+	 /GVM6fPV+CRiQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -34,10 +35,12 @@ Cc: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
 	linux-riscv@lists.infradead.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 00/20] Migrate x86 and RISC-V accelerated AES modes into library
-Date: Sun, 20 Sep 2026 22:08:46 -0700
-Message-ID: <20260921050910.296144-1-ebiggers@kernel.org>
+Subject: [PATCH 01/20] crypto: aes - Fix undesired override of some optimized AES modes
+Date: Sun, 20 Sep 2026 22:08:47 -0700
+Message-ID: <20260921050910.296144-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260921050910.296144-1-ebiggers@kernel.org>
+References: <20260921050910.296144-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,90 +49,112 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series applies to v7.3-rc3.  It can also be retrieved from:
+The new library APIs for AES encryption modes were wired up to the
+traditional crypto API via crypto/aes.c.  However, for now the kernel is
+still in a transitional state where various architectures still have
+architecture-optimized implementations of AES modes in arch/*/crypto/,
+wired up to the traditional crypto API only.  Because of that, the
+crypto/aes.c algorithms were given a cra_priority of only 110 to prevent
+them from overriding arch/*/crypto/ in the traditional crypto API.
 
-    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-lib-x86-riscv-v1
+However, because of how the traditional crypto API works, the
+cra_priority trick doesn't work in cases where the relevant algorithm
+isn't directly implemented by arch/*/crypto/ but rather is provided by a
+template instance using other code in arch/*/crypto/.
 
-Patch 1 is intended to be taken through libcrypto-fixes for 7.3.
-Patches 2-20 are intended to be taken through libcrypto-next for 7.4.
+For example, x86 doesn't have its own "ccm(aes)" but rather relies on
+the "ccm" template constructing it from the x86-optimized "ctr(aes)".
+The existence of the library-based "ccm(aes)" prevents that, even though
+its priority is lower than what the template would produce.
 
-This series migrates the x86 and RISC-V accelerated implementations of
-the AES modes ECB, CBC, CTS, CTR, XCTR, and XTS into lib/crypto/.
+Thus, "ccm(aes)" ends up using the slower single-block AES code.
 
-This makes the corresponding library APIs be properly accelerated on
-these architectures, while still accelerating crypto_skcipher as well
-(via the library-based code in crypto/aes.c).
+Of course, this problem will go away as architecture-optimized
+implementations of AES modes are migrated into the library.  But until
+then, we need to ensure that code continues to be used.
 
-It removes a lot of redundant glue code, since crypto API boilerplate no
-longer needs to be duplicated per-architecture.
+Therefore, skip wiring up the relevant library-based code to the
+traditional crypto API on architectures where this problem can occur, as
+determined by what exists in arch/*/crypto/ for each architecture.
 
-Finally, it fixes the longstanding issue where these optimizations were
-disabled by default.
+Note: "xts(aes)" is left alone.  Though the "xts" template can use
+"ecb(aes)" as an inner algorithm, in practice this isn't very efficient
+and a dedicated "xts(aes)" is already provided in all the important
+cases anyway.  (This omission is also consistent with the fact that the
+library isn't planned to provide a similar ECB-to-XTS "adapter".)
 
-In the case of RISC-V, this series handles all remaining AES code in
-arch/riscv/crypto/.  In the case of x86, AES-GCM is still left in
-arch/x86/crypto/ for now; it will be handled later.  Other architectures
-will be handled later as well.
+Fixes: 20df21a482aa ("crypto: aes - Add CBC and CBC-CTS support using library")
+Fixes: 8ca62072faa1 ("crypto: aes - Add GCM support using library")
+Fixes: f70ad727d1d6 ("crypto: aes - Add CCM support using library")
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ crypto/aes.c | 39 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 36 insertions(+), 3 deletions(-)
 
-For various reasons, aesni-intel_asm.S (i.e. the x86-accelerated ECB,
-CBC, CTS, CTR, and XTS code that doesn't use AVX or VAES) is replaced
-with new functions written from scratch.  The other assembly functions
-are kept but are modified slightly for integration into the library.
-
-Eric Biggers (20):
-  crypto: aes - Fix undesired override of some optimized AES modes
-  lib/crypto: aes-xctr: Pass counter by value to aes_xctr_arch()
-  lib/crypto: x86/aes: Clean up aes-aesni.S in preparation for AES modes
-  lib/crypto: x86/aes-ecb: Add AES-NI optimization
-  lib/crypto: x86/aes-cbc: Add AES-NI optimization
-  lib/crypto: x86/aes-ctr: Add AES-NI optimization
-  lib/crypto: x86/aes-xts: Add AES-NI optimization
-  crypto: x86/aes-ecb - Remove superseded ECB skcipher
-  crypto: x86/aes-cbc - Remove superseded CBC skciphers
-  crypto: x86/aes-ctr - Remove superseded CTR skcipher
-  crypto: x86/aes-xts - Remove superseded XTS skcipher
-  lib/crypto: x86/aes-ctr: Migrate AVX-optimized code into library
-  lib/crypto: x86/aes-xts: Migrate AVX-optimized code into library
-  crypto: x86/aes - Drop superseded 32-bit build support
-  lib/crypto: riscv/aes: Copy aes-macros.S to library
-  lib/crypto: riscv/aes: Pass key struct to assembly code
-  lib/crypto: riscv/aes-ecb: Migrate optimized code into library
-  lib/crypto: riscv/aes-cbc: Migrate optimized code into library
-  lib/crypto: riscv/aes-ctr: Migrate optimized code into library
-  lib/crypto: riscv/aes-xts: Migrate optimized code into library
-
- arch/riscv/crypto/Kconfig                     |   15 -
- arch/riscv/crypto/Makefile                    |    4 -
- arch/riscv/crypto/aes-riscv64-glue.c          |  566 -------
- arch/riscv/crypto/aes-riscv64-zvkned.S        |  312 ----
- arch/x86/crypto/Kconfig                       |   11 +-
- arch/x86/crypto/Makefile                      |    8 +-
- arch/x86/crypto/aesni-intel_asm.S             | 1338 -----------------
- arch/x86/crypto/aesni-intel_glue.c            |  789 +---------
- crypto/aes.c                                  |   53 +-
- lib/crypto/Makefile                           |   14 +
- lib/crypto/aes.c                              |    6 +-
- .../crypto => lib/crypto/riscv}/aes-macros.S  |   25 +-
- .../riscv}/aes-riscv64-zvkned-zvbb-zvkg.S     |   96 +-
- .../crypto/riscv}/aes-riscv64-zvkned-zvkb.S   |   23 +-
- lib/crypto/riscv/aes-riscv64-zvkned.S         |  311 +++-
- lib/crypto/riscv/aes.h                        |  235 ++-
- lib/crypto/x86/aes-aesni.S                    |  823 +++++++++-
- .../crypto/x86}/aes-ctr-avx-x86_64.S          |   75 +-
- .../crypto/x86}/aes-xts-avx-x86_64.S          |  172 +--
- lib/crypto/x86/aes.h                          |  371 ++++-
- 20 files changed, 1824 insertions(+), 3423 deletions(-)
- delete mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
- delete mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.S
- delete mode 100644 arch/x86/crypto/aesni-intel_asm.S
- rename {arch/riscv/crypto => lib/crypto/riscv}/aes-macros.S (90%)
- rename {arch/riscv/crypto => lib/crypto/riscv}/aes-riscv64-zvkned-zvbb-zvkg.S (75%)
- rename {arch/riscv/crypto => lib/crypto/riscv}/aes-riscv64-zvkned-zvkb.S (93%)
- rename {arch/x86/crypto => lib/crypto/x86}/aes-ctr-avx-x86_64.S (92%)
- rename {arch/x86/crypto => lib/crypto/x86}/aes-xts-avx-x86_64.S (81%)
-
-
-base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
+diff --git a/crypto/aes.c b/crypto/aes.c
+index 94791f481e98..e6ba3899d868 100644
+--- a/crypto/aes.c
++++ b/crypto/aes.c
+@@ -637,7 +637,17 @@ static struct skcipher_alg skcipher_algs[] = {
+ 		.decrypt = crypto_aes_cbc_decrypt,
+ 	},
+ #endif
+-#if IS_ENABLED(CONFIG_CRYPTO_CTS)
++#if IS_ENABLED(CONFIG_CRYPTO_CTS) && \
++	/*
++	 * Skip registering this when it might block a "better" implementation
++	 * from being instantiated via the "cts" template wrapping an arch-
++	 * optimized "cbc(aes)" that hasn't yet been migrated into the library.
++	 */ \
++	!(IS_ENABLED(CONFIG_ARM) || \
++	  IS_ENABLED(CONFIG_ARM64) || \
++	  IS_ENABLED(CONFIG_POWERPC) || \
++	  IS_ENABLED(CONFIG_S390) || \
++	  IS_ENABLED(CONFIG_SPARC))
+ 	{
+ 		.base.cra_name = "cts(cbc(aes))",
+ 		.base.cra_driver_name = "cts-cbc-aes-lib",
+@@ -980,7 +990,18 @@ static __maybe_unused int crypto_aes_ccm_decrypt(struct aead_request *req)
+ }
+ 
+ static struct aead_alg aead_algs[] = {
+-#if IS_ENABLED(CONFIG_CRYPTO_GCM)
++#if IS_ENABLED(CONFIG_CRYPTO_GCM) && \
++	/*
++	 * Skip registering these when they might block "better" implementations
++	 * from being instantiated via the corresponding templates using
++	 * arch-optimized code that hasn't yet been migrated into the library.
++	 */ \
++	!(IS_ENABLED(CONFIG_ARM) || \
++	  IS_ENABLED(CONFIG_ARM64) || \
++	  IS_ENABLED(CONFIG_POWERPC) || \
++	  IS_ENABLED(CONFIG_RISCV) || \
++	  IS_ENABLED(CONFIG_S390) || \
++	  IS_ENABLED(CONFIG_SPARC))
+ 	{
+ 		.base.cra_name = "gcm(aes)",
+ 		.base.cra_driver_name = "gcm-aes-lib",
+@@ -1012,7 +1033,19 @@ static struct aead_alg aead_algs[] = {
+ 		.chunksize = AES_BLOCK_SIZE,
+ 	},
+ #endif /* CONFIG_CRYPTO_GCM */
+-#if IS_ENABLED(CONFIG_CRYPTO_CCM)
++#if IS_ENABLED(CONFIG_CRYPTO_CCM) && \
++	/*
++	 * Skip registering this when it might block a "better" implementation
++	 * from being instantiated via the "ccm" template wrapping an arch-
++	 * optimized "ctr(aes)" that hasn't yet been migrated into the library.
++	 */ \
++	!(IS_ENABLED(CONFIG_ARM) || \
++	  IS_ENABLED(CONFIG_ARM64) || \
++	  IS_ENABLED(CONFIG_POWERPC) || \
++	  IS_ENABLED(CONFIG_RISCV) || \
++	  IS_ENABLED(CONFIG_S390) || \
++	  IS_ENABLED(CONFIG_SPARC) || \
++	  IS_ENABLED(CONFIG_X86))
+ 	{
+ 		.base.cra_name = "ccm(aes)",
+ 		.base.cra_driver_name = "ccm-aes-lib",
 -- 
 2.55.0
 
