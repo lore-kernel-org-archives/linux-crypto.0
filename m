@@ -1,83 +1,43 @@
-Received: from mail-pj2-f15.google.com (mail-pj2-f15.google.com [74.125.227.143])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0613EEAE7
-	for <linux-crypto@vger.kernel.org>; Sun, 20 Sep 2026 23:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2653537F8;
+	Mon, 21 Sep 2026 05:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789948373; cv=none; b=Wf2PA/UPwluterRrSPo7MzRL8RS1as2sK1DfXDm3AcGRqmwXWu+slGk3Vpe4I+BifIrneW8LG25Mp/d4O93ttWunrAgkqH6nnSvNL3mqPL7loLfqFG0Gt6zE2SYpcd4HRxDPG4jTq7mIZGSbylWQ+R61rPHMMMwMJ7M32e6kPjs=
+	t=1789967765; cv=none; b=a6TEFlCgFpAiFpciAdVwYzNALq51oGS8BR4U0pXfLus2UKtPJ+G38SxXRQB7dxri4sFeavKE1TQ8GtbEYSZwoYMhF1hG84d2yQl5E2nhHkt0hHIKAgn0Wot6xPn958GogJotPBYrwFQVWzX3ZpHVTanWvHhMtkWKZlQl5lxaP5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789948373; c=relaxed/simple;
-	bh=DdpNXSidQFvpDfBnNgiQM+SzaBF2RjrrqFZBe/ypr34=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JE77qykKn2g08yI+hlOpB1ttw99we3fuCYRc6mCnXuSF7j4o8h1ENjUaCUB20y4+qHStRtmOzI46Bwf+lLNqI/0e3XD2f9VcK2NQfuWwtipev4fUjLnqZdjE+dt9f1bUYbCMfCREM64uA8NR12bovHp8T1EYyzwRbLCc+0pxdPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nLv2VGgm; arc=none smtp.client-ip=74.125.227.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789967765; c=relaxed/simple;
+	bh=RwxCBj7ekpK4lIJCz+FRLVi2BM5o8rtZWYTF5vkL+eU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U4JdVz8Q8IcbvuOghCA3h9jfeUqcUFkSja8z7/OZUokTlzCybn7v1vpNgEdAsbWCVdIEmDh0CLl672v9CFp7ubxCeg4wHMuVR/TOPI3BuU1HOb2xeI8QEW1d0sdSQGew30KMxP9lgNbs9yZ7gWOkS7V8nu32BsR9Fn/LSGJmptA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SzHFdbW5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLv2VGgm"
-Received: by mail-pj2-f15.google.com with SMTP id d9443c01a7336-2d747f01363so19941215ad.2
-        for <linux-crypto@vger.kernel.org>; Sun, 20 Sep 2026 16:52:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789948371; x=1790553171; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=EhakzEdE29nOvUv7Mc+RF2KlaAe5CVApdx8H1znJCcg=;
-        b=nLv2VGgmk6Q6nXxfqY7Ao+KrEk825hmRWaoLUbtWv6u5xhgHMoqMuf5HOfhqeppUQ8
-         A4XN3ipB4tj1lEhSz94rw7UvnRTXtySFTqVY09FlNPVnOqJjFvVHl+qCW884RfynCZVS
-         8cuaCi0q7AT5pOcLUflSA3JdlAYWv0YajB6AfPYwivD158DDG1OPRAQLCE8lhyzbdT9x
-         djQUVGWfTS0sO9GqbYsYjdDuZCt1xuIqgC423QaW/T3d5TzIrRrBMdfsnKGnAPQscmX8
-         HbystK3PXtI2ygYKPWd8yznqj/ZwGKFlV9gk+/8TYRmWITCRkJbsC8PTIwo8JEx1/6Xf
-         UqqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789948371; x=1790553171;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=EhakzEdE29nOvUv7Mc+RF2KlaAe5CVApdx8H1znJCcg=;
-        b=iJfXIkQ4d2/vw+BW5RvOZcEH4rG7YdK8V5MbRTs6IY6towVOIg0sP1JWE0koBfyiVy
-         zpgmMC65HgX/0KNQQFkIqXAmLNszmwieJNQYEg37ecKW6GhEC8YfGE4i/F+lfmhCHf3f
-         FTHy2QkqX1ictbmJk/web3++k+ei6gW55Chj0l908WccZFuT5pw7IVmNyylLsQ5nf//p
-         tYq50uNEiC5MqKcZWXDf66ZH1spm7SZMsXOnC2bpXAjCM0VMTTI1JbgoC1uBjps/wrG6
-         CwrR88QQZIf3+acRISI9OEdYLRh+dtMJxKKEfd8LnmhQ50hq6Qzf1XAeqPqOrdOakCm7
-         9HOw==
-X-Forwarded-Encrypted: i=1; AKwUvBy7/xWHKCPL4yXnOqJQcFDo8g4jjrnmpc9HMy1YT92gzMbI6Hk0UHxBOwwhKNdk/2et9IvU3a2ww8s63ys=@vger.kernel.org
-X-Gm-Message-State: AFuF++k0NcQFKunyUel7GCcDjYJL2roF7C/boOo13nU7wAqxGh39jwcP
-	Yorzq1is4KhWb3sXoevyefuV4bVXOtdv6Ac9lii8D4jmMWZwbO+obEjl
-X-Gm-Gg: AYBFou0/OQcdSbENDm8bYpTSZ9DiT8pA+mcSCC+VB1rrN3My/vCnLp3PuN0RGP+KCgM
-	+NnDBm3tbF1xb2mLED3LPZuAXDTWRk8ZzOMqIewpYLokWiZs+pib1VzsbptM8BhSzRF2cErsLmZ
-	k3WDfxsnvp34UEqsY1VnFWjpD+dUxZKUL/IkEg7FSGaaKP2Hnzb6MNkYmiQuyMoBvVtwtXFpoiJ
-	M02cyr9wMSwYAXaPU7fIq5CbgRf203e13+S1wRsSMFCcf7xp0VM4Pe/6+0oVFN5fBl6IOBFsRfc
-	IADgXkBW5CWzbWBKSrrtnlDMVruoAZ/T4SxTzh5QSlziTuCdNzHFnTQ2UpYl0a2UpqCB6R96KUj
-	iImJu3vd1Fl16z0wmpxM1la+T7CablMrZlv/iqg6Fdyj2srf+W7W4A3IG04HAjAGd8ExK2G8bgU
-	9t6Yv9sqRJ2J/hS5RNq2Ij03kV2nvXYylWS/X0DJ4EtpHTGdUQAY0/nslKnojTwnmTlsKmXZ85R
-	mPixfx+v2rrvAtPR+Dqwuv3zQzx1ZtvEE4vfjRz73xo8ZEdc0s7LW4v2FeIIlOJbfe5oYus6Pdx
-	gHXlPEhjBh4p5f3lubk7
-X-Received: by 2002:a17:903:2c0c:b0:2dd:b3e0:850 with SMTP id d9443c01a7336-2ddb3e008d2mr126436425ad.17.1789948370862;
-        Sun, 20 Sep 2026 16:52:50 -0700 (PDT)
-Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ddc1788173sm24228375ad.19.2026.09.20.16.52.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Sep 2026 16:52:50 -0700 (PDT)
-From: Hui Peng <benquike@gmail.com>
-To: David Howells <dhowells@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Paul Moore <paul@paul-moore.com>,
-	keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hui Peng <benquike@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] certs: x509: duplicate cert->tbs when sig->algo_takes_data is set
-Date: Sun, 20 Sep 2026 23:52:49 +0000
-Message-ID: <20260920235249.260530-1-benquike@gmail.com>
-X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
-In-Reply-To: <CAHC9VhS7sZQaPaRswKQ1ETrReEPB2f5buNAMGSXqZ1iBKTs+bg@mail.gmail.com>
-References: <20260919223438.3883567-1-benquike@gmail.com> <CAHC9VhS7sZQaPaRswKQ1ETrReEPB2f5buNAMGSXqZ1iBKTs+bg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SzHFdbW5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2319E1F000FF;
+	Mon, 21 Sep 2026 05:16:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789967763;
+	bh=qA1Ngc5R1c/XW8ryKGj2jFVjIRydVBq4U46bwGQ8ckw=;
+	h=From:To:Cc:Subject:Date;
+	b=SzHFdbW5HhOKhEH0gK7x4kemk2gUkrJzUQibnxaxO3vR04CVAhvkLwkhskDsL2tep
+	 4TJu77VCIkbRexn3pWixdiZPuP4hOngzzwCPAqvSVRhFxfqnO/SojTI9yYrfAkRgGY
+	 mTtA2K86p6HAonE/z7Dv0ba5RfqYOgxPMs3kIvjJYX5iUOU9KWFoUiiDjMk9lashYD
+	 CoXgRsOCF1GlcSiZtBgVeTvR9LGFY86q+TfLOKwCfpn3qh40r9RbRUHXJN0QtcUxqJ
+	 Lm3A+EDD9nWEzhdyuGIGsZbKN1ylnjmly1p2Y7YVQBo4MjQyR3vCnW3/wkFojQ2FDq
+	 9Ir89ZxwUXDEw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	x86@kernel.org,
+	linux-riscv@lists.infradead.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 00/20] Migrate x86 and RISC-V accelerated AES modes into library
+Date: Sun, 20 Sep 2026 22:08:46 -0700
+Message-ID: <20260921050910.296144-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -86,97 +46,90 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In x509_get_sig_params(), when sig->algo_takes_data is true, sig->m is
-assigned (u8 *)cert->tbs with sig->m_free = false. However, cert->tbs
-points into the temporary ASN.1 buffer (prep->data) passed to
-x509_cert_parse(), while cert->sig is retained in
-prep->payload.data[asym_auth] by x509_key_preparse() after prep->data
-is freed by the caller. Subsequent signature verification on the key's
-public_key_signature dereferences the freed TBS buffer.
+This series applies to v7.3-rc3.  It can also be retrieved from:
 
-Duplicate cert->tbs with kmemdup() and set sig->m_free = true so sig->m
-remains valid for the lifetime of struct public_key_signature.
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-lib-x86-riscv-v1
 
-Tested in QEMU against Linux 7.3.0-rc3 with KASAN enabled by adding an
-ML-DSA-44 (OID 2.16.840.1.101.3.4.3.17) X.509 certificate via
-add_key("asymmetric", ...) and linking it into a signature-restricted
-keyring via keyctl(KEYCTL_LINK), which triggers the following KASAN
-slab-use-after-free before this patch:
+Patch 1 is intended to be taken through libcrypto-fixes for 7.3.
+Patches 2-20 are intended to be taken through libcrypto-next for 7.4.
 
-  BUG: KASAN: slab-use-after-free in mldsa_verify+0x95/0xa0 [mldsa]
-  Read of size 1 at addr ffff88800108c004 by task init/1
+This series migrates the x86 and RISC-V accelerated implementations of
+the AES modes ECB, CBC, CTS, CTR, XCTR, and XTS into lib/crypto/.
 
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x70/0xa0
-   print_report+0x153/0x4c6
-   kasan_report+0xf1/0x120
-   mldsa_verify+0x95/0xa0 [mldsa]
-   public_key_verify_signature+0x5cb/0x8e0
-   verify_signature+0xe4/0x130
-   key_or_keyring_common+0x428/0x850
-   key_link+0x22e/0x360
-   keyctl_keyring_link+0x6b/0xc0
-   __do_sys_keyctl+0x146/0x4f0
-   do_syscall_64+0xda/0x4b0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   </TASK>
+This makes the corresponding library APIs be properly accelerated on
+these architectures, while still accelerating crypto_skcipher as well
+(via the library-based code in crypto/aes.c).
 
-  Allocated by task 1:
-   kasan_save_stack+0x30/0x50
-   kasan_save_track+0x14/0x30
-   __kasan_kmalloc+0x7f/0x90
-   __kvmalloc_node_noprof+0x1c2/0x5b0
-   __do_sys_add_key+0x1c2/0x390
-   do_syscall_64+0xda/0x4b0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+It removes a lot of redundant glue code, since crypto API boilerplate no
+longer needs to be duplicated per-architecture.
 
-  Freed by task 1:
-   kasan_save_stack+0x30/0x50
-   kasan_save_track+0x14/0x30
-   kasan_save_free_info+0x3b/0x70
-   __kasan_slab_free+0x47/0x70
-   kfree+0x159/0x420
-   __do_sys_add_key+0x2b3/0x390
-   do_syscall_64+0xda/0x4b0
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Finally, it fixes the longstanding issue where these optimizations were
+disabled by default.
 
-  The buggy address belongs to the object at ffff88800108c000
-   which belongs to the cache kmalloc-4k of size 4096
-  The buggy address is located 4 bytes inside of
-   freed 4096-byte region [ffff88800108c000, ffff88800108d000)
+In the case of RISC-V, this series handles all remaining AES code in
+arch/riscv/crypto/.  In the case of x86, AES-GCM is still left in
+arch/x86/crypto/ for now; it will be handled later.  Other architectures
+will be handled later as well.
 
-Fixes: f3eccecd782d ("pkcs7: Allow the signing algo to do whatever digestion it wants itself")
-Cc: stable@vger.kernel.org
-Assisted-by: LLM
-Signed-off-by: Hui Peng <benquike@gmail.com>
----
-Changes in v2:
-- Dropped the net/netlabel/netlabel_calipso.c change, keeping only the
-  crypto/asymmetric_keys/x509_public_key.c fix.
-- Added the KASAN slab-use-after-free report and test description to the
-  commit message.
+For various reasons, aesni-intel_asm.S (i.e. the x86-accelerated ECB,
+CBC, CTS, CTR, and XTS code that doesn't use AVX or VAES) is replaced
+with new functions written from scratch.  The other assembly functions
+are kept but are modified slightly for integration into the library.
 
- crypto/asymmetric_keys/x509_public_key.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Eric Biggers (20):
+  crypto: aes - Fix undesired override of some optimized AES modes
+  lib/crypto: aes-xctr: Pass counter by value to aes_xctr_arch()
+  lib/crypto: x86/aes: Clean up aes-aesni.S in preparation for AES modes
+  lib/crypto: x86/aes-ecb: Add AES-NI optimization
+  lib/crypto: x86/aes-cbc: Add AES-NI optimization
+  lib/crypto: x86/aes-ctr: Add AES-NI optimization
+  lib/crypto: x86/aes-xts: Add AES-NI optimization
+  crypto: x86/aes-ecb - Remove superseded ECB skcipher
+  crypto: x86/aes-cbc - Remove superseded CBC skciphers
+  crypto: x86/aes-ctr - Remove superseded CTR skcipher
+  crypto: x86/aes-xts - Remove superseded XTS skcipher
+  lib/crypto: x86/aes-ctr: Migrate AVX-optimized code into library
+  lib/crypto: x86/aes-xts: Migrate AVX-optimized code into library
+  crypto: x86/aes - Drop superseded 32-bit build support
+  lib/crypto: riscv/aes: Copy aes-macros.S to library
+  lib/crypto: riscv/aes: Pass key struct to assembly code
+  lib/crypto: riscv/aes-ecb: Migrate optimized code into library
+  lib/crypto: riscv/aes-cbc: Migrate optimized code into library
+  lib/crypto: riscv/aes-ctr: Migrate optimized code into library
+  lib/crypto: riscv/aes-xts: Migrate optimized code into library
 
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 25cf8ac7f257..5c9165a83f91 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -53,9 +53,11 @@ int x509_get_sig_params(struct x509_certificate *cert)
- 
- 	if (sig->algo_takes_data) {
- 		/* The signature algorithm does whatever passes for hashing. */
--		sig->m = (u8 *)cert->tbs;
-+		sig->m = kmemdup(cert->tbs, cert->tbs_size, GFP_KERNEL);
-+		if (!sig->m)
-+			return -ENOMEM;
- 		sig->m_size = cert->tbs_size;
--		sig->m_free = false;
-+		sig->m_free = true;
- 		goto out;
- 	}
- 
+ arch/riscv/crypto/Kconfig                     |   15 -
+ arch/riscv/crypto/Makefile                    |    4 -
+ arch/riscv/crypto/aes-riscv64-glue.c          |  566 -------
+ arch/riscv/crypto/aes-riscv64-zvkned.S        |  312 ----
+ arch/x86/crypto/Kconfig                       |   11 +-
+ arch/x86/crypto/Makefile                      |    8 +-
+ arch/x86/crypto/aesni-intel_asm.S             | 1338 -----------------
+ arch/x86/crypto/aesni-intel_glue.c            |  789 +---------
+ crypto/aes.c                                  |   53 +-
+ lib/crypto/Makefile                           |   14 +
+ lib/crypto/aes.c                              |    6 +-
+ .../crypto => lib/crypto/riscv}/aes-macros.S  |   25 +-
+ .../riscv}/aes-riscv64-zvkned-zvbb-zvkg.S     |   96 +-
+ .../crypto/riscv}/aes-riscv64-zvkned-zvkb.S   |   23 +-
+ lib/crypto/riscv/aes-riscv64-zvkned.S         |  311 +++-
+ lib/crypto/riscv/aes.h                        |  235 ++-
+ lib/crypto/x86/aes-aesni.S                    |  823 +++++++++-
+ .../crypto/x86}/aes-ctr-avx-x86_64.S          |   75 +-
+ .../crypto/x86}/aes-xts-avx-x86_64.S          |  172 +--
+ lib/crypto/x86/aes.h                          |  371 ++++-
+ 20 files changed, 1824 insertions(+), 3423 deletions(-)
+ delete mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
+ delete mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.S
+ delete mode 100644 arch/x86/crypto/aesni-intel_asm.S
+ rename {arch/riscv/crypto => lib/crypto/riscv}/aes-macros.S (90%)
+ rename {arch/riscv/crypto => lib/crypto/riscv}/aes-riscv64-zvkned-zvbb-zvkg.S (75%)
+ rename {arch/riscv/crypto => lib/crypto/riscv}/aes-riscv64-zvkned-zvkb.S (93%)
+ rename {arch/x86/crypto => lib/crypto/x86}/aes-ctr-avx-x86_64.S (92%)
+ rename {arch/x86/crypto => lib/crypto/x86}/aes-xts-avx-x86_64.S (81%)
+
+
+base-commit: fd73f4a6659897191fa0d40695fe370925dd3780
 -- 
-2.47.3
+2.55.0
+
