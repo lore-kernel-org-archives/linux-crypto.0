@@ -1,77 +1,74 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A1947F2C6;
-	Tue, 22 Sep 2026 18:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EA840B36D;
+	Tue, 22 Sep 2026 18:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790100711; cv=none; b=W/zviPeVzno/3eN7SutOYZOvgW0ocmRcnwHdMgf2xdEPMDE3oAd6S+DdtYccbB61iL8vlN48tysP4MgyUgPxaYzm88D2HGK8aT8k09hMEidrR8amtNRfxxcFBJBgJd/JR33QggBBOL7vo961i1ZKEyyuk7Eyvx9Dj1Kb0blTc4k=
+	t=1790100716; cv=none; b=eDKMXYeUSbM1ySgCSY4XP792CXE84dgZcUwaRfwl6SIa1gQtiEIOgYT3dUVq/nPzWtHP8uq1RP07Yss++RjaaNIrWeOn5mU6xOKQ/cqG4TJDvPJ7dGtf61gA32n/Od3/qut5lfHGRMLA1kfvC2ZC6be7vNdsOcdCFJFVPmpfu1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790100711; c=relaxed/simple;
-	bh=dR6FCo+L/QkWk3dKyErZP2vzU3uNhD6loPTSwdYvDbM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fX4ZDNaIyoBRKz9RDkFqrgFal7MH8qAlczL4d6NGNzkO1adqNFiiGBexWKl7p20Pn8SZQEsd+xwnpID1Mzg43hrx01p3R5Y0LpohGAim4vd39uuVvH6PPq0fnKqF/4tlmoMzU3zMH2ghO4oSYY3lRLA8jNchquVAoDTdFYXfCqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CxEuc4z9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790100716; c=relaxed/simple;
+	bh=myufi8EwWAyN9B27OR5T4u0mb036GPQiGxI//ovO+hk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KRFu+GJaziTXpIDGZZja+jL6R5eYEbtsWqP+3a7KBvLcfwUqNxhhMDMWgtj6tXR8iF6Ew8LxTxgDLVVOj4oh0ED+gDMcYC38xg1ZCS2s9roZzAtr8MJ3MeMUAfMXWDWVcDnGeah22MRzYhTDjzVKCSLRMOjJgUJB8OrerGFe+Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7rA/AJy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CxEuc4z9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CC481F000FF;
-	Tue, 22 Sep 2026 18:11:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7rA/AJy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56D441F000FF;
+	Tue, 22 Sep 2026 18:11:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790100709;
-	bh=x9rRjorTTQ1NG8iXQLdD0SXMgi5+L77Za3fVFjVv25U=;
-	h=From:To:Cc:Subject:Date;
-	b=CxEuc4z9Kf7Ty64z41xnHnYUUSDYyHxAJC3yIkv3GP/H/3rS7mpVcbnQmrJ06g9Cx
-	 DwH6briJBcKoQrHJIEFvZeKPciBcTNBvv3k43ECvkb0PxEtqgU+fjCKUXw/f4ZrNCB
-	 275qAx2s85TmU2aO3MWTJTLZwi4GKC2fOcZsUDzGP3hfcF8xeIOyatrZKX2G4xs/sD
-	 jXDtd/ISxXPIzrRUfPr9DzC25otfRWFe4bQu+Gr6yyvr4FgumNNCqE/reDyCGTTGK8
-	 4qujWCIX/vlTVZSWLsQP37Ov5A1JoIg0qC5QRzQpi7VutZZ978BYHx20UFgu0IBukt
-	 unwEs9gAoge7Q==
+	s=k20260515; t=1790100715;
+	bh=SqCMu56BMSh7Q37nAtPjblJVasH6TThnAkMFB7AIc5c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=c7rA/AJywyqqfMlWM4AjsDv0klh1Du9Xl55afQzjKLekoRtuCLjISGCb/Oi7rih77
+	 oZYO0KBYV1SXrzz/JS+5d4Yc3p+oTMUjF8IGWoiL4YYdaeW4xW9+KwrrCUJZaV6+qR
+	 SCNJRg/KbigFLL7X1tzxx6sbn0CZZXa5zPm/7fevOsJLewAUsYUkKPlcrJk/4jl+fB
+	 tao6gb/5/ip6iYlxKn+6TF3HtC8KYKwUuYF2CEJlb0jo18IbsFoOfaK7k03ghiIYsS
+	 +dMy09dssDuHGV0lIyB4ZW/grwFxhGR8MLH8WGxDp7m4uKGOMLMTWPJOwiBAqdfztf
+	 XRp+vyUKqaVFA==
 From: Thorsten Blum <blum@kernel.org>
 To: Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Kees Cook <kees@kernel.org>,
-	Michael Buesch <mb@bu3sch.de>,
-	Andrew Morton <akpm@osdl.org>,
-	Jan Beulich <jbeulich@novell.com>,
-	Greg Kroah-Hartman <gregkh@suse.de>,
-	Chris Wright <chrisw@sous-sol.org>
+	Andrew Morton <akpm@linux-foundation.org>,
+	Prarit Bhargava <prarit@redhat.com>
 Cc: Thorsten Blum <blum@kernel.org>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] hwrng: intel - return -ENOMEM when ioremap() fails
-Date: Tue, 22 Sep 2026 20:11:01 +0200
-Message-ID: <20260922181102.67309-3-blum@kernel.org>
+Subject: [PATCH 2/2] hwrng: intel - return -ENOMEM when kmalloc_obj() fails
+Date: Tue, 22 Sep 2026 20:11:02 +0200
+Message-ID: <20260922181102.67309-4-blum@kernel.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260922181102.67309-3-blum@kernel.org>
+References: <20260922181102.67309-3-blum@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=788; i=blum@kernel.org; h=from:subject; bh=dR6FCo+L/QkWk3dKyErZP2vzU3uNhD6loPTSwdYvDbM=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmbjmxTOZKmnO5ixX/JbELAPvXMFSfX9/PHrjLxqFGxt X4+63t+RwkLgxgXg6yYIsuDWT9m+JbWVG4yidgJM4eVCWQIAxenAEzk8RuG//ExOd4toRWd6cmM HeLKrMGrH5b9itZgWrdf02XGm2caWgw/Jp+T/Z/0XWm1d4lphENk+9vNggK6MuEvGVU+Cu2RO8A MAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=712; i=blum@kernel.org; h=from:subject; bh=myufi8EwWAyN9B27OR5T4u0mb036GPQiGxI//ovO+hk=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmbjuxg67r4KM/AXXTL3E1rv+skPLn6sGRLTtHHnOSV9 dWHt94/11HKwiDGxSArpsjyYNaPGb6lNZWbTCJ2wsxhZQIZwsDFKQATebibkaF9R+UHY6e660+v Chgl7z39P+yGuqbbTpnlcTM0X6wLclRgZHi7SlH3zZbrOZfeMJbNCOi4sOGWV6mY2zqGTyvf5+9 P/MgIAA==
 X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
 
-intel_init_hw_struct() incorrectly returns -EBUSY when ioremap() fails.
-Return -ENOMEM instead.
+intel_rng_mod_init() incorrectly returns -ENODEV when kmalloc_obj()
+fails. Return -ENOMEM instead.
 
-Fixes: 641dd002d207 ("[PATCH] fix Intel RNG detection")
+Fixes: ee527cd3a20c ("Use stop_machine_run in the Intel RNG driver")
 Signed-off-by: Thorsten Blum <blum@kernel.org>
 ---
- drivers/char/hw_random/intel-rng.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/char/hw_random/intel-rng.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/char/hw_random/intel-rng.c b/drivers/char/hw_random/intel-rng.c
-index d24e747203c1..a4dd21a9de98 100644
+index a4dd21a9de98..f7f734881c68 100644
 --- a/drivers/char/hw_random/intel-rng.c
 +++ b/drivers/char/hw_random/intel-rng.c
-@@ -318,8 +318,8 @@ PFX "RNG, try using the 'no_fwh_detect' option.\n";
+@@ -349,6 +349,7 @@ static int __init intel_rng_mod_init(void)
+ 	intel_rng_hw = kmalloc_obj(*intel_rng_hw);
+ 	if (!intel_rng_hw) {
+ 		pci_dev_put(dev);
++		err = -ENOMEM;
+ 		goto out;
  	}
  
- 	intel_rng_hw->mem = ioremap(INTEL_FWH_ADDR, INTEL_FWH_ADDR_LEN);
--	if (intel_rng_hw->mem == NULL)
--		return -EBUSY;
-+	if (!intel_rng_hw->mem)
-+		return -ENOMEM;
- 
- 	return 0;
- }
