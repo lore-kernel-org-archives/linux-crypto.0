@@ -1,75 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0063264F9;
-	Tue, 22 Sep 2026 05:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBB641A563
+	for <linux-crypto@vger.kernel.org>; Tue, 22 Sep 2026 08:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790056347; cv=none; b=SOuDKBxgcrRCfX0Z2ovW//BmoX4Xdu63+SO0vrFU7cMmKl1x9YS68pJew3ru0h0rBzJEXwlskSlW3JXp0CVJIgpQagej0grQH9du5YPfV9aebeTB6UfD9Poo2bPfBbLU3azjpQdANP5rBu9wUHbRnx1DRgdPnyjqm7jOnT3+B8A=
+	t=1790065318; cv=none; b=BpCRMhEswNh856xEn/g3x+hBMN0rDGxXCzveX3L3nq6BdToPXM+I/YFQCAB8YqUNMDNkr2d2sJZpeV0rlsMT2hFUnzq6BzR4KYGpVhfdsyQsvPRVY7VWwXu/Jdum3tFX50pt9FOPhA92sJH5Jca85ARB1YSalc2Wxqlte4Y50qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790056347; c=relaxed/simple;
-	bh=RDwKLdBgQQO7mj0zEckeXeywAggCXVR5XKZyZA2JvwE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KqSgr5aAH35ONaOOVT7FAHGG6JVPQKcB4VinZS5fq5L2To85Fulcw7FtpQO/1TD/7FjmTsYF1NrUVZFffKme+vndD3wso67NUmndN2+OtoidCcOgnIAwLwbV7SqCvMWtkvJj4Jze0l7b8kus1kIcmBX35OSTxnpHeYKnHeTFrk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FaTu2i+c; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790065318; c=relaxed/simple;
+	bh=PmnKH7lV0V+JoK1QDyZ8ECRxYMKhaupXPZ4PEr3rUjM=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NGGScX68NpsFDIihbej2WbYsSljkqhfcGJgHNhs2eIUgrL6XsAMeg9XloEklKS6noqvB4J+IzbVysc8usmlgTPiLI6NkyW0uhVbIaLPPAjkKYnVTu4qaBv5cayzHy2iYIBODC6pbMVHihHe0Do6mqov8wZGc90ijJol8uq7W/qA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQ7zXqB1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FaTu2i+c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFD0B1F000FF;
-	Tue, 22 Sep 2026 05:52:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQ7zXqB1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65C311F0089B
+	for <linux-crypto@vger.kernel.org>; Tue, 22 Sep 2026 08:21:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790056346;
-	bh=As/vxWHhNUub4BNZFQs2kxwfn6UV/YUfsSwsyKwBmlg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FaTu2i+cS6F1a22YBgrRwP8TZ2qw9lyDsKZS7rCNunFtfJAlUg1FiMFL/8BXK6q/a
-	 KbDZBr3B8LU3/SKrjrOKMa1s9XlzFRjCGY6UsJq93yUqxY8nAl/ClB3wOo5mRksSwH
-	 89MnV4VcrllnxwvfJQAjFqVHNhLgemjNZ+wis+GrKUvboCCupVsAQji9vfrsGf9sP4
-	 CL6fhkpfyfOrt6Dp+8K/eqdwKthIVPENtHT69FVuWHUYiYNnEsnD+bZQ8h7Yg7J+Rn
-	 KOhgD2e5pCR7YUlkNWEwXlaBngtksHLyUxV8UGxCDXrWZyTSWThkStdSjyBe35ExzM
-	 PhPwnPp+wTFSQ==
-Date: Mon, 21 Sep 2026 22:52:24 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Karl Mehltretter <kmehltretter@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH 19/20] lib/crypto: riscv/aes-ctr: Migrate optimized code
- into library
-Message-ID: <20260922055224.GC14616@sol>
-References: <20260921050910.296144-1-ebiggers@kernel.org>
- <20260921050910.296144-20-ebiggers@kernel.org>
- <20260922054401.19194-1-kmehltretter@gmail.com>
+	s=k20260515; t=1790065317;
+	bh=1YdFqoWebSHijCdc5KahaV/EzBXGxPmzQ4XgDu5XncA=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=KQ7zXqB1j1Kf2ZEWYkrHF6LB9KuvaX0ak30Bhwb/gll99KnJZrpaL2ASNa/GPoiuJ
+	 7XoIMP9JRqk6LgcsOsW6OvJYk9FtIQ0ChdC5XBOZQUFHEuYY5nfdKjLifGox+85L/M
+	 1Dr+e+LUh9wPpdBzvsCpwJAn9FcwSI6nucVfmnT1Y71MrgpT13FmlDTgIJJ+N06aSh
+	 aezP9GBIJ1k80OC9zX1K4muzUcd61JwAU6aESh4FwwtJsoUR6PTTM5ZmsM4xo2Wk3T
+	 01AQjOJnlPCVdRsnFJzGHRePubrXKoGSXk2wpxiba8Btqt332SzgGDvzOiM6iWixJt
+	 HkyHew/0/Q2dw==
+Received: by mail-lr2-f12.google.com with SMTP id 38308e7fff4ca-3a5d4688decso38683881fa.2
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Sep 2026 01:21:57 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwDYWFJlDCODspnRxOlFouQNdQkhBUcQDX9faHQ3lvmYoHffTRPrlG+/2nyEqH4uaZOxOCJTyEdv4qmtE4=@vger.kernel.org
+X-Gm-Message-State: AFuF++knH8w5FlX6RhQX1ElRjDS6+3g2nrtOqVQtCh+DuAkNRNIMPIIb
+	TxFPRFhVNwPQYnG6Hmtvuhc7GoSbHgKpTqKXJI7W4Ktpg1TcH4dNa0TPzkZzBoZjrFXsCA3Wwaw
+	TqXWXTk9+eNnoeIee+zNH6PiLdhI/QIK5JxcdNLTOWw==
+X-Received: by 2002:a2e:a99d:0:b0:3a3:7682:499e with SMTP id
+ 38308e7fff4ca-3a5fc0a7d91mr32468651fa.19.1790065315994; Tue, 22 Sep 2026
+ 01:21:55 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 22 Sep 2026 01:21:54 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 22 Sep 2026 01:21:54 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <71cba843-1643-4f5e-9830-9e60b5f1c334@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260922054401.19194-1-kmehltretter@gmail.com>
+References: <20260921-qce-fix-self-tests-v8-0-107537869a72@oss.qualcomm.com>
+ <20260921-qce-fix-self-tests-v8-10-107537869a72@oss.qualcomm.com> <71cba843-1643-4f5e-9830-9e60b5f1c334@gmail.com>
+Date: Tue, 22 Sep 2026 01:21:54 -0700
+X-Gmail-Original-Message-ID: <CAMRc=MesPvie19NcaWmG6hM4zcT830JC2i9yWF6KmhqLHxyPCw@mail.gmail.com>
+X-Gm-Features: AcwNN1XHY68dvq7BbAnO76WN0R6Z1v7gC4G6geUb4OdqJjOqUYaJ5RfbVzMrXq8
+Message-ID: <CAMRc=MesPvie19NcaWmG6hM4zcT830JC2i9yWF6KmhqLHxyPCw@mail.gmail.com>
+Subject: Re: [PATCH v8 10/14] Revert "crypto: qce - Mark QCE as BROKEN"
+To: Demi Marie Obenour <demiobenour@gmail.com>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Stanimir Varbanov <svarbanov@mm-sol.com>, 
+	Eneas U de Queiroz <cotequeiroz@gmail.com>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
+	Eric Biggers <ebiggers@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+	Abel Vesa <abelvesa@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, brgl@kernel.org, 
+	linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 22, 2026 at 07:44:01AM +0200, Karl Mehltretter wrote:
-> On Sun, 20 Sep 2026 22:09:05 -0700 Eric Biggers <ebiggers@kernel.org> wrote:
-> > -// void aes_ctr32_crypt_zvkned_zvkb(const struct crypto_aes_ctx *key,
-> > -//				    const u8 *in, u8 *out, size_t len,
-> > -//				    u8 iv[16]);
-> > +// void aes_ctr32_crypt_zvkned_zvkb(u8 *dst, const u8 *src, u32 len, u8 iv[16],
-> > +//				    const struct aes_enckey *key);
-> >  SYM_FUNC_START(aes_ctr32_crypt_zvkned_zvkb)
-> 
-> isn't this a sign extension problem on rv64? The psABI sign-extends
-> 32-bit args, so for len >= 2G a2 comes in as 0xffffffff8xxxxxxx, and
-> the asm uses it as a 64-bit length as is.
-> 
-> That would run off the end of both buffers.
-> 
-> Nothing passes that much in one call today, but aes_ctr_arch() only
-> chunks down to 0xfffffff0 and aes_ctr() takes a size_t, so it is
-> allowed. The old prototype was size_t and the caller zero-extended.
+On Tue, 22 Sep 2026 07:42:28 +0200, Demi Marie Obenour
+<demiobenour@gmail.com> said:
+> On 9/21/26 08:58, Bartosz Golaszewski wrote:
+>>
+>>  config CRYPTO_DEV_QCE
+>> -	tristate "Qualcomm crypto engine accelerator"
+>> -	depends on (BROKEN && ARCH_QCOM) || COMPILE_TEST
+>> +	tristate "Qualcomm crypto engine offloader"
+>> +	depends on ARCH_QCOM || COMPILE_TEST
+>>  	depends on HAS_IOMEM
+>>  	help
+>> -	  This driver supports Qualcomm crypto engine accelerator
+>> -	  hardware. To compile this driver as a module, choose M here. The
+>> -	  module will be called qcrypto.
+>> +	  This driver supports Qualcomm crypto engine offloader hardware. To
+>> +	  compile this driver as a module, choose M here. The module will be
+>> +	  called qcrypto.
+>>
+>> -	  This driver does not have exclusive access to the
+>> -	  hardware, causing races with the secure world.  It
+>> -	  is also slower than the CPU.
+>> +	  NOTE: This driver does not have exclusive access to the hardware,
+>> +	  causing races with the secure world. It is also *slower* than the
+>> +	  CPU for the same algorithms. Use at your own risk!
+>
+> Would it make sense to clarify that this is only an issue if you pass
+> do_register_algos=1?  With do_register_algos=0 (the default), the
+> driver is perfectly safe (unless you made a mistake elsewhere) and
+> saves power, so most people want it on.
+>
+> Also, if I understand your previous messages correctly, Linux currently
+> doesn't use any of the features that would cause the races with the
+> secure world.
+>
 
-Yes, Sashiko found this too.  I'll probably make the assembly function
-continue to take size_t.
+Yeah, I guess it makes sense. Sashiko still says the series fails to apply, so
+I need to see with Herbert if he wants me to resend or if the change you're
+requesting should be a follow-up.
 
-- Eric
+Bart
