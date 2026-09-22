@@ -1,40 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA35445628F;
-	Tue, 22 Sep 2026 09:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2E048B37D
+	for <linux-crypto@vger.kernel.org>; Tue, 22 Sep 2026 09:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790069249; cv=none; b=rliydO15U4N0Eotgb/JG+tz44tu7RO2iWK0xeSzcIWDOYEAVkt8/WNZEezPQqhKl2LQiiKbNg8Sja8LU++5diPMVi4oeYT20auvcXlLeaxQCX0Q7ZazPdt2NBeluAjq7xZrr5ojBCJS8iNiJFXa0v0NirMLnTbNltwXmmteUeSU=
+	t=1790070567; cv=none; b=acH6qIv+ybTvpn2sec5LVLPXdvIH4vpClqkxdPw/EtOMwTHxHI9BuiSMtrmLG57xEtS2xprK993rI+zCQkuG60voaslN2kKDdkEheTJatDpvGLHAHf+/PUscdz1w/NnhEyrSQ1b+OnYVgG2G8NyqHEUb3tcgPFn00MvWIa2P3CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790069249; c=relaxed/simple;
-	bh=HpJa7NteA3anjJK0Gh8U7wyiuLd4yWFS0aG3ZQjT4Vo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aVbzorFnveqzx7Qg2EREpomPznAai8VXqztg3gsCypcqOIPpgFOS7loEkELyDB7EbKzQOceIh6dws/J/8ooAZ4g4Au9XMAaOqD9kjXv71zgLpQ9t9ateKENQyQNB9LpcMJUDCJ4y2EtW/v5KqPG+6+lDbGT36dn/R35VzwaRtaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KCWZigGs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790070567; c=relaxed/simple;
+	bh=VOWynYCsd67rgPjDByRfZ4zg9fiihl+g/isl0193F7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Ve8zJG/S41e3s5eM7el/cW6A8Veelili+SsMcWBn/8x/+BHCtmQJxNr/N2RsE2tiuejCrgZe7ystIiCFu78rlMYvwXUgkdaHZIPqYmHyxm5pquTHv1VH6TRSMS3yow0W0oh5hmy3ZkCKvjVz5oxqe+cQxAdtOh0gsdmhg3BeYqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=s55vITv4; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KCWZigGs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 903531F000FF;
-	Tue, 22 Sep 2026 09:27:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1790069247;
-	bh=jd/IdHJWT+tury6J4+3Ec3QcvTOjp339LQd8LtVieYg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=KCWZigGscaFX2Ksj0oDFvvEIQKPzh+wDUoQDy364G1GTj0VbBCLfQtUGi0jw5tqT0
-	 28P0CKRstYURwRNanLmX85OZkDaG2/KrfBo+e6u0+pO69MbCtPrk5NHbgNJnV550ok
-	 QJZ0yybs/U0ep7+4NQMBEkSyFB+/CZc6ffjovcNI=
-Date: Tue, 22 Sep 2026 11:21:33 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: qianweili <qianweili@huawei.com>
-Cc: herbert@gondor.apana.org.au, wangzhou1@hisilicon.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	huangchenghai2@huawei.com, liulongfang@huawei.com
-Subject: Re: [PATCH 1/2] uacce: add device usage sysfs interface
-Message-ID: <2026092205-wrist-growing-0f04@gregkh>
-References: <20260921075131.1062155-1-qianweili@huawei.com>
- <20260921075131.1062155-2-qianweili@huawei.com>
- <2026092125-define-unit-ac52@gregkh>
- <fd71cb7c-b9da-5cd9-c52e-ee287923073b@huawei.com>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="s55vITv4"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	Cc:To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=ONrBO7sbJmJreRCu4bK5GXzhOM5WXDtl4DgVmQqMHjQ=; b=s55vI
+	Tv4EssvzfYRL+1OI3bWRdJbQq9D6CRLCRCqcG5lyVKWPlsGish0CGJaknaZIaPsmoDnYZf1WnRliB
+	W8M+Zp9hEfOCE5/USQfdW7LQ1ex8BvOVhoMLUeqDBjz6VrUmI+Xfpa9c2V5DLm4S9U29K5aW5NqjZ
+	CfanSvAWrX3WG+b928kBVKHWTZkiL41dpnBOm8Bk9Y1N8QiuTxVj2NP9ouxRUwxZV1azHGchLGMKx
+	e8n2liZJLSKbahwwIbrSxF4iv/RS1dSTS0Zf9MK2L0RfS2TI3rM8tdB1DwhFhtMahOT2xqCsYGr/g
+	8RO4eZKMFCsmdEPl3NBvWTfv3Ke5Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x8x7m-0000000GawK-2LXT;
+	Tue, 22 Sep 2026 17:49:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 22 Sep 2026 19:49:18 +1000
+Date: Tue, 22 Sep 2026 19:49:18 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: T Pratham <t-pratham@ti.com>, "David S. Miller" <davem@davemloft.net>
+Subject: [PATCH] crypto: tcrypt - Avoid reading req->base after submission
+Message-ID: <arJPHqt-vgu8md57@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,109 +44,571 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fd71cb7c-b9da-5cd9-c52e-ee287923073b@huawei.com>
 
-On Tue, Sep 22, 2026 at 05:11:55PM +0800, qianweili wrote:
-> 
-> 
-> On 2026/9/21 16:12, Greg KH wrote:
-> > On Mon, Sep 21, 2026 at 03:51:30PM +0800, Weili Qian wrote:
-> > > Userspace has no way to query the runtime usage of a UACCE
-> > > device; it can only be inferred indirectly from queue state, which is
-> > > neither accurate nor uniform across drivers.
-> > > 
-> > > Add a read-only dev_usage sysfs attribute and a get_dev_usage callback
-> > > in struct uacce_ops. A driver implementing the callback writes the
-> > > current usage as a percentage (0-100) string into the caller-provided
-> > > buffer and returns the number of bytes written; dev_usage_show()
-> > > appends the trailing newline. The attribute is hidden via
-> > > uacce_dev_is_visible() when the driver does not provide the callback.
-> > > 
-> > > The corresponding ABI entry is added to Documentation/ABI/testing/
-> > > sysfs-driver-uacce.
-> > > 
-> > > Signed-off-by: Weili Qian <qianweili@huawei.com>
-> > > ---
-> > >   Documentation/ABI/testing/sysfs-driver-uacce |  9 +++++++++
-> > >   drivers/misc/uacce/uacce.c                   | 19 +++++++++++++++++++
-> > >   include/linux/uacce.h                        |  5 +++++
-> > >   3 files changed, 33 insertions(+)
-> > > 
-> > > diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
-> > > index d3f0b8f3c589..3e4af4c1e5a9 100644
-> > > --- a/Documentation/ABI/testing/sysfs-driver-uacce
-> > > +++ b/Documentation/ABI/testing/sysfs-driver-uacce
-> > > @@ -55,3 +55,12 @@ Date:           Feb 2020
-> > >   KernelVersion:  5.7
-> > >   Contact:        linux-accelerators@lists.ozlabs.org
-> > >   Description:    Size (bytes) of dus region queue file
-> > > +
-> > > +What:           /sys/class/uacce/<dev_name>/dev_usage
-> > > +Date:           Sep 2026
-> > > +KernelVersion:  7.3
-> > That's not going to happen here :(
-> I'll change it to 7.4 in the next version.
-> > 
-> > > +Contact:        linux-accelerators@lists.ozlabs.org
-> > > +Description:    (R) Current usage of the device, reported as a driver-defined
-> > > +                string of up to PAGE_SIZE - 1 bytes. Usage is expressed as a
-> > > +                percentage (0-100). The attribute is hidden if the driver does
-> > > +                not implement the get_dev_usage callback.
-> > > diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-> > > index 45521d4a56d1..545ba35a590b 100644
-> > > --- a/drivers/misc/uacce/uacce.c
-> > > +++ b/drivers/misc/uacce/uacce.c
-> > > @@ -433,6 +433,20 @@ static ssize_t isolate_strategy_store(struct device *dev, struct device_attribut
-> > >   	return count;
-> > >   }
-> > > +static ssize_t dev_usage_show(struct device *dev, struct device_attribute *attr, char *buf)
-> > > +{
-> > > +	struct uacce_device *uacce = to_uacce_device(dev);
-> > > +	int ret;
-> > > +
-> > > +	ret = uacce->ops->get_dev_usage(uacce, buf, PAGE_SIZE - 1);
-> > Why can't you use sysfs_emit()?  That way you don't have to worry about
-> > PAGE_SIZE, and you don't have to do:
-> > 
-> > > +	if (ret < 0)
-> > > +		return ret;
-> > > +
-> > > +	buf[ret++] = '\n';
-> > That type of thing :(
-> > 
-> > Also, you got your math wrong above :(
-> sysfs_emit() is useful when the framework side knows the format string
-> upfront.  Here get_dev_usage is a driver callback that dynamically
-> generates content -- the format is not known to the framework, so
-> there is no format string to emit.  Having the callback write into a
-> temporary buffer and then sysfs_emit(buf, "%s", tmp) in the show
-> function would just add an unnecessary copy without gaining the
-> overflow protection that sysfs_emit normally provides.
+Once a request has been submitted to the Crypto API, the value
+of req->base.data must not be read by the caller as it may change
+while the request is processed.
 
-Then that is going to be a mess, sysfs files should be in a consistant
-way, don't have random formats for the same filename depending on random
-hardware types.  Use different sysfs files if you want to do that.
+Avoid reading it in tcrypt by combining the crypto_wait struct
+with the request object into a tcrypt request object and pass that
+around instead of the request object.
 
-And this is just going to be a single value, nothing complex, so why do
-you need a callback for that?
+Reported-by: T Pratham <t-pratham@ti.com>
+Fixes: beb63da739f7 ("crypto: tcrypt - Add speed tests for async hashing")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-> But you're right that the manual newline append and the PAGE_SIZE - 1
-> math were unnecessary.  In the next version I'll rework the callback
-> contract so the driver writes the complete output (including any
-> trailing newlines) and dev_usage_show() just returns the callback
-> result directly:
-> 
->     static ssize_t dev_usage_show(struct device *dev,
->                                   struct device_attribute *attr, char *buf)
->     {
->         struct uacce_device *uacce = to_uacce_device(dev);
-> 
->         return uacce->ops->get_dev_usage(uacce, buf, PAGE_SIZE);
-
-Why not have the get_dev_usage() return the value that you want to write
-to the buffer, and then use sysfs_emit() to write it?  Then no need to
-worry about PAGE_SIZE at all.
-
-thanks,
-
-greg k-h
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 61a2501bfe9b..e6834bdde9b9 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -56,6 +56,21 @@
+  */
+ #define get_driver_name(tfm_type, tfm) crypto_tfm_alg_driver_name(tfm_type ## _tfm(tfm))
+ 
++struct tcrypt_aead_request {
++	struct aead_request *req;
++	struct crypto_wait wait;
++};
++
++struct tcrypt_ahash_request {
++	struct ahash_request *req;
++	struct crypto_wait wait;
++};
++
++struct tcrypt_skcipher_request {
++	struct skcipher_request *req;
++	struct crypto_wait wait;
++};
++
+ /*
+  * Used by test_cipher_speed()
+  */
+@@ -129,18 +144,15 @@ static void sg_init_aead(struct scatterlist *sg, char *xbuf[XBUFSIZE],
+ 		sg_set_buf(&sg[k + 1], xbuf[k], rem);
+ }
+ 
+-static inline int do_one_aead_op(struct aead_request *req, int ret)
++static inline int do_one_aead_op(struct tcrypt_aead_request *req, int ret)
+ {
+-	struct crypto_wait *wait = req->base.data;
+-
+-	return crypto_wait_req(ret, wait);
++	return crypto_wait_req(ret, &req->wait);
+ }
+ 
+ struct test_mb_aead_data {
+ 	struct scatterlist sg[XBUFSIZE];
+ 	struct scatterlist sgout[XBUFSIZE];
+-	struct aead_request *req;
+-	struct crypto_wait wait;
++	struct tcrypt_aead_request req;
+ 	char *xbuf[XBUFSIZE];
+ 	char *xoutbuf[XBUFSIZE];
+ 	char *axbuf[XBUFSIZE];
+@@ -154,14 +166,14 @@ static int do_mult_aead_op(struct test_mb_aead_data *data, int enc,
+ 	/* Fire up a bunch of concurrent requests */
+ 	for (i = 0; i < num_mb; i++) {
+ 		if (enc == ENCRYPT)
+-			rc[i] = crypto_aead_encrypt(data[i].req);
++			rc[i] = crypto_aead_encrypt(data[i].req.req);
+ 		else
+-			rc[i] = crypto_aead_decrypt(data[i].req);
++			rc[i] = crypto_aead_decrypt(data[i].req.req);
+ 	}
+ 
+ 	/* Wait for all requests to finish */
+ 	for (i = 0; i < num_mb; i++) {
+-		rc[i] = crypto_wait_req(rc[i], &data[i].wait);
++		rc[i] = crypto_wait_req(rc[i], &data[i].req.wait);
+ 
+ 		if (rc[i]) {
+ 			pr_info("concurrent request %d error %d\n", i, rc[i]);
+@@ -310,21 +322,21 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
+ 		}
+ 
+ 	for (i = 0; i < num_mb; ++i) {
+-		data[i].req = aead_request_alloc(tfm, GFP_KERNEL);
+-		if (!data[i].req) {
++		data[i].req.req = aead_request_alloc(tfm, GFP_KERNEL);
++		if (!data[i].req.req) {
+ 			pr_err("alg: aead: Failed to allocate request for %s\n",
+ 			       algo);
+ 			while (i--)
+-				aead_request_free(data[i].req);
++				aead_request_free(data[i].req.req);
+ 			goto out_free_xoutbuf;
+ 		}
+ 	}
+ 
+ 	for (i = 0; i < num_mb; ++i) {
+-		crypto_init_wait(&data[i].wait);
+-		aead_request_set_callback(data[i].req,
++		crypto_init_wait(&data[i].req.wait);
++		aead_request_set_callback(data[i].req.req,
+ 					  CRYPTO_TFM_REQ_MAY_BACKLOG,
+-					  crypto_req_done, &data[i].wait);
++					  crypto_req_done, &data[i].req.wait);
+ 	}
+ 
+ 	pr_info("testing speed of multibuffer %s (%s) %s\n", algo,
+@@ -386,16 +398,16 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
+ 					     bs + (enc ? authsize : 0),
+ 					     assoc, aad_size);
+ 
+-				aead_request_set_ad(cur->req, aad_size);
++				aead_request_set_ad(cur->req.req, aad_size);
+ 
+ 				if (!enc) {
+ 
+-					aead_request_set_crypt(cur->req,
++					aead_request_set_crypt(cur->req.req,
+ 							       cur->sgout,
+ 							       cur->sg,
+ 							       bs, iv);
+-					ret = crypto_aead_encrypt(cur->req);
+-					ret = do_one_aead_op(cur->req, ret);
++					ret = crypto_aead_encrypt(cur->req.req);
++					ret = do_one_aead_op(&cur->req, ret);
+ 
+ 					if (ret) {
+ 						pr_err("calculating auth failed (%d)\n",
+@@ -404,7 +416,7 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
+ 					}
+ 				}
+ 
+-				aead_request_set_crypt(cur->req, cur->sg,
++				aead_request_set_crypt(cur->req.req, cur->sg,
+ 						       cur->sgout, bs +
+ 						       (enc ? 0 : authsize),
+ 						       iv);
+@@ -432,7 +444,7 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
+ 
+ out:
+ 	for (i = 0; i < num_mb; ++i)
+-		aead_request_free(data[i].req);
++		aead_request_free(data[i].req.req);
+ out_free_xoutbuf:
+ 	for (i = 0; i < num_mb; ++i)
+ 		testmgr_free_buf(data[i].xoutbuf);
+@@ -450,9 +462,10 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
+ 	kfree(iv);
+ }
+ 
+-static int test_aead_jiffies(struct aead_request *req, int enc,
++static int test_aead_jiffies(struct tcrypt_aead_request *treq, int enc,
+ 				int blen, int secs)
+ {
++	struct aead_request *req = treq->req;
+ 	unsigned long start, end;
+ 	int bcount;
+ 	int ret;
+@@ -460,9 +473,9 @@ static int test_aead_jiffies(struct aead_request *req, int enc,
+ 	for (start = jiffies, end = start + secs * HZ, bcount = 0;
+ 	     time_before(jiffies, end); bcount++) {
+ 		if (enc)
+-			ret = do_one_aead_op(req, crypto_aead_encrypt(req));
++			ret = do_one_aead_op(treq, crypto_aead_encrypt(req));
+ 		else
+-			ret = do_one_aead_op(req, crypto_aead_decrypt(req));
++			ret = do_one_aead_op(treq, crypto_aead_decrypt(req));
+ 
+ 		if (ret)
+ 			return ret;
+@@ -473,8 +486,9 @@ static int test_aead_jiffies(struct aead_request *req, int enc,
+ 	return 0;
+ }
+ 
+-static int test_aead_cycles(struct aead_request *req, int enc, int blen)
++static int test_aead_cycles(struct tcrypt_aead_request *treq, int enc, int blen)
+ {
++	struct aead_request *req = treq->req;
+ 	unsigned long cycles = 0;
+ 	int ret = 0;
+ 	int i;
+@@ -482,9 +496,9 @@ static int test_aead_cycles(struct aead_request *req, int enc, int blen)
+ 	/* Warm-up run. */
+ 	for (i = 0; i < 4; i++) {
+ 		if (enc)
+-			ret = do_one_aead_op(req, crypto_aead_encrypt(req));
++			ret = do_one_aead_op(treq, crypto_aead_encrypt(req));
+ 		else
+-			ret = do_one_aead_op(req, crypto_aead_decrypt(req));
++			ret = do_one_aead_op(treq, crypto_aead_decrypt(req));
+ 
+ 		if (ret)
+ 			goto out;
+@@ -496,9 +510,9 @@ static int test_aead_cycles(struct aead_request *req, int enc, int blen)
+ 
+ 		start = get_cycles();
+ 		if (enc)
+-			ret = do_one_aead_op(req, crypto_aead_encrypt(req));
++			ret = do_one_aead_op(treq, crypto_aead_encrypt(req));
+ 		else
+-			ret = do_one_aead_op(req, crypto_aead_decrypt(req));
++			ret = do_one_aead_op(treq, crypto_aead_decrypt(req));
+ 		end = get_cycles();
+ 
+ 		if (ret)
+@@ -520,6 +534,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 			    unsigned int tcount, u8 authsize,
+ 			    unsigned int aad_size, u8 *keysize)
+ {
++	struct tcrypt_aead_request treq;
+ 	unsigned int i, j;
+ 	struct crypto_aead *tfm;
+ 	int ret = -ENOMEM;
+@@ -535,7 +550,6 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 	char *axbuf[XBUFSIZE];
+ 	const int *b_size;
+ 	unsigned int iv_len;
+-	struct crypto_wait wait;
+ 
+ 	iv = kzalloc(MAX_IVLEN, GFP_KERNEL);
+ 	if (!iv)
+@@ -577,7 +591,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 		goto out_noreq;
+ 	}
+ 
+-	crypto_init_wait(&wait);
++	crypto_init_wait(&treq.wait);
+ 	pr_info("testing speed of %s (%s) %s\n", algo,
+ 		get_driver_name(crypto_aead, tfm), e);
+ 
+@@ -587,9 +601,10 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 		       algo);
+ 		goto out_noreq;
+ 	}
++	treq.req = req;
+ 
+ 	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				  crypto_req_done, &wait);
++				  crypto_req_done, &treq.wait);
+ 
+ 	i = 0;
+ 	do {
+@@ -650,7 +665,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 				 */
+ 				aead_request_set_crypt(req, sgout, sg,
+ 						       bs, iv);
+-				ret = do_one_aead_op(req,
++				ret = do_one_aead_op(&treq,
+ 						     crypto_aead_encrypt(req));
+ 
+ 				if (ret) {
+@@ -665,11 +680,11 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 					       iv);
+ 
+ 			if (secs) {
+-				ret = test_aead_jiffies(req, enc, bs,
++				ret = test_aead_jiffies(&treq, enc, bs,
+ 							secs);
+ 				cond_resched();
+ 			} else {
+-				ret = test_aead_cycles(req, enc, bs);
++				ret = test_aead_cycles(&treq, enc, bs);
+ 			}
+ 
+ 			if (ret) {
+@@ -709,23 +724,22 @@ static void test_hash_sg_init(struct scatterlist *sg)
+ 	}
+ }
+ 
+-static inline int do_one_ahash_op(struct ahash_request *req, int ret)
++static inline int do_one_ahash_op(struct tcrypt_ahash_request *treq, int ret)
+ {
+-	struct crypto_wait *wait = req->base.data;
+-
+-	return crypto_wait_req(ret, wait);
++	return crypto_wait_req(ret, &treq->wait);
+ }
+ 
+-static int test_ahash_jiffies_digest(struct ahash_request *req, int blen,
+-				     char *out, int secs)
++static int test_ahash_jiffies_digest(struct tcrypt_ahash_request *treq,
++				     int blen, char *out, int secs)
+ {
++	struct ahash_request *req = treq->req;
+ 	unsigned long start, end;
+ 	int bcount;
+ 	int ret;
+ 
+ 	for (start = jiffies, end = start + secs * HZ, bcount = 0;
+ 	     time_before(jiffies, end); bcount++) {
+-		ret = do_one_ahash_op(req, crypto_ahash_digest(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_digest(req));
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -736,28 +750,29 @@ static int test_ahash_jiffies_digest(struct ahash_request *req, int blen,
+ 	return 0;
+ }
+ 
+-static int test_ahash_jiffies(struct ahash_request *req, int blen,
++static int test_ahash_jiffies(struct tcrypt_ahash_request *treq, int blen,
+ 			      int plen, char *out, int secs)
+ {
++	struct ahash_request *req = treq->req;
+ 	unsigned long start, end;
+ 	int bcount, pcount;
+ 	int ret;
+ 
+ 	if (plen == blen)
+-		return test_ahash_jiffies_digest(req, blen, out, secs);
++		return test_ahash_jiffies_digest(treq, blen, out, secs);
+ 
+ 	for (start = jiffies, end = start + secs * HZ, bcount = 0;
+ 	     time_before(jiffies, end); bcount++) {
+-		ret = do_one_ahash_op(req, crypto_ahash_init(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_init(req));
+ 		if (ret)
+ 			return ret;
+ 		for (pcount = 0; pcount < blen; pcount += plen) {
+-			ret = do_one_ahash_op(req, crypto_ahash_update(req));
++			ret = do_one_ahash_op(treq, crypto_ahash_update(req));
+ 			if (ret)
+ 				return ret;
+ 		}
+ 		/* we assume there is enough space in 'out' for the result */
+-		ret = do_one_ahash_op(req, crypto_ahash_final(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_final(req));
+ 		if (ret)
+ 			return ret;
+ 	}
+@@ -768,15 +783,16 @@ static int test_ahash_jiffies(struct ahash_request *req, int blen,
+ 	return 0;
+ }
+ 
+-static int test_ahash_cycles_digest(struct ahash_request *req, int blen,
+-				    char *out)
++static int test_ahash_cycles_digest(struct tcrypt_ahash_request *treq,
++				    int blen, char *out)
+ {
++	struct ahash_request *req = treq->req;
+ 	unsigned long cycles = 0;
+ 	int ret, i;
+ 
+ 	/* Warm-up run. */
+ 	for (i = 0; i < 4; i++) {
+-		ret = do_one_ahash_op(req, crypto_ahash_digest(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_digest(req));
+ 		if (ret)
+ 			goto out;
+ 	}
+@@ -787,7 +803,7 @@ static int test_ahash_cycles_digest(struct ahash_request *req, int blen,
+ 
+ 		start = get_cycles();
+ 
+-		ret = do_one_ahash_op(req, crypto_ahash_digest(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_digest(req));
+ 		if (ret)
+ 			goto out;
+ 
+@@ -806,26 +822,27 @@ static int test_ahash_cycles_digest(struct ahash_request *req, int blen,
+ 	return 0;
+ }
+ 
+-static int test_ahash_cycles(struct ahash_request *req, int blen,
++static int test_ahash_cycles(struct tcrypt_ahash_request *treq, int blen,
+ 			     int plen, char *out)
+ {
++	struct ahash_request *req = treq->req;
+ 	unsigned long cycles = 0;
+ 	int i, pcount, ret;
+ 
+ 	if (plen == blen)
+-		return test_ahash_cycles_digest(req, blen, out);
++		return test_ahash_cycles_digest(treq, blen, out);
+ 
+ 	/* Warm-up run. */
+ 	for (i = 0; i < 4; i++) {
+-		ret = do_one_ahash_op(req, crypto_ahash_init(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_init(req));
+ 		if (ret)
+ 			goto out;
+ 		for (pcount = 0; pcount < blen; pcount += plen) {
+-			ret = do_one_ahash_op(req, crypto_ahash_update(req));
++			ret = do_one_ahash_op(treq, crypto_ahash_update(req));
+ 			if (ret)
+ 				goto out;
+ 		}
+-		ret = do_one_ahash_op(req, crypto_ahash_final(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_final(req));
+ 		if (ret)
+ 			goto out;
+ 	}
+@@ -836,15 +853,15 @@ static int test_ahash_cycles(struct ahash_request *req, int blen,
+ 
+ 		start = get_cycles();
+ 
+-		ret = do_one_ahash_op(req, crypto_ahash_init(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_init(req));
+ 		if (ret)
+ 			goto out;
+ 		for (pcount = 0; pcount < blen; pcount += plen) {
+-			ret = do_one_ahash_op(req, crypto_ahash_update(req));
++			ret = do_one_ahash_op(treq, crypto_ahash_update(req));
+ 			if (ret)
+ 				goto out;
+ 		}
+-		ret = do_one_ahash_op(req, crypto_ahash_final(req));
++		ret = do_one_ahash_op(treq, crypto_ahash_final(req));
+ 		if (ret)
+ 			goto out;
+ 
+@@ -867,7 +884,7 @@ static void test_ahash_speed_common(const char *algo, unsigned int secs,
+ 				    struct hash_speed *speed, unsigned mask)
+ {
+ 	struct scatterlist sg[TVMEMSIZE];
+-	struct crypto_wait wait;
++	struct tcrypt_ahash_request treq;
+ 	struct ahash_request *req;
+ 	struct crypto_ahash *tfm;
+ 	char *output;
+@@ -896,9 +913,10 @@ static void test_ahash_speed_common(const char *algo, unsigned int secs,
+ 		goto out;
+ 	}
+ 
+-	crypto_init_wait(&wait);
++	treq.req = req;
++	crypto_init_wait(&treq.wait);
+ 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   crypto_req_done, &wait);
++				   crypto_req_done, &treq.wait);
+ 
+ 	output = kmalloc(MAX_DIGEST_SIZE, GFP_KERNEL);
+ 	if (!output)
+@@ -927,11 +945,11 @@ static void test_ahash_speed_common(const char *algo, unsigned int secs,
+ 		ahash_request_set_crypt(req, sg, output, speed[i].plen);
+ 
+ 		if (secs) {
+-			ret = test_ahash_jiffies(req, speed[i].blen,
++			ret = test_ahash_jiffies(&treq, speed[i].blen,
+ 						 speed[i].plen, output, secs);
+ 			cond_resched();
+ 		} else {
+-			ret = test_ahash_cycles(req, speed[i].blen,
++			ret = test_ahash_cycles(&treq, speed[i].blen,
+ 						speed[i].plen, output);
+ 		}
+ 
+@@ -1217,16 +1235,16 @@ static void test_mb_skcipher_speed(const char *algo, int enc, int secs,
+ 	kfree(data);
+ }
+ 
+-static inline int do_one_acipher_op(struct skcipher_request *req, int ret)
++static inline int do_one_acipher_op(struct tcrypt_skcipher_request *req,
++				    int ret)
+ {
+-	struct crypto_wait *wait = req->base.data;
+-
+-	return crypto_wait_req(ret, wait);
++	return crypto_wait_req(ret, &req->wait);
+ }
+ 
+-static int test_acipher_jiffies(struct skcipher_request *req, int enc,
++static int test_acipher_jiffies(struct tcrypt_skcipher_request *treq, int enc,
+ 				int blen, int secs)
+ {
++	struct skcipher_request *req = treq->req;
+ 	unsigned long start, end;
+ 	int bcount;
+ 	int ret;
+@@ -1234,10 +1252,10 @@ static int test_acipher_jiffies(struct skcipher_request *req, int enc,
+ 	for (start = jiffies, end = start + secs * HZ, bcount = 0;
+ 	     time_before(jiffies, end); bcount++) {
+ 		if (enc)
+-			ret = do_one_acipher_op(req,
++			ret = do_one_acipher_op(treq,
+ 						crypto_skcipher_encrypt(req));
+ 		else
+-			ret = do_one_acipher_op(req,
++			ret = do_one_acipher_op(treq,
+ 						crypto_skcipher_decrypt(req));
+ 
+ 		if (ret)
+@@ -1249,9 +1267,10 @@ static int test_acipher_jiffies(struct skcipher_request *req, int enc,
+ 	return 0;
+ }
+ 
+-static int test_acipher_cycles(struct skcipher_request *req, int enc,
++static int test_acipher_cycles(struct tcrypt_skcipher_request *treq, int enc,
+ 			       int blen)
+ {
++	struct skcipher_request *req = treq->req;
+ 	unsigned long cycles = 0;
+ 	int ret = 0;
+ 	int i;
+@@ -1259,10 +1278,10 @@ static int test_acipher_cycles(struct skcipher_request *req, int enc,
+ 	/* Warm-up run. */
+ 	for (i = 0; i < 4; i++) {
+ 		if (enc)
+-			ret = do_one_acipher_op(req,
++			ret = do_one_acipher_op(treq,
+ 						crypto_skcipher_encrypt(req));
+ 		else
+-			ret = do_one_acipher_op(req,
++			ret = do_one_acipher_op(treq,
+ 						crypto_skcipher_decrypt(req));
+ 
+ 		if (ret)
+@@ -1275,10 +1294,10 @@ static int test_acipher_cycles(struct skcipher_request *req, int enc,
+ 
+ 		start = get_cycles();
+ 		if (enc)
+-			ret = do_one_acipher_op(req,
++			ret = do_one_acipher_op(treq,
+ 						crypto_skcipher_encrypt(req));
+ 		else
+-			ret = do_one_acipher_op(req,
++			ret = do_one_acipher_op(treq,
+ 						crypto_skcipher_decrypt(req));
+ 		end = get_cycles();
+ 
+@@ -1300,8 +1319,8 @@ static void test_skcipher_speed(const char *algo, int enc, unsigned int secs,
+ 				struct cipher_speed_template *template,
+ 				unsigned int tcount, u8 *keysize, bool async)
+ {
++	struct tcrypt_skcipher_request treq;
+ 	unsigned int ret, i, j, k, iv_len;
+-	struct crypto_wait wait;
+ 	const char *key;
+ 	char iv[128];
+ 	struct skcipher_request *req;
+@@ -1314,7 +1333,7 @@ static void test_skcipher_speed(const char *algo, int enc, unsigned int secs,
+ 	else
+ 		e = "decryption";
+ 
+-	crypto_init_wait(&wait);
++	crypto_init_wait(&treq.wait);
+ 
+ 	tfm = crypto_alloc_skcipher(algo, 0, async ? 0 : CRYPTO_ALG_ASYNC);
+ 
+@@ -1333,8 +1352,9 @@ static void test_skcipher_speed(const char *algo, int enc, unsigned int secs,
+ 		goto out;
+ 	}
+ 
++	treq.req = req;
+ 	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				      crypto_req_done, &wait);
++				      crypto_req_done, &treq.wait);
+ 
+ 	i = 0;
+ 	do {
+@@ -1401,11 +1421,11 @@ static void test_skcipher_speed(const char *algo, int enc, unsigned int secs,
+ 			skcipher_request_set_crypt(req, sg, sg, bs, iv);
+ 
+ 			if (secs) {
+-				ret = test_acipher_jiffies(req, enc,
++				ret = test_acipher_jiffies(&treq, enc,
+ 							   bs, secs);
+ 				cond_resched();
+ 			} else {
+-				ret = test_acipher_cycles(req, enc,
++				ret = test_acipher_cycles(&treq, enc,
+ 							  bs);
+ 			}
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
