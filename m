@@ -1,86 +1,72 @@
-Received: from mail-pj2-f18.google.com (mail-pj2-f18.google.com [74.125.227.146])
+Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B813B840F
-	for <linux-crypto@vger.kernel.org>; Tue, 22 Sep 2026 03:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9FC3B7747
+	for <linux-crypto@vger.kernel.org>; Tue, 22 Sep 2026 03:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790047253; cv=none; b=JnDOU0uAQpL1oZ8SjJ+kCWvIr2atNzGGdDOVpvQq7rgKn6S63L0ZpR4zLkMj3C/Rga6mWLBIJ2gtvD/a9wjX4H91673uTaQRo1whmZ5WgfwtMTvCi/cG4J7h9vqI1MvN5JU24Vqqf6sCp6n0FP77ov63Xd7mFFgteICreZ9K4O0=
+	t=1790047276; cv=none; b=lHdUOa4I5zbsZIfmVlcSQda22BN/ekfoOvPoCLINXqVzUVehz4BnO7ZZPToykrHP6GGqhzvg/rxKBxN2hhJiAsp/ntx+4eWL4gfzlMuQkdB7tcBo7s1JF/CLu/ENPY2xCH+mvj3KDPPhGncSuP2XqX9pLzJr8q7gnhVq5XCNXV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790047253; c=relaxed/simple;
-	bh=8A5lbFX7jPgNjHXFUP9sZMZQ7/uPse/Wza7yZTZRNrc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dPJH3+I9K5raVTFgdsKm8CAcqxuZAq6BAj2SbxmLWyOjMjIl0E7ZKOKsKfLo3wEMStFBdesG3BflDBAWbONEon9feWe++oIJniFpZXIXPV4Ac8KEJy3JBa0HpqzOjWaghYCQbMeRpK56m5FyVg1pe+tBdPmASG00tebbf72NLb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=saR23UYN; arc=none smtp.client-ip=74.125.227.146
+	s=arc-20240116; t=1790047276; c=relaxed/simple;
+	bh=t9aDlwefuZ2axwxKwmDy5Z1snX8zjB3z3fzSzyXpl74=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h4EObKyGrNFtFGdVk5lv2gEDv+0rTiPHNhLUkJV8RGw4JaDczd9frby1xzOuvU5YZFvbAa5WkO/VQghFObz4uHfmEHryjxMOIkF8tMgLxflj371UPo4ZSK41y7R7tm48y2m/mjcCFTjl/oi6bzuydm2Teln6Y8sHX7omz11cyF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bud63su1; arc=none smtp.client-ip=74.125.227.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="saR23UYN"
-Received: by mail-pj2-f18.google.com with SMTP id d9443c01a7336-2db22383fe8so23782555ad.2
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Sep 2026 20:20:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bud63su1"
+Received: by mail-pj2-f13.google.com with SMTP id 98e67ed59e1d1-396ccd4f99dso3917575a91.2
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Sep 2026 20:21:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790047251; x=1790652051; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Z7TxIVacK4CiPP85Zm/zWINHMIm3Lw/0BaBVswTN6EM=;
-        b=saR23UYN3c0RdK3S66u8CN3exUVRu1tP7W2bqD8sH//ynzAe/N33XR0vvct88asD6d
-         Rg27ndt4TrgdKIi3nZzQRuxXosiKyrgugbHtXzPPfyPp1llMHFhUBnRwAf0Jrio8kFf9
-         IVz5UL2i/Xlxqw2PAoPyNZ7jtJGxt88R13Sy7pljP8G8a3Iq2cGj0PBnt8ro4Ih6Ik2w
-         XHXg8VbqZIxQBtzdMOIbpWFPgWSCAghE0uGXeRwr6fdI6d1Cm+OtmKGUfpvrP7hIMKvp
-         xREJL60U5hqPLo5uKt1SfqZE35Iv4lOw+UD3W6r8/uMlWjkoiXz2xhHp+cdTQeZhMqKE
-         G0qA==
+        d=gmail.com; s=20251104; t=1790047274; x=1790652074; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=AqBh/1GklFhxRrcNP7InBsf+Iuoq5ht51oOU88FidFg=;
+        b=Bud63su1hd+cQ9CNjJ0O+9MW2g38mx+B42J/0zCzB67JXyyjtXa7vhoMRxRleQZSBW
+         TBKMeTFm9d1IzmYxia8VOAe4ZPtU8nA8XIO3VjxwFUtKMJfRR3z3cntUssSIGvF0OEl7
+         5hGifEdsSAplJd3dj64rX7/WZDmfZUAdd/kgiVbz/6Xz049Ws4SdNqsLwXZ/yDQ77GDO
+         iT0aCWw8u+s0sbbRxYnyTwtNl4idti4YQ7JQqo7syJySvrQTmMG2hRkn6DgpTIxmu8je
+         t+qCDRmmVUcVczL7KUlvY5CZb2T5QjxCody60lSHe4D6HvN77O35PPwteAAAGVdWTauU
+         TURg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790047251; x=1790652051;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Z7TxIVacK4CiPP85Zm/zWINHMIm3Lw/0BaBVswTN6EM=;
-        b=j0yl/2SPgW+Z89iJmfKgivJ5Yxm02Bks/faQ7XpV028JZTA3sdm2M1eyWDKMlQ2R6y
-         FsIHC0fojJPSxkiJRLP8VlE0zKOTZ1AlLKp6u4N3GAbX2vKm+6xs3e/EJUl0jsWS53l4
-         iPQogoOdPLh6GYdyyySL5Cx4MryEV+Qvn/KqE01Fx7M3qkLQOq2qFHzbRVygKJ3UIXw7
-         nmfM1ThVdDqG3tddoB5gdAB9yIIvKGTgInmcATPQ0taos5v8NWALRgB+UZLuJva+PgfW
-         HvHuqPPrBDPXGh6STAKksYHBYfFgyGLF7AVsLrc5ZZ9aw9YNulBKcNAKajCguSUEhaPX
-         SS6Q==
-X-Forwarded-Encrypted: i=1; AKwUvBw6a81ELtskFpraPPVjig04PGl455dBCX5e7ihiweBk+0u+RrIu5L83j5zWNHksSruiuHcyLp3Ue+wWhEA=@vger.kernel.org
-X-Gm-Message-State: AFuF++nKapr3PC9mbPnyeRzkQj8OyzBmulwlZMCXDd4hQYo/wwgmjntx
-	Mzkm/SFwPs/jSSo5lkwvoCX84XSqwDNK45IF4PqrUkjxUnQg68ZGlnkH
-X-Gm-Gg: AYBFou0YKpknbSLFtyP2PWGFAyBIfwzk8/3eC+wPB+dWFADERoo7DZLTF3RKzyokwPs
-	5ZLrOg/Xx1+yc//CPexF/u1h30z6JAajeWGQ515xbFp2mQeJA+ksXjaUWAlypNk+cwsm1akA7my
-	hERfDMZF0UYujOdicyt4IhzwsRICLMwHHx8izIg+dj7+c1VjU5d+5rW5cpn5ycXSZqE5wahgMnZ
-	HVsa8VKPD8r0U9AZhbQTUiD2+aqm5IFszWMKYun3k6mYAYWuSgLpG0Hj5I/ojDAmDnTh44X8GMz
-	fcE97gyIuCBDj79NjfsZLJgJIsysQOBR0F4aDXxvuZulhQQUBENvQ7zuXLCzDYQyZTGXcxJnfn2
-	FUlyYrqHtHBbgqUOANzXsTli8NAQLakkfO7KJzniOcbtVmRWODAS9JxYGVc1zmP4Er+Wq5cRH+Q
-	ygdxknRTkF17or2r+JtmIypzi4NetwPYw2u1BVT6He/jox1pV9o2J3sgtnZEBlRSR+P/jvgMHa6
-	vWCccN1jypF2TlAL8O29oUQWndv97puPwDk+KcKIHTsL9MH9Ql6Ya6ca/xO8pcD7q2cDZtVyd4i
-	4gx5KNWEGpmjZJmGQZA6BJTh
-X-Received: by 2002:a17:903:b84:b0:2dd:c053:82fa with SMTP id d9443c01a7336-2ddc053843cmr122847195ad.49.1790047250783;
-        Mon, 21 Sep 2026 20:20:50 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1790047274; x=1790652074;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=AqBh/1GklFhxRrcNP7InBsf+Iuoq5ht51oOU88FidFg=;
+        b=BJ0/xX/dggLWqBlHMdjhbuw3iFbH2mpUDldbPCYzFGfJNsHtSoKjWYPmY458df1urj
+         /KJNuqMNsMMveQPcU9bzXjPtYlgXWzDVgdUzpLJDlBjNPSrYHYz5+Y6SE3eQJb8oeVXo
+         smdJvJhKfRCwE26TfQwS1mDHH0WEr6zoWtQhOXfrTBEASZ8KvmUVWy6fWK9QLxi3Jcet
+         043ApKMmXLBpTFEwCTM8ZakB0mxDCsRbf7EH2RW0nMu6HaG3Z3fQ550uREkYvnzGPaai
+         rF4olcdOpYUNRhwU0w9eduzwOlwrZBu3kl/PZJ9IJppqfADf+8Mo3XHgdYEJnCyWP6tH
+         BEsw==
+X-Gm-Message-State: AFuF++l2fbRN9PHumax4bNzbmnyA9+hIXwpAth/DmWHzo17IE9z6W8PW
+	Qn5fFfuYWxUYLoQLh+wXmpwLu0KC1iq/gQMwEO/v6lISLnPP1G/Y9i2110LDWA==
+X-Gm-Gg: AYBFou1WA4AmFlR4HTlkoBl7en418RgARpmbuKcKtlMpmdX+68lXAFryqkFgR2HQ7eq
+	399CUcNeB4hVe1HaXlW7A21PSTsyfHaG9AyPSgtYNs/qt4PGzmy71UOuzhKJE0k68BC3M4Zd4p0
+	ovNCFvwfPZD5nEE729sOM94lu6dBrUkMYkDpbnMVIALMru/Z3Iy7FF8mVKoeVEoNYwlREKWpsYZ
+	rKdJzgLZl7oYxmyWKUoWPa+HOZg1aF0JQ3QbdFwtOkTnJLQYI9w9F0htfvOKJgXeVIohgoc6KI2
+	thRGBWRpObbIrp9evG/vk9mlHhhF8oMGOqS0PcWaQLWuN26re6bmZaR56O/QOXIQKct0eByWDWX
+	hmrHUHHiTdm2cxvV8VKAIVON/psvcoHOc7hRzxTn5NAI1JeovRivwGYCzYA1I374YaThP9C9Q9X
+	xodBrDn7CttGu7Ndn7KaKwqtr6AhBPNOdYMrj+5smCKWty994/Xegxox+N6FX4NHVxKAMMgKd+e
+	33oPIGGUgtcVuTjPy3542I8pqHMMubMKIWPuMSTl6ewW70sCMwZMeMmg6gAdwDb3f4487SmNFMO
+	28nOoT/iZY7LUg==
+X-Received: by 2002:a17:90b:2752:b0:39e:6a82:afd8 with SMTP id 98e67ed59e1d1-39e6a82bbd7mr13355745a91.42.1790047274271;
+        Mon, 21 Sep 2026 20:21:14 -0700 (PDT)
 Received: from phuc-desktop.. ([183.91.15.56])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2df5cf83512sm1940355ad.5.2026.09.21.20.20.47
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a06dfd6705sm704365a91.0.2026.09.21.20.21.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 20:20:50 -0700 (PDT)
+        Mon, 21 Sep 2026 20:21:13 -0700 (PDT)
 From: phucduc.bui@gmail.com
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	davem@davemloft.net,
-	Chen-Yu Tsai <wens@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Gilad Ben-Yossef <gilad@benyossef.com>,
-	Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-	Linus Walleij <linusw@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: linux-sunxi@lists.linux.dev,
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	bui duc phuc <phucduc.bui@gmail.com>
-Subject: [PATCH 3/3] crypto: sl3516 - Use pm_runtime_resume_and_get()
-Date: Tue, 22 Sep 2026 10:19:54 +0700
-Message-ID: <20260922031954.320895-4-phucduc.bui@gmail.com>
+Subject: [PATCH] hwrng: omap3-rom: Use pm_runtime_resume_and_get()
+Date: Tue, 22 Sep 2026 10:20:54 +0700
+Message-ID: <20260922032054.320969-1-phucduc.bui@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260922031954.320895-1-phucduc.bui@gmail.com>
-References: <20260922031954.320895-1-phucduc.bui@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -101,47 +87,28 @@ Found by manual code inspection.
 
 Signed-off-by: bui duc phuc <phucduc.bui@gmail.com>
 ---
- drivers/crypto/gemini/sl3516-ce-cipher.c | 3 +--
- drivers/crypto/gemini/sl3516-ce-rng.c    | 6 ++----
- 2 files changed, 3 insertions(+), 6 deletions(-)
+ drivers/char/hw_random/omap3-rom-rng.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
-index 02ec4282333b..eba46aebf176 100644
---- a/drivers/crypto/gemini/sl3516-ce-cipher.c
-+++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
-@@ -331,13 +331,12 @@ int sl3516_ce_cipher_init(struct crypto_tfm *tfm)
- 		 crypto_tfm_alg_driver_name(&sktfm->base),
- 		 crypto_tfm_alg_driver_name(crypto_skcipher_tfm(op->fallback_tfm)));
+diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
+index aa71f61c3dc9..0797add0d782 100644
+--- a/drivers/char/hw_random/omap3-rom-rng.c
++++ b/drivers/char/hw_random/omap3-rom-rng.c
+@@ -42,12 +42,9 @@ static int omap3_rom_rng_read(struct hwrng *rng, void *data, size_t max, bool w)
  
--	err = pm_runtime_get_sync(op->ce->dev);
-+	err = pm_runtime_resume_and_get(op->ce->dev);
- 	if (err < 0)
- 		goto error_pm;
+ 	ddata = (struct omap_rom_rng *)rng->priv;
  
- 	return 0;
- error_pm:
--	pm_runtime_put_noidle(op->ce->dev);
- 	crypto_free_skcipher(op->fallback_tfm);
- 	return err;
- }
-diff --git a/drivers/crypto/gemini/sl3516-ce-rng.c b/drivers/crypto/gemini/sl3516-ce-rng.c
-index 76931ec1cec5..19af03b03e42 100644
---- a/drivers/crypto/gemini/sl3516-ce-rng.c
-+++ b/drivers/crypto/gemini/sl3516-ce-rng.c
-@@ -24,11 +24,9 @@ static int sl3516_ce_rng_read(struct hwrng *rng, void *buf, size_t max, bool wai
- 	ce->hwrng_stat_bytes += max;
- #endif
- 
--	err = pm_runtime_get_sync(ce->dev);
--	if (err < 0) {
--		pm_runtime_put_noidle(ce->dev);
-+	err = pm_runtime_resume_and_get(ce->dev);
-+	if (err < 0)
- 		return err;
+-	r = pm_runtime_get_sync(ddata->dev);
+-	if (r < 0) {
+-		pm_runtime_put_noidle(ddata->dev);
+-
++	r = pm_runtime_resume_and_get(ddata->dev);
++	if (r < 0)
+ 		return r;
 -	}
  
- 	while (read < max) {
- 		*data = readl(ce->base + IPSEC_RAND_NUM_REG);
+ 	ptr = virt_to_phys(data);
+ 	r = ddata->rom_rng_call(ptr, 4, RNG_GEN_HW);
 -- 
 2.43.0
 
