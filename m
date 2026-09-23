@@ -1,132 +1,171 @@
-Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA48734EF0C
-	for <linux-crypto@vger.kernel.org>; Wed, 23 Sep 2026 06:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8C64457C2;
+	Wed, 23 Sep 2026 07:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790143978; cv=none; b=cTMKXv1fsdaU3CIk7RfOOErdO2CgBg6hftdoqOkReNFsdmlVI4kEGhJ19/IFzivBgojqcMMdWcaYZyy9Z4gr2nCEHUf6BpxoUbSfAf0Nkoz6mgJLl9OkQPHDzJQnwd4lpbSyLQkd/7SZmWDloz1TmBDErjEx1KNj3Ebx17EgZ50=
+	t=1790147375; cv=none; b=XUPU5bxwmFYUFpfLM2HUM5IX+whkYfzGynFwZrVtegqvjwhyH9p6AAj8q4L4NhKuhpKfw684XZ7/e+yzagDaRQeGODBcUWWQe6vygnrVJiCXCUFWBBDkYLxaQX2cSTNRc8qcmbFl4/KoMS/oJQTkWmThmwnKRY17LpKH/hNlJrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790143978; c=relaxed/simple;
-	bh=1fRPmNbQXvHC53xMbdAtoAdeMF4gnTqois2bu9TUmow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Eklrl0USvr8Vo/kzTuybIvJkZYw7PFDacfX3TDlSyrqO19KEcAOn7a+2wD8if3/IMRNQ1b8xHhtpOkw3Yag+cKw0nv9ciRXsJtztCbXa8WvV2tMJllqx1UHFJuAi8fv5bWuFLj1209OBCfVMLH/IXMbCxdVrOVfveNztRpRp33w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=NH9KNzny; arc=none smtp.client-ip=35.89.44.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+	s=arc-20240116; t=1790147375; c=relaxed/simple;
+	bh=L/aaJexQOyT76ubSikJ4bsjGJgZYDNnvJgdoQpFWVvc=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=VED2x6sWB2SZFVCj9ZSNQvk7IvAvkE+2V3vAiuDYgfOjUazTU3gPyMwIFjGi8v+B4X5+6Rzn/xwoEgPsEcjZY67WK2B9hIa9aCWjA4SC8E6asEPGN1zWwfVU8m2RKSIhCIga0BPO2m4wobfu5Fu/fp+rnYetgj3z5fcZ+Xn1RwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=tiU6Wgwq; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="NH9KNzny"
-Received: from eig-obgw-6007b.ext.cloudfilter.net ([10.0.30.166])
-	by cmsmtp with ESMTPS
-	id 9E2extjjXc3Xs9GDwx9lIA; Wed, 23 Sep 2026 06:12:56 +0000
-Received: from gator4166.hostgator.com ([108.167.190.91])
-	by cmsmtp with ESMTPS
-	id 9GDwxVPabMB9V9GDwxflG7; Wed, 23 Sep 2026 06:12:56 +0000
-X-Authority-Analysis: v=2.4 cv=d5D1yQjE c=1 sm=1 tr=0 ts=6ab36de8
- a=vY9Mjuda9oMEc2E4Cx1x2A==:117 a=vY9Mjuda9oMEc2E4Cx1x2A==:17
- a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=7T7KSl7uo7wA:10 a=1XWaLZrsAAAA:8
- a=VwQbUJbxAAAA:8 a=veQ4WiWKPWtZt7Vb73kA:9 a=QEXdDO2ut3YA:10
- a=2aFnImwKRvkU0tJ3nQRT:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Unsubscribe-Post:List-Subscribe:List-Post:List-Owner:
-	List-Archive; bh=ZO1i4ggFjC7Ha9WvUkpYNEJJNq9r0nBtBbotd8bB72o=; b=NH9KNznycqCa
-	BU4ju8H1PMxR+58tyqj2tg5Na1X7gtSQqh+WYZc4zLltb+/d6BCPWESWEZhXdenMKm6epntaWWVFx
-	PI2554lhHsxwz8BMCIRu+taZlOarboUmWN6yZcSsSO8w8WkyxV38U0dNVcrkd75nlcyBN7IqrS3CB
-	gac6G7hWqOXtm/CaOyIOlmKRG68fEE516VUykP2yaZcsYWliVe+lZK5CEq4UHFVCNjVDyEcsoslDM
-	E3HPw8Fl39XcOvtKQqmAIQLk2Zm6EVbCyeilLx4zt46yC4DGTRZPuJXswW5UTWgW/izDkyLTk//1k
-	sW+sTo6YNZUoKDUgmkwSFw==;
-Received: from flh4-125-195-69-90.tky.mesh.ad.jp ([125.195.69.90]:54704 helo=[10.203.100.34])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.100)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1x9GDv-00000002NYs-2PLz;
-	Wed, 23 Sep 2026 01:12:55 -0500
-Message-ID: <b2bc7fc9-baf3-4717-a012-cda73a9fe977@embeddedor.com>
-Date: Wed, 23 Sep 2026 15:12:51 +0900
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="tiU6Wgwq"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=jCIGTjYCDsagnL4yfhFZnaCVjjOSu85DOW9Gp/qMZeI=;
+	b=tiU6WgwqSKNNczP+FPNT99CCQ2bTOSg9DV3Zv4kw329wLgydixDnloDDjNzwVuU5NyuP1uB1w
+	3c19YNB8ibY5NMiwV17Qw+oRhQiEPM5/TBU8vMD2jeCW0BqKV4oSJ36LBD7+ptSfTIvNFIoW9Kr
+	U2hn0PDw+X868zmr110Ujf8=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4hqSSx0l3NzLlXX;
+	Wed, 23 Sep 2026 14:57:21 +0800 (CST)
+Received: from whupemk100014.china.huawei.com (unknown [7.152.184.20])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6E17D4048B;
+	Wed, 23 Sep 2026 15:09:26 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ whupemk100014.china.huawei.com (7.152.184.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Wed, 23 Sep 2026 15:09:25 +0800
+Subject: Re: [PATCH] crypto: hisilicon/qm - annotate cap_tables with
+ __counted_by_ptr
+To: Bill Wendling <morbo@google.com>, Zhiqi Song <songzhiqi1@huawei.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Weili Qian <qianweili@huawei.com>, Zhou Wang
+	<wangzhou1@hisilicon.com>, Chenghai Huang <huangchenghai2@huawei.com>
+CC: Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva"
+	<gustavoars@kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+	<codemender-patching+linux@google.com>
+References: <20260923060114.2605310-1-morbo@google.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <e645b41d-ce68-58d8-b5d2-03c02d16819b@huawei.com>
+Date: Wed, 23 Sep 2026 15:09:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: hisilicon/qm - add __counted_by_ptr to
- dfx_diff_registers
-To: Bill Wendling <morbo@google.com>, Weili Qian <qianweili@huawei.com>,
- Zhou Wang <wangzhou1@hisilicon.com>
-Cc: Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva"
- <gustavoars@kernel.org>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
- codemender-patching+linux@google.com
-References: <20260923061027.2650324-1-morbo@google.com>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20260923061027.2650324-1-morbo@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20260923060114.2605310-1-morbo@google.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 125.195.69.90
-X-Source-L: No
-X-Exim-ID: 1x9GDv-00000002NYs-2PLz
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: flh4-125-195-69-90.tky.mesh.ad.jp ([10.203.100.34]) [125.195.69.90]:54704
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 34
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfEvr/TXFQ4ZvdHPiMbku6zJ75r+BaFB+YCE9gVqET6DlkO5Dp0huNr/bnyeEXl3Yo5AWyQnaLupDLkUdsvKYoTTHgA2QUmpPoveuzy0VY6blPMNyPXAF
- YmzDD9IY3dsGKv/0cqD9E7+t6/cE9Tb9RyvntInXfvV4up6OG2fTEm2W4Kp36vf0J7go3ldHrKd00FBmNrFBEQNAUElKYPZsLg26MwbwBBdSVpK+IMvtR2Id
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ whupemk100014.china.huawei.com (7.152.184.20)
 
-
-
-On 9/23/26 15:10, Bill Wendling wrote:
-> Annotate the pointer field 'regs' in 'struct dfx_diff_registers' with
-> the '__counted_by_ptr' attribute, referencing the 'reg_len' member
-> which holds the element count of the allocated memory.
+On 2026/9/23 14:01, Bill Wendling wrote:
+> Annotate the 'qm_cap_table' and 'dev_cap_table' pointer fields in
+> 'struct hisi_qm_cap_tables' with the '__counted_by_ptr' attribute.
+> This improves bounds checking via CONFIG_UBSAN_BOUNDS and
+> CONFIG_FORTIFY_SOURCE, allowing KASAN and compiler diagnostics to
+> detect out-of-bounds accesses.
 > 
-> In 'drivers/crypto/hisilicon/debugfs.c', the 'dfx_regs_init' function
-> allocates the 'diff_regs' array and initializes each element's 'regs'
-> pointer after setting its 'reg_len'.
+> The 'qm_cap_table' pointer is associated with 'qm_cap_size' which
+> specifies its element count. Similarly, 'dev_cap_table' is associated
+> with 'dev_cap_size'.
 > 
-> Since 'reg_len' is set before 'regs' is assigned, the compiler's bounds
-> sanitizer can correctly associate the pointer with its allocated size.
+> To ensure safety under compiler instrumentation, the assignments in the
+> initialization paths have been updated to set the 'size'/'count' fields
+> prior to setting the pointer fields. This prevents any transient state
+> where the pointer is valid but the count is 0 (or uninitialized),
+> ensuring that subsequent accesses to these tables do not trigger
+> false-positive bounds check panics.
 > 
 > Cc: codemender-patching+linux@google.com
 > Assisted-by: LLM
 > Signed-off-by: Bill Wendling <morbo@google.com>
-
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-
-Thanks
--Gustavo
-
 > ---
->   include/linux/hisi_acc_qm.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
+>  drivers/crypto/hisilicon/qm.c             | 2 +-
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 2 +-
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 2 +-
+>  include/linux/hisi_acc_qm.h               | 4 ++--
+>  5 files changed, 6 insertions(+), 6 deletions(-)
+>
+
+Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+
+Thanks.
+Longfang.
+
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> index b6903fce6071..4a1b2de476f5 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> @@ -1234,8 +1234,8 @@ static int hpre_pre_store_cap_reg(struct hisi_qm *qm)
+>  		return -EINVAL;
+>  	}
+>  
+> -	qm->cap_tables.dev_cap_table = hpre_cap;
+>  	qm->cap_tables.dev_cap_size = size;
+> +	qm->cap_tables.dev_cap_table = hpre_cap;
+>  
+>  	return 0;
+>  }
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index c01966a4a33f..7d13476451e3 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -5743,8 +5743,8 @@ static int qm_pre_store_caps(struct hisi_qm *qm)
+>  							i, qm->cap_ver);
+>  	}
+>  
+> -	qm->cap_tables.qm_cap_table = qm_cap;
+>  	qm->cap_tables.qm_cap_size = size;
+> +	qm->cap_tables.qm_cap_table = qm_cap;
+>  
+>  	return 0;
+>  }
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index 752565200c16..ac423d016998 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -1285,8 +1285,8 @@ static int sec_pre_store_cap_reg(struct hisi_qm *qm)
+>  				     i, qm->cap_ver);
+>  	}
+>  
+> -	qm->cap_tables.dev_cap_table = sec_cap;
+>  	qm->cap_tables.dev_cap_size = size;
+> +	qm->cap_tables.dev_cap_table = sec_cap;
+>  
+>  	return 0;
+>  }
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index 706a73656977..10091ad4a6a8 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -1400,8 +1400,8 @@ static int zip_pre_store_cap_reg(struct hisi_qm *qm)
+>  				     i, qm->cap_ver);
+>  	}
+>  
+> -	qm->cap_tables.dev_cap_table = zip_cap;
+>  	qm->cap_tables.dev_cap_size = size;
+> +	qm->cap_tables.dev_cap_table = zip_cap;
+>  
+>  	return 0;
+>  }
 > diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-> index 8dc49fa2123b..f2885d60b468 100644
+> index f7570a409905..8dc49fa2123b 100644
 > --- a/include/linux/hisi_acc_qm.h
 > +++ b/include/linux/hisi_acc_qm.h
-> @@ -196,7 +196,7 @@ struct qm_dev_dfx {
->   };
->   
->   struct dfx_diff_registers {
-> -	u32 *regs;
-> +	u32 *regs __counted_by_ptr(reg_len);
->   	u32 reg_offset;
->   	u32 reg_len;
->   };
-
+> @@ -332,9 +332,9 @@ struct hisi_qm_cap_record {
+>  
+>  struct hisi_qm_cap_tables {
+>  	u32 qm_cap_size;
+> -	struct hisi_qm_cap_record *qm_cap_table;
+> +	struct hisi_qm_cap_record *qm_cap_table __counted_by_ptr(qm_cap_size);
+>  	u32 dev_cap_size;
+> -	struct hisi_qm_cap_record *dev_cap_table;
+> +	struct hisi_qm_cap_record *dev_cap_table __counted_by_ptr(dev_cap_size);
+>  };
+>  
+>  struct hisi_qm_list {
+> 
