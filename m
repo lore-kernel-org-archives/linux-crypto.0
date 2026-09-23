@@ -1,95 +1,122 @@
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A7854EEC3
-	for <linux-crypto@vger.kernel.org>; Wed, 23 Sep 2026 15:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A836045C6E0;
+	Wed, 23 Sep 2026 15:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790176802; cv=none; b=Kiij/6LDwlE4QUZEVWr5xUbTtUX0baNpNmxx/FM/ooswFYLCE8yGe1RFjgWUZdn5Nm0+bPa9EFj5EWI4hn0SaeGgVUo9+Nwa5XwTKssEgTjZ/D8nL61wbvjQYGtyfh1feWMcHu1M8PAFQ3eAdtF0wrR8cZ5wz9LEVy87yjQC56s=
+	t=1790179016; cv=none; b=cARqz9YeSkEQjjbdcirhqeuWg/ZCIfi3sjmn73b4b7HQ2suHWAcM++YGc0NiIiZVF5oMs1iOVkXJHuVcqiyOfDAjNOUUmbwyQSQ1FRxFNdE9R758/NHb9vntUJ2uMnxl6dyALLQHpvR0kwWrFgPjwOFFsoocDixwnhfJSqBL0e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790176802; c=relaxed/simple;
-	bh=RhmXl3o9AEJHf4cRc6Z6Vr8c6k6nCxAjUcagIiCZW6s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gG5ZuLdiPbJRrsjLUmFD8TN4PSup3vmy66noNe+IkM/T2ZTe0yBjWn7bkKBXskRS6qdNWAJsumehR5FACPFv41Q7Nly5BHGJ0g23RvBrIoGuYs2yW8h7VEW5dwvhpo5C/dUKLeLeUuxG+apWVthkQJZ+UyujeBJeUMp20F918k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BVTdJpcD; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1790179016; c=relaxed/simple;
+	bh=/FpLeywFakr66tyZtygmudWEDeCblAzYOgiRGXwjdU4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iaorwsvwcoz+rhVSAqNoYObHiZsL4LC6NpiWA3XprmdELmYDOf6b0LOzmIbysFKOE70ASnRGkrAtXfkAJbtnkfMjZM0MDTu81yKYQFHv+Sg0geHyedOk6/cxtbTkDKUF6O9WuEhfTYKl6uFaEECthURogUOEk2v4BrAuEK4hMYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojSxbjbO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BVTdJpcD"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id D16CE4E41048
-	for <linux-crypto@vger.kernel.org>; Wed, 23 Sep 2026 15:19:58 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A647860580;
-	Wed, 23 Sep 2026 15:19:58 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 058C1103293A6;
-	Wed, 23 Sep 2026 17:19:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1790176797; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=LnQXfNYZOYzL4bIDkcswTsJNPsN8lEiy6QszH3hhbpE=;
-	b=BVTdJpcDkgdOkgV4fsz3+pnCsl01wXYnSfzqpYzD9JuutEWUfinYSOGf3WalZXddoE+yb7
-	sx19sby0G8etK5uwumzZu5mZw9fNGL9Tw57mYbRuHjyb2Sa83s0qzRcXCnOKr/CuMTUYmn
-	L2DS1znRPwhTphkpmaRIdabXikhjQniQ7k8Z0oJX7BpRjr0se9JAUFlyc1MnnQpNhK/21w
-	Y+6I9c2PH9/89fqRljzKnDklE4D+R7YODjmfJmoXX755tM8KTMgbR12Eb8aCFiblvwbdRx
-	3JyW1EC0KrOa160wUo0AUqF3nj12T71HPtXX+A2J57D6SRLV8btGm+zQZYDJqQ==
-From: Paul Louvel <paul.louvel@bootlin.com>
-Date: Wed, 23 Sep 2026 17:18:56 +0200
-Subject: [PATCH v7 20/20] MAINTAINERS: add entry for talitos driver
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojSxbjbO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66B541F000FF;
+	Wed, 23 Sep 2026 15:56:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790179013;
+	bh=xMJCztkb++DIu4FkVGc3EOyCHobio6pWpbZKkC50C1g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ojSxbjbO2xBhK41KhWk7HAu6SgNQ/YUdnYIh6T1/jcZBB82dhr1G2iANV2rYHKB41
+	 cZyEtyQs/0s1o2q8liazCWJcjTYWBzkKBvE+pSAfGb8chJTRGc0D8aV5DZXgdYhktd
+	 poj/gCnIMCqd6dTVW4mZO6rD3z4iLJO+SCGM2vC3N5TKciMDJPeV/YWgbSVIr5VcYl
+	 tPkhEiM0GLbJPybQWIG6NqZkaymHpWJmmtW7DkjK8J9wb5Cb+mSGe5h5IFPZ1NC7Fo
+	 oEIT5Ska6RadE4AY04XWDt78E+42Nla0citF9/eyvLOuehAryvQQFCn5qOde5WHjxP
+	 cGVV635fDN6Ig==
+Date: Wed, 23 Sep 2026 16:56:49 +0100
+From: Lee Jones <lee@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@163.com>
+Cc: zhaoqunqin@loongson.cn, chenhuacai@kernel.org,
+	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-crypto@vger.kernel.org, mfd@lists.linux.dev
+Subject: Re: [PATCH v7 1/2] mfd: loongson-se: Add multi-node support
+Message-ID: <20260923155649.GK3864833@google.com>
+References: <20260911090256.7834-1-zhaoqunqin@163.com>
+ <20260911090256.7834-2-zhaoqunqin@163.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260923-7-3-rc2_talitos_cleanup-v7-20-9a45261fc097@bootlin.com>
-References: <20260923-7-3-rc2_talitos_cleanup-v7-0-9a45261fc097@bootlin.com>
-In-Reply-To: <20260923-7-3-rc2_talitos_cleanup-v7-0-9a45261fc097@bootlin.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>
-Cc: Paul Louvel <paul.louvel@bootlin.com>, linux-crypto@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Christophe Leroy <chleroy@kernel.org>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790176746; l=754;
- i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
- bh=RhmXl3o9AEJHf4cRc6Z6Vr8c6k6nCxAjUcagIiCZW6s=;
- b=dPhrLtZh94g1Ojcbi3Kd0bFbwdJU3/D5ytj9nZ1a71tguZOjlzTTr8KALRvuh63AHMqd2XR0I
- KT9PufwvyphCvW1R89xxIw0TSL7izLk5R+UzJlVBZbh+bf/yFZ3VsDP
-X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
- pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260911090256.7834-2-zhaoqunqin@163.com>
 
-An entry is missing for the Talitos crypto driver.
-Add it with myself as maintainer as I have worked on this crypto h/w
-device.
+On Fri, 11 Sep 2026, Qunqin Zhao wrote:
 
-Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+> From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> 
+> On the Loongson platform, each node is equipped with a security engine
+> device. However, due to a hardware flaw, only the device on node 0 can
+> trigger interrupts. Therefore, interrupts from other nodes are forwarded
+> by node 0. We need to check in the interrupt handler of node 0 whether
+> this interrupt is intended for other nodes, this can be accomplished via
+> shared interrupt handling.
+> 
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> ---
+>  drivers/mfd/loongson-se.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+> index 3902ba377..7f552a8ee 100644
+> --- a/drivers/mfd/loongson-se.c
+> +++ b/drivers/mfd/loongson-se.c
+> @@ -140,6 +140,11 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>  
+>  	int_status = readl(se->base + SE_S2LINT_STAT);
+>  
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6215fcb07770..c2f3ac4a572f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -26639,6 +26639,12 @@ L:	platform-driver-x86@vger.kernel.org
- S:	Maintained
- F:	drivers/platform/x86/system76_acpi.c
- 
-+TALITOS CRYPTO DRIVER
-+M:	Paul Louvel <paul.louvel@bootlin.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Maintained
-+F:	drivers/crypto/talitos/*
-+
- TASKSTATS STATISTICS INTERFACE
- M:	Balbir Singh <bsingharora@gmail.com>
- S:	Maintained
+Nit: Checks should follow immediately from the call that allocated them.
+
+Thus, remove this empty line please.
+
+> +	if (int_status == 0) {
+> +		spin_unlock(&se->dev_lock);
+> +		return IRQ_NONE;
+> +	}
+> +
+>  	/* For controller */
+>  	if (int_status & SE_INT_CONTROLLER) {
+>  		complete(&se->cmd_completion);
+> @@ -211,24 +216,26 @@ static int loongson_se_probe(struct platform_device *pdev)
+>  	if (IS_ERR(se->base))
+>  		return PTR_ERR(se->base);
+>  
+> -	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+> -
+>  	nr_irq = platform_irq_count(pdev);
+>  	if (nr_irq <= 0)
+>  		return -ENODEV;
+>  
+> +	writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
+> +
+>  	for (i = 0; i < nr_irq; i++) {
+>  		irq = platform_get_irq(pdev, i);
+> -		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
+> +		err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
+>  		if (err)
+>  			dev_err(dev, "failed to request IRQ: %d\n", irq);
+>  	}
+>  
+> +	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+> +
+>  	err = loongson_se_init(se, paddr, se->dmam_size);
+>  	if (err)
+>  		return err;
+>  
+> -	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
+> +	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
+>  				    ARRAY_SIZE(engines), NULL, 0, NULL);
+>  }
+>  
+> -- 
+> 2.47.2
+> 
 
 -- 
-2.55.0
-
+Lee Jones
