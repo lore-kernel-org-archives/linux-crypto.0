@@ -1,54 +1,54 @@
 Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011002.outbound.protection.outlook.com [52.101.70.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F7B538D92;
-	Wed, 23 Sep 2026 16:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99061544D63;
+	Wed, 23 Sep 2026 16:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.2
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790180409; cv=fail; b=TcKDzaianNG9HdB1lp3Uekq1r/phrLG/lKAQSq8x31r+46/86UozsbcOc2wyC3bWotiarBGln8h1tQ/5g6EySwGdr8+ja6j1dWk++XKOhknJrsleQ1EgVOVgSwKEAloLRNDfw0siU39mXznGqUR6VkLNaAnGryqDeaep2AdCxKk=
+	t=1790180411; cv=fail; b=X+FkyPTtN+kwk0Aakhhv7vltEcZWm1zbT3i8+RM0ij8Hs9Fl2D4yOQ3o0xiOBRQAgLtzPIpVaNgauB9PZxvCsDFKzPAuFr7ybyBu6W7asO3DYtPLhFPPQSAIr/M+utK0V5WCkW4pdBEQ3Ec8RMAyYGPIvlPfr8BN7zxyEyTJF/U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790180409; c=relaxed/simple;
-	bh=yPjcKmIAfAQsHIpprPTVTIFweOIkApZP0n/mTuTRRj4=;
+	s=arc-20240116; t=1790180411; c=relaxed/simple;
+	bh=SQLNuFHw/zpAETUGpHSpY6G3pmWUvsgc4Uzlxk0XO0U=;
 	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=nshejHhK4OnFqmnJMPGb0zgb2k2VIfoT18IFOrGpBvOyrQjQ2UdjAHr2/gIWfweo5YTxA5cEE8d3/kKDKUA7Nkkvx2N0Ti6h782auMdgeRGEXVIM9niOTFgmXDg8EBPGh7WsjbaY99BXEyvEl0nW+WsbB732hb0IL2WesOAgv+g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=WB8MEOBz; arc=fail smtp.client-ip=52.101.70.2
+	 To:Cc:MIME-Version; b=XCHcb1Tfjx5B6DJepQ1sjI1J86KUuSzsegVHT9pKmhJHvK/V6DWrcN2584DDIqLhLUndE3ZM7yoClR/hAvs8OQ88jUGD32JGcYyJOLSpPO4Unt/G7Z81bIvlqiDWOU/CVfiAMbnF0XdudHX5JIbFdSpYxv2SBCXdOyT4GAorjyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=pyR97giH; arc=fail smtp.client-ip=52.101.70.2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="WB8MEOBz"
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="pyR97giH"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LU0IqF3MD7sMb7a6zPhrLQIiPTD8xPYoxR88jp+EpPJMtdOPRQj1OKBY/GCmUFfUvNXNADKDmATXuNrl5NUjVTF4l72c0hHjbMv4D8naE4Q444/4qpJgbB++fXrT6kWub00BnqDUE9mtIqQdA0acHmm7wHE4AI6dmWztkL1TGOIYLL0VUvJpkwyPTYgZoeQVegbqKtzdQIdejlSWCGLdFtzHPmE6m4wk9Y0jS/ZQ+Kxdbw7tDAB+nnxtKgl5+moOGX8py6pKrUGGmWNfBF9+UZHJyKerM1nRn3fSb1/bfEPLL95614K61ZF8jA1Edt0clZwilE2/y0XFtBrnhzwQPQ==
+ b=EyakZkW+h3ocJyZPtzEtcBSnPDEi8DnJiaNkD8NNJ0W8+aFGr6AyjWe8cA+Sle9tkceIpnaaGRgp7mP0VdR2ZaAGmnbIys9GL0xuBvXbiSvVaiQ02IKWBrAtgJKQcutAlOtwxJkTU8CxeGuZf6SZiQKTNA0zcEnMHOgubVltm7hPLsXQn2lItZdnFURJ6L8nGBSigA3vMMwty/hx8eURhziFfz3s29cfywcaBtGE5LPTWJzB3kE7LziS7+VC46nax1Y1NgxrS2Ws70QNEGX4KqQQbwy7/4SAe/7HuGiBHQCcGJRhTUa2Sjc22ImYhUdEDhIGwSrha1iT4I89/JP8QA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qFcdyzJnZBjBVqjPmcCSwYmPD9G8DqgVLR/EWom7g8o=;
- b=xZbq8tzfMVF8BZi/BYBUEqr/34UHSBJ5zEJyE91tuDlEP14u/sKcb1h7ekauU/uEZMohuJs8hERn+h0008XEE1KQpaIrii4Vz7Xp+npg0KxwJ+0sh8mR27uT5gd013nPMl7X1UJHTVOkkcf9H53d2YrTc/2Xqm0pqut0CtXxu9sDw+nKkdYe7Bw1HQjKolXZjDnOAf8EaV/fPZ+wkNSJlMHTGdP6CEd2tEOVIap+v20WSii9g/tWWrCpyjpvm79sIBvtJjvJ+IpvNSNjSWABc/thf/V4OVe0XO+xslORg3TAyF5vrGiY2Gq5xAP6rYMg0a7BBuLNnMMYt5nZnsK1Rg==
+ bh=6Zs+A3N+H4OIvo1dDhBdyyEbjtuWQj/VrfEajEwtm1k=;
+ b=eOsTGzjNSR4tvH1lEc+G1IqVudkpNEU6d69z4iGTvspqtIFGdggAIvsq1sUInLNYyzGOxbw7k9Kq8jxpL7q+YkZZ5lC5Rr4/suPfMExJ/BruQJYAjhWA3EK6C+H9fD1oc73d3d9BXyXPxQ2khtZkjEA0z3B2XVXR9flqqHwCwac/ELgg+6M+PSh4ohaT9bljVKZsPFZFxOGXF8DEl3P8Z/ACCeMExMsIHbsPy4Ny6VIlodiKLhuF3bjIWq4DQseRzUHKBwemUoipSRc/skQdWwqMUpv/HOVjL/HzVlwNiNWk4xhlcs61FA1fxkJPU6bQXegdLLhVIOBhZQ3LJmJffg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
  dkim=pass header.d=oss.nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
  s=selector1-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qFcdyzJnZBjBVqjPmcCSwYmPD9G8DqgVLR/EWom7g8o=;
- b=WB8MEOBzfpl0q2l2WGkrRAIdpvtSgv+eNUQkkCyGt2hV5zCTafBLU97OdpA9I6X1Svk9DbTSojaBnbzYetZLM4/Kd1O4BSFcCfGfCr78voTSA3T3MdLc5KaGWm0WeaFxCeJXB4qytQFdYTFC78jBArvrnx1V9crEbwQn5C2R4ssG6Dqa0nAmBPXZHzo3XEW4b+gBtFdovkffY2yR25sbg6VzFMn7/DU6HvvaanDjJr1ZVw2MrT77zZlEmuHozMu1Gh9y79hfGO5fdYmuuVSRMsTaSSayFKCKae2/+oI4e3lauvUN/5zICK05KNN1zr+HzyzEpB5ZlaYpqadLqDEwvw==
+ bh=6Zs+A3N+H4OIvo1dDhBdyyEbjtuWQj/VrfEajEwtm1k=;
+ b=pyR97giHDUIXKltWGfxVTXbavglmplUTq30Gs+eP3zh8TTYrfilEg9Ar7xpENtUjZMCBZZ4BrLpnJapgYfBXdTA0lA30tM50cL8rzY+n4WU9TRh3i0GHsSAbcRou51/ok9EkFxJVMQ2D0TVJofV76Oku5UBR/6DWsXc+KEkjl3lIFjdaKK3JQYk87dVHSUhsj90gRRCnmmf0LU3XPU6XzhhPD6/hKq9qvzpSYFR3GJ4ydYY7dafhuHuXIUXhi/BYS9L1ydhQSxlRGh9+smG2cZK2oLopwjri3rdA7pG5sH04uwK3dQ+rvMH3UN5JOQ+TWP9kUd0irXI3KWPwo/7VUw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=oss.nxp.com;
 Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
  by DU4PR04MB10433.eurprd04.prod.outlook.com (2603:10a6:10:55f::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.451.17; Wed, 23 Sep
- 2026 16:20:01 +0000
+ 2026 16:20:06 +0000
 Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
  ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
  ([fe80::2146:83a2:5329:b7c%7]) with mapi id 15.21.0428.015; Wed, 23 Sep 2026
- 16:20:01 +0000
+ 16:20:06 +0000
 From: Frank.Li@oss.nxp.com
-Date: Wed, 23 Sep 2026 12:19:33 -0400
-Subject: [PATCH v2 04/12] dmaengine: add dmaengine_is_*_aligned() helpers
- for DMA consumers
+Date: Wed, 23 Sep 2026 12:19:34 -0400
+Subject: [PATCH v2 05/12] dmaengine: add dmaengine_get_copy_align() and
+ related alignment getter helpers
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260923-dmaengine_prep_dma_pq-v2-4-32ed65b8a9b4@nxp.com>
+Message-Id: <20260923-dmaengine_prep_dma_pq-v2-5-32ed65b8a9b4@nxp.com>
 References: <20260923-dmaengine_prep_dma_pq-v2-0-32ed65b8a9b4@nxp.com>
 In-Reply-To: <20260923-dmaengine_prep_dma_pq-v2-0-32ed65b8a9b4@nxp.com>
 To: Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>, 
@@ -59,15 +59,15 @@ Cc: dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org, imx@lists.linux.dev, 
  Frank Li <Frank.Li@nxp.com>, ntb@lists.linux.dev
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790180376; l=3167;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790180376; l=2372;
  i=Frank.Li@nxp.com; s=20240130; h=from:subject:message-id;
- bh=KCTGjzRUC82WfCM01zzXaIcdRgIJEvbFP+94q9Ozdvk=;
- b=L715oChAPuPJw25fXrwJPDFqA15Y8t4v+H8MRrV6dPle8NlCYTL/6PZNlCCNPgx7xfWIMNIwf
- FC2BuZCkJ4VD7zBXtxUzLfr9FQNTlUZGhrFbDCEQazDQ96gAO78MMfh
+ bh=lXp5Ebsxc0CGIQcgDZ0XzZpIYG7TQxy9TOdVgUs//Ko=;
+ b=49heUt1pcyZxpalPPddc9ilC2L+biGmpOVRd4wq6JiFEkXXkolkVK8Iz99dJEPl8wbKuGKfMi
+ eHBO2Wdz2l1B0uIwf5AceN6JldrX9uLyNRSRLzcKkGg+uKlZ/Pbzs9b
 X-Developer-Key: i=Frank.Li@nxp.com; a=ed25519;
  pk=I0L1sDUfPxpAkRvPKy7MdauTuSENRq+DnA+G4qcS94Q=
-X-ClientProxiedBy: CYXP220CA0002.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:930:ee::12) To GV2PR04MB11799.eurprd04.prod.outlook.com
+X-ClientProxiedBy: CYZPR10CA0003.namprd10.prod.outlook.com
+ (2603:10b6:930:8a::15) To GV2PR04MB11799.eurprd04.prod.outlook.com
  (2603:10a6:150:2cf::9)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -77,160 +77,144 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|DU4PR04MB10433:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5bde5f91-a665-4956-4161-08df198e846f
+X-MS-Office365-Filtering-Correlation-Id: bef30e0e-9132-4042-bec6-08df198e877d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|19092799006|23010399003|18002099003|22082099003|56012099006|11063799006|10067099003;
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|19092799006|23010399003|18002099003|22082099003|3023799007|56012099006|11063799006|10067099003;
 X-Microsoft-Antispam-Message-Info:
-	Axj3ckWAsIyJ/VyuupTUWDSZL1//fDcnbAfaAOe/mPD/vJpwdzjUl60Yhjx+08oMBAm8uo9ko5gRRuvoIVDb2ctFmeZEtHs3VMFgVM0qfOhbz2/jP5SKtDwH4fF3kEq1UwhWWezdIQyyvcFMgCWLrnHXFvX/PPj+VFXZ/tJP4rx1ULvyjjbXmm12LmYmyIZlItLcDEeWv21PQhPMRKgdMhw14Sr2SiKdqi5zBQdba/lAsEgW+kkT1pe7CjF+Zh+kgmHrAE8wFq5cl5oPKtHzXU00yfojteVKYqDowxOOIARU5guUOjcm5vgKN1J7hqwf2CMUGgqMAqnhyaXVaG5RQuTIQnYF0bq2EJjv7VaoqBnIcWsCdAiQ01Lb6Ri1tI22rawuHmZzLQ8HkNomrjjtZg7pbW+HuysOAhtaOp60wYS+qYHAefHQEjICOUcGrcaEFLMSSwILgbYAOuvn9MZkYlcE2kHkWgRot/CXCzwnWb2IQx1VLUYFUskU2s3Mq2hDrMI2vuOrLHR2VQSG8UGo/JuDbW2zxC30FFvlxdmERKjP/ZyRrnZ7USmzvsGn7nZjVIGcOlQiEhOTBkVzQRPOamQdBnO8QezwuvWeMpe5oBZ6jTg+3VLeJGZT3XuWd5U7cWCLJjm91bSoUnSoTA0R/Oe0qQ3JcCpY7P/vmUQHs9Q=
+	DP6OFtXCHovIIO3Fnlv7jNwtlKYrBxqEPxB1Ejv3UlqZe+ZdA2tn3cPj5/OQfJLj58ahBxQ1c99DpO7u3T76PL8Vh0JyuHJwEVEFmh8zr5U0fntFjg5UO28ksRv1arSi1/B4XhrNBK9fdiSVzGialEEErQQubandFxW85O7tKGBsG7uTgb3ewzPbPw1XhZT8K7jcERt4V8st+AdImqGzNErN8BU6Cyn46n4U2biRi73xB3cWHWmIjyr5HVlTxckRNOQzG1zVJSys+HYaFkZtjtVs6vfki/Tt2GYUI4rQXijcx2YSFLZ6IxmMwZGDlbeDoRfqHaHCcdv74kOBz+Lr+8b14dsCsi3QsZBXhcy8ckFMCHgKEduAWFVaLgZx55W7LYi3WgeVm625/A80zKmAWxyIOcGF0T7KaLYToX5Afz0XYikQchszCxmVTQcN64tyNwAw4dmpXO+zlKARIcd8pH8yqogOovO7pCvArq2r4rnuzH0HUmuXmDOCAYKmvlS0Tpj997+XJSiuQTVZQu45YG41lSwHPaLUe8uskl2FGQEj27vWU0ap1LevPnjjRacDoppVgmlFnso0jyZIF2nZrWqr7lfteWH/MVlZsDCanjNSXTiMmvaJarWZmn1jmpZNfOZs1Mqc/qWdY0JXvPGAtHxW1QuIZhXbVQmduem6+Bk=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(19092799006)(23010399003)(18002099003)(22082099003)(56012099006)(11063799006)(10067099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(19092799006)(23010399003)(18002099003)(22082099003)(3023799007)(56012099006)(11063799006)(10067099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YU9IWENRSVNzY1BBZkdEblR0aS9NNElSVU5vbnh5RHAxc0RReW9EbTdVZ3lq?=
- =?utf-8?B?eENvcldXbjVuWXVDbUhMQ2tQcUxiQjdGS3hzMDZCOFQvQ3pGMXgwa0I0OUQx?=
- =?utf-8?B?U3ZKRGNhSHlUZUhrYlNUL0E3elNBZDVUU3BZcU9idTBIK0FyaHZGM2M5Q2xM?=
- =?utf-8?B?TW5ueXpUS1I5RW1iblphQVQwZGc1aC85V0JIRXNtNVBBSGptbVV0Y0pzMEt3?=
- =?utf-8?B?TUt2aGgyaXY5R3BXbjlQN3NreXRHQTJLUTZBdWtEN2U0b0JhWU45RU1ITU9x?=
- =?utf-8?B?UU5SeVVaNnZEZkkzOWl5Ky80TEZJRFVOeExZWU82dGFFNDRrS3Q1NUhuMzNt?=
- =?utf-8?B?cGFpcDBNalQvZGRzbDBHSElsYWZZaXgrTmhYRzNHZ1BxTHRjSGo1MnA5Um8v?=
- =?utf-8?B?ZE5LbmdSL0J3QXoyRWJMYVlrRnArcTQ5cjlrUzV0b0RWdTZEOFZFZjRlTURW?=
- =?utf-8?B?OGNZMzhzN1JlZGRkSGdOejh2VVRIT1YzTyt5akdvRUx5Mk5yYTFyNU9VVWZQ?=
- =?utf-8?B?aStiYkZlbUNrd1h3R1hpZWwvTzVoWmFJVGpJNVFMZ1BNTFZHWC8wQXhINndp?=
- =?utf-8?B?Y1BKQkdoZkh5YmdFa1ViTWU2NHFsTlF2Nlp6ZUJzMjdZVWVZMDU5YXR3M2Uz?=
- =?utf-8?B?VmFKMzE5RXVHMm9mZlRRbzYzazdJL0w5YXRScEo2UGZ4ZU1ZN21Tc2I1WnEw?=
- =?utf-8?B?ZXdRbHp6NUxSSzRTczZsVkt0SWlnb2ZzbEhGTWEvNjVrdmhINEVuOUhLREtr?=
- =?utf-8?B?WUJGdEdwdU4zZllwYUhla29HaFY5VTk2eXVoelcwYlNSa1ZIeEd6QkljZ3JD?=
- =?utf-8?B?djd6U3JETGZFU1A1UTRuWlQ4R0JxTlVVeEhqRE9mdDdvUzVVM2hBK3J2VVp0?=
- =?utf-8?B?OU0zRlR4aDRIZFVNN1pIMVJIenJuSnhMb3YveW90dEk5Sy80M1VHSVVJamJI?=
- =?utf-8?B?ZzA0QlloMktYNSsyYStUaXpOMjltNDY4N1J3cEpTVTNDSEFZNmNyM0RkWlR5?=
- =?utf-8?B?WlJvc01EemZvOTdXOUNzeHA4Q0JtSjdFNGsxelZRNE14dGJDN2laeE5ySnBs?=
- =?utf-8?B?NnN5R0Y3SC9nckQxU1lOcnJIcmdlZnRKYlpwTzdML1RCNGxxZEZkU29Lc0Ev?=
- =?utf-8?B?eDh3Z3FmdFVQb2hiN3pBUEFGSEZsdjdtd2JnMmgzdG42RHNraVY0MG14MDV5?=
- =?utf-8?B?K25paTl5dkM5SmRsU3BwbnJ0aHI0cm1BTmU3c29xdWNIdENIeGtMWHNIMlV2?=
- =?utf-8?B?YTZXZFU0S2ZQY2RYV0s4NHlFUUVMRWh3c0dSdkNBM2x1bkVSZXR5UFRoUEEw?=
- =?utf-8?B?aHcrc2xucC9Yakp1U01VK3U0Ync1bmwxV1R5NkRDakl6b2JJRDd4eDMrcDQ0?=
- =?utf-8?B?ZEZtSE1EeWY3N2FJU1FkQjZvQ0oxc2NGbXZ6aU84d3l2U2hxREFGeDlWRTRq?=
- =?utf-8?B?dmY1TjYxTVd4Vk9ENStyMGFjMzFOTkRsWnB0d09uWk5ZZFJNVmpwMi96clZ0?=
- =?utf-8?B?Mlk3MHZBUXhWUnFJQlo0T2g4eTlKL3V4TUUyZkVpaC8rV09ySW5lc2RXZGl1?=
- =?utf-8?B?MmxWekJBQkYra2VQRFJlbjB1dnlVcXZtSy8vV0dQdnB6VWxkbTQ3Mzl6RXl5?=
- =?utf-8?B?NXVWeVNndDM2c3U5ZE9xb0lsQkRRbzRTdEtvRHR1ekloa3VkYVlCbFNTQXIy?=
- =?utf-8?B?bWxWLzhITlE2RmRYcndpcmt4MERFVHNBMmhIZkZNekxrUDhCQ2toWi9aY3Z2?=
- =?utf-8?B?RFZ5RHZMUmwxaUVSc3pKaWY5YzBXRXRzUVQxcTdQV01POHRNTnZPU0ZDV2dv?=
- =?utf-8?B?Y0hjRGd4RnZwOFB6d1dVL0tNUmF6N2drcUJtUmpCVFhZTlQzeGJQWG43cE1S?=
- =?utf-8?B?emkvSXk5T3pqc0Z3OE5VTzNQbXo2L1JjdDNhMVhwNENSRWlMcG5vd0NpaUJv?=
- =?utf-8?B?eHFhVk5UT3EyRkV2N2JNM1pwUkVJVVRVOGd3OUdPK2kwZExkaW1mc25ySnJq?=
- =?utf-8?B?bEFUTEZNTEN2MWxPWVRMc2lERHBYeGZyR2dic1NmZ0wxRS9nbldTSE1hVjVi?=
- =?utf-8?B?a2c5UTV2aEdoRVcyMlZITE5nOWt4cjZmZHB2MjVtTXJJVG1KZDcyaUVLMWQx?=
- =?utf-8?B?dG90dnRtbDQ4b1hyMDRMa0NHYStLSFpqT08xalB6MytmL2YyNU5SMnowNjBP?=
- =?utf-8?B?WGxEdHB0bEJqL3BvL3hVSDlPR1FENGtQUDlUWmtBUTlxYmtVbG9uMUt0bXlP?=
- =?utf-8?B?a3JlVzMwOXc0M1A2bjFTSzlXTDBiRzJzME5Bd0hlMTBlalgrT2dXUm5wQWhC?=
- =?utf-8?B?MWxqZXdjWGRRM1dPSXBlOCsrb2pScHZ6ZXA2aXlrS1R5bGhnQTFqY0FtRzdz?=
- =?utf-8?Q?xQMibY0eECUTjdAWndswxMqTgcPtyS3DqtlYi?=
+	=?utf-8?B?d0IzcnlvSXRrU1c1MC9INTBiZ2R3NlIrZmRFcXpmZGxzdVFodzUvak9TRWx6?=
+ =?utf-8?B?V2t2Q3RqK2NydDQ4OW0zcjhYWUpJd1EwUjZTZHFlL3I1UEdqY2luS0ZNQVlh?=
+ =?utf-8?B?R0Z2d0JURm5sb1FSa2hkWUcyQU5IS0NzOWtWeTBFc0pIRVVzUzdpbU56eWRi?=
+ =?utf-8?B?UGd2ZU5ESVdUYlJhd1NrTUJrak1SRHFXL2VjWlovNThRb3VGVXFVRDhhemEx?=
+ =?utf-8?B?d04xZkxwaVJhMXRodWNwQUtkSy9EMU1QSTJIMGJPUWVjL25FR1FMSTBBSWNH?=
+ =?utf-8?B?ZU56Q1JPcjdpQit6MXNCMTlwQXl3NHZ0b3IvMUdoWGxhR2RPZ25yaUxjVFNt?=
+ =?utf-8?B?TXVQMHkrM0VpWDMwbUxmRVYyUTBaVWFvS3oyNjljU1JmU3hVOUo1dXBHaVV0?=
+ =?utf-8?B?M2c5MWF6aEYvSDVSSnBnK1BnUThWQjkyYlEycHphNW0vTVJlZllmbHRKYmU1?=
+ =?utf-8?B?bSt0c2tYa2J2U09RYThacXQ0T1VOMmZBcW9UNUxDbG5PdEhkUFFRSndaek1t?=
+ =?utf-8?B?Zms5d2R1L1pFbnZEekpOZUxpNXRyNFI3T2drZU1WY3BUT2tpem1MMjloV1pX?=
+ =?utf-8?B?OFlQaUxQR2FEMUhvOTFJemhVSmd3L00wVGNVYjY3N1ZDL0k1OC9ncm56YVk2?=
+ =?utf-8?B?ZkVQSkY2MWJjb1diaXUrWkgzR0pSMWh6Y09PYTNPeDBCZGJsMlVIUnNTd01i?=
+ =?utf-8?B?WENETU5jd1JndU1IeVpGZHlQSnV0aG5XQitZYjkrQ2VPdS9Cdi9KSHIwNXh1?=
+ =?utf-8?B?YmpnQ0h4VXJYVWlhb3NhVGRqWVNGZjk1OXhtWEFPd1NOdVgrOWpDbE4xQkhH?=
+ =?utf-8?B?NCtkdi96V0NrcDh1OUR2RHArTzkvL1FXcVFiZGJpUXdLTFY1Y3JuQ2ZzUGNP?=
+ =?utf-8?B?bGlzaEFHVjJheUYwM0c2WWVYdE4zRGJDVEU5U1FicXcwR2M4K21HYVpBUWlX?=
+ =?utf-8?B?cEU0NmVPbi9SNGlOQzhxWTVNQzBsWWg3M1JBU0hKWFBUa2N2NEVubTU4YSty?=
+ =?utf-8?B?NkxyTkh3YTNKSjBiUnB5RHR5LzNqNlRtVmhjS20vQitnOWRTTFprVnBiTXlM?=
+ =?utf-8?B?V255ZEFsT0xSY3VONHJCdWRIVVFQZk9EOFVNZXNoQVBGVS84WXk4Nm15V2Rh?=
+ =?utf-8?B?MWkzQ2JjL2tKbFZqNUkxSm11VEJtMk12VGlILysxMUlWdEo1L2hkQXp6dUt6?=
+ =?utf-8?B?bmlUN3UrTXU3VW1nYk8rK3VEMk9vRjlRZlVJRVpzT0xUZHBBUkYwQnM4cU9P?=
+ =?utf-8?B?ZDkvam5rUCs4ZFRZcDR1SmpCU3lBdTVRVktDc3dJM1pESTlKbG53OVBYOWNQ?=
+ =?utf-8?B?aEVKbjVhQ0pJNU5DOXEzYkJ2clVDV3VHOVpvcnh2TVlWcWVnM1hUWUhFSWF3?=
+ =?utf-8?B?N2E3SUFLWkxYTFI1M00xblF4S25XS1F4ZEx1NWFtcWJwK2tXRjRPRGJXa1Aw?=
+ =?utf-8?B?TzAxZGZNWUg5NEptOEQ1eUlzbGNSVUVsQzllaUJtdzhyN3Fobk5ZUHpTZ2M2?=
+ =?utf-8?B?dlc2MXhXZGY3UVByaE9nOHdtNFJLSTNjajdnREZUeG5ydmZWcHp0VzM0OHdO?=
+ =?utf-8?B?V2xDZHduR244VjFISTlRNGFvd24weVVHUU9UUUhib29QOUFKaUtLODR6TElz?=
+ =?utf-8?B?aEFuV0RBdXllMm94SDRPU2JMd3haWDR2MzJzNno4MndYTVZhbW5QejVUZWdP?=
+ =?utf-8?B?cjhTdlY5ZFJTaUNKU2pKVU1Lc2QxKytRMlNnK1VRK0EwMWNQMG5ySTNCaDdD?=
+ =?utf-8?B?TEw3L1RUcmV3TlIrS3BwM04rdkp1ZndXTURrWmI3VjNtRFFld3pzZlB3Yk15?=
+ =?utf-8?B?aXlQMXNtTkh2dXpSTFk0TmNzUThpZFlnclFqcm8xOGJaOW8yOVJ1NHBUTjVu?=
+ =?utf-8?B?UG1IaUQ3UVdISUtnbUhpR2NobUlFL1N2bUMxVjR4ZlRmekZmeC80UGhqL1RB?=
+ =?utf-8?B?ZC8rZzgrcjRQWWxjV3hoWUZpOGN6N2J1eXlIVkg0RUVQQ3dMV1RmU1N0cDVY?=
+ =?utf-8?B?dWJjQ2hQVTAvanA1ZVJUcEZqQ3NqRzJlTW40eGVvYUUvUUFocWVUZFI1TUJo?=
+ =?utf-8?B?Y004UU05cEc2cHQ5cFc1YnJoVTVJTEJhWWZjZU9DRHhlbFVZVkdoRDdPMUs5?=
+ =?utf-8?B?bmhVTEVGY3lMQVZ2YjE0aGxUWE03YWVzZE01Uk5va1Irc1lESVArNFc2UFBa?=
+ =?utf-8?B?eVh0TEltMUc1Q3o3Zk9GTnVjVy9IbFFKdTFBT1QrQVdHVUM3UzhtY2lOb3pJ?=
+ =?utf-8?B?THJVQk9USFhQOW5BYWVFLzA1eTdMaVd0V1lucElQdU9rS2o1VHgxdjdYdm80?=
+ =?utf-8?B?Uk0rc1ppT3ZLcW5vUnpvU0NtWWNFbzdaY2NiNEl0MFA1bXpDU3Qra2ZZbnM1?=
+ =?utf-8?Q?oxZympUXgF9tWYTC8leKN7OsWEjQzbvztp6n5?=
 X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5bde5f91-a665-4956-4161-08df198e846f
+X-MS-Exchange-CrossTenant-Network-Message-Id: bef30e0e-9132-4042-bec6-08df198e877d
 X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2026 16:20:00.9359
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2026 16:20:06.1001
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zwtQAFY/Ye4PF5M1ymKsfNg+owQPTKuMb/qCu6aRgnWc5bq3D3aTW0tNAVMRX+zA5NJOo+ERx8Bkmq3r4L+BgKcyjDi7hoVCpYCmKmRN8nMwg6HIq5mIBAN4a6h1juZm
+X-MS-Exchange-CrossTenant-UserPrincipalName: JEKFjnH1K+faUz+MatVpsy1fCKl4cj++hw0ybx+ekW3d0RaBygIOwGEsC9RixD2ingTUnoev1g1mx12PyEQAzZD5vwSsHJK/o7wIMs2yNRuUAUvljKlIPQm+QXIJou5/
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10433
 
 From: Frank Li <Frank.Li@nxp.com>
 
-DMA engine consumers typically hold a struct dma_chan pointer and should
-not need to reach into struct dma_device directly to check alignment
-requirements.  Add dmaengine_is_copy_aligned(), dmaengine_is_xor_aligned(),
-dmaengine_is_pq_aligned() and dmaengine_is_fill_aligned() as channel-based
-counterparts to the existing is_dma_*_aligned() family.
+Add dmaengine_get_copy_align(), dmaengine_get_xor_align(),
+dmaengine_get_pq_align(), and dmaengine_get_fill_align() inline
+helpers to retrieve the alignment requirement of a DMA channel as
+a power-of-2 exponent.
 
-Each wrapper calls dmaengine_check_align() directly with the alignment
-value from chan->device, keeping struct dma_device opaque to consumers.
+These complement the existing dmaengine_is_*_aligned() test helpers
+by providing direct access to the alignment value, which is useful
+when callers need to propagate or compare alignment constraints.
 
 Signed-off-by: Frank Li <Frank.Li@nxp.com>
 ---
- include/linux/dmaengine.h | 64 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ include/linux/dmaengine.h | 48 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
 diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
-index 6a187136f9493..1efb04e137673 100644
+index 1efb04e137673..615eeb708dcda 100644
 --- a/include/linux/dmaengine.h
 +++ b/include/linux/dmaengine.h
-@@ -1537,6 +1537,70 @@ static inline bool is_dma_fill_aligned(struct dma_device *dev, size_t off1,
+@@ -1537,6 +1537,54 @@ static inline bool is_dma_fill_aligned(struct dma_device *dev, size_t off1,
  	return dmaengine_check_align(dev->fill_align, off1, off2, len);
  }
  
 +/**
-+ * dmaengine_is_copy_aligned - test copy alignment
++ * dmaengine_get_copy_align - get copy alignment requirement of a DMA channel
 + * @chan: DMA channel
-+ * @off1: first buffer offset
-+ * @off2: second buffer offset
-+ * @len: transfer length
 + *
-+ * Return true if off1, off2 and len satisfy the copy alignment requirement of
-+ * the DMA channel, false otherwise.
++ * Return the copy alignment requirement of @chan as a power-of-2 exponent.
 + */
-+static inline bool dmaengine_is_copy_aligned(struct dma_chan *chan, size_t off1,
-+					     size_t off2, size_t len)
++static inline enum dmaengine_alignment
++dmaengine_get_copy_align(struct dma_chan *chan)
 +{
-+	return dmaengine_check_align(chan->device->copy_align, off1, off2, len);
++	return chan->device->copy_align;
 +}
 +
 +/**
-+ * dmaengine_is_xor_aligned - test xor alignment
++ * dmaengine_get_xor_align - get xor alignment requirement of a DMA channel
 + * @chan: DMA channel
-+ * @off1: first buffer offset
-+ * @off2: second buffer offset
-+ * @len: transfer length
 + *
-+ * Return true if off1, off2 and len satisfy the xor alignment requirement of
-+ * the DMA channel, false otherwise.
++ * Return the xor alignment requirement of @chan as a power-of-2 exponent.
 + */
-+static inline bool dmaengine_is_xor_aligned(struct dma_chan *chan, size_t off1,
-+					    size_t off2, size_t len)
++static inline enum dmaengine_alignment
++dmaengine_get_xor_align(struct dma_chan *chan)
 +{
-+	return dmaengine_check_align(chan->device->xor_align, off1, off2, len);
++	return chan->device->xor_align;
 +}
 +
 +/**
-+ * dmaengine_is_pq_aligned - test pq alignment
++ * dmaengine_get_pq_align - get pq alignment requirement of a DMA channel
 + * @chan: DMA channel
-+ * @off1: first buffer offset
-+ * @off2: second buffer offset
-+ * @len: transfer length
 + *
-+ * Return true if off1, off2 and len satisfy the pq alignment requirement of
-+ * the DMA channel, false otherwise.
++ * Return the pq alignment requirement of @chan as a power-of-2 exponent.
 + */
-+static inline bool dmaengine_is_pq_aligned(struct dma_chan *chan, size_t off1,
-+					   size_t off2, size_t len)
++static inline enum dmaengine_alignment
++dmaengine_get_pq_align(struct dma_chan *chan)
 +{
-+	return dmaengine_check_align(chan->device->pq_align, off1, off2, len);
++	return chan->device->pq_align;
 +}
 +
 +/**
-+ * dmaengine_is_fill_aligned - test fill alignment
++ * dmaengine_get_fill_align - get fill alignment requirement of a DMA channel
 + * @chan: DMA channel
-+ * @off1: first buffer offset
-+ * @off2: second buffer offset
-+ * @len: transfer length
 + *
-+ * Return true if off1, off2 and len satisfy the fill alignment requirement of
-+ * the DMA channel, false otherwise.
++ * Return the fill alignment requirement of @chan as a power-of-2 exponent.
 + */
-+static inline bool dmaengine_is_fill_aligned(struct dma_chan *chan, size_t off1,
-+					     size_t off2, size_t len)
++static inline enum dmaengine_alignment
++dmaengine_get_fill_align(struct dma_chan *chan)
 +{
-+	return dmaengine_check_align(chan->device->fill_align, off1, off2, len);
++	return chan->device->fill_align;
 +}
 +
- static inline void
- dma_set_maxpq(struct dma_device *dma, int maxpq, int has_pq_continue)
- {
+ /**
+  * dmaengine_is_copy_aligned - test copy alignment
+  * @chan: DMA channel
 
 -- 
 2.43.0
