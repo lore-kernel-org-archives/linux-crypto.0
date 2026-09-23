@@ -1,88 +1,173 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C9C3A8758;
-	Wed, 23 Sep 2026 05:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4972434EF0C
+	for <linux-crypto@vger.kernel.org>; Wed, 23 Sep 2026 06:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790142706; cv=none; b=nqnDuyZ0dDJ/IxgLr20Ph+8yr8+YBkvLtvEbQULoHRtj8/wYgMuxMUNood1Cnc+kJyQ/XYHxei5ymc70rMrLe1nSsJ8JigOUrMR0y5cC4bBbfhIwJOfoa+DRZ0tcrY/en1+MRhYJ7kp56yYbj4PRjEBTkcC0TyQruueaoQk5iIE=
+	t=1790143282; cv=none; b=E+3XITDqH7djrbV+GhmD7RAhDbk7ZixNECPT54EL8OowZRHTiMJiMjBgyYXxr1FHFCYLv/53C6BaZIEm1HxvbWF4k8llip5Dfhl9B6to6WuJTDbSQaJkxU0oHi0O0EK8m+lLm/JKxyUGR/fe8v3rSd+feCCWsCwxO27S1hqZGRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790142706; c=relaxed/simple;
-	bh=cQGIwF3oyOH8whujBqkj49Yt5aSxsBKx2mzeATqLpyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N768II2h2QubZlR3SqjPLQYJgDD6xZOZs7CsGoZiLGPZ6tr97LGu3N6gGQVP4VE6t/09VuRGtUDsUTIHIOZ4r7M5NIb03iXWMFzUmnoDNrqUew492ichEEFqUWoGrI4cgcUIyNL1Lp4k76IB9EvLvkVbyqTmlz2MmP8uXui1T/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=IDnCAQSG; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1790143282; c=relaxed/simple;
+	bh=pteB5a4ppTtEC+Qr6+ZHmeG6rGYW4XCAWYqIiSDQpOw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=N0/2wF5UAjaj3W1II51bhrgf13+NDDjpueT17UwFPuM9cQzmTJUKo3iHO+LRx9jFiA2X2mMVl6vxGYNlzeYsw+JSMCc1iAYvGDrpHocjxjo3ZTDvy6r/Aix5NCeu7Rtdao8fpogoUI/mEVxfGL15i1BbFkNFqALmDCBcjj63j7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--morbo.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H+BZrR3v; arc=none smtp.client-ip=209.85.210.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--morbo.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="IDnCAQSG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=S7JNK+tUJn0aTzQjrBzWjtxF01WxTfKhalyJo4u0hY4=; 
-	b=IDnCAQSGb99ku0dhuQTzsUaivQX+CnccVceO1cBmXc5/5/varpefMqLYhzdJVaWiwVqp9vOXEVN
-	837O7HJCyyi/lXirG9ArZfFGuZTr+RKoqNpzWbGMjFZBszudxDaHWFgG836yvhSMgqT9+nij9CWzQ
-	LxmP0QhnDGYWydFFjhWo2DzagHoegZDu0rkiETH/cMTIBaE0VNBkpzzQ8kyt3DZIDUqIn4h5kyAcF
-	AlXBcmIUwIENqaKP6dvSefj+Z6LajzIcMU4IdzcGePd9L/4kvNl2woid6Sc866SwQES/RPDEBLe43
-	+cCJAyU8dC9b+Iu1JRU6tqNuyB7E7lsznBiw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x9FtL-0000000GutI-0eCd;
-	Wed, 23 Sep 2026 13:51:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Sep 2026 15:51:39 +1000
-Date: Wed, 23 Sep 2026 15:51:39 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Sebin Francis <sebin.francis@ti.com>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 04/15] crypto: ti - Fix use-after-free of dev_data on
- DTHEv2 driver removal
-Message-ID: <arNo63c8NOHkc5CH@gondor.apana.org.au>
-References: <20260918102245.2784000-1-t-pratham@ti.com>
- <20260918102245.2784000-5-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H+BZrR3v"
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-86a43fc3527so1925802b3a.1
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Sep 2026 23:01:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1790143280; x=1790748080; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8hrAtPjqsJPtZ07wpmzE/ZnFtTfixynLllFoyC+ikp8=;
+        b=H+BZrR3vytDRhkE+KMnlH7liPYsWLNgPCTpzKgIrAuqKdVAWQsSck+jES8AQEaC+EV
+         7mPfTsUOPpcn2REnXq8DuaWVM7c7n5II7bhByApl2t+2i8q8U6L6USe9YT3kgK5Ml3HR
+         6qXtMa8G6NtM6z2uHkE0M5vAdWV5wvirQtZHLHVe+PTO7PNea4gqgJnZXImpF8vXTFio
+         /N3ECHp8Mvn7ATlcRhZ4vEA63dSw4MLUyAhUZc0xRSzNI3Z7tZ5zm6KgMKPtoTEqGT+U
+         mdXP9WRAH2tXlAnAgmoi4osgzq8QgqIT3NQv3qQ2qh9CJ0WAz0pT+4x1d50nXlZ0lrAZ
+         D83A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790143280; x=1790748080;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=8hrAtPjqsJPtZ07wpmzE/ZnFtTfixynLllFoyC+ikp8=;
+        b=e5oPUSZ7MSh0lAxPpANr5SLHEzaVWWi66HZjkfc8o9paGIrKv0puuBmBfCRrcQ/pwN
+         5FI2EYHaguR3bze5DPB/w2LjnJbIVWkT+mHfanjHtcmbJJV5FMVr91JpyiFvfFwLw3zP
+         kOYKgU6w51jG9oH1msCtw142631u3oIMpJU/eoSxBZ07dNFk6SeJUM7XbfpL8YAUe4V6
+         7vnpl2cOljnR0b4jIQOIqGqC0lB8dQtvpxjsebQh0TB5QMVymFgB7ndH8lhPXzJax9l6
+         Hd5YSKmEt6O2r3qEgvQzl+QijrwxOwl1TdTWMuju78cpUdsx3f8MqL6aa92YrxrreXZg
+         u4ng==
+X-Forwarded-Encrypted: i=1; AKwUvBz6UrfokbZVHplyArueGqbMMaz27RGKDPUDIVOEv/gfid3ZdNzkwHr4rOqk/zPJ7sSsGCGjCrHPT5iEJXU=@vger.kernel.org
+X-Gm-Message-State: AFuF++mNGq6AsZWFslu7QlBMWbneHJVUKXn2CME2X3TzFUOcFiIpuSXE
+	ScHQ69LdVVQqNfHDDtQRXSgPP0dnx/KFoUEenPr/HV12J0ZYXqPDnLGWraSGbFgvtb0Gq1cZ4pG
+	6
+X-Received: from pgdg16.prod.google.com ([2002:a05:6a02:51d0:b0:cc5:1163:519f])
+ (user=morbo job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:a347:b0:3dd:65a5:a33
+ with SMTP id adf61e73a8af0-3ddf7f6f170mr1230569637.10.1790143280074; Tue, 22
+ Sep 2026 23:01:20 -0700 (PDT)
+Date: Wed, 23 Sep 2026 06:01:14 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260918102245.2784000-5-t-pratham@ti.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
+Message-ID: <20260923060114.2605310-1-morbo@google.com>
+Subject: [PATCH] crypto: hisilicon/qm - annotate cap_tables with __counted_by_ptr
+From: Bill Wendling <morbo@google.com>
+To: Zhiqi Song <songzhiqi1@huawei.com>, Longfang Liu <liulongfang@huawei.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Weili Qian <qianweili@huawei.com>, Zhou Wang <wangzhou1@hisilicon.com>, 
+	Chenghai Huang <huangchenghai2@huawei.com>
+Cc: Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	Bill Wendling <morbo@google.com>, codemender-patching+linux@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Sep 18, 2026 at 03:52:34PM +0530, T Pratham wrote:
-> Each *_init_tfm() caches a pointer to the per-instance struct dthe_data
-> in its transform context (ctx->dev_data), but never takes a reference on
-> it. If there are tfms in progress when dthe_remove() is called, the devm
-> allocated dev_data gets freed. Then ctx->dev_data will point to a memory
-> that has been freed.
-> 
-> Move dthe_data to req_ctx structs of algorithms, and store the device
-> pointer in tfm_ctx. Add a refcnt to struct dthe_data, which atomically
-> counts the number of requests enqueued in the crypto engine queue which
-> reference the dthe_data object.
-> 
-> A waitqueue waits on this atomic counter to get back to zero in
-> dthe_remove() before doing the driver teardown.
-> 
-> Fixes: 52f641bc63a46 ("crypto: ti - Add driver for DTHE V2 AES Engine (ECB, CBC)")
-> Signed-off-by: T Pratham <t-pratham@ti.com>
-> ---
->  drivers/crypto/ti/dthev2-aes.c    | 74 +++++++++++++++++++++----------
->  drivers/crypto/ti/dthev2-common.c | 40 ++++++++++++++---
->  drivers/crypto/ti/dthev2-common.h | 52 ++++++++++++++++++++--
->  3 files changed, 134 insertions(+), 32 deletions(-)
+Annotate the 'qm_cap_table' and 'dev_cap_table' pointer fields in
+'struct hisi_qm_cap_tables' with the '__counted_by_ptr' attribute.
+This improves bounds checking via CONFIG_UBSAN_BOUNDS and
+CONFIG_FORTIFY_SOURCE, allowing KASAN and compiler diagnostics to
+detect out-of-bounds accesses.
 
-Please check the Sashiko comments:
+The 'qm_cap_table' pointer is associated with 'qm_cap_size' which
+specifies its element count. Similarly, 'dev_cap_table' is associated
+with 'dev_cap_size'.
 
-https://sashiko.dev/#/patchset/20260918102245.2784000-1-t-pratham%40ti.com
+To ensure safety under compiler instrumentation, the assignments in the
+initialization paths have been updated to set the 'size'/'count' fields
+prior to setting the pointer fields. This prevents any transient state
+where the pointer is valid but the count is 0 (or uninitialized),
+ensuring that subsequent accesses to these tables do not trigger
+false-positive bounds check panics.
 
-Thanks,
+Cc: codemender-patching+linux@google.com
+Assisted-by: LLM
+Signed-off-by: Bill Wendling <morbo@google.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
+ drivers/crypto/hisilicon/qm.c             | 2 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c  | 2 +-
+ drivers/crypto/hisilicon/zip/zip_main.c   | 2 +-
+ include/linux/hisi_acc_qm.h               | 4 ++--
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index b6903fce6071..4a1b2de476f5 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -1234,8 +1234,8 @@ static int hpre_pre_store_cap_reg(struct hisi_qm *qm)
+ 		return -EINVAL;
+ 	}
+ 
+-	qm->cap_tables.dev_cap_table = hpre_cap;
+ 	qm->cap_tables.dev_cap_size = size;
++	qm->cap_tables.dev_cap_table = hpre_cap;
+ 
+ 	return 0;
+ }
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index c01966a4a33f..7d13476451e3 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -5743,8 +5743,8 @@ static int qm_pre_store_caps(struct hisi_qm *qm)
+ 							i, qm->cap_ver);
+ 	}
+ 
+-	qm->cap_tables.qm_cap_table = qm_cap;
+ 	qm->cap_tables.qm_cap_size = size;
++	qm->cap_tables.qm_cap_table = qm_cap;
+ 
+ 	return 0;
+ }
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 752565200c16..ac423d016998 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -1285,8 +1285,8 @@ static int sec_pre_store_cap_reg(struct hisi_qm *qm)
+ 				     i, qm->cap_ver);
+ 	}
+ 
+-	qm->cap_tables.dev_cap_table = sec_cap;
+ 	qm->cap_tables.dev_cap_size = size;
++	qm->cap_tables.dev_cap_table = sec_cap;
+ 
+ 	return 0;
+ }
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 706a73656977..10091ad4a6a8 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -1400,8 +1400,8 @@ static int zip_pre_store_cap_reg(struct hisi_qm *qm)
+ 				     i, qm->cap_ver);
+ 	}
+ 
+-	qm->cap_tables.dev_cap_table = zip_cap;
+ 	qm->cap_tables.dev_cap_size = size;
++	qm->cap_tables.dev_cap_table = zip_cap;
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index f7570a409905..8dc49fa2123b 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -332,9 +332,9 @@ struct hisi_qm_cap_record {
+ 
+ struct hisi_qm_cap_tables {
+ 	u32 qm_cap_size;
+-	struct hisi_qm_cap_record *qm_cap_table;
++	struct hisi_qm_cap_record *qm_cap_table __counted_by_ptr(qm_cap_size);
+ 	u32 dev_cap_size;
+-	struct hisi_qm_cap_record *dev_cap_table;
++	struct hisi_qm_cap_record *dev_cap_table __counted_by_ptr(dev_cap_size);
+ };
+ 
+ struct hisi_qm_list {
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.55.0.1082.g2b9226bbc0-goog
+
