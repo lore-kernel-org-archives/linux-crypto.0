@@ -1,46 +1,44 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BAD3009E2;
-	Wed, 23 Sep 2026 05:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E6E39182A;
+	Wed, 23 Sep 2026 05:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790140582; cv=none; b=oIZjmbFQdtcn8QeXxS5Qxt/qM3azn4iL23J5+Xif1R++LZh9sU3rswpQhkn0YURAVdVOoZkGmbz0opRY131DObTGmfodMIxU6sQoXRKhM+fvuX1LhDMyLc58R9IVC9QwgnQ+jmMPryyNXi8yNMUXvt5KSJ5/JAnvEpAcXtUV3Qk=
+	t=1790140596; cv=none; b=bOmchpKLZ5s4/Kzei7NchcOgCljAsOEPag1Is12Db282y/ApT19bijgkLF5D2Fl69w9CdqD5ypvlB/thGKN5mrPvMd3StpRlcUFThZz2HaQhrQcjUxfuy+opsnRTax3zA96gZYNjWh2UGU5RjStH2V6bs3oodpuc0/Qyw3kVcrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790140582; c=relaxed/simple;
-	bh=0KvqwC1jc86Be5G6tZb35nf2qhRhFkUlNG0GsPTsodE=;
+	s=arc-20240116; t=1790140596; c=relaxed/simple;
+	bh=py8Y7hDEb7pKJtcphdi5bTKw33iqAlAcl29p45Jf1bE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hzyz2BH43lQHbH4NGit7B4CF2mXrXpUk4CtMlwmtXtFMjbTO6VhfFscSyetEJyTRYNRdVdsCjCOJP3rUiJTE0d45JRGp1kJl/IHC7OG5qveUr5IXV5ByZzhKnf/RH4Gc6j/JleDadY0Gfhj8rjQS3sAl6dDJpjh6OH9xqXiKK9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=auVFEa+X; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dd0sl1x8lneeywJL3cdyXBzIWtrYW0s1KSDeFV0PmL9xhg0AZ2w4vh1Nfm9cgyeUFVbqH0okVUI1VyBkYcp7sczQdkWL+mZWn0B7PFdIs94nZ5kHxm9WdrMSXH/8jSSRsEqV5HCOfM5Xyq+20jwXCgaU9cF/EYlU/cT5GSSUW3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbjzkM/a; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="auVFEa+X"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=I8wM69X4C1XQHXTDA8OR1705KlhzUyG0Av3NZvqVb1o=; 
-	b=auVFEa+XuszRvwtUPVuLUiCTEODi04DFK2DFi5RBVkLLfRJvcF6Gl868/uhLNUpOjKCHFVX1g0P
-	C8l253hAU7YlQK7nroTlNTa6CiE5U0vAR/P6P8E+Xue8WJzzM+DNfu/fPQm857VaoZSSwX5DrLIPn
-	EFueVzcfPAjKe/9hmIHPUBif/6hhyzmKG9kaKP93vJPqlZD+VGdgQQXW8PU91CZxO7y7sZrp/cQlZ
-	T4CPhDyl2EfP/5hAQoysGy7ubvablT6mrXHshbHY7SvwH/tubKUc+wiTzGzcuo7Y51rj8kKW8q4+I
-	OfmqlF1Qd7kENroOduz1BpnAQ14ujm7Drh4A==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x9FL2-0000000GuPz-17Gl;
-	Wed, 23 Sep 2026 13:16:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Sep 2026 15:16:12 +1000
-Date: Wed, 23 Sep 2026 15:16:12 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Manorit Chawdhry <m-chawdhry@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Keerthy <j-keerthy@ti.com>,
-	Colin Ian King <colin.i.king@gmail.com>, Andrew Davis <afd@ti.com>,
-	Pratham T <t-pratham@ti.com>, Kamlesh Gurudasani <kamlesh@ti.com>,
-	Udit Kumar <u-kumar1@ti.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 00/30] Clean and improve SA2UL driver
-Message-ID: <arNgnMuKPAHYxP4Y@gondor.apana.org.au>
-References: <20260915-b4-upstream-sa2ul-cleanup-v1-0-57ab34e97162@ti.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbjzkM/a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D88031F000FF;
+	Wed, 23 Sep 2026 05:16:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790140595;
+	bh=hhq8M0bpMaERJEmL5HHJ4uUb6lbtrmHobr4GrUUBw6Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=IbjzkM/ajcnT1FwT6w33gdufHf1q3sl3qNUxReQNvImCjgoUQN/HuiQj/Q5aCcYBL
+	 LWQjmSjBYQ4APRFTek0I4ncl0Hax3aqVu25b1TNnsYmrSmFrOzZkRYgN8/Uh08/G4E
+	 lifY02K7QQIHgl4aMsQZedquCFjiNHQvg9MCx/kRUzRKnobTJNZFOqVvFXHQ1v5sH8
+	 ePlcz/XBGnE0SbjEsEwKxoebT1On28FxGNF1NxPZ0qClR3ei1ouJOBvlhISoKKajh/
+	 GDTG48rU+aEJr4raac2V9uU+AJXV4PzU2zqx0PQ/w3jgE3cIEKBE/CVW70EXXw7gMb
+	 eV/kA/K0G6lEg==
+Date: Tue, 22 Sep 2026 22:16:33 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+	stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	srk@ti.com
+Subject: Re: [PATCH v2] crypto: sa2ul - Fix stack overflow in
+ sa_prepare_iopads
+Message-ID: <20260923051633.GF42709@sol>
+References: <20260831055141.1632832-1-s-vadapalli@ti.com>
+ <aqpawGagrSvRkpTi@gondor.apana.org.au>
+ <beba08cf-3e1d-4510-9498-d126482cdaa2@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,71 +47,42 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260915-b4-upstream-sa2ul-cleanup-v1-0-57ab34e97162@ti.com>
+In-Reply-To: <beba08cf-3e1d-4510-9498-d126482cdaa2@ti.com>
 
-On Tue, Sep 15, 2026 at 03:25:06PM +0530, Manorit Chawdhry wrote:
-> The following series focuses on some cleanups to the sa2ul driver, it
-> starts with very trivial cleanups then goes to fix some bigger cleanups
-> and migration to crypto_engine which help fix the broader race condition
-> problems with the driver, thereafter it adds the support for AES CM as
-> per SAxUL 3.1 IP. KASAN is also run alongside to fix the issues caught
-> by them.
+On Tue, Sep 22, 2026 at 06:33:51PM +0530, Siddharth Vadapalli wrote:
+> On 9/16/26 2:30 PM, Herbert Xu wrote:
+> > On Mon, Aug 31, 2026 at 11:21:38AM +0530, Siddharth Vadapalli wrote:
+> > > 
+> > > Since crypto_shash_export() writes 105 bytes into this 104-byte union, it
+> > > overflows by one byte into the adjacent stack frame.
+> > 
+> > This should be converted to crypto_shash_export_core which exports
+> > just the hash state without the partial block buffer.
+> > > Changes since v1:
+> > > - Propagated error from sa_prepare_iopads throughout the call chain.
+> > > - Added missing check for authentication key size being within limits.
+> > > Above changes are based on Sashiko review of the v1 patch at:
+> > > https://sashiko.dev/#/patchset/20260819142357.3950463-1-s-vadapalli%40ti.com
+> > 
+> > Looks like Sashiko is still not happy:
+> > 
+> > https://sashiko.dev/#/patchset/20260831055141.1632832-1-s-vadapalli%40ti.com
+> > 
+> > Let's split this up.  Just do a one-liner to switch shash_export
+> > to shash_export_core, that should fix the stack overrun.  Then
+> > fix the long key issue in a separate patch.
+> > 
+> > I think you should support long keys properly by hashing them as
+> > crypto/hmac.c does.
 > 
-> Self test results across K3 family: 
-> https://gist.github.com/manorit2001/544587ec3535125663e3ca9dbc186e96
+> Thank you for reviewing the patch and providing your valuable feedback.
 > 
-> Signed-off-by: Manorit Chawdhry <m-chawdhry@ti.com>
-> ---
-> Manorit Chawdhry (30):
->       crypto: sa2ul - remove dead code
->       crypto: sa2ul - remove totally unused structure fields
->       crypto: sa2ul - remove unused algorithm ID fields
->       crypto: sa2ul - remove unused fields from sa_cmdl_cfg
->       crypto: sa2ul - remove unused fields from sa_tfm_ctx
->       crypto: sa2ul - remove unused macro definitions
->       crypto: sa2ul - consolidate encryption offset definitions
->       crypto: sa2ul - remove unused SC ID range tracking
->       crypto: sa2ul - remove unused base register pointer
->       crypto: sa2ul - remove unused includes and defines
->       crypto: sa2ul - remove unused line
->       crypto: sa2ul - remove redundant sa_sha_digest() wrapper
->       crypto: sa2ul - fix struct documentation for match_data
->       crypto: sa2ul - zero out security context on free
->       crypto: sa2ul - fix context release on errors
->       crypto: sa2ul - fix resource leak of sha in init_alg() error path
->       crypto: sa2ul - fix resource leak of AEAD in init_alg() error path
->       crypto: sa2ul - fix DMA mapping leak in sa_run() error paths
->       crypto: sa2ul - generate dynamic metadata length
->       crypto: sa2ul - fix command label stack corruption
->       crypto: sa2ul - fix error handling in sa_prepare_iopad
->       crypto: sa2ul - move export to appropriate location.
->       crypto: sa2ul - fix stack overflow in sa_prepare_iopads
->       crypto: sa2ul - add more checks before processing ipad/opad
->       crypto: sa2ul - fix data corruption by skipping device sync on unmap
->       crypto: sa2ul - use correct DMA direction in sa_sync_from_device
->       crypto: sa2ul - change dma_alloc_pool to mempool
->       crypto: sa2ul - route requests through crypto_engine
->       crypto: sa2ul - report SA engine hardware revision
->       crypto: sa2ul - add AES-CM (SA3UL_CM) TRNG priming support
-> 
->  drivers/crypto/Kconfig |    1 +
->  drivers/crypto/sa2ul.c | 1042 +++++++++++++++++++++++++++++-------------------
->  drivers/crypto/sa2ul.h |  162 ++------
->  3 files changed, 661 insertions(+), 544 deletions(-)
-> ---
-> base-commit: a9d7ced84989ec05be09b4b8428759ef60450a0f
-> change-id: 20251106-b4-upstream-sa2ul-cleanup-ce85d40c7eb8
-> 
-> Best regards,
-> --  
-> Manorit Chawdhry <m-chawdhry@ti.com>
+> I will split the patch as you have suggested with the one-line fix patch
+> posted first followed by an independent patch posted later for handling long
+> keys.
 
-Please check the Sashiko comments:
+https://lore.kernel.org/linux-crypto/20260923051116.92741-1-ebiggers@kernel.org
+fixes both bugs properly by using the crypto library instead.  There's
+really no need to even consider workarounds using crypto_shash here.
 
-https://sashiko.dev/#/patchset/20260915-b4-upstream-sa2ul-cleanup-v1-0-57ab34e97162%40ti.com
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
