@@ -1,46 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42775419FDA;
-	Wed, 23 Sep 2026 08:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CEE424646;
+	Wed, 23 Sep 2026 08:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790153364; cv=none; b=A+11bw+MVlPYv3GQBp9GkotYlMLlaOyMrq6A0WJ3snd07KDwMi4xxv2QSqoNewd4iFqhhsKLmtx2WHAqf9F9T8zZKAvA9pvrZ6+VbRHwE+3i5J2N7Fkb+vNeRZ1et94yTJNk3N9qMbHDOQYnitUuZu2sat7MwpgFFGUzpi0ReMM=
+	t=1790153428; cv=none; b=K5X59yynuhVx6NeegB4JeKv/HUNt0FNyXx7+czPERSTRt6i3V7D+y+XgkAZImBDXFR8WzWgzSEbBMUgnpEkIcekKd86w+SGWNzEVqZKLHPUr2PK0FOJfxXQiEqILR8uLDRdWxOg0+Rq8CMbEPdUJl2Q6PlEICkRq25WaklIJQCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790153364; c=relaxed/simple;
-	bh=D1g91ZjWmHkh7Ktrud+n9+yw3chYZxh3hH2ykynfykI=;
+	s=arc-20240116; t=1790153428; c=relaxed/simple;
+	bh=qFbsRoJ0Pdm5dsYHk3/8plwt1PvCIphYjvbws+w1l4A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Aa7lU/tQRFApJNX1+lpECoqe6kV63vijhf8lVOF8ucgJAvJEchMAszj/lRogH/Vf8x5olo1mH+LLp+8EHtDHOhNMdnqePM4GI/Wgu7PNkn1qiYpgobUBVkfWwVz8S5w6C0XfuKKsap1gNaNK8A6y9TztKPvUbVyhjLlxLAV3TOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=aQ9M6abU; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=oQtUNTSN21RJGTM/52bS0hoqNxp364iVKv46ixA4tGg1E0nrz6o65TwDoTb5PTRQBVjFDicNBkJNs9jzY4j9Lvf0W7NCQFPexsv/JvA8Q3eRU8MMvsoaj9jfgqjtG5AzBsAWXIOo03ip/zxQf+IfULcstOplTzBxo0MDqDGq1Jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=B8xjEb5Z; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="aQ9M6abU"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="B8xjEb5Z"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=+zcspmb0hquHO5ANgjZOz1PbyctOi3LbJHzh5KTF0lQ=; 
-	b=aQ9M6abUGkcUdIjIgE7/KAqKFg5EalYVj5q5C77oG0GH2DD2TB1KVsTsns3InR4cZZryZdHK1bG
-	8lazk64Oqy2rSMaSEgiVLkRxjTGL9pN2+F+jsaNC4Bh5XloYo21BtLQDLKXdYPiTc1PNSi57rB4/Y
-	uRelxQ/hTwv0VWIKPpHf1s8DH8Er7etor61tyQtnw8wFB+yzJdRQxsgBEwlC7hS8+4QUEh+MjIUPK
-	p/ERQgp+B7jOFX3kiFrLc+DBwIDBd6O7nUbIA9jsBRpjvuhndh7VVc4x3Z1K46U4TYetkICypoPwa
-	sAUdadzU5cbpmd6Dl1v0uu4w6FdePM2GGvoQ==;
+	from:content-type:reply-to; bh=hO932NQ06DTc2e0n4ctH4CB2tn4URweJkiaBxz0DG9o=; 
+	b=B8xjEb5ZxqFwFYLXqG4WKKhTMbn37PNPBxx2xdzCjcbxD86UZxAYzUMsSwk5g9M+yh6rWeg7Q3i
+	nvGnIK1ekypQ0/tMzhF7LN9z+unR/ApeVQJULI02OGk3ERGMx+jDHby4J4KIDKwQFPVT+iJhLRRSH
+	Ww2rlMz+cJpF6fZsEYHQDMoW3x1OwIzRXHJfv11V6gBVXTc5UswDAVOWN63CWSA9Dy+bbHXXuAa1Q
+	elJTdsehOd1fHEC2VO/sPXwgGdSE8bmWTEqP/miZ8n/UmyF5Gh3hKwCf+h64+N0PkKM1IwbmM4TeX
+	ljVH//TwjpjszVPq+exHYAzaS78Q+P+9hU7Q==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x9IfE-0000000GyCK-0CiQ;
-	Wed, 23 Sep 2026 16:49:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Sep 2026 18:49:16 +1000
-Date: Wed, 23 Sep 2026 18:49:16 +1000
+	id 1x9Ig9-0000000GyDF-3T4x;
+	Wed, 23 Sep 2026 16:50:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Sep 2026 18:50:13 +1000
+Date: Wed, 23 Sep 2026 18:50:13 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	stable@vger.kernel.org,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>
-Subject: Re: [PATCH] crypto: qat - fix error source for QAT GEN6 transmit
- interface faults
-Message-ID: <arOSjKbX-VIucSUI@gondor.apana.org.au>
-References: <20260916075536.1361895-1-suman.kumar.chakraborty@intel.com>
+To: Thorsten Blum <blum@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: atmel-tdes - consolidate transfer setup
+Message-ID: <arOSxQ05VZzmP0qx@gondor.apana.org.au>
+References: <20260916171659.129009-3-blum@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,35 +50,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260916075536.1361895-1-suman.kumar.chakraborty@intel.com>
+In-Reply-To: <20260916171659.129009-3-blum@kernel.org>
 
-On Wed, Sep 16, 2026 at 07:55:36AM +0000, Suman Kumar Chakraborty wrote:
-> TI_CD_PAR_STS faults were being decoded under ERRSOU1, which is
-> incorrect for QAT GEN6 devices. They are actually raised on ERRSOU3.
+On Wed, Sep 16, 2026 at 07:17:01PM +0200, Thorsten Blum wrote:
+> atmel_tdes_crypt_pdc() and atmel_tdes_crypt_dma() store the transfer
+> length in dd->dma_size and synchronize the bounce buffers before a slow
+> transfer.
 > 
-> Move the handling of TI_CD_PAR_STS faults as part of the ERRSOU3 logic
-> and split the status bits by their actual source:
+> Move the shared code to atmel_tdes_crypt_start() and use dd->dma_size in
+> atmel_tdes_crypt_pdc() and atmel_tdes_crypt_dma() instead of passing the
+> length separately.
 > 
->  - Bits 0-18 (TI_INT_ERR_DEVHALT) handled when a DEVHALT is signalled
->    and are counted once as ADF_RAS_FATAL.
->  - Bit 19 (TIMISCSTS) handled separately and counted as ADF_RAS_UNCORR.
-> 
-> Previously, a TI_INT_ERR_DEVHALT fault also incremented ADF_RAS_UNCORR
-> in addition to ADF_RAS_FATAL. Since a DEVHALT is already fatal, remove
-> the redundant increment.
-> 
-> Bits 20-25 of TI_CD_PAR_STS are unused/reserved on QAT GEN6. Remove them
-> from the mask.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 7f3401d0a506 ("crypto: qat - enable RAS support for GEN6 devices")
-> Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
+> Signed-off-by: Thorsten Blum <blum@kernel.org>
 > ---
->  .../intel/qat/qat_common/adf_gen6_ras.c       | 20 +++++++++++++---
->  .../intel/qat/qat_common/adf_gen6_ras.h       | 24 ++++++++++---------
->  2 files changed, 30 insertions(+), 14 deletions(-)
+>  drivers/crypto/atmel-tdes.c | 40 ++++++++++++-------------------------
+>  1 file changed, 13 insertions(+), 27 deletions(-)
 
 Patch applied.  Thanks.
 -- 
