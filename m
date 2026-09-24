@@ -1,70 +1,72 @@
-Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
+Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90803B3BF5
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 23:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E413B14DE
+	for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 23:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790293884; cv=none; b=U4UKenzbufxBGNisn54CDoKSrVQXNski8KWQ62n+3VYOxA8S9tJ8VJVwN8VEWcVhtr4qE18qrPgSYLb3N1SmG0xZMgX7C/ZjEdPX71bCe3Z0a3m9ujOw+Gn8mD4aL+/ZbRvdCY5KmCqBjQ+L2LaFrWTDBrNVoTmgk8UGK2wk5ro=
+	t=1790294381; cv=none; b=da2er3zkaLq6AFyCe6zbCdnG5Z9VQgw3yJ9vNL45cmYRgCIuVWz3kauFe1s6Ap8uN2b/Q0OYAjW52OhyG/yNUTLMp+KNgBvVTwh0QFkbNaOsZ7flsjROID3I1Qp4iHekIXANUCewXz6c4aYE/nYZULzmNWhw7g4sG1vNAM5Fa6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790293884; c=relaxed/simple;
-	bh=6L0NjeLbJplSZvx4toERpzY9L3Q5skU0+h9MTU7MozA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u+zpelL1nw3+BT+R8HWuIzGJNtPJKxOuWaJV1F4d8eO9fpDwCOJavopoXilXl+1f3uH7Bbe6vWUXYHSWvQZf0DBxj2PPYLjdnCtet6DtvIc5cZT1EJEuPKa3aSr6V2LNa34NEluGxopN7/dtegzPl0DciYMOq0YvMhf2Htn6RGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gfkJlidC; arc=none smtp.client-ip=74.125.228.43
+	s=arc-20240116; t=1790294381; c=relaxed/simple;
+	bh=cZl8jUmPCC2YDRh4uue366K9dg4z+dvGR3JZ9BCJQ8I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ucQp1yngWuZ6cEZ6/lt0lo+4x/aBQjpFRdAx/DhHnqBZexDRafavbhzQr1dwW831x7tFlavnZmur2zhKwaxA6DI2WqOQV+QogO2wlzvcVpcSxEuRixNooIaztkUfmUihxYR+GX9mU7zneCsjCZjL+MdnHsJdY84cPIXxEFxVIL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tnb/o9Kz; arc=none smtp.client-ip=74.125.227.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gfkJlidC"
-Received: by mail-pz2-f43.google.com with SMTP id 41be03b00d2f7-cc4c3304833so95464a12.3
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 16:51:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tnb/o9Kz"
+Received: by mail-pj2-f12.google.com with SMTP id d9443c01a7336-2d8fb334e72so1038965ad.1
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 16:59:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790293882; x=1790898682; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1790294380; x=1790899180; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=n7h+VVCSvpCLVVej2FOvVs0E08BhObs9j96BCD16kt4=;
-        b=gfkJlidCy/lUQ2oTTUgIRNBe/ph+Vd9+6G1w2nTqB+cx9PzcQ94CcYTSjq4Rr/JN7B
-         SZOzGn6ZCTH7Cw2WT2RRPBpaplC3ub+I1o0C0cB9Fyx0fabb8gSbnqMxuEuPb1jJGijY
-         ZMQPFAxAkTUNi9Nny1Xs4QXIjkd0LJFYk6Yu6aa/nWqic4jHjec+P8j02Aekbr+6A5tS
-         AbyOnbvcZyIEwN/OKSIwt1C7HM49jv1M0Lih81983bYAyCbwbuDNkMH3m24HOUw+rRr/
-         7Po6whY/CLUJe7tFDFltqqsHmzk7R3LIVNS1l6TtYMI4lICffIIHhuLUU7wcd330TX8M
-         RYeg==
+        bh=G+v5BjqCby3H9JvgpWm1j7CmRuzYXHs5Ge9kI+2lfbI=;
+        b=Tnb/o9Kz4MAbnj+seNVfD4P7zfnxRlsBdspIpHka6F1PFxV6L3f8vl0CXWX4FqmEqn
+         kf6VkAg7jOqcViVULKM3lo2lCbA0ql9qEchxARAuqgMYzeOVcso3lSRIaWKp2HFwnM4S
+         UuMYvbKkBPoU2socZzpyGNVkg0+AyAbeWMxod/LLpRIDcrVog7wWIOfQRUnVJs6Nd8PE
+         DhrBLdqZkqZta842ivz88adx4MXIPYfTiQqyA8zkPgZTaz3icOeGLA+P8mrd6mTZ1afC
+         /YlQMZuvppt9RuSs9Ey2sxgKpm0Qabshkpenp+sUBVEXG16eGqcy4S27qCxPPy1Wkvtq
+         DHrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790293882; x=1790898682;
+        d=1e100.net; s=20260707; t=1790294380; x=1790899180;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=n7h+VVCSvpCLVVej2FOvVs0E08BhObs9j96BCD16kt4=;
-        b=0aOuijlrusXxkriuDMVqlbQ7HZKfnpIsvhVvMhut7yUzZU6gzqdcDSI3WC8wW2lNYp
-         S0MVTNBcV1d6nYR7vLnZJn6ja7GKYnCY2Z4lHwbIteYf1gDcU5obp75byYe803kL0klK
-         GSiZmebhTT1K47bTUkjry2TqDGNuXJ1KtkDGgIG9HTpVHhdEYjFo/G5gn1ApNFJQvBfb
-         e51kda+KLNi0Z6GZVGyEbMRWO0vI5qfDEJbD6zDw6Xr1ZVrRHR1/D+WPxKTvv/64GMMv
-         CZJPK00TnMG15l5NXxIl8j19+1gZm6adzmVPnOIRX4KYLqO6NP/Ss1M+igoz/KThXHDw
-         PqVA==
-X-Gm-Message-State: AFuF++lJ+PJp8wBLQXbbHmpBWAFT//gA0J6YJO5KphN1mu3wdlKtE2Es
-	Yzged4TrgH3QgFUVMVxkiccGJNa9A2D8Ia8sr2IKqnY/t8YlmXFC/o2qsRiHhw==
-X-Gm-Gg: AYBFou1p7liGlpiQoAsLUpTbzE3QWrQ2/uozKnpL0yj+GOds6QsNuok/ceR/NIXeUwq
-	gEYMTzXybbN4U94m0ucOvPf8fdYdNWApvvp278eYwvcpG6CbdnY7+QwqrbFA8S7rPOjIrdORcqR
-	VFiZ7R4l3yc4Vr5Mdbn2Wd+6IYxcchy++jfvWVs3uEppGolI4xablfVlcw9MIBhepEA0oprmt5C
-	0+PfMlECmbMfjwkUqlbmChKyE1SLC9kTfjrlQpQ+cVwmJZcYoVb17r0XblNdVl0bVLOmU5Ag1+o
-	zuqnRa7UaMUD4mKW+MSOhEDSTcb5RGEcbZ1iE1168iVNbbc0DpiVKlTcf4tAKskvYy+HX/7jA6s
-	/VD9UKocTKI+LSthbUTYwJoh5ehgFZhbeOEYt5miGZbO6sZNNSG75hYsQVO6IrAqHw7JqHEsTKF
-	0IIm4T58T8LpqDBih2tnvleDnlbRfh8xu4p2pozfLlz5PyAz43lBlI2shHklFEZbn0L5BL8HGcg
-	IEi8GVYZjJCaCF0EwGdB+7OQPkRqLrwvTS1Gkfe3UEZpL4EE2c2HrrxHpBVw21dlOEJQ5ZNnBSb
-	lw3WziY1ZMW9i1w7+zlpq+aV9gXLFR+bp+oQQl0qrtAg3gwY
-X-Received: by 2002:a17:90b:1a8e:b0:39d:eda6:8a0b with SMTP id 98e67ed59e1d1-3a098cd4453mr3505870a91.21.1790293881852;
-        Thu, 24 Sep 2026 16:51:21 -0700 (PDT)
+        bh=G+v5BjqCby3H9JvgpWm1j7CmRuzYXHs5Ge9kI+2lfbI=;
+        b=rkzEagtiLMW0ucfcSmixljrxA1w80OZFfrCpYuT+XQ5VmD6B/tQmXyYjQFiF6zEHo9
+         DDFmSMB6/sn3Ca1QXJ4gTQKwn2WGofHqB7gxpKdUSISevUAd8EfIN3z1fK03H+04b3rJ
+         a6JA2Zab2CHuXC9hb+L5NdUcBBxLV6szDYXo70N5tq8vrolLRHQQq/893M4m9bBNer2I
+         exmrEVfF2jgdHRwdGPqgVf2CrpSUE4/D0AgCubl2mbNPyRqKlbEXZ1M6zfdMWRpo18Nd
+         tpLjgbZJrmyTR1ZRVaBIWyaHWL9JYIRhiVWylcu/Ze7OReDw87Yj0zkVpd6YbrHtEXT8
+         Ejqw==
+X-Gm-Message-State: AFuF++khj/ybd4/atDcOjRTqdr2QfuVUu73LPmeYiiLfeIU3LKOjCXtm
+	iSRkHI2abxOdpbC0RsyhknRXYknxPPKp0AhLqB4Efmv+XP3Uj2iZWltw03abEQ==
+X-Gm-Gg: AYBFou1YEqL+JFQAyV3z4IY1TfjAV/vanzRfueAZAoD8hH6KfYwL3YwyCAS7RKna+uq
+	f7Gx1QoGQ+eOjcHKk3yVZ3JYpTShWC9z2RMIKg5hBvKgZg4K7LH3Gn6v/xs/5U4TfShPUlIpaTh
+	YXK9wcE2eDWdpZq0rBwTT8qs+BYMe/jZr5YIrvlaK6zTA3Z79XRhFbSxoifOeGoX4Dyrj8kQiVt
+	lKjBWAr98oFWmGwbzJEh6vB+pQlpbIDr0LuxOiaz/kpGyAbD8Tl70ApiCGrJt1+MXB2uPOsGXFs
+	rGJIsm3KHPcjAkkr5wlYmooWuMJ0Ay/AFbCuYZt/1evv25rYtwtb3vuaCdhKvRE68ppUWbDRHCR
+	d9LvXxrZTf4y/Weyl33SnKcoXMFLAvb25Sgoj3PLAk9CnIawElX9BW0h5N81JZMZWa67kktcK2n
+	ekXKX9YDYYjRByQCnHtXGXe3GVcb2kpzasbqcFsLOYNo2wrgHCD3Aea4Ee4PUAfB5l5njX0FwkH
+	wUmq2dtRoXbDDNWA4lHeU9/nxDT7CRqbX/5q7/bv6CIAGSbg2ucDlRaDzBfIa0FoPaM3KJtg4T7
+	EsJ9KEv3sE+yKCya231YuxoQceXogR3wQ8cIJVecJ74nT6gJ
+X-Received: by 2002:a17:902:ef12:b0:2dd:b772:57fe with SMTP id d9443c01a7336-2df7da5ce53mr38368675ad.10.1790294379591;
+        Thu, 24 Sep 2026 16:59:39 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8000:7a86::e34])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0b9357f64sm959429a91.3.2026.09.24.16.51.20
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2df9142bafesm2134785ad.51.2026.09.24.16.59.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Sep 2026 16:51:21 -0700 (PDT)
+        Thu, 24 Sep 2026 16:59:38 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: linux-crypto@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv2] crypto: talitos: fix probe IRQ ordering
-Date: Thu, 24 Sep 2026 16:51:19 -0700
-Message-ID: <20260924235119.141323-1-rosenp@gmail.com>
+Subject: [PATCHv2] crypto: cesa: complete pending requests on device remove
+Date: Thu, 24 Sep 2026 16:59:37 -0700
+Message-ID: <20260924235937.148475-1-rosenp@gmail.com>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -74,105 +76,154 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The talitos interrupt handlers schedule priv->done_task[] via
-tasklet_schedule().  In probe(), talitos_probe_irq() ran before
-tasklet_init(), so an interrupt arriving during that window (a shared
-IRQ, or a completion pending from an earlier transmission) would
-schedule an uninitialized tasklet.
+mv_cesa_remove() unregisters the algorithms but never drains the engine
+queues.  Each engine can still hold outstanding requests in three
+places: engine->req (currently in flight), engine->queue (queued but
+not started), and engine->complete_queue (processed but not yet
+reported).  After unregistration those waiters never receive their
+completion callback and block indefinitely, leaking the request and its
+scatterlist buffers.
 
-Resolve the IRQ numbers before the tasklet_init() calls so the
-done_task[] selection can see the secondary IRQ, and only request the
-IRQs after the channel fifos are allocated and the device is
-initialized.  Every structure the handlers touch is then fully set up
-before interrupts are enabled.  This matches remove(), which frees the
-IRQs before killing the tasklets.
+In mv_cesa_remove() stop each engine (mask interrupts, clear the CMD and
+TDMA control registers, then wait for the engine to report idle), quiesce
+the threaded IRQ with disable_irq()/synchronize_irq(), and drain the
+three queues, completing every outstanding request with -ENOENT.  The
+completion callbacks unmap DMA buffers through the global cesa_dev
+pointer, so keep it valid until the engines are drained, and mark the
+engines aborted under their lock so a racing submitter cannot restart a
+halted engine.
 
 Assisted-by: LLM
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- v2: reshuffle code to avoid NULL derefs
- drivers/crypto/talitos.c | 33 +++++++++++++++++++++++----------
- 1 file changed, 23 insertions(+), 10 deletions(-)
+ v2: fix a bunch of sashiko errors
+ drivers/crypto/marvell/cesa/cesa.c | 80 ++++++++++++++++++++++++++++++
+ drivers/crypto/marvell/cesa/cesa.h |  4 ++
+ 2 files changed, 84 insertions(+)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 41a87d7c30a0..b9dfa2b7ccbb 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -3346,28 +3346,36 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 	return t_alg;
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 564b09773507..d91e1af0fe9c 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -52,6 +52,14 @@ static void mv_cesa_rearm_engine(struct mv_cesa_engine *engine)
+ 
+ 	spin_lock_bh(&engine->lock);
+ 	if (!engine->req) {
++		if (engine->aborted) {
++			/*
++			 * The device is being removed: do not restart the
++			 * engine nor fetch any new request.
++			 */
++			spin_unlock_bh(&engine->lock);
++			return;
++		}
+ 		req = mv_cesa_dequeue_req_locked(engine, &backlog);
+ 		engine->req = req;
+ 	}
+@@ -542,9 +550,81 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ static void mv_cesa_remove(struct platform_device *pdev)
+ {
+ 	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
++	struct mv_cesa_engine *engine;
++	struct crypto_async_request *req;
++	unsigned int i;
++	unsigned int timeout;
+ 
+ 	mv_cesa_remove_algs(cesa);
+ 
++	for (i = 0; i < cesa->caps->nengines; i++) {
++		engine = &cesa->engines[i];
++
++		/*
++		 * Stop the engine so it no longer issues DMA to the SRAM
++		 * region or to request scatterlists that are about to be
++		 * unmapped.
++		 */
++		writel(0, engine->regs + CESA_SA_INT_MSK);
++		writel(0, engine->regs + CESA_SA_CMD);
++		writel(0, engine->regs + CESA_TDMA_CONTROL);
++
++		/*
++		 * Flush the posted writes above and wait for the engine to
++		 * report that it is stopped before any buffer is released.
++		 */
++		timeout = CESA_ENGINE_STOP_TIMEOUT_US;
++		while ((readl(engine->regs + CESA_SA_CMD) &
++			CESA_SA_CMD_EN_CESA_SA_ACCL0) && --timeout)
++			udelay(1);
++
++		/*
++		 * Synchronize with the threaded IRQ handler so that it cannot
++		 * run while the queues below are drained.
++		 */
++		disable_irq(engine->irq);
++		synchronize_irq(engine->irq);
++
++		spin_lock_bh(&engine->lock);
++		engine->aborted = true;
++
++		/*
++		 * Complete the request currently in flight and drain the
++		 * pending and already-processed queues with an error so that
++		 * waiters do not block indefinitely when the device is unbound
++		 * while requests are still outstanding.
++		 */
++		if (engine->req) {
++			req = engine->req;
++			engine->req = NULL;
++			spin_unlock_bh(&engine->lock);
++			mv_cesa_complete_req(crypto_tfm_ctx(req->tfm), req,
++					     -ENOENT);
++			spin_lock_bh(&engine->lock);
++		}
++
++		while ((req = crypto_dequeue_request(&engine->queue)) != NULL) {
++			spin_unlock_bh(&engine->lock);
++			mv_cesa_complete_req(crypto_tfm_ctx(req->tfm), req,
++					     -ENOENT);
++			spin_lock_bh(&engine->lock);
++		}
++
++		while ((req = mv_cesa_engine_dequeue_complete_request(engine))
++		       != NULL) {
++			spin_unlock_bh(&engine->lock);
++			mv_cesa_complete_req(crypto_tfm_ctx(req->tfm), req,
++					     -ENOENT);
++			spin_lock_bh(&engine->lock);
++		}
++		spin_unlock_bh(&engine->lock);
++	}
++
++	/*
++	 * The completion callbacks above (and any concurrent submitter) rely
++	 * on the global cesa_dev pointer: only clear it once the engines are
++	 * fully drained.
++	 */
+ 	cesa_dev = NULL;
  }
  
--static int talitos_probe_irq(struct platform_device *ofdev)
-+static int talitos_get_irqs(struct platform_device *ofdev)
- {
- 	struct device *dev = &ofdev->dev;
- 	struct talitos_private *priv = dev_get_drvdata(dev);
--	int err;
--	bool is_sec1 = has_ftr_sec1(priv);
+diff --git a/drivers/crypto/marvell/cesa/cesa.h b/drivers/crypto/marvell/cesa/cesa.h
+index 44351b252861..56c0dd6f5772 100644
+--- a/drivers/crypto/marvell/cesa/cesa.h
++++ b/drivers/crypto/marvell/cesa/cesa.h
+@@ -10,6 +10,9 @@
  
- 	priv->irq[0] = platform_get_irq(ofdev, 0);
- 	if (priv->irq[0] < 0)
- 		return priv->irq[0];
+ #define CESA_ENGINE_OFF(i)			(((i) * 0x2000))
  
-+	priv->irq[1] = platform_get_irq_optional(ofdev, 1);
-+	if (priv->irq[1] == -EPROBE_DEFER)
-+		return priv->irq[1];
++/* Max time in microseconds to wait for the engine to stop */
++#define CESA_ENGINE_STOP_TIMEOUT_US		1000
 +
-+	return 0;
-+}
-+
-+static int talitos_probe_irq(struct platform_device *ofdev)
-+{
-+	struct device *dev = &ofdev->dev;
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	int err;
-+	bool is_sec1 = has_ftr_sec1(priv);
-+
- 	if (is_sec1) {
- 		err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
- 				  dev_driver_string(dev), priv);
- 		goto primary_out;
- 	}
+ #define CESA_TDMA_BYTE_CNT			0x800
+ #define CESA_TDMA_SRC_ADDR			0x810
+ #define CESA_TDMA_DST_ADDR			0x820
+@@ -450,6 +453,7 @@ struct mv_cesa_engine {
+ 	struct mv_cesa_tdma_chain chain_sw;
+ 	struct list_head complete_queue;
+ 	int irq;
++	bool aborted;
+ };
  
--	priv->irq[1] = platform_get_irq_optional(ofdev, 1);
--	if (priv->irq[1] == -EPROBE_DEFER)
--		return priv->irq[1];
--
--	/* get the primary irq line */
-+	/* single (or primary) irq line */
- 	if (priv->irq[1] < 0) {
- 		err = request_irq(priv->irq[0], talitos2_interrupt_4ch, 0,
- 				  dev_driver_string(dev), priv);
-@@ -3379,7 +3387,7 @@ static int talitos_probe_irq(struct platform_device *ofdev)
- 	if (err)
- 		goto primary_out;
- 
--	/* get the secondary irq line */
-+	/* secondary irq line */
- 	err = request_irq(priv->irq[1], talitos2_interrupt_ch1_3, 0,
- 			  dev_driver_string(dev), priv);
- 	if (err) {
-@@ -3481,7 +3489,7 @@ static int talitos_probe(struct platform_device *ofdev)
- 		stride = TALITOS2_CH_STRIDE;
- 	}
- 
--	err = talitos_probe_irq(ofdev);
-+	err = talitos_get_irqs(ofdev);
- 	if (err)
- 		goto err_out;
- 
-@@ -3540,6 +3548,11 @@ static int talitos_probe(struct platform_device *ofdev)
- 		goto err_out;
- 	}
- 
-+	/* enable interrupts once the channel fifos and tasklets are set up */
-+	err = talitos_probe_irq(ofdev);
-+	if (err)
-+		goto err_out;
-+
- 	/* register the RNG, if available */
- 	if (hw_supports(dev, DESC_HDR_SEL0_RNG)) {
- 		err = talitos_register_rng(dev);
+ /**
 -- 
 2.55.0
 
