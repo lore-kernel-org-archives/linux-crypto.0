@@ -1,188 +1,178 @@
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4674028E8
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 21:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90803B3BF5
+	for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 23:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790285860; cv=none; b=q4HwOY1HMT0uMvL1Tl+Ysyi6jOizDbo4L5DT8UbZljJ5hiZ/c94hyAlB7LIv3YPDQNRtWos6cdwP+h40LO+KtakQNzb8la83+nC/p6PJVwxb2uyXEJRLS3l2RO7WcUCSsqkeITDQ8IcIcY1iCY6pfCx3Ey5BMBud61mXRHEi35g=
+	t=1790293884; cv=none; b=U4UKenzbufxBGNisn54CDoKSrVQXNski8KWQ62n+3VYOxA8S9tJ8VJVwN8VEWcVhtr4qE18qrPgSYLb3N1SmG0xZMgX7C/ZjEdPX71bCe3Z0a3m9ujOw+Gn8mD4aL+/ZbRvdCY5KmCqBjQ+L2LaFrWTDBrNVoTmgk8UGK2wk5ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790285860; c=relaxed/simple;
-	bh=y+jcYIXcNsMdpsEczg5evFFk2pa5hyrYLQD0cpV5aTs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MFH80nKngyNrA+gpuYbVWNmCNMLt+i3PJVuom7/HCuJhC/dRb7F4f0tvms95FA1iUmAWGObhjAYgPhx0Uk/fnIzzLJWfsDZ8hGZvDQfhZKLr1/EadMUP8hdJP76XqgJuD+uGSV/aJPmte3Alz7hxE8pFixbv4yWqDNJPm779pdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shansinha.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rigL3T+7; arc=none smtp.client-ip=209.85.210.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shansinha.bounces.google.com
+	s=arc-20240116; t=1790293884; c=relaxed/simple;
+	bh=6L0NjeLbJplSZvx4toERpzY9L3Q5skU0+h9MTU7MozA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u+zpelL1nw3+BT+R8HWuIzGJNtPJKxOuWaJV1F4d8eO9fpDwCOJavopoXilXl+1f3uH7Bbe6vWUXYHSWvQZf0DBxj2PPYLjdnCtet6DtvIc5cZT1EJEuPKa3aSr6V2LNa34NEluGxopN7/dtegzPl0DciYMOq0YvMhf2Htn6RGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gfkJlidC; arc=none smtp.client-ip=74.125.228.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rigL3T+7"
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-869b8d63e28so318429b3a.0
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 14:37:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gfkJlidC"
+Received: by mail-pz2-f43.google.com with SMTP id 41be03b00d2f7-cc4c3304833so95464a12.3
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 16:51:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1790285859; x=1790890659; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=GHqS1F7t3y1uUdOnmT2Sp37qwPIXFrLRYfJOnwkiOhI=;
-        b=rigL3T+70Bl5MJr1z8tBic3bUWPRhLZUy1sH1AD3iW4LAvSh2Vt0x0IObI1FTW/4aX
-         YPfakgVFsN9ICpJycPD9fhpzHIiblnyTKQKnhyEPVcvGHMaF+j9S5kRRCLuO2sQHSRPB
-         aY9APiLsf1jBRrhZ17JbWR5HhbqJ7K3PjJTmRqzIxDCrejMqXHy22sbqOMNgIYPFbAJr
-         acwS4vSmGK0kIqh9VBt38Hi0lwR2w7xcCl9VzmvzRaVAaXZXX+PndcF8auC9Or6R3Nb6
-         3jBm/LiCCFdAcBVv7xKD4NHGo5P0gaUG79FIN666jZhKeoJMKOfk0x3iR65/xxKDrTng
-         C/5A==
+        d=gmail.com; s=20251104; t=1790293882; x=1790898682; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=n7h+VVCSvpCLVVej2FOvVs0E08BhObs9j96BCD16kt4=;
+        b=gfkJlidCy/lUQ2oTTUgIRNBe/ph+Vd9+6G1w2nTqB+cx9PzcQ94CcYTSjq4Rr/JN7B
+         SZOzGn6ZCTH7Cw2WT2RRPBpaplC3ub+I1o0C0cB9Fyx0fabb8gSbnqMxuEuPb1jJGijY
+         ZMQPFAxAkTUNi9Nny1Xs4QXIjkd0LJFYk6Yu6aa/nWqic4jHjec+P8j02Aekbr+6A5tS
+         AbyOnbvcZyIEwN/OKSIwt1C7HM49jv1M0Lih81983bYAyCbwbuDNkMH3m24HOUw+rRr/
+         7Po6whY/CLUJe7tFDFltqqsHmzk7R3LIVNS1l6TtYMI4lICffIIHhuLUU7wcd330TX8M
+         RYeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790285859; x=1790890659;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20260707; t=1790293882; x=1790898682;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=GHqS1F7t3y1uUdOnmT2Sp37qwPIXFrLRYfJOnwkiOhI=;
-        b=LK9qMpSqQjGGKajqxWtb8KiR6cbmHvZU9pfBRWP5TgRsJBy7n6Fbmui1gs0uJcwBDh
-         0VWeim5zM252+fxXe+9I/jkKr9zTHn0djyNZOrwB1QLRXFY+f1TRWmC5eA3yuLOBLFHR
-         j+3jeYrPTNwLIkvra44E0eYl70jauLCVC3Ktf+og7C4rxaXX080wWhMLtXvb7Pi+czAK
-         vDyglbq1cDYk9EzKMxebtQMZHawUrAD1nb0dpVHdmOHxvceDctXbhelD+hFW8HN3deGD
-         9ewir2bMpt4owy839AQhACjbDH0OnGgUemQsVuF7I0vhmsUOSmUohPjgz4R+LsYUv+K6
-         oYNg==
-X-Forwarded-Encrypted: i=1; AKwUvBy1jz6CVh4oyWJGT2aa0OjF9WZ7FlrRIUF6jrm3A2rIV90isLKpQOfHF2KrDEITY1pDPQxgpEwEgubhy4A=@vger.kernel.org
-X-Gm-Message-State: AFuF++kqXPHPoLkTOHGD1aCv1XYQTD2Pvwqx0BwZ2bJ8XvFIti9bbJZB
-	xzUWeF8sZNfIC0G3UUVVXcdy35jw/wNAUKjgdQZ2vkdWCFSb3fx5g4eWjChlb4mArMo+p9Gg8K3
-	awfRfAgku6qkzxHQ5sw==
-X-Received: from pfbfy11.prod.google.com ([2002:a05:6a00:828b:b0:878:3658:23d3])
- (user=shansinha job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:a583:b0:878:34d7:6a26 with SMTP id d2e1a72fcca58-87e9ba90e5emr3074583b3a.40.1790285858279;
- Thu, 24 Sep 2026 14:37:38 -0700 (PDT)
-Date: Thu, 24 Sep 2026 21:37:37 +0000
-In-Reply-To: <3463e8ce7b925d8cade35cf9d98b96bc3fc619b4.1789749016.git.prsampat@amd.com>
+        bh=n7h+VVCSvpCLVVej2FOvVs0E08BhObs9j96BCD16kt4=;
+        b=0aOuijlrusXxkriuDMVqlbQ7HZKfnpIsvhVvMhut7yUzZU6gzqdcDSI3WC8wW2lNYp
+         S0MVTNBcV1d6nYR7vLnZJn6ja7GKYnCY2Z4lHwbIteYf1gDcU5obp75byYe803kL0klK
+         GSiZmebhTT1K47bTUkjry2TqDGNuXJ1KtkDGgIG9HTpVHhdEYjFo/G5gn1ApNFJQvBfb
+         e51kda+KLNi0Z6GZVGyEbMRWO0vI5qfDEJbD6zDw6Xr1ZVrRHR1/D+WPxKTvv/64GMMv
+         CZJPK00TnMG15l5NXxIl8j19+1gZm6adzmVPnOIRX4KYLqO6NP/Ss1M+igoz/KThXHDw
+         PqVA==
+X-Gm-Message-State: AFuF++lJ+PJp8wBLQXbbHmpBWAFT//gA0J6YJO5KphN1mu3wdlKtE2Es
+	Yzged4TrgH3QgFUVMVxkiccGJNa9A2D8Ia8sr2IKqnY/t8YlmXFC/o2qsRiHhw==
+X-Gm-Gg: AYBFou1p7liGlpiQoAsLUpTbzE3QWrQ2/uozKnpL0yj+GOds6QsNuok/ceR/NIXeUwq
+	gEYMTzXybbN4U94m0ucOvPf8fdYdNWApvvp278eYwvcpG6CbdnY7+QwqrbFA8S7rPOjIrdORcqR
+	VFiZ7R4l3yc4Vr5Mdbn2Wd+6IYxcchy++jfvWVs3uEppGolI4xablfVlcw9MIBhepEA0oprmt5C
+	0+PfMlECmbMfjwkUqlbmChKyE1SLC9kTfjrlQpQ+cVwmJZcYoVb17r0XblNdVl0bVLOmU5Ag1+o
+	zuqnRa7UaMUD4mKW+MSOhEDSTcb5RGEcbZ1iE1168iVNbbc0DpiVKlTcf4tAKskvYy+HX/7jA6s
+	/VD9UKocTKI+LSthbUTYwJoh5ehgFZhbeOEYt5miGZbO6sZNNSG75hYsQVO6IrAqHw7JqHEsTKF
+	0IIm4T58T8LpqDBih2tnvleDnlbRfh8xu4p2pozfLlz5PyAz43lBlI2shHklFEZbn0L5BL8HGcg
+	IEi8GVYZjJCaCF0EwGdB+7OQPkRqLrwvTS1Gkfe3UEZpL4EE2c2HrrxHpBVw21dlOEJQ5ZNnBSb
+	lw3WziY1ZMW9i1w7+zlpq+aV9gXLFR+bp+oQQl0qrtAg3gwY
+X-Received: by 2002:a17:90b:1a8e:b0:39d:eda6:8a0b with SMTP id 98e67ed59e1d1-3a098cd4453mr3505870a91.21.1790293881852;
+        Thu, 24 Sep 2026 16:51:21 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e34])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0b9357f64sm959429a91.3.2026.09.24.16.51.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Sep 2026 16:51:21 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2] crypto: talitos: fix probe IRQ ordering
+Date: Thu, 24 Sep 2026 16:51:19 -0700
+Message-ID: <20260924235119.141323-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1789749016.git.prsampat@amd.com> <3463e8ce7b925d8cade35cf9d98b96bc3fc619b4.1789749016.git.prsampat@amd.com>
-X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <20260924213737.3833625-1-shansinha@google.com>
-Subject: Re: [Patch v2 7/7] crypto/ccp: Implement SNP Download Firmware EX
-From: Shantanu Sinha <shansinha@google.com>
-To: prsampat@amd.com
-Cc: aik@amd.com, ashish.kalra@amd.com, chao.gao@intel.com, dakr@kernel.org, 
-	davem@davemloft.net, gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, mcgrof@kernel.org, 
-	michael.roth@amd.com, nikunj@amd.com, rafael@kernel.org, 
-	russ.weight@linux.dev, shansinha@google.com, thomas.lendacky@amd.com, 
-	tycho@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> +static enum fw_upload_err sev_fw_upload_handle_err(struct sev_device *sev,
-> +						   int rc, int psp_ret)
-> +{
-> +	enum fw_upload_err ret = FW_UPLOAD_ERR_FW_INVALID;
-> +
-> +	if (!rc)
-> +		return FW_UPLOAD_ERR_NONE;
-> +
-> +	switch (psp_ret) {
-[...]
-> +	case SEV_RET_UPDATE_FAILED:
-> +		ret = FW_UPLOAD_ERR_HW_ERROR;
-> +		dev_err(sev->dev, "DLFW_EX: Upgrade failed, automatically reverted\n");
-> +		break;
-> +	case SEV_RET_RESTORE_REQUIRED:
-> +		dev_err(sev->dev, "DLFW_EX: live upgrade failed, please roll back\n");
-> +		/*
-> +		 * Firmware requested a roll-back. Declare the PSP dead so
-> +		 * nothing else tries to use it, and let the next upload through
-> +		 * so the admin can restore the previous image.
-> +		 */
-> +		sev->fwl_rollback_required = true;
-> +		psp_dead = true;
-> +		ret = FW_UPLOAD_ERR_HW_ERROR;
-> +		break;
-> +	case SEV_RET_HWSEV_RET_UNSAFE:
-> +		dev_err(sev->dev, "DLFW_EX: SEV firmware no longer safe. Reboot recommended\n");
-> +		/*
-> +		 * Following a return of HARDWARE_UNSAFE, operation of the SEV
-> +		 * firmware is indeterminate and the recommendation is to reboot
-> +		 * the platform. Declare the PSP dead so the driver stops
-> +		 * issuing commands to it while the reboot is pending.
-> +		 */
-> +		psp_dead = true;
-> +		ret = FW_UPLOAD_ERR_HW_ERROR;
-> +		break;
-> +	case SEV_RET_NO_FW_CALL:
-> +		/* The command never reached the firmware. */
-> +		dev_err(sev->dev, "DLFW_EX: driver error %d\n", rc);
-> +		ret = FW_UPLOAD_ERR_HW_ERROR;
-> +		break;
-> +	default:
-> +		dev_err(sev->dev, "Unknown SEV firmware err 0x%x\n", psp_ret);
-> +		ret = FW_UPLOAD_ERR_HW_ERROR;
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
+The talitos interrupt handlers schedule priv->done_task[] via
+tasklet_schedule().  In probe(), talitos_probe_irq() ran before
+tasklet_init(), so an interrupt arriving during that window (a shared
+IRQ, or a completion pending from an earlier transmission) would
+schedule an uninitialized tasklet.
 
-I've been trying to work this patch into our current workflow and
-running into a slight issue. My goal is to cleanly distinguish 
-between the following failure outcomes and their associated actions:
+Resolve the IRQ numbers before the tasklet_init() calls so the
+done_task[] selection can see the secondary IRQ, and only request the
+IRQs after the channel fifos are allocated and the device is
+initialized.  Every structure the handlers touch is then fully set up
+before interrupts are enabled.  This matches remove(), which frees the
+IRQs before killing the tasklets.
 
-1. Rollback to the old (committed) firmware: SEV_RET_RESTORE_REQUIRED
-   (0x25), where the PSP did not auto-revert (psp_dead == true &&
-   fwl_rollback_required == true) and will only accept a
-   DOWNLOAD_FIRMWARE_EX upload of the CommittedVersion binary to recover
-   the host without a reboot.
-2. Retry the update: device busy / legacy SEV guest active
-   (SEV_STATE_WORKING), driver-side -ENOMEM (SEV_RET_NO_FW_CALL), or
-   SEV_RET_UPDATE_FAILED (0x24), where the PSP either auto-reverted or
-   was never modified (psp_dead == false) and remains healthy on the
-   previous firmware.
-3. Abandon the update due to a fundamental image or precondition error:
-   bad signature, malformed image, version/SVN check failure, or
-   SHUTDOWN_REQUIRED, where the PSP rejected the command up front and
-   neither retrying nor rebooting will help.
-4. Reboot the host: SEV_RET_HWSEV_RET_UNSAFE (0x14) where the PSP is
-   permanently disabled until a system reset.
+Assisted-by: LLM
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v2: reshuffle code to avoid NULL derefs
+ drivers/crypto/talitos.c | 33 +++++++++++++++++++++++----------
+ 1 file changed, 23 insertions(+), 10 deletions(-)
 
-Right now, the same user-facing error in /sys/class/firmware/sev/error
-(FW_UPLOAD_ERR_HW_ERROR / "transferring:hw-error") is returned across
-states 1, 2, and 4 above (SEV_RET_RESTORE_REQUIRED,
-SEV_RET_UPDATE_FAILED, -ENOMEM, and SEV_RET_HWSEV_RET_UNSAFE). Because
-psp_ret is only logged via dev_dbg() in __sev_do_cmd_locked(), userspace
-tooling only sees "transferring:hw-error" in sysfs and has no clean way
-to tell whether to roll back to the committed image, retry, or reboot
-the machine without scraping English strings out of dmesg, which has
-been finicky.
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 41a87d7c30a0..b9dfa2b7ccbb 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -3346,28 +3346,36 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+ 	return t_alg;
+ }
+ 
+-static int talitos_probe_irq(struct platform_device *ofdev)
++static int talitos_get_irqs(struct platform_device *ofdev)
+ {
+ 	struct device *dev = &ofdev->dev;
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+-	int err;
+-	bool is_sec1 = has_ftr_sec1(priv);
+ 
+ 	priv->irq[0] = platform_get_irq(ofdev, 0);
+ 	if (priv->irq[0] < 0)
+ 		return priv->irq[0];
+ 
++	priv->irq[1] = platform_get_irq_optional(ofdev, 1);
++	if (priv->irq[1] == -EPROBE_DEFER)
++		return priv->irq[1];
++
++	return 0;
++}
++
++static int talitos_probe_irq(struct platform_device *ofdev)
++{
++	struct device *dev = &ofdev->dev;
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	int err;
++	bool is_sec1 = has_ftr_sec1(priv);
++
+ 	if (is_sec1) {
+ 		err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
+ 				  dev_driver_string(dev), priv);
+ 		goto primary_out;
+ 	}
+ 
+-	priv->irq[1] = platform_get_irq_optional(ofdev, 1);
+-	if (priv->irq[1] == -EPROBE_DEFER)
+-		return priv->irq[1];
+-
+-	/* get the primary irq line */
++	/* single (or primary) irq line */
+ 	if (priv->irq[1] < 0) {
+ 		err = request_irq(priv->irq[0], talitos2_interrupt_4ch, 0,
+ 				  dev_driver_string(dev), priv);
+@@ -3379,7 +3387,7 @@ static int talitos_probe_irq(struct platform_device *ofdev)
+ 	if (err)
+ 		goto primary_out;
+ 
+-	/* get the secondary irq line */
++	/* secondary irq line */
+ 	err = request_irq(priv->irq[1], talitos2_interrupt_ch1_3, 0,
+ 			  dev_driver_string(dev), priv);
+ 	if (err) {
+@@ -3481,7 +3489,7 @@ static int talitos_probe(struct platform_device *ofdev)
+ 		stride = TALITOS2_CH_STRIDE;
+ 	}
+ 
+-	err = talitos_probe_irq(ofdev);
++	err = talitos_get_irqs(ofdev);
+ 	if (err)
+ 		goto err_out;
+ 
+@@ -3540,6 +3548,11 @@ static int talitos_probe(struct platform_device *ofdev)
+ 		goto err_out;
+ 	}
+ 
++	/* enable interrupts once the channel fifos and tasklets are set up */
++	err = talitos_probe_irq(ofdev);
++	if (err)
++		goto err_out;
++
+ 	/* register the RNG, if available */
+ 	if (hw_supports(dev, DESC_HDR_SEL0_RNG)) {
+ 		err = talitos_register_rng(dev);
+-- 
+2.55.0
 
-Could we do a closer review of the error reporting here and potentially
-include (rc, psp_ret) (matching the "failed %d, error %#x" format
-already used in sev_fw_upload_shutdown_platform() and
-sev_fw_upload_reinit_platform() below) in every dev_err() output so the
-exact driver return code and PSP status code are always visible in
-dmesg?
-
-Alternatively (or alongside that), we could also separate the enum
-fw_upload_err buckets so those four outcomes map to distinct sysfs
-errors:
-
-- Keep FW_UPLOAD_ERR_HW_ERROR for fatal states where the PSP is dead
-  until a host reboot (SEV_RET_HWSEV_RET_UNSAFE, or when psp_dead is
-  already latched).
-- Use FW_UPLOAD_ERR_RW_ERROR for SEV_RET_RESTORE_REQUIRED (where writing
-  the committed firmware image recovers the PSP without a reboot).
-- Use FW_UPLOAD_ERR_BUSY for retryable states where the PSP is still
-  running the previous firmware (SEV_RET_UPDATE_FAILED and -ENOMEM,
-  alongside SEV_STATE_WORKING).
-- Keep FW_UPLOAD_ERR_FW_INVALID (and FW_UPLOAD_ERR_INVALID_SIZE) for
-  permanent image/version rejections where the update should be
-  abandoned, and add case SEV_RET_BAD_SVN: alongside
-  SEV_RET_INVALID_CONFIG so an SVN check failure returns
-  FW_UPLOAD_ERR_FW_INVALID instead of falling into default
-  (FW_UPLOAD_ERR_HW_ERROR).
-
-As a side note, I think -ETIMEDOUT is not handled properly. When a
-command times out in __sev_do_cmd_locked(), it zeroes *psp_ret = 0, sets
-psp_dead = true, and returns -ETIMEDOUT. Because
-sev_fw_upload_handle_err() only checks !rc before switch (psp_ret), a
-timeout falls into the default case, prints "Unknown SEV firmware err
-0x0", and returns FW_UPLOAD_ERR_HW_ERROR instead of
-FW_UPLOAD_ERR_TIMEOUT.
