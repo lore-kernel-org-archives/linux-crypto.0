@@ -1,89 +1,127 @@
-Received: from avas.easytechitalia.it (avas.easytechitalia.it [213.217.29.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3572E7165
-	for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 13:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.217.29.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A019149BD74;
+	Thu, 24 Sep 2026 14:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790258048; cv=none; b=c8LgTnqbWOw/L7a676hPEiO+jRMhT9FmeiyLKZqSRllDmWrcBTgq3gGCT4ULEfDWHXAz+JJXvFAXOy4anjggBTXAisNa8zrwZWW8UlnIuJpFz+PI3gM/R0/XC9GmzTkP/FPVquX7mEGhHcpnENojpGPnvmrM0d8n7S4ugBDwZJs=
+	t=1790261903; cv=none; b=Fxmtd1cVjy3kg02NoxnCQOHMpI/FhnIPvC5BF1ABOfMeqk/VE6rojf0XWeD50GnOS7u5SdyR1P8SjOYZDjZySvzuuG2WAIrob7L02K9Hr+Mwm4CCG9FQS5ck/a+pfBHfxYHYqOvLDFX74wzJWilOhpe91SvAscJR6AsYUTyBbZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790258048; c=relaxed/simple;
-	bh=w59vAarjQED26OtWYRcJPUeriJuNUEo1SNn3fTDv4sU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ad1NxT1hDTaFeX8wYK+9yVac5KuxaiV3bl4RVbqCALUuse9b8UxKgZHHkGtnZEMRs6YbX7zIvHYk4nNa8AnqSYto8fuO90KTKS/qc/Gz2PAHPLFAT1NortLom/C0cqyV2BgtywPLOuvEyGT7xchN3rPTovbqVKDrpodTx4hTpTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mtsistemi.it; spf=pass smtp.mailfrom=mtsistemi.it; dkim=fail (0-bit key) header.d=mtsistemi.it header.i=@mtsistemi.it header.b=XHluIrHn reason="key not found in DNS"; arc=none smtp.client-ip=213.217.29.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mtsistemi.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mtsistemi.it
+	s=arc-20240116; t=1790261903; c=relaxed/simple;
+	bh=Pv9is5h4USJHc3Kzav1YALl7yvM7IrZRsj8hM4t94K8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Abj429QUrvz8RvN8KSqK/P38g7jguDQ5J120RSjYtsDqRqter01xfWSjadfkwEdLdjE8suSLXhhOb8nZGweklqFpOHOZgfNZFguESdqsMr1wj0CpobiG/doPHDZDyep7aKrZTY4LYIAK3hlSmB99efMhHbuD7mL6SGRlVNHYo7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IZ3RR0wn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mtsistemi.it header.i=@mtsistemi.it header.b="XHluIrHn"
-X-Envelope-From: <info@mtsistemi.it>
-Received: from ngmx.easytechitalia.it (unknown [185.76.140.216])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by avas.easytechitalia.it (Postfix) with ESMTPS id 4hrFg26cXBzGnv7;
-	Thu, 24 Sep 2026 15:53:50 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by ngmx.easytechitalia.it (Postfix) with ESMTP id 6E93517C481;
-	Thu, 24 Sep 2026 15:52:04 +0200 (CEST)
-Received: from ngmx.easytechitalia.it ([127.0.0.1])
- by localhost (ngmx.easytechitalia.it [127.0.0.1]) (amavis, port 10032)
- with ESMTP id FHEFsjg1oR3b; Thu, 24 Sep 2026 15:52:03 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by ngmx.easytechitalia.it (Postfix) with ESMTP id 177CC17DC3B;
-	Thu, 24 Sep 2026 15:52:03 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 ngmx.easytechitalia.it 177CC17DC3B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mtsistemi.it;
-	s=AD82E3E6-03E3-11EF-83D2-AF8217D6D3C6; t=1790257923;
-	bh=w59vAarjQED26OtWYRcJPUeriJuNUEo1SNn3fTDv4sU=;
-	h=From:To:Date:Message-ID:MIME-Version;
-	b=XHluIrHnAQJjPoWHr+LStiD30Lc8FD5rm7DaGoJztA//c5ZxQMLd19dSevvCE3wTt
-	 2/QVrdbEQUC9y7VS6jg93tiDpF+Z2ZexHPuc53DzwxsvfeRYEIkGvH08zzCF65f4FU
-	 wvMZumHugfP4fpiRblqbRpqaTE/YQJ+CM4XJdRppjhD9nlphwQRv1qmQch1uDDwh7L
-	 IMxELcDSDEO5BxbpkniS+TfbmQY+SBAVmzW6EaADgJLaeFlB8pR3xw/vAHTde5NGz3
-	 XtgFb9C3KafRS6hRxLZTGunUFKtf4E7WpIowa7dV8ybxwErr6CD0M+cV0t9v71gNod
-	 s2kHHSFoJtB+w==
-X-Virus-Scanned: amavis at ngmx.easytechitalia.it
-Received: from ngmx.easytechitalia.it ([127.0.0.1])
- by localhost (ngmx.easytechitalia.it [127.0.0.1]) (amavis, port 10026)
- with ESMTP id TsJJSNHAAwj2; Thu, 24 Sep 2026 15:52:03 +0200 (CEST)
-Received: from [192.168.56.1] (93-38-124-109.ip70.fastwebnet.it [93.38.124.109])
-	by ngmx.easytechitalia.it (Postfix) with ESMTPSA id B20CD17C481;
-	Thu, 24 Sep 2026 15:52:02 +0200 (CEST)
-From: Mattia Tadini <info@mtsistemi.it>
-To: Tom Lendacky <thomas.lendacky@amd.com>,
- Mario Limonciello <mario.limonciello@amd.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] crypto: ccp - two PSP init fixes, and the AMD BC-250
-Date: Thu, 24 Sep 2026 15:53:48 +0200
-Message-ID: <17902580289.11296.7403498173307596661@mtsistemi.it>
-In-Reply-To: <0902307a-52d2-41c9-9552-289d05c05153@amd.com>
-References: <178984289056.12336.17662860552012704364@mtsistemi.it>
- <10469a97-1e55-438b-a9cc-7a7cf650c104@amd.com>
- <179007151736.36856.17325391038801459309@mtsistemi.it>
- <99667c45-b44b-4378-9d92-7fd9eb64ff16@amd.com>
- <0902307a-52d2-41c9-9552-289d05c05153@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IZ3RR0wn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 974811F000FF;
+	Thu, 24 Sep 2026 14:58:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790261892;
+	bh=UZ6iFFyAzpJmp3mAuNI50frHmht+mNjiiWRlqSNZIuw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=IZ3RR0wngUOBduzPhVmPqqP5uRxbpB1SibgFettW2P9cYDYeRimY6nqiCLT22+MIE
+	 N3KGx9BA/VMt6QwtBGQXcfFrCCYBbe5SgGzsn+mJOyW2rukgkKCSLbWxSQvEgI43Pb
+	 nLwPWlYeAl4ZSnlAVaw8BMVG1p7uOY0wubIb9m9+kkPVCVyiI4x82h4ahOIqNeV1VE
+	 yrJxQsXruk9HPVBA4lc6tXrKOe4M+eB6guRNK+wenOqwoQWkbv3/DYLTcFxbsI0GjW
+	 sKgAhN1riCNqM3Iy9luRIembdcjMNdGq2A30OncTyx6lFVFlTPHY1r2fFsij4duhSJ
+	 uv338pEeJyp0w==
+Date: Thu, 24 Sep 2026 10:58:06 -0400
+From: Nathan Chancellor <nathan@kernel.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: Re: [PATCH v4 11/13] lib/crypto: sha2: Provide functions for
+ zeroizing SHA2 hmac_sha* structures
+Message-ID: <20260924145806.GA1949494@ax162>
+References: <20260916095022.604354-1-thuth@redhat.com>
+ <20260916095022.604354-12-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Easytech-Libra-ESVA-Information: Please contact Easytech S.r.l. for more information
-X-Easytech-Libra-ESVA-ID: 4hrFg26cXBzGnv7
-X-Easytech-Libra-ESVA: No virus found
-X-Easytech-Libra-ESVA-From: info@mtsistemi.it
-X-Easytech-Libra-ESVA-Watermark: 1790862832.75239@MmQpJ95n2/K83gQad8cFKg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260916095022.604354-12-thuth@redhat.com>
 
-On 9/22/26 09:42, Tom Lendacky wrote:
-> My take is to just drop it.
+Hi Thomas,
 
-Understood, I'm dropping the series.
+On Wed, Sep 16, 2026 at 11:50:13AM +0200, Thomas Huth wrote:
+> In certain cases crypto code functions need to zeroize their local SHA2
+> hmac_sha*_key or hmac_sha*_ctx structures after use to avoid leaking
+> sensitive material on the stack.
+> Provide hmac_sha*_zeroize_key() and hmac_sha*_zeroize_ctx() helper
+> functions that can be used with __cleanup() to automatically zeroize
+> the structure when it goes out of scope.
+> 
+> Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/crypto/sha2.h | 73 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 73 insertions(+)
+> 
+> diff --git a/include/crypto/sha2.h b/include/crypto/sha2.h
+> index 7bb8fe169daf2..22fbc37ae8407 100644
+> --- a/include/crypto/sha2.h
+> +++ b/include/crypto/sha2.h
+> @@ -7,6 +7,7 @@
+>  #define _CRYPTO_SHA2_H
+>  
+>  #include <linux/types.h>
+> +#include <linux/string.h>
 
-Thanks to both of you for the time and for the careful review.
+I am seeing a build failure with CONFIG_CFI=y after this patch landed in
+-next as commit 09eb210b7deb ("lib/crypto: sha2: Provide functions for
+zeroizing SHA2 hmac_sha* structures").
 
-Mattia
+  $ printf 'CONFIG_%s=y\n' CFI KEXEC_FILE >kernel/configs/repro.config
+
+  $ make -skj"$(nproc)" ARCH=x86_64 LLVM=1 mrproper defconfig repro.config arch/x86/purgatory/
+  ld.lld: error: undefined symbol: __memset
+  >>> referenced by string.c
+  >>>               arch/x86/purgatory/purgatory.ro:(__UNIQUE_ID_addressable___memset_5)
+
+  ld.lld: error: undefined symbol: __memmove
+  >>> referenced by string.c
+  >>>               arch/x86/purgatory/purgatory.ro:(__UNIQUE_ID_addressable___memmove_6)
+  make[6]: *** [arch/x86/purgatory/Makefile:80: arch/x86/purgatory/purgatory.chk] Error 1
+  ...
+
+This comes from the instances of KCFI_REFERENCE in
+arch/x86/include/asm/string_64.h. Maybe __DISABLE_EXPORTS should be set
+for the full purgatory to avoid this? I am juggling a lot of stuff at
+the moment so just this report instead of a full patch.
+
+diff --git a/arch/x86/purgatory/Makefile b/arch/x86/purgatory/Makefile
+index cde8463b4d84..aa5b48c47e4f 100644
+--- a/arch/x86/purgatory/Makefile
++++ b/arch/x86/purgatory/Makefile
+@@ -11,8 +11,6 @@ $(obj)/string.o: $(srctree)/arch/x86/boot/compressed/string.c FORCE
+ $(obj)/sha256.o: $(srctree)/lib/crypto/sha256.c FORCE
+ 	$(call if_changed_rule,cc_o_c)
+ 
+-CFLAGS_sha256.o := -D__DISABLE_EXPORTS
+-
+ # When profile-guided optimization is enabled, llvm emits two different
+ # overlapping text sections, which is not supported by kexec. Remove profile
+ # optimization flags.
+@@ -38,6 +36,7 @@ PURGATORY_CFLAGS += -fpic -fvisibility=hidden
+ PURGATORY_CFLAGS += $(DISABLE_KSTACK_ERASE) -DDISABLE_BRANCH_PROFILING
+ PURGATORY_CFLAGS += -fno-stack-protector
+ PURGATORY_CFLAGS += -D__NO_FORTIFY
++PURGATORY_CFLAGS += -D__DISABLE_EXPORTS
+ 
+ # Default KBUILD_CFLAGS can have -pg option set when FTRACE is enabled. That
+ # in turn leaves some undefined symbols like __fentry__ in purgatory and not
+-- 
+Cheers,
+Nathan
