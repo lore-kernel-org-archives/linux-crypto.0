@@ -1,45 +1,45 @@
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2613AF676;
-	Thu, 24 Sep 2026 11:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF98387590;
+	Thu, 24 Sep 2026 11:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790249900; cv=none; b=IRSvguaID9VcjmAR4oA+ngg7cpIcQuBDbvyXBKGQhd1EUp3D0SxRjd0RUnSfONPx4h5LyMa6Non/h47b0yKJl+J3lIZP05tlDbyiXd2kCHlZa0AwzOmNP8Pw6Xtb1DrM8PitmJvH0eheZL+sqlDQRH6Q9rVxZPkAs90YNgTDq/s=
+	t=1790249900; cv=none; b=s35XKYauxFtfzySQ4wmVmXw2RTUhzUApWemriu9vUW0j1C/B0/lZ+8CEqOa4bsiCsyoqL62M9teEUJeFJt1ioqgH48ZO2zuajLLbDAW19l7gIKAXcn1gIrmFDgU0nhboJcI6091nIabTV4NYenexq/0cTY01jSpuS/a+QVbpdDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790249900; c=relaxed/simple;
-	bh=2NruCBdLSiLMYRtOZ7Z8ixKPyzTctezlt8OCwIYZhLs=;
+	bh=cArwOMRsX9D1spQWCL22iPkCpGBGLK0f+OjAUiVOvns=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OEOtTUEOi3Gm5/4+q2bT83Zpq6BAn0lXuHMcglDgOb72Zwudi0QBkcCuhTb5bhw1a5sUvKDr39Fcnp+rqqVPpx+Q9x+35un77adlZDpxWt//jdbPuP6Zgv30ivw7Irj4k9ohZasvy2UTwbixLRafOmrGJNPxzeVSJC36wIN0m7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=4OR+pURy; arc=none smtp.client-ip=113.46.200.226
+	 MIME-Version:Content-Type; b=uS+jrU5ibLESOKXtgWwMf3jlWEdrRGageq9VGOKZLG2FWMBA6ULEtnW9+StJ+TuvTkd1IPgV12R0lsn2iWrncX3HZFgzDYeUwVN/SzM/kjk6EbMc5/LkzqDld4834YVSxd7WRE8Yn+RP2xlt5xKaQ9WYg8MGATOLfK7hWtHmcaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=d1Kyahw8; arc=none smtp.client-ip=113.46.200.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="4OR+pURy"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="d1Kyahw8"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=Hhip5diLg9l9vQeukaU5OvVWbxT9GoP0EQgST9wfSm8=;
-	b=4OR+pURyTYYPhc7zxIb4uaNVOAGDelWs0qByWGvXlFrWVvk6CP5VFxSSm9TO3q7XSGCU6Tobo
-	YLDSa5t2E/j2/Yz2VqB6eZ7sad1MBWkOUHXvX7dsZnNkmBgKPsEYtIaEgf0YPPuBNfw7RBSb5H/
-	yBbr4ZsUJ/64yolCJlEx7UY=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hrBPk4cNxzKm5t;
-	Thu, 24 Sep 2026 19:27:06 +0800 (CST)
+	bh=kGS4uHMAer8y/uTOn2U71mx+vyJJtnCousScD/utc28=;
+	b=d1Kyahw8C7lY0uA0AvbXVm2wbF7N5NAUeMQ6eHrh5nYc68INsTDOSiX4RlZwfjooZYawHMyKa
+	v7KBza5R5IU+FBTfp7keCpgi2fE5v/qztiG+XAdnfCfa3Qy61d+qXWyM3/g1kFts7bHoXn1bu0w
+	Uq+SzbJXJJqLdqUKM0YOApo=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4hrBNc4gZmz1K97G;
+	Thu, 24 Sep 2026 19:26:08 +0800 (CST)
 Received: from kwepemf200011.china.huawei.com (unknown [7.202.181.237])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0472940563;
+	by mail.maildlp.com (Postfix) with ESMTPS id D839E40588;
 	Thu, 24 Sep 2026 19:38:14 +0800 (CST)
 Received: from localhost.localdomain (10.50.163.32) by
  kwepemf200011.china.huawei.com (7.202.181.237) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.46; Thu, 24 Sep 2026 19:38:13 +0800
+ 15.2.2562.46; Thu, 24 Sep 2026 19:38:14 +0800
 From: Weili Qian <qianweili@huawei.com>
 To: <herbert@gondor.apana.org.au>
 CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<liulongfang@huawei.com>
-Subject: [PATCH 1/4] crypto: hisilicon/qm - clear runtime PM flag for non-power-manageable device
-Date: Thu, 24 Sep 2026 19:38:09 +0800
-Message-ID: <20260924113812.1110302-2-qianweili@huawei.com>
+Subject: [PATCH 4/4] crypto: hisilicon/qm - fix uacce leak when SVA is not supported
+Date: Thu, 24 Sep 2026 19:38:12 +0800
+Message-ID: <20260924113812.1110302-5-qianweili@huawei.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260924113812.1110302-1-qianweili@huawei.com>
 References: <20260924113812.1110302-1-qianweili@huawei.com>
@@ -54,50 +54,31 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  kwepemf200011.china.huawei.com (7.202.181.237)
 
-ACPI_COMPANION() may return NULL on firmware without ACPI support.
-Passing it directly to acpi_device_power_manageable() causes a NULL
-pointer dereference.
+In qm_alloc_uacce(), when SVA is not supported, the error path calls
+qm_remove_uacce(qm). But qm->uacce is not yet assigned and qm->use_sva
+is still false, so qm_remove_uacce() returns without releasing the
+uacce device, causing a memory leak.
 
-Store the companion in a local variable and check it before use.
-When the device is not power manageable, clear QM_SUPPORT_RPM so the
-driver skips the suspend/resume path.
+Call uacce_remove(uacce) on the local variable instead.
 
-Fixes: 3e1d2c52b2045 ("crypto: hisilicon - check _PS0 and _PR0 method")
+Fixes: cd0ac51c5760 ("crypto: hisilicon/qm - define the device isolation strategy")
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index c01966a4a33f..4f555912f5fc 100644
+index f310edfc16cf..096f0b40b82a 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -3158,6 +3158,7 @@ static int hisi_qp_memory_init(struct hisi_qm *qm, size_t dma_size, int id,
- static void hisi_qm_pre_init(struct hisi_qm *qm)
- {
- 	struct pci_dev *pdev = qm->pdev;
-+	struct acpi_device *adev;
- 
- 	if (qm->ver == QM_HW_V1)
- 		qm->ops = &qm_hw_ops_v1;
-@@ -3173,9 +3174,16 @@ static void hisi_qm_pre_init(struct hisi_qm *qm)
- 	mutex_init(&qm->ifc_lock);
- 	init_rwsem(&qm->qps_lock);
- 	qm->qp_in_used = 0;
-+	/*
-+	 * If the device is not power manageable, clear the flag to
-+	 * avoid entering the suspend and resume process later.
-+	 */
- 	if (test_bit(QM_SUPPORT_RPM, &qm->caps)) {
--		if (!acpi_device_power_manageable(ACPI_COMPANION(&pdev->dev)))
--			dev_info(&pdev->dev, "_PS0 and _PR0 are not defined");
-+		adev = ACPI_COMPANION(&pdev->dev);
-+		if (!adev || !acpi_device_power_manageable(adev)) {
-+			dev_warn(&pdev->dev, "device does not support runtime power gating\n");
-+			clear_bit(QM_SUPPORT_RPM, &qm->caps);
-+		}
+@@ -2968,7 +2968,7 @@ static int qm_alloc_uacce(struct hisi_qm *qm)
+ 		qm->use_sva = true;
+ 	} else {
+ 		/* only consider sva case */
+-		qm_remove_uacce(qm);
++		uacce_remove(uacce);
+ 		return -EINVAL;
  	}
- }
  
 -- 
 2.43.0
