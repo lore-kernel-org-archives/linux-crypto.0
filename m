@@ -1,79 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5516B386C21;
-	Thu, 24 Sep 2026 09:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2613AF676;
+	Thu, 24 Sep 2026 11:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790242464; cv=none; b=rx2ooS3zfnlnri2Cd1BiCyLWzVktBOo9B5e48ZkxMeFHsgEO/2v7jIRFnUcJ+52WUs5bFqITBo5n8EDRopQXtvpm/yC9ansoJKW4RjNvzFOM9I10pnuv4vaQTo+wRFYqcnJWl0mxgqGNWuHK9EAJrBwCWrbzvn8QnnDUCIj+tHk=
+	t=1790249900; cv=none; b=IRSvguaID9VcjmAR4oA+ngg7cpIcQuBDbvyXBKGQhd1EUp3D0SxRjd0RUnSfONPx4h5LyMa6Non/h47b0yKJl+J3lIZP05tlDbyiXd2kCHlZa0AwzOmNP8Pw6Xtb1DrM8PitmJvH0eheZL+sqlDQRH6Q9rVxZPkAs90YNgTDq/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790242464; c=relaxed/simple;
-	bh=xo0DDDKcUbFWdrfXFsOqJj6WtQ7ZhkywMQGZSJ5NBhc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uxco/evdBoksOBIFhN/C4TFaCF8l/wWZcBQr5/xE+j/D29oK+XbGZxENZ1mERkvwwe/GpwIvYd0W+o8sREhA3G/zLOXA698Vp4lnda3MyBwXczn6je4ZIDI1ec+bh506mFYYg7UdR5PkCWJ8jrThQj9osL9A+7skb+lz7PkuKIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y4y+tgP6; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790249900; c=relaxed/simple;
+	bh=2NruCBdLSiLMYRtOZ7Z8ixKPyzTctezlt8OCwIYZhLs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OEOtTUEOi3Gm5/4+q2bT83Zpq6BAn0lXuHMcglDgOb72Zwudi0QBkcCuhTb5bhw1a5sUvKDr39Fcnp+rqqVPpx+Q9x+35un77adlZDpxWt//jdbPuP6Zgv30ivw7Irj4k9ohZasvy2UTwbixLRafOmrGJNPxzeVSJC36wIN0m7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=4OR+pURy; arc=none smtp.client-ip=113.46.200.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y4y+tgP6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54C51F000FF;
-	Thu, 24 Sep 2026 09:34:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790242462;
-	bh=psjurhsMaMi8rVj+TV4mvkos7Pu+6gAV9+t2NFW7hZQ=;
-	h=From:To:Cc:Subject:Date;
-	b=Y4y+tgP6qvVhsBg0NoIudKUFpntYyvT1nurFBjCQwzOHuI8GQhIqikCEJJ5dxBLzm
-	 /8mkz7BSZcUa7s1xtSI2CegSqlmqSeykOpqz8CvTZG0ZI/QrWkCdOLts6e1eNDZIF8
-	 mQotkjSfKpH++0cQbtiiLoPvGVX9bFLFN2xnBNcDPhfYeEGd55JZLDgjg/WmmMRBpU
-	 L4TfdO8bSf/H2CD8b835bR+QZdVwNxkmiUjjB72e0l3/iLbAUplQu0t5F377kE1Fm8
-	 Qql3hLdw+xmaPWH/yBfvFWhvuS2ZPl9fTWa7T26TmfLMk1LWNokXv/IqBfr8HQj0Nx
-	 dD16RaKiF7YaQ==
-From: Thorsten Blum <blum@kernel.org>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Olivier Sobrie <olivier.sobrie@silexinsight.com>,
-	Waleed Ziad <waleed94ziad@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>
-Cc: Thorsten Blum <blum@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] hwrng: ba431 - fix reported byte count
-Date: Thu, 24 Sep 2026 11:33:59 +0200
-Message-ID: <20260924093401.113713-2-blum@kernel.org>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="4OR+pURy"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Hhip5diLg9l9vQeukaU5OvVWbxT9GoP0EQgST9wfSm8=;
+	b=4OR+pURyTYYPhc7zxIb4uaNVOAGDelWs0qByWGvXlFrWVvk6CP5VFxSSm9TO3q7XSGCU6Tobo
+	YLDSa5t2E/j2/Yz2VqB6eZ7sad1MBWkOUHXvX7dsZnNkmBgKPsEYtIaEgf0YPPuBNfw7RBSb5H/
+	yBbr4ZsUJ/64yolCJlEx7UY=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4hrBPk4cNxzKm5t;
+	Thu, 24 Sep 2026 19:27:06 +0800 (CST)
+Received: from kwepemf200011.china.huawei.com (unknown [7.202.181.237])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0472940563;
+	Thu, 24 Sep 2026 19:38:14 +0800 (CST)
+Received: from localhost.localdomain (10.50.163.32) by
+ kwepemf200011.china.huawei.com (7.202.181.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.46; Thu, 24 Sep 2026 19:38:13 +0800
+From: Weili Qian <qianweili@huawei.com>
+To: <herbert@gondor.apana.org.au>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<liulongfang@huawei.com>
+Subject: [PATCH 1/4] crypto: hisilicon/qm - clear runtime PM flag for non-power-manageable device
+Date: Thu, 24 Sep 2026 19:38:09 +0800
+Message-ID: <20260924113812.1110302-2-qianweili@huawei.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260924113812.1110302-1-qianweili@huawei.com>
+References: <20260924113812.1110302-1-qianweili@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=908; i=blum@kernel.org; h=from:subject; bh=xo0DDDKcUbFWdrfXFsOqJj6WtQ7ZhkywMQGZSJ5NBhc=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFlb3nWG3px1KKjcwzMl8UbjBbGAozZxO5oULu3qdeedf SBm766NHaUsDGJcDLJiiiwPZv2Y4VtaU7nJJGInzBxWJpAhDFycAjCRoBhGhkv/1oldehHLlvQ+ mj9yu7RU1+0HM19k7XqUxPPQsnq/tSDD/8DJZwMjGcoXtHV7+H2dIPc4qWOzquW5VO7bW2r5K/r PMAIA
-X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemf200011.china.huawei.com (7.202.181.237)
 
-Use the size of the buffer element instead of the pointer size to report
-the number of bytes read. Since data is a u32 pointer and sizeof(data)
-is 8 bytes on 64-bit systems, using the pointer size reports twice the
-number of bytes actually read.
+ACPI_COMPANION() may return NULL on firmware without ACPI support.
+Passing it directly to acpi_device_power_manageable() causes a NULL
+pointer dereference.
 
-Fixes: 0289e9be5dc2 ("hwrng: ba431 - add support for BA431 hwrng")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thorsten Blum <blum@kernel.org>
+Store the companion in a local variable and check it before use.
+When the device is not power manageable, clear QM_SUPPORT_RPM so the
+driver skips the suspend/resume path.
+
+Fixes: 3e1d2c52b2045 ("crypto: hisilicon - check _PS0 and _PR0 method")
+Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/char/hw_random/ba431-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/hisilicon/qm.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/ba431-rng.c b/drivers/char/hw_random/ba431-rng.c
-index b0a39032c610..810c8cd5629a 100644
---- a/drivers/char/hw_random/ba431-rng.c
-+++ b/drivers/char/hw_random/ba431-rng.c
-@@ -147,7 +147,7 @@ static int ba431_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 		}
- 	}
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index c01966a4a33f..4f555912f5fc 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -3158,6 +3158,7 @@ static int hisi_qp_memory_init(struct hisi_qm *qm, size_t dma_size, int id,
+ static void hisi_qm_pre_init(struct hisi_qm *qm)
+ {
+ 	struct pci_dev *pdev = qm->pdev;
++	struct acpi_device *adev;
  
--	n *= sizeof(data);
-+	n *= sizeof(*data);
- 	return (n || !wait) ? n : -EIO;
+ 	if (qm->ver == QM_HW_V1)
+ 		qm->ops = &qm_hw_ops_v1;
+@@ -3173,9 +3174,16 @@ static void hisi_qm_pre_init(struct hisi_qm *qm)
+ 	mutex_init(&qm->ifc_lock);
+ 	init_rwsem(&qm->qps_lock);
+ 	qm->qp_in_used = 0;
++	/*
++	 * If the device is not power manageable, clear the flag to
++	 * avoid entering the suspend and resume process later.
++	 */
+ 	if (test_bit(QM_SUPPORT_RPM, &qm->caps)) {
+-		if (!acpi_device_power_manageable(ACPI_COMPANION(&pdev->dev)))
+-			dev_info(&pdev->dev, "_PS0 and _PR0 are not defined");
++		adev = ACPI_COMPANION(&pdev->dev);
++		if (!adev || !acpi_device_power_manageable(adev)) {
++			dev_warn(&pdev->dev, "device does not support runtime power gating\n");
++			clear_bit(QM_SUPPORT_RPM, &qm->caps);
++		}
+ 	}
  }
  
+-- 
+2.43.0
+
