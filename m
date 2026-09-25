@@ -1,140 +1,120 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx2-f13.google.com (mail-yx2-f13.google.com [74.125.224.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2611A267;
-	Fri, 25 Sep 2026 00:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790294686; cv=none; b=BJ745ajz1MNmrHKmui6Y1oWi1CKpB6FGiTHtozviErynmiJLl9dtmPt7IKGIReKmfSXsHrBxKM5ahFtU1+1CD+p+y+XyA0zMHMZp2+3dZ5wWru5GyCIj6/u2bW7PT7fCyX7tTYFLcTZUj6N4J2czakztpkAvUmVomiFL45CM504=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790294686; c=relaxed/simple;
-	bh=HvsBmvYUBmw+Sy2UkGl81oqHKz8g4fZqaJXTq9WZ5Oo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R1PtpkS59ndx+eIEbUndCvNqJMgk82IlDuvxggg/dd/CBZpseURXDakab/QZ1mwhVxe+lQnj8fiWErAX4GlhAnKekMv1RCkjgyRu0nO664tj/nTI7sUpmhGaU9L/ArT16pjnZ+qSqoahkhVyg7OGbZbFHumWIJNOEqtdIkB6jzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=PG4XNaZL; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC5F1FC0EA
+	for <linux-crypto@vger.kernel.org>; Fri, 25 Sep 2026 00:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.141
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790295377; cv=pass; b=XYhyxWnIe9I5lq/Cp5i6Nl/N2hyg37sh53sgE2KiQ5J3X84Mrvpc6Vojx0F7VaTzhxGTPr9UDXM5NqQTO9aozEINMMvNr6k+QkGuCe/vBS8hTPY1rQOzHm9kMz7x4yBYwlryfo86XHphqhLUoiNeiB18Y0+J8/y0utxHzT76ANk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790295377; c=relaxed/simple;
+	bh=J6NsS0YBb21hzvOhePaLlNVQz4MY3ClTamAaPzj0JeU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qDGUSQ2we+w9E8YG7sjcvIfljNRGAyF3/kfsHBMFUjzqozzREohOCWhET22vq5pwuchv4n6rogBbrazcR71dVXaJzKQCOpIFFUP5p3JZ90IrqrsTArpitfrT1px3a79zMJhkPotdq6i5Y5erLn64KsYunOwtKK0iPizvxMIQiM0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bshadow.us; spf=pass smtp.mailfrom=bshadow.us; dkim=pass (2048-bit key) header.d=bshadow-us.20251104.gappssmtp.com header.i=@bshadow-us.20251104.gappssmtp.com header.b=QdepNmep; arc=pass smtp.client-ip=74.125.224.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bshadow.us
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bshadow.us
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="PG4XNaZL"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=GvrPeFIm2JKZW2zlPW0AMx8ld3eL9qOjcIbpnfOK7W4=; 
-	b=PG4XNaZLPb+yZu/5jr6EvKnkqL5Tx9cTnbufAjN+Bnh0U58qf3qsFw+lq9IqnfzaPh5ahJpW/rX
-	LvJcLDEHrpCZH0k06qFdyO1qaQaTXeVXa2UQIBZwqz0nIPzNSfzJmMu/gwPws8iVoncVtE0JAFiXh
-	1SUgxpAlNX3L4tPIL8DK6qu2mx1xbEcFtJezq8MDEsMruaQmIOBvjs/3XOQ0501khN6WI0QBMVTHT
-	/7wZStfm8bfNAkORMm3TNXpTAgIyGJgWeQp+ZhGwnX7TjGCsShHS/45B00rfMPeFO+9VA+SLQH2FK
-	TcSy/DQBMGTCD0DBIJ9SScOM0GYSGhB6bhEg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x9tQP-000000003eW-42jT;
-	Fri, 25 Sep 2026 08:04:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Sep 2026 10:04:25 +1000
-Date: Fri, 25 Sep 2026 10:04:25 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Usama Arif <usama.arif@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>, justinstitt@google.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, morbo@google.com, nathan@kernel.org,
-	ndesaulniers@google.com, Thomas Graf <tgraf@suug.ch>,
-	nickolay.lysenko@gmail.com, peterz@infradead.org,
-	rostedt@goodmis.org, sched-ext@lists.linux.dev, tj@kernel.org
-Subject: Re: [PATCH] rhashtable: specialize default comparison for constant
- parameters
-Message-ID: <arW6ibT1RkVCqTdT@gondor.apana.org.au>
-References: <20260924184733.2317353-1-usama.arif@linux.dev>
+	dkim=pass (2048-bit key) header.d=bshadow-us.20251104.gappssmtp.com header.i=@bshadow-us.20251104.gappssmtp.com header.b="QdepNmep"
+Received: by mail-yx2-f13.google.com with SMTP id 00721157ae682-85d4ddd179eso4065177b3.3
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Sep 2026 17:16:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790295374; cv=none;
+        d=google.com; s=arc-20260327;
+        b=mBK0cwRzh7iZWFLI1eBCM4Fg1xEvsXWuJ5xfrq77vAEJlYobF0k8Fpm05JB0e4ytWU
+         mF3DkpTvgSUdltsn+H4YW5hTkAgzVjjdWYK5JgajTtg6liy1slk+65O11/jlH1fjoV30
+         NCWUuM+OXg/Bt1CPUGRK9Ms05q0S8+1/T/bvaTFkn0ZhSuC4QaMCHFUqc+NC67gm+aKH
+         sbVryZP8Byf5lOGriU7rRsNXl6otqbjEPZeozEo3RWO75rraE+HO6AxHWHMguS26SULQ
+         mjl1Xxt+KLFxUn873d7jM0/tsC8u900SH8JDVTC+XIHx89drvUkiGZavIvcA9e8uY0S9
+         sbGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=J6NsS0YBb21hzvOhePaLlNVQz4MY3ClTamAaPzj0JeU=;
+        fh=16Lq/Fkb+X1LtWCFcPrRHAz0kS7b3nJudiD4N5+H+Jg=;
+        b=eigvpa669YjnRRCN4tIrr76ai8TKhvTmCaVHXIZE1XDwePG9SsFR8gfRvFr8VK82Vm
+         qZpqOxxKA95Z70Tz2IERjlQ5W+4rUUNwIqfBqwglQh9+fL4ArmO22ATh/so5UzV+1bmj
+         uy4t3Bu7dbT+9zg1EfKj9M7saX5DSLYi2MP93k2Tct0fNRTQVD+Kce8mQtub4VqE6hLL
+         xJCbMKGFLvSbmfcFRNTPNMLzekcI/SCXenArH/glkI4wb9hHmrTAx//gngvMPpfxd7is
+         T1hxqUR8KlCq4HXvM5oDP7b0jyTkaDMD7ujrmKP7Th7xOZ8XQWk4nIIWFXH7mHJGeSU1
+         rR6Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bshadow-us.20251104.gappssmtp.com; s=20251104; t=1790295374; x=1790900174; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=J6NsS0YBb21hzvOhePaLlNVQz4MY3ClTamAaPzj0JeU=;
+        b=QdepNmepi39O8OE6WlLItAiDrPGD1RzRvO/KZGWcEXwPv7s1Hn0HCOv7q5ff7VynVz
+         RZjmQiskYYtlcyndqnrmRxxXQSvOcJW4doM5XSwGTa2Tgpl6JBbZD0osf14ABOniv6cg
+         077+pS4+KSWEHzxXKxl4C8z4ITkte3hV6nG6CoV7CyAOgus68GKCx0ZLPbr9oonM9t7H
+         /ulQPGqfaxRolSqqAulrUy9sW7HJLC+oQg2sBhxHBPSD3VA2rTkM2W/RX6k5Jvm+6IMk
+         K6mnRQQn6tOnilCg1Yanf/IvxOiaV9uMaT1XtgLvVXM2Pg4D2FokJfnux89PMWJ3nefQ
+         ZVUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790295374; x=1790900174;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=J6NsS0YBb21hzvOhePaLlNVQz4MY3ClTamAaPzj0JeU=;
+        b=szIP76PGUpSoC8+a6FNMmZb0Z3Au/2+GLgT22kP0V3+vUA8GwoLTKbCi6Kk/154TAu
+         qOBlGT02PWgAnpLwXZFpUBk1uAqp7gBCmaisSCf1NL4inpqYFSatyPM7lw28+iK7F4N1
+         8cqDN0mJ0D4/ReFS4zOTGPKCN1eMnMdKhjSk+ywu6GpgTkEG5T3w8pRAdBzDLTlQOA2K
+         ZjGwAT9+O6FycVYasl0Q4QFeSQszl3AVh2b7OCwLrQTTeJLyKWqj8ja8VaL6WNJRE+Go
+         9O6SbHzO6uZO5grqdaQ2l2qPNN88GA9tKjXCFALYAVnYNNhlqkge3Usw1DkcFI5fsF6Z
+         a3/w==
+X-Gm-Message-State: AFuF++kuzIQpdHzrk6qL1mFRlwG4dDIgiCSXHoDMM0SSQI5XoOSobwmO
+	bqc+kqfnTrcdCIQMaB+bo4jEaP1uV7AMSud6fS2elUTOacrAZH+QqjWl9dExipFn8gZmU0XG8EB
+	KXAr7EQG4tgunXShvZD41S8KxVwT9Y29E9kCSBWg0Iw==
+X-Gm-Gg: AYBFou30jQF3OmPTVHXhsMg7L+Goxobjme1HEDVIFv+nE4FycsnxahGPxqOB27flA3c
+	D/cKEMGjUaVVLQdh1pWyhfkNCuIn3JYi5b4IZGaqRFWdSehAJgPAwOiAw7iSd5RgBsWewQXnGI6
+	3ksjyI7gCp+YzfaHvlY7kZLkzaj8WhdeNU4o7mgZC5A5dwMbsrlJhDTQqJzX3skzpCAQ3ITufqv
+	R5CjgxT67NAguRg8iK1Ns+ie7zBn3dwT6Pchk9T6NSQHeiEy41T1BOXgm3Pk8NJCAf9+DtB4dQC
+	TKzB5LUdTGxGlLhEsGKMOrD2iA9j328foIjcb0e3shb5+08OQ4NJztWQR1nfXH/y14akdYay+DD
+	Q8+/qoHkjh8fU0Q==
+X-Received: by 2002:a05:690c:e28b:10b0:89a:63da:cbec with SMTP id
+ 00721157ae682-8a64ad4af48mr20301267b3.50.1790295374720; Thu, 24 Sep 2026
+ 17:16:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260924184733.2317353-1-usama.arif@linux.dev>
+References: <20260924235937.148475-1-rosenp@gmail.com>
+In-Reply-To: <20260924235937.148475-1-rosenp@gmail.com>
+From: Robert Lovrinovic <r@bshadow.us>
+Date: Fri, 25 Sep 2026 02:15:37 +0200
+X-Gm-Features: AclHuK8-qQgfbz72-uMb5J0boueQc0SUvZRZGAtgZFpSELI8D9RLgL0irK2iMco
+Message-ID: <CA+39HW2_=z1jggfourLfE8XmXGQx8LV233QO=m0y4Fw2774Z3A@mail.gmail.com>
+Subject: Re: [PATCHv2] crypto: cesa: complete pending requests on device remove
+To: Rosen Penev <rosenp@gmail.com>
+Cc: linux-crypto@vger.kernel.org, Srujana Challa <schalla@marvell.com>, 
+	Bharat Bhushan <bbhushan2@marvell.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Sep 24, 2026 at 11:47:33AM -0700, Usama Arif wrote:
-> The inline lookup and insert helpers receive the rhashtable parameters by
-> value. With a static const parameter block, key_offset and key_len are
-> compile-time constants at the call site.
-> 
-> The default comparison throws that information away by reading both fields
-> back from ht->p. Fixed-size keys consequently load the parameters and call
-> bcmp() for every object in the bucket, even when the compiler could use
-> scalar comparisons instead.
-> 
-> The commit "sched_ext: Specialize the DSQ hashtable compare" [1] resulted
-> in a 2.9x faster DSQ lookup after replacing this path for its u64 key
-> with a scalar comparison. Doing that through obj_cmpfn requires every
-> fixed-key user to provide its own callback.
-> 
-> Pass the call-site parameters to rhashtable_compare(), as
-> rht_key_get_hash() already does. Use them when key_len is a compile-time
-> constant. Retain the ht->p path for dynamic parameter blocks. A constant
-> zero key_len continues to take the runtime length from ht->p.key_len.
-> 
-> This specializes the default comparison for all fixed-size users. With
-> Clang 22 on x86-64, bcmp() disappears from sched_ext, mac80211, NFSd,
-> TIPC, NFQUEUE, VFS superblock, pidfs, SysV IPC and hardware-breakpoint
-> table paths. The affected build_policy.o, sta_info.o and nfsd filecache.o
-> text shrinks by 512, 400 and 352 bytes respectively. Four- and eight-byte
-> keys become direct scalar comparisons; six-byte MAC addresses become a
-> four-byte and a two-byte comparison.
-> 
-> Measure the VFS case with ustat() on a mounted ramfs. This exercises
-> user_get_super() and its super_dev lookup. Across ten interleaved baseline
-> and patched VM boot pairs, with five 3 million call samples per boot, the
-> average per-boot median latency drops from 477.2 to 462.6 ns per call, or
-> 3.0%. All ten pairs improved.
-> 
-> No functional change intended.
-> 
-> [1] https://lore.kernel.org/all/20260921171928.1639407-1-usama.arif@linux.dev/
-> 
-> Suggested-by: Mykola Lysenko <nickolay.lysenko@gmail.com>
-> Signed-off-by: Usama Arif <usama.arif@linux.dev>
-> ---
->  include/linux/rhashtable.h | 20 +++++++++++++++-----
->  lib/rhashtable.c           |  5 +++--
->  2 files changed, 18 insertions(+), 7 deletions(-)
+There still appears to be a race between stopping the engine and
+setting engine->aborted. An IRQ thread already in flight may call
+mv_cesa_rearm_engine() after the CMD idle check but before aborted is
+set, and ctx->ops->step() may restart the hardware. We can then
+synchronize the IRQ and free request/DMA objects while the engine is
+running.
 
-Nice work, I'm glad that someone is looking at the assembly :)
+I think engine->aborted needs to be set before the final engine stop,
+so that once we have observed the engine idle, no software path can
+restart it.
 
-> diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
-> index 57a2a29bef0e8..c9872965b753c 100644
-> --- a/include/linux/rhashtable.h
-> +++ b/include/linux/rhashtable.h
-> @@ -598,13 +598,23 @@ static inline void rht_assign_unlock(struct bucket_table *tbl,
->  	for (pos = list; pos && rht_entry(tpos, pos, member);		\
->  	     pos = rcu_dereference_all(pos->next))
->  
-> -static inline int rhashtable_compare(struct rhashtable_compare_arg *arg,
-> -				     const void *obj)
-> +/*
-> + * Use constant params from inlined callers to specialize memcmp(). If params
-> + * isn't constant, it must be equal to ht->p.
-> + */
-> +static __always_inline int rhashtable_compare(struct rhashtable_compare_arg *arg,
-> +					      const void *obj,
-> +					      const struct rhashtable_params params)
->  {
->  	struct rhashtable *ht = arg->ht;
->  	const char *ptr = obj;
->  
-> -	return memcmp(ptr + ht->p.key_offset, arg->key, ht->p.key_len);
-> +	if (!__builtin_constant_p(params.key_len))
-> +		return memcmp(ptr + ht->p.key_offset, arg->key,
-> +			      ht->p.key_len);
-> +
-> +	return memcmp(ptr + params.key_offset, arg->key,
-> +		      params.key_len ? : ht->p.key_len);
+engine->aborted currently only prevents mv_cesa_rearm_engine() from
+dequeuing a new request; it does not prevent mv_cesa_queue_req() from
+enqueueing one. A submitter racing after the removal drain can
+therefore leave a request permanently queued. Please check aborted
+under engine->lock in mv_cesa_queue_req() before calling
+crypto_enqueue_request() mv_cesa_tdma_chain(), and return an
+appropriate teardown error.
 
-If there is no obj_cmpfn then there is no obj_hashfn.  If there
-is no obj_hashfn then params.key_len must be non-zero.  So this
-could become unconditional, perhaps with a comment.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The stop timeout also looks unsafe as written. If the timeout expires,
+teardown still proceeds to the callbacks and cleanup, which may free
+DMA-visible objects while the engine is still active. The timeout
+needs an explicit failure path or hardware reset rather than simply
+continuing teardown.
