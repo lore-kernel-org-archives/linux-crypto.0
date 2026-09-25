@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E053A7593;
-	Fri, 25 Sep 2026 21:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CDC3BBFC5;
+	Fri, 25 Sep 2026 22:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790372370; cv=none; b=p14oiv40vGTADF2MCDf89gemNgQRRjexRh5nYMev36Mcujtbh/Cctsv5QUzncftpagW5IhWbkAEJ/QHAFQqh2z+txDW3i3kcP3VjR968BuTZRNmlryBp6/I9g6QopWd+cuDQ7+JZhlb9pRMarCP1XTiQQx1bKeMCN+geYETiM2M=
+	t=1790374061; cv=none; b=B0YhvLb0mPn1FvI7iifTXYRdvnvYBO1LM94dPo/q3puBuFucybAvZh/iiGAm77/TqQM1rYY6naHVmDR9v4gUq3HHp40j/bkJY9IB044Gw/Vo7t56kEdMxthSsGFuySEUhEGyhuIJo0KRCvHdmXHChVLgBBMYU0Sbke6W8NDB1GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790372370; c=relaxed/simple;
-	bh=3BiBwcUDkbh+FbP7ofxpEUfVhiDKAwkXAcXzUYOr06U=;
+	s=arc-20240116; t=1790374061; c=relaxed/simple;
+	bh=v5aR+9FNEpK5gxvC7HOJa4TqnF3FfO7zQMNhCpKK8/I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GL4R13lzTgNPhZoc8xSXmQeNJ4NZlY4wnmx33j3/VC5PQevoPchBY1KMbXjj+N7qUqTn8bVtnv24b6fuT396aiGktZP9Eli5I9gFw8omTFc1ZT7+sIfKlYyRkEDNT5+5rWPaCt4MkUqwXin6KHn/Etw8EGVS8SrVsp8QKIIHJFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uq3jK6lz; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=StToNnVbhPlO6Cwfe/gl8l1BtFD1DXthYQDfFHL3qi0+w4YR91/CEmV1zCrMsbPyLQemeD0tiuKuoeukLXtYYg4G3672ut0WVHVohxQViJ1NOs3KltwyHMiAt5lPYAnk7oOgFQYKmb3/f+ZW5YUapuIMYhfsefXk1qBPe6xlZ/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Blm+98gn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uq3jK6lz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55CA41F000FF;
-	Fri, 25 Sep 2026 21:39:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Blm+98gn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3F871F000FF;
+	Fri, 25 Sep 2026 22:07:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790372368;
-	bh=qGAVtFU1ZWDmCtLaT+G7B5o5ljsTh3nqCzq4ca6rlME=;
+	s=k20260515; t=1790374060;
+	bh=k8g2DRYbUFc/WlQ2pAkletlhQtrwe1F0NZCL2F3+zUE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Uq3jK6lzFPBk2mUB+21kzIEJ3e7xo6lES0MeUECU8KDNeBmretRa77Q3OlwhtoQmE
-	 JG8Dx0lTEjtjm2k8juBgSTzHaF2rroNVk1zww7OONmnk0v+x0FA56wC0MjZCrNSV/e
-	 H2pVr0Zo24UJv/vG9L8beZRRHMlmE7YAN/RF7/BIf3sCxDQZGCKJr+E+v3UjzyyNbI
-	 MirHao5U2KikMGzvv4h38MAzkcRcWP7PU8EZ2aiQo71N4cAbsRUfMEcbTXCJ/xYXPz
-	 HyiCZr2awcrNsxXI7Kdq8YVAeSXWzjieQzGLgVnG89GGjnkOohpJbH4QMHQxQzDjRf
-	 Ccal7IQ4ASL7g==
-Date: Fri, 25 Sep 2026 14:39:26 -0700
+	b=Blm+98gnNSmmT+B1FkGka5xELWe0Sas5kxh6t5tiDl8w5RPy2GIR156rg32qYAB8h
+	 0WC2HIz9I9oTU8BMJGRhVpVPYDGzzRjyfJveq8tYuLsmMYq8PIg/rRdFm5JUc5XTUv
+	 91GhFUgvrNiWWbRRvN59hi3Fpb3qet+Bo+uXdpaPUiXnSpzo4uJ6julwsKMhb0hI0F
+	 fCnTm7iQaDrz5G7/S+Ybr+QBIQ138M/AuG4leepfCPOBvTzVcKAe7YoDWwTXpZPdWD
+	 sWKIAoZzsyb+GWb/CE2bNAPLaHe7PFEY5aiF2ExoAzy1jo3Uh5k6xUgU2dktwiDBax
+	 IMsJ0+SwguBcQ==
+Date: Fri, 25 Sep 2026 15:07:37 -0700
 From: Eric Biggers <ebiggers@kernel.org>
 To: Michal Wilczynski <m.wilczynski@samsung.com>
 Cc: Nathan Chancellor <nathan@kernel.org>,
@@ -62,12 +62,11 @@ Cc: Nathan Chancellor <nathan@kernel.org>,
 	linux-erofs@lists.ozlabs.org,
 	linux-f2fs-devel@lists.sourceforge.net,
 	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH RFC 9/9] MAINTAINERS: add an entry for the LZ4
- compression library
-Message-ID: <20260925213926.GA1903@quark>
-References: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
- <CGME20260925113507eucas1p2ddb94f2077b679426aa86dd1d492eaf3@eucas1p2.samsung.com>
- <20260925-lz4-vendor-upstream-v1-9-1c7ffbe21c4b@samsung.com>
+Subject: Re: [PATCH RFC 0/9] lib/lz4: stop forking upstream LZ4, vendor it
+ instead
+Message-ID: <20260925220737.GB1903@quark>
+References: <CGME20260925113450eucas1p2fcf838f00f35e1bce0ca04a694cd0cd2@eucas1p2.samsung.com>
+ <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -76,39 +75,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260925-lz4-vendor-upstream-v1-9-1c7ffbe21c4b@samsung.com>
+In-Reply-To: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
 
-On Fri, Sep 25, 2026 at 01:27:39PM +0200, Michal Wilczynski wrote:
-> lib/lz4/ has never had one: get_maintainer.pl returns only the LKML
-> fallback for every file in it, including include/linux/lz4.h, which eight
-> subsystems build against.
+On Fri, Sep 25, 2026 at 01:27:30PM +0200, Michal Wilczynski wrote:
+> The in-kernel LZ4 is a fork. The decompressor was last synced with
+> upstream v1.8.3 in 2018 and the compressor with v1.7.3 in 2017, both by
+> hand. Upstream has made 488 commits against lib/ since, and the gap is
+> maintained one cherry-pick at a time.
 > 
-> This matters more now than it did. With the previous patches lib/lz4 is
-> vendored upstream sources, and someone has to bump them to new upstream
-> releases and decide what the kernel-side glue may do. I am willing to do
-> that, so add myself as its maintainer.
+> That has left real bugs in place for example the forked
+> LZ4_decompress_fast() has no bounds checks, so corrupted input runs off
+> the output buffer in both directions. 
 > 
-> Signed-off-by: Michal Wilczynski <m.wilczynski@samsung.com>
-> ---
->  MAINTAINERS | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index cc3cae2e378b34aeb705cef654c720ca9f2ba223..989e1b5fab21432dd7042d1e60c4bbad85beb925 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -15606,6 +15606,12 @@ S:	Supported
->  F:	drivers/net/pcs/pcs-lynx.c
->  F:	include/linux/pcs-lynx.h
->  
-> +LZ4 COMPRESSION LIBRARY
-> +M:	Michal Wilczynski <m.wilczynski@samsung.com>
-> +S:	Maintained
-> +F:	include/linux/lz4.h
-> +F:	lib/lz4/
-> +
+> This series vendors the upstream sources unmodified and adapts them at
+> build time, so a re-sync becomes a directory copy:
 
-Should this entry cover lib/decompress_unlz4.c and
-include/linux/decompress/unlz4.h as well?
+At a high level, this looks good to me, and it's similar to what was
+done with zstd.  I don't see any obvious issues with the integration.
+
+There are disadvantages to directly integrating external projects like
+this, vs. writing a small implementation from scratch for the kernel.
+But the existing LZ4 code in the kernel isn't that, but rather a fork
+from upstream anyway, and it's clearly not being maintained properly.
+
+The upstream LZ4 codebase also already avoids many of the typical
+incompatibilities with Linux kernel code that are often seen in
+userspace projects (such as assuming FPU/SIMD/vector instructions can be
+used at any time, or that the stack size is infinite, or that the C
+standard library is available, or that it's reasonable to have hundreds
+of files or 100MB of test data, etc.).
+
+And writing properly optimized compression/decompression code is quite
+difficult.  So yes, syncing with the latest LZ4 upstream seems like the
+right choice for the kernel.
 
 - Eric
