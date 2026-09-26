@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C129536DA04;
-	Sat, 26 Sep 2026 05:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CAE3822A3;
+	Sat, 26 Sep 2026 05:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790402373; cv=none; b=VvFAQ9K/2FxazyY2rQfCtNMsSo9S+FpsZTfYHrZ2fr5aJnQIZYxrQz5gTwIUxXGExNDPK3tCKCAsr4dPCMIkLKXJv6Sg+kieAdKZ1GF89cyxxDqZDp80f48jizXwewB8zEbWpX6jMFfHgkvWimWtGrL+/YabwakOYXazvalIoc0=
+	t=1790402376; cv=none; b=I3D5LO5nPvN4msfwvz8lrwPCT6JVzglZ6tGDEXcBzWx6NJcWspKju+h/OOatlz6IsErYi6edEECy6WOF5i0CKh1CgDsyvxMNF0jpJMVFAbX4SgeLO1DaMGr1I9L6HpCwmfoinZfFDnE7yesquAKN6owAIBkZccAALGeDG3fAtiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790402373; c=relaxed/simple;
-	bh=5YLLI7osw/UGKFuIJYEyngba77vIKU9QAY2tGxqq/FQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AaJeqqYOrYwkd5YPHH2XnDYG0IoSAifUHwAGyvnmSjzENf7nLA28vh7Th5edsyn5MX9OnztEkDZo4TZ2qHoBKMpsrSrCXfBxX8bhY7fmZOT589T6RBgsemt4QbN8M41PgUi3lYYI5Lp0RGkIKp0hdSw5Wr/6tK6pIFUllbEYNc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UeIsWFaD; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790402376; c=relaxed/simple;
+	bh=oi1LnliCzoP4uTFsmZVcSENROhWEOkIB9pv9gbtQMQw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ldlNuNDnT4piS0hPXgf44J0EHaMOGTaXDlAAAdTin+K7UxxB9UkPPxNuk3hmaffbIDJ2pzJHuzP+bvSAAXJtrkz8h9LAo1Hh7KaRvUTJM51S4ML/DvvDNKfRjYzhMIzhxzoc2MwjN9Q5XNzhHr5boClaYH2Qv7a7kNZtpp4iZnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lOK94FlR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UeIsWFaD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A07211F000FF;
-	Sat, 26 Sep 2026 05:59:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lOK94FlR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CE8F1F00893;
+	Sat, 26 Sep 2026 05:59:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790402372;
-	bh=Yf7iKUmtDBEOtKZjxxS5+i5vr2t0DZvI0ceFBcfG13U=;
-	h=From:To:Cc:Subject:Date;
-	b=UeIsWFaDhIQgh1SfUNUmEUx4LsD7Abo9eS5znyoeIOmidXUBJ2lsMacmo9p3rhZM1
-	 Hvaoa6kK5ooWb3YbZC1rKaWdK1yOOw8PoOq46nCDxVwtaAdF5GrS2Fgquf+vxLHihy
-	 SN9pE1dGbkvFadmilN/7K2uLJJFG0oZ9lSBf0hUD9cnMLshDU83YcPl9f1hxMQUSer
-	 R+KliAoT2W3UVJKEeR3Neqjy7qXMQGgB4WH3pOx/D3JlySDmNRvtVoM+Qb2BjSHS04
-	 KK+aHIBeQ/PGmlzjPHb9rrWsVQHGSpfAqGWzbev43ZSLXLzSaHUh9gi5W5/AFJc0Y9
-	 aPTUurAcoUzrA==
+	s=k20260515; t=1790402375;
+	bh=pD5sa4A6W5qlwy9/E5qHspueNlUl3TGZ17rv7wwjV/I=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=lOK94FlRtrW9qWPmMMjgbdZwnmGfQFt49zfzzk6TIR4nbgTVhjywQKWzEFvCbh5r/
+	 F4q3sbVBgKIg6EqVbSmRFooDvcn9GJg3Ycux2cuKg/qiLvrE4jqHHQJacnSEcIHH70
+	 oODBqZM+jmPkGrcMRMdlpA9eKbKIgElbtkSGSnb0/X8D3RX1Pe1j96iovx0FVV6861
+	 rWDkT5ZNgNcAjhxjSIh7OpQ+I5S9uYkMsRxEM3AfEvkJaj4dFtP90+lfhLknFJ9gmA
+	 wUybRtlBL6WnpsKcwN6jTacpdOUqKwr7EdzBfmKfAsmTB6IQfHke+9trJ+9mkLEco+
+	 h9yGHtbNtunfA==
 From: Thorsten Blum <blum@kernel.org>
 To: Laurent Vivier <lvivier@redhat.com>,
 	Olivia Mackall <olivia@selenic.com>,
@@ -33,46 +34,40 @@ Cc: Thorsten Blum <blum@kernel.org>,
 	virtualization@lists.linux.dev,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] hwrng: virtio - use min() in copy_data()
-Date: Sat, 26 Sep 2026 07:58:54 +0200
-Message-ID: <20260926055853.4868-3-blum@kernel.org>
+Subject: [PATCH 2/2] hwrng: virtio - use snprintf() in probe_common()
+Date: Sat, 26 Sep 2026 07:58:55 +0200
+Message-ID: <20260926055853.4868-4-blum@kernel.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260926055853.4868-3-blum@kernel.org>
+References: <20260926055853.4868-3-blum@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1153; i=blum@kernel.org; h=from:subject; bh=5YLLI7osw/UGKFuIJYEyngba77vIKU9QAY2tGxqq/FQ=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFnb4+Uy657G1a22NRNvnsV/kENRyW71bcHoVXz1idJlz FGh4ns7SlkYxLgYZMUUWR7M+jHDt7SmcpNJxE6YOaxMIEMYuDgFYCKLrjP8z7Lh3hoobBcaWJHx PFW7cukLEec9E3O7pp1cnXcrYmXJBkaGZ5Nzirbdnbyw/kXbvYJfh8s+uJ5KPMdV45LlbqNy8pw 4MwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=804; i=blum@kernel.org; h=from:subject; bh=oi1LnliCzoP4uTFsmZVcSENROhWEOkIB9pv9gbtQMQw=; b=kA0DAAoWXqtxINjMdS4ByyZiAGq3XymjCUpvRFZn0XDIvYaB0B1Pr6JRPLxctbxJA5+/Z4SUB 4h1BAAWCgAdFiEE4Jr4mE11fHmyNFi5XqtxINjMdS4FAmq3XykACgkQXqtxINjMdS5cgAEApmZL xztYk83911z8dxR/o6GiigZanqnijVWQaQGN3JUA/2CWPAO1qo5gXsLhI9CWRUnngpzMJveyVOt rr501KOsG
 X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
 
-Use the simpler min() macro since all values are unsigned and
-compatible. The subtraction avail - vi->data_idx is also guaranteed to
-be positive by the preceding check.
+While the current code works correctly, replace the unbounded sprintf()
+with the safer snprintf() to follow secure coding best practices.
 
 Signed-off-by: Thorsten Blum <blum@kernel.org>
 ---
- drivers/char/hw_random/virtio-rng.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/char/hw_random/virtio-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
-index 5e83ffa105e4..5b1b23b5596a 100644
+index 5b1b23b5596a..f9982217247d 100644
 --- a/drivers/char/hw_random/virtio-rng.c
 +++ b/drivers/char/hw_random/virtio-rng.c
-@@ -81,13 +81,13 @@ static unsigned int copy_data(struct virtrng_info *vi, void *buf,
- 	 * steered into adjacent slab memory, including under
- 	 * speculation.
- 	 */
--	avail = min_t(unsigned int, vi->data_avail, sizeof(vi->data));
-+	avail = min(vi->data_avail, sizeof(vi->data));
- 	if (vi->data_idx >= avail) {
- 		vi->data_avail = 0;
- 		request_entropy(vi);
- 		return 0;
+@@ -162,7 +162,7 @@ static int probe_common(struct virtio_device *vdev)
+ 		err = index;
+ 		goto err_ida;
  	}
--	size = min_t(unsigned int, size, avail - vi->data_idx);
-+	size = min(size, avail - vi->data_idx);
- 	idx = array_index_nospec(vi->data_idx, sizeof(vi->data));
- 	memcpy(buf, vi->data + idx, size);
- 	vi->data_idx += size;
+-	sprintf(vi->name, "virtio_rng.%d", index);
++	snprintf(vi->name, sizeof(vi->name), "virtio_rng.%d", vi->index);
+ 	init_completion(&vi->have_data);
+ 
+ 	vi->hwrng = (struct hwrng) {
