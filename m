@@ -1,51 +1,97 @@
-Received: from mail-24424.protonmail.ch (mail-24424.protonmail.ch [109.224.244.24])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38053372B41
-	for <linux-crypto@vger.kernel.org>; Sat, 26 Sep 2026 16:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3EA342538;
+	Sat, 26 Sep 2026 17:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790439281; cv=none; b=WyoBSdAndV+smlR1HDy7vDgb+EZpwUZ6pwR59E+5CmdBibU7ELWamR3owu123u3B2f1AF0YAjMb+VWFFqrWK2hPFphF1/Xcekdls8zzOoHsOrvSD0OKFF9gaUWXwaW0DdClCHr4b0aNDrNyZ6wc3MKwbljZlE2pvg9p3elj4a4c=
+	t=1790443542; cv=none; b=M6rzcrsQ6pTnLxm/MZCqGxTZTV4okrGdUIfBtDZoeeeL6eDPhJYbs4PHHWTeEKijoZZ5V4ARnH3X4tRLvxziDsqBc2eB+GEOWOxoXzRZuSeZkbDBetDaN2xGPGqgaT9OZKZLfVRrDNJmDpJVRZNfAY7WxkxLFTLkS/eZFR+p3Og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790439281; c=relaxed/simple;
-	bh=wllISWjqqTYJHN4fvsiJwIAJx/RKeNluHlu/aznKa6Y=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=tOIKatB5D7GlUL/eLJ1zG2eWzPPzjHCzgKuCEdaOURdHkOxVDkQf7HatnRNE01KzZHoP56reVeXnNaoraCfjFfrV+BnbtpTVUGHxNtEG6IJl0aSBjyhGYWiwhA0x23AXGT7h/rZ6FsHQz2WRYg4BjGcHoyqMY42cEjGhELPj4Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=b5NV3GWF; arc=none smtp.client-ip=109.224.244.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	s=arc-20240116; t=1790443542; c=relaxed/simple;
+	bh=y2I90xoCV3PRj5J53q/2o1GlfM7BQr+3Mkt5l5LjiB8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lEB0nFXMLPEAvhJBFyDReyRtKkXGxDL4D1bwIhMgDLPPOWLeVn0VpX3TD1ZwukTdr/zBYP/Ij6vH4omddYiNf+96gmKT2qWByj9RLXRmPlT8buBHhlATRoMbbUFBTqC0bza1eC26T2tpkwHWRXdPI8vDLDhoXuarK/TJ3KtagsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aMmSBcJH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="b5NV3GWF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1790439272; x=1790698472;
-	bh=wllISWjqqTYJHN4fvsiJwIAJx/RKeNluHlu/aznKa6Y=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=b5NV3GWFZ1UYbRcj2DXQ3a9Gu6ohGZv6bvsnXDdiRNaYkL6G9DKIzIj1ojVxZTZyL
-	 9eqeoFaJ43eCMYFx8ov6pa9VfIyDK6EvYqKYF5gh7N6xqeflFe0RS038Ayrc+QtNV6
-	 mFBY1rwzmeAX+XPo5J8f0Y6Vc+RORKLmlZu0G+Bl0Paz6Re2jymgl9qc6vKtAdH2Ep
-	 r64Pwu15Xrva3Y7EodsDMQtgQutv9s0szgE+76Qay7r/jn7s7xJ0T8z/ahQURLB1NS
-	 PuVCV5m1tKMucWJfmE5lzJCmdpgT3Ffo6ecSfTZv5DsGhLHYJSAPmzvY2BiW5wDl47
-	 eIuiQfKjpqNKA==
-Date: Sat, 26 Sep 2026 16:14:30 +0000
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-From: Jari Ruusu <jariruusu@protonmail.com>
-Subject: util-linux-2.42.4 patch for loop-AES
-Message-ID: <faoyDu0KAMKBXQYUoLAI33mZ13s-i50dcenpDCG3tYFyB3WaEoBeDqFo2mui9m2Gtk6zm7TufcpzGS7BqEcyTXGsu2FHRvGK3b1-bm6NYjg=@protonmail.com>
-Feedback-ID: 22639318:user:proton
-X-Pm-Message-ID: 9c0b784717fb582ce20ad4da54e7f48a4e2774e5
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aMmSBcJH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 147301F000FF;
+	Sat, 26 Sep 2026 17:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790443541;
+	bh=CVfEizPoUtkOeR75ExhS6Q/xBOnwOFbVpHS4hH8XutQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=aMmSBcJHKDv1Rl7vaODxvUx45eWFGorvbm4HEdAkYkkjMjwAChhv8RmUrPWSoR3r1
+	 vGOPVQURZ9GCEpwGsxPZxAeDcmvjkSecdcsxmz8CkSp+woXcSX2RO1b+BlWs/XjEVJ
+	 ry3EMdDjir7fbvNzzuoJ+db2tvPipAFaPiioVjRICNvK9p2vNKcZW6a0sD7vmMBHCJ
+	 qaNolJggh7+3biheHPqrzw+EmtbpUUyNi7l5tO5cNmhc0mc/IRYKzhUA+SW3Kd7/2J
+	 +mKVdstCbmP3ECWwoL6EWmuwRtv++djvgvNV4aqnGxfL7VihKiPf1JZjZ1QERdmjse
+	 GkDq57P3DCFQQ==
+Date: Sat, 26 Sep 2026 10:25:39 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: aes - Fix undesired override of some
+ optimized AES modes
+Message-ID: <20260926172539.GA2460@quark>
+References: <20260925202353.10763-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260925202353.10763-1-ebiggers@kernel.org>
 
-https://loop-aes.sourceforge.net/updates/util-linux-2.42.4.diff.bz2
-https://loop-aes.sourceforge.net/updates/util-linux-2.42.4.diff.bz2.sign
+On Fri, Sep 25, 2026 at 01:23:53PM -0700, Eric Biggers wrote:
+> The new library APIs for AES encryption modes were wired up to the
+> traditional crypto API via crypto/aes.c.  However, for now the kernel is
+> still in a transitional state where various architectures still have
+> architecture-optimized implementations of AES modes in arch/*/crypto/,
+> wired up to the traditional crypto API only.  Because of that, the
+> crypto/aes.c algorithms were given a cra_priority of only 110 to prevent
+> them from overriding arch/*/crypto/ in the traditional crypto API.
+> 
+> However, because of how the traditional crypto API works, the
+> cra_priority trick doesn't work in cases where the relevant algorithm
+> isn't directly implemented by arch/*/crypto/ but rather is provided by a
+> template instance using other code in arch/*/crypto/.
+> 
+> For example, x86 doesn't have its own "ccm(aes)" but rather relies on
+> the "ccm" template constructing it from the x86-optimized "ctr(aes)".
+> The existence of the library-based "ccm(aes)" prevents that, even though
+> its priority is lower than what the template would produce.
+> 
+> Thus, "ccm(aes)" ends up using the slower single-block AES code.
+> 
+> Therefore, skip wiring up the relevant library-based code to the
+> traditional crypto API on architectures where this problem can occur, as
+> determined by what exists in arch/*/crypto/ for each architecture.
+> 
+> This is ugly, but it's also temporary: these conditions will go away as
+> architecture-optimized implementations of AES modes are migrated into
+> the library.  But until then, we need to prevent performance regressions
+> by ensuring that the optimized code continues to be used.
+> 
+> Note: "xts(aes)" is left alone.  Though the "xts" template can use
+> "ecb(aes)" as an inner algorithm, in practice this isn't very efficient
+> and a dedicated "xts(aes)" is already provided in all the important
+> cases anyway.  (This omission is also consistent with the fact that the
+> library isn't planned to provide a similar ECB-to-XTS "adapter".)
+> 
+> Fixes: 20df21a482aa ("crypto: aes - Add CBC and CBC-CTS support using library")
+> Fixes: 8ca62072faa1 ("crypto: aes - Add GCM support using library")
+> Fixes: f70ad727d1d6 ("crypto: aes - Add CCM support using library")
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+> 
+> This patch is intended to be taken through libcrypto-fixes
+> 
+> v2: Fixed PowerPC config option, and resent as standalone patch
 
---
-Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
-80 8132 F189
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
 
+- Eric
