@@ -1,86 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A5C346AFD;
-	Sat, 26 Sep 2026 04:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C129536DA04;
+	Sat, 26 Sep 2026 05:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790398148; cv=none; b=LCyohRHEG//Uve3JAW9SBBbzts2+ilA8EQT7Qj0E+hQif/S5jEW4gQ7/VFIyH/XWUaqgf0SnU8fO+UDVRn3oTEk6CQFyz2IQrLtwGc6REKYf6SDLfE1qmE8tH7IF47WcWcmGZv1xUKf0HTJ7yBsvg07pVV4E6FcGU8cSOu3VcGs=
+	t=1790402373; cv=none; b=VvFAQ9K/2FxazyY2rQfCtNMsSo9S+FpsZTfYHrZ2fr5aJnQIZYxrQz5gTwIUxXGExNDPK3tCKCAsr4dPCMIkLKXJv6Sg+kieAdKZ1GF89cyxxDqZDp80f48jizXwewB8zEbWpX6jMFfHgkvWimWtGrL+/YabwakOYXazvalIoc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790398148; c=relaxed/simple;
-	bh=qvEz7yOXGuOMJQFGtA4Z5p/8/SC881Fg8DFAb+DBDBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uic13sKdqYMz3N6Zfj1x02/W3PDcjhElidTB2wzuv77HtAhMuYQGm9+TYzNfWsw4O99hMRR6xKHfnGq5PMI+QMQjYdTVCy9RMaXJMWUHHqk4DcE4cb1zeeGr/aaXXb2wXMF229j6rYIKhauImbZlWczt3SY9B+n45XKzqFOXhSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ka0oOJcs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790402373; c=relaxed/simple;
+	bh=5YLLI7osw/UGKFuIJYEyngba77vIKU9QAY2tGxqq/FQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AaJeqqYOrYwkd5YPHH2XnDYG0IoSAifUHwAGyvnmSjzENf7nLA28vh7Th5edsyn5MX9OnztEkDZo4TZ2qHoBKMpsrSrCXfBxX8bhY7fmZOT589T6RBgsemt4QbN8M41PgUi3lYYI5Lp0RGkIKp0hdSw5Wr/6tK6pIFUllbEYNc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UeIsWFaD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ka0oOJcs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA1001F000FF;
-	Sat, 26 Sep 2026 04:49:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UeIsWFaD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A07211F000FF;
+	Sat, 26 Sep 2026 05:59:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790398146;
-	bh=QodIB1xe4hI6Svc1ZX75HcrMssbUbUh3lshXwbPYkwU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ka0oOJcsbvP+DY3pf1WeeMeptQ3pUxr7i+0eXL1Mre6vYkzF9q/ynfxuCU8aKUkyu
-	 77i/oN/liqme8ApXMxe3rTFCFmDKMCR1gbLez5ipVQPiaFS5u5ws/2YH8OLzWBMXJq
-	 YR93As/z8037H3HTA71yqyKKaKw9JBN6aT7j7ep8nE1sFZg3gEiGfavGMKo+/7GSGI
-	 Q1TfOgzifvphkwyqLOF+JSZia0IK8x05sgZirof78ujhjzD0wD03wFo1kKZOOYDJ/p
-	 UmzqNdwvzTi6v+dqMwzfTIie4vIKyFzAqhthRa3inDkhzJQmkyZfiMEf45VCr0FTVI
-	 ihw3KlguFQYBA==
-Date: Fri, 25 Sep 2026 21:49:05 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	skhan@linuxfoundation.org, me@brighamcampbell.com,
-	jkoolstra@xs4all.nl, linux-crypto@vger.kernel.org,
+	s=k20260515; t=1790402372;
+	bh=Yf7iKUmtDBEOtKZjxxS5+i5vr2t0DZvI0ceFBcfG13U=;
+	h=From:To:Cc:Subject:Date;
+	b=UeIsWFaDhIQgh1SfUNUmEUx4LsD7Abo9eS5znyoeIOmidXUBJ2lsMacmo9p3rhZM1
+	 Hvaoa6kK5ooWb3YbZC1rKaWdK1yOOw8PoOq46nCDxVwtaAdF5GrS2Fgquf+vxLHihy
+	 SN9pE1dGbkvFadmilN/7K2uLJJFG0oZ9lSBf0hUD9cnMLshDU83YcPl9f1hxMQUSer
+	 R+KliAoT2W3UVJKEeR3Neqjy7qXMQGgB4WH3pOx/D3JlySDmNRvtVoM+Qb2BjSHS04
+	 KK+aHIBeQ/PGmlzjPHb9rrWsVQHGSpfAqGWzbev43ZSLXLzSaHUh9gi5W5/AFJc0Y9
+	 aPTUurAcoUzrA==
+From: Thorsten Blum <blum@kernel.org>
+To: Laurent Vivier <lvivier@redhat.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Thorsten Blum <blum@kernel.org>,
+	virtualization@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: x86/aes-gcm - fix always true check for last AAD
- segment
-Message-ID: <20260926044905.GA11118@sol>
-References: <20260926040614.8683-1-raizudeen.kerneldev@gmail.com>
+Subject: [PATCH 1/2] hwrng: virtio - use min() in copy_data()
+Date: Sat, 26 Sep 2026 07:58:54 +0200
+Message-ID: <20260926055853.4868-3-blum@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260926040614.8683-1-raizudeen.kerneldev@gmail.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1153; i=blum@kernel.org; h=from:subject; bh=5YLLI7osw/UGKFuIJYEyngba77vIKU9QAY2tGxqq/FQ=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFnb4+Uy657G1a22NRNvnsV/kENRyW71bcHoVXz1idJlz FGh4ns7SlkYxLgYZMUUWR7M+jHDt7SmcpNJxE6YOaxMIEMYuDgFYCKLrjP8z7Lh3hoobBcaWJHx PFW7cukLEec9E3O7pp1cnXcrYmXJBkaGZ5Nzirbdnbyw/kXbvYJfh8s+uJ5KPMdV45LlbqNy8pw 4MwA=
+X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
 
-On Sat, Sep 26, 2026 at 09:36:14AM +0530, Mohamad Raizudeen wrote:
-> In gcm_process_assoc(), a segment that is not the last one must have its
-> length rounded down to a multiple of 16 bytes, as required by the
-> assembly. The check intended to detect a non-last segment,
-> `if (unlikely(assoclen)) /* Not the last segment yet? */` is always
-> true, since the loop only runs while assoclen is nonzero.
-> 
-> As a result the last segment was rounded down as well, leading to some
-> avoidable extra work: an additional memcpy into the temporary buffer and
-> an additional call into the assembly after the loop. The GCM
-> authentication tag is unaffected either way, so the self-tests pass and
-> this went unnoticed, its purely an efficiency issue rather than
-> correctness one.
-> 
-> Fix this by comparing the length of the current step against the amount
-> of AAD that remains, so that only a step which cannot consume all of the
-> remaining bytes is treated as a non-last segment.
-> 
-> Fixes: b06affb1cb580 ("crypto: x86/aes-gcm - add VAES and AVX512 / AVX10 optimized AES-GCM")
-> Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-> ---
+Use the simpler min() macro since all values are unsigned and
+compatible. The subtraction avail - vi->data_idx is also guaranteed to
+be positive by the preceding check.
 
-Thanks for finding this!  Please use the correct Fixes commit and add Cc
-stable:
+Signed-off-by: Thorsten Blum <blum@kernel.org>
+---
+ drivers/char/hw_random/virtio-rng.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-    Fixes: e9787deff49e ("crypto: x86/aes-gcm - use the new scatterwalk functions")
-    Cc: stable@vger.kernel.org
-
-> -		if (unlikely(assoclen)) /* Not the last segment yet? */
-> +		if (unlikely(len < assoclen)) /* Not the last segment yet? */
-> 			len = round_down(len, 16);
-
-Well, this is not correct either.  Let's just move
-'assoclen -= orig_len_this_step;' to near the beginning of the loop
-body, restoring the original logic prior to e9787deff49e.
-
-- Eric
+diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+index 5e83ffa105e4..5b1b23b5596a 100644
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -81,13 +81,13 @@ static unsigned int copy_data(struct virtrng_info *vi, void *buf,
+ 	 * steered into adjacent slab memory, including under
+ 	 * speculation.
+ 	 */
+-	avail = min_t(unsigned int, vi->data_avail, sizeof(vi->data));
++	avail = min(vi->data_avail, sizeof(vi->data));
+ 	if (vi->data_idx >= avail) {
+ 		vi->data_avail = 0;
+ 		request_entropy(vi);
+ 		return 0;
+ 	}
+-	size = min_t(unsigned int, size, avail - vi->data_idx);
++	size = min(size, avail - vi->data_idx);
+ 	idx = array_index_nospec(vi->data_idx, sizeof(vi->data));
+ 	memcpy(buf, vi->data + idx, size);
+ 	vi->data_idx += size;
