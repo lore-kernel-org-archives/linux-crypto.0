@@ -1,41 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3EA342538;
-	Sat, 26 Sep 2026 17:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7CA379C35;
+	Sat, 26 Sep 2026 17:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790443542; cv=none; b=M6rzcrsQ6pTnLxm/MZCqGxTZTV4okrGdUIfBtDZoeeeL6eDPhJYbs4PHHWTeEKijoZZ5V4ARnH3X4tRLvxziDsqBc2eB+GEOWOxoXzRZuSeZkbDBetDaN2xGPGqgaT9OZKZLfVRrDNJmDpJVRZNfAY7WxkxLFTLkS/eZFR+p3Og=
+	t=1790443597; cv=none; b=haBL0CCmkcSVVq6LRxRoRJko4qjcMDKKqli9W5bOeMwpiMcUHIM+yDkZf4w+jF5xzECN/cGutqk6wlXoGTdHidCpjK6nQcH72gFnOUF70CPVDYIof+Tz3E4WyIs50hkY5KILcZChvc1q9VpWFiDDv5oakrZXzElXHy6GAbhX/rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790443542; c=relaxed/simple;
-	bh=y2I90xoCV3PRj5J53q/2o1GlfM7BQr+3Mkt5l5LjiB8=;
+	s=arc-20240116; t=1790443597; c=relaxed/simple;
+	bh=vtk/nvYrrT2GwC57yPJZW/gAFXHl4RsJlM0uukAupOU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lEB0nFXMLPEAvhJBFyDReyRtKkXGxDL4D1bwIhMgDLPPOWLeVn0VpX3TD1ZwukTdr/zBYP/Ij6vH4omddYiNf+96gmKT2qWByj9RLXRmPlT8buBHhlATRoMbbUFBTqC0bza1eC26T2tpkwHWRXdPI8vDLDhoXuarK/TJ3KtagsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aMmSBcJH; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=HeJZ/0NNIajl9sAYuCDcH+/NExKX2ZTE3AnylLBsr5d6YoNV14wEehwSv4jf5Dr88x6GwX4MCeKgx31FliRuxPl3SohXIzVuT0BGUrc4Ktu1toQgoHJ2lragGG3qLCfK1KLVrwtFs4KE/HrGAHLsnzzpLqqqBIg5GRDkOrySB3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gi05+yIl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aMmSBcJH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 147301F000FF;
-	Sat, 26 Sep 2026 17:25:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gi05+yIl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BEB81F000FF;
+	Sat, 26 Sep 2026 17:26:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790443541;
-	bh=CVfEizPoUtkOeR75ExhS6Q/xBOnwOFbVpHS4hH8XutQ=;
+	s=k20260515; t=1790443596;
+	bh=Cohpmj7mAHCD9IiQ+bXB1zRntENnHnnP556luGBj2pA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aMmSBcJHKDv1Rl7vaODxvUx45eWFGorvbm4HEdAkYkkjMjwAChhv8RmUrPWSoR3r1
-	 vGOPVQURZ9GCEpwGsxPZxAeDcmvjkSecdcsxmz8CkSp+woXcSX2RO1b+BlWs/XjEVJ
-	 ry3EMdDjir7fbvNzzuoJ+db2tvPipAFaPiioVjRICNvK9p2vNKcZW6a0sD7vmMBHCJ
-	 qaNolJggh7+3biheHPqrzw+EmtbpUUyNi7l5tO5cNmhc0mc/IRYKzhUA+SW3Kd7/2J
-	 +mKVdstCbmP3ECWwoL6EWmuwRtv++djvgvNV4aqnGxfL7VihKiPf1JZjZ1QERdmjse
-	 GkDq57P3DCFQQ==
-Date: Sat, 26 Sep 2026 10:25:39 -0700
+	b=Gi05+yIln6djm6RKzArCCTowfRqEhZ8NQyie2HX11P1g/gMea25/kUdiQeEx2j3j+
+	 yf2xqUzedzjVlbjQvZDBZEUlYq2FKh0aYgUMwitx45aufRtiA2ACezsxWmXS7Ox5vq
+	 nu4qQ9AbH3ZmPklm+QI8HCkWUEG3IiagnYDkr9jeRfV2KIPWt+9HZe10/eOTtVy+HG
+	 b9rGfA6snrqXiACuyYdm7ipWopqiOWnmRh5X4BjD+DkNKDQtUL4rttkKyiHM4ZmW9W
+	 GkZMc1kGqRqeCRWPJvRijb815iT3Psl9IgVgH16s3qwjgxmm6pIBEDumdbr+6sQmWx
+	 +LTiOoZZ22QrA==
+Date: Sat, 26 Sep 2026 10:26:34 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: aes - Fix undesired override of some
- optimized AES modes
-Message-ID: <20260926172539.GA2460@quark>
-References: <20260925202353.10763-1-ebiggers@kernel.org>
+To: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	skhan@linuxfoundation.org, me@brighamcampbell.com,
+	jkoolstra@xs4all.nl, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: x86/aes-gcm - fix always true check for last
+ AAD segment
+Message-ID: <20260926172634.GB2460@quark>
+References: <20260926145903.6061-1-raizudeen.kerneldev@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,54 +45,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260925202353.10763-1-ebiggers@kernel.org>
+In-Reply-To: <20260926145903.6061-1-raizudeen.kerneldev@gmail.com>
 
-On Fri, Sep 25, 2026 at 01:23:53PM -0700, Eric Biggers wrote:
-> The new library APIs for AES encryption modes were wired up to the
-> traditional crypto API via crypto/aes.c.  However, for now the kernel is
-> still in a transitional state where various architectures still have
-> architecture-optimized implementations of AES modes in arch/*/crypto/,
-> wired up to the traditional crypto API only.  Because of that, the
-> crypto/aes.c algorithms were given a cra_priority of only 110 to prevent
-> them from overriding arch/*/crypto/ in the traditional crypto API.
+On Sat, Sep 26, 2026 at 08:29:03PM +0530, Mohamad Raizudeen wrote:
+> In gcm_process_assoc(), a segment that is not the last one must have its
+> length rounded down to a multiple of 16 bytes, as required by the
+> assembly. The check for a non-last segment is `if (unlikely(assoclen))
+> /* Not the last segment yet? */` where assoclen is the number of AAD
+> bytes remaining after the current segment.
 > 
-> However, because of how the traditional crypto API works, the
-> cra_priority trick doesn't work in cases where the relevant algorithm
-> isn't directly implemented by arch/*/crypto/ but rather is provided by a
-> template instance using other code in arch/*/crypto/.
+> Since the conversion to the new scatterwalk API, assoclen is decremented
+> at the end of the loop body rather than the beginning, so it still
+> includes the current segment when the check executes, making the check
+> always true.
 > 
-> For example, x86 doesn't have its own "ccm(aes)" but rather relies on
-> the "ccm" template constructing it from the x86-optimized "ctr(aes)".
-> The existence of the library-based "ccm(aes)" prevents that, even though
-> its priority is lower than what the template would produce.
+> As a result the last segment was rounded down as well, causing some
+> avoidable extra work: an additional memcpy into the temporary buffer and
+> an additional call into the assembly afte the loop. The GCM
+> authentication tag is unaffected either way, so the self-tests pass and
+> this went unnoticed. It is purely an efficiency issue rather than a
+> correctness one.
 > 
-> Thus, "ccm(aes)" ends up using the slower single-block AES code.
+> Fix this by moving the assoclen decrement back to the beginning of the
+> loop body.
 > 
-> Therefore, skip wiring up the relevant library-based code to the
-> traditional crypto API on architectures where this problem can occur, as
-> determined by what exists in arch/*/crypto/ for each architecture.
-> 
-> This is ugly, but it's also temporary: these conditions will go away as
-> architecture-optimized implementations of AES modes are migrated into
-> the library.  But until then, we need to prevent performance regressions
-> by ensuring that the optimized code continues to be used.
-> 
-> Note: "xts(aes)" is left alone.  Though the "xts" template can use
-> "ecb(aes)" as an inner algorithm, in practice this isn't very efficient
-> and a dedicated "xts(aes)" is already provided in all the important
-> cases anyway.  (This omission is also consistent with the fact that the
-> library isn't planned to provide a similar ECB-to-XTS "adapter".)
-> 
-> Fixes: 20df21a482aa ("crypto: aes - Add CBC and CBC-CTS support using library")
-> Fixes: 8ca62072faa1 ("crypto: aes - Add GCM support using library")
-> Fixes: f70ad727d1d6 ("crypto: aes - Add CCM support using library")
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> This patch is intended to be taken through libcrypto-fixes
-> 
-> v2: Fixed PowerPC config option, and resent as standalone patch
+> Fixes: e9787deff49ea ("crypto: x86/aes-gcm - use the new scatterwalk functions")
+> Cc: stable@vger.kernel.org
+> Suggested-by: Eric Biggers <ebiggers@kernel.org>
+> Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
 
 Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-fixes
+
+Thanks!
 
 - Eric
