@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056533EB7F1;
-	Sun, 27 Sep 2026 22:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94ED344CACB;
+	Sun, 27 Sep 2026 22:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790549089; cv=none; b=YuA7wxrMNExiwRKcdEYzF1XC/k8ww8vAgWj/gv93JHPF84RgHCdb8uFDZD2rCgomQl6aHlzTZiWBweFoPPXwSueN1rynDmB0o0mE17zYpj9sIAEBQ61ujZvaaOO/Wo+oGlc/Pbdij411L8KVC1DX/kj9OoVXkzFcz8VwTzuow8Q=
+	t=1790549091; cv=none; b=VQJDuGyzsAK1WDoeh0NCQsLDMAJiBDCvzDgPxaurndA86mph0w4ay4/d0uR3gJT2Z1iez75bbV9YIpYWsnUiZzu3L5io26nWazXRF3dIedZlN0XY/fRX52RnywTeJ7nzVx7XK5/9pvvYCQaEZF5TUnYjmoO07b80CXM20y1+WYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790549089; c=relaxed/simple;
-	bh=7lsTgsp3rNqb2iOXiB5NgGfo2WZOrOs1P6p1ft1h4a0=;
+	s=arc-20240116; t=1790549091; c=relaxed/simple;
+	bh=erFiZoQsM/JPO2eBrK+OFcudrjSAcaYIDB6yAsYYH9k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s2UfskPduph2wW4JPUf2TKUmqnHqkeYgp9eRIWYJzT7X+UKhlT4mxrJ+hcYWq0HcBUq95NiiMcrdxYUoMJKU7ngqKcJXyj9nRQy1p/LzxhIc5GzQPQ4pPMxuz9EQshGyQIBokpc+IqScBSOwxVwZT/7qOlyGSvVXSo74dTjcgfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bxNptmOd; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=F1oDaADzuVclybF3JFhIRJHesVxHlhZSb9Mmx+5B5SN/soXtc7KYsqAEAOL8nXYFciUhVoPR/VtvdQpOxmSIxIqqtPWBqZp7NbIj4y1sgTWuI0VaSHBiuqCKBGiBLAtUm9nRjmqeoKeTvUsZGY+t5r0926b7jDFI++MYnB30ubc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZCfBw2IJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bxNptmOd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73A231F0089A;
-	Sun, 27 Sep 2026 22:44:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZCfBw2IJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD421F000FF;
+	Sun, 27 Sep 2026 22:44:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790549085;
-	bh=/KgPf7qOImf02WNBc/Vis1MwsFR/IDPErtkbwnucFog=;
+	s=k20260515; t=1790549086;
+	bh=H9i3Q/SAUMcPccfe83oyz4OR194DdtURCZgybTDIjxc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=bxNptmOd/heJQcxhNrsEGeLA7P8vZ287twXdNlVuFnsG48L1jyPnNCT09bGD2QrHz
-	 22fMhmV/TDuLDaNLpebZfPmqUzc1HJrbkpzaU69g/qCWHuJ3FHnSCSAthsJ7Xgd2KX
-	 GxIm5wMGLDaUjumYebH6CFW1GZfNpm0Gd+M93uPzuu4x0t7XoIJ+S1I0pcG0dsrPj1
-	 hSSJYd1JYdalcE/B9kqZdOxP8bfzpW+tPlrLadpssc5YfAs6mQ/tue4lpOfolRp25N
-	 RL9TOBPTknFnxYvfeCS7Uv5qhqmXi1dcsKoy7z3iIZhQDkFmA5O8rMJdAXkzVvUMOo
-	 w8rUDsO9/8WGg==
+	b=ZCfBw2IJW44pXJ4TObPjt4fzcwUzTRw1bFDJaPM9eO8r4s+zs8xP89LKFBEdPnjpn
+	 I567p0R1mO2GGfOEcglYdfsacDziEGQM/QXMFcSgS3PhYeX6UYqazXHSlQiiK0rvWW
+	 QcT4sW58DuSRw4UOmr55F2wEMEobqNEJq3jMZbi0aSyp3kEUhe9W3btKD3bMfA/RLX
+	 a6u1k9/vEGwePhvUavG4xq61c+vVhnZaqqz1VMuUMjaSskqYmC1bx6/CLV+6es17HX
+	 6xCKcEw8DLIfxw2DccLmc1cYSbevjVmdfD5Z5IcIXsg7eol8kZnNfmrAIqsN5Og2G8
+	 X8MmOdFnC3umw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
 	linux-riscv@lists.infradead.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 18/20] lib/crypto: riscv/aes-cbc: Migrate optimized code into library
-Date: Sun, 27 Sep 2026 15:43:09 -0700
-Message-ID: <20260927224418.109759-19-ebiggers@kernel.org>
+Subject: [PATCH v2 20/20] lib/crypto: riscv/aes-xts: Migrate optimized code into library
+Date: Sun, 27 Sep 2026 15:43:11 -0700
+Message-ID: <20260927224418.109759-21-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260927224418.109759-1-ebiggers@kernel.org>
 References: <20260927224418.109759-1-ebiggers@kernel.org>
@@ -50,300 +50,81 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Instead of exposing the riscv-optimized AES-CBC and AES-CBC-CTS code via
-a riscv-specific crypto_skcipher algorithm, just implement the AES-CBC
-and AES-CBC-CTS library functions.  This is simpler, it makes the
-AES-CBC and AES-CBC-CTS library functions be riscv-optimized, and it
-also fixes the longstanding issue where the riscv-optimized AES-CBC and
-AES-CBC-CTS code was disabled by default.  AES-CBC and AES-CBC-CTS
+Instead of exposing the riscv-optimized AES-XTS code via a
+riscv-specific crypto_skcipher algorithm, just implement the AES-XTS
+library functions.  This is simpler, it makes the AES-XTS library
+functions be riscv-optimized, and it also fixes the longstanding issue
+where the riscv-optimized AES-XTS code was disabled by default.  AES-XTS
 support still remains available through crypto_skcipher via
 crypto/aes.c, but individual architectures no longer need to handle it.
 
 To match what the library expects, update the assembly functions to
-operate on struct aes_enckey or struct aes_key rather than struct
-crypto_aes_ctx, and adjust the argument order.
+operate on struct aes_key rather than struct crypto_aes_ctx, adjust the
+argument order, and remove the redundant ciphertext stealing support
+which is already implemented in a generic way in the library.
 
-Remove the single-block special case from the assembly code, since it's
-already handled by lib/crypto/aes.c before calling aes_cbc_cts_*_arch().
-
-Bump up the priority of the corresponding library-based algorithms on
-riscv now that they no longer have to be lower than arch/riscv/crypto/.
+Bump up the priority of the corresponding library-based algorithm on
+riscv now that it no longer has to be lower than arch/riscv/crypto/.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/riscv/crypto/Kconfig              |   4 +-
- arch/riscv/crypto/Makefile             |   2 +-
- arch/riscv/crypto/aes-riscv64-glue.c   | 167 +--------------
- arch/riscv/crypto/aes-riscv64-zvkned.S | 273 -------------------------
- crypto/aes.c                           |   6 +-
- lib/crypto/riscv/aes-riscv64-zvkned.S  | 235 +++++++++++++++++++++
- lib/crypto/riscv/aes.h                 |  68 ++++++
- 7 files changed, 312 insertions(+), 443 deletions(-)
- delete mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.S
+ arch/riscv/crypto/Kconfig                     |  14 --
+ arch/riscv/crypto/Makefile                    |   4 -
+ arch/riscv/crypto/aes-macros.S                | 166 ------------
+ arch/riscv/crypto/aes-riscv64-glue.c          | 236 ------------------
+ crypto/aes.c                                  |   3 +-
+ lib/crypto/Makefile                           |   3 +
+ .../riscv}/aes-riscv64-zvkned-zvbb-zvkg.S     |  99 ++------
+ lib/crypto/riscv/aes.h                        |  53 ++++
+ 8 files changed, 74 insertions(+), 504 deletions(-)
+ delete mode 100644 arch/riscv/crypto/aes-macros.S
+ delete mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
+ rename {arch/riscv/crypto => lib/crypto/riscv}/aes-riscv64-zvkned-zvbb-zvkg.S (74%)
 
 diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
-index 84c41824b433..0a3f87ad384e 100644
+index 0733d4894401..614f93214862 100644
 --- a/arch/riscv/crypto/Kconfig
 +++ b/arch/riscv/crypto/Kconfig
-@@ -3,13 +3,13 @@
+@@ -2,20 +2,6 @@
+ 
  menu "Accelerated Cryptographic Algorithms for CPU (riscv)"
  
- config CRYPTO_AES_RISCV64
--	tristate "Ciphers: AES, modes: CBC, CTS, CTR, XTS"
-+	tristate "Ciphers: AES, modes: CTR, XTS"
+-config CRYPTO_AES_RISCV64
+-	tristate "Ciphers: AES, modes: XTS"
+-	depends on 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
+-		   RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
+-	select CRYPTO_LIB_AES
+-	select CRYPTO_SKCIPHER
+-	help
+-	  Length-preserving ciphers: AES with XTS
+-
+-	  Architecture: riscv64 using:
+-	  - Zvkned vector crypto extension
+-	  - Zvbb vector extension (XTS)
+-	  - Zvkg vector crypto extension (XTS)
+-
+ config CRYPTO_SM4_RISCV64
+ 	tristate "Ciphers: SM4 (ShangMi 4)"
  	depends on 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
- 		   RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
- 	select CRYPTO_LIB_AES
- 	select CRYPTO_SKCIPHER
- 	help
--	  Length-preserving ciphers: AES with CBC, CTS, CTR, XTS
-+	  Length-preserving ciphers: AES with CTR, XTS
- 
- 	  Architecture: riscv64 using:
- 	  - Zvkned vector crypto extension
 diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
-index 8cf31db57fc4..d8b85afa6d0b 100644
+index 08904603fc94..9f6956cf50b1 100644
 --- a/arch/riscv/crypto/Makefile
 +++ b/arch/riscv/crypto/Makefile
-@@ -1,7 +1,7 @@
+@@ -1,8 +1,4 @@
  # SPDX-License-Identifier: GPL-2.0-only
  
- obj-$(CONFIG_CRYPTO_AES_RISCV64) += aes-riscv64.o
--aes-riscv64-y := aes-riscv64-glue.o aes-riscv64-zvkned.o \
-+aes-riscv64-y := aes-riscv64-glue.o \
- 		 aes-riscv64-zvkned-zvbb-zvkg.o aes-riscv64-zvkned-zvkb.o
- 
+-obj-$(CONFIG_CRYPTO_AES_RISCV64) += aes-riscv64.o
+-aes-riscv64-y := aes-riscv64-glue.o \
+-		 aes-riscv64-zvkned-zvbb-zvkg.o
+-
  obj-$(CONFIG_CRYPTO_SM4_RISCV64) += sm4-riscv64.o
-diff --git a/arch/riscv/crypto/aes-riscv64-glue.c b/arch/riscv/crypto/aes-riscv64-glue.c
-index f7c492dcfd57..97f5369d7e71 100644
---- a/arch/riscv/crypto/aes-riscv64-glue.c
-+++ b/arch/riscv/crypto/aes-riscv64-glue.c
-@@ -22,17 +22,6 @@
- #include <linux/minmax.h>
- #include <linux/module.h>
- 
--asmlinkage void aes_cbc_encrypt_zvkned(const struct crypto_aes_ctx *key,
--				       const u8 *in, u8 *out, size_t len,
--				       u8 iv[AES_BLOCK_SIZE]);
--asmlinkage void aes_cbc_decrypt_zvkned(const struct crypto_aes_ctx *key,
--				       const u8 *in, u8 *out, size_t len,
--				       u8 iv[AES_BLOCK_SIZE]);
--
--asmlinkage void aes_cbc_cts_crypt_zvkned(const struct crypto_aes_ctx *key,
--					 const u8 *in, u8 *out, size_t len,
--					 const u8 iv[AES_BLOCK_SIZE], bool enc);
--
- asmlinkage void aes_ctr32_crypt_zvkned_zvkb(const struct crypto_aes_ctx *key,
- 					    const u8 *in, u8 *out, size_t len,
- 					    u8 iv[AES_BLOCK_SIZE]);
-@@ -81,110 +70,6 @@ static int riscv64_aes_setkey_skcipher(struct crypto_skcipher *tfm,
- 	return riscv64_aes_setkey(ctx, key, keylen);
- }
- 
--/* AES-CBC */
--
--static int riscv64_aes_cbc_crypt(struct skcipher_request *req, bool enc)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	const struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	unsigned int nbytes;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, false);
--	while ((nbytes = walk.nbytes) != 0) {
--		kernel_vector_begin();
--		if (enc)
--			aes_cbc_encrypt_zvkned(ctx, walk.src.virt.addr,
--					       walk.dst.virt.addr,
--					       nbytes & ~(AES_BLOCK_SIZE - 1),
--					       walk.iv);
--		else
--			aes_cbc_decrypt_zvkned(ctx, walk.src.virt.addr,
--					       walk.dst.virt.addr,
--					       nbytes & ~(AES_BLOCK_SIZE - 1),
--					       walk.iv);
--		kernel_vector_end();
--		err = skcipher_walk_done(&walk, nbytes & (AES_BLOCK_SIZE - 1));
--	}
--
--	return err;
--}
--
--static int riscv64_aes_cbc_encrypt(struct skcipher_request *req)
--{
--	return riscv64_aes_cbc_crypt(req, true);
--}
--
--static int riscv64_aes_cbc_decrypt(struct skcipher_request *req)
--{
--	return riscv64_aes_cbc_crypt(req, false);
--}
--
--/* AES-CBC-CTS */
--
--static int riscv64_aes_cbc_cts_crypt(struct skcipher_request *req, bool enc)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	const struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct scatterlist sg_src[2], sg_dst[2];
--	struct skcipher_request subreq;
--	struct scatterlist *src, *dst;
--	struct skcipher_walk walk;
--	unsigned int cbc_len;
--	int err;
--
--	if (req->cryptlen < AES_BLOCK_SIZE)
--		return -EINVAL;
--
--	err = skcipher_walk_virt(&walk, req, false);
--	if (err)
--		return err;
--	/*
--	 * If the full message is available in one step, decrypt it in one call
--	 * to the CBC-CTS assembly function.  This reduces overhead, especially
--	 * on short messages.  Otherwise, fall back to doing CBC up to the last
--	 * two blocks, then invoke CTS just for the ciphertext stealing.
--	 */
--	if (unlikely(walk.nbytes != req->cryptlen)) {
--		cbc_len = round_down(req->cryptlen - AES_BLOCK_SIZE - 1,
--				     AES_BLOCK_SIZE);
--		skcipher_walk_abort(&walk);
--		skcipher_request_set_tfm(&subreq, tfm);
--		skcipher_request_set_callback(&subreq,
--					      skcipher_request_flags(req),
--					      NULL, NULL);
--		skcipher_request_set_crypt(&subreq, req->src, req->dst,
--					   cbc_len, req->iv);
--		err = riscv64_aes_cbc_crypt(&subreq, enc);
--		if (err)
--			return err;
--		dst = src = scatterwalk_ffwd(sg_src, req->src, cbc_len);
--		if (req->dst != req->src)
--			dst = scatterwalk_ffwd(sg_dst, req->dst, cbc_len);
--		skcipher_request_set_crypt(&subreq, src, dst,
--					   req->cryptlen - cbc_len, req->iv);
--		err = skcipher_walk_virt(&walk, &subreq, false);
--		if (err)
--			return err;
--	}
--	kernel_vector_begin();
--	aes_cbc_cts_crypt_zvkned(ctx, walk.src.virt.addr, walk.dst.virt.addr,
--				 walk.nbytes, req->iv, enc);
--	kernel_vector_end();
--	return skcipher_walk_done(&walk, 0);
--}
--
--static int riscv64_aes_cbc_cts_encrypt(struct skcipher_request *req)
--{
--	return riscv64_aes_cbc_cts_crypt(req, true);
--}
--
--static int riscv64_aes_cbc_cts_decrypt(struct skcipher_request *req)
--{
--	return riscv64_aes_cbc_cts_crypt(req, false);
--}
--
- /* AES-CTR */
- 
- static int riscv64_aes_ctr_crypt(struct skcipher_request *req)
-@@ -366,41 +251,6 @@ static int riscv64_aes_xts_decrypt(struct skcipher_request *req)
- 
- /* Algorithm definitions */
- 
--static struct skcipher_alg riscv64_zvkned_aes_skcipher_algs[] = {
--	{
--		.setkey = riscv64_aes_setkey_skcipher,
--		.encrypt = riscv64_aes_cbc_encrypt,
--		.decrypt = riscv64_aes_cbc_decrypt,
--		.min_keysize = AES_MIN_KEY_SIZE,
--		.max_keysize = AES_MAX_KEY_SIZE,
--		.ivsize = AES_BLOCK_SIZE,
--		.base = {
--			.cra_blocksize = AES_BLOCK_SIZE,
--			.cra_ctxsize = sizeof(struct crypto_aes_ctx),
--			.cra_priority = 300,
--			.cra_name = "cbc(aes)",
--			.cra_driver_name = "cbc-aes-riscv64-zvkned",
--			.cra_module = THIS_MODULE,
--		},
--	}, {
--		.setkey = riscv64_aes_setkey_skcipher,
--		.encrypt = riscv64_aes_cbc_cts_encrypt,
--		.decrypt = riscv64_aes_cbc_cts_decrypt,
--		.min_keysize = AES_MIN_KEY_SIZE,
--		.max_keysize = AES_MAX_KEY_SIZE,
--		.ivsize = AES_BLOCK_SIZE,
--		.walksize = 4 * AES_BLOCK_SIZE, /* matches LMUL=4 */
--		.base = {
--			.cra_blocksize = AES_BLOCK_SIZE,
--			.cra_ctxsize = sizeof(struct crypto_aes_ctx),
--			.cra_priority = 300,
--			.cra_name = "cts(cbc(aes))",
--			.cra_driver_name = "cts-cbc-aes-riscv64-zvkned",
--			.cra_module = THIS_MODULE,
--		},
--	}
--};
--
- static struct skcipher_alg riscv64_zvkned_zvkb_aes_skcipher_alg = {
- 	.setkey = riscv64_aes_setkey_skcipher,
- 	.encrypt = riscv64_aes_ctr_crypt,
-@@ -452,17 +302,11 @@ static int __init riscv64_aes_mod_init(void)
- 
- 	if (riscv_isa_extension_available(NULL, ZVKNED) &&
- 	    riscv_vector_vlen() >= 128) {
--		err = crypto_register_skciphers(
--			riscv64_zvkned_aes_skcipher_algs,
--			ARRAY_SIZE(riscv64_zvkned_aes_skcipher_algs));
--		if (err)
--			return err;
--
- 		if (riscv_isa_extension_available(NULL, ZVKB)) {
- 			err = crypto_register_skcipher(
- 				&riscv64_zvkned_zvkb_aes_skcipher_alg);
- 			if (err)
--				goto unregister_zvkned_skcipher_algs;
-+				return err;
- 		}
- 
- 		if (riscv64_aes_xts_supported()) {
-@@ -478,9 +322,6 @@ static int __init riscv64_aes_mod_init(void)
- unregister_zvkned_zvkb_skcipher_alg:
- 	if (riscv_isa_extension_available(NULL, ZVKB))
- 		crypto_unregister_skcipher(&riscv64_zvkned_zvkb_aes_skcipher_alg);
--unregister_zvkned_skcipher_algs:
--	crypto_unregister_skciphers(riscv64_zvkned_aes_skcipher_algs,
--				    ARRAY_SIZE(riscv64_zvkned_aes_skcipher_algs));
- 	return err;
- }
- 
-@@ -490,18 +331,14 @@ static void __exit riscv64_aes_mod_exit(void)
- 		crypto_unregister_skcipher(&riscv64_zvkned_zvbb_zvkg_aes_skcipher_alg);
- 	if (riscv_isa_extension_available(NULL, ZVKB))
- 		crypto_unregister_skcipher(&riscv64_zvkned_zvkb_aes_skcipher_alg);
--	crypto_unregister_skciphers(riscv64_zvkned_aes_skcipher_algs,
--				    ARRAY_SIZE(riscv64_zvkned_aes_skcipher_algs));
- }
- 
- module_init(riscv64_aes_mod_init);
- module_exit(riscv64_aes_mod_exit);
- 
--MODULE_DESCRIPTION("AES-CBC/CTS/CTR/XTS (RISC-V accelerated)");
-+MODULE_DESCRIPTION("AES-CTR/XTS (RISC-V accelerated)");
- MODULE_AUTHOR("Jerry Shih <jerry.shih@sifive.com>");
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_CRYPTO("aes");
--MODULE_ALIAS_CRYPTO("cbc(aes)");
--MODULE_ALIAS_CRYPTO("cts(cbc(aes))");
- MODULE_ALIAS_CRYPTO("ctr(aes)");
- MODULE_ALIAS_CRYPTO("xts(aes)");
-diff --git a/arch/riscv/crypto/aes-riscv64-zvkned.S b/arch/riscv/crypto/aes-riscv64-zvkned.S
+ sm4-riscv64-y := sm4-riscv64-glue.o sm4-riscv64-zvksed-zvkb.o
+diff --git a/arch/riscv/crypto/aes-macros.S b/arch/riscv/crypto/aes-macros.S
 deleted file mode 100644
-index 00f8a06596d3..000000000000
---- a/arch/riscv/crypto/aes-riscv64-zvkned.S
+index 1384164621a5..000000000000
+--- a/arch/riscv/crypto/aes-macros.S
 +++ /dev/null
-@@ -1,273 +0,0 @@
+@@ -1,166 +0,0 @@
 -/* SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause */
 -//
 -// This file is dual-licensed, meaning that you can use it under your
@@ -384,585 +165,648 @@ index 00f8a06596d3..000000000000
 -// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 -// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -
--// The generated code of this file depends on the following RISC-V extensions:
+-// This file contains macros that are shared by the other aes-*.S files.  The
+-// generated code of these macros depends on the following RISC-V extensions:
 -// - RV64I
 -// - RISC-V Vector ('V') with VLEN >= 128
 -// - RISC-V Vector AES block cipher extension ('Zvkned')
 -
+-// Loads the AES round keys from \keyp into vector registers and jumps to code
+-// specific to the length of the key.  Specifically:
+-//   - If AES-128, loads round keys into v1-v11 and jumps to \label128.
+-//   - If AES-192, loads round keys into v1-v13 and jumps to \label192.
+-//   - If AES-256, loads round keys into v1-v15 and continues onwards.
+-//
+-// Also sets vl=4 and vtype=e32,m1,ta,ma.  Clobbers t0 and t1.
+-.macro	aes_begin	keyp, label128, label192, key_len
+-.ifb \key_len
+-	lwu		t0, 480(\keyp)	// t0 = key length in bytes
+-.endif
+-	li		t1, 24		// t1 = key length for AES-192
+-	vsetivli	zero, 4, e32, m1, ta, ma
+-	vle32.v		v1, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v2, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v3, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v4, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v5, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v6, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v7, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v8, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v9, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v10, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v11, (\keyp)
+-.ifb \key_len
+-	blt		t0, t1, \label128	// If AES-128, goto label128.
+-.else
+-	blt		\key_len, t1, \label128	// If AES-128, goto label128.
+-.endif
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v12, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v13, (\keyp)
+-.ifb \key_len
+-	beq		t0, t1, \label192	// If AES-192, goto label192.
+-.else
+-	beq		\key_len, t1, \label192	// If AES-192, goto label192.
+-.endif
+-	// Else, it's AES-256.
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v14, (\keyp)
+-	addi		\keyp, \keyp, 16
+-	vle32.v		v15, (\keyp)
+-.endm
+-
+-// Encrypts \data using zvkned instructions, using the round keys loaded into
+-// v1-v11 (for AES-128), v1-v13 (for AES-192), or v1-v15 (for AES-256).  \keylen
+-// is the AES key length in bits.  vl and vtype must already be set
+-// appropriately.  Note that if vl > 4, multiple blocks are encrypted.
+-.macro	aes_encrypt	data, keylen
+-	vaesz.vs	\data, v1
+-	vaesem.vs	\data, v2
+-	vaesem.vs	\data, v3
+-	vaesem.vs	\data, v4
+-	vaesem.vs	\data, v5
+-	vaesem.vs	\data, v6
+-	vaesem.vs	\data, v7
+-	vaesem.vs	\data, v8
+-	vaesem.vs	\data, v9
+-	vaesem.vs	\data, v10
+-.if \keylen == 128
+-	vaesef.vs	\data, v11
+-.elseif \keylen == 192
+-	vaesem.vs	\data, v11
+-	vaesem.vs	\data, v12
+-	vaesef.vs	\data, v13
+-.else
+-	vaesem.vs	\data, v11
+-	vaesem.vs	\data, v12
+-	vaesem.vs	\data, v13
+-	vaesem.vs	\data, v14
+-	vaesef.vs	\data, v15
+-.endif
+-.endm
+-
+-// Same as aes_encrypt, but decrypts instead of encrypts.
+-.macro	aes_decrypt	data, keylen
+-.if \keylen == 128
+-	vaesz.vs	\data, v11
+-.elseif \keylen == 192
+-	vaesz.vs	\data, v13
+-	vaesdm.vs	\data, v12
+-	vaesdm.vs	\data, v11
+-.else
+-	vaesz.vs	\data, v15
+-	vaesdm.vs	\data, v14
+-	vaesdm.vs	\data, v13
+-	vaesdm.vs	\data, v12
+-	vaesdm.vs	\data, v11
+-.endif
+-	vaesdm.vs	\data, v10
+-	vaesdm.vs	\data, v9
+-	vaesdm.vs	\data, v8
+-	vaesdm.vs	\data, v7
+-	vaesdm.vs	\data, v6
+-	vaesdm.vs	\data, v5
+-	vaesdm.vs	\data, v4
+-	vaesdm.vs	\data, v3
+-	vaesdm.vs	\data, v2
+-	vaesdf.vs	\data, v1
+-.endm
+-
+-// Expands to aes_encrypt or aes_decrypt according to \enc, which is 1 or 0.
+-.macro	aes_crypt	data, enc, keylen
+-.if \enc
+-	aes_encrypt	\data, \keylen
+-.else
+-	aes_decrypt	\data, \keylen
+-.endif
+-.endm
+diff --git a/arch/riscv/crypto/aes-riscv64-glue.c b/arch/riscv/crypto/aes-riscv64-glue.c
+deleted file mode 100644
+index a7dcceb77c49..000000000000
+--- a/arch/riscv/crypto/aes-riscv64-glue.c
++++ /dev/null
+@@ -1,236 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * AES modes using the RISC-V vector crypto extensions
+- *
+- * Copyright (C) 2023 VRULL GmbH
+- * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
+- *
+- * Copyright (C) 2023 SiFive, Inc.
+- * Author: Jerry Shih <jerry.shih@sifive.com>
+- *
+- * Copyright 2024 Google LLC
+- */
+-
+-#include <asm/simd.h>
+-#include <asm/vector.h>
+-#include <crypto/aes.h>
+-#include <crypto/internal/simd.h>
+-#include <crypto/internal/skcipher.h>
+-#include <crypto/scatterwalk.h>
+-#include <crypto/xts.h>
 -#include <linux/linkage.h>
+-#include <linux/minmax.h>
+-#include <linux/module.h>
 -
--.text
--.option arch, +zvkned
+-asmlinkage void aes_xts_encrypt_zvkned_zvbb_zvkg(
+-			const struct crypto_aes_ctx *key,
+-			const u8 *in, u8 *out, size_t len,
+-			u8 tweak[AES_BLOCK_SIZE]);
 -
--#include "aes-macros.S"
+-asmlinkage void aes_xts_decrypt_zvkned_zvbb_zvkg(
+-			const struct crypto_aes_ctx *key,
+-			const u8 *in, u8 *out, size_t len,
+-			u8 tweak[AES_BLOCK_SIZE]);
 -
+-static int riscv64_aes_setkey(struct crypto_aes_ctx *ctx,
+-			      const u8 *key, unsigned int keylen)
+-{
+-	/*
+-	 * For now we just use the generic key expansion, for these reasons:
+-	 *
+-	 * - zvkned's key expansion instructions don't support AES-192.
+-	 *   So, non-zvkned fallback code would be needed anyway.
+-	 *
+-	 * - Users of AES in Linux usually don't change keys frequently.
+-	 *   So, key expansion isn't performance-critical.
+-	 *
+-	 * - For single-block AES exposed as a "cipher" algorithm, it's
+-	 *   necessary to use struct crypto_aes_ctx and initialize its 'key_dec'
+-	 *   field with the round keys for the Equivalent Inverse Cipher.  This
+-	 *   is because with "cipher", decryption can be requested from a
+-	 *   context where the vector unit isn't usable, necessitating a
+-	 *   fallback to aes_decrypt().  But, zvkned can only generate and use
+-	 *   the normal round keys.  Of course, it's preferable to not have
+-	 *   special code just for "cipher", as e.g. XTS also uses a
+-	 *   single-block AES encryption.  It's simplest to just use
+-	 *   struct crypto_aes_ctx and aes_expandkey() everywhere.
+-	 */
+-	return aes_expandkey(ctx, key, keylen);
+-}
+-
+-/* AES-XTS */
+-
+-struct riscv64_aes_xts_ctx {
+-	struct crypto_aes_ctx ctx1;
+-	struct aes_enckey tweak_key;
+-};
+-
+-static int riscv64_aes_xts_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-				  unsigned int keylen)
+-{
+-	struct riscv64_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	return xts_verify_key(tfm, key, keylen) ?:
+-	       riscv64_aes_setkey(&ctx->ctx1, key, keylen / 2) ?:
+-	       aes_prepareenckey(&ctx->tweak_key, key + keylen / 2, keylen / 2);
+-}
+-
+-static int riscv64_aes_xts_crypt(struct skcipher_request *req, bool enc)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	const struct riscv64_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int tail = req->cryptlen % AES_BLOCK_SIZE;
+-	struct scatterlist sg_src[2], sg_dst[2];
+-	struct skcipher_request subreq;
+-	struct scatterlist *src, *dst;
+-	struct skcipher_walk walk;
+-	int err;
+-
+-	if (req->cryptlen < AES_BLOCK_SIZE)
+-		return -EINVAL;
+-
+-	/* Encrypt the IV with the tweak key to get the first tweak. */
+-	aes_encrypt(&ctx->tweak_key, req->iv, req->iv);
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	/*
+-	 * If the message length isn't divisible by the AES block size and the
+-	 * full message isn't available in one step of the scatterlist walk,
+-	 * then separate off the last full block and the partial block.  This
+-	 * ensures that they are processed in the same call to the assembly
+-	 * function, which is required for ciphertext stealing.
+-	 */
+-	if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
+-		skcipher_walk_abort(&walk);
+-
+-		skcipher_request_set_tfm(&subreq, tfm);
+-		skcipher_request_set_callback(&subreq,
+-					      skcipher_request_flags(req),
+-					      NULL, NULL);
+-		skcipher_request_set_crypt(&subreq, req->src, req->dst,
+-					   req->cryptlen - tail - AES_BLOCK_SIZE,
+-					   req->iv);
+-		req = &subreq;
+-		err = skcipher_walk_virt(&walk, req, false);
+-	} else {
+-		tail = 0;
+-	}
+-
+-	while (walk.nbytes) {
+-		unsigned int nbytes = walk.nbytes;
+-
+-		if (nbytes < walk.total)
+-			nbytes = round_down(nbytes, AES_BLOCK_SIZE);
+-
+-		kernel_vector_begin();
+-		if (enc)
+-			aes_xts_encrypt_zvkned_zvbb_zvkg(
+-				&ctx->ctx1, walk.src.virt.addr,
+-				walk.dst.virt.addr, nbytes, req->iv);
+-		else
+-			aes_xts_decrypt_zvkned_zvbb_zvkg(
+-				&ctx->ctx1, walk.src.virt.addr,
+-				walk.dst.virt.addr, nbytes, req->iv);
+-		kernel_vector_end();
+-		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+-	}
+-
+-	if (err || likely(!tail))
+-		return err;
+-
+-	/* Do ciphertext stealing with the last full block and partial block. */
+-
+-	dst = src = scatterwalk_ffwd(sg_src, req->src, req->cryptlen);
+-	if (req->dst != req->src)
+-		dst = scatterwalk_ffwd(sg_dst, req->dst, req->cryptlen);
+-
+-	skcipher_request_set_crypt(req, src, dst, AES_BLOCK_SIZE + tail,
+-				   req->iv);
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-	if (err)
+-		return err;
+-
+-	kernel_vector_begin();
+-	if (enc)
+-		aes_xts_encrypt_zvkned_zvbb_zvkg(
+-			&ctx->ctx1, walk.src.virt.addr,
+-			walk.dst.virt.addr, walk.nbytes, req->iv);
+-	else
+-		aes_xts_decrypt_zvkned_zvbb_zvkg(
+-			&ctx->ctx1, walk.src.virt.addr,
+-			walk.dst.virt.addr, walk.nbytes, req->iv);
+-	kernel_vector_end();
+-
+-	return skcipher_walk_done(&walk, 0);
+-}
+-
+-static int riscv64_aes_xts_encrypt(struct skcipher_request *req)
+-{
+-	return riscv64_aes_xts_crypt(req, true);
+-}
+-
+-static int riscv64_aes_xts_decrypt(struct skcipher_request *req)
+-{
+-	return riscv64_aes_xts_crypt(req, false);
+-}
+-
+-/* Algorithm definitions */
+-
+-static struct skcipher_alg riscv64_zvkned_zvbb_zvkg_aes_skcipher_alg = {
+-	.setkey = riscv64_aes_xts_setkey,
+-	.encrypt = riscv64_aes_xts_encrypt,
+-	.decrypt = riscv64_aes_xts_decrypt,
+-	.min_keysize = 2 * AES_MIN_KEY_SIZE,
+-	.max_keysize = 2 * AES_MAX_KEY_SIZE,
+-	.ivsize = AES_BLOCK_SIZE,
+-	.chunksize = AES_BLOCK_SIZE,
+-	.walksize = 4 * AES_BLOCK_SIZE, /* matches LMUL=4 */
+-	.base = {
+-		.cra_blocksize = AES_BLOCK_SIZE,
+-		.cra_ctxsize = sizeof(struct riscv64_aes_xts_ctx),
+-		.cra_priority = 300,
+-		.cra_name = "xts(aes)",
+-		.cra_driver_name = "xts-aes-riscv64-zvkned-zvbb-zvkg",
+-		.cra_module = THIS_MODULE,
+-	},
+-};
+-
+-static inline bool riscv64_aes_xts_supported(void)
+-{
+-	return riscv_isa_extension_available(NULL, ZVBB) &&
+-	       riscv_isa_extension_available(NULL, ZVKG) &&
+-	       riscv_vector_vlen() < 2048 /* Implementation limitation */;
+-}
+-
+-static int __init riscv64_aes_mod_init(void)
+-{
+-	int err = -ENODEV;
+-
+-	if (riscv_isa_extension_available(NULL, ZVKNED) &&
+-	    riscv_vector_vlen() >= 128) {
+-		if (riscv64_aes_xts_supported()) {
+-			err = crypto_register_skcipher(
+-				&riscv64_zvkned_zvbb_zvkg_aes_skcipher_alg);
+-			if (err)
+-				return err;
+-		}
+-	}
+-
+-	return err;
+-}
+-
+-static void __exit riscv64_aes_mod_exit(void)
+-{
+-	crypto_unregister_skcipher(&riscv64_zvkned_zvbb_zvkg_aes_skcipher_alg);
+-}
+-
+-module_init(riscv64_aes_mod_init);
+-module_exit(riscv64_aes_mod_exit);
+-
+-MODULE_DESCRIPTION("AES-XTS (RISC-V accelerated)");
+-MODULE_AUTHOR("Jerry Shih <jerry.shih@sifive.com>");
+-MODULE_LICENSE("GPL");
+-MODULE_ALIAS_CRYPTO("aes");
+-MODULE_ALIAS_CRYPTO("xts(aes)");
+diff --git a/crypto/aes.c b/crypto/aes.c
+index 1b84953c5deb..2e61146f6fbb 100644
+--- a/crypto/aes.c
++++ b/crypto/aes.c
+@@ -705,7 +705,8 @@ static struct skcipher_alg skcipher_algs[] = {
+ 	{
+ 		.base.cra_name = "xts(aes)",
+ 		.base.cra_driver_name = "xts-aes-lib",
+-		.base.cra_priority = IS_ENABLED(CONFIG_X86) ? 300 : 110,
++		.base.cra_priority = (IS_ENABLED(CONFIG_RISCV) ||
++				      IS_ENABLED(CONFIG_X86)) ? 300 : 110,
+ 		.base.cra_blocksize = AES_BLOCK_SIZE,
+ 		.base.cra_ctxsize = sizeof(struct aes_xts_key),
+ 		.base.cra_module = THIS_MODULE,
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index ff34aeda37ba..d683b8520f55 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -54,6 +54,9 @@ libaes-$(CONFIG_RISCV) += riscv/aes-riscv64-zvkned.o
+ ifneq ($(CONFIG_CRYPTO_LIB_AES_CTR),)
+ libaes-$(CONFIG_RISCV) += riscv/aes-riscv64-zvkned-zvkb.o
+ endif
++ifneq ($(CONFIG_CRYPTO_LIB_AES_XTS),)
++libaes-$(CONFIG_RISCV) += riscv/aes-riscv64-zvkned-zvbb-zvkg.o
++endif
+ 
+ libaes-$(CONFIG_SPARC) += sparc/aes_asm.o
+ 
+diff --git a/arch/riscv/crypto/aes-riscv64-zvkned-zvbb-zvkg.S b/lib/crypto/riscv/aes-riscv64-zvkned-zvbb-zvkg.S
+similarity index 74%
+rename from arch/riscv/crypto/aes-riscv64-zvkned-zvbb-zvkg.S
+rename to lib/crypto/riscv/aes-riscv64-zvkned-zvbb-zvkg.S
+index 146fc9cfb268..c45aaed80ce6 100644
+--- a/arch/riscv/crypto/aes-riscv64-zvkned-zvbb-zvkg.S
++++ b/lib/crypto/riscv/aes-riscv64-zvkned-zvbb-zvkg.S
+@@ -50,14 +50,13 @@
+ 
+ #include "aes-macros.S"
+ 
 -#define KEYP		a0
 -#define INP		a1
 -#define OUTP		a2
 -#define LEN		a3
--#define IVP		a4
+-#define TWEAKP		a4
++#define DST		a0
++#define SRC		a1
++#define LEN		a2
++#define TWEAKP		a3
++#define KEYP		a4
+ 
+ #define LEN32		a5
+-#define TAIL_LEN	a6
+ #define VL		a7
+ #define VLMAX		t4
+ 
+@@ -67,9 +66,6 @@
+ #define TWEAKS_BREV	v20	// LMUL=4 (most of the time)
+ #define MULTS_BREV	v24	// LMUL=4 (most of the time)
+ #define TMP0		v28
+-#define TMP1		v29
+-#define TMP2		v30
+-#define TMP3		v31
+ 
+ // xts_init initializes the following values:
+ //
+@@ -167,24 +163,21 @@
+ .endm
+ 
+ .macro	__aes_xts_crypt	enc, keylen
+-	// With 16 < len <= 31, there's no main loop, just ciphertext stealing.
+-	beqz		LEN32, .Lcts_without_main_loop\@
 -
--.macro	aes_cbc_encrypt	keylen
--	vle32.v		v16, (IVP)	// Load IV
--1:
--	vle32.v		v17, (INP)	// Load plaintext block
--	vxor.vv		v16, v16, v17	// XOR with IV or prev ciphertext block
--	aes_encrypt	v16, \keylen	// Encrypt
--	vse32.v		v16, (OUTP)	// Store ciphertext block
--	addi		INP, INP, 16
--	addi		OUTP, OUTP, 16
--	addi		LEN, LEN, -16
--	bnez		LEN, 1b
--
--	vse32.v		v16, (IVP)	// Store next IV
--	ret
--.endm
--
--.macro	aes_cbc_decrypt	keylen
--	srli		LEN, LEN, 2	// Convert LEN from bytes to words
--	vle32.v		v16, (IVP)	// Load IV
--1:
--	vsetvli		t0, LEN, e32, m4, ta, ma
--	vle32.v		v20, (INP)	// Load ciphertext blocks
--	vslideup.vi	v16, v20, 4	// Setup prev ciphertext blocks
--	addi		t1, t0, -4
--	vslidedown.vx	v24, v20, t1	// Save last ciphertext block
--	aes_decrypt	v20, \keylen	// Decrypt the blocks
--	vxor.vv		v20, v20, v16	// XOR with prev ciphertext blocks
--	vse32.v		v20, (OUTP)	// Store plaintext blocks
--	vmv.v.v		v16, v24	// Next "IV" is last ciphertext block
--	slli		t1, t0, 2	// Words to bytes
--	add		INP, INP, t1
--	add		OUTP, OUTP, t1
--	sub		LEN, LEN, t0
--	bnez		LEN, 1b
--
--	vsetivli	zero, 4, e32, m1, ta, ma
--	vse32.v		v16, (IVP)	// Store next IV
--	ret
--.endm
--
--// void aes_cbc_encrypt_zvkned(const struct crypto_aes_ctx *key,
--//			       const u8 *in, u8 *out, size_t len, u8 iv[16]);
--//
--// |len| must be nonzero and a multiple of 16 (AES_BLOCK_SIZE).
--SYM_FUNC_START(aes_cbc_encrypt_zvkned)
--	aes_begin	KEYP, 128f, 192f
--	aes_cbc_encrypt	256
--128:
--	aes_cbc_encrypt	128
--192:
--	aes_cbc_encrypt	192
--SYM_FUNC_END(aes_cbc_encrypt_zvkned)
--
--// Same prototype and calling convention as the encryption function
--SYM_FUNC_START(aes_cbc_decrypt_zvkned)
--	aes_begin	KEYP, 128f, 192f
--	aes_cbc_decrypt	256
--128:
--	aes_cbc_decrypt	128
--192:
--	aes_cbc_decrypt	192
--SYM_FUNC_END(aes_cbc_decrypt_zvkned)
--
--.macro	aes_cbc_cts_encrypt	keylen
--
--	// CBC-encrypt all blocks except the last.  But don't store the
--	// second-to-last block to the output buffer yet, since it will be
--	// handled specially in the ciphertext stealing step.  Exception: if the
--	// message is single-block, still encrypt the last (and only) block.
--	li		t0, 16
--	j		2f
--1:
--	vse32.v		v16, (OUTP)	// Store ciphertext block
--	addi		OUTP, OUTP, 16
--2:
--	vle32.v		v17, (INP)	// Load plaintext block
--	vxor.vv		v16, v16, v17	// XOR with IV or prev ciphertext block
--	aes_encrypt	v16, \keylen	// Encrypt
--	addi		INP, INP, 16
--	addi		LEN, LEN, -16
--	bgt		LEN, t0, 1b	// Repeat if more than one block remains
--
--	// Special case: if the message is a single block, just do CBC.
--	beqz		LEN, .Lcts_encrypt_done\@
--
--	// Encrypt the last two blocks using ciphertext stealing as follows:
--	//	C[n-1] = Encrypt(Encrypt(P[n-1] ^ C[n-2]) ^ P[n])
--	//	C[n] = Encrypt(P[n-1] ^ C[n-2])[0..LEN]
--	//
--	// C[i] denotes the i'th ciphertext block, and likewise P[i] the i'th
--	// plaintext block.  Block n, the last block, may be partial; its length
--	// is 1 <= LEN <= 16.  If there are only 2 blocks, C[n-2] means the IV.
--	//
--	// v16 already contains Encrypt(P[n-1] ^ C[n-2]).
--	// INP points to P[n].  OUTP points to where C[n-1] should go.
--	// To support in-place encryption, load P[n] before storing C[n].
--	addi		t0, OUTP, 16	// Get pointer to where C[n] should go
--	vsetvli		zero, LEN, e8, m1, tu, ma
--	vle8.v		v17, (INP)	// Load P[n]
--	vse8.v		v16, (t0)	// Store C[n]
--	vxor.vv		v16, v16, v17	// v16 = Encrypt(P[n-1] ^ C[n-2]) ^ P[n]
--	vsetivli	zero, 4, e32, m1, ta, ma
--	aes_encrypt	v16, \keylen
--.Lcts_encrypt_done\@:
--	vse32.v		v16, (OUTP)	// Store C[n-1] (or C[n] in single-block case)
--	ret
--.endm
--
--#define LEN32		t4 // Length of remaining full blocks in 32-bit words
--#define LEN_MOD16	t5 // Length of message in bytes mod 16
--
--.macro	aes_cbc_cts_decrypt	keylen
--	andi		LEN32, LEN, ~15
--	srli		LEN32, LEN32, 2
--	andi		LEN_MOD16, LEN, 15
--
--	// Save C[n-2] in v28 so that it's available later during the ciphertext
--	// stealing step.  If there are fewer than three blocks, C[n-2] means
--	// the IV, otherwise it means the third-to-last ciphertext block.
--	vmv.v.v		v28, v16	// IV
--	add		t0, LEN, -33
--	bltz		t0, .Lcts_decrypt_loop\@
--	andi		t0, t0, ~15
--	add		t0, t0, INP
--	vle32.v		v28, (t0)
--
--	// CBC-decrypt all full blocks.  For the last full block, or the last 2
--	// full blocks if the message is block-aligned, this doesn't write the
--	// correct output blocks (unless the message is only a single block),
--	// because it XORs the wrong values with the raw AES plaintexts.  But we
--	// fix this after this loop without redoing the AES decryptions.  This
--	// approach allows more of the AES decryptions to be parallelized.
--.Lcts_decrypt_loop\@:
--	vsetvli		t0, LEN32, e32, m4, ta, ma
--	addi		t1, t0, -4
--	vle32.v		v20, (INP)	// Load next set of ciphertext blocks
--	vmv.v.v		v24, v16	// Get IV or last ciphertext block of prev set
--	vslideup.vi	v24, v20, 4	// Setup prev ciphertext blocks
--	vslidedown.vx	v16, v20, t1	// Save last ciphertext block of this set
--	aes_decrypt	v20, \keylen	// Decrypt this set of blocks
--	vxor.vv		v24, v24, v20	// XOR prev ciphertext blocks with decrypted blocks
--	vse32.v		v24, (OUTP)	// Store this set of plaintext blocks
--	sub		LEN32, LEN32, t0
--	slli		t0, t0, 2	// Words to bytes
+ 	vsetvli		VLMAX, zero, e32, m4, ta, ma
+ 1:
+ 	vsetvli		VL, LEN32, e32, m4, ta, ma
+ 2:
+ 	// Encrypt or decrypt VL/4 blocks.
+-	vle32.v		TMP0, (INP)
++	vle32.v		TMP0, (SRC)
+ 	vxor.vv		TMP0, TMP0, TWEAKS
+ 	aes_crypt	TMP0, \enc, \keylen
+ 	vxor.vv		TMP0, TMP0, TWEAKS
+-	vse32.v		TMP0, (OUTP)
++	vse32.v		TMP0, (DST)
+ 
+ 	// Update the pointers and the remaining length.
+ 	slli		t0, VL, 2
 -	add		INP, INP, t0
 -	add		OUTP, OUTP, t0
--	bnez		LEN32, .Lcts_decrypt_loop\@
--
--	vsetivli	zero, 4, e32, m4, ta, ma
--	vslidedown.vx	v20, v20, t1	// Extract raw plaintext of last full block
--	addi		t0, OUTP, -16	// Get pointer to last full plaintext block
--	bnez		LEN_MOD16, .Lcts_decrypt_non_block_aligned\@
--
--	// Special case: if the message is a single block, just do CBC.
--	li		t1, 16
--	beq		LEN, t1, .Lcts_decrypt_done\@
--
--	// Block-aligned message.  Just fix up the last 2 blocks.  We need:
--	//
--	//	P[n-1] = Decrypt(C[n]) ^ C[n-2]
--	//	P[n] = Decrypt(C[n-1]) ^ C[n]
--	//
--	// We have C[n] in v16, Decrypt(C[n]) in v20, and C[n-2] in v28.
--	// Together with Decrypt(C[n-1]) ^ C[n-2] from the output buffer, this
--	// is everything needed to fix the output without re-decrypting blocks.
--	addi		t1, OUTP, -32	// Get pointer to where P[n-1] should go
--	vxor.vv		v20, v20, v28	// Decrypt(C[n]) ^ C[n-2] == P[n-1]
--	vle32.v		v24, (t1)	// Decrypt(C[n-1]) ^ C[n-2]
--	vse32.v		v20, (t1)	// Store P[n-1]
--	vxor.vv		v20, v24, v16	// Decrypt(C[n-1]) ^ C[n-2] ^ C[n] == P[n] ^ C[n-2]
--	j		.Lcts_decrypt_finish\@
--
--.Lcts_decrypt_non_block_aligned\@:
--	// Decrypt the last two blocks using ciphertext stealing as follows:
--	//
--	//	P[n-1] = Decrypt(C[n] || Decrypt(C[n-1])[LEN_MOD16..16]) ^ C[n-2]
--	//	P[n] = (Decrypt(C[n-1]) ^ C[n])[0..LEN_MOD16]
--	//
--	// We already have Decrypt(C[n-1]) in v20 and C[n-2] in v28.
--	vmv.v.v		v16, v20	// v16 = Decrypt(C[n-1])
--	vsetvli		zero, LEN_MOD16, e8, m1, tu, ma
--	vle8.v		v20, (INP)	// v20 = C[n] || Decrypt(C[n-1])[LEN_MOD16..16]
--	vxor.vv		v16, v16, v20	// v16 = Decrypt(C[n-1]) ^ C[n]
--	vse8.v		v16, (OUTP)	// Store P[n]
--	vsetivli	zero, 4, e32, m1, ta, ma
--	aes_decrypt	v20, \keylen	// v20 = Decrypt(C[n] || Decrypt(C[n-1])[LEN_MOD16..16])
--.Lcts_decrypt_finish\@:
--	vxor.vv		v20, v20, v28	// XOR with C[n-2]
--	vse32.v		v20, (t0)	// Store last full plaintext block
--.Lcts_decrypt_done\@:
--	ret
--.endm
--
--.macro	aes_cbc_cts_crypt	keylen
--	vle32.v		v16, (IVP)	// Load IV
--	beqz		a5, .Lcts_decrypt\@
--	aes_cbc_cts_encrypt \keylen
--.Lcts_decrypt\@:
--	aes_cbc_cts_decrypt \keylen
--.endm
--
--// void aes_cbc_cts_crypt_zvkned(const struct crypto_aes_ctx *key,
--//			         const u8 *in, u8 *out, size_t len,
--//				 const u8 iv[16], bool enc);
--//
--// Encrypts or decrypts a message with the CS3 variant of AES-CBC-CTS.
--// This is the variant that unconditionally swaps the last two blocks.
--SYM_FUNC_START(aes_cbc_cts_crypt_zvkned)
--	aes_begin	KEYP, 128f, 192f
--	aes_cbc_cts_crypt 256
--128:
--	aes_cbc_cts_crypt 128
--192:
--	aes_cbc_cts_crypt 192
--SYM_FUNC_END(aes_cbc_cts_crypt_zvkned)
-diff --git a/crypto/aes.c b/crypto/aes.c
-index 9b9e5b413fc4..1daaa59d0cdf 100644
---- a/crypto/aes.c
-+++ b/crypto/aes.c
-@@ -626,7 +626,8 @@ static struct skcipher_alg skcipher_algs[] = {
- 	{
- 		.base.cra_name = "cbc(aes)",
- 		.base.cra_driver_name = "cbc-aes-lib",
--		.base.cra_priority = IS_ENABLED(CONFIG_X86) ? 300 : 110,
-+		.base.cra_priority = (IS_ENABLED(CONFIG_RISCV) ||
-+				      IS_ENABLED(CONFIG_X86)) ? 300 : 110,
- 		.base.cra_blocksize = AES_BLOCK_SIZE,
- 		.base.cra_ctxsize = sizeof(struct aes_key),
- 		.base.cra_module = THIS_MODULE,
-@@ -652,7 +653,8 @@ static struct skcipher_alg skcipher_algs[] = {
- 	{
- 		.base.cra_name = "cts(cbc(aes))",
- 		.base.cra_driver_name = "cts-cbc-aes-lib",
--		.base.cra_priority = IS_ENABLED(CONFIG_X86) ? 300 : 110,
-+		.base.cra_priority = (IS_ENABLED(CONFIG_RISCV) ||
-+				      IS_ENABLED(CONFIG_X86)) ? 300 : 110,
- 		.base.cra_blocksize = AES_BLOCK_SIZE,
- 		.base.cra_ctxsize = sizeof(struct aes_key),
- 		.base.cra_module = THIS_MODULE,
-diff --git a/lib/crypto/riscv/aes-riscv64-zvkned.S b/lib/crypto/riscv/aes-riscv64-zvkned.S
-index 3700028e62ea..61c1f185c33d 100644
---- a/lib/crypto/riscv/aes-riscv64-zvkned.S
-+++ b/lib/crypto/riscv/aes-riscv64-zvkned.S
-@@ -132,3 +132,238 @@ SYM_FUNC_END(aes_ecb_encrypt_zvkned)
- SYM_FUNC_START(aes_ecb_decrypt_zvkned)
- 	aes_ecb_crypt	0
- SYM_FUNC_END(aes_ecb_decrypt_zvkned)
-+
-+#undef DST
-+#undef SRC
-+#undef LEN
-+#undef KEYP
-+
-+#define DST		a0
-+#define SRC		a1
-+#define LEN		a2
-+#define IVP		a3
-+#define KEYP		a4
-+
-+.macro	aes_cbc_encrypt	keylen
-+	vle32.v		v16, (IVP)	// Load IV
-+1:
-+	vle32.v		v17, (SRC)	// Load plaintext block
-+	vxor.vv		v16, v16, v17	// XOR with IV or prev ciphertext block
-+	aes_encrypt	v16, \keylen	// Encrypt
-+	vse32.v		v16, (DST)	// Store ciphertext block
-+	addi		SRC, SRC, 16
-+	addi		DST, DST, 16
-+	addi		LEN, LEN, -16
-+	bnez		LEN, 1b
-+
-+	vse32.v		v16, (IVP)	// Store next IV
-+	ret
-+.endm
-+
-+.macro	aes_cbc_decrypt	keylen
-+	srli		LEN, LEN, 2	// Convert LEN from bytes to words
-+	vle32.v		v16, (IVP)	// Load IV
-+1:
-+	vsetvli		t0, LEN, e32, m4, ta, ma
-+	vle32.v		v20, (SRC)	// Load ciphertext blocks
-+	vslideup.vi	v16, v20, 4	// Setup prev ciphertext blocks
-+	addi		t1, t0, -4
-+	vslidedown.vx	v24, v20, t1	// Save last ciphertext block
-+	aes_decrypt	v20, \keylen	// Decrypt the blocks
-+	vxor.vv		v20, v20, v16	// XOR with prev ciphertext blocks
-+	vse32.v		v20, (DST)	// Store plaintext blocks
-+	vmv.v.v		v16, v24	// Next "IV" is last ciphertext block
-+	slli		t1, t0, 2	// Words to bytes
-+	add		SRC, SRC, t1
-+	add		DST, DST, t1
-+	sub		LEN, LEN, t0
-+	bnez		LEN, 1b
-+
-+	vsetivli	zero, 4, e32, m1, ta, ma
-+	vse32.v		v16, (IVP)	// Store next IV
-+	ret
-+.endm
-+
-+// void aes_cbc_encrypt_zvkned(u8 *dst, const u8 *src, size_t len,
-+//			       u8 iv[AES_BLOCK_SIZE],
-+//			       const struct aes_enckey *key);
-+//
-+// |len| must be nonzero and a multiple of 16 (AES_BLOCK_SIZE).
-+SYM_FUNC_START(aes_cbc_encrypt_zvkned)
-+	aes_begin	KEYP, 128f, 192f
-+	aes_cbc_encrypt	256
-+128:
-+	aes_cbc_encrypt	128
-+192:
-+	aes_cbc_encrypt	192
-+SYM_FUNC_END(aes_cbc_encrypt_zvkned)
-+
-+// void aes_cbc_decrypt_zvkned(u8 *dst, const u8 *src, size_t len,
-+//			       u8 iv[AES_BLOCK_SIZE],
-+//			       const struct aes_key *key);
-+//
-+// |len| must be nonzero and a multiple of 16 (AES_BLOCK_SIZE).
-+SYM_FUNC_START(aes_cbc_decrypt_zvkned)
-+	aes_begin	KEYP, 128f, 192f
-+	aes_cbc_decrypt	256
-+128:
-+	aes_cbc_decrypt	128
-+192:
-+	aes_cbc_decrypt	192
-+SYM_FUNC_END(aes_cbc_decrypt_zvkned)
-+
-+#undef DST
-+#undef SRC
-+#undef LEN
-+#undef IVP
-+#undef KEYP
-+
-+#define DST		a0
-+#define SRC		a1
-+#define LEN		a2
-+#define IVP		a3
-+#define KEYP		a4
-+#define ENC		a5
-+
-+.macro	aes_cbc_cts_encrypt	keylen
-+
-+	// CBC-encrypt all blocks except the last.  But don't store the
-+	// second-to-last block to the output buffer yet, since it will be
-+	// handled specially in the ciphertext stealing step.
-+	li		t0, 16
-+	j		2f
-+1:
-+	vse32.v		v16, (DST)	// Store ciphertext block
-+	addi		DST, DST, 16
-+2:
-+	vle32.v		v17, (SRC)	// Load plaintext block
-+	vxor.vv		v16, v16, v17	// XOR with IV or prev ciphertext block
-+	aes_encrypt	v16, \keylen	// Encrypt
-+	addi		SRC, SRC, 16
-+	addi		LEN, LEN, -16
-+	bgt		LEN, t0, 1b	// Repeat if more than one block remains
-+
-+	// Encrypt the last two blocks using ciphertext stealing as follows:
-+	//	C[n-1] = Encrypt(Encrypt(P[n-1] ^ C[n-2]) ^ P[n])
-+	//	C[n] = Encrypt(P[n-1] ^ C[n-2])[0..LEN]
-+	//
-+	// C[i] denotes the i'th ciphertext block, and likewise P[i] the i'th
-+	// plaintext block.  Block n, the last block, may be partial; its length
-+	// is 1 <= LEN <= 16.  If there are only 2 blocks, C[n-2] means the IV.
-+	//
-+	// v16 already contains Encrypt(P[n-1] ^ C[n-2]).
-+	// SRC points to P[n].  DST points to where C[n-1] should go.
-+	// To support in-place encryption, load P[n] before storing C[n].
-+	addi		t0, DST, 16	// Get pointer to where C[n] should go
-+	vsetvli		zero, LEN, e8, m1, tu, ma
-+	vle8.v		v17, (SRC)	// Load P[n]
-+	vse8.v		v16, (t0)	// Store C[n]
-+	vxor.vv		v16, v16, v17	// v16 = Encrypt(P[n-1] ^ C[n-2]) ^ P[n]
-+	vsetivli	zero, 4, e32, m1, ta, ma
-+	aes_encrypt	v16, \keylen
-+	vse32.v		v16, (DST)	// Store C[n-1]
-+	ret
-+.endm
-+
-+#define LEN32		t4 // Length of remaining full blocks in 32-bit words
-+#define LEN_MOD16	t5 // Length of message in bytes mod 16
-+
-+.macro	aes_cbc_cts_decrypt	keylen
-+	andi		LEN32, LEN, ~15
-+	srli		LEN32, LEN32, 2
-+	andi		LEN_MOD16, LEN, 15
-+
-+	// Save C[n-2] in v28 so that it's available later during the ciphertext
-+	// stealing step.  If there are fewer than three blocks, C[n-2] means
-+	// the IV, otherwise it means the third-to-last ciphertext block.
-+	vmv.v.v		v28, v16	// IV
-+	add		t0, LEN, -33
-+	bltz		t0, .Lcts_decrypt_loop\@
-+	andi		t0, t0, ~15
-+	add		t0, t0, SRC
-+	vle32.v		v28, (t0)
-+
-+	// CBC-decrypt all full blocks.  For the last full block, or the last 2
-+	// full blocks if the message is block-aligned, this doesn't write the
-+	// correct output blocks, because it XORs the wrong values with the raw
-+	// AES plaintexts.  But we fix this after this loop without redoing the
-+	// AES decryptions.  This approach allows more of the AES decryptions to
-+	// be parallelized.
-+.Lcts_decrypt_loop\@:
-+	vsetvli		t0, LEN32, e32, m4, ta, ma
-+	addi		t1, t0, -4
-+	vle32.v		v20, (SRC)	// Load next set of ciphertext blocks
-+	vmv.v.v		v24, v16	// Get IV or last ciphertext block of prev set
-+	vslideup.vi	v24, v20, 4	// Setup prev ciphertext blocks
-+	vslidedown.vx	v16, v20, t1	// Save last ciphertext block of this set
-+	aes_decrypt	v20, \keylen	// Decrypt this set of blocks
-+	vxor.vv		v24, v24, v20	// XOR prev ciphertext blocks with decrypted blocks
-+	vse32.v		v24, (DST)	// Store this set of plaintext blocks
-+	sub		LEN32, LEN32, t0
-+	slli		t0, t0, 2	// Words to bytes
 +	add		SRC, SRC, t0
 +	add		DST, DST, t0
-+	bnez		LEN32, .Lcts_decrypt_loop\@
-+
-+	vsetivli	zero, 4, e32, m4, ta, ma
-+	vslidedown.vx	v20, v20, t1	// Extract raw plaintext of last full block
-+	addi		t0, DST, -16	// Get pointer to last full plaintext block
-+	bnez		LEN_MOD16, .Lcts_decrypt_non_block_aligned\@
-+
-+	// Block-aligned message.  Just fix up the last 2 blocks.  We need:
-+	//
-+	//	P[n-1] = Decrypt(C[n]) ^ C[n-2]
-+	//	P[n] = Decrypt(C[n-1]) ^ C[n]
-+	//
-+	// We have C[n] in v16, Decrypt(C[n]) in v20, and C[n-2] in v28.
-+	// Together with Decrypt(C[n-1]) ^ C[n-2] from the output buffer, this
-+	// is everything needed to fix the output without re-decrypting blocks.
-+	addi		t1, DST, -32	// Get pointer to where P[n-1] should go
-+	vxor.vv		v20, v20, v28	// Decrypt(C[n]) ^ C[n-2] == P[n-1]
-+	vle32.v		v24, (t1)	// Decrypt(C[n-1]) ^ C[n-2]
-+	vse32.v		v20, (t1)	// Store P[n-1]
-+	vxor.vv		v20, v24, v16	// Decrypt(C[n-1]) ^ C[n-2] ^ C[n] == P[n] ^ C[n-2]
-+	j		.Lcts_decrypt_finish\@
-+
-+.Lcts_decrypt_non_block_aligned\@:
-+	// Decrypt the last two blocks using ciphertext stealing as follows:
-+	//
-+	//	P[n-1] = Decrypt(C[n] || Decrypt(C[n-1])[LEN_MOD16..16]) ^ C[n-2]
-+	//	P[n] = (Decrypt(C[n-1]) ^ C[n])[0..LEN_MOD16]
-+	//
-+	// We already have Decrypt(C[n-1]) in v20 and C[n-2] in v28.
-+	vmv.v.v		v16, v20	// v16 = Decrypt(C[n-1])
-+	vsetvli		zero, LEN_MOD16, e8, m1, tu, ma
-+	vle8.v		v20, (SRC)	// v20 = C[n] || Decrypt(C[n-1])[LEN_MOD16..16]
-+	vxor.vv		v16, v16, v20	// v16 = Decrypt(C[n-1]) ^ C[n]
-+	vse8.v		v16, (DST)	// Store P[n]
-+	vsetivli	zero, 4, e32, m1, ta, ma
-+	aes_decrypt	v20, \keylen	// v20 = Decrypt(C[n] || Decrypt(C[n-1])[LEN_MOD16..16])
-+.Lcts_decrypt_finish\@:
-+	vxor.vv		v20, v20, v28	// XOR with C[n-2]
-+	vse32.v		v20, (t0)	// Store last full plaintext block
-+	ret
-+.endm
-+
-+.macro	aes_cbc_cts_crypt	keylen
-+	vle32.v		v16, (IVP)	// Load IV
-+	beqz		ENC, .Lcts_decrypt\@
-+	aes_cbc_cts_encrypt \keylen
-+.Lcts_decrypt\@:
-+	aes_cbc_cts_decrypt \keylen
-+.endm
-+
-+// void aes_cbc_cts_crypt_zvkned(u8 *dst, const u8 *src, size_t len,
-+//				 const u8 iv[AES_BLOCK_SIZE],
-+//				 aes_encrypt_arg key, bool enc);
-+//
-+// Encrypts or decrypts len >= 17 bytes of data using the CS3 variant of
-+// AES-CBC-CTS.  This is the variant that always swaps the last two blocks.
-+SYM_FUNC_START(aes_cbc_cts_crypt_zvkned)
-+	aes_begin	KEYP, 128f, 192f
-+	aes_cbc_cts_crypt 256
-+128:
-+	aes_cbc_cts_crypt 128
-+192:
-+	aes_cbc_cts_crypt 192
-+SYM_FUNC_END(aes_cbc_cts_crypt_zvkned)
+ 	sub		LEN32, LEN32, VL
+ 
+ 	// Check whether more blocks remain.
+@@ -217,73 +210,14 @@
+ 	vsetivli	zero, 4, e32, m1, ta, ma
+ 	vgmul.vv	TWEAKS_BREV, MULTS_BREV		// Advance to next tweak
+ 
+-	bnez		TAIL_LEN, .Lcts\@
+-
+ 	// Update *TWEAKP to contain the next tweak.
+ 	vbrev8.v	TWEAKS, TWEAKS_BREV
+ 	vse32.v		TWEAKS, (TWEAKP)
+ 	ret
+-
+-.Lcts_without_main_loop\@:
+-	load_x
+-.Lcts\@:
+-	// TWEAKS_BREV now contains the next tweak.  Compute the one after that.
+-	vsetivli	zero, 4, e32, m1, ta, ma
+-	vmv.v.v		TMP0, TWEAKS_BREV
+-	vgmul.vv	TMP0, MULTS_BREV
+-	// Undo the bit reversal of the next two tweaks and store them in TMP1
+-	// and TMP2, such that TMP1 is the first needed and TMP2 the second.
+-.if \enc
+-	vbrev8.v	TMP1, TWEAKS_BREV
+-	vbrev8.v	TMP2, TMP0
+-.else
+-	vbrev8.v	TMP1, TMP0
+-	vbrev8.v	TMP2, TWEAKS_BREV
+-.endif
+-
+-	// Encrypt/decrypt the last full block.
+-	vle32.v		TMP0, (INP)
+-	vxor.vv		TMP0, TMP0, TMP1
+-	aes_crypt	TMP0, \enc, \keylen
+-	vxor.vv		TMP0, TMP0, TMP1
+-
+-	// Swap the first TAIL_LEN bytes of the above result with the tail.
+-	// Note that to support in-place encryption/decryption, the load from
+-	// the input tail must happen before the store to the output tail.
+-	addi		t0, INP, 16
+-	addi		t1, OUTP, 16
+-	vmv.v.v		TMP3, TMP0
+-	vsetvli		zero, TAIL_LEN, e8, m1, tu, ma
+-	vle8.v		TMP0, (t0)
+-	vse8.v		TMP3, (t1)
+-
+-	// Encrypt/decrypt again and store the last full block.
+-	vsetivli	zero, 4, e32, m1, ta, ma
+-	vxor.vv		TMP0, TMP0, TMP2
+-	aes_crypt	TMP0, \enc, \keylen
+-	vxor.vv		TMP0, TMP0, TMP2
+-	vse32.v		TMP0, (OUTP)
+-
+-	ret
+ .endm
+ 
+ .macro	aes_xts_crypt	enc
+-
+-	// Check whether the length is a multiple of the AES block size.
+-	andi		TAIL_LEN, LEN, 15
+-	beqz		TAIL_LEN, 1f
+-
+-	// The length isn't a multiple of the AES block size, so ciphertext
+-	// stealing will be required.  Ciphertext stealing involves special
+-	// handling of the partial block and the last full block, so subtract
+-	// the length of both from the length to be processed in the main loop.
+-	sub		LEN, LEN, TAIL_LEN
+-	addi		LEN, LEN, -16
+-1:
+ 	srli		LEN32, LEN, 2
+-	// LEN and LEN32 now contain the total length of the blocks that will be
+-	// processed in the main loop, in bytes and 32-bit words respectively.
+-
+ 	xts_init
+ 	aes_begin	KEYP, 128f, 192f
+ 	__aes_xts_crypt	\enc, 256
+@@ -293,15 +227,14 @@
+ 	__aes_xts_crypt	\enc, 192
+ .endm
+ 
+-// void aes_xts_encrypt_zvkned_zvbb_zvkg(const struct crypto_aes_ctx *key,
+-//					 const u8 *in, u8 *out, size_t len,
+-//					 u8 tweak[16]);
++// void aes_xts_encrypt_zvkned_zvbb_zvkg(u8 *dst, const u8 *src, size_t len,
++//					 u8 tweak[AES_BLOCK_SIZE],
++//					 const struct aes_key *key);
+ //
+-// |key| is the data key.  |tweak| contains the next tweak; the encryption of
+-// the original IV with the tweak key was already done.  This function supports
+-// incremental computation, but |len| must always be >= 16 (AES_BLOCK_SIZE), and
+-// |len| must be a multiple of 16 except on the last call.  If |len| is a
+-// multiple of 16, then this function updates |tweak| to contain the next tweak.
++// Encrypts `len` bytes of data using AES-XTS using the given `key` and `tweak`.
++// `key` is just the main key; `tweak` is assumed to have already been encrypted
++// by the tweak key.  `len` is assumed to be a multiple of 16.  `tweak` is
++// updated to contain the next tweak, allowing for incremental computation.
+ SYM_FUNC_START(aes_xts_encrypt_zvkned_zvbb_zvkg)
+ 	aes_xts_crypt	1
+ SYM_FUNC_END(aes_xts_encrypt_zvkned_zvbb_zvkg)
 diff --git a/lib/crypto/riscv/aes.h b/lib/crypto/riscv/aes.h
-index 5b36d0147d93..150cda82cb89 100644
+index c04e04cf7019..36e9218b507f 100644
 --- a/lib/crypto/riscv/aes.h
 +++ b/lib/crypto/riscv/aes.h
-@@ -93,6 +93,74 @@ static bool aes_ecb_decrypt_arch(u8 *dst, const u8 *src, size_t len,
- }
- #endif /* CONFIG_CRYPTO_LIB_AES_ECB */
+@@ -1,5 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+ /*
++ * AES using the RISC-V vector crypto extensions
++ *
+  * Copyright (C) 2023 VRULL GmbH
+  * Copyright (C) 2023 SiFive, Inc.
+  * Copyright 2024 Google LLC
+@@ -10,6 +12,7 @@
  
-+#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_CBC)
-+void aes_cbc_encrypt_zvkned(u8 *dst, const u8 *src, size_t len,
-+			    u8 iv[AES_BLOCK_SIZE], const struct aes_enckey *key);
-+void aes_cbc_decrypt_zvkned(u8 *dst, const u8 *src, size_t len,
-+			    u8 iv[AES_BLOCK_SIZE], const struct aes_key *key);
-+void aes_cbc_cts_crypt_zvkned(u8 *dst, const u8 *src, size_t len,
-+			      const u8 iv[AES_BLOCK_SIZE],
-+			      aes_encrypt_arg key, bool enc);
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_zvkned);
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_zvkned_zvkb);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_xts);
+ 
+ /* The assembly code assumes the following offsets. */
+ static_assert(offsetof(struct aes_enckey, len) == 0);
+@@ -228,6 +231,52 @@ static bool aes_ctr_arch(u8 *dst, const u8 *src, size_t len,
+ }
+ #endif /* CONFIG_CRYPTO_LIB_AES_CTR */
+ 
++#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_XTS)
++void aes_xts_encrypt_zvkned_zvbb_zvkg(u8 *dst, const u8 *src, size_t len,
++				      u8 tweak[AES_BLOCK_SIZE],
++				      const struct aes_key *key);
++void aes_xts_decrypt_zvkned_zvbb_zvkg(u8 *dst, const u8 *src, size_t len,
++				      u8 tweak[AES_BLOCK_SIZE],
++				      const struct aes_key *key);
 +
 +/* len is always a positive multiple of AES_BLOCK_SIZE here. */
-+#define aes_cbc_encrypt_arch aes_cbc_encrypt_arch
-+static bool aes_cbc_encrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				 u8 iv[AES_BLOCK_SIZE],
-+				 const struct aes_enckey *key)
++static __always_inline bool
++aes_xts_crypt_riscv(u8 *dst, const u8 *src, size_t len,
++		    u8 tweak[AES_BLOCK_SIZE],
++		    const struct aes_xts_key *key, bool cont, bool enc)
 +{
-+	if (!static_branch_likely(&have_zvkned) || unlikely(!may_use_simd()))
++	if (!static_branch_likely(&have_xts) || unlikely(!may_use_simd()))
 +		return false;
 +	kernel_vector_begin();
-+	aes_cbc_encrypt_zvkned(dst, src, len, iv, key);
++	if (!cont)
++		aes_encrypt_zvkned(&key->tweak_key, tweak, tweak);
++	if (enc)
++		aes_xts_encrypt_zvkned_zvbb_zvkg(dst, src, len, tweak,
++						 &key->main_key);
++	else
++		aes_xts_decrypt_zvkned_zvbb_zvkg(dst, src, len, tweak,
++						 &key->main_key);
 +	kernel_vector_end();
 +	return true;
 +}
 +
-+/* len is always a positive multiple of AES_BLOCK_SIZE here. */
-+#define aes_cbc_decrypt_arch aes_cbc_decrypt_arch
-+static bool aes_cbc_decrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				 u8 iv[AES_BLOCK_SIZE],
-+				 const struct aes_key *key)
++#define aes_xts_encrypt_arch aes_xts_encrypt_arch
++static bool aes_xts_encrypt_arch(u8 *dst, const u8 *src, size_t len,
++				 u8 tweak[AES_BLOCK_SIZE],
++				 const struct aes_xts_key *key, bool cont)
 +{
-+	if (!static_branch_likely(&have_zvkned) || unlikely(!may_use_simd()))
-+		return false;
-+	kernel_vector_begin();
-+	aes_cbc_decrypt_zvkned(dst, src, len, iv, key);
-+	kernel_vector_end();
-+	return true;
++	return aes_xts_crypt_riscv(dst, src, len, tweak, key, cont, true);
 +}
 +
-+/* len can be any value greater than AES_BLOCK_SIZE here. */
-+#define aes_cbc_cts_encrypt_arch aes_cbc_cts_encrypt_arch
-+static bool aes_cbc_cts_encrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				     u8 iv[AES_BLOCK_SIZE],
-+				     const struct aes_enckey *key)
++#define aes_xts_decrypt_arch aes_xts_decrypt_arch
++static bool aes_xts_decrypt_arch(u8 *dst, const u8 *src, size_t len,
++				 u8 tweak[AES_BLOCK_SIZE],
++				 const struct aes_xts_key *key, bool cont)
 +{
-+	if (!static_branch_likely(&have_zvkned) || unlikely(!may_use_simd()))
-+		return false;
-+
-+	kernel_vector_begin();
-+	aes_cbc_cts_crypt_zvkned(dst, src, len, iv, key, true);
-+	kernel_vector_end();
-+	return true;
++	return aes_xts_crypt_riscv(dst, src, len, tweak, key, cont, false);
 +}
-+
-+/* len can be any value greater than AES_BLOCK_SIZE here. */
-+#define aes_cbc_cts_decrypt_arch aes_cbc_cts_decrypt_arch
-+static bool aes_cbc_cts_decrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				     u8 iv[AES_BLOCK_SIZE],
-+				     const struct aes_key *key)
-+{
-+	if (!static_branch_likely(&have_zvkned) || unlikely(!may_use_simd()))
-+		return false;
-+
-+	kernel_vector_begin();
-+	aes_cbc_cts_crypt_zvkned(dst, src, len, iv, key, false);
-+	kernel_vector_end();
-+	return true;
-+}
-+#endif /* CONFIG_CRYPTO_LIB_AES_CBC */
++#endif /* CONFIG_CRYPTO_LIB_AES_XTS */
 +
  #define aes_mod_init_arch aes_mod_init_arch
  static void aes_mod_init_arch(void)
  {
+@@ -236,5 +285,9 @@ static void aes_mod_init_arch(void)
+ 		static_branch_enable(&have_zvkned);
+ 		if (riscv_isa_extension_available(NULL, ZVKB))
+ 			static_branch_enable(&have_zvkned_zvkb);
++		if (riscv_isa_extension_available(NULL, ZVBB) &&
++		    riscv_isa_extension_available(NULL, ZVKG) &&
++		    riscv_vector_vlen() < 2048 /* Implementation limitation */)
++			static_branch_enable(&have_xts);
+ 	}
+ }
 -- 
 2.55.0
 
