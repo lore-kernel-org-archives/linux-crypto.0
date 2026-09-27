@@ -1,72 +1,42 @@
-Received: from mail-qk2-f13.google.com (mail-qk2-f13.google.com [74.125.230.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838A9312815
-	for <linux-crypto@vger.kernel.org>; Sun, 27 Sep 2026 21:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0174F37E5E1;
+	Sun, 27 Sep 2026 22:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790544202; cv=none; b=ZHaUFSUk+A19+ZlwzLN2bFAL3lbTRoKX5OKCJG7ccZzb0t77mj2D/aKetWzbugPRRgWMf2FrVYqXuvvPqtFbB4zNkAHVc7U1bQsAeEsPTcIj9bD+0RH9x5SqrDDGGfWCCBV4zEzTxJ7U+mfcB5z9PrNZqPEqbdxdjzRMjpHclOI=
+	t=1790549080; cv=none; b=UgwZr+96xcQR40wr89uMwSAflahxkCQ/yODsW2JqCWKZibFvoQ3HMpw6cU/l/zyieO80x6pj9PXIy4Mbl7n+mlB4Iw4h1Dkz4DKLphQldDkGbMdHDDfcCL6s5hpvVB461yRVtoOsbNRIYKkAsHrg255qpJjS7QuE0To007Z5FIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790544202; c=relaxed/simple;
-	bh=foOUMokXhV1YQBZj9rrq42ml0ef1GpGSyOYE2PlIZwg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UvGBXDpo6o/OExsO/+vA4yJlLpDr7qCMFn8OgevYJ9T13X9YTti7Ts5/Zr1pu9SOP8X4wPz2Y1uq0hBKnwo0yRdR6HBeomttrUrY4qWt0jCF/hVoPbnfF1hihX96ndaydyIw8zpx87Y7nKuhm6UmQWQqnfneK2gBWYWikrES2iY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i0DK75ig; arc=none smtp.client-ip=74.125.230.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790549080; c=relaxed/simple;
+	bh=giRzGhVgrb3yUlYVVGENbhuPOH5naQAn2lsgFneP5K0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b5ttuQXlyLgRNhBhweI6ES79+Fjdq1wVF9sU6YdfjW3+TLXG/kZHUSkp8Gui/ZVczHUOY2RQyLCHeScRQmkkA8DMdwnk75s4vjD+LQw8zEy49vcjs/OCp6zXpXJcMP6W5/DXD1dM+vm+kL+U8qoyok9VsGLmPu+OKy6wW8qFjbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ig26Mr6N; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0DK75ig"
-Received: by mail-qk2-f13.google.com with SMTP id af79cd13be357-939ca12ab70so322721485a.1
-        for <linux-crypto@vger.kernel.org>; Sun, 27 Sep 2026 14:23:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790544199; x=1791148999; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=VQle37WXzAyJLdjrbjf8ZmAmcyTiuSmhV+wDo26Cq+o=;
-        b=i0DK75igeDP/ILiFyg4SfYiXkTKahQT8VAr93q00EDsMfVrkLAx0AQIDQ5BaGm/3f0
-         LcE33YnvfHL1fmBbq0DzaH5jtaVbhq94Q1YqjFn2uqs9weiUYep/Je9ihiLYG2b/2+Id
-         MBjCNtvPzRfhgudcRn3G1dITBNlboQvl5YOgy9dkwmcO3Q8fCNhpHhLWJpiUXhhe0Nzc
-         mdP6Rxo8ooW1GsrLI/Ak30Yxfja8H/XrNmXATzlnPgXJoxdnUk7pfWTikD8z7y+fJ+O0
-         Q8fBaAD0heAzPBrcgXGe+9JLGNljf1D/+pSnPWqc71GJaxzchqwNlSH41Dpaa1AFntEI
-         uALg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790544199; x=1791148999;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=VQle37WXzAyJLdjrbjf8ZmAmcyTiuSmhV+wDo26Cq+o=;
-        b=yj4yRWHVwMGuVweDLUyTuA0Ja23cJRKpQ257+y6/lXm9xLuHewbwdvVO4Tt2u+3qWq
-         Kqex8qB2T3IA6a0YXowXw+c5wznmZdTU7SN8TnPSP1doZNWM2hILpLpSWRFAkTAhS5RO
-         0a5lLm+/+lvxw54EHiqT2j/btjGg/XYC6bYLJIbk+8ig3TiIAz+2YKScMjiw3rvW0Le2
-         IUOFXveVSCTqR9a0hOcy9cRf4J+lvsFgGp2NHgusb9G8aBifpB8cNb3OxUg/64gEJQiJ
-         uqu4kX7Sl02WrXtftRciJ4xAfevuFvVyxU33yRBbVqrMELVX+T0GgQX6U9PYH667HAEh
-         4QjA==
-X-Gm-Message-State: AFuF++mBWTThDKenvIPUb2wqZktgC72ra3vBYsx4K7z9Vsd54eOuz8eh
-	DCIfG1S8SQcKiYxgmli4xKJrc5y4xrv4Eh+YJxTL/V/2IzeJclEO3G0n4ft7nA==
-X-Gm-Gg: AYBFou2BXoSgQVNhI7DB3UxZXdstFg2llZwRXgcQxxekLYEnVkBAQ8jJgrfJSwUKgtD
-	4MZ53nrD25edGz0ReTIfesoQGwcRyBnar4Kt9ENcDLKfq2oXUrWwxX+uDFsbbu/Ed91xWYzpk4H
-	OA3Cy/qqGUAaeq0EuwRMTc3BrHtYIDTnzAwsPp8jtE0z9TQc3IC1s+3kA/bDYBCYSu/StItUdB6
-	mOCohSJcM6vExfEYRMRVxVUQmvI2rpkGN2U4s/SiUz7mZraYh67PtSssjQ14fm6A6fFOPMeqy4l
-	qGHkCo7JXa88W9ZcVb5O5dFacdgBK/eAhjbEKgxaD2PIPntKOGzCvOPj9YGpNlnjtGlg+o8q5Qh
-	ZolFsvPtz6XM2ALDsKqjsew68lyjEZgaJuieC64KKFYWBqr6/XscJSyrgtnXUrY2gUCYCXLCUnR
-	UfnYnVKygnSWY+/1srQAik2lhrP000ZN0zaf/S+8JDI+e542DPtQaWIUgEKk8GQGrhd6kEMb2PU
-	HiRE6fj3k8WMcutPoJB5SrjN3Ch5WpcaPq7YBimwaJEaIB6B7RlaFOraHjNzS6WfL5U64X1/Wfm
-	HBv1+JPyS4L1hQ2UcSbG2Kn0YadPUvlyUn3hV2vcdka2BXx7
-X-Received: by 2002:a05:620a:4113:b0:93c:7e9c:3b3b with SMTP id af79cd13be357-93c7e9c3d27mr59350585a.25.1790544199332;
-        Sun, 27 Sep 2026 14:23:19 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e35])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93c44972febsm701974885a.39.2026.09.27.14.23.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Sep 2026 14:23:18 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ig26Mr6N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AD561F000FF;
+	Sun, 27 Sep 2026 22:44:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790549078;
+	bh=s2N7GNIO6miAwE7X2Pn0iAVzatHtV0DEhOyH9Zjk3tw=;
+	h=From:To:Cc:Subject:Date;
+	b=Ig26Mr6NohGwvXMpKXVrLsCpSsSlrXYuCp1DXpKAE6iTZPF3Igmahkqp0X2s9bUcB
+	 71ejAi0bNbGnQmVA7NrI84AMX+LtYUmIADBLrta10I6gxnx9eF5dbbAKUU7DhmaVQ1
+	 1FZsQxuKreppydshCeduP4D7fV1A5YuE19UYd2ceZpjO+2uZz/VLZ3SvUd1TJHjNCY
+	 7uYumAKzUBdQ/JUpeuz+LZ8Y+/irdvNhovQcLukQFAKtf5IUFSX8X3sl6UQ4rDyV21
+	 mfkAviQSY8q4mkKyNwjRYQidu1Kl8i1jWQrEzUx9FDzTjGad3XmbIRQj7AnUGAr7Wk
+	 /YhSj5uVEomBQ==
+From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Cc: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v3] crypto: cesa: complete pending requests on device remove
-Date: Sun, 27 Sep 2026 14:23:15 -0700
-Message-ID: <20260927212315.113966-1-rosenp@gmail.com>
+	x86@kernel.org,
+	linux-riscv@lists.infradead.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v2 00/20] Migrate x86 and RISC-V accelerated AES modes into library
+Date: Sun, 27 Sep 2026 15:42:51 -0700
+Message-ID: <20260927224418.109759-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -76,236 +46,113 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-mv_cesa_remove() unregisters the algorithms but never drains the engine
-queues, so waiters of requests that were in flight, queued or already
-processed block forever once the device is unbound.
+This series applies to v7.3-rc4.  It can also be retrieved from:
 
-Quiesce the IRQ with disable_irq(), mark the engine aborted so no rearm
-or new submission can restart it, stop it and wait for it to go idle.
-Drain engine->req and engine->queue with -ENODEV, the error
-mv_cesa_queue_req() now returns to new submissions, and report
-engine->complete_queue as successful because ctx->ops->complete() has
-already copied their result out. All of them go through
-mv_cesa_complete_req(), so ctx->ops->cleanup() still releases their DMA
-mappings and descriptors. cesa_dev is cleared last, as those callbacks
-unmap through it.
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-lib-x86-riscv-v2
 
-mv_cesa_dma_cleanup() now stops at dreq->chain.last. mv_cesa_tdma_chain()
-links requests queued back to back and only mv_cesa_tdma_process() severs
-the link, so a request that never ran still points at its successor and
-would otherwise free its tdma_desc_pool and op_pool objects twice.
+Patch 1 was already applied to libcrypto-fixes, but is resent to make
+this series applicable directly to v7.3-rc4 (ensuring that the Sashiko
+review runs).  Patches 2-20 are targeting libcrypto-next for 7.4.
 
-Assisted-by: LLM
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- v3: fix more errors
- v2: fix a bunch of sashiko errors
- drivers/crypto/marvell/cesa/cesa.c | 120 ++++++++++++++++++++++++++++-
- drivers/crypto/marvell/cesa/cesa.h |   4 +
- drivers/crypto/marvell/cesa/tdma.c |   9 ++-
- 3 files changed, 131 insertions(+), 2 deletions(-)
+This series migrates the x86 and RISC-V accelerated implementations of
+the AES modes ECB, CBC, CBC-CTS, CTR, XCTR, and XTS into lib/crypto/.
 
-diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index 564b09773507..aacbc7d0aa0b 100644
---- a/drivers/crypto/marvell/cesa/cesa.c
-+++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -11,11 +11,11 @@
-  * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
-  */
- 
--#include <linux/delay.h>
- #include <linux/dma-mapping.h>
- #include <linux/genalloc.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
-+#include <linux/iopoll.h>
- #include <linux/kthread.h>
- #include <linux/mbus.h>
- #include <linux/minmax.h>
-@@ -51,6 +51,17 @@ static void mv_cesa_rearm_engine(struct mv_cesa_engine *engine)
- 
- 
- 	spin_lock_bh(&engine->lock);
-+	if (engine->aborted) {
-+		/*
-+		 * The device is being removed: do not restart the engine nor
-+		 * fetch any new request. This has to be checked before
-+		 * looking at engine->req, otherwise a request that is still
-+		 * in flight would be stepped again and put the engine back
-+		 * to work on descriptors the removal path is about to free.
-+		 */
-+		spin_unlock_bh(&engine->lock);
-+		return;
-+	}
- 	if (!engine->req) {
- 		req = mv_cesa_dequeue_req_locked(engine, &backlog);
- 		engine->req = req;
-@@ -168,6 +179,14 @@ int mv_cesa_queue_req(struct crypto_async_request *req,
- 	struct mv_cesa_engine *engine = creq->engine;
- 
- 	spin_lock_bh(&engine->lock);
-+	if (engine->aborted) {
-+		/*
-+		 * The device is being removed: reject new requests instead of
-+		 * leaving them queued without a completion.
-+		 */
-+		spin_unlock_bh(&engine->lock);
-+		return -ENODEV;
-+	}
- 	ret = crypto_enqueue_request(&engine->queue, req);
- 	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
- 	    (ret == -EINPROGRESS || ret == -EBUSY))
-@@ -542,9 +561,108 @@ static int mv_cesa_probe(struct platform_device *pdev)
- static void mv_cesa_remove(struct platform_device *pdev)
- {
- 	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
-+	struct mv_cesa_engine *engine;
-+	struct crypto_async_request *req;
-+	unsigned int i;
-+	int ret;
-+	u32 val;
- 
- 	mv_cesa_remove_algs(cesa);
- 
-+	for (i = 0; i < cesa->caps->nengines; i++) {
-+		engine = &cesa->engines[i];
-+
-+		/*
-+		 * Quiesce the threaded IRQ first: disable_irq() waits for any
-+		 * handler in flight to complete, so no completion, rearm or
-+		 * dequeue can still be running past this point.
-+		 */
-+		disable_irq(engine->irq);
-+
-+		/*
-+		 * Mark the engine aborted while still under its lock.  Once
-+		 * this is visible no request can be dequeued or enqueued and
-+		 * the engine cannot be restarted by software, so halting it
-+		 * below leaves it stopped.
-+		 */
-+		spin_lock_bh(&engine->lock);
-+		engine->aborted = true;
-+		spin_unlock_bh(&engine->lock);
-+
-+		/*
-+		 * Stop the engine so it no longer issues DMA to the SRAM
-+		 * region or to request scatterlists that are about to be
-+		 * unmapped.
-+		 */
-+		writel(0, engine->regs + CESA_SA_INT_MSK);
-+		writel(0, engine->regs + CESA_SA_CMD);
-+		writel(0, engine->regs + CESA_TDMA_CONTROL);
-+
-+		/*
-+		 * Flush the posted writes above (readl) and wait for the
-+		 * engine to report that it is stopped before any buffer is
-+		 * released.  If it never stops, the DMA-visible objects below
-+		 * cannot be freed safely; report the failure rather than
-+		 * silently continuing.
-+		 */
-+		ret = readl_poll_timeout(engine->regs + CESA_SA_CMD, val,
-+					 !(val & CESA_SA_CMD_EN_CESA_SA_ACCL0),
-+					 1, CESA_ENGINE_STOP_TIMEOUT_US);
-+
-+		WARN_ON_ONCE(ret);
-+
-+		spin_lock_bh(&engine->lock);
-+		/*
-+		 * Complete the request currently in flight and drain the
-+		 * pending queue with the same -ENODEV that
-+		 * mv_cesa_queue_req() uses to reject new submissions, so that
-+		 * waiters do not block indefinitely when the device is unbound
-+		 * while requests are still outstanding.
-+		 */
-+		if (engine->req) {
-+			req = engine->req;
-+			engine->req = NULL;
-+			spin_unlock_bh(&engine->lock);
-+			mv_cesa_complete_req(crypto_tfm_ctx(req->tfm), req,
-+					     -ENODEV);
-+			spin_lock_bh(&engine->lock);
-+		}
-+
-+		while ((req = crypto_dequeue_request(&engine->queue)) != NULL) {
-+			spin_unlock_bh(&engine->lock);
-+			mv_cesa_complete_req(crypto_tfm_ctx(req->tfm), req,
-+					     -ENODEV);
-+			spin_lock_bh(&engine->lock);
-+		}
-+
-+		while ((req = mv_cesa_engine_dequeue_complete_request(engine))
-+		       != NULL) {
-+			spin_unlock_bh(&engine->lock);
-+			/*
-+			 * The engine has processed these and
-+			 * ctx->ops->complete() has already copied their
-+			 * result to the request buffers, so they must be
-+			 * reported as successful. They still hold their DMA
-+			 * mappings and descriptors, so they have to go
-+			 * through the regular completion path.
-+			 */
-+			mv_cesa_complete_req(crypto_tfm_ctx(req->tfm), req, 0);
-+			spin_lock_bh(&engine->lock);
-+		}
-+
-+		/* Drop the descriptor links into the pools we just freed. */
-+		engine->chain_sw.first = NULL;
-+		engine->chain_sw.last = NULL;
-+		engine->chain_hw.first = NULL;
-+		engine->chain_hw.last = NULL;
-+		spin_unlock_bh(&engine->lock);
-+	}
-+
-+	/*
-+	 * The completion callbacks above (and any concurrent submitter) rely
-+	 * on the global cesa_dev pointer: only clear it once the engines are
-+	 * fully drained.
-+	 */
- 	cesa_dev = NULL;
- }
- 
-diff --git a/drivers/crypto/marvell/cesa/cesa.h b/drivers/crypto/marvell/cesa/cesa.h
-index 44351b252861..56c0dd6f5772 100644
---- a/drivers/crypto/marvell/cesa/cesa.h
-+++ b/drivers/crypto/marvell/cesa/cesa.h
-@@ -10,6 +10,9 @@
- 
- #define CESA_ENGINE_OFF(i)			(((i) * 0x2000))
- 
-+/* Max time in microseconds to wait for the engine to stop */
-+#define CESA_ENGINE_STOP_TIMEOUT_US		1000
-+
- #define CESA_TDMA_BYTE_CNT			0x800
- #define CESA_TDMA_SRC_ADDR			0x810
- #define CESA_TDMA_DST_ADDR			0x820
-@@ -450,6 +453,7 @@ struct mv_cesa_engine {
- 	struct mv_cesa_tdma_chain chain_sw;
- 	struct list_head complete_queue;
- 	int irq;
-+	bool aborted;
- };
- 
- /**
-diff --git a/drivers/crypto/marvell/cesa/tdma.c b/drivers/crypto/marvell/cesa/tdma.c
-index 243305354420..de07f2bf51f1 100644
---- a/drivers/crypto/marvell/cesa/tdma.c
-+++ b/drivers/crypto/marvell/cesa/tdma.c
-@@ -76,7 +76,14 @@ void mv_cesa_dma_cleanup(struct mv_cesa_req *dreq)
- 			dma_pool_free(cesa_dev->dma->op_pool, tdma->op,
- 				      le32_to_cpu(tdma->src));
- 
--		tdma = tdma->next;
-+		/*
-+		 * Stop at the end of our own chain. Requests queued back to
-+		 * back are linked together in mv_cesa_tdma_chain() and the
-+		 * link is only severed once the engine reaches the previous
-+		 * request's END_OF_REQ descriptor, so a request that never
-+		 * ran may still point at its successor.
-+		 */
-+		tdma = (old_tdma == dreq->chain.last) ? NULL : old_tdma->next;
- 		dma_pool_free(cesa_dev->dma->tdma_desc_pool, old_tdma,
- 			      old_tdma->cur_dma);
- 	}
+This makes the corresponding library APIs be properly accelerated on
+these architectures, while still accelerating crypto_skcipher as well
+(via the library-based code in crypto/aes.c).
+
+It removes a lot of redundant glue code, since crypto API boilerplate no
+longer needs to be duplicated per-architecture.
+
+Finally, it fixes the longstanding issue where these optimizations were
+disabled by default.
+
+In the case of RISC-V, this series handles all remaining AES code in
+arch/riscv/crypto/.  In the case of x86, AES-GCM is still left in
+arch/x86/crypto/ for now; it will be handled later.  Other architectures
+will be handled later as well.
+
+For various reasons, aesni-intel_asm.S (the x86-accelerated ECB, CBC,
+CBC-CTS, CTR, and XTS code that doesn't use AVX or VAES) is replaced
+with new functions written from scratch.  The other assembly functions
+are kept but are modified slightly for integration into the library.
+
+Changed in v2:
+   - Fixed 32-bit x86 bisection hazards by making aesni-intel depend on
+     CONFIG_64BIT earlier in the series.
+
+   - Fixed handling of lengths over S32_MAX in RISC-V CTR code.
+
+   - Restored selection of CRYPTO_SKCIPHER by CRYPTO_AES_NI_INTEL, since
+     it is still needed.
+
+   - Made the 32-bit x86 XTS code spill the tweaks to the stack rather
+     than to the destination buffer.
+
+   - Removed the no-longer-needed single block special case from the
+     RISC-V CBC-CTS assembly code.
+
+   - Made x86 CBC-CTS encryption and decryption share more code.
+
+   - Reordered the function parameters in aes-xts-avx-x86_64.S and
+     aes-ctr-avx-x86_64.S.
+
+   - Other miscellaneous cleanups.
+
+Eric Biggers (20):
+  crypto: aes - Fix undesired override of some optimized AES modes
+  lib/crypto: aes-xctr: Pass counter by value to aes_xctr_arch()
+  lib/crypto: x86/aes: Clean up aes-aesni.S in preparation for AES modes
+  lib/crypto: x86/aes-ecb: Add AES-NI optimization
+  lib/crypto: x86/aes-cbc: Add AES-NI optimization
+  lib/crypto: x86/aes-ctr: Add AES-NI optimization
+  lib/crypto: x86/aes-xts: Add AES-NI optimization
+  crypto: x86/aes - Drop superseded 32-bit build support
+  crypto: x86/aes-ecb - Remove superseded ECB skcipher
+  crypto: x86/aes-cbc - Remove superseded CBC skciphers
+  crypto: x86/aes-ctr - Remove superseded CTR skcipher
+  crypto: x86/aes-xts - Remove superseded XTS skcipher
+  lib/crypto: x86/aes-ctr: Migrate AVX-optimized code into library
+  lib/crypto: x86/aes-xts: Migrate AVX-optimized code into library
+  lib/crypto: riscv/aes: Copy aes-macros.S to library
+  lib/crypto: riscv/aes: Pass key struct to assembly code
+  lib/crypto: riscv/aes-ecb: Migrate optimized code into library
+  lib/crypto: riscv/aes-cbc: Migrate optimized code into library
+  lib/crypto: riscv/aes-ctr: Migrate optimized code into library
+  lib/crypto: riscv/aes-xts: Migrate optimized code into library
+
+ arch/riscv/crypto/Kconfig                     |   15 -
+ arch/riscv/crypto/Makefile                    |    4 -
+ arch/riscv/crypto/aes-riscv64-glue.c          |  566 -------
+ arch/riscv/crypto/aes-riscv64-zvkned.S        |  312 ----
+ arch/x86/crypto/Kconfig                       |   10 +-
+ arch/x86/crypto/Makefile                      |   10 +-
+ arch/x86/crypto/aesni-intel_asm.S             | 1338 -----------------
+ arch/x86/crypto/aesni-intel_glue.c            |  792 +---------
+ crypto/aes.c                                  |   53 +-
+ lib/crypto/Makefile                           |   14 +
+ lib/crypto/aes.c                              |    6 +-
+ .../crypto => lib/crypto/riscv}/aes-macros.S  |   25 +-
+ .../riscv}/aes-riscv64-zvkned-zvbb-zvkg.S     |   99 +-
+ .../crypto/riscv}/aes-riscv64-zvkned-zvkb.S   |   23 +-
+ lib/crypto/riscv/aes-riscv64-zvkned.S         |  305 +++-
+ lib/crypto/riscv/aes.h                        |  244 ++-
+ lib/crypto/x86/aes-aesni.S                    |  816 +++++++++-
+ .../crypto/x86}/aes-ctr-avx-x86_64.S          |  103 +-
+ .../crypto/x86}/aes-xts-avx-x86_64.S          |  179 +--
+ lib/crypto/x86/aes.h                          |  381 ++++-
+ 20 files changed, 1852 insertions(+), 3443 deletions(-)
+ delete mode 100644 arch/riscv/crypto/aes-riscv64-glue.c
+ delete mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.S
+ delete mode 100644 arch/x86/crypto/aesni-intel_asm.S
+ rename {arch/riscv/crypto => lib/crypto/riscv}/aes-macros.S (90%)
+ rename {arch/riscv/crypto => lib/crypto/riscv}/aes-riscv64-zvkned-zvbb-zvkg.S (74%)
+ rename {arch/riscv/crypto => lib/crypto/riscv}/aes-riscv64-zvkned-zvkb.S (93%)
+ rename {arch/x86/crypto => lib/crypto/x86}/aes-ctr-avx-x86_64.S (88%)
+ rename {arch/x86/crypto => lib/crypto/x86}/aes-xts-avx-x86_64.S (81%)
+
+
+base-commit: 93f51579e7df248780214094418f205253383cc5
 -- 
 2.55.0
 
