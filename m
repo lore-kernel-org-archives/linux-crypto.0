@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F333ECBCF;
-	Sun, 27 Sep 2026 22:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD754156C6;
+	Sun, 27 Sep 2026 22:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790549082; cv=none; b=nEFrIi9jG9epDSwIICeN79Sv5PrxT1nTonjJIYHkkw/yw/hZm1AZknwPJ57tfrmatnHgsowcC4g5n9ck9xsQv0GRc8f6jtCXaxM1mX8azatd1ZIAfA7LhwLVpQs4UpCSpYNJ1VibGghxW3hhY/RGO49NA1YCniFbyb3R07bXjlg=
+	t=1790549082; cv=none; b=T5G50+f5S6uqWKba6v9fO3bwaqADWwIG1V1ktQ81l1abHjEniU0tB+ifimwbUCve086khVg4pURZHZDp89hp0i6o5oo+c+rgsdUNLXAti34jY+fHxOBLesZjDSiY/py6jkE/ptyuA6flTJ+Zori/IPfG6TeVO5GJ+BFH9p9tND8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790549082; c=relaxed/simple;
-	bh=URItzGhFIX+k//72cGKRp38Qop4dGExyYZ++2ydZM38=;
+	bh=PxfPDUXHvKopaWKDey3veqbNSBBD54mPaVEImMQg+Tg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ka2NocQlLFg7SpyBF8lWejFxruZ4tDiZDGdk743MXB+p3y5l8odh/IrnrKvV322C7b///UEDY31Xa5N2TKWkLqtlnT1SLuFBBKfMlmM0RHyXDfJTrbWqOzcGHAqz71vQZuMG9a1vkZtYvkdcXnn3rD9w4zkl5RZHR6/oyKiRe/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=akppXitB; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Zg1y9biutYvfeGrvq8kTIstNmvVP5HxRajxxQM0Nezpu6+sQJ8sWljRSouwloPHVDrhsLjNlcGCuniENA8ThW7NizE3JO+3FiklbUvJEFm9A8txRD9AWOvb2gOV8se5z9LHh/WxYuye76F+ILTYZImXQMLe6E0RJrPDhT4aWBuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VN84ExcF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="akppXitB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 636911F000FF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VN84ExcF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1AD31F00893;
 	Sun, 27 Sep 2026 22:44:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790549080;
-	bh=n9Da5C1vAGelIU2jXAiQKk44z2kGmavaO4J9KFT700A=;
+	s=k20260515; t=1790549081;
+	bh=PcsrPVJ/UMD1DI0RT43ecOt4FiB+9EnHO4w28Q6a8/w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=akppXitB3zz3a/ioEiELfkZZeYnS3qxgdtJIwjO393JhOUd3JPUwRrJBAoODMFfH2
-	 xSVTr9FT/FgSfpTP2OO6LFKnOwH3AICvlLKq0HaAKhS/Ss1owiuHDIKw1f1tQIkHIY
-	 w8ombCW/oy9v62icmunLwX8Z8rqpsdT/hlPh73agwQVa5ENvivVb0DqVCPR2378VV3
-	 hljeIoMzqWcbXHv4IRFyfOo4TKYo8gPdbu5jwPD09+t/FyDjPyIypMjFHp1btsgqaf
-	 jdg6Hcno4goiWOU8RUYmy3ees2hOX1HWYMx6+CmBSdwMtLzQh3VndUyHdoQVjsRAjJ
-	 /AaVVITG5ugvw==
+	b=VN84ExcFxTdtL9iQpuJbjCKgS56QPisU7CADxnSnoMGeaXhfwuXQLd0m74m7+nsnq
+	 v4tNeVSfwmLPdLjqRVBQSOirLmTr/8Jw+MuhobpVfKWgglyRo8y3ckIKeKWFEQ0mkH
+	 gRoUg0kvLLjDnEFJNSO00mRj0dCU+amI8UkCVQKtSzpkuadITSQC6/X28n2VaieIQ0
+	 sFXuvi57f3Jkk7/WcBy4tRv/LeyE2IalrpU86JHfKfU3JxTDn5Y59YVcOcBr1OdfBE
+	 g1fKTHXWxhQ2QxAKkAcVK2/AdMDy+Lsq7bi/lZBrlRKv9CKt8tx0Jv1yf6DDHKTkd5
+	 Ezbv/gzI7PNnw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
 	linux-riscv@lists.infradead.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 05/20] lib/crypto: x86/aes-cbc: Add AES-NI optimization
-Date: Sun, 27 Sep 2026 15:42:56 -0700
-Message-ID: <20260927224418.109759-6-ebiggers@kernel.org>
+Subject: [PATCH v2 06/20] lib/crypto: x86/aes-ctr: Add AES-NI optimization
+Date: Sun, 27 Sep 2026 15:42:57 -0700
+Message-ID: <20260927224418.109759-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260927224418.109759-1-ebiggers@kernel.org>
 References: <20260927224418.109759-1-ebiggers@kernel.org>
@@ -49,388 +49,240 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Optimize the crypto library's AES-CBC and AES-CBC-CTS support with
-AES-NI, bringing their performance on par with the "cbc-aes-aesni" and
-"cts-cbc-aes-aesni" skcipher algorithms they will supersede.
+Optimize the crypto library's AES-CTR support with AES-NI, bringing its
+performance on par with the "ctr-aes-aesni" skcipher algorithm it will
+supersede.
 
-The new assembly functions are written from scratch to fit well into the
-crypto library.  However, they are functionally very similar to the
-functions in arch/x86/crypto/aesni-intel_asm.S that they will supersede
-and are intended to provide parity with those -- including supporting
-32-bit mode, having the inner loops do 4 AES blocks per iteration, etc.
+The new assembly function is written from scratch to fit well into the
+crypto library and to be more consistent with aes-ctr-avx-x86_64.S than
+the code in arch/x86/crypto/aesni-intel_asm.S that it will supersede.
+That includes using the "ctr64" convention, where the assembly code is
+simplified by making the C code handle incrementing the high 64 bits of
+the counter.  Unlike the ECB, CBC, and XTS code, 32-bit support is *not*
+included for this one, as the existing CTR code didn't have it.
+
+Note: the priority of ctr-aes-lib is left unchanged at 110 temporarily.
+It will be increased when the AVX-optimized code is migrated too.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/aes.c               |   4 +-
- lib/crypto/x86/aes-aesni.S | 232 +++++++++++++++++++++++++++++++++++++
- lib/crypto/x86/aes.h       |  89 ++++++++++++++
- 3 files changed, 323 insertions(+), 2 deletions(-)
+ lib/crypto/x86/aes-aesni.S | 130 ++++++++++++++++++++++++++++++++++++-
+ lib/crypto/x86/aes.h       |  54 +++++++++++++++
+ 2 files changed, 183 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/aes.c b/crypto/aes.c
-index b1f71d2b2460..bf8acc553188 100644
---- a/crypto/aes.c
-+++ b/crypto/aes.c
-@@ -625,7 +625,7 @@ static struct skcipher_alg skcipher_algs[] = {
- 	{
- 		.base.cra_name = "cbc(aes)",
- 		.base.cra_driver_name = "cbc-aes-lib",
--		.base.cra_priority = 110,
-+		.base.cra_priority = IS_ENABLED(CONFIG_X86) ? 300 : 110,
- 		.base.cra_blocksize = AES_BLOCK_SIZE,
- 		.base.cra_ctxsize = sizeof(struct aes_key),
- 		.base.cra_module = THIS_MODULE,
-@@ -651,7 +651,7 @@ static struct skcipher_alg skcipher_algs[] = {
- 	{
- 		.base.cra_name = "cts(cbc(aes))",
- 		.base.cra_driver_name = "cts-cbc-aes-lib",
--		.base.cra_priority = 110,
-+		.base.cra_priority = IS_ENABLED(CONFIG_X86) ? 300 : 110,
- 		.base.cra_blocksize = AES_BLOCK_SIZE,
- 		.base.cra_ctxsize = sizeof(struct aes_key),
- 		.base.cra_module = THIS_MODULE,
 diff --git a/lib/crypto/x86/aes-aesni.S b/lib/crypto/x86/aes-aesni.S
-index 52f4ee5c13b9..51c8522416d7 100644
+index 51c8522416d7..297fe21ba830 100644
 --- a/lib/crypto/x86/aes-aesni.S
 +++ b/lib/crypto/x86/aes-aesni.S
-@@ -57,6 +57,14 @@
- 	// The AES round constants, used during key expansion
- 	.long	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36
+@@ -4,7 +4,8 @@
+ //
+ // Copyright 2026 Google LLC
+ //
+-// The code in this file supports 32-bit and 64-bit CPUs, and it doesn't require
++// The code in this file supports 32-bit and 64-bit CPUs (except for
++// aes_ctr64_crypt_aesni() which supports 64-bit only), and it doesn't require
+ // AVX.  It does use up to SSE4.1, which all CPUs with AES-NI have.
+ #include <linux/linkage.h>
  
-+.Lcts_permute_table:
-+	.byte	0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-+	.byte	0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-+	.byte	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
-+	.byte	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-+	.byte	0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-+	.byte	0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-+
- .text
+@@ -48,6 +49,12 @@
  
- // In 32-bit mode, push certain callee-saved GPRs and optionally load function
-@@ -402,3 +410,227 @@ SYM_FUNC_END(aes_ecb_encrypt_aesni)
- SYM_FUNC_START(aes_ecb_decrypt_aesni)
- 	_ecb_crypt	0
- SYM_FUNC_END(aes_ecb_decrypt_aesni)
+ .section .rodata
+ .p2align 4
++#ifdef __x86_64__
++.Lbswap_mask:
++	// A mask for pshufb that byte-reflects the value.
++	.byte	15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
++#endif
 +
-+// void aes_cbc_encrypt_aesni(u8 *dst, const u8 *src, long nblocks,
-+//			      u8 iv[AES_BLOCK_SIZE],
+ .Lexpandkey_mask:
+ 	// A mask for pshufb that extracts the last dword, rotates it right by 8
+ 	// bits, and copies the result to all four dwords.
+@@ -634,3 +641,124 @@ SYM_FUNC_END(aes_cbc_cts_encrypt_aesni)
+ SYM_FUNC_START(aes_cbc_cts_decrypt_aesni)
+ 	_aes_cbc_cts_crypt	0
+ SYM_FUNC_END(aes_cbc_cts_decrypt_aesni)
++
++#ifdef __x86_64__
++// void aes_ctr64_crypt_aesni(u8 *dst, const u8 *src, s64 len,
++//			      const u64 le_ctr[2],
 +//			      const struct aes_enckey *key);
-+//
-+// This assumes nblocks > 0.
-+SYM_FUNC_START(aes_cbc_encrypt_aesni)
++SYM_FUNC_START(aes_ctr64_crypt_aesni)
 +	// Arguments
 +	.set	DST,		ARG0
 +	.set	SRC,		ARG1
-+	.set	NBLOCKS,	ARG2
-+	.set	IV_PTR,		ARG3
++	.set	LEN,		ARG2
++	.set	LEN32,		ARG2_32	// Used for improved code density
++	.set	LE_CTR_PTR,	ARG3	// Used as temp reg after LE_CTR is loaded
 +	.set	KEY,		ARG4
 +
 +	// Other local variables
-+#ifdef __x86_64__
-+	.set	RNDKEY_PTR,	%r9
-+#else
-+	.set	RNDKEY_PTR,	IV_PTR // IV_PTR is clobbered and reloaded later
-+#endif
-+	.set	NROUNDS,	TMP_32
-+	.set	AESDATA0,	%xmm0
-+	.set	PTEXT,		%xmm1
-+	_prologue	uses_arg3=2, uses_arg4=2
-+
-+	movdqu		(IV_PTR), AESDATA0
-+.p2align 5
-+.Lcbc_enc_loop:
-+	movdqu		(SRC), PTEXT
-+	pxor		PTEXT, AESDATA0
-+	_do_aes		1, 0
-+	movdqu		AESDATA0, (DST)
-+	add		$16, SRC
-+	add		$16, DST
-+	dec		NBLOCKS
-+	jnz		.Lcbc_enc_loop
-+
-+	// Store the next IV.  On 32-bit, reload IV_PTR from stack first.
-+	_reload_arg3
-+	movdqu		AESDATA0, (IV_PTR)
-+	_epilogue
-+SYM_FUNC_END(aes_cbc_encrypt_aesni)
-+
-+// void aes_cbc_decrypt_aesni(u8 *dst, const u8 *src, long nblocks,
-+//			      u8 iv[AES_BLOCK_SIZE], const struct aes_key *key);
-+SYM_FUNC_START(aes_cbc_decrypt_aesni)
-+	// Arguments
-+	.set	DST,		ARG0
-+	.set	SRC,		ARG1
-+	.set	NBLOCKS,	ARG2
-+	.set	NBLOCKS32,	ARG2_32	// Used for improved code density
-+	.set	IV_PTR,		ARG3
-+	.set	KEY,		ARG4
-+
-+	// Other local variables
-+#ifdef __x86_64__
-+	.set	RNDKEY_PTR,	%r9
-+#else
-+	.set	RNDKEY_PTR,	IV_PTR // IV_PTR is clobbered and reloaded later
-+#endif
-+	.set	NROUNDS,	TMP_32
 +	.set	AESDATA0,	%xmm0
 +	.set	AESDATA1,	%xmm1
 +	.set	AESDATA2,	%xmm2
 +	.set	AESDATA3,	%xmm3
-+	.set	RNDKEY,		%xmm4
-+	.set	IV,		%xmm5
-+	.set	CTEXT0,		%xmm6
-+	.set	CTEXT1,		%xmm7
-+#ifdef __x86_64__
-+	.set	CTEXT2,		%xmm8
-+	.set	CTEXT3,		%xmm9
-+#endif
-+	_prologue	uses_arg3=2, uses_arg4=2
++	.set	LE_CTR,		%xmm4	// Current 128-bit little endian counter
++	.set	LE_CTR_INC,	%xmm5	// Initialized to (u64[])[1, 0]
++	.set	BSWAP_MASK,	%xmm6
++	.set	RNDKEY,		%xmm7
++	.set	RNDKEY_PTR,	LE_CTR_PTR  // Temporary register for _do_aes
++	.set	NROUNDS,	TMP_32	// Temporary register for _do_aes
 +
-+	movdqu		(IV_PTR), IV
++	// Initialize LE_CTR, BSWAP_MASK, and LE_CTR_INC.
++	movdqu		(LE_CTR_PTR), LE_CTR
++	movdqa		RODATA(.Lbswap_mask), BSWAP_MASK
++	mov		$1, TMP_32
++	movd		TMP_32, LE_CTR_INC
 +
-+	sub		$4, NBLOCKS
-+	jl		.Lcbc_dec_loop4_done
++	// Encrypt and XOR four blocks (64 bytes) at a time.
++	sub		$64, LEN
++	jl		.Lctr_loop4_done
 +.p2align 5
-+.Lcbc_dec_loop4:
-+	movdqu		0(SRC), AESDATA0
-+	movdqu		16(SRC), AESDATA1
-+	movdqu		32(SRC), AESDATA2
-+	movdqu		48(SRC), AESDATA3
-+	movdqa		AESDATA0, CTEXT0
-+	movdqa		AESDATA1, CTEXT1
-+#ifdef __x86_64__
-+	movdqa		AESDATA2, CTEXT2
-+	movdqa		AESDATA3, CTEXT3
-+#endif
-+	_do_aes		0, 0,1,2,3
-+	pxor		IV, AESDATA0
-+	pxor		CTEXT0, AESDATA1
-+	pxor		CTEXT1, AESDATA2
-+#ifdef __x86_64__
-+	pxor		CTEXT2, AESDATA3
-+	movdqa		CTEXT3, IV
-+#else
-+	movdqu		32(SRC), CTEXT0
-+	pxor		CTEXT0, AESDATA3
-+	movdqu		48(SRC), IV
-+#endif
-+	movdqu		AESDATA0, 0(DST)
-+	movdqu		AESDATA1, 16(DST)
-+	movdqu		AESDATA2, 32(DST)
-+	movdqu		AESDATA3, 48(DST)
++.Lctr_loop4:
++.irp i, 0,1,2,3
++	movdqa		LE_CTR, AESDATA\i
++	pshufb		BSWAP_MASK, AESDATA\i	// => big endian counter
++	paddq		LE_CTR_INC, LE_CTR
++.endr
++	_do_aes		1, 0,1,2,3
++	// AESDATA[0-3] now contain four keystream blocks.
++.irp i, 0,1,2,3
++	movdqu		\i*16(SRC), RNDKEY	// Use RNDKEY as temp register.
++	pxor		RNDKEY, AESDATA\i
++	movdqu		AESDATA\i, \i*16(DST)
++.endr
 +	add		$64, SRC
 +	add		$64, DST
-+	sub		$4, NBLOCKS
-+	jge		.Lcbc_dec_loop4
-+.Lcbc_dec_loop4_done:
-+	add		$4, NBLOCKS32
-+	jz		.Lcbc_dec_done
++	sub		$64, LEN
++	jge		.Lctr_loop4
++.Lctr_loop4_done:
++	add		$64, LEN32
++	jz		.Lctr_done
 +
-+.Lcbc_dec_loop1:
-+	movdqu		(SRC), AESDATA0
-+	movdqa		AESDATA0, CTEXT0
-+	_do_aes		0, 0
-+	pxor		IV, AESDATA0
-+	movdqa		CTEXT0, IV
++	// 1 <= LEN <= 63 bytes remain.  Prepare four more keystream blocks.
++.irp i, 0,1,2,3
++	movdqa		LE_CTR, AESDATA\i
++	pshufb		BSWAP_MASK, AESDATA\i	// => big endian counter
++  .if \i != 3
++	paddq		LE_CTR_INC, LE_CTR
++  .endif
++.endr
++	_do_aes		1, 0,1,2,3
++	// AESDATA[0-3] now contain four keystream blocks.
++
++	// XOR one block (16 bytes) at a time.
++	sub		$16, LEN32
++	jl		.Lctr_xor_partial
++.Lctr_xor1:
++	movdqu		(SRC), RNDKEY		// Use RNDKEY as temp register.
++	pxor		RNDKEY, AESDATA0
 +	movdqu		AESDATA0, (DST)
++	movdqa		AESDATA1, AESDATA0
++	movdqa		AESDATA2, AESDATA1
++	movdqa		AESDATA3, AESDATA2
 +	add		$16, SRC
 +	add		$16, DST
-+	dec		NBLOCKS32
-+	jnz		.Lcbc_dec_loop1
++	sub		$16, LEN32
++	jge		.Lctr_xor1
 +
-+.Lcbc_dec_done:
-+	// Store the next IV.  On 32-bit, reload IV_PTR from stack first.
-+	_reload_arg3
-+	movdqu		IV, (IV_PTR)
-+	_epilogue
-+SYM_FUNC_END(aes_cbc_decrypt_aesni)
-+
-+.macro	_aes_cbc_cts_crypt	enc
-+	.set	DST,		ARG0
-+	.set	SRC,		ARG1
-+	.set	PN_LEN,		ARG2
-+	.set	IV_PTR,		ARG3
-+	.set	KEY,		ARG4
-+	.set	RNDKEY_PTR,	IV_PTR	// Temporary register for _do_aes
-+	.set	NROUNDS,	TMP_32	// Temporary register for _do_aes
-+	.set	RSHIFT_MASK,	%xmm0 // range(16-PN_LEN,16) + [0x80, 0x80, ...]
-+				      // Must be %xmm0 for pblendvb to work.
-+	.set	LSHIFT_MASK,	%xmm1 // [0x80, 0x80, ...] + range(PN_LEN)
-+	.set	AESDATA0,	%xmm2
-+	.set	AESDATA1,	%xmm3
-+	.set	RNDKEY,		%xmm4 // Temporary register for _do_aes
-+	.set	IV,		%xmm5
-+
-+	_prologue	uses_arg3=2, uses_arg4=2
-+
-+	// Load LSHIFT_MASK and RSHIFT_MASK.
-+	lea		RODATA(.Lcts_permute_table), TMP
-+	movdqu		(TMP,PN_LEN), LSHIFT_MASK
-+	sub		PN_LEN, TMP
-+	movdqu		32(TMP), RSHIFT_MASK
-+
-+	// Load the IV, freeing up IV_PTR to reuse for RNDKEY_PTR.
-+	movdqu		(IV_PTR), IV
-+
-+	// Load the second-from-last source block (P[n-1] or C[n-1]) and
-+	// AES-en/decrypt it.  In the encryption case, XOR it with the IV first.
-+	movdqu		(SRC), AESDATA0
-+.if \enc
-+	pxor		IV, AESDATA0
-+.endif
-+	_do_aes		\enc, 0
-+
-+	// Load the last source block (P[n] or C[n]), left-aligned.
-+	movdqu		(SRC,PN_LEN), AESDATA1
-+
-+.if \enc
-+	// Right-align P[n], XOR it with the first AES output, and AES-encrypt
-+	// the result.  This gives C[n-1] in AESDATA1.
-+	pshufb		RSHIFT_MASK, AESDATA1
-+	pxor		AESDATA0, AESDATA1
-+	_do_aes		1, 1
-+
-+	// Left-align the first AES output to get left-aligned C[n].
-+	pshufb		LSHIFT_MASK, AESDATA0
-+.else
-+	// Save a copy of the first AES output in %xmm6 for later.
-+	movdqa		AESDATA0, %xmm6
-+
-+	// Left-align the first AES output and XOR it with the
-+	// already-left-aligned C[n].  This gives the left-aligned P[n].
-+	pshufb		LSHIFT_MASK, AESDATA0
-+	pxor		AESDATA1, AESDATA0
-+
-+	// Right-align C[n], then use RSHIFT_MASK (in %xmm0 as pblendvb's
-+	// implicit operand) as a blend mask to select C[n] and the remaining
-+	// bytes from the first AES output, with the result in AESDATA1.
-+	pshufb		RSHIFT_MASK, AESDATA1
-+	pblendvb	%xmm6, AESDATA1
-+
-+	// AES-decrypt the result and XOR with the IV to get P[n-1] in AESDATA1.
-+	_do_aes		0, 1
-+	pxor		IV, AESDATA1
-+.endif
-+	// Store the left-aligned C[n] or P[n], then C[n-1] or P[n-1].
-+	// Note that these stores may overlap.
-+	movdqu		AESDATA0, (DST,PN_LEN)
-+	movdqu		AESDATA1, (DST)
-+	_epilogue
-+.endm
-+
-+// void aes_cbc_cts_encrypt_aesni(u8 *dst, const u8 *src, long pn_len,
-+//				  const u8 iv[AES_BLOCK_SIZE],
-+//				  const struct aes_enckey *key);
-+// void aes_cbc_cts_decrypt_aesni(u8 *dst, const u8 *src, long pn_len,
-+//				  const u8 iv[AES_BLOCK_SIZE],
-+//				  const struct aes_key *key);
-+//
-+// Use the CS3 variant of ciphertext stealing to encrypt or decrypt the last two
-+// blocks in a message.  The two blocks are located at src and consist of one
-+// full block of length 16 bytes and one possibly-partial block of length 1 <=
-+// pn_len <= 16 bytes.  The output is written to dst, which may equal src.
-+SYM_FUNC_START(aes_cbc_cts_encrypt_aesni)
-+	_aes_cbc_cts_crypt	1
-+SYM_FUNC_END(aes_cbc_cts_encrypt_aesni)
-+SYM_FUNC_START(aes_cbc_cts_decrypt_aesni)
-+	_aes_cbc_cts_crypt	0
-+SYM_FUNC_END(aes_cbc_cts_decrypt_aesni)
++	// XOR the remaining LEN mod 16 bytes.
++.Lctr_xor_partial:
++	test		$8, LEN32
++	jz		1f
++	movq		AESDATA0, TMP
++	xor		(SRC), TMP	// XOR 8 bytes.
++	mov		TMP, (DST)
++	add		$8, SRC
++	add		$8, DST
++	psrldq		$8, AESDATA0
++1:
++	test		$4, LEN32
++	jz		2f
++	movd		AESDATA0, TMP_32
++	xor		(SRC), TMP_32	// XOR 4 bytes.
++	mov		TMP_32, (DST)
++	add		$4, SRC
++	add		$4, DST
++	psrldq		$4, AESDATA0
++2:
++	test		$2, LEN32
++	jz		3f
++	movd		AESDATA0, TMP_32
++	xor		(SRC), TMP_16	// XOR 2 bytes.
++	mov		TMP_16, (DST)
++	add		$2, SRC
++	add		$2, DST
++	psrldq		$2, AESDATA0
++3:
++	test		$1, LEN32
++	jz		.Lctr_done
++	movd		AESDATA0, TMP_32
++	xor		(SRC), TMP_8	// XOR 1 byte.
++	mov		TMP_8, (DST)
++.Lctr_done:
++	RET
++SYM_FUNC_END(aes_ctr64_crypt_aesni)
++#endif // __x86_64__
 diff --git a/lib/crypto/x86/aes.h b/lib/crypto/x86/aes.h
-index 408625750ae9..a0346cb3ecb5 100644
+index a0346cb3ecb5..2a2b26d10e87 100644
 --- a/lib/crypto/x86/aes.h
 +++ b/lib/crypto/x86/aes.h
-@@ -116,6 +116,95 @@ static bool aes_ecb_decrypt_arch(u8 *dst, const u8 *src, size_t len,
+@@ -205,6 +205,60 @@ static bool aes_cbc_cts_decrypt_arch(u8 *dst, const u8 *src, size_t len,
  }
- #endif /* CONFIG_CRYPTO_LIB_AES_ECB */
+ #endif /* CONFIG_CRYPTO_LIB_AES_CBC */
  
-+#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_CBC)
-+void aes_cbc_encrypt_aesni(u8 *dst, const u8 *src, long nblocks,
-+			   u8 iv[AES_BLOCK_SIZE], const struct aes_enckey *key);
-+void aes_cbc_decrypt_aesni(u8 *dst, const u8 *src, long nblocks,
-+			   u8 iv[AES_BLOCK_SIZE], const struct aes_key *key);
-+void aes_cbc_cts_encrypt_aesni(u8 *dst, const u8 *src, long pn_len,
-+			       const u8 iv[AES_BLOCK_SIZE],
-+			       const struct aes_enckey *key);
-+void aes_cbc_cts_decrypt_aesni(u8 *dst, const u8 *src, long pn_len,
-+			       const u8 iv[AES_BLOCK_SIZE],
-+			       const struct aes_key *key);
++#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_CTR) && IS_ENABLED(CONFIG_X86_64)
++void aes_ctr64_crypt_aesni(u8 *dst, const u8 *src, s64 len, const u64 le_ctr[2],
++			   const struct aes_enckey *key);
 +
-+/* len is always a positive multiple of AES_BLOCK_SIZE here. */
-+#define aes_cbc_encrypt_arch aes_cbc_encrypt_arch
-+static bool aes_cbc_encrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				 u8 iv[AES_BLOCK_SIZE],
-+				 const struct aes_enckey *key)
++static void aes_ctr64_x86(u8 *dst, const u8 *src, size_t len,
++			  const u64 le_ctr[2], const struct aes_enckey *key)
 +{
-+	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
-+		return false;
-+	kernel_fpu_begin();
-+	aes_cbc_encrypt_aesni(dst, src, len / AES_BLOCK_SIZE, iv, key);
-+	kernel_fpu_end();
-+	return true;
++	aes_ctr64_crypt_aesni(dst, src, len, le_ctr, key);
 +}
 +
-+/* len is always a positive multiple of AES_BLOCK_SIZE here. */
-+#define aes_cbc_decrypt_arch aes_cbc_decrypt_arch
-+static bool aes_cbc_decrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				 u8 iv[AES_BLOCK_SIZE],
-+				 const struct aes_key *key)
++#define aes_ctr_arch aes_ctr_arch
++static bool aes_ctr_arch(u8 *dst, const u8 *src, size_t len,
++			 u8 ctr[AES_BLOCK_SIZE], const struct aes_enckey *key)
 +{
-+	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
-+		return false;
-+	kernel_fpu_begin();
-+	aes_cbc_decrypt_aesni(dst, src, len / AES_BLOCK_SIZE, iv, key);
-+	kernel_fpu_end();
-+	return true;
-+}
-+
-+/* len can be any value greater than AES_BLOCK_SIZE here. */
-+#define aes_cbc_cts_encrypt_arch aes_cbc_cts_encrypt_arch
-+static bool aes_cbc_cts_encrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				     u8 iv[AES_BLOCK_SIZE],
-+				     const struct aes_enckey *key)
-+{
-+	const size_t cbc_blocks = (len - AES_BLOCK_SIZE - 1) / AES_BLOCK_SIZE;
-+	const size_t pn_len = ((len - 1) % AES_BLOCK_SIZE) + 1;
++	u64 le_ctr[2];
++	u64 ctr64;
++	size_t nblocks;
++	size_t part1_len;
 +
 +	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
 +		return false;
 +
++	ctr64 = le_ctr[0] = get_unaligned_be64(&ctr[8]);
++	le_ctr[1] = get_unaligned_be64(&ctr[0]);
++
 +	kernel_fpu_begin();
-+	if (cbc_blocks) {
-+		aes_cbc_encrypt_aesni(dst, src, cbc_blocks, iv, key);
-+		dst += cbc_blocks * AES_BLOCK_SIZE;
-+		src += cbc_blocks * AES_BLOCK_SIZE;
++
++	nblocks = DIV_ROUND_UP(len, AES_BLOCK_SIZE);
++	ctr64 += nblocks;
++
++	if (likely(ctr64 >= nblocks)) {
++		/* The low 64 bits of the counter won't overflow. */
++		aes_ctr64_x86(dst, src, len, le_ctr, key);
++	} else {
++		/*
++		 * The low 64 bits of the counter will overflow.  The
++		 * assembly doesn't handle this case, so split the
++		 * operation into two at the point where the overflow
++		 * will occur.  After the first part, add the carry bit.
++		 */
++		part1_len = min(len, (nblocks - ctr64) * AES_BLOCK_SIZE);
++		aes_ctr64_x86(dst, src, part1_len, le_ctr, key);
++		le_ctr[0] = 0;
++		le_ctr[1]++;
++		aes_ctr64_x86(dst + part1_len, src + part1_len, len - part1_len,
++			      le_ctr, key);
 +	}
-+	/* Encrypt the last 17 to 32 bytes. */
-+	aes_cbc_cts_encrypt_aesni(dst, src, pn_len, iv, key);
 +	kernel_fpu_end();
++	put_unaligned_be64(ctr64, &ctr[8]);
++	put_unaligned_be64(le_ctr[1], &ctr[0]);
 +	return true;
 +}
-+
-+/* len can be any value greater than AES_BLOCK_SIZE here. */
-+#define aes_cbc_cts_decrypt_arch aes_cbc_cts_decrypt_arch
-+static bool aes_cbc_cts_decrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				     u8 iv[AES_BLOCK_SIZE],
-+				     const struct aes_key *key)
-+{
-+	const size_t cbc_blocks = (len - AES_BLOCK_SIZE - 1) / AES_BLOCK_SIZE;
-+	const size_t pn_len = ((len - 1) % AES_BLOCK_SIZE) + 1;
-+
-+	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
-+		return false;
-+
-+	kernel_fpu_begin();
-+	if (cbc_blocks) {
-+		aes_cbc_decrypt_aesni(dst, src, cbc_blocks, iv, key);
-+		dst += cbc_blocks * AES_BLOCK_SIZE;
-+		src += cbc_blocks * AES_BLOCK_SIZE;
-+	}
-+	/* Decrypt the last 17 to 32 bytes. */
-+	aes_cbc_cts_decrypt_aesni(dst, src, pn_len, iv, key);
-+	kernel_fpu_end();
-+	return true;
-+}
-+#endif /* CONFIG_CRYPTO_LIB_AES_CBC */
++#endif /* CONFIG_CRYPTO_LIB_AES_CTR && CONFIG_X86_64 */
 +
  #define aes_mod_init_arch aes_mod_init_arch
  static void aes_mod_init_arch(void)
