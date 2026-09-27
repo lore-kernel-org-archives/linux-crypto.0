@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CEA13C1090;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEFF3C76A6;
 	Sun, 27 Sep 2026 22:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790549080; cv=none; b=CLFdA21JKHnqufjzmBxoIDzMjgA/RbOoysdpLqdaK67MdSZVVU8OCl370TiTo0gpPOOgUz3yUUnqNfS+Oml920VjfuBerqmAPM2lu3lSDfcFdk4oYQ2stKmn8/mbObEYUYnpuBLzUJ3nO3L2wc9wVPBfw1+XXHElh5sybpzN+kw=
+	t=1790549080; cv=none; b=X+1tKCmbXSKHG47kJYgjzLtW3JL20eG61GSsAxhLTo8RdcVfAwOjVoZLwIDrRHH5pWNMuJcJ7LjyEgVn18EJGQv1cd2lcCbH7unDJ06HNmrLQozcsmo8hymK9BG7Oa6sBl6tyjMfU7ICjuUR9jOhYyGQN74Y4tdCdnKzcdxHMG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790549080; c=relaxed/simple;
-	bh=BWaMUgi/2CVOvtWM13juTMImpVZZ1t1sZxRUNB0dgEg=;
+	bh=7a+4Gt0xDDmCvGCZBY2eafOaHLdMTG7DYM9klLRu/2U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MLyh0vf9IazK84YO8zD4L8bVA4rwRiZJrIC+ModaIxsFuZY+B+MO8/mjAkeVQ7v1pZZ19nDooJ7kelIXPZlg8TQOaAamy4xC5Pn9NtyhWwI7ix4na0rVeXr/iEEkwv7vXnMEDZxCPUmduQpTGR7xBAh1eAGfvAOpbiNb2XSm0ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XCe6pem3; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=pmOr0J5ecX3d211s4dC67WDZT+2fSK3zp1F9T8a+Ao2pcrzvnezFrsRa6Zbd3rwxjcljfyXdnDgoIryZBY0i648pI160rH6Qf2rMgC0qA7eqa1TmAd6sN0Ih41Q8/8gZ0XGwG2dVrD6ZnROzCSfzwo3/T5zA+ZI7YhBvZw6+EHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9dd3Tz8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XCe6pem3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA6131F00893;
-	Sun, 27 Sep 2026 22:44:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9dd3Tz8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34C7C1F00898;
+	Sun, 27 Sep 2026 22:44:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1790549079;
-	bh=RXcPSErStwz9YmSdLDmXCs6xzBZtyX+Xe4rdJW9EhsI=;
+	bh=vnEA9cfMXmX200OnA8/EwYowZNF4bPtpzOYKNAaTVp4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XCe6pem3IEEms0LhO4ZC5dAjM168s9njWq7RKyQf5gEjSga3BeLnLrsA7qEQhHYKj
-	 wyY2EV22fKiCXLENCIOC2DrCmRvWWHJAGV+OtKwroWKsaXty7yVu16e/9fGcCe6e+6
-	 lYJO8m+DIWnAUH6IwaNA1zAyA3Cuzpan3mt1/hPyB8NA4Uay+6gO3f8RN3bLPTPM9K
-	 +GScno032OW4WukqiJlaV7bSym/v9O1jJ4l0Rn+otH8Da3VyeP9J6v8ahvIrf9mo6A
-	 0Dmh9OYCLAzBhnb9TcvC3uC8jHgHCBzROtr+Uh0CetslvxmuMPiqgd+2fdUc2PtXuu
-	 DVR1haEYRwAWw==
+	b=I9dd3Tz8UrCLCCZPxMi2hKHrOe8eOGjMrsJmBJMOv6FMI7jzyUDp7BuO4UbqRJtWQ
+	 qYQ04iqmrX15Yggyt1Yd7A07Al13/LHAmr5VEL1l25C1hFvVeE3wO1MZuGYtURqO3M
+	 P4mqbaonb7vA5B8tpUJZMsUJXRzw7IPkvl2YAVnkKE0mSlINEe1thvC7j6BfpI9r2n
+	 LQGpmoE7N4vksSHpCqSgSYuRipkyu+C0M72R9CCU8eiPl1Eaihy51MIV/vhM1epaNF
+	 jU9Ok/irsiVeA404n5jaEtO003+64JF+m1TSdoOKSpRrl2sxGy1zak7A/ulPlq6znf
+	 uV6j9VnYcPhyg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -34,10 +34,11 @@ Cc: linux-kernel@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	x86@kernel.org,
 	linux-riscv@lists.infradead.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 01/20] crypto: aes - Fix undesired override of some optimized AES modes
-Date: Sun, 27 Sep 2026 15:42:52 -0700
-Message-ID: <20260927224418.109759-2-ebiggers@kernel.org>
+	Eric Biggers <ebiggers@kernel.org>,
+	Thomas Huth <thuth@redhat.com>
+Subject: [PATCH v2 02/20] lib/crypto: aes-xctr: Pass counter by value to aes_xctr_arch()
+Date: Sun, 27 Sep 2026 15:42:53 -0700
+Message-ID: <20260927224418.109759-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260927224418.109759-1-ebiggers@kernel.org>
 References: <20260927224418.109759-1-ebiggers@kernel.org>
@@ -49,113 +50,42 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The new library APIs for AES encryption modes were wired up to the
-traditional crypto API via crypto/aes.c.  However, for now the kernel is
-still in a transitional state where various architectures still have
-architecture-optimized implementations of AES modes in arch/*/crypto/,
-wired up to the traditional crypto API only.  Because of that, the
-crypto/aes.c algorithms were given a cra_priority of only 110 to prevent
-them from overriding arch/*/crypto/ in the traditional crypto API.
+Update the calling convention for aes_xctr_arch() to pass the counter by
+value, then do the increment in generic code.  This aligns better with
+the x86_64 and arm64 assembly code for XCTR, which takes the counter by
+value and thus has to be paired with an increment in C code anyway.
 
-However, because of how the traditional crypto API works, the
-cra_priority trick doesn't work in cases where the relevant algorithm
-isn't directly implemented by arch/*/crypto/ but rather is provided by a
-template instance using other code in arch/*/crypto/.
-
-For example, x86 doesn't have its own "ccm(aes)" but rather relies on
-the "ccm" template constructing it from the x86-optimized "ctr(aes)".
-The existence of the library-based "ccm(aes)" prevents that, even though
-its priority is lower than what the template would produce.
-
-Thus, "ccm(aes)" ends up using the slower single-block AES code.
-
-Therefore, skip wiring up the relevant library-based code to the
-traditional crypto API on architectures where this problem can occur, as
-determined by what exists in arch/*/crypto/ for each architecture.
-
-This is ugly, but it's also temporary: these conditions will go away as
-architecture-optimized implementations of AES modes are migrated into
-the library.  But until then, we need to prevent performance regressions
-by ensuring that the optimized code continues to be used.
-
-Note: "xts(aes)" is left alone.  Though the "xts" template can use
-"ecb(aes)" as an inner algorithm, in practice this isn't very efficient
-and a dedicated "xts(aes)" is already provided in all the important
-cases anyway.  (This omission is also consistent with the fact that the
-library isn't planned to provide a similar ECB-to-XTS "adapter".)
-
-Fixes: 20df21a482aa ("crypto: aes - Add CBC and CBC-CTS support using library")
-Fixes: 8ca62072faa1 ("crypto: aes - Add GCM support using library")
-Fixes: f70ad727d1d6 ("crypto: aes - Add CCM support using library")
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/aes.c | 39 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 36 insertions(+), 3 deletions(-)
+ lib/crypto/aes.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/aes.c b/crypto/aes.c
-index 94791f481e98..5046b887ac9a 100644
---- a/crypto/aes.c
-+++ b/crypto/aes.c
-@@ -637,7 +637,17 @@ static struct skcipher_alg skcipher_algs[] = {
- 		.decrypt = crypto_aes_cbc_decrypt,
- 	},
- #endif
--#if IS_ENABLED(CONFIG_CRYPTO_CTS)
-+#if IS_ENABLED(CONFIG_CRYPTO_CTS) && \
-+	/*
-+	 * Skip registering this when it might block a "better" implementation
-+	 * from being instantiated via the "cts" template wrapping an arch-
-+	 * optimized "cbc(aes)" that hasn't yet been migrated into the library.
-+	 */ \
-+	!(IS_ENABLED(CONFIG_ARM) || \
-+	  IS_ENABLED(CONFIG_ARM64) || \
-+	  IS_ENABLED(CONFIG_PPC) || \
-+	  IS_ENABLED(CONFIG_S390) || \
-+	  IS_ENABLED(CONFIG_SPARC))
- 	{
- 		.base.cra_name = "cts(cbc(aes))",
- 		.base.cra_driver_name = "cts-cbc-aes-lib",
-@@ -980,7 +990,18 @@ static __maybe_unused int crypto_aes_ccm_decrypt(struct aead_request *req)
+diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+index f1549839b3de..22f096c50242 100644
+--- a/lib/crypto/aes.c
++++ b/lib/crypto/aes.c
+@@ -1094,7 +1094,7 @@ static bool aes_ctr_arch(u8 *dst, const u8 *src, size_t len,
  }
+ #endif
+ #ifndef aes_xctr_arch
+-static bool aes_xctr_arch(u8 *dst, const u8 *src, size_t len, u64 *ctr,
++static bool aes_xctr_arch(u8 *dst, const u8 *src, size_t len, u64 ctr,
+ 			  const u8 iv[AES_BLOCK_SIZE],
+ 			  const struct aes_enckey *key)
+ {
+@@ -1150,8 +1150,10 @@ void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
+ 	__le64 aes_input[2];
+ 	u8 keystream[AES_BLOCK_SIZE] __aligned(__alignof__(long));
  
- static struct aead_alg aead_algs[] = {
--#if IS_ENABLED(CONFIG_CRYPTO_GCM)
-+#if IS_ENABLED(CONFIG_CRYPTO_GCM) && \
-+	/*
-+	 * Skip registering these when they might block "better" implementations
-+	 * from being instantiated via the corresponding templates using
-+	 * arch-optimized code that hasn't yet been migrated into the library.
-+	 */ \
-+	!(IS_ENABLED(CONFIG_ARM) || \
-+	  IS_ENABLED(CONFIG_ARM64) || \
-+	  IS_ENABLED(CONFIG_PPC) || \
-+	  IS_ENABLED(CONFIG_RISCV) || \
-+	  IS_ENABLED(CONFIG_S390) || \
-+	  IS_ENABLED(CONFIG_SPARC))
- 	{
- 		.base.cra_name = "gcm(aes)",
- 		.base.cra_driver_name = "gcm-aes-lib",
-@@ -1012,7 +1033,19 @@ static struct aead_alg aead_algs[] = {
- 		.chunksize = AES_BLOCK_SIZE,
- 	},
- #endif /* CONFIG_CRYPTO_GCM */
--#if IS_ENABLED(CONFIG_CRYPTO_CCM)
-+#if IS_ENABLED(CONFIG_CRYPTO_CCM) && \
-+	/*
-+	 * Skip registering this when it might block a "better" implementation
-+	 * from being instantiated via the "ccm" template wrapping an arch-
-+	 * optimized "ctr(aes)" that hasn't yet been migrated into the library.
-+	 */ \
-+	!(IS_ENABLED(CONFIG_ARM) || \
-+	  IS_ENABLED(CONFIG_ARM64) || \
-+	  IS_ENABLED(CONFIG_PPC) || \
-+	  IS_ENABLED(CONFIG_RISCV) || \
-+	  IS_ENABLED(CONFIG_S390) || \
-+	  IS_ENABLED(CONFIG_SPARC) || \
-+	  IS_ENABLED(CONFIG_X86))
- 	{
- 		.base.cra_name = "ccm(aes)",
- 		.base.cra_driver_name = "ccm-aes-lib",
+-	if (likely(aes_xctr_arch(dst, src, len, ctr, iv, key.enc_key)))
++	if (likely(aes_xctr_arch(dst, src, len, *ctr, iv, key.enc_key))) {
++		*ctr += DIV_ROUND_UP(len, AES_BLOCK_SIZE);
+ 		return;
++	}
+ 
+ 	aes_input[1] = get_unaligned((const __le64 *)&iv[8]);
+ 	/* Handle the full blocks. */
 -- 
 2.55.0
 
