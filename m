@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500683BE14A;
-	Mon, 28 Sep 2026 18:58:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EC439768D;
+	Mon, 28 Sep 2026 19:02:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790621927; cv=none; b=PzgnRDguIdUrkYpPCIDSLtrQ+ChVGcJAvPrhnStzyUGzszvGgZSx3/kffFQ+14OokuNqfgC5hDQTe17rd1/XDOgxgcImIsahQD4sCRoNrVRC9xWJrrEXVxQiT3jTPI1Yf21vUl/0mCyridRC6lXXvUqNCCTDlUkFF6R6NmdiFjQ=
+	t=1790622160; cv=none; b=oomXNBUZec/XLhOjjRR27MLkrzs/HkiSwio6nEk4JXGn9tCVEgKhKRRUIeVG5J8DHr0GCsL6Q6tn74E4e4JYyIGz9vX0L1ZqCj/kpfPZV2edcgE9AKa/8OhF0NV49uVBrRyF1BtB11QljV1OcXcU0J0nXXz8pnsYYTus6iMbVGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790621927; c=relaxed/simple;
-	bh=KJz1UrlxroTw9zwWWy6KGkUgPX8Gomb04xBPCt5j6RY=;
+	s=arc-20240116; t=1790622160; c=relaxed/simple;
+	bh=8IfPv+STfMcZJKjf6yggHH5WDwdE237pEfnwfgqDUzg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C27S9Psq6FtMnJRjc/eN3vZNRLsb9F/muD5AHsVH89rrFaQjDo7W/f8mqVzlgi7fcufEOeb4PSoqbLHOXx4VUaPpx6vqcjTDOt6z3T0cs0RLxj1ZzzCVxtkAWGFl7ZkaZQDAC9GbZg0fG1xPpJsytP3FAcqNMjSPB+hXLgsDR7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nOYYg7oC; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=AghzlHEbe0TV9oqltfh46/6WMcSsOgNKBTy90Rz2xeHpTlBwJNZM5NL/GEaYYzjvy8poDbzj+IEVMsoN0gGs3moMS2IbrF3GfQvxWAX0In7COVIjHgdcHXqS45eMOX4AlalbHKuwqNpiRBCKF6kbCnzReD6ucslRkjrd3/5KC3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JpdScsI+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nOYYg7oC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE8331F000FF;
-	Mon, 28 Sep 2026 18:58:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JpdScsI+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 263B61F000FF;
+	Mon, 28 Sep 2026 19:02:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790621925;
-	bh=BQJlLat4qxj8pgDrowtyIAkoQQPKp9J5TEk8suVVKjQ=;
+	s=k20260515; t=1790622158;
+	bh=vTZRqeA3eh/91cOEVB9Z7b7RmqYVnV8/9o2vIx4X17c=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=nOYYg7oCN+CEi6+HSLYl5pLYDPIkgl9oIzaKeRsIwnLQLz8gmq2Wlu8L8C67dnJeG
-	 8Jqjug8DQ2jWcrnxQaDVIw6DTaQKfwBEz5XUeHMtQu+4oXvZNYq/hQmhg9GTUYuIaX
-	 BDacpyX/6tMbFS4fZj3+80NIoy+Z1ibgbEcH6aPXMhaAGIYuRy/vAvhAZDbjQBVPe9
-	 7bwsvipBELhLtcU85W+9CT0n5D9xfPhyUfHWMBbm0bGZocbd8ObHRV61EiYsQnAK5O
-	 OCs1pBsYyjVxK8UZ3AoZWY14OtJ41S0GCn9WpAN4rU+kY6M4c63VqlKaID+AO+oIJZ
-	 sntZfdjPV6lGA==
-Message-ID: <9d4517d0-0e78-4eee-970e-0cac9d0a856f@kernel.org>
-Date: Mon, 28 Sep 2026 20:58:22 +0200
+	b=JpdScsI+6Qzm+N9kvlK8qVUWrOLKhvaCARl3eGaAFGaYO8jR3uleE7yaCCC2auyT3
+	 jbZr+S2DpOD9UfDIEdqk6cBuN8esD48o0Gr0bbRqDa5fkW8kfvg3bc0OO4tZNii7iv
+	 hCZnw+aYEBCML2hR563F9EUvHTG9YIPr8zh9JQIGynl/nYmoSEYCFmA30prsHWWp4o
+	 ouiSZ/rTdzjzBicvJB2pHHx6risqXhJCsl//LUsmZ2yWFCPYtCei5xUflJxZAWNDrU
+	 5hcJqUpuoB8o2R/tjhS4cb6OcUdgWl32Akkvgb7W7xFukQg2PHNhQGjorZFNvgDrDy
+	 5AZH3hA8QW+cQ==
+Message-ID: <7d4816f0-9c18-413f-9a7d-aaa003bf3135@kernel.org>
+Date: Mon, 28 Sep 2026 21:02:17 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,9 +37,8 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 00/12] CRASH_MEMACTION: describe pages to a kdump
  kernel (was: CRASH_WIPE_SECRETS)
-To: "Lorenzo Stoakes (ARM)" <ljs@kernel.org>,
- =?UTF-8?Q?Jan_Sebastian_G=C3=B6tte?= <linux@jaseg.de>
-Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
+To: =?UTF-8?Q?Jan_Sebastian_G=C3=B6tte?= <linux@jaseg.de>,
+ Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
  Randy Dunlap <rdunlap@infradead.org>, Rob Herring <robh@kernel.org>,
  Saravana Kannan <saravanak@kernel.org>,
  Andrew Morton <akpm@linux-foundation.org>, Baoquan He
@@ -61,10 +60,11 @@ Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
  David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>,
  Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
  "Serge E. Hallyn" <serge@hallyn.com>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- "Liam R. Howlett" <liam@infradead.org>, Jann Horn <jannh@google.com>,
- Pedro Falcato <pfalcato@suse.de>, Rik van Riel <riel@surriel.com>,
- Harry Yoo <harry@kernel.org>, Lance Yang <lance.yang@linux.dev>,
+ James Bottomley <James.Bottomley@HansenPartnership.com>,
+ "Liam R. Howlett" <liam@infradead.org>, Lorenzo Stoakes <ljs@kernel.org>,
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>,
+ Rik van Riel <riel@surriel.com>, Harry Yoo <harry@kernel.org>,
+ Lance Yang <lance.yang@linux.dev>,
  Baolin Wang <baolin.wang@linux.alibaba.com>,
  Nico Pache <nico.pache@linux.dev>, Ryan Roberts <ryan.roberts@arm.com>,
  Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
@@ -73,8 +73,8 @@ Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
  Joshua Hahn <joshua.hahnjy@gmail.com>, Byungchul Park <byungchul@sk.com>,
  Gregory Price <gourry@gourry.net>, Ying Huang
  <ying.huang@linux.alibaba.com>, Alistair Popple <apopple@nvidia.com>,
- Peter Xu <peterx@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
- Eric Biggers <ebiggers@kernel.org>, linux-doc@vger.kernel.org,
+ Peter Xu <peterx@redhat.com>, Arnd Bergmann <arnd@arndb.de>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-doc@vger.kernel.org,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  kexec@lists.infradead.org, driver-core@lists.linux.dev, linux-mm@kvack.org,
  linux-arm-kernel@lists.infradead.org, dm-devel@lists.linux.dev,
@@ -82,7 +82,6 @@ Cc: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
  keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
  linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org
 References: <20260928-crash-memaction-upstream-20260921-v3-0-e511e9ee2329@jaseg.de>
- <arqli0H0v5qPG22z@gremlin>
 From: "David Hildenbrand (Arm)" <david@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=david@kernel.org; keydata=
@@ -129,33 +128,44 @@ Autocrypt: addr=david@kernel.org; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <arqli0H0v5qPG22z@gremlin>
+In-Reply-To: <20260928-crash-memaction-upstream-20260921-v3-0-e511e9ee2329@jaseg.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 9/28/26 19:49, Lorenzo Stoakes (ARM) wrote:
-> On Mon, Sep 28, 2026 at 07:17:48PM +0200, Jan Sebastian Götte wrote:
->> I'm using linux on an embedded target in a Hardware Security Module-like
->> application. One requirement is that I want the system to be able to
->> quickly erase its memory when it detects physical tampering. I'm
->> approaching that by using kdump to load into a small payload that
->> instead of dumping RAM, erases RAM frmo start to end. However, writing
->> all of RAM, especially on an embedded target, is rather slow. For this
->> reason, I propose a new crash_memaction mechanism that lets the old
->> kernel indicate marked memory areas to the kdump kernel at page
->> granularity.
+On 9/28/26 19:17, Jan Sebastian Götte wrote:
+> I'm using linux on an embedded target in a Hardware Security Module-like
+> application. One requirement is that I want the system to be able to
+> quickly erase its memory when it detects physical tampering. I'm
+> approaching that by using kdump to load into a small payload that
+> instead of dumping RAM, erases RAM frmo start to end. However, writing
+> all of RAM, especially on an embedded target, is rather slow. For this
+> reason, I propose a new crash_memaction mechanism that lets the old
+> kernel indicate marked memory areas to the kdump kernel at page
+> granularity.
 > 
-> Sorry this all seems really invasive for what seems to be a very specific
-> use case.
+> I will be using this mechanism to indicate "secret" memory ranges for
+> early wiping by my kdump payload. After discussion with Baoquan He early
+> August, the patchset includes a second flag that can be used to indicate
+> "cache" memory that the kdump kernel may want to skip when creating the
+> dumpfile.
 > 
-> In general, with big changes like this, you should send the series as an
-> RFC.
-> 
-> Please send any future revisions of this as an RFC.
-> 
-> The bar for a new VMA flag, a new madvise() flag, 
+> The record is a bitmap with one bit per page, allocated at boot. It
+> reaches the kdump kernel as a PT_NOTE named MEMACTION. Marking is a
+> lock-free atomic bitmap update with no allocation, so it is safe in any
+> context.
 
-It's actually three new madvise modes. Way to invasive indeed. This won't fly.
+This is all rather messy.
+
+So, in general, kdump has access to the memmap, and it can figure out certain
+things about pages to be dumped. That's what makedumpfile does.
+
+It can identify user pages, kernel pages, etc. If you could identify relevant
+pages through the memmap from the second kernel, you might be able to clean them.
+
+I'd assume you could identify secretmem pages that way.
+
+But all these madvise/mmap thingies are really not appropriate to reduce the
+zeroing.
 
 -- 
 Cheers,
