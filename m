@@ -1,37 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45FD4D8DBD;
-	Mon, 28 Sep 2026 14:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FB24D9908;
+	Mon, 28 Sep 2026 14:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790604559; cv=none; b=BD5F9i/yd2b31YhIaxGBCL+vC8CZLQlLe9+NjRz5nPQ9cvLVIbCKuHcwmGQiQMWk5vit1bhUH2HWDBJ97NaO47f+IKueGujCiAkcb17DuJojW6DNfEPzzCssgskIm8HzkIHu5/20UzhahqaBFgqqJIkUz/G5oVjvegwPPFI59HU=
+	t=1790605763; cv=none; b=SAwazMpou0JRaiRAdJJ5prj76Ejc91Ad8IV4hrS3r0NZAEUJvlDmVW94A5exT6Ekza+tVPR8kiuQdnJV0QEpkh7nTPP5BHqvDqrUfD14c5TTr5B3Jj4ZLjnfHt3OvFz+ZgIauG/u3NfSbDS3ocBzn58ieVlI7+mUQCF++HDE0NM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790604559; c=relaxed/simple;
-	bh=2aYzSd0Te0F1sEOZfIzbd72egCva4/9kHzntGInLvTA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mtTO1nw6NTGTTFr7LadPF/DQgsbCE7e2VrYq7xS+iWoG3/+m2uGQN7ocnDJ65XihgR09qS9tXvTg31U9PpHNFMYBoSMJfLtI4sYEwTqqt1ZAgtW8S6rZXhozT1DTFp6mwzM7qhNS+x78mOZaAuPwMFNQzVONfZlVYwxRVvQrA2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FCgLveVh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1790605763; c=relaxed/simple;
+	bh=QVRWFLw76zgCtb7Dk0+R/Mu4NDb54jeLKb2zAJjJsIQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BCIl2QcwxMblRtb6V+TbOJU6GLAKY3UaTiczeJDehCofPWgc+BABd5zdA3P1Hth+qJ9b2rjLOn6Jo3Euzm1azAwmak+6Zn/xQMZOHuW65nLZVvsXfhokwgmc0+GXX/K16+7ZgEN+PThqAHkOxfhDn6U8WLGb+/vW5u2dTHt9aBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/ghxvVF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FCgLveVh"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 56A87C2BCB3;
-	Mon, 28 Sep 2026 14:09:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1790604559;
-	bh=2aYzSd0Te0F1sEOZfIzbd72egCva4/9kHzntGInLvTA=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=FCgLveVhknP4y49M4Ab84aoV09MX82P8YKgzRniUWBLEKzQhJBJn+iY7UxLYDYKCi
-	 JoOVWpM1izVcFLWlLrZPyYAb7KKXpW96r2Yrv09p+zzs4b5vEXeJRB9IuW8Dldgg8Y
-	 xbM+9TnqLEmSuMu5p8XaSihBQ5K+s7H82S223HxnLcrOXIiv63SQ+2dJ1cJmeQCmFc
-	 1Uwsi+WZnSyKcJRTh9u+VCzGrmjwxtYNNgR21fJ8w0G0iQxOQ78YW2zIQ6cRR3qpVw
-	 BNhC9JqaZwK6/Uiie5O6s5hCjE6iy80thXbhnhKlbM5YyoyZ4yNVl6Vcrc1Zp1VsHT
-	 aAwX7yclWSRYQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33585CA5FA5;
-	Mon, 28 Sep 2026 14:09:19 +0000 (UTC)
-From: Vincent Jardin via B4 Relay <devnull+vjardin.free.fr@kernel.org>
-Date: Mon, 28 Sep 2026 16:09:16 +0200
-Subject: [PATCH] crypto: caam/qi,qi2 - set plain_keylen for skcipher
- descriptors
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N/ghxvVF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E5F1F000FF;
+	Mon, 28 Sep 2026 14:29:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790605761;
+	bh=UWCMYFvLNAm68dl9T3p5+ei0mitspgrPR0ZgUvMplx4=;
+	h=From:To:Cc:Subject:Date;
+	b=N/ghxvVFzeM7ZM0edHvlEWjV6tkzS0tfZ9dGHsuTbydx102IBb+Uy5wajLYWomwU5
+	 dQD98F2WlQpzb6NgbSg9uzCRKD90WwdEjg2Ehe3MTvm33ML/MtxmhAcD3LkvOJfz9e
+	 w12EhLDkvzDUvifx/J8IjGmAmTQ+N9etWAnTgK1IMSjUZItyZQ7qtmHCFXDRdyxKnC
+	 dL1k7MS9bSQgrcXidTF71kJVb5H6BAAcfKYXWMwDUb+PS99i1n186Fs4RkHWWLyusq
+	 yeOCJOSJOFjoiiOc+VRZ2X3Z1iT8KZIpjcUXrYnNG4WGtX4kAngJiJeVvReMdZmjhB
+	 /HVtYc4eVKz8g==
+From: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>
+To: "Paul E . McKenney" <paulmck@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
+	rcu@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/3] fprobe, rcu/tasks, rhashtable: Switch fprobe and BPF kprobe-multi to Tasks-Rude RCU
+Date: Mon, 28 Sep 2026 23:29:13 +0900
+Message-ID: <179060575297.372125.10581329083761385407.stgit@devnote2>
+X-Mailer: git-send-email 2.43.0
+User-Agent: StGit/0.19
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -39,86 +70,101 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260928-for-upstream-caam-qi-plain-keylen-v1-1-6edb56649cf9@free.fr>
-X-B4-Tracking: v=1; b=H4sIAAt1umoC/x2NwQ6CMBAFf4Xs2U1oD7T4K8ZDgYduwFK3YCSEf
- 7fxMslcZg7KUEGma3WQ4iNZlljEXCrqnyE+wDIUJ1vbpm6t53FR3lJeFeHFfSh4C6c5SOQJ+4z
- IzsJ3jTFw3lHpJMUo3//jdj/PH/OaIRBzAAAA
-To: =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, 
- Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, 
- Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Vincent Jardin <vjardin@free.fr>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790604557; l=2087;
- i=vjardin@free.fr; s=20260525; h=from:subject:message-id;
- bh=QDDTvtj++xXIso5yDNVOmdUEzAvrdil+dSqHLZL9pTY=;
- b=5putLZlLd+7hbZ9ZnG1Ls3k50acyXFDRr9A7KEm1OAwn7pwd9DHiGP8GDfNw3DHUvScB1xS4M
- X+1Hgp5PC9HApzvzZJto6dtdGBUgzIxLA9RdowDebMWf49Hw0KkJ/od
-X-Developer-Key: i=vjardin@free.fr; a=ed25519;
- pk=hppgLeFpGpKOi7LNwGEZ4jOYofJCoGd4Jf1ltAabiLw=
-X-Endpoint-Received: by B4 Relay for vjardin@free.fr/20260525 with
- auth_id=871
-X-Original-From: Vincent Jardin <vjardin@free.fr>
-Reply-To: vjardin@free.fr
+Content-Transfer-Encoding: 8bit
 
-From: Vincent Jardin <vjardin@free.fr>
+Hi,
 
-Since the commit 66b9a095f7f9
-  ("crypto: caam - Add support of paes algorithm")
+Here is an RFC patch series which removes standard RCU read lock
+(guard(rcu) and rcu_read_lock()) from fprobe callback paths
+by switching fprobe and BPF multi-kprobe to Tasks-Rude RCU.
 
-The shared descriptor then loads a zero-length key and the SEC decodes
-the inlined key bytes as commands.
+Motivation & Problem
+====================
 
-Test: with CONFIG_CRYPTO_SELFTESTS on LX2160A every skcipher but xts fails:
+Currently, fprobe entry and exit callbacks (fprobe_fgraph_entry,
+fprobe_return, and fprobe_ftrace_entry) execute in the tracing hot
+path where preemption is disabled.
 
-  dpaa2_caam dpseci.0: 40000307: DECO: desc idx 3: Invalid LOAD Command
-  alg: skcipher: ctr-aes-caam-qi2 encryption failed on test vector 0; expected_error=0, actual_error=-22, cfg="in-place (one sglist)"
+However, fprobe was forced to wrap hash lookups with guard(rcu)() and
+rcu_read_lock() because:
 
-caamalg_qi.c is compile-tested only.
+- rhashtable defers bucket table deallocation using standard RCU
+- unregister_fprobe() and BPF waited for a standard RCU grace period
 
-Fixes: 66b9a095f7f9 ("crypto: caam - Add support of paes algorithm")
-Signed-off-by: Vincent Jardin <vjardin@free.fr>
+Taking standard RCU read locks in the tracing fast path introduces
+several drawbacks:
+
+1. Unnecessary Runtime Overhead:
+   Every probe hit manipulates current->rcu_read_lock_nesting with
+   memory barriers, and rcu_read_unlock() adds conditional branches
+   to check for special quiescent processing.
+   On debug kernels with CONFIG_PROVE_RCU=y or CONFIG_LOCKDEP=y,
+   this additionally acquires and releases lockdep maps on every hit,
+   introducing severe lockdep hashing overhead and tracer recursion risks.
+
+2. Fragile Dependency on rcu_is_watching():
+   Standard RCU treats idle CPUs (and user-space on nohz_full CPUs) as
+   Extended Quiescent States (EQS). If a function is traced while
+   rcu_is_watching() is false, standard RCU is blind to the read-side
+   critical section. In such contexts, synchronize_rcu() does not wait
+   for the reader (risking Use-After-Free), and lockdep emits an
+   "RCU-illegal: rcu_read_lock() used while not watching!" warning.
+   To avoid this, ftrace callbacks normally require FTRACE_OPS_FL_RCU,
+   adding extra trampoline check overhead.
+
+3. Asymmetric Synchronization with fprobe_return():
+   fprobe_return() executes under preempt_disable_notrace() without
+   holding rcu_read_lock(). Prior to this series, unregister_fprobe()
+   only waited on synchronize_rcu(), which does NOT wait for pure
+   preempt-disabled sections, leaving a potential Use-After-Free window
+   during probe unregistration.
+
+I've tried to fix the last UAF with simply introducing guard(rcu)()[1]
+but Sashiko found the 2nd problem [2]. So I decided to implement this
+series.
+
+[1] https://lore.kernel.org/all/179055575009.241711.6358052647499787191.stgit@devnote2/
+[2] https://lore.kernel.org/all/20260928005114.9C9FC1F000FF@smtp.kernel.org/
+
+
+Solution: Tasks-Rude RCU
+========================
+
+Because fprobe callbacks already run strictly within preempt-disabled
+contexts, we can transition fprobe and its deferred table reclamation
+to Tasks-Rude RCU:
+
+- Tasks-Rude RCU detects grace periods via schedule_on_each_cpu(),
+  forcing a schedule on every online CPU. This guarantees that all
+  preempt-disabled sections that began prior to the grace period have
+  completed before memory is reclaimed.
+- Unlike standard RCU, Tasks-Rude RCU does not rely on dyntick-idle /
+  EQS tracking. It does NOT require rcu_is_watching() to be true and
+  does not trigger lockdep warnings in pre-RCU/idle execution paths.
+- Within fprobe, guard(rcu)() is replaced with guard(rcu_sched_notrace)(),
+  reducing the lookup lock to pure, non-tracing preempt counter
+  increments without lockdep or RCU state manipulation.
+
+Feedback and suggestions from RCU, BPF, and tracing maintainers are welcome!
+
+Thank you,
+
 ---
- drivers/crypto/caam/caamalg_qi.c  | 2 ++
- drivers/crypto/caam/caamalg_qi2.c | 2 ++
- 2 files changed, 4 insertions(+)
+base-commit: 5bfa9f1a9dcb6ecb607adbc1c0226605c972935b
 
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index aa779caacfe5..2f2682c8bcd8 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -637,6 +637,8 @@ static int skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
- 	ctx->cdata.keylen = keylen;
- 	ctx->cdata.key_virt = key;
- 	ctx->cdata.key_inline = true;
-+	ctx->cdata.plain_keylen = keylen;
-+	ctx->cdata.key_cmd_opt = 0;
- 
- 	/* skcipher encrypt, decrypt shared descriptors */
- 	cnstr_shdsc_skcipher_encap(ctx->sh_desc_enc, &ctx->cdata, ivsize,
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 6b47bcc16a50..d52706931285 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -961,6 +961,8 @@ static int skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
- 	ctx->cdata.keylen = keylen;
- 	ctx->cdata.key_virt = key;
- 	ctx->cdata.key_inline = true;
-+	ctx->cdata.plain_keylen = keylen;
-+	ctx->cdata.key_cmd_opt = 0;
- 
- 	/* skcipher_encrypt shared descriptor */
- 	flc = &ctx->flc[ENCRYPT];
+Masami Hiramatsu (Google) (3):
+      rcu/tasks: Export call_rcu_tasks_rude()
+      rhashtable: Add use_tasks_rude parameter to defer bucket table free
+      fprobe: Switch fprobe and BPF kprobe-multi to Tasks-Rude RCU
 
----
-base-commit: 10396a2d6d41d594975b6ece712278570c3c970c
-change-id: 20260928-for-upstream-caam-qi-plain-keylen-72e8b611e787
 
-Best regards,
+ include/linux/rcupdate.h         |    6 +++
+ include/linux/rhashtable-types.h |    2 +
+ kernel/bpf/syscall.c             |    2 +
+ kernel/rcu/tasks.h               |    8 ++---
+ kernel/trace/fprobe.c            |   66 +++++++++++++++++++++-----------------
+ lib/rhashtable.c                 |    5 ++-
+ 6 files changed, 54 insertions(+), 35 deletions(-)
+
 -- 
-Vincent Jardin <vjardin@free.fr>
-
-
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
