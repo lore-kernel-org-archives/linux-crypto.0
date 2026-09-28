@@ -1,46 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74BD304976;
-	Mon, 28 Sep 2026 05:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B483345EC0;
+	Mon, 28 Sep 2026 05:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790572387; cv=none; b=J/RJn14Tile9VXqz/ngzgNdpjKthHSJug15YSHhUTJLHgZKqugCu1Bpp+gM0BcCJGj8kUxHIe2VBLZwevHmwZCtWktRI2hFhokRWLWMDUWq8cOjzYvMeAiUdrD4bcrUwZIyvzAeDnzFzGJ15A0dUUh98Qany9ThYCWnoc5lqrEs=
+	t=1790572500; cv=none; b=ZcCirMlcNhQNmY0AeugMw8jUUUS0UjgSZ4VgRxb3F2Xa0WYBgkjOKPg5NLwmkRXiqDQGzgE63gHllJyVgmjfYAaRpBLHwwYiL+ImGAkOIIJWKXiTCD0GJbTQk3rYmKg4mO/EdKKQ0bI2nsOVgLoOWOdn5k0mhpG4mvuoMWxX1qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790572387; c=relaxed/simple;
-	bh=ddjb+wjuvi1cOlP8e3yNBP7QmK6wSnxRalRF9qu2HR8=;
+	s=arc-20240116; t=1790572500; c=relaxed/simple;
+	bh=o5nCG+OAwTIWJJPZaeWtamUM9DOkcEIPimjNrkVeSz0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HGL73fcNWlZYdfiaRKYo0QT+3kgNJLxiTSoCTu8Z/z8ekecCZ+wLrhAYBrxlztnFB4DJG92XX52Iwgm6ydt27RfdH78BMjQX2Ao3b8WMRIuE1cQJ/Uor/ROlo43vjIx82Oe3mBrppQQH1G2mXWNxlO6f8vCUXjvAuTtr7NppYAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rhKwLiz4; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=MxRPyn/q+L8uGx2S5BlAztButAw3tbewSCGFA2Kb2W16OKj9UYWkgYR0vtv0UIqVVH+ZsLlFeP0wMPes+GA4hL/wKPiMrJHFPyVDES9tReT5oUB1GVQCuM1dgNG8hRh9/lGYeO1ektV1HKNV8/Gam0Sqb6OVoanhHq/caHZ6Lgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=a20t/Mty; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rhKwLiz4"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="a20t/Mty"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=l4S3cZQ27xJ/MCj4M6F8Mpv2fXrMlqYJXkc2iABTX0w=; 
-	b=rhKwLiz4sKZZusau9LVVQM/+91+ioCBjxfz8ZrHTblLR3yCkA96T3oRqeTaW9Fl4EIA52ppIngF
-	LI1i1IEnTcePxI3MzomlDhqW8uimSbUjvwPnZaZXyAxg/zLt+hSr36neodVPUkp+r0dSFySF+ItAB
-	FEOG7p5nkc83y1SEDmtw6R56Dp68b7tAsu6IwRVRqCRBmebk5VdC3YFqSzB2NOshNaUABdPE+AkPf
-	X4b3Bmy/aFZjgnxWym9VZpGJXrKBafyXxMiej/LaINeKfL7uT3clva/Zg32CmEVNzaQAbtItARZFQ
-	XDBq3d2otVr7Sgkbi4y/1yJ2Mt32iHMyoz8w==;
+	from:content-type:reply-to; bh=1r4RZI43iJp/ce+MihAT+y8KPQ68pt5edry6a9L0d70=; 
+	b=a20t/MtycGIrR5HKKg5UBXgywuNKVasX168meCmqtFPxIk1T5s4jSWQq1azveufNS+2FkozLm4u
+	8uTu9Rop8yTC+COA46mDD6fuGPcw/D7R+UmtyZ+gi0/8G99HithqUJs8fBlJ1RgNumpypMaqDHXLL
+	HIlCuauePkPPMR/oWnDWhASO2jsDM6oklpB0LJwMiGSP1+8SR5jwGION5S0/qF+zryVpWMQmiChDw
+	y4a523nxy2TFYWF4DRDZcQuqujoYc1uhJ7vx9HVFLITmdoENVHgxQ7Hex+rptJ7SJAn/+EFW4f33r
+	/ObBvR9eAuJCpFQu/59pPeptgLWj5l0tyHxw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xB3fV-00000000w3f-0AyE;
-	Mon, 28 Sep 2026 13:12:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Sep 2026 15:12:48 +1000
-Date: Mon, 28 Sep 2026 15:12:48 +1000
+	id 1xB3hT-00000000w6e-0KqC;
+	Mon, 28 Sep 2026 13:14:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Sep 2026 15:14:51 +1000
+Date: Mon, 28 Sep 2026 15:14:51 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ralf Lici <ralf@mandelbit.com>
-Cc: linux-crypto@vger.kernel.org, Antoine Tenart <atenart@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH crypto 2/2] crypto: safexcel - Map AEAD buffers with
- accurate DMA directions
-Message-ID: <arn3UFsriRlGMXwB@gondor.apana.org.au>
-References: <arOOmSnC1NxvG1nw@gondor.apana.org.au>
- <20260923091318.194633-1-ralf@mandelbit.com>
+To: huangchenghai <huangchenghai2@huawei.com>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, liulongfang@huawei.com,
+	qianweili@huawei.com, wangzhou1@hisilicon.com,
+	linwenkai6@hisilicon.com
+Subject: Re: [PATCH 2/4] crypto: hisilicon/sec2 - fix scheduling while atomic
+ in aead soft fallback
+Message-ID: <arn3y4kT0izjENFR@gondor.apana.org.au>
+References: <20260911102942.387778-1-huangchenghai2@huawei.com>
+ <20260911102942.387778-3-huangchenghai2@huawei.com>
+ <aq0AtfUHUw1qOD2Y@gondor.apana.org.au>
+ <c19bbae6-e1f1-4ca4-8156-8b1fb6746319@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,30 +52,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260923091318.194633-1-ralf@mandelbit.com>
+In-Reply-To: <c19bbae6-e1f1-4ca4-8156-8b1fb6746319@huawei.com>
 
-On Wed, Sep 23, 2026 at 11:13:17AM +0200, Ralf Lici wrote:
+On Wed, Sep 23, 2026 at 05:55:43PM +0800, huangchenghai wrote:
 >
-> There is no caller to identify for that particular single-entry layout,
-> it was only a hypothetical example in response to your question. Even
-> for out-of-place AEAD, the destination starts with space reserved for
-> the associated data (as documented in the comment at the top of
-> include/crypto/aead.h). A single linear destination entry can therefore
-> contain both that reserved prefix, which the device does not write, and
-> the ciphertext and tag, which it does write. Because the DMA direction
-> applies to the whole entry, such a mixed entry is mapped
-> DMA_BIDIRECTIONAL.
+> I try to use SYNC_AEAD_REQUEST_ON_STACK instead, but it does not
+> work here: crypto_alloc_sync_aead() enforces a MAX_SYNC_AEAD_REQSIZE
+> limit of 384 bytes, and several composite AEAD algorithms supported
+> by sec2 (e.g. ccm(sm4), authenc(hmac(sha512),cbc(aes))) have a larger
+> reqsize, so the sync tfm allocation fails with -EINVAL.
 
-So why is it a problem if the dst SG list entries aren't pointing
-to memory that's also occupied by the SG list entries?
-
-Even if the hardware doesn't write to the data, it should be OK to
-map them.
-
-The only issue that I can see is if the same memory is present in
-both the src SG list and the dst SG list, but that is expressly
-forbidden for out-of-place operations, and indeed would be a grave
-security issue.
+How big are these algorithms, is there any reason why we can't
+increase MAX_SYNC_AEAD_REQSIZE to accommodate them?
 
 Thanks,
 -- 
