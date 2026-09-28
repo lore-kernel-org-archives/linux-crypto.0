@@ -1,77 +1,77 @@
 Received: from flow-a2-smtp.messagingengine.com (flow-a2-smtp.messagingengine.com [103.168.172.137])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA4B4F7CD0;
-	Mon, 28 Sep 2026 17:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CEA126299;
+	Mon, 28 Sep 2026 17:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790616107; cv=none; b=MCnwrJZbnBz+xVRHttNDiFZfRbHgLDuA2MTCdbu/whu6D0iCIjZqNwokJTEZK6KR0+RRNElVjIPX06diWzZbnvsnvuvEDIg3xR5pfgGrvRHYAreZ1U/JOaJHNy+dnI/QweIDCzk0AkUq7gqzYVw71/aFlUjCb6eiC7iidwyjuUw=
+	t=1790616123; cv=none; b=MtKPR0oVl7SVwBTNxkZ4LSwk0Okb+ldxqoGRDUUpIssdh/Tbr8X8C15X4+PecdE/YYhSVjsPBqMhAajFatoJfNYm3cfKb37X9y6O6iaSGJT9gTrVN7f3XW+7Hv3Pl1aWcFq5wD6Stb8ZOmWgn4OwHbUrfKhbJWlKmE7Ge1omodQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790616107; c=relaxed/simple;
-	bh=9PSn2cTF7zrKu0qPshYkjv7zNSjDRtKQ1Ok0v5t9urk=;
+	s=arc-20240116; t=1790616123; c=relaxed/simple;
+	bh=OtF9DqDZEloPj7iXxs8U9LPusUCGA2vppCz3CZyXg0Q=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J9n2CxA/4rSRlin/w3UZ6HbtWKmsZvppEC97drL4X6asVS2bCjPPWEzjV/W57RF8rfzrqaGqXar5Ut/Nx6LsSFNPv/kx8sF9+sOOm9MeOqwGv1JnnHe0zz1ijJu1WYWOV8u1Xo8sed+EdsnSIyeXedtJuLo3xLaIgxcBLodDEag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de; spf=pass smtp.mailfrom=jaseg.de; dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b=KaZlWMLm; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dcbF+wyv; arc=none smtp.client-ip=103.168.172.137
+	 In-Reply-To:To:Cc; b=E/NYANxA2W8AuY7aZZ8SpmOtl0QSJ8hGlVOFbMoB7r7q8WvwpJNYkrHneCpQViPluHUGfNRxrlQ7zYvpsnOO8L7kS4U8FfSdExc7ezn3LG66zWMCJz10BzYTjRs7i5Y/54AsbuIqcIBiGVPilQXJ73Bjxiz89rorm7cV8jLDclc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de; spf=pass smtp.mailfrom=jaseg.de; dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b=dbQnwqwG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rDrxL5x4; arc=none smtp.client-ip=103.168.172.137
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jaseg.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b="KaZlWMLm";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dcbF+wyv"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailflow.phl.internal (Postfix) with ESMTP id B330D1380021;
-	Mon, 28 Sep 2026 13:21:29 -0400 (EDT)
+	dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b="dbQnwqwG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rDrxL5x4"
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailflow.phl.internal (Postfix) with ESMTP id D4DE41380050;
+	Mon, 28 Sep 2026 13:21:51 -0400 (EDT)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Mon, 28 Sep 2026 13:21:29 -0400
+  by phl-compute-11.internal (MEProxy); Mon, 28 Sep 2026 13:21:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaseg.de; h=cc
 	:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1790616089;
-	 x=1790623289; bh=53EGbVlBCmuFO/yPGaufkagD24x0y+PKNHNL/qinRMo=; b=
-	KaZlWMLmtvRq2GeQrDQaqKaxYnEHoQjh5LSeMxcYhf3GCNNRPEu9cY0Ir2XBK7RJ
-	JVbvETgTonrJ8uG1FJh0sfjReLo5OBOKkFNLs2YLZQ4c1QQeIMWSdm+0EmM6ySuo
-	O5p3yRupqREp8EXfTd2Kp5kYmgS1GyiQDoylj+WVxJj7vNnB+vo3r3DQ5YRLBCty
-	DbEMMnEUpVJyBOUa1ZkhZhTb2PyPnldDX3TMn1w/cp+FReq5aNImdY/n6ulGu3Dk
-	uXPh4+ndTpVVPzsJWzdjZI6onVhqrS06M6VIQlkJ90okQJAGhOqmuvCjcQwv+hft
-	4JWAeabHnuDXuHEidheMzA==
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1790616111;
+	 x=1790623311; bh=olwSF3uNVbiXNhlSbfHN88OmJDHwcqFsRULZ6TEZ7DY=; b=
+	dbQnwqwGvJptiJWV3zxDZlSDkn8uqo0HXFIE0ICOqd8uZ9OXtFTfTgkgnoQs2aEk
+	w6T5994mCCxzWjbPjJVqT8JgZM6Pv9FP3tf5J+401tbQfy7rcNK4QJB8jtWb9fYW
+	kJU3IdyFTSrIsC8H+mS5fPlIkPUavVdzX+6WTBSFJLXRm1kTbIF7chVPkia/pajA
+	B/vM+7XJ9hrCXXSOJ173Hnk6ELL20UBwUGbdqpknBNuHYVw24O++te8xb71PmAtj
+	CgOxRTFQI3zRFPz0sjcZaXIXVp3v3xdX7OqQ6P3Ov3v9YTEv/7G3gPaGg6mMUb0f
+	Uoad8qDM6N3nckocuHyXYw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790616089; x=
-	1790623289; bh=53EGbVlBCmuFO/yPGaufkagD24x0y+PKNHNL/qinRMo=; b=d
-	cbF+wyvCLIU7MFxc0k/maGQv0JOz7etFVBshyNhAvaShG64yyzlp15DozydFDWvJ
-	oWB0J/puyiRbPj8OZjia5/gmDRAjBfedW8qqXNyN+LBbHKJwMgfa3r4njouEfric
-	NGeYM80TRvklD08K7HDQ3FG7HhfBNys0763UOylIljc5wnvaQ3x3DAs74RPZVxX3
-	IqFb4Wbfzj/ce5rqonBT+w12nVufrZqrrTch6fwqiIGOfB25BPDQhzgllfLcHAbE
-	GDsLYTZ+ACRgs4Vk5M4uv78aaEct0YGGvewt4/EU/l2AZNZjwr3i4ciUvEEI1Pve
-	kgKyp+WFp3vAsMGRQAEyg==
-X-ME-Sender: <xms:GaK6agME_RUqisuTZaZ8sblvuXWJKUD2UcrSysV3P_vOv8SP4L5R7Q>
-    <xme:GaK6atFD7JhlkoBcU_eCVfpSYrZsTvmWmiMNZI_haZmQ75ER7JfSWTksd5BnQzszT
-    eMb-nR5kYeYODRnDOU_60tQ5hpLmazJlalZrMJMpbxT9uWkbv4ciZA>
-X-ME-Received: <xmr:GaK6akBVgAmZH-kz65nORHPTKkwNmr5ULsLU48UIFOxLeoeoTn8D0mQz1XMGL7QU>
-X-ME-Proxy-Cause: dmFkZTFVchM+bTT1PKuZ7CN10fxXJIikNoVdUVFHA1eqyKMgAAVr8P6ONf1Qg916JwGLA/
-    UIAM5uyklkVrDRDmXBCinnisDlXug/Uvz0CnXEuy4xZlY+Q3iKI5V68dUZbqn8FCfsIN95
-    6KfV8L2bBYYMAysjIpjjTtDvr59SlVXR0rT3rsZ8OOWBdCzi2fs/qRsgGZhcNemn8sEAcR
-    7gOuIxy/+2FBe7o4KglohLGCDym2m4zsXZ2bZO1r7mHjauIXUwmWu2ruzm3DMO6W6IP24K
-    Wr2E/Zfjs4QhZp1KylseoV5Uqh0JkwjuRMQihg5e/hXKn9gV8Cjo7+1dG47k97NaaXBvC7
-    wjkPY0MykASYaurO98ZHxrl0KcaeBJvFcHGkCls8dJmp8N9EgVIVZBPmju1Jaa0vGc/g26
-    ElcZ1+93OK72UscCr1gvESBIDBc/k5GRgmMs4aRi/NhqRPA8qigxm7a8c5v3VBEdkBWELG
-    Hl6Rl3Lo1/OLIPFbcTXUFqhvrftb5lPDDoAdzIZMIihMRVJ0BtE9OAIHN0k5JRPQYUtB50
-    uEN906KhBV3w26s4nR9FTs32IRL8sBtDCGDtj9NdKWa5JOndRzoGCYTcFpYRBBavwhOH46
-    wGLX+aVoqY6v4MsvVkdjVwPbLIC3TqWJI7dmZiEeUCpOJ3rjOknfBh2dkXoQ
-X-ME-Proxy: <xmx:GaK6aulxxt4X4suH6T5nGB8VEVZ8YMgNoWHDGwVXSUcJ9TaynJqzww>
-    <xmx:GaK6asuLAHs1Qq0aqQZTzF_SawsJGPZ16q1y5_5W7BEMkyBB17X5hQ>
-    <xmx:GaK6amV5Hm_CHmZCMDi3seeCJTpRkbIp5yN-e3h9dmvlFppKG0TVlw>
-    <xmx:GaK6amiXj9XCynaX0y4fkOxEbZKWYJzObo4FgQFDu0HZ-nOYgPrLgQ>
-    <xmx:GaK6ats1-IsvrHI78yAph7SKA-W3bmPkQ5IoFPgfEo_-gkU3Kei-02qk>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790616111; x=
+	1790623311; bh=olwSF3uNVbiXNhlSbfHN88OmJDHwcqFsRULZ6TEZ7DY=; b=r
+	DrxL5x4jjwMO8a36NJAqiuQ+tBGDl1Vn1IWoxv+sAX9iuH+FGAn2z4IMeZz+fyaG
+	UmTYyBnxsQUsFUQv2b9Z0DNnaFHBrnW69QUTSXrgmN4DxBuMoaoeHpPE/c0MGUr0
+	+OWr+LRon961uuD4izohqIKvm4pwFxvGt/JhUr3cNfF93JmP6Xtjh92f6lRAnFSr
+	SE8AuWKKtkQXHGGqlejODXlsgK8P6kbyqBV4XNfLjvu6/4jYFX40JfmVmCtMWHbf
+	OXcFxiWeDrGAPuGtvlXB+aP8r0jNUzk++vmdT2bW8t0wV9wUAfko4DEISxYzAEuy
+	q1SBzpcIuXqgzGLPv6QHw==
+X-ME-Sender: <xms:L6K6arIsp-cCUlGKr9vOAeLPDX6hVHsPBAKXvmtsRUFDcZwe2iRvEw>
+    <xme:L6K6ailST5k0OTaFkL4DbwqSk2fRBDnNp_4QDWgXSzpZoesbPRakPna_0QV9c9AIT
+    DwoRoE_JvnBbs88jPS9AWjTkn9dkdjuoU6zE9hNxSSpn_MY19z9ARM>
+X-ME-Received: <xmr:L6K6av-tNXS8bADYQUDC8ZXpVExbx-rizJKKlX3muF16uuvOHEtafuRLdJf0AxWT>
+X-ME-Proxy-Cause: dmFkZTGQbPrEKBeqiEbZUNbtwb09ozvDcKaPX2bGG4VdNYbMU+7LyhaeiINgn6IUjWkUVC
+    6JeDaps5HFM/iVHQBkfCnhUeITcngbOs46DTzpJ8KvHBBayyM5vMO0uohHMN0iPagLm+95
+    Rf1dd3pLxz1GzQp/2gzOK2F0n0TFVWoHHloAxxgj18kV4y1s6LHvG6y9wZp+SAkfx0lqDS
+    6+w2KnfcZVDjO3JLly6DGMBpywLp/GX5H1OE+vex7vwjXGaMwlcbDb4BamiBu6catKWgzf
+    i0JoJoKItLv8231p2gQ7Z4FeLva21ZLwkVm+uIm+lkrRoLKPavhRV5MYmoHTX3B5pG+gJE
+    mgxJ6jMnMrw2kF482XHxzUGcG5YwlHv4x+SFyrc5T6Z0Lfr3urEuSCKwI/VCz24ul4doIT
+    OFRSi/9VlGSrGIhdLmjarMb32SBmTyO8AKI4AXVZRQJQybE+lz33EAzCj5x0ELuVCk5Rfa
+    m1TEY5rMapnCV7CGN27IakeeOyRyXrhcVMhHv972PXUlJD4hxd0Iv1exZB2rkFqGrEZvBf
+    mde8p+CpkUmDZ5hOkl4OweX7iK0rM7DUCQGs1kCixlQDIl8dCflcnqqnlIqMwFvXjx34z5
+    O97ucpQ53u8thcXyAWpFFvCUUdyxbRITMhM2jASS/W/sg0DH08oEh2+PAWPQ
+X-ME-Proxy: <xmx:L6K6atbejyNWkDZ5Myfw8vpfMJyJJ8ey23mDjTj8XCSoRMe1YNTqPQ>
+    <xmx:L6K6asfKSNdGNMePMyW-FoXevmUmitKy4mBHpCa1OaYU7CGIpcLftA>
+    <xmx:L6K6alHW_9apoX-EtKikHRv24CI94EbDrU_MFBWwMqorCF_a86GMeg>
+    <xmx:L6K6anOYTd-zpwW17XDdAiyx6p--ln1secO0Xgu7Eo2jhxkPgFQ1og>
+    <xmx:L6K6av09XGtqYulP8xrMqaO1V5PZeToPxh9LGqv3WKI1jdG99f63t_CD>
 Feedback-ID: i60a14417:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 28 Sep 2026 13:21:08 -0400 (EDT)
+ 28 Sep 2026 13:21:30 -0400 (EDT)
 From: =?utf-8?q?Jan_Sebastian_G=C3=B6tte?= <linux@jaseg.de>
-Date: Mon, 28 Sep 2026 19:17:58 +0200
-Subject: [PATCH v3 10/12] mm/madvise: Add MADV_CRASH_SECRET,
- MADV_CRASH_CACHE and MADV_CRASH_RESET
+Date: Mon, 28 Sep 2026 19:17:59 +0200
+Subject: [PATCH v3 11/12] Documentation/mm: Document the crash memaction
+ registry
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,7 +80,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260928-crash-memaction-upstream-20260921-v3-10-e511e9ee2329@jaseg.de>
+Message-Id: <20260928-crash-memaction-upstream-20260921-v3-11-e511e9ee2329@jaseg.de>
 References: <20260928-crash-memaction-upstream-20260921-v3-0-e511e9ee2329@jaseg.de>
 In-Reply-To: <20260928-crash-memaction-upstream-20260921-v3-0-e511e9ee2329@jaseg.de>
 To: Jonathan Corbet <corbet@lwn.net>,
@@ -136,219 +136,105 @@ Cc: Eric Biggers <ebiggers@kernel.org>, linux-doc@vger.kernel.org,
  =?utf-8?q?Jan_Sebastian_G=C3=B6tte?= <linux@jaseg.de>
 X-Mailer: b4 0.15.2
 
-These flags allow userspace to indicate memory pages to a kdump kernel
-that contain sensitive secrets or unimportant cache data. This allows
-the kdump kernel to e.g. wipe secrets before dumping, or to skip caches
-while dumping.
-
-The feature is similar to MADV_DONTDUMP but for the kdump kernel. In
-contrast to MADV_DONTDUMP, it specifies the contents of the page, not
-what should be done with it. This is to account for some flexibility
-between the host userspace registering the marks, and the kdump
-userspace processing them.
-
-The flags set here are matched against a mask given through the
-crash_memaction= cmdline param. Only when the param is present and the
-mask matches, a VMA flag ("cm") is set. The kdump kernel later receives
-a single bitmap describing all marked ranges matching the mask.
-
-When madvise'd, marked ranges are registered in the bitmap right away.
-These registrations are then kept up to date by code in rmap.
-Marks are transparent to swap etc.
+Describe the crash memaction registry, including its kernel and userspace
+interfaces, allocation lifetime rules, and current limitations.
 
 Signed-off-by: Jan Sebastian Götte <linux@jaseg.de>
-Assisted-by: Claude Opus 5 <noreply@anthropic.com>
 ---
- include/uapi/asm-generic/mman-common.h |   4 +
- mm/madvise.c                           | 132 +++++++++++++++++++++++++++++++++
- 2 files changed, 136 insertions(+)
+ Documentation/mm/crash_memaction.rst | 59 ++++++++++++++++++++++++++++++++++++
+ Documentation/mm/index.rst           |  1 +
+ MAINTAINERS                          |  1 +
+ 3 files changed, 61 insertions(+)
 
-diff --git a/include/uapi/asm-generic/mman-common.h b/include/uapi/asm-generic/mman-common.h
-index ef1c27fa3c57..b00caec7c130 100644
---- a/include/uapi/asm-generic/mman-common.h
-+++ b/include/uapi/asm-generic/mman-common.h
-@@ -79,6 +79,10 @@
- 
- #define MADV_COLLAPSE	25		/* Synchronous hugepage collapse */
- 
-+#define MADV_CRASH_SECRET 26		/* holds secrets, tell the kdump kernel */
-+#define MADV_CRASH_CACHE 27		/* holds nothing worth dumping */
-+#define MADV_CRASH_RESET 28		/* undo MADV_CRASH_SECRET and MADV_CRASH_CACHE */
+diff --git a/Documentation/mm/crash_memaction.rst b/Documentation/mm/crash_memaction.rst
+new file mode 100644
+index 000000000000..3658bff7693c
+--- /dev/null
++++ b/Documentation/mm/crash_memaction.rst
+@@ -0,0 +1,59 @@
++.. SPDX-License-Identifier: GPL-2.0
 +
- #define MADV_GUARD_INSTALL 102		/* fatal signal on access to range */
- #define MADV_GUARD_REMOVE 103		/* unguard range */
- 
-diff --git a/mm/madvise.c b/mm/madvise.c
-index 00b1be655a8b..37f08334e95a 100644
---- a/mm/madvise.c
-+++ b/mm/madvise.c
-@@ -13,6 +13,8 @@
- #include <linux/page-isolation.h>
- #include <linux/page_idle.h>
- #include <linux/userfaultfd_k.h>
-+#include <linux/crash_memaction.h>
-+#include <linux/rmap.h>
- #include <linux/hugetlb.h>
- #include <linux/falloc.h>
- #include <linux/fadvise.h>
-@@ -1173,6 +1175,98 @@ static long madvise_populate(struct madvise_behavior *madv_behavior)
- 	return 0;
- }
- 
-+#ifdef CONFIG_CRASH_MEMACTION
-+static void madvise_crash_mark_pfns(struct mm_walk *walk, unsigned long pfn,
-+		unsigned long nr_pages)
-+{
-+	bool mark = *(bool *)walk->private;
++====================
++Crash memory actions
++====================
 +
-+	/* Acting on the zero page would reach every other mapping of it. */
-+	if (is_zero_pfn(pfn) || is_huge_zero_pfn(pfn) || !pfn_valid(pfn))
-+		return;
++`CONFIG_CRASH_MEMACTION` provides a mechanism for the running kernel to
++communicate a single bit attribute per memory page to a kdump kernel. This
++feature can be used by the kdump kernel to exclude certain pages (e.g. holding
++crypto secrets, or cache) from the system memory dump, or to wipe their contents
++after a  crash.
 +
-+	if (mark)
-+		crash_mark_pages(pfn_to_page(pfn), nr_pages, walk->vma);
-+	else
-+		crash_memaction_unmark_pfns(pfn, nr_pages);
-+}
++The meaning of the registry bitmap is set by the ``crash_memaction=`` kernel
++cmdline parameter. The running kernel only sets the bits for the tracked pages,
++and it's up to the kdump kernel to do something with them.
 +
-+static int crash_mark_pmd_entry(pmd_t *pmd, unsigned long addr,
-+		unsigned long end, struct mm_walk *walk)
-+{
-+	pte_t *start_pte, *pte;
-+	spinlock_t *ptl;
++	``crash_memaction={secret|cache}``
 +
-+	if (fatal_signal_pending(current))
-+		return -EINTR;
++Right now, ``secret`` tracks pages containing kernel crypto keys as well as
++pages explicitly marked using ``madvise(2)``. ``cache`` currently only tracks
++pages marked from userspace using ``madvise(2)``.
 +
-+	ptl = pmd_trans_huge_lock(pmd, walk->vma);
-+	if (ptl) {
-+		pmd_t pmdval = *pmd;
++Kernel users
++============
 +
-+		if (pmd_present(pmdval))
-+			madvise_crash_mark_pfns(walk,
-+				pmd_pfn(pmdval) + ((addr & ~PMD_MASK) >> PAGE_SHIFT),
-+				(end - addr) >> PAGE_SHIFT);
-+		spin_unlock(ptl);
-+		return 0;
-+	}
++Kernel code can mark a virtual range in the linear map or in vmalloc space::
 +
-+	start_pte = pte = pte_offset_map_lock(walk->mm, pmd, addr, &ptl);
-+	if (!start_pte)
-+		return 0;
++	void crash_memaction_mark(void *addr, size_t size, int types);
++	void crash_memaction_unmark(void *addr, size_t size);
 +
-+	for (; addr < end; pte++, addr += PAGE_SIZE) {
-+		pte_t ptent = ptep_get(pte);
++Marking is safe from any context and cannot fail. Markings last until the page
++frame is handed out to another user to cover stale data left over after the page
++is free'd.
 +
-+		if (pte_present(ptent))
-+			madvise_crash_mark_pfns(walk, pte_pfn(ptent), 1);
-+	}
++For objects smaller than a page, lib/secret_pool provides allocations from a
++"secret" marked kmem_buckets. Objects can be allocated through secret_pool
++without the need for any additional lifetime/marking tracking.
 +
-+	pte_unmap_unlock(start_pte, ptl);
-+	cond_resched();
-+	return 0;
-+}
++Userspace interface
++===================
 +
-+#ifdef CONFIG_HUGETLB_PAGE
-+static int crash_mark_hugetlb_entry(pte_t *pte, unsigned long hmask,
-+		unsigned long addr, unsigned long end, struct mm_walk *walk)
-+{
-+	struct hstate *h = hstate_vma(walk->vma);
-+	spinlock_t *ptl;
-+	pte_t entry;
++For userspace code, ``MADV_CRASH_SECRET``, ``MADV_CRASH_CACHE`` and
++``MADV_CRASH_RESET`` are provided for use with ``madvise(2)``. Marks show up in
++``/proc/pid/smaps`` as ``cm`` VMA flag. Only anonymous, shmem and hugetlb ranges
++can be marked. Marking is transparent to swapping and lazy allocation.
 +
-+	ptl = huge_pte_lock(h, walk->mm, pte);
-+	entry = huge_ptep_get(walk->mm, addr, pte);
-+	if (pte_present(entry))
-+		madvise_crash_mark_pfns(walk,
-+			pte_pfn(entry) + ((addr & ~hmask) >> PAGE_SHIFT),
-+			(end - addr) >> PAGE_SHIFT);
-+	spin_unlock(ptl);
++Limitations
++===========
 +
-+	return 0;
-+}
-+#endif /* CONFIG_HUGETLB_PAGE */
-+
-+static const struct mm_walk_ops crash_mark_walk_ops = {
-+	.pmd_entry	= crash_mark_pmd_entry,
-+#ifdef CONFIG_HUGETLB_PAGE
-+	.hugetlb_entry	= crash_mark_hugetlb_entry,
-+#endif
-+	.walk_lock	= PGWALK_WRLOCK,
-+};
-+
-+static int madvise_crash_mark_existing(struct vm_area_struct *vma,
-+		unsigned long start, unsigned long end, bool mark)
-+{
-+	if (!static_branch_unlikely(&crash_memaction_active))
-+		return 0;
-+
-+	return walk_page_range_vma(vma, start, end, &crash_mark_walk_ops,
-+				   &mark);
-+}
-+#endif /* CONFIG_CRASH_MEMACTION */
-+
- /*
-  * Application wants to free up the pages and associated backing store.
-  * This is effectively punching a hole into the middle of a file.
-@@ -1585,6 +1679,26 @@ static int madvise_vma_behavior(struct madvise_behavior *madv_behavior)
- 	case MADV_DONTDUMP:
- 		new_flags |= VM_DONTDUMP;
- 		break;
-+#ifdef CONFIG_CRASH_MEMACTION
-+	case MADV_CRASH_SECRET:
-+		if (!vma_is_anonymous(vma) && !vma_is_shmem(vma) &&
-+		    !vma_is_hugetlb(vma))
-+			return -EINVAL;
-+		if (crash_memaction_types() & CRASH_MEMACTION_SECRET)
-+			new_flags |= VM_CRASH_MARK;
-+		break;
-+	case MADV_CRASH_CACHE:
-+		if (!vma_is_anonymous(vma) && !vma_is_shmem(vma) &&
-+		    !vma_is_hugetlb(vma))
-+			return -EINVAL;
-+		if (crash_memaction_types() & CRASH_MEMACTION_CACHE)
-+			new_flags |= VM_CRASH_MARK;
-+		break;
-+	case MADV_CRASH_RESET:
-+		/* Unmarking stays allowed whatever the VMA has become since. */
-+		new_flags &= ~VM_CRASH_MARK;
-+		break;
-+#endif
- 	case MADV_DODUMP:
- 		/* Non-persistent memory cannot be dumped. */
- 		if (!vma_is_persistent(vma))
-@@ -1614,6 +1728,19 @@ static int madvise_vma_behavior(struct madvise_behavior *madv_behavior)
- 	/* This is a write operation.*/
- 	VM_WARN_ON_ONCE(madv_behavior->lock_mode != MADVISE_MMAP_WRITE_LOCK);
- 
-+#ifdef CONFIG_CRASH_MEMACTION
-+	/* The rmap hooks only see the flag as folios arrive, so walk the rest. */
-+	if ((new_flags ^ vma->vm_flags) & VM_CRASH_MARK) {
-+		error = madvise_update_vma(new_flags, madv_behavior);
-+		if (!error)
-+			error = madvise_crash_mark_existing(
-+					madv_behavior->vma, range->start,
-+					range->end,
-+					!!(new_flags & VM_CRASH_MARK));
-+		goto out;
-+	}
-+#endif
-+
- 	error = madvise_update_vma(new_flags, madv_behavior);
- out:
- 	/*
-@@ -1732,6 +1859,11 @@ madvise_behavior_valid(int behavior)
- 	case MADV_KEEPONFORK:
- 	case MADV_GUARD_INSTALL:
- 	case MADV_GUARD_REMOVE:
-+#ifdef CONFIG_CRASH_MEMACTION
-+	case MADV_CRASH_SECRET:
-+	case MADV_CRASH_CACHE:
-+	case MADV_CRASH_RESET:
-+#endif
- #ifdef CONFIG_MEMORY_FAILURE
- 	case MADV_SOFT_OFFLINE:
- 	case MADV_HWPOISON:
++* This mechanism is best-effort. During a crash, nothing can be guaranteed. At
++  page level granularity, some over- or under-marking is to be expected.
++* Marks are tracked only for *mapped* folios, so a shmem file only ever written
++  with ``write(2)`` cannot be covered.
++* A single ``madvise(2)`` call on a folio mapped into several processes globally
++  (un)marks it for all of them.
++* Marks are tracked at page level granularity. There is no refcounting. When
++  trying to mark smaller objects, use lib/secret_pool or a similar mechanism.
++* Memory hotplug is not supported at this time. When memory is hotplugged, the
++  newly hotplugged memory will not be included in the bitmap.
+diff --git a/Documentation/mm/index.rst b/Documentation/mm/index.rst
+index 13a79f5d092c..4cdfc5030a56 100644
+--- a/Documentation/mm/index.rst
++++ b/Documentation/mm/index.rst
+@@ -54,6 +54,7 @@ documentation, or deleted if it has served its purpose.
+    allocation-profiling
+    arch_pgtable_helpers
+    balance
++   crash_memaction
+    damon/index
+    free_page_reporting
+    hmm
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bcb11c2138bc..269b8be6c222 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14256,6 +14256,7 @@ L:	kexec@lists.infradead.org
+ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/liveupdate/linux.git
+ F:	Documentation/admin-guide/kdump/
++F:	Documentation/mm/crash_memaction.rst
+ F:	fs/proc/vmcore.c
+ F:	include/linux/crash_core.h
+ F:	include/linux/crash_dump.h
 
 -- 
 2.55.0
