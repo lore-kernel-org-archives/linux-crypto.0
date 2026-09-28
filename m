@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E8E4D795C;
-	Mon, 28 Sep 2026 14:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84364C8FFE;
+	Mon, 28 Sep 2026 14:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790604075; cv=none; b=jH5GwOUGgjreuyU2FvC8zykjGEV7CbVmawrBZiYjqzLAouvkY99XIl9nGQFgAhojZ19Y191CZ1C9SdM+s3V5tTzD9G03THcEoB/h018Clf3MY5VT1Lz+NQy+juoxKlPE5VgJ1i4Pbc2gt1mdxEzZmY7f7t6gMQz+WU97iuyNMrw=
+	t=1790604421; cv=none; b=nyufM6WaF+iihuNhY6qlOcx2ZR5yB7lDj0kfuv+Ihm2M8q1bI+bv7eoR0vQZ4u0cbNzneyVOe3DE6HruMO1XjN+LGVLm/fJO4xcBB1tPfNlregBonMM+zKS3Bc7ShbAZgm7gfXLMKlnToZaNZdnmu9AopjdFo+NmqZLAFLkqHS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790604075; c=relaxed/simple;
-	bh=lbw7XDXlDheuvl3VXgTjy60ChRepI7UqLKQnA4+YE5Y=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rNyAQ1y0fyeYZkrBFPZXPXXvf3Nc3Aru43S+npxAUmY53cBnWZ/VXCvfRGVJ3UYTTBNVz52RLQTwlsgdHEhncjOvfss+GImwgeyvPYaDR08CIJS9xObLxTw8SYhFHYU5s0ilkamxOcWsd+XQttbche9JmqBfBTi9hZd4MTk16mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Td+XxIbv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1790604421; c=relaxed/simple;
+	bh=rjb62LS2EAfHJHrEK2dlUefkAbXZgfuGW1JH8vEiC/o=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KT0HzUWMnwDKTLER6htPe23tlOIMr7Za78Tl7ofHkm2UUFW/ElGcpiKZyQuffgWlAtiGg9qFwwqjb/D/vfuJ0vl316EOwNWcPzCAnTCWwM61jtjQ0sHy8MG+Ot8mqS97g6iepN36+ET27MODtzcrhN1XmViN9wQzv3Tr5d22B50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ApG6lPGn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Td+XxIbv"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C055C4AF12;
-	Mon, 28 Sep 2026 14:01:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ApG6lPGn"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 417C3C4AF0B;
+	Mon, 28 Sep 2026 14:07:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1790604075;
-	bh=lbw7XDXlDheuvl3VXgTjy60ChRepI7UqLKQnA4+YE5Y=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=Td+XxIbvrCniXuiL4evnvrVYuugNDdo+qkWBXEHUSitcQtjDE7Vn6wgrSkXneT50d
-	 X3o2/4cFUapX2RO3Bs2XgLRA3BTiMRKqitu1rlnD90itE5wtd5b5ej+fh2Zu1cMyb+
-	 7zLSK/PTABzvOve+B3Vf+a4jqly09SxudedKA7Qez7dBMPxRQDZCp1wNJLk2B1WNAH
-	 KTpjywUSx/tY8VOpMYvmD1qr9iGI0FpQRiaEH8yt0vGRJ1H7zDAWnA+Cmio439ORCE
-	 Xc3Zj2wxvoYH5Xlvu++Y6SHq4UCdao0snVr+cbTz8fD/kdX1EFiKU2mLlv5B5YJPlp
-	 3ny97U9/HhwwA==
+	s=k20201202; t=1790604421;
+	bh=rjb62LS2EAfHJHrEK2dlUefkAbXZgfuGW1JH8vEiC/o=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=ApG6lPGnPZAdpez+ls6BEwhBXEYPByCQOjxLJ+nnfgKIniTZrfK2+JOEiRUCLPpiz
+	 h/FM2ctAbGXaQCqYwJu8rYo1TcIB4SzAwbV86QWOxj7LzmkjhemGHzWfTrhIe9MIIq
+	 Tt7ub51jyHxeT9dAM47hKVCt99NfPgYLbKXdlIqpGQyqkCyRQGCpc8kA72S1zFCQ5Q
+	 VyR7Nlgb3kmnj+H/5yVdSNOjszmyojBdLEqKVidToMedPf+tx3lm7sXfR0uSwumcn/
+	 ksp3w1qqmEbHEgappUi34aYELC2Zyp1uDT5xkXeKbHXl/XCfBEZBGE1/ZhS8vUw6iK
+	 uPjtcDTxP8r0Q==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D01CA5FA2;
-	Mon, 28 Sep 2026 14:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DDD6CA5FA6;
+	Mon, 28 Sep 2026 14:07:01 +0000 (UTC)
 From: Vincent Jardin via B4 Relay <devnull+vjardin.free.fr@kernel.org>
-Date: Mon, 28 Sep 2026 16:01:03 +0200
-Subject: [PATCH 1/3] crypto: caam/qi2 - algorithm priority be a parameter
+Date: Mon, 28 Sep 2026 16:06:56 +0200
+Subject: [PATCH] crypto: caam/qi2 - reset the DPSECI at probe only when
+ enabled
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,24 +40,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260928-for-upstream-caam-qi2-priority-v1-1-e4a8e5f01dbc@free.fr>
-References: <20260928-for-upstream-caam-qi2-priority-v1-0-e4a8e5f01dbc@free.fr>
-In-Reply-To: <20260928-for-upstream-caam-qi2-priority-v1-0-e4a8e5f01dbc@free.fr>
+Message-Id: <20260928-for-upstream-caam-qi2-dpseci-reset-v1-1-042be6c05472@free.fr>
+X-B4-Tracking: v=1; b=H4sIAH90umoC/x2NwQ6CMBAFf4XsmU2gIgK/YjzU9hX3INRdNCaEf
+ 7fxMslcZnYyqMBoqnZSfMRkXYq0dUXh4ZcZLLE4ucb1zegGTqvyO9um8E8OvuAljmM2BGGFYeP
+ zeGnjcErdvUtUQlmR5PufXG/H8QOy3DuhdAAAAA==
 To: =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, 
  Pankaj Gupta <pankaj.gupta@nxp.com>, 
  Sahil Malhotra <sahil.malhotra@nxp.com>, 
  Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Gaurav Jain <gaurav.jain@nxp.com>
+ "David S. Miller" <davem@davemloft.net>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, Vincent Jardin <vjardin@free.fr>
+ Vincent Jardin <vjardin@free.fr>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790604073; l=2919;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790604419; l=1994;
  i=vjardin@free.fr; s=20260525; h=from:subject:message-id;
- bh=FoDedHHY6DKLXx6MwRuYNgLGVMx6qX1+U5vA+e03fhk=;
- b=yzcvSTiMigoIq1oKq70QRFIIrgwFLOTSdfY/dVXJysopYds6mUgsm96EyWu1P6gkd0rEiRBpx
- b2/vlf0DyEXCRNSI/o+8YvU9kMrlm7/MZVj8x9SEN5qmkanO8sqTSe9
+ bh=64VY4tkbF5YIprmJtGNmeGjNbSHu8M2PhnkG7m0FjNk=;
+ b=CBnORxWR3872L1eaK2z5NVlQtTdwHgCmKeIvcfWveQzvlrEYka2Fl5j+x6gHK9eLxwfMa1iiL
+ aqdGIkdTNQKBoNesJ+hoIHvMP10jChPM6DLySTAWTEVf6XF2i8mNMng
 X-Developer-Key: i=vjardin@free.fr; a=ed25519;
  pk=hppgLeFpGpKOi7LNwGEZ4jOYofJCoGd4Jf1ltAabiLw=
 X-Endpoint-Received: by B4 Relay for vjardin@free.fr/20260525 with
@@ -67,82 +66,63 @@ Reply-To: vjardin@free.fr
 
 From: Vincent Jardin <vjardin@free.fr>
 
-dpaa2_caam registers every skcipher, aead and ahash at a fixed priority
-of 2000.
+Since the commit
+  060ce5037d5f ("crypto: caam/qi2 - add support for dpseci_reset()")
+probe resets every DPSECI.
 
-It is above the ARMv8 Crypto Extensions (200 to 300), so on any DPAA2 SoC,
-every in-kernel user of AES, SHA or GCM moves from the CPU to the SEC,
-whatever the request size.
+On a DPSECI the MC has just created from the DPL, never enabled,
+MC 10.40.x then logs for each of its queues:
 
-Whether the SEC should be the default or only be reached by driver name
-depends on the system, and there is no way to choose/tune it.
+  [E, qbman_rec_isr:396, QBMAN]  QBMAN recoverable event 0x1000000
+  [E, dpmng_dump_rerr_fqid:1335, QBMAN]  REL_FQ (FQ[0]) has 1 messages, dumping up to 16:
+  [W, DPSECI]  DPSECI ID[0]: Flush on queue 43 not confirmed
 
-Add a priority parameter
-  dpaa2_caam.priority=
-on the command line
+That is 16 error lines for an 8-queue DPSECI, at every boot, although
+there is nothing to flush: a disabled DPSECI has no request in flight.
+
+The reset at remove is unchanged.
 
 Signed-off-by: Vincent Jardin <vjardin@free.fr>
 ---
- drivers/crypto/caam/caamalg_qi2.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 6b47bcc16a50..dbb84a6996a2 100644
+index 6b47bcc16a50..6dccbd3b27a3 100644
 --- a/drivers/crypto/caam/caamalg_qi2.c
 +++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -28,6 +28,13 @@
+@@ -5041,11 +5041,22 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
+ 	dev_info(dev, "dpseci v%d.%d\n", priv->major_ver, priv->minor_ver);
  
- #define CAAM_CRA_PRIORITY	2000
- 
-+static unsigned int priority;
-+module_param(priority, uint, 0444);
-+MODULE_PARM_DESC(priority,
-+		 "Crypto API priority of the algorithms (0: default, 2000)");
+ 	if (DPSECI_VER(priv->major_ver, priv->minor_ver) > DPSECI_VER(5, 3)) {
+-		err = dpseci_reset(priv->mc_io, 0, ls_dev->mc_handle);
++		int enabled;
 +
-+static int cra_priority = CAAM_CRA_PRIORITY;
++		err = dpseci_is_enabled(priv->mc_io, 0, ls_dev->mc_handle,
++					&enabled);
+ 		if (err) {
+-			dev_err(dev, "dpseci_reset() failed\n");
++			dev_err(dev, "dpseci_is_enabled() failed\n");
+ 			goto err_get_vers;
+ 		}
 +
- /* max key is sum of AES_MAX_KEY_SIZE, max split key size */
- #define CAAM_MAX_KEY_SIZE	(AES_MAX_KEY_SIZE + CTR_RFC3686_NONCE_SIZE + \
- 				 SHA512_DIGEST_SIZE * 2)
-@@ -3014,7 +3021,7 @@ static void caam_skcipher_alg_init(struct caam_skcipher_alg *t_alg)
- 	struct skcipher_alg *alg = &t_alg->skcipher;
++		if (enabled) {
++			err = dpseci_reset(priv->mc_io, 0, ls_dev->mc_handle);
++			if (err) {
++				dev_err(dev, "dpseci_reset() failed\n");
++				goto err_get_vers;
++			}
++		}
+ 	}
  
- 	alg->base.cra_module = THIS_MODULE;
--	alg->base.cra_priority = CAAM_CRA_PRIORITY;
-+	alg->base.cra_priority = cra_priority;
- 	alg->base.cra_ctxsize = sizeof(struct caam_ctx) + crypto_dma_padding();
- 	alg->base.cra_flags |= (CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
- 			      CRYPTO_ALG_KERN_DRIVER_ONLY);
-@@ -3028,7 +3035,7 @@ static void caam_aead_alg_init(struct caam_aead_alg *t_alg)
- 	struct aead_alg *alg = &t_alg->aead;
- 
- 	alg->base.cra_module = THIS_MODULE;
--	alg->base.cra_priority = CAAM_CRA_PRIORITY;
-+	alg->base.cra_priority = cra_priority;
- 	alg->base.cra_ctxsize = sizeof(struct caam_ctx) + crypto_dma_padding();
- 	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
- 			      CRYPTO_ALG_KERN_DRIVER_ONLY;
-@@ -4659,7 +4666,7 @@ static struct caam_hash_alg *caam_hash_alloc(struct device *dev,
- 	alg->cra_init = caam_hash_cra_init;
- 	alg->cra_exit = caam_hash_cra_exit;
- 	alg->cra_ctxsize = sizeof(struct caam_hash_ctx) + crypto_dma_padding();
--	alg->cra_priority = CAAM_CRA_PRIORITY;
-+	alg->cra_priority = cra_priority;
- 	alg->cra_blocksize = template->blocksize;
- 	alg->cra_alignmask = 0;
- 	alg->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY;
-@@ -5208,6 +5215,9 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
- 
- 	caam_imx = false;
- 
-+	if (priority)
-+		cra_priority = priority;
-+
- 	dev = &dpseci_dev->dev;
- 
- 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+ 	err = dpseci_get_attributes(priv->mc_io, 0, ls_dev->mc_handle,
 
+---
+base-commit: 67aefeccc4101a93627f36abbd049f191b54f903
+change-id: 20260928-for-upstream-caam-qi2-dpseci-reset-5971d83f4b4f
+
+Best regards,
 -- 
-2.43.0
+Vincent Jardin <vjardin@free.fr>
 
 
