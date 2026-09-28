@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FB24D9908;
-	Mon, 28 Sep 2026 14:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64EB20010A;
+	Mon, 28 Sep 2026 14:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790605763; cv=none; b=SAwazMpou0JRaiRAdJJ5prj76Ejc91Ad8IV4hrS3r0NZAEUJvlDmVW94A5exT6Ekza+tVPR8kiuQdnJV0QEpkh7nTPP5BHqvDqrUfD14c5TTr5B3Jj4ZLjnfHt3OvFz+ZgIauG/u3NfSbDS3ocBzn58ieVlI7+mUQCF++HDE0NM=
+	t=1790605776; cv=none; b=Kt2ZBOsTHB8EDP2OlNLRU3HMv9aBdKfd9IoipXQMZLfGqxMqSQ3bn1KsdJG6NA9kTX480biYCcOa1ySKllXy42HhA6rqXsxW27+FE1BALuMVCK6hGZg/LO/8V2Qh9DgoxeRhgwN6dpQFL/eZNAr7hn5fvhZ887wDe8GSyXsbGi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790605763; c=relaxed/simple;
-	bh=QVRWFLw76zgCtb7Dk0+R/Mu4NDb54jeLKb2zAJjJsIQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BCIl2QcwxMblRtb6V+TbOJU6GLAKY3UaTiczeJDehCofPWgc+BABd5zdA3P1Hth+qJ9b2rjLOn6Jo3Euzm1azAwmak+6Zn/xQMZOHuW65nLZVvsXfhokwgmc0+GXX/K16+7ZgEN+PThqAHkOxfhDn6U8WLGb+/vW5u2dTHt9aBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/ghxvVF; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790605776; c=relaxed/simple;
+	bh=IyMAtB9cbjsiIH/TGlu9jcnjk9wBC5bT3ub/aG6oRTk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L9h3kxCnwOtmGWXjWKOTj0uqRAbPHE1lbNU59NMiLHTuP7KYdyrLoleVUkUgX72G6NqMTKVtav0FP86ecoqNSnsTaY7udobq7b+lhjwXs7clpGVP0tQXf2LjfMySBDUzy5boXWMmuSGzktKc2BiDXAiSwdVSpg/xSF8k/VWDwwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cllssm3L; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N/ghxvVF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E5F1F000FF;
-	Mon, 28 Sep 2026 14:29:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cllssm3L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 943EE1F00893;
+	Mon, 28 Sep 2026 14:29:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790605761;
-	bh=UWCMYFvLNAm68dl9T3p5+ei0mitspgrPR0ZgUvMplx4=;
-	h=From:To:Cc:Subject:Date;
-	b=N/ghxvVFzeM7ZM0edHvlEWjV6tkzS0tfZ9dGHsuTbydx102IBb+Uy5wajLYWomwU5
-	 dQD98F2WlQpzb6NgbSg9uzCRKD90WwdEjg2Ehe3MTvm33ML/MtxmhAcD3LkvOJfz9e
-	 w12EhLDkvzDUvifx/J8IjGmAmTQ+N9etWAnTgK1IMSjUZItyZQ7qtmHCFXDRdyxKnC
-	 dL1k7MS9bSQgrcXidTF71kJVb5H6BAAcfKYXWMwDUb+PS99i1n186Fs4RkHWWLyusq
-	 yeOCJOSJOFjoiiOc+VRZ2X3Z1iT8KZIpjcUXrYnNG4WGtX4kAngJiJeVvReMdZmjhB
-	 /HVtYc4eVKz8g==
+	s=k20260515; t=1790605775;
+	bh=hENkM5jtUQlxWUVRVmB2Y3HGiTekSFtmW2vKEK3DXWs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Cllssm3LYvSI8akntOXuWzEnLDlf+FJFyRcfB2c1OMLaPesPIIxKYPuXVNS/5EOh8
+	 YOtumZ+eJ1+ztycOb0yLkK324ss9N4cbSE1lAxabBLjSCK+0UWaptAwURo2LKcaTtB
+	 0sVF03gnmjkGEnli62PjGD/xwxSaVqMmZGvJhE+zwW5EDs7PqCB2a8GXK6TLyXeZys
+	 7/ydXGqnFJgpUb19ZUIbZm2UCuuKoeT0IVdkQZpKB2pISoOrGWLLAxHbagBtFwR9to
+	 HT8V+dsWBp0EY/Q1lG+NsY+GHeQCl3rBCpNcQBk99+qJ4CUVrBFA1nvD3ZNoqzMVsW
+	 O1zHcMolz7c9g==
 From: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>
 To: "Paul E . McKenney" <paulmck@kernel.org>,
 	Frederic Weisbecker <frederic@kernel.org>,
@@ -58,10 +59,12 @@ Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
 	linux-crypto@vger.kernel.org,
 	bpf@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [RFC PATCH 0/3] fprobe, rcu/tasks, rhashtable: Switch fprobe and BPF kprobe-multi to Tasks-Rude RCU
-Date: Mon, 28 Sep 2026 23:29:13 +0900
-Message-ID: <179060575297.372125.10581329083761385407.stgit@devnote2>
+Subject: [RFC PATCH 1/3] rcu/tasks: Export call_rcu_tasks_rude()
+Date: Mon, 28 Sep 2026 23:29:27 +0900
+Message-ID: <179060576723.372125.8212099501235098804.stgit@devnote2>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <179060575297.372125.10581329083761385407.stgit@devnote2>
+References: <179060575297.372125.10581329083761385407.stgit@devnote2>
 User-Agent: StGit/0.19
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -72,99 +75,80 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
-Here is an RFC patch series which removes standard RCU read lock
-(guard(rcu) and rcu_read_lock()) from fprobe callback paths
-by switching fprobe and BPF multi-kprobe to Tasks-Rude RCU.
+Currently call_rcu_tasks_rude() is static and private to
+kernel/rcu/tasks.h, while synchronize_rcu_tasks_rude() is exported.
+Subsystems that execute handlers under preempt_disable() (such as
+fprobe and BPF kprobe-multi) cannot safely wait on
+synchronize_rcu_tasks_rude() in atomic or asynchronous contexts
+without an asynchronous call_rcu_tasks_rude() variant.
 
-Motivation & Problem
-====================
+Make call_rcu_tasks_rude() non-static, declare it in
+include/linux/rcupdate.h, and export it via EXPORT_SYMBOL_GPL().
+Also provide fallbacks to call_rcu when Tasks Rude RCU is not
+configured.
 
-Currently, fprobe entry and exit callbacks (fprobe_fgraph_entry,
-fprobe_return, and fprobe_ftrace_entry) execute in the tracing hot
-path where preemption is disabled.
-
-However, fprobe was forced to wrap hash lookups with guard(rcu)() and
-rcu_read_lock() because:
-
-- rhashtable defers bucket table deallocation using standard RCU
-- unregister_fprobe() and BPF waited for a standard RCU grace period
-
-Taking standard RCU read locks in the tracing fast path introduces
-several drawbacks:
-
-1. Unnecessary Runtime Overhead:
-   Every probe hit manipulates current->rcu_read_lock_nesting with
-   memory barriers, and rcu_read_unlock() adds conditional branches
-   to check for special quiescent processing.
-   On debug kernels with CONFIG_PROVE_RCU=y or CONFIG_LOCKDEP=y,
-   this additionally acquires and releases lockdep maps on every hit,
-   introducing severe lockdep hashing overhead and tracer recursion risks.
-
-2. Fragile Dependency on rcu_is_watching():
-   Standard RCU treats idle CPUs (and user-space on nohz_full CPUs) as
-   Extended Quiescent States (EQS). If a function is traced while
-   rcu_is_watching() is false, standard RCU is blind to the read-side
-   critical section. In such contexts, synchronize_rcu() does not wait
-   for the reader (risking Use-After-Free), and lockdep emits an
-   "RCU-illegal: rcu_read_lock() used while not watching!" warning.
-   To avoid this, ftrace callbacks normally require FTRACE_OPS_FL_RCU,
-   adding extra trampoline check overhead.
-
-3. Asymmetric Synchronization with fprobe_return():
-   fprobe_return() executes under preempt_disable_notrace() without
-   holding rcu_read_lock(). Prior to this series, unregister_fprobe()
-   only waited on synchronize_rcu(), which does NOT wait for pure
-   preempt-disabled sections, leaving a potential Use-After-Free window
-   during probe unregistration.
-
-I've tried to fix the last UAF with simply introducing guard(rcu)()[1]
-but Sashiko found the 2nd problem [2]. So I decided to implement this
-series.
-
-[1] https://lore.kernel.org/all/179055575009.241711.6358052647499787191.stgit@devnote2/
-[2] https://lore.kernel.org/all/20260928005114.9C9FC1F000FF@smtp.kernel.org/
-
-
-Solution: Tasks-Rude RCU
-========================
-
-Because fprobe callbacks already run strictly within preempt-disabled
-contexts, we can transition fprobe and its deferred table reclamation
-to Tasks-Rude RCU:
-
-- Tasks-Rude RCU detects grace periods via schedule_on_each_cpu(),
-  forcing a schedule on every online CPU. This guarantees that all
-  preempt-disabled sections that began prior to the grace period have
-  completed before memory is reclaimed.
-- Unlike standard RCU, Tasks-Rude RCU does not rely on dyntick-idle /
-  EQS tracking. It does NOT require rcu_is_watching() to be true and
-  does not trigger lockdep warnings in pre-RCU/idle execution paths.
-- Within fprobe, guard(rcu)() is replaced with guard(rcu_sched_notrace)(),
-  reducing the lookup lock to pure, non-tracing preempt counter
-  increments without lockdep or RCU state manipulation.
-
-Feedback and suggestions from RCU, BPF, and tracing maintainers are welcome!
-
-Thank you,
-
+Assisted-by: LLM
+Signed-off-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
 ---
-base-commit: 5bfa9f1a9dcb6ecb607adbc1c0226605c972935b
+ include/linux/rcupdate.h |    6 ++++++
+ kernel/rcu/tasks.h       |    8 +++-----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-Masami Hiramatsu (Google) (3):
-      rcu/tasks: Export call_rcu_tasks_rude()
-      rhashtable: Add use_tasks_rude parameter to defer bucket table free
-      fprobe: Switch fprobe and BPF kprobe-multi to Tasks-Rude RCU
+diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
+index 44c07a66edff..dca61b52dc8c 100644
+--- a/include/linux/rcupdate.h
++++ b/include/linux/rcupdate.h
+@@ -198,7 +198,11 @@ void rcu_tasks_torture_stats_print(char *tt, char *tf);
+ 
+ # ifdef CONFIG_TASKS_RUDE_RCU
+ void synchronize_rcu_tasks_rude(void);
++void call_rcu_tasks_rude(struct rcu_head *rhp, rcu_callback_t func);
+ void rcu_tasks_rude_torture_stats_print(char *tt, char *tf);
++# else
++# define call_rcu_tasks_rude call_rcu
++# define synchronize_rcu_tasks_rude synchronize_rcu
+ # endif
+ 
+ #define rcu_note_voluntary_context_switch(t) rcu_tasks_qs(t, false)
+@@ -210,6 +214,8 @@ void exit_tasks_rcu_finish(void);
+ #define rcu_note_voluntary_context_switch(t) do { } while (0)
+ #define call_rcu_tasks call_rcu
+ #define synchronize_rcu_tasks synchronize_rcu
++#define call_rcu_tasks_rude call_rcu
++#define synchronize_rcu_tasks_rude synchronize_rcu
+ static inline void exit_tasks_rcu_start(void) { }
+ static inline void exit_tasks_rcu_finish(void) { }
+ #endif /* #else #ifdef CONFIG_TASKS_RCU_GENERIC */
+diff --git a/kernel/rcu/tasks.h b/kernel/rcu/tasks.h
+index 627295396cd9..f0b524d5f3f5 100644
+--- a/kernel/rcu/tasks.h
++++ b/kernel/rcu/tasks.h
+@@ -1355,7 +1355,7 @@ static void rcu_tasks_rude_wait_gp(struct rcu_tasks *rtp)
+ 	schedule_on_each_cpu(rcu_tasks_be_rude);
+ }
+ 
+-static void call_rcu_tasks_rude(struct rcu_head *rhp, rcu_callback_t func);
++void call_rcu_tasks_rude(struct rcu_head *rhp, rcu_callback_t func);
+ DEFINE_RCU_TASKS(rcu_tasks_rude, rcu_tasks_rude_wait_gp, call_rcu_tasks_rude,
+ 		 "RCU Tasks Rude");
+ 
+@@ -1376,14 +1376,12 @@ DEFINE_RCU_TASKS(rcu_tasks_rude, rcu_tasks_rude_wait_gp, call_rcu_tasks_rude,
+  *
+  * See the description of call_rcu() for more detailed information on
+  * memory ordering guarantees.
+- *
+- * This is no longer exported, and is instead reserved for use by
+- * synchronize_rcu_tasks_rude().
+  */
+-static void call_rcu_tasks_rude(struct rcu_head *rhp, rcu_callback_t func)
++void call_rcu_tasks_rude(struct rcu_head *rhp, rcu_callback_t func)
+ {
+ 	call_rcu_tasks_generic(rhp, func, &rcu_tasks_rude);
+ }
++EXPORT_SYMBOL_GPL(call_rcu_tasks_rude);
+ 
+ /**
+  * synchronize_rcu_tasks_rude - wait for a rude rcu-tasks grace period
 
-
- include/linux/rcupdate.h         |    6 +++
- include/linux/rhashtable-types.h |    2 +
- kernel/bpf/syscall.c             |    2 +
- kernel/rcu/tasks.h               |    8 ++---
- kernel/trace/fprobe.c            |   66 +++++++++++++++++++++-----------------
- lib/rhashtable.c                 |    5 ++-
- 6 files changed, 54 insertions(+), 35 deletions(-)
-
--- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
