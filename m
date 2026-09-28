@@ -1,213 +1,131 @@
-Received: from mail-ej2-f42.google.com (mail-ej2-f42.google.com [74.125.228.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9015D4B7A32
-	for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2026 11:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408654CE681
+	for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2026 13:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790596517; cv=none; b=SlP4Uv5yBs3ppu4m/WYqEpKS2MzdctKKiv1Yuoz6Zli6F69avJtvQfeVowEBjPwy+udLOr23Keje8V/nUYShzW7gXpoqhctgKCGR0zx3yI5Sye916zDQ4yq8L4tccTOcQWPUJ2aQhvE2X0RYgx5XbonGraoff4z+oAQZlALSAn4=
+	t=1790602991; cv=none; b=qwFWrxBnbreNjiaT5D5oTWDbdH0+n5TBeRd8+s7VpeC30cuOV6pAngWONpz9/AXdKVus9pONAVnbQwE2AMDNsunpk5jWf2NTIK+IHSNISRJiZVkvhhyTQhpyr/uRaOFVLgt72y2QVsTBAgSNiR+QM1CCCmXNTB4NK5BXcLlGXmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790596517; c=relaxed/simple;
-	bh=cQAChtepgMpC3QAC/HxIQYzzUCwW6JkrFd27BgpOpRo=;
+	s=arc-20240116; t=1790602991; c=relaxed/simple;
+	bh=LAfG9aZjGdrhKCf/58E+Lupe9Ivg/F16AB6VzU/JCk0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b39QuaSW1ROlC9Vc5fso7OYym2+5Pe2Oiu/Zp6uHWjG3zG6HMQT9ym7EhA/R7eXIkmOxP1LtkXYkwaN8d0ZAXtOUPJk+k8Rwb3ICNzpmi3Jmnlg/4aXJEautcGqSC2CDdcjEBXWSuz+fN59Nt5OkBmQm0axqXVUbNrqPQLRIRpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.228.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej2-f42.google.com with SMTP id a640c23a62f3a-c2da4eea067so206161766b.3
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2026 04:55:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790596514; x=1791201314;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=QRj08SUQ00B6c/vwfuBc/4g/UNksF46V58efjI36W1s=;
-        b=dpweD+1rbt9Ye85llPaKNGYyoasJmxtDbseUQgAoIx5fq0duxPkEEIiqr0yEWEh2FB
-         s3VTqEPCysEZu7PP97r0z+0627XtYAZhQQAqLLmzlQJAca9XRDOYciiRduK+ysw2KVyl
-         oxqEKAm7Xz4i9EIPXtg0A6pbVcDuRyBHBI/qEVbxauo1gH/5Sa6rS3tlkL/QX5S4QKvf
-         G7bgVX1ISYjUjPRwH9ghYlAnQpBxOE7gmQENYr8OHgAL8RTiahiDQEEp07s/s0nRBOzX
-         s9491tcmFGAzr1I6f/HowYB1orInDhXOSbV9PwrmyctCpilRqTDGGirpMwwlT+K/FCdc
-         HeDw==
-X-Gm-Message-State: AFuF++msSRH1RkiPdab4tYPsHkWCsLUQFtptvpo9e+QtNkCRcs4nZUJJ
-	h+X3Nx+vVVPXykyTGWn6c4LP8NapESWVSuf4j5GEWwWSavBejfBwDXk3bD/t5XAugJo=
-X-Gm-Gg: AYBFou3hnvFDfNat2TDZZXZvRv4DWrvM8q/BycjxYel4QGMd9nsml71Dp3T1k5D/2HF
-	dkbrhXm2G8CvEBYHNuRVSaYbQhYEFQdQFKKaw/sO7Su7tCn250LSNumdABeHtd7a+MW5PhnATHH
-	6PK5TsfihkKhMLBZzzmJmbaHcBAF21Zk2wbr9fQuDpwZJdnxtSgVH2iRvSEn+mTuFvm1n2oFkHj
-	dsoAPaTDI0S2J4AeYznlMyr+rJ8svyvWwzXp2ly3kCVrFgwBJBq/PzpU1Sy4R8PvGG4A5CNCnMC
-	T9bGcASzOvW1MYmp5lytE4vdeVnpasPMLFKTdkL1q0WfzEOqn5LNAtcsubzMlunJw3CKFI5CUYW
-	l9SSi2fgshuM26qi6iPIS5RZ7sYBRIWMCumqTBr0QS9HYOcG1rg8eFRbY1lt4ZafIvi06GViT8H
-	Sqtmt1Uj81olZpCZqf/RATsoIQnMgjU+rv20jdqBbLLrMoUi2hHjJavpx63zrb8E60qkJemnWHQ
-	qsxRf/N1tYWPyGpJirekOIB24U0llM=
-X-Received: by 2002:a17:907:ea91:b0:c29:45f6:6a1d with SMTP id a640c23a62f3a-c2ac5507183mr975334766b.43.1790596513408;
-        Mon, 28 Sep 2026 04:55:13 -0700 (PDT)
-Received: from mail-ed2-f33.google.com (mail-ed2-f33.google.com. [74.125.228.97])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2dd1153f09sm176785166b.15.2026.09.28.04.55.10
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Sep 2026 04:55:11 -0700 (PDT)
-Received: by mail-ed2-f33.google.com with SMTP id 4fb4d7f45d1cf-6ac6fa788e6so1570537a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2026 04:55:10 -0700 (PDT)
-X-Received: by 2002:a17:907:c308:b0:c28:ec7c:27ae with SMTP id
- a640c23a62f3a-c2ac5396f65mr1010475866b.25.1790596507876; Mon, 28 Sep 2026
- 04:55:07 -0700 (PDT)
+	 To:Cc:Content-Type; b=bGSUlTllFvji/jCqBF16LFgeF9c5bf46vrS1eIlPeqaPO9Q95KjtS/RPkY0NIyCjIihYl7wL5UkxChKFTMqDFnXm4TdKOjkfYAXutS9FhfmEJL9aDDsQzPGSl0gtwrl4K+vu1eJZd9KKGVJTMkymyoagwYTdoaOxjgxYDasVr4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XqgwPDhN; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XqgwPDhN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D20181F00898
+	for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2026 13:43:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790602988;
+	bh=KhMGxUvRlRgkjraFBvxRRPukh6cwxdgVureX0v0+n4g=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=XqgwPDhN/UCUkPF09xSf+JZzOnf+JLMeW+aF1DWSWGeSSdZjF0vTWKEoP/AZNss0x
+	 h2sggBfT0YCdHVdVc5t7BYeqx6OLpqdhTjx3xECXnFs9ofzNp+LzrHGSGNUVKzjgxy
+	 258QZwNIGi8BmRKb/Mt6XU4QHgD4uefN1BBXMmLtPMQenLPh2fc28zI5nOKnBDP6XJ
+	 GMDWgbwE2Iq+42tslszYitegdOoW4H0bHHZzz1gCYD5U5xMlXELp0Z2mH/As4gfK+5
+	 yroTVB5B+ukJzW/NA2d9lfFaXMoZLUD9J83TkGD8V/rG61Yhi7HuvX5tuI2G6rbVSO
+	 SVNptfreJTUEA==
+Received: by mail-ed2-f34.google.com with SMTP id 4fb4d7f45d1cf-6aae90f528fso4380141a12.1
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Sep 2026 06:43:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBw7jGsxiXnPaiye2+3mRpzrtKN12L4jvCCFvJ7YXZFpVmaQSmEa7b1FM5z3snlIIxrr3J9P80YFVXmB3Xg=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJQDqA2PCF2fD+Q1lHVuLbDg/4ao8sTemXO8g1dWkKkdkJBlcDf
+	+YYIfAcalKpC6Hrlbw40CbTVDXSVNdMzK6FHzCWdvYEVnr7ypSCYrpj81XR+FwTu2j/7SwMCFlT
+	AnWUIjppNV0/lFzMgm11bJGOMO8w3daQ=
+X-Received: by 2002:a05:6402:52d6:b0:6ac:9a44:d412 with SMTP id
+ 4fb4d7f45d1cf-6ac9a451421mr453774a12.7.1790602987498; Mon, 28 Sep 2026
+ 06:43:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4a0b2e00f5cc62c173a01fec2f56eab1b04d70bb.1790568982.git.xuyuqiabc@gmail.com>
-In-Reply-To: <4a0b2e00f5cc62c173a01fec2f56eab1b04d70bb.1790568982.git.xuyuqiabc@gmail.com>
-From: Ignat Korchagin <ignat@linux.win>
-Date: Mon, 28 Sep 2026 12:54:56 +0100
-X-Gmail-Original-Message-ID: <CAOs+rJUaq6W_TBh-rThhd_N4Aj33sndvYhEA6=zOVGBbz7NP4g@mail.gmail.com>
-X-Gm-Features: AclHuK_Wg6kgdXGN_cBEZ2B8n--Ssk5P9tVcVa6IjqC_p1OFoCo87o4XkTq72pA
-Message-ID: <CAOs+rJUaq6W_TBh-rThhd_N4Aj33sndvYhEA6=zOVGBbz7NP4g@mail.gmail.com>
-Subject: Re: [PATCH v2] KEYS: Account for asymmetric key payload data in the quota
-To: Yuqi Xu <xuyuqiabc@gmail.com>
-Cc: linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, 
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
-	Rusty Russell <rusty@rustcorp.com.au>, stable@vger.kernel.org, Vega <vega@nebusec.ai>, 
-	Ren Wei <weir@nebusec.ai>, xuyq21@lenovo.com
+References: <20260923084802.29508-1-zhaoqunqin@163.com>
+In-Reply-To: <20260923084802.29508-1-zhaoqunqin@163.com>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Mon, 28 Sep 2026 21:42:56 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7+oXvoFbY1TDyRhYCgLXncRWNzpWrEBxpm6rwb_u8g5Q@mail.gmail.com>
+X-Gm-Features: AclHuK9T9s7VHBe8CzWdrIsP39KtE45HD6piVqFEHQ4lotnnM54AAYzrWUKy_1w
+Message-ID: <CAAhV-H7+oXvoFbY1TDyRhYCgLXncRWNzpWrEBxpm6rwb_u8g5Q@mail.gmail.com>
+Subject: Re: [PATCH v8 0/2] mfd: loongson-se: Add multi-node support and fix
+ miscellaneous issues
+To: Qunqin Zhao <zhaoqunqin@163.com>
+Cc: lee@kernel.org, zhaoqunqin@loongson.cn, linux-kernel@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, mfd@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 28, 2026 at 9:27=E2=80=AFAM Yuqi Xu <xuyuqiabc@gmail.com> wrote=
-:
->
-> add_key("asymmetric", ...) preparses the supplied blob and then
-> instantiates the key with generic_key_instantiate(), which charges
-> prep->quotalen to the owning user's key quota through
-> key_payload_reserve().
->
-> pkcs8_parse() duplicates the attacker-controlled PrivateKey OCTET
-> STRING with kmemdup() into pub->key. pkcs8_key_preparse() stores that
-> object in the asymmetric-key payload but hard-codes prep->quotalen to
-> 100, so the quota records 100 bytes regardless of the retained private
-> key size. The ASN.1 decoder accepts blobs up to 65535 bytes, so one
-> key can pin about 64 KiB while consuming 100 quota bytes. With the
-> default non-root limits (200 keys / 20000 bytes) a user can retain
-> roughly 12 MiB instead of the 20 KiB the limit is meant to allow.
->
-> x509_key_preparse() keeps the parsed public key, its parameters, the
-> signature and the authority key IDs, but also charges a fixed 100
-> bytes. PKCS#8 later repeated the same fixed-100 accounting. The same
-> add_key() call reaches the X.509 parser, so fixing only PKCS#8 would
-> leave the bypass reachable.
->
-> Charge the size of the retained payload instead. An oversized PKCS#8
-> key now fails with -EDQUOT instead of being accepted for 100 bytes,
-> and the same applies to an X.509 certificate that retains an oversized
-> public key or set of authority key IDs.
->
-> Measured on v7.3-rc1 (10396a2d6d41), 2 vCPU / 2 GiB QEMU guest, as uid
-> 1000, adding PKCS#8 keys with a 65000-byte PrivateKey field. Before
-> the patch, 176 keys were retained (about 11.4 MiB) while
-> /proc/key-users charged only 19712 bytes. After the patch the
-> oversized key is rejected immediately, and a 200-byte PrivateKey still
-> loads and is charged 264 bytes. A small X.509 certificate whose only
-> large object is a 26000-byte authorityKeyIdentifier is likewise
-> rejected, while the unpatched kernel accepted it and charged 109
-> bytes.
->
-> Fixes: c26fd69fa009 ("X.509: Add a crypto key parser for binary (DER) X.5=
-09 certificates")
-> Cc: stable@vger.kernel.org
-> Reported-by: Vega <vega@nebusec.ai>
-> Assisted-by: LLM
-> Signed-off-by: Yuqi Xu <xuyuqiabc@gmail.com>
-> Reviewed-by: Ren Wei <weir@nebusec.ai>
+For the whole series,
+Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
 
-Reviewed-by: Ignat Korchagin <ignat@linux.win>
-
-> ---
-> Changes in v2:
->  - Move the bug details and the measured quota numbers into this
->    commit message, as requested by Ignat Korchagin.
->  - Sashiko (High): "keys: integer truncation in key->quotalen causes
->    permanent quota leak" on pkcs8_key_preparse() and
->    x509_key_preparse(). Not changed. The truncation is real only past
->    USHRT_MAX, the unprivileged maxbytes is 20000 so add_key() fails
->    with -EDQUOT first, and this patch does not widen key->quotalen.
->    Replied publicly: Message-ID
->    20260920073515.64399-1-xuyuqiabc@gmail.com
->  - v1 Link: https://lore.kernel.org/all/cover.1789801335.git.xuyuqiabc@gm=
-ail.com/
->  crypto/asymmetric_keys/pkcs8_parser.c    |  2 +-
->  crypto/asymmetric_keys/x509_public_key.c | 23 ++++++++++++++++++++++-
->  2 files changed, 23 insertions(+), 2 deletions(-)
+On Wed, Sep 23, 2026 at 4:48=E2=80=AFPM Qunqin Zhao <zhaoqunqin@163.com> wr=
+ote:
 >
-> diff --git a/crypto/asymmetric_keys/pkcs8_parser.c b/crypto/asymmetric_ke=
-ys/pkcs8_parser.c
-> index 9dd1c181789a..fa8b142a8e14 100644
-> --- a/crypto/asymmetric_keys/pkcs8_parser.c
-> +++ b/crypto/asymmetric_keys/pkcs8_parser.c
-> @@ -150,7 +150,7 @@ static int pkcs8_key_preparse(struct key_preparsed_pa=
-yload *prep)
->         prep->payload.data[asym_key_ids] =3D NULL;
->         prep->payload.data[asym_crypto] =3D pub;
->         prep->payload.data[asym_auth] =3D NULL;
-> -       prep->quotalen =3D 100;
-> +       prep->quotalen =3D sizeof(*pub) + pub->keylen;
->         return 0;
->  }
+> From: Qunqin Zhao <zhaoqunqin@loongson.cn>
 >
-> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric=
-_keys/x509_public_key.c
-> index 25cf8ac7f257..f2bdd0244262 100644
-> --- a/crypto/asymmetric_keys/x509_public_key.c
-> +++ b/crypto/asymmetric_keys/x509_public_key.c
-> @@ -163,9 +163,11 @@ static int x509_key_preparse(struct key_preparsed_pa=
-yload *prep)
->  {
->         struct x509_certificate *cert __free(x509_free_certificate) =3D N=
-ULL;
->         struct asymmetric_key_ids *kids __free(kfree) =3D NULL;
-> +       struct asymmetric_key_id *id;
->         char *p, *desc __free(kfree) =3D NULL;
->         const char *q;
->         size_t srlen, sulen;
-> +       int i;
+> - Patch 1 introduces the multi-node platform support.
 >
->         cert =3D x509_cert_parse(prep->data, prep->datalen);
->         if (IS_ERR(cert))
-> @@ -228,7 +230,26 @@ static int x509_key_preparse(struct key_preparsed_pa=
-yload *prep)
->         prep->payload.data[asym_crypto] =3D cert->pub;
->         prep->payload.data[asym_auth] =3D cert->sig;
->         prep->description =3D desc;
-> -       prep->quotalen =3D 100;
-> +
-> +       /* Charge the memory retained in the payload, not a fixed estimat=
-e */
-> +       prep->quotalen =3D sizeof(*cert->pub) + cert->pub->keylen +
-> +                        cert->pub->paramlen;
-> +       if (cert->sig) {
-> +               prep->quotalen +=3D sizeof(*cert->sig) + cert->sig->s_siz=
-e;
-> +               if (cert->sig->m_free)
-> +                       prep->quotalen +=3D cert->sig->m_size;
-> +               for (i =3D 0; i < ARRAY_SIZE(cert->sig->auth_ids); i++) {
-> +                       id =3D cert->sig->auth_ids[i];
-> +                       if (id)
-> +                               prep->quotalen +=3D sizeof(*id) + id->len=
-;
-> +               }
-> +       }
-> +       prep->quotalen +=3D sizeof(*kids);
-> +       for (i =3D 0; i < ARRAY_SIZE(kids->id); i++) {
-> +               id =3D kids->id[i];
-> +               if (id)
-> +                       prep->quotalen +=3D sizeof(*id) + id->len;
-> +       }
+>   v6-v8: no changes
+>   v5: Clear pending interrupts with S2LINT_CL before requesting IRQs,
+>        and move S2LINT_EN to after all interrupt handlers are registered.
+>   v4: Safely handling shared interrupt handler returns.
+>   v3: Using shared interrupts (IRQF_SHARED) instead of manually
+>       iterating through all devices to check for interrupts.
 >
->         /* We've finished with the certificate */
->         cert->pub =3D NULL;
+> - Patch 2 focuses on structural and error-path hardening for the
+>   pre-existing baseline code. This includes resolving critical issues
+>   discovered by the Sashiko Automation system such as: completion
+>   race conditions, missing engine completion initialization, spinlock
+>   held with interrupts disabled for up to 10 ms, EPROBE_DEFER
+>   handling, DMA buffer overflow validation, interrupt cleanup on
+>   probe failure, and device removal ordering.
+>
+>   v8:
+>        - Remove the poll_lock added in v7
+>
+>   v7:
+>        - Re-enable the interrupt under dev_lock in loongson_se_poll()
+>          instead of poll_lock, so both the mask and re-enable of
+>          SE_S2LINT_EN are protected by the same lock and cannot race
+>        - Wait for controller command completion with a bounded
+>          non-interruptible wait so a pending signal cannot leave the
+>          controller running while DMA buffers are torn down
+>        - Validate the id argument in loongson_se_init_engine() to
+>          reject engine 0 and out-of-bounds indices
+>        - Drop the redundant init_completion() in
+>          loongson_se_init_engine() now that probe() initializes all
+>          engine completions
+>   v6:
+>        - Mask the target interrupt, clear pending status, and
+>          reinitialize the completion under dev_lock before issuing a
+>          command, re-enabling the interrupt after triggering
+>        - Keep the original engine_init_lock scope instead of the
+>          broader cmd_lock mutex
+>        - Reuse loongson_se_send_controller_cmd() in the STOP path and
+>          register the stop handler before loongson_se_init()
+>        - Correct the dmam_size validation formula
+>   v5: Fix all issues reported by Sashiko analysis:
+>        - Initialize engine completions in probe to avoid NULL deref
+>        - Use cmd_lock mutex for command serialization, drop spin_lock_irq
+>        - Add reinit_completion to controller and engine command paths
+>        - Fix EPROBE_DEFER handling in platform_irq_count()
+>        - Validate dmam_size against minimum required size
+>        - Disable IRQs in probe error path after init failure
+>        - Add loongson_se_stop() devres cleanup with proper ordering
+>        - Use non-interruptible wait for STOP command
+>   v4: new patch
+>
+> Qunqin Zhao (2):
+>   mfd: loongson-se: Add multi-node support
+>   mfd: loongson-se: Fix miscellaneous issues
+>
+>  drivers/mfd/loongson-se.c       | 119 ++++++++++++++++++++++++++++----
+>  include/linux/mfd/loongson-se.h |   1 +
+>  2 files changed, 106 insertions(+), 14 deletions(-)
+>
+>
+> base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
 > --
-> 2.55.0
+> 2.47.2
 >
->
-
-Thanks
