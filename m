@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D2E3603EE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DE54D7948;
 	Mon, 28 Sep 2026 14:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790604075; cv=none; b=fIcZSEbuNPHGmyh12N75C/kLBsjfUkAgUSl+XXF7QzTz/VX73uV7jEGrILHHVa8X+YVWQ1/f+jnZiXjYqw3I6s9xbUwkEPuP7GVvu1Hzo1R1iGf+fs+keF/EnVE03DssJIuCfVvV1ct2b8balQPELCsFtwNAt9S4EcSpR09ftmo=
+	t=1790604075; cv=none; b=LemhkWWJ6l7XVHnscXcXvD5cMPQ4BR1Qv8zfkuhDLnOhSKkEokJnocG8opwCv2T6GAttlXALjMU6Rf0jSA4akrsY/K0bA6ZHQ5yfAy4rvki4MhIxgmzwY06IeYCJj7LgOeF0u+/KFh6BD+dNSzQBdA0LJpPsIRes4Fv3Z6nR+E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790604075; c=relaxed/simple;
-	bh=46+Rp5O2lg0V+JRNwYc5a2//EZbW9Cy4/tzxUOaVB5M=;
+	bh=VQCqIbvpKHoGuXknDG939w5Zs3oTF6LC3BYTebnxqaw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jplLxJ623KDbpczHlAHaHbxXx8wBmLU/BQkek0/lf1eLYJiR452/6OEFl/Jgl21FW8mmTsEcDnfAbK5yYymt1cIo6sXxo6i360hxgZ19p5mJtIwvdBMr0p4ZP+epU3kG7qpyCE0ioNtwNkPl+UY1daTUP4VyV1CtV58sudfIwWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RrFZ8E0h; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=N2ECjk5fYXw5TM0p7kAZRUweZuTT4me6R/s+m3DZ17TrAGBvwTdMpStSCEr0qPud2AImFhviUXoW+ZQEnsk1sCzt2hKH7QQmDmrpxZGIDDFrr1hg8JJpLCd7JroT21iHvCZjQlczH7tKW5okKRxSllvMrHPJSZaeQ/+mcslq2wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A6fDghgi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RrFZ8E0h"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 95123C4AF13;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A6fDghgi"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 753F5C4AF0B;
 	Mon, 28 Sep 2026 14:01:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1790604075;
-	bh=46+Rp5O2lg0V+JRNwYc5a2//EZbW9Cy4/tzxUOaVB5M=;
+	bh=VQCqIbvpKHoGuXknDG939w5Zs3oTF6LC3BYTebnxqaw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=RrFZ8E0huVdnYvr7CtYwMxqKkehDUIaH2GjEykpSGbWEkU+2+f/yT61KkystL2TZY
-	 INwNksK+mpfXXKonRWVdHj9XUB83ae/4ybw3pVcxrdsao7ovrLW6Y/XnJ1JXKVTSJp
-	 HFoqJeCEcq+li80QpIVOVo/oFCKWeHI+TRwv3fXwnwLUJVBxvkWH5xfc1NuRmBI4MZ
-	 r3GcZ1Avjp6ONKylDhk5G/RNkKFiuzvcXKup7NtmZaW5yqYtpRLlSq3FDHBTuhVBMU
-	 t7dqYdTxCktJDpOqkDNXP24CdWMqDAatdzFtuPcQ9La2lRNrndWECQUawA1EousakI
-	 3awdhbJMBRUMA==
+	b=A6fDghgiEcT33Ew8Xt1yV8kCH+VmoHnBXX/Bc4kutVQVKAMoveCAuJlzzDwLZRTXP
+	 zs5sMwow2iMR28DUy3Y8Jx06YHny7BhBj2AS3QtDkmsGIgiaTciOBNsHZakm2hxBJ1
+	 AyLWAXBQu0zK2xq/b3lurNDydiuR0ZnRKSy2dt2sYD5cmBV4Vr08Gj65sn546ZdqcC
+	 C8Yj0cX24UHLBOnj+/Jxe3xeyztvBhddmr/wb4QXFFrvvnZmoFhLeYlu8HozwpHKdG
+	 /1Rx0eyhs8g4FXtzZRBzk308Bc34LU//kuDG8/RqOszboEWfvEDvta5QkLb3UDykGh
+	 +3crr/0wAYqWQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EC3C9833F;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57296CA5FA6;
 	Mon, 28 Sep 2026 14:01:15 +0000 (UTC)
 From: Vincent Jardin via B4 Relay <devnull+vjardin.free.fr@kernel.org>
-Date: Mon, 28 Sep 2026 16:01:05 +0200
-Subject: [PATCH 3/3] crypto: caam/qi2 - priority from the DTS
+Date: Mon, 28 Sep 2026 16:01:04 +0200
+Subject: [PATCH 2/3] dt-bindings: crypto: fsl,sec-v4.0: add
+ fsl,qi2-crypto-priority
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,7 +41,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260928-for-upstream-caam-qi2-priority-v1-3-e4a8e5f01dbc@free.fr>
+Message-Id: <20260928-for-upstream-caam-qi2-priority-v1-2-e4a8e5f01dbc@free.fr>
 References: <20260928-for-upstream-caam-qi2-priority-v1-0-e4a8e5f01dbc@free.fr>
 In-Reply-To: <20260928-for-upstream-caam-qi2-priority-v1-0-e4a8e5f01dbc@free.fr>
 To: =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, 
@@ -53,11 +54,11 @@ To: =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
  devicetree@vger.kernel.org, Vincent Jardin <vjardin@free.fr>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1790604073; l=1782;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1790604073; l=1266;
  i=vjardin@free.fr; s=20260525; h=from:subject:message-id;
- bh=iq3+PxFNmYgXB61bU9JaS64+yNKmnFhKP0HR8tcxDG8=;
- b=J9qxMrWMVHlBWp4AOfdZ7RQ4U0ivmsSMx8YCLJF2ihntA1MShcyS4XdkdjDVUGWF6AEUk/7ML
- NRgRksUz4gcBgjMmJho67RJ8cmqDL6KAF4ZUgz+Z6/1/XKpkag+vVxd
+ bh=14RLdogArJ3g8dT8zr0+nx/DICrh8YFGpKTsKBxlPRo=;
+ b=bqXI0S0xMmAYCpfL9E7bpJIfPD3dsRqR1is6HT9SASQArZPs2FLs90E4sdi0mQY/3J9mKbaI6
+ Ca54EWx4dGfCChneC+MS83wXOkm8L7QxXggVvftV3/5c/EbFQRV5lMQ
 X-Developer-Key: i=vjardin@free.fr; a=ed25519;
  pk=hppgLeFpGpKOi7LNwGEZ4jOYofJCoGd4Jf1ltAabiLw=
 X-Endpoint-Received: by B4 Relay for vjardin@free.fr/20260525 with
@@ -67,65 +68,37 @@ Reply-To: vjardin@free.fr
 
 From: Vincent Jardin <vjardin@free.fr>
 
-Read fsl,qi2-crypto-priority from the SEC node when dpaa2_caam probes,
-so the board's DTS sets the priority its algorithms register with.
+Let a board set the crypto API priority of the algorithms the DPAA2
+front end (dpaa2_caam) registers.
 
-The dpaa2_caam.priority parameter has precedence when it is set.
-When they are not set, we keep the default behaviour.
+Benefits: Its DTS decides whether the SEC or the CPU is the default for
+in-kernel crypto.
 
 Signed-off-by: Vincent Jardin <vjardin@free.fr>
 ---
- drivers/crypto/caam/caamalg_qi2.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index dbb84a6996a2..7d6a5e4ee86e 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -19,6 +19,7 @@
- #include <linux/dma-mapping.h>
- #include <linux/fsl/mc.h>
- #include <linux/kernel.h>
-+#include <linux/of.h>
- #include <linux/string.h>
- #include <linux/string_choices.h>
- #include <soc/fsl/dpaa2-io.h>
-@@ -35,6 +36,25 @@ MODULE_PARM_DESC(priority,
+diff --git a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
+index dcc755d2709a..0231fe3853b0 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
++++ b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
+@@ -86,6 +86,15 @@ properties:
+     description: Defines the 'ERA' of the SEC device.
+     $ref: /schemas/types.yaml#/definitions/uint32
  
- static int cra_priority = CAAM_CRA_PRIORITY;
- 
-+static int dpaa2_caam_cra_priority(void)
-+{
-+	struct device_node *np;
-+	u32 prio;
-+	int err;
++  fsl,qi2-crypto-priority:
++    description:
++      Crypto API priority of the algorithms the DPAA2 (QI2) front end
++      registers. Below the CPU's own implementations, the SEC is used only
++      when asked for by driver name. The dpaa2_caam.priority module
++      parameter overrides it.
++    $ref: /schemas/types.yaml#/definitions/uint32
++    default: 2000
 +
-+	if (priority)
-+		return priority;
-+
-+	np = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!np)
-+		return CAAM_CRA_PRIORITY;
-+
-+	err = of_property_read_u32(np, "fsl,qi2-crypto-priority", &prio);
-+	of_node_put(np);
-+
-+	return err ? CAAM_CRA_PRIORITY : prio;
-+}
-+
- /* max key is sum of AES_MAX_KEY_SIZE, max split key size */
- #define CAAM_MAX_KEY_SIZE	(AES_MAX_KEY_SIZE + CTR_RFC3686_NONCE_SIZE + \
- 				 SHA512_DIGEST_SIZE * 2)
-@@ -5215,8 +5235,7 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
- 
- 	caam_imx = false;
- 
--	if (priority)
--		cra_priority = priority;
-+	cra_priority = dpaa2_caam_cra_priority();
- 
- 	dev = &dpseci_dev->dev;
- 
+ patternProperties:
+   '^jr@[0-9a-f]+$':
+     type: object
 
 -- 
 2.43.0
