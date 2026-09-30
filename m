@@ -1,99 +1,125 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576302FD69D;
-	Tue, 29 Sep 2026 22:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3FA26A1AC;
+	Wed, 30 Sep 2026 00:35:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790722645; cv=none; b=dvXZSd7q3qLw6AFpBjotWwXXbf+FlDzVCl26sPNwW+WvvasK88P0QFrpvuHkD9RNse+/qJFY12oNor7L6NMNrhzxnV4Fa4LOQEy0UwKK8sjPRm0vV1iG178SDsrrkyD7gm+Ai7VM3h3NMAnol+5hRzU4I5q7ULjOpfm5ar8Z0Qc=
+	t=1790728536; cv=none; b=oZez42YbHaERExk+heVUymh7k3/UncU/3EXdqwyOsaeGR+z4yq3fN0jSRSGv3ax0AZYO49lNMucm6ouiDp2w9WDJC9XJACsTdDMR84VcQURXlyDO9xw4z1DKgke+UZE9ugzK44D+9xf/HRgKY8kWRHfdpQeWOMY492aA7twHQxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790722645; c=relaxed/simple;
-	bh=UZ7TPFnZ8PRkgPT7RwOFKd+eqi9dOQW8vw/C1tCq0As=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rNV1bkOTNo3ANHqMz+eDrfE2aSOTmHLBePg6lH898K0sA1JhzSWPm7oLR/LX9TVLoqO5TGy6Qj8V2wyzOLE8tFmmSTqldpPKpyKxWcyaAU0Hy124yytN2aF/Cak2b0xtMtpGrV+sYViF3AeuyB2faLU9kFvYP2ObwuPvt6cqZ9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQ6wV5aF; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790728536; c=relaxed/simple;
+	bh=Vr5kbx/Wxo2uiemM56xIN6W/PPs8cLnBrrHO4OmJDLA=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=WECfUxYnvnsZWsuJ9eEPnE60tY5TGmJVs0NyikHRrWSp0kqWuLDazhSaf3vhExWfMufcEBHBqepD2l53w4bw+TxpfSURqD7YfV4bsla9ml4aFUMoMEupgFuAY3BlloNvl/inFiUcKS6DQoGRuR7utXCz/5bDf8lZMuvx0i7GtVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OGXI9v6a; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQ6wV5aF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B252A1F000FF;
-	Tue, 29 Sep 2026 22:57:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OGXI9v6a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 831D81F000FF;
+	Wed, 30 Sep 2026 00:35:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790722643;
-	bh=R6gmglEOgAQTUpDzQVkvy6EINCAKv6cFhDk7A6AFvWg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=AQ6wV5aFQ9dGJ02rCSi2IMK/2VfbRnj7slqRfgw8da3Eu1UtHvCVgKxa0D6BWtR0G
-	 2yStUkln71qqZlFAgJWIoUDGRgu3tacQaXq8SFyauPVCZPc3c8MGXenSGycU4N5WEm
-	 XapTDI2OgIzQs+cAETjMl9AX5+Ov7pqheNXXB9JLzderXg/DI8mvOeR5AMIZVQ2fvQ
-	 BInFi6rmcS8mLC0r3gT0H4zSZPV+Qa47QZqoSZK9u4SsqI6qHGkoLI3XGEuYKw8FnM
-	 0gsjm2WJDQmHr+ZKaplBZdQ1mmwEqXmC7Zr8p447yAjaIdiPavP8GLdYcjQsfdXTb2
-	 cM9Wltln/cyow==
-Date: Tue, 29 Sep 2026 15:57:22 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stian Halseth <stian@itx.no>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>, linux-crypto@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: sparc/aes-xts: Add optimization using the
- AES opcodes
-Message-ID: <20260929225722.GA1921@sol>
-References: <20260929211218.4194135-1-stian@itx.no>
- <20260929212459.GA2843629@google.com>
- <a166f1e004b8c2d859232d87a3745f5faa480607.camel@itx.no>
+	s=k20260515; t=1790728535;
+	bh=+zMz3pARJwKwANTMZ9Ker8rEGNYg5ecscOmKVXfHuss=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=OGXI9v6aDu7NK77ISmFND7TDVDaKjmE6K1TqOA49jS2s21Xp17XrJwUjH15QgfyQa
+	 NaH4vZGX93CVY3HqTfNGeBfbSTS7aWcXXPURdpJgp+d6xbjgDlZvmlnaIKTpVROyem
+	 tCg3PjGXPtSP5/qEbA3N7yVVJbrVXKMBjD61p45lpzmkLkJzT/YorirJ8tODYVxX5S
+	 PABBXH13M/nWnRJgdWMEbtZ3/LkDOC900glf0QyUKnozOYzBkWp5vHQIM0CdEhlIVc
+	 l06t3VsehnZtmP5E5LCaAS05TjG/jLP3TnwiIgsnJh+DgceLNm9quKOj1nf5CVzgq4
+	 +06FtidTuYtMA==
+Date: Wed, 30 Sep 2026 09:35:26 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: paulmck@kernel.org
+Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Frederic Weisbecker <frederic@kernel.org>, Neeraj
+ Upadhyay <neeraj.upadhyay@kernel.org>, Joel Fernandes
+ <joelagnelf@nvidia.com>, Josh Triplett <josh@joshtriplett.org>, Boqun Feng
+ <boqun@kernel.org>, Uladzislau Rezki <urezki@gmail.com>, Thomas Graf
+ <tgraf@suug.ch>, Herbert Xu <herbert@gondor.apana.org.au>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>, Steven Rostedt
+ <rostedt@goodmis.org>, Andrew Morton <akpm@linux-foundation.org>, Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan
+ <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, Song
+ Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa
+ <jolsa@kernel.org>, Emil Tsalapatis <emil@etsalapatis.com>, Ihor Solodrai
+ <ihor.solodrai@linux.dev>, rcu@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ bpf@vger.kernel.org, linux-trace-kernel@vger.kernel.org, Roman Gushchin
+ <roman.gushchin@linux.dev>, Chris Mason <clm@meta.com>
+Subject: Re: [RFC PATCH 0/3] fprobe, rcu/tasks, rhashtable: Switch fprobe
+ and BPF kprobe-multi to Tasks-Rude RCU
+Message-Id: <20260930093526.53be607c55184faf05e8d1f8@kernel.org>
+In-Reply-To: <41b37fed-af5c-4559-9e4e-696ef8ccfdd0@paulmck-laptop>
+References: <179060575297.372125.10581329083761385407.stgit@devnote2>
+	<f593867e-dcef-4f68-b609-a253f489f7b8@paulmck-laptop>
+	<20260929082828.cd9844b5e632a23fd8308dbf@kernel.org>
+	<b39d3368-fc5c-49a6-b47e-c58224a23e07@paulmck-laptop>
+	<CAEf4BzZGdpbX5TdtgbDvDZEsj4wDQiLX94dz-wKfM9aCQJHzzg@mail.gmail.com>
+	<41b37fed-af5c-4559-9e4e-696ef8ccfdd0@paulmck-laptop>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a166f1e004b8c2d859232d87a3745f5faa480607.camel@itx.no>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 29, 2026 at 11:33:58PM +0200, Stian Halseth wrote:
-> Hi Eric,
+On Mon, 28 Sep 2026 17:41:57 -0700
+"Paul E. McKenney" <paulmck@kernel.org> wrote:
+
+> > > > Thanks for the clarification!
+> > > > So I think we can replace rcu_read_lock() with rcu_read_lock_sched_notrace()?
+> > > > (also, maybe we need to add rcu_is_watching() check)
+> > >
+> > > That would work, and yes, you are quite right that if !rcu_is_watching(),
+> > > RCU is studiously ignoring you completely, no matter what your preemption
+> > > state is.
+> > >
+> > > > Current code may involves lockdep in fprobe, that is not good.
+> > >
+> > > Agreed, that could be problematic in any number of contexts.  ;-)
+> > >
+> > > > BTW, if we want to trace some code in extended quiescent state, do we
+> > > > still need this Tasks-Rude RCU?
+> > >
+> > > Well, you need something other than vanilla RCU, anyway.  And Tasks Rude
+> > > RCU is one candidate, though it is also a candidate that might annoy
+> > > people wishing to minimize IPIs.
+> > 
+> > Would RCU Tasks Trace be a better candidate given uprobes and
+> > sleepable BPF depends on it? Would it work here?
+
+Hmm, those can be sleepable, but this is not. fprobe is based on ftrace
+so the callbacks are non preemptive.
+
 > 
-> On Tue, 2026-09-29 at 21:24 +0000, Eric Biggers wrote:
-> > 
-> > It's a little late to be adding new optimized code in 7.3.  But yes,
-> > full AES-XTS performance requires that it be implemented directly, so
-> > we
-> > should add this optimized AES-XTS code in 7.4 (assuming people still
-> > care about SPARC, which I guess you do).  For 7.3 let's just suppress
-> > "xts-aes-lib" on sparc.  I left it out of the patch
-> > https://lore.kernel.org/linux-crypto/20260925202353.10763-1-ebiggers@kernel.org/
-> > , but I guess it should be included after all.
-> > 
-> Completely understandable. I was considering sending two patches at
-> first, one to suppress "xts-aes-lib" on sparc, and one with the
-> optimized code.
->  
-> You're adding the suppression? 
->
-> If yes, I can test the suppression on a T7-1 and a T4-1 when you have
-> it. 
+> Quite possibly!  Of course, there might be corner-case ftrace/BPF issues
+> that you and Masami would know better than would I.
+> 
+> David Woodhouse suggests the new Atomic SRCU for a vaguely similar
+> purpose:
+> 
+> https://lore.kernel.org/all/20260920211920.928306-1-dwmw2@infradead.org/
+> 
+> Now that Tasks Trace RCU is implemented in terms of SRCU-fast, there
+> might not be all that much air between David's suggestion and yours.
 
-It's in v3 now:
-https://lore.kernel.org/linux-crypto/20260929222752.36427-1-ebiggers@kernel.org
+OK, let me check it. But at a glance, this atomic SRCU is still a bit
+heavier than rcu_sched_notrace, for fprobe. It involves smp_mb and lockdep. 
 
-> For 7.4 I could send a v2 on top of it that takes sparc out of the
-> suppression again, without the Fixes: tag.
+So if all of these rcu_read_lock() in fprobe are replaced with
+rcu_read_lock_sched_notrace(), isn't it enough to switch the
+synchronize_rcu() to synchronize_rcu_tasks_rude() for avoiding
+`if (!rcu_is_watching()) return;` ?
 
-I suppose.  QEMU support is normally required for new crypto library
-code, so that it is actually testable.  That would rule out adding any
-"new" code using the SPARC crypto opcodes until support for them is
-added to QEMU (https://github.com/sparclinux/issues/issues/77).
+(Note, most of replacement will be done by [1])
+[1] https://lore.kernel.org/all/179064115227.394389.16910234241400391996.stgit@devnote2/
 
-I might be willing to make an exception for AES-XTS, since otherwise for
-parity with the "xts" template the library would need to gain an
-implementation of AES-XTS on top of AES-ECB.  That would be annoying
-since it's inefficient, and SPARC is the *only* architecture that would
-need it, as on every other architecture AES-XTS was optimized properly.
+Thank you,
 
-Anyway, I'll be migrating the SPARC optimized AES-{ECB,CBC,CTR} into the
-library too.  I'll need your help to test it, since it's completely
-untestable for anyone without SPARC hardware.  (And it will soon the
-only arch with that property now that even s390 is being fixed...)
-
-- Eric
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
