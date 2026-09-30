@@ -1,218 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f42.google.com (mail-pz2-f42.google.com [74.125.228.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769A23AF674;
-	Wed, 30 Sep 2026 05:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209F63B2FE7
+	for <linux-crypto@vger.kernel.org>; Wed, 30 Sep 2026 06:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790747465; cv=none; b=Sp2OuRyf3MOWpIF1IKQWI4upqnRvihCeTM4D+5uy4g/GS1oDMjPkKnMasHx2gL2gitLb3hA7lJE8K9mfTIZxdGXRcImxaL71OE+l2wMRByvSHxyHeHtet/GVlKLMkDAsUkxaUSpF3LlzkN3zQRNEOoM56Cw4pp72GIjNX9j7ZNY=
+	t=1790748489; cv=none; b=RNoNYWILt7LMd+BMLcBmDsxGl9a/Ln7YCkmZ2OsG2RKMc7gSklwifMWcVmdU+mKzH+ua4atURhcXNwYc2JouxY7g6h5rKu/oN8FDwBmz1xtyNwoZfT9q+IVfNXbf2xoUwJf4V3YpmMrrf3ikquWj+FT4WOkVMFvz6WTVSFMU3oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790747465; c=relaxed/simple;
-	bh=SBMQ5qrAZ5yu/0snOz+uE+yYBZur5j7xEmTmr+qRiks=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=rmJZ0VUaEQoyh9c2cu9w+hl6IaEPdI3Z1WOb7CZCaXrDvii3RsFTvchmEo66wyzOVtw9SqvjeKES4XXsUrhUh8yXsuXLqlHWFtKWRZQrzKR1iLOVWOi4Ga4G8rLwjWxodLvTzxLBPuZ+MxTmvZweF5B4qJe2nlfQzhsBs264xBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JRWQk1Yv; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790748489; c=relaxed/simple;
+	bh=FQT7C9mEtUI9zyQeAiy/rz7mwvm/L9IqR2P4MCxmtag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pJKDZcnzH+2jAyESJOMvJIV1HdvjF1agxe5SafmTeM9n0q/8vSTUX+88Eua4APy0+qFZRjitunv+YBUJOF5DxENddmyN7D4LljRjSudi+ZNbHNJfGh6Ma1ZU9C+Xe/tABGs1wI1JM78/MJYD9oVRjThIv0fEOdqpKPjpDiDzf0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=GpLOQ885; arc=none smtp.client-ip=74.125.228.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JRWQk1Yv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F3BB1F00893;
-	Wed, 30 Sep 2026 05:51:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790747464;
-	bh=IHbXRYFtZI/bnUL44bF/j7F87IwMQs0LtRsynOSxKXI=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=JRWQk1Yved9WLkp5iDT2l+W4Pxti1bacMKwdch8K67TADhlddurQ30A4A5F/8HISl
-	 NoIv4ZyBMsAvyjdP0uOeaPFUy394ATqMpGt1f61VDPi5w5jWvTOclxnE24jNdc9H1A
-	 kf5Fxji/LdIB5zXKbmz28H08NPCkE+pgbPr53EWUH9QHEFX3uMv1uueMhYR0UVCJOg
-	 yUWsOvu3SNSZWp6dZpemY6E09U/F4vSsIuNuAvShMTseS6/wCe5CRXw9U7Kin4BRuj
-	 OvcRVSzTYFoXCoUMDK+Txu2bXCL1+nv8uwmy0imbvn+RzvWBGiO519I5d1mCExDvZM
-	 3zwP+/Y9yN4Ww==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id AB04D198003A;
-	Wed, 30 Sep 2026 01:51:01 -0400 (EDT)
-Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Wed, 30 Sep 2026 01:51:01 -0400
-X-ME-Sender: <xms:Q6O8ahG3cE6hJrrWPvOHOxJI_sj4cG0tKJ3gyTh1Rc01OIcj9A15Xw>
-    <xme:Q6O8ahIMsgcBmKpDLhZ6VqJXmP3JOlRLqArFDaOIDAFepcnUnYWR059HrGs3Q1ujd
-    _qvEUkn7HoFrqogAGprlfUrMI6-z9xB6nQ3vX11q_OtJxBZwUjoD6E>
-X-ME-Proxy-Cause: dmFkZTFSJcrBtQWEbmdY9KpRSSoNya1P4NnDPRL0fhq6fme4Lw/QJwVgh+NPSHPIjqR4J/
-    uLo7iJyY81KO5H0sJqBay6vB2ONbtDM0dIHPKbvJXcTXNb2DO2K89CdBmPVL9uuVr6U78i
-    rqRZDe9K3iQJZCJEaOaeXRGcG63+UB9h/g4B6sOpgBK7xA5MzZnUimcHNlhBOR1UnbsXIC
-    Jmb24i7auxNzjx5Q+/xyRaRfb6RPnfxQBd/xGlLacbRyfo8E7aKAC4SKPg7rgtgajQ0Owi
-    rtSk1hTQRVoNJ5Ustc9qXMBOLS9tvhcVEaB7Z4KULJBcfZyyePN63Zsp+H9DI5D3FH66RA
-    xVFWR9bi6DKxsbP+JMa+ISwENtr1o43QAaQvOrh/W6rQB7UqcJDuNoKK8kGOV8Yaut/VyL
-    y6Eexmoh5i982aiwQXfhN7xRz5WK7CJ6K5ez1payzrbA9j/bXx2F+gAFmM2EEDPT8aTGGx
-    g+PRK8WIEog+bmVvY3kQ5MG7RzXunWBRNHTxp3+NqXlTq2HGJVk151lWxcdDKd10YpaZ2w
-    icyncgC32Wo+p0hnjT8ObOzkA9p/8L6HyhMoWDNcZYk4iJAQ8bWoTIR/TyTsNbd+4Bc+3x
-    IvL/r2GTs1TeEOix/Z32LO8iMw8YC3dDduEMVbLUmxPG+4BGQQOvPFP+oQ1A
-X-ME-Proxy: <xmx:RaO8ahmjwdKSKPOOT5txvlsyRBH7wyx9hsm3N4fc1vwLmkq3fASShw>
-    <xmx:RaO8ao3lvp5JRqaPWHXwB50mzLKN3v5G5aWvThT3RfqNpJPAq9n2wA>
-    <xmx:RaO8ap27Q4DSgEebLq8jZhzBqClz246rb9KCQaFX6470Gch2i76yvw>
-    <xmx:RaO8airQ1cT0-wurEpBpIwsaGgKZkatGkZSpHCAGgwRsgPDIgumSNA>
-    <xmx:RaO8atgy5cH95NBmzqhWGG5Fk_VXrnY_fNvoaH526uy4sRHgqMOq_mhG>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 511E2F80086; Wed, 30 Sep 2026 01:50:59 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GpLOQ885"
+Received: by mail-pz2-f42.google.com with SMTP id 41be03b00d2f7-cc797656e44so1670751a12.2
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Sep 2026 23:08:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1790748487; x=1791353287; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=CgFmFj2igJGpmbRflOSd7wans++uMlq7r70gUY54Vy0=;
+        b=GpLOQ885YueQnMRr7aYksbM090881sDEr8Fe1usp/q0pr6fKEwx2Cglw8wGIeuqXfo
+         z9+qdro7WLQlY5O7IK5f2JeUGmrO0obUFcd+Na/uUiQIuolwIOhoYcdmwDhyJuUCflos
+         uNc3Zr3tAz8ZSh0r82sTNNcJOP6oSeRIpn2Zg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790748487; x=1791353287;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=CgFmFj2igJGpmbRflOSd7wans++uMlq7r70gUY54Vy0=;
+        b=uV8lxJBmw2vXkKNWtY66I2fsYOAKpWpaG8HOIY9eEmRLhFKU8bJiNJMreaE+Iawjq/
+         domD7Woc6jYgaD48W0NXh3lZvEFf1gdTLG7ZKhc/aScLhGy7Iwqr9SHXe/Bu7DJWeSrK
+         NnEb8YziSK+kXcWfX0m9Hu64UzMxESvtBCgNgHYGWLeEu7CgXuu6GWHUcWQ/KLrKdCp2
+         58ehGiC8HlDxhaS7v8pkA7F6xSLTTiS3EvrweJ7iyw9r9PoXmxgr7FMyVqynMu3xlASy
+         msKRf6bPbSwgGh6/HO81BpZeXGKvVx2bUc7PJkJI/5diZ0YL9z0AeIJ60thjqSjn+tqz
+         n8KA==
+X-Forwarded-Encrypted: i=1; AKwUvBxjbVLU7Q2OqSLfq2+iwKHkUVfJ75p4FLSbbJIjfZbwy9JiXU2MLbPXsoMelA+PHZ2IWDFP/2QkXIyFs/A=@vger.kernel.org
+X-Gm-Message-State: AFuF++mcvSwm2VS26kaGjIGAwbWTFY8Lx9jbwINlFyj1Bd2MXdMQR3Ew
+	FyBXqHICt+R8aK0WmXzZP+wKrykcHepqlNnEIT6TdWqKnMabvtZFxQhdNgAax13KYA==
+X-Gm-Gg: AYBFou12M80zXMWjem4auL1EbXyPAK5/6TCYFPED8vav0XbDtONl7Ipy/PwmPItaUyP
+	0pqutKKYzXg7y4i2/anBMM+CE4I+vdu9MN10nsMijF9HIEW78UBqlcz0XmjvqazTpdQ8UnIR2H5
+	7V7/m/Rwu/+6acRemDZfz0WUYLY3RpSthnMQV3MDnL6vU7KauJFi5gag9XARfmFewrohArM+xs2
+	vPGB2GHM4tXA7H86ef4wT47aY0QLZqkkw+KNudR6mjBEF/8FCv4gCo4aXiA/PGNhtSQTIvS9h2c
+	Uo6kfSfj8y4FZydOU6e2BB4K2IBYsbQTuZpamKrCh0op8saWv21v1P+CTy5CJxi4X68uWqOxo/O
+	ptPxA/Q3rrpKXbsw6ewIZaXFHrxiuW0cf2Zndndj6QClSvv/Uy5AflsQTX7Q4olux80SV4T8PNq
+	3NkcrmnV3TQ7YfBXYluuj4PUqM9Rxqvex+2MSf47+N8R6t8jS/1Dwl42pDaTUmvm9RWx1SvThZq
+	ukNOqaCtJWwinrryetJuhb+3kPrJxH76rfU0A3opLKO7Ea/zA==
+X-Received: by 2002:a05:6a21:492:b0:3de:3bd5:604c with SMTP id adf61e73a8af0-3de9e87f358mr387844637.41.1790748487167;
+        Tue, 29 Sep 2026 23:08:07 -0700 (PDT)
+Received: from google.com ([2a00:79e0:2031:6:31b3:f8c3:893a:d0bb])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-88725d68389sm247895b3a.39.2026.09.29.23.08.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Sep 2026 23:08:06 -0700 (PDT)
+Date: Wed, 30 Sep 2026 15:07:56 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Michal Wilczynski <m.wilczynski@samsung.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>, 
+	Nick Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
+	Jaegeuk Kim <jaegeuk@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Phillip Lougher <phillip@squashfs.org.uk>, Sungguk <sungguk.na@samsung.com>, 
+	Jaehoon Chung <jh80.chung@samsung.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH RFC 1/9] lib/lz4: import upstream LZ4 sources verbatim
+Message-ID: <aryehUJml8fTy0o-@google.com>
+References: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
+ <CGME20260925113452eucas1p170bfdb34dfbf670a14a6f8f0c2f5094a@eucas1p1.samsung.com>
+ <20260925-lz4-vendor-upstream-v1-1-1c7ffbe21c4b@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 30 Sep 2026 07:50:39 +0200
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>, "Stian Halseth" <stian@itx.no>,
- sparclinux@vger.kernel.org
-Message-Id: <2b9f2387-924a-4a3a-bb35-32a8a7cfef5d@app.fastmail.com>
-In-Reply-To: <20260929222752.36427-1-ebiggers@kernel.org>
-References: <20260929222752.36427-1-ebiggers@kernel.org>
-Subject: Re: [PATCH v3] crypto: aes - Fix undesired override of some optimized AES
- modes
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260925-lz4-vendor-upstream-v1-1-1c7ffbe21c4b@samsung.com>
 
+On (26/09/25 13:27), Michal Wilczynski wrote:
+[..]
 
+> +void LZ4_resetStream_fast(LZ4_stream_t* ctx) {
+> +    LZ4_prepareTable(&(ctx->internal_donotuse), 0, byU32);
+> +}
 
-On Wed, 30 Sep 2026, at 00:27, Eric Biggers wrote:
-> The new library APIs for AES encryption modes were wired up to the
-> traditional crypto API via crypto/aes.c.  However, for now the kernel is
-> still in a transitional state where various architectures still have
-> architecture-optimized implementations of AES modes in arch/*/crypto/,
-> wired up to the traditional crypto API only.  Because of that, the
-> crypto/aes.c algorithms were given a cra_priority of only 110 to prevent
-> them from overriding arch/*/crypto/ in the traditional crypto API.
->
-> However, because of how the traditional crypto API works, the
-> cra_priority trick doesn't work in cases where the relevant algorithm
-> isn't directly implemented by arch/*/crypto/ but rather is provided by a
-> template instance using other code in arch/*/crypto/.
->
-> For example, x86 doesn't have its own "ccm(aes)" but rather relies on
-> the "ccm" template constructing it from the x86-optimized "ctr(aes)".
-> The existence of the library-based "ccm(aes)" prevents that, even though
-> its priority is lower than what the template would produce.
->
-> Thus, "ccm(aes)" ends up using the slower single-block AES code.
->
-> Therefore, skip wiring up the relevant library-based code to the
-> traditional crypto API on architectures where this problem can occur, as
-> determined by what exists in arch/*/crypto/ for each architecture.
->
-> This is ugly, but it's also temporary: these conditions will go away as
-> architecture-optimized implementations of AES modes are migrated into
-> the library.  But until then, we need to prevent performance regressions
-> by ensuring that the optimized code continues to be used.
->
-> Fixes: 20df21a482aa ("crypto: aes - Add CBC and CBC-CTS support using library")
-> Fixes: 8ca62072faa1 ("crypto: aes - Add GCM support using library")
-> Fixes: f70ad727d1d6 ("crypto: aes - Add CCM support using library")
-> Fixes: 94efa0c9fb36 ("crypto: aes - Add XTS support using library")
-> Closes: https://github.com/sparclinux/issues/issues/106
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->
-> This patch is intended to taken through libcrypto-fixes
->
-> v3: Also suppress xts(aes) on SPARC, and improved comments
-> v2: Fixed PowerPC config option, and resent as standalone patch
->
+[..]
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> +void LZ4_attach_dictionary(LZ4_stream_t* workingStream, const LZ4_stream_t* dictionaryStream)
+> +{
+> +    const LZ4_stream_t_internal* dictCtx = (dictionaryStream == NULL) ? NULL :
+> +        &(dictionaryStream->internal_donotuse);
+> +
+> +    DEBUGLOG(4, "LZ4_attach_dictionary (%p, %p, size %u)",
+> +             workingStream, dictionaryStream,
+> +             dictCtx != NULL ? dictCtx->dictSize : 0);
+> +
+> +    if (dictCtx != NULL) {
+> +        /* If the current offset is zero, we will never look in the
+> +         * external dictionary context, since there is no value a table
+> +         * entry can take that indicate a miss. In that case, we need
+> +         * to bump the offset to something non-zero.
+> +         */
+> +        if (workingStream->internal_donotuse.currentOffset == 0) {
+> +            workingStream->internal_donotuse.currentOffset = 64 KB;
+> +        }
+> +
+> +        /* Don't actually attach an empty dictionary.
+> +         */
+> +        if (dictCtx->dictSize == 0) {
+> +            dictCtx = NULL;
+> +        }
+> +    }
+> +    workingStream->internal_donotuse.dictCtx = dictCtx;
+> +}
 
-
->  crypto/aes.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 47 insertions(+), 4 deletions(-)
->
-> diff --git a/crypto/aes.c b/crypto/aes.c
-> index 94791f481e98..51eee78396ea 100644
-> --- a/crypto/aes.c
-> +++ b/crypto/aes.c
-> @@ -637,7 +637,18 @@ static struct skcipher_alg skcipher_algs[] = {
->  		.decrypt = crypto_aes_cbc_decrypt,
->  	},
->  #endif
-> -#if IS_ENABLED(CONFIG_CRYPTO_CTS)
-> +	/*
-> +	 * Don't register library-based "cts(cbc(aes))" on architectures where
-> +	 * it might block a "better" implementation from being instantiated 
-> via
-> +	 * the "cts" template.  These exclusions are temporary and will go 
-> away
-> +	 * as the arch-optimized AES code is migrated into the library.
-> +	 */
-> +#if IS_ENABLED(CONFIG_CRYPTO_CTS) && \
-> +	!(IS_ENABLED(CONFIG_ARM) || \
-> +	  IS_ENABLED(CONFIG_ARM64) || \
-> +	  IS_ENABLED(CONFIG_PPC) || \
-> +	  IS_ENABLED(CONFIG_S390) || \
-> +	  IS_ENABLED(CONFIG_SPARC))
->  	{
->  		.base.cra_name = "cts(cbc(aes))",
->  		.base.cra_driver_name = "cts-cbc-aes-lib",
-> @@ -687,7 +698,13 @@ static struct skcipher_alg skcipher_algs[] = {
->  		.decrypt = crypto_aes_xctr_crypt,
->  	},
->  #endif
-> -#if IS_ENABLED(CONFIG_CRYPTO_XTS)
-> +	/*
-> +	 * Don't register library-based "xts(aes)" on architectures where it
-> +	 * might block a "better" implementation from being instantiated via 
-> the
-> +	 * "xts" template.  This exclusion is temporary and will go away when
-> +	 * the library AES-XTS is optimized for SPARC.
-> +	 */
-> +#if IS_ENABLED(CONFIG_CRYPTO_XTS) && !IS_ENABLED(CONFIG_SPARC)
->  	{
->  		.base.cra_name = "xts(aes)",
->  		.base.cra_driver_name = "xts-aes-lib",
-> @@ -980,7 +997,20 @@ static __maybe_unused int 
-> crypto_aes_ccm_decrypt(struct aead_request *req)
->  }
-> 
->  static struct aead_alg aead_algs[] = {
-> -#if IS_ENABLED(CONFIG_CRYPTO_GCM)
-> +	/*
-> +	 * Don't register library-based "gcm(aes)" and "rfc4106(gcm(aes))" on
-> +	 * architectures where they might block a "better" implementation from
-> +	 * being instantiated via the "gcm" and "rfc4106" templates.  These
-> +	 * exclusions are temporary and will go away as the arch-optimized AES
-> +	 * code is migrated into the library.
-> +	 */
-> +#if IS_ENABLED(CONFIG_CRYPTO_GCM) && \
-> +	!(IS_ENABLED(CONFIG_ARM) || \
-> +	  IS_ENABLED(CONFIG_ARM64) || \
-> +	  IS_ENABLED(CONFIG_PPC) || \
-> +	  IS_ENABLED(CONFIG_RISCV) || \
-> +	  IS_ENABLED(CONFIG_S390) || \
-> +	  IS_ENABLED(CONFIG_SPARC))
->  	{
->  		.base.cra_name = "gcm(aes)",
->  		.base.cra_driver_name = "gcm-aes-lib",
-> @@ -1012,7 +1042,20 @@ static struct aead_alg aead_algs[] = {
->  		.chunksize = AES_BLOCK_SIZE,
->  	},
->  #endif /* CONFIG_CRYPTO_GCM */
-> -#if IS_ENABLED(CONFIG_CRYPTO_CCM)
-> +	/*
-> +	 * Don't register library-based "ccm(aes)" on architectures where it
-> +	 * might block a "better" implementation from being instantiated via the
-> +	 * "ccm" template.  These exclusions are temporary and will go away as
-> +	 * the arch-optimized AES code is migrated into the library.
-> +	 */
-> +#if IS_ENABLED(CONFIG_CRYPTO_CCM) && \
-> +	!(IS_ENABLED(CONFIG_ARM) || \
-> +	  IS_ENABLED(CONFIG_ARM64) || \
-> +	  IS_ENABLED(CONFIG_PPC) || \
-> +	  IS_ENABLED(CONFIG_RISCV) || \
-> +	  IS_ENABLED(CONFIG_S390) || \
-> +	  IS_ENABLED(CONFIG_SPARC) || \
-> +	  IS_ENABLED(CONFIG_X86))
->  	{
->  		.base.cra_name = "ccm(aes)",
->  		.base.cra_driver_name = "ccm-aes-lib",
->
-> base-commit: 93f51579e7df248780214094418f205253383cc5
-> -- 
-> 2.55.0
+Just a side note,
+there is a bunch of new helpful API added in this release.  Currently,
+we do some memcpy hacks to avoid re-init of lz4 C/D-dict in zram, but
+once this series lands I'll be happy to send some trivial EXPORT_SYMBOL
+patches so that zram (and other lz4 users) can use standard lz4 dict
+API instead of hacks.
