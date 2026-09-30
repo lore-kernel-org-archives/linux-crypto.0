@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F0E517BD9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14084E4305;
 	Wed, 30 Sep 2026 17:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790788027; cv=none; b=IYYpHeO5W4yRz0T9NGeqjYVu6JvWPov4nPT2TxTWT1sgQGLaaVzuRgCW2KKQNqcbOkIs163SCxtKUEdedoh/TnWB6Pz8FvwyJCSCJ8YMCfFxbA6NbiedXr431AwJujveY6N4GlGbKuuurgtF8Sgcx0yVsVJ5MqMIwvnawEJtJ5c=
+	t=1790788028; cv=none; b=fJSPEv/s6mHZ1W2KqCSy+eTlXOHdMba/htcFNRwcDTruEE8CDlIhIprjkkHkiYyzd3eVCFZMZTvzJX+yuHugQaee1oNFjbuqk8wC/NeBuA397Fj3k5cB15PB9CRvpxU9FtDv7IgMo9Pf8w8VLq4n1xwwRE/dxzFzvU56Sn/qFX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790788027; c=relaxed/simple;
-	bh=Eje0GkhqlVuGoHPUffeu/Os8V+rmoQVwPj57/NuhmXA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fB2kCkL3gyb2ZzPGYElI7W0Xk3i2VqRm/pR6DfVLN9vgiTozHDUCxm0/21ApeHUPbnmdwU5mjGQfU1LBmn78vVJJc6PpQBEkHbX9dek9S2KOlML1qOi5ptAIlzhNNQibNz35RAHHaLCz3tNI4aJxOezZB7ejm+vE/EHyY6dpmSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A90IL+PJ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790788028; c=relaxed/simple;
+	bh=Ll15U5oTFGAETmmSNYy0t7V/jB8so5m0JMQs/ACqILo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hiwurocPCTpmW3ElbhpAw3pintNXAL83HlJiA72ETtMrdohDSLSPqsZ6ppFG0sT0IP2sExq96flNuUu0dtaDglIXokzCUEgjE5U7EzvDqnzgjXpEU1hcavOHoeBFWC1VF1nTq7SGiA4hvwty85NUrLuf0yiH3+ubtNkjF7tMjjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VlA+OEWO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A90IL+PJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43C101F000FF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VlA+OEWO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A27351F00899;
 	Wed, 30 Sep 2026 17:07:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1790788026;
-	bh=gV1VZo5ChHO2fSyCyOJqPRlEK6//5s/BjQbyvHz21vw=;
-	h=From:To:Cc:Subject:Date;
-	b=A90IL+PJqzP+WdwF/zaT/g2pFgC4XgPOvn6pfIJUwBflbRHMskuNE6C83nBhPKGiw
-	 g/63LPFZigZIaPNrLCnvfqg9/w2c+Y5eXwREtVzDQKypLh0xtn0EY9o03v92qdtSOE
-	 uEW/EFXujNtxyWClkkg33Q5mB2rzq/XE+JF4VwZuY6pI5QP4dfs+gjSlkjQdU9vrFC
-	 pNYtXdTo8aeD+GPX7/LqsuUbHA3T90uzuyBqRzPIPddgVn57LEiwqm51fT+AYznvyK
-	 9U+9Ws+FZx1YU5WsQEij6ezbVY0TLQL+DcRFtcc9gg59b6WtxCeE/PKdardNRAwfx2
-	 Q2aNZtK74qcaA==
+	bh=lJNNPU+h3y3yBzc4wvmuhZQC64m+gFHjjjDi0DSp/2c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=VlA+OEWO93rJUg/FoMLbtCnqubVpiMLr7wQmhfkWxMFgll8DOJtzjWby0X8Zu8cul
+	 gGyFw9OZkRf6Pq2MWiDYDnUeVDELeQ7un8lcyNZbNF6DhLhfFFdP/t1iiD/bwrd9ZB
+	 9fkHpg3MeMN+nflc716WpHx13ynmxvXSqRC7OQy6KiMmfVfdeB+z8HSXPCRCQrj7u/
+	 NKrNXMPv56ciLpLdVXFppPS+I7z+eclFYxLkb2JNVPmUzBfauT8/J9toENDEyMnF6o
+	 LqqxMRMlQ7BJv3aro1HojYQCrfOOBtqVxDj70un7g9Y7/UEcabseg/EeH34+YwiwK/
+	 k0egq2x4xO8ow==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -33,10 +34,12 @@ Cc: linux-kernel@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 0/3] AES library fixups
-Date: Wed, 30 Sep 2026 10:05:39 -0700
-Message-ID: <20260930170542.140403-1-ebiggers@kernel.org>
+Subject: [PATCH 1/3] lib/crypto: x86/aes: Set RNDKEY in aes_cbc_encrypt_aesni()
+Date: Wed, 30 Sep 2026 10:05:40 -0700
+Message-ID: <20260930170542.140403-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260930170542.140403-1-ebiggers@kernel.org>
+References: <20260930170542.140403-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,21 +48,99 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A few small fixups on top of
-https://lore.kernel.org/linux-crypto/20260927224418.109759-1-ebiggers@kernel.org/
+Make aes_cbc_encrypt_aesni() set the RNDKEY register alias explicitly,
+rather than reusing the alias left by the previous function (which
+worked by chance).
 
-Eric Biggers (3):
-  lib/crypto: x86/aes: Set RNDKEY in aes_cbc_encrypt_aesni()
-  crypto: aes - Boost priority of encryption modes further
-  crypto: x86/aesni-intel - Add transitional selections
+Also consistently comment the register aliases needed by _do_aes.
 
- arch/x86/crypto/Kconfig    | 12 ++++++++++--
- crypto/aes.c               | 12 ++++++------
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
  lib/crypto/x86/aes-aesni.S | 25 +++++++++++++------------
- 3 files changed, 29 insertions(+), 20 deletions(-)
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-
-base-commit: 69897f5e8552af8835a2c8a36aa7d597e1cf6689
+diff --git a/lib/crypto/x86/aes-aesni.S b/lib/crypto/x86/aes-aesni.S
+index cbc0cc23f63e..6795e82c34c8 100644
+--- a/lib/crypto/x86/aes-aesni.S
++++ b/lib/crypto/x86/aes-aesni.S
+@@ -444,13 +444,14 @@ SYM_FUNC_START(aes_cbc_encrypt_aesni)
+ 
+ 	// Other local variables
+ #ifdef __x86_64__
+-	.set	RNDKEY_PTR,	%r9
++	.set	RNDKEY_PTR,	%r9	// Temporary register for _do_aes
+ #else
+-	.set	RNDKEY_PTR,	IV_PTR // IV_PTR is clobbered and reloaded later
++	.set	RNDKEY_PTR,	IV_PTR	// IV_PTR is clobbered and reloaded later
+ #endif
+-	.set	NROUNDS,	TMP_32
++	.set	NROUNDS,	TMP_32	// Temporary register for _do_aes
+ 	.set	AESDATA0,	%xmm0
+ 	.set	PTEXT,		%xmm1
++	.set	RNDKEY,		%xmm2	// Temporary register for _do_aes
+ 	_prologue	uses_arg3=2, uses_arg4=2
+ 
+ 	movdqu		(IV_PTR), AESDATA0
+@@ -484,16 +485,16 @@ SYM_FUNC_START(aes_cbc_decrypt_aesni)
+ 
+ 	// Other local variables
+ #ifdef __x86_64__
+-	.set	RNDKEY_PTR,	%r9
++	.set	RNDKEY_PTR,	%r9	// Temporary register for _do_aes
+ #else
+-	.set	RNDKEY_PTR,	IV_PTR // IV_PTR is clobbered and reloaded later
++	.set	RNDKEY_PTR,	IV_PTR	// IV_PTR is clobbered and reloaded later
+ #endif
+-	.set	NROUNDS,	TMP_32
++	.set	NROUNDS,	TMP_32	// Temporary register for _do_aes
+ 	.set	AESDATA0,	%xmm0
+ 	.set	AESDATA1,	%xmm1
+ 	.set	AESDATA2,	%xmm2
+ 	.set	AESDATA3,	%xmm3
+-	.set	RNDKEY,		%xmm4
++	.set	RNDKEY,		%xmm4	// Temporary register for _do_aes
+ 	.set	IV,		%xmm5
+ 	.set	CTEXT0,		%xmm6
+ 	.set	CTEXT1,		%xmm7
+@@ -575,7 +576,7 @@ SYM_FUNC_END(aes_cbc_decrypt_aesni)
+ 	.set	LSHIFT_MASK,	%xmm1 // [0x80, 0x80, ...] + range(PN_LEN)
+ 	.set	AESDATA0,	%xmm2
+ 	.set	AESDATA1,	%xmm3
+-	.set	RNDKEY,		%xmm4 // Temporary register for _do_aes
++	.set	RNDKEY,		%xmm4	// Temporary register for _do_aes
+ 	.set	IV,		%xmm5
+ 
+ 	_prologue	uses_arg3=2, uses_arg4=2
+@@ -674,7 +675,7 @@ SYM_FUNC_START(aes_ctr64_crypt_aesni)
+ 	.set	LE_CTR,		%xmm4	// Current 128-bit little endian counter
+ 	.set	LE_CTR_INC,	%xmm5	// Initialized to (u64[])[1, 0]
+ 	.set	BSWAP_MASK,	%xmm6
+-	.set	RNDKEY,		%xmm7
++	.set	RNDKEY,		%xmm7	// Temporary register for _do_aes
+ 	.set	RNDKEY_PTR,	LE_CTR_PTR  // Temporary register for _do_aes
+ 	.set	NROUNDS,	TMP_32	// Temporary register for _do_aes
+ 
+@@ -795,17 +796,17 @@ SYM_FUNC_END(aes_ctr64_crypt_aesni)
+ 
+ 	// Other local variables
+ #ifdef __x86_64__
+-	.set	RNDKEY_PTR,	%r9
++	.set	RNDKEY_PTR,	%r9	// Temporary register for _do_aes
+ #else
+ 	.set	RNDKEY_PTR,	TWEAK_PTR // TWEAK_PTR is clobbered and reloaded later.
+ #endif
+-	.set	NROUNDS,	TMP_32
++	.set	NROUNDS,	TMP_32	// Temporary register for _do_aes
+ 	.set	AESDATA0,	%xmm0
+ 	.set	AESDATA1,	%xmm1
+ 	.set	AESDATA2,	%xmm2
+ 	.set	AESDATA3,	%xmm3
+ 	.set	GF_POLY,	%xmm4
+-	.set	RNDKEY,		%xmm5
++	.set	RNDKEY,		%xmm5	// Temporary register for _do_aes
+ 	.set	TWEAK,		%xmm6
+ 	.set	SAVED_TWEAK0,	%xmm7
+ #ifdef __x86_64__
 -- 
 2.55.0
 
