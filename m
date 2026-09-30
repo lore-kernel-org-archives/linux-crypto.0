@@ -1,51 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99435516168;
-	Wed, 30 Sep 2026 16:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AB55172EB;
+	Wed, 30 Sep 2026 16:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790787341; cv=none; b=is7vsH3S19bJeWXR0rkYgLRCuNGVINJMh3w+UJzM8+T2MNar0AowS3ImCjUIELngWfmEiJsUrkW3eP66LPlycv8ErOWxpUmO1O2Guc00zDHGmKYYRL5h6eyKhR2u1fqFBhxqnt1ox/7ms9ztJFIL0VayTZvT0uvKAwQtOUN+jdM=
+	t=1790787384; cv=none; b=i4dL0yRpv8KO9bQr/BQO2CpOn4TWpmOPhM1TFjmu54CW4KKBXVSaW1kuAOnODZWYNuHbhGhT4UsD9ucONgi4JmCfCEhKGAVV1LOOwPIJO4PBWXenA4Da7W8D6+/T6tdrNxTVfht7dgqFBB42npt0TBtbTvT58r9m0ncQ0TTS5lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790787341; c=relaxed/simple;
-	bh=kCyCgTsnlUEUtTx5XDzuYMRr9EEWi8O6pNK8ByDwi40=;
+	s=arc-20240116; t=1790787384; c=relaxed/simple;
+	bh=eAJWhgPEBUmIfICJ2OMf/y08joH9wLceKD7r07HIOgg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rv8EA1k0ZdK3TGEDwknHhVUgGt22Gy7w/XrdLqDpqvenauNsVevZGGp2ZFiB+fR+tpIk/eSCQFCifusMGvvQwC9n3KpiIqShJ9rbOICvf+TzPT6st2y0DPU7kjxxGp60ugPYfzdsuhaBehzU1M1eFu8402z4HwQi413ZwJEgAUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AgsmGb8Y; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=G4Q36iAGCIveKXgLur6UgtDFL9m4xDDHP6UaesfupNpP/Aakt8lFzc5Fq2HInHllylidp9uXS63rE1TVUptyY0VZYyhyVFgp6sktNIJ2S+K94MiuwlN2UywogPS3StsSM3x8o9f0iI0jPFghVAnrwSbNMofQMaheC2xAsGjdwTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OiOhok8J; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AgsmGb8Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA53E1F000FF;
-	Wed, 30 Sep 2026 16:55:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OiOhok8J"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE9F01F0089B;
+	Wed, 30 Sep 2026 16:56:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790787340;
-	bh=WnrxsMlYbuNiN0sOt5cArC0YflbX16T5rrTid0gusO8=;
+	s=k20260515; t=1790787383;
+	bh=MEt9F7bDmFpXzE8U3rYbOUl8S1E1YNzfSq4bi3U+m2A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=AgsmGb8YkWjnWJvzYcKG3u1pK03luyLvOyYDVbjIei41K033UUJ2VlF00Jmc4nNCG
-	 oaK/A/2YMI+sMzddNfsSoPiieoE7UmiSy3BspRMpebe2N25xPUO4IY52dsaL1dNO9r
-	 DgDfB5fwwd0wbHmr2BgGXZY8nVvI8i5FQ46Q5DJeNwsrzFzVdU9o1MA0CrHHTsPum/
-	 jUZ0ik0KMhF7pscIhKpduE/dLoYiurQ0XBEb8XppAki9RmuukkUBwu61m3wCCBLAm6
-	 ZmxT/aTxLwxPrWWH3cDGMV19KCSiEkV89tqn6UCPUtdc6gpccIZo9u9aQSXHBiHKN1
-	 X3GRINPVemvhg==
-Date: Wed, 30 Sep 2026 09:55:38 -0700
+	b=OiOhok8J4oOfwL2I0IK8JGcUqZT7PsmqQQudooDFm3wIPbZpTnqBZ2/wyH/cPCn+6
+	 GSRa2o5JVLy5gxNJxy+rZKNMGYdYYsSLC3u1GbaOfcoefML7O546kycOhol/j7KGx/
+	 maXCxYxaDs+ptjqCpqp2lS9FQVBaefVgHq6PUrFgkHM855P5bHtj1qOJUnORTV0rww
+	 eCAzL5cgJEcDEQGW5QEpRHU0COps1i2YXUvuxt0urTVsdRR8o74rv97zcKDyioaP36
+	 o0RgPA8rtMgiZwIHEZ995GOX/sUcDKiHRmWrxYmL6hVQwjpch7FbqDz0iKthyKWg0I
+	 EJlCqgAkKLdiQ==
+Date: Wed, 30 Sep 2026 09:56:21 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-crypto@vger.kernel.org, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH 0/3] lib/crypto: Provide functions for zeroizing SHA2
- hmac_sha* structures
-Message-ID: <20260930165538.GB1904@sol>
-References: <20260928083055.104266-1-thuth@redhat.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 00/20] Migrate x86 and RISC-V accelerated AES modes
+ into library
+Message-ID: <20260930165621.GC1904@sol>
+References: <20260927224418.109759-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,30 +45,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260928083055.104266-1-thuth@redhat.com>
+In-Reply-To: <20260927224418.109759-1-ebiggers@kernel.org>
 
-On Mon, Sep 28, 2026 at 10:30:52AM +0200, Thomas Huth wrote:
-> This patch series has been split of my earlier zeroization patch
-> series since there were some troubles left with the purgatory patch:
+On Sun, Sep 27, 2026 at 03:42:51PM -0700, Eric Biggers wrote:
+> This series applies to v7.3-rc4.  It can also be retrieved from:
 > 
->  https://lore.kernel.org/all/20260924145806.GA1949494@ax162/
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-lib-x86-riscv-v2
 > 
-> As I've confirmed now, the fix for the problem is indeed to set
-> -D__DISABLE_EXPORTS for the other files in the x86 purgatory, too,
-> so the first patch here has now been changed accordingly.
+> Patch 1 was already applied to libcrypto-fixes, but is resent to make
+> this series applicable directly to v7.3-rc4 (ensuring that the Sashiko
+> review runs).  Patches 2-20 are targeting libcrypto-next for 7.4.
 > 
-> Thomas Huth (3):
->   x86/purgatory: Compile purgatory with -D__NO_FORTIFY and
->     -D__DISABLE_EXPORTS
->   lib/crypto: sha2: Provide functions for zeroizing SHA2 hmac_sha*
->     structures
->   smb: client: Use hmac_sha256_zeroize_ctx function to clear
->     hmac_sha256_ctx
+> This series migrates the x86 and RISC-V accelerated implementations of
+> the AES modes ECB, CBC, CBC-CTS, CTR, XCTR, and XTS into lib/crypto/.
 > 
->  arch/x86/purgatory/Makefile   |  3 +-
->  fs/smb/client/smb2transport.c |  3 +-
->  include/crypto/sha2.h         | 73 +++++++++++++++++++++++++++++++++++
->  3 files changed, 75 insertions(+), 4 deletions(-)
+> This makes the corresponding library APIs be properly accelerated on
+> these architectures, while still accelerating crypto_skcipher as well
+> (via the library-based code in crypto/aes.c).
+> 
+> It removes a lot of redundant glue code, since crypto API boilerplate no
+> longer needs to be duplicated per-architecture.
+> 
+> Finally, it fixes the longstanding issue where these optimizations were
+> disabled by default.
+> 
+> In the case of RISC-V, this series handles all remaining AES code in
+> arch/riscv/crypto/.  In the case of x86, AES-GCM is still left in
+> arch/x86/crypto/ for now; it will be handled later.  Other architectures
+> will be handled later as well.
+> 
+> For various reasons, aesni-intel_asm.S (the x86-accelerated ECB, CBC,
+> CBC-CTS, CTR, and XTS code that doesn't use AVX or VAES) is replaced
+> with new functions written from scratch.  The other assembly functions
+> are kept but are modified slightly for integration into the library.
+> 
 
 Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
