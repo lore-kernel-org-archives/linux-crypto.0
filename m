@@ -1,194 +1,158 @@
-Received: from mx0b-0002e601.pphosted.com (mx0b-0002e601.pphosted.com [148.163.154.28])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3276A4F85D1;
-	Wed, 30 Sep 2026 13:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.154.28
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790773470; cv=fail; b=GG0YO1uG20X8xksOveM2vRhAQjbIsXhqn5UKhpiZc8vTFbZog3eAwWrzGzCfYpvDZxRsOAYvqWefqxYTgxUWgU6qYz8IGJR6d8UQ2FqAA+8ifGM3WvySbd2SS14Gm/HLMH1UA3lOKSB1lGPkPgdlIICF4VjIR54DSFvpF+AOAnQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790773470; c=relaxed/simple;
-	bh=ndwIygiGssDoz5q/ueg07gfaYiLfaaO8MLV274FTOVQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sqL8zkW3Sx3gPAGBXP5VCrJyBrllaO3X3bOE4tvOY7agZ2CMDP81pR6ScixqPrDzdzSm4odNIa5w74n2zl2iVvriFGwx0TmYPdg2dyTe8MC9DE8VCIbFC/lc9/f6GZO0ug5jjkDjBh8/xce3p8qRAzd2NexepK9oJNiOQEo9oTc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b=oMX2DFzE; dkim=pass (1024-bit key) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.b=iCbwkNfE; arc=fail smtp.client-ip=148.163.154.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A126A4D5992;
+	Wed, 30 Sep 2026 13:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790774174; cv=none; b=LTk0dCKjE1qNBNbVZkvtaMf2r9buC9TGZfmrVj6es5DCLg7ydbWBXOB4mj7rts1p0dj3LeYSUDJogU6Bl8iSTDb5g3Eo65H6SzbL18WKeQU8nbU/sj1iQuGN8pcdbal2VrHRqvR4fWBhyiXcnEwETnKH4OeBwQATz1jXoKfg2+g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790774174; c=relaxed/simple;
+	bh=2W2b5w9CitvZJwAgaF0y7ed8QMsLx48Y3KCdeiUUSaE=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=CIDK9rk38+miSKfWQp7WLcbWEzGkbw8XxSe/DeEtHkR6EbL9kLgZuTsiWOLWqUC3W7F4IDL+dPSidddeSkMxNxzczcgjdiEvlGqAKKC2goePXvhrOe4VNBJwTt6XCXCnQ+gHS0O83FrYbYwzEluZC0vWnnCgwOsVAt0IoMTg5tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3zUeeHE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b="oMX2DFzE";
-	dkim=pass (1024-bit key) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.b="iCbwkNfE"
-Received: from pps.filterd (m0374955.ppops.net [127.0.0.1])
-	by mx0b-0002e601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 68UB5v3B3214059;
-	Wed, 30 Sep 2026 08:04:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	proofpoint-05-2026; bh=ZVcTeE6m/y53kUFmifhnWrtEOUK+oXArPdjthkrLB
-	aw=; b=oMX2DFzEwB/PpJQJu5GrDPbKu1wbegbyc+fDC5pBgE6DrsNbCEmLRUhRs
-	LrY4Or+IHeTE8TQSFC61XgHHXzLzWNrUs19fo3Q2hNfG3obH8w6f/S4BOThYGROc
-	6S1axjPA8NjRB/QUNc1o0Ag/BuVeEDVbYsVxseG7tSBDErbG8xglZIhbCFmMaYaq
-	lYjKtYsjKbOQf26WHGVCqDZF7kQiVvfPPa+kS1SNOSLD+CtoikyUKvZl7VRyqu10
-	GGGTsPqLf3Bl2nvwJcqY2v+q+eKvMIdj/VX9Bs8zxD29QQLSY4z0IOx6jhUXn+wH
-	+osXQQ1AiaPSW0KFoYZ/Wcvk6jBvw==
-Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11012003.outbound.protection.outlook.com [52.101.43.3])
-	by mx0b-0002e601.pphosted.com (PPS) with ESMTPS id 4h0ydv96xx-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 30 Sep 2026 08:04:12 -0500 (CDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nIwqFJMm3/yg8wgWL96Yq3SB373kD8XTHLYRnsLh1IJ5+wY4kSzUIjAm63e//oIzWYDfE4wzVz02WgFgRXhwQrTp2g+/rwjCOF4678RbP0J0ugJ5+X++TNMwuAMw4LCuX6bVMadNSig1tPGuOWdPMuvoGiru2LRhzHMm8P9o6/fvCTd11YcianEXBNJazIYvSvHax9wythmXx1o2ea0eq1eOqkXBdUGO+HgfAI11PsRfl8TQ+swE43/CGCqhQTG6oR4K1POiKQe/3/XkaNSpgsfTGjtw5e+S1N5sY+J7j3ywMxlTZiYjcDXIjwrMy1u6HHMyb6JvpaiT/HNfbcjPqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZVcTeE6m/y53kUFmifhnWrtEOUK+oXArPdjthkrLBaw=;
- b=vZI445l/ZLqzKGRkCSXm+Aa0x7bn9Ur4Nsq31dkoTijg1LUcyia58k8nBBvUfjebWRwr/ftYyPfnGAqVsn0KQN4Wgu6Gjzib449M2eRiYxMogm+0zJ2Bv9cUgBodjq4LngQhu6eMhJz8xjNVSZzX7r5rcm6bMjKWiKaaG6JbvFyCxk1/Kn7nopKtFRL3iSlRqyzVZ51RInvFd4lx2Z+VaouLiw020aDwLPnqJ/zHayGcp/H6b5Yw1mWaiaaP0Gfkz6e7+v5La/59MyZ7xKB2+kSMpodZuPmK1v0Iv22+MDFwMjcNKZXoVq1wfreG4Cdusdbn8peQeG3QTpsU7WeNog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.194) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ticloud.onmicrosoft.com; s=selector1-ticloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZVcTeE6m/y53kUFmifhnWrtEOUK+oXArPdjthkrLBaw=;
- b=iCbwkNfE5Xbu8TbKMoT64LS8udNlZTKUrIHK0PljyAtWn6N+Kpq9neezUKScSmT099Y/pkRenq8upPJUU1myeutgtO1Vmm8ZpcbGJ+pTXEYB8PddikzTFQx64/msNzeMC+SfihTVY4VJH4TIVnWIqIovmJDrotwM6U1Q+5lz9T0=
-Received: from BN0PR04CA0001.namprd04.prod.outlook.com (2603:10b6:408:ee::6)
- by IA1PR10MB5971.namprd10.prod.outlook.com (2603:10b6:208:3ed::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.472.14; Wed, 30 Sep
- 2026 13:04:09 +0000
-Received: from BN7PEPF000000A6.namprd05.prod.outlook.com
- (2603:10b6:408:ee:cafe::5c) by BN0PR04CA0001.outlook.office365.com
- (2603:10b6:408:ee::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.472.14 via Frontend Transport; Wed,
- 30 Sep 2026 13:04:09 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 198.47.21.194) smtp.mailfrom=ti.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
-Received: from flwvzet200.ext.ti.com (198.47.21.194) by
- BN7PEPF000000A6.mail.protection.outlook.com (10.167.245.230) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.472.14 via Frontend Transport; Wed, 30 Sep 2026 13:04:07 +0000
-Received: from DFLE202.ent.ti.com (10.64.6.60) by flwvzet200.ext.ti.com
- (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Wed, 30 Sep
- 2026 08:03:20 -0500
-Received: from DFLE203.ent.ti.com (10.64.6.61) by DFLE202.ent.ti.com
- (10.64.6.60) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Wed, 30 Sep
- 2026 08:03:20 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE203.ent.ti.com
- (10.64.6.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45 via Frontend
- Transport; Wed, 30 Sep 2026 08:03:20 -0500
-Received: from [10.24.53.205] (pratham-workstation-pc.dhcp.ti.com [10.24.53.205])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 68UD3Hhb3163157;
-	Wed, 30 Sep 2026 08:03:18 -0500
-Message-ID: <d181cdef-09dd-4d6c-8f51-cd560bcf05af@ti.com>
-Date: Wed, 30 Sep 2026 18:33:17 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3zUeeHE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FFEB1F000FF;
+	Wed, 30 Sep 2026 13:15:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790774159;
+	bh=RQq3zxbvW0CRQnFqL05jVxP61C6OM3COQRF4/hXrqf8=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=l3zUeeHEKdk2aEmp7uvn3nUyTLjrPE1XFDsfNdoUtcqxI62UX7M6zQVb0vWwnzu8v
+	 CUGbPyg7O0LHQfoNczEXawzM/XgjXSR9nyAKhfHBouxmtOvGSJjGloF0A9MHSG3ePQ
+	 TlhaXMJFCjlU5b9AW4mKriU7FEfbBESwVAflWkL2yyyklbgWs25PD9mpSxXzVIqvDr
+	 DA/7qM37EIeJj/plgdIX3+6BUAH44/+vUozW9IcaDOTgN9VlQ6DVraaOPvUn+sRX3U
+	 5EjRCVeJ8LNp2gtFAivo/D2x0ihciFbkqHskchemOexBY+veJ74ub4AEa2RnHij8C6
+	 8sAqjNEoc07tA==
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 7891B198003A;
+	Wed, 30 Sep 2026 09:15:57 -0400 (EDT)
+Received: from ams-imap-11 ([10.64.2.31])
+  by ams-compute-02.internal (MEProxy); Wed, 30 Sep 2026 09:15:57 -0400
+X-ME-Sender: <xms:iwu9asVpkuuQd-zSzBwYUXlvjydMWP9l1UeAcmwICvEGgj49DUXrMQ>
+    <xme:iwu9arbaiAuoianQMsQiKHehH2ssN2G8q2qBJLqRp8-CeA56Yy5HJKkWJ56Ylmjdm
+    Xjt_TJYgs7GGANBs4cxkYGkepab5pSlziCiXgHr6DjhNs2S2zYLFnw>
+X-ME-Proxy-Cause: dmFkZTEeDmdMrlEwTtESmDsCIEznmr5i42EluG+14rMDU/Yf1Ka8K5mnopAhISDdZ7sgXE
+    oSlOZfQqzwDyKV4jm6PRU/ECknr334Ik8NuS7WMF9o1NHXiToE5HUXPImIr9yVpMTHc4RU
+    r8JS3rQbukBtma79z041uDfkXzo0Gofz7xDGdLqLSoGNebxH4QfJMGDlMgrr/hGLwOMaWy
+    e1NCrptSJwHxyCIm2Iq8Ek2baDpL/cZRwIcs28hC60dAsh1mU+h7/1DJWUfyNFJXS9hkUh
+    gO3PM22f0z9/Xo+9EO7xUz6wa3GjFQag7uowUy1983jPDbnkkHWLjtR3zRF6cJkHH3nKT0
+    pMt56zLMfNIBbUqzYvYyapM5XQIJZojRQARBXiyNQuanTYBybCJDMtwJzYoyjvNrbQmffH
+    BScGAOsmgpNKUHyKaPatz3fGMYPitCDm186hPALlm9L8HFhTxxl0hlObX+6pMGN1Nn2DYY
+    8GCz6CyLK9wG+BTQAKzNU61AYqTC+8E6SaAuf2PUQqcl5JjDFhCHvfCnZRFh3yM3Jos3rf
+    N6wGR+5AuPThs91Jp0jC074koUNtHuuDovyD7dx/d/elIHiVtq/CaPeVfnKBcX2gq9X6XD
+    EuWjTLbIItm09JnLMHNoJRUWYYih6wXNITcF8J4BkCQViplkLW0MvyxubxUw
+X-ME-Proxy: <xmx:jQu9ai3nKzQACpy9ShQYyykovrswdQCriH1AoY_TQy9NAeyv5N9JLg>
+    <xmx:jQu9ahHal6yDuZPwenAlTiAMlgolL8GYu6uOx_aC_OBGW_nLVenXhQ>
+    <xmx:jQu9atFvAjPEl-cNU9WvTiuEoxPH8Poy2f1p9CqcQVYuBlH3dxh7pQ>
+    <xmx:jQu9ak5C3223rYJVT-S3Wq_cq7ZX8bFajz3Pdt-EMWr1N5koEkqQqA>
+    <xmx:jQu9aiwkp6iheB0F8f3ipZEJNrwjRbgcxQFsdADoPZExx1IESrbXb0ao>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 7DCE5F80084; Wed, 30 Sep 2026 09:15:55 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 00/15] Fix several issues in DTHEv2 driver
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Sebin
- Francis" <sebin.francis@ti.com>,
-        Manorit Chawdhry <m-chawdhry@ti.com>,
-        Praneeth Bajjuri <praneeth@ti.com>, Vishal Mahaveer <vishalm@ti.com>
-References: <20260930112533.1593952-1-t-pratham@ti.com>
-Content-Language: en-US
-From: T Pratham <t-pratham@ti.com>
-In-Reply-To: <20260930112533.1593952-1-t-pratham@ti.com>
-Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 30 Sep 2026 15:15:35 +0200
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>, x86@kernel.org,
+ linux-riscv@lists.infradead.org
+Message-Id: <e357ed97-6098-49c1-b031-c4955c97a35a@app.fastmail.com>
+In-Reply-To: <20260927224418.109759-1-ebiggers@kernel.org>
+References: <20260927224418.109759-1-ebiggers@kernel.org>
+Subject: Re: [PATCH v2 00/20] Migrate x86 and RISC-V accelerated AES modes into library
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN7PEPF000000A6:EE_|IA1PR10MB5971:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2b4dbc59-ecec-4f5d-06d7-08df1ef34fb7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|82310400026|1800799024|376014|36860700016|10067099003|56012099006|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	9zOv26bxUGgWrw0umGCYvmNezIZgB7oS4eb+B9g7xzId/7HsZwIG5AxquedPPZb8rKqtfGS2sQ89K0MSCx88mzxGD4BZeBWoZ0or3Me6MGrnj8O7Ph7ZtzWO1wu8m+EJK6hO17WhJHOHUtO3DhvciQd54c7fSE5cA1qXIfk5GSPMcqk1J8LCZZH0CM8xmaSawAYBg8W3+kyNrFSd3wYPvmPQPZJbLQTLfDhaJVWIdUN25u1F4z+0CgRsG+7ZLYed5FhHd7jaAGfEc9kte0doDHFuZf46iCpzJ2zpgJMJM3997sHyDBLlj5dg3JyZWxxiFEIyErdrW3l1jPaQE6EIBhFvWAlkzyxGmuDt9RO+5h01ztZp9CLwxySrG83+mcyDCbhChggvYOcumkJUDwfDWMS/hddglmjZBZXr/HZihvgOdvV+U3JMkTLzhmnX4YiHl/7Mc5IzldMs+KaJCSioAWOrylfze8631DgkpKNnTqtlNTz4iYHlNTDd74vWhhxT+ZYmZ9YSKwe9MWoRDByrxOsOS6stafICOpvSpgTAmvFvV5xOLdT9gtJEqMEpnOzRouBpepLrBq9bpn+MRiiQypOLswo3E2jNTv7KWXyBFd288XHSypiglBAxLdainSub3JFjinAJoZzUnxlE/9y/s56z1RJG9spRyR9QrXe8ID528giUySQoViQwRWetKH0c/VLmKV26nCXIRGU0JPQPTg==
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(23010399003)(82310400026)(1800799024)(376014)(36860700016)(10067099003)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	dax+MV2XoNIhAm2Ij9GwGxhiGsYPbLxNM4EhJj1+XtdC2kirqiH9/aeDinxq3ZgZe22GMnmZwIy6mzbE4/BzJ/hZAAk9jKJwI93T4Ou+FxIA0OQp59VDyEax//N+2EVkNiUaqTgUwKhM3MEb5wmpY0ttYmFVrii8QFD0tGx2aBT6izGH0tqGSkoCn1wZHpDlIVndcmqRBZnXGiG6gI3ZuSKiVTfo/MvYdFT1o2SFshN1Q4WboS0VopomuXhNzOF5gCdgMDh8fi90mvwP0d97IjvIzfEDNDjuYJBDW6fzmm3O5G1/nhb/uCsfu/ojGlyyiXLOGIk8hRcjty8e9DN2USsM04e1xNZPwMj5InTCvLyMqwpsDhiBQunBdmU5ETUUZy5k0hDsMpf/Yyf/b43ExmquK5RmT3geCU3FEL1dADO1PzFc3mJt4TFPqV9HtYJV
-X-Exchange-RoutingPolicyChecked:
-	VLjwIA4da7jzXDQ35nHm03dYJOy8EMS7yRDY6xDsVBB4CDakkcTcea2OB5q5xO7D4LVko+3pJIdSu0eYe2ylyy7yGc+qgMzk2hU/WyYGDtCAu3bueXRbSMNBHse5eFEDO5iVIWlvlwSQpaxzRhBniW/HuBM2tmlWyicnQlys6pR7st64NHM0sQEh2BHRdfWv26OoOgqt6Yq7s2hgUNQPvlti9P+b1jsWtku0nx+813UJUyBeQISCIdOlbEpNEbGr6tQpmf7zUkZBe3UeuTIjfPeyLBhb8f+iH6eYDAW+Z8B0g2gAHM2DZPYWVarIwoznGM5fla1J06snfobvWG7SjA==
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2026 13:04:07.2087
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b4dbc59-ecec-4f5d-06d7-08df1ef34fb7
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN7PEPF000000A6.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB5971
-X-Proofpoint-Spam-Info: AW1haW4tMjYwOTMwMDA1MSBTYWx0ZWRfX4dHD8C+ujo0x
- u8GAkmqqdGShUM7KYO/ctJbaqAUCejD1NM0byCcDm4uZgHNTviu4ggxxzBd+bwdGS0ksWj2HHFS
- AFZMaBSIX+JEdpM5Cc8byo1OCuPG2Gw=
-X-Proofpoint-GUID: 7oicbx1J13Hdrp-m5A27i-J6AUfKTaEF
-X-Authority-Analysis: v=2.4 cv=TegDJhQh c=1 sm=1 tr=0 ts=6abd08cc cx=c_pps
- a=ayBBURk7jZ4GzqZFlR2IhQ==:117 a=iwqwCZQqcuTv3JOpYdM7/Q==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10
- a=AlMIdn_sM9wA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Z8NIEmU8O1QQgoT56wFK:22
- a=fPAWb5peG099m5CrUpKH:22 a=sozttTNsAAAA:8 a=A0WTEL4GiMLLo0qe230A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 7oicbx1J13Hdrp-m5A27i-J6AUfKTaEF
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTMwMDA1MSBTYWx0ZWRfX70OMWWsn87An
- SjftM8mTCVYKOAOmIapXwRjecgMLS8UCwfieYkci42YHuI6KKhq1xuYpfdCPCXQIhe9z/mixCsw
- UEB1yRRsWBZpaxg2+Ozeg3zC8NMpQImxyIZcULPsUBDjHG1TWm65x+7NUPjK9qLBmT0Rtkc7JUR
- /zu/htfnmAKMg8nStoBIudNKGruOh8pDZWVPGaWjgvBXzdbrdqm6uEBaD2hwF9VMkcW4i6UJktj
- 4dkm4WwuSGNUPpuuEeq8+rzeHpuHAhC4nvDCM4bpv8gyNYPXDZ2p7zkuo2agwKXqHI8DzGxrQ2c
- 9D5Ek0AR00aNdN1XtkBG56XFzufQ4fsgjc2MgpjqozXT6RoSZMUxCGr78qHKbUKNbs6T6cMaTGJ
- h45eJeuCVOfL80UcF4wXddtRojZNZLsxLbyekAAABoeDw2x5oTiF/pGFisWdxN1YFGW662fEx7w
- Sv5FhTEWqInbjwhM/Sg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-09-30_02,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0 bulkscore=0
- clxscore=1015 priorityscore=1501 adultscore=0 suspectscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2609300051
 
-On 9/30/26 16:55, T Pratham wrote:
-> This series fixes a handful of independent and mostly benign till now
-> issues in the DTHEv2 driver which were flagged by bots and AI agents.
-> Except for the fifth patch in this series which was found in an
-> internal testing.
-> 
-> The Sashiko review on DTHEv2 hashing driver patch series v5 pointed out
-> some pre-existing issues which needed to be fixed [1].
-> 
-> One of the issues had already been flagged by kernel test bot and a fix
-> sent on the list by Mert [2].
-> 
-> I included this patch in this series with minor edits. Then the Sashiko
-> review page for [2] had more comments [3]
-> 
-> Overall this resulted in a bunch of fixes patches which would have
-> deviated the DTHEv2 hashing driver series had they been included with
-> it. So I clubbed them together in a new patch series which is this.
-> 
-> Signed-off-by: T Pratham <t-pratham@ti.com>
-> ---
-Superseeded with v7 containing one minor change (addressing Sashiko
-comments)
 
--- 
-Regards
-T Pratham <t-pratham@ti.com>
+
+On Mon, 28 Sep 2026, at 00:42, Eric Biggers wrote:
+> This series applies to v7.3-rc4.  It can also be retrieved from:
+>
+>     git fetch 
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git 
+> aes-lib-x86-riscv-v2
+>
+> Patch 1 was already applied to libcrypto-fixes, but is resent to make
+> this series applicable directly to v7.3-rc4 (ensuring that the Sashiko
+> review runs).  Patches 2-20 are targeting libcrypto-next for 7.4.
+>
+> This series migrates the x86 and RISC-V accelerated implementations of
+> the AES modes ECB, CBC, CBC-CTS, CTR, XCTR, and XTS into lib/crypto/.
+>
+> This makes the corresponding library APIs be properly accelerated on
+> these architectures, while still accelerating crypto_skcipher as well
+> (via the library-based code in crypto/aes.c).
+>
+> It removes a lot of redundant glue code, since crypto API boilerplate no
+> longer needs to be duplicated per-architecture.
+>
+> Finally, it fixes the longstanding issue where these optimizations were
+> disabled by default.
+>
+> In the case of RISC-V, this series handles all remaining AES code in
+> arch/riscv/crypto/.  In the case of x86, AES-GCM is still left in
+> arch/x86/crypto/ for now; it will be handled later.  Other architectures
+> will be handled later as well.
+>
+> For various reasons, aesni-intel_asm.S (the x86-accelerated ECB, CBC,
+> CBC-CTS, CTR, and XTS code that doesn't use AVX or VAES) is replaced
+> with new functions written from scratch.  The other assembly functions
+> are kept but are modified slightly for integration into the library.
+>
+> Changed in v2:
+>    - Fixed 32-bit x86 bisection hazards by making aesni-intel depend on
+>      CONFIG_64BIT earlier in the series.
+>
+>    - Fixed handling of lengths over S32_MAX in RISC-V CTR code.
+>
+>    - Restored selection of CRYPTO_SKCIPHER by CRYPTO_AES_NI_INTEL, since
+>      it is still needed.
+>
+>    - Made the 32-bit x86 XTS code spill the tweaks to the stack rather
+>      than to the destination buffer.
+>
+>    - Removed the no-longer-needed single block special case from the
+>      RISC-V CBC-CTS assembly code.
+>
+>    - Made x86 CBC-CTS encryption and decryption share more code.
+>
+>    - Reordered the function parameters in aes-xts-avx-x86_64.S and
+>      aes-ctr-avx-x86_64.S.
+>
+>    - Other miscellaneous cleanups.
+>
+> Eric Biggers (20):
+>   crypto: aes - Fix undesired override of some optimized AES modes
+>   lib/crypto: aes-xctr: Pass counter by value to aes_xctr_arch()
+>   lib/crypto: x86/aes: Clean up aes-aesni.S in preparation for AES modes
+>   lib/crypto: x86/aes-ecb: Add AES-NI optimization
+>   lib/crypto: x86/aes-cbc: Add AES-NI optimization
+>   lib/crypto: x86/aes-ctr: Add AES-NI optimization
+>   lib/crypto: x86/aes-xts: Add AES-NI optimization
+>   crypto: x86/aes - Drop superseded 32-bit build support
+>   crypto: x86/aes-ecb - Remove superseded ECB skcipher
+>   crypto: x86/aes-cbc - Remove superseded CBC skciphers
+>   crypto: x86/aes-ctr - Remove superseded CTR skcipher
+>   crypto: x86/aes-xts - Remove superseded XTS skcipher
+>   lib/crypto: x86/aes-ctr: Migrate AVX-optimized code into library
+>   lib/crypto: x86/aes-xts: Migrate AVX-optimized code into library
+>   lib/crypto: riscv/aes: Copy aes-macros.S to library
+>   lib/crypto: riscv/aes: Pass key struct to assembly code
+>   lib/crypto: riscv/aes-ecb: Migrate optimized code into library
+>   lib/crypto: riscv/aes-cbc: Migrate optimized code into library
+>   lib/crypto: riscv/aes-ctr: Migrate optimized code into library
+>   lib/crypto: riscv/aes-xts: Migrate optimized code into library
+>
+
+For the series,
+
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
