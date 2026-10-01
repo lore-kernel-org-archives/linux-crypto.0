@@ -1,99 +1,85 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A57951D51E;
-	Thu,  1 Oct 2026 20:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B76047D951;
+	Thu,  1 Oct 2026 21:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790886188; cv=none; b=Eh/rXkv7KiuCxr5ON0VJ3I8Em/bSZ+hDfABIpMMqZekmHE4F3ENZ3DwZv9wT/Jpx5LRGseT+zTZTzQFbLzVNwISl9DgJUebXvhAqkCKiGd5A+nikQG4kcA0y9DtlGpJ6GqdljDrj+7DAzYOY5KhTBo80jCR8XxH0RcfV0N4SuSY=
+	t=1790888715; cv=none; b=XQhYDvsLw5zaTEPO66aUZVPMDTVpNHhKiWvnFhWzKs9PgIaSddmtFnl3r0glHL7thLoANX5kN6bXbymQyFDb88sR25tfxYMtlYpFae822Yv3w4pi6lZpL3X/FGTX0GTnDe9Nc+Y/zDk3H5QFp5hJYtbrFmMUmY3Q5FYC8xDlgbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790886188; c=relaxed/simple;
-	bh=QH0Ond0pO0Z/CebP1SXSVOfeQ2bDj0kyIRwKTBh+YNw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bN6wDZidp1HsbGzzERo+MxdJltqvcGbxMxwl3hlSym3CZg1fikbldQ6eHFSJOHAhB8LVGVJCFIHwGYRUsPTjxqgSVb4Ak+ekNc1+1zQxvVbyY9Bx6n69P0ZoWIxpcMvHv8vObGruXdFFtLUzGIEBl70Ai+gOGZEobhUWsAxxvT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Hp6E7lO+; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1790888715; c=relaxed/simple;
+	bh=Nz0LSI3aZYawMQnKQbqCra0lDUN5qofWzsmAg68O8io=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gZQwROXy+Ubjh5d0qt0lXtwuGcRDO3eN+L60Wlzepcpaew12b3WmLybEhKdZuHtLNL35f3ZO3QS/ZSZjh42abWHMAXk1gg+Bk0PWiHAeK04OfCTbFNLGRm+6m0taxaxmPBztvkOazRehNvlM53gr+XsuGOuWLvw9eHmoL6Siz5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mjgu9TMb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Hp6E7lO+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=QH0Ond0pO0Z/CebP1SXSVOfeQ2bDj0kyIRwKTBh+YNw=;
-	t=1790886186; x=1792095786; b=Hp6E7lO+FE7A4yIxfFK628HFs/kkgSp0H1YSok8BoFjs28V
-	t4FkcRUhMMVdHWAHSPNciSPvaT12mpRF8p32cZEgG+mPKLJ18w37bffofwBfjfGqLYzBWmirjcjY1
-	0AFvFcOe+4Nj3dRgcb9iuR6Wg1YkECqPqrzZON4vlmicYaL6F1zmdAY2qlTpXpjunKpjBSIYyPGw+
-	1XHiJcnJsCKjHEJd6JWJq7sKA3YQzDC0jEZKX1dgh/eeThO6hCuwtu9MZYzKXPKygAFWQhCopwHRy
-	6ELlL8scWU4laYEatZUBoS5XyEl/1s2uwwnQocoQP3kElhYVAz7OZXDg5/qT7g0A==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__ECDSA_SECP256R1_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1xCNIv-00000000R4f-1i7Y;
-	Thu, 01 Oct 2026 22:22:57 +0200
-Message-ID: <4ede9873924541b7bed3fc09f5b8c8eb0415ea40.camel@sipsolutions.net>
-Subject: Re: [PATCH v2 0/5] wifi: add opt-in FIPS exception for iwlwifi
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: davem@davemloft.net, emmanuel.grumbach@intel.com, 
-	herbert@gondor.apana.org.au, ilan.peer@intel.com,
- linux-crypto@vger.kernel.org, 	linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org, 	miriam.rachel.korenblit@intel.com
-Date: Thu, 01 Oct 2026 22:22:56 +0200
-In-Reply-To: <20261001185218.189030-1-jtornosm@redhat.com>
-References: 
-	<eac35c39724254fe0b208d50130cd6a6737ee407.camel@sipsolutions.net>
-	 <20261001185218.189030-1-jtornosm@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-2.fc44) 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mjgu9TMb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FB3A1F000FF;
+	Thu,  1 Oct 2026 21:05:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790888714;
+	bh=MaEMQ5X2bx5FhW9iOXMM3Gs1pceUqUDrW0W/Yi+E1tk=;
+	h=From:To:Cc:Subject:Date;
+	b=mjgu9TMbC00b5ykkzAq9efosTt5Zeec4nGpNGxqj5k6mXxAHZuEOMmlBfZshTTdE0
+	 VUDOeTiCgspL1FcOekGab8a0+mb3GjxDsP2Ye8AIOfs5NJoiDR8KqZA427fA0gCQkk
+	 aZQHr/uBsZ7uqFwWvOZAm5vuF2zmxC9rH3ZPhGyPc4Jz9aqURp4/Z2Tew5GG2wQvW1
+	 uszgajNmWMXgqanOXWwlYAhFO+KT0WSQ9GUGh/0vmUeeipVTaOGNIDkieHyOHRxmO7
+	 lyBfWCdmCIwAcZlFNpXP2Cf1CbaF44Z5yqVMNrjNMwQxAjlthzdKy/EDYC2Ak72vk5
+	 NSvmih+dN5c0A==
+From: Thorsten Blum <blum@kernel.org>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Can Peng <pengcan@kylinos.cn>,
+	Linus Walleij <linusw@kernel.org>
+Cc: Thorsten Blum <blum@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: stm32 - use swap() in stm32_rng_probe()
+Date: Thu,  1 Oct 2026 23:04:48 +0200
+Message-ID: <20261001210450.37467-2-blum@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1197; i=blum@kernel.org; h=from:subject; bh=Nz0LSI3aZYawMQnKQbqCra0lDUN5qofWzsmAg68O8io=; b=kA0DAAoWXqtxINjMdS4ByyZiAGq+yvKireINrPyi0y0O4zRoXZkaH6bDL64tXpx61Rlyk51U5 oh1BAAWCgAdFiEE4Jr4mE11fHmyNFi5XqtxINjMdS4FAmq+yvIACgkQXqtxINjMdS4AOwEA0uqR pwNEUqQcXK7n595liNdI+iJmFG5r9X9nX142apMA/0SKwEZZqEmSEn9+VduY/fA6+u8SXdxR1FQ RPibC7doD
+X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2026-10-01 at 20:52 +0200, Jose Ignacio Tornos Martinez wrote:
-> Hi Johannes,
->=20
-> > I don't _think_ it does that. It does behave a bit differently for MFP,
-> > but that's wrt. management frames.
->=20
-> Good to know. I will re-test with just MFP re-enabled and no data
-> keys to hardware, adding more debug logging to understand where
-> data gets stuck. Something else must have been wrong in my v1 test.
->=20
-> > Fundamentally, in this case the driver (even mac80211) shouldn't instal=
-l
-> > (data) keys to hardware.
->=20
-> Ok
->=20
-> > I'd need to sit down and (re-)derive that, but I don't recall it being
-> > particularly tricky - just boils down to the various dependencies
-> > between features.
->=20
-> Ok, I can assume there are no other dependencies to start with.
+Use swap() to simplify stm32_rng_probe().
 
-A-MSDU size is definitely dependent on PTK since A-MSDU splitting
-requires hardware crypto, and otherwise the RX buffers aren't big
-enough=C2=A0(by default, but it's not worth the complexity, and people won'=
-t
-want to do big allocations anyway). There may eventually be a way out
-with split RBs but we don't (yet) implement that in the driver.
+Signed-off-by: Thorsten Blum <blum@kernel.org>
+---
+ drivers/char/hw_random/stm32-rng.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-EHT requires MFP and beacon protection, beacon protection requires
-checking in firmware since firmware reacts to beacon frames.
-
-6 GHz was documented in the code.
-
-MLO needs EHT and then transitively that was disabled.
-
-The biggest question then remains what MFP gaps you create with this. I
-_think_ you might even have to install random keys to the firmware, but
-... then maybe it wouldn't even pass certain frames to the driver? I'm
-not sure you want to accept a loss of MFP security.
-
-johannes
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index d3fc910f674a..b13361dcad12 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -569,18 +569,11 @@ static int stm32_rng_probe(struct platform_device *ofdev)
+ 		return dev_err_probe(dev, -EINVAL, "Failed to get clocks: %d\n", ret);
+ 
+ 	if (priv->data->nb_clock == 2) {
+-		const char *id = priv->clk_bulk[1].id;
+-		struct clk *clk = priv->clk_bulk[1].clk;
+-
+ 		if (!priv->clk_bulk[0].id || !priv->clk_bulk[1].id)
+ 			return dev_err_probe(dev, -EINVAL, "Missing clock name\n");
+ 
+-		if (strcmp(priv->clk_bulk[0].id, "core")) {
+-			priv->clk_bulk[1].id = priv->clk_bulk[0].id;
+-			priv->clk_bulk[1].clk = priv->clk_bulk[0].clk;
+-			priv->clk_bulk[0].id = id;
+-			priv->clk_bulk[0].clk = clk;
+-		}
++		if (strcmp(priv->clk_bulk[0].id, "core"))
++			swap(priv->clk_bulk[0], priv->clk_bulk[1]);
+ 	}
+ 
+ 	pm_runtime_set_autosuspend_delay(dev, 100);
