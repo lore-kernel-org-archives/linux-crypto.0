@@ -1,111 +1,158 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53693A6F10;
-	Thu,  1 Oct 2026 15:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDB54E4C30
+	for <linux-crypto@vger.kernel.org>; Thu,  1 Oct 2026 15:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790867198; cv=none; b=DFzFV3r+ROqnOIA+qg4uFyYcF8Sv4C0JVzMC6zM+PUl0kOpaY8riPI+I9BqA3IGObdOgglAJmRqDqf19p27XOIm+4B+qzsDE53t/VJ9x8ABDc/4PUBhKMYrnQkZZWAuBywlAiVxTcg1rAJs3A5djNy1Y6egGa7rjx1+R3632T84=
+	t=1790870379; cv=none; b=JIJzBqgYLmY0YZPHAttmlLlv5IOLfPxf2gcT2TLcVV5TCs2gY+DYqwgjr1PX/NtPl9n/QqdrS1XKfTJ0jgh6fcLIhrrAF46YDhFBn3YxqPRubE5pYnzuYho494AF8RUQ+2WNgXIft02S/JMUmUQYyDbW/pKj7qZ3ahUn9W/uc6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790867198; c=relaxed/simple;
-	bh=6tnpaxSYCnecmkR2q7Y2SX+ha2jZJ9VAu4sMFH6bceM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EvW/Y68e5+gZ7XWvpzc6cs6mk6dZu3TNK6RU3BHwNu1XieqI7Dne1Y5VXuQweA2OVTwz8Q+33hpEqeeY775vD0zl5ybJngJRZOggPUXxAGMJFbGIaWhV4J4+x1qR02sm66h6VT8GWFhIp33tmPeD347jXKMC35+SCQP82hjOaFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ajkguinj; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790870379; c=relaxed/simple;
+	bh=VSOQRqkRi9QhMTkEEnVtkYBylSOIqf7jD4LzCWJyB1U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mVn+R2QZUEEG3hIe8BOoE4DxZlOL136LQXx15gTqRacYfpqjGjqOiG/0AWui2qslOm5hetBihX7069qOB6x0wylw9pYlq0ohqH5QBrZ6wknqqBaNjKjn0Aa3Bl1IdZjBR/Owp+ddbCRNDeeZXx/uYYPt14slRcW+jPgFt0MHfzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gcxb1NY8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ajkguinj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4AB01F00898;
-	Thu,  1 Oct 2026 15:06:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790867197;
-	bh=bqQFgH+WBxsZQmR/PwdeROrCNijo0oLTzM8iyufxI7k=;
-	h=From:To:Cc:Subject:Date;
-	b=Ajkguinj54ZGtZlDRxO77k1F85GAUj6PLxkWsWocBkMPxrH+fRhCelfgAmFPFqbO7
-	 TP3RYOtDpmNJveHZGIWSxsy1+H86zftp5ZgV0IZdcTlgmYDvB66vAhBe9nhX4pD6z9
-	 TUENRi9vxigH4AX6nV9PTpFzhkjCn0+u0vc5L3AsVq0DJRNBvhG3chRaCK50CpIuLy
-	 UQRV3azz7n9W5alTsKd0KUwzy7t4RvZyDlcvNiKeh/+hoX+3jtzV+i0TLF1aKf5EeP
-	 hz9HngvIBtXcOcP1Tl7QnGsO6+mUUtHO0uCw/lbdKfnqgV09c4LzFVMy4dr8j/tn+8
-	 Q2kCu5YDXBKwg==
-From: Thorsten Blum <blum@kernel.org>
-To: Hadar Gat <hadar.gat@arm.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Thorsten Blum <blum@kernel.org>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gcxb1NY8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790870375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VSOQRqkRi9QhMTkEEnVtkYBylSOIqf7jD4LzCWJyB1U=;
+	b=gcxb1NY8bWuoyx+Z2L28+EoDaJPLogX0L3tGIJEyF5h7k3fK0WLT7M+bcs6uZkfvIPVaUn
+	39pFm+2ytvdDD9Ki0XWIvEUNzSDsVuWqQEwuHSq3TRaSmzMjzCooGMOpEYnnfNYR/xqjA4
+	uuD6benqrUBC78o56UawZi2N1pD48UE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-73-0C8GnYawMNOvZcs4wuQPzg-1; Thu,
+ 01 Oct 2026 11:59:31 -0400
+X-MC-Unique: 0C8GnYawMNOvZcs4wuQPzg-1
+X-Mimecast-MFC-AGG-ID: 0C8GnYawMNOvZcs4wuQPzg_1790870370
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 20CA618005B4;
+	Thu,  1 Oct 2026 15:59:29 +0000 (UTC)
+Received: from jtornosm-thinkpadp1gen7.rmtes.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E611E1956089;
+	Thu,  1 Oct 2026 15:59:25 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: johannes@sipsolutions.net
+Cc: davem@davemloft.net,
+	emmanuel.grumbach@intel.com,
+	herbert@gondor.apana.org.au,
+	ilan.peer@intel.com,
+	jtornosm@redhat.com,
 	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] hwrng: cctrng - drop redundant initializations
-Date: Thu,  1 Oct 2026 17:06:04 +0200
-Message-ID: <20261001150603.143696-3-blum@kernel.org>
-X-Mailer: git-send-email 2.55.0
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	miriam.rachel.korenblit@intel.com
+Subject: Re: [PATCH v2 0/5] wifi: add opt-in FIPS exception for iwlwifi
+Date: Thu,  1 Oct 2026 17:59:24 +0200
+Message-ID: <20261001155924.168311-1-jtornosm@redhat.com>
+In-Reply-To: <5cb9e89db758fd3af22d3a168a93406fef82c5c2.camel@sipsolutions.net>
+References: <5cb9e89db758fd3af22d3a168a93406fef82c5c2.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2024; i=blum@kernel.org; h=from:subject; bh=6tnpaxSYCnecmkR2q7Y2SX+ha2jZJ9VAu4sMFH6bceM=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFn7ym7XbKm28fZbpC7r0nfe00I+ibGgXPPsXrWfsvcZn 5d8izjRUcrCIMbFICumyPJg1o8ZvqU1lZtMInbCzGFlAhnCwMUpABP59prhf9r6N4aBuznVN126 M39p72HxOSfP+Me4n/T5nFI4c9OiVzwM/7SqO5t2bXQ5fljb8YvtEvfnaU6x4Z2sTmWSEcJcu5U 28wAA
-X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-The variables are reassigned before their initial values are read - drop
-the redundant initializations.
+Hi Johannes,
 
-Signed-off-by: Thorsten Blum <blum@kernel.org>
----
-Changes in v2:
-- Missed two redundant initializations
-- v1: https://lore.kernel.org/r/20260930200139.110437-4-blum@kernel.org/
----
- drivers/char/hw_random/cctrng.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+> Yes, it does remain disabled, but then (for example) why allow
+> set_rekey_offload() to go through - it's clearly not necessary.
 
-diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
-index 51290ea345c3..be35f058f37a 100644
---- a/drivers/char/hw_random/cctrng.c
-+++ b/drivers/char/hw_random/cctrng.c
-@@ -91,7 +91,7 @@ static int cc_trng_pm_get(struct device *dev)
- 
- static void cc_trng_pm_put_suspend(struct device *dev)
- {
--	int rc = 0;
-+	int rc;
- 
- 	rc = pm_runtime_put_autosuspend(dev);
- 	if (rc)
-@@ -208,7 +208,7 @@ static int cctrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- 	struct cctrng_drvdata *drvdata = (struct cctrng_drvdata *)rng->priv;
- 	struct device *dev = &(drvdata->pdev->dev);
- 	u32 *buf = (u32 *)drvdata->circ.buf;
--	size_t copied = 0;
-+	size_t copied;
- 	size_t cnt_w;
- 	size_t size;
- 	size_t left;
-@@ -268,7 +268,7 @@ static int cctrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- 
- static void cc_trng_hw_trigger(struct cctrng_drvdata *drvdata)
- {
--	u32 tmp_smpl_cnt = 0;
-+	u32 tmp_smpl_cnt;
- 	struct device *dev = &(drvdata->pdev->dev);
- 
- 	dev_dbg(dev, "cctrng hw trigger.\n");
-@@ -309,8 +309,8 @@ static void cc_trng_hw_trigger(struct cctrng_drvdata *drvdata)
- 
- static void cc_trng_compwork_handler(struct work_struct *w)
- {
--	u32 isr = 0;
--	u32 ehr_valid = 0;
-+	u32 isr;
-+	u32 ehr_valid;
- 	struct cctrng_drvdata *drvdata =
- 			container_of(w, struct cctrng_drvdata, compwork);
- 	struct device *dev = &(drvdata->pdev->dev);
-@@ -453,7 +453,7 @@ static int cctrng_probe(struct platform_device *pdev)
- {
- 	struct cctrng_drvdata *drvdata;
- 	struct device *dev = &pdev->dev;
--	int rc = 0;
-+	int rc;
- 	u32 val;
- 	int irq;
- 
+Ok, understood, set_rekey_offload() is not needed with WoWLAN
+disabled, that was an oversight.
+
+> But again, what are you actually trying to achieve?
+
+What I would like and what we need is: data encryption stays in
+software (FIPS-compliant), WiFi connectivity works, and we accept
+that some management frame protection is not fully FIPS-validated.
+
+> If you want big A-MSDUs, then you need hardware crypto, which you allow
+> now, which would seem to _completely_ defeat the purpose of FIPS here
+> (to protect data, if you read it charitably vs. just saying it's for
+> paper-pushing).
+
+Analyzing it again with your comment, you are right about A-MSDUs,
+if there is no HW crypto then big A-MSDUs are not possible anyway,
+so restoring A-MSDU sizes was wrong.
+
+> OTOH, why does IGTK matter so much to you? That particular key has no
+> relation to data protection, so arguably *that* could still be
+> offloaded. But you're doing it all precisely the other way around.
+
+And you are right about IGTK, it has no relation to data protection
+so it could be offloaded, and I should not have kept it in software
+while sending PTK/GTK to firmware. That was indeed the opposite.
+
+> Well, it does work without MFP, so fundamentally the firmware can pass
+> data without having keys?
+
+That is what I would expect, but in v1 I only re-enabled MFP_CAPABLE
+without passing any keys to firmware and got connection but no data
+traffic. Looking at the code, mac80211 SW crypto plumbing works
+correctly when drv_set_key() does not install keys in hardware,
+and the TX path sets IWL_TX_FLAGS_ENCRYPT_DIS for pre-encrypted
+frames. So the host side should handle it. My suspicion is that
+firmware changes its behavior when MFP is negotiated, expecting
+keys to be installed, and drops encrypted data frames it cannot
+decrypt instead of forwarding them to the host. The SEC_ENC_ERR
+messages I saw in v1 were likely from management frames, not data.
+Any guidance on this would help me take the right approach for v3.
+
+> That's not the point - the point is that there are different
+> dependencies and you didn't think about _why_ something is disabled.
+> Not all of this is all related to MFP.
+
+Fair point. These dependencies were not documented in the original
+disabling commits, so I treated everything as a single block to
+revert. Could you clarify which features depend on MFP, which on
+HW crypto, and which on other reasons? That would help me get
+the separation right.
+
+> But again, the way you did that doesn't make any sense.
+
+I just reverted the necessary parts (to me) to the previous working
+state. I can narrow it once I understand the correct separation.
+
+> Which is the opposite of what you actually did.
+
+Understood. The patches gave data keys to firmware (defeating FIPS
+for data) while keeping management keys in software. The correct
+approach should be the reverse: keep PTK/GTK in software for
+FIPS-compliant data encryption, and offload IGTK if needed since
+it has no data relation. Happy to rework this properly for v3.
+
+> I really do think it starts with spelling out what you (or your
+> customers) actually want, and what trade-offs wrt. FIPS you're
+> willing to accept.
+
+Spelled out: data encryption (PTK/GTK) must stay in software
+(FIPS-compliant). We accept that firmware-autonomous management
+frames (like AddBA) are not FIPS-protected. We accept reduced
+uplink throughput from missing TX aggregation. We do not need
+big A-MSDUs or WoWLAN. The goal is a working WPA3-SAE connection
+with FIPS-compliant data path.
+
+Also, is the general approach of an opt-in boot parameter
+(fips_exception) to keep the default behavior unchanged
+acceptable, or would you prefer a different mechanism?
+
+Thanks
+
+Best regards
+Jose Ignacio
+
