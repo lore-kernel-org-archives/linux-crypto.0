@@ -1,252 +1,326 @@
-Received: from mx0b-0002e601.pphosted.com (mx0b-0002e601.pphosted.com [148.163.154.28])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855044CEE6B;
-	Thu,  1 Oct 2026 08:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.154.28
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790844862; cv=fail; b=dbPfWRXmzSehCAgJrKPsl+EBgolRvyXLqxzClAtbPVO34WBNfk/s0gFDAOHUeJ9+HP17FWZBHYhw0c3dv4QLo/55MtV524GlRoBvG1JxvSK/2YmzV9Ic2iygYahSGjEW1VRNFuIxNWyT+3hrERNGtxq++pkwhC/qD4KDudrwvcI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790844862; c=relaxed/simple;
-	bh=Fz6141O6onZO78SV7cw1hoqrEuLJOiXK6EO+PyIU2OU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZIht4TKHMrx3nnLhj+reOj2gbHvg7S3IOPRb3ZkCTYBJOrlzCWghQZMoKgihDPZii4ZQJ4fPN4ptoCUMeP2sVcsyv/lo9I7/HbPrU28DQ4ZLU8MYBcq6C1yuUBHXD2e35Z+zTHUwFzTre2fbcnOhfSffXa5rXlesKmxIgZV5aXA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b=Fz6pD/8K; dkim=pass (1024-bit key) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.b=RmDGYoMp; arc=fail smtp.client-ip=148.163.154.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6C7375F62
+	for <linux-crypto@vger.kernel.org>; Thu,  1 Oct 2026 12:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790857708; cv=none; b=uVNudBkqBKyPz3i+47z0S/nM3+QobrX3SWdhhv0PGpA2E2u2zTYUvEuSFsfuNuwAqt/70ziVWJOvWlKFBn1mzYB87CnWa4Nggne40N75LRGhKpsi3HTOw9M0J3LWNA7qkCC8Y9GUxrerrVhmE/UcJWUWZpedAML2WarxGdLhgWI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790857708; c=relaxed/simple;
+	bh=mCAJQll2ndLW5e6HbTsTqseqxsNxUTgV8lSxa8qEXr4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dkBNzerXg73Z5HdKzSBqo3+kpU2CliH9ZgUCKjd0B9vXbxbxFBUldUNUr0LTpysJwaoLhkWBtBjI4JiTAExP1fEZlAIws8RPr2Ad9hI3hqQhrzJewnWzfIWKwK4kb3vUtei8SjvDdhvfypTO53kAy2VfpZOMz/GKDekngFthy9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IkolRAWq; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b="Fz6pD/8K";
-	dkim=pass (1024-bit key) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.b="RmDGYoMp"
-Received: from pps.filterd (m0374955.ppops.net [127.0.0.1])
-	by mx0b-0002e601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 691714Kt1294721;
-	Thu, 1 Oct 2026 03:54:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	proofpoint-05-2026; bh=t0WbCSWTB0HDYtz3eFDQ6ua+13hjlle1dIefZT9sX
-	PY=; b=Fz6pD/8K+IVVLAx7kIAxCsRi1Yxi4Sqr47qC4Y4qrsSVTu8KUL/duX4Gz
-	vYr9C6D55VbZOvslBq6r596oDlJF427zA8Q9tKgX87qHEachnAqNGnxNJjNe2fkh
-	FvVPfm/btR8OBr+81zZKDyb/dm17/qhCs5i/iMrulkwnNgse5z6cZlckDJWLA6Qo
-	M2LY4yo+azBJudCQ4N5xoRbtv5iF/Br0WVr3jspai6XyOuNSYlrxzCxwVJumftXn
-	s1WPiX7NemAKTXukiAMpZpLFpeRWZpGrDcyilWeV0avLMpIv/ZhHMpWpoNeFO633
-	tpx8I7TA3RTIyrO8PLZplC+bsEGmg==
-Received: from sn4pr0501cu005.outbound.protection.outlook.com (mail-southcentralusazon11011018.outbound.protection.outlook.com [40.93.194.18])
-	by mx0b-0002e601.pphosted.com (PPS) with ESMTPS id 4h1eur9t5t-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 01 Oct 2026 03:54:16 -0500 (CDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NPuauphP23M8gi7rfGRz1KnWTyPGI2BDLSfDDPP+9fZR2VcR6xI2WI4ISEkrrPYJLB+wtPgk5mL0eMrDfP1xNyMz0EV9WDlzGnsUKcCbcPqEUd8BVJZgdsAWuJU2IiDTHDJI/8/0TogVJR0kgcEm1irRBy9TtG0qaDtCMgop2SVpKjfDr4AYwQDSnSg2YJP8Bk6e/P8MbIh6VMouNNjEueu119ywHhpN6E9/TQTS94PHljaOTXuxvdbD78W9I78a995uwtvU8hbTkDeTYLkMUL2iStcGoi+hy61Fd7iJ8SLxVYNs8Rx7WmXN3b4Nop6Jk/mESjs83MKR37vz8IxZrg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t0WbCSWTB0HDYtz3eFDQ6ua+13hjlle1dIefZT9sXPY=;
- b=O1KPp5vw5dO8AbQGqvbySo8TA/3hI61KKoIo0biV1/OU+5lbx7IgqzldZYLwdZ+Q3yhsLFU9Bi47nGd0hLb3h36Cd1+VH4TPdkrwrowZXe72Wxm6beVQsfUocv3Wst7y9qnTsw7oA7f/Nvx3UspUg2LpSL0d4vyjmM4By17MMT3w3+Kt6els0T+aRSjWs0rAYQJy4caRLmt1zsHHJqAEdq74Q7p9a7Zm6616l+FkaxJyCz0HYzM8iHinibxJw7loahRbkK+sO1GgBu4wNi2i4IpQxKyFpPHO0AxfbsM/CcEo5KgQik9P7DGNOX+CXXhOOvVdz9PH20V5Apwp4D8XDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.21.194) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=ti.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ticloud.onmicrosoft.com; s=selector1-ticloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t0WbCSWTB0HDYtz3eFDQ6ua+13hjlle1dIefZT9sXPY=;
- b=RmDGYoMpyVYgxyz85WrPcOVLxBYRt+7tmULdqL6A0adyRjRqr+CwEW6UQ6al/BFw0l82a35Ee8SOJQZ9XgGHccH8umY5og2RtJNqJwN0AGxIGOlxD9qXRdvQZz0anwmeiW4LJqJRI6kcCtwn8f4AoNR0WoclOoujzwm7iKSAoOo=
-Received: from CH0PR03CA0249.namprd03.prod.outlook.com (2603:10b6:610:e5::14)
- by PH7PR10MB6058.namprd10.prod.outlook.com (2603:10b6:510:1fe::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.472.14; Thu, 1 Oct
- 2026 08:54:14 +0000
-Received: from BN2PEPF000044A4.namprd02.prod.outlook.com
- (2603:10b6:610:e5:cafe::11) by CH0PR03CA0249.outlook.office365.com
- (2603:10b6:610:e5::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.472.16 via Frontend Transport; Thu, 1
- Oct 2026 08:54:13 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 198.47.21.194) smtp.mailfrom=ti.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=ti.com;
-Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
-Received: from flwvzet200.ext.ti.com (198.47.21.194) by
- BN2PEPF000044A4.mail.protection.outlook.com (10.167.243.155) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.472.14 via Frontend Transport; Thu, 1 Oct 2026 08:54:12 +0000
-Received: from DFLE214.ent.ti.com (10.64.6.72) by flwvzet200.ext.ti.com
- (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Thu, 1 Oct
- 2026 03:53:27 -0500
-Received: from DFLE207.ent.ti.com (10.64.6.65) by DFLE214.ent.ti.com
- (10.64.6.72) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Thu, 1 Oct
- 2026 03:53:26 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE207.ent.ti.com
- (10.64.6.65) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45 via Frontend
- Transport; Thu, 1 Oct 2026 03:53:26 -0500
-Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.53.205])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 6918rPBr648920;
-	Thu, 1 Oct 2026 03:53:26 -0500
-From: T Pratham <t-pratham@ti.com>
-To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC: Sebin Francis <sebin.francis@ti.com>,
-        Manorit Chawdhry
-	<m-chawdhry@ti.com>,
-        Praneeth Bajjuri <praneeth@ti.com>, Vishal Mahaveer
-	<vishalm@ti.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v8 15/15] crypto: ti - Change lengths in AEAD to u64 to avoid potential overflows
-Date: Thu, 1 Oct 2026 14:22:45 +0530
-Message-ID: <20261001085245.2922974-16-t-pratham@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261001085245.2922974-1-t-pratham@ti.com>
-References: <20261001085245.2922974-1-t-pratham@ti.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IkolRAWq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1790857706; x=1822393706;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mCAJQll2ndLW5e6HbTsTqseqxsNxUTgV8lSxa8qEXr4=;
+  b=IkolRAWqdP73bUD5bnpz+gcY8bdvkFC04VRT0D/v+iDz1PhqT4cUlFwr
+   f5Het3zOBnyVYX3Jc5nTCqv6r/ip8Grgu0iz1htzMJ25GmYR4JLQdXGkb
+   fhbR4ipDagP7YzE1W6Dk5mb+XN7tC92Kv9fbRKZNMjnxeAELnvF/KN73O
+   9hqjvzsReChf4+XWsztlmca+QbOH3rwfzmhdEy41E9vGSwKR7voU6zy+d
+   68u46e36XwEehbX6akbX/Mk1k/4J11xJAnwh0UOKc0YLhNKpJOyFXtrx9
+   /mAoR7KsotnQZ+v0WCxgtRGPlJxa7V9RzOlJa++QF36PATakGflWyZat1
+   w==;
+X-CSE-ConnectionGUID: LXHRRsPzSaGMj0mjXng76w==
+X-CSE-MsgGUID: azcDafM3RDO0NXxiEpIo0A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11921"; a="107993414"
+X-IronPort-AV: E=Sophos;i="6.27,134,1787036400"; 
+   d="scan'208";a="107993414"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2026 05:28:26 -0700
+X-CSE-ConnectionGUID: VFkoqOEOR0S6vRVd06/Rkg==
+X-CSE-MsgGUID: XEWQLgWJRjWJbZPXbfRTgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,134,1787036400"; 
+   d="scan'208";a="272406859"
+Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
+  by fmviesa009.fm.intel.com with ESMTP; 01 Oct 2026 05:28:24 -0700
+From: Ahsan Atta <ahsan.atta@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Ahsan Atta <ahsan.atta@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - remove unused get_num_accels()
+Date: Thu,  1 Oct 2026 13:28:41 +0100
+Message-ID: <20261001122841.2271248-1-ahsan.atta@intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A4:EE_|PH7PR10MB6058:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48db8bed-d965-411c-b9ca-08df1f999087
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|376014|82310400026|23010399003|1800799024|10067099003|56012099006|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	WduxGgl50yDF09/POvjHDYa/3cmf4izvN0ipWN4jP2OqXZMRerNVeBVSpfCvAV56XRhklKms7LnJSk33SFYbzW4YUmoh7An40Jk+EidUioHH47aQZPbLw4Bi/ZAE2vMW9MtQgh+TC9AtGLmePKX3OBkq7IQybjG3s7TSWj4/yaRbO19sbDE7VZpqQGNRsKJsBLMpAVCY6mjcGqoqP9f/f8/VMYbQUXYc3FHnnjTQQGF+PpQy9vsiL1SpXeVBjD7bgyQOwBNBWp56/cTo6Azu0ycr4KlALUiw7qSIPeh+SkQKcP6lTQl9LgFcCigSB3x1xjjo5isZxjJ0pRloMTkEg4PnDHqquCp5yVx3yqN/s9rOTEJHDYJhc4y8SqudvuwwfrbW58orQAEHzn0+RhUTxw+CN3UyTVLGYJYrRkHHelpEkZGU50w05sbxjD85JgYEEiOndUPPyRfcV+5RGnkrwMid8lyRFOvWiXMHFsHD/TROgwoWuk2MHfQFmIqGsu510zKTc/V5vwpuBIJSSp499PYPaR5V/rG29malXAZpAqzoJuD6q3jJWz0jrX/AMGvf2o5i0EWJQ/79pFupPReZu8p1YhN2SxG8zbdGARqZRgWSNcMifTqw6kqF17CCAPAoWmcheAkC9aTQO4+BiLm6B7g0b+krTz+TQHHXtSuVIE5sqf8jxQ6555b3TdbFDaQJyvNH5MoBvBWa2NiLUyDtXw==
-X-Forefront-Antispam-Report:
-	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(36860700016)(376014)(82310400026)(23010399003)(1800799024)(10067099003)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	acPzfaAZTdF8E9lvG2ynFR+DFnb4O1KC0BompR65hXYFk/6Mt2wh3gxGrmILajBGoYgj0jwPrxEGFTGqoTfuB37GoKVTe4FseJI1cuOmhKwKAP1WJ+QLvDAv6YjsdDjE0U088+z/+zfDRz5M53jS+Kh9n8tzsngqIrIHqAFRNJesT9hAsss+2TbSTR1/CQktoq4OCn1QBupLSzJ0bZg9VmTYKLfIp8V5x1ysgEe/ySyiqAfHtkXMWR/5tsLXyrcGTQWH7VVxwvqjiLY/WOgkEeB/mEH8ASiIQ5NGvIl1BdEGja5mcLhBA0dFwYog/6W8j6L8PCEKUTv/nRqY736n95L/eXguOPGmeofM1JaW003q7wRg8JJ5tND9jL4pKo1UyiuSpbwXPlUvAAsSw8jbhqeWKTWHfQt0SQhQiCl+XaMO7Mn43y4Iam6GtOSYXOfw
-X-Exchange-RoutingPolicyChecked:
-	Kd1vz3sLZnH3J0730DUMIMmq8t6H1yeyejg1eA1AOMAmB/HoKaCweK1UhVGQe6xKbzHBRMyrf0GIUQAJj0KSN8F9SpVReOF4Lll9cYBwhJzd03A4j45316E3IQb5VnVMS7M3SSVZV6dHDYX57+Oj6qLF4NX7NFTUnlLUxmcawongjJZgi7ZJbg2uS5UMzPa9PF3fLRyyAuwVxR0s1lBiX5XbH0KA6GJoUg+Mowjnu9YEerN+LfukAMDYvxvc8BxLRBxbPLEEx8A8p/9GAltQgMnNcm4KrshG6VaSBW8OLKTuHbovcC0YJlr0ZRkUrNRc/+ZJGRt2LarxjCmqTzQq1g==
-X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2026 08:54:12.3949
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48db8bed-d965-411c-b9ca-08df1f999087
-X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044A4.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB6058
-X-Proofpoint-GUID: 2OnFqbIapzrt-cvzznhMJO5RwE7VbWtC
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDAxMDAzNSBTYWx0ZWRfX/evZkCOKZT8C
- g3VCLtZSRqBrw935tek4sKCMCMkRI1SPxbPJpJEOlleXKGifiz10mT69ueB3ARXb4HDVA/XC2RV
- jLBKj6mywEaCOG2f8F+y3xt/pD2LTF36hk1RtUxnagsQfm/o2VIfYTkjReBqNaSdnS1g9urxfP4
- vKi2cuGUG1CPhOleGPAk1fmdztKfd8Z52geS0JMuXRrFPqaMTDuIBUGyFDcmbFRj6GQjP944MYP
- bGM89n+xoaouACGLVc6x7cEMVxOQgwXrv+ZCoxhcLh8FPbnYLtt0S/JXN/2EfVVkeh0ZdCM0MZU
- OLxdw74mGaOuMkaQwqiDYJNaZoIxntiFa3IpWHD9WwoHZ0WRR6IE3KCe/fL0tP928V/8g4qxmkn
- Bf8Dzh64x66wbbZDWUaeiFuZQG2Qn3wvreCDXY3OXzmTpfCuky7tEtaUWVdrCepvKkFmL1hXhe/
- kxK7kN9dzM2gkOc82bw==
-X-Authority-Analysis: v=2.4 cv=KvzYSmWN c=1 sm=1 tr=0 ts=6abe1fb8 cx=c_pps
- a=jA10WLhXiBAWrDGJQFCh7w==:117 a=iwqwCZQqcuTv3JOpYdM7/Q==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=660iZSQnnn4A:10 a=AlMIdn_sM9wA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=Z8NIEmU8O1QQgoT56wFK:22 a=fPAWb5peG099m5CrUpKH:22
- a=sozttTNsAAAA:8 a=rGLHzWtdNaH96TCHXsUA:9
-X-Proofpoint-ORIG-GUID: 2OnFqbIapzrt-cvzznhMJO5RwE7VbWtC
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDAxMDAzNSBTYWx0ZWRfX2DxqbAMqWOOU
- Z5b88Eoz6eztBHrfU0aLAxjDsUhTiPAvSnXnDTsWjNCfHCkAHP0iMQQj580qoWEDNSJmaifz5f4
- 1Jao2jVQXJbX8vZQrCJZcKeuKxTMGbQ=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-01_03,2026-09-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0 bulkscore=0 clxscore=1015 priorityscore=1501
- impostorscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2609040000 definitions=main-2610010035
 
-Change assoclen, cryptlen, authsize from unsigned int to u64 to avoid
-overflow when they are added (in TAG offset and padding length
-calculation)
+The get_num_accels() hook in struct adf_hw_device_data has had no
+callers since commit d237230728c5 ("crypto: qat - remove unused
+character device and IOCTLs"), which deleted its last user in
+adf_ctl_drv.c. Every device driver still populates it and two
+implementations are still exported, all of it dead code.
 
-Fixes: 37b902c603042 ("crypto: ti - Add support for AES-GCM in DTHEv2 driver")
-Signed-off-by: T Pratham <t-pratham@ti.com>
+Remove the hook, its generation-level implementations
+adf_gen2_get_num_accels() and adf_gen4_get_num_accels(), the
+per-device static implementations and all the assignments.
+
+The hw_data->num_accel field is left untouched as it is still used.
+
+Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/ti/dthev2-aes.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+ drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c   | 1 -
+ drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c     | 1 -
+ drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c     | 6 ------
+ drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   | 1 -
+ .../crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c   | 6 ------
+ drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c     | 1 -
+ drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c | 6 ------
+ drivers/crypto/intel/qat/qat_common/adf_accel_devices.h  | 1 -
+ drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c   | 9 ---------
+ drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h   | 1 -
+ drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c   | 6 ------
+ drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h   | 1 -
+ .../crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c | 1 -
+ .../intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c    | 6 ------
+ 14 files changed, 47 deletions(-)
 
-diff --git a/drivers/crypto/ti/dthev2-aes.c b/drivers/crypto/ti/dthev2-aes.c
-index e141ab8980000..2d7fd335b770c 100644
---- a/drivers/crypto/ti/dthev2-aes.c
-+++ b/drivers/crypto/ti/dthev2-aes.c
-@@ -758,6 +758,9 @@ static int dthe_aead_enc_get_tag(struct aead_request *req)
- 	struct dthe_tfm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
- 	struct dthe_aes_req_ctx *rctx = aead_request_ctx_dma(req);
- 	u32 tag[AES_BLOCK_WORDS];
-+	u64 assoclen = req->assoclen;
-+	u64 cryptlen = req->cryptlen;
-+	u64 authsize = ctx->authsize;
- 	int nents;
- 	int ret;
- 
-@@ -765,12 +768,12 @@ static int dthe_aead_enc_get_tag(struct aead_request *req)
- 	if (ret)
- 		return ret;
- 
--	nents = sg_nents_for_len(req->dst, req->cryptlen + req->assoclen + ctx->authsize);
-+	nents = sg_nents_for_len(req->dst, cryptlen + assoclen + authsize);
- 	if (nents < 0)
- 		return nents;
- 
--	sg_pcopy_from_buffer(req->dst, nents, tag, ctx->authsize,
--			     req->assoclen + req->cryptlen);
-+	sg_pcopy_from_buffer(req->dst, nents, tag, authsize,
-+			     assoclen + cryptlen);
- 
- 	return 0;
+diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
+index 19f9f738630b..d6f1f626cf5a 100644
+--- a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
+@@ -443,7 +443,6 @@ void adf_init_hw_data_420xx(struct adf_hw_device_data *hw_data, u32 dev_id)
+ 	hw_data->enable_error_correction = adf_gen4_enable_error_correction;
+ 	hw_data->get_accel_mask = adf_gen4_get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+-	hw_data->get_num_accels = adf_gen4_get_num_accels;
+ 	hw_data->get_num_aes = adf_gen4_get_num_aes;
+ 	hw_data->get_sram_bar_id = adf_gen4_get_sram_bar_id;
+ 	hw_data->get_etr_bar_id = adf_gen4_get_etr_bar_id;
+diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
+index 49b425be34c8..7d9dd44ca477 100644
+--- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
+@@ -412,7 +412,6 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
+ 	hw_data->enable_error_correction = adf_gen4_enable_error_correction;
+ 	hw_data->get_accel_mask = adf_gen4_get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+-	hw_data->get_num_accels = adf_gen4_get_num_accels;
+ 	hw_data->get_num_aes = adf_gen4_get_num_aes;
+ 	hw_data->get_sram_bar_id = adf_gen4_get_sram_bar_id;
+ 	hw_data->get_etr_bar_id = adf_gen4_get_etr_bar_id;
+diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
+index 388087e64540..ca9bc5dccf67 100644
+--- a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
+@@ -326,11 +326,6 @@ static u32 get_accel_mask(struct adf_hw_device_data *self)
+ 	return ADF_GEN6_ACCELERATORS_MASK;
  }
-@@ -781,6 +784,9 @@ static int dthe_aead_dec_verify_tag(struct aead_request *req)
- 	struct dthe_aes_req_ctx *rctx = aead_request_ctx_dma(req);
- 	u32 tag_out[AES_BLOCK_WORDS];
- 	u32 tag_in[AES_BLOCK_WORDS];
-+	u64 assoclen = req->assoclen;
-+	u64 cryptlen = req->cryptlen;
-+	u64 authsize = ctx->authsize;
- 	int nents;
- 	int ret;
  
-@@ -788,14 +794,14 @@ static int dthe_aead_dec_verify_tag(struct aead_request *req)
- 	if (ret)
- 		return ret;
+-static u32 get_num_accels(struct adf_hw_device_data *self)
+-{
+-	return ADF_GEN6_MAX_ACCELERATORS;
+-}
+-
+ static u32 get_num_aes(struct adf_hw_device_data *self)
+ {
+ 	return self ? hweight32(self->ae_mask) : 0;
+@@ -1023,7 +1018,6 @@ void adf_init_hw_data_6xxx(struct adf_hw_device_data *hw_data)
+ 	hw_data->enable_error_correction = enable_error_correction;
+ 	hw_data->get_accel_mask = get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+-	hw_data->get_num_accels = get_num_accels;
+ 	hw_data->get_num_aes = get_num_aes;
+ 	hw_data->get_sram_bar_id = get_sram_bar_id;
+ 	hw_data->get_etr_bar_id = get_etr_bar_id;
+diff --git a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
+index 07f2c42a68f5..b9cc6c97778a 100644
+--- a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
+@@ -129,7 +129,6 @@ void adf_init_hw_data_c3xxx(struct adf_hw_device_data *hw_data)
+ 	hw_data->get_accel_mask = get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+ 	hw_data->get_accel_cap = adf_gen2_get_accel_cap;
+-	hw_data->get_num_accels = adf_gen2_get_num_accels;
+ 	hw_data->get_num_aes = adf_gen2_get_num_aes;
+ 	hw_data->get_sram_bar_id = get_sram_bar_id;
+ 	hw_data->get_etr_bar_id = get_etr_bar_id;
+diff --git a/drivers/crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c b/drivers/crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
+index db3c33fa1881..8a5cce516436 100644
+--- a/drivers/crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c
+@@ -24,11 +24,6 @@ static u32 get_ae_mask(struct adf_hw_device_data *self)
+ 	return ADF_C3XXXIOV_ACCELENGINES_MASK;
+ }
  
--	nents = sg_nents_for_len(req->src, req->assoclen + req->cryptlen);
-+	nents = sg_nents_for_len(req->src, assoclen + cryptlen);
- 	if (nents < 0)
- 		return nents;
+-static u32 get_num_accels(struct adf_hw_device_data *self)
+-{
+-	return ADF_C3XXXIOV_MAX_ACCELERATORS;
+-}
+-
+ static u32 get_num_aes(struct adf_hw_device_data *self)
+ {
+ 	return ADF_C3XXXIOV_MAX_ACCELENGINES;
+@@ -80,7 +75,6 @@ void adf_init_hw_data_c3xxxiov(struct adf_hw_device_data *hw_data)
+ 	hw_data->disable_iov = adf_vf2pf_notify_shutdown;
+ 	hw_data->get_accel_mask = get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+-	hw_data->get_num_accels = get_num_accels;
+ 	hw_data->get_num_aes = get_num_aes;
+ 	hw_data->get_etr_bar_id = get_etr_bar_id;
+ 	hw_data->get_misc_bar_id = get_misc_bar_id;
+diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
+index 0b410b41474d..aed1c951754a 100644
+--- a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
+@@ -131,7 +131,6 @@ void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
+ 	hw_data->get_accel_mask = get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+ 	hw_data->get_accel_cap = adf_gen2_get_accel_cap;
+-	hw_data->get_num_accels = adf_gen2_get_num_accels;
+ 	hw_data->get_num_aes = adf_gen2_get_num_aes;
+ 	hw_data->get_sram_bar_id = get_sram_bar_id;
+ 	hw_data->get_etr_bar_id = get_etr_bar_id;
+diff --git a/drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c b/drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c
+index 7f00035d3661..ded32eaae48d 100644
+--- a/drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c
+@@ -24,11 +24,6 @@ static u32 get_ae_mask(struct adf_hw_device_data *self)
+ 	return ADF_C62XIOV_ACCELENGINES_MASK;
+ }
  
--	sg_pcopy_to_buffer(req->src, nents, tag_in, ctx->authsize,
--			   req->assoclen + req->cryptlen - ctx->authsize);
-+	sg_pcopy_to_buffer(req->src, nents, tag_in, authsize,
-+			   assoclen + cryptlen - authsize);
+-static u32 get_num_accels(struct adf_hw_device_data *self)
+-{
+-	return ADF_C62XIOV_MAX_ACCELERATORS;
+-}
+-
+ static u32 get_num_aes(struct adf_hw_device_data *self)
+ {
+ 	return ADF_C62XIOV_MAX_ACCELENGINES;
+@@ -80,7 +75,6 @@ void adf_init_hw_data_c62xiov(struct adf_hw_device_data *hw_data)
+ 	hw_data->disable_iov = adf_vf2pf_notify_shutdown;
+ 	hw_data->get_accel_mask = get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+-	hw_data->get_num_accels = get_num_accels;
+ 	hw_data->get_num_aes = get_num_aes;
+ 	hw_data->get_etr_bar_id = get_etr_bar_id;
+ 	hw_data->get_misc_bar_id = get_misc_bar_id;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+index a84380125fe5..b77f461e8583 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+@@ -279,7 +279,6 @@ struct adf_hw_device_data {
+ 	u32 (*get_misc_bar_id)(struct adf_hw_device_data *self);
+ 	u32 (*get_etr_bar_id)(struct adf_hw_device_data *self);
+ 	u32 (*get_num_aes)(struct adf_hw_device_data *self);
+-	u32 (*get_num_accels)(struct adf_hw_device_data *self);
+ 	void (*get_arb_info)(struct arb_info *arb_csrs_info);
+ 	void (*get_admin_info)(struct admin_info *admin_csrs_info);
+ 	enum dev_sku_info (*get_sku)(struct adf_hw_device_data *self);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c
+index 6a505e9a5cf9..bff89c8538f0 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c
+@@ -7,15 +7,6 @@
+ #include "icp_qat_hw.h"
+ #include <linux/pci.h>
  
--	if (crypto_memneq(tag_in, tag_out, ctx->authsize))
-+	if (crypto_memneq(tag_in, tag_out, authsize))
- 		return -EBADMSG;
- 	else
- 		return 0;
-@@ -889,10 +895,10 @@ static int dthe_aead_run(struct crypto_engine *engine, void *areq)
- 	struct dthe_aes_req_ctx *rctx = aead_request_ctx_dma(req);
- 	struct dthe_data *dev_data = rctx->dev_data;
+-u32 adf_gen2_get_num_accels(struct adf_hw_device_data *self)
+-{
+-	if (!self || !self->accel_mask)
+-		return 0;
+-
+-	return hweight16(self->accel_mask);
+-}
+-EXPORT_SYMBOL_GPL(adf_gen2_get_num_accels);
+-
+ u32 adf_gen2_get_num_aes(struct adf_hw_device_data *self)
+ {
+ 	if (!self || !self->ae_mask)
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
+index 59bad368a921..3caeb1d178cf 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
+@@ -78,7 +78,6 @@
+ #define ADF_GEN2_SMIAPF1_MASK_OFFSET    (0x3A000 + 0x30)
+ #define ADF_GEN2_SMIA1_MASK             0x1
  
--	unsigned int cryptlen = req->cryptlen;
--	unsigned int assoclen = req->assoclen;
--	unsigned int authsize = ctx->authsize;
--	unsigned int unpadded_cryptlen;
-+	u64 cryptlen = req->cryptlen;
-+	u64 assoclen = req->assoclen;
-+	u64 authsize = ctx->authsize;
-+	u64 unpadded_cryptlen;
- 	struct scatterlist *src = NULL;
- 	struct scatterlist *dst = NULL;
- 	struct scatterlist *aad_sg = NULL;
+-u32 adf_gen2_get_num_accels(struct adf_hw_device_data *self);
+ u32 adf_gen2_get_num_aes(struct adf_hw_device_data *self);
+ void adf_gen2_enable_error_correction(struct adf_accel_dev *accel_dev);
+ void adf_gen2_cfg_iov_thds(struct adf_accel_dev *accel_dev, bool enable,
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
+index f4a58f04071a..d9a0ed7eee3d 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
+@@ -21,12 +21,6 @@ u32 adf_gen4_get_accel_mask(struct adf_hw_device_data *self)
+ }
+ EXPORT_SYMBOL_GPL(adf_gen4_get_accel_mask);
+ 
+-u32 adf_gen4_get_num_accels(struct adf_hw_device_data *self)
+-{
+-	return ADF_GEN4_MAX_ACCELERATORS;
+-}
+-EXPORT_SYMBOL_GPL(adf_gen4_get_num_accels);
+-
+ u32 adf_gen4_get_num_aes(struct adf_hw_device_data *self)
+ {
+ 	if (!self || !self->ae_mask)
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
+index cd26b6724c43..46dfa23d825f 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
+@@ -157,7 +157,6 @@ void adf_gen4_get_arb_info(struct arb_info *arb_info);
+ u32 adf_gen4_get_etr_bar_id(struct adf_hw_device_data *self);
+ u32 adf_gen4_get_heartbeat_clock(struct adf_hw_device_data *self);
+ u32 adf_gen4_get_misc_bar_id(struct adf_hw_device_data *self);
+-u32 adf_gen4_get_num_accels(struct adf_hw_device_data *self);
+ u32 adf_gen4_get_num_aes(struct adf_hw_device_data *self);
+ enum dev_sku_info adf_gen4_get_sku(struct adf_hw_device_data *self);
+ u32 adf_gen4_get_sram_bar_id(struct adf_hw_device_data *self);
+diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
+index 5b4bd0ba1ccb..c318015fc2e2 100644
+--- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
+@@ -229,7 +229,6 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
+ 	hw_data->get_accel_mask = get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+ 	hw_data->get_accel_cap = get_accel_cap;
+-	hw_data->get_num_accels = adf_gen2_get_num_accels;
+ 	hw_data->get_num_aes = adf_gen2_get_num_aes;
+ 	hw_data->get_etr_bar_id = get_etr_bar_id;
+ 	hw_data->get_misc_bar_id = get_misc_bar_id;
+diff --git a/drivers/crypto/intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
+index 828456c43b76..6fd5bb333859 100644
+--- a/drivers/crypto/intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c
+@@ -24,11 +24,6 @@ static u32 get_ae_mask(struct adf_hw_device_data *self)
+ 	return ADF_DH895XCCIOV_ACCELENGINES_MASK;
+ }
+ 
+-static u32 get_num_accels(struct adf_hw_device_data *self)
+-{
+-	return ADF_DH895XCCIOV_MAX_ACCELERATORS;
+-}
+-
+ static u32 get_num_aes(struct adf_hw_device_data *self)
+ {
+ 	return ADF_DH895XCCIOV_MAX_ACCELENGINES;
+@@ -80,7 +75,6 @@ void adf_init_hw_data_dh895xcciov(struct adf_hw_device_data *hw_data)
+ 	hw_data->disable_iov = adf_vf2pf_notify_shutdown;
+ 	hw_data->get_accel_mask = get_accel_mask;
+ 	hw_data->get_ae_mask = get_ae_mask;
+-	hw_data->get_num_accels = get_num_accels;
+ 	hw_data->get_num_aes = get_num_aes;
+ 	hw_data->get_etr_bar_id = get_etr_bar_id;
+ 	hw_data->get_misc_bar_id = get_misc_bar_id;
 -- 
-2.34.1
+2.50.1
 
