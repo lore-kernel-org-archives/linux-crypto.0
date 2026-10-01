@@ -1,88 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9D831F996
-	for <linux-crypto@vger.kernel.org>; Thu,  1 Oct 2026 07:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4A13DA5A3;
+	Thu,  1 Oct 2026 07:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790840084; cv=none; b=d63uNlgXW72ZbWItt0U/UlIv/R9G/U5xMRRDSHJ+tdTTlLeVgTGM0yaermXyWdFSJynJSTlmZBBt/FYAJ0xIuaROFNmgyBPxlMWZ2qdjQCFah/bilO1+uZmKh4Mo1FY98YhttdJtKP9f6IL2EeLX85JE7zsacIEjvvsY2wU7C1I=
+	t=1790840260; cv=none; b=Vc5We2QmX71wbDA812Wob8Fl9e1sZucO2ruHE6F2ggSA9wIn6CWT3GIzUUjt1TonnF/R2mRd6D8tW9e893LRl2M7VF4EE3n1+rgfSIHKeuY3aLf7JlYchFI3kwYhXeoM8p9yQCGZBNKR+LJ63/DHU350bLVFYPXswJnMIIRlBic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790840084; c=relaxed/simple;
-	bh=kuV33l73kgCfxMXZpX+G6jMpAhtpEBO72ZuYilyuWkY=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j+CfD/ih4z2WKtbfNhx84fa45Y1AjbXLbxOGYxgolX9XKSRogp6hZ9wKHrgOEBVE92t3vPKxKIACixsW9sJM8uKn0u1Lc6NLfZfsxOL4MbIq6X/YpWHZl8D9lRCmphl0RMB3H1aEvJiAmkUaLpivYPrPWN0YKzQgJkxyguqkYJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QfyM4xSR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790840260; c=relaxed/simple;
+	bh=UiHlbN6JO+38M0NHYQ6YdG919LW3YMtEtW2boekRz8c=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SUbXk1zqk+huuQ3rA+QgxwvmmkC0PbsUg1mLsra/nSAWT9kuv16BYP4rXX6LWaV765IdLOWZMAYI+Z2UpLLp/Sg2VgCa8OnwQA/chAvjEeoUoJJmyCFB+ntw8L9zmUMab295+VIp8PzjcSya94bm74JBgCdZMV6yvJjdh87Lscg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=hRcDw7MZ; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QfyM4xSR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BC5F1F00906
-	for <linux-crypto@vger.kernel.org>; Thu,  1 Oct 2026 07:34:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790840082;
-	bh=kuV33l73kgCfxMXZpX+G6jMpAhtpEBO72ZuYilyuWkY=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=QfyM4xSRlKStaeo/bShD69v/jI3OoLIt9RIlKAxFj08Dl+wLGEQBSqAvQhCoRjKGk
-	 LoKxGHq+CxrS9V2uPd4C5LVxuMTeyD/4DL9PTaaXXBcaF2qhNh1u33Mb0Tmft89/y4
-	 JK540dc3kMHcoBdpmpzys4aF4Nkaa0kf2vhA6a8+g5l0P2qVUnQsbNT5YoHFfupbRo
-	 3LUkl77zt0THmf0rxul77MMD9Mzv5USAhLR7J4SHkujvTjrVFs1pOrtS9bS9hk3jHW
-	 gyZ/cyJI1HqruFwWPwC6FAOzyMxVeGrl5UkQeiFG5RTWufhU4paN7KN7JEuBJimpfG
-	 4GtqckmA4KRMQ==
-Received: by mail-lr2-f35.google.com with SMTP id 38308e7fff4ca-3a64d20990fso59830471fa.1
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Oct 2026 00:34:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxgLPXw0DCTu4RG3DBVP7mJZ2zkbq7iEJIaJ6ikmPT/0xHU04oZOCy3062DndGNvgpTzJUf/bckROAcfiA=@vger.kernel.org
-X-Gm-Message-State: AFq9FYIMsoQtr9IeayupK+ehLYwN9G8vIbl6MhpsfGHfADos4xwcQRi+
-	9lRiwwHk11U+J/w+Cb0NG5N3xo7UWqmIQtbGolI5QwTu8jxwnuc7u0tTY2o11duPZ0UmQZMyABR
-	AMj6PNkmADMioBvYAjL7bYg3V4OxmyXH7Yj7flEbSvw==
-X-Received: by 2002:a2e:b8ce:0:b0:3a6:6aad:be45 with SMTP id
- 38308e7fff4ca-3a779206b12mr11576161fa.10.1790840081040; Thu, 01 Oct 2026
- 00:34:41 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 1 Oct 2026 10:34:39 +0300
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 1 Oct 2026 10:34:39 +0300
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260723-qcom-qce-cmd-descr-v24-1-4f87bb4d9938@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="hRcDw7MZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=kCKep5BKuURXfC25icw8yxRw6hM7YFCvbMlLzOcfVeg=;
+	t=1790840257; x=1792049857; b=hRcDw7MZipLTjJZf7QxldkWFk9yfRjfJKHruB+M4BJKBQE8
+	ynzGVMeknFlicPzH4SKxla0GeFJSWhyvlR/3Y8369Adve4ulm6sliTXz8La8mBmhrNOLYWvyy2qtj
+	1wxNEoV2CmN1t/aZ17dtLTKgioDvI7Xm3RJe/YfdCCuhGXwVks3WZJys3T9ZPOufkH1dIRXAxZqiD
+	4zK2EksgDT3uFP5YBaOqg+ktv/j710OK4HUUvB+WTHN9lDXmjGZ5U6ZJSVnMUFu9q+wL6webeQaJi
+	woRNKXOVluxyQafTdh5OeMcQpHNAISgLmtsmucR0FADiaSaAImc4u8zv6WqUbY7g==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__ECDSA_SECP256R1_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1xCBM0-0000000HWrR-2m9Q;
+	Thu, 01 Oct 2026 09:37:20 +0200
+Message-ID: <47ebbd91b4bdb57723be40608349eff9ced1f34b.camel@sipsolutions.net>
+Subject: Re: [PATCH v2 0/5] wifi: add opt-in FIPS exception for iwlwifi
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, 
+	miriam.rachel.korenblit@intel.com
+Cc: ilan.peer@intel.com, emmanuel.grumbach@intel.com, 
+	linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Thu, 01 Oct 2026 09:37:19 +0200
+In-Reply-To: <20260930120829.383408-1-jtornosm@redhat.com>
+References: <20260930120829.383408-1-jtornosm@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.2 (3.60.2-2.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260723-qcom-qce-cmd-descr-v24-0-4f87bb4d9938@oss.qualcomm.com> <20260723-qcom-qce-cmd-descr-v24-1-4f87bb4d9938@oss.qualcomm.com>
-Date: Thu, 1 Oct 2026 10:34:39 +0300
-X-Gmail-Original-Message-ID: <CAMRc=Mc9O-wgeWGNgEW45p5YumdkBwKf7_Zkrgw1=r3Pn8QTPQ@mail.gmail.com>
-X-Gm-Features: AclHuK9Cfoeox9K-SbC3OnT5eZecFWUtZX-vzEsZcBWrrPHwk34664gyCfLJNQY
-Message-ID: <CAMRc=Mc9O-wgeWGNgEW45p5YumdkBwKf7_Zkrgw1=r3Pn8QTPQ@mail.gmail.com>
-Subject: Re: [PATCH v24 01/14] dmaengine: constify struct dma_descriptor_metadata_ops
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	brgl@kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Vinod Koul <vkoul@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Thara Gopinath <thara.gopinath@gmail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Udit Tiwari <quic_utiwari@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
-	Dmitry Baryshkov <lumag@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
-	Stephan Gerhold <stephan.gerhold@linaro.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Mukesh Kumar Savaliya <mukesh.savaliya@oss.qualcomm.com>, 
-	Peter Ujfalusi <peter.ujfalusi@gmail.com>, Michal Simek <michal.simek@amd.com>, 
-	Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@codeaurora.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Vignesh Raghavendra <vigneshr@ti.com>
-Content-Type: text/plain; charset="UTF-8"
+X-malware-bazaar: not-scanned
 
-On Thu, 23 Jul 2026 19:09:07 +0200, Bartosz Golaszewski
-<bartosz.golaszewski@oss.qualcomm.com> said:
-> There's no reason for the instances of this struct to be modifiable.
-> Constify the pointer in struct dma_async_tx_descriptor and all drivers
-> currently using it.
->
-> Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
-> Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
+Hi Jose,
 
-Vinod: this patch is independent from the rest of the series and the BAM DMA
-rework. Could youtake it for v7.4 as I won't respin the rest of the series
-before we get the QCE fixes in anyway?
+I'm super confused by this, it looks like mostly random code changes to
+not really do anything useful any more ... Nor do the code changes seem
+to actually be doing what you describe.
 
-Bart
+> Commits 5241526dede9 ("wifi: mac80211: don't send keys to driver when
+> fips_enabled") and 0636800c8ee1 ("wifi: iwlwifi: disable certain features
+> for fips_enabled") disabled WiFi functionality under FIPS mode because
+> Intel firmware autonomously sends some management frames without
+> FIPS-validated integrity protection.
+>=20
+> While this is technically correct, it leaves FIPS-required environments
+> with no WiFi connectivity at all, since WPA3-SAE mandates MFP and without
+> MFP_CAPABLE the client cannot even associate.
+
+Arguably, that's what FIPS wanted. It mandates that you cannot give keys
+to the device since it's not certified, and therefore it cannot do the
+necessary functionality for these connections.
+
+I can understand why you don't like it, and I guess we can try to find
+ways around it like what you fundamentally seem to try to be doing here,
+i.e. formulate an exception to the policies.
+
+But I think you should actually formulate the exception that you *want*
+first and then implement it, not randomly poke holes into the code and
+call it done.
+
+> Patch 1: Adds the fips_exception infrastructure (boot parameter,
+>          read-only sysctl, fips_allows() helper)
+
+Not my domain, but I'd argue that design documentation I ask for above
+should somehow make it into the documentation for this parameter so taht
+administrators can actually make an informed decision.
+
+> Patch 2: Gates the mac80211 key blocking with fips_allows() so keys
+>          can reach the firmware for data traffic
+
+This patch is mostly wrong. If the exception is called "MFP" then
+there's no need to pass all keys, and in fact the way you implemented
+it, I don't even see how it doesn't end up with HW crypto after all.
+
+> Patch 3: Gates the iwlwifi feature disabling with fips_allows(),
+>          restoring MFP, Beacon Protection, EHT, 6GHz, A-MSDU sizes
+>          and MLO support
+
+This is also partially wrong - you didn't really understand this and
+just undid everything?
+
+> Patch 4: Best effort to force software encryption for unicast
+>          management frames (CCMP/GCMP). It sets
+>          IEEE80211_KEY_FLAG_SW_MGMT_TX on pairwise CCMP/GCMP keys when th=
+e
+>          exception is active, forcing mac80211 to encrypt unicast robust
+>          management frames (SA Query, deauth, disassoc) in software using
+>          FIPS-approved CCMP/GCMP, the same mechanism used by ath9k, ath5k=
+,
+>          carl9170, mt76x02, rtw88, rtw89, rtlwifi, ... and other drivers.
+
+This makes no sense at all.
+
+> Patch 5: Reduces firmware decryption error message to debug level in
+>          FIPS mode. Same as v1 patch 2/2, accepted upstream but not
+>          yet landed.
+
+That seems reasonable.
+
+I'm not going to reply to the individual patches, but I observe that you
+didn't understand IGTK functionality, WoWLAN, A-MSDUs, or maybe
+encryption offload in general. From what I can tell, your patches are
+mostly equivalent to turning FIPS off for wifi.
+
+I don't know where to go from here. I don't think I'm going to teach you
+all the necessary things here in the context of an upstream review, or
+redo the patches correctly myself. Maybe you can approach Intel over the
+distro channel Redhat has and ask them to help. Which will almost
+certainly end up falling back to me, but at least then we can support it
+and it's accounted for.
+
+johannes
