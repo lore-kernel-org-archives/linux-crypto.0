@@ -1,41 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494574D0CF9;
-	Fri,  2 Oct 2026 14:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83A82BE655;
+	Fri,  2 Oct 2026 14:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790950818; cv=none; b=QdsJ3trRd5TYUKRuJozJOsw45cmJr/iMR6Jaa9UXZ4lXAIDJDBu3MOmcyL9SN3MFsEs4nXWqKdX+bhEzm/SP0EIjVf2NyNYoNOmg7n67fkDU/6+KhEVzq/18YekCJ0bk7Lt8VHgXiZxNSdlyYWBORKshBwkEg5a5y31vgrXWn4g=
+	t=1790951793; cv=none; b=OWXFVTP0cRxU9T7Iec0dDUQWPwNg88uSmND0uGPEgTwWdryDimE4ybYKQUyB45GlgRZanhwr6QIMaBqxNmLVcVQLjf/FBh5LnrCVIvooBj4MI0TZ8uVh/wTF9wr8lRck6/9mHZ3KXK6zropc8dWvmjo1b5j3MCB4jOOMiFfJxZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790950818; c=relaxed/simple;
-	bh=ggbz9FX2tgErZnK4914QFVjccv8z/VxHr/twQ2pIaZk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qNTnYa6xxJhQlJ0ihArx/rUSCzOFIDU+1YWsK8xTwPYOYWuGXlbLIVik7TAz4qzoaORqj0bsBCZIMtHTF2/5jBVsjHeX8OEeoSaYiXQYQeH7fI4c/YNwxlrdQvf75qSnwnBjKgwl4byk6knfiu8wWTywAa7Hr0hT4SnEJcQ6MRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dx7YVTg2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790951793; c=relaxed/simple;
+	bh=slpYjfvppyIYCvee4mbPKEgF5KZtNosKvyE5AxWLmic=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N0rE3c6bUEoI47285u+Ulked8xQjYoD1lBcjU0I0qcSCv8bPHlRr1lgmwUCVDAwcFuL+duuKMUOsIonjY/yJbJjmlKvjMZ0y9ox/6IaW9YXN7emk3vniTpct80NM9pwTnCwcVjKp4o27aA6OguaR1pxl80JiPAMTJptxFUsrS+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kc1hpE5A; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dx7YVTg2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C3AC1F00898;
-	Fri,  2 Oct 2026 14:20:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kc1hpE5A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E959E1F000FF;
+	Fri,  2 Oct 2026 14:36:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790950815;
-	bh=jtKFI+wm5GDO4FBlr6o6o2Ki/IyY0N1f4S1f5Graqgg=;
+	s=k20260515; t=1790951791;
+	bh=YaXAl32+bJwu3Ubi8gzjduwO4aL0flsfqwPdvVWa9Kc=;
 	h=From:To:Cc:Subject:Date;
-	b=dx7YVTg2sjiUOud3Hj239dSisH6wb8FsUhF5va+Y9anwDF5zwG5MsF8lFoZpjJXFL
-	 ZmUbLj1qdD7qfxqZXQqeb1jIaHm8fpqDhPl0eXAs2SdFjyWiO+4Fz8PkeTNOILyXTe
-	 vHw8/c4IE4ZO1+FSw1gLfkpBn8N8eQG2++bqX2IBSkLKRRZKboavAe5OFq9Yn2Fmdg
-	 ffPnJNkNFz6bLDbE1FS7Vv/sz4l93CVxuNaXWFZdiVPls+K+ahoCQOe001+rO4ht/O
-	 rBA0ge7QVDfAE0zv9pBXxPbfcmAtcU+zkhZa5HWLcsyVDRnOU4PgqMaZs4fXoBMZii
-	 Pg6+VKlW21xPg==
+	b=kc1hpE5AqE8Xj5dP3BGj9j9it+sPlQj6jilIyzY67TjShxNrN4rl30fvv013IJaT9
+	 mKPB3v95kTB4r1MIv613BRAyghPLsW6HpMRbP2RjJnRI6kAohzwx3dDvAv6s61b/nC
+	 tB8+hHgg6fN4jLgCMWHthvl4maCc4u5V6HvpR7NkmOOxGcEMvvikTqrv5LioAOXIYw
+	 QV+DgtpQHRCdkJxqdPBkQL4HwgRKcPxNLJNj3DJNUTtv9FddYZHSnuNLE3RO2icNCk
+	 kKJFgVAHGmkqQJz/du6zKww+Hc6WxvW5qG7p+aQDfrrNL7cdKgdU4ZAM0fqKK7+zjf
+	 UvRYhUmAqAy/g==
 From: Thorsten Blum <blum@kernel.org>
 To: Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
-	Kees Cook <kees@kernel.org>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Can Peng <pengcan@kylinos.cn>,
+	Linus Walleij <linusw@kernel.org>
 Cc: Thorsten Blum <blum@kernel.org>,
 	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] hwrng: amd - simplify control flow in amd_rng_mod_init()
-Date: Fri,  2 Oct 2026 16:19:51 +0200
-Message-ID: <20261002141952.169528-2-blum@kernel.org>
+Subject: [PATCH] hwrng: stm32 - drop redundant initializations
+Date: Fri,  2 Oct 2026 16:35:53 +0200
+Message-ID: <20261002143556.43214-2-blum@kernel.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -43,70 +47,46 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1687; i=blum@kernel.org; h=from:subject; bh=ggbz9FX2tgErZnK4914QFVjccv8z/VxHr/twQ2pIaZk=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFn793ZUHpP9mR7xrWr9+ahNu1KzpCbpbYpw//Et1/XBx VldTI+EOkpZGMS4GGTFFFkezPoxw7e0pnKTScROmDmsTCBDGLg4BWAiarsZGX5dsPVdeJB/jvb/ Ix2Re3K+PE95k2BoGXpNJfXG1mVmdQcY/lfXC0v6/MhTCz/Gvm+9ZM6N8B9rNA8brZSdE37ogUt xNzsA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1465; i=blum@kernel.org; h=from:subject; bh=slpYjfvppyIYCvee4mbPKEgF5KZtNosKvyE5AxWLmic=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFn7D/owf9lk7Cno7JfuESMu8/PI270a6mrOc8vnT5/89 kzoxxlyHaUsDGJcDLJiiiwPZv2Y4VtaU7nJJGInzBxWJpAhDFycAjARLU1Ghofq92Qk28/deKOk OJ3ts3cuv/qav7n6V5dsdJmzkeG36UyG/w5Za1ZdKns+QcviBBdL2iXuW8FrCyamTDcXbcy/oJ8 4ixMA
 X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
 
-Replace the goto found statement with a break and check pdev after the
-loop. Also consolidate the cleanup paths.
+The variables are reassigned before their initial values are read - drop
+the redundant initializations.
 
 Signed-off-by: Thorsten Blum <blum@kernel.org>
 ---
- drivers/char/hw_random/amd-rng.c | 23 +++++++++--------------
- 1 file changed, 9 insertions(+), 14 deletions(-)
+ drivers/char/hw_random/stm32-rng.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-index dff80daae587..a4c027dd8df2 100644
---- a/drivers/char/hw_random/amd-rng.c
-+++ b/drivers/char/hw_random/amd-rng.c
-@@ -129,19 +129,15 @@ static int __init amd_rng_mod_init(void)
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index f5bfe54c01dc..d3fc910f674a 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -156,7 +156,7 @@ static int stm32_rng_conceal_seed_error_cond_reset(struct stm32_rng_private *pri
+  */
+ static int stm32_rng_conceal_seed_error_sw_reset(struct stm32_rng_private *priv)
  {
- 	int err;
- 	struct pci_dev *pdev = NULL;
--	const struct pci_device_id *ent;
- 	u32 pmbase;
- 	struct amd768_priv *priv;
+-	unsigned int i = 0;
++	unsigned int i;
+ 	u32 sr = readl_relaxed(priv->base + RNG_SR);
  
--	for_each_pci_dev(pdev) {
--		ent = pci_match_id(pci_tbl, pdev);
--		if (ent)
--			goto found;
--	}
--	/* Device not found. */
--	return -ENODEV;
-+	for_each_pci_dev(pdev)
-+		if (pci_match_id(pci_tbl, pdev))
-+			break;
-+	if (!pdev)
-+		return -ENODEV;
+ 	writel_relaxed(sr & ~RNG_SR_SEIS, priv->base + RNG_SR);
+@@ -187,7 +187,7 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ {
+ 	struct stm32_rng_private *priv = container_of(rng, struct stm32_rng_private, rng);
+ 	unsigned int i = 0;
+-	int retval = 0, err = 0;
++	int retval, err;
+ 	u32 sr;
  
--found:
- 	err = pci_read_config_dword(pdev, 0x58, &pmbase);
- 	if (err) {
- 		err = pcibios_err_to_errno(err);
-@@ -171,7 +167,7 @@ static int __init amd_rng_mod_init(void)
- 	if (!priv->iobase) {
- 		pr_err(DRV_NAME "Cannot map ioport\n");
- 		err = -EINVAL;
--		goto err_iomap;
-+		goto err;
- 	}
+ 	retval = pm_runtime_resume_and_get(priv->dev);
+@@ -264,7 +264,7 @@ static uint stm32_rng_clock_freq_restrain(struct hwrng *rng)
+ {
+ 	struct stm32_rng_private *priv =
+ 	    container_of(rng, struct stm32_rng_private, rng);
+-	unsigned long clock_rate = 0;
++	unsigned long clock_rate;
+ 	uint clock_div = 0;
  
- 	amd_rng.priv = (unsigned long)priv;
-@@ -182,13 +178,12 @@ static int __init amd_rng_mod_init(void)
- 	err = hwrng_register(&amd_rng);
- 	if (err) {
- 		pr_err(DRV_NAME " registering failed (%d)\n", err);
--		goto err_hwrng;
-+		ioport_unmap(priv->iobase);
-+		goto err;
- 	}
- 	return 0;
- 
--err_hwrng:
--	ioport_unmap(priv->iobase);
--err_iomap:
-+err:
- 	release_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
- out:
- 	kfree(priv);
+ 	clock_rate = clk_get_rate(priv->clk_bulk[0].clk);
