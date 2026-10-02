@@ -1,44 +1,53 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2448644AB6A;
-	Fri,  2 Oct 2026 08:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FA844A417;
+	Fri,  2 Oct 2026 08:26:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790929572; cv=none; b=WnCr+GXf3aAgNfbxLE8MwzrOGwhi/Taq4VMoOwyYRrKO+jKXFo5mpEN3dqQgfLqcndoXk5UA58PEuZAa2z1DsBHQnK+C3g9l/oiF2DvpXGMNt9iYdeuuDr1xI9yx0OS/XEBVnrijTSEDd4c8ESQkQbHfRGWdlgzwiMhSDOVpP0E=
+	t=1790929592; cv=none; b=cOjyCjNUW6biukqOwEEUQ9++hHqTQrhPGnHtEuW+E8klgBdG8S8yF4IDoqtXpuWHCiJdVNx2tRZbQzlV2A4WKzq3aP/3xZtlqfj448zNRnIrWiPuyrLYaA/MqC01/91+ORV2yyE6TIhX28Nv5LtnTeQS7znYWFVKpbygqRy3dEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790929572; c=relaxed/simple;
-	bh=rEJFtJF0xQTEFm2TPz8e/ruPrgiSyVR1vkAqotVstVA=;
+	s=arc-20240116; t=1790929592; c=relaxed/simple;
+	bh=E+pHqQpI6i3Vihb8D8zLnusxaYh1XlPsSeBNtV4dqfo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NMwr85wG84q09YouvYkP/v1mqM2bmQFitB1FTorcbOJ85mdmUu/T/fTt07Z3h5nOPEUX3HCPz/vTSGiuir0nt7SAgrNh2DrT71ymKt623AKg5UZ1C1k7lzTGnxpHh6ABqtvvPv1OQLwonPUeHvfb8j1hsPKidHnPQoHKzfGbGm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=liYZfYgW; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=B8qMdTLod/Oo6Vfv//I+YCaTItk5xwVg5A2Ckh2seP7Ew90lBvjMmqs9VpGPAS3StQOdYNIhmQfDpMuVZykaa1PVE6js3gnSLG1/v1MY1bxzaaeYQ/QUlX/jqDwaonyDkTTMEyWOGXZGfMpkfp8/5smOiyMKw7ixp3nf4pbClXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ILBAGpMt; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="liYZfYgW"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ILBAGpMt"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=+ga4PUxJ7DyZl/TIAxs1kY2f082Q38jxhP/17oj7jWM=; 
-	b=liYZfYgWM30itCMfxlPH8awNR2tV2hKht+9P1D2ghJjjxzjsgupgSHE3eBhP99lthcIx1rfG4t5
-	aXPdFQnLoMb2/NN03Nb7vTk4BcNe7K7oCq1tFBx8IQUqwMSjedO1DNs8CMuhvo/T8LD13OLKkIWke
-	Sql1v/mIC66wRwcPYnmxh01OlsaocLOVsnArOjyCz8SL8yqeCe1nWxKRct380bhRge1K/3+zZ4xym
-	snDmAueyFnH/nMnuIG+fP/IPQOk4Ih18MzLRbRePGPJ8+hDjxIiihJI6qonIimyvz7rxk3vytCi9r
-	kuJtwwS79i+JbvaG/6clQ4ow79sCDYmlRmHw==;
+	from:content-type:reply-to; bh=Id6HJiKvUSBEp3UrNv9fXkakPqolui9DiZmkFRhGHLY=; 
+	b=ILBAGpMtl75PTtt48oKGT0+aHlR5Q5HPyZJdLbtcy7SE7zUtkNleILgw80wgbydo0xUr5pSOoft
+	vTvRnSrA7JIGgli3iZQY11g1EeTkk30QBKhsixZHLc0PIR1T2R4tbz7udVL1aiHEHy2ZPX/OdkA+f
+	PmgQa3TOBoaeZDcFL7uDv+cYA9Yl1CD8k2Qvqx1WgBusSSWDND0Fewr3iqR21qKHmye6sem1BpPvp
+	PiMCTXav8DuQ8q3LWVp69wCx+ICHAX8f9ElwtxWcSaG0b+Xl/PikfxZnIK31J+/ENEBqyROAk1tSa
+	5lQRQY5KCIKeAtQHidEv5otTADHttKnTPMEw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xCYaf-00000002mk9-3eZu;
-	Fri, 02 Oct 2026 16:26:02 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Oct 2026 18:26:01 +1000
-Date: Fri, 2 Oct 2026 18:26:01 +1000
+	id 1xCYat-00000002mkH-1mAV;
+	Fri, 02 Oct 2026 16:26:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Oct 2026 18:26:15 +1000
+Date: Fri, 2 Oct 2026 18:26:15 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Tero Kristo <t-kristo@ti.com>, Keerthy <j-keerthy@ti.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: sa2ul - Fix HMAC key preparation
-Message-ID: <ar9qma1xm5q-eb6X@gondor.apana.org.au>
-References: <20260923051116.92741-1-ebiggers@kernel.org>
+To: Bill Wendling <morbo@google.com>
+Cc: Zhiqi Song <songzhiqi1@huawei.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Weili Qian <qianweili@huawei.com>,
+	Zhou Wang <wangzhou1@hisilicon.com>,
+	Chenghai Huang <huangchenghai2@huawei.com>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	codemender-patching+linux@google.com
+Subject: Re: [PATCH] crypto: hisilicon/qm - annotate cap_tables with
+ __counted_by_ptr
+Message-ID: <ar9qpzRS9E8UOWcB@gondor.apana.org.au>
+References: <20260923060114.2605310-1-morbo@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,29 +56,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260923051116.92741-1-ebiggers@kernel.org>
+In-Reply-To: <20260923060114.2605310-1-morbo@google.com>
 
-On Tue, Sep 22, 2026 at 10:11:16PM -0700, Eric Biggers wrote:
-> sa_prepare_iopads() has multiple bugs, as discussed at
-> https://lore.kernel.org/linux-crypto/20260831055141.1632832-1-s-vadapalli@ti.com/T/#u
+On Wed, Sep 23, 2026 at 06:01:14AM +0000, Bill Wendling wrote:
+> Annotate the 'qm_cap_table' and 'dev_cap_table' pointer fields in
+> 'struct hisi_qm_cap_tables' with the '__counted_by_ptr' attribute.
+> This improves bounds checking via CONFIG_UBSAN_BOUNDS and
+> CONFIG_FORTIFY_SOURCE, allowing KASAN and compiler diagnostics to
+> detect out-of-bounds accesses.
 > 
-> - Commit 3bf533787910 ("crypto: sha256 - Use the partial block API")
->   introduced a 1-byte buffer overflow in the SHA-256 case by making the
->   crypto_shash_export() write 1 more than sizeof(struct sha256_state).
+> The 'qm_cap_table' pointer is associated with 'qm_cap_size' which
+> specifies its element count. Similarly, 'dev_cap_table' is associated
+> with 'dev_cap_size'.
 > 
-> - It never worked for HMAC keys longer than 64 bytes in the first place.
+> To ensure safety under compiler instrumentation, the assignments in the
+> initialization paths have been updated to set the 'size'/'count' fields
+> prior to setting the pointer fields. This prevents any transient state
+> where the pointer is valid but the count is 0 (or uninitialized),
+> ensuring that subsequent accesses to these tables do not trigger
+> false-positive bounds check panics.
 > 
-> Fix both of these bugs by just using the crypto library to prepare the
-> key, like what the chelsio and qat drivers do.  Also remove the
-> pointless use of an indirect call.
-> 
-> Fixes: 3bf533787910 ("crypto: sha256 - Use the partial block API")
-> Fixes: d2c8ac187fc9 ("crypto: sa2ul - Add AEAD algorithm support")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> Cc: codemender-patching+linux@google.com
+> Assisted-by: LLM
+> Signed-off-by: Bill Wendling <morbo@google.com>
 > ---
->  drivers/crypto/sa2ul.c | 121 +++++++++--------------------------------
->  1 file changed, 27 insertions(+), 94 deletions(-)
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
+>  drivers/crypto/hisilicon/qm.c             | 2 +-
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 2 +-
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 2 +-
+>  include/linux/hisi_acc_qm.h               | 4 ++--
+>  5 files changed, 6 insertions(+), 6 deletions(-)
 
 Patch applied.  Thanks.
 -- 
