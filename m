@@ -1,84 +1,118 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3593D471D00;
-	Fri,  2 Oct 2026 10:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A5A4825AF
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Oct 2026 10:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790936169; cv=none; b=bP06pVKgqiH/ZxcDdbPThFDoLv6mpjyPfe/kTjlRvV0LwfEqld7E72TQXTq3DFfr190LFKuikG2w4VQ4DZQtNpIZ0x25OLwDV1wp+m6YQG06T1Iw0dnXtnbqrrcc3gx6yyuBWczs4tj7k6rpQynHgRPJzCaePrvU06A75czwkhk=
+	t=1790937927; cv=none; b=T3/FBF5k+MWtyt2bEzFPztYGsn5AJmfa5qOFVgptEIZcX4lYVZcnfbySYBnacL0+hiwWjSXg441epE6foTcUQIaygI2WuMmDvSu6/mhEtwveGsKdgE1M3ngc5JSPueZULgJ+9YCI5ym3gMJ55yGl7CHNuBnUipJxWBgTAzv1noA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790936169; c=relaxed/simple;
-	bh=X2Ebc6tLj5pIA1zMWNKioEXI8YkXRm0VnlJaK2vkcB8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KtsXR7DWV1s8vzNgVPA9kHAf3Lt2ROn856XCim7TWfI1UWQnveRMzxRlgLJAVv3/KUn883Fb6tRvmhhgCsqEFjoSGQdwuQEmQ8Lo/u0lWBcggfAVAd3alkpW5KEi4hBTMOdn8xvzEZNjmBLIW49tTFmqP62heoNNgtscUPGEPjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=q7LnU0km; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1790937927; c=relaxed/simple;
+	bh=dGR1f+GNVEfMS1LNIZ6/CtLwpdK6ROJnEqnttlfsMtE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=srEkYHpOWo+rpFl44y4ClozDvc1FCPQYsCEICND/8+m+HBGL4AQa8MQaF2j7Nq2c1jSz7sfcWXy5PktvrQEiCc6fbNEIdkThEvuaJFIq/U0VyrQrbpILJeTRdgm5m16kpFspmy/2Lx2qE5x55GUR+mDZ8d+oEdHz+rd4J15MJfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vl+s958A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="q7LnU0km"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=t66sqEvgjPu5eqIB2QAmy+AC5KfBWnu8nCcammsIiX8=; 
-	b=q7LnU0kmL4OQ7NME5MvQM1j8ktWSrqzz3kU9RpnEdsy4aZp8o9Yr9vSzuHOc3jF8RiSFPnR+yO9
-	/wm22oYux8HKha49vv62SXdjdjIRr75s5+wcuCWYV7S7plbidGVQRhlWLraGRIubNNFFkeyNd7u/+
-	KR5UVSHv0xMILBitJjkMDVCZB9s6TjR4BhdbRbHKgeFqz9pNU/qAxyG2fswkDqa4LfEdwOF+Rb+42
-	RI9Iwgd3mLguNwc4dQJXJ9FfU3dyOy+DP1n+R+ffP66E8gbjw8DFRw7I2M6PrKhedCdXwBqWLlR2U
-	ocCP8rf2HIYCYMsriMLKIP06OzNe71EQcHcg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xCaIy-000000001iS-1Xy0;
-	Fri, 02 Oct 2026 18:15:53 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Oct 2026 20:15:52 +1000
-Date: Fri, 2 Oct 2026 20:15:52 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: =?iso-8859-1?B?Suly6W15?= Jean <Jeremy.Jean@oss.cyber.gouv.fr>
-Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: ecc - Handle exceptional points in Shamir
- multiplication
-Message-ID: <ar-EWEQc_Y7eiwWL@gondor.apana.org.au>
-References: <20260926204323.1913803-4-Jeremy.Jean@oss.cyber.gouv.fr>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vl+s958A"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790937924;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dGR1f+GNVEfMS1LNIZ6/CtLwpdK6ROJnEqnttlfsMtE=;
+	b=Vl+s958ApZFFm2o5HXwScTRl485MjrK86qgupwBHGifcL8Cs06mgSO9Kqd11TPvDoUU0M4
+	/iaUBNsZgIdvUEUCF13c9pZC00Vt0qkTKLBlV4thaIOG6T2SVo2rRvTpXxh/qT+a1PtsB+
+	qlWGXAIJynSlUpnp7SqH3b2BKdwumk4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-674-oaTCLrNKO5yEw7dtjdHaQA-1; Fri,
+ 02 Oct 2026 06:45:19 -0400
+X-MC-Unique: oaTCLrNKO5yEw7dtjdHaQA-1
+X-Mimecast-MFC-AGG-ID: oaTCLrNKO5yEw7dtjdHaQA_1790937917
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E2E241935333;
+	Fri,  2 Oct 2026 10:45:16 +0000 (UTC)
+Received: from jtornosm-thinkpadp1gen7.rmtes.csb (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AAE491956095;
+	Fri,  2 Oct 2026 10:45:13 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: johannes@sipsolutions.net
+Cc: davem@davemloft.net,
+	emmanuel.grumbach@intel.com,
+	herbert@gondor.apana.org.au,
+	ilan.peer@intel.com,
+	jtornosm@redhat.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	miriam.rachel.korenblit@intel.com
+Subject: Re: [PATCH v2 0/5] wifi: add opt-in FIPS exception for iwlwifi
+Date: Fri,  2 Oct 2026 12:45:12 +0200
+Message-ID: <20261002104512.307060-1-jtornosm@redhat.com>
+In-Reply-To: <4ede9873924541b7bed3fc09f5b8c8eb0415ea40.camel@sipsolutions.net>
+References: <4ede9873924541b7bed3fc09f5b8c8eb0415ea40.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260926204323.1913803-4-Jeremy.Jean@oss.cyber.gouv.fr>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Sat, Sep 26, 2026 at 08:43:26PM +0000, Jérémy Jean wrote:
-> Shamir multiplication mishandles equal points, opposite points and the
-> point at infinity. This rejects valid ECDSA signatures and can accept
-> invalid digest/signature tuples when the public key is G or -G. The
-> kernel incorrectly rejects 16 valid signatures from Wycheproof.
-> 
-> Handle doubling, cancellation and the point at infinity in precomputation
-> and accumulation. Add regression tests for P-256 ECDSA and 256/512-bit
-> EC-RDSA. The valid vectors are Wycheproof P1363 secp256r1/SHA-256 cases
-> 60 and 210 converted to X9.62, two constructed ECDSA signatures for
-> Q = +/-G with k = 2, and six constructed EC-RDSA signatures for Q = G,
-> -G and -2G. Also add two invalid P-256 digest/signature tuples for
-> Q = +/-G that must return -EKEYREJECTED.
-> 
-> Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
-> Cc: stable@vger.kernel.org
-> Assisted-by: LLM
-> Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
-> ---
->  crypto/ecc.c     |  33 ++++-
->  crypto/testmgr.c |  11 +-
->  crypto/testmgr.h | 327 ++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 363 insertions(+), 8 deletions(-)
+Hi Johannes,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> A-MSDU size is definitely dependent on PTK since A-MSDU splitting
+> requires hardware crypto, and otherwise the RX buffers aren't big
+> enough (by default, but it's not worth the complexity, and people won't
+> want to do big allocations anyway).
+
+Ok, A-MSDU stays out.
+
+> EHT requires MFP and beacon protection, beacon protection requires
+> checking in firmware since firmware reacts to beacon frames.
+
+Understood, so Beacon Protection needs BIGTK offloaded to firmware.
+With the approach of IGTK/BIGTK to firmware, this should be
+possible, and then EHT can be re-enabled.
+
+> 6 GHz was documented in the code.
+
+Ok, I will check the code comments for that dependency.
+
+> MLO needs EHT and then transitively that was disabled.
+
+Clear, the chain is MLO -> EHT -> MFP + Beacon Protection.
+
+> The biggest question then remains what MFP gaps you create with this. I
+> _think_ you might even have to install random keys to the firmware, but
+> ... then maybe it wouldn't even pass certain frames to the driver? I'm
+> not sure you want to accept a loss of MFP security.
+
+This is the part I am investigating now. Without PTK in firmware,
+firmware-autonomous TX management frames (like AddBA) would be
+unprotected, that is the accepted trade-off. For RX, the question
+is whether firmware forwards protected unicast management frames
+to mac80211 for SW decryption or drops them. I am testing this.
+
+About random keys, I think that would cause firmware to attempt
+decryption with wrong keys and corrupt or drop the frames, so
+probably not a viable path, but needs to be tested.
+
+Regarding MFP security, the intention is not to lose it but to
+handle it in software where possible. I think the only gap would be
+firmware-autonomous frames that bypass mac80211, but of course I
+need to confirm it.
+
+Thank you for your help again
+
+Best regards
+Jose Ignacio
+
