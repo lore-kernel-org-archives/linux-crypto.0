@@ -1,81 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF00340417;
-	Fri,  2 Oct 2026 14:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61DA1C2324
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Oct 2026 19:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790952571; cv=none; b=XeS4ld9HBwQsoH9JaCs7p2aeTkUEaCS6KFo+GGadZEVk2KrEV8efNHI1m2t+SXLn3L8vYDSDfeGJ1UWLCKI2jeMQMZ5OU6btEm3nooP2smnJkVuCaJtxNoJ2HHccMu+dsWo9WxQQ9MXAgPlAtoidl5D7vO3lb1WH1IitqeitwQc=
+	t=1790969507; cv=none; b=aLUbhEJjaE00pPLS7KsWMBo3MY3ZCqPDS4+VMRPdDx0BAxU4haYWNT/G54xR94+ETdonOA2oBb+y8TimD+zAHWNiFQEqITMyZcfEChc1wPw5ALkRZKrVnLLr7U+OPOuFctW/3kboQi6igvGTmgXsKoolSqM+0x+/aZqoAHWuZZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790952571; c=relaxed/simple;
-	bh=2Iwh1YBp293wVOzp50snGvj+P98VSbsE/9m4UEmQTXI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LwUTLg+8cxwJckN9RHnG0C41KYr4EDbNLBMSipywALrQ1cIie4naX9RBN3D1TheRLGIdcOI2Nk4pqwzd6C0pEIpBF76b2UhVK1x7hhcbArePuEJFe3vRZIevTufq8uLFFREDf0fGUgm7ZX8TARHO0IOVkwhHFLEP83MjXSme0dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xto4jLfJ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790969507; c=relaxed/simple;
+	bh=Gj+PEAhdIV/uFJgJbAghSUHPHdZ/2r0J4sOrBe2CBfI=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aVclU4+CFoHwaPyRcg1ynPSjFo93jeLWRYjPPr+3GFMdtoq+GlU5EnNxpnu7DApjigYgSy/fe6UJbzEqg479krbTit2vY0HMINWDVfPrkokIK68WgYV0mKLuB3TJ6Dbk3jttP1bLCLyoGwTU5LO5IeRnx/LWdk/4eF5KGQaRxAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IZSEymhM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xto4jLfJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB7331F000FF;
-	Fri,  2 Oct 2026 14:49:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IZSEymhM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C91421F0089C
+	for <linux-crypto@vger.kernel.org>; Fri,  2 Oct 2026 19:31:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790952569;
-	bh=5kIp6AK84MEo9GlzF/Be95zArasU2AChgod6QlX+xlg=;
-	h=From:To:Cc:Subject:Date;
-	b=Xto4jLfJvUFRd1Cfb57Dyt861cC2741yPwg1ytnac1QHmnW8OXzRVdAD6pishXAaf
-	 xfbQFtDw7fLA+G87oLwR9cHo1jjKo0iAyh75iQcFTKuclouv3DUcDEtkIkGHhgh5W6
-	 cNlvGBlOYPQCcQBhY+npkTJMYusA5Nwe+MxKxJYjdb0U2IM/y46wGHcFkV8SIEwEgT
-	 MqO6IsfyPiCcxNeRcLkNRCGunBnE6UehwY/5lD1t3X1xR2pSvXWXa8tovf58BLMtmU
-	 eGsl6+3ygGN2hr0DTs+rWWdE34sKc5dC2ZNIVtKpW9KTK6JoYZsc1MXSbnaTE/Q28n
-	 h+avyIg2yvPDA==
-From: Thorsten Blum <blum@kernel.org>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Can Peng <pengcan@kylinos.cn>,
-	Linus Walleij <linusw@kernel.org>
-Cc: Thorsten Blum <blum@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] hwrng: stm32 - use devm_platform_ioremap_resource() in stm32_rng_probe()
-Date: Fri,  2 Oct 2026 16:48:38 +0200
-Message-ID: <20261002144839.51627-3-blum@kernel.org>
-X-Mailer: git-send-email 2.55.0
+	s=k20260515; t=1790969505;
+	bh=Gj+PEAhdIV/uFJgJbAghSUHPHdZ/2r0J4sOrBe2CBfI=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=IZSEymhMRmymU/5mjnOE3y5B/8QhrXrNBFWEdRmLHSCXxuw/2tuSkkBpfxtDZ8C2+
+	 6+a2iCX4rgvLAkGlUd/0DkXOY7QXWdSX7jD03TM6NgI5j3Rf7TEqOEwJAEChQGF2T6
+	 YLoXKyiHiEW1/pRdMFRvXBhxISIxzxA04E+sed3xoqoInnXXzlVEPsSHZlK/PLQB/S
+	 iuYH9efUKViXPqdL9P8iPCOsP6wiLSHDkirGQVmkWXAaJFc/R8bzy+A1QtyvhnKCYc
+	 yz45RPWrNAX/CIVRFwrTN4C6g4N4AYN3aRmHOoettwByFFPh1Vk3zA1vHmXF1XpdCI
+	 8JasszxgRAB+A==
+Received: by mail-lr2-f35.google.com with SMTP id 38308e7fff4ca-3a6124046f0so2342781fa.3
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Oct 2026 12:31:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBy58I09RawGbnXfVC9TgaA1qpdCx2GLe6trppoNU7T2vr375VrWeGaJPIbvlgHPqV43svT+D2F5v/LgJRA=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLG9KGKXN1Nu4PA8e+gViPvGqHqU3G8D7hYUY9L3gbFvFGlvG0O
+	nqL1JPLHQF+W6gr7bhkohlBRDom222ExpgrACH79Eom7QjuqJJV4DrblpWRqJrWRZPnpRvYNOeS
+	KdURmMnxQVQa7h2yWmLh271e16mbtv3GI43O7aUbNYg==
+X-Received: by 2002:a05:651c:2121:b0:3a8:7b84:be9b with SMTP id
+ 38308e7fff4ca-3a8877b73a8mr9365471fa.5.1790969503992; Fri, 02 Oct 2026
+ 12:31:43 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 2 Oct 2026 22:31:41 +0300
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 2 Oct 2026 22:31:41 +0300
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <ar9qNirrzOTDLipN@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1003; i=blum@kernel.org; h=from:subject; bh=2Iwh1YBp293wVOzp50snGvj+P98VSbsE/9m4UEmQTXI=; b=kA0DAAoWXqtxINjMdS4ByyZiAGq/xEejLZNBJ+SYr8+Ib0WyLcbJIkc4wUBkp/z3YfDJ30Ckt 4h1BAAWCgAdFiEE4Jr4mE11fHmyNFi5XqtxINjMdS4FAmq/xEcACgkQXqtxINjMdS4NCQD/bqnL tAU6U/IwSMVUcOr1/pua2Tlaa6fBpL+OPSm505YA/jiPDnXJcEll3KolODLI3efPvXG7ALDcIcy Fb3EPxYII
-X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
-Content-Transfer-Encoding: 8bit
+References: <20260922-qce-fix-self-tests-v9-0-b1aa742e79af@oss.qualcomm.com> <ar9qNirrzOTDLipN@gondor.apana.org.au>
+Date: Fri, 2 Oct 2026 22:31:41 +0300
+X-Gmail-Original-Message-ID: <CAMRc=MdRBu5gg7Q3pz8Wn9Da4RpmmiKLP2-LwiszKCd3o8jQdQ@mail.gmail.com>
+X-Gm-Features: AclHuK8wQ6TwGfqRhG76u8I4Ivw1PHBRVeaKEhxJd2tlBCqG9_-Cl1JOHG4NPMU
+Message-ID: <CAMRc=MdRBu5gg7Q3pz8Wn9Da4RpmmiKLP2-LwiszKCd3o8jQdQ@mail.gmail.com>
+Subject: Re: [PATCH v9 00/14] crypto: qce - Fix crypto self-test failures
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Stanimir Varbanov <svarbanov@mm-sol.com>, Eneas U de Queiroz <cotequeiroz@gmail.com>, 
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, Eric Biggers <ebiggers@kernel.org>, 
+	Demi Marie Obenour <demiobenour@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+	Abel Vesa <abelvesa@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, brgl@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The resource pointer is unused - use devm_platform_ioremap_resource()
-and remove the unnecessary local variable.
+On Fri, 2 Oct 2026 10:24:22 +0200, Herbert Xu
+<herbert@gondor.apana.org.au> said:
+> On Tue, Sep 22, 2026 at 02:57:15PM +0200, Bartosz Golaszewski wrote:
+>> This iteration - in addition to the previous fixes - proposes to split
+>> the QCE driver into a core part necessary to bind to the QCE DT node and
+>> enable runtime power management in order to allow to drop the
+>> interconnect votes, and the crypto part registering the crypto
+>> algorithms. The core module is then enabled in arm64 defconfig while the
+>> crypto part stays disabled by default. In addition: the actual
+>> registration of crypto algos is gated with a module parameter that
+>> default to false.
+>
+> Please check the Sashiko comments:
+>
+> https://sashiko.dev/#/patchset/20260922-qce-fix-self-tests-v9-0-b1aa742e79af%40oss.qualcomm.com
+>
 
-Signed-off-by: Thorsten Blum <blum@kernel.org>
----
- drivers/char/hw_random/stm32-rng.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+I've gone through them. None of the issues were introduced by this series, all
+are pre-existing. I've added them to my list and will fix them. Can we not
+delay this series any longer and instead work in smaller steps since the crypto
+algos will be disabled by default anyway?
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index f5bfe54c01dc..8468a4a24d48 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -528,14 +528,13 @@ static int stm32_rng_probe(struct platform_device *ofdev)
- 	struct device *dev = &ofdev->dev;
- 	struct device_node *np = ofdev->dev.of_node;
- 	struct stm32_rng_private *priv;
--	struct resource *res;
- 	int ret;
- 
- 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
- 
--	priv->base = devm_platform_get_and_ioremap_resource(ofdev, 0, &res);
-+	priv->base = devm_platform_ioremap_resource(ofdev, 0);
- 	if (IS_ERR(priv->base))
- 		return PTR_ERR(priv->base);
- 
+Bartosz
