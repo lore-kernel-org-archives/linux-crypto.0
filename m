@@ -1,53 +1,44 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FA844A417;
-	Fri,  2 Oct 2026 08:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F030844D00D;
+	Fri,  2 Oct 2026 08:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790929592; cv=none; b=cOjyCjNUW6biukqOwEEUQ9++hHqTQrhPGnHtEuW+E8klgBdG8S8yF4IDoqtXpuWHCiJdVNx2tRZbQzlV2A4WKzq3aP/3xZtlqfj448zNRnIrWiPuyrLYaA/MqC01/91+ORV2yyE6TIhX28Nv5LtnTeQS7znYWFVKpbygqRy3dEI=
+	t=1790929923; cv=none; b=FMrIHU6NE9RrTwTy7r6jsG5c9aOtOC8mzziS2C9NdbemomZwY86UgDeIYh64P++mLwnWlAFyoXNEnvkt2KmUuvw2RLH1n+3a98GD25nYJPmwy19BBNXMJ1gA/kJt+IlH31ZWjDjOLZTAmPYcpUawkji9xQ2/lEJUNnHtgGg/a78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790929592; c=relaxed/simple;
-	bh=E+pHqQpI6i3Vihb8D8zLnusxaYh1XlPsSeBNtV4dqfo=;
+	s=arc-20240116; t=1790929923; c=relaxed/simple;
+	bh=cy7ApzXstdVj4Tfu30LVIjQuadA3Vd94/WodUwBgnkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B8qMdTLod/Oo6Vfv//I+YCaTItk5xwVg5A2Ckh2seP7Ew90lBvjMmqs9VpGPAS3StQOdYNIhmQfDpMuVZykaa1PVE6js3gnSLG1/v1MY1bxzaaeYQ/QUlX/jqDwaonyDkTTMEyWOGXZGfMpkfp8/5smOiyMKw7ixp3nf4pbClXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ILBAGpMt; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=kXmzh43GUr5tFuvShm3kUBQOimyDXGHe+46t1lKgGBXZJyAWxqCRHb8sgK8Iv24jeTk+CDaEUugOIZuzXZHApU/lNwqpfd0b1MScMU1eO2wymS5ANOAqpCpPrsZZn+bMYmvaZknTaZUIhu5JjTpbcbtpP8a4nnz3E8HfpOea36w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OTpoqiUS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ILBAGpMt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=Id6HJiKvUSBEp3UrNv9fXkakPqolui9DiZmkFRhGHLY=; 
-	b=ILBAGpMtl75PTtt48oKGT0+aHlR5Q5HPyZJdLbtcy7SE7zUtkNleILgw80wgbydo0xUr5pSOoft
-	vTvRnSrA7JIGgli3iZQY11g1EeTkk30QBKhsixZHLc0PIR1T2R4tbz7udVL1aiHEHy2ZPX/OdkA+f
-	PmgQa3TOBoaeZDcFL7uDv+cYA9Yl1CD8k2Qvqx1WgBusSSWDND0Fewr3iqR21qKHmye6sem1BpPvp
-	PiMCTXav8DuQ8q3LWVp69wCx+ICHAX8f9ElwtxWcSaG0b+Xl/PikfxZnIK31J+/ENEBqyROAk1tSa
-	5lQRQY5KCIKeAtQHidEv5otTADHttKnTPMEw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xCYat-00000002mkH-1mAV;
-	Fri, 02 Oct 2026 16:26:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Oct 2026 18:26:15 +1000
-Date: Fri, 2 Oct 2026 18:26:15 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Bill Wendling <morbo@google.com>
-Cc: Zhiqi Song <songzhiqi1@huawei.com>,
-	Longfang Liu <liulongfang@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Weili Qian <qianweili@huawei.com>,
-	Zhou Wang <wangzhou1@hisilicon.com>,
-	Chenghai Huang <huangchenghai2@huawei.com>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	codemender-patching+linux@google.com
-Subject: Re: [PATCH] crypto: hisilicon/qm - annotate cap_tables with
- __counted_by_ptr
-Message-ID: <ar9qpzRS9E8UOWcB@gondor.apana.org.au>
-References: <20260923060114.2605310-1-morbo@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OTpoqiUS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4463D1F000FF;
+	Fri,  2 Oct 2026 08:31:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790929921;
+	bh=VhRq2QxjH/GFd6p1HBiOhkCq4H/AIVqR20QgHUYCFkk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=OTpoqiUSX6mSnjwKNaqsLx4pbchWeXuWr1t/5MD2p0F4vE9pYos491WzDM6QXbWwx
+	 r5rKJ3FbNMqUhPNnrCj8OmPCsiEmJQk5WrFoB1DZj4DrOJPqmRp06g668QtNIM25CM
+	 +rhGMK+9CWt0ZCxfDMsuOfip0L8KAz0ihNTiedtHkWPsPlDyPDBiqyJpPAE1cneYhG
+	 WdVDNJ6EZE1r8xBHfVSbmA3v+2WP94V+hQDSLvIjhlD2bfrX0//9l7ipTVW7qOzHlE
+	 cOGR7ZoxfXPg5JArbHHUbC+SOtCx5dxnNGR8ydbBMv94fSXXyZ07RyC0xRhWgzMWvj
+	 kPBRZCOnrL3hQ==
+Date: Fri, 2 Oct 2026 10:31:56 +0200
+From: Thorsten Blum <blum@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Olivia Mackall <olivia@selenic.com>, Kees Cook <kees@kernel.org>,
+	Michael Buesch <mb@bu3sch.de>, Andrew Morton <akpm@osdl.org>,
+	Jan Beulich <jbeulich@novell.com>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	Chris Wright <chrisw@sous-sol.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] hwrng: intel - return -ENOMEM when ioremap() fails
+Message-ID: <ar9r_KsYh2qGSfE6@kernel.org>
+References: <20260922181102.67309-3-blum@kernel.org>
+ <ar9bjjPC6xAgfPzT@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,39 +47,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260923060114.2605310-1-morbo@google.com>
+In-Reply-To: <ar9bjjPC6xAgfPzT@gondor.apana.org.au>
 
-On Wed, Sep 23, 2026 at 06:01:14AM +0000, Bill Wendling wrote:
-> Annotate the 'qm_cap_table' and 'dev_cap_table' pointer fields in
-> 'struct hisi_qm_cap_tables' with the '__counted_by_ptr' attribute.
-> This improves bounds checking via CONFIG_UBSAN_BOUNDS and
-> CONFIG_FORTIFY_SOURCE, allowing KASAN and compiler diagnostics to
-> detect out-of-bounds accesses.
+On Fri, Oct 02, 2026 at 05:21:50PM +1000, Herbert Xu wrote:
+> On Tue, Sep 22, 2026 at 08:11:01PM +0200, Thorsten Blum wrote:
+> > intel_init_hw_struct() incorrectly returns -EBUSY when ioremap() fails.
+> > Return -ENOMEM instead.
+> > 
+> > Fixes: 641dd002d207 ("[PATCH] fix Intel RNG detection")
 > 
-> The 'qm_cap_table' pointer is associated with 'qm_cap_size' which
-> specifies its element count. Similarly, 'dev_cap_table' is associated
-> with 'dev_cap_size'.
-> 
-> To ensure safety under compiler instrumentation, the assignments in the
-> initialization paths have been updated to set the 'size'/'count' fields
-> prior to setting the pointer fields. This prevents any transient state
-> where the pointer is valid but the count is 0 (or uninitialized),
-> ensuring that subsequent accesses to these tables do not trigger
-> false-positive bounds check panics.
-> 
-> Cc: codemender-patching+linux@google.com
-> Assisted-by: LLM
-> Signed-off-by: Bill Wendling <morbo@google.com>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
->  drivers/crypto/hisilicon/qm.c             | 2 +-
->  drivers/crypto/hisilicon/sec2/sec_main.c  | 2 +-
->  drivers/crypto/hisilicon/zip/zip_main.c   | 2 +-
->  include/linux/hisi_acc_qm.h               | 4 ++--
->  5 files changed, 6 insertions(+), 6 deletions(-)
+> This commit ID appears to be incorrect (but the subject is correct).
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The commit ID is from stable, in mainline it is:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c24c95a085c6b52c11c2f5afecc38b0ca143cdae
+
+The correct tag is therefore:
+
+Fixes: c24c95a085c6 ("[PATCH] fix Intel RNG detection")
+
+Should I submit a v2 or can you apply it like this?
+
+Thanks,
+Thorsten
