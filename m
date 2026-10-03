@@ -1,219 +1,133 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC1239D6FD
-	for <linux-crypto@vger.kernel.org>; Sat,  3 Oct 2026 22:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A073AEF45;
+	Sat,  3 Oct 2026 22:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791065476; cv=none; b=ojsZCI/osqRB8uS/zqg44dEguAax/vy6uM/kmRX1N2ULGFUUnsW1c6QDd+9gpiu0bsNTjVoXtBvx1QxjBu0AnE/jBsX0zLmFA9KNVQFcMYJdMv4RqQSj/f59wtLdbLQzqqo1oFC6HK4DUIXNPOf0lVeNHjaGEcUwZe4AKw4rHVk=
+	t=1791067515; cv=none; b=gON947QdjuPuU2zGXsYPF21cOiGZUF+wWISRoUsSBD1FJBj/ZXr1dWxyWTRAShgwZEU+LMODly4dS6sRbMNfU5KqRjM+Z7eYKxUWGU4h8NAwd1KfsbbAmMh7DYlE0PyKM5y25l9tl98NLGdFmoXP4wc5pgaNYfAEqezEiJLDXPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791065476; c=relaxed/simple;
-	bh=YdLb+UECdYOYR8sWTgVCqw/o0TzIrjRTUucwz7a0+fw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=bAONDujs3mmnatQFXQ80g50kF5Gbezx355g3j6A/YnqxcweuGCCTr5I762M6qfQzVaKwQHtUnpGsOaJoNPu4zrLoFx3BAtSta32EHc13ALBqC4UECLttzImcKyp5byOUAqahxxmD5NRfZAtU9a72F7EB6Uq9gbkJDjCkTlgJOQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ME6J3Zzd; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1791067515; c=relaxed/simple;
+	bh=W21SRaEwpj9rNXOhq+Ty48iMmU1uKpvKeWtWaSSd1JM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=bR9s/8S8Hd7D9keLFi6OXHvF9fI6mclT5+W+Azyuh98MyH74vfpYjz+9KQprVuKTz/dFsQZMtmHPxQhIj0StJ5yN1Xa+YxRzmtaFwPOaqAtww88OSFFPBJO57WLh7aFtyMvRBuegolFTaz+UTuMvDb/4o5ZyckuS43rCpF2pf3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=RLbFDHwu; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ME6J3Zzd"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 7665E1A110E;
-	Sat,  3 Oct 2026 22:11:11 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D0EAE604FF;
-	Sat,  3 Oct 2026 22:11:10 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 59F6610328366;
-	Sun,  4 Oct 2026 00:11:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1791065470; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=vLIYpYbzpe+zZr7ujIrUdld5c1tY2PuBJWK9DL9g1vM=;
-	b=ME6J3ZzdtRrq62A5MLnXaIDN7hOG4Ldxr389YyJvedeQ5VWMUNto2YA14JI4d4rOjQL+4M
-	D7f9/YEOqBkY73L9P9n8NUEPlYkXwkYXpl9FQSOT6j9GCM9TAk0B/cVnSzb4fmiy+qG24D
-	ukwmaWLXywlGu1baoH8C0Ri03+UIxnc5kVtwyyJV/Hc0HrT4m9JF6DuRKkgztwS6WGVGOs
-	LfrbsGpdI0RXtUehGdFGwKARBY8THgts5JqI7dQ+HMwU8qctVaWMS84wqdMVk75chWTvaQ
-	WBa9chQZtz9dVRCYdsAbIt0WLRtiD8+2RkeDqC1u987QXWWxHl+JecP3FS0m2Q==
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="RLbFDHwu"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20261003224508euoutp02c41c30b489eaee9363e860f2478d6027~bJmji_WXc2979329793euoutp02u;
+	Sat,  3 Oct 2026 22:45:08 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20261003224508euoutp02c41c30b489eaee9363e860f2478d6027~bJmji_WXc2979329793euoutp02u
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1791067508;
+	bh=vFhGMCg6Ji/JXdFQ3B6wXXIZQgQ9xvpb3HvqRmvxgSk=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=RLbFDHwuh3NRChlB5DbAnpf5fbQ/9VI4LqGu4llTjFUiXPQ562rniZUJozx7F6f0C
+	 O998yLIejmOOpMfO2undeRdQGMIbbwvHHW6qvrglXgdLXRekz3Vq8zAZ0mrAGgSxG4
+	 yLsO68CPN7a6ZuBi2t//4zMj/AdCV8fhYFGTexlA=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20261003224507eucas1p200ece20a05f4aac2eeb0180f041df0fe~bJmigAu1f3080530805eucas1p2D;
+	Sat,  3 Oct 2026 22:45:07 +0000 (GMT)
+Received: from [192.168.1.44] (unknown [106.210.136.40]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20261003224505eusmtip1f6ac4f841c43fd74cce4c31cdfba487f~bJmg3wbbL2072920729eusmtip1D;
+	Sat,  3 Oct 2026 22:45:05 +0000 (GMT)
+Message-ID: <9c5913c0-11c8-4db8-844b-ea2ef29bf5db@samsung.com>
+Date: Sun, 4 Oct 2026 00:45:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 04 Oct 2026 00:11:04 +0200
-Message-Id: <DLVJPVEV4SW7.16A8YC0SH3Z63@bootlin.com>
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S. Miller"
- <davem@davemloft.net>, "open list" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3] crypto: talitos: fix probe IRQ ordering
-From: "Paul Louvel" <paul.louvel@bootlin.com>
-To: "Rosen Penev" <rosenp@gmail.com>, <linux-crypto@vger.kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20261003212359.126745-1-rosenp@gmail.com>
-In-Reply-To: <20261003212359.126745-1-rosenp@gmail.com>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 9/9] MAINTAINERS: add an entry for the LZ4
+ compression library
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+	<justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, Thomas
+	Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+	<James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, Heiko
+	Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander
+	Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
+	<borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
+	Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>, Sergey
+	Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Andrew
+	Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-block@vger.kernel.org, Yann Collet
+	<yann.collet.73@gmail.com>, Nick Terrell <terrelln@meta.com>, Gao Xiang
+	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Jaegeuk Kim
+	<jaegeuk@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Phillip
+	Lougher <phillip@squashfs.org.uk>, Sungguk <sungguk.na@samsung.com>, Jaehoon
+	Chung <jh80.chung@samsung.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+	linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-crypto@vger.kernel.org
+Content-Language: en-US
+From: Michal Wilczynski <m.wilczynski@samsung.com>
+In-Reply-To: <20260925213926.GA1903@quark>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20261003224507eucas1p200ece20a05f4aac2eeb0180f041df0fe
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260925113507eucas1p2ddb94f2077b679426aa86dd1d492eaf3
+X-EPHeader: CA
+X-CMS-RootMailID: 20260925113507eucas1p2ddb94f2077b679426aa86dd1d492eaf3
+References: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
+	<CGME20260925113507eucas1p2ddb94f2077b679426aa86dd1d492eaf3@eucas1p2.samsung.com>
+	<20260925-lz4-vendor-upstream-v1-9-1c7ffbe21c4b@samsung.com>
+	<20260925213926.GA1903@quark>
 
-On Sat Oct 3, 2026 at 11:23 PM CEST, Rosen Penev wrote:
-> The talitos interrupt handlers schedule priv->done_task[] via
-> tasklet_schedule().  In probe(), talitos_probe_irq() ran before
-> tasklet_init(), so an interrupt arriving during that window (a shared
-> IRQ, or a completion pending from an earlier transmission) would
-> schedule an uninitialized tasklet.
->
-> Resolve the IRQ numbers before the tasklet_init() calls so the
-> done_task[] selection can see the secondary IRQ, and only request the
-> IRQs after the channel fifos are allocated and the device is
-> initialized.  Every structure the handlers touch is then fully set up
-> before interrupts are enabled.  This matches remove(), which frees the
-> IRQs before killing the tasklets.
 
-LLM tends to be very verbose on commit messages and describe what the git d=
-iff
-could already tell us.
-The second paragraph could be resumed to:
 
-"Request IRQs after the necessary data structures are initialized, so that
-interrupts do not schedule uninitialized tasklets."
+On 9/25/26 23:39, Eric Biggers wrote:
+> On Fri, Sep 25, 2026 at 01:27:39PM +0200, Michal Wilczynski wrote:
+>> lib/lz4/ has never had one: get_maintainer.pl returns only the LKML
+>> fallback for every file in it, including include/linux/lz4.h, which eight
+>> subsystems build against.
+>>
+>> This matters more now than it did. With the previous patches lib/lz4 is
+>> vendored upstream sources, and someone has to bump them to new upstream
+>> releases and decide what the kernel-side glue may do. I am willing to do
+>> that, so add myself as its maintainer.
+>>
+>> Signed-off-by: Michal Wilczynski <m.wilczynski@samsung.com>
+>> ---
+>>  MAINTAINERS | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index cc3cae2e378b34aeb705cef654c720ca9f2ba223..989e1b5fab21432dd7042d1e60c4bbad85beb925 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -15606,6 +15606,12 @@ S:	Supported
+>>  F:	drivers/net/pcs/pcs-lynx.c
+>>  F:	include/linux/pcs-lynx.h
+>>  
+>> +LZ4 COMPRESSION LIBRARY
+>> +M:	Michal Wilczynski <m.wilczynski@samsung.com>
+>> +S:	Maintained
+>> +F:	include/linux/lz4.h
+>> +F:	lib/lz4/
+>> +
+> 
+> Should this entry cover lib/decompress_unlz4.c and
+> include/linux/decompress/unlz4.h as well?
 
->
-> Assisted-by: LLM
+Yes I'll add both in v2.
+Thanks a lot for looking at the series as a whole.
 
-There are some available skills to improve AI wording, or you can make one
-yourself tell it to avoid verbosity.
+> 
+> - Eric
+> 
 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  v3: reshuffle again to fix IRQs.
->  v2: reshuffle code to avoid NULL derefs
->  drivers/crypto/talitos.c | 48 ++++++++++++++++++++++------------------
->  1 file changed, 26 insertions(+), 22 deletions(-)
->
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-> index 41a87d7c30a0..70f7ad9e09f9 100644
-> --- a/drivers/crypto/talitos.c
-> +++ b/drivers/crypto/talitos.c
-> @@ -3353,21 +3353,13 @@ static int talitos_probe_irq(struct platform_devi=
-ce *ofdev)
->  	int err;
->  	bool is_sec1 =3D has_ftr_sec1(priv);
-> =20
-> -	priv->irq[0] =3D platform_get_irq(ofdev, 0);
-> -	if (priv->irq[0] < 0)
-> -		return priv->irq[0];
-> -
->  	if (is_sec1) {
->  		err =3D request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
->  				  dev_driver_string(dev), priv);
->  		goto primary_out;
->  	}
-> =20
-> -	priv->irq[1] =3D platform_get_irq_optional(ofdev, 1);
-> -	if (priv->irq[1] =3D=3D -EPROBE_DEFER)
-> -		return priv->irq[1];
-> -
-> -	/* get the primary irq line */
-> +	/* single (or primary) irq line */
->  	if (priv->irq[1] < 0) {
->  		err =3D request_irq(priv->irq[0], talitos2_interrupt_4ch, 0,
->  				  dev_driver_string(dev), priv);
-> @@ -3379,13 +3371,11 @@ static int talitos_probe_irq(struct platform_devi=
-ce *ofdev)
->  	if (err)
->  		goto primary_out;
-> =20
-> -	/* get the secondary irq line */
-> +	/* secondary irq line */
->  	err =3D request_irq(priv->irq[1], talitos2_interrupt_ch1_3, 0,
->  			  dev_driver_string(dev), priv);
-> -	if (err) {
-> +	if (err)
->  		dev_err(dev, "failed to request secondary irq\n");
-> -		priv->irq[1] =3D 0;
-> -	}
-> =20
->  	return err;
-> =20
-> @@ -3404,12 +3394,27 @@ static int talitos_probe(struct platform_device *=
-ofdev)
->  	struct device_node *np =3D ofdev->dev.of_node;
->  	struct talitos_private *priv;
->  	unsigned int num_channels;
-> +	void __iomem *reg;
->  	int i, err;
->  	int stride;
-> +	int irq0;
-> +	int irq1;
-> =20
->  	if (of_property_read_u32(np, "fsl,num-channels", &num_channels))
->  		return -EINVAL;
-> =20
-> +	irq0 =3D platform_get_irq(ofdev, 0);
-> +	if (irq0 < 0)
-> +		return irq0;
-> +
-> +	irq1 =3D platform_get_irq_optional(ofdev, 1);
-> +	if (irq1 =3D=3D -EPROBE_DEFER)
-> +		return irq1;
-> +
-> +	reg =3D devm_platform_ioremap_resource(ofdev, 0);
-> +	if (IS_ERR(reg))
-> +		return PTR_ERR(reg);
-> +
-
-You are dropping a previous error message here, use dev_err_probe().
-
->  	priv =3D devm_kzalloc(dev, struct_size(priv, chan, num_channels), GFP_K=
-ERNEL);
->  	if (!priv)
->  		return -ENOMEM;
-> @@ -3425,12 +3430,7 @@ static int talitos_probe(struct platform_device *o=
-fdev)
-> =20
->  	spin_lock_init(&priv->reg_lock);
-> =20
-> -	priv->reg =3D devm_platform_ioremap_resource(ofdev, 0);
-> -	if (IS_ERR(priv->reg)) {
-> -		dev_err(dev, "failed to of_iomap\n");
-> -		err =3D PTR_ERR(priv->reg);
-> -		goto err_out;
-> -	}
-> +	priv->reg =3D reg;
-> =20
->  	/* get SEC version capabilities from device tree */
->  	of_property_read_u32(np, "fsl,channel-fifo-len", &priv->chfifo_len);
-> @@ -3481,9 +3481,8 @@ static int talitos_probe(struct platform_device *of=
-dev)
->  		stride =3D TALITOS2_CH_STRIDE;
->  	}
-> =20
-> -	err =3D talitos_probe_irq(ofdev);
-> -	if (err)
-> -		goto err_out;
-> +	priv->irq[0] =3D irq0;
-> +	priv->irq[1] =3D irq1;
-> =20
->  	if (has_ftr_sec1(priv)) {
->  		if (priv->num_channels =3D=3D 1)
-> @@ -3540,6 +3539,11 @@ static int talitos_probe(struct platform_device *o=
-fdev)
->  		goto err_out;
->  	}
-> =20
-> +	/* enable interrupts once the channel fifos and tasklets are set up */
-> +	err =3D talitos_probe_irq(ofdev);
-> +	if (err)
-> +		goto err_out;
-> +
->  	/* register the RNG, if available */
->  	if (hw_supports(dev, DESC_HDR_SEL0_RNG)) {
->  		err =3D talitos_register_rng(dev);
-
-I guess to be 100% correct, IRQs could be masked at the beginning of probe
-and unmasked at the end.
-
-Thanks,
---=20
-Paul Louvel, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Best regards,
+-- 
+Michal Wilczynski <m.wilczynski@samsung.com>
