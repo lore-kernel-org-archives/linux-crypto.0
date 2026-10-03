@@ -1,99 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC81B221FB4;
-	Sat,  3 Oct 2026 20:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAAA2F260C;
+	Sat,  3 Oct 2026 21:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791058928; cv=none; b=nw3Vi6wScyYBPsb5A27lKxR+Ezrb/BFciF0lJvALV9/mMRYPvhAL/a/UyhMYO6TamQAOZsX3jc6h8Jd6bop4KBiG8AT/KTgm9l08SCo5Silgz2KGuHF4pulDSsjzVMycSlNbAfBGl1n4+inkinz7TlTHlZ6nKlrn0gHftlw5XHA=
+	t=1791062510; cv=none; b=aTEIWWf3YvGyMJQHXXUrRocrfM/jME3EZH0lr2kqtFkvEOizWL1W9A50PWUazQbO7P8VKNpSMg10auCaewNQ1PaHZCsXOsFoGJHOUjoGJA2jL90hDGPB5G+l5XKqv5QhMeZF4fzZhYKg9dc7gHhMao56Lp7Wq3kuGH2xOR9TKJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791058928; c=relaxed/simple;
-	bh=ed1lGsJ+1gqMPNVoWL3aELzqPoySA/fwsDpsdVzIxYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ruOV65F5OMxmj7BNt1NXKQCAYkgnKAWAuBhSCsnlyAo4RVdJ/J4NAs6eEJWWj2FGRHNe2g+/bazBDLwHAPe6cPW4TEiGZ6W2r3WPP9RHYewSA1LRPdD3ddfuCYe2zYxKyEhNiG5JgXkOSskppqUZhMMVPNYsqhgSzrzPO0yFmp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=TOixXT7a; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791062510; c=relaxed/simple;
+	bh=Cj+jJtKzKTj4QUIJmxOK+pHBvigpBLU3uvq91tlzTvw=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=iBpTNlVf8WXySvsl/FXc7OLOpImn0FUcXzTmKRaL6GpXaHUulQ0zrj/I0dv611JDXXB+Ds9FmbzFe9lNjmcgMUJZZhUfoTMI3U0h6Ngo43VpoYwr4rj+vqwBVEBoJlKCaR7Ql/QCt/RyM1IiY2np6XFws/lYAqIR2OCFEFrie5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=VqH80xQw; arc=none smtp.client-ip=51.159.188.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TOixXT7a"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E301F0089B;
-	Sat,  3 Oct 2026 20:22:05 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=zx2c4.com header.i=@zx2c4.com header.a=rsa-sha256 header.s=20210105 header.b=TOixXT7a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1791058923;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Or+qA0Cnb+L7NO6L4PEfticloQh82qWV1cmacilxU10=;
-	b=TOixXT7aovNieDKA6F6Q8JkqhABbKyM85UnwRHzgqYR52NtSNbKsxH50Xtle+dDzwdz92b
-	llcuMEq9orWrSb9qmIUWZKYl84oV+DZjB76qLXufOw2Bos152bZ/NPVI2f+nZxpzU8VgH3
-	jXemBS1VmyiGHWNY+PFYz7L+Yp03ZOQ=
-Received: 
-	by mail.zx2c4.com (OpenSMTPD) with ESMTPSA id e40e2a3a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Sat, 3 Oct 2026 20:22:02 +0000 (UTC)
-Date: Sat, 3 Oct 2026 22:22:00 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-Cc: ebiggers@kernel.org, ardb@kernel.org, skhan@linuxfoundation.org,
-	me@brighamcampbell.com, jkoolstra@xs4all.nl,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: chacha20poly1305 - Fix missing state zeroization
- in xchacha decrypt
-Message-ID: <asFj6Nxf6fglYfor@zx2c4.com>
-References: <20261003060826.7792-1-raizudeen.kerneldev@gmail.com>
+	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="VqH80xQw"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
+	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:
+	Reply-To:Sender:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=w0vFGAQrTlZQVOAGyxoUEUpagoLajH3K19LKdT8aOkk=; b=VqH80xQweQBuB5Lu437obUxkBS
+	7Bc+X71VP//gM8Jecmgwr8vsraRopIsULHDh8PX+pZydQYKuA4J/sSDk7EqmRrTAbC3SmEa84iVoJ
+	6syB/KjiouvOgDICeu3TwkB4sY81+vhTxmVDk9dhJQDu64s+2EV6XUOa4DvecmlNY4qOhZm21toUb
+	O46akZdY2q5RqMyaV1eR+dgVxCwfSx7NBYAI6uB39TpAWMXGwnrwqwJ4Rhx9d+Ik/gIxUlrJkeE1G
+	8K3ORZ8UU+FBclytT1Q5vcYj1BrpP8cXbjavixq/8+fgeSIzej7t+OjYT+7upfmtS54WnrviZfSfn
+	Y8H0YbBg==;
+Received: from [::1] (port=55232 helo=pf-012.whm.fr-par.scw.cloud)
+	by pf-012.whm.fr-par.scw.cloud with esmtpa (Exim 4.100.1)
+	(envelope-from <jeremy.jean@oss.cyber.gouv.fr>)
+	id 1xD7B1-0000000H2IA-2Wgo;
+	Sat, 03 Oct 2026 23:21:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20261003060826.7792-1-raizudeen.kerneldev@gmail.com>
+Date: Sat, 03 Oct 2026 23:21:44 +0200
+From: =?UTF-8?Q?J=C3=A9r=C3=A9my_Jean?= <jeremy.jean@oss.cyber.gouv.fr>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+ davem@davemloft.net, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: caam - reject overlong RSA CRT parameters
+In-Reply-To: <ao4xobfWhs5Ss8Uy@gondor.apana.org.au>
+References: <20260810154024.3178145-1-Jeremy.Jean@oss.cyber.gouv.fr>
+ <ao4xobfWhs5Ss8Uy@gondor.apana.org.au>
+User-Agent: Roundcube Webmail/1.6.19
+Message-ID: <752d9ff313bb52a7f8d2295161c1d9a4@oss.cyber.gouv.fr>
+X-Sender: jeremy.jean@oss.cyber.gouv.fr
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
+X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
+X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Sat, Oct 03, 2026 at 11:38:26AM +0530, Mohamad Raizudeen wrote:
-> The `__chacha20poly1305_decrypt` function does not zeroize the chacha
-> state, unlike its encrypt counterpart. The regular
-> `chacha20poly1305_decrypt` function handles this by manually calling
-> chacha_zeroize_state(). However, `xchacha20poly1305_decrypt` returns
-> the result directly without clearing the state.
+On 2026-08-26 02:21, Herbert Xu wrote:
+> On Mon, Aug 10, 2026 at 03:40:24PM +0000, Jérémy Jean wrote:
+>> caam_read_rsa_crt() right-aligns dP, dQ, and qInv in buffers sized
+>> from the corresponding prime. rsa_parse_priv_key() only bounds these
+>> integers against n, so a malformed key can provide, for example, a
+>> two-byte dP with a one-byte p. dstlen - nbytes then underflows and
+>> memcpy() writes outside the allocation during set_priv_key(). KASAN
+>> reports a slab-out-of-bounds write in caam_read_rsa_crt().
+>> 
+>> Reject empty or overlong CRT parameters after stripping leading zeros.
+>> qInv is consumed by CAAM as a p-sized value, so size it from p rather
+>> than q to match the DMA mapping in set_rsa_priv_f3_pdb(). Let the
+>> top-level key cleanup handle partial form-3 allocations and return the
+>> specific error to the caller.
+>> 
+>> Also test nbytes before dereferencing it while stripping zeros, so an
+>> all-zero integer does not read one byte beyond its input.
+>> 
+>> Fixes: 4a651b122adb ("crypto: caam - add support for RSA key form 3")
+>> Cc: stable@vger.kernel.org
+>> Assisted-by: Codex:gpt-5
+>> Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+>> ---
+>>  drivers/crypto/caam/caampkc.c | 69 
+>> +++++++++++++++--------------------
+>>  1 file changed, 30 insertions(+), 39 deletions(-)
 > 
-> This leaves the derived chacha20 subkey on the stack after the function
-> returns. Fix this by storing the return value, calling
-> chacha_zeroize_state() and then returning the result, matching the
-> logic in `chacha20poly1305_decrypt`.
+> Is this driver still maintained? If not let's just remove it.
 > 
-> Fixes: ed20078b7e333 ("crypto: chacha20poly1305 - import construction and selftest from Zinc")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-> ---
->  lib/crypto/chacha20poly1305.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
-> index ea42a28f4ff7..03b14d272520 100644
-> --- a/lib/crypto/chacha20poly1305.c
-> +++ b/lib/crypto/chacha20poly1305.c
-> @@ -199,10 +199,13 @@ bool xchacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
->  			       const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
->  {
->  	struct chacha_state chacha_state;
-> +	bool ret;
->  
->  	xchacha_init(&chacha_state, key, nonce);
-> -	return __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
-> +	ret = __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
->  					  &chacha_state);
-> +	chacha_zeroize_state(&chacha_state);
-> +	return ret;
->  }
->  EXPORT_SYMBOL(xchacha20poly1305_decrypt);
+> Thanks,
 
-In my memory, the reason it's like this is because for WireGuard,
-xchapoly is just being used to encrypt a cookie value, which has no
-forward secrecy concerns at all. So it doesn't matter if it's left
-around on the stack.
+Hello,
 
-Are there other use cases, though, where you think it might matter?
+I don't know for sure, but it is still getting fixed, e.g.,
+https://lore.kernel.org/all/FF2F0DC4D3930E6A+20260923101457.204629-1-zhaojinming@uniontech.com/
 
-Jason
+Regards,
+Jérémy
