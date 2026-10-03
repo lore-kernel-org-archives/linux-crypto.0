@@ -1,57 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC841CAA6D;
-	Sat,  3 Oct 2026 07:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180B03382CB
+	for <linux-crypto@vger.kernel.org>; Sat,  3 Oct 2026 07:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791012726; cv=none; b=kR2Ceqi/FzYnaPCGhJtdXyQBZaPkt6WmyY9boK5Q0W6M+6i7IZ0JfExb9QQAUac7GMnGdUzvA7Bx3DvJ2cP7I6uqV7Fx83zfqjnzzWaQjClA+bhpPAezHGe11zLalSPhWtX3A26ZZKcuqr4r+8DfaZYvo5JpoOWWYjwReLqVVYA=
+	t=1791012888; cv=none; b=rvtyedwBXLeTr8HyYqkKD7Xrvqjd/W/ZE46eQdILnhqN9P52IMchAtM3uyEW+9DKkZ7lTg/lABe3rRCn7mRBAtXbvpy/j/rZOPDF7aDvJobg5Ve4aRoDHxoQxrg5+uWRGKPG082TDm5FPp8l7f99TBayAnKn+Gyu+iDSpPSBHRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791012726; c=relaxed/simple;
-	bh=lW4jU0rgUwVCAXMdj5R6M9jkWzHgc21RwLdTYVcBIks=;
+	s=arc-20240116; t=1791012888; c=relaxed/simple;
+	bh=JI5meg9Y+N5PGOfPmS8AmteGtmiH28zLKCv938nDuK8=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=RfVopgrNDwZAtOK6YhypsNzsXwzMVCw8XfrOxefBUN0JW3fasbxzgSUSIWPceLS74YwO12KUXbTqmCmJAh5pG4hdvnTpFKmXahjcwrhFeRcWL10baojZRFluFJyVkNz8Sb1NQk9hqsyXZiEn5Pmywppjp057cc7ZDE6Ws8qIZKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P85Brt73; arc=none smtp.client-ip=100.103.45.18
+	 Subject:Content-Type; b=UYXQvk8VpYzZELK0wiwPqdwKz4i7xneOsuSXYj6Y2jQk9rqmYPjcbc97UNi5RRqdGlfFBnu5peThVM90d+apPucysi9c91gSRkC6WgKH2CSMBnJaqOoad/Yvz2dlA0wYMHSEF0bXuMWl91iPURSxJ+F1sepR7cWGuTT7TGdyr5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WYQyq4Me; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P85Brt73"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05E721F0089B;
-	Sat,  3 Oct 2026 07:32:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WYQyq4Me"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46DE21F0089D;
+	Sat,  3 Oct 2026 07:34:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791012724;
-	bh=4VEmLjyRjf8Qvg2LMZxEQtyqpIDGiu9mpIfBw4CjgoY=;
+	s=k20260515; t=1791012886;
+	bh=kqhpRcWtMe7BR3qSONW6oEGsEH2C2z6yBYNd65orP8g=;
 	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=P85Brt73KUT6Z1RRpX0AoGGJHOPD566eoEKeCyVK9zR1mDp4xz8Hwk6YSOaKimchK
-	 nNm3gUTekQpJJko+hyxNJfqH7J+1MyDuOipm1KO66NrU/fSrrtSAYwiUQsyyaaxfPE
-	 mlCQrimnq5DqqxLnFk2hijrBgrjd2CZ/sPkhO7Aq0dIBTenc5t+dksLLLlms1UtVle
-	 q0uJg0fD4AGmk/jZt5TEEyrZqVKAK8dJcIo/1dfDirGwIjJ6tkQsrQ6DJCLVZtiLMk
-	 uRcFXAVbgWbPcWKn7Vg9+BmabZ9WtacIKkMsVVyqI5OR/t2pnn7TYs4myZcJSYyrL8
-	 //QNjdv2JY65A==
+	b=WYQyq4MesjMAaQzScvp7QeHSTJnAkOl0c0YlwvCjM1DlgGiVUMJ7U86XR2WhT3SAk
+	 V9sjdEOY95yAUwJAMbuka5S9pQ1vhQl9JPj0h3dQIPPs1saiIxqfd7RER5qKwQTFC0
+	 zSimTmN4AgkYpNX3MhVcj2R7wwsGedHPAFwT4fz6RBmO4HE+flcxRcRF5+/vFBDTTJ
+	 pafwcljhkmK/mQLuOkNQHbpt0L4v0ZzbomY1JyydfyU967b+nHKEjJdPGX0lmRm4xs
+	 9R3iKMDShqMNE0AXQxxma5Dll56ppjOxFgxDGkLPF3NvyLUH+3A8Bisk0+Xs4INaPu
+	 3yCcth9JS8MRQ==
 Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 6588A198003A;
-	Sat,  3 Oct 2026 03:32:02 -0400 (EDT)
+	by mailfauth.ams.internal (Postfix) with ESMTP id BA781198003A;
+	Sat,  3 Oct 2026 03:34:44 -0400 (EDT)
 Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Sat, 03 Oct 2026 03:32:02 -0400
-X-ME-Sender: <xms:cK_Aao66tBT4SWeS5MUZiUkdvCdGYuJZOZ68rD289ueeG1sx6D7TsQ>
-    <xme:cK_AakvWBSt9DS28J2KvwqVin8JYbsNqRMOqwS9vv8qX_U90FtPOzFA4NGgXTlasy
-    Cwh5YTdFGNpNYrubD3xt4n7g_1SxZzlGyzcmCsh8zn88YCjYbPLhjOx>
-X-ME-Proxy-Cause: dmFkZTE0yaIvcJoyKUS2wC2MTUrgiztPATsDZhFTsu6K+1E7h8b9DzPQUZtbLGBdqlwX9B
-    5ihlcyXTnas7GOLEgClLsfpq0hLg7RtuJeG1GG3tOU+fVIwzDso136G/po6TDs9sCm2Hmb
-    VXpAaTA8TWgUdhhNRWcjoeAhpw9NLpL25sQJmmzezLXG6PUJUcVtQ77s4hNu4Yv27S5+bp
-    YzW3RBGYurCHF/RaLTkDpVucpyfQNXeHByTveMZ9mr7sje2Wm93JoB+zFtpWOrd+BXc+Cd
-    n65msms5C5E+05MZQDQTCD+6wccgKwokPvFpyzz/CWzIA7+3yeuWWt3I2PdEWM+NnLvEFH
-    SNR0inOBwrkS89wb0MaNngod8hT1AbqIDZJQaUAXsspitA7J6tsk4GQnTFGGRlWsYZqNon
-    0iKDzcgwzp5Kf51pIJvpPn3cpueMVY4qq/rB3aYKmLFRi/7fYl+/vG4NeXd2UeiP9cOqUP
-    SpfhIe05pT0/qJ7BGUOmhMLsLnJwAttl2j7Y2SdoPSWQnnpOw5jwwFJXtbOYEhQmQyo0dx
-    8bxPAo8VU7Gj5MTMMHOxCjG4JPgAvYuVVtlDlZyLOcf3DvPOHCLvoEBYQp/NkkIEkbH7ls
-    iwv9vArdeLDxeHaDzPrwkf8pIj1DtljEvvAJprnw6Am1cUYaBjJzvSOnl0ow
-X-ME-Proxy: <xmx:cq_AamydFc75JWEBcBEVBrrNnxJzWbrKrhgZZfFiejsaJfapMdI0fQ>
-    <xmx:cq_Aai994oCWoed86LqPTlHeYHIGqrMM-INwVaqa44wmmpG2NEdoXg>
-    <xmx:cq_Aamhb8M3aNswFU-85-lQsFWvyK2ec2fbZHXwEQppDmNvVmYCkdg>
-    <xmx:cq_AahG7o2dzznihXJ0EP8NONnapiSZAidalravU27nO_L3Bm_r8zA>
-    <xmx:cq_Aat9HTuC4zz8Ovq8_bG84cExcCQCziE0KpA7NjmT_V0ujqzIth-n->
+  by ams-compute-02.internal (MEProxy); Sat, 03 Oct 2026 03:34:44 -0400
+X-ME-Sender: <xms:ErDAapwIEeWqEvMSQC7VW6O4ZbAgDYf-yzdA2ni9bhCMbKDlNIg2qw>
+    <xme:ErDAakGmW-lceV7s6H3xDbC4IFrmNZLnomyhbs21Bu3XPqs_j56ffKSPNwHLHUanM
+    aldXpKYBzQQepb_DEb9niGLUWb-jIyiHnA7dS_vUSkfBlC4nUyF48p5cw>
+X-ME-Proxy-Cause: dmFkZTFvci9LgTVkO8YAK5DRX0xpuv7lnyVgN1YhmTbMrkkWzAi3dXrxYdtJHro3Lesaxg
+    bfGQGNA/0bQFt1gwW90keJ3rnTg4aP2mf/z2/ZTqqZXuaTourwR0NHnZZ8flf2Sham1XUY
+    42FxVCAdmriHWATdc8ejG11Le/6bR5l83KUD3AfC2+GTMrD7tYbmiAdCaFAK1+mfDRbFiz
+    NQdd9Rsb9SdEpuwiDxDIDHG+9LF8E4Z3EAqHnCd4Dfohu1NEojm5zJEw5btEeR914RjBCw
+    sQoiEw7/OL3zX3Ynww78zfvBveCn40a/B4MqYAwqGH/5V3mYl5TD1fUcgEOi8RylJIUhab
+    ryg7CEcy9uSerdR2KFGEeLtsSDd/xc011dc0NAwHMpirwU19Zwa4lNvFwVMVWXeO3iiAFe
+    gKqSQf/waGK5aCpjicJJPcF6btlJ28zRRllLQdVZ6pQUuFdOVfVllEO95/eVY8qHigVRGy
+    67UmOI78+xDnfnZ4uzxAbeypUBM3vRyFbqpCOHRsqmAuqgEA2foiprbL59GxCRt6G9tNxa
+    GgFBvJCBtlkd84TxASUTmO6aKYUpkMoj7WDa6avMtnFygjGhkrJgX6V4uDgY6WcRXrcXh6
+    xSffoEOSc7Q5sEPxPvewlxlAUSyeTuS8pM2HaI7F0rOWD8Y+lW7KWluTdnXQ
+X-ME-Proxy: <xmx:FLDAarRLGxGPOa1niVLLbPOhFtsom-H_BXPuFKk13kL075rf-83c_Q>
+    <xmx:FLDAapXaXijI7JRMm3WOIAJwZWisky4Oc3oEcQ7MoHYItucmHvKMKg>
+    <xmx:FLDAalQox5M_kNqwTOqzBZsNKz8N7TUqkZOlbVM5RX7ACSnPiaTB8A>
+    <xmx:FLDAah2l7A9jyEIOi1ouwm434F6Bk5IURrjp1wHdQSYDicRa_DmgTw>
+    <xmx:FLDAalcz9By-izeaKZ75uvPT4d7xwzgiFUIFEZF6OcHsqrHrGeJ7HEtD>
 Feedback-ID: ice86485a:Fastmail
 Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 79940F80096; Sat,  3 Oct 2026 03:32:00 -0400 (EDT)
+	id B3215F80090; Sat,  3 Oct 2026 03:34:42 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,47 +59,66 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sat, 03 Oct 2026 09:31:39 +0200
+Date: Sat, 03 Oct 2026 09:34:21 +0200
 From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+To: "Mohamad Raizudeen" <raizudeen.kerneldev@gmail.com>,
  "Eric Biggers" <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "Andrew Morton" <akpm@linux-foundation.org>
-Message-Id: <019c709e-9513-44c1-bbb0-82cb16040709@app.fastmail.com>
-In-Reply-To: <asB7QVFMlgKgbje2@zx2c4.com>
-References: <20261002223708.39183-1-ebiggers@kernel.org>
- <asB7QVFMlgKgbje2@zx2c4.com>
-Subject: Re: [PATCH] lib: Move SipHash into lib/crypto/
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Shuah Khan" <skhan@linuxfoundation.org>, me@brighamcampbell.com,
+ jkoolstra@xs4all.nl, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Message-Id: <b937fca8-f436-47a5-988c-963fa1af6296@app.fastmail.com>
+In-Reply-To: <20261003060826.7792-1-raizudeen.kerneldev@gmail.com>
+References: <20261003060826.7792-1-raizudeen.kerneldev@gmail.com>
+Subject: Re: [PATCH] crypto: chacha20poly1305 - Fix missing state zeroization in
+ xchacha decrypt
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
-On Sat, 3 Oct 2026, at 05:49, Jason A. Donenfeld wrote:
-> On Fri, Oct 02, 2026 at 03:37:08PM -0700, Eric Biggers wrote:
->> The addition of SipHash to lib/ predated the existence of the
->> lib/crypto/ directory.  Since it's a cryptographic algorithm, move it
->> from the top-level lib/ directory to lib/crypto/.
->> 
->> Specifically:
->> 
->> - Move both siphash.c and siphash_kunit.c.  Keep the header
->>   <linux/siphash.h> as-is for now.
->> 
->> - Keep the dedicated MAINTAINERS entry for SipHash.  Just update the
->>   file paths it references.
->
-> Given that I'm also listed in the crypto section, I think we may as well
-> delete the whole separate entry.
->
-> The only downside of this change is that those hsiphash functions are,
-> erm, a bit less than cryptographic-strength. But maybe such concerns
-> don't really matter any more at this stage, and we might as well group
-> it all in lib/crypto/ where it all belonged originally anyway.
->
-> Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
->
 
-Either works for me.
+On Sat, 3 Oct 2026, at 08:08, Mohamad Raizudeen wrote:
+> The `__chacha20poly1305_decrypt` function does not zeroize the chacha
+> state, unlike its encrypt counterpart. The regular
+> `chacha20poly1305_decrypt` function handles this by manually calling
+> chacha_zeroize_state(). However, `xchacha20poly1305_decrypt` returns
+> the result directly without clearing the state.
+>
+> This leaves the derived chacha20 subkey on the stack after the function
+> returns. Fix this by storing the return value, calling
+> chacha_zeroize_state() and then returning the result, matching the
+> logic in `chacha20poly1305_decrypt`.
+>
+> Fixes: ed20078b7e333 ("crypto: chacha20poly1305 - import construction 
+> and selftest from Zinc")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+> ---
+>  lib/crypto/chacha20poly1305.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/lib/crypto/chacha20poly1305.c 
+> b/lib/crypto/chacha20poly1305.c
+> index ea42a28f4ff7..03b14d272520 100644
+> --- a/lib/crypto/chacha20poly1305.c
+> +++ b/lib/crypto/chacha20poly1305.c
+> @@ -199,10 +199,13 @@ bool xchacha20poly1305_decrypt(u8 *dst, const u8 
+> *src, const size_t src_len,
+>  			       const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
+>  {
+>  	struct chacha_state chacha_state;
+> +	bool ret;
+> 
+>  	xchacha_init(&chacha_state, key, nonce);
+> -	return __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
+> +	ret = __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
+>  					  &chacha_state);
+> +	chacha_zeroize_state(&chacha_state);
+> +	return ret;
+>  }
+>  EXPORT_SYMBOL(xchacha20poly1305_decrypt);
+> 
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Wouldn't it be better to move the existing call from chacha20poly1305_decrypt()
+to __chacha20poly1305_decrypt()?
+
