@@ -1,137 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703443D1CC5;
-	Sat,  3 Oct 2026 09:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B0A4519B5
+	for <linux-crypto@vger.kernel.org>; Sat,  3 Oct 2026 16:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791019729; cv=none; b=cIAtuIqkizg96OG484zo9OiIZT7QCdwIUqVE7nmwzE3Ev56wYJgyARxPUpXZXtrMn7IG1L2bd9Fihxme7dGuuXQzVoHwHBjLIxY1P7m4RdvZRJ8UWA4iCDXJfh8J97QYMGGLy8yBp5kzjcszdHyoOJOy2NYOTZTYkIYny10kAz4=
+	t=1791043409; cv=none; b=c5479A143B+2N3Vjrbh0X5LlACybKvMnd9FMqjxWc8RkX3YAByR5hrbigdHw58szLmrNWXbRCAXZCZJJLZY2jqjHpQBs2FglD2ENbh2NgIEz0pWnMkooHVnezgHYzYgCQzqnknuOm5u3KsACZ4ugFsONMTgfAYB1VIq7B7EDUHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791019729; c=relaxed/simple;
-	bh=Sfk0UwJ3tjklr8atozqCktFvsFL6wQOpuL9pPk57400=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=LPDgDDqYkO4WTDV59jTv5BzX+yArD5UyXm9Ja+CKnpUt4LnDtCJakz7aLJH9gC4EMSv6+RaCH567a1giKkvisA3fveGyhBwG95Bo7PvBeFWNJLcLNbd88zQZMflhSf5TPM+gEAIJBg3nE/NT3fmCeAdA6H405tQsHfICs2gzHoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkOxg/6N; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791043409; c=relaxed/simple;
+	bh=JI0soRYZ5BAD8dBXxZRnsimny2m9p9Nj9R3Oq+EjSJA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C9AAu7Vt5P9DfzVCbpRSb7fgPKgOiUSJGcnRdZWzNIPoQA1IM7vNB+L47QHSxZObYE7UZw0b7D52H3uMkl8RiOrKI4oTx6staqmV8NLMjV/d47fWuxjNLMMtuUhhPeb1EWp0UiaYg8hhT4pqmYEUzEvyqQhnC5/E++WfQcBpJd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=fedoraproject.org; spf=pass smtp.mailfrom=linuxtx.org; dkim=pass (1024-bit key) header.d=linuxtx.org header.i=@linuxtx.org header.b=DLIlvahU; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=fedoraproject.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxtx.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkOxg/6N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F341A1F0089D;
-	Sat,  3 Oct 2026 09:28:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791019724;
-	bh=NXHTDGFzDR1i3PJvTQnsk21+Bd0QI0atro2c8qzup6Q=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=PkOxg/6NOkWaRJw2lRcg3Q3ZHZoZ7UvNTmcJH5PBroF2UGaXihmHiIkDBFth/zFc4
-	 AfWAbn5LzCjCKkRktxiRt0q8zG2NLNAVGwe6FFCyiucxm2YBB/cVCECuv8Fyo0fgNx
-	 hEKpOhATEsk1o6iHodM2phuPASx3KfpytVgyuUqvMHmHbrRkLosSU1W6dEtP3l2tnf
-	 jfSX26fYLqEGGE8NMewzp7PCr6+OtB64OSs5XGDOQICulsqDTmafvktiWs6kLQNuKv
-	 TxxEpLrZ8ZmshAN3vEUZ4Re38MSGuMcH9acVY2fK0Yxu960jOEa81wmvpvo2ehXPnu
-	 fpqK168GpF/qg==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 6DEE7198004A;
-	Sat,  3 Oct 2026 05:28:42 -0400 (EDT)
-Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Sat, 03 Oct 2026 05:28:42 -0400
-X-ME-Sender: <xms:yMrAasEWUgbAGNUnYxj71TZKPvauiJg--gU5wwlOpsCEdfGoEZukcQ>
-    <xme:yMrAagLq36RChLbnXxyrr5Lm2zvSXqewGD9DIMC3gws6zL6EVwivnT_FjrMK2oYdo
-    t5ZwQC5STeQ9MTOZmpsT9IBJj3tS2dUtJFQIHx-6THwm9aB4wRBzJtU>
-X-ME-Proxy-Cause: dmFkZTGUOpTrvF/UVMRbKIW2rMITUrWTIbqE0HIdGbdFFk0eqaRrYo3fXpLhvBwMPblllr
-    n+5t7M7F/mcPFRv+mJPQN6MX3tnaCJmh7UHJlLPRzTbb/HrruLCqYzOdGsI03JyJIWT4jC
-    3aFkCv5KSpy5ClJ8cP8t8HsARwOyLXQP+BDpE0REpoDWqq4vm17F2CNU+Rf4E6i63Rqdc7
-    oZ/gUa6I22JuWZU6U0ZGnGrozSpkCRcSwlbHwR3Yr/5UYAjBT4lM7yeR0IMAB29k/txrn2
-    p7f7PzSEQIkcEI5IesFSZRRvdoIx5I5psCZ14IwyBlCz7lUbfOFZWOyO66mc+1EwlTwrlW
-    ZnZ8Hc2LE3aIEp3TqRjLFBGhs/iQNYE7PSJnzrmpe0/3Oo9UvTIv4VtNVdR6BAOo+zh2s9
-    nFu3NlXbodGxglR7L25Cqd8RdKNpfbNr65VCxx8GFCf/JWTNlTlsS1sY6BpnDs3dqgOoq9
-    3SNTs6o18Hu9FSq65irCzkU6yNetbmE70BFzk8FEDhHiv1TjI+TGpNwlmLR1JqPJ9UsdDm
-    NMzZsGwtDW+DkbWpwYLY4p9E+ePlTA49RT0rC544jXRRwiBy2CDSs+UCsKndOh0lrMVFN2
-    bGLt1DmutxIHejDjX3MWr/4pptCv2d3p7XLzQFBGANNVbha1ofE0VcjmnWMg
-X-ME-Proxy: <xmx:ysrAahHHeyhdJNPggX2rvzAVMwfVK6-uG9ZAPk_WUhjkFaWi50tW6A>
-    <xmx:ysrAai7vBCtwJ4YeZUDD_ExaJEajK8xOqB0tiY2hmnrsDJ6fXW2ccQ>
-    <xmx:ysrAanljC5bWOfb8A2uGOZ1uwMA9QuLdzlGkqnKgainhFvbgvkPLJw>
-    <xmx:ysrAat4ROfAveEARUjjhyKqfCb3-HyyW350bp4sp8PVz6MYC6X24Ag>
-    <xmx:ysrAaoTnH-eo-2UQQAe6H0H_HL00kb9wsQRGBNAZo2WxbCYzMIc5E6pI>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 2139EF8008E; Sat,  3 Oct 2026 05:28:40 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=linuxtx.org header.i=@linuxtx.org header.b="DLIlvahU"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-93e55db58cfso45037385a.1
+        for <linux-crypto@vger.kernel.org>; Sat, 03 Oct 2026 09:03:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxtx.org; s=google; t=1791043402; x=1791648202; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=KBadGkBMhFXmrhoE9hmsF6c0zFZFOIvfrbohBEExOc0=;
+        b=DLIlvahUwaLfiUTFf5++haZ0yy0UKVKrp6P+6bC3hdNzSaB4ibgN6A+txhBCXJ8YMt
+         enf3dIkhPDODQUo1GYvGYJlDJ/YTWjXVwLvjG/O9KhR8SYuvdNFaGDdg3ermyShuPKgs
+         MJkUY/IbQ5gIfW3Z76WZLSENh2MTW/Sy6A+OY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791043402; x=1791648202;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=KBadGkBMhFXmrhoE9hmsF6c0zFZFOIvfrbohBEExOc0=;
+        b=zkDNrruOlXWGYgivDa/6XvcWCSLYm1kXRL8DtH0EmHq26ApqOyIoxecm8PoO4IyRcV
+         yQhsGN3DL9eSCk1u/0pVKetTe5VYz3tAekmSUDlXSv3W5iybsDDeIeIXkbaboqN2lyhO
+         r8orxrO5082mpcm5BQm8KfoAbSAijjlhcqfhW7vzUZ6zbYNB5VGmw5RGLwxKt4kAySvI
+         O+XC6GKczTWSmXU0MTFPS0cEoux67fvRs/k68hviU1Ki0l3GY8Sx64lqZPTqDR7RG7p9
+         +Qt4XVb4TuZuhMY9W1cIN1lKmrrC9gMYFE+v1i6mda0vswPO912IfvSnsySIGrZKnJQ9
+         icew==
+X-Forwarded-Encrypted: i=1; AKwUvBzWYMUDWaQIKZeaBBXav3itYYcf2jOxUF9Sz1vnye2gyAi0Pq/kbmqiyRle3yoFLAdyvuqXcAxQpIm8cIw=@vger.kernel.org
+X-Gm-Message-State: AFuF++kzB8gQvgZcPBS6n0J35OS955GBD5jFdklC9hRyOS6350IA6Usj
+	aq0WsZxZ7EsCe2riiPyaxumcLW6CAdyfw0U58p90cpXhVe9aoHPJHy+GdnB0pKuBt6zGrThMQJx
+	WJowHCQ==
+X-Gm-Gg: AYBFou3D/MH44WZhQMrcY2UDMIhymQzY+fQIA1N0wOoz2r5pLMk4ele3OLh7hgyJJ8i
+	A5WcTo3WVqZUkvtytZSfoZj8cZPBb3YSzZ9udQfasT6bI3DNiKMlf6Ez7+YVWMaalE0wJJirVwc
+	dg0Ul2ASt/dbVqt0aTivHl0xLzmMCnUBTTMxeioWbJZNgMGk+U9YqhBx6CDo9ZJMjAaPZGPmDb6
+	AxOLau8zbad4KLgHEHZXMasCOmttZPihiy18YVKuuTznHGyZolk+sHcPsv+UR66QK1OerWrIpF3
+	IlPlJCeqZeO5R90KwaJVqb78w2uu4pWoEzjG+UrlQVczf/HNVKQg2xfFvmySFOA34bWoqfs4h6k
+	B/lGv5EwOsWO47YyQXlNlngsjKxhp1xCXyuj/3bZdIlC4Mb1u+15IVf2+HJhILUvue6EPf+NOtr
+	cnLOR2xR2Hw4Ytv3SyxEUHtP+h04BLFAruRh4zC44WIuunzb6phHMau4BcjDfNIhoKoOPBnpWVW
+	6Vut6BxKLhVE7CM
+X-Received: by 2002:a05:620a:1a03:b0:93c:9e2a:ba08 with SMTP id af79cd13be357-93e510db69amr482479085a.63.1791043402243;
+        Sat, 03 Oct 2026 09:03:22 -0700 (PDT)
+Received: from fedora64.linuxtx.org ([98.97.107.167])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93e4e7b2cb2sm266910885a.17.2026.10.03.09.03.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Oct 2026 09:03:21 -0700 (PDT)
+Sender: Justin Forbes <jmforbes@linuxtx.org>
+From: "Justin M. Forbes" <jforbes@fedoraproject.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: "Justin M. Forbes" <jforbes@fedoraproject.org>
+Subject: [PATCH] Allow hmac(sha512) for unpriviledged users
+Date: Sat,  3 Oct 2026 10:03:02 -0600
+Message-ID: <20261003160302.3000325-1-jforbes@fedoraproject.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sat, 03 Oct 2026 11:28:20 +0200
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>
-Cc: "Mohamad Raizudeen" <raizudeen.kerneldev@gmail.com>,
- "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Shuah Khan" <skhan@linuxfoundation.org>, me@brighamcampbell.com,
- jkoolstra@xs4all.nl, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Message-Id: <ea68191f-86cf-44b1-a045-237b93a4953f@app.fastmail.com>
-In-Reply-To: <20261003085757.GA144870@quark>
-References: <20261003060826.7792-1-raizudeen.kerneldev@gmail.com>
- <b937fca8-f436-47a5-988c-963fa1af6296@app.fastmail.com>
- <20261003085757.GA144870@quark>
-Subject: Re: [PATCH] crypto: chacha20poly1305 - Fix missing state zeroization in
- xchacha decrypt
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+By default users cannot run sha512hmac with the current set up. This
+is problematic because our kernel builds call this for FIPS compliance.
+Rather than have anyone turn off af_alg_restrict all together, let's
+allow a common use case.
 
+Signed-off-by: Justin M. Forbes <jforbes@fedoraproject.org>
+---
+ crypto/algif_hash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Sat, 3 Oct 2026, at 10:57, Eric Biggers wrote:
-> On Sat, Oct 03, 2026 at 09:34:21AM +0200, Ard Biesheuvel wrote:
->> 
->> 
->> On Sat, 3 Oct 2026, at 08:08, Mohamad Raizudeen wrote:
->> > The `__chacha20poly1305_decrypt` function does not zeroize the chacha
->> > state, unlike its encrypt counterpart. The regular
->> > `chacha20poly1305_decrypt` function handles this by manually calling
->> > chacha_zeroize_state(). However, `xchacha20poly1305_decrypt` returns
->> > the result directly without clearing the state.
->> >
->> > This leaves the derived chacha20 subkey on the stack after the function
->> > returns. Fix this by storing the return value, calling
->> > chacha_zeroize_state() and then returning the result, matching the
->> > logic in `chacha20poly1305_decrypt`.
->> >
->> > Fixes: ed20078b7e333 ("crypto: chacha20poly1305 - import construction 
->> > and selftest from Zinc")
->> > Cc: stable@vger.kernel.org
->> > Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
->> > ---
->> >  lib/crypto/chacha20poly1305.c | 5 ++++-
->> >  1 file changed, 4 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/lib/crypto/chacha20poly1305.c 
->> > b/lib/crypto/chacha20poly1305.c
->> > index ea42a28f4ff7..03b14d272520 100644
->> > --- a/lib/crypto/chacha20poly1305.c
->> > +++ b/lib/crypto/chacha20poly1305.c
->> > @@ -199,10 +199,13 @@ bool xchacha20poly1305_decrypt(u8 *dst, const u8 
->> > *src, const size_t src_len,
->> >  			       const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
->> >  {
->> >  	struct chacha_state chacha_state;
->> > +	bool ret;
->> > 
->> >  	xchacha_init(&chacha_state, key, nonce);
->> > -	return __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
->> > +	ret = __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
->> >  					  &chacha_state);
->> > +	chacha_zeroize_state(&chacha_state);
->> > +	return ret;
->> >  }
->> >  EXPORT_SYMBOL(xchacha20poly1305_decrypt);
->> > 
->> 
->> Wouldn't it be better to move the existing call from chacha20poly1305_decrypt()
->> to __chacha20poly1305_decrypt()?
->
-> Since __chacha20poly1305_decrypt() has two return statements that would
-> need to be considered, I think this patch (which makes each
-> *chacha_init() clearly paired with chacha_zeroize_state()) is slightly
-> cleaner.
->
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 6e8b5fb82a7f..0d3ec5760de6 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -23,7 +23,7 @@ static const struct af_alg_allowlist_entry hash_allowlist[] = {
+ 	{ "hmac(sha224)" }, /* iwd */
+ 	{ "hmac(sha256)" }, /* iwd */
+ 	{ "hmac(sha384)" }, /* iwd */
+-	{ "hmac(sha512)" }, /* iwd, sha512hmac */
++	{ "hmac(sha512)", AF_ALG_UNPRIVILEGED }, /* iwd, sha512hmac */
+ 	{ "md4" }, /* iwd */
+ 	{ "md5" }, /* iwd */
+ 	{ "sha1", AF_ALG_UNPRIVILEGED }, /* iwd, iproute2 < 7.0 */
+-- 
+2.55.0
 
-Fair enough.
