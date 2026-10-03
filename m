@@ -1,42 +1,42 @@
 Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12D61CAA6D;
-	Sat,  3 Oct 2026 23:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99F5379C5F;
+	Sat,  3 Oct 2026 23:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791070723; cv=none; b=eyBvLkldFMU5vOpbp29Ne67iTVgYbPMNQkfbPILoAwP7/PH3PsoP6Nwy3/iyE2sHOdWHEKEcq+X3bIEF5hU8UgeNAnybOIAK/PHGe4BD3dhx7Fq6szGYULwdNvnLTi/LI4nDEULsoSDuBptSOl0K9XXbsb2vM+2VovTJM6XZ9UU=
+	t=1791071447; cv=none; b=Nhuc4A+nOpt4hWs8uLZATEylDml/zGAKTGRwdAtmahT8AY4iAlQw5ktQORmAk8tv8yCFPHZKszRW/myCrmEt7nx29iYSXkPK29Vy8dP/miRn22fmX3cvygyFwlDRHm/dQyvI+shskAwQNTWttUuT6IsAzNnXF4Hg9eM2lANkAcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791070723; c=relaxed/simple;
-	bh=OFlvWDsasH+ZORS4uWDp2Ut5WBqGn1WpdgT9tuwtkpM=;
+	s=arc-20240116; t=1791071447; c=relaxed/simple;
+	bh=8z46ic+dLllQVP0MRANTHmG+pMnHP3qu4phmk3bfrNE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=SHeqv1k66Sz52ni6vEl/MpPbxSFCMzacuSKveEi/qOzmP3TvnWPaq/HqsNpc9Bh+hQpFxVqVffZeGUKwveQI373cwGiDduuth3sshGPxUey8OCMjHZxw9isBe52BidsHCNCaUfUMLtU5xtu9o6MQ1nnf9awFjc+eQdFz2f1jGlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=JHm5783m; arc=none smtp.client-ip=210.118.77.11
+	 Content-Type:References; b=fU4cwk5p8BbO6pi81YE/iyg8YM87RqLTfg5IIaESPe2z1eSIXpuPGDSD7V8mcLYTocCwRC2kUIy8SCOzzJF/tY3LPeqet/npJ1bkW98BP6aGRmqTG/N8xTIBBxL0IFHysGwG8xrJC53BPsLXjRbgMdgAZnZwuOUCvdBrRw2EQmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=J6UYA23G; arc=none smtp.client-ip=210.118.77.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="JHm5783m"
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20261003233839euoutp019b93e0a38d74f7844d866dcf976a036b~bKVRYyCTw2859728597euoutp01F;
-	Sat,  3 Oct 2026 23:38:39 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20261003233839euoutp019b93e0a38d74f7844d866dcf976a036b~bKVRYyCTw2859728597euoutp01F
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="J6UYA23G"
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20261003235042euoutp010ae13b921807e43a815feb68ae19742a~bKfy8ONYY1131411314euoutp01C;
+	Sat,  3 Oct 2026 23:50:42 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20261003235042euoutp010ae13b921807e43a815feb68ae19742a~bKfy8ONYY1131411314euoutp01C
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1791070719;
-	bh=DCSSTKMktb+HuS50/2vCoVXjx6kQyokLqg66BRCB0B4=;
+	s=mail20170921; t=1791071442;
+	bh=6il4wp6k9x9TZkz/+h7OllEoUNqhyj9iIClTYmBbfBE=;
 	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=JHm5783mcsClVTOaAWZXZGUM5Mak3g4ei3h3Phsta5hYe2YrnBr40qBI7wEY0xmvN
-	 UMD5Hqg1kFQ/WCC4EuAuxIXk8MsORKJXSu+n5fnbc6nyJUT/p+4BAj2I/JULzrOMYS
-	 TIDbvU8ViajQeQ9onvYQmblwNgBjnxB65Btm5B/c=
-Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20261003233838eucas1p237c405e495deb98ca1ab7bffb909923a~bKVQa7ruV0031900319eucas1p2V;
-	Sat,  3 Oct 2026 23:38:38 +0000 (GMT)
+	b=J6UYA23GbXzSgWDiylsYXmqPqrWmGrxHinr+zo153Mh5xVMO3Fq4093yCW56RM5zv
+	 TyAOK++gZXWwfZ1rhR13Mfp5PEywRRMqi6WkuWaomAKaDMbZmHoF11QNolqip1ZlRU
+	 w4hnoy1FfOTb+5wYvNiuKO9RUPya9G8Bd3toECJc=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20261003235041eucas1p15384f0a3889321f025161bbe2b71bb94~bKfyB3g9T0047100471eucas1p1e;
+	Sat,  3 Oct 2026 23:50:41 +0000 (GMT)
 Received: from [192.168.1.44] (unknown [106.210.136.40]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20261003233836eusmtip19df22b79e12bcb1dd0f2058e4a99ebb4~bKVO0uuxI2102321023eusmtip1C;
-	Sat,  3 Oct 2026 23:38:36 +0000 (GMT)
-Message-ID: <d60a30e1-7e9d-4061-a61f-d50909665c19@samsung.com>
-Date: Sun, 4 Oct 2026 01:38:36 +0200
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20261003235039eusmtip254e0d6be44f5a841ebd1c20bd2d1c117~bKfwWPKr40220102201eusmtip2G;
+	Sat,  3 Oct 2026 23:50:39 +0000 (GMT)
+Message-ID: <fac0f401-bbd3-444b-a755-53cc393673de@samsung.com>
+Date: Sun, 4 Oct 2026 01:50:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,8 +44,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 7/9] lib/lz4: switch the decompressor to the
- vendored sources
+Subject: Re: [PATCH RFC 1/9] lib/lz4: import upstream LZ4 sources verbatim
 To: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
 	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
@@ -71,46 +70,53 @@ Cc: Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
 	linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org
 Content-Language: en-US
 From: Michal Wilczynski <m.wilczynski@samsung.com>
-In-Reply-To: <arnpj53cgDErAQEz@google.com>
+In-Reply-To: <arn3TC7BgjTXWmdG@google.com>
 Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20261003233838eucas1p237c405e495deb98ca1ab7bffb909923a
+X-CMS-MailID: 20261003235041eucas1p15384f0a3889321f025161bbe2b71bb94
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20260925113504eucas1p25e50de59c02681fc1385220be8acd184
+X-RootMTR: 20260925113452eucas1p170bfdb34dfbf670a14a6f8f0c2f5094a
 X-EPHeader: CA
-X-CMS-RootMailID: 20260925113504eucas1p25e50de59c02681fc1385220be8acd184
+X-CMS-RootMailID: 20260925113452eucas1p170bfdb34dfbf670a14a6f8f0c2f5094a
 References: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
-	<CGME20260925113504eucas1p25e50de59c02681fc1385220be8acd184@eucas1p2.samsung.com>
-	<20260925-lz4-vendor-upstream-v1-7-1c7ffbe21c4b@samsung.com>
-	<arnpj53cgDErAQEz@google.com>
+	<CGME20260925113452eucas1p170bfdb34dfbf670a14a6f8f0c2f5094a@eucas1p1.samsung.com>
+	<20260925-lz4-vendor-upstream-v1-1-1c7ffbe21c4b@samsung.com>
+	<arn3TC7BgjTXWmdG@google.com>
 
 
 
-On 9/28/26 06:16, Sergey Senozhatsky wrote:
+On 9/28/26 07:19, Sergey Senozhatsky wrote:
 > On (26/09/25 13:27), Michal Wilczynski wrote:
 > [..]
->> -static FORCE_INLINE int LZ4_decompress_generic(
-> [..]
->> -			/* Necessarily EOF when !partialDecoding.
->> -			 * When partialDecoding, it is EOF if we've either
->> -			 * filled the output buffer or
->> -			 * can't proceed with reading an offset for following match.
->> -			 */
->> -			if (!partialDecoding || (cpy == oend) || (ip >= (iend - 2)))
->> -				break;
+>> +int LZ4_compress_fast_extState(void* state, const char* source, char* dest, int inputSize, int maxOutputSize, int acceleration)
+>> +{
+>> +    LZ4_stream_t_internal* const ctx = & LZ4_initStream(state, sizeof(LZ4_stream_t)) -> internal_donotuse;
+>> +    assert(ctx != NULL);
 > 
-> Worth noting, these lines are downstream commit eafc0a02391b
-> (lz4: fix LZ4_decompress_safe_partial read out of bound).
+> Probably in some other places as well:
 > 
-> Is this intended or are we "loosing" some of the downstream fixes?
+> LZ4_initStream() can return NULL, but the code immediately derefs
+> the pointer.  The assert() check seems to be misplaced, unless I'm
+> missing something.
 > 
+> I suppose those need to be decoupled.  First LZ4_initStream() call and
+> NULL check, then stream->internal_donotuse.
 
-Yeah it's intended, eafc0a02391b was itself a backport of upstream
-c5d6f8a8be39  which is in v1.9.3 and later; its own commit message links
-it. The same check is at lib/lz4/upstream/lz4.c in this series.
+Good catch, this assert() is a noop in the kernel (as any build without
+LZ4_DEBUG), so a NULL, undersized or misaligned wrkmem oopses in
+LZ4_compress_fast(), and LZ4_compress_destSize() and LZ4_resetStreamHC()
+carry on with an uninitialised state.
 
-And upstream's version also clamps a literal run that would read past
-the end of the input, which the backport didn't take.
+No in-tree caller hits it (all use kmalloc/vmalloc), and I listed the
+alignment requirement as a behaviour change in the cover letter. Still,
+the vendored files need to stay verbatim.
+
+So in v2 our own entry points can check alignment with a WARN_ON_ONCE()
+and bail out early. It might be something that we can fix upstream as
+well.
+
+
+> 
 
 Best regards,
 -- 
