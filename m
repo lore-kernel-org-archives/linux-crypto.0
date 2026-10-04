@@ -1,150 +1,139 @@
-Received: from mail-wr2-f35.google.com (mail-wr2-f35.google.com [74.125.225.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.42.203.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C689E414A1F
-	for <linux-crypto@vger.kernel.org>; Sun,  4 Oct 2026 08:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E385E3F9F5B;
+	Sun,  4 Oct 2026 09:51:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.42.203.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791102843; cv=none; b=UAsZMPccZwGZE6ScnxinfcLm0g79N7NziAPinPI6NRklc2khoDfvvGi2QQGP0D4EUK5UpkXXepc6fjHJA8nhbP7EDISslhx7nge50H06YdNUeL+Wlc0qX8XmekYhSIC3V1a7W76vD9FBLNh7++mzwbuFXFldB/Cy1sblRVvrhOI=
+	t=1791107515; cv=none; b=bqViCsA6SkvIgVH9XqJnJ5Yqsm7NQppe4zvmrSQAL3oZnhZLBm9dXvNkCPyTuKXd24sZIhYQSiXgQ3B4PLgWD4Pbef/zhViw8tMvtvmtulra0cDMA0KN2TJScLlYn/h22ZAxE/cW9M7NbIF5qtzfi5Afmb18JhAmmvEfrIMa3Mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791102843; c=relaxed/simple;
-	bh=1sBv2SI3wnHyVQDHUJVigmIehBQG6EXZHnsM+TL5srs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NWh6tNneDyHbudRjKwkdpJsfOpPTjQHtS3F5d0lLnP+Go9Q237ct3k1s2uQTVVhDKk91neWAc+pssNjrFezcxoM8gkxYvyu4lvBUiTinD+s48vSYJnnitsVphsZapPNkhTtAFSCCW9BY373WahZlQ3ZOL1Eu4KL51TvvvObleNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NdkAUfd2; arc=none smtp.client-ip=74.125.225.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791107515; c=relaxed/simple;
+	bh=sFxhWSCP0mcaK4JLEjpA5w635bnyYYjPC1eVVHJLC3k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aLFFXhAKn8n7V7Pd30pTZLFVkgAHsuh4Kvb+Mj5SsXLPwieN4eKUCg2HArDTn+adDS0RrX05/lNdyJPXax8em4yVpebglnopLhzwzMZbTGP/E/05ixZgQ/yZkBRaWWhK6zoijF2DeUXIqZD1RJpX1VQ2gweShwkUf2D/R+XA6j8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=eWjZL/pT; arc=none smtp.client-ip=52.42.203.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NdkAUfd2"
-Received: by mail-wr2-f35.google.com with SMTP id ffacd0b85a97d-488811c9ebaso332236f8f.2
-        for <linux-crypto@vger.kernel.org>; Sun, 04 Oct 2026 01:34:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="eWjZL/pT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791102840; x=1791707640; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=0HFDC0D77tUqEmXehAlYyAx2E0DK1wOzX1zKg1ym3bo=;
-        b=NdkAUfd2+KZTf3s9hEpqKwliTej8peJLCSWDISLUjLwt09egN/aiRz2XZCkpPnIhNC
-         aK2B8KkXrAsfSf5UqEl+SqvFza5LHgVUqAccsIdsuUTmlR+g8Uea5bMpAzd2qbdFBiCg
-         t8fADBhEweXTv2ZNQgB7eZ1zF3dsFM6vncUf/ADRkOjyLLHTRGIDP4eOp+lBBA8JuXeu
-         nBJoxu6110IVlbTfAnaegRILWMJ2WNttnECN9/fl0pH8w6q6eG9C43JEnC4p9zNrOs3x
-         cGQa4jIxiwUPFj88RAfsTL3tjVtRaEeC2g1Rjy8xyoFrbRQsWvwMztVhAx2Ih1bK6nsb
-         4faQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791102840; x=1791707640;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0HFDC0D77tUqEmXehAlYyAx2E0DK1wOzX1zKg1ym3bo=;
-        b=z47/4IBUcAvlfQAnDb7h4tE1CCCwqsyNpb9Lwivbdp0U6rZBDb0KxPgznFFp03lAIF
-         VzLWMENPUM+SeAOuWRVDXdAseAB1ptsv5DiYygUB9LN73BpTKm3CZEbB/HRWtMOAV0+i
-         5RmfghO4oy0OAL/+So6Thuv4pdnKuSRn+CA2eguoR/JVR9WuW75j3DFBqEXlwW5AaRv3
-         1wGHss4KTavc210a8QnVGMArOh15KW1NGzr2kNfI/6yUbNInxK7beoeYvRuGYSVv9k0E
-         akf2lu4Uc3AsSn6jZTIC1Gr9INUnKUJlZTEc6w55NOjsbffKNAjKVzfINOE7xXDAbYXt
-         i8pg==
-X-Forwarded-Encrypted: i=1; AKwUvBwK4+B/NGwAbIJydMWuCxPdpKpfj3VPPfmtPBF9eN078Es/scvszhrSlIVw+rAYXBdxdLwEKIGlVhBpHeA=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLJB/FugA1CYIXHFDQsdN1RuSPTz+or7DPBAgtnIQTkqFxazs4M
-	SCV3nTLkbkEjmjOFlHWVR4yayd2K3ejFmM9Lvvs6OUafNGzbEteAJ8Je
-X-Gm-Gg: AYBFou2WUKyodUk9FOcVjVTaHnwtL9AccnQIEiohUMjW/vGcbneiUM0fwp/HQfeGza6
-	daU8rCrSanLwIpEpjTLShJnz+Ye68vOwuq5tPifERcHcRfxg9Nmd/8b2dFOvffMcJOegv6YsOa9
-	HcDGsnaBD/RCglpcxK+Qqu+bxzFIIcgzV0p8pnEmmwSo2J2FWjOw06uK37CAu70O2BtHZIa14Zo
-	F2BiiyZVGGdjBRTKZnq9YlOvwd8VpwlOo6Dj/dNZjpJ7INIMyQSBAWo7oMN9GZefWd8HHIIsGRp
-	tVXeESbMH02Dj4H/ebRa7X7Aob5bjwjPmqnAChY/K2cYTT99KLU09MJNFm+7CgIPdv1KLpN//MT
-	99ImXKLMH2CvVzJp2Cmnth8zTWQVTHszt2Hd6IN0h5r87TnJ3qeJMHyCZBKNOZEfeosZUrzW3zL
-	vzBvCyz/C9mv1gfC4fejrhG3J+C+kXco+ZQtljPYvRlTQDqmOHS1luXzo9osHkI7su1pKwCrXBV
-	88a1gnf11TaGzrLVH6iF+5Kkgyn+49vcKXAPFOloeGV2A==
-X-Received: by 2002:a5d:5d0f:0:b0:488:83f7:633a with SMTP id ffacd0b85a97d-48b12736b49mr11750202f8f.28.1791102839800;
-        Sun, 04 Oct 2026 01:33:59 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48b380f04f8sm17350793f8f.9.2026.10.04.01.33.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Oct 2026 01:33:59 -0700 (PDT)
-Date: Sun, 4 Oct 2026 09:33:57 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Michal Wilczynski <m.wilczynski@samsung.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Nathan Chancellor
- <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Bill
- Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Russell
- King <linux@armlinux.org.uk>, Thomas Bogendoerfer
- <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
- Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>, Jens
- Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>, Nick
- Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>, Chao Yu
- <chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>, Herbert Xu
- <herbert@gondor.apana.org.au>, Phillip Lougher <phillip@squashfs.org.uk>,
- Sungguk <sungguk.na@samsung.com>, Jaehoon Chung <jh80.chung@samsung.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, linux-erofs@lists.ozlabs.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH RFC 1/9] lib/lz4: import upstream LZ4 sources verbatim
-Message-ID: <20261004093357.33a124b4@pumpkin>
-In-Reply-To: <fac0f401-bbd3-444b-a755-53cc393673de@samsung.com>
-References: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
-	<CGME20260925113452eucas1p170bfdb34dfbf670a14a6f8f0c2f5094a@eucas1p1.samsung.com>
-	<20260925-lz4-vendor-upstream-v1-1-1c7ffbe21c4b@samsung.com>
-	<arn3TC7BgjTXWmdG@google.com>
-	<fac0f401-bbd3-444b-a755-53cc393673de@samsung.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1791107511; x=1822643511;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qOHcbtb/VRWrwcQuRj1W7KizObd5F5syz26snzqQx+g=;
+  b=eWjZL/pTFXRXAmJJkjN3akCJN+Uf4qdJfI6tHIp7yb/++PRqoB+1caW5
+   XF+/zxmyfMwwaQw/YTDtLsD1IPjfvbwZ4mGkP+hYyJwFeYSvFl2cvUYCj
+   kyEivbTZ8s+BgxgmfUD9OrOEap2H+e7GZJJOO7UUeXSkkYb/7+5r1HzhP
+   dL37LJ9oH79xClm5mUtZ4pFYbG5cKiGn1Xpjd1pVD5ELJckIRi+W1sEO3
+   l+Vs4l51FFLjC8IT48PyGXnGZDdPl2TIn/W8f1YoY2/HRJItXRtRSPo3w
+   ERiTT+Mmg3MnzV/ZHUgbVUhK9EZRMGnz0CNMkqjnBpklsa6T+Mp5OIPb5
+   A==;
+X-CSE-ConnectionGUID: D2xFCtpiS1WBE4zn8XfXIA==
+X-CSE-MsgGUID: yLnNzBhMTxqwMUEUZ2yIhQ==
+X-IronPort-AV: E=Sophos;i="6.27,139,1787011200"; 
+   d="scan'208";a="30371884"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2026 09:51:47 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:22268]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.137:2525] with esmtp (Farcaster)
+ id 19c6d27f-d39f-48d3-a63a-e9224414ef55; Sun, 4 Oct 2026 09:51:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 19c6d27f-d39f-48d3-a63a-e9224414ef55
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Sun, 4 Oct 2026 09:51:47 +0000
+Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.49;
+ Sun, 4 Oct 2026 09:51:45 +0000
+From: Leonid Ravich <lravich@amazon.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Christoph Hellwig <hch@infradead.org>, <linux-crypto@vger.kernel.org>,
+	<dm-devel@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<davem@davemloft.net>, <ebiggers@kernel.org>, <agk@redhat.com>,
+	<snitzer@kernel.org>, <mpatocka@redhat.com>, <bmarzins@redhat.com>
+Subject: Re: [PATCH v6 0/6] crypto: skcipher - multi-data-unit request splitting
+Date: Sun, 4 Oct 2026 09:51:39 +0000
+Message-ID: <20261004095140.24161-1-lravich@amazon.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <ar9hjvFGLUKv3lEM@gondor.apana.org.au>
+References: <20260924075846.28203-1-lravich@amazon.com> <ar9hjvFGLUKv3lEM@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Sun, 4 Oct 2026 01:50:39 +0200
-Michal Wilczynski <m.wilczynski@samsung.com> wrote:
+On Fri, Oct 02, 2026 at 05:47:26PM +1000, Herbert Xu wrote:
+> I think the issue is that we're generating the IV twice.  Once
+> in the Crypto API and once again in the DM layer.  Not only is
+> this slow, but it is actually wrong for decryption.  You're ignoring
+> the IVs on the disk.
 
-> On 9/28/26 07:19, Sergey Senozhatsky wrote:
-> > On (26/09/25 13:27), Michal Wilczynski wrote:
-> > [..]  
-> >> +int LZ4_compress_fast_extState(void* state, const char* source, char* dest, int inputSize, int maxOutputSize, int acceleration)
-> >> +{
-> >> +    LZ4_stream_t_internal* const ctx = & LZ4_initStream(state, sizeof(LZ4_stream_t)) -> internal_donotuse;
-> >> +    assert(ctx != NULL);  
-> > 
-> > Probably in some other places as well:
-> > 
-> > LZ4_initStream() can return NULL, but the code immediately derefs
-> > the pointer.  The assert() check seems to be misplaced, unless I'm
-> > missing something.
-> > 
-> > I suppose those need to be decoupled.  First LZ4_initStream() call and
-> > NULL check, then stream->internal_donotuse.  
-> 
-> Good catch, this assert() is a noop in the kernel (as any build without
-> LZ4_DEBUG), so a NULL, undersized or misaligned wrkmem oopses in
-> LZ4_compress_fast(), and LZ4_compress_destSize() and LZ4_resetStreamHC()
-> carry on with an uninitialised state.
+I don't think either happens in v6, so let me check we are reading
+the same code before I change the design.
 
-The assert() is also just a waste of code.
-Debugging the NULL pointer dereference is just as easy.
+The IV is generated once per request, not per unit.  In
+crypt_convert_block_skcipher() dm-crypt calls iv_gen_ops->generator()
+for the first sector of the segment only.  The Crypto API then derives
+the IV of each following unit by incrementing the 64-bit little-endian
+sector number in the low 8 bytes.  That is the same value the
+generator would have produced for that sector, so no generator runs
+twice.  Only plain64 and essiv are batched, because those are the
+modes where IV(sector + i) is exactly that increment.
 
-David 
- 
-> 
-> No in-tree caller hits it (all use kmalloc/vmalloc), and I listed the
-> alignment requirement as a behaviour change in the cover letter. Still,
-> the vendored files need to stay verbatim.
-> 
-> So in v2 our own entry points can check alignment with a WARN_ON_ONCE()
-> and bail out early. It might be something that we can fix upstream as
-> well.
-> 
-> 
-> >   
-> 
-> Best regards,
+On-disk IVs are never ignored, because batching is never enabled when
+they exist.  The only case where dm-crypt reads an IV from disk is
+the integrity-metadata branch in the same function:
 
+	/* For READs use IV stored in integrity metadata */
+	if (cc->integrity_iv_size && bio_data_dir(ctx->bio_in) != WRITE)
+		memcpy(org_iv, tag_iv, cc->integrity_iv_size);
+
+CRYPT_MULTI_DATA_UNIT is only set when integrity_iv_size is 0 (and
+the target is not AEAD; see crypt_can_batch_units() and its caller
+in crypt_ctr_cipher()).  So a device with stored IVs keeps the
+one-sector-per-request path, and its reads use the stored IV exactly
+as today.
+
+On the cost: the IV part of the ~50 ns is a 16-byte copy and an
+increment per unit.  The rest is re-pointing the scatterlist at each
+unit and the extra call into the algorithm per unit.  An IV array
+would replace the copy and increment with a load from the array, but
+the per-unit scatterlist and call overhead would stay.  I have not
+measured the components separately; I can if that would help.
+
+> My suggestion is to allocate memory for the IVs.  Of course
+> memory allocation can fail, but we have an easy fallback, which
+> is to use the existing single-unit path.
+>
+> IOW if you succeed in allocating memory for storing the IVs,
+> then invoke the multi-unit code path, otherwise fall back to
+> the single-unit code path which iterates over the sectors one-
+> by-one.
+>
+> To pass the IVs to the Crypto API (or back), just use the existing
+> IV pointer and extend it by the number of units.
+
+That said, I can see what an IV array would buy beyond the current
+modes.  The Crypto API would no longer need to know how IVs relate
+to each other, so every dm-crypt IV mode could batch (lmk, tcw,
+eboiv, benbi, and plain64be without a template), and so could
+devices that store their IVs in integrity metadata, since dm-crypt
+would fill the array from the tags on read.
+
+So the question for you is about scope rather than correctness: do
+you want the interface to be "one IV per unit, ivsize * nunits bytes
+at req->iv" so that it covers those modes too?  If so, v7 will do it
+that way, with the single-unit fallback when the allocation fails.
+If plain64 and essiv are enough for now, I would keep the counter
+form from v6.
+
+Thanks,
+Leonid
