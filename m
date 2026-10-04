@@ -1,76 +1,76 @@
-Received: from mail-qk2-f39.google.com (mail-qk2-f39.google.com [74.125.230.231])
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9A73E51E8
-	for <linux-crypto@vger.kernel.org>; Sun,  4 Oct 2026 04:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A451632DD
+	for <linux-crypto@vger.kernel.org>; Sun,  4 Oct 2026 04:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791087999; cv=none; b=PCJafltPgM+rrmbcz0rRx7AB29ysaUW5OPMmPa3glnGVqgXVfDA+8NqpYV9T6nH7C9MQLMtxzbchHjcYAquJUaZ0nYZ8O/2BrT6VAsOD+27575PB7+WcvnlF3irKSpaSEo4ERWtXETqpBRgXrxJG4YNLIa72ojCmlGMH17Nsmec=
+	t=1791088464; cv=none; b=eg86ZOMJKSfN5jmenroZ18oRJY4e0dJQ0BsiGiHYnwRmVIxAL+yOzsVpeXbfsR5fMJdEfBqx9ez7VCRrk8SAV/jnv2VyUt7MGN3EcuZ51Ug9H+MASp3kjTkF+OVLXAeaM3WnlFbArH6/TCuEDR5PESBHZkNBTcPPgfHzCQ/pAYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791087999; c=relaxed/simple;
-	bh=SA1v7m8+a2Ph1dwt7YN7E3qaLG1ZxbVKpYnbGXKAW/Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IitG4TagZAB6d6/ywlU3/gglnmlo32UDLBkmZsszac/cR5E7NNTTvT4aH1oG0KMfzGr0TKAWEu1xtLTZOHV1qoBpKK9iQsiALIcyQHFcIvzk0lOgMUmaFWeRcKb0iUHBRs1QiOy8Pxo0QOvNiZkjkvU7Z/2JKjvlB1EA3eh5zGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b4O8O7mI; arc=none smtp.client-ip=74.125.230.231
+	s=arc-20240116; t=1791088464; c=relaxed/simple;
+	bh=eOJroCEzUg20LIcT5kdsMvafVDt/htmU7I2wtynufTg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Btm+tBfLD6sXVuUP1cjxd0qgqN4NpuWFJxPhQRrbSQjQwp2hqnJvb0iHgatWc4C9vgeE6l7MDfzWlBRefYkj+MyEhNOAyYSnouZNMRH0WUkmlJ4qaRFG2+Pg+lOZA8egckjsskLuRZyYi7yegOkVfW3OQOu+0+AF5tQ/+SrqANI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pXKFqMSo; arc=none smtp.client-ip=74.125.82.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b4O8O7mI"
-Received: by mail-qk2-f39.google.com with SMTP id af79cd13be357-93cb545be7fso60123485a.2
-        for <linux-crypto@vger.kernel.org>; Sat, 03 Oct 2026 21:26:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pXKFqMSo"
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-33fb4680717so2062435eec.1
+        for <linux-crypto@vger.kernel.org>; Sat, 03 Oct 2026 21:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791087996; x=1791692796; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791088463; x=1791693263; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=0rrUctqm6Dy9eiIYp5kLscMDUQowC1+vgzYg3FmL2FU=;
-        b=b4O8O7mI1BxA3yZkmoIW7N5WotuhLsnSsM6erxc/kANV2lj8ADBx2JLapbXXbgmya+
-         C9cdvQrf/wSNsm5awAODq7f85+hTfx05LOnzaK/UoMJZfggp30dszscPYox+As3ClNT9
-         T923PF2sSVW/UXr74RlgVbmOuwVQ6cTRmiuKqHJWC7hSbwUxOPj3S1n9SQJiUAOlvEdc
-         aG9SVhjlCrdEUXidhY7z9Zp+7q25OlSojwJB2quuuLyFiraYbSUy3r0MIzhKsGylHbb8
-         keCCqPrgYWP1s1/kHyh2GgBdRU2qhAWjFk0T3a1nNzbvCdDVwA90AVBz+ucdjAsQoOWu
-         xe7A==
+        bh=Lij0dHcd6a3wl8+hMVYGItOL2a0NxZaK7HaD/YGzx5I=;
+        b=pXKFqMSoJmMkYRK8wRM3fhQc9ZU8bnKdEmvZQ3Rs4sRH9DJEAnrrOqS+JVjYRq+H08
+         rBz9XVFBKf6CjUO8BAFhGF+ns9wZySDmc27SOPHhcBKrzBiSXCRMVfaj0YMtr/ygOKA6
+         Ab6oUawB6SSrAgAtH/U7o7YpO3fReWyYnP3OaUyaFtLHF7+UAPlGRmC09dlo2trTECWf
+         l9bJMjWF9BLMfmpvFrKr28Y+08aoC0aoYtGDvT610lboxNXDc6BWHtkkVO6CZOCeERwE
+         ahoHCZnn+yjmeIFZ9v9H4STg/Un2n1YhHXN5Um4ziBJfH7+n19Fc0PX48rW2ofnbyQVW
+         Hd6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791087996; x=1791692796;
+        d=1e100.net; s=20260707; t=1791088463; x=1791693263;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=0rrUctqm6Dy9eiIYp5kLscMDUQowC1+vgzYg3FmL2FU=;
-        b=cuGJn1gtLxRBKUeRLGDpUB8fz4ativhOldtnAXDbh1YZCDTSKDYZash8WqEMnEG4pB
-         9qMWukhpffDPJXW9+Z2CImNZ47xiQhsxXVZ9udep7YoQrOlsJTEaKRBImx7c7ahedNZ5
-         3DrH8aFKP+QdeZtRI4oN/W3kv4kMFbqHNfjedY2F6CMuDNwQonix1zZJ1WwWU8pDIYyl
-         1nygpEjoY0Zypyv93lnYMibWx6n5QcLrvC2b2ru9rVDvGh0QdaCY5WkkiKQ6Cgp4NYQj
-         hz00EMkCTHEjG5sVd5D+lbyj98h0PqGFxmV2oVhvH4vBuEr/GH6fUgSnPdeLHPnLKXcj
-         /q9Q==
-X-Forwarded-Encrypted: i=1; AKwUvBxS+2OQ2CuEo/qhTzlUZGzWsmYTz/i+G+YHVZid+3LF0ouQ3rphyQsDsI14/6gfAdknnFAJ9ypPkwzWxrY=@vger.kernel.org
-X-Gm-Message-State: AFuF++l9SvT8+U+uxdSuNzsxfV5731FuClHstpuorWVd6vWXOdatjwtH
-	JnNT1n3wuG5/QUW5UdIJGCMUJvc5+bQ8uhoa11mfQmZkCH2tp771QQcGL/JWKyw=
-X-Gm-Gg: AYBFou0zjkt1dCOsK68Oj/MZxqncWRd/X6qZyQPjJ0sYVoxuRfWsCsr4P2gE92qroVd
-	quNuXhnzptlcgrBIPkGSxEeoPPfhJbEsltPqPnxe2JWtPtO0IH3B3uU8ycx9MwlMd/HmfraBvWI
-	q07sGLOJJVRFMYsjYZnAw1zlHkgeDuG1p1dd03v9TtvkMZx6hEP3vmklVr6Z/vD9eQoTzFj3bjw
-	sH3BEkmbuwYVqee+Lg5a9wr8GpxrV8LUzJsj/Y5ZjjCBin0y2sJa5txat7+dQzZ65bHO1+wTiYJ
-	6fhFsHCmTfeZMhbtsg7U9KjXz2kD5EDYkeAeLj81U0EMjzZBchxDD9g5004G/lTaOqryz3TmV5P
-	gNFVx8IVgfq/nY6wDOrf3L/8zZDVm8eRNL/Uf11DPI5JBOp2VecCCCKRjCdQrEeyQBcVRrcFISk
-	tCrnI57NcU0nFth/ouYKIhVRbVnB6IwKzpHtPesOgJAWHwCy9gvcx+xy0RXWBQj7MIjkHSCsjik
-	15HkQPuSXujI7eIrWh4uykcq/Lc02itb/BUlAfPFNcd86sUgvP/Kx6GYP13sddhm8mjxFzZZxEE
-	VhuX2egy5LOtxhX1AbzIFDrXdURt
-X-Received: by 2002:a05:620a:2259:20b0:93c:2dae:ec5c with SMTP id af79cd13be357-93cf188f68cmr935971185a.42.1791087996607;
-        Sat, 03 Oct 2026 21:26:36 -0700 (PDT)
-Received: from i4-gl-tmk5904-1.ad.psu.edu ([130.203.156.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93e4e57b9cbsm367051985a.11.2026.10.03.21.26.35
+        bh=Lij0dHcd6a3wl8+hMVYGItOL2a0NxZaK7HaD/YGzx5I=;
+        b=vaQXBznuvnHYL72rQt05IwrHp1hqWydXFlvQDDpphGjdC3CKur2W6HMnuLAKn+o8C4
+         0UOi3CN3nK5JnRlfxRB5VuOcVP7hA+w1S3mslEfBUSdmvXu4NK4Lsq9O+faw59xz1Fc/
+         BFvjwrY6mibHXnKxlIBeQZTjWztf//n5+Vo5A2e8jyEtksGMvbmnRP0zefRmVJZGzA4O
+         /2ozADwwXgre1a63++Xa57g1ePA36MR31Z6NwKy1nGULmeT8t1LzXvzX2rttRsdsGpDz
+         MgZoNLvnhG+++mJNafKJ3d6zigrCIpDLt21XMRVpex/B4I8za7pnVTpbKqmI2idAWxNi
+         9Lhw==
+X-Forwarded-Encrypted: i=1; AKwUvBxqBAqY1l/zmqN6oZ39HVk4etwmojvtc4+NyIaef2GzlwbOooQJKFoWqgrH7X3MWAlJP9YeIatD0T40Pnc=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLOc8Yduj+36qhDtdkE6dSo2t5qSGRAHtXzOmAhV2ablihT5G3u
+	VwhQk1mTrZyronCcOGOmDujXaofxSDtXbVcTRBbqFKV7T5yQctZRjUQL
+X-Gm-Gg: AYBFou2ygU+dR2R9kH8d2iCr1rA8o52tIaqZ3mdhXbgMPG90zITAtkKbD+HQ8J0ED/t
+	NG1Uy/ZDkiZRg8jB/83Hw1SlhRlYpxBhOocomtDmzw+v9m1+DPKr38nimwo1XGJywWZhScmUUtQ
+	NwzAbtDIE0sclqp9TqTaVvpQcn5p7qXYunQhjNgPfhJXBnwFdEgWSatHHIIdB6CgPcc+xUB8Bw8
+	xKGbxqTjiwLtcaon8tmHttuJfCBzVZapLTeDJ7RO2QmlTjx694+qVqoxPffYgN2O6WSknTTUZj1
+	8iRCqX9goNYe0nxEARrqs/o0NbP+cs1s5yEHeCqeNJ/sWjaPKIZYuE/RknZVlIBY8BIrmoEcfpG
+	5Y7ya2J45uKHworzz4srYw4gAT/7hjTVDkVbMZfWz3cClCIJp0s8q/prJU3s8sgWYjn+22Yxhjs
+	RQnyBM1eekx514pZCHoIBxc9qBHFaFnt47iAmQsId1nVsMPXoy0hLJx6VRLF1UIc329k8PIwQoN
+	rnR9TpBweNobi1YB/+1MACf41g0
+X-Received: by 2002:a05:7301:df43:b0:34e:f8bb:4e2a with SMTP id 5a478bee46e88-3511162fe7dmr4629978eec.10.1791088462592;
+        Sat, 03 Oct 2026 21:34:22 -0700 (PDT)
+Received: from kernel ([103.219.206.69])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-351271847fbsm2366660eec.15.2026.10.03.21.34.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Oct 2026 21:26:35 -0700 (PDT)
-From: Myeonghun Pak <mhun512@gmail.com>
-To: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Lukasz Bartosik <lbartosik@marvell.com>,
+        Sat, 03 Oct 2026 21:34:22 -0700 (PDT)
+From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+To: ebiggers@kernel.org,
+	ardb@kernel.org,
+	Jason@zx2c4.com
+Cc: skhan@linuxfoundation.org,
+	me@brighamcampbell.com,
+	jkoolstra@xs4all.nl,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Ijae Kim <ae878000@gmail.com>
-Subject: [PATCH] crypto: marvell/octeontx - clean up VF resources when DOWN fails
-Date: Sun,  4 Oct 2026 00:26:34 -0400
-Message-ID: <20261004042634.1130247-1-mhun512@gmail.com>
+	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] lib/crypto: chacha20poly1305: zeroize state in __chacha20poly1305_decrypt
+Date: Sun,  4 Oct 2026 10:04:13 +0530
+Message-ID: <20261004043413.6870-1-raizudeen.kerneldev@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -80,71 +80,65 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A failed DOWN mailbox notification makes otx_cptvf_remove() skip all
-local cleanup. The driver core still completes unbind and releases the
-devm-allocated cptvf, leaving the raw IRQ handlers registered with that
-object as their argument. The sysfs group, crypto device-table entry,
-software queues and PCI resources also remain uncleaned.
+The `__chacha20poly1305_decrypt` function does not zeroize the chacha
+state, unlike its encrypt counterpart. The regular
+`chacha20poly1305_decrypt` function handles this by manually calling
+chacha_zeroize_state(). However, `xchacha20poly1305_decrypt` returns
+the result directly without clearing the state, leaving the derived
+chacha20 subkey on the stack.
 
-Keep the notification error diagnostic, but run the existing local
-cleanup regardless of the PF response. This removes both IRQ handlers
-before killing the tasklet and releasing its resources, as on the
-successful notification path.
+Fix this by moving the chacha_zeroize_state() call into
+__chacha20poly1305_decrypt() itself, so the helper cleans up after
+itself just like __chacha20poly1305_encrypt does. This ensures all
+callers are secure without needing manual cleanup.
 
-This issue was identified during our ongoing static-analysis research
-while reviewing kernel code.
-
-Fixes: 10b4f09491bf ("crypto: marvell - add the Virtual Function driver for CPT")
+Fixes: ed20078b7e333 ("crypto: chacha20poly1305 - import construction and selftest from Zinc")
 Cc: stable@vger.kernel.org
-Assisted-by: LLM
-Co-developed-by: Ijae Kim <ae878000@gmail.com>
-Signed-off-by: Ijae Kim <ae878000@gmail.com>
-Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
+Suggested-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
 ---
- .../crypto/marvell/octeontx/otx_cptvf_main.c  | 29 +++++++++----------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+Changes in v2:
+- Move chacha_zeroize_state() into __chacha20poly1305_decrypt() as
+  suggested by Ard and requested by Eric.
+- Update subject prefix to "lib/crypto: chacha20poly1305:"
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-index 159c1d290a36..27d7b094c861 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-@@ -937,22 +937,21 @@ static void otx_cptvf_remove(struct pci_dev *pdev)
- 	}
+Link to v1: https://lore.kernel.org/all/20261003060826.7792-1-raizudeen.kerneldev@gmail.com/T/
+
+ lib/crypto/chacha20poly1305.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index ea42a28f4ff7..80904321458b 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -137,8 +137,10 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 		__le64 lens[2];
+ 	} b;
  
- 	/* Convey DOWN to PF */
--	if (otx_cptvf_send_vf_down(cptvf)) {
-+	if (otx_cptvf_send_vf_down(cptvf))
- 		dev_err(&pdev->dev, "PF not responding to DOWN msg\n");
--	} else {
--		sysfs_remove_group(&pdev->dev.kobj, &otx_cptvf_sysfs_group);
--		otx_cpt_crypto_exit(pdev, THIS_MODULE, cptvf->vftype);
--		cptvf_free_irq_affinity(cptvf, CPT_VF_INT_VEC_E_DONE);
--		cptvf_free_irq_affinity(cptvf, CPT_VF_INT_VEC_E_MISC);
--		free_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_DONE), cptvf);
--		free_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_MISC), cptvf);
--		cptvf_sw_cleanup(cptvf);
--		pci_free_irq_vectors(cptvf->pdev);
--		pci_iounmap(pdev, cptvf->reg_base);
--		pci_release_regions(pdev);
--		pci_disable_device(pdev);
--		pci_set_drvdata(pdev, NULL);
--	}
-+
-+	sysfs_remove_group(&pdev->dev.kobj, &otx_cptvf_sysfs_group);
-+	otx_cpt_crypto_exit(pdev, THIS_MODULE, cptvf->vftype);
-+	cptvf_free_irq_affinity(cptvf, CPT_VF_INT_VEC_E_DONE);
-+	cptvf_free_irq_affinity(cptvf, CPT_VF_INT_VEC_E_MISC);
-+	free_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_DONE), cptvf);
-+	free_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_MISC), cptvf);
-+	cptvf_sw_cleanup(cptvf);
-+	pci_free_irq_vectors(cptvf->pdev);
-+	pci_iounmap(pdev, cptvf->reg_base);
-+	pci_release_regions(pdev);
-+	pci_disable_device(pdev);
-+	pci_set_drvdata(pdev, NULL);
+-	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
++	if (unlikely(src_len < POLY1305_DIGEST_SIZE)) {
++		chacha_zeroize_state(chacha_state);
+ 		return false;
++	}
+ 
+ 	chacha20_crypt(chacha_state, b.block0, pad0, sizeof(b.block0));
+ 	poly1305_init(&poly1305_state, b.block0);
+@@ -164,6 +166,7 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 
+ 	memzero_explicit(&b, sizeof(b));
+ 
++	chacha_zeroize_state(chacha_state);
+ 	return !ret;
  }
  
- /* Supported devices */
+@@ -186,7 +189,6 @@ bool chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 	ret = __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
+ 					 &chacha_state);
+ 
+-	chacha_zeroize_state(&chacha_state);
+ 	memzero_explicit(iv, sizeof(iv));
+ 	memzero_explicit(k, sizeof(k));
+ 	return ret;
 -- 
 2.53.0
 
