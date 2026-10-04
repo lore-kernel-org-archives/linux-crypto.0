@@ -1,70 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2607047C0F7;
-	Sun,  4 Oct 2026 18:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A14479892
+	for <linux-crypto@vger.kernel.org>; Sun,  4 Oct 2026 18:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791136945; cv=none; b=uL/1eI1CC0mH4QOBGet1emhrxmxTk7d4tbrdE9Bj7r/pu3uB0NKN0pr3yoLTBpAmrNg9+TPU9b9VME4CiEZnYHzOavsIUCTRGPc8St9/efj3nuIBJsx9AoNBWrQtSgep2f5gE5t//HiozgKN4U/nZ7z3u1+VOholEk7wO40VpUc=
+	t=1791137005; cv=none; b=Qj0VQKhqNGUr0DU66wyoI8itBdsUd8M2M+ntunlNNM3kBzsQwCEUnCQJ49iWUY1D7QKiLbwVBBW1TXCjxefgD/jC6Uxu5qA2ZVETrnnJ0ORRaeU9W+DKH0PWusjJkjtZSsI3jJbdH/Osfs16snDZ71I1u4sUp9mrMEKwb+Eoe8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791136945; c=relaxed/simple;
-	bh=yRs6iOyIksXzAXZLCm/L98/ZXr20yi5TUXOnv8IIzHM=;
+	s=arc-20240116; t=1791137005; c=relaxed/simple;
+	bh=dNKM+sahtRYM7Fk0yEqNixvM/s91PnZHoKUvFlUKi/A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IIruS799dgFqHA0R5dFuO/Sg1G+MrEATX/Ds7NYsA3mzktxpyrMCmTVDMJrZ3gLu7GJOFX5qsY0ZMsJUKtdrgzDtLL1KhX3AiIbmCDBdBXhkMK5tEnoR6YpHmAtHNbEEaRj2z/1GOeD0FdWFQXB09yuj+2b1n036z2PUDWsBcFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0l7RULS; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=iyeSTdeZ/bicMNZ3bQKldGS/QeVKxJInbjIroW5iWrZCvEwH8w2X1FPXWAWBfKfErPtdqmKH0YtxJ/QjEb5Y/ThI6npMNyCLClXUTXqr3y5QzK/dtxWzS3kYEFHv9oKM9pwIkc+jwrSCWZxBT46ttBAPAkSQSqWbNeKwzwBeuok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InMqn0R5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0l7RULS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD05C1F000FF;
-	Sun,  4 Oct 2026 18:02:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InMqn0R5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03A171F000FF;
+	Sun,  4 Oct 2026 18:03:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791136934;
-	bh=3NrjrMQG6PRCSAYGrvIhG5WZILo0AC3+blI+7TQNQrg=;
+	s=k20260515; t=1791137000;
+	bh=Iq/0zGgwz7z19bg3mZHaHi5SzqsONlQc1uYFxb3hszA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=H0l7RULS+6689LmK4W/cZCuj7+DOqNc/kV+zxBRy6jy+8yZVmqbBJahdHbF4XN61v
-	 UWxc3oGHOBV3H78WNK/GFjLrrraXqT1Q6Z0nvF8zLWh7Y5mYXbnZCHfpkif/alVCly
-	 ZcfF4O5mshEnxBInyjzfuQQHg0VbnMNyrg9Rpn+pJeuNTIHllmWd21rRZrhexlFoVl
-	 quzTMz2QJkY3vaBaUeFFhxS/7of5NBzSW6pADACeyMBd7x/HioBhZK5EHXroUVqmEN
-	 Ux4UqDIB/c5c8yhBQeaGNhSoWTht7UFonVKpQ3J1+dI0/26yOVAm4OzD/hY/fkKDsZ
-	 8U8NPPwavWWyA==
-Date: Sun, 4 Oct 2026 20:02:08 +0200
+	b=InMqn0R5e/6MxNV2kjat6PZgw4gr6MZPEuPcZFnHp2wFPNOMY1N+GLSFLkdSA37Sv
+	 p/t7hLe9QG6GpNRBeTQg0yuU8XwBeFKgyKJrmyuByx+Ma7/eOqi5t8HuYmlltGkanV
+	 tofvADGBMOVMD0xEYF5zpRBGBQ2xMepQlzrBwA3aja269UaUhuxXFWPvq5kYVDJyN8
+	 uDU/8KuXZeb1Cq1gsZjw7B3n2N91XaYKTgY9YpZJqrxXQXnHcvJVE5gdMtCm5PrFN2
+	 wD0oY3/co3ZekJk2An1k96tAG43Ib5Rq9onF/w7+3xWFXaGtKOOsrEiojnmhBLVKPq
+	 m+xUJKKWmOACw==
+Date: Sun, 4 Oct 2026 20:03:16 +0200
 From: Eric Biggers <ebiggers@kernel.org>
-To: Stian Halseth <stian@itx.no>
+To: Martin Willi <martin@strongswan.org>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>, linux-crypto@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] lib/crypto: sparc/aes-xts: Add optimization using the
- AES opcodes
-Message-ID: <20261004180208.GD1906@quark>
-References: <20261002072110.1221579-1-stian@itx.no>
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: x86/chacha: Add a 16-block AVX-512 variant
+Message-ID: <20261004180316.GE1906@quark>
+References: <20260722153247.630519-1-martin@strongswan.org>
+ <20260722232424.GA50619@quark>
+ <aaca79db6bd81c539b1f1698603c7249be48a7b7.camel@strongswan.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20261002072110.1221579-1-stian@itx.no>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aaca79db6bd81c539b1f1698603c7249be48a7b7.camel@strongswan.org>
 
-On Fri, Oct 02, 2026 at 09:21:10AM +0200, Stian Halseth wrote:
-> +#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_XTS)
-> +ENTRY(aes_sparc64_xts_encrypt_128)
-[...]
-> +ENTRY(aes_sparc64_xts_encrypt_256)
-[...]
-> +ENTRY(aes_sparc64_xts_decrypt_128)
-[...]
-> +ENTRY(aes_sparc64_xts_decrypt_256)
+On Thu, Jul 23, 2026 at 01:03:50PM +0200, Martin Willi wrote:
+> Hi Eric,
+> 
+> > This is very similar to the existing chacha_8block_xor_avx512vl(), just
+> > with 512-bit vectors instead of 256-bit.  They even use the same CPU
+> > instruction set extensions: there are actually no cases where a CPU can
+> > run chacha_8block_xor_avx512vl() but not chacha_16block_xor_avx512()
+> > (the choice of vector length is just going to be made by policy).
+> > 
+> > Given that, could we consolidate these implementations?
+> 
+> Yes, it is doable, but with some constraints:
+> 
+>  * In the 512-bit version, adding the initial state to the result uses
+>    a small optimization with re-broadcasting, so it differs from the
+>    256-bit variant. That optimization can be applied to the 256-bit
+>    version for a unification, but would mean a change to it.
+>  * The larger part of the interleaving tail is different and will
+>    require separate code paths.
+> 
+> So the net win is shared broadcasting/doubleround at the cost of some
+> macro complexity. I'll give it a try.
+> 
+> > Well, this is one of the cases where
+> > cpu_has_xfeatures(XFEATURE_MASK_AVX512) was already required by the
+> > existing code (since all AVX512 bits need to be enabled for any EVEX
+> > coded instructions to work, even on xmm/ymm).  But it was never checked,
+> > and no one ever noticed.  I would just continue to leave it out.
+> > 
+> > You can also drop the check of X86_FEATURE_AVX512F, which is implied by
+> > X86_FEATURE_AVX512VL and X86_FEATURE_AVX512BW already.
+> 
+> Ok, will do so.
 
-These four functions are almost identical.  They should each just invoke
-a macro that expands to different code only in the parts that are
-actually different, like what the __aes_xts_crypt macro in
-lib/crypto/riscv/aes-riscv64-zvkned-zvbb-zvkg.S or the _aes_xts_crypt
-macro in lib/crypto/x86/aes-aesni.S do.
-
-This will generate the same object file with way fewer lines of source.
+Hi Martin, is there any update on this?
 
 - Eric
