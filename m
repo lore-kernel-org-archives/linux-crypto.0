@@ -1,77 +1,73 @@
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+Received: from mail-pj2-f42.google.com (mail-pj2-f42.google.com [74.125.227.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A451632DD
-	for <linux-crypto@vger.kernel.org>; Sun,  4 Oct 2026 04:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85009190462
+	for <linux-crypto@vger.kernel.org>; Sun,  4 Oct 2026 05:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791088464; cv=none; b=eg86ZOMJKSfN5jmenroZ18oRJY4e0dJQ0BsiGiHYnwRmVIxAL+yOzsVpeXbfsR5fMJdEfBqx9ez7VCRrk8SAV/jnv2VyUt7MGN3EcuZ51Ug9H+MASp3kjTkF+OVLXAeaM3WnlFbArH6/TCuEDR5PESBHZkNBTcPPgfHzCQ/pAYI=
+	t=1791090606; cv=none; b=Qdp19JE1kE3K87m5ZlrDhlPMMzTtSG5rtIl9C9gCol3LUXKwEXRExUjVgQZ2MEQL7FpI+7ohfuY6an2yuFiuujBXz/uuN/7iMfYaaBPHSNWwN6rJJNtW+ouSl+BXHTddLTO60SV48avzHCQd3dq8Dd2wuNkX4KcZTXdb7p89j8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791088464; c=relaxed/simple;
-	bh=eOJroCEzUg20LIcT5kdsMvafVDt/htmU7I2wtynufTg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Btm+tBfLD6sXVuUP1cjxd0qgqN4NpuWFJxPhQRrbSQjQwp2hqnJvb0iHgatWc4C9vgeE6l7MDfzWlBRefYkj+MyEhNOAyYSnouZNMRH0WUkmlJ4qaRFG2+Pg+lOZA8egckjsskLuRZyYi7yegOkVfW3OQOu+0+AF5tQ/+SrqANI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pXKFqMSo; arc=none smtp.client-ip=74.125.82.169
+	s=arc-20240116; t=1791090606; c=relaxed/simple;
+	bh=IXzXisik/Zy5HF8UDVd3aRDCXeaSkyvSVfGa+Dmmx/8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LpVf7OKxzM332whjgNpVsA82M7N7uBfkN/mlxQ5e3zI8SOgFHq+Xqu1j3SD4Fn1SnFiT3qwztA5MPhOOmz7SeVR6F5OqlJNohN6dFJ2sJ1bbaa2Jfy8VNUYe/lbpv+iz+lr1307eeX0nPTlHTTAxlkW5pLbCod5wpw2uajGx6LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N2Z1UPor; arc=none smtp.client-ip=74.125.227.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pXKFqMSo"
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-33fb4680717so2062435eec.1
-        for <linux-crypto@vger.kernel.org>; Sat, 03 Oct 2026 21:34:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2Z1UPor"
+Received: by mail-pj2-f42.google.com with SMTP id 98e67ed59e1d1-396ccda24afso201359a91.3
+        for <linux-crypto@vger.kernel.org>; Sat, 03 Oct 2026 22:10:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791088463; x=1791693263; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791090603; x=1791695403; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Lij0dHcd6a3wl8+hMVYGItOL2a0NxZaK7HaD/YGzx5I=;
-        b=pXKFqMSoJmMkYRK8wRM3fhQc9ZU8bnKdEmvZQ3Rs4sRH9DJEAnrrOqS+JVjYRq+H08
-         rBz9XVFBKf6CjUO8BAFhGF+ns9wZySDmc27SOPHhcBKrzBiSXCRMVfaj0YMtr/ygOKA6
-         Ab6oUawB6SSrAgAtH/U7o7YpO3fReWyYnP3OaUyaFtLHF7+UAPlGRmC09dlo2trTECWf
-         l9bJMjWF9BLMfmpvFrKr28Y+08aoC0aoYtGDvT610lboxNXDc6BWHtkkVO6CZOCeERwE
-         ahoHCZnn+yjmeIFZ9v9H4STg/Un2n1YhHXN5Um4ziBJfH7+n19Fc0PX48rW2ofnbyQVW
-         Hd6w==
+        bh=O39FQFwyEOH81dyYEdu1kpPgRRCGO2BOYjVofQBwRYA=;
+        b=N2Z1UPoreiUxFkjhHjnqbI4m8j5gvYudz3SKJuJwaMbFtOknNJqQSHpM1UDPl32k6i
+         HTnmgmQyk90jqhXXMA884wTyg7hoik4xJA+s2UwU9BmcEAggnzKnf8Oy/XHMBrN3wIZN
+         sUu1Gqdzw4lDRSXjVB67YeF6FNdJkvhrgLrNr4asU4YN1hQvCB6DyIFWlgoP1UR/t8s0
+         AMz3weHcudabo/kG2DMg+66QlKcQfRCzXDnpgpnNrUOdUrzMc2GRWZe3br+I4t8IfuV3
+         AsmZ+Mro2Qzty2LGZrzUnhEvSPZ6xNiSB6VIqUGO2UBgr6fBP1BdsFcn4SQNlDdLAoQU
+         BONw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791088463; x=1791693263;
+        d=1e100.net; s=20260707; t=1791090603; x=1791695403;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Lij0dHcd6a3wl8+hMVYGItOL2a0NxZaK7HaD/YGzx5I=;
-        b=vaQXBznuvnHYL72rQt05IwrHp1hqWydXFlvQDDpphGjdC3CKur2W6HMnuLAKn+o8C4
-         0UOi3CN3nK5JnRlfxRB5VuOcVP7hA+w1S3mslEfBUSdmvXu4NK4Lsq9O+faw59xz1Fc/
-         BFvjwrY6mibHXnKxlIBeQZTjWztf//n5+Vo5A2e8jyEtksGMvbmnRP0zefRmVJZGzA4O
-         /2ozADwwXgre1a63++Xa57g1ePA36MR31Z6NwKy1nGULmeT8t1LzXvzX2rttRsdsGpDz
-         MgZoNLvnhG+++mJNafKJ3d6zigrCIpDLt21XMRVpex/B4I8za7pnVTpbKqmI2idAWxNi
-         9Lhw==
-X-Forwarded-Encrypted: i=1; AKwUvBxqBAqY1l/zmqN6oZ39HVk4etwmojvtc4+NyIaef2GzlwbOooQJKFoWqgrH7X3MWAlJP9YeIatD0T40Pnc=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLOc8Yduj+36qhDtdkE6dSo2t5qSGRAHtXzOmAhV2ablihT5G3u
-	VwhQk1mTrZyronCcOGOmDujXaofxSDtXbVcTRBbqFKV7T5yQctZRjUQL
-X-Gm-Gg: AYBFou2ygU+dR2R9kH8d2iCr1rA8o52tIaqZ3mdhXbgMPG90zITAtkKbD+HQ8J0ED/t
-	NG1Uy/ZDkiZRg8jB/83Hw1SlhRlYpxBhOocomtDmzw+v9m1+DPKr38nimwo1XGJywWZhScmUUtQ
-	NwzAbtDIE0sclqp9TqTaVvpQcn5p7qXYunQhjNgPfhJXBnwFdEgWSatHHIIdB6CgPcc+xUB8Bw8
-	xKGbxqTjiwLtcaon8tmHttuJfCBzVZapLTeDJ7RO2QmlTjx694+qVqoxPffYgN2O6WSknTTUZj1
-	8iRCqX9goNYe0nxEARrqs/o0NbP+cs1s5yEHeCqeNJ/sWjaPKIZYuE/RknZVlIBY8BIrmoEcfpG
-	5Y7ya2J45uKHworzz4srYw4gAT/7hjTVDkVbMZfWz3cClCIJp0s8q/prJU3s8sgWYjn+22Yxhjs
-	RQnyBM1eekx514pZCHoIBxc9qBHFaFnt47iAmQsId1nVsMPXoy0hLJx6VRLF1UIc329k8PIwQoN
-	rnR9TpBweNobi1YB/+1MACf41g0
-X-Received: by 2002:a05:7301:df43:b0:34e:f8bb:4e2a with SMTP id 5a478bee46e88-3511162fe7dmr4629978eec.10.1791088462592;
-        Sat, 03 Oct 2026 21:34:22 -0700 (PDT)
-Received: from kernel ([103.219.206.69])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-351271847fbsm2366660eec.15.2026.10.03.21.34.18
+        bh=O39FQFwyEOH81dyYEdu1kpPgRRCGO2BOYjVofQBwRYA=;
+        b=YHveTj4NQOMJHdfYhN0Q4IUP8Hlup37nIAlvsU6J/CCGfNgCQDhP7KbmfEyKUbj1Gy
+         kImx1YTmowaVh+LbaVJqP/ZVlA8CMw6CoTl/WJncMOGorYyH4rZkdJisb1GcUeWborpo
+         VRJJWqCZPA7AxodcHuvLCDMbcosT/h8Edw2usjhH0i8aAc2eI8LDFGGTQ6W9eVtoScPP
+         FKA/ry19di6NE2SHz368nmv6IbIAEQTPbCUngKopcaezQ5NC3yZa8yFuQn3JimVKrjZD
+         SEAVAszLm3vJaBCQtx1EZsWS1Z79SHm5CC67I3grGob02PWf43cPlEdsYC/M6aQR2VAD
+         dYVA==
+X-Forwarded-Encrypted: i=1; AKwUvBw+lE16I9L5WJM8EgdkvJWdAOM39qU3czQvqP6m4PpItUU8mKNUMYSwMJi99zYL7w2a6+j396jd/xbv364=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJapaqnFdhhXCZ7eRzMnXmVai/LkCZnY5ZTVH9WyRcx9WVBidDw
+	fwUfHD2EX7fQ9sttfS1YNvTnAAW/bmB9QWMaF6E/AmsvvjZdVrZtovN/
+X-Gm-Gg: AYBFou2c7oyc69qZcDQ2TLlWZfghsFYIsycCsqFglsMUVafKWbujyXY6oH2BhrsyJBV
+	a/7yKnvOLHfooR4GUdcIRZKlcWNnPGZX23MTuWeoFmipBgbzRAumvJoGbKSCPfEmxCDtuxWNkir
+	NEEXwoWplcTR9QQgCqMegmB//blW36KPBCCORPUnsg8cNra0UBTkh82Q9vHqDaQk7KD/0+QNI1R
+	SWlYh92jbgUBrSnKHC3qZTqH4XU8IC/W3pB4YIZqX/dlweyLeJRhP8oip6fndm03wXJyZamgBZ/
+	MORKaCWw40p4xutWhsizToDAlyRFIn7Yrq8b9Uvld35mO4nk9V5DtD8GIuLgJ3e/SGZNQ8L81Wy
+	br91Jx1kOZwER4T0xNLiA4c+awf1q7WdbnQIfCdMMwjJiJNcbK5F06c+1YVTwVP8IfP7DmpbcFq
+	cyYjoW/5j5ljbHWeHIIEldJtHwaf8CmBxIzrqi8h3Ml4IT3KV4jKcZsHt4cifMqFP2MCjBlbOg0
+	ux1Kjp+aZ4JIzyjz0YQQg==
+X-Received: by 2002:a17:90a:2ce1:b0:3a6:dc2f:f087 with SMTP id 98e67ed59e1d1-3a6dc2ff4ffmr1693679a91.53.1791090602694;
+        Sat, 03 Oct 2026 22:10:02 -0700 (PDT)
+Received: from ancienth-X870E-Nova-WiFi ([125.186.72.2])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a7e4b00de6sm100531a91.1.2026.10.03.22.09.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Oct 2026 21:34:22 -0700 (PDT)
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: ebiggers@kernel.org,
-	ardb@kernel.org,
-	Jason@zx2c4.com
-Cc: skhan@linuxfoundation.org,
-	me@brighamcampbell.com,
-	jkoolstra@xs4all.nl,
+        Sat, 03 Oct 2026 22:10:01 -0700 (PDT)
+From: Daehyeon Ko <4ncienth@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: Stephan Mueller <smueller@chronox.de>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] lib/crypto: chacha20poly1305: zeroize state in __chacha20poly1305_decrypt
-Date: Sun,  4 Oct 2026 10:04:13 +0530
-Message-ID: <20261004043413.6870-1-raizudeen.kerneldev@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	Daehyeon Ko <4ncienth@gmail.com>
+Subject: [PATCH] crypto: algif_skcipher: rewind rounded output bytes
+Date: Sun,  4 Oct 2026 14:09:46 +0900
+Message-ID: <20261004050946.3131044-1-4ncienth@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,65 +76,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The `__chacha20poly1305_decrypt` function does not zeroize the chacha
-state, unlike its encrypt counterpart. The regular
-`chacha20poly1305_decrypt` function handles this by manually calling
-chacha_zeroize_state(). However, `xchacha20poly1305_decrypt` returns
-the result directly without clearing the state, leaving the derived
-chacha20 subkey on the stack.
+af_alg_get_rsgl() advances the receive iterator by the unrounded RX
+scatterlist length.  For a continuing skcipher request,
+_skcipher_recvmsg() then rounds its local length down to a whole chunksize
+without restoring the iterator.
 
-Fix this by moving the chacha_zeroize_state() call into
-__chacha20poly1305_decrypt() itself, so the helper cleans up after
-itself just like __chacha20poly1305_encrypt does. This ensures all
-callers are secure without needing manual cleanup.
+A later chunk starts after bytes which the provider never wrote, while the
+syscall returns only the processed length.  When copy_splice_read()
+supplies non-zeroed pages and publishes that return as a dense prefix, the
+gap exposes stale bytes from a previous page lifetime.
 
-Fixes: ed20078b7e333 ("crypto: chacha20poly1305 - import construction and selftest from Zinc")
+With unprivileged xts(aes), a 31-byte MSG_MORE request followed by one
+final byte advances a 47-byte destination while returning 32 bytes.  A
+hardened v7.2-rc5 image retained all 15 seeded stale bytes in 4,829 of
+4,829 records.  With init_on_alloc enabled, all 72,345 gap bytes observed
+were zero.
+
+Rewind the iterator by the tail excluded during rounding, before rejecting
+a zero processed length.  The crypto request uses only the rounded length;
+af_alg_free_resources() releases the entire RX list before another receive
+iteration.
+
+The fixed target-like kernel returned byte-identical dense 48-byte output
+in 4,771 of 4,771 rounds.  The unmodified kernel returned the vulnerable
+32-byte short record in 2,409 of 2,409 rounds.
+
+Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
 Cc: stable@vger.kernel.org
-Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+Assisted-by: LLM
+Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
 ---
-Changes in v2:
-- Move chacha_zeroize_state() into __chacha20poly1305_decrypt() as
-  suggested by Ard and requested by Eric.
-- Update subject prefix to "lib/crypto: chacha20poly1305:"
+ crypto/algif_skcipher.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Link to v1: https://lore.kernel.org/all/20261003060826.7792-1-raizudeen.kerneldev@gmail.com/T/
-
- lib/crypto/chacha20poly1305.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
-index ea42a28f4ff7..80904321458b 100644
---- a/lib/crypto/chacha20poly1305.c
-+++ b/lib/crypto/chacha20poly1305.c
-@@ -137,8 +137,10 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
- 		__le64 lens[2];
- 	} b;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 1e61fe6e24b99d..291dbd69893257 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -135,12 +135,16 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	 * full block size buffers.
+ 	 */
+ 	if (ctx->more || len < ctx->used) {
+-		if (len < bs) {
++		size_t excess = len % bs;
++
++		len -= excess;
++		iov_iter_revert(&msg->msg_iter, excess);
++
++		if (!len) {
+ 			err = -EINVAL;
+ 			goto free;
+ 		}
  
--	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
-+	if (unlikely(src_len < POLY1305_DIGEST_SIZE)) {
-+		chacha_zeroize_state(chacha_state);
- 		return false;
-+	}
+-		len -= len % bs;
+ 		cflags |= CRYPTO_SKCIPHER_REQ_NOTFINAL;
+ 	}
  
- 	chacha20_crypt(chacha_state, b.block0, pad0, sizeof(b.block0));
- 	poly1305_init(&poly1305_state, b.block0);
-@@ -164,6 +166,7 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
- 
- 	memzero_explicit(&b, sizeof(b));
- 
-+	chacha_zeroize_state(chacha_state);
- 	return !ret;
- }
- 
-@@ -186,7 +189,6 @@ bool chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
- 	ret = __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
- 					 &chacha_state);
- 
--	chacha_zeroize_state(&chacha_state);
- 	memzero_explicit(iv, sizeof(iv));
- 	memzero_explicit(k, sizeof(k));
- 	return ret;
 -- 
-2.53.0
+2.55.0
 
