@@ -1,111 +1,146 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy2-f43.google.com (mail-dy2-f43.google.com [74.125.229.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62EE32C8B;
-	Sun,  4 Oct 2026 00:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BF83E16A5
+	for <linux-crypto@vger.kernel.org>; Sun,  4 Oct 2026 03:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791072315; cv=none; b=Ved6bSJYPXRlRAg9/TqgirAXNCVvqmEFaltxf+F8uyy/T6Fc7qcNwpAkTOXvBZbHLIXlDTNu+iYoF8mga55Tr+F5BGSePCqvJWes2WemxXvSFVMtYHEfMwyzrtK3pRjFri6VJUEtvLeQwEQv4RCCLpMHBXWYqBNSWQ3IRmVp4fU=
+	t=1791084056; cv=none; b=OHsBA1+Gv66g+44HOCJnDRaKoDIyku6k/5udbAVe9rBQ2JsgvN1zzIeTwDIlrccq/YgrjS02yD9QU/L+jh1Kpjn2nQOio9cpYgArolLylBu4SaOydiCWqvUnqg2HuEfevkFsWhIhLhDwFSxlTvfQmUp2Qbv839d0iVzXikcn/SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791072315; c=relaxed/simple;
-	bh=wUOiMs0DspmDIltKjRve6iQy32gxZsqIXTx3Sugvn/Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=QVjDccg+Tipw6U0ZBFTv7K4NO3TKVn4+qjhW2LwhToYkWsXIC38dTQCTCHmvOIjwtjdxv1eFLy9b6V2QyLBY2n+Wd/5m//rofbwL8pN2dk6Th2NI/raG5puYhqEbil8RWxhWcnyiSome5yXmnwXfEttkJPxO2MWDlJXeh1uxz+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=KFP5LNkz; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1791084056; c=relaxed/simple;
+	bh=ZuoVLXI9mZ7Ed8I5MUuPHCLNfDIzZ0wmyd2KS2Qgu5M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bMN7XeZAWKpFuHhz0xzh6IJDL15Voe/ocSPMKaLRT4QuUGS4jpe+4ydpRMl8nTNlwtwmHPuaIu7huW80n4ZtxsxzkG1YQCNg/Um891/HQ9fK9Ijhll2dHSQOCaqYebQX8Y5d/f12SZmwmYUR6Fg/kFYeRY8ypXdZgkLOZcWYSo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B0XgZHiw; arc=none smtp.client-ip=74.125.229.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="KFP5LNkz"
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20261004000510euoutp013ee4f267ec7b07e822726f0b5d88d0fa~bKsbKQ__B2163921639euoutp01V;
-	Sun,  4 Oct 2026 00:05:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20261004000510euoutp013ee4f267ec7b07e822726f0b5d88d0fa~bKsbKQ__B2163921639euoutp01V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1791072310;
-	bh=ZJZTrL5SQnYa6gvVNuN2LjMawlbBBC4EWuE7TxWcKx8=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=KFP5LNkza8OoBtj5HTuawzDRYYYBZ/WrfFMAfjXatZRd5ZwpmRtkrpGNteNnFAcFW
-	 a+pvo77kefjxlg+J0Kbo3aGXfUJFkeO4mBIkzt4cVg0+G6B7j2sqT1cGqS4uI3Kd2H
-	 +7VeWQwlvnZ97NOV2yx7DRYeXvD3SKk6JpL6yeyc=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20261004000509eucas1p12b906a44a576ad1b1bf6f8099f081cdd~bKsaNgMf72285022850eucas1p1h;
-	Sun,  4 Oct 2026 00:05:09 +0000 (GMT)
-Received: from [192.168.1.44] (unknown [106.210.136.40]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20261004000507eusmtip2934e51491ae1d0ccbd9db1e873d1df61~bKsYgse7o0742707427eusmtip2n;
-	Sun,  4 Oct 2026 00:05:07 +0000 (GMT)
-Message-ID: <ff30763b-d39b-450f-82ef-cba10d221ae6@samsung.com>
-Date: Sun, 4 Oct 2026 02:05:06 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B0XgZHiw"
+Received: by mail-dy2-f43.google.com with SMTP id 5a478bee46e88-33e62211987so795256eec.2
+        for <linux-crypto@vger.kernel.org>; Sat, 03 Oct 2026 20:20:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791084054; x=1791688854; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=x2thzfSt5QLT8HAsgWdixq/Y9P05apsvpgjsWLwXNuo=;
+        b=B0XgZHiwIuXftckS6QbH+LUuWK7NJZDT3/wKixb7SF2xgjN+IcAmACMyKp3RMn14Go
+         op8+gW0fVXk5In3Gk89F36XPaIhwDc4TYGoaIOsSBpRS2j6CRj6GZUG5305h4dTrsLCO
+         GqJ7Fz6CvTGCBXVHAGDkOQTO8hNn37AvcVSWejREOxelnu7OgwXs13R6mbEIZM2QOcEA
+         FYT05de1UJGniKCblrixXDM3hguvsd9VI2Y1fVaeoiyYOxnQ7qge7S/dK7WLirdrhLkh
+         c/No4shSCuZfOUkHMeiHi5g3ESe6S6RVvZxODTLSSige2A7MVdGT5u74ND/C3RW3a1sW
+         jQgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791084054; x=1791688854;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=x2thzfSt5QLT8HAsgWdixq/Y9P05apsvpgjsWLwXNuo=;
+        b=zL4xYbYNI3tmOleUiGBFgNeh9YzdkEiAJC6blw5LwhwxqFAT9f2C+Xeoymf3NeNt2r
+         5wyza8E+FWWH4sRCK2Yp9XWlVNRSYS8PDtxNVUxGXpKl5sk6lOTKsynTM5vN6FztN/BT
+         kd6Ik2241zuAmdJlMaTtVXnPTdiUw21eqxzRc+QZvZbENppR2D5xfC29FI4Z/azC3gL1
+         zq4ZH01Zr8kVkqGCINmskTFJfIgXfLX5/w3UzAPKJnBcGy1S6HEegNB7v8HXaV/v1SzB
+         v1Mk00FbjFD40Kr02ciEl55gAmbvSF15mgPdUbg+qI9LMWB+HnM8QURx4GhVd7D3Pg27
+         wOEQ==
+X-Forwarded-Encrypted: i=1; AKwUvBz4ay4+5NQGkZYOSdQmub0X3LYjyjgHWlDIhi1TZuPOs/3G1nI0YsMakH23Bstv8//X7GzeIUYQjlWIFUs=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJTEG8MLE8+qWtMh0mmYa38Zzh8h7T2v/LPFm85uajcpYtHnKdo
+	xVUZTCUT8cPfxqQsIRh/dI5kMc//547Ek4GnuR/B8N3Dmqanx89mYlFx
+X-Gm-Gg: AYBFou0K9H/+GRaNfiYEJbRqVhvG4Ez/vn1/X5kBDlDgn24zPcCz2ZNUjXEWWh5KiOO
+	XleVqTzzEqZMmdzq0sFsGwpfqUm+f9qPUR8ld5mVDjaeR4T4e5kB1Jp0IzQUZ6m9VhTxjeMkGAI
+	8Wu24bli5/oMnMzid2oZ5QZLBzTNYqao7Xryr6ToOEfpldbopqzVklrpcp+R0bvhwcNeGy0TVyb
+	bYNcbFuACXGja1gHhyGVrSxI8M59+rsrWqGC3+mZT3DCgb8v+mv80Jq+5LCpVmbTiiaiMsOn+Gr
+	Dhhi/EDEWLdayc5xEfsJ/3pyZDFv6TWqtqCQPJKOjjO/zbcZQsqJwPIE/LCV7Q2AAVAz8a76XzE
+	iQz5qS3NMbSCktzcy1iSo9HIMRuUe8XGdkr0B/61u89KSG1EK7fXnzI8ZeCGxJWLyh3pxzzXwl/
+	W/eNVuF7WC2GFObfuakP6RB0U/zqIo9e1clcTQZ/FjkKVCIvptIPoqYbhqYJiAWDGq45IatXYO+
+	sdVW7xaJvf3kUF2cDg=
+X-Received: by 2002:a05:7300:6a90:b0:339:8131:424e with SMTP id 5a478bee46e88-34f2185ad93mr8712750eec.34.1791084054190;
+        Sat, 03 Oct 2026 20:20:54 -0700 (PDT)
+Received: from kernel ([103.219.206.69])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-351272bb9basm1070301eec.24.2026.10.03.20.20.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Oct 2026 20:20:53 -0700 (PDT)
+Date: Sun, 4 Oct 2026 08:50:47 +0530
+From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: ebiggers@kernel.org, ardb@kernel.org, skhan@linuxfoundation.org,
+	me@brighamcampbell.com, jkoolstra@xs4all.nl,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: chacha20poly1305 - Fix missing state zeroization
+ in xchacha decrypt
+Message-ID: <asHGD1_z-N9k0czy@kernel>
+References: <20261003060826.7792-1-raizudeen.kerneldev@gmail.com>
+ <asFj6Nxf6fglYfor@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 3/9] lib/lz4: add the build environment for the
- vendored sources
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
-	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
-	<justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, Thomas
-	Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
-	<James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, Heiko
-	Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander
-	Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
-	<borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
-	Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>, Jens
-	Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>, Nick
-	Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>, Chao Yu
-	<chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Phillip Lougher <phillip@squashfs.org.uk>,
-	Sungguk <sungguk.na@samsung.com>, Jaehoon Chung <jh80.chung@samsung.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>, linux-erofs@lists.ozlabs.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org
-Content-Language: en-US
-From: Michal Wilczynski <m.wilczynski@samsung.com>
-In-Reply-To: <arn9tK5MxxxfH7OW@google.com>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20261004000509eucas1p12b906a44a576ad1b1bf6f8099f081cdd
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20260925113456eucas1p136c3cd1f08be7201ad6b3f7b0e8ff02d
-X-EPHeader: CA
-X-CMS-RootMailID: 20260925113456eucas1p136c3cd1f08be7201ad6b3f7b0e8ff02d
-References: <20260925-lz4-vendor-upstream-v1-0-1c7ffbe21c4b@samsung.com>
-	<CGME20260925113456eucas1p136c3cd1f08be7201ad6b3f7b0e8ff02d@eucas1p1.samsung.com>
-	<20260925-lz4-vendor-upstream-v1-3-1c7ffbe21c4b@samsung.com>
-	<arn9tK5MxxxfH7OW@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <asFj6Nxf6fglYfor@zx2c4.com>
 
-
-
-On 9/28/26 07:48, Sergey Senozhatsky wrote:
-> On (26/09/25 13:27), Michal Wilczynski wrote:
-> [..]
->> +
->> +/* LZ4_decompress_fast() and LZ4_resetStream() are still kernel API. */
->> +#define LZ4_DISABLE_DEPRECATE_WARNINGS 1
+On Sat, Oct 03, 2026 at 10:22:00PM +0200, Jason A. Donenfeld wrote:
+> On Sat, Oct 03, 2026 at 11:38:26AM +0530, Mohamad Raizudeen wrote:
+> > The `__chacha20poly1305_decrypt` function does not zeroize the chacha
+> > state, unlike its encrypt counterpart. The regular
+> > `chacha20poly1305_decrypt` function handles this by manually calling
+> > chacha_zeroize_state(). However, `xchacha20poly1305_decrypt` returns
+> > the result directly without clearing the state.
+> > 
+> > This leaves the derived chacha20 subkey on the stack after the function
+> > returns. Fix this by storing the return value, calling
+> > chacha_zeroize_state() and then returning the result, matching the
+> > logic in `chacha20poly1305_decrypt`.
+> > 
+> > Fixes: ed20078b7e333 ("crypto: chacha20poly1305 - import construction and selftest from Zinc")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+> > ---
+> >  lib/crypto/chacha20poly1305.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+> > index ea42a28f4ff7..03b14d272520 100644
+> > --- a/lib/crypto/chacha20poly1305.c
+> > +++ b/lib/crypto/chacha20poly1305.c
+> > @@ -199,10 +199,13 @@ bool xchacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+> >  			       const u8 key[at_least CHACHA20POLY1305_KEY_SIZE])
+> >  {
+> >  	struct chacha_state chacha_state;
+> > +	bool ret;
+> >  
+> >  	xchacha_init(&chacha_state, key, nonce);
+> > -	return __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
+> > +	ret = __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
+> >  					  &chacha_state);
+> > +	chacha_zeroize_state(&chacha_state);
+> > +	return ret;
+> >  }
+> >  EXPORT_SYMBOL(xchacha20poly1305_decrypt);
 > 
-> Is this upstream code?  As far as I understand it, LZ4_decompress_fast*()
-> deprecated upstream and are strongly discouraged.  Do we want to suppress
-> deprecation warnings?
+> In my memory, the reason it's like this is because for WireGuard,
+> xchapoly is just being used to encrypt a cookie value, which has no
+> forward secrecy concerns at all. So it doesn't matter if it's left
+> around on the stack.
 > 
+> Are there other use cases, though, where you think it might matter?
+> 
+> Jason
 
-It's ours lz4_deps.h but upstream's lz4.c sets the same switch for
-itself lz4.c, since its own code calls deprecated functions. We
-include lz4.h before lz4.c, so we have to set it first.
+No, none that exist today. The only in-tree callers are the wireguard
+cookie code and the kunit test and I agree the cookie has no forward
+secrecy concerns. My only thought is that the function is
+EXPORT_SYMBOL()ed, so a future caller with a long term key would leave
+the derived subkey on the stack and since chacha20poly1305_decrypt()
+already wipes the state, having the xchacha variant do the same seemed
+like safer default.
 
-I agree on the direction. The only in-tree _fast() user is the pre boot
-path of lib/decompress_unlz4.c, so as a follow-up I'd move it to
-LZ4_decompress_safe_partial() and drop the three _fast exports.
+Also, Eric requested a v2 that moves the zeroization into the helper
+function for consistency with the encrypt path, so I will be sending
+that out shortly.
 
-Best regards,
--- 
-Michal Wilczynski <m.wilczynski@samsung.com>
+Thanks,
+Mohamad Raizudeen
