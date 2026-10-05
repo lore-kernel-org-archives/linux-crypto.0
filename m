@@ -1,154 +1,113 @@
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07702E266C
-	for <linux-crypto@vger.kernel.org>; Mon,  5 Oct 2026 03:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A9C348C67
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Oct 2026 06:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791172367; cv=none; b=szLQhqBa6d6rQTFKXXYicyKrLBugEvGZcK+Absmf3kHd6DY2xZo+0nwp+KZhuydr50w0Hb34APd5KtZ9jK5p+8QUtog5s1wO6xANIllev23NxflfKgndIZOVcpM/pVhTNjDu2VDWO3MOm/mtOhn60w+lroTi0DyujK+knPmgVxY=
+	t=1791181695; cv=none; b=lBoUJatSPPQsezxQ/GKw22tsuYXyc3WsN3Ay5AluCF/NWqLUxZ1K+0KDkfaIfCEcm1wlHvPBC/owMcdu9bgNyMpbvmhL2ULjRm0HRrICSxLkW3AExl+6f4U/SKt3wHQeB9fBBL97aaNDp+Hq8iOdXAvnU+sDETaQS6Tywan5wgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791172367; c=relaxed/simple;
-	bh=rg8HqcEt6/UKvtkh4FvIyk7WZ6ROa9pdbPJeFBHWYtM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sMlYnPdm9rfMlu6HZyC2KGM0vHMMZfkNbX5bAhYcdTjXHo96yszMF8mVH4RY4SdhMLJptVebwYZ6R3Gz1WbyNVMVuTG70oRz+uLWYb7poq9zih7H4+VSIfxGnmYxdMqqLdJN2U+itnr7fJKOmt9AipPHk0ygeWRiajMiOCJFf+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rj2QoOZd; arc=none smtp.client-ip=74.125.82.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791181695; c=relaxed/simple;
+	bh=JNCrdJBnnAqL/jwpqgfdN+WnXKXvfeK1kyNTahqk8NM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Z18DEpY5yNGWLh2jPcCT/awNX/wcM9S5qMuLiNUeQaJhnZpSmmySXpsdIE3lB/lNzS/wcuEWVR/7PY7VJFDJ3M9ku94nEvQsFNLpyNNeo7HOlRF7TRjS1RJwpTT2w8iG3gvyqv6jnJV6Hfjadu2xUiVfNKH7oJJYD0kgqCPm70s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=RYF57lsy; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rj2QoOZd"
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-15354aa70e8so2756318c88.1
-        for <linux-crypto@vger.kernel.org>; Sun, 04 Oct 2026 20:52:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791172364; x=1791777164; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=Y0A/ymLpHBtY+HqPCY23ZCUWm2WvUIC70nptaCiUNE4=;
-        b=rj2QoOZdzOgjAberCJa2w7HT3cqLsu6XGG4ZVqn2bGR+DW7wXHQImG9g8igd4U26y8
-         GldvwE7ZF5kU4RtMAubkxhuA08wbbPvW6e7j1hKzRo4+FR2uBjjA1/G8KGwZ21T6HoFT
-         7q8u500yuQ07Y6gWmwRik4ZC/HWexj6wxzNuTKBmrzg89fZKE4IBscfpJtrsbPeo5aL/
-         77Wwjyu51Q3bNVW+QPau5MmYLbG4VrzRWxm7w/geuY2qgrFcLaz5JoFgz4+xMyHPBAEQ
-         EaNCBBlg6TavHzzBbSFMCWtoVvdiRkV7mUeVJgniQtlraCNQx/dsTdCO8LTDMzaI2Dil
-         A7HQ==
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="RYF57lsy"
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C7B533F301
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Oct 2026 06:28:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1791181690;
+	bh=JNCrdJBnnAqL/jwpqgfdN+WnXKXvfeK1kyNTahqk8NM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=RYF57lsyE8mjNcu8wAWA0J45gwNRG0uWjhp9TGW2mr0WeGA1xp4/DjCxQIw+wIVCf
+	 +pKz8ug3WGybfyq3/S5pYTBCM/f0OGs5U/Y2JUEebeySrsrPpao/bD3y5BeIo4nu2p
+	 Bsm5LzeXvs7KweELl1HA4zjpCXC5bUDGZzx8FBWqjI4JJJpN/axoLwe0/UtXs3Ugpm
+	 bz4S+hBJFdEHFrl/G0MHWbpCe9x8ezzDSkWi3V5LV30g+9LxVbN+r3cnayCEhyxwyw
+	 no41nx3DRJgBRxJx7WhFNXTrRdENH8aqCiUKe71zeHeidD78FxUuL3JMQqQ/RDY7g+
+	 EQn7x+/WTTtvYkGduCqXbGYWZ9qcyXfxGCQ8qviZ7P88Sih6nfhMW7pjHw3UOsa0mk
+	 7SsZIpEqTCJeC2+cEq01SkxLYgMXrCxgxmXIYbOXKR6FajGh46gHNCLcl8iTrTsV+3
+	 BZUHrKvjR8PYlYszqB0GgWjEWL95rwT7lhhs007L2zlKBLT2WBUWwzl1gLBla4GaLc
+	 P+oPpXvI2j06iGyZsHa0WXyZI+QvR3odkMwdVwfocorIezFim6ILjyK70WajcvXcE0
+	 o4049JgFuafDXSugHjtEav+Fnb4TDPHVt8TavhKqsS9Bdl/Aj/97mDzsy3vjlPMfeG
+	 tpT87oTYyIp3KWQb5UFtKkRw=
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-88a46301d92so1082658b3a.3
+        for <linux-crypto@vger.kernel.org>; Sun, 04 Oct 2026 23:28:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791172364; x=1791777164;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Y0A/ymLpHBtY+HqPCY23ZCUWm2WvUIC70nptaCiUNE4=;
-        b=petM74zAl3DOzgSS1B1VCna1Op+iuecufXeGq88pGuMQ2H33Fzv6rAxnIjBWKptk+T
-         NZwjgZeo0Y9JQgdMxzN0tjsjzyRn7eOSwRzl4ubFEmIX2qHA/RnBdGXFDsU/5w0iymSx
-         bDWapudARffQToSLCWLEOA+blvxqxh0kUIaAMfrYx/c+9iy7QdrKbGbjUrXG0ifBFFtB
-         nYjERZoc2mEvFKBqn1t4zzq6/CN2aD0CNOHOizSInv49Qp4qQixyFWgfokxDACtoNWuw
-         CTCZtfdCS7Vfp9i1djsSQJGRtp5HQGVI2+5URGv5Yce3P6weUQWi6XaDftXuEBK3cpAy
-         wUXQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzZLBLm0FJAbBR/hHZT4q/5tUc8DRJnoww3768Uy1sxVAM7lmEUvOM4DAztzphhBTO1RmUQPcZY7CWLXCw=@vger.kernel.org
-X-Gm-Message-State: AFuF++koGRlyKKwRrt8aZKfFumfJU8v2j5/KgeSXLHdEIkSxopstjaAL
-	yWc0K6bsdPvdeNSI06cZYS1O7OdJhVVANKYsxOtFgMCnQVxdIpCerZLRZSZbaQ==
-X-Gm-Gg: AYBFou3QBSu1NHl4zzp+t7se/I1E6l57IGOhohb5+KaBktpH363esYtesOnGVATKNQf
-	wyGyWJXHLGpcSyP/NiWNO/o2P7H+pwn2Qc2rLRez+hwa2hGVdDIp0BvB6K66J4J1NfFVgx6gwvw
-	OqEObH7Pz/WD6+DwsOTL+Dyg9SHR4093kc1wRuQtsTuZGF4POR0yi2EnfRvGwQsp2wbA8NpyLax
-	3Psre7j1bYAy8KrsnJIu5xlYwOvRUfEmljLpure7oRg8bBVU0+47u7ZGhVhKLbFb2HrYw/b/4+G
-	97y1aip8EKBgZbp7WwmSQ/70iHJjXgT1xVcC2HjtyG2TA7MeeLw5BdibbpOv+L4SVQ8NXisGuyX
-	u/er3l19NzrbBzU+dmN3j0dlRGByjvccR6pUieUs9LGBPb5VIob7ZndfETZTBYRHoQKR+3iu8gi
-	xmAM6+bJj1M+KbpZ6rjoDHu18xIh64PAfyNDZQJ2nTb+pwJ3e5QZcgjmpQg8aqPUJOZtH48YxSn
-	kWMRCBBQiSQULSBDS4NYQ8UmkyU
-X-Received: by 2002:a05:7023:a4d:20b0:149:1feb:6d9d with SMTP id a92af1059eb24-151c38b3a52mr8616726c88.19.1791172363728;
-        Sun, 04 Oct 2026 20:52:43 -0700 (PDT)
-Received: from kernel ([103.219.206.69])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-151fa751693sm41149630c88.2.2026.10.04.20.52.40
+        d=1e100.net; s=20260707; t=1791181689; x=1791786489;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=JNCrdJBnnAqL/jwpqgfdN+WnXKXvfeK1kyNTahqk8NM=;
+        b=wgLMK3Ymg34IZ0kO1giaf6Q3UkkwCpomodx8qJK0/2t73KMTgbIvIz4Nlwvf6aMm8P
+         ucpBQmh2KJXq3BGzNazGPLIQTI+GnxheHJOxVd9LS+gGFQgWbII5jaQz9fzg5UXvh4PR
+         lU2Ysta46UXb5XO3YLBH/YCsiFRmAaaQhRcF578iZWhH1PVVnFNDdyrzj7E8tXNsXFY9
+         0uJ6RSpfyt6cmrDQUkl89zM2tdKt1g5ONsT19+87fPagwZnfXYMU1aAXjmDe8j1in/Rd
+         deFRI/MUFu7mRCaxAcgPPCB2IpKMCjixpnbB4cZLqT40/DJkjcHxJmFHc4xFcM0n8cyE
+         xs3A==
+X-Forwarded-Encrypted: i=1; AKwUvBxq3aFXLaFAp/n1KBkdhwvXBWgi4hGbv8iboF/LP2YWMf3ZKAQ9s3dw44cB6GIR6LjWOgKao+0tqVOZ9DY=@vger.kernel.org
+X-Gm-Message-State: AFuF++kyjd3Pkqc0Opn5v6xM/5JI/esrA17DZLzHfPZf97di6SuYNfnr
+	KnsZhP4hfmyt181AXcix4HTj/uVkQTwmdrrDbWAhxAkP9TKYOh4eVdP/VPmoCpUEThx+VYr+nVd
+	S4le/KN7K6Cn/pa6GiwFK2AezD3J4bl0c9eQFU3JkL8cbD34ZusDwS+v70rt0uyyG3SwAWgKHp8
+	TqfZKFRg==
+X-Gm-Gg: AYBFou1tPNysKdEmMx5nbL8gwmdubMaeWcV0JtJZumvUpqvEQeqJaIZ5syK7QLcogst
+	DbOjDp3PAUjyHhLEtJGvcfUcA+dk1ONa1VU1JQkCCWQPAM77zq6w4VLQLj6+1C7+jvxYlqJxzBc
+	CmenaI6c8AOI/ZpRAaitezbgkhJef6/uzoLBYPaH/svyWqs+a/WyMdf7L3I7odZICsbCqkPK1iV
+	VxtrGfdso41pxl/AoEdGISJYcqiCHZtD4QldwQjkmbDmsy2TIJ3dwBXD3+gBVtLBiAz7d71/eHF
+	G1MqPFGdGTOwHL+I6C2bbOITX1vEALeUuRP4Nf7L2jYjjftq90ceLDgjdRFYWhuXmOYf8endTeH
+	IWmyVMPyjnA==
+X-Received: by 2002:a05:6a00:1253:b0:88b:9eca:94ff with SMTP id d2e1a72fcca58-88c600d2571mr5084090b3a.7.1791181688918;
+        Sun, 04 Oct 2026 23:28:08 -0700 (PDT)
+X-Received: by 2002:a05:6a00:1253:b0:88b:9eca:94ff with SMTP id d2e1a72fcca58-88c600d2571mr5084076b3a.7.1791181688535;
+        Sun, 04 Oct 2026 23:28:08 -0700 (PDT)
+Received: from ZBook.gateway ([123.208.39.53])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-88b0bfc3da9sm3061771b3a.25.2026.10.04.23.28.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Oct 2026 20:52:43 -0700 (PDT)
-Date: Mon, 5 Oct 2026 09:22:36 +0530
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: ardb@kernel.org, Jason@zx2c4.com, skhan@linuxfoundation.org,
-	me@brighamcampbell.com, jkoolstra@xs4all.nl,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] lib/crypto: chacha20poly1305: zeroize state in
- __chacha20poly1305_decrypt
-Message-ID: <asMfBGbckJAhCa45@kernel>
-References: <20261004043413.6870-1-raizudeen.kerneldev@gmail.com>
- <20261004172155.GB1906@quark>
+        Sun, 04 Oct 2026 23:28:07 -0700 (PDT)
+From: Changwei Zou <changwei.zou@canonical.com>
+To: martin.kepplinger-novakovic@ginzinger.com
+Cc: changwei.zou@canonical.com,
+	davem@davemloft.net,
+	herbert@gondor.apana.org.au,
+	sahil.malhotra@oss.nxp.com,
+	ignat@linux.win,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lukas@wunner.de,
+	martink@posteo.de
+Subject: Re: [PATCH v5] crypto: rsassa-pkcs1 - Avoid cacheline sharing with underlying driver
+Date: Mon,  5 Oct 2026 17:28:01 +1100
+Message-ID: <20261005062801.20336-1-changwei.zou@canonical.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <e7b2e28eccfeb8c8dee87e9a8d782ccbd7d7da3d.camel@ginzinger.com>
+References: <e7b2e28eccfeb8c8dee87e9a8d782ccbd7d7da3d.camel@ginzinger.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261004172155.GB1906@quark>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Oct 04, 2026 at 07:21:55PM +0200, Eric Biggers wrote:
-> On Sun, Oct 04, 2026 at 10:04:13AM +0530, Mohamad Raizudeen wrote:
-> > The `__chacha20poly1305_decrypt` function does not zeroize the chacha
-> > state, unlike its encrypt counterpart. The regular
-> > `chacha20poly1305_decrypt` function handles this by manually calling
-> > chacha_zeroize_state(). However, `xchacha20poly1305_decrypt` returns
-> > the result directly without clearing the state, leaving the derived
-> > chacha20 subkey on the stack.
-> > 
-> > Fix this by moving the chacha_zeroize_state() call into
-> > __chacha20poly1305_decrypt() itself, so the helper cleans up after
-> > itself just like __chacha20poly1305_encrypt does. This ensures all
-> > callers are secure without needing manual cleanup.
-> > 
-> > Fixes: ed20078b7e333 ("crypto: chacha20poly1305 - import construction and selftest from Zinc")
-> > Cc: stable@vger.kernel.org
-> > Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-> > Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-> 
-> Sorry, to nitpick this a bit more:
-> 
-> Can you reword this to clarify that this is an ABI robustness
-> improvement rather than a fix, since currently the single caller of
-> xchacha20poly1305_decrypt() in wg_cookie_message_consume() doesn't
-> require forward secrecy, as mentioned by Jason.  And maybe remove Fixes
-> and 'Cc stable'.  Otherwise this commit will unnecessarily trigger all
-> the stable backport and CVE spam.
-> 
-> > diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
-> > index ea42a28f4ff7..80904321458b 100644
-> > --- a/lib/crypto/chacha20poly1305.c
-> > +++ b/lib/crypto/chacha20poly1305.c
-> > @@ -137,8 +137,10 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
-> >  		__le64 lens[2];
-> >  	} b;
-> >  
-> > -	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
-> > +	if (unlikely(src_len < POLY1305_DIGEST_SIZE)) {
-> > +		chacha_zeroize_state(chacha_state);
-> >  		return false;
-> > +	}
-> 
-> How about we move this length check into the two callers before they
-> write anything to the state at all?  Then the state would not need to be
-> zeroized if the length check fails.  Note that
-> chacha20poly1305_decrypt_sg_inplace() already does it this way.
-> 
-> >  	memzero_explicit(&b, sizeof(b));
-> >  
-> > +	chacha_zeroize_state(chacha_state);
-> >  	return !ret;
-> 
-> Nit: Use the same order and whitespace as
-> chacha20poly1305_crypt_sg_inplace():
-> 
-> 	chacha_zeroize_state(chacha_state);
-> 	memzero_explicit(&b, sizeof(b));
-> 
-> 	return !ret;
-> 
-> - Eric
+Hi Martin,
 
-Sure, that makes sense. I will drop the fixes and stable tags and reword
-the commit message to focus on ABI robustness.
+Thanks a lot for your feedback.
 
-Moving the length check to the callers is a much cleaner approach. I
-will implement that and fix the whitespace ordering for v3.
+Please refer to Herbert's review.
 
-Thanks,
-Mohamad Raizudeen
+https://lore.kernel.org/linux-crypto/am2UMhd5CAhDiKBF@gondor.apana.org.au/
+
+A new driver-level version (PATCH v2) is available at the following link.
+
+https://lore.kernel.org/linux-crypto/20261004210200.290119-1-changwei.zou@canonical.com/
+
+Kind regards,
+Changwei
+
