@@ -1,91 +1,167 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy2-f41.google.com (mail-dy2-f41.google.com [74.125.229.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241CD375AC4;
-	Mon,  5 Oct 2026 13:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1604BB7E2
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Oct 2026 15:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791207186; cv=none; b=IwQoBn/p4kAH/xe9Xsw8qwg223tuz2atziCQzICiGQ9N9N6c9UKk/fDi37GUTzrGEPZfaXHSuoeEDQguBq8fJbMDNw0yMNlvUjKfTTQFMmIP5sQWCnQ/Fs4I4gQMlNbEZ8lD5FQd1kx291PVmPriM6sHhYQM56geo527FFRZpHg=
+	t=1791212615; cv=none; b=FsoPUz+YR6qrOV7vA4/1NKYd4HUVx0CYIJY8UkX0T4PbDWUzqrWLI/0fe5VdT7AmIIIRL94cAawUtnGzcMTynKU/T6p6aPJuEHooJkK0yuOe3qdO1QeGOF6Mb52EbvX5MeHnYtOFIIRSxMHeLqnQO4eiMsxYqw+PmEoM4pZB4MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791207186; c=relaxed/simple;
-	bh=aT8PS2E3a7bhd924HAuIfPBfiLuL3+9jINhJTSwiUCI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aFPNTX8c+g4GrmRQo29ElQB9uRaaFQw56xR/zEWwnFGI6a1ZpbrppqB9gKVQoNDKJUBns5kMQ4JUCdJOs8Zpu6ojtZMcCOsIU9mKl9GvyLGtdQ5tpjMAqRF4llDjqC2r+Sr2RfjOIIJKY0hn6mj3vF7EKfQrmqmiCM8I5m0u7q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E8cHoytT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791212615; c=relaxed/simple;
+	bh=NbwgF8HB32C6CTSgmUSYGhfsnpFr/uNAFvC75azPG9c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qF6h8ADbYvZ/k+Mu3uV/NtmAXAaGhRqA5tPiu8CWPSzWIebOdAqSTpgf5+bzA8gdjjVYH+EM6a3ugfcNtTeyaUMugwTrR+WOkZaQZ2oSkaAy9GWzjThCy9F6yo6FRDKuygO1ayp6ojMYva4uRJwQhCby7zNAZ5RFlJ2jfwFyaOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GcbNFZbi; arc=none smtp.client-ip=74.125.229.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E8cHoytT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B8891F000FF;
-	Mon,  5 Oct 2026 13:33:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791207184;
-	bh=vRSjAn2HXlvNPh5TXJ1/OPlTSvXLCZd3301h7Tj9cBk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=E8cHoytTQxKGfJUI+2+DLj0MCjcb74VDeahz5csF72vZZMuQIafv3kB9+S0G55aNQ
-	 QXWjy3/QPf65PMWKJ88VDDpqMeWSB86ftruhhr9CPGb+SGvt9XswJBllpUJcyb3S7o
-	 3N8fFTpNOnk0J8n7Uupc1yPk8O4LZjv/Ha7r6Ib4w6hegn2n+96wNMyhjJu3QbjUQU
-	 qcnGdOMyCVrbkJsuiIaqdfI5NKHbFPfS5QPiHmEtvCo73XZhSeUcx7M6YOrv/EWye6
-	 EAN/wFiFf7+b1zCmRAEWEf2KnvBCgY0X0La9r7PJvEp6BdXUWNjEr6q9q/EJkGwfZO
-	 Gqi+YTYbMGYUA==
-Date: Mon, 5 Oct 2026 15:32:59 +0200
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stian Halseth <stian@itx.no>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>, linux-crypto@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] lib/crypto: sparc/aes-xts: Add optimization using the
- AES opcodes
-Message-ID: <20261005133259.GB3436@quark>
-References: <20261004192812.4145406-1-stian@itx.no>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GcbNFZbi"
+Received: by mail-dy2-f41.google.com with SMTP id 5a478bee46e88-34bffc8105eso2236549eec.0
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Oct 2026 08:03:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791212613; x=1791817413; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=w2wQ/G2NsTt77H0vEd1WVka3hOPCfr18QpjBWN9sEj4=;
+        b=GcbNFZbizI55meM37dm2XA8jick7Z92BaOkS7D4DZc2bw9cXSBqhJNxQZo0y6sbdi7
+         VcBv/HhETpI1AsRPtv0UZJaGJV1uVF8tnNG6+xrxEIbYI54+dxLCSJsbXu5+fzxLzNxX
+         jDcxh5kjfYqcWU6dpGYvu/xak9FmAloNivUXuth4wB3HqccGEIDg3ORxTWNfycWr7YYn
+         xxzg8gGrcduY1332VHEq41/eftRMEq1cw7z+WW4e2BvjTGm0k7mJbFDHGHxmjyHnLv8d
+         d+H/RUxZ4gjVs9iOGe5GRxBpXDaWdtWwK8aqJoAmrhPxXh3CkwgAHfCCbAZljgNzo42C
+         n35w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791212613; x=1791817413;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=w2wQ/G2NsTt77H0vEd1WVka3hOPCfr18QpjBWN9sEj4=;
+        b=UrTy5/lnu+a/CnlUMNvtb1vPycdYdfSn33DQdL1AjTrO56t25Ek4SB5dAgqYz6vAQj
+         6SbyKo54X6gXeeCd2rvBI79o0tsHaHeF2WD3qCh2vtOzQmXPuNXnT+GO/3jETTuhuCL3
+         kmYz22/pdHYrgiZ42iAYiIONwQePWJoJP95bjpd41XuAhHhGUsFWo4zbiHR+Dovw0QBJ
+         XzIJ1xQCuZBE9sZ+THh4RVQU9GMiK9wIBaYKGVyDTxEbjHiyOGOwYPGfQGHhfsLhQhqg
+         Xwptt8U/KJeS7odCVdioFVPf1vuUrgNTKRSeX6DC8P7xd/4xlDJllqrjpKc1/AvsgVmZ
+         Mb8Q==
+X-Forwarded-Encrypted: i=1; AKwUvBwoGaM+6sYilhh6NQTpc8CzMGTN2TAdMzhjBh+ixaM+kA8th3N1//qyeuo6s5crwpBbXnMf90yQp/ATjwY=@vger.kernel.org
+X-Gm-Message-State: AFuF++lOITWAor+/X7QBL/Z3kSty/fy19TKvUb3hs1ke5qipItSw0b+n
+	iauG9wQbFngDCkiTg4qUSILdoQ/J+V+IfDpEoqVgIeratthmlqxpd+Nq
+X-Gm-Gg: AYBFou1auFNLorh2xlA0qobvuVsdVHC0VvhORG4+uRCd98UoWL5BXLs1NiWvxTA0GLq
+	qKE0JTQvZjvdOzqYUsVlvCt/E9S6h+2Bt1OgSq9JTTQh97ycUDKKn8WFi3wfAo8l50IZg4QZkeg
+	f122IBGsY9+M6lAHzsWgd4ImQPIVVrZNUwafIUpNuj9W+RLwCbbO09UNbwhSjn+JHQTN8ueT/wP
+	PPYZ/bDIGVZ/hlb3Mw16nDmf6+NcGcqFTU0pI7QRiFeA9Z/N4lxgwuH7MV8Cw2u+JUV7yXKtxbU
+	h1Xublqn2t8kjoGiLt3Ub4FTY+F9bdvjaCVQv1h//ikrsVTBJt310/p1ZlSNlbmNehDk3Qat20o
+	PFEJIqfms40bLyLeBSnfQHTo7LVPXtupfRwZ/xdgfS/LodiZp56nbkfh/bR+g5Vi0UIDjLrTTqD
+	uo6J7F9LNEAkHouypdlswTVsc/Sd7K6TdqWvfhhk1xF32kHfQXAkG93Yt+ANgSj3E4fdkEePL0L
+	JPYPYJzoHh74OCwgQ==
+X-Received: by 2002:a05:693c:41d6:10b0:342:451b:c0cc with SMTP id 5a478bee46e88-34f1509e598mr13877273eec.6.1791212611886;
+        Mon, 05 Oct 2026 08:03:31 -0700 (PDT)
+Received: from kernel ([103.219.206.73])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-351272a9360sm14886789eec.23.2026.10.05.08.03.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Oct 2026 08:03:31 -0700 (PDT)
+From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+To: ebiggers@kernel.org,
+	ardb@kernel.org,
+	Jason@zx2c4.com
+Cc: skhan@linuxfoundation.org,
+	me@brighamcampbell.com,
+	jkoolstra@xs4all.nl,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+Subject: [PATCH v3] lib/crypto: chacha20poly1305: zeroize state in __chacha20poly1305_decrypt
+Date: Mon,  5 Oct 2026 20:33:24 +0530
+Message-ID: <20261005150324.5621-1-raizudeen.kerneldev@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261004192812.4145406-1-stian@itx.no>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Oct 04, 2026 at 09:28:12PM +0200, Stian Halseth wrote:
-> Implement aes_xts_encrypt_arch() and aes_xts_decrypt_arch() with the AES
-> opcodes, for AES-128 and AES-256, two blocks per iteration. AES-192,
-> which IEEE 1619 does not specify, and data that is not 8-byte aligned
-> are left to the generic code.
-> 
-> The tweak is kept as little-endian words, so that multiplying it by x is
-> a 128-bit shift done with addcc and the VIS3 addxc. A little-endian
-> store and an ordinary load through a stack slot give it in the byte
-> order of the data, and the slot is cleared on return. The routines open
-> a register window, as %g4-%g6 belong to the kernel.
-> 
-> With that, xts-aes-lib no longer has to be kept off SPARC. Register it
-> there again, with the priority x86 and RISC-V use, so that it also
-> outranks an xts(ecb-aes-sparc64) instance (priority 300).
-> 
-> On a T7-1 (M7), MiB/s unless noted:
-> 
->                                xts(ecb-aes-sparc64)  xts-aes-lib
->   AF_ALG, 64 KiB, AES-128                     415         1092
->   AF_ALG, 64 KiB, AES-256                     390          936
->   dm-crypt on brd, AES-256:
->     sequential read                          1399         2559
->     sequential write                         1472         3480
->     4 KiB write latency, QD1 (us)            40.6         32.7
-> 
-> dm-crypt now matches aes-cbc-essiv on the same ramdisk.
-> 
-> On a T4-1, AF_ALG AES-256 goes from 238 to 544 MiB/s, and AES-128
-> from 252 to 616.
-> 
-> Tested with CONFIG_CRYPTO_SELFTESTS_FULL, and against OpenSSL over
-> random keys, tweaks and lengths, on both machines.
-> 
-> Link: https://github.com/sparclinux/issues/issues/106
-> Signed-off-by: Stian Halseth <stian@itx.no>
+The `__chacha20poly1305_decrypt` function does not zeroize the chacha
+state, unlike its encrypt counterpart. The regular
+`chacha20poly1305_decrypt` function handles this by manually calling
+chacha_zeroize_state(). However, `xchacha20poly1305_decrypt` returns
+the result directly without clearing the state, leaving the derived
+chacha20 subkey on the stack.
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
+Because this function is EXPORT_SYMBOL()ed, this is an ABI robustness
+improvement. To ensure consistent and safe cleanup for any future
+callers, move the chacha_zeroize_state() call into
+`__chacha20poly1305_decrypt()` itself, so the helper cleans up after its
+own state just like `__chacha20poly1305_encrypt()` does.
 
-- Eric
+Additionally, moved the src_len check to the callers so the state is not
+initialized on invalid inputs, matching the logic in
+chacha20poly1305_crypt_sg_inplace().
+
+Suggested-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+---
+Changes in v3:
+- Remove Fixes and Cc: stable tags, as this is an ABI robustness
+  improvement rather than a fix.
+- Move the src_len check to the callers so the state is not initialized
+  on invalid inputs.
+- Fix whitespace and ordering of the chacha_zeroize_state() to match
+  chacha20poly1305_crypt_sg_inplace().
+
+Link to v2: https://lore.kernel.org/all/asMfBGbckJAhCa45@kernel/T/
+
+ lib/crypto/chacha20poly1305.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index ea42a28f4ff7..c3995ac8acb7 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -137,9 +137,6 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 		__le64 lens[2];
+ 	} b;
+ 
+-	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
+-		return false;
+-
+ 	chacha20_crypt(chacha_state, b.block0, pad0, sizeof(b.block0));
+ 	poly1305_init(&poly1305_state, b.block0);
+ 
+@@ -162,6 +159,7 @@ __chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 	if (likely(!ret))
+ 		chacha20_crypt(chacha_state, dst, src, dst_len);
+ 
++	chacha_zeroize_state(chacha_state);
+ 	memzero_explicit(&b, sizeof(b));
+ 
+ 	return !ret;
+@@ -177,6 +175,9 @@ bool chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 	__le64 iv[2];
+ 	bool ret;
+ 
++	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
++		return false;
++
+ 	chacha_load_key(k, key);
+ 
+ 	iv[0] = 0;
+@@ -186,7 +187,6 @@ bool chacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ 	ret = __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
+ 					 &chacha_state);
+ 
+-	chacha_zeroize_state(&chacha_state);
+ 	memzero_explicit(iv, sizeof(iv));
+ 	memzero_explicit(k, sizeof(k));
+ 	return ret;
+@@ -200,6 +200,9 @@ bool xchacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
+ {
+ 	struct chacha_state chacha_state;
+ 
++	if (unlikely(src_len < POLY1305_DIGEST_SIZE))
++		return false;
++
+ 	xchacha_init(&chacha_state, key, nonce);
+ 	return __chacha20poly1305_decrypt(dst, src, src_len, ad, ad_len,
+ 					  &chacha_state);
+-- 
+2.53.0
+
