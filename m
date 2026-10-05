@@ -1,72 +1,94 @@
-Received: from mail-dl2-f40.google.com (mail-dl2-f40.google.com [74.125.229.168])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768463B8BC7
-	for <linux-crypto@vger.kernel.org>; Sun,  4 Oct 2026 21:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B47D266576
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Oct 2026 02:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791150646; cv=none; b=uLm1TgFng0RmJef4+EogjdZP0lEsOnydsRY5LKOwUvhR3eqg+kve6kIniI2tNOSsdcx965DnLrPAlj3Jq9FTsPDdkamdT98VXvc+p14MeM3yl50EmtJpHpZULmS8/2iV9GMOBRpJGqA3KvEe3lu4F9lXW3j8L1e7BmO4UXfs85c=
+	t=1791166759; cv=none; b=ka+itYnNj6IYEN6L5mN93LgVgqrl7AcX7Vmn1NtVOZVj8CIGIwUtGEetWZk3by0ejfv1hGRyZSJE4956B+2pJouETXulHm1uo7TPDCSVUIb2Pkl1KTb/Y+pJ6CpU4X1rcZ/B7njsNfQMUyGMaC1Lz7ZGmxnVTZgrQeoMEjhU71s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791150646; c=relaxed/simple;
-	bh=005wmVDhIjHmxV8E64+HaG6G200We7gr964+HBH3FhA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gKVH64kPaDA1D4G40jDenJjFhPMA1JYez+gmS9yHk0TiDaRmMPy5h2JmQTC/PjQw/bDAHVbtypWdhNL5pWI7RoNvFc0xJQOjcNcJuCsLjUz5jnYwf53Bf0HH5XTZBhRJJWIzS2hFfox03bVslxQHxkIKFGBpDDdEOs8n42kipz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SsvS9GZY; arc=none smtp.client-ip=74.125.229.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791166759; c=relaxed/simple;
+	bh=DoZx4B6mVqtoKkjnxisQ7+qRK/tLflDwfpXl0AImRps=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=O1BEWLEFHDxhJsHBHv1DN93xlAB4v9mYuLU9HN64f8LQrHulN4cpzPftz20Nl5wWOieW4kzcX1f24xTkOMTVSYOqKKM/U8vpjSWCRCPf9agteV+YDZtY147N+U5n0h9ykumaZa6o4vcqIWgxJK83m/0y4H19P7kC7HuSGHKE3Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=qk2SVn+y; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SsvS9GZY"
-Received: by mail-dl2-f40.google.com with SMTP id a92af1059eb24-154e9d2d877so239382c88.0
-        for <linux-crypto@vger.kernel.org>; Sun, 04 Oct 2026 14:50:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791150644; x=1791755444; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=e2dgUERMJ9zgT7cA30qvueorKToJxEejYLolsCAr6Ks=;
-        b=SsvS9GZYrkKZEefsdmhq6jAa8tYUHt1mYDX7j7LtYb5RRXKtW+AagU9rVJj3eaRcLT
-         VWdaYJYeJrv3g8qQs0fa/hVA1aOYNOuliJZPe1jvTrdhXnWtojkE3pMAaMVtWm2BnK8v
-         XnJPbN2oy54o8xeq2uN4G/U4CWmEMfjOASmJdFE5yAizuDtPLQdBtI9D9SxvddNxKael
-         ZkuOOQrHV31w+lU4BXRBvGODGzDYmVv2sLD3AkOhNSAYQN1RgxVLc50IHL7qUS3hSb0I
-         ka2R0YJnQhEn5iujsm6qeuybvZtGPK+v2idc/xCcCN/dBx0hPw0tOhKMSnJNROCwxgCe
-         lSng==
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="qk2SVn+y"
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id ADE4B3F223
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Oct 2026 02:19:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1791166754;
+	bh=DoZx4B6mVqtoKkjnxisQ7+qRK/tLflDwfpXl0AImRps=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=qk2SVn+yPZ9Ku0HCQ+Xj9xPJKx53xwIg1SipSUnJGm5JR5+vStekkELa0sAIHsH8w
+	 vhFTeLZLz99hQq9+nNYV29aftKirdNQXTZr9LJJy8//lujqNQHTsRlIKBparhcDZAz
+	 9R6wXKSmmxAWHC5r3lPapdWNwlXbaLM4QhEuokGIk9SgNW1G7pl55rqc7AzKfboAaE
+	 xpMNIQFwSoIjRaTC0yspc+orR8r6Zm3+FWT26QA8l9sHjGwVm7wEJcgEX0J8UvVmr6
+	 JTMEU8jU+1Tl4kHiQS3/8zfBfcFV6MI/qBY7sJsvfykWhv1gfDkxxl6Lybc101n4la
+	 Ero4l3PJer8svASw2faTcaoQp1iEJtoiqRWinyeyQeBihHgn9nOgyntbzB+GxEWOFc
+	 RKkqMypQHscLe+XCWpHs+115HmdGosFbrcMa0N3f43XZO0seYFWKnBYQCjqYSoO9Ck
+	 v2dMibP9nEHVzUZ6iDVBNLkArjkyh24dfVCBpHJh2Zr2bCYH06vsGbo+24CDRvAM8j
+	 QE4bKZk8Xd3b+nDp6Dw3cTQ8bLlihYB7SpBiPacLdXq2VJla92MruUhxc5zwiXe6df
+	 c3VfyNoe9x1bW+LvR5/9JxBZL6hV/jSwYkj0EFWw/XyXFQr1Ow6sCTF8446p74/B7U
+	 KIT53pFkkbYJmnfh/Sdvp9fE=
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cc1a439db36so802948a12.2
+        for <linux-crypto@vger.kernel.org>; Sun, 04 Oct 2026 19:19:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791150644; x=1791755444;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=e2dgUERMJ9zgT7cA30qvueorKToJxEejYLolsCAr6Ks=;
-        b=GLTfRzsN+cZcWRvrjg1QZ1w0VoZ9zwAoOaqnLahxEuTtQwtW9Y9IyfR6OeLj8fZRsG
-         6TnFFW1Qj4/dtmyY4/JukzLqeCXuA3scBHAPtkk4FwO8lhvLkYyvGhyKvZpFL2Hfffov
-         UKfKv84KhvHmMLFadM1B91LJoqO+8PJzwGJOS7GXCgWrr2apiWbim+qQwBk14rmG9kou
-         FCOIxUPX2gW2M35a9mT3SKww2+TToKnKbVMcXuGdCaBYAaKy1RnDHLSp033QIVhW9EFP
-         c2HNvBMhTTe7jJPBLSTBd5fsiwfYwh71+gpgllYNy+w/nsSX2goVf0E72CkrGzs+zpdl
-         l45g==
-X-Gm-Message-State: AFuF++loaaMXvk4AKobn7bIP/2W8edvDMWCohLY77HX4h8y+hzDp9yUv
-	3f4D6lGBYbJdnGGJOsqn5/ymEZwZQKgMbLEoD8RhY0QxilMJn35nKianpDbwJKA8
-X-Gm-Gg: AYBFou037OJ2lujU+3iZh2EAMXNpfyJc+9Y3dLYyxybUWNfAES6WUQLTjPSvzSeyxq8
-	PZdblZTh8yNOcj+SVNNNm1xq0tThdu3t5EP3gjHBebkvBD4APMLdkJqWyCaj7dVxNPeerZzMMoF
-	cu8ZDYxZ9H/1v31xGAWJpWTx+DQ/m4KvYC3+kZXNvbTDFQEIJdgijv8t5BKkWGHsJ8r7i4mdHva
-	OpX0xK5prIT5SZRRN6INHt7ZFZjVL401UKV/jUWRyl3tOleIsgpMyLwp9VZpH3yoivygiJrccW7
-	KVPiD6T3s4G+EHe2VlyBuZp6fLeMlo11WxqqtIYe3JS6U35pZ7r2FSEAQAk0t50q9vMgEBZhrHG
-	hN7grS5cuawRRF2y063iy8ySsAdWM+LX1oKhueTaB34D74sLNkRlR0ePXYjC8SGX8Zn2PjN7Ksf
-	YP6tGKkA6524dXoq5KjVtpSiY/sdgNdzZL8SptR9S/yTugUdXBRa6kjbqzauQl4IEq1A/58OA3I
-	Fv1mvAswBSxB/770sDq+1Z5lWLm1W3Ir2yIBQOCjW8HfEm0EQs1ACwi3yZ/6OfwSHi9k+dvzmtj
-	4uFHdhKVzGf74PR5MyoLJwzWHlyYl+azp9UR78OepD/xjwIr
-X-Received: by 2002:a05:7022:798:b0:14d:c7ae:85dd with SMTP id a92af1059eb24-14f5b50b67fmr15595843c88.7.1791150644150;
-        Sun, 04 Oct 2026 14:50:44 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e35])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-351271847fbsm11970410eec.15.2026.10.04.14.50.43
+        d=1e100.net; s=20260707; t=1791166753; x=1791771553;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=DoZx4B6mVqtoKkjnxisQ7+qRK/tLflDwfpXl0AImRps=;
+        b=zLrtQBHRgjmldzEQZyxktitlkt8abRUxbA6WjNnXqvOORZqozQZh0gSQrhLePzPUTL
+         gX3S76Bwi0VxYMsnZRzqAEVaWvD2FFvWeK5j8mlYZ81m1LpRIvDeegl6DMVNMXsXY7tR
+         faDcuG/gPyWJ/u9DmjrCNyZU0i5FuLew6PSVcdSt8SKlesi/TmkOIJtqijRkjAGFUytb
+         sRX7EjTUGY0ThA4LiWX0y8IQa0fnYUm+3kkgyK7KXD8Ig3dMyKtRRdd6viQ6KPbQtjfa
+         yhECp/KA/lSy7N8cOaLCSLPU7kd1XYEi5zhImpoufOaTiAMTiRmQsMP+G2IGdGpWqL31
+         8yag==
+X-Forwarded-Encrypted: i=1; AKwUvBxlSZby1E+Ljp6e9bsvhT2xivDc1VFO8DHpEafnKUZp4oOTGpX9fIg4vu+gRf8+xrlMndw1ucchOPyjM2U=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLR5jXyxtSwGL3l7mBjZ4778qqWLpNUm/SjLzIvKlo7zaTcLGDB
+	q5zBd+hHq9ta0JuhKJ0uSuXEQy11TEWTW0ljyvSpM8UKUqIfzjUXYVFy6ao6N1VQeuOVupqGsmo
+	yW/mMGXrdyLRjwLITD58PWfnpdWmkuyuKMHj6Ceu/UN5TNHJQqGgg8DAPsI67F/5slMyXZj9RTg
+	Hjw4QrYw==
+X-Gm-Gg: AYBFou1fswbwobxJ5jGyKRLUAHR61aNxRggP8gXpU04ehE9OphGBCmfzfh/W//Eo0GW
+	6MO9EftXN7+UvSTZ/4kNU8sxL15H2xFWItD8Cfw4dO3gyCP2mBG4WSka03TeNbSescHjnJwxBDZ
+	y1J+UjoodYxd/sFyjQ1GacHuz5ULj3yMxMECJW2bKgCWKGk+miLElMy5JY2C5KlhyPMExje6r+R
+	0/tV6TrG9qC5SV3/majg75SQfDFFoJY8gMu5rrQlFmJrjRuSeM8w8g5v15sStP7IUhU37GCfAn9
+	pmPd6lvaZX/slDQ2WEdnR403wUZFoal9FbQTzWSu1/ZN8yyXo3Il3xDW7Y4xhGd49+XxvwamXok
+	sSy1k3NlFrA==
+X-Received: by 2002:a17:90b:4a10:b0:3a8:878:ebbd with SMTP id 98e67ed59e1d1-3a808796209mr1050590a91.32.1791166752741;
+        Sun, 04 Oct 2026 19:19:12 -0700 (PDT)
+X-Received: by 2002:a17:90b:4a10:b0:3a8:878:ebbd with SMTP id 98e67ed59e1d1-3a808796209mr1050569a91.32.1791166752352;
+        Sun, 04 Oct 2026 19:19:12 -0700 (PDT)
+Received: from ZBook.gateway ([123.208.39.53])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a78d7c64b1sm9637087a91.14.2026.10.04.19.19.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Oct 2026 14:50:43 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v4] crypto: talitos: init tasklets before requesting IRQs
-Date: Sun,  4 Oct 2026 14:50:42 -0700
-Message-ID: <20261004215042.383358-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        Sun, 04 Oct 2026 19:19:11 -0700 (PDT)
+From: Changwei Zou <changwei.zou@canonical.com>
+To: sahil.malhotra@oss.nxp.com
+Cc: changwei.zou@canonical.com,
+	davem@davemloft.net,
+	gaurav.jain@nxp.com,
+	herbert@gondor.apana.org.au,
+	horia.geanta@nxp.com,
+	martin.kepplinger-novakovic@ginzinger.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lukas@wunner.de,
+	pankaj.gupta@nxp.com
+Subject: Re: [EXT] [PATCH 1/2] crypto: caam - Fix wrong unmap operations
+Date: Mon,  5 Oct 2026 13:19:05 +1100
+Message-ID: <20261005021905.11732-1-changwei.zou@canonical.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <DB9PR04MB8139513BA24CDF15DDC44B8D828C2@DB9PR04MB8139.eurprd04.prod.outlook.com>
+References: <DB9PR04MB8139513BA24CDF15DDC44B8D828C2@DB9PR04MB8139.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -75,178 +97,14 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The talitos interrupt handlers schedule priv->done_task[] via
-tasklet_schedule(). Since the second IRQ support, probe has requested
-the IRQs before calling tasklet_init(), so an interrupt already pending
-when a line is requested, e.g. engine state left by the bootloader or
-a kexec'd kernel, would schedule a tasklet with a NULL callback.
+Hi Sahil and Martin,
 
-Look up the IRQ numbers and map the registers up front, so that
--EPROBE_DEFER returns before anything is allocated and the done_task[]
-selection and reset_device() can see the secondary IRQ. Only request
-the IRQs once the channel fifos are allocated and init_device() has
-reset the engine. This matches remove(), which frees the IRQs before
-killing the tasklets.
+Thank you very much.
 
-remove() frees every IRQ number that is > 0, so make sure that only
-requested lines are set when it runs from the probe error path: clear
-both numbers when probe fails before the request, and clear any line
-talitos_probe_irq() did not request. Previously a failed primary
-request in the two-IRQ case freed the never-requested secondary line.
+A new version (PATCH v2) is available at the following link.
 
-Fixes: c3e337f88a5b ("crypto: talitos - support for channel remap and 2nd IRQ")
-Assisted-by: LLM
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- v4: actually fix IRQs this time. Add a Fixes: tag.
- v3: reshuffle again to fix IRQs.
- v2: reshuffle code to avoid NULL derefs
- drivers/crypto/talitos.c | 54 ++++++++++++++++++++++++----------------
- 1 file changed, 33 insertions(+), 21 deletions(-)
+https://lore.kernel.org/linux-crypto/20261004210200.290119-1-changwei.zou@canonical.com/
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 41a87d7c30a0..c7d9ce2905be 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -3353,21 +3353,13 @@ static int talitos_probe_irq(struct platform_device *ofdev)
- 	int err;
- 	bool is_sec1 = has_ftr_sec1(priv);
- 
--	priv->irq[0] = platform_get_irq(ofdev, 0);
--	if (priv->irq[0] < 0)
--		return priv->irq[0];
--
- 	if (is_sec1) {
- 		err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
- 				  dev_driver_string(dev), priv);
- 		goto primary_out;
- 	}
- 
--	priv->irq[1] = platform_get_irq_optional(ofdev, 1);
--	if (priv->irq[1] == -EPROBE_DEFER)
--		return priv->irq[1];
--
--	/* get the primary irq line */
-+	/* single (or primary) irq line */
- 	if (priv->irq[1] < 0) {
- 		err = request_irq(priv->irq[0], talitos2_interrupt_4ch, 0,
- 				  dev_driver_string(dev), priv);
-@@ -3379,7 +3371,7 @@ static int talitos_probe_irq(struct platform_device *ofdev)
- 	if (err)
- 		goto primary_out;
- 
--	/* get the secondary irq line */
-+	/* secondary irq line */
- 	err = request_irq(priv->irq[1], talitos2_interrupt_ch1_3, 0,
- 			  dev_driver_string(dev), priv);
- 	if (err) {
-@@ -3392,7 +3384,9 @@ static int talitos_probe_irq(struct platform_device *ofdev)
- primary_out:
- 	if (err) {
- 		dev_err(dev, "failed to request primary irq\n");
-+		/* neither line is requested, keep remove() from freeing them */
- 		priv->irq[0] = 0;
-+		priv->irq[1] = 0;
- 	}
- 
- 	return err;
-@@ -3404,12 +3398,27 @@ static int talitos_probe(struct platform_device *ofdev)
- 	struct device_node *np = ofdev->dev.of_node;
- 	struct talitos_private *priv;
- 	unsigned int num_channels;
-+	void __iomem *reg;
- 	int i, err;
- 	int stride;
-+	int irq0;
-+	int irq1;
- 
- 	if (of_property_read_u32(np, "fsl,num-channels", &num_channels))
- 		return -EINVAL;
- 
-+	irq0 = platform_get_irq(ofdev, 0);
-+	if (irq0 < 0)
-+		return irq0;
-+
-+	irq1 = platform_get_irq_optional(ofdev, 1);
-+	if (irq1 == -EPROBE_DEFER)
-+		return irq1;
-+
-+	reg = devm_platform_ioremap_resource(ofdev, 0);
-+	if (IS_ERR(reg))
-+		return PTR_ERR(reg);
-+
- 	priv = devm_kzalloc(dev, struct_size(priv, chan, num_channels), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
-@@ -3425,12 +3434,7 @@ static int talitos_probe(struct platform_device *ofdev)
- 
- 	spin_lock_init(&priv->reg_lock);
- 
--	priv->reg = devm_platform_ioremap_resource(ofdev, 0);
--	if (IS_ERR(priv->reg)) {
--		dev_err(dev, "failed to of_iomap\n");
--		err = PTR_ERR(priv->reg);
--		goto err_out;
--	}
-+	priv->reg = reg;
- 
- 	/* get SEC version capabilities from device tree */
- 	of_property_read_u32(np, "fsl,channel-fifo-len", &priv->chfifo_len);
-@@ -3481,9 +3485,7 @@ static int talitos_probe(struct platform_device *ofdev)
- 		stride = TALITOS2_CH_STRIDE;
- 	}
- 
--	err = talitos_probe_irq(ofdev);
--	if (err)
--		goto err_out;
-+	priv->irq[0] = irq0;
- 
- 	if (has_ftr_sec1(priv)) {
- 		if (priv->num_channels == 1)
-@@ -3493,6 +3495,7 @@ static int talitos_probe(struct platform_device *ofdev)
- 			tasklet_init(&priv->done_task[0], talitos1_done_4ch,
- 				     (unsigned long)dev);
- 	} else {
-+		priv->irq[1] = irq1;
- 		if (priv->irq[1] > 0) {
- 			tasklet_init(&priv->done_task[0], talitos2_done_ch0_2,
- 				     (unsigned long)dev);
-@@ -3524,7 +3527,7 @@ static int talitos_probe(struct platform_device *ofdev)
- 		if (!priv->chan[i].fifo) {
- 			dev_err(dev, "failed to allocate request fifo %d\n", i);
- 			err = -ENOMEM;
--			goto err_out;
-+			goto err_noirq;
- 		}
- 
- 		atomic_set(&priv->chan[i].submit_count,
-@@ -3537,9 +3540,14 @@ static int talitos_probe(struct platform_device *ofdev)
- 	err = init_device(dev);
- 	if (err) {
- 		dev_err(dev, "failed to initialize device\n");
--		goto err_out;
-+		goto err_noirq;
- 	}
- 
-+	/* enable interrupts once the channel fifos and tasklets are set up */
-+	err = talitos_probe_irq(ofdev);
-+	if (err)
-+		goto err_out;
-+
- 	/* register the RNG, if available */
- 	if (hw_supports(dev, DESC_HDR_SEL0_RNG)) {
- 		err = talitos_register_rng(dev);
-@@ -3597,6 +3605,10 @@ static int talitos_probe(struct platform_device *ofdev)
- 
- 	return 0;
- 
-+err_noirq:
-+	/* the irq numbers are known, but the lines are not requested yet */
-+	priv->irq[0] = 0;
-+	priv->irq[1] = 0;
- err_out:
- 	talitos_remove(ofdev);
- 
--- 
-2.56.0
+Kind regards,
+Changwei
 
