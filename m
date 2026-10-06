@@ -1,73 +1,40 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0230248E0F0
-	for <linux-crypto@vger.kernel.org>; Tue,  6 Oct 2026 16:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464FC377A80;
+	Tue,  6 Oct 2026 17:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791305191; cv=none; b=tSPcZV22nzStMHkgnO5TOoZzMWpaJbUBmCRhg5WyyFPYHaHce2zFwx7El9dXPbwNljwhVg/bPthCkKYRDaXaA5kM2HWp3QR+sehbbkIi8CS/PkPES0ZQvHpnHC0IsLCsqsOGw8zB7i933m3v/uHnahvnlsrhVm6mqQdYbK66+QM=
+	t=1791307606; cv=none; b=nOOH2NxTW0C+dmlot9s0rwxsDFjU9gLegfgaTmCz5ERa9s2EkkMn4wR1GXhSJYVybgG0KNKnmfDX670AJey2nsuRpwHLGSvW/LVbPMFL7Y8jdZFUkG5xBe+CYrfKAaV3g/gGaS38/p3W+oaMCn6gYGk/qimmwutpcdVDb6qwA5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791305191; c=relaxed/simple;
-	bh=PmY2/2+YeeJVj0sv07/vs1Hu1NyaLYs5j1MFToQCEf4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ok3V8tFsrCt5tqxq+48GQrkZCzYtlHfFIr4aY+ApPfDcuqFRgP21lTj0oCv3pM02uZ9pvplKMLS+p2MDd6ZYEO34zyWbQKwM0jyxBf+//0x679khK9adcwhrXoc2kjtSLqvyu8TCa17WyLMXXbTv1m69ebRIoYs3yZgtCnt7USI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1srn5IR; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791307606; c=relaxed/simple;
+	bh=FodDoie6fWj1l+m/6kbl9hn7MgwpFNPnAUkhfGtlanY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M0qGhURIGYMpfRI1AvuHw8JWkI6LmL5YLLtdZD13AnwfLPAircU/KY7YvQePb59sZZ+TRNNpga0XVbSKgv/GmF7m2vFuOWHx0Ra0g3t8RgDAzQhMlu4ndDnG8QlaDonNqqiBM+66/26Of11HnNLfoJnIoJWNEdBcR24+XwNuBT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jv3AINXj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1srn5IR"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4a171b677d2so7032425e9.0
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Oct 2026 09:46:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791305188; x=1791909988; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=nYsDsdPup8U8QMnz4nrwKqf/8/44Yd6sLmVcGYR6ZYI=;
-        b=V1srn5IRbjf9sTfmIZ6zvrdhHliJxZ2bl9oxVWTd39QEEc6kwI3btIbeh0X5R2KSeu
-         WsRfORieSgr0um4K6SHd9+odrtI6H229qQYE1uj1DOoxD0waanuCyU/qHKFGPohCdhjF
-         BhxlsmV3mAF2yPnUDu6ClkV5aFQg4kNBwimWbNa5lXkZpvZPuh3M8POzJO905sL7Dvd3
-         zNQoS1nlhzPMVjS84xyqUqjS91GaQWrGQU2R5n1K9G9YXFml1CF2E3kQ8BdpZLiZMqBT
-         gkxWTpB9iiq0Ows3xxrhiqSsvGJRQ0ihckicnwmjEXWRQFFqYv47T9FCSJxFD17FXw2D
-         +0Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791305188; x=1791909988;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=nYsDsdPup8U8QMnz4nrwKqf/8/44Yd6sLmVcGYR6ZYI=;
-        b=hzz2MYjWztLmB1ypyWK3FJScRFuAG6a+FK7ZtEMAwBw+ZpqwEeIZiVm+ajea7uyj+4
-         olfR+GcV1ZhwqvBU8eWG7Jc7iwHfU4K+F72kIpJfN/j9JuZs4uupo4fEI6XWl6MGBIY2
-         5WrkVfWY+REz5Cf3njSUGsuUbizqQ7Wx/AglXru7hYrErc+IR/yUOAwIrVUE1ZYemj/t
-         q+fgcXwtZujZ6V9H4Ch5avZgba6b6U3h004Ed9ZY5HftwpyP/zytyNf74hLNJZzNg6Hs
-         lEaSOG1jPwoJYoes/rKr/usRqGNu6p30W1LMxWHuYC+5JzjsMkgNXi+/AZgg76xtQ2rt
-         uNLg==
-X-Forwarded-Encrypted: i=1; AKwUvBxAxeueZNCBRrOg5EE28PlIXoEQk4h16nClGuM1YQJPUr6cFO2qfo6Z0HBejC9mr5TouMMmP1ZcqGrDrHQ=@vger.kernel.org
-X-Gm-Message-State: AFuF++kLHWRkL8OK5ewyVPErpPRvQIrlXICaFbp+DCTzHFx7aoPEIJ5m
-	JeEgeQacpbG+FUYYtl2idB3bdx7c87XcSvCOSe+gUoWHAUu63IiTW68xbACf534ut7IjTrzyKE0
-	rqg==
-X-Gm-Gg: AYBFou0/jVQN9sq24MzrMdBRGqnfI1hwH6E5DNl1U1LFMDWJg2ot4ScJvHDt0IrOVnd
-	5PVnmbdvkHYl9RnJXjMLx3jWE5MfFUl7GAKboQV66trelZ+hBYg+QNRwGn9/280GWB+WzCXQlxX
-	5h233RuPxGEAOJKu9OuoS5STHOu7K0NizllRl3KqOmOp71iBQjqZ+L42/oM40bZVnTqKXt8+npG
-	16kPdQibkfukQPrJPvb5kjYmkrrr3IX6CpTX/EFimMVZuVgfnPkDU+Rk7UbMlrtSeuEwF1/c+WD
-	08Id/PeR6I/8Q4n8oxN1QQxfegBhysOocRAUYcc+FAj32Us71226OeOI0CTSvbZdeDGhhHMJyIN
-	vSkIjk9v8uQUYaFTjjDytz41Em7G6eJNdG2mQO7C/nJc0dJDdf9AMkUVcEg9eBSOxMjyBPeLo2C
-	74El1+9Pw/L2AZhpLL2en6goSVoaCsaQhPgQVFVZnDFlhiCoNc5m+pzzW06l0GydF1nAGs2/jDh
-	RY/fNpa
-X-Received: by 2002:a05:600c:3516:b0:4a0:1efa:c74a with SMTP id 5b1f17b1804b1-4a17b53c6e9mr29983675e9.20.1791305188032;
-        Tue, 06 Oct 2026 09:46:28 -0700 (PDT)
-Received: from fedora.domain.name ([217.218.153.210])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a178db8c6dsm134197405e9.14.2026.10.06.09.46.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Oct 2026 09:46:27 -0700 (PDT)
-From: Muhammad Mahdi Amirpour <ampr.mhd@gmail.com>
-To: tgraf@suug.ch
-Cc: herbert@gondor.apana.org.au,
-	akpm@linux-foundation.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Muhammad Mahdi Amirpour <ampr.mhd@gmail.com>
-Subject: [PATCH] rhashtable: move init kernel-doc to header
-Date: Tue,  6 Oct 2026 20:16:19 +0330
-Message-ID: <20261006164619.342010-1-ampr.mhd@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jv3AINXj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 535AF1F0089B;
+	Tue,  6 Oct 2026 17:26:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791307604;
+	bh=IE6O5c7XWLLU6nQOD5z+C8o3JrdyW05AK1pNT+bwlg4=;
+	h=From:To:Cc:Subject:Date;
+	b=Jv3AINXjsJc1MraatkZZlwWKpqYoqr8gBvG/dIq4C+Kt3Oc74PJQUmbhIUw9QFVRx
+	 lKzDCqigl57SmUhI9uIRzVVu+3GG4m/QT1dAFeCHeiewKS88Cud6Prn9efCeLyAItZ
+	 fXDpgh2ZkITHCh51ZpbrDmh4IGqzVrGb7p4fZyJJ28jcCh6OhaVp/Ahw5m+pgPkJGu
+	 +H5FmeGAU7/riPn5ItIXBh9D0sOnahTks9P7OHGYIquw8pw3zo+IbPUpLTbLSlrKxO
+	 5PDxBXiv5qtdJB8WYI2lclg3zWRXN/80x09l7ogaLXl1U3YDOR9Kn5zci+hRQXNUgD
+	 QRf19VIKEoLJw==
+From: Thorsten Blum <blum@kernel.org>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Thorsten Blum <blum@kernel.org>,
+	Kees Cook <kees@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: intel - simplify intel_rng_mod_init()
+Date: Tue,  6 Oct 2026 19:26:27 +0200
+Message-ID: <20261006172628.103594-2-blum@kernel.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -75,152 +42,95 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2240; i=blum@kernel.org; h=from:subject; bh=FodDoie6fWj1l+m/6kbl9hn7MgwpFNPnAUkhfGtlanY=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFlH9V2WnMw/Z3xEb7PDovzJUwNZdjpaKZpE1hRMb5jQJ zM/bf/hjlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZiIx1pGhtbte4I2Sm2RCfSq +/Tw9I/dq3NlQuestJqcKP8zgUPV6Tkjwzv+mPUzPMW52Vwkbh3eXabiahERypam+63kwvtzWvx xvAA=
+X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Muhammad Mahdi Amirpour <ampr.mhd@gmail.com>
+Return errors directly to simplify intel_rng_mod_init().
+
+Signed-off-by: Thorsten Blum <blum@kernel.org>
 ---
- include/linux/rhashtable-types.h | 51 ++++++++++++++++++++++++++++++++
- lib/rhashtable.c                 | 51 --------------------------------
- 2 files changed, 51 insertions(+), 51 deletions(-)
+ drivers/char/hw_random/intel-rng.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-types.h
-index 57c11ec9d..b35ad6ff1 100644
---- a/include/linux/rhashtable-types.h
-+++ b/include/linux/rhashtable-types.h
-@@ -145,6 +145,48 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
- 									\
- 	__rhashtable_init_noprof(ht, params, &__key);			\
- })
-+/**
-+ * rhashtable_init - initialize a new hash table
-+ * @ht:		hash table to be initialized
-+ * @params:	configuration parameters
-+ *
-+ * Initializes a new hash table based on the provided configuration
-+ * parameters. A table can be configured either with a variable or
-+ * fixed length key:
-+ *
-+ * Configuration Example 1: Fixed length keys
-+ * struct test_obj {
-+ *	int			key;
-+ *	void *			my_member;
-+ *	struct rhash_head	node;
-+ * };
-+ *
-+ * struct rhashtable_params params = {
-+ *	.head_offset = offsetof(struct test_obj, node),
-+ *	.key_offset = offsetof(struct test_obj, key),
-+ *	.key_len = sizeof(int),
-+ *	.hashfn = jhash,
-+ * };
-+ *
-+ * Configuration Example 2: Variable length keys
-+ * struct test_obj {
-+ *	[...]
-+ *	struct rhash_head	node;
-+ * };
-+ *
-+ * u32 my_hash_fn(const void *data, u32 len, u32 seed)
-+ * {
-+ *	struct test_obj *obj = data;
-+ *
-+ *	return [... hash ...];
-+ * }
-+ *
-+ * struct rhashtable_params params = {
-+ *	.head_offset = offsetof(struct test_obj, node),
-+ *	.hashfn = jhash,
-+ *	.obj_hashfn = my_hash_fn,
-+ * };
-+ */
- #define rhashtable_init(...)	alloc_hooks(rhashtable_init_noprof(__VA_ARGS__))
+diff --git a/drivers/char/hw_random/intel-rng.c b/drivers/char/hw_random/intel-rng.c
+index bc4aa9ea1195..b6a50e3e7a6a 100644
+--- a/drivers/char/hw_random/intel-rng.c
++++ b/drivers/char/hw_random/intel-rng.c
+@@ -327,7 +327,7 @@ static int __init intel_init_hw_struct(struct intel_rng_hw *intel_rng_hw,
  
- int __rhltable_init_noprof(struct rhltable *hlt,
-@@ -156,6 +198,15 @@ int __rhltable_init_noprof(struct rhltable *hlt,
- 									\
- 	__rhltable_init_noprof(hlt, params, &__key);			\
- })
-+/**
-+ * rhltable_init - initialize a new hash list table
-+ * @hlt:	hash list table to be initialized
-+ * @params:	configuration parameters
-+ *
-+ * Initializes a new hash list table.
-+ *
-+ * See documentation for rhashtable_init.
-+ */
- #define rhltable_init(...)	alloc_hooks(rhltable_init_noprof(__VA_ARGS__))
+ static int __init intel_rng_mod_init(void)
+ {
+-	int err = -ENODEV;
++	int err;
+ 	int i;
+ 	struct pci_dev *dev = NULL;
+ 	void __iomem *mem;
+@@ -339,7 +339,7 @@ static int __init intel_rng_mod_init(void)
+ 				     NULL);
  
- #endif /* _LINUX_RHASHTABLE_TYPES_H */
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 6362896e4..5f53b4c71 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -1120,48 +1120,6 @@ static u32 rhashtable_jhash2(const void *key, u32 length, u32 seed)
- 	return jhash2(key, length, seed);
+ 	if (!dev)
+-		goto out; /* Device not found. */
++		return -ENODEV;
+ 
+ 	if (no_fwh_detect < 0) {
+ 		pci_dev_put(dev);
+@@ -349,8 +349,7 @@ static int __init intel_rng_mod_init(void)
+ 	intel_rng_hw = kmalloc_obj(*intel_rng_hw);
+ 	if (!intel_rng_hw) {
+ 		pci_dev_put(dev);
+-		err = -ENOMEM;
+-		goto out;
++		return -ENOMEM;
+ 	}
+ 
+ 	err = intel_init_hw_struct(intel_rng_hw, dev);
+@@ -359,7 +358,7 @@ static int __init intel_rng_mod_init(void)
+ 		kfree(intel_rng_hw);
+ 		if (err == -ENODEV)
+ 			goto fwh_done;
+-		goto out;
++		return err;
+ 	}
+ 
+ 	/*
+@@ -375,21 +374,19 @@ static int __init intel_rng_mod_init(void)
+ 	iounmap(intel_rng_hw->mem);
+ 	kfree(intel_rng_hw);
+ 	if (err)
+-		goto out;
++		return err;
+ 
+ fwh_done:
+-	err = -ENOMEM;
+ 	mem = ioremap(INTEL_RNG_ADDR, INTEL_RNG_ADDR_LEN);
+ 	if (!mem)
+-		goto out;
++		return -ENOMEM;
+ 	intel_rng.priv = (unsigned long)mem;
+ 
+ 	/* Check for Random Number Generator */
+-	err = -ENODEV;
+ 	hw_status = hwstatus_get(mem);
+ 	if ((hw_status & INTEL_RNG_PRESENT) == 0) {
+ 		iounmap(mem);
+-		goto out;
++		return -ENODEV;
+ 	}
+ 
+ 	pr_info("Intel 82802 RNG detected\n");
+@@ -398,10 +395,10 @@ static int __init intel_rng_mod_init(void)
+ 		pr_err(PFX "RNG registering failed (%d)\n",
+ 		       err);
+ 		iounmap(mem);
++		return err;
+ 	}
+-out:
+-	return err;
+ 
++	return 0;
  }
  
--/**
-- * rhashtable_init - initialize a new hash table
-- * @ht:		hash table to be initialized
-- * @params:	configuration parameters
-- *
-- * Initializes a new hash table based on the provided configuration
-- * parameters. A table can be configured either with a variable or
-- * fixed length key:
-- *
-- * Configuration Example 1: Fixed length keys
-- * struct test_obj {
-- *	int			key;
-- *	void *			my_member;
-- *	struct rhash_head	node;
-- * };
-- *
-- * struct rhashtable_params params = {
-- *	.head_offset = offsetof(struct test_obj, node),
-- *	.key_offset = offsetof(struct test_obj, key),
-- *	.key_len = sizeof(int),
-- *	.hashfn = jhash,
-- * };
-- *
-- * Configuration Example 2: Variable length keys
-- * struct test_obj {
-- *	[...]
-- *	struct rhash_head	node;
-- * };
-- *
-- * u32 my_hash_fn(const void *data, u32 len, u32 seed)
-- * {
-- *	struct test_obj *obj = data;
-- *
-- *	return [... hash ...];
-- * }
-- *
-- * struct rhashtable_params params = {
-- *	.head_offset = offsetof(struct test_obj, node),
-- *	.hashfn = jhash,
-- *	.obj_hashfn = my_hash_fn,
-- * };
-- */
- int __rhashtable_init_noprof(struct rhashtable *ht,
- 		    const struct rhashtable_params *params,
- 		    struct lock_class_key *key)
-@@ -1228,15 +1186,6 @@ int __rhashtable_init_noprof(struct rhashtable *ht,
- }
- EXPORT_SYMBOL_GPL(__rhashtable_init_noprof);
- 
--/**
-- * rhltable_init - initialize a new hash list table
-- * @hlt:	hash list table to be initialized
-- * @params:	configuration parameters
-- *
-- * Initializes a new hash list table.
-- *
-- * See documentation for rhashtable_init.
-- */
- int __rhltable_init_noprof(struct rhltable *hlt,
- 			   const struct rhashtable_params *params,
- 			   struct lock_class_key *key)
--- 
-2.55.0
+ static void __exit intel_rng_mod_exit(void)
 
+base-commit: 4c3ca7c8c152278332590bfd3df1b0f086364759
