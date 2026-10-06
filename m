@@ -1,86 +1,81 @@
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC7C3FBEBB
-	for <linux-crypto@vger.kernel.org>; Tue,  6 Oct 2026 20:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A3325B0BD;
+	Tue,  6 Oct 2026 20:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791318287; cv=none; b=r1aOwgZAVOR0C8L9SsleZ6Yc9e94/jFU3b5uxHhdvwRdUvbIgCwn6PtqOwKk8Kd4OvzCvFX1vAs/mfun+V4Lg/FwgZopxpZWnwbo2lZ/JxBrKRucUWwqPb/fpBPKygw5u72e3HicKBXgx2I1oZnJqfSVJFZ7xwc7UBdqK9DwCOM=
+	t=1791318479; cv=none; b=lIakEu02ag5OeDAUN69ZQ/j6HJI0VhjhMc7isnR6mSuQ1UEzwHHKe4iCsm37ypL9qa/JpcPGALtWsQMb7wq5I4rSc9LqjlH0ASuvw1tlCGFxZSnSiFAIwV1ve08H8E9GtTeLdjCHzdhQ87q9VkzoFM7gIttehIoDsHoxNptRSjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791318287; c=relaxed/simple;
-	bh=ZMs1I0vHEJ58LnW7kl3Pxyj2r0+UXZyY7hpZLdur94U=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vui9GJ/vtiq03XHqT2hiMzqpCiNSJebvcmYrAMOz9EYSXwsW/YlaTt/4JmO0hMISsypBNfHlmfvtA+p3uOI9luvvZrnozwaoSs7I6mLQ6oOSugOKMB9GzRbH7L2Z5ECaWvxzyn/JhmvzuK5tQ8mGaA8GuMU7n5QS/i+7ZWoNj/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shansinha.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CwGxn/gu; arc=none smtp.client-ip=209.85.214.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shansinha.bounces.google.com
+	s=arc-20240116; t=1791318479; c=relaxed/simple;
+	bh=nQ68lgnNWIGQzaj+6IGjraICICFgXTOkubcAJ/wqw9A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RxtFpYT0n56/6P9Y9zGqtkP7WhYrBui+cDF2eAxJbbEWDG+2w8XkqNmgnq0iQod894F45VQPwF1K5rZCUAhcD4H1TL+F2YGsRZQCGUSDStSYmdwULc4Ajzrgo9rBAq86Rna2/zpWb8ECos1Jo446ITb8wqJ7EVVTlEShSqyZX9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qy3g2J/M; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CwGxn/gu"
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2e601800e58so4142825ad.2
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Oct 2026 13:24:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1791318286; x=1791923086; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iP6xZp/taTTzoZCVyCIXKC0KFbdOjG51cDdoA/0MxQM=;
-        b=CwGxn/gueoaO1C/MMRZGjnVY7WxlEwMbCtfPPAsbxQX72d7B7vjxwAd3KlOEeNBJyg
-         GOKaFFlq3b+DJ23739iQ5CzQj3NJKZgQEEFzy+6YS/8Bro5LpT5dGTXlqykfsCtb+65e
-         SIaM+QN32Q5A6vcK3BbyZHRqJ+9Ny2ZtQygmSdfmjc2vFE/qtXxH9kBZj7kMQAUtbxvP
-         bBDlF9+8Xm88MeSqaR606xtZUZCsPgfawf5Bv16mhmbZYDcJ0iGEGY1N9D8ooPd6t+XE
-         DFoHE7HsCJ0E85//L7cfIIsgKmlE2LUFyUDm6b72Ik0Ww24KNTz/fA1GUFaYEuBAe8cr
-         1+hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791318286; x=1791923086;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=iP6xZp/taTTzoZCVyCIXKC0KFbdOjG51cDdoA/0MxQM=;
-        b=03+2wRfaPZbvgJqf7mW1GA3k42JD6hgiNinLDQ6+Zk1trk+5kyuysCw+NbSup8W8Q8
-         QEMj3WLHL6dt4CI7Rsuc3iN3297bJnSPdnRXYfuI1SB5dTDP+i8+bHFsz2kcI/g8O+Ub
-         HsTLqbdG1sAX77jpLaYnouR4Hbjc+rid/HJzJ9jzC1I0rZKwDT0X6PbrVfgxo+mP2Z8s
-         g9FshAz38xof3ACktINJYtPaSNRvoX/ejV/rkEcv3bcUkbR2pc72xd/F9cZU5V3sG2qb
-         WkJh2MbAhADwbF8e+9ChY/LP+lxM+dZyQrqaWE1GVRvquDP7sLq4XOy6YUFWioQ8SOQF
-         SAKQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzcFn5Jnogw35EAc6IKdQ5IZTDjIdkq0rsFR2zhEzsVbjfPPlarHljdrwMkO7TsejdInvIWuu+TPIf5460=@vger.kernel.org
-X-Gm-Message-State: AFq9FYIQgl7J1enLtKjMU49I0sG6hftEDXCkgsXqP1MdhIuhzoeM6QXO
-	GKOjN3hshIrFflmFo/NJEbpxdzhqNU4RaFU7bBgB+3z6GLVf/KNrIjov7YX71BtzDekv4oSrXcj
-	E+xHNlHZFWy/QHlAkGg==
-X-Received: from plbli6.prod.google.com ([2002:a17:903:2946:b0:2e5:35ae:2a7a])
- (user=shansinha job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:b86:b0:2db:3d84:effc with SMTP id d9443c01a7336-2e5ffabc0c4mr4755845ad.6.1791318285725;
- Tue, 06 Oct 2026 13:24:45 -0700 (PDT)
-Date: Tue,  6 Oct 2026 20:24:44 +0000
-In-Reply-To: <35ce536c154380a2f8f3af9b2b50069ce16804d0.1791212077.git.prsampat@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qy3g2J/M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 965321F0089B;
+	Tue,  6 Oct 2026 20:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791318478;
+	bh=cqxmOhAaf0jJbiWYynr1D5oxbMRyOf/h5HQ0F1FiFV0=;
+	h=From:To:Cc:Subject:Date;
+	b=Qy3g2J/ML4rWXYkeIGYfCnGQn/4cLG3svw+yeSe1zz/dHkcYgNmbB5o8wTXc6AvjL
+	 SF2OV7DPmIRguv5qrvlPJhjBFBzoN1E9E6aHfNTAmpnAbs9+5P04rOd8NecK/S3NUO
+	 l5NfiuRCZIbJBPaZ6NG5YAbbQ11SehMm8znA2hRemGwzV0vNRZgnXU+3iZmsGBM72j
+	 6GETpu27e31118+hkrqbb4ghYn7DCvM41cy4A0X5QAh//Ye/X6J/PgKSynkf/YuwKY
+	 9SHFr7rEKUOQ/VPid8geo27WdaQTUzS1IHCzfuEjmQsixf1IUXxMqhXnjTxgm21Tez
+	 g9Fc0fc7Lr5Tw==
+From: Thorsten Blum <blum@kernel.org>
+To: Hadar Gat <hadar.gat@arm.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Thorsten Blum <blum@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: cctrng - simplify cctrng_probe()
+Date: Tue,  6 Oct 2026 22:27:34 +0200
+Message-ID: <20261006202734.104415-2-blum@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <35ce536c154380a2f8f3af9b2b50069ce16804d0.1791212077.git.prsampat@amd.com>
-X-Mailer: git-send-email 2.56.0.rc1.315.gc6ed9934b7-goog
-Message-ID: <20261006202444.2676092-1-shansinha@google.com>
-Subject: Re: [Patch v3 6/7] crypto/ccp: Register with fw_uploader and always fail
-From: Shantanu Sinha <shansinha@google.com>
-To: prsampat@amd.com, thomas.lendacky@amd.com
-Cc: mcgrof@kernel.org, russ.weight@linux.dev, dakr@kernel.org, 
-	ashish.kalra@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	gregkh@linuxfoundation.org, rafael@kernel.org, chao.gao@intel.com, 
-	aik@amd.com, tycho@kernel.org, nikunj@amd.com, michael.roth@amd.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=994; i=blum@kernel.org; h=from:subject; bh=nQ68lgnNWIGQzaj+6IGjraICICFgXTOkubcAJ/wqw9A=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFlHI7d97+57tyD+gWvPSYnp6z6/yS+I+T1z7QemMlkVO VOvO7xTOkpZGMS4GGTFFFkezPoxw7e0pnKTScROmDmsTCBDGLg4BWAia7cx/BXY/2Vz1PcjSxsU +o7U+G7zP7gpUvMK1ysuPfPA/L9sN4MZGVYUCyrJqvVYZ0b+XXM/mvNz5bPWRZoMKsZhqvPqtEu 3cwMA
+X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
 
-On 10/5/26 9:15 AM, Pratik R. Sampat wrote:
-> +#ifdef CONFIG_FW_UPLOAD
-[...]
-> +#else	/* CONFIG_FW_UPLOAD */
-> +static void register_sev_fw_uploader(struct sev_device *sev) { }
-> +static void unregister_sev_fw_uploader(struct sev_device *sev) { }
-> +#endif	/* CONFIG_FW_UPLOAD */
+Handle the error directly and drop the goto statement.
 
-There's no Kconfig change in this patch. Should CRYPTO_DEV_SP_PSP select
-FW_UPLOAD? It defaults to N, and the other fw_upload users select it.
+Signed-off-by: Thorsten Blum <blum@kernel.org>
+---
+ drivers/char/hw_random/cctrng.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Thanks,
-Shantanu
+diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
+index a6925211c3b5..43bf99741bdf 100644
+--- a/drivers/char/hw_random/cctrng.c
++++ b/drivers/char/hw_random/cctrng.c
+@@ -539,7 +539,8 @@ static int cctrng_probe(struct platform_device *pdev)
+ 	rc = devm_hwrng_register(dev, &drvdata->rng);
+ 	if (rc) {
+ 		dev_err(dev, "Could not register hwrng device.\n");
+-		goto post_pm_err;
++		cc_trng_pm_fini(drvdata);
++		return rc;
+ 	}
+ 
+ 	/* trigger HW to start generate data */
+@@ -552,11 +553,6 @@ static int cctrng_probe(struct platform_device *pdev)
+ 	dev_info(dev, "ARM cctrng device initialized\n");
+ 
+ 	return 0;
+-
+-post_pm_err:
+-	cc_trng_pm_fini(drvdata);
+-
+-	return rc;
+ }
+ 
+ static void cctrng_remove(struct platform_device *pdev)
