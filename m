@@ -1,45 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9521C5D72;
-	Wed,  7 Oct 2026 03:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B993F5BFA;
+	Wed,  7 Oct 2026 06:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791343284; cv=none; b=NVZowzDo7xVLu28ikTZOPYnI6JtZyJ0z6DYqjwuCnSfO74AtH6W/QN7qvrWqyF4R2/lOCeHwQk4EW69zFFWILJ44e4Dk+zS4aYGUMOgfZ5mmdc11t6JNqBoU3JF3ZRoBNMXIE3M5xXit0jGIKd3h9RxEUK1RUc/01ZYaujJG4GY=
+	t=1791354357; cv=none; b=HVlMYa8pNsHyB1P1ouMF8qM7t0mKHSHOVOBvV294YNK1IgaxZrH1iHZ8uYqwoZ/cqSiPlQxrSSXQgTqPWSC3FoJQIaRWsJh+sTVU1rIvxF279RAGTdRzD/1PlEn+RmEm5eBLpMFdgD4O9gNW7bwSw5jSy5cO4HMZ1PylM0BT+cQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791343284; c=relaxed/simple;
-	bh=T7pOsAaf3j03tqrZ5y6PhNW92WjQ81jbfp1a9oMGIjM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S8xHukEXw4eMl7pDWpoC1Etk9KXC0+h6+Hi9QSPBN2TAweWeiE+igrtiPxyVMCqmk9r9n+Emn26nj3AKVouPh0aijYwS3NXWgsJqJXGC97awV3MuGQ5tCQqgi/8znh+b9EZP7J6WfAl0uiv3Ze2+AnmOBaJO9Z6g7JPmzI1WsZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Uw8HHscq; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1791354357; c=relaxed/simple;
+	bh=IHX18+Z8DCxWdJ/mJd1fhwAHjvsQaKKztpdPLqxruYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=XdTxFC5/KFMHbldjIZl0VyS1txXDj6mj8jp4lbU/5Q3gsvGxjuNRAotP2YKs8xHHkQC/MFIRhn/NuFVcdWIQ8xLuyBD29S5tAUURqaX4+0Vq0Ud8Vao4As+epwSwzSLt57Vi8CgO2tznnkhTQgZkb6yUl3CHIihFxUW+QGtDGWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=QFWTUzwg; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Uw8HHscq"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="QFWTUzwg"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=YNF2MgleN/chs3AY95VxBP/Ykum7GlsKFhi3C00XiMM=; 
-	b=Uw8HHscqTQ3x/XWgx0jCmRpdonsBC6LLH/AXgvCC43BASszHOAxnaogWAfGumD9bvQ2b0c9xlla
-	CC6WqH99aNlcZp4qPuOlTlDUvO4nb0cmzj/Yf/gScADESNpSpYRJsiCB3QyqRcaamn3l4B1IheogD
-	OCa+Ez772/fWMaCHOgugQ42QKJRexaPcUFB1P3TcqIIj4DHQz5JKjKIXswIGtmZDjtzAYYuGoVpOj
-	H4D0NV1QUbW6rxuK6fCOvPvcuJvXfKSJRDP6wwlAdyt72hYRsZiHNBB6GMMyBPszhk0aK2oRguqJg
-	J67/tIY0HwUZJFkEf9zaYfbiohYuhpyP3CRg==;
+	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
+	content-type:references:reply-to;
+	bh=ONxxEHM8gGb9JpDSIAVzRshPOv6r6+W1oSBPlfvg+Gc=; b=QFWTUzwgblCuBwXDRCe3VfXeBw
+	mUYPUYH5UCS1O3L/hTIYHpLnRKhGC0tYjhNz2uwPhUJqrb11wj4jh8b55b+IcyfIk3iVLBv3hHSGQ
+	IEtPIPvfpDNTKz5vENtOWJCU0WA+kyMDgRSiQdaJ2/vvtMzSzxRQW4ZL6WKbz0QTNNz6NsSTgOVn3
+	HoACIuVYA1L57C4TyBZGBfYFCC2YZpjfXKtVU/H0T1CJNgC9zEjdEJILUFv/VzSfNy/whzFlmHQGj
+	lEu3fx/stuZ1c0lSlCPwDiThS2CB288nH6M6O2MBqeLjDooxU96hyYoO6rtskBAqaog+zFMLm2icv
+	+zqA+pDQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xEIDK-00000001RSJ-39Yq;
-	Wed, 07 Oct 2026 11:21:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 07 Oct 2026 14:21:06 +1100
-Date: Wed, 7 Oct 2026 14:21:06 +1100
+	id 1xEL63-00000001T2D-1ZpX;
+	Wed, 07 Oct 2026 14:25:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 07 Oct 2026 17:25:47 +1100
+Date: Wed, 7 Oct 2026 17:25:47 +1100
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Fan Wu <fanwu01@zju.edu.cn>
-Cc: thomas.lendacky@amd.com, john.allen@amd.com, davem@davemloft.net,
+To: Runyu Xiao <runyu.xiao@seu.edu.cn>
+Cc: ansuelsmth@gmail.com, atenart@kernel.org, davem@davemloft.net,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Song Li <songl@zju.edu.cn>
-Subject: Re: [PATCH v2] crypto: ccp - Fix use-after-free in backlog cmd
- advancement
-Message-ID: <asW6osf7KarT6E48@gondor.apana.org.au>
-References: <20260929143825.21349-1-fanwu01@zju.edu.cn>
+	stable@vger.kernel.org, runyu.xiao@seu.edu.cn,
+	jianhao.xu@seu.edu.cn
+Subject: Re: [PATCH] crypto: inside-secure: initialize EIP93 state before
+ requesting IRQ
+Message-ID: <asXl69ABi0_1ZKIJ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,55 +49,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260929143825.21349-1-fanwu01@zju.edu.cn>
+In-Reply-To: <20260930092551.2976763-1-runyu.xiao@seu.edu.cn>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-On Tue, Sep 29, 2026 at 02:38:25PM +0000, Fan Wu wrote:
->
-> @@ -391,26 +372,61 @@ static struct ccp_cmd *ccp_dequeue_cmd(struct ccp_cmd_queue *cmd_q)
->  		return NULL;
->  	}
->  
-> -	if (ccp->cmd_count) {
-> +	if (!list_empty(&ccp->cmd)) {
->  		cmd_q->active = 1;
->  
->  		cmd = list_first_entry(&ccp->cmd, struct ccp_cmd, entry);
->  		list_del(&cmd->entry);
->  
-> -		ccp->cmd_count--;
-> -	}
-> -
-> -	if (!list_empty(&ccp->backlog)) {
-> +		if (!list_empty(&ccp->backlog)) {
-> +			/* Transfer the freed slot to the backlogged
-> +			 * command, so that concurrent submissions cannot
-> +			 * claim the space meant for it.
-> +			 */
-> +			backlog = list_first_entry(&ccp->backlog,
-> +						   struct ccp_cmd, entry);
-> +			list_del(&backlog->entry);
-> +		} else {
-> +			ccp->cmd_count--;
-> +		}
-> +	} else if (!list_empty(&ccp->backlog)) {
-> +		/* No command is available for execution, but a backlogged
-> +		 * command is stranded: reserve a slot for it.
-> +		 */
->  		backlog = list_first_entry(&ccp->backlog, struct ccp_cmd,
->  					   entry);
->  		list_del(&backlog->entry);
-> +
-> +		ccp->cmd_count++;
+Runyu Xiao <runyu.xiao@seu.edu.cn> wrote:
+> devm_request_threaded_irq() can invoke the handler as soon as
+> registration starts.  The EIP93 probe currently requests the IRQ
+> before allocating the descriptor rings and initializing the tasklet,
+> locks, and IDR used by the handler.
+> 
+> Initialize the software and hardware state, and disable the device
+> interrupts, before requesting the IRQ.  The existing interrupt enable
+> remains after successful IRQ registration.
+> 
+> Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
+> Cc: stable@vger.kernel.org
+> Assisted-by: LLM
+> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+> ---
+> drivers/crypto/inside-secure/eip93/eip93-main.c | 12 ++++++------
+> 1 file changed, 6 insertions(+), 6 deletions(-)
 
-This seems dangerous.  Since you're keeping the cmd_count without
-actually moving the backlogged entry over to the active list.
-Wouldn't this increment potentially exceed the limit on the number
-of active entries?
+Please check
 
-I think rather than spending time on fixing this mess, we should
-just convert it over to crypto_engine and be done with it.  The
-crypto_engine system is known to work without these subtle race
-conditions and all drivers should use it.
+https://sashiko.dev/#/patchset/20260930092551.2976763-1-runyu.xiao%40seu.edu.cn
 
 Thanks,
 -- 
