@@ -1,48 +1,64 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284443EC830;
-	Thu,  8 Oct 2026 08:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25ABF3E832B;
+	Thu,  8 Oct 2026 08:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791447181; cv=none; b=WIpqnY0WmQGe0erkrlWudfjV/Nybw9SIQqe1+xFFLyTvSsop2DU5hHpYHeyxc3uyr5bVElHQ9afekdOwjjayYBnxLCAweoEwDyV7p9S46b4VQ7WzxKrxUAoHKdZfuy2oH6Ifu1sXhr5qFS2n+ebFQ/srCFl+Yng+KGkFycqBjxY=
+	t=1791447645; cv=none; b=NymuOURWNBFr7s8OPmmb++51qumoBlNP1SCTFg2QgnZ3EQTYZoFsr0bNWULGMpgaVGgliAmv13rCQIpuZ3BG1UxLi37ECRjkW3VxGD5SxOnakO/nAEMkfQpcsnwdImCVjcteKttSSZDKK+J3daFrknzp07Vu9YMm6HCXa5QQObQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791447181; c=relaxed/simple;
-	bh=4XRIzFva09Wy+HYE3F4rXVPE6UznRI9eXz8GXTGfqfA=;
+	s=arc-20240116; t=1791447645; c=relaxed/simple;
+	bh=3Sk5NaZ/Bu8SSP7FCPJME86fIAMU7VYaUos3Ntjb9D4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qb1m9fYpvQhyEN391OuEc09sF1Bteq/PvkHJ0S0wawoMbovSDpNor3Gr8y40BrPj5OFg0C34YR21z7Mz5VubXdq1gwmZK5iny2HKq3rPP8UJ+PIci8/INgUfXvTRKVbZCZl+XRwn55RPgoKeu3WywFJwqR2MUDBK8oh5zBae35o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=UPHtbnfu; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=o+IoyJxLvqbicr2m2CRzNyW6Kh0vuEBfuHe2MZ/0HEkW6xPAd1UVqXODraEnvdlsXbdhqYU24kxr7BTNuKQ/CkHek/yn/cPsasV38dyB5YW1yLCwqjpg5YwnhEoyAbJMlEMyaznW9H7I8gL2BF+dEAKoldjb6tJiMYKGA0dp7B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=qIxLCF/Q; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="UPHtbnfu"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="qIxLCF/Q"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=ac7EMFljepk0Jyd/TX4T0XlDpZfkDGr6F+1vB1qVH8A=; 
-	b=UPHtbnfuIARHYzTPcthKj7ILW4F+HmTHUlgmY+F02e5gRSzbixr4Q0F0PqOGCei2Cpp4866oWwq
-	FMr92KfKqQMaicSee+HmxlNXGPtHke9V7b3p1GVuMKV4uvrjhfs1g7aOT5WhQMczn1eR9fbpRIj08
-	rE6tTBFAabWkyq/B9UcSkQn0W8OQCJNtPhMFEMY0Fjf2YGZZOUhGzLV8Wy6TdPTdjrW/GM4SPAdPt
-	ViAhZ6S6lDwpUVxT03Dqp9yNJ3/tLfDXZzEiX9grfFH/B3K3uDk8itUhisd9XcSYD5o/G+8tVADea
-	vBAFBKSbOPQxtrL6e8uyi8Yj9x3ZaN7IMSgg==;
+	from:content-type:reply-to; bh=f+02SRQjVsyruBBOH2rFMcrG5d5kk7OJLtCYx/Hk4oE=; 
+	b=qIxLCF/QxXzMTk8lXa6At1c596QKDAvp786bHbFiuzcoMfTd4O27ktRYjko4QEFPll8B5QiNvUQ
+	KjGZLkLw9w2S1ILK199IhveDxcNy8oYIjU3nsJukTri5cRbTy16PJaBnvmzDYCu5NyV0Eg2wKh9fU
+	wYgE9FNQX5ANkJlTFxjVlvjOomN2D4D8KppBmrsYoAjuCBnLSFZ18GXH9rh6RmPjKe2wg1xe9mVHh
+	KVnUmsOMDu5PjsDG3ABak+ExL135uwuVuqZz2fyImsjiOMaOf2m1Z4y7i3evsCdIf7K/4IqlgBj/a
+	AQlX307+j3t8F4NoSqi/b6qPSItUhRX3ZLeg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xEjFH-00000001nYQ-253F;
-	Thu, 08 Oct 2026 16:12:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2026 19:12:55 +1100
-Date: Thu, 8 Oct 2026 19:12:55 +1100
+	id 1xEjMY-00000001nfj-1PAN;
+	Thu, 08 Oct 2026 16:20:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2026 19:20:26 +1100
+Date: Thu, 8 Oct 2026 19:20:26 +1100
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: vjardin@free.fr
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
+To: "Ousherovitch, Alex" <aousherovitch@rambus.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor+dt@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: caam/qi,qi2 - set plain_keylen for skcipher
- descriptors
-Message-ID: <asdQh0Z3F3mjj0dL@gondor.apana.org.au>
-References: <20260928-for-upstream-caam-qi-plain-keylen-v1-1-6edb56649cf9@free.fr>
+	Jonathan Corbet <corbet@lwn.net>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	"Krishnamoorthy, Saravanakrishnan" <skrishnamoorthy@rambus.com>,
+	Shuah Khan <shuah@kernel.org>, Alexandre Ghiti <alex@ghiti.fr>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Wittenauer, Joel" <Joel.Wittenauer@cryptography.com>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	"Nguyen, Thi" <thin@rambus.com>
+Subject: Re: [PATCH v5 04/19] crypto: cmh - add SHA-2/SHA-3/SHAKE ahash
+Message-ID: <asdSSjBML72-YaGq@gondor.apana.org.au>
+References: <20260917225929.2494111-1-aousherovitch@rambus.com>
+ <20260917225929.2494111-5-aousherovitch@rambus.com>
+ <arNn_fjy4jamSitO@gondor.apana.org.au>
+ <LV8PR04MB9006374FD8621EBF3C7E7F6CD7822@LV8PR04MB9006.namprd04.prod.outlook.com>
+ <arn4XYwPYt6i2k7d@gondor.apana.org.au>
+ <SJ0PR04MB8406AD1C92438FBCBA2EEED4D7962@SJ0PR04MB8406.namprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,32 +67,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260928-for-upstream-caam-qi-plain-keylen-v1-1-6edb56649cf9@free.fr>
+In-Reply-To: <SJ0PR04MB8406AD1C92438FBCBA2EEED4D7962@SJ0PR04MB8406.namprd04.prod.outlook.com>
 
-On Mon, Sep 28, 2026 at 04:09:16PM +0200, Vincent Jardin via B4 Relay wrote:
-> From: Vincent Jardin <vjardin@free.fr>
+On Mon, Oct 05, 2026 at 05:04:25PM +0000, Ousherovitch, Alex wrote:
+>
+> > Please also elaborate what you mean by opaque checkpoint, does it
+> > contain the entire hash state or not?
 > 
-> Since the commit 66b9a095f7f9
->   ("crypto: caam - Add support of paes algorithm")
+> It holds everything needed to resume, but not in a portable layout.  The
+> SAVE output is a fixed-size hardware container (600 bytes worst case)
+> holding the core's internal state, the buffered partial block, the block
+> counters, the mode and a CRC.  The state portion varies by algorithm:
 > 
-> The shared descriptor then loads a zero-length key and the SEC decodes
-> the inlined key bytes as commands.
-> 
-> Test: with CONFIG_CRYPTO_SELFTESTS on LX2160A every skcipher but xts fails:
-> 
->   dpaa2_caam dpseci.0: 40000307: DECO: desc idx 3: Invalid LOAD Command
->   alg: skcipher: ctr-aes-caam-qi2 encryption failed on test vector 0; expected_error=0, actual_error=-22, cfg="in-place (one sglist)"
-> 
-> caamalg_qi.c is compile-tested only.
-> 
-> Fixes: 66b9a095f7f9 ("crypto: caam - Add support of paes algorithm")
-> Signed-off-by: Vincent Jardin <vjardin@free.fr>
-> ---
->  drivers/crypto/caam/caamalg_qi.c  | 2 ++
->  drivers/crypto/caam/caamalg_qi2.c | 2 ++
->  2 files changed, 4 insertions(+)
+>   - SHA-3/SHAKE: the 200-byte Keccak state is stored as two shares (the
+>     core is DPA/side-channel protected), so it is not the canonical
+>     state.
+>   - SHA-2: a single 64-byte register block plus the partial block and
+>     byte count, in a hardware-internal layout.
+>   - Keyed SHA-3 HMAC state cannot be saved by the hardware at all.
 
-Patch applied.  Thanks.
+So it sounds like the info is there.  Is it possible to transform
+this to the format that we use?
+
+> None of these is the canonical export format the API needs, so the
+> fallback/digest-only model above is the right fit and we are not pursuing
+> incremental hashing upstream.
+
+That's we have the export and import functions, to transcribe
+the hardware hash state into a standard format.
+
+> One process question, if you don't mind: we would like to fold as much as
+> possible into v6 rather than spinning several revisions.  Have you had a
+> chance to look at the rest of the series, or should we expect further
+> comments on the remaining patches?  No rush at all -- it would just help
+> us decide whether to post v6 now or hold it until the rest of your
+> feedback has landed.
+
+I would appreciate it if you can break the series into smaller
+chunks.  Perhaps add the algorithms which are the least problematic
+first.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
