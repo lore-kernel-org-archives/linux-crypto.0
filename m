@@ -1,96 +1,88 @@
-Received: from mout-b-106.mailbox.org (mout-b-106.mailbox.org [195.10.208.46])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC8A44063B;
-	Thu,  8 Oct 2026 08:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.10.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B543BD638;
+	Thu,  8 Oct 2026 08:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791448032; cv=none; b=mkyXBbDpZQhp2gBYn9K0ievarDDldNPg8zxng8uCfXysdtQivq+du0qAz5QnQgSdA9XOapFLPSE7LuU+87qvUmp6jT91yy1V9JEi2CMwt2OGFABxoMUx79MQAA0kcipvLEd3tY+Tx/+lS9edkHFMjn/MxV2fgYoTXqq56zEdKsc=
+	t=1791448088; cv=none; b=HLc4MUyCNbWhed7fC8u8cEZ9uOjQmNvi3M9eq3fqdgOS6FbxHFuOnaG9Z5e/xOsGP+jcueMvOaoAuLGCL+FX4gYftZRwsdqnETfqFGBWN9Bbb98M4OaPHj9MkdUxoT2ZgaXaXhUjwld3J2HzFLeKezLd30PJvfeQqdCQ6JeNmEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791448032; c=relaxed/simple;
-	bh=W2FiMfqNT76u+PmRotKF3fwFJBZ6h8Aw6J4ijgeDlEM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mxeSv/sdlDJ6OnQIGHSVrzQVIYNO/skoU4EZH/6A2hSIt2uYCViyilp9iF5UXGyQQ4YnMaOKbE7oBAzOVz7Y4uSi0bBkrpqIh4zGaTc+Ul7AvhCds9eRcl7km55/AnHXyEPyG/6ozsZPp8bs0JEFtedi/DkYsYTT62oWCTCAtWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com; spf=pass smtp.mailfrom=mandelbit.com; dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b=1LAMQ2dF; arc=none smtp.client-ip=195.10.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
+	s=arc-20240116; t=1791448088; c=relaxed/simple;
+	bh=EuBA128hXeCR8JmIS8R6pNG0eJW+KJC5QhtaCPCJXmE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uwpE/qXDs8dItTrDBQvcGqXD1iph+us3vHxGIoof8lAy1KQ1S1JSSzflsst7/kFIGO4ZpNbMvRQI+i9nblLyxIp5Rvgd/h6HwcpHMNqkAAcBWZrIY4alPr3oAa2ntGilqlmtKe1FLXJz3/xPcoyOJTN++9a2xw/BoX9KgHZReUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=fnFHgSXb; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandelbit.com header.i=@mandelbit.com header.b="1LAMQ2dF"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-106.mailbox.org (Postfix) with ESMTPS id 4j0jdX2ZnSzNly6;
-	Thu, 08 Oct 2026 10:21:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1791447712;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+qaCxgDcAncZY5S4v07CSiuSyR8RtPuFA/S9rsJ2uJk=;
-	b=1LAMQ2dFRlFQs4sF2uo9ShvmtNqWgjO+GjQeiF/d+goG5rk46i8lKhy2bpDFsrTyzv+Xok
-	AQOfyZ54P94JCNDQZmMvqYpQeoxgY9+zo9mcAROUa8NaoBPS8OgkXcUBtS04eoRU9qFg1o
-	RxRZPPOdF57Cm+MrbDJlCp2Ia31DyP3MboCHN0L/V5/RklaI7cUbxr79TCVw3gtkUV1age
-	RR8KL6Tgx1Tla1lHpYHVKfAEe8EtyLnmj3KG+fambZzqVkf4/UVVvrHgiOYbHNQufxHovI
-	Ffq9VD8LlclU2eCZwcTyLwW0WxfN6oPxu2LUpRIGuUPWIplgaPuo/OxsF1reaw==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of ralf@mandelbit.com designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=ralf@mandelbit.com
-From: Ralf Lici <ralf@mandelbit.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org,
-	Antoine Tenart <atenart@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH crypto 2/2] crypto: safexcel - Map AEAD buffers with accurate DMA directions
-Date: Thu,  8 Oct 2026 10:21:44 +0200
-Message-ID: <20261008082145.125762-1-ralf@mandelbit.com>
-In-Reply-To: <asdL7rQTM5nSTIH5@gondor.apana.org.au>
-References: <asdL7rQTM5nSTIH5@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="fnFHgSXb"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=sNT+W80Z5JEqnaaO8YBUuD4jDz+3u0qB1a0toon9Zx0=; 
+	b=fnFHgSXbC+V7FZJVCz1rJni8XB6MCtosH7DI3VNqIZ7Fuo/uOpsUrsA7F6TcVMLqtpvsPTp4zPo
+	hL6zgKDtMLQYPb+u4gc8UmKqwPoJoQMTYgumisqD7w2l0iUEmpPkM7FeqdpMqxmh2oz+GyIpf+R82
+	XjCLloC38uR1u23ju3BMan0vzGyXTFr4TxKlXMp/XGLR/HlFvsC092cNXc+YkJOueYJVzAhicNOic
+	QM2kt0PrtrxCewW592/HRQbjTXzXdujF3R4OeZIXwDHnpCb74j0Rnm2oF5T/1IKObRJoSv5Riw24y
+	sIKrfhUPwE8UBYg/UZyAEYp06Gt13QjpWpQw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xEjTr-00000001nuj-27Wx;
+	Thu, 08 Oct 2026 16:28:00 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2026 19:27:59 +1100
+Date: Thu, 8 Oct 2026 19:27:59 +1100
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: huangchenghai <huangchenghai2@huawei.com>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, liulongfang@huawei.com,
+	qianweili@huawei.com, wangzhou1@hisilicon.com,
+	linwenkai6@hisilicon.com
+Subject: Re: [PATCH 2/4] crypto: hisilicon/sec2 - fix scheduling while atomic
+ in aead soft fallback
+Message-ID: <asdUD5XOvhQbpHNN@gondor.apana.org.au>
+References: <20260911102942.387778-1-huangchenghai2@huawei.com>
+ <20260911102942.387778-3-huangchenghai2@huawei.com>
+ <aq0AtfUHUw1qOD2Y@gondor.apana.org.au>
+ <c19bbae6-e1f1-4ca4-8156-8b1fb6746319@huawei.com>
+ <arn3y4kT0izjENFR@gondor.apana.org.au>
+ <82938646-1ee4-4789-8911-051c43b84d57@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4j0jdX2ZnSzNly6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <82938646-1ee4-4789-8911-051c43b84d57@huawei.com>
 
-On Thu, 08 Oct 2026 18:53:18 +1100, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Mon, Sep 28, 2026 at 12:25:00PM +0200, Ralf Lici wrote:
-> >
-> > For an out-of-place request, the caller may have already populated the
-> > reserved destination AAD area. The AEAD API says that this area will not
-> > be written by the cipher operation:
+On Wed, Sep 30, 2026 at 09:22:31AM +0800, huangchenghai wrote:
 >
-> That's what I was asking.  Which caller is doing this and thus
-> would be broken without your patch?
->
+> The sizes vary by algorithm. The worst case in the sec2 driver is
+> authenc(hmac(sha512),cbc(aes)) at ~568 bytes, mainly due to reqoff = 2 *
+> SHA512_DIGEST_SIZE plus the embedded HMAC ahash request. The ccm variants
+> are ~468 bytes since crypto_ccm_req_priv_ctx embeds a full ahash_request
+> union along with two 3-element scatterlist arrays. gcm(aes) and gcm(sm4)
+> are ~288 bytes and fit within the current 384.
+> 
+> The only concern with bumping MAX_SYNC_AEAD_REQSIZE is stack usage, since
+> SYNC_AEAD_REQUEST_ON_STACK allocates on the 16KB kernel stack. But the
+> fallback path is shallow -- driver -> crypto_aead_encrypt -> template
+> internals -- so the additional stack usage should be fine.
+> 
+> Would increasing MAX_SYNC_AEAD_REQSIZE to 1024 be acceptable? That covers
+> all current algorithms with some headroom. Per-call stack allocation would
+> be roughly 1KB, which seems reasonable for this path.
 
-The caller which exposed this is the ovpn UDP-GSO transmit path [1],
-part of a series currently under review and not in mainline yet. It
-builds an out-of-place AEAD request and explicitly copies the
-authenticated header into the reserved destination prefix before
-submitting it:
+Thanks for looking into this.
 
-  ovpn_aead_encrypt_header(..., aad);
-  skb_store_bits(gso_skb, offset, aad, aad_size);
+My preference would be to change authenc to store everything on
+the stack *if* both skcipher and the hash are actually sync.
 
-The source AAD then points to the temporary aad buffer, while the
-destination AAD points into gso_skb (they are separate storage). The
-accelerator skips the destination prefix as required by the AEAD API,
-but safexcel maps it as DMA_FROM_DEVICE, so SWIOTLB may copy untouched
-bounce-buffer contents over the header during unmap. This is the
-out-of-place case in which I reproduced the corruption.
+Let me write something up.
 
-Technically, the in-tree ESP out-of-place path also constructs its
-destination around an already initialized header, but my ESP tests did
-not reproduce the corruption, so ovpn is the concrete demonstrated case
-here.
-
-[1] https://lore.kernel.org/openvpn-devel/f075b9782b14d64756c84e132c138482f08287b9.1790843153.git.ralf@mandelbit.com/
-
+Cheers,
 -- 
-Ralf Lici
-Mandelbit Srl
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
