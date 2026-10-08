@@ -1,92 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1029A43BDA0;
-	Wed,  7 Oct 2026 22:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961792FE056;
+	Thu,  8 Oct 2026 05:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791412654; cv=none; b=hTW5BH4YRW2C6AbhEjC7W0rL9DIvtSmpnLNhMrY8tJLXs7Y1vCQdeKIQWSzFX9d/WuwX+vwJJNGdRdrtIfVbJw1r4YngfTElbpo+20LMncvwr9TI7Ppx7u9wedE+8E7tseQSEh2T8RTZlijwAHQhFY4ExB2rmMgzj9tKD/3Dsn8=
+	t=1791436077; cv=none; b=Bgyu2HO3c48NoEuxOi3HaGfsRcigSlU0zhEIAPCAM1yWTgLb96GUYCA5qXoxNgpZabB1reCHGVweMUYTtsnNXZiaTlJTcJwxCveP+b2qhlCUmL/P1DFEb2fXeyXvPtGHc7e4ym7RIF0xIbWh3kUvtFwfnDepn2emN8m45WSAazo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791412654; c=relaxed/simple;
-	bh=G9xv3wDpg5Ngwcp/X0keDDatoMA/PUwJxG3No0lZ0uU=;
+	s=arc-20240116; t=1791436077; c=relaxed/simple;
+	bh=iY+vaCJTlRE+gFdJrLqBpIrdGs4JLRCjfTcxUn91T64=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4XgMnH8mxtjZ0j5BP+pZG9rypkhYrsZ8WwEL9a3p561mOERNQIul6YbGAcp/3mF4oPFtaw7CQxlTpHGscTCsppHmTem7nzqCIkUwSrYDRSZt8jecaak4lzWTfKIn5atALa8eEUp0uMu110QjVS8LijCsBhY0R4yMhCWUnfdxPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l4VK5rRQ; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=fXREje7mAc+lg89jdv3A8zXRuCHMzzgXh+w+it3L6Lo6j7sgY/fOLNuaHC3CBeiADHWbTu09j1Mvcx+zRhASHvxPNnIEC46G/I6PkzoU8/8zGo0+waMqwW/O4+titRBkQMeGCcHHhs2ka1oLdB91/sBIh/BZwJT3SwErlZHoYyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=VJXddwPf; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l4VK5rRQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E691F000FF;
-	Wed,  7 Oct 2026 22:37:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791412652;
-	bh=y5Eb6wDN3K+IXIlDEkTMmRQzs1wHV9zCpiZ2/PHKpJg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=l4VK5rRQYJL0qcq9g0tv7vE/oUgY/q4t4pSyAeKEletXiqDAKhczjPFxKBL+irrg9
-	 9/OENVKxvsc2NI91WpHOMCU9U6A1wm27SvtKdF0aBV9xfSUp6iJ541Q1fEVmLp+1dF
-	 5wYxyZon1RG2lLKJd8pj/Z7mnvpQJY/k8pfJ3Qw3j0LmzRjcRYpWsYfYmmENOZ5icS
-	 lvX//ZWhNhxYPilne4kiF4C32k+e6NGmKv1vTWZW4JirPzWRSG7b2y2VG17fxLl7jO
-	 bmkh0QqAIFOu5ht/m2nTpM1d98oqta62PvphTUinQusm67jeJoDvO0sUDukCe9OkzH
-	 pESc++MeIaXJg==
-Date: Thu, 8 Oct 2026 00:37:26 +0200
-From: Eric Biggers <ebiggers@kernel.org>
-To: =?iso-8859-1?B?Suly6W15?= Jean <Jeremy.Jean@oss.cyber.gouv.fr>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: arm64: Fix lost Poly1305 carry when resuming
- NEON state
-Message-ID: <20261007223726.GA24521@quark>
-References: <20261007220235.200818-2-Jeremy.Jean@oss.cyber.gouv.fr>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="VJXddwPf"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=z8jVOr3a3RnLmvpjacgTz0lUn70LvW19S2xPohDWSWk=; 
+	b=VJXddwPf/9zD6kGHPeC1KwMyGlnX5kpFO5pZrteHAvp1wk2wL7PmSBrqw708a2NIT7Xg9woyzCp
+	QUTjHvL8GS9PTYcqJFb4pJ1jbgy+SWYnt5hBOd8F0KNPF3e29ubq9Xtpzf8IcmpeXef7v2H6yJZcn
+	oviANcOzJvc6gitQZdgZKaQR1NE4uukUqFE6cuByrNK0mGqtNF/IG78E4hT7TQU6Wtk2jb1ppI5OI
+	UoYqMD6r/1tQoRxs76GObwxFbuFa04amX1agSybZeVi2plOUagvnlK9D8Y7HuT7BHdvANLBcrGd6N
+	blhAmwTIkZioZGNsh6wssl+36xgwscrO758A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xEgLz-00000001l0F-3nH2;
+	Thu, 08 Oct 2026 13:07:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2026 16:07:39 +1100
+Date: Thu, 8 Oct 2026 16:07:39 +1100
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: T Pratham <t-pratham@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Sebin Francis <sebin.francis@ti.com>,
+	Manorit Chawdhry <m-chawdhry@ti.com>,
+	Praneeth Bajjuri <praneeth@ti.com>,
+	Vishal Mahaveer <vishalm@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 04/15] crypto: ti - Fix use-after-free of dev_data on
+ DTHEv2 driver removal
+Message-ID: <asclG7JDJ4SYHZiy@gondor.apana.org.au>
+References: <20260930112533.1593952-1-t-pratham@ti.com>
+ <20260930112533.1593952-5-t-pratham@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261007220235.200818-2-Jeremy.Jean@oss.cyber.gouv.fr>
+In-Reply-To: <20260930112533.1593952-5-t-pratham@ti.com>
 
-On Wed, Oct 07, 2026 at 10:02:36PM +0000, Jérémy Jean wrote:
-> When poly1305_blocks_neon() resumes from a radix-2^26 state with an odd
-> number of input blocks, it converts the accumulator back to radix-2^64
-> before consuming the first block. The final ADC stores the carry into d2,
-> but the following accumulation and poly1305_mult() use h2.  If the
-> conversion overflows across bit 128, the carry is dropped and the emitted
-> tag is wrong.
-> 
-> Store the carry back into h2. This matches the other conversion paths and
-> preserves the represented accumulator.
-> 
-> Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
-> Cc: stable@vger.kernel.org
-> Assisted-by: LLM
-> Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
-> ---
->  lib/crypto/arm64/poly1305-armv8.pl | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/crypto/arm64/poly1305-armv8.pl b/lib/crypto/arm64/poly1305-armv8.pl
-> index f1930c6..234398f 100644
-> --- a/lib/crypto/arm64/poly1305-armv8.pl
-> +++ b/lib/crypto/arm64/poly1305-armv8.pl
-> @@ -375,7 +375,7 @@ poly1305_blocks_neon:
->  	adc	$h1,$h1,xzr
->  	lsr	$h2,x14,#24
->  	adds	$h1,$h1,x14,lsl#40
-> -	adc	$d2,$h2,xzr		// can be partially reduced...
-> +	adc	$h2,$h2,xzr		// preserve carry into top limb
+On Wed, Sep 30, 2026 at 04:55:22PM +0530, T Pratham wrote:
+>
+> +struct dthe_data *dthe_get_drvdata(struct device *dev)
+> +{
+> +	struct dthe_data *dev_data;
+> +
+> +	spin_lock_bh(&dthe_dev_list.lock);
+> +	dev_data = dev_get_drvdata(dev);
+> +	if (dev_data && !atomic_fetch_inc(&dev_data->req_refcnt))
+> +		reinit_completion(&dev_data->drain_compl);
 
-This needs a regression test in lib/crypto/tests/poly1305_kunit.c.
+This is correct but rather baroque.
 
-Please include more details in the commit message about under what
-circumstances that carry bit could be nonzero.
+How about simplifying it by making the drvdata also hold a ref
+count.  That way the refcount will only hit zero during the removal
+process.  So you don't have to keep reinitialising the completion
+object over and over again.
 
-It seems this was introduced by commit 03dc4adf91c8bc of
-https://github.com/dot-asm/cryptogams just before the kernel imported
-the code.  The bug never reached the copy of this file in OpenSSL.  Do
-you agree?  If so, please mention this information in the commit message
-too, and also open an issue at https://github.com/dot-asm/cryptogams so
-that it can be fixed there as well.
+Also refcnt should use kref_t which is easier to use than atomic_t.
 
-- Eric
++struct dthe_data *dthe_get_drvdata(struct device *dev)
++{
++	struct dthe_data *dev_data;
++
++	spin_lock_bh(&dthe_dev_list.lock);
++	dev_data = dev_get_drvdata(dev);
++	if (dev_data)
++		kref_get(&dev_data->req_refcnt);
+ 	spin_unlock_bh(&dthe_dev_list.lock);
+
+ 	return dev_data;
+ }
+
++void dthe_release_drvdata(struct kref *kref)
++{
++	struct dthe_data dev_data = container_of(kref, struct dthe_data, req_refcnt);
++
++	complete(&dev_data->drain_compl);
++}
++
++void dthe_put_drvdata(struct dthe_data *dev_data)
++{
++	kref_put(&dev_data->req_refcnt, dthe_release_drvdata);
++		complete(&dev_data->drain_compl);
++}
++
+
+> @@ -152,6 +176,10 @@ static int dthe_probe(struct platform_device *pdev)
+>  	if (IS_ERR(dev_data->regs))
+>  		return PTR_ERR(dev_data->regs);
+>  
+> +	atomic_set(&dev_data->req_refcnt, 0);
+
+Use kref_init so that drvdata holds a refcount too.
+
+> +	init_completion(&dev_data->drain_compl);
+> +	complete(&dev_data->drain_compl);
+
+You can then drop the complete call as the last kref_put will
+automatically complete the object.
+
+> @@ -202,10 +230,13 @@ static void dthe_remove(struct platform_device *pdev)
+>  
+>  	spin_lock_bh(&dthe_dev_list.lock);
+>  	list_del(&dev_data->list);
+> +	platform_set_drvdata(pdev, NULL);
+>  	spin_unlock_bh(&dthe_dev_list.lock);
+>  
+>  	dthe_unregister_algs();
+
+Just add this here:
+
++	dthe_put_drvdata(dev_data);
+
+> +	wait_for_completion(&dev_data->drain_compl);
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
