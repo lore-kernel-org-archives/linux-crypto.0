@@ -1,89 +1,120 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE693DFC86;
-	Thu,  8 Oct 2026 07:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A22429CD6;
+	Thu,  8 Oct 2026 07:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791444480; cv=none; b=JGd7isRL/fL9nbLZNyYCB2U1PxleDi0QmNN3RULoO31B+IBhyMZHhhOzRXu1hSQmoxGL+jw7dFMA+awgQSLI3DuDAszmgoZj3VE4OgifxmDokrkacFzAo3Z05ucYKNE7w2M68qTf/l1HU0aMBDVUIBabcPs/v6oAr1fCqQ5KdtQ=
+	t=1791444764; cv=none; b=iJb/g+KOhI+195lbjLizcW+wKpcgiDH2RbXqgIgu+eU/5qOd9qd/7710eVUvTjlK+aNrc417PrzPh0481wtoa27hP0IcB8G4U7Xft/4mBl3crlGtE2JeVcCZnVLgwnUym804ZlON2oBNWDW3jQXjI3oJDRrhy7lmHhAUAg3Hf1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791444480; c=relaxed/simple;
-	bh=qBAGobkXEF80EkjGkrrUBJ18fZvzLv7B0XeiwAoe6WY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m8gqLmthkdYIA7X8suTlBwZ4sPXKOLl2WoxZpH9TRyNLwiTR4omsn+iWJUpqUa94xaYrjtNf9U/+dsKsyN4jv00NdnRuiFdY+CnnBweXItVZ4C7voUMcNemUWxqXMohgetTkjciN4svpiztKvVweYoQ/ZkXnimM3QxfudfrvZrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=mwWknI5Y; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1791444764; c=relaxed/simple;
+	bh=/zdqDkp+MR4muNmPlebN8/G/pEFyOL6VDyJAsQ+89jk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=sIW1PODPH9WG58FA3/zbd8lW4eQVZ6Qr4lmLNyIUvrkPEEewT/kc0+rlAJUFA0+eKvGJ/r4VJlCzkcijyIVwz9d64YOxYCTVEK48Gw5PQRmyn26zLIPe/LIYhrGcDM8f9+fjQXKGvDDkqNpSeuCUj2bn280uRwDXYEpB6ECXEGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=RIPiK8mW; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="mwWknI5Y"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=B8ws3EBIy08Up+iiRNHokXFVPHN1FMASSEMGNyDJtng=; 
-	b=mwWknI5YzBhXat3JROklBkDyGbfLKybILlVP1dy8NsbPpkavqvLilURbfhwq9Q1dZgOop8fkNwP
-	SrifwseTLujxRer9xCofQr2ySUasmx6cpWSYOItkansN1c31jJZiZYzBoFygeQa1CWB5jXpi2+z0J
-	RDBGgtn4fmBm+2jBWhsNA/XfI7CnNqqdecZ+EPL5Vv7PKngOHPyBgaZ26Zdiud11+xgvTHHSLpyON
-	gzraNKAMyIMEFOFcUsXMIaHQXE4jNbQXTtyWBVfj7pQSLuAztfy//h9+q/NLC7MAfUfribQjl9oDQ
-	jom76ZQ0jxCS5gZoMRlC+1HlX64HCiu8YqcQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xEiXd-00000001mre-48EU;
-	Thu, 08 Oct 2026 15:27:51 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2026 18:27:49 +1100
-Date: Thu, 8 Oct 2026 18:27:49 +1100
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Myeonghun Pak <mhun512@gmail.com>
-Cc: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Lukasz Bartosik <lbartosik@marvell.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Ijae Kim <ae878000@gmail.com>
-Subject: Re: [PATCH] crypto: marvell/octeontx - clean up VF resources when
- DOWN fails
-Message-ID: <asdF9YJCHv6LQ_me@gondor.apana.org.au>
-References: <20261004042634.1130247-1-mhun512@gmail.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="RIPiK8mW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=2W
+	mrGmbVz8iXt7vLLO/9uShFkQKub27VoiEbcOyNMm4=; b=RIPiK8mW5gZWNcYdrG
+	NEYWtCcXD/q5a1ZQpKz48xcYzpIV5hnQwgkuzzZFiyLA1zh3NFh2N9r4s3G9UFhe
+	HXnL5U/iJzYRWJ5NT666jusWC1m31/E3oTv8jVc7nDG0N7TG8AB2nKzbPU/ngTdJ
+	kz4v9PJQjwtqxlKZp2F1ugZ9U=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wD3v07tRsdqtq9hDA--.12178S3;
+	Thu, 08 Oct 2026 15:32:02 +0800 (CST)
+From: Qunqin Zhao <zhaoqunqin@163.com>
+To: lee@kernel.org,
+	zhaoqunqin@loongson.cn
+Cc: chenhuacai@kernel.org,
+	linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
+	mfd@lists.linux.dev,
+	Huacai Chen <chenhuacai@loongson.cn>
+Subject: [PATCH v9 1/2] mfd: loongson-se: Add multi-node support
+Date: Thu,  8 Oct 2026 15:31:50 +0800
+Message-Id: <20261008073151.15808-2-zhaoqunqin@163.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20261008073151.15808-1-zhaoqunqin@163.com>
+References: <20261008073151.15808-1-zhaoqunqin@163.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261004042634.1130247-1-mhun512@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3v07tRsdqtq9hDA--.12178S3
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Kr45Jr4DZFWUJFW5AF1xAFb_yoW8ur4xpF
+	45CayYvr4UWw48uw1DZa4DCr15AFWFq39xCanrJw47Aas8Jwn3WrWfJFy2qFs8CFW8Xay8
+	ZrZ5CFW8CFy8uF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jnID7UUUUU=
+X-CM-SenderInfo: 52kd01pxqtx0i6rwjhhfrp/xtbC7hJamWrHRvKhqwAA3s
 
-On Sun, Oct 04, 2026 at 12:26:34AM -0400, Myeonghun Pak wrote:
-> A failed DOWN mailbox notification makes otx_cptvf_remove() skip all
-> local cleanup. The driver core still completes unbind and releases the
-> devm-allocated cptvf, leaving the raw IRQ handlers registered with that
-> object as their argument. The sysfs group, crypto device-table entry,
-> software queues and PCI resources also remain uncleaned.
-> 
-> Keep the notification error diagnostic, but run the existing local
-> cleanup regardless of the PF response. This removes both IRQ handlers
-> before killing the tasklet and releasing its resources, as on the
-> successful notification path.
-> 
-> This issue was identified during our ongoing static-analysis research
-> while reviewing kernel code.
-> 
-> Fixes: 10b4f09491bf ("crypto: marvell - add the Virtual Function driver for CPT")
-> Cc: stable@vger.kernel.org
-> Assisted-by: LLM
-> Co-developed-by: Ijae Kim <ae878000@gmail.com>
-> Signed-off-by: Ijae Kim <ae878000@gmail.com>
-> Signed-off-by: Myeonghun Pak <mhun512@gmail.com>
-> ---
->  .../crypto/marvell/octeontx/otx_cptvf_main.c  | 29 +++++++++----------
->  1 file changed, 14 insertions(+), 15 deletions(-)
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
 
-Please check
+On the Loongson platform, each node is equipped with a security engine
+device. However, due to a hardware flaw, only the device on node 0 can
+trigger interrupts. Therefore, interrupts from other nodes are forwarded
+by node 0. We need to check in the interrupt handler of node 0 whether
+this interrupt is intended for other nodes, this can be accomplished via
+shared interrupt handling.
 
-https://sashiko.dev/#/patchset/20261004042634.1130247-1-mhun512%40gmail.com
+Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+---
+ drivers/mfd/loongson-se.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-Thanks,
+diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+index 3902ba377..969378518 100644
+--- a/drivers/mfd/loongson-se.c
++++ b/drivers/mfd/loongson-se.c
+@@ -139,6 +139,10 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+ 	spin_lock(&se->dev_lock);
+ 
+ 	int_status = readl(se->base + SE_S2LINT_STAT);
++	if (int_status == 0) {
++		spin_unlock(&se->dev_lock);
++		return IRQ_NONE;
++	}
+ 
+ 	/* For controller */
+ 	if (int_status & SE_INT_CONTROLLER) {
+@@ -211,24 +215,26 @@ static int loongson_se_probe(struct platform_device *pdev)
+ 	if (IS_ERR(se->base))
+ 		return PTR_ERR(se->base);
+ 
+-	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+-
+ 	nr_irq = platform_irq_count(pdev);
+ 	if (nr_irq <= 0)
+ 		return -ENODEV;
+ 
++	writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
++
+ 	for (i = 0; i < nr_irq; i++) {
+ 		irq = platform_get_irq(pdev, i);
+-		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
++		err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
+ 		if (err)
+ 			dev_err(dev, "failed to request IRQ: %d\n", irq);
+ 	}
+ 
++	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
++
+ 	err = loongson_se_init(se, paddr, se->dmam_size);
+ 	if (err)
+ 		return err;
+ 
+-	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
++	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
+ 				    ARRAY_SIZE(engines), NULL, 0, NULL);
+ }
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.47.2
+
