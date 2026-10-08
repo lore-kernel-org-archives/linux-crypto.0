@@ -1,51 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B543BD638;
-	Thu,  8 Oct 2026 08:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922303002DD
+	for <linux-crypto@vger.kernel.org>; Thu,  8 Oct 2026 08:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791448088; cv=none; b=HLc4MUyCNbWhed7fC8u8cEZ9uOjQmNvi3M9eq3fqdgOS6FbxHFuOnaG9Z5e/xOsGP+jcueMvOaoAuLGCL+FX4gYftZRwsdqnETfqFGBWN9Bbb98M4OaPHj9MkdUxoT2ZgaXaXhUjwld3J2HzFLeKezLd30PJvfeQqdCQ6JeNmEE=
+	t=1791448251; cv=none; b=AcLvV2nTsex9+Jjo7OkypQTN8RAds0mo+ZD2H6ebgEKKOBIHaF12QdYwSA/EUHL84X0OquUAGS2t28UpIKoST2LIBLDzK7fBXMdjjaL+gw0SjHIeb3zzBleNYe6MoUU/nXv/UPdHJnIRUc/EaWQsDS6kSRV+uPWPinShDmca7jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791448088; c=relaxed/simple;
-	bh=EuBA128hXeCR8JmIS8R6pNG0eJW+KJC5QhtaCPCJXmE=;
+	s=arc-20240116; t=1791448251; c=relaxed/simple;
+	bh=2z7foNV+A9ZqDY33LFwDJEmgnkm5KIg4lbELzO2aff0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uwpE/qXDs8dItTrDBQvcGqXD1iph+us3vHxGIoof8lAy1KQ1S1JSSzflsst7/kFIGO4ZpNbMvRQI+i9nblLyxIp5Rvgd/h6HwcpHMNqkAAcBWZrIY4alPr3oAa2ntGilqlmtKe1FLXJz3/xPcoyOJTN++9a2xw/BoX9KgHZReUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=fnFHgSXb; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=XhMJxFocfo9R7Z6HXlFwZlRFnV49akW6skZEAKAchEbS7aTKzCj7UpOqSUOVu2CoDeAxgS4JKy4emy1XiyG+DieiTeVXIS/PMQnHUM+/L9/WOPSP0cWynlZb+DgWJo3VzN5hbK7rJN0jgsUZopnQ/KkqEMuaChtDDsZgVKb8U24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Blny+af9; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="fnFHgSXb"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Blny+af9"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=sNT+W80Z5JEqnaaO8YBUuD4jDz+3u0qB1a0toon9Zx0=; 
-	b=fnFHgSXbC+V7FZJVCz1rJni8XB6MCtosH7DI3VNqIZ7Fuo/uOpsUrsA7F6TcVMLqtpvsPTp4zPo
-	hL6zgKDtMLQYPb+u4gc8UmKqwPoJoQMTYgumisqD7w2l0iUEmpPkM7FeqdpMqxmh2oz+GyIpf+R82
-	XjCLloC38uR1u23ju3BMan0vzGyXTFr4TxKlXMp/XGLR/HlFvsC092cNXc+YkJOueYJVzAhicNOic
-	QM2kt0PrtrxCewW592/HRQbjTXzXdujF3R4OeZIXwDHnpCb74j0Rnm2oF5T/1IKObRJoSv5Riw24y
-	sIKrfhUPwE8UBYg/UZyAEYp06Gt13QjpWpQw==;
+	from:content-type:reply-to; bh=HUS0m9nkAVt5akFvzEt3C9BHk93ENoKJofI3CAc0Jzg=; 
+	b=Blny+af9GRuSjPKl1sqfGoY7GMhVWoyYuqRV2hfo3etG1pguzDjpqQ4oZI1nrKyJfEBYvAVbGuk
+	cA9Gqd0FyI3sq1sSn0FrPFw0SEcq6GHSg5f2NvyxRv3elh6vtv5SjZHsgjNkYhgxKmS3UzMmBKqz5
+	zszZhiG5pMywD6k3+VlukaxF7S70Dn7jSRPpHpi14yw86RZz7FhqcS9AhbW0FV/iOjzULisRo/TD6
+	C6u2Kna+YvgCnUjKEKwVDL/JbMhgbf5A2kCYGKyonjfcFt9GcsFwAjnwsD+cfNAZMkphUlnsnrlM5
+	Dk7sXAn+P/pTKOqvfNkOOW6+Dz5xKZwFqdWA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xEjTr-00000001nuj-27Wx;
-	Thu, 08 Oct 2026 16:28:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2026 19:27:59 +1100
-Date: Thu, 8 Oct 2026 19:27:59 +1100
+	id 1xEjWX-00000001o13-02xC;
+	Thu, 08 Oct 2026 16:30:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Oct 2026 19:30:45 +1100
+Date: Thu, 8 Oct 2026 19:30:45 +1100
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: huangchenghai <huangchenghai2@huawei.com>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, liulongfang@huawei.com,
-	qianweili@huawei.com, wangzhou1@hisilicon.com,
-	linwenkai6@hisilicon.com
-Subject: Re: [PATCH 2/4] crypto: hisilicon/sec2 - fix scheduling while atomic
- in aead soft fallback
-Message-ID: <asdUD5XOvhQbpHNN@gondor.apana.org.au>
-References: <20260911102942.387778-1-huangchenghai2@huawei.com>
- <20260911102942.387778-3-huangchenghai2@huawei.com>
- <aq0AtfUHUw1qOD2Y@gondor.apana.org.au>
- <c19bbae6-e1f1-4ca4-8156-8b1fb6746319@huawei.com>
- <arn3y4kT0izjENFR@gondor.apana.org.au>
- <82938646-1ee4-4789-8911-051c43b84d57@huawei.com>
+To: Ahsan Atta <ahsan.atta@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH] crypto: qat - remove unused get_num_accels()
+Message-ID: <asdUtSboy8oa_FIm@gondor.apana.org.au>
+References: <20261001122841.2271248-1-ahsan.atta@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,34 +46,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <82938646-1ee4-4789-8911-051c43b84d57@huawei.com>
+In-Reply-To: <20261001122841.2271248-1-ahsan.atta@intel.com>
 
-On Wed, Sep 30, 2026 at 09:22:31AM +0800, huangchenghai wrote:
->
-> The sizes vary by algorithm. The worst case in the sec2 driver is
-> authenc(hmac(sha512),cbc(aes)) at ~568 bytes, mainly due to reqoff = 2 *
-> SHA512_DIGEST_SIZE plus the embedded HMAC ahash request. The ccm variants
-> are ~468 bytes since crypto_ccm_req_priv_ctx embeds a full ahash_request
-> union along with two 3-element scatterlist arrays. gcm(aes) and gcm(sm4)
-> are ~288 bytes and fit within the current 384.
+On Thu, Oct 01, 2026 at 01:28:41PM +0100, Ahsan Atta wrote:
+> The get_num_accels() hook in struct adf_hw_device_data has had no
+> callers since commit d237230728c5 ("crypto: qat - remove unused
+> character device and IOCTLs"), which deleted its last user in
+> adf_ctl_drv.c. Every device driver still populates it and two
+> implementations are still exported, all of it dead code.
 > 
-> The only concern with bumping MAX_SYNC_AEAD_REQSIZE is stack usage, since
-> SYNC_AEAD_REQUEST_ON_STACK allocates on the 16KB kernel stack. But the
-> fallback path is shallow -- driver -> crypto_aead_encrypt -> template
-> internals -- so the additional stack usage should be fine.
+> Remove the hook, its generation-level implementations
+> adf_gen2_get_num_accels() and adf_gen4_get_num_accels(), the
+> per-device static implementations and all the assignments.
 > 
-> Would increasing MAX_SYNC_AEAD_REQSIZE to 1024 be acceptable? That covers
-> all current algorithms with some headroom. Per-call stack allocation would
-> be roughly 1KB, which seems reasonable for this path.
+> The hw_data->num_accel field is left untouched as it is still used.
+> 
+> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> ---
+>  drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c   | 1 -
+>  drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c     | 1 -
+>  drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c     | 6 ------
+>  drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   | 1 -
+>  .../crypto/intel/qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c   | 6 ------
+>  drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c     | 1 -
+>  drivers/crypto/intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c | 6 ------
+>  drivers/crypto/intel/qat/qat_common/adf_accel_devices.h  | 1 -
+>  drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.c   | 9 ---------
+>  drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h   | 1 -
+>  drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c   | 6 ------
+>  drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h   | 1 -
+>  .../crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c | 1 -
+>  .../intel/qat/qat_dh895xccvf/adf_dh895xccvf_hw_data.c    | 6 ------
+>  14 files changed, 47 deletions(-)
 
-Thanks for looking into this.
-
-My preference would be to change authenc to store everything on
-the stack *if* both skcipher and the hash are actually sync.
-
-Let me write something up.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
