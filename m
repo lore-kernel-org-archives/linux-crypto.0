@@ -1,80 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0EB4908A8;
-	Thu,  8 Oct 2026 09:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0123F787E;
+	Thu,  8 Oct 2026 09:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791452276; cv=none; b=g8s16Fs+xkm3RX7G1qPWo8UfMRchuflET+bCBALfZEgK53gVDtrbTO3cejkQeFPT06RQBzjkWKzkL+8jKwtsH3409gmI+8RRS5Aw/pAZpxNnCn+orx/0Z042fsx/tsP9md7wkTcZK5TIVPf+d3PsusY1jIZs8KhIYUvs1ndYbvM=
+	t=1791452303; cv=none; b=TsD8TMGXfCj7uS8v54d+U0ayQkabuTYfIWvxV84xsNL8qBMJz3JJLVUqCRXhbAt25E+nbKZeRggUZs7HyUEzPBa++9v2r66T9H/j8QE8r5N2YSWESdqQTgJ6DCSeQegK6ZCdgYXaFlWrdrHtr8hCZUIddjISQ8UiYHHoAyAre0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791452276; c=relaxed/simple;
-	bh=LIzDhFJ2sEcX8erKvfHAlfKm6YOYUd7Zosu9ldd2/po=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IrjrQqZ1SBikieL48rS9HE/bpBMy6mGFS/tQtTqsc4ripE/9PSRAmaJzGAaHJIQhC7TceikUffkyg7pS/4uHrpqxuFg6VyZyYOtgRzOV9yYPx4YbVzuSQAQwQ+LCJ5Pos/W5oaEFTGVTDybjD6fQY1cvKUnod2N1qaT74fdnUTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JdMjdlBu; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791452303; c=relaxed/simple;
+	bh=nnscKn1wEp/rtypGzD2BDiO0qA6U94JjEgTxpNHQ01s=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=apPuZHrHLGFYR3A2If8Tj9lcmPq+HN0MZEK+HgdRtyaTzWiTiczR7uOE7ciX5dUmbsaNV9SnNILRbyo46SHI4huU162MfO6n3WoyCCC0+ffjtomfkm4o19cgUNR0dLLkjcgrYOFejIATT0eeuRmXeYU1q/b5xhmyJGVj8XJ+Mik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=UzzVxIaf; arc=none smtp.client-ip=51.159.188.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JdMjdlBu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3FD01F000FF;
-	Thu,  8 Oct 2026 09:37:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791452274;
-	bh=oeE97OM4GL2/16lUMhzDgf2hcEkXVhsahCqxO3mLEdQ=;
-	h=From:To:Cc:Subject:Date;
-	b=JdMjdlBu1tITP18i8Lix/cYXZFha8NKaZaGR5b8lf8oK5inTEZ3KQ1ufsz1XkSVb/
-	 sDuol+0bNnN8v/zu11hHePjkdQAC5o+u5enbEDF/OZaKA9ZQMOX6ypZo/V6QpXYs7G
-	 1iMGIoyKIaHAKSLrhNDaoNED5zupSYnCA6RJVLWjiJaT+F/W8JS3wvwvMYXvwHXW1F
-	 eVVeFn3qazJMXPcL+pqG5/t/MBdyx6exr3xELZPFOy060lXgPcanz4PUfgkGssn5/4
-	 gH/bAeT5/jLUNq14Fbnc1y+NpWqyXKTUS/DqxGG5XarMLZzS+NSEqah1hHGlsrUnJg
-	 PSn7j9H2cy/UQ==
-From: Thorsten Blum <blum@kernel.org>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Thorsten Blum <blum@kernel.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
-	Kees Cook <kees@kernel.org>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] hwrng: amd - use PMBASE_OFFSET consistently
-Date: Thu,  8 Oct 2026 11:37:37 +0200
-Message-ID: <20261008093737.180712-2-blum@kernel.org>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="UzzVxIaf"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
+	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:
+	Reply-To:Sender:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=6y9keDCpNEXGfcE8lb9J8bKLESkB7T/8lsxsJ3Xb15Y=; b=UzzVxIafzqyagIYaOqTlAL4cJf
+	lwKotMiXPyAJENllgMYS5LlSuo+N57anN6zhd1Ldfpw314mk2oWYAA1uwUsfW9QffPVfmW7lC/TJm
+	n8GgK1auql/A74IyDpwV+NKz13VISgg4iwB7KIU6j1QkKWYFEz7D2oRj+vQ0K+GD8868cMrFPLN5U
+	0MSmfF0DIwQEWp0UFyhyagm4LAn/d7D/FpeIjbKsrz7Qa8IO47QbF5T7YRxpguw8NfoVRBW+3TGys
+	RWa/evFWk8clzDs/eoqaBQwrqWTafRU1IxSq49uk25ZSHh0hSBnJwzAbMb14WUOL1Zc/mCmg5AJSp
+	a1Fvu9XQ==;
+Received: from [::1] (port=58644 helo=pf-012.whm.fr-par.scw.cloud)
+	by pf-012.whm.fr-par.scw.cloud with esmtpa (Exim 4.100.1)
+	(envelope-from <jeremy.jean@oss.cyber.gouv.fr>)
+	id 1xEkZu-00000003F08-3kWD;
+	Thu, 08 Oct 2026 11:38:18 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1039; i=blum@kernel.org; h=from:subject; bh=LIzDhFJ2sEcX8erKvfHAlfKm6YOYUd7Zosu9ldd2/po=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFnHUxL1u/4U3fW2XsWW/Zj3oeWnMy13xHRik5wrY2+qH /vUyh7WUcrCIMbFICumyPJg1o8ZvqU1lZtMInbCzGFlAhnCwMUpABO5+JDhv1NB85ytF4pqXWa/ Zb2+uD38QOgm7fcZj3ylE9tE3oqnMjAyXLpqsP0Fk8VD52+NN6cfqJDrUkmaZ6l9KO226xS7Dba irAA=
-X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Date: Thu, 08 Oct 2026 11:38:18 +0200
+From: =?UTF-8?Q?J=C3=A9r=C3=A9my_Jean?= <jeremy.jean@oss.cyber.gouv.fr>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+ davem@davemloft.net, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: caam - reject overlong RSA CRT parameters
+In-Reply-To: <asdWCJgRzQuH1wH0@gondor.apana.org.au>
+References: <20260810154024.3178145-1-Jeremy.Jean@oss.cyber.gouv.fr>
+ <ao4xobfWhs5Ss8Uy@gondor.apana.org.au>
+ <752d9ff313bb52a7f8d2295161c1d9a4@oss.cyber.gouv.fr>
+ <asdWCJgRzQuH1wH0@gondor.apana.org.au>
+User-Agent: Roundcube Webmail/1.6.19
+Message-ID: <f3b5863bad3f025f3ddf859397acddc8@oss.cyber.gouv.fr>
+X-Sender: jeremy.jean@oss.cyber.gouv.fr
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
+X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
+X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Use PMBASE_OFFSET instead of the hard-coded 0xF0 and add the missing
-space to the ioport_map() error message.
+On 2026-10-08 10:36, Herbert Xu wrote:
+> On Sat, Oct 03, 2026 at 11:21:44PM +0200, Jérémy Jean wrote:
+>> 
+>> I don't know for sure, but it is still getting fixed, e.g.,
+>> https://lore.kernel.org/all/FF2F0DC4D3930E6A+20260923101457.204629-1-zhaojinming@uniontech.com/
+> 
+> Can you please repost with a Cc to the new maintainer?
+> 
+> Thanks,
 
-Signed-off-by: Thorsten Blum <blum@kernel.org>
----
- drivers/char/hw_random/amd-rng.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hopefully done.
 
-diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-index fb5422612182..ef177c99515d 100644
---- a/drivers/char/hw_random/amd-rng.c
-+++ b/drivers/char/hw_random/amd-rng.c
-@@ -158,14 +158,14 @@ static int __init amd_rng_mod_init(void)
- 
- 	if (!request_region(pmbase + PMBASE_OFFSET, PMBASE_SIZE, DRV_NAME)) {
- 		dev_err(&pdev->dev, DRV_NAME " region 0x%x already in use!\n",
--			pmbase + 0xF0);
-+			pmbase + PMBASE_OFFSET);
- 		err = -EBUSY;
- 		goto out;
- 	}
- 
- 	priv->iobase = ioport_map(pmbase + PMBASE_OFFSET, PMBASE_SIZE);
- 	if (!priv->iobase) {
--		pr_err(DRV_NAME "Cannot map ioport\n");
-+		pr_err(DRV_NAME " cannot map ioport\n");
- 		err = -EINVAL;
- 		goto err;
- 	}
-
-base-commit: 666d66df25253070cb297cb920b0bcfcfe5eb871
+Thanks,
+Jérémy
