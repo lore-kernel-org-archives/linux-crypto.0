@@ -1,193 +1,135 @@
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBEF4F5DE9
-	for <linux-crypto@vger.kernel.org>; Thu,  8 Oct 2026 18:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE51934F46F;
+	Thu,  8 Oct 2026 20:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791484138; cv=none; b=YDU4/XZPsjuv4fN8/y5qjqJX+Gdowuaaul5K6Y04Id79dM9+vKjrtJUUd4Xoz7MN4IXp0osEt+jftSwUutGmx7uj5egTRT62XjWKggQFMa9kojchFytVSRiem3pLGB+KnpPzgNHsQ5ACUoDwaeDYjaimD98NRSmRKlDYwU5O++8=
+	t=1791490203; cv=none; b=pWesbRs5mFjUdyMrhyNxjKt73dmn2qwk7P8rkyUANx4fIsTOVEf2wYuMYocgGpKgQL2qaorfY/QgLKYznB9X7y/ZbvuRJAyBaBaQRAHeZutl52yit+tMgwpWnJi9/XIiI/Grr9ikN1TDdNQv3AJhTgkjHVFkwzC9rZxid/S2pmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791484138; c=relaxed/simple;
-	bh=JEBAkbGUNY6kIW9W2b3U3EYpJVf2gM14JyWf1+1Hy9Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CJPCLZMwHEyzzIU1bzibciBIDBmb1um8kxUiByXXlPqGPZDk2lhspJxD+tIiuXfSWu78fMt2kQn1f1vP30f3y1IlkPrPiBRY1/QLT1KaLY5XKrloW6QYelbdw4xjzoOnVLHEeZfFb+XqVrg+E5qw4mEsloS3VCbuOSo3jPCc2x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YJWUdA6P; arc=none smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791490203; c=relaxed/simple;
+	bh=KKuQYSPoqVFlZgMofQHblBL21sE9VKaHPTLF8PqoPqg=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=igNJ78kGfVOlSZFNQ+x/2hT2n9P2+DYlYeds8B4/UgHgwkEZ0VZg09GbheXZNmyseMZDJmkYM/0pj8bV4sVu7FXS9MaKjyntPB8uH88JkNrKPb7rBCvDQ8wvmz8Ihr3iWAdd7CgZCZvZ4FHesSeLeM6D8OyrzkehU4CitDQQ+w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=DmAqU79N; arc=none smtp.client-ip=51.159.188.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJWUdA6P"
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-1433e7b057fso4031505c88.1
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Oct 2026 11:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791484115; x=1792088915; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=AxE3sHe6me8Wwsd+c2Znto62yEHlspamg6eVt2Dlhi0=;
-        b=YJWUdA6PyO50u0I3gFadFpccg5yBFxoc7RAvuyvVb9q3VG9GImtyOqiKljAMmK0XDW
-         r1Uxpfo8ToPpb9704C6/bGPdBvZe3ZtBJxELMsBk3rETbTw84EQSN9o3g8OMBWxaCWj7
-         UWBewMds+goq9dSpeiWnKq2PuHMJGW7A+EY68witI17XWQnbVcqx+Q20y4j3Wpgy2whY
-         96T4DbNc/imFAf1D3WiQekgKsBS8UuJx7ZqaOGaqZj48FDGOAqAhwvDEM435+CF2SgJI
-         HNQaeHpynJ8x5jJP3FH2fBPh4j99zhhSU2p/VV8IexNMsUeI5HQZrJyPoGm7z3ZNx2Ob
-         ZboQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791484115; x=1792088915;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=AxE3sHe6me8Wwsd+c2Znto62yEHlspamg6eVt2Dlhi0=;
-        b=EcQ55fZblyUceUXYBMXPIbwWN/lqWyrQweTJBde8cOs5cyR8vhmaHkq8GaucDBjCCQ
-         Zdj2eLqmPx0eWidC0Tzloabn8b1J1Nbcovwh5bjjD13aSjlxkWloQp03kpnrQkEmWuYe
-         zhgt7X9kTPcwYaJBHVUXSIjf74doJzRTJ0NAWYLZndRyQbQ34zQ7Pt2J21XpmrosEdm3
-         pIgyysODCWd0Zhp6hxizy7qZMrvaGPuBWZ52BD075dt+alCSZ16Dnfg12j1CaEN5L7A3
-         7gNKT334iUOpqmfgXENxJWHXJHl+cGwNmvX/I/m6My5FGLK1v8M+aVkGrbtqRNLgsJ0L
-         t1gA==
-X-Forwarded-Encrypted: i=1; AKwUvBzyW/txcWXUfy/0eppyHUdamEFsN/BINXv09LvWsbjQ3rCo4VWkE93mh9IJ2dEc/H4Sq4Y2u47hVlNIuR4=@vger.kernel.org
-X-Gm-Message-State: AFuF++m5HZGjvxEwOYhrKEM/wIb29eV7WWaybY2qtUYg+YlLPivTRx2y
-	qus2mR1qNGJs1rrO8qrpnBFYrrCh8OakUFsoLBXq9GswOg629jrCBItf
-X-Gm-Gg: AYBFou0rV+lvBanU5tR3y8j+t5OWsmNucjc8a8CK6Fy16fwrACsPF5pslQzW82JYQz6
-	EHLL9R/O5lZHpxUgCSAHdv+EpAhYzv/LTRToHHaRu8TcTER14DrF7m7MrMsICwIYJAcT2O8riAn
-	aIp7DdkxEPboNC+LQGsyMJTAsicRQzJLq6YtnVWFK0GIJiuBgzHyLXGvjwwB/x0fz/mkJSP4vGe
-	qTvhgQDGlp1veWJqj97/HWmMyWDETMBnM37UJczz35sbDWojEeJ44z5t/HvBVmrbxiAXR+XBD7A
-	skwZsZ6rU9TyJb7vPGM8KrGhdP6Mzw5jchZdsiL+aVDseZfi1MPm0slAVa6aDcJsh3XbNFFcM5D
-	5gAgdxSQ/deemJSB4CBfZxQyQuslt3sUVSoAz9ReAhbzdXSn6IZ6a5+9kNNFi2s+EynLeVb+06E
-	GIrN33zs/Ed9Yg4E9WHwU/E2MDMbE7VbCXhmmqOUi3aVNVdGFqikGhLi8Y718kIDrrx+6SbDz2U
-	J63gGMImYA=
-X-Received: by 2002:a05:701b:21ce:b0:151:8280:2c57 with SMTP id a92af1059eb24-1620880900amr6711157c88.38.1791484115200;
-        Thu, 08 Oct 2026 11:28:35 -0700 (PDT)
-Received: from penguin.lxd ([12.187.136.98])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-169a2d2db98sm57236c88.10.2026.10.08.11.28.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 11:28:34 -0700 (PDT)
-From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-To: hannes@cmpxchg.org,
-	yosry@kernel.org,
-	nphamcs@gmail.com,
-	chengming.zhou@linux.dev,
-	akpm@linux-foundation.org,
-	linux-mm@kvack.org,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	kanchanapsridhar2026@gmail.com,
-	linux-kernel@vger.kernel.org
-Cc: rientjes@google.com,
-	willy@infradead.org,
-	senozhatsky@chromium.org
-Subject: [PATCH v1 5/8] mm: zswap: Store the folio's node id in the zswap_entry.
-Date: Thu,  8 Oct 2026 11:28:11 -0700
-Message-Id: <20261008182814.27450-6-kanchanapsridhar2026@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20261008182814.27450-1-kanchanapsridhar2026@gmail.com>
-References: <20261008182814.27450-1-kanchanapsridhar2026@gmail.com>
+	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="DmAqU79N"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
+	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:
+	Reply-To:Sender:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=2SOMAf6/FUJCTJbvwoY4BNDpzpbM9WO2QMNyv7qonXs=; b=DmAqU79NR9JIQF+bbOjnOjGVNL
+	CTm7BATAzdTRVQN6Zwxy0jAzDfD1N+mKkkvcbUO2Lw7Ij/Anp8zRa/0HtoQLuUbgiEf+KhWiX7/q3
+	f5XMUa2B6/PKLP+HIa4RrxL51UOFkhH0Qo3Lix/naF5RDOp/zjupr3uAOG2by0Rhp06EZkjNlowv2
+	pDVYx+1CR/tf6BL7EKJT7t6M76GMgG2EGtPwVSv5PLuoUrLjl5zTRlK9QlmDqiz+eAiqLkxd9WWWM
+	CzSLogS2utHFsKSaUaWt6lCBEFBEJk6dbrVLd5nGy7NQiYZj/RN2uFNYnJ9FsrMff5fRnutkejlNf
+	QEomQdLg==;
+Received: from [::1] (port=54016 helo=pf-012.whm.fr-par.scw.cloud)
+	by pf-012.whm.fr-par.scw.cloud with esmtpa (Exim 4.100.1)
+	(envelope-from <jeremy.jean@oss.cyber.gouv.fr>)
+	id 1xEuR8-00000002h9s-0j14;
+	Thu, 08 Oct 2026 22:09:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Date: Thu, 08 Oct 2026 22:09:54 +0200
+From: =?UTF-8?Q?J=C3=A9r=C3=A9my_Jean?= <jeremy.jean@oss.cyber.gouv.fr>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel
+ <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: arm64: Fix lost Poly1305 carry when resuming
+ NEON state
+In-Reply-To: <20261007223726.GA24521@quark>
+References: <20261007220235.200818-2-Jeremy.Jean@oss.cyber.gouv.fr>
+ <20261007223726.GA24521@quark>
+User-Agent: Roundcube Webmail/1.6.19
+Message-ID: <e15602ed17e6798be95d5780f7e07961@oss.cyber.gouv.fr>
+X-Sender: jeremy.jean@oss.cyber.gouv.fr
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
+X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
+X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-When storing a folio in zswap, save the folio's node id in the zswap
-entry instead of relying on the zswap_entry being allocated on the same
-node. This enables optimizations such as batch allocation of zswap
-entries for large folios using kmem_cache_alloc_bulk() that does not
-support specifying a node id.
+On 2026-10-08 00:37, Eric Biggers wrote:
+> On Wed, Oct 07, 2026 at 10:02:36PM +0000, Jérémy Jean wrote:
+>> When poly1305_blocks_neon() resumes from a radix-2^26 state with an 
+>> odd
+>> number of input blocks, it converts the accumulator back to radix-2^64
+>> before consuming the first block. The final ADC stores the carry into 
+>> d2,
+>> but the following accumulation and poly1305_mult() use h2.  If the
+>> conversion overflows across bit 128, the carry is dropped and the 
+>> emitted
+>> tag is wrong.
+>> 
+>> Store the carry back into h2. This matches the other conversion paths 
+>> and
+>> preserves the represented accumulator.
+>> 
+>> Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate 
+>> OpenSSL/CRYPTOGAMS NEON implementation")
+>> Cc: stable@vger.kernel.org
+>> Assisted-by: LLM
+>> Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+>> ---
+>>  lib/crypto/arm64/poly1305-armv8.pl | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> diff --git a/lib/crypto/arm64/poly1305-armv8.pl 
+>> b/lib/crypto/arm64/poly1305-armv8.pl
+>> index f1930c6..234398f 100644
+>> --- a/lib/crypto/arm64/poly1305-armv8.pl
+>> +++ b/lib/crypto/arm64/poly1305-armv8.pl
+>> @@ -375,7 +375,7 @@ poly1305_blocks_neon:
+>>  	adc	$h1,$h1,xzr
+>>  	lsr	$h2,x14,#24
+>>  	adds	$h1,$h1,x14,lsl#40
+>> -	adc	$d2,$h2,xzr		// can be partially reduced...
+>> +	adc	$h2,$h2,xzr		// preserve carry into top limb
 
-The size of the zswap_entry remains unchanged as 'referenced' is lumped
-in with the 'length' (as it doesn't need a full unsigned int anyway).
+Hello Eric,
 
-Suggested-by: Nhat Pham <nphamcs@gmail.com>
-Suggested-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Signed-off-by: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
----
- mm/zswap.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+> This needs a regression test in lib/crypto/tests/poly1305_kunit.c.
 
-diff --git a/mm/zswap.c b/mm/zswap.c
-index ca513a9f89e3..c2731d3acb2c 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -194,6 +194,7 @@ static struct shrinker *zswap_shrinker;
-  *              writeback logic. The entry is only reclaimed by the writeback
-  *              logic if referenced is unset. See comments in the shrinker
-  *              section for context.
-+ * nid - NUMA node id of the page for which this is the zswap entry.
-  * pool_idx - id of the zswap_pool that the entry's data is in.
-  * handle - zsmalloc allocation handle that stores the compressed page data
-  * objcg - the obj_cgroup that the compressed memory is charged to
-@@ -201,8 +202,11 @@ static struct shrinker *zswap_shrinker;
-  */
- struct zswap_entry {
- 	swp_entry_t swpentry;
--	unsigned int length;
--	bool referenced;
-+	struct {
-+		unsigned int length:31;
-+		bool referenced:1;
-+	};
-+	int nid;
- 	u8 pool_idx;
- 	unsigned long handle;
- 	struct obj_cgroup *objcg;
-@@ -672,14 +676,8 @@ static int zswap_enabled_param_set(const char *val,
- * lru functions
- **********************************/
- 
--static inline int entry_to_nid(struct zswap_entry *entry)
--{
--	return page_to_nid(virt_to_page(entry));
--}
--
- static void zswap_lru_add(struct zswap_entry *entry)
- {
--	int nid = entry_to_nid(entry);
- 	struct mem_cgroup *memcg;
- 
- 	/*
-@@ -696,19 +694,18 @@ static void zswap_lru_add(struct zswap_entry *entry)
- 	rcu_read_lock();
- 	memcg = obj_cgroup_memcg(entry->objcg);
- 	/* will always succeed */
--	list_lru_add(&zswap_list_lru, &entry->lru, nid, memcg);
-+	list_lru_add(&zswap_list_lru, &entry->lru, entry->nid, memcg);
- 	rcu_read_unlock();
- }
- 
- static void zswap_lru_del(struct zswap_entry *entry)
- {
--	int nid = entry_to_nid(entry);
- 	struct mem_cgroup *memcg;
- 
- 	rcu_read_lock();
- 	memcg = obj_cgroup_memcg(entry->objcg);
- 	/* will always succeed */
--	list_lru_del(&zswap_list_lru, &entry->lru, nid, memcg);
-+	list_lru_del(&zswap_list_lru, &entry->lru, entry->nid, memcg);
- 	rcu_read_unlock();
- }
- 
-@@ -1449,9 +1446,10 @@ static bool zswap_store_page(struct folio *folio, long index,
- {
- 	swp_entry_t page_swpentry = folio_swap_entry(folio, index);
- 	struct zswap_entry *entry, *old;
-+	int nid = folio_nid(folio);
- 
- 	/* allocate entry */
--	entry = zswap_entry_cache_alloc(GFP_KERNEL, folio_nid(folio));
-+	entry = zswap_entry_cache_alloc(GFP_KERNEL, nid);
- 	if (!entry) {
- 		zswap_reject_kmemcache_fail++;
- 		return false;
-@@ -1466,6 +1464,7 @@ static bool zswap_store_page(struct folio *folio, long index,
- 	 * to an unrelated live pool.
- 	 */
- 	entry->pool_idx = pool->idx;
-+	entry->nid = nid;
- 
- 	old = xa_store(swap_zswap_tree(page_swpentry),
- 		       swp_offset(page_swpentry),
--- 
-2.39.5
+I have prepared one, and will send it along in the v2.
 
+> Please include more details in the commit message about under what
+> circumstances that carry bit could be nonzero.
+
+I have expanded the commit message of the bugfix: it should be clearer
+in the v2. In particular, I have added an explicit example and provided
+probability estimates for which this bug would trigger under nominal 
+use.
+The probability is so low that this should never happen for normal use;
+the fix merely fixes correctness of the algorithm.
+
+> It seems this was introduced by commit 03dc4adf91c8bc of
+> https://github.com/dot-asm/cryptogams just before the kernel imported
+> the code.  The bug never reached the copy of this file in OpenSSL.  Do
+> you agree?  If so, please mention this information in the commit 
+> message
+> too, and also open an issue at https://github.com/dot-asm/cryptogams so
+> that it can be fixed there as well.
+
+Agreed. I have added a short paragraph about that in the commit message
+as well. I will see later to open an issue on
+https://github.com/dot-asm/cryptogams.
+
+Regards,
+Jérémy
