@@ -1,41 +1,40 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CCB4D598D
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Oct 2026 11:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9EA24E3231
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Oct 2026 11:52:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791546379; cv=none; b=KUM0yGauRIPwC/WnfAEZ6mKEM9V/WzKwjRsbxO3XQvCFj2IxflFZZVrSgCUC+GzDQY0ie8mwBnAgaluHg2PoicbzcyWs8MUjhec6BkV7hZzIXmW92WS19KTzhruAJ/+frI1St6wg+tJgulKuQXU03OjqpEu2oGkmhLvmcDRG+Xw=
+	t=1791546747; cv=none; b=Qz7pJzGeJh3MNqNetfJ7dcmS1UWj3jKbWq/J0YnROvCEs9uS1q4ZOhFBvkkQadJabg86TDKxPjDqYlx+kDoUyVmJNe6+ibEtrdlvn63d+t0feRnNxCKntIPHl3dGu+O7JHES9wR60q91ISIMDelFdlngeHm0rLvRVpV9iQ4ruus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791546379; c=relaxed/simple;
-	bh=6OyfUkCcq+5a4+jKjfXr9o2UC0BND5RBfqZsYyoudLc=;
+	s=arc-20240116; t=1791546747; c=relaxed/simple;
+	bh=pwMFnc2rPtSFC29Bitewbej3vYZc9k4yEXAZScfORVI=;
 	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=tHCqWGQZf4iHAbhMoXR8l5SS8fytdpgmk6O/sXkLAbI1HhtXFh1O4vrdXOJ0yi/U5Vi1y9bkJbyK6e49JgtR/gHfVubixO2X1egWgV6ePmj5oc+DW+dNGCICRxOQxsx2iCMVF7RGmUHNqrRH5h3H2lgO7W/mb0pzlOPI4xnqB/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=EGkQH4iS; arc=none smtp.client-ip=180.181.231.80
+	 Content-Disposition; b=bk+wAavYROOTGd8JX3z6SzY5oZhbEAp7BdUQAKvDKNtGKO9yL2TFqDqCsaG4k3UU4q3vx+AYh4F5it0uwt4ADA1vvLsqihbQyndB3R+0LNUWVGG27Oktebk0VDtemOLLcPIh4eS452mTd8Si44QaOh1cBfc9ax0IMBLyM+UZvHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=WtRzmqGo; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="EGkQH4iS"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="WtRzmqGo"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
 	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=7RAuYbVHxMfFVKoS2Ro3Heg1nEJZmX33jSr6Ebia+AU=; b=EGkQH
-	4iSnL8yen6oZho9r1Ddi0ajMdBEaqAC1HCY3I2eLkVh1+VaUU3ptf7muJEqPbUFOtVRq0a9+8nuKA
-	B226M/Xx5upLoidUhCLlrPq6bLGGvWQsxPbZZ77xez4Bnjk70Xd3OX8rlp8JpZsc5rJN+cdAuZiyP
-	jV0h33YhaX/l6LEkvNYnjKtaptY6D66TN7TQCXh76MTmha0/Xy8bvWP0/HjHdJnirjepdxBbZIDM1
-	pJHs7jNbNbdOEj+aPqbdPDXpQZpKzk1Lnlfr4r6Lgd3ayVtmfrUB9+y7WoqGUVB5uxR3N7APbzk8x
-	r6e3l9fD9lgRd1s0GS+rm5/TWrTqg==;
+	references:reply-to; bh=2xF+AMG5R4TEYJNdXoc5o970pr2NMWNcgO+q6pcTccs=; b=WtRzm
+	qGoetnR06kQC/R77XalTyZ8zdFyNj31+NL6gAUC+HNhl/5tWf6eKQZaTLyjwfAYIZKQpt10bVgNMu
+	Q3bq6icVGlYxEebqosiYjrIWWamr8nWV8a6EMcTXKROA8I0UBp7xgbL8io7bESyFcUi2OWtqaMXLk
+	R7oKmTnYxo7T4jB9DK2Rt8/hWBC7OuSyz15axH+Bz1UHbbioH2pIkErsx93yUB6+CqOMxXRonKiSf
+	ZMMbJEppCXIUncdfVM4jjSYDJFe4KrohnzLm5iUENUuh5Vw5cyy8tqus6Xlew8UQjGwBdaj7zn57b
+	4PjMWyNe7Vlm4tGZNnuX6ZbWWj4pQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xF92x-00000002Ck4-47Gp;
-	Fri, 09 Oct 2026 19:45:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Oct 2026 22:45:55 +1100
-Date: Fri, 9 Oct 2026 22:45:55 +1100
+	id 1xF98z-00000002CpB-0E7D;
+	Fri, 09 Oct 2026 19:52:10 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Oct 2026 22:52:09 +1100
+Date: Fri, 9 Oct 2026 22:52:09 +1100
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH] crypto: aes - Add import_core/export_core to cmac/xcbc/cbcmac
-Message-ID: <asjT87HAZ_UUbbvm@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: hash - Preserve withheld block in export_core
+Message-ID: <asjVaVGfI3JhoQja@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,192 +44,100 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-The export format for cmac-aes-lib, xcbc-aes-lib and cbcmac-aes-lib
-did not match that of the generic templates.  Add custom export and
-import functions to align with the generic tempaltes.
+Some algorithms (cmac and xcbc) withhold one block for finalisation.
+This breaks crypto_ahash_export_core (only called when there is no
+partial block data) because the exported hash state is missing the
+withheld block.
 
-For cmac and xcbc, perform an extra encryption on the withheld block
-for export_core so that the information isn't lost.
+Fix this by performing a hash update of the partial block if it is
+present before doing the export.
 
-Reported-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/crypto/aes.c b/crypto/aes.c
-index 94791f481e98..a1af4d5a7608 100644
---- a/crypto/aes.c
-+++ b/crypto/aes.c
-@@ -18,7 +18,10 @@
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
-+#include <crypto/utils.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/string.h>
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index d86c78f8d550..706440ebe4eb 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -634,6 +634,43 @@ int crypto_ahash_export_core(struct ahash_request *req, void *out)
  
- static_assert(__alignof__(struct aes_key) <= CRYPTO_MINALIGN);
- static_assert(__alignof__(struct aes_enckey) <= CRYPTO_MINALIGN);
-@@ -95,6 +98,71 @@ static int __maybe_unused crypto_aes_cmac_digest(struct shash_desc *desc,
- 	return 0;
- }
- 
-+static int crypto_cmac_export_core(struct shash_desc *desc, void *out)
-+{
-+	struct aes_cmac_ctx *ctx = AES_CMAC_CTX(desc);
-+	struct aes_cmac_ctx ctx1;
-+	u8 *h = ctx->h;
+ 	if (likely(tfm->using_shash))
+ 		return crypto_shash_export_core(ahash_request_ctx(req), out);
 +
-+	if (!ctx->partial_len)
-+		;
-+	else if (ctx->partial_len != AES_BLOCK_SIZE)
-+		return -EINVAL;
-+	else {
-+		union {
-+			long l;
-+			char c;
-+		} u = {};
++	if (crypto_ahash_block_only(tfm)) {
++		unsigned int reqsize = crypto_ahash_reqsize(tfm);
++		unsigned int bs = crypto_ahash_blocksize(tfm);
++		u8 *buf = ahash_request_ctx(req);
++		unsigned int partial;
++		int err;
 +
-+		BUILD_BUG_ON(sizeof(u) >= AES_BLOCK_SIZE);
-+		ctx1 = *ctx;
-+		aes_cmac_update(&ctx1, &u.c, sizeof(u));
-+		h = ctx1.h;
++		buf += reqsize - 1;
++		partial = *buf;
++		*buf = 0;
++
++		if (!partial)
++			;
++		else if (partial != bs)
++			return -EINVAL;
++		else {
++			struct crypto_ahash *fb = crypto_ahash_fb(tfm);
++			u8 state[HASH_MAX_STATESIZE];
++
++			err = crypto_ahash_export(req, state);
++
++			ahash_request_set_tfm(req, fb);
++			err = err ?: crypto_ahash_import(req, state);
++
++			sg_init_one(req->sg_head, buf - bs, bs);
++			req->src = req->sg_head;
++			req->nbytes = bs;
++
++			err = err ?: crypto_ahash_update(req) ?:
++			      crypto_ahash_export_core(req, out);
++
++			ahash_request_set_tfm(req, tfm);
++			return err ?: crypto_ahash_import(req, state);
++		}
 +	}
 +
-+	memcpy(out, h, AES_BLOCK_SIZE);
-+	memzero_explicit(&ctx1, sizeof(ctx1));
-+	return 0;
-+}
-+
-+static int crypto_cmac_import_core(struct shash_desc *desc, const void *in)
-+{
-+	struct aes_cmac_ctx *ctx = AES_CMAC_CTX(desc);
-+
-+	ctx->key = AES_CMAC_KEY(desc->tfm);
-+	memcpy(ctx->h, in, AES_BLOCK_SIZE);
-+	ctx->partial_len = 0;
-+	return 0;
-+}
-+
-+static int crypto_cmac_export(struct shash_desc *desc, void *out)
-+{
-+	struct aes_cmac_ctx *ctx = AES_CMAC_CTX(desc);
-+	unsigned int partial = ctx->partial_len;
-+	u8 *p = out;
-+
-+	memcpy(p, ctx->h, AES_BLOCK_SIZE);
-+	memset(p + AES_BLOCK_SIZE, 0, AES_BLOCK_SIZE);
-+	p[AES_BLOCK_SIZE * 2] = partial;
-+	return 0;
-+}
-+
-+static int crypto_cmac_import(struct shash_desc *desc, const void *in)
-+{
-+	struct aes_cmac_ctx *ctx = AES_CMAC_CTX(desc);
-+	unsigned int partial;
-+	const u8 *p = in;
-+
-+	crypto_cmac_import_core(desc, p);
-+	p += AES_BLOCK_SIZE;
-+	partial = p[AES_BLOCK_SIZE];
-+	if (partial > AES_BLOCK_SIZE)
-+		return -EOVERFLOW;
-+	crypto_xor(ctx->h, p, partial);
-+	ctx->partial_len = partial;
-+	return 0;
-+}
-+
- #define AES_CBCMAC_KEY(tfm) ((struct aes_enckey *)crypto_shash_ctx(tfm))
- #define AES_CBCMAC_CTX(desc) ((struct aes_cbcmac_ctx *)shash_desc_ctx(desc))
- 
-@@ -136,6 +204,49 @@ static int __maybe_unused crypto_aes_cbcmac_digest(struct shash_desc *desc,
- 	return 0;
+ 	return crypto_ahash_alg(tfm)->export_core(req, out);
  }
+ EXPORT_SYMBOL_GPL(crypto_ahash_export_core);
+diff --git a/crypto/shash.c b/crypto/shash.c
+index d4a6c3b6fa37..d9e9377cbd6a 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -225,6 +225,31 @@ static int __crypto_shash_export(struct shash_desc *desc, void *out,
  
-+static int crypto_cbcmac_export_core(struct shash_desc *desc, void *out)
-+{
-+	memcpy(out, AES_CBCMAC_CTX(desc)->h, AES_BLOCK_SIZE);
-+	return 0;
-+}
+ int crypto_shash_export_core(struct shash_desc *desc, void *out)
+ {
++	struct crypto_shash *tfm = desc->tfm;
 +
-+static int crypto_cbcmac_import_core(struct shash_desc *desc, const void *in)
-+{
-+	struct aes_cbcmac_ctx *ctx = AES_CBCMAC_CTX(desc);
++	if (crypto_shash_block_only(tfm)) {
++		unsigned int descsize = crypto_shash_descsize(tfm);
++		unsigned int bs = crypto_shash_blocksize(tfm);
++		u8 *buf = shash_desc_ctx(desc);
++		unsigned int partial;
++		int err;
 +
-+	ctx->key = AES_CBCMAC_KEY(desc->tfm);
-+	memcpy(ctx->h, in, AES_BLOCK_SIZE);
-+	ctx->partial_len = 0;
-+	return 0;
-+}
++		partial = buf[descsize - 1];
++		buf[descsize - 1] = 0;
 +
-+static int crypto_cbcmac_export(struct shash_desc *desc, void *out)
-+{
-+	struct aes_cbcmac_ctx *ctx = AES_CBCMAC_CTX(desc);
-+	unsigned int partial = ctx->partial_len;
-+	u8 *p = out;
++		if (!partial)
++			;
++		else if (partial != bs)
++			return -EINVAL;
++		else {
++			err = crypto_shash_alg(tfm)->update(
++				desc, buf + descsize - bs - 1, bs);
 +
-+	memset(p + AES_BLOCK_SIZE, 0, AES_BLOCK_SIZE);
-+	p[AES_BLOCK_SIZE * 2] = partial;
-+	return crypto_cbcmac_export_core(desc, p);
-+}
++			if (err)
++				return err;
++		}
++	}
 +
-+static int crypto_cbcmac_import(struct shash_desc *desc, const void *in)
-+{
-+	struct aes_cbcmac_ctx *ctx = AES_CBCMAC_CTX(desc);
-+	unsigned int partial;
-+	const u8 *p = in;
-+
-+	crypto_cbcmac_import_core(desc, p);
-+	p += AES_BLOCK_SIZE;
-+	partial = p[AES_BLOCK_SIZE];
-+	if (partial > AES_BLOCK_SIZE)
-+		return -EOVERFLOW;
-+	crypto_xor(ctx->h, p, partial);
-+	ctx->partial_len = partial;
-+	return 0;
-+}
-+
- static struct crypto_alg alg = {
- 	.cra_name = "aes",
- 	.cra_driver_name = "aes-lib",
-@@ -166,7 +277,12 @@ static struct shash_alg mac_algs[] = {
- 		.update = crypto_aes_cmac_update,
- 		.final = crypto_aes_cmac_final,
- 		.digest = crypto_aes_cmac_digest,
-+		.export	= crypto_cmac_export,
-+		.import = crypto_cmac_import,
-+		.export_core = crypto_cmac_export_core,
-+		.import_core = crypto_cmac_import_core,
- 		.descsize = sizeof(struct aes_cmac_ctx),
-+		.statesize = AES_BLOCK_SIZE * 2 + 1,
- 	},
- #endif
- #if IS_ENABLED(CONFIG_CRYPTO_XCBC)
-@@ -187,7 +303,12 @@ static struct shash_alg mac_algs[] = {
- 		.update = crypto_aes_cmac_update,
- 		.final = crypto_aes_cmac_final,
- 		.digest = crypto_aes_cmac_digest,
-+		.export	= crypto_cmac_export,
-+		.import = crypto_cmac_import,
-+		.export_core = crypto_cmac_export_core,
-+		.import_core = crypto_cmac_import_core,
- 		.descsize = sizeof(struct aes_cmac_ctx),
-+		.statesize = AES_BLOCK_SIZE * 2 + 1,
- 	},
- #endif
- #if IS_ENABLED(CONFIG_CRYPTO_CCM)
-@@ -204,7 +325,12 @@ static struct shash_alg mac_algs[] = {
- 		.update = crypto_aes_cbcmac_update,
- 		.final = crypto_aes_cbcmac_final,
- 		.digest = crypto_aes_cbcmac_digest,
-+		.export	= crypto_cbcmac_export,
-+		.import = crypto_cbcmac_import,
-+		.export_core = crypto_cbcmac_export_core,
-+		.import_core = crypto_cbcmac_import_core,
- 		.descsize = sizeof(struct aes_cbcmac_ctx),
-+		.statesize = AES_BLOCK_SIZE * 2 + 1,
- 	},
- #endif
- };
+ 	return __crypto_shash_export(desc, out,
+ 				     crypto_shash_alg(desc->tfm)->export_core);
+ }
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
