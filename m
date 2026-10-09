@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABAC53BB689
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Oct 2026 06:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E0B44471C
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Oct 2026 06:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791528873; cv=none; b=k+iLY8OcsfqPZtOeEhsITB4PVwlhVDfVDBPvEbyGIET4o+pJFSEvUPKRdb3u6Di14BeFiw+7Bh/jjfCOXHlEN2wDF3y7ssVo5r71H6797BR9Du97BUV05vM9rQQDz1NnvmB4G+DisnmHwZFM4+Hd77zZg00WGz7O5hbCR2toPLo=
+	t=1791528881; cv=none; b=trhjnkVK4mjPi3GYX2bJ2ICf8uvtdDWfpP1vkIS7HdxkwATl7Svx2vlKjQNYL2XYKEqiuJfpOxC2zLr0kjK4KAKBRUk6dz9LngS+j73fvGD/PU34aYwG+KxnNbI7v0laHCcJiTpjjtJLzINOc2bqWUMaXYGD6euAHKY1dOcXuU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791528873; c=relaxed/simple;
-	bh=n7TuFPqgtRxjCRGFyy+0Rdz7rjIvV+ajIcqXa5LF3yU=;
+	s=arc-20240116; t=1791528881; c=relaxed/simple;
+	bh=wu+uBrjlvRD2ITE4XBNGOFu01cCzqEw5y8dP/zxWqpM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kO6RFlb5LgCZ0FKRnoQ2drQum7jqUxz7+NbTZmIUXyocMAuXe1IkFtivKvIiCkiMP8IRRt6+nX9xwEVk51JRCG5X+rF9TeorV+hL3EtE7SCtaGFjDrQNOiE+tBCEGt49RdESsjXvQRR/XqFGaYX0FWLwP1sFb888BPpy7KYpOFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Naw2yRK2; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=VAEzalfVr1peO4nRS1W4+dQtlhTO/8hlWOmmIafP46JXFZOFgjhFn0WVsELlk9hxQ0CFssqb5Ch2sCHlw5UjXi5BC/oQmNWkBC3t+kUNv/XSsq/ADrsDT2v3B+gc3dtPxq0/ZWa/VVcKMJrfPoxByYMba4fsmgiwkN537qGMBiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OGmcVRXR; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Naw2yRK2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGmcVRXR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1791528870;
+	s=mimecast20190719; t=1791528877;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vcePdjvF8DWO+rsrHllskedZqHh+JrGfqqP/14EOl+o=;
-	b=Naw2yRK2SpNlWVaonkvLAIJZDLGOs+2vRUapHUH6jTOYpLW1K4Lw8vw64Wz4IfaytRNLZm
-	zcw5F7ETV5cUKS6Q862DBhKA1jPXAsyR+J7/HlKx0bx2cM7q/I49trWP0UeFW1E3m3sNks
-	hY72wpDDbIWp54S8OCp20RwcesHC0aY=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=S3+4R+QpyK4HOxxP6qoWhYfhHc4hscg5LMjpnbpjS08=;
+	b=OGmcVRXRc9Dhe8aATL9k4Ck+RKB8gDYhdp363NFnvSo7DK2ROF5C5EK9V/3gT1ciIFyQZz
+	Mn0Z8Tq0qAnYEu1zYzIIczkzNnJN4zTDpX87gbateNuUlNaQDSAUzEfhTlRIF832XN/dFY
+	AKmBIjiQN19DvHYpBPW9RgIcozT71xg=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-599-CgNFcyNiNbGWNS8jzJ5UJA-1; Fri,
- 09 Oct 2026 02:54:27 -0400
-X-MC-Unique: CgNFcyNiNbGWNS8jzJ5UJA-1
-X-Mimecast-MFC-AGG-ID: CgNFcyNiNbGWNS8jzJ5UJA_1791528866
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-628-OxYrb-qoOie7b1HofEXdiA-1; Fri,
+ 09 Oct 2026 02:54:33 -0400
+X-MC-Unique: OxYrb-qoOie7b1HofEXdiA-1
+X-Mimecast-MFC-AGG-ID: OxYrb-qoOie7b1HofEXdiA_1791528872
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C90E41802173;
-	Fri,  9 Oct 2026 06:54:25 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E40419560A7;
+	Fri,  9 Oct 2026 06:54:32 +0000 (UTC)
 Received: from jtornosm-thinkpadp1gen7.rmtes.csb (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0D9C11956095;
-	Fri,  9 Oct 2026 06:54:22 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 943031956095;
+	Fri,  9 Oct 2026 06:54:29 +0000 (UTC)
 From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
 To: herbert@gondor.apana.org.au,
 	davem@davemloft.net,
@@ -53,9 +53,9 @@ Cc: ilan.peer@intel.com,
 	linux-wireless@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Subject: [PATCH v3 1/4] crypto: fips: add fips_exception kernel boot parameter and fips_allows_exception() helper
-Date: Fri,  9 Oct 2026 08:54:10 +0200
-Message-ID: <20261009065413.53403-2-jtornosm@redhat.com>
+Subject: [PATCH v3 2/4] wifi: iwlwifi: enable MFP_CAPABLE in FIPS mode
+Date: Fri,  9 Oct 2026 08:54:11 +0200
+Message-ID: <20261009065413.53403-3-jtornosm@redhat.com>
 In-Reply-To: <20261009065413.53403-1-jtornosm@redhat.com>
 References: <20261009065413.53403-1-jtornosm@redhat.com>
 Precedence: bulk
@@ -67,133 +67,60 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Add a new kernel boot parameter fips_exception=<bitmap> to allow
-documented exceptions to strict FIPS compliance when full compliance
-is not achievable due to hardware/firmware limitations but
-functionality is required.
+Re-enable MFP_CAPABLE flag in FIPS mode for iwlwifi to allow Management
+Frame Protection (802.11w) to work with mac80211 software crypto.
 
-The parameter is stored in a static variable and accessed through the
-exported fips_allows_exception() helper function, which returns true
-when FIPS is enabled and the requested exception bit is set. This
-makes fips_allows_exception() an explicit "is this FIPS exception
-active?" check, only meaningful when FIPS mode is on.
+Commit 0636800c8ee1f ("wifi: iwlwifi: disable certain features for
+fips_enabled") disabled MFP_CAPABLE when fips_enabled=1.
+The original concern about "some frames need to be handled in
+firmware" applies to firmware-offloaded features like WoWLAN and beacon
+protection, which remain correctly disabled by the commented commit.
+For normal STA mode operation, management frames are processed in
+software. And MFP can function in FIPS mode for normal STA operation
+when mac80211 software crypto handles IGTK encryption/decryption using
+FIPS-approved AES-CMAC/GMAC algorithms.
 
-For !CONFIG_CRYPTO_FIPS, fips_allows_exception() is a trivial static
-inline returning false (no FIPS means no FIPS exceptions).
+Other major WiFi drivers (ath11k, rtlwifi, mt76, ...) set MFP_CAPABLE
+unconditionally, suggesting this approach is viable for FIPS mode
+operation with software crypto.
 
-The parameter is exposed as a read-only sysctl at
-/proc/sys/crypto/fips_exception for runtime inspection. As with
-fips_enabled, it is intentionally not writable at runtime so that
-enabling exceptions requires a deliberate boot-time decision,
-visible in /proc/cmdline.
+When FIPS_EXCEPTION_WIFI_MFP is set via the fips_exception boot
+parameter, use fips_allows_exception() to restore MFP_CAPABLE.
+Without fips_exception set, the behavior remains exactly as commit
+0636800c8ee1 implemented.
 
-The bitmap design allows individual subsystem exceptions to be
-defined independently. Currently defined bits:
-  - Bit 0 (FIPS_EXCEPTION_WIFI_MFP): Allow WiFi MFP (802.11w)
-    in FIPS mode despite firmware sending some unprotected
-    management frames on TX
+Testing on Intel WiFi 6E AX210 with fips=1 fips_exception=1 shows:
+- IGTK ciphers (CMAC, GMAC-128, GMAC-256) are properly advertised
+- WPA3-SAE connections with MFP required succeed
+- iw station dump confirms "MFP: yes"
 
-Without this parameter (or with fips_exception=0), all existing
-FIPS restrictions remain in effect.
+Firmware logs "Unhandled alg: 0x707" (SEC_ENC_ERR) during operation,
+confirming that firmware does not have the keys and frames are being
+handled by software crypto as expected.
 
+Fixes: 0636800c8ee1f ("wifi: iwlwifi: disable certain features for fips_enabled")
 Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
 ---
-v3: rename fips_allows() to fips_allows_exception(), change semantics
-    to fips_enabled && exception (was !fips_enabled || exception)
-v2: https://lore.kernel.org/all/20260930120829.383408-2-jtornosm@redhat.com/
+v3: reuse v1 1/2 idea plus fips_allows_exception() helper from patch 1/4
+v2: https://lore.kernel.org/all/20260930120829.383408-1-jtornosm@redhat.com/
+v1: https://lore.kernel.org/all/20260629121213.597038-2-jtornosm@redhat.com/
 
- crypto/fips.c        | 27 +++++++++++++++++++++++++++
- include/linux/fips.h | 14 ++++++++++++++
- 2 files changed, 41 insertions(+)
+ drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/fips.c b/crypto/fips.c
-index c59711248d95..0f075e61a657 100644
---- a/crypto/fips.c
-+++ b/crypto/fips.c
-@@ -21,6 +21,15 @@ EXPORT_SYMBOL_GPL(fips_enabled);
- ATOMIC_NOTIFIER_HEAD(fips_fail_notif_chain);
- EXPORT_SYMBOL_GPL(fips_fail_notif_chain);
- 
-+static unsigned long fips_exception;
-+
-+int fips_allows_exception(unsigned long feature)
-+{
-+	return fips_enabled &&
-+	       (fips_exception & feature);
-+}
-+EXPORT_SYMBOL_GPL(fips_allows_exception);
-+
- /* Process kernel command-line parameter at boot time. fips=0 or fips=1 */
- static int __init fips_enable(char *str)
- {
-@@ -34,6 +43,17 @@ static int __init fips_enable(char *str)
- 
- __setup("fips=", fips_enable);
- 
-+static int __init fips_exception_setup(char *str)
-+{
-+	if (kstrtoul(str, 0, &fips_exception))
-+		return 0;
-+
-+	pr_info("fips exceptions: 0x%lx\n", fips_exception);
-+	return 1;
-+}
-+
-+__setup("fips_exception=", fips_exception_setup);
-+
- #define FIPS_MODULE_NAME CONFIG_CRYPTO_FIPS_NAME
- #ifdef CONFIG_CRYPTO_FIPS_CUSTOM_VERSION
- #define FIPS_MODULE_VERSION CONFIG_CRYPTO_FIPS_VERSION
-@@ -52,6 +72,13 @@ static const struct ctl_table crypto_sysctl_table[] = {
- 		.mode		= 0444,
- 		.proc_handler	= proc_dointvec
- 	},
-+	{
-+		.procname	= "fips_exception",
-+		.data		= &fips_exception,
-+		.maxlen		= sizeof(unsigned long),
-+		.mode		= 0444,
-+		.proc_handler	= proc_doulongvec_minmax
-+	},
- 	{
- 		.procname	= "fips_name",
- 		.data		= &fips_name,
-diff --git a/include/linux/fips.h b/include/linux/fips.h
-index c6961e932fef..61fe58b0762c 100644
---- a/include/linux/fips.h
-+++ b/include/linux/fips.h
-@@ -2,17 +2,31 @@
- #ifndef _FIPS_H
- #define _FIPS_H
- 
-+#include <linux/bits.h>
-+
- #ifdef CONFIG_CRYPTO_FIPS
- extern int fips_enabled;
- extern struct atomic_notifier_head fips_fail_notif_chain;
- 
- void fips_fail_notify(void);
-+/*
-+ * fips_allows_exception - check if a FIPS exception is active
-+ * Returns true when FIPS is enabled and the requested exception
-+ * bit is set via the fips_exception= boot parameter.
-+ */
-+int fips_allows_exception(unsigned long feature);
- 
- #else
- #define fips_enabled 0
- 
- static inline void fips_fail_notify(void) {}
-+static inline int fips_allows_exception(unsigned long feature)
-+{
-+	return 0;
-+}
- 
- #endif
- 
-+#define FIPS_EXCEPTION_WIFI_MFP	BIT(0)
-+
- #endif
--- 
-2.55.0
+diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c b/drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c
+index 5bd246e37943..144a19a4015c 100644
+--- a/drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c
++++ b/drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c
+@@ -462,7 +462,7 @@ int iwl_mvm_mac_setup_register(struct iwl_mvm *mvm)
+ 		IWL_ERR(mvm,
+ 			"iwlmvm doesn't allow to disable BT Coex, check bt_coex_active module parameter\n");
+
+-	if (!fips_enabled)
++	if (!fips_enabled || fips_allows_exception(FIPS_EXCEPTION_WIFI_MFP))
+ 		ieee80211_hw_set(hw, MFP_CAPABLE);
+
+ 	mvm->ciphers[hw->wiphy->n_cipher_suites] = WLAN_CIPHER_SUITE_AES_CMAC;
+--
+2.49.0
 
