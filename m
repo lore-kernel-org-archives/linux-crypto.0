@@ -1,71 +1,91 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE36A32E68D;
-	Fri,  9 Oct 2026 07:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BE4497B87;
+	Fri,  9 Oct 2026 09:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791529733; cv=none; b=lT14+VZYpO9m3f4x93Cp087by2NBmz/p3Q1MDCgr9rNp64FacxZaaJ6rs4oFfdYxVIIXnKonHV06yLw0hh75K/NoNL9Ph3s7x5/40p0u6I26NXubxSJkpMn4rOPI9IdbbUArVJhuxN2chBL54lPVE95wbDBWOQUuo77kfX+INd8=
+	t=1791539029; cv=none; b=I3ktKHm5kwJ7tJQa9DeMBUpZJiu3gJlA2TuLKf4UcDDD2RM9kVh6mbgN27DkNwzPMTMzkHJ1PyZhGM+5Y/HHY4MawPk3nLDXsLgZcVJbB+OCsDHicJJNXXpkKzAZIWWfFRA+iN9Cs02Np7LkVuzlGCwJcuR9t4rzQfiBpbBJfkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791529733; c=relaxed/simple;
-	bh=8NxBLb8ZNmBXpmw3rwNeLFbP1yNxwK8PHctFf2OXNEU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QT+BUUy2KCHdCZAoUc/sX8uQbkiR1LwDFMamszeskEhFTAMnv/0R3Sy6SyTPG1Taz0ted264UeOsdtdkt0f2yZbadvMqSxstUFKL/uEVh9JhPRW67vEXaxJauY2xZjlfxXU1AosedI7uT9SXI/ve2Q1gpTCB/TdOxsLjka6npZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=UatnvD/o; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=permerror header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1791539029; c=relaxed/simple;
+	bh=Ni1fdoFnjpafpiRBYCB9qFuOoNMXdGPwfxm/cU2m6Xc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SB3xQCEIAsZXbhKJZmXkDJNub1QyR0cVlp5tXZmvRpcm1D7vRV5LnygSk5iVujmC7/273yOGDf8rDuk9iHrB9cN0fpBsi1s1S4vTDuu26Whop/49N8Jz7iU5rA5pg8I54pxdZr1wxrY8G4quqAPYECYeYePmWuseFKMe3v4p/qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/knBLIM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="UatnvD/o"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=8NxBLb8ZNmBXpmw3rwNeLFbP1yNxwK8PHctFf2OXNEU=;
-	t=1791529730; x=1792739330; b=UatnvD/oj4qeQezeh/XjLdGmZKbnfaOmxMAaR5cX99L9OWb
-	BAOPW2R0b/2J+LkxaGnn4kGuN4NdMZQcpFdzM4rot3aOicQ1LyxINqogXZlJMnz+3FXVvb7sn/j5C
-	nFyvhWVUNCTabNN+pcaQAJvXu14kTM1NO9426GsFedN4OEYjVXV/InHjKih6mlxqtjwPJ2VyREZTD
-	XZQQVUgBzvgvymn9RCnQ00EX+WdhPOwblTejHZgh3fpvYlcphd1473WAYB/N37CNXNKnPuTEDLwXz
-	xQ1myt6zWmUxWRQ9uU4F80D1hjczeJgByGDh6mh9Bp9JYF0nW/0cpYhrrGY54R2A==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__ECDSA_SECP256R1_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1xF4if-0000000ASam-3nJ7;
-	Fri, 09 Oct 2026 09:08:42 +0200
-Message-ID: <8b9ee18061d7519ca41034c1b25317e43b35d746.camel@sipsolutions.net>
-Subject: Re: [PATCH v2 0/5] wifi: add opt-in FIPS exception for iwlwifi
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: davem@davemloft.net, emmanuel.grumbach@intel.com, 
-	herbert@gondor.apana.org.au, ilan.peer@intel.com,
- linux-crypto@vger.kernel.org, 	linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org, 	miriam.rachel.korenblit@intel.com
-Date: Fri, 09 Oct 2026 09:08:40 +0200
-In-Reply-To: <20261009064326.43891-1-jtornosm@redhat.com>
-References: 
-	<289161e6ddaf18fa63a55623c75d700850fd57b6.camel@sipsolutions.net>
-	 <20261009064326.43891-1-jtornosm@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-2.fc44) 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/knBLIM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D94BA1F000FF;
+	Fri,  9 Oct 2026 09:43:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791539019;
+	bh=PbSICq/SyAcnLxJ/3kBxuPhqZVN84tKx60r3+VjqUJk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=i/knBLIM4WbJ6eCCx2LdtFz39MlFxgzvCe53ay28diCbGgVGzKdC7g890BfCGOt3F
+	 Y4YGw4jR3d6ylWN/N1H6ZGQEQy5jqqbFjclEqZKcp3UALxZ1UtLjuC4/ap9SkixN3p
+	 o7VGvNRrPm0wrFTrSeA1Xrwt6Hbz0cliP3RIiUyW44yfDoIYPoxG8pxjfoBgyYBXd7
+	 ECRqBUYWgL5F87U+ofqiyKS/ValTrdxq26dC8DANHDCB3W9UyLFkAjhGLHne28BTar
+	 WCXotEk6gUY2v5dEUmN280CCi/2IUt2OR51+gcGSoje7gaHjjy+1cwSxSgui/4h06y
+	 F+nHhioEpii3g==
+Date: Fri, 9 Oct 2026 11:43:35 +0200
+From: Vinod Koul <vkoul@kernel.org>
+To: Dave Jiang <dave.jiang@intel.com>
+Cc: Frank.Li@oss.nxp.com, Dan Williams <djbw@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Frank Li <Frank.Li@kernel.org>, Jon Mason <jdmason@kudzu.us>,
+	Allen Hubbe <allenbh@gmail.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:DMA GENERIC OFFLOAD ENGINE SUBSYSTEM" <dmaengine@vger.kernel.org>,
+	"open list:NTB DRIVER CORE" <ntb@lists.linux.dev>,
+	imx@lists.linux.dev, Frank Li <Frank.Li@nxp.com>
+Subject: Re: [PATCH 1/1] dmaengine: change dmaengine_get_unmap_data() first
+ arg to dma_chan
+Message-ID: <asi3R24SY-Y2wJQx@parshuram>
+References: <20260922184527.2414043-1-Frank.Li@oss.nxp.com>
+ <b40fa0d7-fbd0-4ee8-b99c-781d08c18838@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b40fa0d7-fbd0-4ee8-b99c-781d08c18838@intel.com>
 
-Hi,
+On 22-09-26, 16:09, Dave Jiang wrote:
+> 
+> 
+> On 9/22/26 11:45 AM, Frank.Li@oss.nxp.com wrote:
+> > From: Frank Li <Frank.Li@nxp.com>
+> > 
+> > Replace the struct device *dev argument with struct dma_chan *chan so
+> > callers do not need to reach into the dma_device internals to obtain
+> > the device pointer.  The implementation now derives the device via
+> > dmaengine_get_dma_device(chan), which correctly handles the per-channel
+> > IOMMU mapping case.
+> > 
+> > Prepare to make dma_device private and make dmaengine API consistent.
+> > 
+> > Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> 
+> For the NTB bits:
+> Acked-by: Dave Jiang <dave.jiang@intel.com>
+> 
+> 
+> > ---
+> >  crypto/async_tx/async_memcpy.c      | 4 ++--
+> >  crypto/async_tx/async_pq.c          | 4 ++--
+> >  crypto/async_tx/async_raid6_recov.c | 4 ++--
+> >  crypto/async_tx/async_xor.c         | 8 ++++----
+> 
+> Maybe one day Dan's wishes will become true and someone will finally deprecate async_tx....
 
-> Is there a way to allow TX aggregation from mac80211
-> in this scenario, similar to how the RX path can be
-> managed from the host? Or any other mechanism to let
-> TLC know that a BA session has been established for a
-> TID so it can aggregate? I could not find a TX
-> equivalent of STA_MODIFY_ADD_BA_TID in the firmware
-> API, but maybe there is another way I am missing.
+Does Intel still have use it. I am looking at fixing the names and we
+can drop async_tx completely...? 
 
-No. We did this in old devices, but there are relations between the SN
-and the queue index and other things, so there's no such API now.
-
-johannes
+-- 
+~Vinod
