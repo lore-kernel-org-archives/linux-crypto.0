@@ -1,41 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5524F4D37BE
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Oct 2026 12:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254BA486E40;
+	Fri,  9 Oct 2026 12:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791550470; cv=none; b=owIJB0Cnn+vPBEynIoXgsuCYz1xY7zRnQ4ShfCtz/XL1kHkQyv+iQpSCgCnpe1k7ZVU9LErdTCvEtgt+llR7PFjqTTR0opp0njK9CrulImxzSJouV5Gb8PjTUnriQ9xAajnnecsZCPTp5cosKA/6Qfwjpcu0KgAue+adCUXX/hQ=
+	t=1791550482; cv=none; b=tgYhflzIBfxVVhvbcbopL87gny0CnAK/Zq97QdfiL1Lhk2WrGDcBma+Quh5zOqPavrd8xUapvmVUeoR4BjBSdNhEr5NGLFtCwseBJBkq7MEsFVdHH4DpPVpiyjrP61C/K6ooURhzxanGTVuSyCwSBi705m6+ErSTZQ0Vbw+gsqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791550470; c=relaxed/simple;
-	bh=oFXViLcU6nRZlIqU0e/dvHeGmV0H6CzsE20a8ie0DcE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=N5UqEyFWDWDMDwDQckwxzwwtXPNIx0zWlT3pF1BD25rxjpyJ1M54g38xIkWHFZC18Rllcuu4RVGkmE0UNv1VawMsaZOlGIj1vtM6/bTn87hiNckWQPnFuPrZ7AaI0l+2a1PsONB/g0jM4gfGzhF/zwWg346QqQuDY19pnJGmsAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mMTnTzhW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791550482; c=relaxed/simple;
+	bh=CAJpIALCNKBs7+IQqpobbfwiPFOMMgsIrlFEutuXWEg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XtDuAuqKP+NcOfbZ//jKpp9CV9pKj1T7z5/3vcVo9ltWvxmGVBLW8J6aUMTcI7cmTJ1PisKmugI++9GeSXyqdpiakGeVtg/FFHdcNJEGYbA+jg+EXOOdULHkM8wwheI2RKJ/qXQNFyHX1ZBE7NMbmN8XBztzOOG8++TVDBDg51o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k0TYGnHl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mMTnTzhW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38DFF1F000FF;
-	Fri,  9 Oct 2026 12:54:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k0TYGnHl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63A811F00893;
+	Fri,  9 Oct 2026 12:54:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791550467;
-	bh=c09C4KTZtxsB1EwbJfHre3kLSdUdymxJsJbi/9voYA0=;
-	h=From:To:Cc:Subject:Date;
-	b=mMTnTzhWWbiNnDJ6gzOvtfs0hAJBQh3V3SB87jY2RW9HQ/QdHd94DCX94UrKjHj6t
-	 hxzbKtwGiVGqIR/emfhal+5HbBulT+Ch+toqpZM/Na/lneJ7C8+VvV9dJdJMb/i/KK
-	 iIsdn9agveAsrf7FK9H7qRCOAoH7UQWALOyIzLTPhZUd26KpHy2vogP+YW87LcESb7
-	 eF5egryx0kXePamJG6XmvxfUP3QX8dEdoxj4TRO4xA79KzkUAJr5s9fk8cTNyW+qKw
-	 bkPtMxwVrpFkX9Dl7WwqY1J8HN9kgyr1pz788W18ipeZNhukiawzV5YcUv2Pb4QP0M
-	 exF+E0jcktZMA==
+	s=k20260515; t=1791550478;
+	bh=wN9BHkt86Y/qHrXCRuKCB1Rre2zJtJsy9zYh9NyiYs0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=k0TYGnHlpxTrTLdzCPG5DNTnffxT+6cnt/m7A0CJJ70Ad8A+Lt4gbwzsYt+YCY4Ej
+	 qaXwzJdtT21dBAGvz2KiZ8iv5VcRzCa0QQRVIWhAeFqa/HdOBMUnyfJChqxea27Y6L
+	 NudVqgsDKePcEPPKcWdG7pdC2YcLAmeLN+UuwhDCdEhdqCX6kCocJyRuNdHsOWi8TO
+	 D+l9ikOCvt8+xWLOzl8GhzKbAzApxUZIjyLmcIl207FEJLBY0oXCA8ByvtM5SUCRyn
+	 KjE2Js9OnMcMZYdk8SWVE8vEX2DFuQt4/lug70IpG3vaR4vNYxqRBn3uAoJIuvLOQo
+	 yqA6PemeJuCkw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-arm-kernel@lists.infradead.org,
+	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>,
+	stable@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v3 0/2] lib/crypto: arm64: Fix Poly1305 NEON resume carry loss
-Date: Fri,  9 Oct 2026 14:53:52 +0200
-Message-ID: <20261009125354.315476-1-ebiggers@kernel.org>
+Subject: [PATCH v3 1/2] lib/crypto: arm64: Fix lost Poly1305 carry when resuming NEON state
+Date: Fri,  9 Oct 2026 14:53:53 +0200
+Message-ID: <20261009125354.315476-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261009125354.315476-1-ebiggers@kernel.org>
+References: <20261009125354.315476-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,29 +50,76 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This series fixes a lost carry bit in the arm64 Poly1305 implementation,
-then adds a regression test for it.
+From: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
 
-Compared to v2 sent by Jérémy Jean, I cleaned up the verbose
-LLM-generated text in the commit message of the fix commit, and I
-replaced the LLM-generated minimal test case with a more comprehensive
-one similar to the existing test cases in the file.
+When poly1305_blocks_neon() resumes from a base 2^26 accumulator and the
+next update contains an odd number of full 16-byte blocks, it processes
+one leading block through poly1305_mult() so that the remaining NEON
+work has an even block count.  That requires converting the accumulator
+to the base 2^64 form used by poly1305_mult().  The final ADC of that
+conversion stores the carry into d2, but the following accumulation and
+poly1305_mult() use h2.  If the conversion carries across bit 128, the
+carry is dropped and the emitted tag is wrong.
 
-Note: the second commit has references to the commit ID of the first,
-which I'll fix up when applying.
+This was introduced by Cryptogams commit 03dc4adf91c8
+("arm/poly1305-armv*.pl: optimize branches."), which removed the
+reduction that consumed d2 shortly before Linux imported the code.
+OpenSSL's copy did not take that change.
 
-Eric Biggers (1):
-  lib/crypto: tests: Add Poly1305 split-update carry regression test
+The carry is possible because the NEON code stores the accumulator [h0,
+h1, h2, h3, h4] in a lazily reduced, redundant base 2^26 form: its final
+carry chain leaves h0, h2, h3 < 2^26, but h1 and h4 may slightly exceed
+2^26 - 1.  For example, the reachable state
 
-Jérémy Jean (1):
-  lib/crypto: arm64: Fix lost Poly1305 carry when resuming NEON state
+  h0 = 4
+  h1 = 2^26
+  h2 = 2^26 - 1
+  h3 = 2^26 - 1
+  h4 = 2^24 - 1
 
- lib/crypto/arm64/poly1305-armv8.pl |  2 +-
- lib/crypto/tests/poly1305_kunit.c  | 97 +++++++++++++++++++++++++++---
- 2 files changed, 89 insertions(+), 10 deletions(-)
+represents 2^128 + 4, so the conversion must produce the base 2^64 limbs
+h0 = 4, h1 = 0, h2 = 1.  The low 64-bit word sums to 2^64 + 4 and the
+middle 64-bit word (including the carry from the low word) sums to 2^64,
+so both carry out.  However, the carry out of the middle word goes to
+d2, leaving h2 = 0 and the value 4 instead of 2^128 + 4.
 
+Given the above bounds, a carry across bit 128 happens exactly when
+h1 >= 2^26, h2 = h3 = 2^26 - 1, and h4 mod 2^24 = 2^24 - 1.
 
-base-commit: 572af6872e520c7102e58362ef7cd7c2ed4342be
+Store the carry into h2, matching the other base 2^26 to base 2^64
+conversions in poly1305_blocks() and poly1305_emit().
+
+This bug causes an incorrect tag to be emitted.  However, this is
+unlikely to happen in practice where Poly1305 is used with a random key,
+since the random key tends to distribute the accumulator values
+throughout their valid range.  There isn't an obvious way for an
+attacker without knowledge of the r_key to cause [h0, h1, h2, h3, h4] to
+land on the precise values where this bug occurs.
+
+Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+[EB: Rewrote the commit message to more clearly describe the bug and
+ its impact, and removed a lot of pointless LLM-generated text.]
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/arm64/poly1305-armv8.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/crypto/arm64/poly1305-armv8.pl b/lib/crypto/arm64/poly1305-armv8.pl
+index f1930c6b55ce..234398ff6b60 100644
+--- a/lib/crypto/arm64/poly1305-armv8.pl
++++ b/lib/crypto/arm64/poly1305-armv8.pl
+@@ -375,7 +375,7 @@ poly1305_blocks_neon:
+ 	adc	$h1,$h1,xzr
+ 	lsr	$h2,x14,#24
+ 	adds	$h1,$h1,x14,lsl#40
+-	adc	$d2,$h2,xzr		// can be partially reduced...
++	adc	$h2,$h2,xzr		// preserve carry into top limb
+ 
+ 	ldp	$d0,$d1,[$inp],#16	// load input
+ 	sub	$len,$len,#16
 -- 
 2.56.0
 
