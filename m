@@ -1,40 +1,41 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9EA24E3231
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Oct 2026 11:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535B74DD3BA
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Oct 2026 12:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791546747; cv=none; b=Qz7pJzGeJh3MNqNetfJ7dcmS1UWj3jKbWq/J0YnROvCEs9uS1q4ZOhFBvkkQadJabg86TDKxPjDqYlx+kDoUyVmJNe6+ibEtrdlvn63d+t0feRnNxCKntIPHl3dGu+O7JHES9wR60q91ISIMDelFdlngeHm0rLvRVpV9iQ4ruus=
+	t=1791549393; cv=none; b=Fp3fc1edfht60zJdtol+K+Xmk9AiBgozupXZD27/2RfKiRjbIVVv2wW8vVTRpQ9TWkRp38pJVOCrcP3opmg1dlSFOyUWeQuwTF0Y/JQ6lzQ1NUU6U82wdDJfs8YUkBnPEwCZHPiM1JiHoQpbUEZkDbvW1Px+i/z6M6IRQTW2FBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791546747; c=relaxed/simple;
-	bh=pwMFnc2rPtSFC29Bitewbej3vYZc9k4yEXAZScfORVI=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=bk+wAavYROOTGd8JX3z6SzY5oZhbEAp7BdUQAKvDKNtGKO9yL2TFqDqCsaG4k3UU4q3vx+AYh4F5it0uwt4ADA1vvLsqihbQyndB3R+0LNUWVGG27Oktebk0VDtemOLLcPIh4eS452mTd8Si44QaOh1cBfc9ax0IMBLyM+UZvHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=WtRzmqGo; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1791549393; c=relaxed/simple;
+	bh=J9Vp/L9a9L9wvDsoyFD6hHJaqf3TKVp3NA4B8AAcq18=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sbnunPlG6m44m6hGmq1jLu6YWIfN/Kxckcr55i+8c3CDlmDvSXau1urZPmmxGaMzK6wwcNYJupe+nYjdGT4iH8qxG/im6IziHmyUjANfkgilLZLermMLhAL2b16oLD6m/SdupYpwztBv1hV3KDQHEh9Rbl7v8Pmxo+YEMJ0hSgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Bor+F5Q+; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="WtRzmqGo"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Bor+F5Q+"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
-	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=2xF+AMG5R4TEYJNdXoc5o970pr2NMWNcgO+q6pcTccs=; b=WtRzm
-	qGoetnR06kQC/R77XalTyZ8zdFyNj31+NL6gAUC+HNhl/5tWf6eKQZaTLyjwfAYIZKQpt10bVgNMu
-	Q3bq6icVGlYxEebqosiYjrIWWamr8nWV8a6EMcTXKROA8I0UBp7xgbL8io7bESyFcUi2OWtqaMXLk
-	R7oKmTnYxo7T4jB9DK2Rt8/hWBC7OuSyz15axH+Bz1UHbbioH2pIkErsx93yUB6+CqOMxXRonKiSf
-	ZMMbJEppCXIUncdfVM4jjSYDJFe4KrohnzLm5iUENUuh5Vw5cyy8tqus6Xlew8UQjGwBdaj7zn57b
-	4PjMWyNe7Vlm4tGZNnuX6ZbWWj4pQ==;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:To:From:Date:cc:to:subject:message-id:date:from
+	:content-type:reply-to; bh=H9TYFwMfYzt6ahylBkl2WulXx+ayEFsbARQlR7vHY7A=; b=Bo
+	r+F5Q+qQK97Qlev+rEa1PphCwoJKwhThEzbpbhny731uuUC+R3LwlsyQ0EfqUNwpkVmr/F9V9XOu9
+	G5wYUI2XC4A2HG85P3myCTRADtokxVE16qByMbQbrcuPtCP3d/tZTd78AwPyU800P+dzD15Xydzfw
+	0qivgXI9QYHiVT6T0ZhyrsCRQ8ACYz3K80QFOg3An3aSAu39e355umValRTzvDCAxF+5hXmlVb/2v
+	zi9lbhrevqlkvPtUdvsJER97psYm59SCITacvRxV4+jUg154IhivU/DTqXqx3lFpu7fjJ6tbJ8dYy
+	4SjQ4wx6DQStrrp5TbuuT7MgFb/D3MFw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xF98z-00000002CpB-0E7D;
-	Fri, 09 Oct 2026 19:52:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Oct 2026 22:52:09 +1100
-Date: Fri, 9 Oct 2026 22:52:09 +1100
+	id 1xF9pm-00000002Dcd-3TyR;
+	Fri, 09 Oct 2026 20:36:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 09 Oct 2026 23:36:22 +1100
+Date: Fri, 9 Oct 2026 23:36:22 +1100
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: hash - Preserve withheld block in export_core
-Message-ID: <asjVaVGfI3JhoQja@gondor.apana.org.au>
+Subject: [v2 PATCH] crypto: hash - Preserve withheld block in export_core
+Message-ID: <asjfxnGfCtvD7QJL@gondor.apana.org.au>
+References: <asjVaVGfI3JhoQja@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,7 +44,13 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <asjVaVGfI3JhoQja@gondor.apana.org.au>
 
+v2 changes crypto_ahash_export_core to import the updated hash state
+after export_core, rather than the original (which causes the partial
+block to be lost).
+
+---8<---
 Some algorithms (cmac and xcbc) withhold one block for finalisation.
 This breaks crypto_ahash_export_core (only called when there is no
 partial block data) because the exported hash state is missing the
@@ -55,7 +62,7 @@ present before doing the export.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/crypto/ahash.c b/crypto/ahash.c
-index d86c78f8d550..706440ebe4eb 100644
+index d86c78f8d550..28c58933845f 100644
 --- a/crypto/ahash.c
 +++ b/crypto/ahash.c
 @@ -634,6 +634,43 @@ int crypto_ahash_export_core(struct ahash_request *req, void *out)
@@ -95,7 +102,7 @@ index d86c78f8d550..706440ebe4eb 100644
 +			      crypto_ahash_export_core(req, out);
 +
 +			ahash_request_set_tfm(req, tfm);
-+			return err ?: crypto_ahash_import(req, state);
++			return err ?: crypto_ahash_import_core(req, out);
 +		}
 +	}
 +
