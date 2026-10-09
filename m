@@ -1,35 +1,40 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286DC3AD518;
-	Thu,  8 Oct 2026 23:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E723AB5DC;
+	Fri,  9 Oct 2026 03:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791503407; cv=none; b=a0CCL15NIlMSveRmmUii5vY5AxWwNza4c/yvED1ykYLWXPvS7bHSTJAkApAFL8gAIfOsiZPN3+dKxG3nmxNHP3H5n+wTNpEOwlqKh4du6OaPGV4TOLiAqQutCsZ+jKbYkDOMkbwYGQX/cQJaNwHfqUfAy+LzAW637vack7N+Xm4=
+	t=1791516729; cv=none; b=UUO2dqM9KTehsNdI1RWFUyhn9AQ5+i8l7WNP5Lneuhx3r4uvJ5ZgXzB4y75AtQxt5a6WUYdnpQJVU9xLgV/oRZlt0pvK+gd/piPmLOCenmKnPIkTjxTGEpbRELg0sfv7pm7yoO6QRxgFnGbydUygS2ZpSKV4xFoUn/rmNq8c0xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791503407; c=relaxed/simple;
-	bh=CJxOqD3NE61s59E7mg9tMzBvtBspVcInzlShefe/6P4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bRsc3QJiNu3bY4h8eVF3ZUnhcjrv8VfKiXSgU1xbeXbybDidiUyqXarADdwbFKcCQikLg7DdGNcIqKB+s+n21EysZ5MCEGmpo4EybL4XmUTOoEGMvWgl6pOuTtOz8VXIHMEpa+7nOOr6fIaiA7x64XwvCkMGoYaIDJqfxdAviZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X84G1Tz1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791516729; c=relaxed/simple;
+	bh=DJdBDREzG7h7vTup7WhoYyl/QMwzRMYkrocwbln5h/Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ahdC4KvYm0s9XrO5eMPsfZpD84Bp0G1wInrcSooMw1aE4sqeGc9gvp/HS59p5ecK+8s2/GjG5zH8dJyhSVsFI+LQFBMLgCQX8cTdudPiR7gPVu8k31g3e1UHCTcZ68OduedoZqT3gct9toLfLOy8ptNkDKWuGRIkdsXBsyouZJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=dLPMMMJw; arc=none smtp.client-ip=101.71.155.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X84G1Tz1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE6451F000FF;
-	Thu,  8 Oct 2026 23:50:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791503405;
-	bh=w6nkmv/DDpaHl5YKwomMF3p1zN5UZG16ybANi5RR8Jg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=X84G1Tz1+NBASMVv7LWyF0pxG85zWONvjbkufRPTUwl78f2Fr2947zOcEhH6JiGSp
-	 1mwu32bEvNGsSZH1alEfPXoDFq73CVuaQ+jyUvxp8xBuDLC5Fmp/tksjuC1clhA7eL
-	 yeS+WYpVR1ZGc3Xz+nS3iPtqgXwG5rqvcXm2QfRxxmx3zC5CpTeLLOCxwBT6hj/W4/
-	 Ygf2h5jffs8j3jik+4WzXMYyCg6TQdsTDBH6fWx1vbaxybWJQYatwjbHLaENOlA1zM
-	 h52TT0RuAym1ajzGBxdsSZe5Ayur+hPlVzm70YyIYiMOSL3xU4qSLroVFohBASTWZD
-	 7yc5OkkCV2qMg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B4574380AA60;
-	Thu,  8 Oct 2026 23:50:05 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="dLPMMMJw"
+Received: from PC-202605011814.localdomain (unknown [223.112.146.162])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 50622dd9c;
+	Fri, 9 Oct 2026 11:31:55 +0800 (GMT+08:00)
+From: Runyu Xiao <runyu.xiao@seu.edu.cn>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Antoine Tenart <atenart@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Runyu Xiao <runyu.xiao@seu.edu.cn>,
+	Jianhao Xu <jianhao.xu@seu.edu.cn>
+Subject: [PATCH v2] crypto: inside-secure: initialize EIP93 state before requesting IRQ
+Date: Fri,  9 Oct 2026 11:31:49 +0800
+Message-Id: <20261009033149.1127441-1-runyu.xiao@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <asXl69ABi0_1ZKIJ@gondor.apana.org.au>
+References: <asXl69ABi0_1ZKIJ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,44 +42,65 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] octeontx2: use arch_extension to enable LSE
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <179150340428.483817.886115147971378041.git-patchwork-notify@kernel.org>
-Date: Thu, 08 Oct 2026 23:50:04 +0000
-References: <20261005162137.71397-1-emanuele.rocca@arm.com>
-In-Reply-To: <20261005162137.71397-1-emanuele.rocca@arm.com>
-To: Emanuele Rocca <emanuele.rocca@arm.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, rkannoth@marvell.com,
- sbhatta@marvell.com, bbhushan2@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- schalla@marvell.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Tamar.Christina@arm.com, Jeremy.Linton@arm.com
+X-HM-Tid: 0aa11eb7aa1e03a1kunmf0a94a55431ab9
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZSU5IVh0eShhJTR0dSU8dGlYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUJCSU
+	5LVUpLS1VKQktCWQY+
+DKIM-Signature: a=rsa-sha256;
+	b=dLPMMMJwVRjlnu86nmy5mGbxVwus/Ry5hal25mIpLf69CCgtpEYBHOQRDele3PgMtxnsMiRfpe0Rfc5DkltwT8652i881XhXE3dRTu22kKQ1Unab4sAYClROZh3j/apEI+lVeqa3WbdG4dgMd8hNQgnU6VRK1dBUEiFm4rAifzI=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
+	bh=56dcQkmnI7815PCgex3ip24CJMUdwzNIUdqUHZX90Dk=;
+	h=date:mime-version:subject:message-id:from;
 
-Hello:
+devm_request_threaded_irq() can invoke the handler as soon as registration
+starts. Initialize EIP93 state before requesting it and leave device
+interrupts disabled until registration succeeds.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+If IRQ registration fails after the hardware and rings are initialized,
+call eip93_cleanup() before returning. This shuts down the engine and
+clears the ring registers before devres releases the DMA rings.
 
-On Mon,  5 Oct 2026 18:21:37 +0200 you wrote:
-> Instead of using ".cpu generic+lse", use ".arch_extension lse" to
-> enable LSE.
-> 
-> The ".cpu generic+lse" directive replaces the assembler's current feature
-> set with generic+lse, dropping other previously enabled features. In
-> contrast, ".arch_extension lse" enables LSE while preserving the current
-> feature set.
-> 
-> [...]
+Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
+---
+Changes in v2:
+- Call eip93_cleanup() if IRQ registration fails after device initialization.
 
-Here is the summary with links:
-  - [net] octeontx2: use arch_extension to enable LSE
-    https://git.kernel.org/netdev/net-next/c/9142c2f8f84b
+ drivers/crypto/inside-secure/eip93/eip93-main.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
+index e62785952b..52b5fb1ffc 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-main.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
+@@ -430,12 +430,6 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+ 	if (eip93->irq < 0)
+ 		return eip93->irq;
+ 
+-	ret = devm_request_threaded_irq(eip93->dev, eip93->irq, eip93_irq_handler,
+-					NULL, IRQF_ONESHOT,
+-					dev_name(eip93->dev), eip93);
+-	if (ret)
+-		return ret;
+-
+ 	ret = eip93_desc_init(eip93);
+ 	if (ret)
+ 		return ret;
+@@ -452,6 +446,14 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+ 
+ 	eip93_initialize(eip93, algo_flags);
+ 
++	ret = devm_request_threaded_irq(eip93->dev, eip93->irq, eip93_irq_handler,
++					NULL, IRQF_ONESHOT,
++					dev_name(eip93->dev), eip93);
++	if (ret) {
++		eip93_cleanup(eip93);
++		return ret;
++	}
++
+ 	/* Init finished, enable RDR interrupt */
+ 	eip93_irq_enable(eip93, EIP93_INT_RDR_THRESH);
+ 
