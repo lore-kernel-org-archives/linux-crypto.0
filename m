@@ -1,139 +1,80 @@
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B291A42586B;
-	Sat, 10 Oct 2026 07:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E91333439;
+	Sat, 10 Oct 2026 08:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791617160; cv=none; b=jBbv04Zv61r2CXsD6THLzUW7TqIgiFIXuEr7QGjV1gll+ME0HTB+g7G77tFCqF0B1qglTCF5rg9y+s9nzCpvTtWf1qULdgHAD2YbWJDkB5PtWw+h/8f7UnO1RDgRokJSfHjUxJyXJi11OAkiFkzuJWTZC2CREAkI/ES/jK9sbMA=
+	t=1791620154; cv=none; b=Lo4uimUHwAZnhl9WYuTX+MczU1tAGdMU0LSzjKY0uzK6x9maDtv1Tev7Dmzi8XuEv/ITsRbDNjD73rUc4g5NMgVfeykX+wZTqckfMdGDDDgaG/yYgTo5yWHDMuA9ag3iLdr6+f3lJn2SD6KGKatguAiFhbOxqqX9cbJo5jmeZPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791617160; c=relaxed/simple;
-	bh=psSEhTAu6sd/btygb5O4mtgWqP0fyubjuaxPUt/yIxQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tmd7rcH6pd8AI1hkEF/os5EfzKPuOKL97gW1ENZ3Dk06CEuXrieanVXhooIHTLIQxeOkjJQ4guzyfHn5amJSL4tBalsmwbqofq3fozoMppP7PWEPY8xXhu+5cXqGLmSN3KGXOnJNvVaVCPFkJ1iAPY4KVDmbc7bshKyrFKJiRNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=AyG5aA91; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1791620154; c=relaxed/simple;
+	bh=acDxKuhOLGGK2oW0DYlbt1lxqD6yQrEiPWUyi1jPvy0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Zv5D+YJ6+rdB6IZgnfInIo247/P0Xa78a0iPf+/ArwVN9KVN25tVYpZ4jP6jGT+C0XQAcuFzIaTLLg0rcqYlkst1FsLrV6uL/Xc7dVVW/Zm/Jza1EubIA+BW2GG1iSHeDyUvligV36FhWJvM34cEBPV5YCLRKsdXDQ3XdDRZTXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=pxTD+Ef7; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yoseli.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yoseli.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="AyG5aA91"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1791617097;
-	bh=f5XnlgkuyXmuZubmW1iV33/WbNbQKyGxmVA7ORE9aTQ=;
-	h=From:Date:Subject:MIME-Version:Message-Id:To;
-	b=AyG5aA91QByma1CZsPYllkJe5iu+Yo13+hFuC/ag0VTmCPT9sJZ6axenJECheZj0n
-	 oqTX9/jLBDw1sWi8xbfIL8otcoR/dEQ3RyESTlf0421GNnukXFM0eDdHN+9jyBOAvT
-	 NW1vMdVx+TU5eaDGUPKjVnqAP5HvJdGv/UKNSUF8=
-X-QQ-mid: zesmtpgz3t1791617081t38466de1
-X-QQ-Originating-IP: gKWMmCO6Ux/ph6jGHs4xziZ9kQfZjAs/dywymu9EN04=
-Received: from [10.10.7.69] ( [1.202.39.170])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sat, 10 Oct 2026 15:24:29 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 12070926784501131299
-EX-QQ-RecipientCnt: 8
-From: ZhaoJinming <zhaojinming@uniontech.com>
-Date: Sat, 10 Oct 2026 15:23:58 +0800
-Subject: [PATCH] crypto: hisilicon/sec - Fix double free of split
- scatterlists
+	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="pxTD+Ef7"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1DAF31F4F6;
+	Sat, 10 Oct 2026 08:15:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
+	t=1791620144;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=acDxKuhOLGGK2oW0DYlbt1lxqD6yQrEiPWUyi1jPvy0=;
+	b=pxTD+Ef7LnIgux8lbFifhuueGT6s5ZGqEbs6PTnqG6KVeZEgb8gZdGLqNVqp8f82FM/sD7
+	SdaPfraXf/HHd+OLq1H1U2Q/5SmqmyAqwLx6hFFYB7SOwfTFBOnUOvnqCaJ/Me5kIZ5lfw
+	+9qqy06GztKKzXEnIU/AHAJMgiN4irwTrEoVsgWB5Pv1iDJfQ4Ru7El5Cmw1O1ILqSJxeJ
+	nJAc19qo0kPfviey4PJHYBppOG92hpJr4fSrcJvZalJ/k7ILd9WK3tCUAq2aDWidbA3Abw
+	XyHMAylUywUve7YTqwjyCbF5UjYgXCAdDxjcig+nF1hdlj77Nh7QHewQx8y8zA==
+From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Greg Ungerer <gerg@linux-m68k.org>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Martin Kaiser <martin@kaiser.cx>,
+	Frank Li <Frank.Li@nxp.com>,
+	linux-crypto@vger.kernel.org,
+	linux-m68k@lists.linux-m68k.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/2] m68k: coldfire: Add RNG support for MCF54418
+Date: Sat, 10 Oct 2026 10:15:40 +0200
+Message-Id: <20261010081540.1572638-1-jeanmichel.hautbois@yoseli.org>
+In-Reply-To: <9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com>
+References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org> <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org> <bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org> <ddf0ab32-5b66-453e-b7aa-1722aeaf2aa0@yoseli.org> <9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261010-hisilicon-sec-double-free-v1-1-05d6f9b901ae@uniontech.com>
-X-B4-Tracking: v=1; b=H4sIAA3oyWoC/yXMUQrCQAyE4auUPBtIVqjFq4gPdju1kbIrG1uE0
- ru76uMHM/9GjmJwOjcbFazmllOFHhqK0y3dwTZUU5DQqqjwVCezxZzYEXnISz+DxwLwCZ100mo
- 4qlD9PwtGe//al+vfvvQPxNc3SPv+AWH0bsB9AAAA
-X-Change-ID: 20261010-hisilicon-sec-double-free-7e8080612310
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Jonathan Cameron <jic23@kernel.org>, 
- John Garry <john.garry@linux.dev>, stable@vger.kernel.org, 
- ZhaoJinming <zhaojinming@uniontech.com>
-X-Mailer: b4 0.15.2
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: OHYeUdyRmGQYHA7oI7qlB4lkJz6f4mbVE8rwdYGA5Mu4cgArKPKFVAOd
-	Fvc1S7M+8DX6lDG/4H5vN/6cCk3bGBtt0b/IrHn5aUmFDpbP2RLXtXsFxgv+oUL8YrCK6db
-	4/mtoJZJo1UmemDw+den+qt1bEwR6M+kag9W0+syiz/LTRfdNF6cs2/K+lgOJywwZF5O4W7
-	tLWfAU4jRZ4G7RDWnuF6CSUMY2zLNvnKFcw6wMQ+uGu26Wt2hrX9VVOdXN6Neq7pV3fCxYg
-	+k4ubmTENq7rWIdQI3uKPB6fIPNf1322sUKL8ozR+QpdZZ8rBi6WZRnghJr+S9fde/MmRkv
-	uT0c9QpPVAQRxt0qq0Uj55/YcpyGYzf6t7vLol7senDi0RPkMuYxh0UXSO3YxN96WP2MdtR
-	/Ro/N/fgljxi45bS0gqhYtz7qaZeWdOdSC5HTjkHboZ3cWJ9qguJZCMeCDdA8g7cMMEO/3s
-	ySvTZ44nA7y863+eUOpD4VpRWhxkOXloohNCkCJxvv0wjvSd64oxq9Fb2W0waYfgc9ezSFt
-	nlumKJKz3Efr9qPYMOYNh8EFbA6e3497pv4652IilSuXtrCbH3qhmtaZjhVhxdNY8aDG/bG
-	YwGgDd39Eddx52jdXmIYWdH7gE7Wa6dzDFSgEKvGCjMIljKgF5qlICFVmIv0TwhDQt69HYf
-	vDCV4KmA+VweFInFVfbZYuSxW/L6SmgPTC1R0GL0TbO/ldfzt3uM3j1uav8/iR4u4I8l/wA
-	lBVKEEE0jlivZsg6xHUYzzAU5Yvg7xDYoqRLY/Rl3ntzCVqBSmtynLps7n9szwuG/fzE3MZ
-	DBir1hI22GUk7ETaJkcTQitxA1my+zcIfYCH/kbWJafB6wIPU1voBlhufiVfXj4A/jCMZv9
-	WUfoUxiJhu+lGe6OVx/RjyAs7LDg0k31kyHnUqo6UsvsHmvGcD78VqH1JI79ARpfU3YGssd
-	oWRGEqHu1MQoImlhmX31NNlLvNZB5cLzzfU9wTKm0/p7t6qEVUWmWoMzM+Yj432Jq67Nf/n
-	q1Nmozz/o0q1T2/ueewmL/UYOQKEPVBzNNEkKihiWSEQvsiQYy2o8iUHaTeg8=
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: jeanmichel.hautbois@yoseli.org
+X-GND-Score: -100
+X-GND-Cause: dmFkZTFFgjXmLX45G3dprB7mBNjC39R3ZFdOmBlaHPfi/DKTpY93XscaCHp5tMBkCqA9LArRLUDoM01EVChTeeFfzAOttynoyn4me75u/AMeur57qlYoUt28xbQr2VCzXrUKal88bFbOX/hmdfoSkia+g6mFtqi4z6GrYMEXCOiDsV3FUVX8TYm7BBKI/RXSmTai2gy+ulBqwsEFBEddLFN4/92EvJILYI+Zo4Eyak/G5G4UazEN1k348y7oO3yYpRtX24mnqQSPJqenYmzqhSuK6YbTKJP0uTTlUkB2cDn9iFz/54twkKrzfLJ0FxYsvYGvnEunmDA/jK01KhIV1AWtZhBZI2V/e07WWs0y8f1WYwTAIXk1hDV6N+tWvITXJisqU2nGU02SemrmJIISIfL/Q9FDLSUbejgzG55Eq9flnptsFLvIuwTw8tWjZQFRnwOA0U4YbBPI/rWwDnGep2IFlESqwbUbxWtfEGjHpyhTUGlPjUD15YBeHwGKMd0jMVcAH0WY+awSWtAHaWILtKaOmNM58L2/SPAbPeai+41h5yR8j91BdARmLl6HC7gu4Ohx8UPgqVzajKmhN1ZqnuYYQIkDRaIofR/OtxMculnKPsx4r2bWYWh8o49LqT3ya7KV4NQq/WZ/wKI8jHZHMiWoyHEHTm0DRYbay1kKk5poGWHjHg
+X-GND-State: clean
 
-sec_alg_skcipher_crypto() splits the request scatterlists into per-element
-lists with sec_map_and_split_sg().  Each element keeps a reference to its
-share in el->sgl_in/el->sgl_out, and sec_alg_free_el() releases them when
-the element is torn down.
+Herbert, Greg,
 
-The error paths that jump to err_free_elements free the elements with
-sec_alg_free_el(), which kfree()s el->sgl_in and el->sgl_out.  Execution
-then falls through into err_unmap_out_sg/err_unmap_in_sg, where
-sec_unmap_sg_on_err() kfree()s the very same splits[] pointers again, so
-every scatterlist that was already attached to an element is freed twice.
-This is reachable through the queue-full back-pressure path taken when the
-request is not marked CRYPTO_TFM_REQ_MAY_BACKLOG, through a failed
-sec_send_request(), or through a failed sec_alg_alloc_and_fill_el().
+Gentle ping, and the delay is mostly mine: this sat on my own list for
+months. The series has had all the acks it needs since December 2025,
+but Greg would like your word before taking the arch half[1].
 
-Hand ownership of the split scatterlists over to the element as soon as it
-is created by clearing the matching entries in the splits_in/splits_out
-arrays.  Entries that were never assigned to an element are still released
-by sec_unmap_sg_on_err().
+The two patches are independent at build time, so the simplest path is
+the one Greg suggested himself[2]: 1/2 through crypto, 2/2 through
+m68knommu. 2/2 is mostly arch code, but it also adds COLDFIRE to the
+HW_RANDOM_IMX_RNGC dependency and a platform id_table to imx-rngc.c[3],
+so it needs your ack for Greg to take it.
 
-Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
----
-The per-element split scatterlists are released by sec_alg_free_el() and
-then freed a second time by sec_unmap_sg_on_err() on the error path that
-falls through from err_free_elements.  The bug has been present since the
-driver was introduced in 915e4e8413da and was not covered by the earlier
-error-path fix 0b0cf6af3f31, which only handled split_sizes and the
-temporary pointer arrays.
----
- drivers/crypto/hisilicon/sec/sec_algs.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Both still apply with git am -3 on current mainline and on
+m68knommu/for-next. Happy to send a rebased v5 instead, no rush.
 
-diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
-index 85eecbb40e7e..fa9ccd8109f3 100644
---- a/drivers/crypto/hisilicon/sec/sec_algs.c
-+++ b/drivers/crypto/hisilicon/sec/sec_algs.c
-@@ -782,6 +782,15 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 			ret = PTR_ERR(el);
- 			goto err_free_elements;
- 		}
-+		/*
-+		 * The element owns the split scatterlists from here on and
-+		 * releases them in sec_alg_free_el().  Drop the references
-+		 * kept in the temporary pointer arrays so that the error
-+		 * cleanup does not kfree() the same memory a second time.
-+		 */
-+		splits_in[i] = NULL;
-+		if (split)
-+			splits_out[i] = NULL;
- 		el->req.cipher_iv_addr_lo = lower_32_bits(sec_req->dma_iv);
- 		el->req.cipher_iv_addr_hi = upper_32_bits(sec_req->dma_iv);
- 		el->sec_req = sec_req;
+[1] https://lore.kernel.org/all/9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com
+[2] https://lore.kernel.org/all/bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org
+[3] https://lore.kernel.org/all/20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org
 
----
-base-commit: 3857c2fe5449541e24afc5efdb0f81a8a8f9a3a0
-change-id: 20261010-hisilicon-sec-double-free-7e8080612310
-
-Best regards,
---  
-ZhaoJinming <zhaojinming@uniontech.com>
-
+Thanks,
+JM
