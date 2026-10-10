@@ -1,50 +1,39 @@
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E91333439;
-	Sat, 10 Oct 2026 08:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195AE376A02;
+	Sat, 10 Oct 2026 08:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791620154; cv=none; b=Lo4uimUHwAZnhl9WYuTX+MczU1tAGdMU0LSzjKY0uzK6x9maDtv1Tev7Dmzi8XuEv/ITsRbDNjD73rUc4g5NMgVfeykX+wZTqckfMdGDDDgaG/yYgTo5yWHDMuA9ag3iLdr6+f3lJn2SD6KGKatguAiFhbOxqqX9cbJo5jmeZPA=
+	t=1791620290; cv=none; b=C4N3Dk/ENdOrHGeEXgcynLwD6KdyKC1UYKpxwBDX2bc9lKy2Qai3GhW9H/DzIPVZ89k5JcM9Er1jOkgVHCTy2VRurLP3UC7pewgUxFiZROLNr+zBxYCF55/csvBqFziVF4P3u0GXcJ2yOFhw4CiTF96DxmEXoDJTBmiQi+sjmCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791620154; c=relaxed/simple;
-	bh=acDxKuhOLGGK2oW0DYlbt1lxqD6yQrEiPWUyi1jPvy0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Zv5D+YJ6+rdB6IZgnfInIo247/P0Xa78a0iPf+/ArwVN9KVN25tVYpZ4jP6jGT+C0XQAcuFzIaTLLg0rcqYlkst1FsLrV6uL/Xc7dVVW/Zm/Jza1EubIA+BW2GG1iSHeDyUvligV36FhWJvM34cEBPV5YCLRKsdXDQ3XdDRZTXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=pxTD+Ef7; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yoseli.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yoseli.org
+	s=arc-20240116; t=1791620290; c=relaxed/simple;
+	bh=OS9EwkaKxHu1KTV4vOtxKzx6o3vEAVWBmk0osN0R4xc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TFo3JM881h3UMwhEHgFRYebwDL93fzKtejkbQj4fbDEmMDSGiLZS0V8yxN2D46C4Jb+FBOYzPQBEACLVzE8DyHgg6f2Vny22KJ26iHWGO/T2L7KJrTy+7AYEgySETDxsdF+HB35K1czJbrtrp2Jr9shCkbbERYMV3OyvbBHr4UM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mSsYTjQg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="pxTD+Ef7"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1DAF31F4F6;
-	Sat, 10 Oct 2026 08:15:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1791620144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=acDxKuhOLGGK2oW0DYlbt1lxqD6yQrEiPWUyi1jPvy0=;
-	b=pxTD+Ef7LnIgux8lbFifhuueGT6s5ZGqEbs6PTnqG6KVeZEgb8gZdGLqNVqp8f82FM/sD7
-	SdaPfraXf/HHd+OLq1H1U2Q/5SmqmyAqwLx6hFFYB7SOwfTFBOnUOvnqCaJ/Me5kIZ5lfw
-	+9qqy06GztKKzXEnIU/AHAJMgiN4irwTrEoVsgWB5Pv1iDJfQ4Ru7El5Cmw1O1ILqSJxeJ
-	nJAc19qo0kPfviey4PJHYBppOG92hpJr4fSrcJvZalJ/k7ILd9WK3tCUAq2aDWidbA3Abw
-	XyHMAylUywUve7YTqwjyCbF5UjYgXCAdDxjcig+nF1hdlj77Nh7QHewQx8y8zA==
-From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Greg Ungerer <gerg@linux-m68k.org>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Martin Kaiser <martin@kaiser.cx>,
-	Frank Li <Frank.Li@nxp.com>,
-	linux-crypto@vger.kernel.org,
-	linux-m68k@lists.linux-m68k.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] m68k: coldfire: Add RNG support for MCF54418
-Date: Sat, 10 Oct 2026 10:15:40 +0200
-Message-Id: <20261010081540.1572638-1-jeanmichel.hautbois@yoseli.org>
-In-Reply-To: <9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com>
-References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org> <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org> <bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org> <ddf0ab32-5b66-453e-b7aa-1722aeaf2aa0@yoseli.org> <9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mSsYTjQg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63A081F000FF;
+	Sat, 10 Oct 2026 08:18:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791620289;
+	bh=KN8inG2eDZZjrXlblF7pQPwBcbGnsDcd2/rkjsC9adM=;
+	h=From:To:Cc:Subject:Date;
+	b=mSsYTjQg96Sj1BvFIjPMenFd+3xAjLBfZmgzAEQJqw/xvvb67z9FCXqSPGgFECiNF
+	 lAy1j7GS2b3Dy0D2dqJ7lRSpt0ZbVuwSA5UqJv1zeW5uVT8t55u9lpZ2p2r7I2BbWk
+	 YTYtKpIcYQMxvg79PDw5l01ybkqKM/JQDQq9su7uj525WPjG2+bO0IKP17Jgm57KOj
+	 txwRSugKEabFu3Gi167D0bYAlthsH95eAOb3I7ZkzRKm7vIk1Q9jyUJs/z1pd3hO8w
+	 h0Lqeg6z2CMdLf5cQztqJbxTzj6jzcEGntHKfsTcGdX7RH1WgsiDWYQev2gudSsYun
+	 lEsUy2sqAD2yw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: stable@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 6.18,6.12,6.6,6.1,5.15,5.10] crypto: drbg - Fix ineffective sanity check
+Date: Sat, 10 Oct 2026 10:17:20 +0200
+Message-ID: <20261010081720.17151-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.56.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,29 +41,61 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: jeanmichel.hautbois@yoseli.org
-X-GND-Score: -100
-X-GND-Cause: dmFkZTFFgjXmLX45G3dprB7mBNjC39R3ZFdOmBlaHPfi/DKTpY93XscaCHp5tMBkCqA9LArRLUDoM01EVChTeeFfzAOttynoyn4me75u/AMeur57qlYoUt28xbQr2VCzXrUKal88bFbOX/hmdfoSkia+g6mFtqi4z6GrYMEXCOiDsV3FUVX8TYm7BBKI/RXSmTai2gy+ulBqwsEFBEddLFN4/92EvJILYI+Zo4Eyak/G5G4UazEN1k348y7oO3yYpRtX24mnqQSPJqenYmzqhSuK6YbTKJP0uTTlUkB2cDn9iFz/54twkKrzfLJ0FxYsvYGvnEunmDA/jK01KhIV1AWtZhBZI2V/e07WWs0y8f1WYwTAIXk1hDV6N+tWvITXJisqU2nGU02SemrmJIISIfL/Q9FDLSUbejgzG55Eq9flnptsFLvIuwTw8tWjZQFRnwOA0U4YbBPI/rWwDnGep2IFlESqwbUbxWtfEGjHpyhTUGlPjUD15YBeHwGKMd0jMVcAH0WY+awSWtAHaWILtKaOmNM58L2/SPAbPeai+41h5yR8j91BdARmLl6HC7gu4Ohx8UPgqVzajKmhN1ZqnuYYQIkDRaIofR/OtxMculnKPsx4r2bWYWh8o49LqT3ya7KV4NQq/WZ/wKI8jHZHMiWoyHEHTm0DRYbay1kKk5poGWHjHg
-X-GND-State: clean
 
-Herbert, Greg,
+commit 040ad83b0e8aa065fd2fc641cacba8491a8b186d upstream.
 
-Gentle ping, and the delay is mostly mine: this sat on my own list for
-months. The series has had all the acks it needs since December 2025,
-but Greg would like your word before taking the arch half[1].
+Fix drbg_healthcheck_sanity() to correctly check the return value of
+drbg_generate().  drbg_generate() returns 0 on success, or a negative
+errno value on failure.  drbg_healthcheck_sanity() incorrectly assumed
+that it returned a positive value on success.
 
-The two patches are independent at build time, so the simplest path is
-the one Greg suggested himself[2]: 1/2 through crypto, 2/2 through
-m68knommu. 2/2 is mostly arch code, but it also adds COLDFIRE to the
-HW_RANDOM_IMX_RNGC dependency and a platform id_table to imx-rngc.c[3],
-so it needs your ack for Greg to take it.
+This didn't make the sanity check fail, but it made it ineffective.
 
-Both still apply with git am -3 on current mainline and on
-m68knommu/for-next. Happy to send a rebased v5 instead, no rush.
+Fixes: cde001e4c3c3 ("crypto: rng - RNGs must return 0 in success case")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-[1] https://lore.kernel.org/all/9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com
-[2] https://lore.kernel.org/all/bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org
-[3] https://lore.kernel.org/all/20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org
+This commit doesn't matter for anything other than certification.  But
+it did have 'Cc stable' on it, and it failed to apply due to a trivial
+conflict.  So it might as well be backported as intended.
 
-Thanks,
-JM
+ crypto/drbg.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index dc8996789da6..51c36cfa8eff 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1986,7 +1986,6 @@ static int drbg_kcapi_seed(struct crypto_rng *tfm,
+  */
+ static inline int __init drbg_healthcheck_sanity(void)
+ {
+-	int len = 0;
+ #define OUTBUFLEN 16
+ 	unsigned char buf[OUTBUFLEN];
+ 	struct drbg_state *drbg = NULL;
+@@ -2030,12 +2029,12 @@ static inline int __init drbg_healthcheck_sanity(void)
+ 	max_addtllen = drbg_max_addtl(drbg);
+ 	max_request_bytes = drbg_max_request_bytes(drbg);
+ 	drbg_string_fill(&addtl, buf, max_addtllen + 1);
+-	/* overflow addtllen with additonal info string */
+-	len = drbg_generate(drbg, buf, OUTBUFLEN, &addtl);
+-	BUG_ON(0 < len);
++	/* overflow addtllen with additional info string */
++	ret = drbg_generate(drbg, buf, OUTBUFLEN, &addtl);
++	BUG_ON(ret == 0);
+ 	/* overflow max_bits */
+-	len = drbg_generate(drbg, buf, (max_request_bytes + 1), NULL);
+-	BUG_ON(0 < len);
++	ret = drbg_generate(drbg, buf, max_request_bytes + 1, NULL);
++	BUG_ON(ret == 0);
+ 
+ 	/* overflow max addtllen with personalization string */
+ 	ret = drbg_seed(drbg, &addtl, false);
+
+base-commit: 725bd2f3c81d54edccb66fead01d4c0c222e2231
+-- 
+2.56.0
+
