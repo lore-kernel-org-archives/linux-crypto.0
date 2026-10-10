@@ -1,115 +1,144 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAA33D75A0;
-	Sat, 10 Oct 2026 08:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791622298; cv=none; b=H5XQy/b7vIA4sfRpF/Uhm014bGBecq5Vcb17prI1whpUm9GYUJGWDIstfl4doNAvuL/F5nzWpha7FGbeEubpY7q9xh+2zCYE9/8mnOqY0GWqeIZ7dCXMR9m4uZLk6eYWM33qqTD66rNXgHa77qaaYDaNY+I2gc2i178yvpYdI54=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791622298; c=relaxed/simple;
-	bh=RuOovqrOh1KCioDiSzvzTR23m07513lBeXANRFcJqLc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eIulK/5gWVmMb9wzjG7j1U53S9AUhgLk7NDICt6kdRZOXCrK9s/67O6xgpQ+RxX3mWNDtfAIV5LZbXEpJj94YR7UWLu65pvaSPBr/rDDR87jnuSLEcJZP9xZ/hbGzXgEUuCbXoCU+IN8jQoaGrSU2nEKwCWJSdj1uO6sOYgDe18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=COXd/rYh; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83CB439F62
+	for <linux-crypto@vger.kernel.org>; Sat, 10 Oct 2026 10:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791627298; cv=pass; b=gGBVm5rD8eN17uhPTHFypEPNk2lIeqU0Fs+SLYx8deMJquKEpK2g4+x0sQy5MhrQFZslj+021J1yZwVZXEjpT5sldAIgnHupM2JuZDCRqvJi30xjBYA3niCX8W1Px93Ks94FjZEA971FllbuQKw7iknCc7CCgHUHRhgydnxelaI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791627298; c=relaxed/simple;
+	bh=to0DTtAZWnV/meuGGusMEzel5dBXd8LQTc50qPpb4A8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tY30cikUnlGxLzB970pH1RZkc7tFJcr0OPvtAxm7LXV7Ry4HhCoVWoHqs9eHFBnviru1FUFusjU+/9ZX57wIc2SaCRKwLD3Rd9TEj+/E21eIWeWGSkA5vyMQE/3ODeSuBGUA7v9zaHAjBJEmassuR5GLSfaZCxODYZwCbAhtbto=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NMCoGtcQ; arc=pass smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="COXd/rYh"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=GRQCjk8o/a/C0+wV15inpx1btX0H9yvKy9U4k4uppuo=; 
-	b=COXd/rYh6c/YIeSmGHxKuzPrhoV2lB4EI1g+3cavw5LEJgQ1BzD4kOybLc4/lzQu3/5477pYrgA
-	AhrlmfN/9ALE2CrEvAlevl8YMcU46aRk/h0oWUADoPrAvJ1Pe8HOH/VZTdd19Q16Vx+aS5sKui5yy
-	ygS/NQGpLe4vSCZ+hZqC+ZXFAA2dBE5nRSlRsib4i5OSLoLcmf5ihPKeGOhiLPIq2aC978V7eEht/
-	Dw+ccFzuLz3Ph2daSx7iloaS5RzQOQikYKHB/o5bFMl0EkIK8n6Y5aQ84buPl32/CMb5MoCDDLGL9
-	Y7imYxMT9vHgC2Oi/7Vzlhr2gKxjnYBbXOHA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xFSnL-00000002TuW-2Zcm;
-	Sat, 10 Oct 2026 16:51:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 10 Oct 2026 19:51:07 +1100
-Date: Sat, 10 Oct 2026 19:51:07 +1100
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Greg Ungerer <gerg@polyxeno.com>
-Cc: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>,
-	Greg Ungerer <gerg@linux-m68k.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, linux-m68k@lists.linux-m68k.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Frank Li <Frank.Li@nxp.com>
-Subject: Re: [PATCH v4 2/2] m68k: coldfire: Add RNG support for MCF54418
-Message-ID: <asn8e5puc3I01Lva@gondor.apana.org.au>
-References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org>
- <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org>
- <bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org>
- <ddf0ab32-5b66-453e-b7aa-1722aeaf2aa0@yoseli.org>
- <9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NMCoGtcQ"
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-487048857f6so490721f8f.3
+        for <linux-crypto@vger.kernel.org>; Sat, 10 Oct 2026 03:14:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791627295; cv=none;
+        d=google.com; s=arc-20260327;
+        b=MnioGpOUhIYpSSSxNf1VrHazbRPQrdZy4JLcuZkj/a00V0xWcAxk1DmIDaYyJIcopu
+         /4KQE+P6PYJzsxURpb+oZq4uX9G4tar8URaDBSgoCyh1SU2cUbHi6PVJ9fF1xNu0QlZC
+         pX8VzgAtYpZHskW2bBQJx6Q6yuMF3smQ3SQLsn1C5fwuOnIkazn+5RwOdCxmfQhhE/g8
+         ch9kKSw5GgKBzBnnq4UTX8oXjo7GqP16pBS/KxoWdmryl0Ffszinkfw9VmJSGcnwEfG8
+         GuZ2qjvUYNDZ4h9+1fmHTFAZKFn3Y8WLZU+HAnwswUCQBEE+csFEEuZdAaRgAgFrhKSc
+         ozwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=4ZCwz3KK4ioGo2sblpjh0J8bdLeG8IsOrV/Z4ACQP54=;
+        fh=Qpge+PQwjPZpKyJ5qZeSd2tHkYfybBqpNIiOEyyfaHM=;
+        b=lfVUpgaVlXu0trJl/LM4VQD8OnfUHqQPl5a+kIzvU4zWERFTASAys+n302j0V7d2PT
+         xTJ6zt/jXWN9cL8Fjt/60kPsefSjdQEbuCnLZO0+0QoNNpdYUw/eQd69JF8K4pcFpoLw
+         7lkjTof3HDLj03HY2Fniwx/QEsE7EzFqRH0r4VWkcTENjIHbayIax2LHTTDAhKGisfnX
+         JfWeME0YrnNifYMqk81mIb6bpLkopQOqrZqmKVtuXqZ6lavS0yK/8YdkFTX0OOxf8oLy
+         PWWx5CKlWWTXoCtLjgJqq00/E/W6NUaNO4ui29FBV6TPvBk+XbJ0pDl/vuE7i/rA9Fp4
+         +/rQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1791627295; x=1792232095; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=4ZCwz3KK4ioGo2sblpjh0J8bdLeG8IsOrV/Z4ACQP54=;
+        b=NMCoGtcQ0QY+nCy8fRACIZuo0G4YycaFF6FzJyqBf4KJmDt8HkHnas7PtnkOYWm4Ki
+         0lKLyE3+5dnG+c2lLgyHKS7hVCYJUkIt6FpGv19VDpdMVCAmHy6wndDsMuJO/MuzdB+6
+         app9oROrc1/+t8dQY0I7MJdZbor6tR4hMVLreSpiAGdMZxTHcX7v6XKfPWGU3rtH/0/H
+         92LRxuER/emjnd1qKvby1E1/cyrhR7+yQfRTu0Mqoi25w7T+qlum3m+K7DXPu37RI3kx
+         BTezhG055u6ENLe6d32gFxq0Xg1dQe0XmRCUwdoiNOu2o+RRDD9zi1TPb/YXs/p1KdUk
+         MkfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791627295; x=1792232095;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=4ZCwz3KK4ioGo2sblpjh0J8bdLeG8IsOrV/Z4ACQP54=;
+        b=Quuhn9hTwOLRUjp7Qan9hZh+lZI2JEcmKSVquQU/PT07pQPjX7Nh4JPsaLTUGsh8A/
+         NiGK0dPhFM1M2d/Ev39n0XSoBhEHStPJZCYTuI2G5gp4drLeFI3VhxU9FXKnaem1q+e8
+         DYdQffZQrDjinPqH+csP96JerpXFGv96UHYTM6TDtW0gaZjwG92xN3TJZ7u0UzYYVvIf
+         0XJGtxn2LfcDjfsrj5+URAGp/pLvGlAtVauUOKrQ5ULErLDaLTf5iyojTSZsoiOQC3Hs
+         ep0qeUJ2XfxTHGBK3VAbHX5RNw20jXmVjWdthepsS2oMN9hStkVxeohs211tsPsoocHq
+         /avw==
+X-Forwarded-Encrypted: i=1; AKwUvByXy8wdKTKerGNB5pKHoort+zP5Tzx3DxUgApmNJv6D4Tk/Laq1jtasbwK83rU9uUW4LrtQJOl/BDc/fUQ=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJCfNSqQZHIVak2ovocpdgBTEJ49RyvrH+QLjqR0+pM9AGrHa7r
+	+DS10MWoWbUx/upM5ujfuvqJ7jxHxeNdmjVMkXmkOKbZuvEQdOlBIzaCDWGOBZx3Lhv3YSGC0DV
+	Eoa6+rnwkjL6SVY/LbDJQkuHKtxGI4Jda0a9ehZQ=
+X-Gm-Gg: AYBFou1AwVoXdI9k6pGieYZOSo150EafvUekeUVAD9qqweoi/g7pzgTlxAmxzh5sQ1j
+	xxt6E9M/D6IuWBsvgjvmWcGEtyWw9dffxl8E94zNGEBi37ZGGeKq8LNcl71x8GvttLou3kcVrEm
+	cMxOymj6fAPRL3vdEgqymtIIoqLNYbx4neb7kw26vUPPy5BOF4qz+MemIco0wHHnVONTBGsycoU
+	YH3aOoIHdEiCF5ruC9L/bYfM8m9pVemgWxgXMi/wTl5jivsR1h/BfYG25WTmkyZBlCNkt1oCadL
+	ixVqLm6zPJZkE/CxoMpPOxTXB+M3iKfFj69ugDyZ3/BfR5I/hxShO/SpmerjUO/sN+gCZ54hOLN
+	H1wFqYwaJSxw=
+X-Received: by 2002:a05:6000:4917:b0:48c:7302:96ea with SMTP id
+ ffacd0b85a97d-48dbace4edemr8358190f8f.51.1791627294664; Sat, 10 Oct 2026
+ 03:14:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com>
+References: <20261009163146.83112-1-usama.arif@linux.dev> <20261009163146.83112-2-usama.arif@linux.dev>
+In-Reply-To: <20261009163146.83112-2-usama.arif@linux.dev>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Sat, 10 Oct 2026 12:14:42 +0200
+X-Gm-Features: AclHuK8eHrKrxCU2Kz0-csCBZga-KHX89XLvw82csYCAbhZVbUsSPi6LOzolr2M
+Message-ID: <CAKEwX=NFGr9hwavYof=zGtZ-nXGcWWsxnt6xQE_F5D1ZO1MnBA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] mm: zswap: use separate compression and
+ decompression requests
+To: Usama Arif <usama.arif@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, chengming.zhou@linux.dev, dsterba@suse.com, 
+	hannes@cmpxchg.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	terrelln@fb.com, yosry@kernel.org, riel@surriel.com, shakeel.butt@linux.dev, 
+	alex@ghiti.fr, senozhatsky@chromium.org, 
+	Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net, 
+	linux-crypto@vger.kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 19, 2026 at 07:36:36AM +1000, Greg Ungerer wrote:
-> Hi JM,
-> 
-> On 19/8/26 01:09, Jean-Michel Hautbois wrote:
-> > Hi Greg,
-> > 
-> > Sorry for the very long silence on this one, it fell off my radar...
-> > 
-> > Le 03/12/2025 à 13:15, Greg Ungerer a écrit :
-> > > Hi Jean-Michel,
-> > > 
-> > > On 26/11/25 17:08, Jean-Michel Hautbois via B4 Relay wrote:
-> > > > From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-> > > > 
-> > > > Add support for the hardware Random Number Generator (RNGB) found on
-> > > > MCF54418 ColdFire processors with clock enabled at platform
-> > > > initialization.
-> > > > 
-> > > > The RNGB block is compatible with the imx-rngc driver.
-> > > > 
-> > > > Reviewed-by: Frank Li <Frank.Li@nxp.com>
-> > > > Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-> > > > ---
-> > > >   arch/m68k/coldfire/device.c       | 28 ++++++++++++++++++++++++++++
-> > > >   arch/m68k/coldfire/m5441x.c       |  2 +-
-> > > >   arch/m68k/include/asm/m5441xsim.h |  9 +++++++++
-> > > >   drivers/char/hw_random/Kconfig    |  3 ++-
-> > > >   drivers/char/hw_random/imx-rngc.c |  7 +++++++
-> > > >   5 files changed, 47 insertions(+), 2 deletions(-)
-> > > 
-> > > I am happy with the ColdFire arch parts, so from me:
-> > > 
-> > >      Acked-by: Greg Ungerer <gerg@linux-m68k.org>
-> > > 
-> > > I don't mind taking this commit via the m68knommu git tree if the hw_rng
-> > > maintainers are ok with that. Otherwise if you break out the arch/m68k
-> > > parts I can apply those on their own.
-> > 
-> > I think Herbert acked ?
-> > Do you need another ack ?
-> 
-> I would like to see an acknowledgement that taking this patch via the
-> m68knommu git tree (to Linus) is ok with the RNG maintainers.
+On Fri, Oct 9, 2026 at 6:31=E2=80=AFPM Usama Arif <usama.arif@linux.dev> wr=
+ote:
+>
+> Stores and loads serialize on the same per-CPU acomp request and mutex.
+> A low-priority store can be preempted as soon as the compressor drops
+> its stream lock, while it still holds the mutex. A higher-priority load
+> on that CPU then waits until the store runs again, which can take a
+> long time when other tasks are runnable.
+>
+> Give compression and decompression their own request, completion wait
+> and mutex. Since commit e2c3b6b21c77f ("mm: zswap: use SG list
+> decompression APIs from zsmalloc"), the per-CPU buffer is only used for
+> compression, so group it with the compression request. Independent
+> requests can share the per-CPU transform; the codecs and drivers
+> synchronize their shared state internally. Loads can still wait for
+> each other on the decompression mutex, and stores still serialize on
+> the compression mutex.
+>
+> acomp_request_free() ignores NULL requests, so drop the check in
+> acomp_ctx_free().
+>
+> This follows the proposal from Sergey Senozhatsky for the same split
+> for zram [1].
+>
+> [1] https://lore.kernel.org/all/20261005122036.718976-10-senozhatsky@chro=
+mium.org/
+>
+> Signed-off-by: Usama Arif <usama.arif@linux.dev>
 
-I have no objections to this.
+Acked-by: Nhat Pham <nphamcs@gmail.com>
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Herbert, does this also look good to you?
+
+> ---
+>  mm/zswap.c | 108 +++++++++++++++++++++++++++++++----------------------
+>  1 file changed, 64 insertions(+), 44 deletions(-)
+> +       if (zswap_acomp_req_init(&acomp_ctx->comp.areq, acomp_ctx->acomp)=
+ ||
+> +           zswap_acomp_req_init(&acomp_ctx->decomp, acomp_ctx->acomp)) {
+
+This really breaks my brain...
