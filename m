@@ -1,169 +1,117 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A568743B3C0;
-	Sun, 11 Oct 2026 12:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51614433BB0;
+	Sun, 11 Oct 2026 13:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791722188; cv=none; b=Wpi/9zB2Ec3iDmQQRG1fuuRlPvYwunAbYoTWweet23jNT7BeWUyh2yH81v1L/HbRllqbhvFajxjHmP0rxWGdEmu2rgTQKiPy8jXr3RbfybsHMo1kfl47ojZeshQ4sv7L5tF+eYVTIS5bqdC9/fOCGX5XodiCqMtF6f4g0+vH7pQ=
+	t=1791724564; cv=none; b=r79ghJ8npt9J25V0nd+frWbD0+73EH6pOPbVUZoUuvQm5La4qoCDqVN78n8X3AhLzh1zenGV83zfu6469wfgV5VlG/7tc6653w2vjctObhBH07pPCR+InA3WgtL4p0ya8aEkk9ErFQNHoTwsA6bkRgXRSBPgy8q/kHDPV9TqUaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791722188; c=relaxed/simple;
-	bh=R10yOSvD0fqRg4qqb0k38A3uupIsJ0VGiUVxAS7FerY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BRmRLxFfWNyYUouBBUySTH8W8W9rN6Ehar5P6GNzJKru2r9xusl9eQNVXuX93BpjIG+cKXFmi4TP+JpmSZonnoAFty0MgJvTpUI8G8i6jCtt92vHiW2xQix+hQqlTpn4Ku8lYB/hqN3IIMLdG6zu9m39PeB06t9ITo/kKJ2vMbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vuPnk4ND; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1CIaHC/k; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vuPnk4ND; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1CIaHC/k; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1791724564; c=relaxed/simple;
+	bh=KEkmnMWgYaghFaXFMXtaovDls7gPJm8lfBR8aCes3mY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R/K7vLHdAFEy2+i4pI1MRPiz3YfW7BKJe+5jtGrRa7/ZJffEIyVZdUQbo7+mvm1Wp30h+lxtB81inLuEVeVfmURrmGMSL1fwfWQqNz6nKK/KqCW76JBfwhMV3rb+HMIeMMljiftAR7wLkRhWes+q0jEhbirMrSQd45EjJJ2b+30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cLgiQH8V; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vuPnk4ND";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1CIaHC/k";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vuPnk4ND";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1CIaHC/k"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 440A51F394;
-	Sun, 11 Oct 2026 12:36:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791722181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=olaofrwGl8T9NhHp9VCEFIBcwErQS3PK86N+qFcRHGw=;
-	b=vuPnk4NDtXzs+WsmrEIxGhbUR6kYNunS0UM0sgvDYIS8JUw7oahxpMttwuwdM7pQNhvLNY
-	UMRrR1yYjuXtAEAadsoS1ipYzGk7tuebFRkUUKc588xVcRd9RRzJJVNWNwkCNNnONQEMfy
-	e8e+yLzfQDtOMb3ifhcV6bI/6KeCte4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791722181;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=olaofrwGl8T9NhHp9VCEFIBcwErQS3PK86N+qFcRHGw=;
-	b=1CIaHC/kkRdbNaKNluyGMJyssl3unh9cC1n6juD0fP5KMPtLPzRUW7sLOupDgR3hpyXpiB
-	Eax54VxwF3FB+uDQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=vuPnk4ND;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="1CIaHC/k"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791722181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=olaofrwGl8T9NhHp9VCEFIBcwErQS3PK86N+qFcRHGw=;
-	b=vuPnk4NDtXzs+WsmrEIxGhbUR6kYNunS0UM0sgvDYIS8JUw7oahxpMttwuwdM7pQNhvLNY
-	UMRrR1yYjuXtAEAadsoS1ipYzGk7tuebFRkUUKc588xVcRd9RRzJJVNWNwkCNNnONQEMfy
-	e8e+yLzfQDtOMb3ifhcV6bI/6KeCte4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791722181;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=olaofrwGl8T9NhHp9VCEFIBcwErQS3PK86N+qFcRHGw=;
-	b=1CIaHC/kkRdbNaKNluyGMJyssl3unh9cC1n6juD0fP5KMPtLPzRUW7sLOupDgR3hpyXpiB
-	Eax54VxwF3FB+uDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4D93013408;
-	Sun, 11 Oct 2026 12:36:17 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id eFhFKcCCy2qAcgAAD6G6ig
-	(envelope-from <ddiss@suse.de>); Sun, 11 Oct 2026 12:36:16 +0000
-Date: Sun, 11 Oct 2026 23:36:00 +1100
-From: David Disseldorp <ddiss@suse.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-scsi@vger.kernel.org, target-devel@vger.kernel.org, "Martin K .
- Petersen" <mkp@kernel.org>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, Lee Duncan <lduncan@suse.com>, Alexandru
- Hossu <hossu.alexandru@gmail.com>
-Subject: Re: [PATCH] scsi: target: iscsi: Use crypto library API
-Message-ID: <20261011233600.5bb5d6c9.ddiss@suse.de>
-In-Reply-To: <20261001044857.169487-1-ebiggers@kernel.org>
-References: <20261001044857.169487-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cLgiQH8V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A2D1F0089B;
+	Sun, 11 Oct 2026 13:16:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791724562;
+	bh=pe5ZoGWIz1vQLH5FnEmGSnJ3DTic8vhTTxWYQCwafgs=;
+	h=From:To:Cc:Subject:Date;
+	b=cLgiQH8V1smqJMLx/3kIeIAKEfO6jMkuAucYMIBpHFmHilnilK2DAPcDC06BG/r5C
+	 Neg5maOVRxjWyXBjWpu8Ex9rewgBDSQSZcSI7lcOCtRKgXY2H83fsdyxxAO/a0MZv/
+	 eUhELVRQqB8RrZbDMZi9Ioj3b5bVnIUyoWbSnFXzBpcVRvXDiMwjYSK4ZBDwTZklUj
+	 ZeP59kj0d/XJ24aBS7O7XoW+fcQwiN3CeQqKSKX0qzTGvsz5SXUrlCqe4Hdt7SxFD/
+	 Yk7o5C1Uf9nONXBa3A5pvplxBnu/QzJnLd1O6yu7qGfW/3dgZMmUrF/mGCpEKc2+Hi
+	 nULrVLJW9SyTA==
+From: Thorsten Blum <blum@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Thorsten Blum <blum@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/3] crypto: atmel-tdes - use separate DMA scatterlists
+Date: Sun, 11 Oct 2026 15:15:56 +0200
+Message-ID: <20261011131556.272382-4-blum@kernel.org>
+X-Mailer: git-send-email 2.56.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 440A51F394
-X-Rspamd-Action: no action
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,suse.com,gmail.com];
-	DKIM_TRACE(0.00)[suse.de:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TAGGED_RCPT(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:dkim]
-X-Spam-Flag: NO
-X-Spam-Score: -2.01
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2443; i=blum@kernel.org; h=from:subject; bh=KEkmnMWgYaghFaXFMXtaovDls7gPJm8lfBR8aCes3mY=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmne3g2Kh/Pvi7Lv+O8rtKGWYGlITnSsRcKPaUXJAQtu fZ32r+ojlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZiI2EGG/x4OEj7tXPGPVuTE KfPxyd9TPbT9f879A2Z7tK3/c//dcpPhv9u9iSG/atMneZlMM8z3ymetXDot6SDrIvHlYZUSoqs a+AA=
+X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
 
-This looks like a worthwhile clean-up and doesn't trigger any libiscsi
-chap test regressions.
-Reviewed-by: David Disseldorp <ddiss@suse.de>
+Use two separate input and output scatterlists instead of an array.
 
-I do have one minor concern: 
+Also use DMA_SLAVE_BUSWIDTH_4_BYTES directly and drop the now-unused
+addr_width variable.
 
-On Wed, 30 Sep 2026 21:48:57 -0700, Eric Biggers wrote:
+Signed-off-by: Thorsten Blum <blum@kernel.org>
+---
+ drivers/crypto/atmel-tdes.c | 33 ++++++++++++++-------------------
+ 1 file changed, 14 insertions(+), 19 deletions(-)
 
-> Make iscsi_target_auth.c call into the crypto library directly instead
-> of going through crypto_shash.  This is simpler and much more efficient,
-> as it avoids overhead of the crypto_shash layer.  The hash computation
-> itself also no longer has error codes that need to be checked.
-> 
-> For simplicity, still do a memory allocation per operation to buffer the
-> data (which is typically less than 50 bytes here) so that the one-shot
-> digest functions can be used.  It's still much more efficient than doing
-> the super slow crypto_alloc_shash().
-> 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  drivers/target/iscsi/Kconfig             |   7 +-
->  drivers/target/iscsi/iscsi_target_auth.c | 192 +++++++++--------------
->  drivers/target/iscsi/iscsi_target_auth.h |   8 +-
->  3 files changed, 78 insertions(+), 129 deletions(-)
-...
-> @@ -113,17 +143,17 @@ static int chap_check_algorithm(const char *a_str)
->  		if (kstrtol(token, 10, &digest_type))
->  			continue;
->  
-> -		digest_name = chap_get_digest_name(digest_type);
-> -		if (!digest_name)
-> +		if (fips_enabled && digest_type == CHAP_DIGEST_MD5)
->  			continue;
-
-Could e.g. SHA1 also require fips filtering here in future? If so, would
-it make sense to track the fips compat status (preferably at build time)
-in chap_digest_algs?
-
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index f084fda42423..b2fca4baee2f 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -372,37 +372,32 @@ static int atmel_tdes_crypt_dma(struct atmel_tdes_dev *dd,
+ 				dma_addr_t dma_addr_in,
+ 				dma_addr_t dma_addr_out)
+ {
+-	struct scatterlist sg[2];
+-	struct dma_async_tx_descriptor	*in_desc, *out_desc;
+-	enum dma_slave_buswidth addr_width;
++	struct scatterlist sg_in, sg_out;
++	struct dma_async_tx_descriptor *in_desc, *out_desc;
+ 
+-	addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
+-
+-	dd->dma_lch_in.dma_conf.dst_addr_width = addr_width;
+-	dd->dma_lch_out.dma_conf.src_addr_width = addr_width;
++	dd->dma_lch_in.dma_conf.dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
++	dd->dma_lch_out.dma_conf.src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
+ 
+ 	dmaengine_slave_config(dd->dma_lch_in.chan, &dd->dma_lch_in.dma_conf);
+ 	dmaengine_slave_config(dd->dma_lch_out.chan, &dd->dma_lch_out.dma_conf);
+ 
+ 	dd->flags |= TDES_FLAGS_DMA;
+ 
+-	sg_init_table(&sg[0], 1);
+-	sg_dma_address(&sg[0]) = dma_addr_in;
+-	sg_dma_len(&sg[0]) = dd->dma_size;
++	sg_init_table(&sg_in, 1);
++	sg_dma_address(&sg_in) = dma_addr_in;
++	sg_dma_len(&sg_in) = dd->dma_size;
+ 
+-	sg_init_table(&sg[1], 1);
+-	sg_dma_address(&sg[1]) = dma_addr_out;
+-	sg_dma_len(&sg[1]) = dd->dma_size;
++	sg_init_table(&sg_out, 1);
++	sg_dma_address(&sg_out) = dma_addr_out;
++	sg_dma_len(&sg_out) = dd->dma_size;
+ 
+-	in_desc = dmaengine_prep_slave_sg(dd->dma_lch_in.chan, &sg[0],
+-				1, DMA_MEM_TO_DEV,
+-				DMA_PREP_INTERRUPT  |  DMA_CTRL_ACK);
++	in_desc = dmaengine_prep_slave_sg(dd->dma_lch_in.chan, &sg_in, 1, DMA_MEM_TO_DEV,
++					  DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+ 	if (!in_desc)
+ 		return -EINVAL;
+ 
+-	out_desc = dmaengine_prep_slave_sg(dd->dma_lch_out.chan, &sg[1],
+-				1, DMA_DEV_TO_MEM,
+-				DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
++	out_desc = dmaengine_prep_slave_sg(dd->dma_lch_out.chan, &sg_out, 1, DMA_DEV_TO_MEM,
++					   DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+ 	if (!out_desc)
+ 		return -EINVAL;
+ 
