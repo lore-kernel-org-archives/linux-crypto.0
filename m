@@ -1,44 +1,36 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FFE44F548
-	for <linux-crypto@vger.kernel.org>; Sun, 11 Oct 2026 13:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06FE45D925;
+	Sun, 11 Oct 2026 14:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791726556; cv=none; b=DlgFUMFrwzy/ZGgzJMS0E84Hd1z6rel4DtWeJFcjQL5P7ZU06qpgtnjBNmSbDR7C/NizVim3GoeZpOWdFGqevSv2yPe1eYtfzF58xKOrJ613LQPSkt3SmwEwHh5FcgyiR0ChoTZNDbCyCR16de7tM3p54lUKbItCKOSHAdZXr2k=
+	t=1791729023; cv=none; b=rfNN3bP8Hj3RDodXecerXsZt6mhUqjZr5Z1pfhbF60lgHvrtdXtSvVVDO8GX5TQ/umcPla9OVFThUKYWPHYIpjb7eyt5GnoLJble4y9FnyVdQg9/VxuyNcxSkB0JgupVtGoyUcDWbe7kwPKvvHna2hT1MngSy4jrM2Ffo4NoDho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791726556; c=relaxed/simple;
-	bh=9hLgyO2+Qr1BW3xo24vUdp7i/p/fJbbtAoY/O7W35B0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rJD2JXRizrtkkSrny2Tlo+SpIvgTb+PHNQhiAKSh5AjxYtJAhAOALJomBAQz4kPSdZSej0oMeUTxKTrAy8EVgjP/C68qK7JL6NSx7uijb/99fc9RJCcqs6HwIZxsI2GCTyGog3+aLN4f0AYjCThwjCM7906w6GIgfGp/rYaW1vY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqAkxhai; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqAkxhai"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 713611F0089C;
-	Sun, 11 Oct 2026 13:49:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791726555;
-	bh=It+GyRuyrR2NE/jZUdqvVG3tQygkgzv6sQmBpQYfzps=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kqAkxhaiunTR7nDEslcLJBkbm3614Jsa6/wux9YzQJ4ZPklaTx/1I68BXi87zS1MP
-	 XrHQR/06jzYZqEMf/DiOljYDx5GsiJsYwdPwMy3UPvD80qFCMSpdhD0Rw0qlzwhLNj
-	 gs/9RsK5PmxdkqQP8r2MV0tA8Fg+Ac/dlC1yJp3cejmMzRje+dDN4rLE3KZDE52GE0
-	 nuljgWn3V0tel7amf3PT+BPis2N+pcwQHIGdgJndF3k37P+MLmnsNWazFGRzhWvvgj
-	 wUKoCDy+muZuQ+uY1/+C/QTexAHm+DiXyuGmZ/BcheGfnN1A8GkbpR9K57muQLTdnR
-	 /pRSSNEHt6H8g==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
+	s=arc-20240116; t=1791729023; c=relaxed/simple;
+	bh=72qUgiSaHSs/OtjdwuJYNHnpyqD0mBkihaiADxgjWy4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rkGuOGYSuogR4jrZQ8GbDbed/IJQMmvu17hXIB4Xyua9CcC8dRJcEvpOWRPL7YhmXeVn1NUb3XvdHYXHvg0Lv+ltVcrkg+4yRvd/R6arRHqQ9/l1Yk7y5gs+J5W0Zc3XY0zFYHbQ7xgMNGiqERIXHFxFM/XYgee0l04QCkOuZrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.159])
+	by gateway (Coremail) with SMTP id _____8CxPtN5nctq+68UAA--.60124S3;
+	Sun, 11 Oct 2026 22:30:17 +0800 (CST)
+Received: from kernelserver (unknown [223.64.68.159])
+	by front1 (Coremail) with SMTP id qMiowJDxRs1lnctqpSYrAA--.12667S2;
+	Sun, 11 Oct 2026 22:30:16 +0800 (CST)
+From: Huacai Chen <chenhuacai@loongson.cn>
+To: Eric Biggers <ebiggers@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>
 Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	x86@kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 3/3] lib/crypto: x86/sha512: Follow the normal %rbp convention
-Date: Sun, 11 Oct 2026 15:48:43 +0200
-Message-ID: <20261011134843.166585-4-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261011134843.166585-1-ebiggers@kernel.org>
-References: <20261011134843.166585-1-ebiggers@kernel.org>
+	linux-crypto@vger.kernel.org,
+	WANG Xuerui <kernel@xen0n.name>,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Huacai Chen <chenhuacai@loongson.cn>,
+	Tianyang Zhang <zhangtianyang@loongson.cn>
+Subject: [PATCH 1/2] lib/crc: loongarch: Use hardware unaligned load in CRC32(C) loops
+Date: Sun, 11 Oct 2026 22:29:29 +0800
+Message-ID: <20261011142930.492999-1-chenhuacai@loongson.cn>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,180 +38,145 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJDxRs1lnctqpSYrAA--.12667S2
+X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxWF1DGF1xtF1fWrykCr47Jrc_yoW5Kr4UpF
+	Z0kF9IgF15XFZ3WFyYqw4fG3Z8Z393JrZIqFZ3K34xC3W7Jw17JFWkuFyYvFy5Cr929r1j
+	grs5XFnxKF4vqwbCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
+	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jUsqXUUUUU=
 
-The SHA-512 assembly functions push callee-save GPRs to the stack
-*before* they set up the frame pointer (%rbp).  (They are leaf
-functions, but they need to set up a frame pointer anyway because they
-allocate a 32-byte-aligned buffer on the stack.)
+With CONFIG_ARCH_STRICT_ALIGN=y the kernel is built with -mstrict-align,
+so get_unaligned_le{16,32,64}() compiles into a byte-by-byte load/shift/
+or sequence (~22 instructions per 8 bytes). On a Loongson-3C6000 machine
+this throttles the CRC pipeline to ~5.7 cycles per 8 bytes (2.8 GB/s),
+while the crcc.* instruction itself runs at ~1.1 cycles (latency) / ~0.8
+cycles (throughput) -- the CRC unit sits idle waiting for loads.
 
-As a result, during these functions, 8(%rbp) doesn't contain a return
-address like it is supposed to.
+CPU cores with the UAL feature handle unaligned accesses in hardware,
+so issue real ld.{h,w,d} instructions when possible and keep the generic
+get_unaligned*() path for cores without UAL.
 
-This differs from the convention used by C code, and it interferes with
-the frame pointer unwinder (CONFIG_UNWINDER_FRAME_POINTER=y).
-Specifically, if a call trace is dumped in these functions, then all
-entries are populated purely from the fallback scan of the entire stack:
+Measured on Loongson-3C6000 (single core):
 
-    RIP: 0010:sha512_transform_rorx+0x673/0xdf0
-    [...]
-    Call Trace:
-     <TASK>
-     ? sha512_blocks_avx2+0x37/0x60
-     ? __sha512_update+0x80/0x230
-     ? sha512+0x31/0x190
-     ? sha512+0x114/0x190
-     [...]
-     ? do_syscall_64+0x6f/0x3e0
+    before: 2.8 GB/s
+    after:  8.4 GB/s   (~3x)
 
-With this fix to follow the normal %rbp convention, the call trace is
-generated reliably:
-
-    RIP: 0010:sha512_transform_rorx+0x90c/0xdf0
-    [...]
-    Call Trace:
-     <TASK>
-     sha512_blocks_avx2+0x37/0x60
-     __sha512_update+0x80/0x230
-     sha512+0x114/0x190
-     [...]
-     do_syscall_64+0x6f/0x3e0
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Tianyang Zhang <zhangtianyang@loongson.cn>
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
 ---
- lib/crypto/x86/sha512-avx-asm.S   | 11 ++++++-----
- lib/crypto/x86/sha512-avx2-asm.S  | 11 ++++++-----
- lib/crypto/x86/sha512-ssse3-asm.S | 11 ++++++-----
- 3 files changed, 18 insertions(+), 15 deletions(-)
+ lib/crc/loongarch/crc32.h | 39 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 33 insertions(+), 6 deletions(-)
 
-diff --git a/lib/crypto/x86/sha512-avx-asm.S b/lib/crypto/x86/sha512-avx-asm.S
-index 7732aa8fd850..a17dfedc1c51 100644
---- a/lib/crypto/x86/sha512-avx-asm.S
-+++ b/lib/crypto/x86/sha512-avx-asm.S
-@@ -276,6 +276,9 @@ frame_size = frame_WK + WK_SIZE
- ########################################################################
- SYM_FUNC_START(sha512_transform_avx)
+diff --git a/lib/crc/loongarch/crc32.h b/lib/crc/loongarch/crc32.h
+index d34fa4c68632..692a4165eca2 100644
+--- a/lib/crc/loongarch/crc32.h
++++ b/lib/crc/loongarch/crc32.h
+@@ -24,15 +24,40 @@ do {							\
+ #define CRC32(crc, value, size)		_CRC32(crc, value, size, crc)
+ #define CRC32C(crc, value, size)	_CRC32(crc, value, size, crcc)
  
-+	push	%rbp
-+	mov	%rsp, %rbp
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_ual);
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_crc32);
+ 
++static inline u16 get_le16(const void *p)
++{
++	if (static_branch_likely(&have_ual))
++		return *((__le16 *)p);
++	else
++		return get_unaligned_le16(p);
++}
 +
- 	# Save GPRs
- 	push	%rbx
- 	push	%r12
-@@ -284,8 +287,6 @@ SYM_FUNC_START(sha512_transform_avx)
- 	push	%r15
- 
- 	# Allocate Stack Space
--	push	%rbp
--	mov	%rsp, %rbp
- 	sub     $frame_size, %rsp
- 	and	$~(0x20 - 1), %rsp
- 
-@@ -348,9 +349,8 @@ SYM_FUNC_START(sha512_transform_avx)
- 	dec     msglen
- 	jnz     .Lupdateblock
- 
--	# Restore Stack Pointer
--	mov	%rbp, %rsp
--	pop	%rbp
-+	# Deallocate Stack Space
-+	lea	-40(%rbp), %rsp
- 
- 	# Restore GPRs
- 	pop	%r15
-@@ -358,6 +358,7 @@ SYM_FUNC_START(sha512_transform_avx)
- 	pop	%r13
- 	pop	%r12
- 	pop	%rbx
-+	pop	%rbp
- 
- 	RET
- SYM_FUNC_END(sha512_transform_avx)
-diff --git a/lib/crypto/x86/sha512-avx2-asm.S b/lib/crypto/x86/sha512-avx2-asm.S
-index 22bdbfd899d0..2256d51297e1 100644
---- a/lib/crypto/x86/sha512-avx2-asm.S
-+++ b/lib/crypto/x86/sha512-avx2-asm.S
-@@ -568,6 +568,9 @@ frame_size = frame_CTX + CTX_SIZE
- ########################################################################
- SYM_FUNC_START(sha512_transform_rorx)
- 
-+	push	%rbp
-+	mov	%rsp, %rbp
++static inline u32 get_le32(const void *p)
++{
++	if (static_branch_likely(&have_ual))
++		return *((__le32 *)p);
++	else
++		return get_unaligned_le32(p);
++}
 +
- 	# Save GPRs
- 	push	%rbx
- 	push	%r12
-@@ -576,8 +579,6 @@ SYM_FUNC_START(sha512_transform_rorx)
- 	push	%r15
- 
- 	# Allocate Stack Space
--	push	%rbp
--	mov	%rsp, %rbp
- 	sub	$frame_size, %rsp
- 	and	$~(0x20 - 1), %rsp
- 
-@@ -667,9 +668,8 @@ SYM_FUNC_START(sha512_transform_rorx)
- 	cmp	frame_INPEND(%rsp), INP
- 	jne	.Lloop0
- 
--	# Restore Stack Pointer
--	mov	%rbp, %rsp
--	pop	%rbp
-+	# Deallocate Stack Space
-+	lea	-40(%rbp), %rsp
- 
- 	# Restore GPRs
- 	pop	%r15
-@@ -677,6 +677,7 @@ SYM_FUNC_START(sha512_transform_rorx)
- 	pop	%r13
- 	pop	%r12
- 	pop	%rbx
-+	pop	%rbp
- 
- 	vzeroupper
- 	RET
-diff --git a/lib/crypto/x86/sha512-ssse3-asm.S b/lib/crypto/x86/sha512-ssse3-asm.S
-index 4cae7445b2a8..1a37b7a735cf 100644
---- a/lib/crypto/x86/sha512-ssse3-asm.S
-+++ b/lib/crypto/x86/sha512-ssse3-asm.S
-@@ -275,6 +275,9 @@ frame_size = frame_WK + WK_SIZE
- ########################################################################
- SYM_FUNC_START(sha512_transform_ssse3)
- 
-+	push	%rbp
-+	mov	%rsp, %rbp
++static inline u64 get_le64(const void *p)
++{
++	if (static_branch_likely(&have_ual))
++		return *((__le64 *)p);
++	else
++		return get_unaligned_le64(p);
++}
 +
- 	# Save GPRs
- 	push	%rbx
- 	push	%r12
-@@ -283,8 +286,6 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	push	%r15
+ static inline u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
+ {
+ 	if (!static_branch_likely(&have_crc32))
+ 		return crc32_le_base(crc, p, len);
  
- 	# Allocate Stack Space
--	push	%rbp
--	mov	%rsp, %rbp
- 	sub	$frame_size, %rsp
- 	and	$~(0x20 - 1), %rsp
+ 	while (len >= sizeof(u64)) {
+-		u64 value = get_unaligned_le64(p);
++		u64 value = get_le64(p);
  
-@@ -347,9 +348,8 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	dec	msglen
- 	jnz	.Lupdateblock
+ 		CRC32(crc, value, d);
+ 		p += sizeof(u64);
+@@ -40,14 +65,14 @@ static inline u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
+ 	}
  
--	# Restore Stack Pointer
--	mov	%rbp, %rsp
--	pop	%rbp
-+	# Deallocate Stack Space
-+	lea	-40(%rbp), %rsp
+ 	if (len & sizeof(u32)) {
+-		u32 value = get_unaligned_le32(p);
++		u32 value = get_le32(p);
  
- 	# Restore GPRs
- 	pop	%r15
-@@ -357,6 +357,7 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	pop	%r13
- 	pop	%r12
- 	pop	%rbx
-+	pop	%rbp
+ 		CRC32(crc, value, w);
+ 		p += sizeof(u32);
+ 	}
  
- 	RET
- SYM_FUNC_END(sha512_transform_ssse3)
+ 	if (len & sizeof(u16)) {
+-		u16 value = get_unaligned_le16(p);
++		u16 value = get_le16(p);
+ 
+ 		CRC32(crc, value, h);
+ 		p += sizeof(u16);
+@@ -68,7 +93,7 @@ static inline u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
+ 		return crc32c_base(crc, p, len);
+ 
+ 	while (len >= sizeof(u64)) {
+-		u64 value = get_unaligned_le64(p);
++		u64 value = get_le64(p);
+ 
+ 		CRC32C(crc, value, d);
+ 		p += sizeof(u64);
+@@ -76,14 +101,14 @@ static inline u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
+ 	}
+ 
+ 	if (len & sizeof(u32)) {
+-		u32 value = get_unaligned_le32(p);
++		u32 value = get_le32(p);
+ 
+ 		CRC32C(crc, value, w);
+ 		p += sizeof(u32);
+ 	}
+ 
+ 	if (len & sizeof(u16)) {
+-		u16 value = get_unaligned_le16(p);
++		u16 value = get_le16(p);
+ 
+ 		CRC32C(crc, value, h);
+ 		p += sizeof(u16);
+@@ -103,6 +128,8 @@ static inline u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
+ #define crc32_mod_init_arch crc32_mod_init_arch
+ static void crc32_mod_init_arch(void)
+ {
++	if (cpu_has_ual)
++		static_branch_enable(&have_ual);
+ 	if (cpu_has_crc32)
+ 		static_branch_enable(&have_crc32);
+ }
 -- 
-2.56.0
+2.52.0
 
