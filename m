@@ -1,186 +1,156 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171B3466B1F;
-	Sun, 11 Oct 2026 14:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E99845FFA6;
+	Sun, 11 Oct 2026 14:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791729036; cv=none; b=Re4JDldgtbgCAd/yLYlbqsV+EOd2OHoD6SYs+L2VxKPgrEA8HK11ErTTGMLijVSAE5iYJpwq++pYJTeF5rfSGTIPTi3ZtpvJ//LU3xq91wyu4AcobOFel30qVrk50+6ds3asMTOxCPhVdUvHJqLPfduOb0zgke9+WgxZE5PvV5Q=
+	t=1791730150; cv=none; b=H/Nz+x6xipdcwYCOy7mxEjC+cat2VVvpBr9DTCkMjC6700tatcgW+EiYGZ8+3EVdISUV43LJTsgL6MUG7uHTdyZTc4rKYcX/ib7aWT47I2gi9u/gAQN/esAR1Y1B8pwt7/kxnrG8ZE4witNzX84LbayJUJ4NRsxRQ2e/t8y4b7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791729036; c=relaxed/simple;
-	bh=f2Ga42+G52t4CNU5u0jbJpl/NH+ifMFTlGknNh3zSbI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eGDEseO91MB87RFOmLeLFGuFrl7k4/HEhZgx+X+lS/jcWNt+t5mh5omvz9/fy9v6CFugakvXCiUmAJu8gN1FJMedaWBCS62wKD7xu+A+bhJhclpIC2xLuPAjJwSHA27qrfhhVKv56fSiMofmlu0g6gtARmpao0JOhbLNn9Rly7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.159])
-	by gateway (Coremail) with SMTP id _____8BxW_CCnctqArAUAA--.60281S3;
-	Sun, 11 Oct 2026 22:30:26 +0800 (CST)
-Received: from kernelserver (unknown [223.64.68.159])
-	by front1 (Coremail) with SMTP id qMiowJDxRs1lnctqpSYrAA--.12667S3;
-	Sun, 11 Oct 2026 22:30:26 +0800 (CST)
-From: Huacai Chen <chenhuacai@loongson.cn>
-To: Eric Biggers <ebiggers@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	WANG Xuerui <kernel@xen0n.name>,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Huacai Chen <chenhuacai@loongson.cn>,
-	Tianyang Zhang <zhangtianyang@loongson.cn>
-Subject: [PATCH 2/2] lib/crc: loongarch: Add 3-way parallel CRC32(C) for large buffers
-Date: Sun, 11 Oct 2026 22:29:30 +0800
-Message-ID: <20261011142930.492999-2-chenhuacai@loongson.cn>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20261011142930.492999-1-chenhuacai@loongson.cn>
-References: <20261011142930.492999-1-chenhuacai@loongson.cn>
+	s=arc-20240116; t=1791730150; c=relaxed/simple;
+	bh=WgfjE6w/iV+/Q8psxIU1uR8cGTUs0zq7AtX7GRKIQKw=;
+	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
+	 References:In-Reply-To; b=VP4gE7PYN1teUI5imZKYWxUMYMR0N2P9GooMrg5LtQjzjVyOpO/IXRiauYj0n0tQQO8OkIT0p4jdoRtcwjl3KDNZVhYqWoffKcm/Td8VXiEDtmqRja6xu/j98T+w0biZ/6miXGCyLIYBGn3pPGg1LUmgTGICEzp2IkO/vJdxuxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=Vjj1jRlJ; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="Vjj1jRlJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1791730093;
+	bh=WgfjE6w/iV+/Q8psxIU1uR8cGTUs0zq7AtX7GRKIQKw=;
+	h=From:To:Subject:Mime-Version:Date:Message-ID;
+	b=Vjj1jRlJ5bpBcG8B1I1dViROKbsdY8iwxVTl03NCqm9DiAP7PAVIkOK6lOX6cnrFC
+	 2AT2N9QU/Z6NWvBQmzC0+4hXONMkfWXKtdzMQEquhkl29UrU0MGIPVqcc0GkMaWXl8
+	 cbjzMoafQIagGu4uSjYsUtqWrQCXcFpgJWKVxFzk=
+EX-QQ-RecipientCnt: 9
+X-QQ-GoodBg: 1
+X-QQ-SSF: 00400000000000F0
+X-QQ-FEAT: D4aqtcRDiqQnft7kyUuJbd/1GndRJklzmB5VJlBX//o=
+X-QQ-BUSINESS-ORIGIN: 2
+X-QQ-Originating-IP: OZ/2O17fkU/gTQpWagRbtsz9NgVm9HguexorBuvl+tw=
+X-QQ-STYLE: 
+X-QQ-mid: lv3gz7b-6t1791730086te0434b63
+From: "=?utf-8?B?V2VudGFvIEd1YW4=?=" <guanwentao@uniontech.com>
+To: "=?utf-8?B?SHVhY2FpIENoZW4=?=" <chenhuacai@loongson.cn>, "=?utf-8?B?RXJpYyBCaWdnZXJz?=" <ebiggers@kernel.org>, "=?utf-8?B?Y2hlbmh1YWNhaQ==?=" <chenhuacai@kernel.org>
+Cc: "=?utf-8?B?QXJkIEJpZXNoZXV2ZWw=?=" <ardb@kernel.org>, "=?utf-8?B?bGludXgtY3J5cHRv?=" <linux-crypto@vger.kernel.org>, "=?utf-8?B?V0FORyBYdWVydWk=?=" <kernel@xen0n.name>, "=?utf-8?B?bG9vbmdhcmNo?=" <loongarch@lists.linux.dev>, "=?utf-8?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>, "=?utf-8?B?SHVhY2FpIENoZW4=?=" <chenhuacai@loongson.cn>, "=?utf-8?B?VGlhbnlhbmcgWmhhbmc=?=" <zhangtianyang@loongson.cn>
+Subject: Re:[PATCH 1/2] lib/crc: loongarch: Use hardware unaligned load in CRC32(C) loops
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxRs1lnctqpSYrAA--.12667S3
-X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxAF4xGr4DGF1kWw1DCw1DCFX_yoWrCF1fpF
-	yDKrn8tFsxZa9rCa15Xw1rtwn0vrs7Jry5tFWaq3y7t3ZrJw18XF4ktFWYq398AFZakryU
-	GrWDJ3ZxCF40qrbCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
-	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j83kZUUUUU=
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Date: Sun, 11 Oct 2026 22:48:06 +0800
+X-Priority: 3
+Message-ID: <tencent_2FA7E90024D880CB686D3640@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+References: <20261011142930.492999-1-chenhuacai@loongson.cn>
+In-Reply-To: <20261011142930.492999-1-chenhuacai@loongson.cn>
+X-QQ-ReplyHash: 3411518549
+X-BIZMAIL-ID: 8665579666805268209
+X-Address-Ticket:version=;type=;ticket_id=;id_list=;display_name=;session_id=;
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1])
+	by smtp.qq.com (ESMTP) with SMTP
+	id ; Sun, 11 Oct 2026 22:48:07 +0800 (CST)
+Feedback-ID: lv:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: N83erINCyABs7aKYwGFlrQdhkyilG+zymmetcDj0YUH4zKRAML8BWpGb
+	bO2OOUe1R5JfP/XfElUj7mA1qypX4XaAQkBZ7SUI/L5ch9E0En2oko7/WYoqZi4tMK99BaZ
+	3d9opfuCFxgsZVgIZ3UEdu+PXO1CMIxmN/rZJ1KZKcUJ1KNyd3STuRWHFvIqAPK+KiHK4GC
+	5mIxeHGhH+aX8rARsKOeujUJ1m2djG3FSLjJw4nQFIL6hHOFoWQU3LLEdEw1hqBZZToI0t4
+	Z289S4N6GkZ+DHwlMyrteejk47y2QFz+bsHZZ1KUrbltYwaVfwv+eEm5KlWeghto3GTg1lz
+	mKxMzDFi0BwpJscA0aOf9GY5NKo7U0B0xXW3VSj8atxDSBg731scOt3G0oG25txE30c8O5O
+	5a0wkU3d9CT+z7Mo1NoU0BuEoZyJNWklREq0RUYegXacM/lForE83f+sFOrhijYp3B3zB4H
+	bIJAy+3aNTyFCPi27qFvuwLiqHinUwmU/vKc/t9MLW41DTa+jgFUjrQE05XmQWb4djqhqri
+	d9zGWWkb33oVyQoKDuiqgiaNeU3cZYPJUTnyE11mvY6EK+bIGhpgaEDHlCDHrSkqunjP+ao
+	sR4kQc4tkSp0jy9ux0rdlAKD3VLMrOVbU97ZEEuoQKuK2mDCNRLtCqta+Kg/f5eoX9uxx53
+	jB9FaEAbXLNeTqwbXMV7a5KWgQIgXOe6N49fbeivTbdGEXzZMXCFeEphjOscplDhrFDf9Pm
+	tU9sxsxew8Aymhy6c/9JxcIpOOuI6Z3v/PhnuvZPfv6NZ6a7X9MXxns2XjU5u116TIhXK9C
+	GzQLNqO0fwAM2Fo4UQgW1z+ass+xhsD/zzIY/VryAVCyu/24T+OE4TN7LA15O+Njir0qYo6
+	SuDz1ezgYJs8lIw0WtyzMKp28gW2le5GWfTkt0KyXKWLOGFKEOjILaPdHE+Bo80bUDYSCre
+	hS6fRMNLMD5R6gjcQ+AuSRwc+/Blah87Ml7Gm8Yqg5lVztzUJlzq41ESjyAxV9qjp5lU7vP
+	EqqQ2IFCq/NRZmoKwBgvSzR09yNbFFx3y8L216L9vc3KKb6sHuhmFOEV+b7aTz+DO4Ig48g
+	K6bkCwtr5PR5wFwxSPrjjrI0jdyR3Py5w==
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+X-QQ-RECHKSPAM: 0
 
-The crc* loop is a single serial dependency chain: every instruction
-consumes the previous one's result. CRC is linear over GF(2), so a
-buffer can be split into 3 contiguous lanes processed by independent
-chains and combined afterwards:
-
-    crc(A|B|C) = shift(crc(A), |B|+|C|) ^ shift(crc(B), |C|) ^ crc(C)
-
-with lanes B and C seeded with 0. The shift (multiplication by x^(8n)
-mod P) is linear, so its multiplier is tabulated at module init as 4x256
-tables built from crc32_le_base()/crc32c_base(); each combine then costs
-4 lookups instead of a log-time GF(2) square loop.
-
-Lanes use a fixed 2 KiB stride (6 KiB superblock); smaller buffers fall
-through to the serial path. The 3-way parallel loop CRC32 is measured on
-a Loongson-3C6000 machine (single core, cache-hot, with UAL):
-
-    8 KiB:   8.4 -> 12.0 GB/s
-    64 KiB:  8.4 -> 12.4 GB/s   (+45% over the serial hw loop,
-                                 ~12x over the generic table)
-
-Correctness was verified bit-exact against crc32c() over all lengths
-0..6168 with 3 seeds, plus 3000 random offset/length/seed combinations.
-
-Signed-off-by: Tianyang Zhang <zhangtianyang@loongson.cn>
-Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
----
- lib/crc/loongarch/crc32.h | 53 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
-
-diff --git a/lib/crc/loongarch/crc32.h b/lib/crc/loongarch/crc32.h
-index 692a4165eca2..1750c6eb4a01 100644
---- a/lib/crc/loongarch/crc32.h
-+++ b/lib/crc/loongarch/crc32.h
-@@ -12,6 +12,9 @@
- #include <asm/cpu-features.h>
- #include <linux/unaligned.h>
- 
-+#define CRC3WAY_STRIDE	SZ_2K
-+#define CRC3WAY_BLOCK	(3 * CRC3WAY_STRIDE)
-+
- #define _CRC32(crc, value, size, type)			\
- do {							\
- 	__asm__ __volatile__(				\
-@@ -27,6 +30,50 @@ do {							\
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_ual);
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_crc32);
- 
-+static const u8 zero[4] = {0};
-+static u32 crc32_k1tab[4][256], crc32_k2tab[4][256];
-+static u32 crc32c_k1tab[4][256], crc32c_k2tab[4][256];
-+
-+static void crc3way_build_table(u32 tab[4][256],
-+		u32 (*init)(u32, const u8 *p, size_t), size_t len)
-+{
-+	int i, j;
-+
-+	for (i = 0; i < 4; i++)
-+		for (j = 0; j < 256; j++)
-+			tab[i][j] = init((u32)j << (8 * i), zero, len);
-+}
-+
-+static void crc3way_table_init(void)
-+{
-+	crc3way_build_table(crc32_k1tab, crc32_le_base, CRC3WAY_STRIDE);
-+	crc3way_build_table(crc32_k2tab, crc32_le_base, 2 * CRC3WAY_STRIDE);
-+	crc3way_build_table(crc32c_k1tab, crc32c_base, CRC3WAY_STRIDE);
-+	crc3way_build_table(crc32c_k2tab, crc32c_base, 2 * CRC3WAY_STRIDE);
-+}
-+
-+static inline u32 crc3way_shift(const u32 tab[4][256], u32 crc)
-+{
-+	return tab[0][crc & 0xff] ^ tab[1][(crc >> 8) & 0xff] ^
-+	       tab[2][(crc >> 16) & 0xff] ^ tab[3][crc >> 24];
-+}
-+
-+#define CRC3WAY_LOOP(crc, p, len, type, k1tab, k2tab)			\
-+while ((len) >= CRC3WAY_BLOCK) {					\
-+	unsigned int i;							\
-+	u32 c0 = (crc), c1 = 0, c2 = 0;					\
-+	const u8 *p1 = (p) + CRC3WAY_STRIDE;				\
-+	const u8 *p2 = (p) + 2 * CRC3WAY_STRIDE;			\
-+									\
-+	for (i = 0; i < CRC3WAY_STRIDE; i += sizeof(u64)) {		\
-+		_CRC32(c0, get_le64((p) + i), d, type);			\
-+		_CRC32(c1, get_le64((p1) + i), d, type);		\
-+		_CRC32(c2, get_le64((p2) + i), d, type);		\
-+	}								\
-+	(p) += CRC3WAY_BLOCK; (len) -= CRC3WAY_BLOCK;			\
-+	crc = crc3way_shift(k2tab, c0) ^ crc3way_shift(k1tab, c1) ^ c2;	\
-+}
-+
- static inline u16 get_le16(const void *p)
- {
- 	if (static_branch_likely(&have_ual))
-@@ -56,6 +103,8 @@ static inline u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
- 	if (!static_branch_likely(&have_crc32))
- 		return crc32_le_base(crc, p, len);
- 
-+	CRC3WAY_LOOP(crc, p, len, crc, crc32_k1tab, crc32_k2tab);
-+
- 	while (len >= sizeof(u64)) {
- 		u64 value = get_le64(p);
- 
-@@ -92,6 +141,8 @@ static inline u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
- 	if (!static_branch_likely(&have_crc32))
- 		return crc32c_base(crc, p, len);
- 
-+	CRC3WAY_LOOP(crc, p, len, crcc, crc32c_k1tab, crc32c_k2tab);
-+
- 	while (len >= sizeof(u64)) {
- 		u64 value = get_le64(p);
- 
-@@ -128,6 +179,8 @@ static inline u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
- #define crc32_mod_init_arch crc32_mod_init_arch
- static void crc32_mod_init_arch(void)
- {
-+	crc3way_table_init();
-+
- 	if (cpu_has_ual)
- 		static_branch_enable(&have_ual);
- 	if (cpu_has_crc32)
--- 
-2.52.0
+PiBXaXRoIENPTkZJR19BUkNIX1NUUklDVF9BTElHTj15IHRoZSBrZXJuZWwgaXMgYnVpbHQg
+d2l0aCAtbXN0cmljdC1hbGlnbiwNCj4gc28gZ2V0X3VuYWxpZ25lZF9sZXsxNiwzMiw2NH0o
+KSBjb21waWxlcyBpbnRvIGEgYnl0ZS1ieS1ieXRlIGxvYWQvc2hpZnQvDQo+IG9yIHNlcXVl
+bmNlICh+MjIgaW5zdHJ1Y3Rpb25zIHBlciA4IGJ5dGVzKS4gT24gYSBMb29uZ3Nvbi0zQzYw
+MDAgbWFjaGluZQ0KPiB0aGlzIHRocm90dGxlcyB0aGUgQ1JDIHBpcGVsaW5lIHRvIH41Ljcg
+Y3ljbGVzIHBlciA4IGJ5dGVzICgyLjggR0IvcyksDQo+IHdoaWxlIHRoZSBjcmNjLiogaW5z
+dHJ1Y3Rpb24gaXRzZWxmIHJ1bnMgYXQgfjEuMSBjeWNsZXMgKGxhdGVuY3kpIC8gfjAuOA0K
+PiBjeWNsZXMgKHRocm91Z2hwdXQpIC0tIHRoZSBDUkMgdW5pdCBzaXRzIGlkbGUgd2FpdGlu
+ZyBmb3IgbG9hZHMuDQo+IA0KPiBDUFUgY29yZXMgd2l0aCB0aGUgVUFMIGZlYXR1cmUgaGFu
+ZGxlIHVuYWxpZ25lZCBhY2Nlc3NlcyBpbiBoYXJkd2FyZSwNCj4gc28gaXNzdWUgcmVhbCBs
+ZC57aCx3LGR9IGluc3RydWN0aW9ucyB3aGVuIHBvc3NpYmxlIGFuZCBrZWVwIHRoZSBnZW5l
+cmljDQo+IGdldF91bmFsaWduZWQqKCkgcGF0aCBmb3IgY29yZXMgd2l0aG91dCBVQUwuDQo+
+IA0KPiBNZWFzdXJlZCBvbiBMb29uZ3Nvbi0zQzYwMDAgKHNpbmdsZSBjb3JlKToNCj4gDQo+
+ICAgICBiZWZvcmU6IDIuOCBHQi9zDQo+ICAgICBhZnRlcjogIDguNCBHQi9zICAgKH4zeCkN
+Cj4gDQo+IFNpZ25lZC1vZmYtYnk6IFRpYW55YW5nIFpoYW5nIDx6aGFuZ3RpYW55YW5nQGxv
+b25nc29uLmNuPg0KPiBTaWduZWQtb2ZmLWJ5OiBIdWFjYWkgQ2hlbiA8Y2hlbmh1YWNhaUBs
+b29uZ3Nvbi5jbj4NCj4gLS0tDQo+ICBsaWIvY3JjL2xvb25nYXJjaC9jcmMzMi5oIHwgMzkg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tDQo+ICAxIGZpbGUgY2hh
+bmdlZCwgMzMgaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1n
+aXQgYS9saWIvY3JjL2xvb25nYXJjaC9jcmMzMi5oIGIvbGliL2NyYy9sb29uZ2FyY2gvY3Jj
+MzIuaA0KPiBpbmRleCBkMzRmYTRjNjg2MzIuLjY5MmE0MTY1ZWNhMiAxMDA2NDQNCj4gLS0t
+IGEvbGliL2NyYy9sb29uZ2FyY2gvY3JjMzIuaA0KPiArKysgYi9saWIvY3JjL2xvb25nYXJj
+aC9jcmMzMi5oDQo+IEBAIC0yNCwxNSArMjQsNDAgQEAgZG8geyBcDQo+ICAjZGVmaW5lIENS
+QzMyKGNyYywgdmFsdWUsIHNpemUpIF9DUkMzMihjcmMsIHZhbHVlLCBzaXplLCBjcmMpDQo+
+ICAjZGVmaW5lIENSQzMyQyhjcmMsIHZhbHVlLCBzaXplKSBfQ1JDMzIoY3JjLCB2YWx1ZSwg
+c2l6ZSwgY3JjYykNCj4gIA0KPiArc3RhdGljIF9fcm9fYWZ0ZXJfaW5pdCBERUZJTkVfU1RB
+VElDX0tFWV9GQUxTRShoYXZlX3VhbCk7DQo+ICBzdGF0aWMgX19yb19hZnRlcl9pbml0IERF
+RklORV9TVEFUSUNfS0VZX0ZBTFNFKGhhdmVfY3JjMzIpOw0KPiAgDQo+ICtzdGF0aWMgaW5s
+aW5lIHUxNiBnZXRfbGUxNihjb25zdCB2b2lkICpwKQ0KPiArew0KPiArIGlmIChzdGF0aWNf
+YnJhbmNoX2xpa2VseSgmaGF2ZV91YWwpKQ0KPiArIHJldHVybiAqKChfX2xlMTYgKilwKTsN
+Cj4gKyBlbHNlDQo+ICsgcmV0dXJuIGdldF91bmFsaWduZWRfbGUxNihwKTsNCj4gK30NCj4g
+Kw0KPiArc3RhdGljIGlubGluZSB1MzIgZ2V0X2xlMzIoY29uc3Qgdm9pZCAqcCkNCj4gK3sN
+Cj4gKyBpZiAoc3RhdGljX2JyYW5jaF9saWtlbHkoJmhhdmVfdWFsKSkNCj4gKyByZXR1cm4g
+KigoX19sZTMyICopcCk7DQo+ICsgZWxzZQ0KPiArIHJldHVybiBnZXRfdW5hbGlnbmVkX2xl
+MzIocCk7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyBpbmxpbmUgdTY0IGdldF9sZTY0KGNvbnN0
+IHZvaWQgKnApDQo+ICt7DQo+ICsgaWYgKHN0YXRpY19icmFuY2hfbGlrZWx5KCZoYXZlX3Vh
+bCkpDQo+ICsgcmV0dXJuICooKF9fbGU2NCAqKXApOw0KPiArIGVsc2UNCj4gKyByZXR1cm4g
+Z2V0X3VuYWxpZ25lZF9sZTY0KHApOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgaW5saW5lIHUz
+MiBjcmMzMl9sZV9hcmNoKHUzMiBjcmMsIGNvbnN0IHU4ICpwLCBzaXplX3QgbGVuKQ0KPiAg
+ew0KPiAgIGlmICghc3RhdGljX2JyYW5jaF9saWtlbHkoJmhhdmVfY3JjMzIpKQ0KPiAgIHJl
+dHVybiBjcmMzMl9sZV9iYXNlKGNyYywgcCwgbGVuKTsNCj4gIA0KPiAgIHdoaWxlIChsZW4g
+Pj0gc2l6ZW9mKHU2NCkpIHsNCj4gLSB1NjQgdmFsdWUgPSBnZXRfdW5hbGlnbmVkX2xlNjQo
+cCk7DQo+ICsgdTY0IHZhbHVlID0gZ2V0X2xlNjQocCk7DQo+ICANCj4gIENSQzMyKGNyYywg
+dmFsdWUsIGQpOw0KPiAgcCArPSBzaXplb2YodTY0KTsNCj4gQEAgLTQwLDE0ICs2NSwxNCBA
+QCBzdGF0aWMgaW5saW5lIHUzMiBjcmMzMl9sZV9hcmNoKHUzMiBjcmMsIGNvbnN0IHU4ICpw
+LCBzaXplX3QgbGVuKQ0KPiAgIH0NCj4gIA0KPiAgIGlmIChsZW4gJiBzaXplb2YodTMyKSkg
+ew0KPiAtIHUzMiB2YWx1ZSA9IGdldF91bmFsaWduZWRfbGUzMihwKTsNCj4gKyB1MzIgdmFs
+dWUgPSBnZXRfbGUzMihwKTsNCj4gIA0KPiAgQ1JDMzIoY3JjLCB2YWx1ZSwgdyk7DQo+ICBw
+ICs9IHNpemVvZih1MzIpOw0KPiAgIH0NCj4gIA0KPiAgIGlmIChsZW4gJiBzaXplb2YodTE2
+KSkgew0KPiAtIHUxNiB2YWx1ZSA9IGdldF91bmFsaWduZWRfbGUxNihwKTsNCj4gKyB1MTYg
+dmFsdWUgPSBnZXRfbGUxNihwKTsNCj4gIA0KPiAgIENSQzMyKGNyYywgdmFsdWUsIGgpOw0K
+PiAgIHAgKz0gc2l6ZW9mKHUxNik7DQo+IEBAIC02OCw3ICs5Myw3IEBAIHN0YXRpYyBpbmxp
+bmUgdTMyIGNyYzMyY19hcmNoKHUzMiBjcmMsIGNvbnN0IHU4ICpwLCBzaXplX3QgbGVuKQ0K
+PiAgcmV0dXJuIGNyYzMyY19iYXNlKGNyYywgcCwgbGVuKTsNCj4gIA0KPiAgIHdoaWxlIChs
+ZW4gPj0gc2l6ZW9mKHU2NCkpIHsNCj4gLSB1NjQgdmFsdWUgPSBnZXRfdW5hbGlnbmVkX2xl
+NjQocCk7DQo+ICsgdTY0IHZhbHVlID0gZ2V0X2xlNjQocCk7DQo+ICANCj4gICBDUkMzMkMo
+Y3JjLCB2YWx1ZSwgZCk7DQo+ICAgcCArPSBzaXplb2YodTY0KTsNCj4gQEAgLTc2LDE0ICsx
+MDEsMTQgQEAgc3RhdGljIGlubGluZSB1MzIgY3JjMzJjX2FyY2godTMyIGNyYywgY29uc3Qg
+dTggKnAsIHNpemVfdCBsZW4pDQo+ICAgfQ0KPiAgDQo+ICAgaWYgKGxlbiAmIHNpemVvZih1
+MzIpKSB7DQo+IC0gdTMyIHZhbHVlID0gZ2V0X3VuYWxpZ25lZF9sZTMyKHApOw0KPiArIHUz
+MiB2YWx1ZSA9IGdldF9sZTMyKHApOw0KPiAgDQo+ICBDUkMzMkMoY3JjLCB2YWx1ZSwgdyk7
+DQo+ICBwICs9IHNpemVvZih1MzIpOw0KPiAgIH0NCj4gIA0KPiAgIGlmIChsZW4gJiBzaXpl
+b2YodTE2KSkgew0KPiAtIHUxNiB2YWx1ZSA9IGdldF91bmFsaWduZWRfbGUxNihwKTsNCj4g
+KyB1MTYgdmFsdWUgPSBnZXRfbGUxNihwKTsNCj4gIA0KPiAgIENSQzMyQyhjcmMsIHZhbHVl
+LCBoKTsNCj4gICBwICs9IHNpemVvZih1MTYpOw0KPiBAQCAtMTAzLDYgKzEyOCw4IEBAIHN0
+YXRpYyBpbmxpbmUgdTMyIGNyYzMyY19hcmNoKHUzMiBjcmMsIGNvbnN0IHU4ICpwLCBzaXpl
+X3QgbGVuKQ0KPiAgI2RlZmluZSBjcmMzMl9tb2RfaW5pdF9hcmNoIGNyYzMyX21vZF9pbml0
+X2FyY2gNCj4gIHN0YXRpYyB2b2lkIGNyYzMyX21vZF9pbml0X2FyY2godm9pZCkNCj4gIHsN
+Cj4gKyBpZiAoY3B1X2hhc191YWwpDQo+ICsgc3RhdGljX2JyYW5jaF9lbmFibGUoJmhhdmVf
+dWFsKTsNCj4gICBpZiAoY3B1X2hhc19jcmMzMikNCj4gICBzdGF0aWNfYnJhbmNoX2VuYWJs
+ZSgmaGF2ZV9jcmMzMik7DQo+ICB9DQo+IC0tDQo+IDIuNTIuMA0KDQpSZXZpZXdlZC1ieTog
+V2VudGFvIEd1YW4gPGd1YW53ZW50YW9AdW5pb250ZWNoLmNvbT4NCg0KTmljZSBwZXJmb3Jt
+YW5jZSBpbXByb3ZlZCBwYXRjaH4u
 
