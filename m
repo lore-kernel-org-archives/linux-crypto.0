@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51614433BB0;
-	Sun, 11 Oct 2026 13:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE6B449B11;
+	Sun, 11 Oct 2026 13:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791724564; cv=none; b=r79ghJ8npt9J25V0nd+frWbD0+73EH6pOPbVUZoUuvQm5La4qoCDqVN78n8X3AhLzh1zenGV83zfu6469wfgV5VlG/7tc6653w2vjctObhBH07pPCR+InA3WgtL4p0ya8aEkk9ErFQNHoTwsA6bkRgXRSBPgy8q/kHDPV9TqUaw=
+	t=1791724567; cv=none; b=vGOKstu8VL9LB2K4dFX+WmmmtKv//OpAoWFL/6sKyL+prV22Db8b+ol/m47zh0tNLI30caT0//zu5IESP+A+CIRBLk0Rnh6zrg8w+Er5WFV5Job8c8iJ2ILNBJcHMjJdakexy98PAw2vy4OGo+d3xB8rQbv1eXTfTZ9odC95/K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791724564; c=relaxed/simple;
-	bh=KEkmnMWgYaghFaXFMXtaovDls7gPJm8lfBR8aCes3mY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R/K7vLHdAFEy2+i4pI1MRPiz3YfW7BKJe+5jtGrRa7/ZJffEIyVZdUQbo7+mvm1Wp30h+lxtB81inLuEVeVfmURrmGMSL1fwfWQqNz6nKK/KqCW76JBfwhMV3rb+HMIeMMljiftAR7wLkRhWes+q0jEhbirMrSQd45EjJJ2b+30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cLgiQH8V; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791724567; c=relaxed/simple;
+	bh=i2IEMteghzbOZjEP3K+DE9tgH6sC3YNRIyeoSHGFpFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=j7xlv/HJGS6mw9acLnNyGOaU8G+uOfcOIkVaGnqIZQcZ0oesuOcvgZPkkvUuhB4HxfQzFY1qpEoNF1/p/exsQk2MOLOcid79uH9pTLG5/suN3OEcrVoAemdMHFQscTEKuOsUI1TdNNlvw1GYI+xh4edlquViMrb7Bzwuza9hcxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nz+4JZpg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cLgiQH8V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A2D1F0089B;
-	Sun, 11 Oct 2026 13:16:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nz+4JZpg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A16B21F0089C;
+	Sun, 11 Oct 2026 13:16:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791724562;
-	bh=pe5ZoGWIz1vQLH5FnEmGSnJ3DTic8vhTTxWYQCwafgs=;
-	h=From:To:Cc:Subject:Date;
-	b=cLgiQH8V1smqJMLx/3kIeIAKEfO6jMkuAucYMIBpHFmHilnilK2DAPcDC06BG/r5C
-	 Neg5maOVRxjWyXBjWpu8Ex9rewgBDSQSZcSI7lcOCtRKgXY2H83fsdyxxAO/a0MZv/
-	 eUhELVRQqB8RrZbDMZi9Ioj3b5bVnIUyoWbSnFXzBpcVRvXDiMwjYSK4ZBDwTZklUj
-	 ZeP59kj0d/XJ24aBS7O7XoW+fcQwiN3CeQqKSKX0qzTGvsz5SXUrlCqe4Hdt7SxFD/
-	 Yk7o5C1Uf9nONXBa3A5pvplxBnu/QzJnLd1O6yu7qGfW/3dgZMmUrF/mGCpEKc2+Hi
-	 nULrVLJW9SyTA==
+	s=k20260515; t=1791724565;
+	bh=cXlzmbaJxn4CnVjR3PmJa42S9oeGWwiIQUYVGfBTiNI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=nz+4JZpgR7Rxw3diD26ozBvvIAX8rNv2SZ9fNaYvEcJwmd3grNrk4yzs/FVCPptJN
+	 gU0hli8SxSwxUMt3nL+66Voapi5ZN/IpN4aLbe8AM9SSSKstQzmQWTL18PFwm0YZ33
+	 h/nVctRh1TZw5CryPmuwmibjrPgvpx4hksHji9C5y88c+3yD3eJpONKWU8g0iBQwht
+	 mREZnOIZuhLKvxJLk3GfpVzsyNvrBzfIW0SQQqnPHXvFjTemfzxxRg9g5Wuu//JQ3E
+	 DfV9Mcme7OmvHsGVDCOXhWXN/sxtTpt1qI2xIwj6q3W8DV2MrZWL2nZKnfF26fRnKs
+	 TfrIUtJBrpmGA==
 From: Thorsten Blum <blum@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -35,83 +36,40 @@ Cc: Thorsten Blum <blum@kernel.org>,
 	linux-crypto@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] crypto: atmel-tdes - use separate DMA scatterlists
-Date: Sun, 11 Oct 2026 15:15:56 +0200
-Message-ID: <20261011131556.272382-4-blum@kernel.org>
+Subject: [PATCH 2/3] crypto: atmel-tdes - reuse fast in atmel_tdes_crypt_start()
+Date: Sun, 11 Oct 2026 15:15:57 +0200
+Message-ID: <20261011131556.272382-5-blum@kernel.org>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261011131556.272382-4-blum@kernel.org>
+References: <20261011131556.272382-4-blum@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2443; i=blum@kernel.org; h=from:subject; bh=KEkmnMWgYaghFaXFMXtaovDls7gPJm8lfBR8aCes3mY=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmne3g2Kh/Pvi7Lv+O8rtKGWYGlITnSsRcKPaUXJAQtu fZ32r+ojlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZiI2EGG/x4OEj7tXPGPVuTE KfPxyd9TPbT9f879A2Z7tK3/c//dcpPhv9u9iSG/atMneZlMM8z3ymetXDot6SDrIvHlYZUSoqs a+AA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=754; i=blum@kernel.org; h=from:subject; bh=i2IEMteghzbOZjEP3K+DE9tgH6sC3YNRIyeoSHGFpFw=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmne3jMMiZc5y06s/9nKdfvH68axF5tMv7DY7l1U0Rdl lbWtZ2SHaUsDGJcDLJiiiwPZv2Y4VtaU7nJJGInzBxWJpAhDFycAjCRCBFGhj1WTlYHuOuPMm2/ YH3cam22dN/zxpRVV667eTeEeKn8q2RkuLVI563Z/TX5m9nrzh041PonKOhB/K+ei70TCi7waXu lMQMA
 X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
 
-Use two separate input and output scatterlists instead of an array.
-
-Also use DMA_SLAVE_BUSWIDTH_4_BYTES directly and drop the now-unused
-addr_width variable.
+Use the existing fast variable instead of testing for TDES_FLAGS_FAST in
+dd->flags again.
 
 Signed-off-by: Thorsten Blum <blum@kernel.org>
 ---
- drivers/crypto/atmel-tdes.c | 33 ++++++++++++++-------------------
- 1 file changed, 14 insertions(+), 19 deletions(-)
+ drivers/crypto/atmel-tdes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index f084fda42423..b2fca4baee2f 100644
+index b2fca4baee2f..f92dc2fff50c 100644
 --- a/drivers/crypto/atmel-tdes.c
 +++ b/drivers/crypto/atmel-tdes.c
-@@ -372,37 +372,32 @@ static int atmel_tdes_crypt_dma(struct atmel_tdes_dev *dd,
- 				dma_addr_t dma_addr_in,
- 				dma_addr_t dma_addr_out)
- {
--	struct scatterlist sg[2];
--	struct dma_async_tx_descriptor	*in_desc, *out_desc;
--	enum dma_slave_buswidth addr_width;
-+	struct scatterlist sg_in, sg_out;
-+	struct dma_async_tx_descriptor *in_desc, *out_desc;
+@@ -473,7 +473,7 @@ static int atmel_tdes_crypt_start(struct atmel_tdes_dev *dd)
+ 	else
+ 		err = atmel_tdes_crypt_pdc(dd, addr_in, addr_out);
  
--	addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
--
--	dd->dma_lch_in.dma_conf.dst_addr_width = addr_width;
--	dd->dma_lch_out.dma_conf.src_addr_width = addr_width;
-+	dd->dma_lch_in.dma_conf.dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
-+	dd->dma_lch_out.dma_conf.src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
- 
- 	dmaengine_slave_config(dd->dma_lch_in.chan, &dd->dma_lch_in.dma_conf);
- 	dmaengine_slave_config(dd->dma_lch_out.chan, &dd->dma_lch_out.dma_conf);
- 
- 	dd->flags |= TDES_FLAGS_DMA;
- 
--	sg_init_table(&sg[0], 1);
--	sg_dma_address(&sg[0]) = dma_addr_in;
--	sg_dma_len(&sg[0]) = dd->dma_size;
-+	sg_init_table(&sg_in, 1);
-+	sg_dma_address(&sg_in) = dma_addr_in;
-+	sg_dma_len(&sg_in) = dd->dma_size;
- 
--	sg_init_table(&sg[1], 1);
--	sg_dma_address(&sg[1]) = dma_addr_out;
--	sg_dma_len(&sg[1]) = dd->dma_size;
-+	sg_init_table(&sg_out, 1);
-+	sg_dma_address(&sg_out) = dma_addr_out;
-+	sg_dma_len(&sg_out) = dd->dma_size;
- 
--	in_desc = dmaengine_prep_slave_sg(dd->dma_lch_in.chan, &sg[0],
--				1, DMA_MEM_TO_DEV,
--				DMA_PREP_INTERRUPT  |  DMA_CTRL_ACK);
-+	in_desc = dmaengine_prep_slave_sg(dd->dma_lch_in.chan, &sg_in, 1, DMA_MEM_TO_DEV,
-+					  DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
- 	if (!in_desc)
- 		return -EINVAL;
- 
--	out_desc = dmaengine_prep_slave_sg(dd->dma_lch_out.chan, &sg[1],
--				1, DMA_DEV_TO_MEM,
--				DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
-+	out_desc = dmaengine_prep_slave_sg(dd->dma_lch_out.chan, &sg_out, 1, DMA_DEV_TO_MEM,
-+					   DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
- 	if (!out_desc)
- 		return -EINVAL;
- 
+-	if (err && (dd->flags & TDES_FLAGS_FAST)) {
++	if (err && fast) {
+ 		dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
+ 		dma_unmap_sg(dd->dev, dd->out_sg, 1, DMA_FROM_DEVICE);
+ 	}
