@@ -1,120 +1,169 @@
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94BC2D47F1
-	for <linux-crypto@vger.kernel.org>; Sun, 11 Oct 2026 09:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A568743B3C0;
+	Sun, 11 Oct 2026 12:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791710059; cv=none; b=mCaixJwYdyF13830J/7NJNlqD2zSxrFTpF8dPwX/28t4ZpDtziQhaIY1ciLJgUV9OGtf+VTjASRmO46C4/3LxJjSlJHB2AST0MlA+GHU3IXogY80zSaQjEt0fn+uVXuufAq+b6bLlVx+o/cTKr6XjYzSrL774Fnk4graEIfUZr4=
+	t=1791722188; cv=none; b=Wpi/9zB2Ec3iDmQQRG1fuuRlPvYwunAbYoTWweet23jNT7BeWUyh2yH81v1L/HbRllqbhvFajxjHmP0rxWGdEmu2rgTQKiPy8jXr3RbfybsHMo1kfl47ojZeshQ4sv7L5tF+eYVTIS5bqdC9/fOCGX5XodiCqMtF6f4g0+vH7pQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791710059; c=relaxed/simple;
-	bh=fnspbfCcGV6mSBf+inHXyL2EwSxqPFcnpLeH6pQJXGs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pKFIRDU5UYyrAXKYwVfgl5cK7zOYEUTx/R9E4WVnxQ2DODsxIMPx/dQyOyPbWE1tERLgV5VLjaT50B8u/RUe8m3gUexj368g0+Sf8I7dWuSiCIQKrh7OO3/8RzmQSnHIl5R0/ZFaC4jMsy4TibaGDk7MvrsC/jK7EPeCD0O+kKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GEPZmFdv; arc=none smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791722188; c=relaxed/simple;
+	bh=R10yOSvD0fqRg4qqb0k38A3uupIsJ0VGiUVxAS7FerY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BRmRLxFfWNyYUouBBUySTH8W8W9rN6Ehar5P6GNzJKru2r9xusl9eQNVXuX93BpjIG+cKXFmi4TP+JpmSZonnoAFty0MgJvTpUI8G8i6jCtt92vHiW2xQix+hQqlTpn4Ku8lYB/hqN3IIMLdG6zu9m39PeB06t9ITo/kKJ2vMbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vuPnk4ND; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1CIaHC/k; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vuPnk4ND; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1CIaHC/k; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEPZmFdv"
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-3535a54bed9so1359623eec.1
-        for <linux-crypto@vger.kernel.org>; Sun, 11 Oct 2026 02:14:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791710058; x=1792314858; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=h7FJI5dN/FyGY4mAC7187znWc+Enmok4bG9Rd/tePv0=;
-        b=GEPZmFdvFJDaHfQhxwEi3zgBPWDkrqia5bP5tZ+UMSRuXmtZhGiye6dKXT6z4m3j9K
-         ykjj7wb4noRZJOCUQawCujxwzKk9n52SziVlqB7w64fHK52zmB5x+sxYiR2D6oaiVuj7
-         Xkv5wb27PJA/PEwKiq7Cd1Qcll+L8mt1EWbcUwvX5dwsAjqqs2jSLDmzHvLh8ykIr+iO
-         ev/QJAHnsBK4WLzWlew+3RQJIKEpvwXzOeQ5rEXuF58s3ECNjHburhHrFDeetRcY7HDM
-         nAuWFGEXNChxHlY7WPnAEZBpNOrVpnV1vfWAsWdY6IoJlaBCDCULrkyeSKl8CUV5+PVK
-         CVnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791710058; x=1792314858;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=h7FJI5dN/FyGY4mAC7187znWc+Enmok4bG9Rd/tePv0=;
-        b=wTHX7VaP/J7w4CNzKUTEulPdBt9paO8cR7gF8NyvF8T1YsTxBU4y5WTJtdmh3jVflf
-         BR2EcwcHHBOghYlmfbOu+Qb88LzBr4vyyLl7CeoIbZ1qvXsqexVctAEC+EAYfs2iPzY7
-         nw7zsI2vnApnwAw8fLbWZFkcb8YImcG0M+37Pxj2Y6/yII/StRV0XU0QystKsDGbbt33
-         12neHB3Y+pjYvexE6cbkJYio8vsCwd+orK95pCQXHoFMQ4ONS54d/eI7DNHU8xdoZSyA
-         xHZeBB8wBzP7+YINiVWk1zkMX7WMprk85Y/qjIdFjepRflwsxA41KktgsCiXsDW8wCPn
-         ChIA==
-X-Forwarded-Encrypted: i=1; AKwUvByE1L7j9Vl/1P5Ad86a2fPBet5YwRDDa5R7Fx8Pnpm/yfiYrlnfmK2LA9GhdM8+aJ5BGtJaTgc8VJNr/aE=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJJcJ0wwFW31YunfNl4HE6fXoLHVFmA6LR+x+B5xo/MfnXZaRA+
-	8P1A4ugINJ95Q+dXDaNanVykohyfMHd/L6OTzTS/SCIW77hqJKToOiOb
-X-Gm-Gg: AYBFou3/MP74dySAsYSIO6PSSDLygNcidQZ2o9UPBWHJif2ezwCnkMxX1KW35LS7E8h
-	LJ/FNeKTy+u7BOEd2yUJqCgi4AJ8mtiNvU3cJw1kJAfAdkDYtTrnGCZ5gpINH2TaamQ3PBHWBPM
-	ny7qnS9OFR68OJvj+Gg+ykqFgjUSPKu8GK0Ng4KKBZx0OwBbW0A+Ncy4fA95eO8RiUlZQl+mlJL
-	7ZRmV+c2gsIvwNM+cgKyEPmbxjcvOhPaEYT3kt0SUE5frkAYoORLqYZ27zJxwcjl5VfZagNzHOJ
-	Fe5/jZk4dvQ3RxbkVK8GVDnEDPvnLHBguWCaoWjZ2apXYt9HjwoTkvel2dc/GDD1bzj2J8mTqGo
-	kTYOxS5kA9o6L+8lzgBWDb5+6eZcRJPopbAEhrI5Mf6UbF26JljngSyGpzdilkPcSFNVvN4T0/l
-	oxEFk69uyFEypDby+L8AkZizoCdDYNNT5yKtKtsi1Srrz0fH3In1c8Ga1DoWqyykKvMWFjyliFJ
-	gL2DDitlaSi+aY=
-X-Received: by 2002:a05:7300:ce94:b0:328:7033:9b8c with SMTP id 5a478bee46e88-3537e03331bmr9513887eec.6.1791710057560;
-        Sun, 11 Oct 2026 02:14:17 -0700 (PDT)
-Received: from kernel ([45.251.35.97])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-358de54fe47sm9822262eec.31.2026.10.11.02.14.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Oct 2026 02:14:17 -0700 (PDT)
-Date: Sun, 11 Oct 2026 14:44:09 +0530
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: Simon Richter <Simon.Richter@hogyros.de>
-Cc: ebiggers@kernel.org, ardb@kernel.org, Jason@zx2c4.com,
-	skhan@linuxfoundation.org, me@brighamcampbell.com,
-	jkoolstra@xs4all.nl, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: sha1: use put_unaligned_be64() for length
- encoding
-Message-ID: <astTYX3RBV44n2gX@kernel>
-References: <20261011051524.6703-1-raizudeen.kerneldev@gmail.com>
- <454f2204-2c4b-43c0-8fd0-1eaa83186e69@hogyros.de>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vuPnk4ND";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1CIaHC/k";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vuPnk4ND";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1CIaHC/k"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 440A51F394;
+	Sun, 11 Oct 2026 12:36:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1791722181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=olaofrwGl8T9NhHp9VCEFIBcwErQS3PK86N+qFcRHGw=;
+	b=vuPnk4NDtXzs+WsmrEIxGhbUR6kYNunS0UM0sgvDYIS8JUw7oahxpMttwuwdM7pQNhvLNY
+	UMRrR1yYjuXtAEAadsoS1ipYzGk7tuebFRkUUKc588xVcRd9RRzJJVNWNwkCNNnONQEMfy
+	e8e+yLzfQDtOMb3ifhcV6bI/6KeCte4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1791722181;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=olaofrwGl8T9NhHp9VCEFIBcwErQS3PK86N+qFcRHGw=;
+	b=1CIaHC/kkRdbNaKNluyGMJyssl3unh9cC1n6juD0fP5KMPtLPzRUW7sLOupDgR3hpyXpiB
+	Eax54VxwF3FB+uDQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=vuPnk4ND;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="1CIaHC/k"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1791722181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=olaofrwGl8T9NhHp9VCEFIBcwErQS3PK86N+qFcRHGw=;
+	b=vuPnk4NDtXzs+WsmrEIxGhbUR6kYNunS0UM0sgvDYIS8JUw7oahxpMttwuwdM7pQNhvLNY
+	UMRrR1yYjuXtAEAadsoS1ipYzGk7tuebFRkUUKc588xVcRd9RRzJJVNWNwkCNNnONQEMfy
+	e8e+yLzfQDtOMb3ifhcV6bI/6KeCte4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1791722181;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=olaofrwGl8T9NhHp9VCEFIBcwErQS3PK86N+qFcRHGw=;
+	b=1CIaHC/kkRdbNaKNluyGMJyssl3unh9cC1n6juD0fP5KMPtLPzRUW7sLOupDgR3hpyXpiB
+	Eax54VxwF3FB+uDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4D93013408;
+	Sun, 11 Oct 2026 12:36:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id eFhFKcCCy2qAcgAAD6G6ig
+	(envelope-from <ddiss@suse.de>); Sun, 11 Oct 2026 12:36:16 +0000
+Date: Sun, 11 Oct 2026 23:36:00 +1100
+From: David Disseldorp <ddiss@suse.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-scsi@vger.kernel.org, target-devel@vger.kernel.org, "Martin K .
+ Petersen" <mkp@kernel.org>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Lee Duncan <lduncan@suse.com>, Alexandru
+ Hossu <hossu.alexandru@gmail.com>
+Subject: Re: [PATCH] scsi: target: iscsi: Use crypto library API
+Message-ID: <20261011233600.5bb5d6c9.ddiss@suse.de>
+In-Reply-To: <20261001044857.169487-1-ebiggers@kernel.org>
+References: <20261001044857.169487-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <454f2204-2c4b-43c0-8fd0-1eaa83186e69@hogyros.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: 440A51F394
+X-Rspamd-Action: no action
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,suse.com,gmail.com];
+	DKIM_TRACE(0.00)[suse.de:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:dkim]
+X-Spam-Flag: NO
+X-Spam-Score: -2.01
 
-On Sun, Oct 11, 2026 at 03:10:44PM +0900, Simon Richter wrote:
-> Hi,
-> 
-> On 10/11/26 14:15, Mohamad Raizudeen wrote:
-> 
-> > The rest of this file already uses the unaligned access helpers like
-> > get_unaligned_be32() for reading input and put_unaligned_be32() for writing
-> > the digest, for all structured buffer accesses. Replace both casts with
-> > put_unaligned_be64() for consistency.
-> 
-> These aren't unaligned accesses, though.
-> 
-> > In hmac_sha1_final(), this also writes the full 64-bit length field
-> > explicitly rather than writing only 32 bits and relying on a preceding
-> > memset() to zero the upper 32 bits. The resulting bytes are identical,
-> > nothing changes functionally.
-> 
-> These aren't unaligned either, and the size here is fixed (which is also why
-> we don't need to handle the case where the size does not fit into the
-> current block).
-> 
-> The get_unaligned and put_unaligned functions aren't used as convenience
-> functions, but because the data might actually be unaligned, so we need to
-> eat the cost of doing an unaligned access.
-> 
->    Simon
+This looks like a worthwhile clean-up and doesn't trigger any libiscsi
+chap test regressions.
+Reviewed-by: David Disseldorp <ddiss@suse.de>
 
-Hi,
+I do have one minor concern: 
 
-Well, you are right. My patch would have added unnecessary overhead on
-strict alignment architectures.
+On Wed, 30 Sep 2026 21:48:57 -0700, Eric Biggers wrote:
 
-Withdrawing this patch.
+> Make iscsi_target_auth.c call into the crypto library directly instead
+> of going through crypto_shash.  This is simpler and much more efficient,
+> as it avoids overhead of the crypto_shash layer.  The hash computation
+> itself also no longer has error codes that need to be checked.
+> 
+> For simplicity, still do a memory allocation per operation to buffer the
+> data (which is typically less than 50 bytes here) so that the one-shot
+> digest functions can be used.  It's still much more efficient than doing
+> the super slow crypto_alloc_shash().
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  drivers/target/iscsi/Kconfig             |   7 +-
+>  drivers/target/iscsi/iscsi_target_auth.c | 192 +++++++++--------------
+>  drivers/target/iscsi/iscsi_target_auth.h |   8 +-
+>  3 files changed, 78 insertions(+), 129 deletions(-)
+...
+> @@ -113,17 +143,17 @@ static int chap_check_algorithm(const char *a_str)
+>  		if (kstrtol(token, 10, &digest_type))
+>  			continue;
+>  
+> -		digest_name = chap_get_digest_name(digest_type);
+> -		if (!digest_name)
+> +		if (fips_enabled && digest_type == CHAP_DIGEST_MD5)
+>  			continue;
 
-Thanks,
-Mohamad Raizudeen
+Could e.g. SHA1 also require fips filtering here in future? If so, would
+it make sense to track the fips compat status (preferably at build time)
+in chap_digest_algs?
+
