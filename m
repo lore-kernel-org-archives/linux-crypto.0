@@ -1,138 +1,106 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970CB393DE2;
-	Mon, 12 Oct 2026 09:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5038038C423
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Oct 2026 09:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.202.192.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791796339; cv=none; b=iXShzCYAeZM0G+8F6H4rUmG5goe6ehIGtEf/4dXCpv5Aw/IS13NJlGy+qhM3WMc9y1CrmTvp2/KPK6dx7MOAILCHHC7kBm7q/cXVXytf7YmfB2pI3LIHR3NiGA5cy49L6WeG/WxMQIzzq/KxrWbL+XnYq2xB8wewIPF2F9fXb5k=
+	t=1791797413; cv=none; b=ITV74XLFsh6aqt2yKXmPhUWhJ3SZyzgvILocvWhwpXZ0YeAk35B7UDCQquM9FDV379syFm5sAm35OQxnKUz2lLEyJjonH6lWKeTsxQ6r5nSRV2IUQ/Hce2vaYbhphe601GRkamDQIcHTvaa+1R8gph+GVq9YFGgr28RSgARH9n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791796339; c=relaxed/simple;
-	bh=JJbp9gY5o+Y9jQt84wdvC7PHP6OKYOMmG0y/d7r9l+k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nYK/TJr+lk2Lc1a0mAK44orTmWocpaVSxIywPeYy/Ea4zLvGzXhz7C2M1I7TKjNmrKz0V8opQItLwHJubJF3RMV9zKpaPhwNW23qCskz1/9IDQlt+EfAGjsY3BaWrcmr/zqE+o9obdrrpf5Fz6aLeCFe2uxDNZ6xvfcfZl6hjgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=AAz8ZPAZ; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yoseli.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yoseli.org
+	s=arc-20240116; t=1791797413; c=relaxed/simple;
+	bh=rL0fvVP9fDZc1blGZLqu9RtCF1FfXYpJwfhKydWrzCU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=k0MfW2jl28MxguRlZ/Aqp4VNyQ9pICykLn4ZLsCEVPVflAevyxUWASVDkVv0bTG62DCd0A49EXMh/evJtM0Pd0hJSK4Sl1PdM68ODXC6vx2v+EKJpArfqN+LKh7sQm/Eg7HzfVthg2nXqy/DB8t96B6gsbhLIxb6cZkATCPQLG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org; spf=pass smtp.mailfrom=strongswan.org; dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b=boGYg4yP; arc=none smtp.client-ip=109.202.192.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strongswan.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="AAz8ZPAZ"
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id A475F580BAB;
-	Mon, 12 Oct 2026 08:46:29 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 957A53EB8E;
-	Mon, 12 Oct 2026 08:46:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1791794782;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=19boBTCsjzigUNehuNnbCAd0sjXKxyv/w6iDQ2Y4Fdc=;
-	b=AAz8ZPAZyEpuFA2hg1GD2suLLmvBqd0ODa7hc1UL+saONfjIxVSk6G/tnsQe2ISC1P0G4y
-	VfxTMHDMvQ0SZdF0yzIY/jsdYFHuCL2MQyvJFMaWhQm9liejE3gEDXTWRaJYvrtY6XxDTY
-	QeVKWrkiKVYFh8wizEQb7r8XBHtku4LDZ4ZwEiIndpKFQaTH7DIpd3jqTHzBuTH7olquCm
-	HUb/Zl1H7kEfZa5DEizrslSK8++usYILUQQIMp6BKUNSzVEKh+aFJ+ehl/oZFk6NR2R63V
-	nudiPNLAPLX9rUQkjM56gpuhxlvy2Vvo5vSA8vmwDlfzD9bBEl+/zdF274qzUQ==
-Message-ID: <ee54b08f-b3d8-4a62-bc43-0117a9b11102@yoseli.org>
-Date: Mon, 12 Oct 2026 10:46:16 +0200
+	dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b="boGYg4yP"
+Received: from localhost (localhost [127.0.0.1])
+	by mail.codelabs.ch (Postfix) with ESMTP id 262115A0005;
+	Mon, 12 Oct 2026 11:20:52 +0200 (CEST)
+Received: from mail.codelabs.ch ([127.0.0.1])
+ by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id 8vKntI9c464r; Mon, 12 Oct 2026 11:20:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strongswan.org;
+	s=default; t=1791796851;
+	bh=rL0fvVP9fDZc1blGZLqu9RtCF1FfXYpJwfhKydWrzCU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=boGYg4yPKd0PZ/GfbIeUa+IfLuFYo7Zka+wEeq4S+VyDJbQERZbYsnspGbstacovm
+	 ZD4+4v3NyRlYb/L1BIFUuAgW8vicrHdpbHNanVqFrvwhTOtytOXhWsgj2vssZ+Ot2J
+	 MAmT1EPAo0QqE6AiB8u76pj8WFiHuUS3GLgfQabataqfr6IYVbC/q2QcTINMU7SXM7
+	 ZSGvaNlb0Zxg4U7p7m/G7OzKn1TocoKUgaWlCVsqYHgXdrsNMtB9VmlOxH0VLPzdDA
+	 hfcsnblS3GlY5gyAqqDnpqLhxdtNCsPpGDFzxaadmefHZhjNmtuv2XHGwCgucf7Gyl
+	 9emFde/x9ZuTA==
+Received: from [10.6.32.205] (unknown [185.12.128.224])
+	by mail.codelabs.ch (Postfix) with ESMTPSA id 0FE845A0004;
+	Mon, 12 Oct 2026 11:20:51 +0200 (CEST)
+Message-ID: <3a56d9305a01872b127269e7afa4b105adcf0f85.camel@strongswan.org>
+Subject: Re: [PATCH] lib/crypto: x86/chacha: Add a 16-block AVX-512 variant
+From: Martin Willi <martin@strongswan.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel
+ <ardb@kernel.org>, 	linux-crypto@vger.kernel.org
+Date: Mon, 12 Oct 2026 11:20:50 +0200
+In-Reply-To: <20261004180316.GE1906@quark>
+References: <20260722153247.630519-1-martin@strongswan.org>
+	 <20260722232424.GA50619@quark>
+	 <aaca79db6bd81c539b1f1698603c7249be48a7b7.camel@strongswan.org>
+	 <20261004180316.GE1906@quark>
+Autocrypt: addr=martin@strongswan.org; prefer-encrypt=mutual;
+ keydata=mQENBEhbeIwBCADbKW4rqhkBsvQumeWTAfy+Q+YciIbbqLvxwRZPKpxz19nxJQPbWF7pG
+ oiPb3TWLK3TitWVKKZuNILStsKTGiR4RqLUs8n3sESPoz5HmRqsijm6yJDzzPAE3/B7IWHBeAOssV
+ TWS7b9ROz4iFI+fNLnqMqE22zMEItC2r9zi6GpDmi/QP3CcxHFzPMF5iQkMPp6QJMwOdPvYR9kBb1
+ x1ubDOjsfWqI41neJTGlv3EVFc5nkv0s7PfoYxMkf8/VStd29pMe4csKJUaPDkLqenLl8Omq8Z3F+
+ sbjdo+hcim4i3EsROYh59kA4/UuMFfI0hxaIaoW6UAb6gyqOHkS6vC+VABEBAAG0Jk1hcnRpbiBXa
+ WxsaSA8bWFydGluLndpbGxpQHJldm9zZWMuY2g+iQE4BBMBAgAiBQJRsHoSAhsvBgsJCAcDAgYVCA
+ IJCgsEFgIDAQIeAQIXgAAKCRAQGu6ewTL0wxf8B/9EThZXuVqNTK2nH2QuRi2zQntFXkK2QbU11sv
+ zkfZV8xDfWKHdq67LLako/FOE1dXN6iurWFChgMexs0bSMzaftCmHGSSgGaQhBhANSObKu8M+UyHd
+ bes88zNpQKdwVd9guIo6oRrX33IYkb63ifZReChcBffu6cjXQky7/79kpnl6f3qlP5ZluyNGX9Iwe
+ z1EpmG2zHkJlc+3oPQbsQbFKjUOdR1hfyKbcVVQHs1ddv830Z0cpM6QbcknR81VsCQ7FYBrH5Hw3N
+ AKhrfbIaZMvwBgQfXIgc7mwPZFg2oONZMzauzX6EpZ29Z+kCsy3AArnZssVAwxk+ydRJhUWlZmtCR
+ NYXJ0aW4gV2lsbGkgPG1hcnRpbkBzdHJvbmdzd2FuLm9yZz6JATYEEwECACAFAkhbeIwCGy8GCwkI
+ BwMCBBUCCAMEFgIDAQIeAQIXgAAKCRAQGu6ewTL0w9ruCADDGN0JgrImHOPGgsJwdP2nKwBytO8mM
+ Z/Z/folgH20zqiMqyNR4lOZW9L3DF4rz83fKXQFbP7nCf6GZ/tmjmrImiTZBkKwr37ZsaBRaCz3i9
+ rYITY94njenYp7jy6roMcvlBMhNjSI04AvLjaA/hcPuSexqqso+qoNTa7+VplF7OpikB8vKPt+fMp
+ XuGP8TF/q8v9TrY+gcVv0c8ZOrGDnI5vJt1Fp0PvoH/vXFx3Jy90g+hRUYFbLW2S76geiGVML9AeK
+ IQKjEpp2bxsd+JYGo91MeKBqjlllonxZ17eKNtlA+X+iluwcDJZzdabB19EQG7ZEf0jAy6Sy09au6
+ MYFtCBNYXJ0aW4gV2lsbGkgPG1hcnRpbkByZXZvc2VjLmNoPokBNgQTAQIAIAUCSzjspgIbLwYLCQ
+ gHAwIEFQIIAwQWAgMBAh4BAheAAAoJEBAa7p7BMvTDaP4IALJRUmUEagBRrdAi1SrxxcsgPDr5vo8
+ 1UrPADXKnMdf6KXPqfPMN4hIeS4zbFyC/FA9cg0T9680pVk8hLmcD3iCRMMnL9d38hOQmMxw2TYnd
+ 7rth1LuoDRhIwI1bfADw3EJGEMsTy49zVtVl1KwmqBZDDk3PGHvukHYawleOrTRVitOEvavg0vfgg
+ CgqvSeSBy3tkX2EIlagC/5eXpYLguj1iI84xG01M4bZ9PU+PuzZADaHL+a9iPelBvk0uNjwKvKjPx
+ OPDfaxsmEgjNG7M9gZjBkjSjvclRUlLMpe+3qHhGEYf2yKsv72hCLYy8my5jRnu59eZq72lX9YWVs
+ jlXU=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-9 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/2] m68k: coldfire: Add RNG support for MCF54418
-To: Greg Ungerer <gerg@linux-m68k.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
- Olivia Mackall <olivia@selenic.com>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, linux-m68k@lists.linux-m68k.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- Frank Li <Frank.Li@nxp.com>, Herbert Xu <herbert@gondor.apana.org.au>
-References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org>
- <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org>
- <bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org>
- <ddf0ab32-5b66-453e-b7aa-1722aeaf2aa0@yoseli.org>
- <9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com>
- <asn8e5puc3I01Lva@gondor.apana.org.au>
- <8be9c875-68a9-4bb5-b581-501a0a6819f4@linux-m68k.org>
-Content-Language: fr-FR, en-US, en-GB
-From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-In-Reply-To: <8be9c875-68a9-4bb5-b581-501a0a6819f4@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: jeanmichel.hautbois@yoseli.org
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: dmFkZTEPWrJqe016L8I3chHHuK71fvLMlYu+6IrNfxrvD/MyQtgB2kOmSroRn5pztNxyoPXTsP3v9st2xoK0cTKVkCkEXnzk+tyydkEnZa3BeDOpN+lBo3VSfju+U2Tk5DFLr2QTf3rS7cF70bZN6RCshXOZ6HVSfbaHlah6rgF+S1ghDvtrdNc33ylG978pFkIVKZAjrHrrK4lzsId4ZikSGWG++dyZRIZYSLuxWGOy6uWwFvRqYp7eHk+F8lCkqQkRzDYLf/PNuPs9yHrHnCbSXcwXnUuKid+zR4eyu85684+A5SFc3yxeSVSajXUtZMboFqBEssGGUH2TBR8Yk1f07MSZJgLkJ/dO+CwPvwngLjI92MEv73dMHbbBqJibq0do1B0Lz0Zo4mzA4OezcBN5mVpeb0VThW9sEYznRUJeYGoRvkCbWRdrYkcknQFhqJwUI1dRKs9JjHOG0kHLDHZ8rpKjMT14YRCg/zYDN9c5wK/DOOHXEvlA1ipL+b+3rKxzP3fnDw63p4Y44/pyd0xok+TQxEAM35f5EE+5btGH4X2G7kPlNHHh5Ik+e2cJFW/1kSa3D12NjWBUnaHClNFyhqUsOcUOJZDYAZk3O5uHc2Xx45m7gaOtKGgKEbDe1QC01g3/kF2lnlW+BO6+ah4NHNgEER4kazqxwF5roUA2tzhB1w
 
-Hi Greg,
+Hi Eric,
 
-Le 11/10/2026 à 17:28, Greg Ungerer a écrit :
-> Hi JM,
-> 
-> On 10/10/26 18:51, Herbert Xu wrote:
->> On Wed, Aug 19, 2026 at 07:36:36AM +1000, Greg Ungerer wrote:
->>> Hi JM,
->>>
->>> On 19/8/26 01:09, Jean-Michel Hautbois wrote:
->>>> Hi Greg,
->>>>
->>>> Sorry for the very long silence on this one, it fell off my radar...
->>>>
->>>> Le 03/12/2025 à 13:15, Greg Ungerer a écrit :
->>>>> Hi Jean-Michel,
->>>>>
->>>>> On 26/11/25 17:08, Jean-Michel Hautbois via B4 Relay wrote:
->>>>>> From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
->>>>>>
->>>>>> Add support for the hardware Random Number Generator (RNGB) found on
->>>>>> MCF54418 ColdFire processors with clock enabled at platform
->>>>>> initialization.
->>>>>>
->>>>>> The RNGB block is compatible with the imx-rngc driver.
->>>>>>
->>>>>> Reviewed-by: Frank Li <Frank.Li@nxp.com>
->>>>>> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
->>>>>> ---
->>>>>>    arch/m68k/coldfire/device.c       | 28 ++++++++++++++++++++++++++++
->>>>>>    arch/m68k/coldfire/m5441x.c       |  2 +-
->>>>>>    arch/m68k/include/asm/m5441xsim.h |  9 +++++++++
->>>>>>    drivers/char/hw_random/Kconfig    |  3 ++-
->>>>>>    drivers/char/hw_random/imx-rngc.c |  7 +++++++
->>>>>>    5 files changed, 47 insertions(+), 2 deletions(-)
->>>>>
->>>>> I am happy with the ColdFire arch parts, so from me:
->>>>>
->>>>>       Acked-by: Greg Ungerer <gerg@linux-m68k.org>
->>>>>
->>>>> I don't mind taking this commit via the m68knommu git tree if the hw_rng
->>>>> maintainers are ok with that. Otherwise if you break out the arch/m68k
->>>>> parts I can apply those on their own.
->>>>
->>>> I think Herbert acked ?
->>>> Do you need another ack ?
->>>
->>> I would like to see an acknowledgement that taking this patch via the
->>> m68knommu git tree (to Linus) is ok with the RNG maintainers.
->>
->> I have no objections to this.
-> 
-> Thanks Herbert.
-> 
-> JM: I have applied this to the for-next branch of the m68knommu git tree.
-> I didn't quite go on cleanly, so please double check it for me.
+> > > This is very similar to the existing
+> > > chacha_8block_xor_avx512vl(), just
+> > > with 512-bit vectors instead of 256-bit.=C2=A0[..]
+> > >=20
+> > > Given that, could we consolidate these implementations?
+> >=20
+> > Yes, it is doable [...]
+>=20
+> Hi Martin, is there any update on this?
 
-Thanks, I think you missed 1/2 ?
-Or did I miss something ?
+I prepared a patchset that wraps the AVX-512 and AVX-2 block functions
+in macros. On top it adds this 16-block and a 4-block ZMM that is then
+almost free and probably worth it.
 
-Thanks !
-JM
+It is a series with 9 patches now, and unfortunately I haven't found
+the time to bring it in shape for a submission. I hope that I can do
+this soon...
 
-> 
-> Regards
-> Greg
-
+Thanks,
+Martin
