@@ -1,89 +1,113 @@
-Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4305B3A1691
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Oct 2026 10:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64A43CB2DC;
+	Mon, 12 Oct 2026 11:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791801830; cv=none; b=kRa5Ca39g6MYnjcUZ9UdhivB/ouGOoNiOE80oWJwgpjN7AfCDksFdEuYc8EdteDShA7KNMvR8+SNUiCIyGAHKEPGWA9KVoYGR7lOW/BJgxvQfeHojWzVhVJdHdYtoIIyoDpBVRdz0bQsy2fsRH9RW2nXfOwkP11m7FRfWv3XC28=
+	t=1791803451; cv=none; b=E+O/MMW8C7dRwO4p9fjC6PTSH8hz+k9uIVwSQ96iGQ2dOyGqgyqVL1QTi7u3f/FRnEYambIHoz4L0GIMKKthmr5k9mwgoimOcJASGp4fczTTBfnvimAseQ8HKeU3zMKR0+X2cmtuO5aCVJar+K8jGCxR5MN5Cssz+yUUowEZQ40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791801830; c=relaxed/simple;
-	bh=Zz2W0z0cWvL9+n753j1WAam4CZ5s6Xk6anZyjUmFcYM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nWjVxPny7KZAdLlCgUlJVCFip5klxENFafW16lbWkgH12lz2La5+90UztjEeb7Esu/MhNCh9renfATEB9MRTKm9n6NzyTQ5LM9idenlDbjT8BkKYMHRCCevam7yJTmI6KPogFOOMMgsN1lGUMOAwAcp3hz3S8Iyje/spU4eG4gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=Pfkrqqxj; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="Pfkrqqxj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=Zz2W
-	0z0cWvL9+n753j1WAam4CZ5s6Xk6anZyjUmFcYM=; b=PfkrqqxjfA00PkgN4eGe
-	w9fYKHRwUyvNDBHQIdWkxcM4HNQ18C9RKNIwxq+Cah2yw/HWkmhMylE/eFZ2JcSo
-	JD6mljTPVKaq1dhJlUq8TBFaQ9cdkbwtO4SliW0JS3O1H8/hgUsVAGYA5RYemkzZ
-	EEBAlfm75RDHqWhuHBK1RcC+7uUghQr1JvK4HJGfLZOwqF6AKEO60AKuiTST35zw
-	rTmoD9baJ+tTzCiqt5KuFCZO+npDkppd4FMEJD0PEfF2fQJ8d1LHhA9S2Q9wh7xR
-	JR0Rb4k62oVIHqK5JXBWI5sIpf96c7N/ZYb8t7FXJ5YEYfbL5GAvtTx9rL2R+nUP
-	dg==
-Received: (qmail 2216586 invoked from network); 12 Oct 2026 12:43:44 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 12 Oct 2026 12:43:44 +0200
-X-UD-Smtp-Session: l3s3148p1@uDVEX6JdHJQujnuu
-Date: Mon, 12 Oct 2026 12:43:44 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: dmaengine@vger.kernel.org
-Cc: Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: ccp - unmap descriptor before completing cookie
-Message-ID: <asy53A_Noe3EE-KZ@shikoro>
-References: <20261010125001.19300-3-wsa+renesas@sang-engineering.com>
+	s=arc-20240116; t=1791803451; c=relaxed/simple;
+	bh=meL/o5DImxbUnM/+BUmkCbQ7elraRI5kkf5ONcCuyHc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NUreZwxWiPAgJxoz2ZvAA6OTFwtVsbhZHAeAfhBE1EO+qVrZK1YYTIDfmfwdHrzJyqhB4I4EcL1DI/HrhXqLmgExUfeLxC8dRUSJJLSTHaj7tmSpuOG4+ymi6gOlz289CQ50L4dKVQS1Wwiv7HwqM6+WOxmkDpT0JfMm9DxsU+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 950421F0089B;
+	Mon, 12 Oct 2026 11:10:46 +0000 (UTC)
+Message-ID: <d2a8ae3b-779d-42c2-8a36-2770ab7ce19c@linux-m68k.org>
+Date: Mon, 12 Oct 2026 21:10:29 +1000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="WDG1I0qEgaCJ3/l0"
-Content-Disposition: inline
-In-Reply-To: <20261010125001.19300-3-wsa+renesas@sang-engineering.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/2] m68k: coldfire: Add RNG support for MCF54418
+To: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+ Olivia Mackall <olivia@selenic.com>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, linux-m68k@lists.linux-m68k.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Frank Li <Frank.Li@nxp.com>, Herbert Xu <herbert@gondor.apana.org.au>
+References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org>
+ <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org>
+ <bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org>
+ <ddf0ab32-5b66-453e-b7aa-1722aeaf2aa0@yoseli.org>
+ <9ba1ebd8-61cc-4e1a-b68d-906b20dd4999@polyxeno.com>
+ <asn8e5puc3I01Lva@gondor.apana.org.au>
+ <8be9c875-68a9-4bb5-b581-501a0a6819f4@linux-m68k.org>
+ <ee54b08f-b3d8-4a62-bc43-0117a9b11102@yoseli.org>
+Content-Language: en-US
+From: Greg Ungerer <gerg@linux-m68k.org>
+In-Reply-To: <ee54b08f-b3d8-4a62-bc43-0117a9b11102@yoseli.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---WDG1I0qEgaCJ3/l0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi JM,
 
-On Sat, Oct 10, 2026 at 02:50:03PM +0200, Wolfram Sang wrote:
-> To ensure that buffers are flushed, make sure that the descriptor gets
-> unmapped before completing the cookie.
->=20
-> Link: https://lore.kernel.org/r/20261009093745.539924-1-vkoul@kernel.org
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+On 12/10/26 18:46, Jean-Michel Hautbois wrote:
+> Le 11/10/2026 à 17:28, Greg Ungerer a écrit :
+>> On 10/10/26 18:51, Herbert Xu wrote:
+>>> On Wed, Aug 19, 2026 at 07:36:36AM +1000, Greg Ungerer wrote:
+>>>> On 19/8/26 01:09, Jean-Michel Hautbois wrote:
+>>>>> Sorry for the very long silence on this one, it fell off my radar...
+>>>>>
+>>>>> Le 03/12/2025 à 13:15, Greg Ungerer a écrit :
+>>>>>> Hi Jean-Michel,
+>>>>>>
+>>>>>> On 26/11/25 17:08, Jean-Michel Hautbois via B4 Relay wrote:
+>>>>>>> From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+>>>>>>>
+>>>>>>> Add support for the hardware Random Number Generator (RNGB) found on
+>>>>>>> MCF54418 ColdFire processors with clock enabled at platform
+>>>>>>> initialization.
+>>>>>>>
+>>>>>>> The RNGB block is compatible with the imx-rngc driver.
+>>>>>>>
+>>>>>>> Reviewed-by: Frank Li <Frank.Li@nxp.com>
+>>>>>>> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+>>>>>>> ---
+>>>>>>>    arch/m68k/coldfire/device.c       | 28 ++++++++++++++++++++++++++++
+>>>>>>>    arch/m68k/coldfire/m5441x.c       |  2 +-
+>>>>>>>    arch/m68k/include/asm/m5441xsim.h |  9 +++++++++
+>>>>>>>    drivers/char/hw_random/Kconfig    |  3 ++-
+>>>>>>>    drivers/char/hw_random/imx-rngc.c |  7 +++++++
+>>>>>>>    5 files changed, 47 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> I am happy with the ColdFire arch parts, so from me:
+>>>>>>
+>>>>>>       Acked-by: Greg Ungerer <gerg@linux-m68k.org>
+>>>>>>
+>>>>>> I don't mind taking this commit via the m68knommu git tree if the hw_rng
+>>>>>> maintainers are ok with that. Otherwise if you break out the arch/m68k
+>>>>>> parts I can apply those on their own.
+>>>>>
+>>>>> I think Herbert acked ?
+>>>>> Do you need another ack ?
+>>>>
+>>>> I would like to see an acknowledgement that taking this patch via the
+>>>> m68knommu git tree (to Linus) is ok with the RNG maintainers.
+>>>
+>>> I have no objections to this.
+>>
+>> Thanks Herbert.
+>>
+>> JM: I have applied this to the for-next branch of the m68knommu git tree.
+>> I didn't quite go on cleanly, so please double check it for me.
+> 
+> Thanks, I think you missed 1/2 ?
+> Or did I miss something ?
 
-I'd like to drop this patch because Sashiko reported an issue with it
-which I am not able to analyze.
+I assumed patch 1/2 would go via the RNG maintainers directly since it has
+no dependency on, and contains no arch code for, m68knommu. Is the expectation
+that I should push that too?
+
+Regards
+Greg
 
 
---WDG1I0qEgaCJ3/l0
-Content-Type: application/pgp-signature; name=signature.asc
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmrMudwACgkQFA3kzBSg
-KbZctg//QUjmtYf+fv/Tb+l0cx19fZ7DQ6TyitPOt+zSM6bAGICljOGxPoBUlBex
-OnPPAc8g9lMK0JImxjzMBRydjne/HLE+AwwZq9FtALF9gnXahpvGXWZD9hnBAlvD
-UwkwEPDOMZqLYD0zhZEusg9sxNoa9/nNCojhfq0gNrBTPRfaXXeC61gGY/MSrJXA
-3TQuqEIUduyvfBPPUy1UhwFLLZADvZLPg5L94hD2z5EPWHf5LNY88aTiXYDy/CWz
-xj7KqV3Xn4SzbDORjc0nsbtIJ7tx1O9u4e0B3g/wUQFyv4Pyt7jOaKWou2oHxbxv
-rBlfuDjXtWSwD7Qy2/jodgSSEmORcM8VoNxFwcYXkxgbSAQR1luEmmOyyd3esUp/
-h2URmUmqW5/kZ/7f5Sg1l345D5NIG/WsIWS6kRjTNkLH/hxTE5s/jX4wAPS5A6Us
-qmizsVEDPfz7L2Gmo5ew9TsUGXIoe89bfcASaGBZtGv4WPi10vfwbao1/a859k6c
-ZarkLWqToSQVcpxfmyV4U6wsF7oEEE98sZBJeMHXTzbBovtTgeB4NyqYom+mQhLa
-xy0mEXN6DjeZd9iQSLIQLuHjSVktazTEY5xc30+lwNYMQvGBrJiKao6dslW2gz6+
-sR6esEAkcaG/BeKsd0IvcQhVZ9pGMfwnjp7GSTj31PtO8aMKXD0=
-=HbNB
------END PGP SIGNATURE-----
-
---WDG1I0qEgaCJ3/l0--
