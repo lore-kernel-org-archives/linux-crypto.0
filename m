@@ -1,300 +1,89 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DE6282F2C
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Oct 2026 10:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791801682; cv=pass; b=eON79+teD51cbUOuj/SnaFBY6ZLNuhxon5VmSzfntOm8P3H5xo0Yb/NbdUa2S9hJanGkRnN13dydPSSMXE0sGWmTKRigiKb9rpXtFHWUuiwbFjqcrbuoOjh7codPgokSalMjXNOn7yQu1W/77ZJg/M1N4Lj2pVsW/xr3JKggFpU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791801682; c=relaxed/simple;
-	bh=dyDkbf4tApIKHMRKlGvnnSGRaFxM/EK5HXOveYssYfg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K7aSmh5uRKQoTcLbl78IROpt1K0PWXo8puY+YE/uFNDmecxgwnpY/TqHKwzHKjbkkD8E+V5swAGk04vqdvdPobtKr+g2VRdOWBAizLkGYdj6r+UBuBv7ahkr6Y9VBZA+3ArtFxybe6uwkuh475Ls4WN8IHvfy5EnBSgiTbySsUE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=HrGbP5hZ; arc=pass smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4305B3A1691
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Oct 2026 10:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791801830; cv=none; b=kRa5Ca39g6MYnjcUZ9UdhivB/ouGOoNiOE80oWJwgpjN7AfCDksFdEuYc8EdteDShA7KNMvR8+SNUiCIyGAHKEPGWA9KVoYGR7lOW/BJgxvQfeHojWzVhVJdHdYtoIIyoDpBVRdz0bQsy2fsRH9RW2nXfOwkP11m7FRfWv3XC28=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791801830; c=relaxed/simple;
+	bh=Zz2W0z0cWvL9+n753j1WAam4CZ5s6Xk6anZyjUmFcYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nWjVxPny7KZAdLlCgUlJVCFip5klxENFafW16lbWkgH12lz2La5+90UztjEeb7Esu/MhNCh9renfATEB9MRTKm9n6NzyTQ5LM9idenlDbjT8BkKYMHRCCevam7yJTmI6KPogFOOMMgsN1lGUMOAwAcp3hz3S8Iyje/spU4eG4gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=Pfkrqqxj; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="HrGbP5hZ"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-533952f3714so21447001cf.2
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Oct 2026 03:41:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791801679; cv=none;
-        d=google.com; s=arc-20260327;
-        b=gZ9ml6flwKgncvblRIzPgFY8kAMMQ1/9u2t3BFJm8+AyjozJEN99nZrvCqnPzce+aJ
-         hYQBzqPq29eiW0Kh6dV2BxbQT1LlkKlMzA9Ns3gHqIKKAiWMU0Ehlz3qZLSmJAhuSHb5
-         Sn3dVHvk+qoI7++5mRmGK0YjRowIII6mm9U7iz0eKAGXaIggjH4SxcieVcs/6fGAUJ5Y
-         aNxVFmwY3bH8vfsViyBelo1LvCUS6PSxwYo+w982rxCXG1cPNGqiyCKvboCKR4ng5yby
-         /tlUHfufvvd82ey/ISWwQcfRkGpkom5/54Ozbia1KMzcXCv44ihKEAVByUjYqVnkOJy9
-         M5Kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+xFSB7mA2/iOIBu3KdFK8kWp09+Xthh/N0K4ju2p7Ws=;
-        fh=OUpgHz8gu+EFyREjScBnwgXxe9p5hHef04jJGlkpTWE=;
-        b=iY4fLAchC2Z5/3b/ZqPnoXQsD0FusE3F1af0tsVjWUdbQD8ZghzI9JLd2Ec+VWg1vj
-         R7jbOCbuRRj66auAByUGy46xL+NFCvVNboVdIRufznpLxdsBcHsA72JW/qmVE1LBvcII
-         r+pdo5HsMsru8/VQTMe2LYdgKyUPUYkVTeJ+yAM1okXS0YxoutbsuGNuVpkzn01W1197
-         c00L7re2zsdKFxGGxcEZcrWcdk1iHFIfRfwnHtVMygWepRzqgec3lrpF0Zg3yt0iFM/l
-         +DPC/64Zp6JasnHsOxs/p0sewXBcQNhpHgvayKnWtimjKBhRB4WPF5b8/eUrgGw9wxJV
-         cjww==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1791801679; x=1792406479; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=+xFSB7mA2/iOIBu3KdFK8kWp09+Xthh/N0K4ju2p7Ws=;
-        b=HrGbP5hZ/G46ouL8oj7u0tHoLw2an39QOYARSRAFQtxF+cLWftZw6hl/6oA4OvTu+z
-         hAJAP4WS1RnL3Ww4Aa6OTH6iPU6fc95UXnIRqX/FgA+F5EXoyMc6pUOJ+PU9vjDj3w2r
-         sQE7oQRdrX0VzWOJBQUSoE2esmlABvdPtMZlY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791801679; x=1792406479;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+xFSB7mA2/iOIBu3KdFK8kWp09+Xthh/N0K4ju2p7Ws=;
-        b=HZFKlm4HTCVfVYy63P5wLSzCaHsiW3Ttl28ioQKiQiyZ5eun2QP/Q99KR4+H2SIhPe
-         j0iyrpb5qkGHstOYtQjkUYsB/QrS483XuqGQgExBXxQTashMkB3M08bV+yxoovjMmfYi
-         xwpPVleIT0/FLj9bm8PYDxDNyBW3pwft0JiHvzP2g1yvqd2wrSIOYHLM+ZBsAKBlYEoB
-         FysIo63NLeQmWK6lKj81u/eH0JuMoMa7wsNGPFAcPxsbls/+XuAQFXCvwQ3VV6kWJbjM
-         zfDBpFa0YZc/K10wCaNAkrXIiePmF4czY/ixScIdUdW/MAx0ty0n87wc0gYeeN+6fxLd
-         lWRA==
-X-Gm-Message-State: AFq9FYKQ9fN79K9F05U0Doa2pRijVnKU5PwwRve95AeYBegVP+PJsg30
-	zdqe7+SipFKGVvfXXqOjS8H2sP2aKr9m2VQHlVwGpcHi6rus2UTutGA028a5KYCdmbq19jxhbW4
-	6pVDzSzPZtCGRdB+WzvpFzppGXBrWCPXi+sWKK9r1jE58YsOui9/ArVw=
-X-Gm-Gg: AYBFou3oWj9ku+NONYrR6ENJXfCizZ/0Is5fSSC0IMlNFZH0m9GaaS1HD5OwvTeOaK6
-	SrDVBToxfK/ura+Xo0QzMRSZlDPXjC70an5uBfOkEg/nHHFmry5ASakmCgio0fKEA8dT96Ulvpm
-	JPss5J14EoErAVwYtD1vW4slxTI3ef8G3puuDT7Jue7uADdcrpHwKc88mKmU0n92+SHJ4DKUA+Y
-	hgbIqL6+N5wQOF+f35lLJGQmDvAhFjxt+N1mGuw6FWMqSjP6zrrGD78lBBKKv/1kgsqu+Jv8cYA
-	4kVQx65GIJ+KHeryrtA1flqpCE70XfiIU+MUkhkpp8bXsngA9wQ4HdlMIQJnq8yDJizwyDTaR9D
-	dMc4yTtByw5vh/dyJ7FAUqxGiNRVXUm4ql0EZbHYGohyjlSjM4ZUvYEm4ScYezC5FhIQrIG0Dwq
-	DvfSwA8Od1wfNvKY5NkawAa4O7t1rbsqY=
-X-Received: by 2002:a05:622a:1817:b0:533:3572:250f with SMTP id
- d75a77b69052e-5359fb4a7c8mr155431001cf.36.1791801679512; Mon, 12 Oct 2026
- 03:41:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="Pfkrqqxj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=Zz2W
+	0z0cWvL9+n753j1WAam4CZ5s6Xk6anZyjUmFcYM=; b=PfkrqqxjfA00PkgN4eGe
+	w9fYKHRwUyvNDBHQIdWkxcM4HNQ18C9RKNIwxq+Cah2yw/HWkmhMylE/eFZ2JcSo
+	JD6mljTPVKaq1dhJlUq8TBFaQ9cdkbwtO4SliW0JS3O1H8/hgUsVAGYA5RYemkzZ
+	EEBAlfm75RDHqWhuHBK1RcC+7uUghQr1JvK4HJGfLZOwqF6AKEO60AKuiTST35zw
+	rTmoD9baJ+tTzCiqt5KuFCZO+npDkppd4FMEJD0PEfF2fQJ8d1LHhA9S2Q9wh7xR
+	JR0Rb4k62oVIHqK5JXBWI5sIpf96c7N/ZYb8t7FXJ5YEYfbL5GAvtTx9rL2R+nUP
+	dg==
+Received: (qmail 2216586 invoked from network); 12 Oct 2026 12:43:44 +0200
+Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 12 Oct 2026 12:43:44 +0200
+X-UD-Smtp-Session: l3s3148p1@uDVEX6JdHJQujnuu
+Date: Mon, 12 Oct 2026 12:43:44 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: dmaengine@vger.kernel.org
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccp - unmap descriptor before completing cookie
+Message-ID: <asy53A_Noe3EE-KZ@shikoro>
+References: <20261010125001.19300-3-wsa+renesas@sang-engineering.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <asjT87HAZ_UUbbvm@gondor.apana.org.au>
-In-Reply-To: <asjT87HAZ_UUbbvm@gondor.apana.org.au>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Mon, 12 Oct 2026 16:11:08 +0530
-X-Gm-Features: AclHuK9TX0ZvyDYt4B9H_Or25_gOyM2rCIhlKNdH80-m2I3Y0cpw-XgVaFFUNuw
-Message-ID: <CALxtO0=TXw68akF3AFPT0=J4tZ2XV+G5kuTOELGBzhbgBdN0RA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: aes - Add import_core/export_core to cmac/xcbc/cbcmac
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="WDG1I0qEgaCJ3/l0"
+Content-Disposition: inline
+In-Reply-To: <20261010125001.19300-3-wsa+renesas@sang-engineering.com>
+
+--WDG1I0qEgaCJ3/l0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Herbert,
-  I tested your patch with the SPAcc driver, all cmac(aes)/xcbc(aes)
-tests pass.
+On Sat, Oct 10, 2026 at 02:50:03PM +0200, Wolfram Sang wrote:
+> To ensure that buffers are flushed, make sure that the descriptor gets
+> unmapped before completing the cookie.
+>=20
+> Link: https://lore.kernel.org/r/20261009093745.539924-1-vkoul@kernel.org
+> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
-Warm regards,
-PK
-Vayavya Labs Pvt. Ltd.
+I'd like to drop this patch because Sashiko reported an issue with it
+which I am not able to analyze.
 
-On Fri, Oct 9, 2026 at 5:16=E2=80=AFPM Herbert Xu <herbert@gondor.apana.org=
-.au> wrote:
->
-> The export format for cmac-aes-lib, xcbc-aes-lib and cbcmac-aes-lib
-> did not match that of the generic templates.  Add custom export and
-> import functions to align with the generic tempaltes.
->
-> For cmac and xcbc, perform an extra encryption on the withheld block
-> for export_core so that the information isn't lost.
->
-> Reported-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/crypto/aes.c b/crypto/aes.c
-> index 94791f481e98..a1af4d5a7608 100644
-> --- a/crypto/aes.c
-> +++ b/crypto/aes.c
-> @@ -18,7 +18,10 @@
->  #include <crypto/internal/hash.h>
->  #include <crypto/internal/skcipher.h>
->  #include <crypto/scatterwalk.h>
-> +#include <crypto/utils.h>
-> +#include <linux/kernel.h>
->  #include <linux/module.h>
-> +#include <linux/string.h>
->
->  static_assert(__alignof__(struct aes_key) <=3D CRYPTO_MINALIGN);
->  static_assert(__alignof__(struct aes_enckey) <=3D CRYPTO_MINALIGN);
-> @@ -95,6 +98,71 @@ static int __maybe_unused crypto_aes_cmac_digest(struc=
-t shash_desc *desc,
->         return 0;
->  }
->
-> +static int crypto_cmac_export_core(struct shash_desc *desc, void *out)
-> +{
-> +       struct aes_cmac_ctx *ctx =3D AES_CMAC_CTX(desc);
-> +       struct aes_cmac_ctx ctx1;
-> +       u8 *h =3D ctx->h;
-> +
-> +       if (!ctx->partial_len)
-> +               ;
-> +       else if (ctx->partial_len !=3D AES_BLOCK_SIZE)
-> +               return -EINVAL;
-> +       else {
-> +               union {
-> +                       long l;
-> +                       char c;
-> +               } u =3D {};
-> +
-> +               BUILD_BUG_ON(sizeof(u) >=3D AES_BLOCK_SIZE);
-> +               ctx1 =3D *ctx;
-> +               aes_cmac_update(&ctx1, &u.c, sizeof(u));
-> +               h =3D ctx1.h;
-> +       }
-> +
-> +       memcpy(out, h, AES_BLOCK_SIZE);
-> +       memzero_explicit(&ctx1, sizeof(ctx1));
-> +       return 0;
-> +}
-> +
-> +static int crypto_cmac_import_core(struct shash_desc *desc, const void *=
-in)
-> +{
-> +       struct aes_cmac_ctx *ctx =3D AES_CMAC_CTX(desc);
-> +
-> +       ctx->key =3D AES_CMAC_KEY(desc->tfm);
-> +       memcpy(ctx->h, in, AES_BLOCK_SIZE);
-> +       ctx->partial_len =3D 0;
-> +       return 0;
-> +}
-> +
-> +static int crypto_cmac_export(struct shash_desc *desc, void *out)
-> +{
-> +       struct aes_cmac_ctx *ctx =3D AES_CMAC_CTX(desc);
-> +       unsigned int partial =3D ctx->partial_len;
-> +       u8 *p =3D out;
-> +
-> +       memcpy(p, ctx->h, AES_BLOCK_SIZE);
-> +       memset(p + AES_BLOCK_SIZE, 0, AES_BLOCK_SIZE);
-> +       p[AES_BLOCK_SIZE * 2] =3D partial;
-> +       return 0;
-> +}
-> +
-> +static int crypto_cmac_import(struct shash_desc *desc, const void *in)
-> +{
-> +       struct aes_cmac_ctx *ctx =3D AES_CMAC_CTX(desc);
-> +       unsigned int partial;
-> +       const u8 *p =3D in;
-> +
-> +       crypto_cmac_import_core(desc, p);
-> +       p +=3D AES_BLOCK_SIZE;
-> +       partial =3D p[AES_BLOCK_SIZE];
-> +       if (partial > AES_BLOCK_SIZE)
-> +               return -EOVERFLOW;
-> +       crypto_xor(ctx->h, p, partial);
-> +       ctx->partial_len =3D partial;
-> +       return 0;
-> +}
-> +
->  #define AES_CBCMAC_KEY(tfm) ((struct aes_enckey *)crypto_shash_ctx(tfm))
->  #define AES_CBCMAC_CTX(desc) ((struct aes_cbcmac_ctx *)shash_desc_ctx(de=
-sc))
->
-> @@ -136,6 +204,49 @@ static int __maybe_unused crypto_aes_cbcmac_digest(s=
-truct shash_desc *desc,
->         return 0;
->  }
->
-> +static int crypto_cbcmac_export_core(struct shash_desc *desc, void *out)
-> +{
-> +       memcpy(out, AES_CBCMAC_CTX(desc)->h, AES_BLOCK_SIZE);
-> +       return 0;
-> +}
-> +
-> +static int crypto_cbcmac_import_core(struct shash_desc *desc, const void=
- *in)
-> +{
-> +       struct aes_cbcmac_ctx *ctx =3D AES_CBCMAC_CTX(desc);
-> +
-> +       ctx->key =3D AES_CBCMAC_KEY(desc->tfm);
-> +       memcpy(ctx->h, in, AES_BLOCK_SIZE);
-> +       ctx->partial_len =3D 0;
-> +       return 0;
-> +}
-> +
-> +static int crypto_cbcmac_export(struct shash_desc *desc, void *out)
-> +{
-> +       struct aes_cbcmac_ctx *ctx =3D AES_CBCMAC_CTX(desc);
-> +       unsigned int partial =3D ctx->partial_len;
-> +       u8 *p =3D out;
-> +
-> +       memset(p + AES_BLOCK_SIZE, 0, AES_BLOCK_SIZE);
-> +       p[AES_BLOCK_SIZE * 2] =3D partial;
-> +       return crypto_cbcmac_export_core(desc, p);
-> +}
-> +
-> +static int crypto_cbcmac_import(struct shash_desc *desc, const void *in)
-> +{
-> +       struct aes_cbcmac_ctx *ctx =3D AES_CBCMAC_CTX(desc);
-> +       unsigned int partial;
-> +       const u8 *p =3D in;
-> +
-> +       crypto_cbcmac_import_core(desc, p);
-> +       p +=3D AES_BLOCK_SIZE;
-> +       partial =3D p[AES_BLOCK_SIZE];
-> +       if (partial > AES_BLOCK_SIZE)
-> +               return -EOVERFLOW;
-> +       crypto_xor(ctx->h, p, partial);
-> +       ctx->partial_len =3D partial;
-> +       return 0;
-> +}
-> +
->  static struct crypto_alg alg =3D {
->         .cra_name =3D "aes",
->         .cra_driver_name =3D "aes-lib",
-> @@ -166,7 +277,12 @@ static struct shash_alg mac_algs[] =3D {
->                 .update =3D crypto_aes_cmac_update,
->                 .final =3D crypto_aes_cmac_final,
->                 .digest =3D crypto_aes_cmac_digest,
-> +               .export =3D crypto_cmac_export,
-> +               .import =3D crypto_cmac_import,
-> +               .export_core =3D crypto_cmac_export_core,
-> +               .import_core =3D crypto_cmac_import_core,
->                 .descsize =3D sizeof(struct aes_cmac_ctx),
-> +               .statesize =3D AES_BLOCK_SIZE * 2 + 1,
->         },
->  #endif
->  #if IS_ENABLED(CONFIG_CRYPTO_XCBC)
-> @@ -187,7 +303,12 @@ static struct shash_alg mac_algs[] =3D {
->                 .update =3D crypto_aes_cmac_update,
->                 .final =3D crypto_aes_cmac_final,
->                 .digest =3D crypto_aes_cmac_digest,
-> +               .export =3D crypto_cmac_export,
-> +               .import =3D crypto_cmac_import,
-> +               .export_core =3D crypto_cmac_export_core,
-> +               .import_core =3D crypto_cmac_import_core,
->                 .descsize =3D sizeof(struct aes_cmac_ctx),
-> +               .statesize =3D AES_BLOCK_SIZE * 2 + 1,
->         },
->  #endif
->  #if IS_ENABLED(CONFIG_CRYPTO_CCM)
-> @@ -204,7 +325,12 @@ static struct shash_alg mac_algs[] =3D {
->                 .update =3D crypto_aes_cbcmac_update,
->                 .final =3D crypto_aes_cbcmac_final,
->                 .digest =3D crypto_aes_cbcmac_digest,
-> +               .export =3D crypto_cbcmac_export,
-> +               .import =3D crypto_cbcmac_import,
-> +               .export_core =3D crypto_cbcmac_export_core,
-> +               .import_core =3D crypto_cbcmac_import_core,
->                 .descsize =3D sizeof(struct aes_cbcmac_ctx),
-> +               .statesize =3D AES_BLOCK_SIZE * 2 + 1,
->         },
->  #endif
->  };
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+--WDG1I0qEgaCJ3/l0
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmrMudwACgkQFA3kzBSg
+KbZctg//QUjmtYf+fv/Tb+l0cx19fZ7DQ6TyitPOt+zSM6bAGICljOGxPoBUlBex
+OnPPAc8g9lMK0JImxjzMBRydjne/HLE+AwwZq9FtALF9gnXahpvGXWZD9hnBAlvD
+UwkwEPDOMZqLYD0zhZEusg9sxNoa9/nNCojhfq0gNrBTPRfaXXeC61gGY/MSrJXA
+3TQuqEIUduyvfBPPUy1UhwFLLZADvZLPg5L94hD2z5EPWHf5LNY88aTiXYDy/CWz
+xj7KqV3Xn4SzbDORjc0nsbtIJ7tx1O9u4e0B3g/wUQFyv4Pyt7jOaKWou2oHxbxv
+rBlfuDjXtWSwD7Qy2/jodgSSEmORcM8VoNxFwcYXkxgbSAQR1luEmmOyyd3esUp/
+h2URmUmqW5/kZ/7f5Sg1l345D5NIG/WsIWS6kRjTNkLH/hxTE5s/jX4wAPS5A6Us
+qmizsVEDPfz7L2Gmo5ew9TsUGXIoe89bfcASaGBZtGv4WPi10vfwbao1/a859k6c
+ZarkLWqToSQVcpxfmyV4U6wsF7oEEE98sZBJeMHXTzbBovtTgeB4NyqYom+mQhLa
+xy0mEXN6DjeZd9iQSLIQLuHjSVktazTEY5xc30+lwNYMQvGBrJiKao6dslW2gz6+
+sR6esEAkcaG/BeKsd0IvcQhVZ9pGMfwnjp7GSTj31PtO8aMKXD0=
+=HbNB
+-----END PGP SIGNATURE-----
+
+--WDG1I0qEgaCJ3/l0--
