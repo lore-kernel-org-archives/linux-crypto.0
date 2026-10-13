@@ -1,175 +1,531 @@
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010070.outbound.protection.outlook.com [52.101.61.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FB452BE3D;
-	Tue, 13 Oct 2026 15:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791906306; cv=fail; b=DQz/CGkV6nEwt3VzLL8OIN616oq+Y674R7CfnYa0b4mjKh4n6+Uv9w3+uChyk5fhHaZk1zICoHFs6mg2DpeomhwID3fzPvprs8cDp5h3hHyQKOJN7XDI7TbFFUzu5Q6zjLlpIAIlPjQ+YGA8kGhJqM1px/eeasdnXyCI72SI8sM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791906306; c=relaxed/simple;
-	bh=Jd2lk+SMDM0YzvFo9PkJoNt94FgrL8PPudgFAp7RpTg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ATfy745leS9LSJlu+WD+F7l0EAPUg+AG5vo+E3xMjzkHLiTBm7qMNLABPXQ6loRLQz/9X+zQIbEjZT+OVkGmA2mAaSJdtsua60j9UvRx4IYRanVdykdlO1AI5ng6aJ/gBZUjCe7RoMRrZqqWyyD9iCpXYp1qLGNqpKj0t1NpZxs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=VDtsWh9i; arc=fail smtp.client-ip=52.101.61.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0DA50B8DB
+	for <linux-crypto@vger.kernel.org>; Tue, 13 Oct 2026 16:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791909012; cv=none; b=uuRdwQhAHxOCITA07AHUYPOTCrT/b0TbRDXW+VBTvtM3C52HUBflxHr0Y8x8HrFp0mN1Tb48gDipMN3N+T+9XgvYzLMKkwiMkveYQg3D7EsZLdhxV6yu0TSkYSByv9nNe+aW7GXYLuVMkeXUj8xH9nsAhB7YBJlhvd4uCWs55ko=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791909012; c=relaxed/simple;
+	bh=X7JX2w4ntvIjGzutatsHkx+z8Tbd85g8maN+5Y+xR0k=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=blZHwRFi6HHalj4hU8RubaewNWI6+ErDMw0VaEVsE0b7k7purOXOumRTlH+sYKlkZfIiwKY81Ynqkdn0V8lzM/eZP7E9RzoavbbcaYglXPc+qJm6GLFFbGU/ykliV5ao3F/QHlV/ja/r4aZ6Ok8DCvTsSKURO9+ULizv3uUYlzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org; spf=fail smtp.mailfrom=beagleboard.org; dkim=pass (2048-bit key) header.d=beagleboard.org header.i=@beagleboard.org header.b=ZSYUdf8n; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VDtsWh9i"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NfnVcOmYnzKn4t6TrNNxM3e5C6XjZlPqCCNweegkIywegltP+A2c4bC9h9kXv3YHSk0bwqoQjdsUoGMP/Szd3f3TIzg042MAegClTPhLr0d6Bokarx7zsz4IcSDHjpWRlk1Kk3r5L+fty5iq3tovMwUMez0eoP4mYxe5QkjpHv8ImI+gPryJbd8/ex4hjiHGpEn0DoDPOW5tRDrJDEv/fziZw2Ek4AtSSDgh+jyXIhK0CN9rDtiXrUMA2n0HyVARUibGYFsk7tQcHfjD6c5kge0J5uBP6GO2SaI296FtkzAaIRaHTVjCptlmTgt0FDbyhgAPpSsxXWiR2f0SvmpPsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=w8iG4TSJpyaTX7Xug0cSr0jQl18/kTXSpgIy9yry9zo=;
- b=HhQ24HlFV4AxdMbg8NPxI/AjDVjxuZcn4qJ08Nyrcmj84zng63pw2TCQpCxD4cMyW5yBhZ7vRJf+ZN6LWTJGXyyM6GZxBSsnjA4vb0OB0D59JfwFnx40J7Tm5qXcp1MIcvUYnm2XKttcglgahZvJKojW+YhNXmVioTj78ydusMkVNd4x9vqsCnue4tjhozbJO6aL7I5pSA7aGZQlR13pEhB59nnWCWWlDNPpJjUL6aQDdD8iovpJneZM4JZ/yeqNKHfHyN4eEstTGb/YSaMOcBcSC+/mQPBYlRqeZsTTfojFea4yECYkCCDQfei9KaF2yKWfD1DFniRbWg4n8+yueQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w8iG4TSJpyaTX7Xug0cSr0jQl18/kTXSpgIy9yry9zo=;
- b=VDtsWh9ioAzezSvufc3dtDZnsFwoA8ODCLyBbFLf41IgmMrrH7ul8tVvZFKjQMcPBoD/Ar+PbUgutmWMHn4b5wH+IgteJDdXLKHxq3QdeTWD4ScAnQOpruEo8MJyekPE0jrFMQBcizm/W59wSIbl8tsyU7NRblkpnUYqx9V4H3Q=
-Received: from DS7PR03CA0148.namprd03.prod.outlook.com (2603:10b6:5:3b4::33)
- by DM6PR12MB4265.namprd12.prod.outlook.com (2603:10b6:5:211::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.13; Tue, 13 Oct
- 2026 15:44:30 +0000
-Received: from DS8PEPF000000E3.namprd05.prod.outlook.com
- (2603:10b6:5:3b4:cafe::60) by DS7PR03CA0148.outlook.office365.com
- (2603:10b6:5:3b4::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.496.5 via Frontend Transport; Tue, 13
- Oct 2026 15:44:30 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- DS8PEPF000000E3.mail.protection.outlook.com (10.167.23.200) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.522.6 via Frontend Transport; Tue, 13 Oct 2026 15:44:30 +0000
-Received: from nigeria-2635-os.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.53; Tue, 13 Oct
- 2026 10:44:23 -0500
-From: Ashish Kalra <Ashish.Kalra@amd.com>
-To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-	<seanjc@google.com>, <peterz@infradead.org>, <thomas.lendacky@amd.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>
-CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
-	<KPrateek.Nayak@amd.com>, <Tycho.Andersen@amd.com>,
-	<Nathan.Fontenot@amd.com>, <ackerleytng@google.com>, <jackyli@google.com>,
-	<pgonda@google.com>, <rientjes@google.com>, <jacobhxu@google.com>,
-	<xin@zytor.com>, <pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
-	<dyoung@redhat.com>, <nikunj@amd.com>, <darwi@linutronix.de>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>
-Subject: [PATCH 1/2] x86/sev: Clear RMPOPT when segmented RMP is disabled by firmware
-Date: Tue, 13 Oct 2026 15:44:18 +0000
-Message-ID: <24ec806222fb8cda660269d3360780687403d150.1791905953.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1791905953.git.ashish.kalra@amd.com>
-References: <cover.1791905953.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=beagleboard.org header.i=@beagleboard.org header.b="ZSYUdf8n"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cd5e6f0a22bso19751a12.1
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Oct 2026 09:30:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=beagleboard.org; s=google; t=1791909009; x=1792513809; darn=vger.kernel.org;
+        h=content-type:mime-version:user-agent:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=tcud5Etzhncfi8d+BnzJtSoqh1QBRSXr7BSsTwrb8t8=;
+        b=ZSYUdf8n4q3ULNNbNRT20fJrItRlst3fRmF4V2LLp7g0xJCrJ6C+uMr/biKPQPPo+U
+         vXPMqZaT2p8/bgUxes82r3DJfXl9wjeVn00QRsTZveJQ28wJbp8VGykF9CH0egUQcUQW
+         Fbdunwa5cVq+UJUm2KJTqiw7JP3OhRsIJwQPDtOuD7+obxsjA28ka1+QxctyAawRMyEn
+         kDDFPWt1sMLxd6OxGjDG5SmO9QuSEQ4xHeH9oMsU8TX4xvKwHhZRsKI//as+Ft10/iQz
+         4KF4yyxEJLFcTnR94zdE2JdzC5aFhPY79L0gGNTgmViYolGb5PV6YApU0cxSI+T52moj
+         JqWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791909009; x=1792513809;
+        h=content-type:mime-version:user-agent:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=tcud5Etzhncfi8d+BnzJtSoqh1QBRSXr7BSsTwrb8t8=;
+        b=J4FzfkOFHD0ScNOJQOA3cVmnjXuIZpWxCRjwTyUsGjBa/lvtg05cwQ4OSIoQY6Gpzl
+         vzvUu2PlWet9Elggkq8BhyXZruzo0tHJa1upac3qOBUf7lhlRCxEDfXOO3Fb0pTAaaCa
+         DTVrkPRi1xnzwlKvBa5rSkcHhGwQPv25Ns7AIh/c6HHLUFbGxk7/jBrVohO5nio77UWn
+         4zuOxl+Qu+B02nkLCZhBCpVgZTvHZrvASMf4Sh2x9xnxYCu3L/LbdACEZFoui8VY0jIe
+         4s3OTXrwkLXygKoWBf+lmhStdELb7Ar3xSoytIxYTb8a/3G29HXsX4YPyaCfpzosxH4N
+         YTjQ==
+X-Forwarded-Encrypted: i=1; AKwUvByzmPej6PMDx8FGQL5mC5yO9fnHyYz5+8ZXYdcQJEndaw8JUPoHzHPCONJSWOYdnLa5tPFoEfaTWi+2Ims=@vger.kernel.org
+X-Gm-Message-State: AFq9FYI1Ao7SEKKXFMXV7y0xY4wzf6tobbMx4XNx2WWfxCOPhPlTSLQ8
+	ODLUe45OwEJEnxEZKUJRw0f+TcZgbsKXXieMSoApNhjoq5p9ja0ljMqRs7hGNvx17w==
+X-Gm-Gg: AYBFou0XNmGzvyzNx404/12G6dvnYsFREebTJp+HPTQNeigtWdcHNqWeT/Cm2ewa5Ai
+	lIQU/tgD4p48EveRkHyQBJxP2yIqUhzNCmXn7bU7HxBYthv3ser+VfO4oCzT1uxkP7Ddx79osqT
+	HR86OuFm4KyKncQxhzP6tCowbw33UuCeWvetF2wL0HePVba0KuUUbFJUquC7JUBudFvqgsRWWWL
+	+dIThIQI6UBKRZEDtT8RLaxsdNMRQrdU6dSuBBx8+nsaQsCewa5gNSpXcdsbJQexwlLBP3pA7e7
+	Dkl1vrUHSpwow0ED3eTd4T/evkY7WydE9ioc97xn6R3UOlEOn9BmMItJCT3/ELWqXPdIvJocXlY
+	A7r1kES/OEoqZe+rhS1Mc6LxjcBtQrGp9tnNx/+FiBqm0i2mG/dp00DnLSPv8OGroboiNFISgTh
+	0gUh71mn2I0awmheWlzC4I/yZOUXcJv0bbb7c1FRy0p/kbdqtB4WND4cv9VNMeKDIVi2O/c0vd
+X-Received: by 2002:a05:6a20:9c15:b0:3e0:bbb8:bbdb with SMTP id adf61e73a8af0-3e16be9eb80mr11365286637.47.1791909008452;
+        Tue, 13 Oct 2026 09:30:08 -0700 (PDT)
+Received: from fedorapc ([2405:201:4019:32fc:3c55:6b24:5147:322b])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cd61fc465c3sm813399a12.27.2026.10.13.09.29.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Oct 2026 09:30:07 -0700 (PDT)
+From: Ayush Singh <ayush@beagleboard.org>
+To: Markus Probst <markus.probst@posteo.de>
+Cc: Ayush Singh <ayush@beagleboard.org>,  Jason Kridner
+ <jkridner@beagleboard.org>,  robertcnelson@gmail.com,  Johan Hovold
+ <johan@kernel.org>,  Alex Elder <elder@kernel.org>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,  Miguel Ojeda <ojeda@kernel.org>,  Boqun
+ Feng <boqun@kernel.org>,  Gary Guo <gary@garyguo.net>,  =?utf-8?Q?Bj?=
+ =?utf-8?Q?=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>,  Benno Lossin <lossin@kernel.org>,  Andreas
+ Hindborg <a.hindborg@kernel.org>,  Alice Ryhl <aliceryhl@google.com>,
+  Trevor Gross <tmgross@umich.edu>,  Danilo Krummrich <dakr@kernel.org>,
+  Daniel Almeida <daniel.almeida@collabora.com>,  Tamir Duberstein
+ <tamird@kernel.org>,  Alexandre Courbot <acourbot@nvidia.com>,  Onur
+ =?utf-8?Q?=C3=96zkan?=
+ <work@onurozkan.dev>,  Eric Biggers <ebiggers@kernel.org>,  Ard Biesheuvel
+ <ardb@kernel.org>,  Ayush Singh <ayush@beagleboard.com>,  Rob Herring
+ <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>,  Lorenzo Stoakes <ljs@kernel.org>,
+  Vlastimil Babka <vbabka@kernel.org>,  "Liam R. Howlett"
+ <liam@infradead.org>,  Uladzislau Rezki <urezki@gmail.com>,
+  greybus-dev@lists.linaro.org,  linux-kernel@vger.kernel.org,
+  rust-for-linux@vger.kernel.org,  linux-crypto@vger.kernel.org,
+  devicetree@vger.kernel.org
+Subject: Re: [PATCH v3 7/7] greybus: Add Rust UART node driver
+In-Reply-To: <037d7460eae92dd00f9283dd5595a3257212f0b9.camel@posteo.de>
+	(Markus Probst's message of "Tue, 13 Oct 2026 14:48:45 +0000")
+References: <20261013-gb-uart-transport-v3-0-81d0a8a1acf7@beagleboard.org>
+	<20261013-gb-uart-transport-v3-7-81d0a8a1acf7@beagleboard.org>
+	<037d7460eae92dd00f9283dd5595a3257212f0b9.camel@posteo.de>
+Date: Tue, 13 Oct 2026 21:59:56 +0530
+Message-ID: <87y0c14l8b.fsf@beagleboard.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS8PEPF000000E3:EE_|DM6PR12MB4265:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c445512-664e-447c-7218-08df2940dedc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|82310400026|376014|7416014|1800799024|36860700016|6133799003|18002099003|22082099003|10067099003|3023799007|921020|11063799006|261009223027099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	J89OOIi1uXWxMFCIFTiuktWwRV+MLngZDbxJdiRPLJ5Zw9AO2RcSjY4ShucIBMqPXpcooccvkt0qRWzfC6AF4FVire2C/ORWVY3KH6Lx3s95th23wM57XP3bDZQU084NE6LLSs1It9KDwaiw5/2AkbCvNziz+fhyU6TRMoVOQenTQBL2z2wHVlaNPHwIP0EyytXLkjerhqqWtfRWSVbf07dtpowvidJO6QuFADnYcagr1RAEI/15PDBiXR8FJnmSNUhmlGVS9o/8ASASArPb2J9Hxg0FEqeKMW9OSz3tTq/ZTA6W+8yHZcgQlVF8Db6QInY4H7ZaUl75cd2ypWc8nqVzZZwRegwS9taXc9Qn7SoR+XbfoS/Ymf32M904TjvqJPYcnl3Ck/VAT59tVMr+S88md9jF2+q/Spxfa0+SuJF5odzYHXxeUbHLyoh3snaiXXOxA3Vd3mX5Jpa2gQrZdtjpFZCdNMy/v/FJS+TSQeisFnKMu8lnoldKU3axR8ClqTyljBCEpiaAy5Jd+3RhfwQ58V05FOU3A6bCKgg4NG9ULc60nJifCxcsKPhu8G5JfX/qi9tqzQsZsdX1cxNpWKCYcclQmDdWZHLi+WEs4IicBcW5gtmwxfTnZqYc8L1WPhBprSlNjqVWcv8BzmdU+XqrtN/3r77wfbTc2gE0vB29jc2Yb6vrYT8kURb2r29hVQ4pssf35Uv57z0/ixysBr0G6X2ulWyu/1lHvf3vNomBZGrh3OynVwcfnVxLg5BC
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(82310400026)(376014)(7416014)(1800799024)(36860700016)(6133799003)(18002099003)(22082099003)(10067099003)(3023799007)(921020)(11063799006)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	Uw68+Efjk375HPuazSGXs70siNi08XvzRAAGO5ES5nZ9IyVZrx1yJHGYx9Gwu84i5fci4I/0fRDFAm3ex0JMCCkFt23pCmG/uqG4q067r24pwLXRJ54+Cj1Eo6vCck5Sy2QxJtLEgtGSaQcaK0vXA8GIq9tZOFOhKmMm9vak0Mk8mvWSd/3XM3MxOAHnbC9mMHN5nm6VvB0dvGj5WRKOjCv6hiGBrMGMIeQ1E7gnZRkaVy1NbvoGZjwcjbKTwz5QIFGhidkDCLrbmS+/pHZ+lsfMBnO3solTLY+ToCpS5w4bDNuwRh+Z2BAwRZRbstz4+TT8+eZHQ6iPyXQVKNnHKf0pNuT68hJpkH/26LVNTXZJ7OhbwR/bc+U94RGwIDElMKnIe/bCpb2wVhm96NprNfUlHPWcUnFD0+r9pEVDiBxFx4SMHwwRrlIZdH2OyrPO
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2026 15:44:30.2739
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c445512-664e-447c-7218-08df2940dedc
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS8PEPF000000E3.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4265
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+Markus Probst <markus.probst@posteo.de> writes:
 
-snp_probe_rmptable_info() only clears X86_FEATURE_RMPOPT when the platform
-does not advertise X86_FEATURE_SEGMENTED_RMP, or when the segmented RMP
-table probe fails.  It misses the case where the platform advertises
-segmented RMP but the firmware has it disabled (MSR_AMD64_RMP_CFG's
-SEG_RMP_ENABLED bit is clear), so the system runs with a contiguous RMP:
-that path falls through to the contiguous probe with X86_FEATURE_RMPOPT
-still set.
+> On Tue, 2026-10-13 at 17:30 +0530, Ayush Singh wrote:
+>> Add a driver for Greybus nodes attached over a plain serial port. The
+>> node is registered with the software SVC (gb-softsvc), which handles the
+>> SVC protocol on behalf of the AP, so no dedicated coprocessor running
+>> SVC firmware is needed.
+>> 
+>> Greybus messages are carried over HDLC framing on the wire. Each frame
+>> carries a one-byte address (0x01 for Greybus) and control byte, followed
+>> by the 16-bit CPort ID and the Greybus message itself.
+>> 
+>> Port parameters are taken from the firmware node: "baudrate" if
+>> present, otherwise 115200, with flow control and parity disabled.
+>> 
+>> Since gb-uart-node imports types from gb-softsvc, Rust to Rust calling
+>> setup from nova-core [0] is being used.
+>> 
+>> [0]: https://lore.kernel.org/all/20260622-nova-exports-v5-0-6191773fc977@nvidia.com/
+>> 
+>> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
+>> ---
+>>  MAINTAINERS                     |   1 +
+>>  drivers/greybus/.gitignore      |   1 +
+>>  drivers/greybus/Kconfig         |  15 +++
+>>  drivers/greybus/Makefile        |  48 ++++++++
+>>  drivers/greybus/gb_uart_node.rs | 253 ++++++++++++++++++++++++++++++++++++++++
+>>  5 files changed, 318 insertions(+)
+>> 
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 521bc6c67979..5bdd500ef63e 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -11527,6 +11527,7 @@ M:	Ayush Singh <ayush@beagleboard.org>
+>>  L:	greybus-dev@lists.linaro.org (moderated for non-subscribers)
+>>  S:	Maintained
+>>  F:	Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml
+>> +F:	drivers/greybus/gb_uart_node.rs
+>>  
+>>  GREYBUS SUBSYSTEM
+>>  M:	Johan Hovold <johan@kernel.org>
+>> diff --git a/drivers/greybus/.gitignore b/drivers/greybus/.gitignore
+>> new file mode 100644
+>> index 000000000000..ff9c4a3539b4
+>> --- /dev/null
+>> +++ b/drivers/greybus/.gitignore
+>> @@ -0,0 +1 @@
+>> +exports_gb_softsvc_generated.h
+>> diff --git a/drivers/greybus/Kconfig b/drivers/greybus/Kconfig
+>> index 709563f8c0ad..ce2030161f30 100644
+>> --- a/drivers/greybus/Kconfig
+>> +++ b/drivers/greybus/Kconfig
+>> @@ -61,5 +61,20 @@ config GREYBUS_SOFTSVC
+>>  	  To compile this code as a module, choose M here: the module
+>>  	  will be called gb-softsvc.ko
+>>  
+>> +config GREYBUS_UART_NODE
+>> +	tristate "Greybus UART node transport"
+>> +	depends on GREYBUS_SOFTSVC
+>> +	depends on RUST_SERIAL_DEV_BUS_ABSTRACTIONS
+>> +	depends on RUST_GREYBUS_ABSTRACTIONS
+>> +	select RUST_CRC_CCITT_ABSTRACTIONS
+>> +	help
+>> +	  Select this option if you have a Greybus node connected over a
+>> +	  serial port. The node is registered with the software SVC, which
+>> +	  handles the SVC protocol on behalf of the AP, so no dedicated
+>> +	  coprocessor running SVC firmware is required.
+>> +
+>> +	  To compile this code as a module, choose M here: the module
+>> +	  will be called gb-uart-node.ko
+>> +
+>>  endif	# GREYBUS
+>>  
+>> diff --git a/drivers/greybus/Makefile b/drivers/greybus/Makefile
+>> index e6f594128802..bf4d08f728fe 100644
+>> --- a/drivers/greybus/Makefile
+>> +++ b/drivers/greybus/Makefile
+>> @@ -28,3 +28,51 @@ obj-$(CONFIG_GREYBUS_ES2)	+= gb-es2.o
+>>  obj-$(CONFIG_GREYBUS_SOFTSVC)	+= gb-softsvc.o
+>>  gb-softsvc-y			+= gb_softsvc.o gb_softsvc_exports.o
+>>  
+>> +obj-$(CONFIG_GREYBUS_UART_NODE)	+= gb-uart-node.o
+>> +gb-uart-node-y			+= gb_uart_node.o
+>> +
+>> +# Export Rust symbols from gb-softsvc only if gb-uart-node actually references them.
+>> +gb-softsvc-export-deps := $(if $(CONFIG_GREYBUS_UART_NODE),$(obj)/gb_uart_node.o)
+>> +
+>> +rust_needed_exports = \
+>> +	{ $(if $(strip $(2)),$(NM) -u $(2);,) echo "__DEFINED_RUST_SYMBOLS__"; \
+>> +	  $(NM) -p --defined-only $(1); } | \
+>> +	awk -v fmt='$(3)' ' \
+>> +		/^__DEFINED_RUST_SYMBOLS__$$/ { defs = 1; next } \
+>> +		!defs { if ($$NF ~ /^_R/) needed[$$NF] = 1; next } \
+>> +		defs && $$2 ~ /(T|R|D|B)/ && $$3 ~ /^_R/ && \
+>> +			$$3 !~ /_(init|cleanup)_module$$/ && \
+>> +			$$3 !~ /__(pfx|cfi|odr_asan)/ && \
+>> +			$$3 in needed { printf fmt, $$3 } \
+>> +	'
+>> +
+>> +quiet_cmd_exports = EXPORTS $@
+>> +      cmd_exports = \
+>> +	$(call rust_needed_exports,$<,$(gb-softsvc-export-deps),EXPORT_SYMBOL_RUST_GPL(%s);\n) > $@
+>> +
+>> +$(obj)/exports_gb_softsvc_generated.h: $(obj)/gb_softsvc.o $(gb-softsvc-export-deps) FORCE
+>> +	$(call if_changed,exports)
+>> +
+>> +targets += exports_gb_softsvc_generated.h
+>> +
+>> +$(obj)/gb_softsvc_exports.o: $(obj)/exports_gb_softsvc_generated.h
+>> +CFLAGS_gb_softsvc_exports.o := -I $(objtree)/$(obj)
+>> +
+>> +ifdef CONFIG_MODVERSIONS
+>> +# The C export shim declares Rust symbols as `extern int`, so reuse its export
+>> +# list but generate symbol CRCs from the Rust object instead of the shim's DWARF.
+>> +$(obj)/gb_softsvc_exports.o: private cmd_gensymtypes_c = \
+>> +	$(call getexportsymbols,\1) | \
+>> +	$(objtree)/scripts/gendwarfksyms/gendwarfksyms \
+>> +		$(if $(KBUILD_GENDWARFKSYMS_STABLE), --stable) \
+>> +		$(if $(KBUILD_SYMTYPES), --symtypes $(@:.o=.symtypes),) \
+>> +		$(obj)/gb_softsvc.o
+>> +endif
+>> +
+>> +# Output gb_softsvc's crate metadata for use by gb_uart_node at compile time.
+>> +RUSTFLAGS_gb_softsvc.o += \
+>> +	--emit=metadata=$(objtree)/$(obj)/libgb_softsvc.rmeta
+>> +
+>> +# Allow nova-drm to import nova-core's types.
+>> +$(obj)/gb_uart_node.o: $(obj)/gb_softsvc.o
+>> +RUSTFLAGS_gb_uart_node.o := -L $(objtree)/$(obj) --extern gb_softsvc
+>> diff --git a/drivers/greybus/gb_uart_node.rs b/drivers/greybus/gb_uart_node.rs
+>> new file mode 100644
+>> index 000000000000..f719ee35e8f3
+>> --- /dev/null
+>> +++ b/drivers/greybus/gb_uart_node.rs
+>> @@ -0,0 +1,253 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +
+>> +//! Greybus UART Node driver
+>> +
+>> +use kernel::{
+>> +    alloc::Flags,
+>> +    crc_ccitt::crc_ccitt,
+>> +    device::{
+>> +        AsBusDevice,
+>> +        Bound,
+>> +        Core, //
+>> +    },
+>> +    error::code,
+>> +    new_spinlock,
+>> +    of, //
+>> +    prelude::*,
+>> +    serdev,
+>> +    sync::{
+>> +        aref::ARef,
+>> +        Arc,
+>> +        SpinLock, //
+>> +    },
+>> +};
+>> +
+>> +use zerocopy::little_endian;
+>> +use zerocopy_derive::{FromBytes, Immutable, KnownLayout};
+>> +
+>> +const HDLC_MAX_FRAME_LEN: usize = 256;
+>> +
+>> +const HDLC_FRAME: u8 = 0x7E;
+>> +const HDLC_ESC: u8 = 0x7D;
+>> +const HDLC_XOR: u8 = 0x20;
+>> +const HDLC_EXPECTED_CRC: u16 = 0xf0b8;
+>> +
+>> +const ADDRESS_GREYBUS: u8 = 0x01;
+>> +
+>> +#[repr(C, packed)]
+>> +#[derive(FromBytes, Immutable, KnownLayout)]
+>> +struct GreybusFrame {
+>> +    cport: little_endian::U16,
+>> +    msg: [u8],
+>> +}
+>> +
+>> +struct HdlcRx {
+>> +    rx_buf: KVec<u8>,
+>> +    rx_in_esc: bool,
+>> +    rx_overflow: bool,
+>> +    sdev: ARef<serdev::Device>,
+>> +    node: gb_softsvc::Module,
+>> +}
+>> +
+>> +impl HdlcRx {
+>> +    fn new(sdev: ARef<serdev::Device>, node: gb_softsvc::Module) -> Result<Self> {
+>> +        Ok(Self {
+>> +            node,
+>> +            sdev,
+>> +            rx_buf: KVec::with_capacity(HDLC_MAX_FRAME_LEN, GFP_KERNEL)?,
+>> +            rx_in_esc: false,
+>> +            rx_overflow: false,
+>> +        })
+>> +    }
+>> +
+>> +    fn frame_finish(&self) -> Result<()> {
+>> +        if self.rx_buf.len() < 4 {
+>> +            return Err(code::EFAULT);
+>> +        }
+>> +
+>> +        let crc = crc_ccitt(0xffff, &self.rx_buf);
+>> +        if crc != HDLC_EXPECTED_CRC {
+>> +            dev_warn!(self.sdev.as_ref(), "CRC failed {}", crc);
+>> +            return Ok(());
+>> +        }
+>> +
+>> +        let addr = self.rx_buf[0];
+>> +        let _ctrl = self.rx_buf[1];
+>> +        let payload = &self.rx_buf[2..self.rx_buf.len() - size_of::<u16>()];
+>> +
+>> +        match addr {
+>> +            ADDRESS_GREYBUS => {
+>> +                let frame = GreybusFrame::ref_from_bytes(payload).map_err(|_| code::EINVAL)?;
+>> +                self.node.submit_message(0, frame.cport.into(), &frame.msg)
+>> +            }
+>> +            _ => Err(code::EINVAL),
+>> +        }
+>> +    }
+>> +
+>> +    fn rx(&mut self, data: &[u8]) -> usize {
+>> +        for i in data.iter() {
+>> +            match *i {
+>> +                HDLC_FRAME => {
+>> +                    if !self.rx_buf.is_empty() {
+>> +                        if let Err(e) = self.frame_finish() {
+>> +                            dev_warn!(self.sdev.as_ref(), "bad frame: {e:?}\n");
+>> +                        }
+>> +                    }
+>> +
+>> +                    self.rx_buf.clear();
+>> +                    self.rx_in_esc = false;
+>> +                    self.rx_overflow = false;
+>> +                }
+>> +                HDLC_ESC => self.rx_in_esc = true,
+>> +                // Skip data if buffer has overflown.
+>> +                _ if self.rx_overflow => {}
+>> +                _ => {
+>> +                    let c = if self.rx_in_esc { *i ^ HDLC_XOR } else { *i };
+>> +                    self.rx_in_esc = false;
+>> +
+>> +                    if self.rx_buf.push_within_capacity(c).is_err() {
+>> +                        dev_warn!(self.sdev.as_ref(), "buffer overflow. Dropping frame");
+>> +
+>> +                        self.rx_overflow = true;
+>> +                        self.rx_buf.clear();
+>> +                    }
+>> +                }
+>> +            }
+>> +        }
+>> +
+>> +        data.len()
+>> +    }
+>> +}
+>> +
+>> +struct GbNode {
+>> +    sdev: ARef<serdev::Device>,
+>> +}
+>> +
+>> +impl GbNode {
+>> +    const fn new(sdev: ARef<serdev::Device>) -> Self {
+>> +        Self { sdev }
+>> +    }
+>> +
+>> +    fn fill_buf(mut crc: u16, data: &[u8], buf: &mut KVec<u8>) -> Result<u16> {
+>> +        for i in data {
+>> +            crc = crc_ccitt(crc, &[*i]);
+>> +            if *i == HDLC_ESC || *i == HDLC_FRAME {
+>> +                buf.push_within_capacity(HDLC_ESC)?;
+>> +                buf.push_within_capacity(i ^ HDLC_XOR)?;
+>> +            } else {
+>> +                buf.push_within_capacity(*i)?;
+>> +            }
+>> +        }
+>> +
+>> +        Ok(crc)
+>> +    }
+>> +}
+>> +
+>> +impl gb_softsvc::InterfaceOps for GbNode {
+>> +    fn write(&self, data: &[u8], cport: u16, gfp_mask: Flags) -> Result<()> {
+>> +        // SAFETY: `GbNode` only exists while its serdev driver is bound, so the device is in the
+>> +        // `Bound` state for the duration of this call.
+>> +        let bound: &serdev::Device<Bound> =
+>> +            unsafe { serdev::Device::from_device(self.sdev.as_ref().as_bound()) };
+>> +
+>> +        let mut buf = KVec::with_capacity(HDLC_MAX_FRAME_LEN, gfp_mask)?;
+>> +
+>> +        let mut crc = 0xffff;
+>> +
+>> +        buf.push_within_capacity(HDLC_FRAME)?;
+>> +
+>> +        crc = Self::fill_buf(crc, &[ADDRESS_GREYBUS, 0x03], &mut buf)?;
+>> +        crc = Self::fill_buf(crc, &cport.to_le_bytes(), &mut buf)?;
+>> +        crc = Self::fill_buf(crc, data, &mut buf)?;
+>> +
+>> +        crc ^= 0xffff;
+>> +        Self::fill_buf(crc, &crc.to_le_bytes(), &mut buf)?;
+>> +
+>> +        buf.push_within_capacity(HDLC_FRAME)?;
+>> +
+>> +        bound.write_all(&buf, 0)?;
+>> +
+>> +        Ok(())
+>> +    }
+>> +}
+>> +
+>> +#[pin_data]
+>> +struct GbUartNode {
+>> +    #[pin]
+>> +    rx: SpinLock<Option<HdlcRx>>,
+>> +}
+>> +
+>> +impl GbUartNode {
+>> +    fn init(sdev: &serdev::Device<Core<'_>>) -> Result<HdlcRx> {
+>> +        if sdev
+>> +            .set_baudrate(
+>> +                sdev.as_ref()
+>> +                    .fwnode()
+>> +                    .and_then(|fwnode| fwnode.property_read(c"baudrate").optional())
+>> +                    .unwrap_or(115200),
+>> +            )
+>> +            .is_err()
+>> +        {
+>> +            return Err(EINVAL);
+>> +        }
+>> +        sdev.set_flow_control(false);
+>> +        sdev.set_parity(serdev::Parity::None)?;
+>> +
+>> +        let node = gb_softsvc::Module::new(&[Arc::new(GbNode::new(sdev.into()), GFP_KERNEL)?])?;
+>> +
+>> +        HdlcRx::new(sdev.into(), node)
+>> +    }
+>> +}
+>> +
+>> +kernel::of_device_table!(
+>> +    OF_TABLE,
+>> +    <GbUartNode as serdev::Driver>::IdInfo,
+>> +    [(of::DeviceId::new(c"beagle,beagleconnect-freedom"), ())]
+>> +);
+>> +
+>> +#[vtable]
+>> +impl serdev::Driver for GbUartNode {
+>> +    type IdInfo = ();
+>> +    type Data<'bound> = Self;
+>> +    const OF_ID_TABLE: Option<of::IdTable<Self::IdInfo>> = Some(&OF_TABLE);
+>> +
+>> +    fn probe<'bound>(
+>> +        sdev: &'bound serdev::Device<Core<'_>>,
+>> +        _info: Option<&'bound Self::IdInfo>,
+>> +    ) -> impl PinInit<Self, Error> + 'bound {
+>> +        dev_dbg!(sdev.as_ref(), "Probe gb_uart_node.\n");
+>> +
+>> +        try_pin_init!(Self {
+>> +            rx <- new_spinlock!(Some(Self::init(sdev)?), "gb_uart_node::rx"),
+>> +        }? Error)
+>> +    }
+>> +
+>> +    fn receive<'bound>(
+>> +        _sdev: &'bound serdev::Device<Bound>,
+>> +        this: Pin<&Self>,
+>> +        data: &[u8],
+>> +    ) -> usize {
+>> +        if let Some(mut guard) = this.rx.try_lock() {
+>> +            if let Some(ref mut hdlc_rx) = *guard {
+>> +                return hdlc_rx.rx(data);
+>> +            }
+>> +        }
+>> +
+>> +        0
+>> +    }
+>> +
+>> +    fn unbind<'bound>(_: &'bound serdev::Device<Core<'_>>, this: Pin<&Self::Data<'bound>>) {
+>> +        // Getting a bound device is not possible after this point. So drop HdlcRx.
+>> +        // This also drops HdlcRx::node, which should ensure that GbNode::write will not be called
+>> +        // after this point.
+>> +        let _ = this.rx.lock().take();
+> Not exactly.
+>
+> e.g.
+> ```
+> struct SerdevDriver<'bound> {
+>   dev: &'bound serdev::Device<Bound>,
+> }
+>
+> impl<'bound> Drop for SerdevDriver<'bound> {
+>
+>   fn drop(&mut self) {
+>     // Access to a bound device should still be possible here.
+>   }
+>
+> }
+> ```
+>
+> So afaik there should be no advantage of manually dropping it here.
+> Drop of `GbUartNode` should automatically drop the spinlock and the
+> data contained. The bound serial device is still valid at this point.
+>
+> This would likely make the usage of Option<> obsolete too.
+>
+> Thanks
+> - Markus Probst
 
-X86_FEATURE_RMPOPT is a CPUID bit advertised independently of whether
-segmented RMP is enabled, but RMPOPT requires an enabled segmented RMP.
-With the capability left set, the RMPOPT initcall programs RMPOPT_BASE and
-issues the RMPOPT instruction, both of which #GP on a contiguous RMP:
+My understanding was that the state of serdev device is unknown between
+unbind and Drop calls. That would make the unsafe Bound device conversion
+in GbNode::write unsound.
 
-  unchecked MSR access error: WRMSR to 0xc0010139 ...
-  general protection fault ... snp_enable_rmpopt
+If I don't need to do the early drop, yes, that would remove the Option
+which would be great.
 
-Clear X86_FEATURE_RMPOPT on the common contiguous fall-through so it covers
-both "segmented RMP not supported" and "segmented RMP supported but
-disabled by firmware".  The clear runs at BSP init before alternatives, so
-the subsequent cpu_feature_enabled(X86_FEATURE_RMPOPT) checks observe it.
+>
+>> +    }
+>> +}
+>> +
+>> +kernel::module_serdev_device_driver! {
+>> +    type: GbUartNode,
+>> +    name: "gb_uart_node",
+>> +    authors: ["Ayush Singh <ayush@beagleboard.org>"],
+>> +    description: "Greybus node connected over UART",
+>> +    license: "GPL v2",
+>> +}
+>
 
-Fixes: 15d974be0a3b ("x86/sev: Initialize RMPOPT configuration MSRs")
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
 
-Note: this restores the snp_probe_rmptable_info() structure from the
-posted series (v16 3/5), where a single setup_clear_cpu_cap() on the
-common contiguous fall-through covered the "SEGMENTED_RMP advertised but
-disabled by firmware" case (called out in the v16 cover letter).  When
-applied, 15d974be0a3b narrowed that clear into an else branch and dropped
-that case.
- arch/x86/virt/svm/sev.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Best Regards,
+Ayush Singh
 
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index bd70c4d0b774..43e4945e6cdf 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -827,10 +827,16 @@ bool snp_probe_rmptable_info(void)
- 			setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
- 			return false;
- 		}
--	} else {
--		setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
- 	}
- 
-+	/*
-+	 * Segmented RMP is either not supported on the platform or is
-+	 * disabled by the firmware.  RMPOPT is not supported without
-+	 * segmented RMP, so drop the capability before it reaches the
-+	 * initcall and faults programming RMPOPT_BASE / issuing RMPOPT.
-+	 */
-+	setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
-+
- 	return probe_contiguous_rmptable_info();
- }
- 
 -- 
-2.43.0
-
+BeagleBoard.org Foundation
+https://www.beagleboard.org
