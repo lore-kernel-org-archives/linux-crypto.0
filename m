@@ -1,86 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A587F47A894
-	for <linux-crypto@vger.kernel.org>; Tue, 13 Oct 2026 21:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA4A54146A;
+	Tue, 13 Oct 2026 22:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791925268; cv=none; b=YJ4orENeF8qEriwL5q2Ivg67sRjNA3gudGcOKPu9ZcrDCSZ4d7Gwk6vlbcVXlXLE12kIPpHYiVMg7ZJRYCfOsYQ1R81f0lHEx7gv7f8VSRalYDlFTUQ90nkE1hFMKt3DqCCwjXJ6vnmEkHqvIPn8PwoeCqYfLt5XsgRFhANTMRA=
+	t=1791930465; cv=none; b=JlgvSKnNwgHu4KnH4CjBNA1mqMondAN3Ot1lPQASOYFHG6VN7Zws+bKfnOf5wl1BpfjIYW2xZPLvNcCDM7EyV/r/ECjWG+D7dBmUz6C2kkI+HGLDbFgNEeaYzbKUqzBFYuJH9F9nu3iypABITQDbOygaluaUqkwIKmtN75Lmtxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791925268; c=relaxed/simple;
-	bh=otzqAwHTarH+nPjYAj7PC0qYusRb59jP1GBa3Q2bM/8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A4QeEI1NUOounoe3qq6xF3oP27VzYntRBZZFTMj5hvtLhzAIU7csdt5734Sxb4K0VJWvYkxEuzJ7bbC4FmIOlSVyDGxEet0NmVM1FNTaVq8gw9mEsPlCo9HlPGfAC6202v3ZSFzibmUpg6wszFI+w2DnLhhXehwQXpV0tTIxizs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ze+YyELs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791930465; c=relaxed/simple;
+	bh=MYH/6BTWP4WBym5dOVKu8AGvlq8RGdvDGlhtonURdeo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AM7eXiZcojZfWW7kxHHpP7FyOcDsDPhBwZH3k/5J24lmGkVk4FwrrJ9u9+92VHHW+5k8dHTCpjBLJUWeaEu5sEK2X4wyuAnJhc87eH95tp3rXTo59YEwIQgnIwPYhy0me1+gOCDhhcwgU+uEUeJ8qzRECI5YYy5H4LIFgQZMb/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=A8JKDyN7; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ze+YyELs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48D231F00899
-	for <linux-crypto@vger.kernel.org>; Tue, 13 Oct 2026 21:01:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791925267;
-	bh=otzqAwHTarH+nPjYAj7PC0qYusRb59jP1GBa3Q2bM/8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Ze+YyELsWXzooRsH8Nwdw8sHpfqQhqX57KvCfNiePy+9l8l0oZs5QDWKMeOOMtJCZ
-	 cp9PdgMMnYugE36LIjYfY+bK5/6Bat85gwbdTJRibl+Uf2I9JiUQl/xtsQ3EkHAtAv
-	 w0chzgxOlJL+dtI5vxqJgRiychRWf+GrCt6N7MQs4rOflSwAJEYDAZrrbZpyt4mtvS
-	 9JYZsHtCMHYZ1njOEW7iGJS6evqzPdlPDMv8j6pcIRQCipPYeF3ZDIyUGHukAYefim
-	 HS5s3JwhamteA4n2ZcMBEwFVohicWzhIZ/A1AV4nHmaof/WvK5FcN/jbAs1f5tGVgL
-	 MpkjoRUKLClrw==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c2e5e801487so514055966b.3
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Oct 2026 14:01:07 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzsDzuloniyMLdR/TgZjmx7+MVktfn7gz6fogJX1Ab8EFAHFJMdWCLL/zpXXh4MNBWDcURHImKv3pFhxxk=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ0BwKIjuaNqMBVRdyfSZNFS58T/zykBm8D9NCgyONLl/a6rExg
-	L4YUeblnuU1fjSwNpDcb1qlPUAWxn59KX4rgwN6y6WnemK66f2Ns5wDGb3tnIruRkzGgkz+/T09
-	gtnJNwJaM4egxgz+wQOzuWtw0wxxQ2D0=
-X-Received: by 2002:a17:907:7b8d:b0:c2d:d9f4:2c85 with SMTP id
- a640c23a62f3a-c31aa0c129fmr1295928366b.41.1791925266214; Tue, 13 Oct 2026
- 14:01:06 -0700 (PDT)
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="A8JKDyN7"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id CEFF540E015B;
+	Tue, 13 Oct 2026 22:27:33 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id p5hBXKBQD4ff; Tue, 13 Oct 2026 22:27:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1791930450; bh=gWFz/4FQAxsI4drfvLMDt4B9p5wLm1FIioKwPsbSOQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A8JKDyN7x9fBLPybMZn4shIOOO6NXKB+T0e8QvbdPsV6MCXCJIqo9A0t4Lnj31Fdk
+	 lPbEaCaW4ywn3TxcXM3t8hpTQ2otiF0n+oq4QlAEcAF88rHomI1GvyxT/1DkiXlzaJ
+	 ZKNyYBpY4hQixZY8TGWNrh5ZniOwfEPTzDiRphMsxEgz0TNNEqpP8auAMcDfh1HeHY
+	 FVSeNJYtqSQDcjsvT1vGKponTTAT/AI/ycl4/6cZtf37tqfIyEPdvrezJUhtvv4Gwb
+	 uFekqi4fEXVgtpYC4mnN+oF45y8PPI66M3bm5ho8mugd+oLJGMIcYbh8ED3h2KLiwl
+	 oqwFrHRMQhbA1oe2y8gIaBxrj+6iUVeqoxeXcLPXzO2Eq6Xw1eQPYtZrLd7bTUqVdH
+	 F6v9AInZbb2jebIfyqJ2by+kAiUnWHBQ5ojdjlwCP/ksTL03+ZkRYRm9Q0r8EFZeFJ
+	 96A/hKzt4n60p5BaticYommv2pWH6J5aq1Qj6AqiHx5ZNon8rk1AXbPdpexlCNNd4K
+	 stpCFJ/ulWaz3HhETQ8xBbI+WeisLD/7SlKGElCJAAPZTlDzJpVMbHcQwKuHITonUv
+	 jgSYLKbD43j3YLW0EOr/IxBMnf5MIFnGQV7HWbcPl/XZegGeOTWIri/7TmbO91nZXy
+	 Qq+cLoKejsPSS9jqnauSFqZw=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::3a])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8A89D40E02B0;
+	Tue, 13 Oct 2026 22:26:56 +0000 (UTC)
+Date: Tue, 13 Oct 2026 15:26:53 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	darwi@linutronix.de, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev
+Subject: Re: [PATCH 1/2] x86/sev: Clear RMPOPT when segmented RMP is disabled
+ by firmware
+Message-ID: <20261013222653.GAas6wLTEwIw9Te240@fat_crate.local>
+References: <cover.1791905953.git.ashish.kalra@amd.com>
+ <24ec806222fb8cda660269d3360780687403d150.1791905953.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261013151007.2093943-1-usama.arif@linux.dev>
- <20261013151007.2093943-2-usama.arif@linux.dev> <CAO9r8zM-utRFYGBfaEb=89LWM0DOKc8dywcDLSb6L7f4c80yuQ@mail.gmail.com>
-In-Reply-To: <CAO9r8zM-utRFYGBfaEb=89LWM0DOKc8dywcDLSb6L7f4c80yuQ@mail.gmail.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Tue, 13 Oct 2026 14:00:53 -0700
-X-Gmail-Original-Message-ID: <CAO9r8zO5HgtH0-jgCrj1uyv9fjUrHCxSZA21mWpDVU2B7qS7Ww@mail.gmail.com>
-X-Gm-Features: AclHuK81jQ6rnaJmrP6r3K2lHMSwKc6BJEWDK7sFlCmG2sgXzWUx5CcLolataic
-Message-ID: <CAO9r8zO5HgtH0-jgCrj1uyv9fjUrHCxSZA21mWpDVU2B7qS7Ww@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] mm: zswap: use separate compression and
- decompression requests
-To: Usama Arif <usama.arif@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>, chengming.zhou@linux.dev, dsterba@suse.com, 
-	hannes@cmpxchg.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	nphamcs@gmail.com, terrelln@fb.com, riel@surriel.com, shakeel.butt@linux.dev, 
-	alex@ghiti.fr, senozhatsky@chromium.org, 
-	Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net, 
-	linux-crypto@vger.kernel.org, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <24ec806222fb8cda660269d3360780687403d150.1791905953.git.ashish.kalra@amd.com>
 
-On Tue, Oct 13, 2026 at 1:57=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrot=
-e:
->
-> On Tue, Oct 13, 2026 at 8:10=E2=80=AFAM Usama Arif <usama.arif@linux.dev>=
- wrote:
-> >
-> > Stores and loads serialize on the same per-CPU acomp request and mutex.
-> > A low-priority store can be preempted as soon as the compressor drops
-> > its stream lock, while it still holds the mutex. A higher-priority load
-> > on that CPU then waits until the store runs again, which can take a
-> > long time when other tasks are runnable.
-> >
-> > Give compression and decompression their own request, completion wait
-> > and mutex. Since commit e2c3b6b21c77f ("mm: zswap: use SG list
-> > decompression APIs from zsmalloc"), the per-CPU buffer is only used for
-> > compression, so group it with the compression request. Independent
-> > requests can share the per-CPU transform; the codecs and drivers
-> > synchronize their shared state internally. Loads can still wait for
-> > each other on the decompression mutex, and stores still serialize on
-> > the compression mutex.
+On Tue, Oct 13, 2026 at 03:44:18PM +0000, Ashish Kalra wrote:
+> snp_probe_rmptable_info() only clears X86_FEATURE_RMPOPT when the platform
+> does not advertise X86_FEATURE_SEGMENTED_RMP, or when the segmented RMP
+> table probe fails.  It misses the case where the platform advertises
+> segmented RMP but the firmware has it disabled (MSR_AMD64_RMP_CFG's
+> SEG_RMP_ENABLED bit is clear)
 
-Probably worth calling out the extra memory usage pCPU (at least on x86_64)=
-.
+What does that mean: "the platform advertises segmented RMP"?
+
+The CPUID bit is still set?
+
+Or anything else?
+
+How do you create this configuration?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
