@@ -1,257 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021086.outbound.protection.outlook.com [52.101.62.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36831531AEB;
-	Tue, 13 Oct 2026 17:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791914281; cv=none; b=YqNDM6/78MXg/l/FAlL0MLl9O8p8hOc34yNxEdL0aXVJ/1Rt2o9XEVY88k1VhNucOVAqpVcd7/kCpIpVJ2ccJJr28e4/FZt97evthrPU0ISgLtaG1xl2sU4vA/zWNIl0sMQFUroWK38vPK8evwGV70+fMJD0yNdhbwkT72o3EkM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791914281; c=relaxed/simple;
-	bh=GDmMD4sIrmNYBycrF7YP1/QQqlkzc2KhWvyRnBLeZBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CtitlUWgmzbMeUlHU8TIa61xM7x2g3ZJzzQNf/XIcqvyhSS7uEtD4UTXB3e3Q1TKgycgg7DgXL9TALQNIa0FAx0QjVwrSgLw7GZMc6i+h/mXS+zc7dk9Et5p+UhQTdbfD2f0YPGt0lVf/FYNBOKlOn6Z+XQJV7AAGmcChwcx7FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WIPgPmso; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F174A0921;
+	Tue, 13 Oct 2026 18:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791916526; cv=fail; b=bpM8b/cE6EpmhDkOSZI5ytf9k/bruwBCnzBn6u0wKtM4/XkcMfZcSomW5owD2X41Jg7FGvKf5VLLC7YE/2XJ0rZwZFbDl75P5iiRcP/nGwWGRH4M49wNw9K1ekujRaKd/MOI9coYxM/QyrzlkvCQiFhJxwSSqheKPQ9tKUR5M+Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791916526; c=relaxed/simple;
+	bh=HJD46zJ9WVqKP7BpNa3crK5UQySF10gO4jd0Gtkgq0g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PDVDO0OM1dD0Gzy33xf1H8UYGA3vXLMKfJ+24Dnw/izhPOY51hon+3aWqiyOQhmM2AjmiuvyDuvdpvsL/STBU20RVs/lYzZMPelYotBOuQFD2y7BxZeRig7UMMhJnrhutvpVAOXnLNwJQDA5cWAFhGxJimSRkw1pjn3x054ZF28=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com; spf=fail smtp.mailfrom=rambus.com; dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b=uZEAvw8G; arc=fail smtp.client-ip=52.101.62.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=rambus.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WIPgPmso"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0051F1F000FF;
-	Tue, 13 Oct 2026 17:57:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791914279;
-	bh=i7AZZq2waiHhton6XVVNaa/s7XNNzzIS0f3JEI3r7co=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=WIPgPmso+lzJ2fe2IG1tg5UoJDMGR9gFxSgW47cZEriKrbg+R13VP0bOdBImbzQ3F
-	 UvkiXhKQk3YJnHftUPtF+4HlwmOxBeZ0oaG4H2RCq21hg/IRellQlU4Fv+shiDfvSO
-	 dLZ1ztCcsnypuG2Wzd2uybvLPwW83iga3uB7IwAuGuYefmvS78kOyW4BrzH0DS4nv2
-	 LG9FKryw4s/R5vw4ydpESNdjegD0WnQjctz+xicIJ2zRCq8mjQsBa5Tg0dVDE0vgUd
-	 tfPt34LrZPJ12bm+gOBTWvW29u/Z4o3xhNdsPAX/GYWcCPvxDk2prBtR+3X7LNTZVS
-	 FBt49F+yfsYQg==
-Date: Tue, 13 Oct 2026 18:57:55 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Alex Ousherovitch <aousherovitch@rambus.com>
-Cc: Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>,
-	devicetree@vger.kernel.org,
-	Joel Wittenauer <Joel.Wittenauer@cryptography.com>,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Thi Nguyen <thin@rambus.com>
-Subject: Re: [PATCH 0/5] crypto: cmh - add Rambus CryptoManager Hub core
+	dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b="uZEAvw8G"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JDKT3WJHvVszzCF6NV7QP3W3spnBEAiltNSmdUuylHrzZ9nUBCTY3PTXMJ1CymmRKg+wcf2YlCJQQQvUHJAwwDiHraZT4OS521Pr1wFAuUUY77Prcx7om6pm3zdESvSROCGLFmzyY8B88N3+4D/fd8RVaOfHMsbvAh/3d77DmFn4bC6JXQIZc7dXXyR4S3PV9tfy1+V9fl38ao7HZUIDI627/COillA+DHhu3vgiNMHa46KWsNEwllR0OyS/YyHykpaFMj8EHFgOEXZE1u1Wm+yJPVIVkC0dTYMCGJ6sT3bwMil/ZZ3IYu+fTMyY3NgzTJrmZZ8uylMDn7/2XWhJnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PklP1Qo0ScXaf+dnwiogrYZQuZqN98TwgqNS+OLSGFE=;
+ b=RAsiEwqE8lpi4dT1caxUrUUGwRMXKU2OdRyWU9FIyJ3gpCXeyde83lw9VRu9Wy+4s384BihlyKjg9uE321AUSNWzHzZbCh4iP0b2h7obT9Rp0t7KO1tdjQ+xKgDipYQ/hAPD2d/yrCvRNBCe+8FVaxfqH92UWX3ptVgOG0rlj9E7yrqAJk1NrOqE18+ODsa99u/IoMOlqsiGH89uxSmhzzFYlZZIiB7h8kJ8VWPUq/7wuBfUdDRPI1R1smFu3cJRdJSnbfHhu3RfpyHq6SVUoVavC9wAxqKl+NL3pPw2DQYQ4E6w4ixj2OsrbaZZpjTkjBlhBL8gFI670Sfh86jk/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=rambus.com; dmarc=pass action=none header.from=rambus.com;
+ dkim=pass header.d=rambus.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PklP1Qo0ScXaf+dnwiogrYZQuZqN98TwgqNS+OLSGFE=;
+ b=uZEAvw8Gpkm82Lqot2+vzjxXZI6swVfgqcrodC7pnuP91l6tlIu3r5HwKtmfwJc6JMMC2d69GgbECCZE+j96fBg6KR+gY3RwiNsL3tc3hK/l4PBnjJAoeTmEwJYVNIwc+bEw5ftO7/T5/63e/T3bqGSCD/paU3y73QF/t5yVvikZzxiua+GcrwJweb2tXm/y4lSnWeUzTLkFBeuksyooyI7u2u2W9E5TYAemP91bYJg8UimRVwaWu4NhBC6kD4DHPcJaEuvUXJLVXykQqITJoPIDHnvLzapq2KXmAdJiZTieKQIm5uafzrlt6Xs2VDw/zbx0j2z3Pm3NGaxtayFLeg==
+Received: from SJ0PR04MB8406.namprd04.prod.outlook.com (2603:10b6:a03:3d3::14)
+ by BL4PR04MB993787.namprd04.prod.outlook.com (2603:10b6:207:301::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.12; Tue, 13 Oct
+ 2026 18:35:10 +0000
+Received: from SJ0PR04MB8406.namprd04.prod.outlook.com
+ ([fe80::cbad:dfcc:82:7dbf]) by SJ0PR04MB8406.namprd04.prod.outlook.com
+ ([fe80::cbad:dfcc:82:7dbf%6]) with mapi id 15.21.0522.011; Tue, 13 Oct 2026
+ 18:35:10 +0000
+From: "Ousherovitch, Alex" <aousherovitch@rambus.com>
+To: Conor Dooley <conor@kernel.org>
+CC: Conor Dooley <conor+dt@kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Jonathan
+ Corbet <corbet@lwn.net>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob
+ Herring <robh@kernel.org>, "Krishnamoorthy, Saravanakrishnan"
+	<skrishnamoorthy@rambus.com>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "Wittenauer, Joel"
+	<Joel.Wittenauer@cryptography.com>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+	"Nguyen, Thi" <thin@rambus.com>
+Subject: RE: [PATCH 0/5] crypto: cmh - add Rambus CryptoManager Hub core
  driver and AES
-Message-ID: <20261013-evoke-coil-60a7037b7a0d@spud>
+Thread-Topic: [PATCH 0/5] crypto: cmh - add Rambus CryptoManager Hub core
+ driver and AES
+Thread-Index: AQHdWzsf2ri+IRKaj0WI06DJnkhjM7b7wkiAgAAKTNA=
+Date: Tue, 13 Oct 2026 18:35:10 +0000
+Message-ID:
+ <SJ0PR04MB84063ACE9EE09E2E52B24DA8D79E2@SJ0PR04MB8406.namprd04.prod.outlook.com>
 References: <20261013174847.2192609-1-aousherovitch@rambus.com>
+ <20261013-evoke-coil-60a7037b7a0d@spud>
+In-Reply-To: <20261013-evoke-coil-60a7037b7a0d@spud>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+dlp-product: dlpe-windows
+dlp-version: 11.14.0.414
+dlp-reaction: no-action
+authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=rambus.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR04MB8406:EE_|BL4PR04MB993787:EE_
+x-ms-office365-filtering-correlation-id: e0c94f84-ebd2-4c9d-0748-08df2958b64c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|23010399003|22082099003|18002099003|10067099003|4143699003|11063799006|56012099006|38070700021;
+x-microsoft-antispam-message-info:
+ b6sPcZjszAjmfl5HyWgqGn/hGck9yyLWrP02n6OUV7QW2iLJC4oDvSsVOB+uORvpM69LEmTPG2SC80HoVxP2sN0sm+KumPZona+BMYLKpVDPvfvOkXDxsrjBkejyaDucsjHAzCz/bMdpIiBFydM1XMnC7EzyxNUVXn9A0/c+puW479c/dGFi+znwVb6t/qKPURydQGYitx0JeshJfuQ1gmpvujZ1QErxQO4Y8cs2W89J8g8MdoYnUWMFBE3KLo72mIFM775jCspctWZAXd0zPniq/e/PRz6uImApOsCKnj5loccxGwJhzpa9zM4oldURN7hLdGZyDlIMiLfFNESKVbPSTas2ct1THwcvZKwY+rvYJ2W2m2GgRz4RLWLJvpl3+hv2ffJyret4rEN54X92dmhhFv2C/MdmqWBLLCSmudeaVRhU3wdDKjpOfH0DEk6C2o3mjGeJqkoJhZ36uLiLSZ1kIweeRrZ3nLGn8r08B7+o6aIvjv8L6AeM+PmhpPxF5LbcrmDrnyauqHY1xFfpbqPwVZmGw2jvu9S0FGcXyOyu11qIEqRUTjAOiEO0sAh9NobPqiD20lmW76uepXDukqxsvf7ZFbDbfYv28fgqWkKfKMfwgV4ffN2UacyBvVjdqmHIZb6O8kZYLzpcD9X6KQVTF1ZhhunU/Cw7TZeN0BzRzHw1j7ERbpmw4d2s3gOrioRyfjvjQoCzeW3dQrQ1oHpBEPGfsaf0elrd+6JfTO4=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR04MB8406.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(23010399003)(22082099003)(18002099003)(10067099003)(4143699003)(11063799006)(56012099006)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?cGTs7rPG9m4TFTWX7Iqjn2kvsHNj25H1njim6sZMlvC9Nxtcfm09jWwnsi2E?=
+ =?us-ascii?Q?9fFEPFovrDCW8fCaV1xGv6F2ZOJIJ3nD/e58Ww055cpjgOCzBNCjmpwJ0QHE?=
+ =?us-ascii?Q?D2q9eZDyYd7mtTv5g0Z1/rODKHynjlouDazX3f48B2mEyESIftNiKpmjcm2n?=
+ =?us-ascii?Q?2aJQa6lxhbbF1D2pIjYtHwuXlcs+Ess+MJLEFX8eHdqE3eEJzCMLgTc65TF/?=
+ =?us-ascii?Q?bnGQFnjY3nQrCsrzsh5iZQI1W0zq3z/qOCdm5/iCKyZPo2zISmQm1CIb/XuQ?=
+ =?us-ascii?Q?RGus+MqevuqXrDl6FgEgTlhmwKD1/JTlIV/BE/1khlkLIG6DBhhequ8VSmem?=
+ =?us-ascii?Q?um5YYDDtn0l/JOwq0zRzi67BPbyzlzxN9TT7mLZTSeTjkdTbbjm1rIRCHqj3?=
+ =?us-ascii?Q?lgf0wSo9OpzgoHkjTLq61m7C9x9dwmkkDkNqMmVJA4vkenKcNJT3F9uNa1H4?=
+ =?us-ascii?Q?rtsKdsHnGEryrelQ4nEAnm8YljDb+OUWDNSqtKsQ4b89G4rYgftE0fAwjbJV?=
+ =?us-ascii?Q?5Z6krLwyslf1VrWZpMej2xHgjSqHZ3iacNwlnu1ID4dV7h1JcUw3uzCtB/pU?=
+ =?us-ascii?Q?ayn2jxqAeutNNIILOQcEfRRoAQLTp3yODalcteOrVIDpnbtvq+C5ABjQPCVy?=
+ =?us-ascii?Q?kYKCPz+woZbjuubiZhRsz7EkAxnqFIhzwy3CfG/MOuPdQ4CSPGM4f57JS9wS?=
+ =?us-ascii?Q?UhBcAPkAI0oXH3oLxLPtGM81/1smsbA785taymYhbvLT21TIoFzrV87rHkar?=
+ =?us-ascii?Q?O2ZYNiY4EDSLZw8iOi8A25MpllUUutcpdkUJ1oECEikPsLqfAdfmrvqLK/ci?=
+ =?us-ascii?Q?0q06HTR1DcwAsEvrPu6pz3x9M0dmPpcUgf4mQGma7EuOcYNVltQirwd6doM6?=
+ =?us-ascii?Q?kF4dLyxT0oO40g8GsmIMX5xB2wEe6mSG0bIsmkA0e3HEt6E0xv+d3wP3JjCL?=
+ =?us-ascii?Q?sGJz4769xmo9i5XbZqxBeMoBX9t4UU0oHx35M8S30dp6q0YhrMhD9odKbso5?=
+ =?us-ascii?Q?0vo8flTlxllxdIVsfSm1OLGjEj4rKPYfKs6YDchBmlHBPnhijvBAFdHXV5B7?=
+ =?us-ascii?Q?8w7PN5bmQXEg5ZThLNIDK2KBbUkqqQqrPTGF0x0r042QOA7ZIR5xs03BgefE?=
+ =?us-ascii?Q?Agm47aSL02OzYsu6ayoCDsU+adjqVZWuhbVpxOXf5Y9ljlh5zbYxhSbcK+wI?=
+ =?us-ascii?Q?Beo80xBoC2YcYtPlvKNpOXttk3IGZYTzkSSl5l9lwQqKBgVWWVIK7nEAJXhv?=
+ =?us-ascii?Q?ISXOD/nq0RIizZX8meBy0GoNF9trIq4co1IJTKuSKFg6BIrpW+zZRVsVb5ly?=
+ =?us-ascii?Q?yaBbGphcmEccMYCUCti/hqITGyUmS63Mg6t8iF1JMZnVYQ3fbt9tDLCR4q53?=
+ =?us-ascii?Q?4RqnynVs1IEt18uZEn8D118YcGTTLjjlnP2U+bAM+r4Wf6Crg8HTs0s7oHmf?=
+ =?us-ascii?Q?8UvUxJ8QAWW30QkWL+q+fsqgFcYzd/y5w9gRE28QsB1DAQXWQQ75ly7uUiSS?=
+ =?us-ascii?Q?7AmxaXOcUnxmztC2Z5iXXxHkWiKjANP0oYrfiPHgoPkD7SUVnMYiP2qGXG0R?=
+ =?us-ascii?Q?htwt8166dqXS8kLMLXVMjNAssoWrdto2YIlOumqKfF5ODvLsQ0wS7auOL5w3?=
+ =?us-ascii?Q?d8EHwxwcun5fWgLt9Gevsy1YPiHAVQgBeGZJKx00cZYm2HAEGNKh3f661T1L?=
+ =?us-ascii?Q?ARhQ94pBCIL7ccGtsaHt/M8xCFzfifzNqWLYp9QjWyPOMD3r8dhOSSTyHLig?=
+ =?us-ascii?Q?NrVkaTmVZA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="svkqgvb3wERjsy4Q"
-Content-Disposition: inline
-In-Reply-To: <20261013174847.2192609-1-aousherovitch@rambus.com>
+X-OriginatorOrg: rambus.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR04MB8406.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0c94f84-ebd2-4c9d-0748-08df2958b64c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Oct 2026 18:35:10.1695
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nZwdvWLr8os/HYAOir3jUbXuH/Az6yE+n0EvsBnanvCX6UL51Xq0mqVMTQvgj1ZusVzY+JztVLgCwHXanPvINAy1TPp91WbJfrPjlVa6Aos=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR04MB993787
 
---svkqgvb3wERjsy4Q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, Oct 13, 2026 at 06:57:55PM +0100, Conor Dooley wrote:
+> Maybe you're breaking stuff down, but this is v6, not v1, and should
+> contain a changelog.
 
-On Tue, Oct 13, 2026 at 10:48:42AM -0700, Alex Ousherovitch wrote:
-> This is the first of a short, incremental set of submissions adding
-
-Maybe you're breaking stuff down, but this is v6, not v1, and shopuld
-contain a changelog.
+You're right, apologies -- I restarted the numbering when splitting the
+series into smaller chunks, which I shouldn't have.  The next revision
+of this chunk will be v6 and carry a "since v5" changelog.
 
 Thanks,
-Conor.
-
-> support for the Rambus CryptoManager Hub (CMH), a hardware cryptographic
-> accelerator accessed through a mailbox-based VCQ (Virtual Command Queue)
-> interface.  To keep each posting small and independently reviewable, the
-> driver is submitted in self-contained parts; this first series adds the
-> core platform driver, the shared key/datastore layer and the AES
-> transforms (plus the device-tree binding and the MAINTAINERS entry).  AES
-> is the first and least-problematic algorithm family, so the core has a
-> user and the VCQ/DMA/completion data path is reviewable end to end.
-> Later series add the remaining symmetric ciphers (SM4, ChaCha20-Poly1305)
-> and the hwrng, the hashes and MACs, and finally the asymmetric and
-> post-quantum algorithms together with the /dev/cmh_mgmt management
-> interface.
->=20
-> The core driver binds the device, parses its device-tree description,
-> sets up DMA, the mailbox queue interface and the transaction manager,
-> and exposes sysfs/debugfs instrumentation.  The key/datastore patch adds
-> the key provisioning and system-object layer that the AES driver in this
-> series, and the algorithm drivers in the following series, build on.
->=20
-> The transaction manager runs as a kthread that packs VCQ entries, maps
-> DMA, and submits to the least-loaded mailbox; completion is handled by
-> per-mailbox threaded IRQs.  The data path is asynchronous: requests
-> return -EINPROGRESS and the driver honors CRYPTO_TFM_REQ_MAY_BACKLOG for
-> queue-full backpressure.  The CMH eSW is loaded independently by the
-> hardware before probe; the driver loads no firmware.
->=20
-> The CMH is a platform device matched via device tree (compatible
-> "rambus,cmh-v1030").  Following the inside-secure,eip93 binding model
-> and the DT maintainer's guidance, the schema requires a SoC-specific
-> compatible ahead of the IP fallback and therefore carries no example.
->=20
-> Public hardware documentation:
->   Product brief: https://go.rambus.com/ch-7xx-and-cc-7xx-product-brief
->   No public datasheets are currently available.  The driver was
->   developed against the Rambus CryptoManager Hub Hardware Reference
->   Manual (Rambus Inc. confidential).  Detailed hardware reference is
->   available under NDA from Rambus Inc.; contact the maintainers listed
->   in MAINTAINERS for access during review.
->=20
-> Developed against Herbert Xu's cryptodev tree.  checkpatch.pl --strict,
-> sparse (C=3D2) and a W=3D1 -Werror build are clean, and dtschema's
-> dt-doc-validate accepts the binding.  Exercised on riscv64 and arm64 --
-> QEMU with the CMH hardware model and a Xilinx VMK180 FPGA with the CMH
-> IP -- under lockdep/PROVE_LOCKING, DEBUG_OBJECTS,
-> KASAN/UBSAN/KMEMLEAK/KFENCE and (arm64) KCSAN with no findings;
-> worst-case stack stays under 1 KB.
->=20
-> Alex Ousherovitch (5):
->   dt-bindings: crypto: add Rambus CryptoManager Hub
->   crypto: cmh - add core platform driver
->   crypto: cmh - add key/datastore infrastructure
->   crypto: cmh - add AES skcipher/aead/cmac
->   MAINTAINERS: add Rambus CryptoManager Hub (CMH)
->=20
->  Documentation/ABI/testing/debugfs-driver-cmh  |  171 ++
->  Documentation/ABI/testing/sysfs-driver-cmh    |   67 +
->  Documentation/crypto/device_drivers/cmh.rst   |  340 +++
->  Documentation/crypto/device_drivers/index.rst |    1 +
->  .../bindings/crypto/rambus,cmh-v1030.yaml     |  144 ++
->  .../devicetree/bindings/vendor-prefixes.yaml  |    2 +
->  MAINTAINERS                                   |   13 +
->  drivers/crypto/Kconfig                        |    1 +
->  drivers/crypto/Makefile                       |    1 +
->  drivers/crypto/cmh/Kconfig                    |   62 +
->  drivers/crypto/cmh/Makefile                   |   30 +
->  drivers/crypto/cmh/cmh_aes.c                  |  755 ++++++
->  drivers/crypto/cmh/cmh_aes_aead.c             | 1013 ++++++++
->  drivers/crypto/cmh/cmh_aes_cmac.c             |  476 ++++
->  drivers/crypto/cmh/cmh_config.c               |  619 +++++
->  drivers/crypto/cmh/cmh_debugfs.c              |  307 +++
->  drivers/crypto/cmh/cmh_dma.c                  |  482 ++++
->  drivers/crypto/cmh/cmh_key.c                  |  119 +
->  drivers/crypto/cmh/cmh_main.c                 |  394 +++
->  drivers/crypto/cmh/cmh_mqi.c                  |  344 +++
->  drivers/crypto/cmh/cmh_rh.c                   | 1211 +++++++++
->  drivers/crypto/cmh/cmh_sys.c                  |  376 +++
->  drivers/crypto/cmh/cmh_sysfs.c                |  108 +
->  drivers/crypto/cmh/cmh_txn.c                  | 2235 +++++++++++++++++
->  drivers/crypto/cmh/include/cmh.h              |   24 +
->  drivers/crypto/cmh/include/cmh_aes.h          |   24 +
->  drivers/crypto/cmh/include/cmh_aes_abi.h      |   98 +
->  drivers/crypto/cmh/include/cmh_ccp_abi.h      |  108 +
->  drivers/crypto/cmh/include/cmh_config.h       |  105 +
->  drivers/crypto/cmh/include/cmh_debugfs.h      |   93 +
->  drivers/crypto/cmh/include/cmh_dma.h          |  249 ++
->  drivers/crypto/cmh/include/cmh_drbg_abi.h     |   67 +
->  drivers/crypto/cmh/include/cmh_eac_abi.h      |   44 +
->  drivers/crypto/cmh/include/cmh_hc_abi.h       |  162 ++
->  drivers/crypto/cmh/include/cmh_hcq_abi.h      |  222 ++
->  drivers/crypto/cmh/include/cmh_key.h          |   73 +
->  drivers/crypto/cmh/include/cmh_kic_abi.h      |   77 +
->  drivers/crypto/cmh/include/cmh_mqi.h          |   35 +
->  drivers/crypto/cmh/include/cmh_pke_abi.h      |  272 ++
->  drivers/crypto/cmh/include/cmh_qse_abi.h      |  201 ++
->  drivers/crypto/cmh/include/cmh_registers.h    |  161 ++
->  drivers/crypto/cmh/include/cmh_rh.h           |   93 +
->  drivers/crypto/cmh/include/cmh_sm3_abi.h      |   79 +
->  drivers/crypto/cmh/include/cmh_sm4_abi.h      |  101 +
->  drivers/crypto/cmh/include/cmh_sys.h          |  111 +
->  drivers/crypto/cmh/include/cmh_sys_abi.h      |  148 ++
->  drivers/crypto/cmh/include/cmh_sysfs.h        |   14 +
->  drivers/crypto/cmh/include/cmh_txn.h          |  493 ++++
->  drivers/crypto/cmh/include/cmh_vcq.h          |  288 +++
->  49 files changed, 12613 insertions(+)
->  create mode 100644 Documentation/ABI/testing/debugfs-driver-cmh
->  create mode 100644 Documentation/ABI/testing/sysfs-driver-cmh
->  create mode 100644 Documentation/crypto/device_drivers/cmh.rst
->  create mode 100644 Documentation/devicetree/bindings/crypto/rambus,cmh-v=
-1030.yaml
->  create mode 100644 drivers/crypto/cmh/Kconfig
->  create mode 100644 drivers/crypto/cmh/Makefile
->  create mode 100644 drivers/crypto/cmh/cmh_aes.c
->  create mode 100644 drivers/crypto/cmh/cmh_aes_aead.c
->  create mode 100644 drivers/crypto/cmh/cmh_aes_cmac.c
->  create mode 100644 drivers/crypto/cmh/cmh_config.c
->  create mode 100644 drivers/crypto/cmh/cmh_debugfs.c
->  create mode 100644 drivers/crypto/cmh/cmh_dma.c
->  create mode 100644 drivers/crypto/cmh/cmh_key.c
->  create mode 100644 drivers/crypto/cmh/cmh_main.c
->  create mode 100644 drivers/crypto/cmh/cmh_mqi.c
->  create mode 100644 drivers/crypto/cmh/cmh_rh.c
->  create mode 100644 drivers/crypto/cmh/cmh_sys.c
->  create mode 100644 drivers/crypto/cmh/cmh_sysfs.c
->  create mode 100644 drivers/crypto/cmh/cmh_txn.c
->  create mode 100644 drivers/crypto/cmh/include/cmh.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_aes.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_aes_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_ccp_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_config.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_debugfs.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_dma.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_drbg_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_eac_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_hc_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_hcq_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_key.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_kic_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_mqi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_pke_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_qse_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_registers.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_rh.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_sm3_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_sm4_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_sys.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_sys_abi.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_sysfs.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_txn.h
->  create mode 100644 drivers/crypto/cmh/include/cmh_vcq.h
->=20
->=20
-> ---
->=20
-> The CMH driver was first posted as a single series; it is now
-> split into smaller, independently reviewable series per maintainer
-> feedback.  Earlier single-series postings:
->   v1: https://lore.kernel.org/linux-crypto/20260625173328.1140487-1-skris=
-hnamoorthy@rambus.com/
->   v2: https://lore.kernel.org/linux-crypto/20260709203037.1884436-1-skris=
-hnamoorthy@rambus.com/
->   v3: https://lore.kernel.org/linux-crypto/20260806195519.2703224-1-skris=
-hnamoorthy@rambus.com/
->   v4: https://lore.kernel.org/linux-crypto/20260825221539.255951-1-aoushe=
-rovitch@rambus.com/
->   v5: https://lore.kernel.org/linux-crypto/20260917225929.2494111-1-aoush=
-erovitch@rambus.com/
-> base-commit: 9695df3b1db4ac4534274d38ee16e3b9b0bf910e
->=20
-> --=20
-> 2.43.7
->=20
-
---svkqgvb3wERjsy4Q
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCas5xIgAKCRB4tDGHoIJi
-0p4DAQCsuhJ7uCjrDn+zL9O+OmZw1FIK5NC33gbsGt7Mr2H2dAD+JlSflVPc6YB3
-9Tmx7kWjE9jon4co9zStzsBQoLSG3gM=
-=LQG7
------END PGP SIGNATURE-----
-
---svkqgvb3wERjsy4Q--
+Alex
