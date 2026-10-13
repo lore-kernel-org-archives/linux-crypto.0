@@ -1,59 +1,76 @@
-Received: from mta1.migadu.com (out-144.mta1.migadu.com [95.215.58.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012054.outbound.protection.outlook.com [40.93.195.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967B851AFF5
-	for <linux-crypto@vger.kernel.org>; Tue, 13 Oct 2026 15:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.144
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791904264; cv=none; b=RtBHPyR3lAb54Id50lQ3ncyAa5PAnRrqGGQ2JQ5CAuwW9i4lILmqw9Jwe5s4NvNfKsjVs7NwS3d1Lv/9V6ODp2G9xIRh9qc3La0YP0qlpVEK7XsJsSqBHivSPb+v3LsT7ChO7IvmHSLozyvSFfzwcVrnak9L0FuSOhM7NkhtooM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791904264; c=relaxed/simple;
-	bh=bceBj1lCDVf8rlvw9Pnq+5QiEUpw58usmClWP5+lnkY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IHcQPI4/DzTCDok5Sy173tTGPolu8/AG54sQmT36S2MmP4Cfmr6KTWi1We5dQwU40mY5N3NWNPTkc2h+vv3RtjXc6R2hyyi+WNnX2vI1lw7zfqDV2BsVDwubxp1iJzyI2vI+vD8d+4qq1nVpYxkKB07SYAkd0YpF9HRyRNGFbtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HtGXlp7H; arc=none smtp.client-ip=95.215.58.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF74552759F;
+	Tue, 13 Oct 2026 15:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791906261; cv=fail; b=TdspNy1xPeQzV9ffbnbgSWdArfv/k+v4fyxd7etYbHpO8NZMORMVs5Ahy60HPCHoxLWefM0rEDesWc1q4LteguJt065LnINI308Z96QW0NG9h7B1HMhlCGR3wAchiOxmdT6QPu0A3Mt3onpfmrDgUOKL347G+bWRKRAqkwDM9cw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791906261; c=relaxed/simple;
+	bh=5tPxbyKpDFkZguuPz4xfzO6I89Ifaq0C3zwCaGrQpoM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fOqXpqtv2JNxrs6Nb7fVUE6eg87ATj95gJBkxvfcpAxArt9IHOiIVRJOLNG3ZR2vy3tAqdHJ4AyWdtwiC8U8ixQtt7aHO9dP5aNVcM5wnjWDuIP7N+4JKlpUw6En3o8hiiqB6ZS7uG5WUnCr6K6ebbK3sHgo4K9/uWRuLq1/pg4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YvcFZdTI; arc=fail smtp.client-ip=40.93.195.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HtGXlp7H"
-X-Envelope-To: linux-crypto@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=bceBj1lCDVf8rlvw9Pnq+5QiEUpw58usmClWP5+lnkY=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1791904259; v=1; x=1792509059;
- b=HtGXlp7HdsU1MrQuqwiw9TlpTVxg8+B367C+6XmUokvnjnAmqzJ1bEOJkqSvPrpCLl2Bf5tg
- Cu5ndTkyLR+sOmEKfLBCQabrmiY+9e/NsRG3Re7Y8rKhGYGpbNUrqTFp4wsn8MEIJpY4d10N5OU
- TtLbv+nctJHKnxQWVxsYfwZ4=
-X-Envelope-To: linux-crypto@vger.kernel.org
-Received: by mta12.migadu.com with ESMTPS id 3d5937a095650203;
-	Tue, 13 Oct 2026 15:10:59 +0000
-X-Mizu-Trace-ID: 3d5937a095650203
-X-Migadu-Flow: FLOW_OUT
-From: Usama Arif <usama.arif@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	chengming.zhou@linux.dev,
-	dsterba@suse.com,
-	hannes@cmpxchg.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	nphamcs@gmail.com,
-	terrelln@fb.com,
-	yosry@kernel.org,
-	riel@surriel.com,
-	shakeel.butt@linux.dev,
-	alex@ghiti.fr,
-	senozhatsky@chromium.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	kernel-team@meta.com
-Cc: Usama Arif <usama.arif@linux.dev>
-Subject: [PATCH v3 3/3] mm: zswap: use stack requests for synchronous decompression
-Date: Tue, 13 Oct 2026 08:09:37 -0700
-Message-ID: <20261013151007.2093943-4-usama.arif@linux.dev>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261013151007.2093943-1-usama.arif@linux.dev>
-References: <20261013151007.2093943-1-usama.arif@linux.dev>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YvcFZdTI"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mR4BGrdw39pqqL2jXDcM+MhIqsjpmrCy6hgv91Lta4mL23wJFOlJ1cF5MZAXeQ0o0iGiefF3hfgd6UsGS2OxeXUml+/psqyT36EnVcQeLoYarX1hQKko3QFpgCpuX5iJ1J9N0hlwyNA1TpJtcTwA11hSP6GUl8Pi4X8UiZ/NGdQbxgm0QnesED2QrCgKrl6V/9wmWcMitp2PIKJRkGEyOID2vw11st0rjgeb5rUFRVoYfM3iMFXwS5VE7UnaGrdX9MotdFlN7QFgWA30AWTZ+lIoyOpw9WJiQaNueZrEosFf4YXVI2mLaIM1EiDXNUHyKfkRP8960+WxB11dt/ti5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G26C7JNcbKtbki1fte4Xtc8Pkhvwq78k4vDcGMFnWBc=;
+ b=EuN6QQnK4vQf6bxSX71Oz56YlRhaHYVzNcg2km9YSq2g1e+A2o9OlGFh257Oay8cQq6suPAxhBvXpMU8yzbW0RktL1H5Qs0O9v/ffi6oUPYzIlz8vDUF+RQEhs/8ob6BhSK+70bbiaVVO5PD0q2CZiiag0cGWXRGjNqRbnAmaW/w6OXE1ZOPnOqUdVAB6knXBEhk+l3ne0fcaobcq/CPq1f4GJFcQ98yHe8i3v3O3wPadMv96txkeGlWxvpTMz7Nh8wS4lJvu2l85/cSA+N5z7plQPwQySluTn6Rxoe6/r3kf3awA/jDx6C+nLng5+Uf6grHw/105+Hp4R30jiyV0g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G26C7JNcbKtbki1fte4Xtc8Pkhvwq78k4vDcGMFnWBc=;
+ b=YvcFZdTIcNbf0HYAOwASu+PmE+U0iupHgVWQzyaDdMLMiwzh2E0lNPfvWz6UbGpQ1Pyv7x0o2ABo/O/LKgNTwENE/laEATb5/OynRCcTzSSJ9vl90lgiISYU940PD1n8c9A+3qUIVCJuJhwofdfssqZoaKyA8vk7soOSL/hoHBc=
+Received: from CH2PR12CA0002.namprd12.prod.outlook.com (2603:10b6:610:57::12)
+ by DS0PR12MB6534.namprd12.prod.outlook.com (2603:10b6:8:c1::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.24; Tue, 13 Oct
+ 2026 15:44:14 +0000
+Received: from DS8PEPF000000E2.namprd05.prod.outlook.com
+ (2603:10b6:610:57:cafe::3b) by CH2PR12CA0002.outlook.office365.com
+ (2603:10b6:610:57::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.496.5 via Frontend Transport; Tue, 13
+ Oct 2026 15:44:14 +0000
+X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
+ is 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ DS8PEPF000000E2.mail.protection.outlook.com (10.167.23.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.522.6 via Frontend Transport; Tue, 13 Oct 2026 15:44:13 +0000
+Received: from nigeria-2635-os.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.53; Tue, 13 Oct
+ 2026 10:44:06 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<seanjc@google.com>, <peterz@infradead.org>, <thomas.lendacky@amd.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>
+CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
+	<KPrateek.Nayak@amd.com>, <Tycho.Andersen@amd.com>,
+	<Nathan.Fontenot@amd.com>, <ackerleytng@google.com>, <jackyli@google.com>,
+	<pgonda@google.com>, <rientjes@google.com>, <jacobhxu@google.com>,
+	<xin@zytor.com>, <pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
+	<dyoung@redhat.com>, <nikunj@amd.com>, <darwi@linutronix.de>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>
+Subject: [PATCH 0/2] x86/sev: Fix RMPOPT enablement on non-RMPOPT configs
+Date: Tue, 13 Oct 2026 15:44:00 +0000
+Message-ID: <cover.1791905953.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,189 +78,62 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS8PEPF000000E2:EE_|DS0PR12MB6534:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0afaae3e-9bb1-4851-d6b0-08df2940d521
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|7416014|36860700016|23010399003|6133799003|10067099003|18002099003|11063799006|261009223027099003|921020|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	0MUEUwa7yXoO/3wo+o+H61j/J3WH97WjaAShexg5kF0BpDhDw8l4L+yFkLaagXxHvqhQ3WM94oolIyt7wH6TbL1wnE9Rb0eyBFK7IJbbswZqsNWwgyyjGVnagqympFVvFG4IHI1qroUUNAJDFIodeJPAbY+L/R49zXJZgAdTEWMgCnFPzQKv5KDvFGKi42TaksmkoaFOLAb/hQV3pLfYHXhijinQXcvvy46D/5HBckQyU9zPgeB1u4HOhtNkFdR158zpQAeYo5gZDVx+22HMVmr2vlejyaW+W2qVBojW/Ug3wKCkQOXlzws1iyLSmai/Wta8TRh2ofvHe3uZdMMe2XWb2TT574FTCkV/+8HW02Z0Gen9AlhgrpPoOiTDdCLLDC12YAL6bfLklmjGHqmWPNFNcswN/xHJfn9EJiuKTKDHxhxBkDkyih9ebsfslXhyj4hi+CdnNcecH4xGNuH8eMst6LfL1muiYuXBiUdeXABoQpNole9YXwWNJujPi4MtIsh2TFcg+64Kv+hyIY55Bq+F0Ku/3JueGZIxQsfoDXItJkBrtP7VR9cfnCyBbW2VN7KsDfxiH3EVJqlXkinwcLB7g11dnh/ZGjg402UvRQ51zFue81qrw2ti/UNPWxkS2uP6EBb9YM/dlUj/8jXrZOe7p+9YI+AWfQR4i62+9zdtJ/38rJw5uQDB9Pl/ETAHSM6ZR0H2JV7+IbxAgztLKBWS2fDIGw5+meomuJQmXWGK6MiYcGvjvZpvPbm4nFlF
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(7416014)(36860700016)(23010399003)(6133799003)(10067099003)(18002099003)(11063799006)(261009223027099003)(921020)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	AB13Tb4mQeZdnky+oyVXtzh5/BkAQseSiRVTlMD11MYVCU7Qr25ufkIamTc82pKvExExKXmqlBSRpIxG4rmtxUi+018BCKIN2tf+VJVvmU7dR2xnfL7S76GHtvvDfH0tAkUdB0LAXnr2ppFqQpNtW45bmhLGjPkwfG1iI8HP6xUk2scLqzQZlPQ/Zhb1QcBEJccu/cfbCZSuurSAM/vCW/ysbephUMjS92G/rchpRHBR7BATqx9JlRUVSgFmOc7UWZWJ7Ti358m9+GEL5hqDfjALxWXZkbcS5su9Rt+8pasTonHa8X1mk76JrABe2Z+I6nmrtDOYn4QC0+8dnVpGM1bXXzo/++Ia1NQd5R3EMDCAxiyk/eP4UCbVQIVj0x8jsbqkcRjZbYqfuyfCf1EYlaUoxIFknt5gBoHRr1dr1p1OcEBEvHQXBr1OBln0WJDz
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2026 15:44:13.9495
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0afaae3e-9bb1-4851-d6b0-08df2940d521
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS8PEPF000000E2.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6534
 
-With separate requests for compression and decompression, loads still
-serialize on the per-CPU decompression mutex. A low-priority load that
-is preempted after the codec drops its stream lock keeps holding the mutex
-and stalls every other load on that CPU, including higher-priority ones.
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Synchronous algorithms can use an on-stack request, so decompress with
-one and take no zswap lock. All in-tree software compressors qualify.
-The Crypto API enforces MAX_SYNC_COMP_REQSIZE during initialization,
-so checking acomp_is_async() is sufficient. Asynchronous algorithms
-keep the per-CPU request and mutex, which is still taken before the
-zsmalloc read lock.
+Two fixes for the RMPOPT series, both for configurations where the
+RMPOPT CPUID bit is advertised but RMPOPT is not actually usable:
 
-Reading the per-CPU context without the mutex is safe. Since
-commit ef3c0f6cb798e ("mm: zswap: tie per-CPU acomp_ctx lifetime to the
-pool"), it is set up before its CPU comes online and is not torn down
-until the pool is destroyed. The codecs keep their own stream locks, and
-crypto_acomp_decompress() rejects on-stack requests only for
-asynchronous transforms, which never take this path.
+Patch 1 clears X86_FEATURE_RMPOPT when the platform advertises segmented
+RMP but the firmware has it disabled (contiguous RMP) - otherwise the
+RMPOPT initcall programs RMPOPT_BASE and issues RMPOPT, which #GP.
 
-For software compressors this drops the heap request added for
-decompression. The on-stack request and wait take 216 bytes, which
-makes the load path about 270 bytes deeper on x86-64. Asynchronous
-algorithms pay this too.
+Patch 2 moves the "RMPOPT optimizations enabled" message out of the
+feature-only-gated initcall and into the SNP-gated enable path, so it is
+not printed when SNP is disabled in the BIOS.
 
-Acked-by: Nhat Pham <nphamcs@gmail.com>
-Signed-off-by: Usama Arif <usama.arif@linux.dev>
----
- mm/zswap.c | 87 ++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 59 insertions(+), 28 deletions(-)
+Both restore the behaviour of the posted series; the issues were
+introduced when the series was applied (see the per-patch notes). Each
+carries a Fixes: tag.
 
-diff --git a/mm/zswap.c b/mm/zswap.c
-index 23c4298765795..beacdf83c8b31 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -153,7 +153,7 @@ struct zswap_comp_ctx {
- struct crypto_acomp_ctx {
- 	struct crypto_acomp *acomp;
- 	struct zswap_comp_ctx comp;
--	struct zswap_acomp_req decomp;
-+	struct zswap_acomp_req decomp;	/* unused with on-stack requests */
- };
- 
- /*
-@@ -803,6 +803,18 @@ static void zswap_entry_free(struct zswap_entry *entry)
- /*********************************
- * compressed storage functions
- **********************************/
-+static void zswap_set_acomp_req_callback(struct acomp_req *req,
-+					 struct crypto_wait *wait)
-+{
-+	/*
-+	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
-+	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
-+	 * won't be called, crypto_wait_req() will return without blocking.
-+	 */
-+	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				   crypto_req_done, wait);
-+}
-+
- static int zswap_acomp_req_init(struct zswap_acomp_req *areq,
- 				struct crypto_acomp *acomp)
- {
-@@ -812,14 +824,7 @@ static int zswap_acomp_req_init(struct zswap_acomp_req *areq,
- 		return -ENOMEM;
- 
- 	crypto_init_wait(&areq->wait);
--
--	/*
--	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
--	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
--	 * won't be called, crypto_wait_req() will return without blocking.
--	 */
--	acomp_request_set_callback(areq->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				   crypto_req_done, &areq->wait);
-+	zswap_set_acomp_req_callback(areq->req, &areq->wait);
- 
- 	mutex_init(&areq->mutex);
- 	return 0;
-@@ -856,15 +861,19 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
- 		goto fail;
- 	}
- 
--	if (zswap_acomp_req_init(&acomp_ctx->comp.areq, acomp_ctx->acomp) ||
--	    zswap_acomp_req_init(&acomp_ctx->decomp, acomp_ctx->acomp)) {
--		pr_err("could not alloc crypto acomp_request %s\n",
--		       pool->tfm_name);
--		goto fail;
-+	if (zswap_acomp_req_init(&acomp_ctx->comp.areq, acomp_ctx->acomp))
-+		goto req_fail;
-+
-+	/* Skip the per-CPU request when decompression can use the stack. */
-+	if (acomp_is_async(acomp_ctx->acomp)) {
-+		if (zswap_acomp_req_init(&acomp_ctx->decomp, acomp_ctx->acomp))
-+			goto req_fail;
- 	}
- 
- 	return 0;
- 
-+req_fail:
-+	pr_err("could not alloc crypto acomp_request %s\n", pool->tfm_name);
- fail:
- 	acomp_ctx_free(acomp_ctx);
- 	return ret;
-@@ -956,19 +965,14 @@ static bool zswap_compress(struct folio *folio, long index,
- 	return comp_ret == 0 && alloc_ret == 0;
- }
- 
--static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
-+static bool __zswap_decompress(struct zswap_entry *entry,
-+			       struct zswap_pool *pool, struct acomp_req *req,
-+			       struct crypto_wait *wait, struct folio *folio)
- {
--	struct zswap_pool *pool = zswap_entry_pool(entry);
- 	struct scatterlist input[2]; /* zsmalloc returns an SG list 1-2 entries */
- 	struct scatterlist output;
--	struct crypto_acomp_ctx *acomp_ctx;
- 	int ret = 0, dlen;
- 
--	if (WARN_ON_ONCE(!pool))
--		return false;
--
--	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
--	mutex_lock(&acomp_ctx->decomp.mutex);
- 	zs_obj_read_sg_begin(pool->zs_pool, entry->handle, input, entry->length);
- 
- 	/* zswap entries of length PAGE_SIZE are not compressed. */
-@@ -985,15 +989,13 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
- 	} else {
- 		sg_init_table(&output, 1);
- 		sg_set_folio(&output, folio, PAGE_SIZE, 0);
--		acomp_request_set_params(acomp_ctx->decomp.req, input, &output,
--					 entry->length, PAGE_SIZE);
--		ret = crypto_acomp_decompress(acomp_ctx->decomp.req);
--		ret = crypto_wait_req(ret, &acomp_ctx->decomp.wait);
--		dlen = acomp_ctx->decomp.req->dlen;
-+		acomp_request_set_params(req, input, &output, entry->length, PAGE_SIZE);
-+		ret = crypto_acomp_decompress(req);
-+		ret = crypto_wait_req(ret, wait);
-+		dlen = req->dlen;
- 	}
- 
- 	zs_obj_read_sg_end(pool->zs_pool, entry->handle);
--	mutex_unlock(&acomp_ctx->decomp.mutex);
- 
- 	if (!ret && dlen == PAGE_SIZE)
- 		return true;
-@@ -1007,6 +1009,35 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
- 	return false;
- }
- 
-+static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
-+{
-+	struct zswap_pool *pool = zswap_entry_pool(entry);
-+	struct crypto_acomp_ctx *acomp_ctx;
-+	bool ret;
-+
-+	if (WARN_ON_ONCE(!pool))
-+		return false;
-+
-+	acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
-+	/*
-+	 * Use a private on-stack request when the transform supports it.
-+	 * Otherwise serialize decompression on the shared per-CPU request.
-+	 */
-+	if (!acomp_ctx->decomp.req) {
-+		ACOMP_REQUEST_ON_STACK(req, acomp_ctx->acomp);
-+		DECLARE_CRYPTO_WAIT(wait);
-+
-+		zswap_set_acomp_req_callback(req, &wait);
-+		return __zswap_decompress(entry, pool, req, &wait, folio);
-+	}
-+
-+	mutex_lock(&acomp_ctx->decomp.mutex);
-+	ret = __zswap_decompress(entry, pool, acomp_ctx->decomp.req,
-+				 &acomp_ctx->decomp.wait, folio);
-+	mutex_unlock(&acomp_ctx->decomp.mutex);
-+	return ret;
-+}
-+
- /*********************************
- * writeback code
- **********************************/
+Ashish Kalra (2):
+  x86/sev: Clear RMPOPT when segmented RMP is disabled by firmware
+  x86/sev: Only announce RMPOPT optimizations when SNP is enabled
+
+ arch/x86/virt/svm/sev.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+
+base-commit: 250ee734115bca1c1f7a38d838909aa83cce87ae
 -- 
-2.53.0-Meta
+2.43.0
 
