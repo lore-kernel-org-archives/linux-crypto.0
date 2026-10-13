@@ -1,79 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA42D384242;
-	Tue, 13 Oct 2026 06:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C492C38DC53;
+	Tue, 13 Oct 2026 09:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791873895; cv=none; b=gQfnmnAjBs0VFaPEuLYxVF4SUVRbZHq6UwPT746NRMQEft0747HjsN3paOjC3gzdl2Tw12cFTfum/K6iel5b9CT2H21QixNubMHg0mOW6qPU/OOwA/Q+VrOzapj3IP/gPX44HncjGnfXzUfSVMp+3rfyYmVcY2iAIh0JdpLABuk=
+	t=1791883746; cv=none; b=PGzRsff9nxoNw/OT4lk+FLyq1Ljq3qe8/Jatfs7g25u4GTaLslqbz31a4XXy79JUZ2EIeIlBbmtefsHNHoF5uTkB/Tuew9/PIaofMm/XwKU/aPQc49GET5iyNzibWZl2P/+j5o0ocnL6aBpDw6ESYuorrSh8GkcNyuToKRKRiDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791873895; c=relaxed/simple;
-	bh=rKzcYvUF0MTtrWzr8w21BcuSnYY1JHXhpx5c8qIFJdA=;
+	s=arc-20240116; t=1791883746; c=relaxed/simple;
+	bh=VOrBNeeotCBvrE6nzVveJn0StREXe/HIMgVnGyG7zdI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IPBzDWsr78T0ZSXIgX/sdxTZsgEL4XYQa0aFGIY/MJbzF0PLF9Nc1oOuDW912IMSqYx0oFDFY9olkpWrV7xDbqjGquqU8BRoQQ08dkVgkSH+eiOMOoZZ+R6q5BeQtdrmxrvkDkxdAwPy/k+5UksSH3NNtkxkhKsQ2B6svn2u8us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTFgFvmx; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=j6ipjqAIqiDfQJuerzXSa0CpHWAfQjUdSdTpPuN2qKPWRLhLLu4jcs2PZfBHIdQM3yfiJV09m4HDYzEaTEmYl9FvdNgAcTiKCCiPwup8+oKgksaWZgcgRP7/CkQLjrcj1AK1KoLnLSHS2CC89Yxeoqo6c4VZWPqKJh3/jAoNwIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=WfMo1nIj; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTFgFvmx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B99D1F000FF;
-	Tue, 13 Oct 2026 06:44:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791873893;
-	bh=GuXm5gBL1DdcdZs9QrDVPnY+/wBXXe8hkEN4rR1MOOU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=JTFgFvmxgAFrwjJZARatj6cTapS+RDW7uiPc/W9FPQOJSvUJZ0zeCY/OY9L9dOhmf
-	 1JQ0AaEwMIIJGEtcLgZiKuo/3MTlVpRbLAItsrHh4s0xAVtPtqNhpRiCTS61RJdRHz
-	 NuckPFDzgMzUctjA7szk121Luz7vPU2a67nSFoTB/rqfY8RTCAoyBSzmJs69a9reyV
-	 A49OGzvjIYapJ1sbiqLthf3wgxCRdT6gsOBXtc1U4RO4xcm6Udrvk3LoDSf98OQaJK
-	 vlMVEyHnv8QRuh79AIMXKY8QT5Jbqu7ULfoa6m3KebCDLcc7o4WhUhEhLxrCpnCZBd
-	 oKZXQSq4I/PCA==
-Date: Tue, 13 Oct 2026 08:44:49 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Abel Vesa <abelvesa@kernel.org>, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: Adjust Shikra compatible
- hierarchy
-Message-ID: <20261013-pastoral-magic-perch-1a2e5a@quoll>
-References: <20261006-shikra_qce_fix-v1-0-8ac54d81edb4@oss.qualcomm.com>
- <20261006-shikra_qce_fix-v1-1-8ac54d81edb4@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="WfMo1nIj"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=6hJ13YiNASF4v9jSRm8CUr3MziD7bZPk/IbsIdHVuFU=; 
+	b=WfMo1nIjEzj7fpCgP4aFArUaV808tG2tyogpXRRg9RJOYydOToeyO7xCsqHucNu/SdxI55N6WyZ
+	4dnHOK4CeQfsl3Bal/2OZQawNC7fqfSl/fjRbfb2fQzs3Btoul+qpoFoRXcAcoTgnjyphUNHoyNKa
+	scRapRGfZ+rPDTTiZ046p91yb75HXHMPC6S/L/VrmpLMty3xoiXnli3ADscj6CobnvpSQyIFOLL+d
+	WvUoAI27XPCA5e/81QBGI9E5Hzz2GZpPH2TJ8FRHCVljToqGwQLh9wImHGfjdxs1XieG7kyAKh+R2
+	cqd8zfKJlyb98aeCnaNM/8fr51DA0ilOZwsA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xGYo8-00000003JrW-2cU7;
+	Tue, 13 Oct 2026 17:28:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 Oct 2026 20:28:28 +1100
+Date: Tue, 13 Oct 2026 20:28:28 +1100
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Usama Arif <usama.arif@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, chengming.zhou@linux.dev,
+	dsterba@suse.com, hannes@cmpxchg.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, nphamcs@gmail.com, terrelln@fb.com,
+	yosry@kernel.org, riel@surriel.com, shakeel.butt@linux.dev,
+	alex@ghiti.fr, senozhatsky@chromium.org, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH v2 1/2] mm: zswap: use separate compression and
+ decompression requests
+Message-ID: <as35vERorcRxFwGb@gondor.apana.org.au>
+References: <20261009163146.83112-1-usama.arif@linux.dev>
+ <20261009163146.83112-2-usama.arif@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261006-shikra_qce_fix-v1-1-8ac54d81edb4@oss.qualcomm.com>
+In-Reply-To: <20261009163146.83112-2-usama.arif@linux.dev>
 
-On Tue, Oct 06, 2026 at 04:44:03PM +0530, Kuldeep Singh wrote:
-> Shikra reuses the same QCE integration as Agatti and should follow the
-
-`git grep Agatti` gives zero.
-
-> corresponding binding requirements too.
+On Fri, Oct 09, 2026 at 09:30:30AM -0700, Usama Arif wrote:
+> Stores and loads serialize on the same per-CPU acomp request and mutex.
+> A low-priority store can be preempted as soon as the compressor drops
+> its stream lock, while it still holds the mutex. A higher-priority load
+> on that CPU then waits until the store runs again, which can take a
+> long time when other tasks are runnable.
 > 
-> Move the Shikra compatible to the appropriate binding hierarchy
-> (matching qcom,qcm2290-qce) to reflect the underlying hardware
-> description.
-
-You do not change any binding hierarchy. You are changing fallback
-compatible which is ABI break without any reason.
-
+> Give compression and decompression their own request, completion wait
+> and mutex. Since commit e2c3b6b21c77f ("mm: zswap: use SG list
+> decompression APIs from zsmalloc"), the per-CPU buffer is only used for
+> compression, so group it with the compression request. Independent
+> requests can share the per-CPU transform; the codecs and drivers
+> synchronize their shared state internally. Loads can still wait for
+> each other on the decompression mutex, and stores still serialize on
+> the compression mutex.
 > 
-> Fixes: 45834ff95a6f ("dt-bindings: crypto: qcom-qce: Document the Shikra crypto engine")
-> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-> Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> acomp_request_free() ignores NULL requests, so drop the check in
+> acomp_ctx_free().
+> 
+> This follows the proposal from Sergey Senozhatsky for the same split
+> for zram [1].
+> 
+> [1] https://lore.kernel.org/all/20261005122036.718976-10-senozhatsky@chromium.org/
+> 
+> Signed-off-by: Usama Arif <usama.arif@linux.dev>
+> ---
+>  mm/zswap.c | 108 +++++++++++++++++++++++++++++++----------------------
+>  1 file changed, 64 insertions(+), 44 deletions(-)
 
-Drop, that's v1, so this likely did not happen. Anyway, your SoB is
-supposed to be last.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Best regards,
-Krzysztof
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
