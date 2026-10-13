@@ -1,27 +1,28 @@
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11022142.outbound.protection.outlook.com [40.93.195.142])
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11020120.outbound.protection.outlook.com [52.101.201.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BD75208D5;
-	Tue, 13 Oct 2026 17:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5567E52BE32;
+	Tue, 13 Oct 2026 17:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.120
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791913743; cv=fail; b=Ro9yEG3tiz5Ni7IPungk9wSPERARKj0ILuWjpECObbM5xolXhFPc7YeL7OxgjQlkMKDhjvqUmfsPjdBaBEGsUDP2swurYl4JzUPaBF3Peti6Y3Hj1f7zQbJpbA5c33hXhe1Um/frOWy6Da23bOzCN/V4kVMsq114HZL5j6s7UZA=
+	t=1791913763; cv=fail; b=pYr/7WwmUgq+N4kUInnHAHeGkdb2r9hLUUEQYAmfO/6433KhCS0YuAAYLt6AP7j9wGnlSAoK2JelcKLkxXA33JCZyH+RfvM0gMjtuD9aRAF7IrSLFm38KyivB57fgkGt9XwnPpvQgVohQmpPZbUpBHK6mwZmilsEW+GEmQKZSj0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791913743; c=relaxed/simple;
-	bh=2tgTu65qkmhytKBt8p/aNaPE8HLZmHIs/2G0oJnroKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=o813WByvFfynAQk4Fj7wpdBY9dv6xhpIOutEA/phIgpUq3Y+E1cRmMm8RY0cP1+2sfl/VV+g0VtnXxe6TCTiBMtzm2XYrTVWbKYnb7GPDArsMPQ+5MsXwkfU146/jO2XqulxrSE0Gy9QyEyjTNX9IENvFt0DzoCS1hpfstLLGIs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com; spf=fail smtp.mailfrom=rambus.com; dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b=cRADqUlX; arc=fail smtp.client-ip=40.93.195.142
+	s=arc-20240116; t=1791913763; c=relaxed/simple;
+	bh=a4Gev/JuIaV0/Qe/XjdfWvgNdEDoGSIn43f07NV7oXA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oHBves+8t1on/Hdv00Z+TeNOrLmcTfB/k6shahQ8VVBRbcDIIp9aQb0ARq0XqjeSdDQamUHJwtISCsXiAtiTXtvpQt76l9vNllYFBUcEEb7vuGOfz5utOqZSiLRwJ6JpnQs4CXc3dkvK49nwUoBdRIkUSEWacAgjX60bimmdEVI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com; spf=fail smtp.mailfrom=rambus.com; dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b=X444IijH; arc=fail smtp.client-ip=52.101.201.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=rambus.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b="cRADqUlX"
+	dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b="X444IijH"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aPihsuiq64m9kUDjX0etE2olmO2k5cVsOF+vaNqgJ/eKh8fgsJ/9sxzb4wL4ets8cSzbuVL0Rqa19qWl3EZcTRuvkfS0PiGBehlVnoygB6FcfltnHsiyC/FpNqOo2HqH0+fSs/u0kVKHv3RK3HReArZXtUXkZnwbetWKkS7bNSACTtze5D+aZAGnmAa9WLr6PjE9EwlwcHy7O03+P4oZ2YI2dF/3kY+7kJG4sQcU9Lig1vd9U1F0+JCAvbZ05jD5Na8bQOE8cURLvEbR02jcQ+8ictE6aZOm5o4cDxo2dgBnttE7An1Zq2MQi183ctm5t2+eMCe7KT3TyHjm+5IoxA==
+ b=v4OMDeT5maM3vIoC8GWLzcVt8ou6lCHZzCd4PGp4xBt8/Qb5EWZb2dd+rb00p+NVhw99KN90eTDq5UgrLTaJdk49nXsLxke8NRePwduqHJcwGkqm71vGZBxzcrfbDjGPuoQ3m6GviVG3HSVi67S2QdM4fmf+Nm06mvTPIVlUnkRwpFiP3l0lWqPVKjbH1C6wMTwiORoiMNxbS/JWn+nzklICpaLh5+3FkkcHxtpSWKs8Wql03eO2halI7SNmIApuEhXkFe+4XurMzrK3k6tsrhstv0C2uyW+MVCoY+Q8kPpTSXAqr92vkl0pTptZJOZLTLDdVtbTxZLqtiXRGTJTtA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wOAFRi/yF/Qq6qQ+tzp1qrDwbsxk11RMCyAwRcmrqzc=;
- b=GWwk5c8iVWtOmTZgKWKhesD4lpkTKMvGFYdNbqxrbFZZoJHmMbkwxI7RtCeKaYAEcruMDRBsia8Ccx9S5JDfb7zGRfoAY4kamvQg5aXUcmoFAERZ8t8aR+ZdYuOmuuCh4sMEA5eFW2iWvulnzzmMXdwWwf9UlKbBYVC1Js3nNmor7GZYkMuCeyGw5275b9Mbyx8/m/NxmrMTaWbIa/W6OqMDPWNc4NN5aP0F9LLBOXGbQt5LHsNmzKJ9v4dHIxFTyVu2Fw6IGNE2ia06rGQ7R2PKQsrGTYAx3dmGGrvoPD6z8BZeYBuu/7rmhANN4GRoswTAMThMHsLBS559+b33Dg==
+ bh=hLMTyz3XZg4YAf4wpkPUetkHjrbjFWk5SOmllKgLgrQ=;
+ b=cQVCDciXxTdKTFScoHFBbH+bLjpfR6Xl83Ar0tvFQNFzq244lJ45YFLDLbNcRukW0EQ5Vvbsi72ocTtLUa9++sEnNrXOd574fx4EISqcfFYRXkJaheuFjQrQemIKrDgktWe+0qEEARAg6NIJkFdhwsw+1sfE2I86iU09Ko7K9r3B5CwZg8wiGm1Ii7cR84MwwT9CsbvTCl9+svq4naQlvVHBpgh+oz8XwsScejsQ+yUDVeyUqcqyrgjNBSmZSffI2cOrlUbnavSt2ypTKc4KSMtNhqnRJiCqf0VK58UrOhEpEJm1a6LSs++REMIcjkYbzNXOb8V1RCKS+1GIpKhRJQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  192.86.86.210) smtp.rcpttodomain=cryptography.com smtp.mailfrom=rambus.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=rambus.com;
@@ -29,18 +30,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wOAFRi/yF/Qq6qQ+tzp1qrDwbsxk11RMCyAwRcmrqzc=;
- b=cRADqUlXIA7tSn5ZCclJw71Qo2cBtAdP4OZuWQ1Dq/chY5LpeHISUsvG1EJyAy9CeY7afTTxppujsLQeAjn5i82+qL9QBtmrddlYFPnXqSEPQ4QL+72b57lVXa/sS68dVKx2LoxEQB7tyRe/v1NAwPvLc4ONuEI4kf2vPOlCyYv3giOFmXv05qVh7KU5JBt2yo5N2KgAT/3kjFSLU651HUXBVTJD8lYO3puuGbRdL06nzItfGaw0cBuQfzL+bEHRb9Bg6poG259F3jXChbQVtjf6TaMy3J2gjxeo6wErFzzy9Zhwje/RBT9SVXdp+0DsDuGNQHbn9YETexapKPPcwg==
-Received: from BN9PR03CA0173.namprd03.prod.outlook.com (2603:10b6:408:f4::28)
- by CH8PR04MB994550.namprd04.prod.outlook.com (2603:10b6:610:373::17) with
+ bh=hLMTyz3XZg4YAf4wpkPUetkHjrbjFWk5SOmllKgLgrQ=;
+ b=X444IijHDL8cZ+cD30RzEoy+BiUbgpHl0X/MxN4LuHAUb/eiQXhA1WASz3rPQZLXAVZ3BAtNu00NLpCWkC2vF82noK6GiVUgUx6/GQcRv/OD6tKiHU1S2tT+bEVtfPqXdz3/jrHzA6+UcoHc6h8YxDD7BGPmqErU78OxvggeSAcTKUNTWeIiVR9QGlbfX6kumkxSjScc9On3oOSywtUyEOMWWMy+zWQVLmJFoEwWDm9tinnBjuYwB7aBqqjiBPkCb1ZCXuneIq+IQkJicFpjcoPjW3iDLtEkgSFLbHqATviMqiIMEnEGY/YUQX056uahHZxGCpZM1hIC5VF4KrrBWg==
+Received: from SJ0PR13CA0220.namprd13.prod.outlook.com (2603:10b6:a03:2c1::15)
+ by EAYPR04MB10186.namprd04.prod.outlook.com (2603:10b6:303:2c9::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.12; Tue, 13 Oct
- 2026 17:48:53 +0000
-Received: from BN2PEPF000044AB.namprd04.prod.outlook.com
- (2603:10b6:408:f4:cafe::98) by BN9PR03CA0173.outlook.office365.com
- (2603:10b6:408:f4::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.496.5 via Frontend Transport; Tue, 13
- Oct 2026 17:48:52 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.23; Tue, 13 Oct
+ 2026 17:49:14 +0000
+Received: from SJ1PEPF00002317.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c1:cafe::79) by SJ0PR13CA0220.outlook.office365.com
+ (2603:10b6:a03:2c1::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.522.4 via Frontend Transport; Tue, 13
+ Oct 2026 17:49:14 +0000
 X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
  is 192.86.86.210) smtp.mailfrom=rambus.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=rambus.com;
@@ -48,12 +49,12 @@ Received-SPF: Pass (protection.outlook.com: domain of rambus.com designates
  192.86.86.210 as permitted sender) receiver=protection.outlook.com;
  client-ip=192.86.86.210; helo=hqxsv-psmtppxy02.rambus.com; pr=C
 Received: from hqxsv-psmtppxy02.rambus.com (192.86.86.210) by
- BN2PEPF000044AB.mail.protection.outlook.com (10.167.243.106) with Microsoft
+ SJ1PEPF00002317.mail.protection.outlook.com (10.167.242.171) with Microsoft
  SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.21.522.6
- via Frontend Transport; Tue, 13 Oct 2026 17:48:52 +0000
+ via Frontend Transport; Tue, 13 Oct 2026 17:49:14 +0000
 Received: from hqxsv-cmdev3-aousherovitch.rambus.com (hqn-lb-int-float.rambus.com [10.12.20.20])
-	by hqxsv-psmtppxy02.rambus.com (Postfix) with ESMTP id AFDE7180174C;
-	Tue, 13 Oct 2026 17:48:51 +0000 (UTC)
+	by hqxsv-psmtppxy02.rambus.com (Postfix) with ESMTP id 8BD8F180175C;
+	Tue, 13 Oct 2026 17:49:14 +0000 (UTC)
 From: Alex Ousherovitch <aousherovitch@rambus.com>
 To: Alex Ousherovitch <aousherovitch@rambus.com>,
 	Conor Dooley <conor+dt@kernel.org>,
@@ -70,10 +71,12 @@ Cc: devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Thi Nguyen <thin@rambus.com>
-Subject: [PATCH 0/5] crypto: cmh - add Rambus CryptoManager Hub core driver and AES
-Date: Tue, 13 Oct 2026 10:48:42 -0700
-Message-ID: <20261013174847.2192609-1-aousherovitch@rambus.com>
+Subject: [PATCH 3/5] crypto: cmh - add key/datastore infrastructure
+Date: Tue, 13 Oct 2026 10:48:45 -0700
+Message-ID: <20261013174847.2192609-4-aousherovitch@rambus.com>
 X-Mailer: git-send-email 2.43.7
+In-Reply-To: <20261013174847.2192609-1-aousherovitch@rambus.com>
+References: <20261013174847.2192609-1-aousherovitch@rambus.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -83,195 +86,774 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044AB:EE_|CH8PR04MB994550:EE_
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002317:EE_|EAYPR04MB10186:EE_
 Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: f78e077c-ae5e-40b4-f23d-08df29523ea8
+X-MS-Office365-Filtering-Correlation-Id: 33029f93-d4ef-4240-a3b3-08df29524be4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700016|23010399003|7416014|82310400026|1800799024|11063799006|56012099006|261009221227099003|261009223027099003|10067099003|18002099003|6133799003|3023799007;
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700016|23010399003|11063799006|22082099003|56012099006|18002099003|6133799003|261009223027099003|3023799007|10067099003;
 X-Microsoft-Antispam-Message-Info:
-	pp71fHAJZH8CG/gheShrErFdzxAf5UPYxGNcXYhLHDwXWgtAlNhdyYi9+TVzmLkfRRTr+ilg3sCr52xZXATOvQnhHlYhaeK/1ow4jKYsVkBDjEUQqIkuM2LpPxcDGoOmNW8XofSvWoA0H0JChKbanMPPTGCwp+9RFdFUo+3+hR4jqrMHPxNdcGRERLMM49JzDCAshcqv0B20+l+gpbOzgGjWkmW6OkET2kA5NIYrapTRV7ZeRJmuS9CvgIvbJljZYt7zFvta5dp2uhrYyHyx/PoIYAtAIvve4MlGuHVZnoLvEjDhVxSTr4bGSzhWmVB7+kK04KLZfNSpFQtZKaIIimCfsWGVwiCdUxAUcd68L5OxJjAxrZO8SssYsHsdznhTXDkdKmGA888RhwTcE8F/m+nbEQXZghP5hDKOrPSSl7aKpTBRmn7cQmMZgQCjXrQ9u+rJHcKnsciBeV79GpAAAyBiiOAPSOe+drqFsrk1MrsPk2A8CxDU6/paAuTIH8UfIF6K9Z9TzUdX+is5iCpo2gj/2OkrfnIcEZR09ch++QJnWQJPPe9szsKNLcQ/UapfYZZ1mgr5IKPW1wNAtz16qU/fFCmMtsP8SfmnHc0I0XMPtsPndM0+vQAzycpbwPUc3sUiJDnQnPrOT8/LcSM4Gw==
+	6Gd+9XBuZYxIgtOSFgdmyI8x2cAiwgmRYSgiZM1YP+6jf6yXROqmNgDE91+M5C2cBuZ+wkUFacM0cjGweOnk2f1uuwNyQcpj9QCsvycwwz/I0BcGvcuNFwiAOTZa0yXFlf7Z3PiMcW0Q0xzPW+II0Dj53M/h1j3nPvo26FQO9mj5bS0IOT5GmDcPvQKK4TfF0G9xulSA4fWnRE/CcWohfSEiuRtrwPgiqzoWx5mDE8XqkABmt1IwchyJS2HY41nMTZmasVMyinWR1128DZ8dwiNxwS7PoyoVGtw6gF4L+ZfXkAA97yO+MXVsq1rlC0aMLqVWfKcffKi2EHS8QP9A+7ZupeNeBchzgHsa1zUx6gWse4IdNy01gTIVxgV4Vfyp79afQInhvyKtHnhd0/flBPXbpfpOktdORPJgltrB+zbUl0/QTF4uknwNX5tmIzcYl/xvTA0xcMd0Vpp2uFA36Eu+rBuzUBFQcQt+yg0BB+rCxniC2MRQlYucU4YaiJJnzBRgjmw8bkQNqlJpovItwjw0GEajMjKNyhOP2bDMmVgHIJveNXEfER8VVZpatEjfm9VnBXxbct1iaxbnhu4ucwL4GKVbhEpWpLmhtoCsKzHwzfC4GFKscR9Cav0oamNb+PaX0TBQ4fo47Uk6qSsdegsITx1uGeN0DN/w8isRAEzmDhOhgr94Jz1oC3q0utkVjE1Q7UuKbPSPj21B3z8j8Q==
 X-Forefront-Antispam-Report:
-	CIP:192.86.86.210;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:hqxsv-psmtppxy02.rambus.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700016)(23010399003)(7416014)(82310400026)(1800799024)(11063799006)(56012099006)(261009221227099003)(261009223027099003)(10067099003)(18002099003)(6133799003)(3023799007);DIR:OUT;SFP:1102;
+	CIP:192.86.86.210;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:hqxsv-psmtppxy02.rambus.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700016)(23010399003)(11063799006)(22082099003)(56012099006)(18002099003)(6133799003)(261009223027099003)(3023799007)(10067099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	vqgn0mciIzYuCEe9ji5touMc3olSsDU1cVct9tpbS9Y8oF0+/Oe1AbY0TdjNZcr+r1s2vcvL7UeLYXMfDl4fzHa5Z7mu4cUxQ627kh1jd0WCNaUgRLlnKqTKE9BruBbGuyHAqbXjJl/93Y85807NCh58TQlCP6s/KJZzIQe0n/ih7y1Dd4G2G5vH2CmouIr11ointoY9Xa4S/qD9mJLSgxL8uJF0VZVkbBKAhLQr+RV3EXOankXCx80PY3/SS9rULU5txtBDpiwrqiZzUWNiqFV4eioT3huhVGBOjHIhTRm9F4a/eTgcGZ7GxEgu+8Q1GGK5IEM0Onue2Lz3y+pBZW4+mMInekbJqGlUUKIpssvXnROfxmyRulBOiIFdT1jXmvrvDVc3HEm9K40bFN7gzuwd205NeLuEruMIEEmZjfdEmB8auUJ+8VushTv3wsdx
+	+TN7IZ3iIVHvFkNxZQ1pYHf73Wtjr27mHQwe/rKyIeax2fwpwJ+nz5m7AYgPkmKkGt0qzn/0P7rJTfLD2IzhSTaDlgFh+ovZJ1wXCs/z0lVpqJJTw5TjHK4G53KZmo/lbklHBBB7nYcsGpIPDyhwfuGuM1kBs17uwGvvlnL1rZqyll/ZGr6TejyKDc3fnkX7ZwuVp++XuCIgbPZdx2QYj6EiUWCt1NEuryQrndEd3VtsfRsTJJ0GlyVpPGl6YO+TeMxzhwgrX2ei39HZTtdhfUaeN3ZnELGmHBz3Q5cuGVI9T3Tu44cAnjmFhK4HUXSBMRamBdsKSupviaKyHQw08XYwUjYEofUO309GlM4h5AFMO4oESx8uBgaP+wXX2v4YXFCpJC1dsG1o/AsWpdWxW5MgegyBmzMtMll0B7SVloiGLMkjztwyfZd6P43LociV
 X-OriginatorOrg: rambus.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2026 17:48:52.3539
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2026 17:49:14.6751
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f78e077c-ae5e-40b4-f23d-08df29523ea8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33029f93-d4ef-4240-a3b3-08df29524be4
 X-MS-Exchange-CrossTenant-Id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=bd0ba799-c2b9-413c-9c56-5d1731c4827c;Ip=[192.86.86.210];Helo=[hqxsv-psmtppxy02.rambus.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044AB.namprd04.prod.outlook.com
+	SJ1PEPF00002317.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH8PR04MB994550
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: EAYPR04MB10186
 
-This is the first of a short, incremental set of submissions adding
-support for the Rambus CryptoManager Hub (CMH), a hardware cryptographic
-accelerator accessed through a mailbox-based VCQ (Virtual Command Queue)
-interface.  To keep each posting small and independently reviewable, the
-driver is submitted in self-contained parts; this first series adds the
-core platform driver, the shared key/datastore layer and the AES
-transforms (plus the device-tree binding and the MAINTAINERS entry).  AES
-is the first and least-problematic algorithm family, so the core has a
-user and the VCQ/DMA/completion data path is reviewable end to end.
-Later series add the remaining symmetric ciphers (SM4, ChaCha20-Poly1305)
-and the hwrng, the hashes and MACs, and finally the asymmetric and
-post-quantum algorithms together with the /dev/cmh_mgmt management
-interface.
+Add the CMH key and datastore (system object) layer shared by the
+algorithm drivers.  cmh_sys.c manages CMH system objects (allocate and
+free datastore slots); cmh_key.c stages a raw key into a per-transform
+context and DMA-maps it for the lifetime of the transform.
 
-The core driver binds the device, parses its device-tree description,
-sets up DMA, the mailbox queue interface and the transaction manager,
-and exposes sysfs/debugfs instrumentation.  The key/datastore patch adds
-the key provisioning and system-object layer that the AES driver in this
-series, and the algorithm drivers in the following series, build on.
+These are used by the symmetric, hash/MAC and asymmetric algorithm
+drivers that follow, and by the /dev/cmh_mgmt ioctl device.  No crypto
+API algorithm is registered by this patch.
 
-The transaction manager runs as a kthread that packs VCQ entries, maps
-DMA, and submits to the least-loaded mailbox; completion is handled by
-per-mailbox threaded IRQs.  The data path is asynchronous: requests
-return -EINPROGRESS and the driver honors CRYPTO_TFM_REQ_MAY_BACKLOG for
-queue-full backpressure.  The CMH eSW is loaded independently by the
-hardware before probe; the driver loads no firmware.
-
-The CMH is a platform device matched via device tree (compatible
-"rambus,cmh-v1030").  Following the inside-secure,eip93 binding model
-and the DT maintainer's guidance, the schema requires a SoC-specific
-compatible ahead of the IP fallback and therefore carries no example.
-
-Public hardware documentation:
-  Product brief: https://go.rambus.com/ch-7xx-and-cc-7xx-product-brief
-  No public datasheets are currently available.  The driver was
-  developed against the Rambus CryptoManager Hub Hardware Reference
-  Manual (Rambus Inc. confidential).  Detailed hardware reference is
-  available under NDA from Rambus Inc.; contact the maintainers listed
-  in MAINTAINERS for access during review.
-
-Developed against Herbert Xu's cryptodev tree.  checkpatch.pl --strict,
-sparse (C=2) and a W=1 -Werror build are clean, and dtschema's
-dt-doc-validate accepts the binding.  Exercised on riscv64 and arm64 --
-QEMU with the CMH hardware model and a Xilinx VMK180 FPGA with the CMH
-IP -- under lockdep/PROVE_LOCKING, DEBUG_OBJECTS,
-KASAN/UBSAN/KMEMLEAK/KFENCE and (arm64) KCSAN with no findings;
-worst-case stack stays under 1 KB.
-
-Alex Ousherovitch (5):
-  dt-bindings: crypto: add Rambus CryptoManager Hub
-  crypto: cmh - add core platform driver
-  crypto: cmh - add key/datastore infrastructure
-  crypto: cmh - add AES skcipher/aead/cmac
-  MAINTAINERS: add Rambus CryptoManager Hub (CMH)
-
- Documentation/ABI/testing/debugfs-driver-cmh  |  171 ++
- Documentation/ABI/testing/sysfs-driver-cmh    |   67 +
- Documentation/crypto/device_drivers/cmh.rst   |  340 +++
- Documentation/crypto/device_drivers/index.rst |    1 +
- .../bindings/crypto/rambus,cmh-v1030.yaml     |  144 ++
- .../devicetree/bindings/vendor-prefixes.yaml  |    2 +
- MAINTAINERS                                   |   13 +
- drivers/crypto/Kconfig                        |    1 +
- drivers/crypto/Makefile                       |    1 +
- drivers/crypto/cmh/Kconfig                    |   62 +
- drivers/crypto/cmh/Makefile                   |   30 +
- drivers/crypto/cmh/cmh_aes.c                  |  755 ++++++
- drivers/crypto/cmh/cmh_aes_aead.c             | 1013 ++++++++
- drivers/crypto/cmh/cmh_aes_cmac.c             |  476 ++++
- drivers/crypto/cmh/cmh_config.c               |  619 +++++
- drivers/crypto/cmh/cmh_debugfs.c              |  307 +++
- drivers/crypto/cmh/cmh_dma.c                  |  482 ++++
- drivers/crypto/cmh/cmh_key.c                  |  119 +
- drivers/crypto/cmh/cmh_main.c                 |  394 +++
- drivers/crypto/cmh/cmh_mqi.c                  |  344 +++
- drivers/crypto/cmh/cmh_rh.c                   | 1211 +++++++++
- drivers/crypto/cmh/cmh_sys.c                  |  376 +++
- drivers/crypto/cmh/cmh_sysfs.c                |  108 +
- drivers/crypto/cmh/cmh_txn.c                  | 2235 +++++++++++++++++
- drivers/crypto/cmh/include/cmh.h              |   24 +
- drivers/crypto/cmh/include/cmh_aes.h          |   24 +
- drivers/crypto/cmh/include/cmh_aes_abi.h      |   98 +
- drivers/crypto/cmh/include/cmh_ccp_abi.h      |  108 +
- drivers/crypto/cmh/include/cmh_config.h       |  105 +
- drivers/crypto/cmh/include/cmh_debugfs.h      |   93 +
- drivers/crypto/cmh/include/cmh_dma.h          |  249 ++
- drivers/crypto/cmh/include/cmh_drbg_abi.h     |   67 +
- drivers/crypto/cmh/include/cmh_eac_abi.h      |   44 +
- drivers/crypto/cmh/include/cmh_hc_abi.h       |  162 ++
- drivers/crypto/cmh/include/cmh_hcq_abi.h      |  222 ++
- drivers/crypto/cmh/include/cmh_key.h          |   73 +
- drivers/crypto/cmh/include/cmh_kic_abi.h      |   77 +
- drivers/crypto/cmh/include/cmh_mqi.h          |   35 +
- drivers/crypto/cmh/include/cmh_pke_abi.h      |  272 ++
- drivers/crypto/cmh/include/cmh_qse_abi.h      |  201 ++
- drivers/crypto/cmh/include/cmh_registers.h    |  161 ++
- drivers/crypto/cmh/include/cmh_rh.h           |   93 +
- drivers/crypto/cmh/include/cmh_sm3_abi.h      |   79 +
- drivers/crypto/cmh/include/cmh_sm4_abi.h      |  101 +
- drivers/crypto/cmh/include/cmh_sys.h          |  111 +
- drivers/crypto/cmh/include/cmh_sys_abi.h      |  148 ++
- drivers/crypto/cmh/include/cmh_sysfs.h        |   14 +
- drivers/crypto/cmh/include/cmh_txn.h          |  493 ++++
- drivers/crypto/cmh/include/cmh_vcq.h          |  288 +++
- 49 files changed, 12613 insertions(+)
- create mode 100644 Documentation/ABI/testing/debugfs-driver-cmh
- create mode 100644 Documentation/ABI/testing/sysfs-driver-cmh
- create mode 100644 Documentation/crypto/device_drivers/cmh.rst
- create mode 100644 Documentation/devicetree/bindings/crypto/rambus,cmh-v1030.yaml
- create mode 100644 drivers/crypto/cmh/Kconfig
- create mode 100644 drivers/crypto/cmh/Makefile
- create mode 100644 drivers/crypto/cmh/cmh_aes.c
- create mode 100644 drivers/crypto/cmh/cmh_aes_aead.c
- create mode 100644 drivers/crypto/cmh/cmh_aes_cmac.c
- create mode 100644 drivers/crypto/cmh/cmh_config.c
- create mode 100644 drivers/crypto/cmh/cmh_debugfs.c
- create mode 100644 drivers/crypto/cmh/cmh_dma.c
- create mode 100644 drivers/crypto/cmh/cmh_key.c
- create mode 100644 drivers/crypto/cmh/cmh_main.c
- create mode 100644 drivers/crypto/cmh/cmh_mqi.c
- create mode 100644 drivers/crypto/cmh/cmh_rh.c
- create mode 100644 drivers/crypto/cmh/cmh_sys.c
- create mode 100644 drivers/crypto/cmh/cmh_sysfs.c
- create mode 100644 drivers/crypto/cmh/cmh_txn.c
- create mode 100644 drivers/crypto/cmh/include/cmh.h
- create mode 100644 drivers/crypto/cmh/include/cmh_aes.h
- create mode 100644 drivers/crypto/cmh/include/cmh_aes_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_ccp_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_config.h
- create mode 100644 drivers/crypto/cmh/include/cmh_debugfs.h
- create mode 100644 drivers/crypto/cmh/include/cmh_dma.h
- create mode 100644 drivers/crypto/cmh/include/cmh_drbg_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_eac_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_hc_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_hcq_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_key.h
- create mode 100644 drivers/crypto/cmh/include/cmh_kic_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_mqi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_pke_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_qse_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_registers.h
- create mode 100644 drivers/crypto/cmh/include/cmh_rh.h
- create mode 100644 drivers/crypto/cmh/include/cmh_sm3_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_sm4_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_sys.h
- create mode 100644 drivers/crypto/cmh/include/cmh_sys_abi.h
- create mode 100644 drivers/crypto/cmh/include/cmh_sysfs.h
- create mode 100644 drivers/crypto/cmh/include/cmh_txn.h
- create mode 100644 drivers/crypto/cmh/include/cmh_vcq.h
-
-
+Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
+Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
 ---
+ drivers/crypto/cmh/Makefile          |   4 +-
+ drivers/crypto/cmh/cmh_key.c         | 119 +++++++++
+ drivers/crypto/cmh/cmh_sys.c         | 376 +++++++++++++++++++++++++++
+ drivers/crypto/cmh/include/cmh_key.h |  73 ++++++
+ drivers/crypto/cmh/include/cmh_sys.h | 111 ++++++++
+ 5 files changed, 682 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/cmh/cmh_key.c
+ create mode 100644 drivers/crypto/cmh/cmh_sys.c
+ create mode 100644 drivers/crypto/cmh/include/cmh_key.h
+ create mode 100644 drivers/crypto/cmh/include/cmh_sys.h
 
-The CMH driver was first posted as a single series; it is now
-split into smaller, independently reviewable series per maintainer
-feedback.  Earlier single-series postings:
-  v1: https://lore.kernel.org/linux-crypto/20260625173328.1140487-1-skrishnamoorthy@rambus.com/
-  v2: https://lore.kernel.org/linux-crypto/20260709203037.1884436-1-skrishnamoorthy@rambus.com/
-  v3: https://lore.kernel.org/linux-crypto/20260806195519.2703224-1-skrishnamoorthy@rambus.com/
-  v4: https://lore.kernel.org/linux-crypto/20260825221539.255951-1-aousherovitch@rambus.com/
-  v5: https://lore.kernel.org/linux-crypto/20260917225929.2494111-1-aousherovitch@rambus.com/
-base-commit: 9695df3b1db4ac4534274d38ee16e3b9b0bf910e
-
+diff --git a/drivers/crypto/cmh/Makefile b/drivers/crypto/cmh/Makefile
+index 742e65e3917e..485247405cb2 100644
+--- a/drivers/crypto/cmh/Makefile
++++ b/drivers/crypto/cmh/Makefile
+@@ -12,7 +12,9 @@ cmh-y := \
+ 	cmh_txn.o \
+ 	cmh_rh.o \
+ 	cmh_dma.o \
+-	cmh_sysfs.o
++	cmh_sysfs.o \
++	cmh_sys.o \
++	cmh_key.o
+ 
+ ccflags-y += -I$(src)/include
+ 
+diff --git a/drivers/crypto/cmh/cmh_key.c b/drivers/crypto/cmh/cmh_key.c
+new file mode 100644
+index 000000000000..b74187e09870
+--- /dev/null
++++ b/drivers/crypto/cmh/cmh_key.c
+@@ -0,0 +1,119 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- Dual Key Path Implementation
++ *
++ * Two key provisioning paths are supported:
++ *
++ * Raw key:  key bytes -> stored in tfm context ->
++ *   SYS_CMD_WRITE(SYS_REF_TEMP) packed into every crypto VCQ.
++ *   The raw key buffer is DMA-mapped once at setkey time and remains
++ *   mapped for the lifetime of the transform (unmapped in destroy).
++ *
++ * Raw key DMA lifetime rationale
++ * ------------------------------
++ * Raw keys are DMA-mapped at setkey time and the mapping persists
++ * until the transform is destroyed (cmh_key_destroy).  This is a
++ * deliberate design choice, consistent with upstream HW crypto
++ * drivers (CAAM, ccree, CCP) that also map keys at setkey for
++ * transform-lifetime reuse:
++ *
++ *   - The Linux crypto framework expects setkey to prepare the
++ *     transform for repeated encrypt/decrypt calls.  Remapping the
++ *     same key on every request would add DMA API overhead per crypto
++ *     operation with no security benefit.
++ *   - On destroy, kfree_sensitive() scrubs the key buffer and the
++ *     DMA mapping is released.  For key-by-ID (persistent), the
++ *     per-MBX ref cache is zeroed with memzero_explicit().
++ *   - No key material is ever logged; dev_dbg() messages only show
++ *     CIDs (content identifiers), not key bytes.
++ *
++ * Hardware-required behaviors (not driver policy)
++ * ------------------------------------------------
++ * - SYS_REF_TEMP lifetime:  the eSW firmware reclaims temporary
++ *   datastore objects when the mailbox slot is reused.  This is a
++ *   hardware constraint; the driver packs SYS_CMD_WRITE into every
++ *   VCQ to re-provision the raw key for each operation.
++ * - Mailbox flush (SYS_CMD_FLUSH):  reclaims temp-stack space on the
++ *   target MBX.  Required by HW to prevent temp-stack exhaustion
++ *   across multi-VCQ operations.
++ */
++
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++
++#include "cmh_key.h"
++#include "cmh_sys.h"
++#include "cmh_txn.h"
++#include "cmh_dma.h"
++#include "cmh_sys_abi.h"
++
++/**
++ * cmh_key_setkey_raw() - Store a raw key in the key context
++ * @ctx: Key context to populate
++ * @key: Pointer to the raw key bytes
++ * @keylen: Length of @key in bytes
++ * @core_id: Logical core ID for SYS_TYPE tagging
++ *
++ * Duplicates the raw key, DMA-maps the copy for the lifetime of the
++ * transform, and stores the mapping in @ctx.  Any previously held key
++ * is destroyed first.
++ *
++ * The DMA mapping persists until cmh_key_destroy() is called (typically
++ * from the algorithm .exit_tfm callback).  This avoids per-request DMA
++ * mapping overhead and matches the setkey-to-destroy lifetime model used
++ * by other upstream HW crypto drivers (CAAM, ccree, CCP).  The key
++ * buffer is freed via kfree_sensitive() on destroy.
++ *
++ * Return: 0 on success, negative errno on failure.
++ */
++int cmh_key_setkey_raw(struct cmh_key_ctx *ctx, const u8 *key,
++		       u32 keylen, u32 core_id)
++{
++	dma_addr_t dma;
++	u8 *copy;
++
++	if (!keylen || !key)
++		return -EINVAL;
++
++	copy = kmemdup(key, keylen, GFP_KERNEL);
++	if (!copy)
++		return -ENOMEM;
++
++	/* Pre-map for the lifetime of the transform */
++	dma = cmh_dma_map_single(copy, keylen, DMA_TO_DEVICE);
++	if (cmh_dma_map_error(dma)) {
++		kfree_sensitive(copy);
++		return -ENOMEM;
++	}
++
++	/* Clean up any previous key */
++	cmh_key_destroy(ctx);
++
++	ctx->mode = CMH_KEY_RAW;
++	ctx->raw.data = copy;
++	ctx->raw.len = keylen;
++	ctx->raw.dma = dma;
++	ctx->raw.sys_type = SYS_TYPE_SET(SYS_TYPE_FLAG_PT, core_id);
++
++	return 0;
++}
++
++/**
++ * cmh_key_destroy() - Destroy and zero-fill a key context
++ * @ctx: Key context to destroy
++ *
++ * For raw keys, unmaps the DMA buffer and securely frees the key material.
++ * Resets the key mode to CMH_KEY_NONE.
++ */
++void cmh_key_destroy(struct cmh_key_ctx *ctx)
++{
++	if (ctx->mode == CMH_KEY_RAW && ctx->raw.data) {
++		cmh_dma_unmap_single(ctx->raw.dma, ctx->raw.len,
++				     DMA_TO_DEVICE);
++		kfree_sensitive(ctx->raw.data);
++		memzero_explicit(&ctx->raw, sizeof(ctx->raw));
++	}
++	ctx->mode = CMH_KEY_NONE;
++}
+diff --git a/drivers/crypto/cmh/cmh_sys.c b/drivers/crypto/cmh/cmh_sys.c
+new file mode 100644
+index 000000000000..b01d058e6d89
+--- /dev/null
++++ b/drivers/crypto/cmh/cmh_sys.c
+@@ -0,0 +1,376 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- SYS Core VCQ Builders
++ *
++ * VCQ builder functions for SYS core datastore commands.  Each function
++ * populates a single vcq_cmd slot.  Callers (cmh_mgmt.c, cmh_key.c)
++ * assemble complete VCQs by combining header + command(s) + flush,
++ * then submit via cmh_tm_submit_sync().
++ *
++ * Hardware-required datastore semantics
++ * --------------------------------------
++ * The commands below (NEW, WRITE, DATA, FIND, DELETE, FLUSH) are
++ * direct mappings of the eSW firmware SYS core command set.  The
++ * eSW maintains per-mailbox datastore namespaces with two object
++ * classes:
++ *
++ *   SYS_REF_TEMP   -- Temporary objects.  Lifetime is scoped to the
++ *                      current mailbox slot; reclaimed automatically
++ *                      when the slot is reused or on explicit FLUSH.
++ *                      Used for raw-key provisioning on every VCQ.
++ *
++ *   SYS_REF_PERSIST -- Persistent objects.  Survive across slots;
++ *                      require explicit DELETE to reclaim.  Identified
++ *                      by a 64-bit Content ID (CID) and resolved to
++ *                      a per-MBX ref via SYS_CMD_FIND.
++ *
++ * These semantics are hardware requirements, not driver policy.
++ * The per-MBX temp-stack and per-MBX ref namespace are eSW firmware
++ * design constraints that cannot be changed by the kernel driver.
++ */
++
++#include <linux/string.h>
++
++#include "cmh_sys.h"
++
++/**
++ * vcq_add_sys_flush() - Build a SYS_FLUSH VCQ command
++ * @slot: VCQ command slot to populate
++ */
++void vcq_add_sys_flush(struct vcq_cmd *slot)
++{
++	vcq_add_flush(slot, CORE_ID_SYS);
++}
++
++/**
++ * vcq_add_sys_new() - Build a SYS_NEW VCQ command
++ * @slot: VCQ command slot to populate
++ * @cid: Content identifier for the new datastore object
++ * @ref_dma: DMA address of the object reference buffer
++ * @len: Length of the object data in bytes
++ */
++void vcq_add_sys_new(struct vcq_cmd *slot, u64 cid, u64 ref_dma, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_NEW);
++	slot->hwc.sys.cmd_new.cid = cid;
++	slot->hwc.sys.cmd_new.ref = ref_dma;
++	slot->hwc.sys.cmd_new.len = len;
++}
++
++/**
++ * vcq_add_sys_write() - Build a SYS_WRITE VCQ command
++ * @slot: VCQ command slot to populate
++ * @ref: Datastore object reference handle
++ * @src_dma: DMA address of source data buffer
++ * @wrap_key: Wrapping key reference (0 if none)
++ * @len: Length of data to write in bytes
++ * @sys_type: Datastore object type identifier
++ */
++void vcq_add_sys_write(struct vcq_cmd *slot, u64 ref, u64 src_dma,
++		       u64 wrap_key, u32 len, u32 sys_type)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_WRITE);
++	slot->hwc.sys.cmd_write.ref = ref;
++	slot->hwc.sys.cmd_write.src = src_dma;
++	slot->hwc.sys.cmd_write.key = wrap_key;
++	slot->hwc.sys.cmd_write.len = len;
++	slot->hwc.sys.cmd_write.type = sys_type;
++}
++
++/**
++ * vcq_add_sys_read() - Build a SYS_READ VCQ command
++ * @slot: VCQ command slot to populate
++ * @ref: Datastore object reference handle
++ * @dst_dma: DMA address of destination buffer
++ * @wrap_key: Wrapping key reference (0 if none)
++ * @len: Length of data to read in bytes
++ */
++void vcq_add_sys_read(struct vcq_cmd *slot, u64 ref, u64 dst_dma,
++		      u64 wrap_key, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_READ);
++	slot->hwc.sys.cmd_read.ref = ref;
++	slot->hwc.sys.cmd_read.dst = dst_dma;
++	slot->hwc.sys.cmd_read.key = wrap_key;
++	slot->hwc.sys.cmd_read.len = len;
++}
++
++/**
++ * vcq_add_sys_data() - Build a SYS_DATA VCQ command
++ * @slot: VCQ command slot to populate
++ * @ref: Datastore object reference handle
++ * @dst_dma: DMA address of destination buffer
++ * @len: Length of data section to read in bytes
++ */
++void vcq_add_sys_data(struct vcq_cmd *slot, u64 ref, u64 dst_dma, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_DATA);
++	slot->hwc.sys.cmd_data.ref = ref;
++	slot->hwc.sys.cmd_data.dst = dst_dma;
++	slot->hwc.sys.cmd_data.len = len;
++}
++
++/**
++ * vcq_add_sys_find() - Build a SYS_FIND VCQ command
++ * @slot: VCQ command slot to populate
++ * @cid: Content identifier to search for
++ * @dst_dma: DMA address of destination buffer for result
++ * @len: Length of destination buffer in bytes
++ */
++void vcq_add_sys_find(struct vcq_cmd *slot, u64 cid, u64 dst_dma, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_FIND);
++	slot->hwc.sys.cmd_find.cid = cid;
++	slot->hwc.sys.cmd_find.dst = dst_dma;
++	slot->hwc.sys.cmd_find.len = len;
++}
++
++/**
++ * vcq_add_sys_list() - Build a SYS_LIST VCQ command
++ * @slot: VCQ command slot to populate
++ * @ref: Datastore object reference for enumeration start
++ * @dst_dma: DMA address of destination buffer for list
++ * @len: Length of destination buffer in bytes
++ */
++void vcq_add_sys_list(struct vcq_cmd *slot, u64 ref, u64 dst_dma, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_LIST);
++	slot->hwc.sys.cmd_list.ref = ref;
++	slot->hwc.sys.cmd_list.dst = dst_dma;
++	slot->hwc.sys.cmd_list.len = len;
++}
++
++/**
++ * vcq_add_sys_grant() - Build a SYS_GRANT VCQ command
++ * @slot: VCQ command slot to populate
++ * @ref: Datastore object reference handle
++ * @read: Read permission bitmask
++ * @write: Write permission bitmask
++ * @execute: Execute permission bitmask
++ */
++void vcq_add_sys_grant(struct vcq_cmd *slot, u64 ref, u64 read,
++		       u64 write, u64 execute)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_GRANT);
++	slot->hwc.sys.cmd_grant.ref = ref;
++	slot->hwc.sys.cmd_grant.read = read;
++	slot->hwc.sys.cmd_grant.write = write;
++	slot->hwc.sys.cmd_grant.execute = execute;
++}
++
++/**
++ * vcq_add_sys_export() - Build a SYS_EXPORT VCQ command
++ * @slot: VCQ command slot to populate
++ * @cid: Content identifier of object to export
++ * @dst_dma: DMA address of destination buffer for wrapped blob
++ * @wrap_key: Wrapping key reference for export
++ * @len: Length of destination buffer in bytes
++ */
++void vcq_add_sys_export(struct vcq_cmd *slot, u64 cid, u64 dst_dma,
++			u64 wrap_key, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_EXPORT);
++	slot->hwc.sys.cmd_export.cid = cid;
++	slot->hwc.sys.cmd_export.dst = dst_dma;
++	slot->hwc.sys.cmd_export.key = wrap_key;
++	slot->hwc.sys.cmd_export.len = len;
++}
++
++/**
++ * vcq_add_sys_import() - Build a SYS_IMPORT VCQ command
++ * @slot: VCQ command slot to populate
++ * @src_dma: DMA address of wrapped datastore blob to import
++ * @wrap_key: Wrapping key reference for unwrapping
++ * @len: Length of wrapped blob in bytes
++ */
++void vcq_add_sys_import(struct vcq_cmd *slot, u64 src_dma,
++			u64 wrap_key, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_IMPORT);
++	slot->hwc.sys.cmd_import.src = src_dma;
++	slot->hwc.sys.cmd_import.key = wrap_key;
++	slot->hwc.sys.cmd_import.len = len;
++}
++
++/* -- KIC Core VCQ Builders --------------------- */
++
++/**
++ * vcq_add_kic_hkdf1() - Build a KIC HKDF-Expand VCQ command
++ * @slot: VCQ command slot to populate
++ * @dst: Datastore reference for derived key output
++ * @base: Datastore reference for base key input
++ * @label_dma: DMA address of HKDF label/info buffer
++ * @key_len: Derived key length in bytes
++ * @label_len: Length of label buffer in bytes
++ * @type: Derived key datastore type
++ */
++void vcq_add_kic_hkdf1(struct vcq_cmd *slot, u64 dst, u64 base,
++		       u64 label_dma, u32 key_len, u32 label_len, u32 type)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_KIC, 0, 1, KIC_CMD_HKDF1);
++	slot->hwc.kic.cmd_hkdf1.dst = dst;
++	slot->hwc.kic.cmd_hkdf1.base = base;
++	slot->hwc.kic.cmd_hkdf1.label = label_dma;
++	slot->hwc.kic.cmd_hkdf1.llen = label_len;
++	slot->hwc.kic.cmd_hkdf1.len = key_len;
++	slot->hwc.kic.cmd_hkdf1.type = type;
++}
++
++/**
++ * vcq_add_kic_hkdf2() - Build a KIC HKDF-with-salt VCQ command
++ * @slot: VCQ command slot to populate
++ * @dst: Datastore reference for derived key output
++ * @base: Datastore reference for base key input
++ * @salt: Datastore reference for HKDF salt key
++ * @label_dma: DMA address of HKDF label/info buffer
++ * @key_len: Derived key length in bytes
++ * @label_len: Length of label buffer in bytes
++ * @type: Derived key datastore type
++ */
++void vcq_add_kic_hkdf2(struct vcq_cmd *slot, u64 dst, u64 base, u64 salt,
++		       u64 label_dma, u32 key_len, u32 label_len, u32 type)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_KIC, 0, 1, KIC_CMD_HKDF2);
++	slot->hwc.kic.cmd_hkdf2.dst = dst;
++	slot->hwc.kic.cmd_hkdf2.base = base;
++	slot->hwc.kic.cmd_hkdf2.salt = salt;
++	slot->hwc.kic.cmd_hkdf2.label = label_dma;
++	slot->hwc.kic.cmd_hkdf2.llen = label_len;
++	slot->hwc.kic.cmd_hkdf2.len = key_len;
++	slot->hwc.kic.cmd_hkdf2.type = type;
++}
++
++/**
++ * vcq_add_kic_aes_cmac_kdf() - Build a KIC AES-CMAC KDF VCQ command
++ * @slot: VCQ command slot to populate
++ * @out_key: Datastore reference for derived key output
++ * @base_key: Datastore reference for base key input
++ * @label_dma: DMA address of KDF label buffer
++ * @key_len: Derived key length in bytes
++ * @label_len: Length of label buffer in bytes
++ * @type: Derived key datastore type
++ */
++void vcq_add_kic_aes_cmac_kdf(struct vcq_cmd *slot, u64 out_key, u64 base_key,
++			      u64 label_dma, u32 key_len, u32 label_len,
++			      u32 type)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_KIC, 0, 1, KIC_CMD_AES_CMAC_KDF);
++	slot->hwc.kic.cmd_aes_cmac_kdf.base_key = base_key;
++	slot->hwc.kic.cmd_aes_cmac_kdf.out_key = out_key;
++	slot->hwc.kic.cmd_aes_cmac_kdf.label = label_dma;
++	slot->hwc.kic.cmd_aes_cmac_kdf.key_len = key_len;
++	slot->hwc.kic.cmd_aes_cmac_kdf.label_len = label_len;
++	slot->hwc.kic.cmd_aes_cmac_kdf.type = type;
++}
++
++/**
++ * vcq_add_kic_dkek_derive() - Build a KIC DKEK derivation VCQ command
++ * @slot: VCQ command slot to populate
++ * @out_key: Datastore reference for derived DKEK output
++ * @base_key: Datastore reference for base key input
++ * @host_id: Host identifier for key binding
++ * @metadata_dma: DMA address of derivation metadata buffer
++ * @metadata_len: Length of metadata buffer in bytes
++ */
++void vcq_add_kic_dkek_derive(struct vcq_cmd *slot, u64 out_key, u64 base_key,
++			     u32 host_id, u64 metadata_dma, u32 metadata_len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_KIC, 0, 1, KIC_CMD_DKEK_DERIVE);
++	slot->hwc.kic.cmd_dkek_derive.base_key = base_key;
++	slot->hwc.kic.cmd_dkek_derive.out_key = out_key;
++	slot->hwc.kic.cmd_dkek_derive.host_id = host_id;
++	slot->hwc.kic.cmd_dkek_derive.metadata = metadata_dma;
++	slot->hwc.kic.cmd_dkek_derive.metadata_len = metadata_len;
++}
++
++/* -- DRBG Core VCQ Builders -------------------- */
++
++/**
++ * vcq_add_drbg_reset() - Build a DRBG reset VCQ command
++ * @slot: VCQ command slot to populate
++ *
++ * Issues DRBG_CMD_RESET which clears the instantiated state, allowing
++ * a subsequent CONFIG to proceed without a double-instantiate error.
++ */
++void vcq_add_drbg_reset(struct vcq_cmd *slot)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_DRBG, 0, 1, DRBG_CMD_RESET);
++}
++
++/**
++ * vcq_add_drbg_config() - Build a DRBG configuration VCQ command
++ * @slot: VCQ command slot to populate
++ * @ratio: Entropy-to-output ratio
++ * @strength: Security strength in bits
++ */
++void vcq_add_drbg_config(struct vcq_cmd *slot, u32 ratio, u32 strength)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_DRBG, 0, 1, DRBG_CMD_CONFIG);
++	slot->hwc.drbg.cmd_config.entropy_ratio = ratio;
++	slot->hwc.drbg.cmd_config.security_strength = strength;
++}
++
++/**
++ * vcq_add_drbg_datastore() - Build a DRBG datastore setup VCQ command
++ * @slot: VCQ command slot to populate
++ * @ref: Datastore object reference handle
++ * @len: Length of datastore allocation in bytes
++ * @type: Datastore object type
++ */
++void vcq_add_drbg_datastore(struct vcq_cmd *slot, u64 ref, u32 len, u32 type)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_DRBG, 0, 1, DRBG_CMD_DATASTORE);
++	slot->hwc.drbg.cmd_datastore.ref = ref;
++	slot->hwc.drbg.cmd_datastore.len = len;
++	slot->hwc.drbg.cmd_datastore.type = type;
++}
++
++/* -- EAC Core VCQ Builder ---------------------- */
++
++/**
++ * vcq_add_eac_read() - Build an EAC read VCQ command
++ * @slot: VCQ command slot to populate
++ * @dst_dma: DMA address of destination buffer
++ * @len: Length of data to read in bytes
++ */
++void vcq_add_eac_read(struct vcq_cmd *slot, u64 dst_dma, u32 len)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_EAC, 0, 1, EAC_CMD_READ);
++	slot->hwc.eac.cmd_read.dst = dst_dma;
++	slot->hwc.eac.cmd_read.len = len;
++}
+diff --git a/drivers/crypto/cmh/include/cmh_key.h b/drivers/crypto/cmh/include/cmh_key.h
+new file mode 100644
+index 000000000000..6591f120a85e
+--- /dev/null
++++ b/drivers/crypto/cmh/include/cmh_key.h
+@@ -0,0 +1,73 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- Per-transform key context
++ *
++ * Per-transform key context used by all keyed crypto algorithms (AES,
++ * SM4, CCP, HMAC, KMAC).  Stores raw key bytes supplied via the crypto
++ * API .setkey() callback: the key is DMA-mapped once at setkey time and
++ * written to SYS_REF_TEMP in every VCQ.
++ *
++ * Each keyed algorithm driver embeds a struct cmh_key_ctx in its
++ * per-transform context and calls cmh_key_setkey_raw() from its
++ * .setkey() callback.
++ *
++ * Raw-key atomicity (SYS_REF_TEMP)
++ * ---------------------------------
++ * SYS_CMD_WRITE to SYS_REF_TEMP is packed into the same VCQ as the
++ * algorithm commands (AES_CMD_INIT, HC_CMD_HMAC, etc.).  SYS_REF_TEMP
++ * is per-MBX -- the CMH eSW allocates it in the tail of each mailbox's
++ * own VCQ buffer (mbx_alloc_temp), so concurrent raw-key requests on
++ * different MBXes do not interfere.
++ */
++
++#ifndef CMH_KEY_H
++#define CMH_KEY_H
++
++#include <linux/types.h>
++#include "cmh_config.h"
++#include "cmh_vcq.h"
++
++/* Key context mode */
++enum cmh_key_mode {
++	CMH_KEY_NONE = 0,	/* no key set yet */
++	CMH_KEY_RAW,		/* raw key bytes in memory */
++};
++
++/* Per-transform key context */
++struct cmh_key_ctx {
++	enum cmh_key_mode mode;
++	struct {
++		u8 *data;	/* kmemdup'd raw key bytes */
++		u32 len;	/* key length in bytes */
++		u32 sys_type;	/* SYS_TYPE_SET(flags, core_id) */
++		dma_addr_t dma;	/* pre-mapped DMA addr (DMA_TO_DEVICE) */
++	} raw;
++};
++
++/**
++ * cmh_key_setkey_raw() - Store raw key bytes in the transform context
++ * @ctx: Per-transform key context
++ * @key: Raw key bytes
++ * @keylen: Key length in bytes
++ * @core_id: Target algorithm core (e.g. CORE_ID_AES)
++ *
++ * SYS_TYPE_FLAG_PT is set so the written temp key
++ * can be read back as plaintext if needed.  The actual SYS_CMD_WRITE
++ * to SYS_REF_TEMP is deferred to each encrypt/decrypt VCQ, where it
++ * is packed inline for atomicity.
++ *
++ * Return: 0 on success, -ENOMEM on allocation failure.
++ */
++int cmh_key_setkey_raw(struct cmh_key_ctx *ctx, const u8 *key,
++		       u32 keylen, u32 core_id);
++
++/**
++ * cmh_key_destroy() - Free key resources
++ * @ctx: Per-transform key context
++ *
++ * Zeroises and frees the raw key buffer.
++ */
++void cmh_key_destroy(struct cmh_key_ctx *ctx);
++
++#endif /* CMH_KEY_H */
+diff --git a/drivers/crypto/cmh/include/cmh_sys.h b/drivers/crypto/cmh/include/cmh_sys.h
+new file mode 100644
+index 000000000000..47c19e2f72a9
+--- /dev/null
++++ b/drivers/crypto/cmh/include/cmh_sys.h
+@@ -0,0 +1,111 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- SYS Core VCQ Builders
++ *
++ * VCQ builder functions for SYS core commands (NEW, WRITE, READ,
++ * FIND, GRANT, DATA, EXPORT, IMPORT).  Each builder populates one
++ * vcq_cmd slot with the appropriate magic, command ID, and payload.
++ *
++ * Callers combine these with vcq_set_header() + vcq_add_flush()
++ * and submit via cmh_tm_submit_sync().
++ */
++
++#ifndef CMH_SYS_H
++#define CMH_SYS_H
++
++#include "cmh_vcq.h"
++
++void vcq_add_sys_new(struct vcq_cmd *slot, u64 cid, u64 ref_dma, u32 len);
++void vcq_add_sys_write(struct vcq_cmd *slot, u64 ref, u64 src_dma,
++		       u64 wrap_key, u32 len, u32 sys_type);
++void vcq_add_sys_read(struct vcq_cmd *slot, u64 ref, u64 dst_dma,
++		      u64 wrap_key, u32 len);
++void vcq_add_sys_data(struct vcq_cmd *slot, u64 ref, u64 dst_dma, u32 len);
++void vcq_add_sys_find(struct vcq_cmd *slot, u64 cid, u64 dst_dma, u32 len);
++void vcq_add_sys_list(struct vcq_cmd *slot, u64 ref, u64 dst_dma, u32 len);
++void vcq_add_sys_grant(struct vcq_cmd *slot, u64 ref, u64 read,
++		       u64 write, u64 execute);
++void vcq_add_sys_export(struct vcq_cmd *slot, u64 cid, u64 dst_dma,
++			u64 wrap_key, u32 len);
++void vcq_add_sys_import(struct vcq_cmd *slot, u64 src_dma,
++			u64 wrap_key, u32 len);
++
++/* KIC core VCQ builders */
++void vcq_add_kic_hkdf1(struct vcq_cmd *slot, u64 dst, u64 base,
++		       u64 label_dma, u32 key_len, u32 label_len, u32 type);
++void vcq_add_kic_hkdf2(struct vcq_cmd *slot, u64 dst, u64 base, u64 salt,
++		       u64 label_dma, u32 key_len, u32 label_len, u32 type);
++void vcq_add_kic_aes_cmac_kdf(struct vcq_cmd *slot, u64 out_key, u64 base_key,
++			      u64 label_dma, u32 key_len, u32 label_len,
++			      u32 type);
++void vcq_add_kic_dkek_derive(struct vcq_cmd *slot, u64 out_key, u64 base_key,
++			     u32 host_id, u64 metadata_dma, u32 metadata_len);
++
++/* DRBG core VCQ builders */
++void vcq_add_drbg_reset(struct vcq_cmd *slot);
++void vcq_add_drbg_config(struct vcq_cmd *slot, u32 ratio, u32 strength);
++void vcq_add_drbg_datastore(struct vcq_cmd *slot, u64 ref, u32 len, u32 type);
++
++/* QSE core VCQ builders */
++void vcq_add_qse_flush(struct vcq_cmd *slot, u32 core_id);
++void vcq_add_qse_ml_kem_keygen(struct vcq_cmd *slot, u32 core_id, u32 k, u32 flags,
++			       u64 seed, u64 z, u64 ek, u64 dk, u32 dk_type,
++			       bool masked);
++void vcq_add_qse_ml_kem_enc(struct vcq_cmd *slot, u32 core_id, u32 k, u32 flags,
++			    u64 coin, u64 ek, u64 ct, u64 ss, u32 ss_type,
++			    bool masked);
++void vcq_add_qse_ml_kem_dec(struct vcq_cmd *slot, u32 core_id, u32 k, u32 flags,
++			    u64 ct, u64 dk, u64 ss, u32 ss_type,
++			    bool masked);
++void vcq_add_qse_ml_dsa_keygen(struct vcq_cmd *slot, u32 core_id, u32 mode, u32 flags,
++			       u64 seed, u64 pk, u64 sk, u32 sk_type,
++			       bool masked);
++void vcq_add_qse_ml_dsa_sign(struct vcq_cmd *slot, u32 core_id, u32 mode, u32 flags,
++			     u64 rnd, u64 m, u64 sk, u64 sig, u32 mlen,
++			     bool masked);
++void vcq_add_qse_ml_dsa_verify(struct vcq_cmd *slot, u32 core_id, u32 mode, u32 flags,
++			       u64 m, u64 pk, u64 sig, u32 mlen);
++
++/* HCQ core VCQ builders */
++void vcq_add_hcq_flush(struct vcq_cmd *slot, u32 core_id);
++void vcq_add_hcq_slhdsa_keygen(struct vcq_cmd *slot, u32 core_id, u32 param_set,
++			       u32 seed_len, u32 pk_len, u32 sk_len,
++			       u64 seed, u64 pk, u64 sk, u32 sk_type);
++void vcq_add_hcq_slhdsa_sign(struct vcq_cmd *slot, u32 core_id, u32 param_set,
++			     u32 msg_len, u32 ctx_len,
++			     u64 add_random, u64 msg, u64 ctx,
++			     u64 sk, u64 sig);
++void vcq_add_hcq_slhdsa_sign_internal(struct vcq_cmd *slot, u32 core_id, u32 param_set,
++				      u32 msg_len, u64 add_random,
++				      u64 msg, u64 sk, u64 sig);
++void vcq_add_hcq_slhdsa_verify(struct vcq_cmd *slot, u32 core_id, u32 param_set,
++			       u32 msg_len, u32 ctx_len,
++			       u64 msg, u64 ctx, u64 pk, u64 sig);
++void vcq_add_hcq_slhdsa_sign_prehash(struct vcq_cmd *slot, u32 core_id,
++				     u32 cmd, u32 param_set, u32 prehash_algo,
++				     u32 msg_len, u32 ctx_len,
++				     u64 add_random, u64 msg, u64 ctx,
++				     u64 sk, u64 sig);
++void vcq_add_hcq_slhdsa_verify_prehash(struct vcq_cmd *slot, u32 core_id,
++				       u32 cmd, u32 param_set, u32 prehash_algo,
++				       u32 msg_len, u32 ctx_len,
++				       u64 msg, u64 ctx, u64 pk, u64 sig);
++void vcq_add_hcq_slhdsa_verify_internal(struct vcq_cmd *slot, u32 core_id, u32 param_set,
++					u32 msg_len, u64 msg, u64 pk, u64 sig);
++void vcq_add_hcq_slhdsa_pubgen(struct vcq_cmd *slot, u32 core_id, u32 param_set,
++			       u32 sk_len, u64 sk, u64 pk);
++void vcq_add_hcq_lms_verify(struct vcq_cmd *slot, u32 core_id, u32 lms_hss,
++			    u32 pk_len, u32 sig_len, u32 msg_len,
++			    u64 pk, u64 sig, u64 msg);
++void vcq_add_hcq_xmss_verify(struct vcq_cmd *slot, u32 core_id, u32 xmss_mt,
++			     u32 pk_len, u32 sig_len, u32 msg_len,
++			     u64 pk, u64 sig, u64 msg);
++
++/* SYS core flush */
++void vcq_add_sys_flush(struct vcq_cmd *slot);
++
++/* EAC core VCQ builder */
++void vcq_add_eac_read(struct vcq_cmd *slot, u64 dst_dma, u32 len);
++
++#endif /* CMH_SYS_H */
 -- 
 2.43.7
 
