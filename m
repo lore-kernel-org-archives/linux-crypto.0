@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071CA409279;
-	Wed, 14 Oct 2026 05:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF6F3F8709;
+	Wed, 14 Oct 2026 05:59:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791957495; cv=none; b=QaQmMZ3aMVMOqiDDaUavDdyQoXMoc1KP9fYnGLXz5O7JzrFEPr0/YC5CoVnDQVmJ1z7/27tsPaQ1AyFN4wOsI3z2qgc6lEewv9pyxb/MnU7bq5LgZPWmEBICPB/0iLhKrvIpWBIKK2JOZaVFnq2oqZoMThyS0cVp+ssLUIHiRoU=
+	t=1791957548; cv=none; b=gt9NkkkuSm0hQ+InPLTcgAkgL593l60uCtW/YoV4lgOJVKFBGAXskANtj3r0y7mKpdGdp27n8bdRuiu0egFP6XDAL57rKoyEA5yX/ldLa2mf4VuzJ6ZKqiCA8XMsLjKdDPNDdPsMx/2GHg/H6hlUsWncWMOTnTlswofUE1JCJLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791957495; c=relaxed/simple;
-	bh=xvRXfhb1ChpesI2F6zY7z4p9M+BBmKYWbfw/sqijP4w=;
+	s=arc-20240116; t=1791957548; c=relaxed/simple;
+	bh=dzFhQt7sIi+0u5zzPRM02d4Zhlvk2VU2fi5jP+uF0YE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q9XEA+prrdLceyzGEX3HjpDsFwKZSxv8woB011BRXDNLcP9qHFpR4450S6TbY11zxxjBNdtye15DoylK0VvNP0VATf2F1rF11jqECcas8ULv8eRXEKDmjJOwRRzte4KijTwrj7dzrkgNh4HAto45r6rxRnJpYN4SehKF/F2bFLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BaA1noIF; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=CxZ8KD2ZOY9+ae/G58kgeTYMbpCIo3piQ9gcOExwXhfxBfHBPFfEzBl2xovWQZ35aF4mlR8cH5TgXoQbBPybEqvJarIT0aK9EpsUip4NDaBQwNNhg72HJI6PZf8ByQNrnthQd/AgVmP+33Tc4XnhYwymr4hXusVQ8zJ3URs0M9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=njysdxst; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BaA1noIF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4D1D1F000FF;
-	Wed, 14 Oct 2026 05:58:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="njysdxst"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06B221F000FF;
+	Wed, 14 Oct 2026 05:59:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791957493;
-	bh=0AiepSceSI0wbLAXLdkjMHeYRhrWogIFFJqYVDbTWa0=;
+	s=k20260515; t=1791957546;
+	bh=dzFhQt7sIi+0u5zzPRM02d4Zhlvk2VU2fi5jP+uF0YE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=BaA1noIFo2zINthQwR9TN2eAWQiRZRUkfl9zvnEo8h7RmTP2kGxKE5+22en2BZMjX
-	 e/1V2IJdiW6t0NdMth2kM3ibgwX2rtFDkz6H5KuhDHY80bzwxc2C+zBC+8XQWjIKM8
-	 CrbNvdJzu6gIQjAvisdOe0uuaxI9tRN7JniULIyb4cahvHF6pTPB1FAtrN3hRDh5XW
-	 /WffhBZ5RQWkHEtgmq23tqt6N2VOUAJMLz+5jJj1xDXgirE+RLvckEaZu/yC233EBc
-	 Svj8FTpIs5QpMIk0gIikyguAVQs8IDr6EwDIDOdxxdgZ9h1ZRpnVLWqt4cCd3u1PxT
-	 PMoG4fkwU0W9A==
-Message-ID: <e723950e-44f1-4b2d-9677-7fe599ffe3c4@kernel.org>
-Date: Wed, 14 Oct 2026 07:58:06 +0200
+	b=njysdxsthFklD4tP2Bpir93+Gnbr+l08bJ42fF9OP4njyu48FeBtYgA9eUWGwbpdR
+	 oPvzERJXn+2JvkVv9ik9dOBMrd9+jx2irUCs27do1gJIvPIxtG60HnkCDtLOf1ICHi
+	 KjntA8HeMf1yWM2WAdGLwPYFbS00s+oyxMfPPcAJo5YiviwgJkRQRMQl/ikXJH23x4
+	 UUM6xGM2qCgNYDdXBCd1laYK7aGZD01Cg+QO2PWClAFuN4H3F0fYeXlyEVp8HDp5Q0
+	 GkIyLSB3/oF2tJkWCxOnWvCh3aQT4rw3kAwfyxYHPVRp+UwEpI2zN8zNNcJZ2TnkPc
+	 +COm2+YMfTB9Q==
+Message-ID: <8ca47766-a09f-4795-9eb3-5772ba0c3b8f@kernel.org>
+Date: Wed, 14 Oct 2026 07:58:59 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] dt-bindings: crypto: add Rambus CryptoManager Hub
+Subject: Re: [PATCH 0/5] crypto: cmh - add Rambus CryptoManager Hub core
+ driver and AES
 To: Alex Ousherovitch <aousherovitch@rambus.com>,
  Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
  Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
@@ -47,7 +48,6 @@ Cc: devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
  Thi Nguyen <thin@rambus.com>
 References: <20261013174847.2192609-1-aousherovitch@rambus.com>
- <20261013174847.2192609-2-aousherovitch@rambus.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -93,23 +93,15 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261013174847.2192609-2-aousherovitch@rambus.com>
+In-Reply-To: <20261013174847.2192609-1-aousherovitch@rambus.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 13/10/2026 19:48, Alex Ousherovitch wrote:
-> Add device tree binding schema for the Rambus CryptoManager Hub (CMH)
-> hardware crypto accelerator.  The binding describes the parent
-> SoC-level node with its SIC register region and one queue@N child
-> node per mailbox the host owns, each carrying a reg (mailbox instance
-> index), an optional interrupt, VCQ ring geometry (rambus,num-slots /
-> rambus,slot-stride-bytes) and a rambus,cores affinity list.  Which
-> crypto cores are present is discovered from the SIC CORE_ENABLE
-> register at probe, not described in the device tree.
-> 
+> This is the first of a short, incremental set of submissions adding
 
-Hm? You already sent it 5 times, so how this can be v1? Did you just
-ignore entire feedback you receive? Where is any explanation of that?
+Obviously not true. You sent already five versions of this. Where is
+changelog? Where is proper versioning or even explanation of any changes?
 
 Best regards,
 Krzysztof
