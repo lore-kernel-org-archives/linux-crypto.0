@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF6F3F8709;
-	Wed, 14 Oct 2026 05:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9257C3FFFA1;
+	Wed, 14 Oct 2026 06:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791957548; cv=none; b=gt9NkkkuSm0hQ+InPLTcgAkgL593l60uCtW/YoV4lgOJVKFBGAXskANtj3r0y7mKpdGdp27n8bdRuiu0egFP6XDAL57rKoyEA5yX/ldLa2mf4VuzJ6ZKqiCA8XMsLjKdDPNDdPsMx/2GHg/H6hlUsWncWMOTnTlswofUE1JCJLA=
+	t=1791957610; cv=none; b=toYQQhUdJuaUHoHadbs3vwCXobfhgAi2RobAhUs4yaLvjoQijCwOIRQQG/b3TlC7ekAUHrYLWEPIvGDkDOc5WRMRzRmIqtdFVNUB6ECNPeQpRduqxhXiy1lf1gHCd/Dbtoa90Y43Rg5jd6AvKevaOKQSe3c1Nf2KgBg49JIZntI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791957548; c=relaxed/simple;
-	bh=dzFhQt7sIi+0u5zzPRM02d4Zhlvk2VU2fi5jP+uF0YE=;
+	s=arc-20240116; t=1791957610; c=relaxed/simple;
+	bh=I1EnMF6K4AwnQ+BgnaWpdihZ+HJRBO7Kys3jihVMDAc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CxZ8KD2ZOY9+ae/G58kgeTYMbpCIo3piQ9gcOExwXhfxBfHBPFfEzBl2xovWQZ35aF4mlR8cH5TgXoQbBPybEqvJarIT0aK9EpsUip4NDaBQwNNhg72HJI6PZf8ByQNrnthQd/AgVmP+33Tc4XnhYwymr4hXusVQ8zJ3URs0M9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=njysdxst; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=nLCAZg4p4DUocsFRsqN1nSGfntj9u6L+dzikxB/QUXIooN9ybtPY52+T78hpSIBwbHvI/JA8KWT73EBYdHE8O6NL7W0xtX6GIkDtHLk0URYF2S9A2txeSGMzjTSrR4IPqSUUkKVjXnWa6iN1/MaAoU4zYLzdTaaqaJbSk/UfxYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=csCOrcxc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="njysdxst"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06B221F000FF;
-	Wed, 14 Oct 2026 05:59:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="csCOrcxc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744F01F000FF;
+	Wed, 14 Oct 2026 06:00:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791957546;
-	bh=dzFhQt7sIi+0u5zzPRM02d4Zhlvk2VU2fi5jP+uF0YE=;
+	s=k20260515; t=1791957609;
+	bh=wWOvmT1yxjbWEgmfNJtWVvom2jinW7qTuoUipExt2L4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=njysdxsthFklD4tP2Bpir93+Gnbr+l08bJ42fF9OP4njyu48FeBtYgA9eUWGwbpdR
-	 oPvzERJXn+2JvkVv9ik9dOBMrd9+jx2irUCs27do1gJIvPIxtG60HnkCDtLOf1ICHi
-	 KjntA8HeMf1yWM2WAdGLwPYFbS00s+oyxMfPPcAJo5YiviwgJkRQRMQl/ikXJH23x4
-	 UUM6xGM2qCgNYDdXBCd1laYK7aGZD01Cg+QO2PWClAFuN4H3F0fYeXlyEVp8HDp5Q0
-	 GkIyLSB3/oF2tJkWCxOnWvCh3aQT4rw3kAwfyxYHPVRp+UwEpI2zN8zNNcJZ2TnkPc
-	 +COm2+YMfTB9Q==
-Message-ID: <8ca47766-a09f-4795-9eb3-5772ba0c3b8f@kernel.org>
-Date: Wed, 14 Oct 2026 07:58:59 +0200
+	b=csCOrcxcOT2IDnsS8+MSDQ38C3HPdKPotXfFr++2UC4btC3SZyzKF9PUXXi7BQrln
+	 vIwGN2T3+aBCvDgBL84SQoTa6CLO4bPiv5a3oLcZSZzOVSUn7KljcLKMMl+dOIe5U4
+	 oxy4yL1+N6GseX+nPYYGlFUG9Le253jTjgYgcldH9pZ+5rrLJuDDae09ei17sXqDyy
+	 ta+TYcSHSodX6KEuznD0j3sepNO866lNkTGOdJFxURoGAJ9SPzOLufcVDRg+VXIwxh
+	 s7C7i35bUyw/RG503xYXeGOFd1kj6nNSk1OpypeQ9NK/vofjAcpbVo/lpXmyokLpn1
+	 908LUdGEligEw==
+Message-ID: <2590dca4-70d0-4de9-be9c-d76657dd3239@kernel.org>
+Date: Wed, 14 Oct 2026 07:59:59 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,8 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/5] crypto: cmh - add Rambus CryptoManager Hub core
- driver and AES
+Subject: Re: [PATCH 1/5] dt-bindings: crypto: add Rambus CryptoManager Hub
 To: Alex Ousherovitch <aousherovitch@rambus.com>,
  Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
  Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
@@ -48,6 +47,7 @@ Cc: devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
  Thi Nguyen <thin@rambus.com>
 References: <20261013174847.2192609-1-aousherovitch@rambus.com>
+ <20261013174847.2192609-2-aousherovitch@rambus.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -93,15 +93,30 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261013174847.2192609-1-aousherovitch@rambus.com>
+In-Reply-To: <20261013174847.2192609-2-aousherovitch@rambus.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 13/10/2026 19:48, Alex Ousherovitch wrote:
-> This is the first of a short, incremental set of submissions adding
+> Add device tree binding schema for the Rambus CryptoManager Hub (CMH)
+> hardware crypto accelerator.  The binding describes the parent
+> SoC-level node with its SIC register region and one queue@N child
+> node per mailbox the host owns, each carrying a reg (mailbox instance
+> index), an optional interrupt, VCQ ring geometry (rambus,num-slots /
+> rambus,slot-stride-bytes) and a rambus,cores affinity list.  Which
+> crypto cores are present is discovered from the SIC CORE_ENABLE
+> register at probe, not described in the device tree.
+> 
+> Register the 'rambus' vendor prefix for Rambus Inc.
+> 
+> Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
+> Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+> Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
 
-Obviously not true. You sent already five versions of this. Where is
-changelog? Where is proper versioning or even explanation of any changes?
+So this v6 still has wrong DCO, thus you just ignored feedback you
+received on v3.
+
+NAK
 
 Best regards,
 Krzysztof
