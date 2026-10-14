@@ -1,56 +1,56 @@
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012041.outbound.protection.outlook.com [52.101.43.41])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011065.outbound.protection.outlook.com [40.93.194.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB8D538D92
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2026 13:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58A8457E4A
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2026 14:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791986317; cv=fail; b=ujItQK0UyevJfn6lrWfDzyr7mA69+oayBrDsNc5Yjdd94v9HDcpZNqBU9VxdoTmwT5++U6T4GCvA7zL/U/VO7D61wsTQmsll9ZQR89aVkif5MUDXZNxeMXL2mHZ5KLZrMxv+F8Y3wtjghuSq1uiBaR9PqxOZBnyzHz9IY2bHke0=
+	t=1791986692; cv=fail; b=MPlTAgoGLTGeFslDIJjCTjGrLU/RZ2G8GbJ8ckY6ct74vC6KbwKnqejpQumBVaqJf4Ikf7Xs7kuQRujFMla0MDEviKI38htbJmRrlR/c/gx8bW72W13CrOyjoTgamqPsv24Xy5fVAjUyKu27D9IDFKnkA5oMfVhEZZP0hRgz9Hc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791986317; c=relaxed/simple;
-	bh=sb4Erk5iFvbPpU1c8Ex/965COk2mzwCNbQm7o7JeY5M=;
+	s=arc-20240116; t=1791986692; c=relaxed/simple;
+	bh=2JPxk/OWHaDqkmjmnUXl5R3XtRZ1jKwvz6vSd6O6Tjs=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uAwbBhuExyh17kQSiHcNYSnAb2j7JiIHTBxzxgSDfx9tXsSnm+77w0e4lNynUXEncX15N1YYLjSs7KdPpmU6NClQWXAE5JF//oYETdJTU5PLkc32KGh12xfMNFAKRuru5XncKs+SX2uxuFT4OCGpct/A4P7RX1M1aMS+hw6aPmg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uVI4siNL; arc=fail smtp.client-ip=52.101.43.41
+	 Content-Type:MIME-Version; b=NL48Ms1sJySYRRZHlxhhXFBEgYFDGyUSA2NLKU9ECR1BKuSU4k5EtdmO3XL7zOxvrKq/8/jcbOzaX3pyph4UzIfiKv8y3+DopJvDyXTXmK3OgFN/Qx2PzyTvBI+PABLIsSaq8hVYhg1cOR0RUGQ1h2bOqa3ljWIK3e7X+euK6Gc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jUaTFDIO; arc=fail smtp.client-ip=40.93.194.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uVI4siNL"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jUaTFDIO"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ciDIgoV+iREj999i5ZjvJ+aoTB7B2lePZaPoj5UcIgUt6tj9G6io1eFkF+lZF0zrr7pkgPoQ/XHOIy5fJ+HwQt8NX6xWhvfLsRwTEa4uirfZqA/aW9bfC8bPovnx9FuMednpQmZR2Q9uNY/5/mWN28TRvGbWgIKDpMINWdDGgU6xbYKSHmLauNqg9hwoC0lqtVaLAxzDSEomjslR3tLc12NEuQdesIA6oI0+eHzqf+pKMg8ruS2X1II4EMS5MgTRIPmAckUedDnUQ2J9SIUVXrXCULVyGAAI+cOFL7bo1v3K1AjBUqJZj2wnYyirsO6J6khchw5WD8OCJScw3KEPqA==
+ b=qQ5rXTnNRYFWi+yvoTAmn4AQFmbUTlWNo5gXJtx1AWvzFXCq813r51bhM7QSV9d8kFkizSImMoWRzElXhgti0hgDwDnB6zAtUegc8b3XcQLBgjxXT08+4k6BjQCxUrxz/b5kZ1doiLFBauwJxhwpoHZFVirWl+1QsTEmSt+PCqSYcB/B8IaehgkI9wN7LxPVdTyNjUGOIxSHCKy5G0DR++Y4BKMUYXfZ9DDamXz7WrYGBT+IIstOshaEOBHLHCBXZZXNJ4tn7xRu4/Qh9ON2hgf3nznevQu9FwlXLrZCmGYL7jC1rmJjPET84frceDdjcQ4/9eFGQF9KxxewcsFUyw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JST0HWbTphRyWjbK/cUeWiELhxXdPyv5/HZ9+XdamxQ=;
- b=HdOqSItYBdUiLUSugIZVuxBLoh9AEFHroBsaEBzq9+QA/2njZBLzk2EnYZTTznY/NttiZmHbxY7tAyoAH1uUt0KerRHfy2pflVZvSME/bSpeeXEIeLS9CNCJHqEjcUKQOzAaEfmUfB3uAoERx6zC01GHjT6bID8Ptii/WZJEfxPA/TT0UBeY+gnwtPKo8c3uu4WvCjmWGndTN4oZ23Hsy5FifKl7jyEC9hIWkVfCYnZauwwq5aVUEZs1msLHlIpC2ttujuVktrgXjXnZZGJeljfPXXUbI5sHP1iyTYIVfN+qcygvPNvzC4xg9eKuc2wxm+i35C2LRvXA9L+uBZp5dw==
+ bh=9qFgMUGoEGk71DiMiS7V4/tzksCjiMnDFYgnK8iL/cE=;
+ b=dMN2wFqu+D7ZcXygubTPQwEcLTZJRxbCdsTwelVFUALwWyPsEcIVhk23yDxfXTgECSS4UrwjoaANfT+uQR5aDBTvcDfAIk+gjmBW9d121FUmbhXSc3CMVxntU34jqaEXfDAVwqGn6o+bYa97wjv3zQ3/IfExCMju6MIxHhO+163VthP6aawKHv+AZxoWeXHhv7nju9x9fGVlS3WImBN+ohnnwi155naceiX/6DQc15PW/4jL6WJsJzEjDt1uCRWbnit4aL0P+DXd27ECpkd9ZHxPS/RXK6GfcyLhnkVdCVxsc7zIHX92McsQ1SEZfsYdGpSl++zB6i8Cmsc+k0vGyQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JST0HWbTphRyWjbK/cUeWiELhxXdPyv5/HZ9+XdamxQ=;
- b=uVI4siNLsMulvtcl0sCh1moRCaV0bWTJff2pHIyHyZb5nKJL5oo61dCojTC+SqmjyuEwx8E9Yb0R2yOk2w+58hmEY0Sofwr9XaEpapuRbG3w0zSeAO47H3SXFH30vBh2RZ/sbzTG5RC25ZxetTpfCYdqzdAHTnvcUEOOjHLTLnE=
+ bh=9qFgMUGoEGk71DiMiS7V4/tzksCjiMnDFYgnK8iL/cE=;
+ b=jUaTFDIOOvyKwgMhC/uJbu/4RPOQ5VjjiuQlFoJSp0DMLxwAWbjQBC90HiTguzW5LsCW48g5xUOz65YwDdbs9aDBRH1uu4sVDnfZ6GCHfXDT7DZPVaBH+lMxPz1wLsAHhLYydWEFCT7bMYOiRdrf2GL+pFn0Zh5QrEKPXXWOysw=
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from SN7PR12MB8131.namprd12.prod.outlook.com (2603:10b6:806:32d::12)
- by PH7PR12MB5620.namprd12.prod.outlook.com (2603:10b6:510:137::5) with
+ by SJ5PPFFA661D690.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::9ab) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.13; Wed, 14 Oct
- 2026 13:58:26 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.23; Wed, 14 Oct
+ 2026 14:04:41 +0000
 Received: from SN7PR12MB8131.namprd12.prod.outlook.com
  ([fe80::c2dd:62c5:67fe:aa46]) by SN7PR12MB8131.namprd12.prod.outlook.com
  ([fe80::c2dd:62c5:67fe:aa46%6]) with mapi id 15.21.0496.021; Wed, 14 Oct 2026
- 13:58:25 +0000
-Message-ID: <26b55a53-7d19-4ea3-9a56-a34d71b2b4ee@amd.com>
-Date: Wed, 14 Oct 2026 08:58:23 -0500
+ 14:04:41 +0000
+Message-ID: <552abfdd-fc3c-4a46-9595-bcc05146f3c6@amd.com>
+Date: Wed, 14 Oct 2026 09:04:38 -0500
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] crypto: ccp - Make usage of sev_cmd_mutex more
- granular
+Subject: Re: [PATCH 4/4] crypto: ccp - Allocate status page outside
+ sev_cmd_mutex in SNP_PLATFORM_STATUS
 To: Michael Roth <michael.roth@amd.com>, linux-crypto@vger.kernel.org
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, ackerleytng@google.com,
  ashish.kalra@amd.com, aik@amd.com, seanjc@google.com
 References: <20261014132145.1726322-1-michael.roth@amd.com>
- <20261014132145.1726322-4-michael.roth@amd.com>
+ <20261014132145.1726322-5-michael.roth@amd.com>
 Content-Language: en-US
 From: Tom Lendacky <thomas.lendacky@amd.com>
 Autocrypt: addr=thomas.lendacky@amd.com; keydata=
@@ -97,11 +97,11 @@ Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  qFAgP+x+ODm6/SYn0LE0VLbYuEGfyx5XcdNnSvww1NLUxSvuShcJMII0bSgP3+KJtFqrUx9z
  l+/NCGvn/wMy6NpYUpRSOmsqVv0N71LbtXnHRrJ42LzWiRW2I5IWsb1TfdMAyVToHPNaEb0i
  WiyqywZI5g==
-In-Reply-To: <20261014132145.1726322-4-michael.roth@amd.com>
+In-Reply-To: <20261014132145.1726322-5-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR06CA0077.namprd06.prod.outlook.com
- (2603:10b6:5:336::10) To SN7PR12MB8131.namprd12.prod.outlook.com
+X-ClientProxiedBy: BN0PR04CA0145.namprd04.prod.outlook.com
+ (2603:10b6:408:ed::30) To SN7PR12MB8131.namprd12.prod.outlook.com
  (2603:10b6:806:32d::12)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -110,313 +110,213 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR12MB8131:EE_|PH7PR12MB5620:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2fa0f9b5-097e-4789-e298-08df29fb377a
+X-MS-TrafficTypeDiagnostic: SN7PR12MB8131:EE_|SJ5PPFFA661D690:EE_
+X-MS-Office365-Filtering-Correlation-Id: 891b7607-c0ee-4418-08bf-08df29fc1747
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|1800799024|23010399003|56012099006|11063799006|261009223027099003|4143699003|10067099003|22082099003|18002099003;
+	BCL:0;ARA:13230040|1800799024|366016|376014|23010399003|56012099006|11063799006|4143699003|261009223027099003|10067099003|22082099003|18002099003|6133799003;
 X-Microsoft-Antispam-Message-Info:
-	JtKiysszvs5QsjSDGYLYyn3jsReLcH8n9fE7CWI6lMKIozfbufsWRN222MB0RL9nRGaznRi4c+DzZLZuGE2daIXl8xFSZGXEILSCioQyfXjvYw16G9QaWLxcFDyTIouKVQOnwcMZ29AyRWPFI3ZoiD4DMCjeaQPMhk3+PxZ1jBVyU8yOROlQovkGFpUGHW06TctqNzYj531Tcn0mXFqYoNBrUL4ISHjn3axNIgBfoyyY6g0BmAZJr8CXAgFVn1mq3OUObAEBhdkrx5p6wA+4dHVjNk6W7GOcHw2Df2kevpPAohs+JNpyWQY6AZou1UaaX3LKURy9SHhNp6mhsupX6Hq2cjEgJcvz8POaaTREbcgtRjAFW+3sGoBAbyj1nLKu2JTTcyEMdpM1XyEa8JSN+Exopr7EP8VMfl5oE/dRresvTjhML5iKA4tLGwdFgygl/GvETQDNX/GQ9XJ33DLRfGwwcpBJeEFfg4HHHSC9y5Pm2MhT+GL9lQVbNP4Wy1deOCwZ1DFEqVOJkOXYDCRlvaLPgFhJwJvonViDzIMSfrOCWE1my7/sjcpe66u65uTBDJ8ZUe5A7JNdZrTCcmm+KJGvFRGKZG4nU+RuMEuurO+4Wp3JccPnpQLPVvkSxkgkSkFI61HG3cx9B+p+MtvrIPvT9Pozc3rjAJV9+2JMHn0=
+	L09IaVa/DSR2aW4ccYKB6+Vbcaog7qfKzV3Xsw1PlyIOMgayJxJS94FZmvvowaHcTNJ1ffLS7iFae9LTpEwUTaJBSL1jAyRCOcdfb3LgG8KeIu8Pv2H3k2N8/XHwZAPLr5NA331E8gAXziZadq8VUzRU7UNz1jugr2Rz9oQoe0LUIm67a+bJ4sCwXtTHRJzTfijjmCsjYLdofI9Uh5kyRsKSDptMy7dxPw2bGKIG8IJSi0eJ3nlEY+3AHnWMDMUF4fqLFxGUvb1Au8o/X6dWKSvaY51JCRAvr4uQoz6lIUEyYivptdXJZhfHgRlN3C5aXm52cVdveRySjwnlQggs2ErLQDym80kyWhU7vnV1JAw4NjmOueEeL8RgnIH8lKZ5L9eFx0nuqMRYnI5UvfBDDBTP6rdusx5dx55AeLber9hBiw7ndmQOT/Yrkh7vjzQd26hAry7p+eCpiaqQPpSkO7GW+AUQ9lCKEsrBxohoGkLqKYHLRan5awXtPQCPU90Qj+kqqa9CG4J2GmTuQA97q756/rTgKvrJYeaf+ozHSwoa0cJqaQmMatZV4BHt12qcoj7Jbly8avckGDc0qKbk9vVv5QI4tuxkz72RcfXIeN7poty/upCflS5d4aqDcAecbBRauFQzd85fNzP5gDGQoVA9b1o/bYS8/6cm4vFrxuk=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(23010399003)(56012099006)(11063799006)(261009223027099003)(4143699003)(10067099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(23010399003)(56012099006)(11063799006)(4143699003)(261009223027099003)(10067099003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eW5nekhlTmpCaTBlUWk4N3NrNjltSzZXV3h4Uk1LSTlWRFh2UDZBU01YSlpk?=
- =?utf-8?B?QW5jeGRyc3hQOUYzNlV0VXdqcVpTNy8yVlVwRnErZkpHcjlnLy9yVWk4Wmlw?=
- =?utf-8?B?d0VpNm5ZUXhwZ3FUcmZHWXkzK1dsclRjTk14c3VtUDNYVjZnVmV0bXZGL0lV?=
- =?utf-8?B?Q25vbHJhTzNqQkJiNVJQRWhtRnJkWXdCS2ovZFY3Zk1LTS9JSEZVOFdnbWFR?=
- =?utf-8?B?UDVtNTRmRkh4akpqS2NMQ0ZWcXpEWmlmbjVNTjJSWkFzWCtNSktQMFR3Z095?=
- =?utf-8?B?NFh6UjJmZ3lISnRDblY0S1pLZjZFS1crZGJzZGdkU1NrSlJucDVmT2c1MEJz?=
- =?utf-8?B?UEVVcVE2Y2lrSGhOWWlRdzFtM043bEErTXM5WWFyMmRNZ05aTGFhZkh6VXB1?=
- =?utf-8?B?ZnZPcHdvWC9wOGU3RFZxVHB5eWpSbzI2ejZEclpaTG1Ub00xYy9qK2hIVSsy?=
- =?utf-8?B?K2pmVklhaFk5ZnZTYW5iaSt0b3UycTh0MTVOb3liNEk2N20yUVZ0TG9zVmlj?=
- =?utf-8?B?S0ZRRnZ6ZjQyQUp2akt3c1hqT21NMHVqRzZtNmpiZEpmT0pSMG0ybXArWVQy?=
- =?utf-8?B?YkNQcDRqM2Fsd3Fvek5GWlVyckVBeTNRemNpUk5OY0x6UzdsUnBzWnlYMHZ4?=
- =?utf-8?B?WnRZVG5QZDJucmVqVHFSSFluV2pTVGd3ZTA2UU40Q2J2Z2ZIVU4rTnRkMGlY?=
- =?utf-8?B?SWpxUFhUYnNOemE1UGpRbk1SWGVRdGlBQzc3cm16bG1yR2FWK2JHYkkwUmVW?=
- =?utf-8?B?Ly94dHlDZWhRbXgyODhpeFdKeWtHQ3hieHF5eHRyR2g2bkJxL3FlQUxhVkda?=
- =?utf-8?B?NnJ1VDd2Z0t1cHZwTm4yOGw4d3BXL1ovOTlwekdWSkszTFQrNjRGc0w1RlMz?=
- =?utf-8?B?QXNFOWI2Y242cWJMdW5yVnBOaXVQMVZ1N3JOOFFSc056VEVqN0JtTFBYWlZJ?=
- =?utf-8?B?QkZmU1prMnI5SHhYMGkzek9BaFRIanRKZ1ZhZmxzWUVqdUNCMGxESm8xMzJq?=
- =?utf-8?B?YjhmUk5SeExLRUxYYnRPZEVjaUVOVVJxK0VRdWgzOWZPNDJYTzIxOGNYMzc5?=
- =?utf-8?B?TitTL2NHL3QxY0w3UjNPb1ZVTHBad3Ywak5UM3VNc1RIMDlkQXVQaFlmL0dF?=
- =?utf-8?B?R05HblYzN3RDMzVKM3dRUHBBRCtHc0wvckNadk5vaGZnVWc4Sks5MWZGdTF1?=
- =?utf-8?B?Q0xEcFJpanN1ZllheUlqbUNXSlBEQkNHaG1rNVNYUGMxMjZkRWlJSnVvaDRj?=
- =?utf-8?B?blp4ZVorMkRMWTQwTGF2UWNublFVL0hVbXpWM1RxREJiWFFqaGpCcXljeEVB?=
- =?utf-8?B?TVZNQWozNkYxOWlidnR4KzgvRWdKTms5VkNDSjh5Y0FYOUlFUVN2UXBmN0pK?=
- =?utf-8?B?b1ZxVlhYVFFWL3lJWXhMdFBlTXVIcXBZQ3hRYUdrdENrUFdvekNJdmV6UXMy?=
- =?utf-8?B?MTNrR2pTTmtTc0F6QkJNcDhqRktoTHBwRE5XN3dxYlVPSEdiWkViY0NiWGJS?=
- =?utf-8?B?dWM5M0hZOC9JSWgyejducXdueUdRLzJwMnlJYnNNUkx5b2RJZFZia09PWHhs?=
- =?utf-8?B?MkVXQWhBY24xVGF2bHpjUVV4NnhXaWZ2dEVrait3czBDdHBYdUVPOWhyNS84?=
- =?utf-8?B?cklrbzRyRUVibUNNeDdOdkJObUJlRVVsRTU0b0orMGIwMmVxUVltSTZUY3Ro?=
- =?utf-8?B?VUk3UWdLWlVnWGNzb0lDTldDVnNWM09lZysxTjRlS1EyZTVkZ3hYcXRDUXBI?=
- =?utf-8?B?bmluT3RNY1pVZUUyeFhJOHF2elJ4SHR5bVNPYkpmU0k4RVhPcmxvUkU0TVFE?=
- =?utf-8?B?WHVIRlZxNGdYYTdhRVd2aXFYZWpSaUhBNDVVMS9zL04vaDRVTmpYWkQyUGdF?=
- =?utf-8?B?QkpEV0NTMHJha0VTbUFVei9vbnRUaEFscHB4WTJBb3hXa2JmRmZ1VTlIeEhH?=
- =?utf-8?B?QnZqb2ZqajZwbEJnRnBqaGtYTFlEZENleDRqNE05bHF6T1NsTDlQL201L3Y1?=
- =?utf-8?B?UmtGeFRFRjR0SldMM3E1QURwQktNNFJJK2FlY1ZEUUY0dHBVL2NKWFgrWEpG?=
- =?utf-8?B?S1kvM2grKzV0N0RUSE5YSHE3TGdrQU0zNmQ0SXJ4NWZENVNFbSttaE1SUktK?=
- =?utf-8?B?VEMxeFdlakNiSWo1ZFQ3TGxBRFlpekp0VVBHYUJoRVIzbkxEMjEwQVliYlky?=
- =?utf-8?B?RmEwanE5cCtXeHExTEZFaXVHMmRmekc0T1JFa3MzbHNHbWF3cEY1Rnp0Zyty?=
- =?utf-8?B?Y041QlQ4NXhraTBPRmZZRVVPczlCT2wvbXFuR1RSQ2lTd0tvT1FITGlzWkZI?=
- =?utf-8?Q?r7DBRWbNxCVDGSkrk3?=
+	=?utf-8?B?bTRuNm52VnBQZ0I4amozY3BDazgzOC9yMjlpU3oxYk4rSmlQY2VIZ3p1SGtv?=
+ =?utf-8?B?TUFIeXpWUkZUcDliUFJkU2QvY3YxY2lOUGI2eDdRc3NMejFEZUw3cHhSTExF?=
+ =?utf-8?B?S3RlS1dSalpiSVBJRWp0NWJwSDFITy9iSFhqSFNzcXJpWElpU080NlZYSGhB?=
+ =?utf-8?B?UHhOR2VZTUU0ZGxaazdGd3kyT0gvT1h1YlhhTnI4T3doNW9COGo5UHRKQkUr?=
+ =?utf-8?B?emNRVWR1ZFcyTlVwQXNZL25kRHBLaDZ3MDhxb0hPNzZJN1pINnpqN1dtUXN6?=
+ =?utf-8?B?dG9wUU01Rk5EWXdiWjhGSHF0VktDblJ1UTVpWGhJNno5ZEwrN0hCZFpTdklH?=
+ =?utf-8?B?bGxDaDdxZjVBdzd0UDlCNWZ6TmgzcUdueDJLdVI5VU9jTXdldWlxbnlCUHYz?=
+ =?utf-8?B?dlkzSnFXVUhVUDhlRUtBR3dTaWpNMll3aWR6c29PZzRsTUkrRVVvTzJWcERF?=
+ =?utf-8?B?OUFqN0JPQ1dMZkdQMWVoS0x1aDY5SHg3YU5NWG8zMC83L3QrOTNLWkFNd3My?=
+ =?utf-8?B?aVlXd09xeHFWVy9NT21sOGZkeG5vbEliUW43VzF1TGNYdnJmZGd2SklZdjlF?=
+ =?utf-8?B?M0wrdlJnYS9zNklWWEtuaWhEL2FNMlQrM2pHa0FLSHNQY2xUbTBnakE2eTky?=
+ =?utf-8?B?VHQ3SHJwbGtyYWdFU3pPNm5TTUFaV3B3UnIvc0VjTTFOSnV6Q2dwdFlZTVBz?=
+ =?utf-8?B?blBDZmV0RDA2THZDcVFCbXJ2MWZLNys0M3VRVDE4YkFWaUFWajVSWE5XUEhn?=
+ =?utf-8?B?T05EM3lBZHdSUThtTWlHaytPQTY3WlVRV0xFdG5remk5TGRyK3hSeGZwbG5F?=
+ =?utf-8?B?aGxIbFNjMExMWWhkRnRJNmtkcnRHeFhyenVXOHh0b0RUTndqSUlObUxYR2Zk?=
+ =?utf-8?B?c0Fya1RXWUxTVVd5TFk0bHRRdkZuS1NMQ2dnUlBMbnNoVEt3RnFFTExDdEor?=
+ =?utf-8?B?Y2h0U3JpZnpDQWRCaUdFZzZYaU5nMURGMmVkanB4OGZhdU1PTGVMRlF4b3VM?=
+ =?utf-8?B?Q09YdUJOOE55TlBVOEF0ZStaOU5lMHlWaVdxMTdKUEhENHlhbE03UzZGM2pi?=
+ =?utf-8?B?d1BEbU9UZ2EyYUpDbWptVzJDYVhpQnpFeHl1RUt5TytlTnpHZ3NJSDRwNUMx?=
+ =?utf-8?B?M0tCOTl2N1RwV0FCSjYwMVNoZUVtd212dmp5R1k1RmM2MW1HWmRmcG4wcmww?=
+ =?utf-8?B?M0NXSjV5NlVWMzlGdm1hUUNVdzFtTHAxN0Ywc1dNZmxySnlBTXlUcXNRbzF4?=
+ =?utf-8?B?bnR6Ly9xaS9OWm82SFBYRlFKL2EzaWUrWHNYcG5nTVd1RHpxaFJkcitKWFhQ?=
+ =?utf-8?B?NEpoMjN6ZW1UdkxoRG8zVS9uWWlwVnkzMEQzYnVHMTZraWVXWTltS1lFL2Qz?=
+ =?utf-8?B?WjNtQ292b3JvbmtzWmRtYm16Y203YlIzbUN3bmw4MUZvWFR2WlIvb0cySkwy?=
+ =?utf-8?B?WG9LRXltZ0c0SWVCajYvUnhGZGtkeUNHUlYwUjdxK3Nkb2NpZG1CYTJyT1hn?=
+ =?utf-8?B?K1RJQlFpUGRSa2RiNkRQV2pYUzRncHEwZmEwNjIvRTVMbFRsTmg3eHQ2aXFl?=
+ =?utf-8?B?eGdITThlSEU4MGg2VUZNb095N0NaZk5VYi8zNnVVVXBIVHd6bXlpeUVMZDJI?=
+ =?utf-8?B?cStScEFvQWN4blFCUHFydWwvc3hSNDJGUHFpSlZGSDdPZkJEY0htWDkxY1JV?=
+ =?utf-8?B?SDUyRWlXemxCRHJDcnVZSHNEV2ZhcWlpejFmYUcxUzJtM2lGQnIvZGVTdXdy?=
+ =?utf-8?B?M3ZhK3VoSkdDdkFEcG1lZ0RaNGNFT1RhMnlnUXh6SEJCK0pLejBCQU8rdzlo?=
+ =?utf-8?B?S3R2WnYycEg5VEZrNlVMUVAzMEx5bGFBRXJqanZsZy96T04rZGFDNW5ML0tQ?=
+ =?utf-8?B?aDQzZWMrNzRvQVZJdWREb1N3RjZlNWduM2w2Q2oyazR3KzQ1MTJWOURjS3hG?=
+ =?utf-8?B?eVBIV0F1SWppdnVkeUlDejhpdUduZm5vclJqVlBLYUFVUFMvMzI1OEFPWnpT?=
+ =?utf-8?B?SVVVNUQ0bWVUM1BSb0FPRWpVMVpBSjFjbm9lQ20yRUh5bXUzelFoT1c5bVcy?=
+ =?utf-8?B?SVZaT1o1WkJzUXJ4a2lxQ01jcTdabEkxbFJINmhiY0ozcDJqMnA0VGhkdnEz?=
+ =?utf-8?B?MjFTUTJwdWdQeWdSU2czejE4M09LYmMzRm1Nb3ZSTlhOSjhyczFmMmxrV2lV?=
+ =?utf-8?B?Z2E3Z2s4VUhPQisyblhwaFVON29zUGpLVENSY1p4anVGTW9NZUNSTS81c25F?=
+ =?utf-8?B?WFI1d1BVU25IZlpQbEFoT0tIS2VJY1FHY3VaTjNlMXR6VENLM2FXaXpDNkxk?=
+ =?utf-8?Q?Zc5Jgd4Gpqt5hmYa1L?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2fa0f9b5-097e-4789-e298-08df29fb377a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 891b7607-c0ee-4418-08bf-08df29fc1747
 X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB8131.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2026 13:58:25.5714
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2026 14:04:41.3462
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ybdoY/S8yQU0v6y9LLZ5Vf6EJrtNhnuWCI9qK31idLjaXnX2rwE/4X1avXRwM25mu8MnItYRgvoEP7HWotyhSA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5620
+X-MS-Exchange-CrossTenant-UserPrincipalName: dItU2zbqlqB6A7PC8qkpEakEykJC13bJ4/l/OQConwHdsEWGpyK2QEfZuUwpBoNZwchhXcoNMl70rTHFJbabZg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFFA661D690
 
 On 10/14/26 08:20, Michael Roth wrote:
-> From: Ackerley Tng <ackerleytng@google.com>
+> Allocating memory while holding the global SEV command mutex
+> (sev_cmd_mutex) unnecessarily blocks concurrent SEV and SNP operations
+> across the system if page allocation stalls or triggers memory reclaim.
 > 
-> The current code makes very coarse usage of the sev_cmd_mutex; for SEV
-> firmware ioctls, it is essentially taking upon entry, and ends up
-> wrapping a lot of potentially time-consuming prep work that may need to
-> be done before issuing the actual firmware call, which is the main thing
-> the mutex is meant to protect.
+> Rename __sev_do_snp_platform_status() to sev_do_snp_platform_status()
+> and push the sev_cmd_mutex and firmware call down into a new routine so
+> that allocation/freeing of the status page can be done outside of the
+> mutex.
+
+Seems a bit complex. Can you rename __sev_do_snp_platform_status() to
+sev_do_snp_platform_status() and just put a scoped guard in after the
+allocation up to just before the "if (ret) goto cleanup"?
+
+Thanks,
+Tom
+
 > 
-> Additionally, some of that prep work involves
-> copy_from_user()/copy_to_user() calls which can generate page faults and
-> unecessarily lead to potential deadlock scenarios. No known case exists
-> in current upstream, but with the upcoming KVM/guest_memfd support for
-> in-place conversion of the same PFN between shared/private state, a
-> special fault handler is needed that could theoretically deadlock if a
-> malicious user tries to use guest_memfd pages as the source/target of
-> target of said copy_from_user()/copy_to_user() scenarios.
-> 
-> There's no reason to hold the mutex across these problematic scenarios
-> however. Push sev_cmd_mutex down from the top-level sev_ioctl() into
-> each individual command handler, acquiring the mutex only around the
-> platform state transitions and firmware command execution.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> [mdr: rework commit message]
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
-
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-
 > ---
->  drivers/crypto/ccp/sev-dev.c | 98 ++++++++++++++++++++----------------
->  1 file changed, 54 insertions(+), 44 deletions(-)
+>  drivers/crypto/ccp/sev-dev.c | 60 +++++++++++++++++++++---------------
+>  1 file changed, 36 insertions(+), 24 deletions(-)
 > 
 > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index e42cf3aee50a..c8c229a6757c 100644
+> index c8c229a6757c..37b948a81bc9 100644
 > --- a/drivers/crypto/ccp/sev-dev.c
 > +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1914,6 +1914,8 @@ static int sev_ioctl_do_reset(struct sev_issue_cmd *argp, bool writable)
->  	if (!writable)
->  		return -EPERM;
+> @@ -2554,20 +2554,13 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>  	return ret;
+>  }
 >  
-> +	guard(mutex)(&sev_cmd_mutex);
-> +
->  	/*
->  	 * The SEV spec requires that FACTORY_RESET must be issued in
->  	 * UNINIT state. Before we go further lets check if any guest is
-> @@ -1946,7 +1948,7 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+> -static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
+> -					int *error)
+> +static int __sev_do_snp_platform_status(void *data, int *error, bool *free)
+>  {
+>  	struct sev_device *sev = psp_master->sev_data;
+>  	struct sev_data_snp_addr buf;
+> -	struct page *status_page;
+> -	void *data;
+>  	int ret;
 >  
->  	memset(&data, 0, sizeof(data));
->  
-> -	ret = __sev_do_cmd_locked(SEV_CMD_PLATFORM_STATUS, &data, &argp->error);
-> +	ret = sev_do_cmd(SEV_CMD_PLATFORM_STATUS, &data, &argp->error);
->  	if (ret)
->  		return ret;
->  
-> @@ -1965,6 +1967,8 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool wr
->  	if (!writable)
->  		return -EPERM;
->  
-> +	guard(mutex)(&sev_cmd_mutex);
-> +
->  	if (sev->sev_plat_status.state == SEV_STATE_UNINIT) {
->  		rc = sev_move_to_init_state(argp, &shutdown_required);
->  		if (rc)
-> @@ -2014,16 +2018,18 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
->  	data.len = input.length;
->  
->  cmd:
-> -	if (sev->sev_plat_status.state == SEV_STATE_UNINIT) {
-> -		ret = sev_move_to_init_state(argp, &shutdown_required);
-> -		if (ret)
-> -			goto e_free_blob;
-> -	}
-> +	scoped_guard(mutex, &sev_cmd_mutex) {
-> +		if (sev->sev_plat_status.state == SEV_STATE_UNINIT) {
-> +			ret = sev_move_to_init_state(argp, &shutdown_required);
-> +			if (ret)
-> +				goto e_free_blob;
-> +		}
->  
-> -	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
-> +		ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
->  
-> -	if (shutdown_required)
-> -		__sev_firmware_shutdown(sev, false);
-> +		if (shutdown_required)
-> +			__sev_firmware_shutdown(sev, false);
-> +	}
+> -	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> -	if (!status_page)
+> -		return -ENOMEM;
+> -
+> -	data = page_address(status_page);
+> +	*free = true;
 >  
 >  	/*
->  	 * Firmware will returns the length of the CSR blob (either the minimum
-> @@ -2317,18 +2323,20 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
->  	data.oca_cert_address = __psp_pa(oca_blob);
->  	data.oca_cert_len = input.oca_cert_len;
->  
-> -	/* If platform is not in INIT state then transition it to INIT */
-> -	if (sev->sev_plat_status.state != SEV_STATE_INIT) {
-> -		ret = sev_move_to_init_state(argp, &shutdown_required);
-> -		if (ret)
-> -			goto e_free_oca;
-> -	}
-> +	scoped_guard(mutex, &sev_cmd_mutex) {
-> +		/* If platform is not in INIT state then transition it to INIT */
-> +		if (sev->sev_plat_status.state != SEV_STATE_INIT) {
-> +			ret = sev_move_to_init_state(argp, &shutdown_required);
-> +			if (ret)
-> +				goto e_free_oca;
-> +		}
->  
-> -	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
-> +		ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
->  
->  e_free_oca:
-> -	if (shutdown_required)
-> -		__sev_firmware_shutdown(sev, false);
-> +		if (shutdown_required)
-> +			__sev_firmware_shutdown(sev, false);
-> +	}
->  
->  	kfree(oca_blob);
->  e_free_pek:
-> @@ -2372,7 +2380,7 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
->  		data.len = 0;
+>  	 * SNP_PLATFORM_STATUS can be executed in any SNP state. But if executed
+> @@ -2578,10 +2571,8 @@ static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
+>  		 * Firmware expects the status page to be in Firmware state,
+>  		 * otherwise it will report an error INVALID_PAGE_STATE.
+>  		 */
+> -		if (rmp_mark_pages_firmware(__pa(data), 1, true)) {
+> -			ret = -EFAULT;
+> -			goto cleanup;
+> -		}
+> +		if (rmp_mark_pages_firmware(__pa(data), 1, true))
+> +			return -EFAULT;
 >  	}
 >  
-> -	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, &data, &argp->error);
-> +	ret = sev_do_cmd(SEV_CMD_GET_ID, &data, &argp->error);
+>  	buf.address = __psp_pa(data);
+> @@ -2591,19 +2582,45 @@ static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
+>  		/*
+>  		 * The status page will be in Reclaim state on success, or left
+>  		 * in Firmware state on failure. Use snp_reclaim_pages() to
+> -		 * transition either case back to Hypervisor-owned state.
+> +		 * transition either case back to Hypervisor-owned state. If
+> +		 * for some reason that fails, it will have been added to the
+> +		 * leaked pages list, so indicate to the caller to not free
+> +		 * the page.
+>  		 */
+> -		if (snp_reclaim_pages(__pa(data), 1, true))
+> +		if (snp_reclaim_pages(__pa(data), 1, true)) {
+> +			*free = false;
+>  			return -EFAULT;
+> +		}
+>  	}
 >  
->  	/*
->  	 * Firmware will return the length of the ID value (either the minimum
-> @@ -2430,7 +2438,7 @@ static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
->  	data->address = __psp_pa(id_blob);
->  	data->len = user_size;
+> +	return ret;
+> +}
+> +
+> +static int sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
+> +				      int *error)
+> +{
+> +	struct page *status_page;
+> +	void *data;
+> +	bool free;
+> +	int ret;
+> +
+> +	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
+> +	if (!status_page)
+> +		return -ENOMEM;
+> +
+> +	data = page_address(status_page);
+> +
+> +	scoped_guard(mutex, &sev_cmd_mutex)
+> +		ret = __sev_do_snp_platform_status(data, error, &free);
+> +
+>  	if (ret)
+>  		goto cleanup;
 >  
-> -	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, data, &argp->error);
-> +	ret = sev_do_cmd(SEV_CMD_GET_ID, data, &argp->error);
->  	if (!ret) {
->  		if (copy_to_user((void __user *)argp->data, id_blob, data->len))
->  			ret = -EFAULT;
-> @@ -2492,21 +2500,23 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->  	data.cert_chain_len = input.cert_chain_len;
+>  	memcpy(status, data, sizeof(*status));
 >  
->  cmd:
-> -	/* If platform is not in INIT state then transition it to INIT. */
-> -	if (sev->sev_plat_status.state != SEV_STATE_INIT) {
-> -		if (!writable) {
-> -			ret = -EPERM;
-> -			goto e_free_cert;
-> +	scoped_guard(mutex, &sev_cmd_mutex) {
-> +		/* If platform is not in INIT state then transition it to INIT. */
-> +		if (sev->sev_plat_status.state != SEV_STATE_INIT) {
-> +			if (!writable) {
-> +				ret = -EPERM;
-> +				goto e_free_cert;
-> +			}
-> +			ret = sev_move_to_init_state(argp, &shutdown_required);
-> +			if (ret)
-> +				goto e_free_cert;
->  		}
-> -		ret = sev_move_to_init_state(argp, &shutdown_required);
-> -		if (ret)
-> -			goto e_free_cert;
-> -	}
+>  cleanup:
+> -	__free_pages(status_page, 0);
+> +	if (free)
+> +		__free_pages(status_page, 0);
+>  	return ret;
+>  }
 >  
-> -	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
-> +		ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
->  
-> -	if (shutdown_required)
-> -		__sev_firmware_shutdown(sev, false);
-> +		if (shutdown_required)
-> +			__sev_firmware_shutdown(sev, false);
-> +	}
->  
->  	/*
->  	 * Firmware will return the length of the blobs (either the minimum
-> @@ -2605,7 +2615,8 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+> @@ -2615,8 +2632,7 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
 >  	if (!argp->data)
 >  		return -EINVAL;
 >  
-> -	ret = __sev_do_snp_platform_status(&status, &argp->error);
-> +	scoped_guard(mutex, &sev_cmd_mutex)
-> +		ret = __sev_do_snp_platform_status(&status, &argp->error);
+> -	scoped_guard(mutex, &sev_cmd_mutex)
+> -		ret = __sev_do_snp_platform_status(&status, &argp->error);
+> +	ret = sev_do_snp_platform_status(&status, &argp->error);
 >  	if (ret < 0)
 >  		return ret;
 >  
-> @@ -2623,7 +2634,7 @@ static int sev_ioctl_do_snp_commit(struct sev_issue_cmd *argp)
->  
->  	buf.len = sizeof(buf);
->  
-> -	ret = __sev_do_cmd_locked(SEV_CMD_SNP_COMMIT, &buf, &argp->error);
-> +	ret = sev_do_cmd(SEV_CMD_SNP_COMMIT, &buf, &argp->error);
->  
->  	return ret;
->  }
-> @@ -2642,6 +2653,8 @@ static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable
->  	if (copy_from_user(&config, (void __user *)argp->data, sizeof(config)))
->  		return -EFAULT;
->  
-> +	guard(mutex)(&sev_cmd_mutex);
-> +
->  	if (!sev->snp_initialized)
->  		return -ENODEV;
->  
-> @@ -2674,10 +2687,12 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
->  
->  	input.vlek_wrapped_address = __psp_pa(blob);
->  
-> -	if (!sev->snp_initialized)
-> -		ret = -ENODEV;
-> -	else
-> -		ret = __sev_do_cmd_locked(SEV_CMD_SNP_VLEK_LOAD, &input, &argp->error);
-> +	scoped_guard(mutex, &sev_cmd_mutex) {
-> +		if (!sev->snp_initialized)
-> +			ret = -ENODEV;
-> +		else
-> +			ret = __sev_do_cmd_locked(SEV_CMD_SNP_VLEK_LOAD, &input, &argp->error);
-> +	}
->  
->  	kfree(blob);
->  
-> @@ -2703,8 +2718,6 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
->  	if (input.cmd > SEV_MAX)
->  		return -EINVAL;
+> @@ -3114,9 +3130,7 @@ static int get_v1_svn(struct sev_device *sev)
+>  	struct sev_user_data_snp_status status;
+>  	int ret, error = 0;
 >  
 > -	mutex_lock(&sev_cmd_mutex);
-> -
->  	switch (input.cmd) {
->  
->  	case SEV_FACTORY_RESET:
-> @@ -2748,14 +2761,11 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
->  		ret = sev_ioctl_do_snp_vlek_load(&input, writable);
->  		break;
->  	default:
-> -		ret = -EINVAL;
-> -		goto out;
-> +		return -EINVAL;
->  	}
->  
->  	if (copy_to_user(argp, &input, sizeof(struct sev_issue_cmd)))
->  		ret = -EFAULT;
-> -out:
+> -	ret = __sev_do_snp_platform_status(&status, &error);
 > -	mutex_unlock(&sev_cmd_mutex);
+> +	ret = sev_do_snp_platform_status(&status, &error);
+>  	if (ret < 0)
+>  		return ret;
 >  
->  	return ret;
->  }
+> @@ -3131,9 +3145,7 @@ static int get_v2_svn(struct sev_device *sev)
+>  	struct sev_snp_tcb_version_turin *tcb;
+>  	int ret, error = 0;
+>  
+> -	mutex_lock(&sev_cmd_mutex);
+> -	ret = __sev_do_snp_platform_status(&status, &error);
+> -	mutex_unlock(&sev_cmd_mutex);
+> +	ret = sev_do_snp_platform_status(&status, &error);
+>  	if (ret < 0)
+>  		return ret;
+>  
 
