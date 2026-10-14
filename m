@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F04015665C;
-	Wed, 14 Oct 2026 06:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A626B1D9A66;
+	Wed, 14 Oct 2026 06:18:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791957677; cv=none; b=LHLlU27sFyoxVp7ZOHZinTLWKF9J7i+91bmYl2x9cIyxHhlZk0XRAB18dkBVNQaflpY/vvbbIMU84E8mR8gDK2QFXb/fik0vRhjegYXHTcXx85/7Ge8+UzyI0eD/emYaxSwoZLwaDI7nADrUQHvaD87ptnTV+qYk7792afSTlEU=
+	t=1791958723; cv=none; b=GGqOA1hovArtdVdFWiFXIX0yEuTeghTbQwsB9DmJ7gA82ibHGFuCEZ1yGJ+961ObStEPyGhjIYpD2Ghbc4W2X82G3bC6kRO6XyN89UxijThpvSrlk2R5TMlk40fdPbgO3dl1BNMpT6q6FAewbveGAUVHCha7TjPPdoJmh2WVTDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791957677; c=relaxed/simple;
-	bh=h69P9IVvITyOUa4EKlJXaOOUJK5YhPfqtKU6Kg5orQs=;
+	s=arc-20240116; t=1791958723; c=relaxed/simple;
+	bh=tk28j8cE0GpX0flJyrpa+UqXpYdfQWCQv2MX/4xQFr8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DrPUvbs52PpK4KLuyLq8L8HVond3nftNHv8Be0a4MD3DTQ/iH9+0lqQwp9AYYHmHbObeEe5ah5VZEnFqYNtJQv29G1QtXpdwnOXWQ8/7wG0LjjGVGEmuiNqkGyUkuq8MO0lEx1I1z2ZQBbNr8mJvbWLlXdOEJArbcJ9+oVcEOA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAZ/E+dS; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=ojKvGkAJgI5wnStmblKrAnBMbVr91DrDwbTJQJRJU5HeTL6xLB/bq6ZAA7pTbr+R088I9Fv4Pmj3a8q82GGFnkBC5Na0E0FRbeFOd8Ld1H3HQAIAfzZtsjYEanLPz0lmS+QPEk5ADppQzMfGIoSDY4IJVgwpBi49/qj4p/fFclY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayJ88EZn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAZ/E+dS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A85C1F000FF;
-	Wed, 14 Oct 2026 06:01:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayJ88EZn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 869851F000FF;
+	Wed, 14 Oct 2026 06:18:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791957675;
-	bh=I70yyy6hREz/IB0eS0Nv/gFrWcLZfqLyoAB4qOMkZUQ=;
+	s=k20260515; t=1791958722;
+	bh=lPV0f0P+OlbQsun3sAAvy5HVXr3czVbo2sJjluw/ocg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=PAZ/E+dS1tv6oX42wtbOtTHgyT7nJxgvq6RK5+TUPB77+NQ+12wBWM7/Avrp75o8Y
-	 /VPADTdaKgC8Kp2qXAh+lVV4NpjTbYJbacPznNXy+sCCPG1MY2p4nTU6XTLxlKAFj2
-	 KwtDegNQLIInT/rSc4gOyT1Ddim7QbKqeBogM7URXQOXmR/wBwhe0ooxCBXYPsEFTh
-	 Adb+ie7h/NgNa66ZvI0PLL+rSm7AdqtnElneAv7eUybqUMXLU2iwrc1dz/X/IJRfyf
-	 9Kqp/m1AFRvNOicLPJgQDgAekOUfwy3Hqb9LcL8hOJWeEH0fgFiMXPiv5fua/HgIRX
-	 m3EPMPCf90D3A==
-Message-ID: <1190d520-fbf3-410e-b9db-f940370d0533@kernel.org>
-Date: Wed, 14 Oct 2026 08:01:09 +0200
+	b=ayJ88EZng8xSFT38achQy/9Jv4OXmdtQfsqARpzdzwVDQXlp+mgU0nT1S71z/lerQ
+	 jga5lka5RuyPuCP7LoAWzrrUYxukCur4V2PH9LOV3tQUe7l5t0DfDnd2klMoLmrr/c
+	 7RMvH5PcGu4Zm/le86aQ9f3jb88M0LRnrwOL2UYypXIfxfsqvIqTr+m12/zMUx/m3Y
+	 eP/f/tWvhCCjKTFQy7l7LgbYkMvw5tNF3vivfvz/sX5AspYi0JvSnElhz2XOJmI0BS
+	 Fd14/S1isb4KPLwGU9lvOGeJ1maPzlbhI1RN0PG2/SHJCUNqaX6+KCEoOiqW1pktSY
+	 UCqf0Qw+rf1nw==
+Message-ID: <aa220570-f573-4d85-8cb8-e009bb5ab856@kernel.org>
+Date: Wed, 14 Oct 2026 08:18:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,19 +35,26 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] crypto: cmh - add core platform driver
-To: Alex Ousherovitch <aousherovitch@rambus.com>,
- Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-Cc: devicetree@vger.kernel.org,
- Joel Wittenauer <Joel.Wittenauer@cryptography.com>,
- linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
- Thi Nguyen <thin@rambus.com>
-References: <20261013174847.2192609-1-aousherovitch@rambus.com>
- <20261013174847.2192609-3-aousherovitch@rambus.com>
+Subject: Re: [PATCH v10 13/14] arm64: defconfig: enable the Qualcomm Crypto
+ Engine core driver
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+ Thara Gopinath <thara.gopinath@gmail.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Stanimir Varbanov <svarbanov@mm-sol.com>,
+ Eneas U de Queiroz <cotequeiroz@gmail.com>,
+ Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+ Eric Biggers <ebiggers@kernel.org>,
+ Demi Marie Obenour <demiobenour@gmail.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Russell King
+ <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, brgl@kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ Pankaj Patil <pankaj.patil@oss.qualcomm.com>
+References: <20261013-qce-fix-self-tests-v10-0-57162a38a554@oss.qualcomm.com>
+ <20261013-qce-fix-self-tests-v10-13-57162a38a554@oss.qualcomm.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -93,30 +100,27 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261013174847.2192609-3-aousherovitch@rambus.com>
+In-Reply-To: <20261013-qce-fix-self-tests-v10-13-57162a38a554@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 13/10/2026 19:48, Alex Ousherovitch wrote:
-> Add the Rambus CryptoManager Hub (CMH) hardware crypto accelerator
-> core platform driver.  This patch provides:
-> 
-> - Platform driver registration and probe/remove lifecycle
-> - Hardware configuration and core discovery
-> - Mailbox Queue Interface (MQI) for VCQ command submission
-> - Transaction manager with async completion and backlog support
-> - Result handler with threaded-IRQ completion
-> - DMA buffer management
-> - Debugfs instrumentation (when CONFIG_CRYPTO_DEV_CMH_DEBUG=y)
-> - Sysfs attributes (fw_version, hw_version, boot_status,
->   mbx_available, mbx_count)
-> - Kconfig and Makefile integration
-> 
-> No crypto algorithms are registered yet -- those follow in
-> subsequent patches.
-> 
+On 13/10/2026 11:57, Bartosz Golaszewski wrote:
+> The QCE core driver should be enabled by default as it binds to the qce
+> device node and scales down the interconnects if no child auxiliary
+> driver is using the IP. Add it to the arm64 defconfig. Disable the
+> crypto part of the driver by default.
 
-Implement feedback you already received on v1, v2, v3, v4 and v5.
+
+Standard comment for Qualcomm defconfig: why do we want it? If no
+hardware is using it, then it does not matter that it scales something down.
+
+> 
+> Tested-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+> Tested-by: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
+
+
+Drop fake tests, you cannot test this.
+
 
 Best regards,
 Krzysztof
