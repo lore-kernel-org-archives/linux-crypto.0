@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A626B1D9A66;
-	Wed, 14 Oct 2026 06:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A40A1D9A66;
+	Wed, 14 Oct 2026 06:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791958723; cv=none; b=GGqOA1hovArtdVdFWiFXIX0yEuTeghTbQwsB9DmJ7gA82ibHGFuCEZ1yGJ+961ObStEPyGhjIYpD2Ghbc4W2X82G3bC6kRO6XyN89UxijThpvSrlk2R5TMlk40fdPbgO3dl1BNMpT6q6FAewbveGAUVHCha7TjPPdoJmh2WVTDk=
+	t=1791958773; cv=none; b=TRmV3Iy5bynXefZSfDQealtaIobWNMI/15RF/FRtr0PBBfF/gmnxnbqJwpe0x2QG45qkOJssKpnhBirjXEjOCV0uXQRCO9+lRAmvSoaE/TY/gTrTAS26n7zR6OTChVR3JffH3qD0XEfXS6Qr8QgqkSy8Kdz7WN0AgCpZnri8xvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791958723; c=relaxed/simple;
-	bh=tk28j8cE0GpX0flJyrpa+UqXpYdfQWCQv2MX/4xQFr8=;
+	s=arc-20240116; t=1791958773; c=relaxed/simple;
+	bh=uja0QDNG70D474fEr/ZOuQtQZgiiIqZHPofVLLF4zoA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ojKvGkAJgI5wnStmblKrAnBMbVr91DrDwbTJQJRJU5HeTL6xLB/bq6ZAA7pTbr+R088I9Fv4Pmj3a8q82GGFnkBC5Na0E0FRbeFOd8Ld1H3HQAIAfzZtsjYEanLPz0lmS+QPEk5ADppQzMfGIoSDY4IJVgwpBi49/qj4p/fFclY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayJ88EZn; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=fKk/jOVpMcIbgTpbdchjeoPAyElVDPP3Jg36qsQRa+76bH57X0fTdQAGsvkao5LVFZprucPda/4qjtoCqrguh79/a/vtbdwRsS1UmftvqQS2BxHtQwuaKy8P9hNZ8jP35HEMWbQHYT9sv7MJyy5nJCD2yldhWJ77diBReU4L2Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zyo1uzyp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayJ88EZn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 869851F000FF;
-	Wed, 14 Oct 2026 06:18:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zyo1uzyp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBC271F000FF;
+	Wed, 14 Oct 2026 06:19:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791958722;
-	bh=lPV0f0P+OlbQsun3sAAvy5HVXr3czVbo2sJjluw/ocg=;
+	s=k20260515; t=1791958772;
+	bh=0yDFWXidPUpD6GR8yKBVyIefq/VsIeeuNEuSAxQe+oI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=ayJ88EZng8xSFT38achQy/9Jv4OXmdtQfsqARpzdzwVDQXlp+mgU0nT1S71z/lerQ
-	 jga5lka5RuyPuCP7LoAWzrrUYxukCur4V2PH9LOV3tQUe7l5t0DfDnd2klMoLmrr/c
-	 7RMvH5PcGu4Zm/le86aQ9f3jb88M0LRnrwOL2UYypXIfxfsqvIqTr+m12/zMUx/m3Y
-	 eP/f/tWvhCCjKTFQy7l7LgbYkMvw5tNF3vivfvz/sX5AspYi0JvSnElhz2XOJmI0BS
-	 Fd14/S1isb4KPLwGU9lvOGeJ1maPzlbhI1RN0PG2/SHJCUNqaX6+KCEoOiqW1pktSY
-	 UCqf0Qw+rf1nw==
-Message-ID: <aa220570-f573-4d85-8cb8-e009bb5ab856@kernel.org>
-Date: Wed, 14 Oct 2026 08:18:33 +0200
+	b=Zyo1uzypz4fSM0KloSSS9SVY+3DeiGf7FUMG8Ff0J/te8kx78yKQyJFoxSH9Vb5hB
+	 KV6iYsdDi5Km940R37qM1bkNWcj7ArIvwja/q5QxoCfHFW3COh3gKApr1+jQfRBpMw
+	 SJQmWHNTsKSnH+7TuAm1B1BkKS6NGcycYbuGb/NUqOCiQqxozr+K/9JtTOsXo9cAD8
+	 QmGQAhykysyCwGTcGGU1U5pIpZy0ZJMDtuXGdKeW34F2lu4TlK2FKiWVrz355X7XD/
+	 VAQUTg1gBhF575KEm3RPEfA57UqZQUEjL1AwbHKwFpWDZf+DIY/JamagqhqSpxGfms
+	 6UCZnpehxS4VQ==
+Message-ID: <5e221ba3-fea2-4663-80a9-94fdd5135e89@kernel.org>
+Date: Wed, 14 Oct 2026 08:19:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 13/14] arm64: defconfig: enable the Qualcomm Crypto
- Engine core driver
+Subject: Re: [PATCH v10 14/14] arm: multi_v7_defconfig: enable the Qualcomm
+ Crypto Engine core driver
 To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
  Thara Gopinath <thara.gopinath@gmail.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
@@ -52,9 +52,10 @@ To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
 Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  linux-kernel@vger.kernel.org, brgl@kernel.org,
  linux-arm-kernel@lists.infradead.org,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
  Pankaj Patil <pankaj.patil@oss.qualcomm.com>
 References: <20261013-qce-fix-self-tests-v10-0-57162a38a554@oss.qualcomm.com>
- <20261013-qce-fix-self-tests-v10-13-57162a38a554@oss.qualcomm.com>
+ <20261013-qce-fix-self-tests-v10-14-57162a38a554@oss.qualcomm.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -100,26 +101,24 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261013-qce-fix-self-tests-v10-13-57162a38a554@oss.qualcomm.com>
+In-Reply-To: <20261013-qce-fix-self-tests-v10-14-57162a38a554@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 13/10/2026 11:57, Bartosz Golaszewski wrote:
 > The QCE core driver should be enabled by default as it binds to the qce
 > device node and scales down the interconnects if no child auxiliary
-> driver is using the IP. Add it to the arm64 defconfig. Disable the
+> driver is using the IP. Add it to the multi_v7_defconfig. Disable the
 > crypto part of the driver by default.
 
-
-Standard comment for Qualcomm defconfig: why do we want it? If no
-hardware is using it, then it does not matter that it scales something down.
+Missing use case/hardware (see maintainer profile).
 
 > 
+> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 > Tested-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
 > Tested-by: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
 
-
-Drop fake tests, you cannot test this.
+Drop fake tests. You cannot execute defconfig on the device.
 
 
 Best regards,
