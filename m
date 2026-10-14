@@ -1,153 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4114718DA;
-	Wed, 14 Oct 2026 20:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792010355; cv=none; b=DV3IL6mMhGioXJo9uGITPswAlgGHracn7McjLt+wYQLk54CPMYUU/E9hU/V8nVOsKRs0a4A9CVr6wHcpYHcLBsG3bh9cBM6U/6hD43dzXAixVcdn7CqEhaGb/SOdfTWYQAUjwwfEMxwpvBn5XGSIdd8+ew65aw+BQx1NfEqSWl8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792010355; c=relaxed/simple;
-	bh=UBvuNYZW41/APtR5ddoeb0UgGDD+zXYvUBuSkNWMIaI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=s+vKlbvC+maUbIq2b83up2dnHYReO6wZMTd6GleBqOsJFQ0umq9NT5AzR/uqLKKvKhzZuu8HPZpmpWyiZjcB0cOEsg+8UYD6BRTYJu7Vm9w6FkbYfpA9ESgLR5JBQsPcncOmasjmIArkq2bxGfSgeefPc+7PEhcX3rccVkL5cFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2c3T2Fx; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E9F26982C
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2026 20:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792010393; cv=pass; b=XJjwFQRcHJwqUC5A4kIJlX/aR+01l4VbKaOMajAcs7Q+BtDET9q+oZplNlwCHvnX+nboisKb/Nbdn2941pHhTa8twDZpe5JDMkChuRk9+XozeUt53ZnN0FE8VvhCK0gOUx2aMNMTGx/RUT1YMIDNTdHfufX0yyt4ml7lt/aCuHY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792010393; c=relaxed/simple;
+	bh=kHScfoW5QFIW3Mr69IJ6gRNLJcbVSehxc7L4Ub2Bs/0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L+TEHq9sEL/m6zY4ZojDLYr5vPjeXRo/70RPTEvBc475MoyH1Hy70SnEM/uiOpFaYr7fYj2Pat8Q9bKWCz8AwX+m4gX+Ljk59M/OESmKRcOPn/aeLpZyiMo4B6BPAM3WPfdVnG7sCy7zvsm2AK3u4aFiNlqUl0MA8uYlXGFtjn8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=genproof.com; spf=pass smtp.mailfrom=genproof.com; dkim=pass (2048-bit key) header.d=genproof-com.20251104.gappssmtp.com header.i=@genproof-com.20251104.gappssmtp.com header.b=U7F475Od; arc=pass smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=genproof.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=genproof.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2c3T2Fx"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 732B6C2BCFC;
-	Wed, 14 Oct 2026 20:39:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1792010355;
-	bh=UBvuNYZW41/APtR5ddoeb0UgGDD+zXYvUBuSkNWMIaI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=q2c3T2FxqkrsZUIE6rNPEf33TUEUgcVUBuCwXb9dd6QsiHsbMD0mSEKP8SWMmWbkf
-	 d4mZJeJuG0JItVczEC9KqQRKIEiWB6Zxn6SVlmhBfPntTXkCfV+HGJgCvZUkaRGdly
-	 ufHU1brKIyMfpurIpS822TX/iorgRkOqNISidZ+8pBLUHUMH36INMFFl/lpgIFmfrZ
-	 XuRnTDapdGNuh/o5OKaTNLLlA4jUtL3MzrMZJK76JzsFtpy8wjaFg882S7EmGlXFaC
-	 MAhyYxmNzC5SkoMvpCFDvZJcanccB9Yry6hfYTYvEPxOBY6814i8iAA5HqErXehdPR
-	 4AAdAkxL4JdTw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FEACC6B2E;
-	Wed, 14 Oct 2026 20:39:15 +0000 (UTC)
-From: Vladimir Kukharenko via B4 Relay <devnull+vladimir.genproof.com@kernel.org>
-Date: Wed, 14 Oct 2026 20:34:22 +0000
-Subject: [PATCH 2/2] lib/crypto: mips/chacha: Handle lengths of 2 GiB or
- more
+	dkim=pass (2048-bit key) header.d=genproof-com.20251104.gappssmtp.com header.i=@genproof-com.20251104.gappssmtp.com header.b="U7F475Od"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-91986c5cb75so8574736d6.0
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2026 13:39:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792010391; cv=none;
+        d=google.com; s=arc-20260327;
+        b=GI8pVf3iw+PAUc8k/Ltl44qUjFFwxDSIJd9c1nZKJnqzXT43bvWNDKQ4ikHQPaoOlx
+         ALeEkuQSNRdWBkOjLrQTyAYFY0vLkW7TdgihOe9Ti3x5U48zsv9vKYoHND2vmPXVsKm0
+         jdC/QibI5dyP7+tWe4Jc19U8K3febpxIjAl+ygrc5E3OGA7Q/Z/gNv1lMUvBrMntH6gz
+         XTLFEdc7RIoqNiJCjiqoK1rRDpBtbOfnfirLVt8GogAdCfGATLFHSYGSU5NYFqa1GCQA
+         9Rgug4Gkrey0o9T7H/09HGxj1X+m62Xvi+CAguiKXZgNy80EeCqve4h1LchjknmjYhD6
+         7YVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Hvbv4h83/gh3e9PL4i/Jed17SUFA0/98By/JOQOBZh0=;
+        fh=wyWsXAgja5fTTsOZNbb2LupfyLsh27Te7okfNdMlF1U=;
+        b=S+0ZBIGY6WJj6xVRlXbTYIPCtOmEfrpC2IKPIG26LYxS7jhhdUQnHlGf6mvR+ZuEg7
+         xPxCABHUM+njebYgi23RfgtftfqXKKp2qN9nxPyCMSJd/pDunCwTUxqKBkRkldOjddu9
+         0fGfZ6C6WONWnU2SrFBStK5deFjxw4F7+9Gnt30dl6W+xmK1hlgBGOfxKF9jgAdIsFBn
+         XJHvyjbMkt0aGE5+THfD5iV3gZ0AmSaipltEAzqcBnWmUNkWMLaDdziwywRFskwupKkg
+         Ooyr9yD4DHvQKKQzM6VVv+YGrkGXfUoc02PP6/V3FtzpFgFpiqd9gDxua2dDypFTnImy
+         Vb8g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=genproof-com.20251104.gappssmtp.com; s=20251104; t=1792010391; x=1792615191; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=Hvbv4h83/gh3e9PL4i/Jed17SUFA0/98By/JOQOBZh0=;
+        b=U7F475OdYf5kb07nThOQvtR0WFPPyrqMnHZjQXQgOzINTPbb0DY8LoFFI5o73SV36+
+         VXe7kk3owmDCKmzmde08X+A40npWreGlmfAqsG2EVl1zAjHeyrc3irmnjs/z+MhHYj+z
+         LOsFcfDvSwc2lnT7OPa5YKirDwMks2y0wmZytdsbyInUL45lsLWveKAQI65tamLzp+jB
+         2oR3qiaAVNCXFaZEHm6AWQIlpyzIMpZ6O0lpx0iZYYbsgn9HVbW/y6DwtM2Qn0p8nSJE
+         2lEPbDL/AwR6hMkwocn22Q7QPyTLsAFAkrWcGnDzx68YJgk2ZMOl4xUCcW19unKlf2YJ
+         VIeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792010391; x=1792615191;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=Hvbv4h83/gh3e9PL4i/Jed17SUFA0/98By/JOQOBZh0=;
+        b=HqURsJ7YwwQv+aj37ulLU1bqFqEparDSKQa9te+Gqfn8WQIiiStzmJ8E6siTRTjPUt
+         BujJ9+Hh1QFLODr4AfSf7chtSu81bVdmG37N8Unu2OzIZOlngsTm7U2GLVqXwcAFn8O4
+         rzhJgKAafPtf/rogdFAoyTM7X6FgvrLpw0NkdZwWIal/KcVhKviWGBaeRD3eQhP7mCuC
+         kdAq4oiQSUAyq/HCjW5/0ViOrRSRg0gZJSCGgcA17Ms5HMOPccoshGr0JqbDlhOgsyBB
+         wV+q+q1UziMDhvuGhvzQReS4kzzvAaPuVQwHwD3qOw6+vyi8ohgbjYbjFeY2ACu5j25h
+         gjSg==
+X-Gm-Message-State: AFq9FYKDHW0mmqgHOJ0fDpofUK5P4fYa7vOZqhu359ic46chQrnmK2aQ
+	xlFaMst5IFiBDedh9Ot/TxqhKpRUaG0rHSSXXGZ8w3Kh/mdOq+GJmPXMjnRPwNIDKl9h7vFSLJq
+	F2yAQV23aYJNqf2YsTPSF71rxHDKQEXujPp6rgTXpJ0o=
+X-Gm-Gg: AYBFou2EbgtJ0KVSRrUVSmCMy0xHuJ70A6qfFUkhnbhkylUb/vAUSnhMH6hvDDZu53+
+	r8/MJAUjzBab3SKPpMWn7EbVRbhFnyE7mqoCs45Z2KzMrVgknC9a0telMsalb3HiZIhCOKT3ZcU
+	wFD17zoWkIYDi1lvxffrT4pvjDrpFoHApgDNwCrTAI6Noi+YBezXUGybTICoL1T+sVIkz2XC37f
+	CFasp50Sw7/P1lC4X3QMyemKcboclh/FxIaLFxZWewJ2tdNU70smpmqPmIaOy5w9XH7WotNs2Na
+	Xr2E9QEKaefkEhHQumJWvMigrrGwIGG+VwZ1tSxd/IAlXby6mcp+oWoYUIysZdIDpQcAVRc5/jt
+	YvvOWoWhdzKgr
+X-Received: by 2002:a05:6214:5082:b0:91b:80ac:66ea with SMTP id
+ 6a1803df08f44-91b80ac67d2mr172010016d6.24.1792010390916; Wed, 14 Oct 2026
+ 13:39:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261014-libcrypto-chacha-32bit-2gib-v1-2-e0719ca0be89@genproof.com>
-References: <20261014-libcrypto-chacha-32bit-2gib-v1-0-e0719ca0be89@genproof.com>
-In-Reply-To: <20261014-libcrypto-chacha-32bit-2gib-v1-0-e0719ca0be89@genproof.com>
-To: Eric Biggers <ebiggers@kernel.org>, 
- "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
- Vladimir Kukharenko <vladimir@genproof.com>
-X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1792010354; l=2832;
- i=vladimir@genproof.com; s=20261012; h=from:subject:message-id;
- bh=TE9/gftYr+enx+PZyGbuYGXK7HjmheuriB0NIElpFUA=;
- b=WOkimjKS6q9y+tTvfw/GyU0mi88Yj7HdCBcTmTAQGDb1YctRcrBvsYwbJ1Jg3i7NiV+cIVR+a
- 8pxikIGozpaAWK0ypu8z2t18ifIHtLu8A0hLRdsR/pNvbzEHMC7SEVg
-X-Developer-Key: i=vladimir@genproof.com; a=ed25519;
- pk=EqOzBSKBgFn7ExzKj5f9T8u+1yTrGVlLBwf3fj/sdHM=
-X-Endpoint-Received: by B4 Relay for vladimir@genproof.com/20261012 with
- auth_id=1169
-X-Original-From: Vladimir Kukharenko <vladimir@genproof.com>
-Reply-To: vladimir@genproof.com
-
+References: <20261014152604.323310-1-ebiggers@kernel.org>
+In-Reply-To: <20261014152604.323310-1-ebiggers@kernel.org>
 From: Vladimir Kukharenko <vladimir@genproof.com>
+Date: Wed, 14 Oct 2026 22:39:39 +0200
+X-Gm-Features: AclHuK9hyj4qEGknIGYgSBtc9GBfZkkTP8Pl6YErh1Uue02KgFYR-0JbdSeWHNE
+Message-ID: <CABB2QaKKvuTFt5fHa6+=n3siom4TFYCqZ67bcHyHTrD+PogojA@mail.gmail.com>
+Subject: Re: [PATCH 0/2] lib/crypto: Use size_t lengths for Poly1305 and ChaCha
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-mips@vger.kernel.org, 
+	linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-The MIPS ChaCha assembly, which is chacha_crypt_arch() itself, tests
-the remaining length with signed branches, so for 2 GiB + 64 bytes or
-more it takes the final partial block path too early and processes less
-than requested.  It is only used on 32-bit kernels, where size_t is 32
-bits, so declaring the length as size_t does not avoid this.  No
-in-tree caller passes such lengths.
+Hi Eric,
 
-The partial block code also keeps the remaining length as a negative
-value, so instead of changing the assembly, rename it to
-chacha_crypt_mips() and add a C chacha_crypt_arch() that passes it at
-most 1 GiB per call.
+Sorry for not replying to your question on v1. I was already reworking
+the series in that direction and should have told you.
 
-Tested in QEMU user mode: with a length of 0xfffff045 the assembly
-processed about 4 KiB and advanced the block counter by 64; with the
-same 1 GiB loop in C, a 1.25 GiB + 4101 byte buffer matches a C
-reference.  An LLM review of this code found the bug.
+Thanks for doing this. I tested your two patches with the lib/crypto
+KUnit tests in QEMU on x86_64, i386, arm, arm64, powerpc64le, riscv64,
+mips, mips64, s390x and UML, plus temporary tests with buffers over
+2 GiB and 4 GiB. Everything passed, except for two things that fail the
+same way without your patches: the POWER10 Poly1305 interrupt context
+tests (I force-enabled that code, which depends on BROKEN), and two
+Poly1305 tests that crash under QEMU with AVX2 because of a QEMU bug.
 
-Assisted-by: LLM
-Signed-off-by: Vladimir Kukharenko <vladimir@genproof.com>
----
- lib/crypto/mips/chacha-core.S |  8 ++++----
- lib/crypto/mips/chacha.h      | 20 +++++++++++++++++++-
- 2 files changed, 23 insertions(+), 5 deletions(-)
+Tested-by: Vladimir Kukharenko <vladimir@genproof.com>
 
-diff --git a/lib/crypto/mips/chacha-core.S b/lib/crypto/mips/chacha-core.S
-index 706aeb850fb0..1a2253d91af7 100644
---- a/lib/crypto/mips/chacha-core.S
-+++ b/lib/crypto/mips/chacha-core.S
-@@ -196,9 +196,9 @@ CONCAT3(.Lchacha_mips_xor_aligned_, PLUS_ONE(x), _b: ;) \
- .text
- .set	reorder
- .set	noat
--.globl	chacha_crypt_arch
--.ent	chacha_crypt_arch
--chacha_crypt_arch:
-+.globl	chacha_crypt_mips
-+.ent	chacha_crypt_mips
-+chacha_crypt_mips:
- 	.frame	$sp, STACK_SIZE, $ra
- 
- 	/* Load number of rounds */
-@@ -414,7 +414,7 @@ chacha_crypt_arch:
- 
- 	/* Jump table */
- 	FOR_EACH_WORD(JMPTBL_UNALIGNED)
--.end chacha_crypt_arch
-+.end chacha_crypt_mips
- .set at
- 
- /* Input arguments
-diff --git a/lib/crypto/mips/chacha.h b/lib/crypto/mips/chacha.h
-index 5a565d0a8c26..15b39c744c28 100644
---- a/lib/crypto/mips/chacha.h
-+++ b/lib/crypto/mips/chacha.h
-@@ -6,8 +6,26 @@
-  */
- 
- #include <linux/kernel.h>
-+#include <linux/sizes.h>
- 
--asmlinkage void chacha_crypt_arch(struct chacha_state *state, u8 *dst,
-+asmlinkage void chacha_crypt_mips(struct chacha_state *state, u8 *dst,
- 				  const u8 *src, size_t bytes, int nrounds);
- asmlinkage void hchacha_block_arch(const struct chacha_state *state,
- 				   u32 out[HCHACHA_OUT_WORDS], int nrounds);
-+
-+static void chacha_crypt_arch(struct chacha_state *state, u8 *dst,
-+			      const u8 *src, size_t bytes, int nrounds)
-+{
-+	/*
-+	 * chacha_crypt_mips() compares the length as a signed value, so pass
-+	 * it at most 1 GiB at a time.
-+	 */
-+	do {
-+		size_t todo = min(bytes, SZ_1G);
-+
-+		chacha_crypt_mips(state, dst, src, todo, nrounds);
-+		bytes -= todo;
-+		src += todo;
-+		dst += todo;
-+	} while (bytes);
-+}
+One gap remains on 32-bit arm and MIPS: the ChaCha assembly there
+treats the length as signed, and size_t is 32 bits, so lengths of 2 GiB
+or more are still handled incorrectly. On a Cortex-A7, which always
+uses the scalar code, a 2 GiB + 4101 byte in-place chacha20_crypt()
+changed only one byte.
 
--- 
-2.43.0
+As a suggestion, I've sent two small fixes on top of your series:
 
+- arm: use unsigned conditions in chacha-scalar-core.S, and
+  DIV_ROUND_UP_POW2() for the block count, since DIV_ROUND_UP() wraps
+  above 0xffffffc0.
+- MIPS: the partial block code also relies on the sign of the remaining
+  length, so a small C chacha_crypt_arch() passes the assembly at most
+  1 GiB at a time.
 
+Feel free to fold them into your series or handle it differently.
+
+Thanks,
+Vladimir Kukharenko
