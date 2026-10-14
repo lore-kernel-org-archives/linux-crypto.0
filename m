@@ -1,56 +1,56 @@
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012011.outbound.protection.outlook.com [52.101.53.11])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011065.outbound.protection.outlook.com [52.101.52.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81995502795
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2026 13:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F3C52E050
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Oct 2026 13:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791985038; cv=fail; b=Ijg6SU7NdAe+AnHylBBzO5mQx2/0X4ZHxx37u7EniMYqPCe3qRco9JyodhZVFghZ+3PzlOD3JOsmuuInNErTWETmr3doVYJZMKAxLzIHfjrBEMRaN8H7Z3IPN5qwIY+lLO/bBHmoX5JB5WCE8UAS7/n3ZrojMXrYOlzvG7fhMEA=
+	t=1791985570; cv=fail; b=a1feAeRMDM6yz0q0Jmrz5YqsKwStD9UyqhwDV0eckIFE5TOVc2Z5OSmPlmUliTemapV0Go1DgBdzIEP2DYt0gDLJ9t/WbB6klkggw0bF5ry150Nr9oRQ3gULHDhgClCVmXv63o0QU6YDrPCkaDGvUvWgxJ4yZFlUQH99MUpmkhY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791985038; c=relaxed/simple;
-	bh=ImQLBKetpFG9k75nOzpf6wNVlpFmueamiolve0qNxvs=;
+	s=arc-20240116; t=1791985570; c=relaxed/simple;
+	bh=oF0BABzL1dTUcZUS81q777JK8J8EYVmcgLfrNtCmTfA=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Kk2iQz7LNAezX65znqdXlrF9Nb9dF4aTgUv+TVZc+Y/cxM8LADf9TfWaZh+M3QDnWeE/Pb8fJKJLkgw+MdBSsVxcynlztYkkpYDqFljyd4/gI8hzWDZOSeohMalXigb0sJSPfO4nZH7nnm92ixxRgAvo7uOn8jXZy4mzGzlNnmE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=T96pT8mY; arc=fail smtp.client-ip=52.101.53.11
+	 Content-Type:MIME-Version; b=Gpivr90ra/VBXkog5zib2Vp3sWwFeXy2yJ1NjKGxtZmDOS4YzwEeXrG7KjcTF4BNqB6+SyyjCU5hFBY4aAry3ya9GHFw3WWNpjgDKB09Ui3NxdyVYIAbFKji4wfW5wkZHhK0Mz10d31syJCWxfEvWTVrcf3dDZd8Lae/y3MFnUs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=v85P9RX+; arc=fail smtp.client-ip=52.101.52.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="T96pT8mY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="v85P9RX+"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ixOLOU9w+MdHjIndet1EmofTOe3V1AoVUGwQwO7gFcck/Pyot8pYxG1ctBmWvE7QL4nK+EKyvjddrHcX2HMqUN4AcfoEmxnlbXNaRWmd5cNvyASC4+QNWb0IaZvHu29TUffQT27bRWasVcqSCr0F6b6RhzaI2CLnB+062TE8uoUhekMMqAgufVd5zerzGmTHrhPRJuOQ4e3gVXCFPwk81UrIIYzDrceKlbXofZpII4mc0+821XIPxphK/N+aRRQhrz7yNqeGeoO6mVlbXlBpS0MgVVbB9CKf5XSuhVlj7QWjPkcM3gzeC6WGIYX+badZcUIied8pyc3EZ+HKHisGQQ==
+ b=PaIf8JBtwpYCeYaKmrVw/6k81mZS7ZptWahXfDhsrTA8Jvvs+vrdfC29VDUhNm/iptGHqr7TiD1WRRHjWGZ6pPrHzq5VhSfR7pI2QDOSnp+h6AaQ7bOPDXOrr7Sy8FVEsoOf5RV3UsLML4lVQT4bwAC0R/6c0Y9w4d89wGVVSL+tr+TLlfFs7LX1gddFpw25hxPnGJlwyesFWHJT+7Fdfoi+CBVB2IdHTuBxjxThS/fhdv4KgqOvpsy8rn5gV2DIXLmCw9pg9U3ajEoDEH0tnfBPfyU5WU8GiYhkrNsSTi1o1zfv4xOE4uM/ltcIQJYmb/hj+F8tpUI+J8BsyPNliQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BHCL3Efzn4GOJB1kqyqYvoGWrMzr+Dfj581KyXZG/80=;
- b=VQTs8QPWbmM3q8zt7KcVpRx/nTyk/yZMrWMJtpLiCRQUVfmdzNWNl76ThctKz7xH1HkCY2m7iU1hoTViLw43nQp0aXYni3EvmaEduhsqj1fMnYpHW8dPeVELfM2K0Q21sXkbb/kkYcnG02qlVWjKy02yXKTxVYwLyNizEP8pUeGLf5USQRrm+vhKea7dGM6EGalRokvcG7OJ2J2znCQK7G74b6Xbnvon9zOaWMTWv8NqaUL1jb5bga6SDvIdXDuX1Rcvbb75bN7gvHKZeVTDHlANq0dMeYH0OWe0s+6SjP4hoib0L00KL75E1PJHWolVHsLMmFMF1p051dNg2Ui/hA==
+ bh=+mrq20QUKt3CkhJrFFlZ1Z/lqNHAmt74gvDFaJj0ES4=;
+ b=QQrY/4n3mQT64s5jDkFQsRCuosiuoGVvr9+u84Iw1w3Kj4B3YmIUwhcZW00obI9B2q8fRqkHnb/fUV9Beo6uctrw6LKRDhXiwKlVB7ZHVbNEO6eOLRsxL8/rjjmCayYr8oolQ/YGZfXZ/LJCS3nLwrin1ATKXMEOBhs6PTY2bDOYWhR6lZgB12iEVh8D5Ru9Y9a6WAHnokMAZTXdL+qc2bwG2uiFrIQAhongFz243x6tU9tb9Qh9C8NoyugU0p7GgcD/zzCuchnbwrGzM/C1rjuL6FTGiUM4u4SyPDF1d69KsF8cGWKmNLkzDfOWWNr8cy/rp4tPNTVnG0CClW76Dg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BHCL3Efzn4GOJB1kqyqYvoGWrMzr+Dfj581KyXZG/80=;
- b=T96pT8mYfO1CxKmofYijYyORk41bsXG2Z7ZbsndOCCRJ2073u5NAUD5IRy5jbzrB4qF6G7mdWptXF63YJpYaoPDaHnOfhHXAAzykeCqNbK7iD/oT7Q62LeE6gM8vMB5tqSpZ2sP9jQPWj4Ix/g/IT9ysFDNimEd7oa457SH7PdU=
+ bh=+mrq20QUKt3CkhJrFFlZ1Z/lqNHAmt74gvDFaJj0ES4=;
+ b=v85P9RX+ejTPye1QOtmxbfbWUxldcVAc+Gk/2W4fF2m8BGNaP7eFZBvobJQ0QjP5bUtKzwyeDuOMqwlooEEiF/ar8MdeLaOFkQf3LYt+M39uQGMDYNQTpnx/ZVGmP6y+juPxHSYKARkIxvwlyG1m8pqOesrLLSQ02geDzF7S+kY=
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from SN7PR12MB8131.namprd12.prod.outlook.com (2603:10b6:806:32d::12)
- by IA1PR12MB6354.namprd12.prod.outlook.com (2603:10b6:208:3e2::11) with
+ by BL3PR12MB6425.namprd12.prod.outlook.com (2603:10b6:208:3b4::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.12; Wed, 14 Oct
- 2026 13:37:12 +0000
+ 2026 13:45:54 +0000
 Received: from SN7PR12MB8131.namprd12.prod.outlook.com
  ([fe80::c2dd:62c5:67fe:aa46]) by SN7PR12MB8131.namprd12.prod.outlook.com
  ([fe80::c2dd:62c5:67fe:aa46%6]) with mapi id 15.21.0496.021; Wed, 14 Oct 2026
- 13:37:11 +0000
-Message-ID: <6ff1ff1f-6849-4d1c-9232-ea8af465c606@amd.com>
-Date: Wed, 14 Oct 2026 08:37:09 -0500
+ 13:45:51 +0000
+Message-ID: <e33122fd-4c55-412f-8780-9aea08ac641e@amd.com>
+Date: Wed, 14 Oct 2026 08:45:49 -0500
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] crypto: ccp - Shut down SEV firmware before copying
- to user
+Subject: Re: [PATCH 2/4] crypto: ccp - Check SNP initialization state after
+ copying user inputs
 To: Michael Roth <michael.roth@amd.com>, linux-crypto@vger.kernel.org
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net, ackerleytng@google.com,
  ashish.kalra@amd.com, aik@amd.com, seanjc@google.com
 References: <20261014132145.1726322-1-michael.roth@amd.com>
- <20261014132145.1726322-2-michael.roth@amd.com>
+ <20261014132145.1726322-3-michael.roth@amd.com>
 Content-Language: en-US
 From: Tom Lendacky <thomas.lendacky@amd.com>
 Autocrypt: addr=thomas.lendacky@amd.com; keydata=
@@ -97,11 +97,11 @@ Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  qFAgP+x+ODm6/SYn0LE0VLbYuEGfyx5XcdNnSvww1NLUxSvuShcJMII0bSgP3+KJtFqrUx9z
  l+/NCGvn/wMy6NpYUpRSOmsqVv0N71LbtXnHRrJ42LzWiRW2I5IWsb1TfdMAyVToHPNaEb0i
  WiyqywZI5g==
-In-Reply-To: <20261014132145.1726322-2-michael.roth@amd.com>
+In-Reply-To: <20261014132145.1726322-3-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR14CA0010.namprd14.prod.outlook.com
- (2603:10b6:610:60::20) To SN7PR12MB8131.namprd12.prod.outlook.com
+X-ClientProxiedBy: CH2PR14CA0011.namprd14.prod.outlook.com
+ (2603:10b6:610:60::21) To SN7PR12MB8131.namprd12.prod.outlook.com
  (2603:10b6:806:32d::12)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -110,140 +110,155 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR12MB8131:EE_|IA1PR12MB6354:EE_
-X-MS-Office365-Filtering-Correlation-Id: 90e7ac6d-0d54-42d1-b34c-08df29f84019
+X-MS-TrafficTypeDiagnostic: SN7PR12MB8131:EE_|BL3PR12MB6425:EE_
+X-MS-Office365-Filtering-Correlation-Id: f8414295-8fa2-4fba-e979-08df29f975e2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|366016|23010399003|56012099006|11063799006|4143699003|261009223027099003|10067099003|18002099003|22082099003|6133799003|3023799007;
+	BCL:0;ARA:13230040|23010399003|376014|1800799024|366016|6133799003|18002099003|22082099003|10067099003|3023799007|11063799006|4143699003|261009223027099003|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	LgN4No2YTzDwcgBchX6Gjm4jdsonoHWFKk0xdSq/vM8EbFeOvCSmms2cdyHxh9c+ugBQdsSfFkglT2kVRWXadSBHxiyCH0mvXZXe/jV0grOdhU4u3vLA1OH3i3gGRRV3Pcbs8yyh/bIvZEXGrBCwmEqL/dbk/tF/B83eduKbbIeS5CslRCbbcSmDhwexUZfxwHFh6I9023MsO+00XTBk04/3LYhmunziTYhqe3fBjij5Q8s9ZV2CaZ+q3YwVQLZLik6EFcGlG8gtwijh8dpz3r6rrOnAJZ3L3ICPXQ1BQWTO3oDCqPHeKzpkPm1ktBlUeQFwHXXMeOtT4QAffSR5Ijm06MWfNYGn4R8IVCTyBsXkSJQng4H2GMoudxCQxkZabr430iS37iMJj4NL+6VP/k18NXzcDUagSoOUOUguNZ9iDaAkXnvBbMJbo2RhKIaaFQUqUBprlLh3EYhqS9I+ZcVwrXrJS2aRhbqtVGV2qeGmHCnt+w/pxBtabg4k0ljxfSHmhBT5uiY4AgX3EGi6Le1yshzprneBDFR8o9JLuW5SnPWwlUjWsKSizTxsAzj9wcQjxoga+HmxhtW188ybJTw1R3mOnoP9JSoIvIt4017umKF5xgZDB1Iizl5T9Jsleq4giSPF2cFwnHKmQ4oy0yPQkyYnZs3DEy9ouZpi0lE=
+	dxJ6bYvBjrtjhUDZIRHZUPrQNUgjMh6oe18XHIeOvVor6jdcWHNjEWSJu/kg0YoZJPPVyLQ3ihQo5SwQjFf7D3XjcDs88KEkTqxePGMm6xt0vo2+etXhiAgsY0xB9ZVJpwoJMpHLCdEbqwrwogzNI+TkXgfNrlRmkgnHQGaug/zQkVhMEINTMTJND7W3wtxb01uoG+5kmmd62TGd8dMkVAYkbg06KRrVZ7re1qb1ojsH1MrOa8KOcvCIURD1+fYVbu8wnJV9U3Gwhys817oyxDCJCNWZMFsOXiFtVdkcySvLbj2X9LHdqYyLcpcXNOTACaRtj4Wzgxj42MXpmTBTT9+iEZvqOuHb1yN5Yvss1+OUyg3mNKBXPnmW9u8NDSME8DSTc6qFBKkkyHYSB6jeM/QE7YZ0+adfHD/VL0669fpyawN+T9I86F/byS8BJLjRhiENAAsChTnmppXa+m4O/PIRVVjVfM8W4cYWuYo+ssMsFKivlAJHdMlQWhOAh0Y51iHFuUi6RvRE0yJ/45fcg3k2hA1UpPFzXtfV051K8dM6H4Rc5nzihJ60tlXx5FVv2tFPPTcnrzHt25GO87DkctI8Nsv7a53L4ZK6WP4b7RaCDr2D3C8V3rrrvDFRh8CiVw/Wfjhe+6jEnSFHhOs2ZjljqOX0O9mQt1wYKhfz9pQ=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(23010399003)(56012099006)(11063799006)(4143699003)(261009223027099003)(10067099003)(18002099003)(22082099003)(6133799003)(3023799007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(1800799024)(366016)(6133799003)(18002099003)(22082099003)(10067099003)(3023799007)(11063799006)(4143699003)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZSsvTVlGaWJzYkgwZWRuQUxmSlRiYWNMcjdZVG9NUG1IcTFjejhqTEE1VUpS?=
- =?utf-8?B?emNRK25CelFvUVh2NHZtNU1OdnN2Y2pZQ2JvckY3VHNtWFUwdHlPWGNBaGV0?=
- =?utf-8?B?SkNHRS9VMTdUdnMwWk1xMkhUTEZUUGZDUEJjVk8xREV0RWtlUFNJV29SWElG?=
- =?utf-8?B?N1hXcVFKOCtYQnVxVEtaMDkxYUFyM2pxRWRrWTRxUVF3RmhvYUtnZEFZM3Z4?=
- =?utf-8?B?TlBqOVVWU3FaRWM4MkdpcWZsYStkckpNTjM4U1MrQi92dWUwY2Zrakd3Sllv?=
- =?utf-8?B?UFdEUDZaVVNocUpVUnFrRG1tSjBPQVlrYm5UZDFFSXM0WmVTU0VJYTE1UURa?=
- =?utf-8?B?Tk90bTJvcE5aYys4OWNKUW41Q0tZTm83eXFQMGY5dTM5OHNCQ09GNFQ2eXhY?=
- =?utf-8?B?ajhxamdubllCdHdQWG1xdmhZcVJMT3o3cTRTMVVQRVgxeG1kd2xjOE9mSlVU?=
- =?utf-8?B?NitjbmtiWmJZSjR0RGp2WG0rVmQ4N1dQYXRHbDZPN0MyMTJaYUxKNjZsVmxh?=
- =?utf-8?B?MXBwakh0U2F6WEhzendmNHVvcjFrVkw4Rm4rdFJiRUh1dEQzcll6MER4RXp6?=
- =?utf-8?B?ZHl3TGpyUGdUYXhFMXJ2TS9xQVB0RmNqM0lWeGxVZ0hpV3FoUVJUUExFekgv?=
- =?utf-8?B?Qzl2UTJwcXhCMThKUzZ4cmhpN1kvaUJxZnNiVDQ3em9aNEtyaWdSMHJzeHFz?=
- =?utf-8?B?NGg4OHpBTmxjd1VCalFoR2doVHkwZUFaUzNVdEZ1WVBvbFRibmhJaE4wWmxz?=
- =?utf-8?B?aWhOdVNYV1hVM2M5aW5MVUwxZnhYREFlZVNIWDgzMEtKeFBsSFVnbVlCMG9J?=
- =?utf-8?B?NWZQbk81NHNZT09wYlhueGJHVnRZTWhXdkl2ZXlBdFZ2UlYzNEc4RnpEUUIx?=
- =?utf-8?B?S3RkeHdFd1MwTVArTjhNdzFoRlJUZ3h0QVRJUWxKWVJtNUtWa2pEYUZWSTdZ?=
- =?utf-8?B?UDYya21yQUJ0QTFIRGJoZHZvMnpDMTZuYVRDQXZUUDlzR2xvcjd0dHp4TEVm?=
- =?utf-8?B?SEg5NmtmdHhKRHh6dGdvSHlYZlBhQnp5L0g1dkR2UG1RVm95d002UTNRT09n?=
- =?utf-8?B?VSs2ZXh3dXBxaGVFdmxGeCtpK3VUakxQRTBsQjd5ZFk2SG9XN0J4YlF1Z25C?=
- =?utf-8?B?WTBBR0crQnZqRVVGVVNmaEdmdzd4dGdMWmd3VFBBUEJnT0p0a0dIbVhCRHlk?=
- =?utf-8?B?RzhIaVVTRDE0VERWcTdHdVRVeFFjTDlUQ0JsRGFMWFphc243TTFTc2JwTkRu?=
- =?utf-8?B?QTZNcmNmMERCRjZNNXgrMmx1Z09jTmNYOUNteWxCQWF0MC9HL3FXdkZrVjVr?=
- =?utf-8?B?SkZ5WE8xdCtVOFlJQVZxTmNqSXE4RnpEaWM5MmlONHBUWjdGbllUT0hBUThn?=
- =?utf-8?B?SDZnNDQ1VWdkcjYwQnFVSDVOcnlBZXV2MHB1UkVZSGtnWlk5UFJ1T3NXbUVX?=
- =?utf-8?B?a05QRlRNTkRvZ0FWd1d1K2ljZDRTNmNYaGgxTHlLMlNxVDR5VWVWaWJLZmRs?=
- =?utf-8?B?Q2RTejcwZWwzZVhHSllMbk1NRkh3ZHNkOVZtQ3A5Z3lOWUxpRE9BUzl6ZlpC?=
- =?utf-8?B?V2NEVTYrZ3ZWdzIwaGZWMFlRd2wrQys5cjE3SThhaTJyUHhoQlBENm9STUpP?=
- =?utf-8?B?eWNoUUJqNXBrZm1yZ09ienYzQ0tKTXY5dkhUdElHbjlmbGVpUDAvWmZOT1Vq?=
- =?utf-8?B?QjliZ3VSZlBxSGpweG1KU0QrcFZHT3hMQnIwMkp2bEtYWWp6STBqZlRQOGp6?=
- =?utf-8?B?UGRja3BtNi9YcXpNd3M5ck8zWlNwUCtoK3FJbHFlUU1Fc3MvWHF5akJHaHAr?=
- =?utf-8?B?S1Vwa0ZRTHVHNU92djV2Mmc0QTN5N0VvYzhmcmtMcWt1dUJKQ0kxWDhhY2lC?=
- =?utf-8?B?TTQ3VHVMK0tBakZuMjdoSDhoRlQrM3ppQ25ORjd6MU5HTXNqRW1nQTh2cGN6?=
- =?utf-8?B?U0FybUV6Ynd1MTJRdFFpTHVrWlpoQURJbS91WS9FdU9XYWdvYUNuVkxoSjlN?=
- =?utf-8?B?bG5UZi9GbzZaSmRmcVcxUWxWcHpiak0vaWlGNklHN0VKdUNBVWRLVEtUUDB0?=
- =?utf-8?B?VGlYaUFkbFEzQWFvUjlLTVpBOXBLUHl0eTdBSmdLMC8yVFkzbTl6NDJBbWIy?=
- =?utf-8?B?WU92VlQrRGZYM1J6NzF2cDZ5UEJkVE54OFcxbytTVlVyNVlqczRaWnNCYm5M?=
- =?utf-8?B?Ump0Z2tTNUprMjV4MEl6N08zTnRyQ1hUSUgrQ2dPSFEzQXlNcTN0OW91VHJr?=
- =?utf-8?B?UHlKN2svQzhpendmWjhzZ1VYdnFNODhEMXJnN1g3UlhQaUlDY2NrUG5SQnpt?=
- =?utf-8?Q?takanL1XLd7BlA7cVM?=
+	=?utf-8?B?OGwvR29Cd3RRZUlYMHZzUEdCMTZQMXBkSWlSMjJRWTNIYVJwNVFiMXBVMHNS?=
+ =?utf-8?B?cExTVmIxMkpYeUJYanFYMVlnZzNPK3hSSWZFb2d5TE1mbVBMNXdoK2xNMW03?=
+ =?utf-8?B?QWZSMXBBU2tlMUdiQnFqcHhUNldBVVRSeUR5cFRkdmxFNjEzMEhXb1dZSEp0?=
+ =?utf-8?B?Wk92cFFTeVdzZjVKMThKdDhmQjhFdno4L2dCWGxZYmMxeHdlSHh4Qm1tTlhK?=
+ =?utf-8?B?Sm5zS3pGM0VaL1FJTDlERURPYWRmMGxPZURXOXNWUEpnLzlKS3pyU1QyTGZ2?=
+ =?utf-8?B?dkZ2RVZjMXBsYzUrRGNVOUlueUVucnVIT1hObEp0eTNxOTBCdWdZUmdvdGw5?=
+ =?utf-8?B?ZGd0d2JrcnRuZTYrLy9EejRyMUk0ZDg4NzhKdWo0aUNEZ01OODNkNGtoUEx3?=
+ =?utf-8?B?b2hobzNUamdzQnlnei9mRm1kODlCaG9IK3JHMVV0anZBVFZVMVZmQU9RT0t3?=
+ =?utf-8?B?UnFXbUwzQUdXejBNK0drTWFDMTJQZEQzZkRDRU0yb2pTL20wc04rS1JGYTlM?=
+ =?utf-8?B?MjVhRExYQUp2OUVhdXNBUUZXREFCQjRRSzhkMHo0OGk1M2pCTlhhaHVqdDd4?=
+ =?utf-8?B?eWxCYlhZcVVrU2VyV01CSEdoZXNNb2p3Y25NTmhCNE5OdUdMSzhLQ2E5Qisr?=
+ =?utf-8?B?a3BraGN2eGp4bFd2M0lEVkpvUDFTQ25Xa1Vsdnd5Uk9hYzBLclU5M2pYY1U3?=
+ =?utf-8?B?a0hqczNoWHNVMmFUaGtaaFJWcXp5TEtRb3hyZ2VnNFNqTHhlSHFGeGpCcCtl?=
+ =?utf-8?B?MEE0T3A3dE9uVEZHM24xaVBEZHA0end0VkxIbElzT3o1SVdEZE9pd3p0eGlm?=
+ =?utf-8?B?SmIralo0MFVrUVZnQVROdHFOVmdsU2NJY0lLTXBTZU4wUXA5andrOU5jTkJy?=
+ =?utf-8?B?ZzVpZ2UyT3NRK21Fd0llQ3lSRGlOcUp3RHlsMW95ZlZsZXN2bGVYYTN5NnRw?=
+ =?utf-8?B?QUtTcGlQMTJFb3c5WmFrZnVCWVBKcm9PZnYxT2ZXUnZUbXJERnZaNXl4VG93?=
+ =?utf-8?B?Z1pZR0J5OFJ2V2pYYmtqYmRxUHlqcCszeitrNitVMUhZN3FaUU5WQU04NFRx?=
+ =?utf-8?B?UUJBM2FrN2UrYmJmcExmV0NRUmg0NzM5R0lWWStCcTlvaUs5bTBGK1hGOE8x?=
+ =?utf-8?B?U1FTVTY1U0NGcEtQekxxU09wbXo4YWUxY3duMjFpT3d5djJnUXlnQnZiU2Q2?=
+ =?utf-8?B?UFh4U1BpYUVmc0xldklxVG94aDRsU0ZxWWxmd1BiMzlzKzFtU2FOdW5TTXZa?=
+ =?utf-8?B?UWdrd1VTbDkyMGxyWEtSbzhhZ0lqRkE2bTRhYzM5MDZ3Um03VHc4NEVuSTBs?=
+ =?utf-8?B?WFZkeTZSdDRMTE1BNDZXNjg1Vk94Q1NjV3gwbGp2ZWJHTVNESXcxcnpmWUhF?=
+ =?utf-8?B?L0NCOVo5NFN6bjlNcUFQSklYUERTTEhTNEgyVGE3a0lSa0ViNXpCeDQ1bFla?=
+ =?utf-8?B?UDBiTEV6emppOTdnTmFPdDFidkt5MDVHWHRXamczVHhHeWNEOFdteEFjbHlL?=
+ =?utf-8?B?TW5lZkxjTzVoNFZ3ZHpTR2daaS9xUkhjNjR6aU1xd2hib0VvYjZ4Q1Jad241?=
+ =?utf-8?B?VnlkNWMrYlF0djBwOWFKTzVLWnlZRldibkRDRTN5KzJSM012QURmNXJoUGtr?=
+ =?utf-8?B?Z044b2UydW1oTU15cWdsR0Q1cVlQb0VDWmttakhyaVNDOVBTV0RSSUIxdnR4?=
+ =?utf-8?B?czJ1b0JHbWZsQmVta2Z5WjFMUjRBMjM4VFJoVnowclIyN1A3eFAwVmFWSUhG?=
+ =?utf-8?B?VjN1blZ5dVV4dDd2c2hGWlllZ0dOMldoMkFDV0lscWswTk1MZnVIU0wxWXdz?=
+ =?utf-8?B?Rkd3YW9OSEtvME41MDlSaDFaTmwzdS9zZGpzdlVwOVk4YnhsSXRrMXExN2Vz?=
+ =?utf-8?B?cEFtMkF5OVgvUW5iZVFIVXpabmt3bXQ4OXg4Rnp3V01xc3I4VStBaHQwMEE0?=
+ =?utf-8?B?dVhMM3d4emtaanJvL3NJY0xlMTIyT0h4NXZ4eUFwdFR5by9YNDhYbnVPZFF0?=
+ =?utf-8?B?NnhqdUNxelg1WVlhYlBiSzdld2d0WFZhZmwwMGRzNUFBbW54V282QVBWWWh3?=
+ =?utf-8?B?aXN1aFZRWVhQTGV5czlYVHlQbGFOcGZ2TWxnelpIM3MvcWhwVDVzTTNIUXJ1?=
+ =?utf-8?B?b0FyczdCc25HVzNpRlFoeGFoS0RhVDBOamZZQlB0NUorK2J6aERsczJibXJR?=
+ =?utf-8?B?dGFsQlBhZmk2bTc0RDRUcmNXbk43YzJJVDF4OGJ1ZjkyQ0ZLK29peFMrTHdh?=
+ =?utf-8?B?MWdKbEsweU5VWlFudHM2NC83U3N6enBteS9UYndiZUZJODFZSW9sZHQ3VDNq?=
+ =?utf-8?Q?xLX/cmWsQzHTMcFMV7?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90e7ac6d-0d54-42d1-b34c-08df29f84019
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8414295-8fa2-4fba-e979-08df29f975e2
 X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB8131.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2026 13:37:11.7717
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2026 13:45:51.3715
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: u4dYkhgJlk5PuptCRIr6pKKlD9tIg2HUBn2jPuJBOw8BPPz31fJwVB5MEkybtMKpbQEpUMiAkLstNomEO4WyHQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6354
+X-MS-Exchange-CrossTenant-UserPrincipalName: j3ocpepOkrpYR1gRssPD2BZkiRDovSmkx4CX6AddRljk/0K+tiiITsdMLqYJj2JRSCqCcQkIVgf3rGofM8TdWw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6425
 
 On 10/14/26 08:20, Michael Roth wrote:
 > From: Ackerley Tng <ackerleytng@google.com>
 > 
-> When servicing PEK CSR and PDH certificate export ioctl commands while
-> the SEV platform is in the uninitialized state, the driver temporarily
-> transitions the firmware to the initialized state, executes the
-> firmware command, and shuts the firmware back down.
+> When servicing SNP configuration and VLEK load ioctl commands, the
+> driver checks whether SNP is initialized before copying command inputs
+> from userspace.
 > 
-> Currently, the firmware shutdown is performed in the cleanup path
-> after copying the command results back to userspace. To allow
-> releasing the global SEV command mutex before copying results to
-> userspace in a subsequent change, the temporary firmware state
-> transition and shutdown must remain grouped with the firmware command
-> execution rather than spanning across userspace memory copies.
-> 
-> Move the conditional firmware shutdown immediately after executing the
-> firmware command, before copying the output buffers to userspace.
+> The SNP initialization state is protected by the global SEV command
+> mutex. To prepare for acquiring the global SEV command mutex only
+> around firmware command execution rather than across userspace memory
+> copies, move the SNP initialization check after the userspace copies
+> and buffer allocations, right before issuing the firmware command.
 > 
 > No functional change intended.
 > 
 > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 
+Minor comment below only if you end up having to do a v2.
+
 Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 
 > ---
->  drivers/crypto/ccp/sev-dev.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  drivers/crypto/ccp/sev-dev.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 > 
 > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index f833cb7e4da3..7de3b6bf71e1 100644
+> index 7de3b6bf71e1..e42cf3aee50a 100644
 > --- a/drivers/crypto/ccp/sev-dev.c
 > +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -2022,6 +2022,9 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+> @@ -2639,12 +2639,12 @@ static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable
+>  	if (!writable)
+>  		return -EPERM;
 >  
->  	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
->  
-> +	if (shutdown_required)
-> +		__sev_firmware_shutdown(sev, false);
-> +
->  	/*
->  	 * Firmware will returns the length of the CSR blob (either the minimum
->  	 * required length or the actual length written), return it to the user.
-> @@ -2042,9 +2045,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
->  	}
->  
->  e_free_blob:
-> -	if (shutdown_required)
-> -		__sev_firmware_shutdown(sev, false);
+> -	if (!sev->snp_initialized)
+> -		return -ENODEV;
 > -
->  	kfree(blob);
->  	return ret;
+>  	if (copy_from_user(&config, (void __user *)argp->data, sizeof(config)))
+>  		return -EFAULT;
+>  
+> +	if (!sev->snp_initialized)
+> +		return -ENODEV;
+> +
+>  	return __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
 >  }
-> @@ -2505,6 +2505,9 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
 >  
->  	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
+> @@ -2661,9 +2661,6 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
+>  	if (!writable)
+>  		return -EPERM;
 >  
-> +	if (shutdown_required)
-> +		__sev_firmware_shutdown(sev, false);
-> +
->  	/*
->  	 * Firmware will return the length of the blobs (either the minimum
->  	 * required length or the actual length written), return 'em to the user.
-> @@ -2535,9 +2538,6 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->  	}
->  
->  e_free_cert:
-> -	if (shutdown_required)
-> -		__sev_firmware_shutdown(sev, false);
+> -	if (!sev->snp_initialized)
+> -		return -ENODEV;
 > -
->  	kfree(cert_blob);
->  e_free_pdh:
->  	kfree(pdh_blob);
+>  	if (copy_from_user(&input, u64_to_user_ptr(argp->data), sizeof(input)))
+>  		return -EFAULT;
+>  
+> @@ -2677,7 +2674,11 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
+>  
+>  	input.vlek_wrapped_address = __psp_pa(blob);
+>  
+> -	ret = __sev_do_cmd_locked(SEV_CMD_SNP_VLEK_LOAD, &input, &argp->error);
+> +	if (!sev->snp_initialized)
+> +		ret = -ENODEV;
+> +	else
+> +		ret = __sev_do_cmd_locked(SEV_CMD_SNP_VLEK_LOAD, &input, &argp->error);
+> +
+
+I would prefer this to be
+
+	ret = sev->snp_initialized ? __sev_do_cmd_locked(...
+				   : -ENODEV;
+
+or
+
+	if (sev->snp_initialized)
+		ret = __sev_do_cmd_locked(...
+	else
+		ret = -ENODEV;
+
+Either of those reads a bit clearer to me than the negative check with
+an else - just my opinion though.
+
+Thanks,
+Tom
+
+>  	kfree(blob);
+>  
+>  	return ret;
 
