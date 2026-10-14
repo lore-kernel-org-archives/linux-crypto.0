@@ -1,73 +1,116 @@
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013071.outbound.protection.outlook.com [52.101.83.71])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012018.outbound.protection.outlook.com [52.101.43.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7463C1984;
-	Wed, 14 Oct 2026 19:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8949E418346;
+	Wed, 14 Oct 2026 19:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.18
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792004632; cv=fail; b=aQPeL7JP5oTolwiZFrvwa2KhJ7dbzsxkmqkiqMG8mjEbYnc14FTb8LtBv1fVsamwACdKVuUpp81E2GxDXHVTC/pKugc7syoDajxdJ7/wZmUroZvPK7rEkHIoxyqRh5cFMKrC5p/keFPLmDgIv9Z/CNIt7HIjs/IKgrh+meO838g=
+	t=1792006414; cv=fail; b=QZw3ZkD8Y27ZnATH44eB8leDURlO1YqP/4052AJH+hodLvGaQeIcFOMr+pjgkIDbJITE7Fmg1/zG11Isi1PqdFWnB5sXMf1Q1VYCAajp7MybuLNWHtEt4AqfD2xvcg44666eMnu8rhqjZRPEeJYR+FHF5wRWy36Os0kHAV9qnjc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792004632; c=relaxed/simple;
-	bh=GGFSU3faEEg65D68Ku4NlJe+PqS7CWvw94rfp3iYRAk=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=W3OTan38XvwfWpZdTZl4aah69d8n4vf/zq5Eh802/rl3RUBPeSDZmjmAg1/crVNZkupoiZpVjBZ170wqIsd/d0ZJmTc4xxUJMdnuPgNTCa6Px6mEWbF91MdW+I3mlVioSmiqgOqVC5pCc04ln1vL5jWbCBgndIZnF28TevlcX7U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=I62izhux; arc=fail smtp.client-ip=52.101.83.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+	s=arc-20240116; t=1792006414; c=relaxed/simple;
+	bh=8gVHgDm1ycbyat5G7Ovw3fG0SiRNLIHLaqEWT+9Ska4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Va/IgWnQegKLZ0v9zzVfhy6LgXm8dO7YXyCLQFdU2iAxJuWjs0clFZOG9bPUxzC4KY8mJ5dBIo9WV5xlUfhx+M6nvh3CpQrgMxav8UhMPJLBVHuM71oxVYSesM9WzfZeVWvzWXosz8ysB/NEb5NOn2XIJWjHBJOSVdvdEsgzit4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lw1GCEv6; arc=fail smtp.client-ip=52.101.43.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="I62izhux"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lw1GCEv6"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a8Ep+zUoE3snmgkBXrGi6EkRr8lQmGNvNQSBICprXxWOblMAMPAZ76wstVscV8Xxa846VK1uNRjsPa53px/hxazQdGFcCtVug1TY1hM/dT044k+91OAb+/axil+oxobb/320ax6apBQkqJNtIE87YY4TsHjcMxjvJQmNQm5i830SKfAfQ0HIWXrYY3i6DJzeUWb5RnK8ZNFBYvb9oJuoQuW0g1Sm1KzmswO5oIuaoUZ5hY8yY9egKHDjfPUZvEnztzKGFj+R5L5gi8p9SU5BJzhnyO4wStkEbadyUvpwOX2IcjKTi+hesRfMI8vHhZlqJ66061WgZm74SdX2plnh3g==
+ b=B/OHLYcgcTwF9TdH5bVyn3vTllDG3qeZzIlFkluMYi7Zfm6xUaSFIb/+gi9sxDj2zWRWoG8sT7HacaiyAX3qXQ53+jDPUXtiqfap1flrKRSYHmwpK5rlrb0dwOEXU1Gc4rrYn+I1Q++6XIACiVr7kmTVFKfC4tZ4iW8oaG85oJXzmLlLITOpCGmfowvIxn2XYMpoyQfEpZl8806faIOfk+vuKVzrRSdMMm/SBFwL7HFxjlh2FykudijQJbZqTK7xloEe8sFt075IydXPrB0owHU5djs+3nXEUZzgKQ7wjwUB406zTDTd8g9caE3wrd93WBhvXpMRCgcIDsjvT9VvbQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G0zN63vbOmDx5ET2iHdtl7Bw1EF9pF0okqQc+kGba3I=;
- b=fzjMk5LO/p9CB50YLSnYsLLKg6Dw9CUb3Hqwi98rKFb1WQJ9DNXfuqeMqQ97H7NAU7oX3+bg2zmdoJwYQ2RJ1WyZYL/URmD9I3CtBuJoZKVqOmdyttKJTfWKvfLiToCfIBHuayWGVmSXso7+G/F5K/oM6lgkC6OxsrZyBusSDD/dDhvPOGN+qo0HOSPK6xXMJlTWchqz6aouhzH20bl6TCgVLhx6rhGLrLes1EcEQ5sSta26C5u9rNwOJwHyT6xG9Xtv7PDx5sdq3xjgG3UfwrUphs3Ue3i4/ZgbVtn0FnmcXmmgXvtS1hlqRwfASayP+UyiVCDO0qLdoi6VN8pwww==
+ bh=dlIUr+jKklOP5V0YF0Qbm88nubKrpkEpZrHG4Hzm/h0=;
+ b=WYip3WU+Hc2dfw18aiy+pfJf9DrymUpwF/dkunOgkY//6AH8hkxMtBshR9v4muAAdUSvjukoZ+Mv30bkuiJuKVc5sPy36ES5wbu3i/Nu52aBUHe1VZDH20BZtcSuGvWW45RmBjt0xoBHV5FeA/WvP2eXxrFHHw4KorLLUHHl6wXnmmKEBwkQTqvmjrylksdW6V0w92w9rl3kL/nmAIj4IpE5gWQjymqUykJ1rYW2ixkpzZV1cu8yKZZdnqNDrDxWBxLeZ0VuRBB46bUdg+PlHLngatE091ikGR/vE4gp7MIKrQ9uwBQDA2KrE2Y/32AgSEwHNWorDFwfR8pCB1FcZQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G0zN63vbOmDx5ET2iHdtl7Bw1EF9pF0okqQc+kGba3I=;
- b=I62izhux5g0uAouzufQiEaDtaLJwV5hqoYpO2wvBp68mb/XQlIpAfHuReQHfyvUzNNT1vsqbJTy3eEXwDW2Bw+yKxJdlKsEARIgDdDcRbU48cm1FEuvdJEd4vueATw4AxiCEQy/tncbtB4Q8sw5ggQ1Oj4QJ1kPKRFjRzpAzFRuz6xq2nhpRN8USFaYq2UvOm3wyqf0Zjv907IdIHLhwu3NbJR0ZcfoiZDWk/jP9oE2VA7IEOOqiB4P3zDozADOqlEV9tuM4DU5f43iKz8JDRi0GVth77rCDkb6WGbuU9N4FvFHsUiqL7KeZo9JTm2yruuObNjT1BD3BXeq3y6e6wA==
+ bh=dlIUr+jKklOP5V0YF0Qbm88nubKrpkEpZrHG4Hzm/h0=;
+ b=lw1GCEv6dqBRBXWkUYQsnFqMkNTTirhAs1M5DBlgOOMoSzfUfwHBGtzmFxgEFvtWzI+Oyf9uEkD7pWlFoPxixN4oSyknYhLofGR4MftkMkUd0zc3d9WPyuGV8YN2kwf5fyw5KNJcTibHFiIzw44KZMG1e9OjdqAEGD4puJ6tzG4=
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
- by VI2PR04MB10764.eurprd04.prod.outlook.com (2603:10a6:800:271::15) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by DM4PR12MB9069.namprd12.prod.outlook.com (2603:10b6:8:b8::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.13; Wed, 14 Oct
- 2026 19:03:45 +0000
-Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
- ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
- ([fe80::2146:83a2:5329:b7c%7]) with mapi id 15.21.0522.012; Wed, 14 Oct 2026
- 19:03:45 +0000
-From: Frank.Li@oss.nxp.com
-To: Dan Williams <djbw@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vinod Koul <vkoul@kernel.org>,
-	Frank Li <Frank.Li@kernel.org>,
-	Jon Mason <jdmason@kudzu.us>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	linux-crypto@vger.kernel.org (open list:CRYPTO API),
-	linux-kernel@vger.kernel.org (open list),
-	dmaengine@vger.kernel.org (open list:DMA GENERIC OFFLOAD ENGINE SUBSYSTEM),
-	ntb@lists.linux.dev (open list:NTB DRIVER CORE)
-Cc: imx@lists.linux.dev,
-	Frank Li <Frank.Li@nxp.com>
-Subject: [PATCH v3 1/2] dmaengine: change dmaengine_get_unmap_data() first arg to dma_chan
-Date: Wed, 14 Oct 2026 15:03:24 -0400
-Message-ID: <20261014190337.1718622-1-Frank.Li@oss.nxp.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0147.namprd13.prod.outlook.com
- (2603:10b6:a03:2c6::32) To GV2PR04MB11799.eurprd04.prod.outlook.com
- (2603:10a6:150:2cf::9)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.496.23; Wed, 14 Oct
+ 2026 19:33:30 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad%4]) with mapi id 15.21.0496.021; Wed, 14 Oct 2026
+ 19:33:29 +0000
+Message-ID: <9f16cbfe-7864-4733-b4d3-4da03d731d7a@amd.com>
+Date: Wed, 14 Oct 2026 14:33:18 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] x86/sev: Only announce RMPOPT optimizations when SNP
+ is enabled
+To: Tom Lendacky <thomas.lendacky@amd.com>, tglx@kernel.org,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
+ herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
+Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+ KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
+ ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
+ rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
+ pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
+ nikunj@amd.com, darwi@linutronix.de, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1791905953.git.ashish.kalra@amd.com>
+ <11df35266257afcad3825a8e89c965bb0cf7cf34.1791905953.git.ashish.kalra@amd.com>
+ <a66f932d-4ca2-402d-9f76-628ef53a1107@amd.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+Autocrypt: addr=ashish.kalra@amd.com; keydata=
+ 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
+In-Reply-To: <a66f932d-4ca2-402d-9f76-628ef53a1107@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CY5PR18CA0046.namprd18.prod.outlook.com
+ (2603:10b6:930:13::8) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -75,298 +118,137 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|VI2PR04MB10764:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f77133c-797a-49d2-2b27-08df2a25deb9
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DM4PR12MB9069:EE_
+X-MS-Office365-Filtering-Correlation-Id: 772719cf-1564-4a7a-3a06-08df2a2a05ce
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|19092799006|366016|1800799024|376014|7416014|18002099003|10067099003|921020|11063799006|261009223027099003|56012099006;
+	BCL:0;ARA:13230040|23010399003|376014|7416014|366016|1800799024|18002099003|22082099003|6133799003|10067099003|4143699003|11063799006|261009223027099003|921020|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	vi0vZWKljCcg6OHgmPICk2Lrg/x5TrEBujmSSMQ9qHpJ2080yYDn7zqZNDiu+ltwNP6xwfpzfgY0wgKBh8eHOHOfXY83GwFWXOjFu5Es44P/zRORVc1DODUw/wqplyF9OYazpiL0rRi5QcVtZ+iYMsNcM+NDcO90Quctpszb3LuYBCFxjSgygqiO8YXerESUJ9khCYNAIfk8N4Z/flnN42A5VYG3SW+b4hTMEfVVyfiLckdaYJPk54mVXDswYF2IC46kF19Z+BDu6IRssRKUfeEMpDpL0bbjhBpOmB31h+3X7j1N8Ihw0/gLl2xkcbtSjEqLPmfiaoJUH8iUifCI9MvnBS9zQPsq8424KvXZjrJ3L+qIylKY4z7kxHrRWYiSvL+gUtc6sFk5sVaaJ28PnOSLiAJ/gWTjhlBDCx4Wkr9wqg7b6Wv6bN+OCVI/hHOZGjWg+MxggaLRgU6/DQdd+28WbDyvDm0YSIz8ZiquR7tVHS48LTjdx/T+LHevlnh5HDDHCQLoaD+HUCeckWhg4mYbtpd3K4k47wSO5dHPE5+8FYbrtShNub/WgJgQVIRIIBCPi/0uW44cpSnqKoYqi9WyJGrCRYjKsgKF51s2WMPqryDMCaSja7FXVRtRQCYgOuv44SwfzzRoOl8FQc+rjOYXnJVIAMhK/PTima/XQ7o=
+	Cjw9wSaocTTeGonGcmP1+LbQH25pjFmoYFKpxU58fckY6Hvd0pja9XIZGPS/yL+1wjhdN6Y4m+hVuL5+yjwpXCJ0mWUB3ffnG8ckxITyWxbhI+9o4Zn/psl7GQ+4+5kpCKiW0ZUQppmyTw9FUFnfLoie1rrelDTahzrgD8uL69TSrSKoLhn3uvoNewmroWzYIa27xb4JT1XWvfFksjlyExBQqP2enRzZbPPGoqQnhCCabHOvgWh6kO+ZSFKb4SfOkuZCKCRPyG0l7geRoV5b8J/LgPZ0TrzElEvfQzOwjbtV1aihCZrll6LOkpUCU5TVKN8W7rJUBFQBocDoCMJIA2f/miMM6Row91QMfh0r+L/YFUqePTu9a20//iSY31hJaLBW7SDWk87FD7uS0/mr+ykg1Fm4JGYy/qKwLuOh7MWs79JzgYLGyIYYO1TTCwAJfdaO3cLcZOCH6m2yLJLYT/q2UUNmTZiDxhCnbxRDOaJmpsN1z4ECpLUDeFcy2RHLr+D+GIE+cQLgRKxLQ2q2QhEi1gp3WuZ6N61ASRMyqglc+a0oxHhV/rXAR1evNAcP9JMtqUp8lJeUaSJoqpqWxHTCIeC1NLF8Z0KKZl2iHw478kbhzmmhMCLMQpgUX1MjQ+9gWu9HYWe54AtRyZiN6cVelt2g5akvvJyRnHqGIxPK+8+aYHZytOD1XRw36Ii3XJ+oEYLwp+SuznTzsR/lWQ==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(19092799006)(366016)(1800799024)(376014)(7416014)(18002099003)(10067099003)(921020)(11063799006)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(366016)(1800799024)(18002099003)(22082099003)(6133799003)(10067099003)(4143699003)(11063799006)(261009223027099003)(921020)(56012099006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?DOql8M2y099eGhlH4XrT6JLjjNqlHfxivVDX5KTszy0zzun4lCTOu6przF2r?=
- =?us-ascii?Q?kjQyi4iLPJ07BCaWl26fdaRLpahVbHTKZW1a+HVuHssjZVOf65fjMnfhOiyq?=
- =?us-ascii?Q?fB5J2mkJ6niMvcpQfE20IW8RQKgSzehP6VsbBh0LIz1newmpijG1i58hFVAU?=
- =?us-ascii?Q?HMYKeiNrCOaqbbv4uAwW3XIAWoxw62T+h1f+SZLqD9axG1xFaK0/+4jvkBuP?=
- =?us-ascii?Q?fYKD2IaIso4FN4L5k+iSAQIlDNWtUqtLy4K2T1FEr/CS04lWZhAiC+LTkaY1?=
- =?us-ascii?Q?SB8rFTAk6KYJqNRH1e7TYJfCdW9kfcdXYyRHHgvwf43vRMhNVzLee7ImmNyY?=
- =?us-ascii?Q?0FOtG88VXQ+OAnXSXUjrHYGiRgpsMwqRBKpxmFK0U8vipnFz7/F7lZDFEnL4?=
- =?us-ascii?Q?lHRtfADeZCuevnhHW/Ehlcr7QpRW0fuVS5qfleLZg+1420s2hRiJuLntiLKP?=
- =?us-ascii?Q?pj3AkvHemQQqdI/mTLfvJ5dFzeIWwNCuHvLgtNvuw5bcmU8GwZ1VdUpfoEPb?=
- =?us-ascii?Q?wy6hxv80AQRZ8EYA2Mo7FKndv7RqGklhSxyT0cOskUEB91Bt1H/2tV915tAi?=
- =?us-ascii?Q?p3wH4zrywn+pkOBawx/0ucpmfn6qR4op+cR9u0wZ1F2O7+RrdELHxQio2vsB?=
- =?us-ascii?Q?p3U7x/+BUATe2AppQ9kmrlpJi2TypkU2S2EBkybrDvUlpY4Vb+Od++9K92RY?=
- =?us-ascii?Q?yhxm30RKJ3qbWjrvoNgMgIZ5zbjQawEDhc0uoKk9nQuIr7JK2wnfnn+T/Xcn?=
- =?us-ascii?Q?Rvzy/pBqzwYlo0TekwkzPVkrmesh5+z56V0WiyMQieIOqD139xkWUUOC4foW?=
- =?us-ascii?Q?Vm+jm02fwjBISj4eujvVPORir6lPgaIjqdEh77Jd7D46J5TsqJReaeleyBCO?=
- =?us-ascii?Q?huv1Sig6Z/l8iINpB32Off4B3qsaeQKyL6Z43Xi5IlPqnA/51YT7VkfimQ/b?=
- =?us-ascii?Q?BQUmXBWufnBlzSJPg0M2R/p3n5j3c/ZgoW0jsUvU1x8ikRoqurqj4yBM1bP1?=
- =?us-ascii?Q?HW8skuMwS8Y2Qyp+uRUskVWoWZIkau6rlUhYSNjEkteYvlslTuqTubi81Pmx?=
- =?us-ascii?Q?PKpfUk98QvwQP24SRi0likfPHgse/VnZHQxq5D67SXfvVpK9h/Tg3tni9F9M?=
- =?us-ascii?Q?gWFtjmNxJcQGXFeLBZTNJfmms2xjniUr/P5gMdxs7ZKZ1xvq4y8rD873iqsH?=
- =?us-ascii?Q?66/xwmF2QtYpVRCWMvVEGPozWNRH367ucsBqITet3owTbW2xp0T39FmMlxBg?=
- =?us-ascii?Q?bsTUDCW1GiFtCx3efUMyPynEtxSBUwLP2VQtRHkMAbYv8HsU2sWR1RpI/P74?=
- =?us-ascii?Q?/cRr0z9vaP5OHmP226/qKStcvp8gsoJNvoF6VsrY81TPtaBlnqZxn1PKSpNf?=
- =?us-ascii?Q?1j9X7/F70nYvbL6ZRBCgxd17xSX6QT1QqIA7fedkLLE/j9sQMWKDloT7xESW?=
- =?us-ascii?Q?4HvP/ebzte/6BpYkQ9ovGnWE9M0BOPpaKAtrwfadcbTQFjxY9IM5aJTd1nGl?=
- =?us-ascii?Q?wSkbob/wXwC1JwMSPEySQXVL9AFFcqPDcJ3K9fzx4Nt86roS8sP4f/wpf6KA?=
- =?us-ascii?Q?noDnYar0rIqoJZU/lgouyVRf35ZHg8Pj2qkkQzVlwzbHZrqcs+0byL6ftM4N?=
- =?us-ascii?Q?ryOY92GpSTk7SE/iZjx6HebsxUt/J/6HAAydh4hc5hC//2SvdbymP+DTFwOf?=
- =?us-ascii?Q?26Tt8WLTbGqAyzzw6R2W7OnquznMK407k3l9t+bL1JPTH5mKFey4g5mSD+Bv?=
- =?us-ascii?Q?p5xcvBr+FDCgdz7ZXgNG8tIMN+XNwhj3oX2Pg7FzmW5Tyx6rLaxN?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f77133c-797a-49d2-2b27-08df2a25deb9
-X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
+	=?utf-8?B?aUdnMGdnL0NvQ0R2ZHAzK1FOYnE5OHBKWGo0SmU4QWtvV052K3pwVmpFZkVq?=
+ =?utf-8?B?RnNRTzVEZDl6R04rUVRYdW9GK1hWT21tY0dTb2REYnQwZlNFcVIra3RrZGcw?=
+ =?utf-8?B?QkJMNEZGOTNLdFFocUxxbjNpaFFmQm9YdG9FbHJwcjF4cC9wZDVLV1lxRS8x?=
+ =?utf-8?B?MWFVdHlPK2ZWTzFoWWtSc0xqWjhMU3FiY3VNWmliQytxNnhDaStvaDFSYnAw?=
+ =?utf-8?B?MEhzblJMRHE4UGFKWTd3c005TjE2OXQzQlRiVXZNcXFiVk5PajVYQS9WRnNF?=
+ =?utf-8?B?NUVmazdvM2NUbVZoQ2Eyc1lsL0xBVWxjSVFsT2RmZHo0eUVZTSsxdlZjYmFH?=
+ =?utf-8?B?QlkvSDdyTndhU0NLbDhFSHB4S0NQS1FDV0Y4VU93aXJrU2Y5cEd5Y0l6UW44?=
+ =?utf-8?B?ck0rSExhZ2U3MHVia05nU2ZoVVpoTUNSL2lmZWlCMGpPMldmTjF1YjAyVSts?=
+ =?utf-8?B?eVdLUDNUTndFaW9RZzJwVlV5OHJuUk1XZVp3OG1ZNWxPcFhPUk9PekY0RU9x?=
+ =?utf-8?B?cERJcVQyRzVGSmhFMFRvdnVXMmI5aDFRY0lTZElxZ2tVWmxyRnpsaE53RnVL?=
+ =?utf-8?B?NDZPQXpweDNmakdXRWZsOXU4cnYwbnB1d0prSkZhbnhMWmUvRlR0d2Rka0Yy?=
+ =?utf-8?B?WTcwOHJjVDlGdG9TYkEyQm5BdDZBK1NGY3FZRm9UM1djU2h3ZnJ4bDRRSXJz?=
+ =?utf-8?B?a2NSZm1PQTJOdmFFYjI4MTQ2SFd0K2daWnhodzFWM3B1QjFUK0hBQmFBWE1T?=
+ =?utf-8?B?ZU13MDIyL3RHdnVWRWVDMHdVMmo2YTJWUUh6NUp5eE0wWWtnM3pKcG5VSUVw?=
+ =?utf-8?B?dk9nRllxS0UzZlBMS0dNYVc3RGRqTkVqVHRtRkxJUFluS1hyRUlCNWdOWHJ4?=
+ =?utf-8?B?Z1c0VjVzOGRaWUc5UUVwMmcvdVZUUzFLUFR0MWVwU2d5L0o2eE9LbDA4TFRX?=
+ =?utf-8?B?ellvSHZyT1NyTTlwem54THYwWUhCZC9VN1l5NGhhTFd5YTVjNHJpRmZISnh2?=
+ =?utf-8?B?Y0ZoYXVFdnE0YXFaNzN3K2JEVi8vYXZPbE9kVGxianUzNHRjc3dEbW1nS2lt?=
+ =?utf-8?B?YWFxQlNoakZ5RGpjRnR1RzNua0ZPTjcxeW9UOGIzYWRaYzlySGhLOGNObzl4?=
+ =?utf-8?B?bnRldVJ1RWhWdGhZZS80VGttOGlHTjltQlU4N0xsYjQ1ZDNXTU5FRGRkUDJx?=
+ =?utf-8?B?UnJpK0lNd1Q1enZZK1N3aDZ5MHZ5Q3NNVDlISUQ2OTVpOTR2eGVzZ2RoNXg4?=
+ =?utf-8?B?Qk1MM1ViSllhems3YlBiRlZERmwvbU1YdVFjbmhmRzRVbHJ4aEpwQmt1czlZ?=
+ =?utf-8?B?cVY0NUQ5UG9ZczJYOTA2Q0I5ZGtvMzVheDRaakZhc3NqNlc2NmRTVWdXdzl0?=
+ =?utf-8?B?UlU0Vlpyc0FBZVdUZURPanI3aGtiNXMwd3BIcFdsZlczZ2p2Ly9EbDJrcTVp?=
+ =?utf-8?B?UzZHSG1HM3MvZUQ3eFJIaHVITDlIN1YvSEF4NFF6aUFCekpERnd3WGF1dTRT?=
+ =?utf-8?B?TTd4cFcyR0ZTaWUyR2dJY1lIdG56aUhsZ0lmWGQwOERMR1p4aHhyUk5FeFJN?=
+ =?utf-8?B?bC9naXM1SjEyYklJS0FpK0o1MUVqK2ZQb2pOckw2TVIxdFdDWXVNNEZ6b3Jh?=
+ =?utf-8?B?cWdsNERWWUpCcUZsUWZIUHBycWdEWk0rbERDQnFLZ0o0L0xXcGdsQTRRTktF?=
+ =?utf-8?B?aHgzOFJFMDdqa211a1JPZmE3UERkTWFTUkxOYm9lajRzTXRYOVhiWFU3emlK?=
+ =?utf-8?B?aTczNXpWenZQOERxZVV1ajFnVGZhc2JDM2NiOWsyNFNGSnJlR1Nyby9NQ0Ji?=
+ =?utf-8?B?QlRHM1ZhdnpEa085SVJFWk1vR292Q1lWdjRuREJnTnE2K3pjcHJaMXZWdUFF?=
+ =?utf-8?B?QThDYjJlaDJ0Z3VVN1RkUE5ZdFUzYSt6cHlhMXNwRWFQZ0hhNFRtYjFFaFh2?=
+ =?utf-8?B?bWJDb1AybXVlTFpBV0hQV3JsM2JUNzNMWm1hT3ZIV051eHY4YnErVFhYSFUr?=
+ =?utf-8?B?QWRvQXA0K1JscHhHYVg2dzlFN1BidTZ0Yi9GOGdEWVZLT1pLWjh3S0hMck92?=
+ =?utf-8?B?RlJWU1dzZDBQYzNOcjhxR2RkVFZrdXR5UW5kRGdxS2dudWt3QVBMUzk1NWhT?=
+ =?utf-8?B?NEpJeXJOZ1FTUEhwOFZGN016MlVidHMwWTJwT25KSjZJTjdXRjFTS05TRmJq?=
+ =?utf-8?B?NUVwR0FGNnFYOW5iN0pScVJHVysvdDdTaThzeHFTMjN3WW1FbGJyaWJqUlBK?=
+ =?utf-8?B?Q05aeDFmRVBCc25WT25NZWZDdTFvNGRwa1EyaWZFODFXa08vQjBQVTJKbVJr?=
+ =?utf-8?Q?hCP0z6RJzZon4abvdc?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 772719cf-1564-4a7a-3a06-08df2a2a05ce
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2026 19:03:45.0195
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2026 19:33:28.9641
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /tC+2qwbvrOElWU5Bu2ULgj5fWIuxlnLLqnnM4+Dfz4kQAblUckQX1lIZn+Ithi15wctgRqUbGo2rnBB3tdu4epld9pcTV2vMtaB090ihgQnxceLm/VD1ZCsDG5gheWW
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10764
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2GMeg354a0nWpz4SDjYDT4TP0h/wZhAamU7VY6auIcZ+wXYTtsz6IAUlk6R2KMEvYq+PQswXZ1zhcyEZalxYbA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB9069
 
-From: Frank Li <Frank.Li@nxp.com>
 
-Replace the struct device *dev argument with struct dma_chan *chan so
-callers do not need to reach into the dma_device internals to obtain
-the device pointer.  The implementation now derives the device via
-dmaengine_get_dma_device(chan), which correctly handles the per-channel
-IOMMU mapping case.
+On 10/14/2026 8:24 AM, Tom Lendacky wrote:
+> On 10/13/26 10:44, Ashish Kalra wrote:
+>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>
+>> rmpopt_init() prints "RMPOPT optimizations enabled" gated only on
+>> X86_FEATURE_RMPOPT, which is a CPUID bit advertised independently of
+>> whether SNP is active.  On a system where SNP is disabled in the BIOS the
+>> message is still printed at boot even though RMPOPT is never actually used
+>> (snp_enable_rmpopt() bails out on !CC_ATTR_HOST_SEV_SNP), which is
+>> misleading.
+>>
+>> rmpopt_init() is only the software setup (workqueue and the delayed work);
+>> the capability that matters for the message - an active SNP host - is
+>> checked in snp_enable_rmpopt().  Move the announcement there, as a
+>> pr_info_once(), so it is emitted only when RMPOPT is actually enabled on an
+>> SNP host.
+>>
+>> Fixes: c6c6f156d192 ("x86/sev: Perform RMP optimizations asynchronously")
+>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>> ---
+>>
+>> Note: in the posted series the pr_info_once() lived in
+>> snp_enable_rmpopt() (SNP-gated); when applied, c6c6f156d192 moved it to
+>> rmpopt_init() (feature-only-gated) as a plain pr_info().  This restores the
+>> original placement.
+>>  arch/x86/virt/svm/sev.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+>> index 43e4945e6cdf..6f5f4ee821d0 100644
+>> --- a/arch/x86/virt/svm/sev.c
+>> +++ b/arch/x86/virt/svm/sev.c
+>> @@ -656,8 +656,6 @@ static int __init rmpopt_init(void)
+> 
+> Should the check at the start of rmpopt_init() just be
+> 
+> if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP) ||
+>     !cpu_feature_enabled(X86_FEATURE_RMPOPT))
+> 
+> so that you don't even bother setting up the workqueue, etc.?
+> 
 
-Prepare to make dma_device private and make dmaengine API consistent.
+Thanks, that's cleaner, and gating on X86_FEATURE_SEV_SNP avoids the workqueue setup entirely on a non-SNP host. 
 
-Acked-by: Dave Jiang <dave.jiang@intel.com>
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
----
-V3 split from origianl thread
-https://lore.kernel.org/dmaengine/20260923-dmaengine_prep_dma_pq-v2-0-32ed65b8a9b4@nxp.com/
-V2 change collect Dave Jiang ack tags
-v1 version at
-https://lore.kernel.org/imx/b40fa0d7-fbd0-4ee8-b99c-781d08c18838@intel.com/T/#t
----
- crypto/async_tx/async_memcpy.c      | 4 ++--
- crypto/async_tx/async_pq.c          | 8 ++++----
- crypto/async_tx/async_raid6_recov.c | 8 ++++----
- crypto/async_tx/async_xor.c         | 8 ++++----
- drivers/dma/dmaengine.c             | 4 ++--
- drivers/dma/dmatest.c               | 2 +-
- drivers/dma/mv_xor.c                | 4 ++--
- drivers/ntb/ntb_transport.c         | 4 ++--
- drivers/ntb/test/ntb_perf.c         | 2 +-
- include/linux/dmaengine.h           | 4 ++--
- 10 files changed, 24 insertions(+), 24 deletions(-)
+Will add this and post a v2, keeping the pr_info() in rmpopt_init().
 
-diff --git a/crypto/async_tx/async_memcpy.c b/crypto/async_tx/async_memcpy.c
-index c538e30e99094..893e7e17f1f61 100644
---- a/crypto/async_tx/async_memcpy.c
-+++ b/crypto/async_tx/async_memcpy.c
-@@ -39,8 +39,8 @@ async_memcpy(struct page *dest, struct page *src, unsigned int dest_offset,
- 	struct dma_async_tx_descriptor *tx = NULL;
- 	struct dmaengine_unmap_data *unmap = NULL;
- 
--	if (device)
--		unmap = dmaengine_get_unmap_data(device->dev, 2, GFP_NOWAIT);
-+	if (chan)
-+		unmap = dmaengine_get_unmap_data(chan, 2, GFP_NOWAIT);
- 
- 	if (unmap && is_dma_copy_aligned(device, src_offset, dest_offset, len)) {
- 		unsigned long dma_prep_flags = 0;
-diff --git a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
-index 27f99349e310b..733af24a2762b 100644
---- a/crypto/async_tx/async_pq.c
-+++ b/crypto/async_tx/async_pq.c
-@@ -187,8 +187,8 @@ async_gen_syndrome(struct page **blocks, unsigned int *offsets, int disks,
- 
- 	BUG_ON(disks > MAX_DISKS || !(P(blocks, disks) || Q(blocks, disks)));
- 
--	if (device)
--		unmap = dmaengine_get_unmap_data(device->dev, disks, GFP_NOWAIT);
-+	if (chan)
-+		unmap = dmaengine_get_unmap_data(chan, disks, GFP_NOWAIT);
- 
- 	/* XORing P/Q is only implemented in software */
- 	if (unmap && !(submit->flags & ASYNC_TX_PQ_XOR_DST) &&
-@@ -309,8 +309,8 @@ async_syndrome_val(struct page **blocks, unsigned int *offsets, int disks,
- 
- 	BUG_ON(disks < 4 || disks > MAX_DISKS);
- 
--	if (device)
--		unmap = dmaengine_get_unmap_data(device->dev, disks, GFP_NOWAIT);
-+	if (chan)
-+		unmap = dmaengine_get_unmap_data(chan, disks, GFP_NOWAIT);
- 
- 	if (unmap && disks <= dma_maxpq(device, 0) &&
- 	    is_dma_pq_aligned_offs(device, offsets, disks, len)) {
-diff --git a/crypto/async_tx/async_raid6_recov.c b/crypto/async_tx/async_raid6_recov.c
-index e53870d84bc55..306448c47aa00 100644
---- a/crypto/async_tx/async_raid6_recov.c
-+++ b/crypto/async_tx/async_raid6_recov.c
-@@ -28,8 +28,8 @@ async_sum_product(struct page *dest, unsigned int d_off,
- 	u8 ax, bx;
- 	u8 *a, *b, *c;
- 
--	if (dma)
--		unmap = dmaengine_get_unmap_data(dma->dev, 3, GFP_NOWAIT);
-+	if (chan)
-+		unmap = dmaengine_get_unmap_data(chan, 3, GFP_NOWAIT);
- 
- 	if (unmap) {
- 		struct device *dev = dma->dev;
-@@ -96,8 +96,8 @@ async_mult(struct page *dest, unsigned int d_off, struct page *src,
- 	const u8 *qmul; /* Q multiplier table */
- 	u8 *d, *s;
- 
--	if (dma)
--		unmap = dmaengine_get_unmap_data(dma->dev, 3, GFP_NOWAIT);
-+	if (chan)
-+		unmap = dmaengine_get_unmap_data(chan, 3, GFP_NOWAIT);
- 
- 	if (unmap) {
- 		dma_addr_t dma_dest[2];
-diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
-index 84458375b202b..40caee262a4ab 100644
---- a/crypto/async_tx/async_xor.c
-+++ b/crypto/async_tx/async_xor.c
-@@ -178,8 +178,8 @@ async_xor_offs(struct page *dest, unsigned int offset,
- 
- 	BUG_ON(src_cnt <= 1);
- 
--	if (device)
--		unmap = dmaengine_get_unmap_data(device->dev, src_cnt+1, GFP_NOWAIT);
-+	if (chan)
-+		unmap = dmaengine_get_unmap_data(chan, src_cnt + 1, GFP_NOWAIT);
- 
- 	if (unmap && dma_xor_aligned_offsets(device, offset,
- 				src_offs, src_cnt, len)) {
-@@ -310,8 +310,8 @@ async_xor_val_offs(struct page *dest, unsigned int offset,
- 
- 	BUG_ON(src_cnt <= 1);
- 
--	if (device)
--		unmap = dmaengine_get_unmap_data(device->dev, src_cnt, GFP_NOWAIT);
-+	if (chan)
-+		unmap = dmaengine_get_unmap_data(chan, src_cnt, GFP_NOWAIT);
- 
- 	if (unmap && src_cnt <= device->max_xor &&
- 	    dma_xor_aligned_offsets(device, offset, src_offs, src_cnt, len)) {
-diff --git a/drivers/dma/dmaengine.c b/drivers/dma/dmaengine.c
-index 34be53487a21d..52e7dcc4e5822 100644
---- a/drivers/dma/dmaengine.c
-+++ b/drivers/dma/dmaengine.c
-@@ -1477,7 +1477,7 @@ static int __init dmaengine_init_unmap_pool(void)
- }
- 
- struct dmaengine_unmap_data *
--dmaengine_get_unmap_data(struct device *dev, int nr, gfp_t flags)
-+dmaengine_get_unmap_data(struct dma_chan *chan, int nr, gfp_t flags)
- {
- 	struct dmaengine_unmap_data *unmap;
- 
-@@ -1487,7 +1487,7 @@ dmaengine_get_unmap_data(struct device *dev, int nr, gfp_t flags)
- 
- 	memset(unmap, 0, sizeof(*unmap));
- 	kref_init(&unmap->kref);
--	unmap->dev = dev;
-+	unmap->dev = dmaengine_get_dma_device(chan);
- 	unmap->map_cnt = nr;
- 
- 	return unmap;
-diff --git a/drivers/dma/dmatest.c b/drivers/dma/dmatest.c
-index 2ae3469397f37..043bb065dd68a 100644
---- a/drivers/dma/dmatest.c
-+++ b/drivers/dma/dmatest.c
-@@ -748,7 +748,7 @@ static int dmatest_func(void *data)
- 			filltime = ktime_add(filltime, diff);
- 		}
- 
--		um = dmaengine_get_unmap_data(dma_dev, src->cnt + dst->cnt,
-+		um = dmaengine_get_unmap_data(chan, src->cnt + dst->cnt,
- 					      GFP_KERNEL);
- 		if (!um) {
- 			failed_tests++;
-diff --git a/drivers/dma/mv_xor.c b/drivers/dma/mv_xor.c
-index c4e0dce3ca64e..dec01b6264d7a 100644
---- a/drivers/dma/mv_xor.c
-+++ b/drivers/dma/mv_xor.c
-@@ -794,7 +794,7 @@ static int mv_chan_memcpy_self_test(struct mv_xor_chan *mv_chan)
- 		goto out;
- 	}
- 
--	unmap = dmaengine_get_unmap_data(dma_chan->device->dev, 2, GFP_KERNEL);
-+	unmap = dmaengine_get_unmap_data(dma_chan, 2, GFP_KERNEL);
- 	if (!unmap) {
- 		err = -ENOMEM;
- 		goto free_resources;
-@@ -927,7 +927,7 @@ mv_chan_xor_self_test(struct mv_xor_chan *mv_chan)
- 		goto out;
- 	}
- 
--	unmap = dmaengine_get_unmap_data(dma_chan->device->dev, src_count + 1,
-+	unmap = dmaengine_get_unmap_data(dma_chan, src_count + 1,
- 					 GFP_KERNEL);
- 	if (!unmap) {
- 		err = -ENOMEM;
-diff --git a/drivers/ntb/ntb_transport.c b/drivers/ntb/ntb_transport.c
-index f9caa1a653c5b..e1cb55890d72b 100644
---- a/drivers/ntb/ntb_transport.c
-+++ b/drivers/ntb/ntb_transport.c
-@@ -1532,7 +1532,7 @@ static int ntb_async_rx_submit(struct ntb_queue_entry *entry, void *offset)
- 	if (!is_dma_copy_aligned(device, pay_off, buff_off, len))
- 		goto err;
- 
--	unmap = dmaengine_get_unmap_data(device->dev, 2, GFP_NOWAIT);
-+	unmap = dmaengine_get_unmap_data(chan, 2, GFP_NOWAIT);
- 	if (!unmap)
- 		goto err;
- 
-@@ -1872,7 +1872,7 @@ static int ntb_async_tx_submit(struct ntb_transport_qp *qp,
- 	if (!is_dma_copy_aligned(device, buff_off, dest_off, len))
- 		goto err;
- 
--	unmap = dmaengine_get_unmap_data(device->dev, 1, GFP_NOWAIT);
-+	unmap = dmaengine_get_unmap_data(chan, 1, GFP_NOWAIT);
- 	if (!unmap)
- 		goto err;
- 
-diff --git a/drivers/ntb/test/ntb_perf.c b/drivers/ntb/test/ntb_perf.c
-index dfd175f79e8f0..5fea36432ba92 100644
---- a/drivers/ntb/test/ntb_perf.c
-+++ b/drivers/ntb/test/ntb_perf.c
-@@ -809,7 +809,7 @@ static int perf_copy_chunk(struct perf_thread *pthr,
- 	dst_vaddr = dst;
- 	dst_dma_addr = peer->dma_dst_addr + (dst_vaddr - vbase);
- 
--	unmap = dmaengine_get_unmap_data(dma_dev, 1, GFP_NOWAIT);
-+	unmap = dmaengine_get_unmap_data(pthr->dma_chan, 1, GFP_NOWAIT);
- 	if (!unmap)
- 		return -ENOMEM;
- 
-diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
-index 805668fbe4376..6d918ccf852f9 100644
---- a/include/linux/dmaengine.h
-+++ b/include/linux/dmaengine.h
-@@ -676,7 +676,7 @@ static inline void dma_set_unmap(struct dma_async_tx_descriptor *tx,
- }
- 
- struct dmaengine_unmap_data *
--dmaengine_get_unmap_data(struct device *dev, int nr, gfp_t flags);
-+dmaengine_get_unmap_data(struct dma_chan *chan, int nr, gfp_t flags);
- void dmaengine_unmap_put(struct dmaengine_unmap_data *unmap);
- #else
- static inline void dma_set_unmap(struct dma_async_tx_descriptor *tx,
-@@ -684,7 +684,7 @@ static inline void dma_set_unmap(struct dma_async_tx_descriptor *tx,
- {
- }
- static inline struct dmaengine_unmap_data *
--dmaengine_get_unmap_data(struct device *dev, int nr, gfp_t flags)
-+dmaengine_get_unmap_data(struct dma_chan *chan, int nr, gfp_t flags)
- {
- 	return NULL;
- }
--- 
-2.43.0
+Thanks,
+Ashish
 
+> Thanks,
+> Tom
+> 
+>>  	if ((rmpopt_pa_end - rmpopt_pa_start) > SZ_2T)
+>>  		rmpopt_pa_end = rmpopt_pa_start + SZ_2T;
+>>  
+>> -	pr_info("RMPOPT optimizations enabled\n");
+>> -
+>>  	rmpopt_soft_init = true;
+>>  
+>>  	return 0;
+>> @@ -690,6 +688,8 @@ void snp_enable_rmpopt(void)
+>>  
+>>  	mod_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
+>>  			 msecs_to_jiffies(RMPOPT_WORK_TIMEOUT));
+>> +
+>> +	pr_info_once("RMPOPT optimizations enabled\n");
+>>  }
+>>  EXPORT_SYMBOL_FOR_MODULES(snp_enable_rmpopt, "ccp,kvm-amd");
+>>  
+> 
