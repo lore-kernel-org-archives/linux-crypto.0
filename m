@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9257C3FFFA1;
-	Wed, 14 Oct 2026 06:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F04015665C;
+	Wed, 14 Oct 2026 06:01:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791957610; cv=none; b=toYQQhUdJuaUHoHadbs3vwCXobfhgAi2RobAhUs4yaLvjoQijCwOIRQQG/b3TlC7ekAUHrYLWEPIvGDkDOc5WRMRzRmIqtdFVNUB6ECNPeQpRduqxhXiy1lf1gHCd/Dbtoa90Y43Rg5jd6AvKevaOKQSe3c1Nf2KgBg49JIZntI=
+	t=1791957677; cv=none; b=LHLlU27sFyoxVp7ZOHZinTLWKF9J7i+91bmYl2x9cIyxHhlZk0XRAB18dkBVNQaflpY/vvbbIMU84E8mR8gDK2QFXb/fik0vRhjegYXHTcXx85/7Ge8+UzyI0eD/emYaxSwoZLwaDI7nADrUQHvaD87ptnTV+qYk7792afSTlEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791957610; c=relaxed/simple;
-	bh=I1EnMF6K4AwnQ+BgnaWpdihZ+HJRBO7Kys3jihVMDAc=;
+	s=arc-20240116; t=1791957677; c=relaxed/simple;
+	bh=h69P9IVvITyOUa4EKlJXaOOUJK5YhPfqtKU6Kg5orQs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nLCAZg4p4DUocsFRsqN1nSGfntj9u6L+dzikxB/QUXIooN9ybtPY52+T78hpSIBwbHvI/JA8KWT73EBYdHE8O6NL7W0xtX6GIkDtHLk0URYF2S9A2txeSGMzjTSrR4IPqSUUkKVjXnWa6iN1/MaAoU4zYLzdTaaqaJbSk/UfxYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=csCOrcxc; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=DrPUvbs52PpK4KLuyLq8L8HVond3nftNHv8Be0a4MD3DTQ/iH9+0lqQwp9AYYHmHbObeEe5ah5VZEnFqYNtJQv29G1QtXpdwnOXWQ8/7wG0LjjGVGEmuiNqkGyUkuq8MO0lEx1I1z2ZQBbNr8mJvbWLlXdOEJArbcJ9+oVcEOA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAZ/E+dS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="csCOrcxc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744F01F000FF;
-	Wed, 14 Oct 2026 06:00:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAZ/E+dS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A85C1F000FF;
+	Wed, 14 Oct 2026 06:01:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791957609;
-	bh=wWOvmT1yxjbWEgmfNJtWVvom2jinW7qTuoUipExt2L4=;
+	s=k20260515; t=1791957675;
+	bh=I70yyy6hREz/IB0eS0Nv/gFrWcLZfqLyoAB4qOMkZUQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=csCOrcxcOT2IDnsS8+MSDQ38C3HPdKPotXfFr++2UC4btC3SZyzKF9PUXXi7BQrln
-	 vIwGN2T3+aBCvDgBL84SQoTa6CLO4bPiv5a3oLcZSZzOVSUn7KljcLKMMl+dOIe5U4
-	 oxy4yL1+N6GseX+nPYYGlFUG9Le253jTjgYgcldH9pZ+5rrLJuDDae09ei17sXqDyy
-	 ta+TYcSHSodX6KEuznD0j3sepNO866lNkTGOdJFxURoGAJ9SPzOLufcVDRg+VXIwxh
-	 s7C7i35bUyw/RG503xYXeGOFd1kj6nNSk1OpypeQ9NK/vofjAcpbVo/lpXmyokLpn1
-	 908LUdGEligEw==
-Message-ID: <2590dca4-70d0-4de9-be9c-d76657dd3239@kernel.org>
-Date: Wed, 14 Oct 2026 07:59:59 +0200
+	b=PAZ/E+dS1tv6oX42wtbOtTHgyT7nJxgvq6RK5+TUPB77+NQ+12wBWM7/Avrp75o8Y
+	 /VPADTdaKgC8Kp2qXAh+lVV4NpjTbYJbacPznNXy+sCCPG1MY2p4nTU6XTLxlKAFj2
+	 KwtDegNQLIInT/rSc4gOyT1Ddim7QbKqeBogM7URXQOXmR/wBwhe0ooxCBXYPsEFTh
+	 Adb+ie7h/NgNa66ZvI0PLL+rSm7AdqtnElneAv7eUybqUMXLU2iwrc1dz/X/IJRfyf
+	 9Kqp/m1AFRvNOicLPJgQDgAekOUfwy3Hqb9LcL8hOJWeEH0fgFiMXPiv5fua/HgIRX
+	 m3EPMPCf90D3A==
+Message-ID: <1190d520-fbf3-410e-b9db-f940370d0533@kernel.org>
+Date: Wed, 14 Oct 2026 08:01:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] dt-bindings: crypto: add Rambus CryptoManager Hub
+Subject: Re: [PATCH 2/5] crypto: cmh - add core platform driver
 To: Alex Ousherovitch <aousherovitch@rambus.com>,
  Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
  Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
@@ -47,7 +47,7 @@ Cc: devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
  Thi Nguyen <thin@rambus.com>
 References: <20261013174847.2192609-1-aousherovitch@rambus.com>
- <20261013174847.2192609-2-aousherovitch@rambus.com>
+ <20261013174847.2192609-3-aousherovitch@rambus.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -93,30 +93,30 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261013174847.2192609-2-aousherovitch@rambus.com>
+In-Reply-To: <20261013174847.2192609-3-aousherovitch@rambus.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 13/10/2026 19:48, Alex Ousherovitch wrote:
-> Add device tree binding schema for the Rambus CryptoManager Hub (CMH)
-> hardware crypto accelerator.  The binding describes the parent
-> SoC-level node with its SIC register region and one queue@N child
-> node per mailbox the host owns, each carrying a reg (mailbox instance
-> index), an optional interrupt, VCQ ring geometry (rambus,num-slots /
-> rambus,slot-stride-bytes) and a rambus,cores affinity list.  Which
-> crypto cores are present is discovered from the SIC CORE_ENABLE
-> register at probe, not described in the device tree.
+> Add the Rambus CryptoManager Hub (CMH) hardware crypto accelerator
+> core platform driver.  This patch provides:
 > 
-> Register the 'rambus' vendor prefix for Rambus Inc.
+> - Platform driver registration and probe/remove lifecycle
+> - Hardware configuration and core discovery
+> - Mailbox Queue Interface (MQI) for VCQ command submission
+> - Transaction manager with async completion and backlog support
+> - Result handler with threaded-IRQ completion
+> - DMA buffer management
+> - Debugfs instrumentation (when CONFIG_CRYPTO_DEV_CMH_DEBUG=y)
+> - Sysfs attributes (fw_version, hw_version, boot_status,
+>   mbx_available, mbx_count)
+> - Kconfig and Makefile integration
 > 
-> Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
-> Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+> No crypto algorithms are registered yet -- those follow in
+> subsequent patches.
+> 
 
-So this v6 still has wrong DCO, thus you just ignored feedback you
-received on v3.
-
-NAK
+Implement feedback you already received on v1, v2, v3, v4 and v5.
 
 Best regards,
 Krzysztof
