@@ -1,40 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434E449A3A5
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 22:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792101984; cv=none; b=kY3HRifJHW1Yn8C09kU8BY9dsOWsHV9lybjtIZma2Q+4NkehuuiikiuL47xJjcnXJmiOquFjeBYNt25FtXvMn4kYqS8MWrhyG64lA3AFI6lLU670pcCMr8lcZvz+lMgSsT1vRIYGYbE5/1wZ1vCAGysYoUwVB8Gq7yD50/DozM8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792101984; c=relaxed/simple;
-	bh=nrAOSkpfvvC53d8wyV+4GEFbopuHgXUDky8Zx5ZxtII=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5754C39794B
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 22:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792104322; cv=pass; b=AoV8QQlfTYjoy6qskTgiqU2SwHBQMRFWgvgMCxERIwl10hSG1cce89mMb+L2apSn0OpLgWy73h3LdJ0TyGF4UPdZO5eao+sVSzGqKrEH4Mj6vMeIEgX821+HM+dF8bOOJh/t+HxtanrIcOePbx0ZyE1w+BI4OpYRnF2ZHVVu9TY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792104322; c=relaxed/simple;
+	bh=pde/atokYGlXVQMXPE555qjnd8HsZsyowtY+/7fM9dI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AoDlHZigcjzz9KGWkBeypzKluWDwVxuvzlGRVbVhuO2M8N7zmp5ULmVJBJDw3R/m8/zQaAu8HbosZV2uToHlaYNryvsOzq0zSr0NYUg1gjysynDBLdjrU8n3uAeP4UqhC0xmLD06+itOqZxEHYY8xk5bqVz1eV2VjjHWrqO3UvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itmch/aA; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=pdAB5ORbFdTEICO8nVmNXEQsl79VPbZBBY9VQSBQ+Clwa9DQeVYzrn/4NqhmjDBokiz0WepP7G1/qfzBP4r4M8plXmTwV5uBmtTGEZD18RpWE57j9wABs2vVMLGFJ8sdyAa1SD3WPWFYgRVY7Cnb/cnOrE7X+LsGIG5ID2nPbWA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xc93N2Pa; arc=pass smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itmch/aA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCCE51F000C7
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 22:06:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792101982;
-	bh=mJbsb6dU/XznSRrcG1GSuxTRuvW4/61fnYkUcg+ByiM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=itmch/aArHNeBR/ur+BnCI+m882cF1KxHAM9x0OT8uMYRvdLvVM1x0/qIeS151x5L
-	 Fyoo6cz7VRpbhDZKe915EUj0SEQmP9ybIJeRc0PFePcvDsOkr9Vp4CPO3d1xGYscXF
-	 dbfazzin059JqRPz3VadX8oAMj3XjSxudqglgs1/2e6P8WvVvJUi1DsKmNkiwdEjty
-	 NEouf7vKm/ktaNHDjyjQ3SOVQcRcHQ8iW/KPBaddWhbyemcvbzDeVFV419KEhJ1KeS
-	 M8ntuHWI6hkqyNPOCcAOVXFVhrJO4TJWxjMZt75aEm0U7ve0+2/aJE4ClWgWI3zSip
-	 MKTC1HRN8MPYQ==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c2e8c710847so728151766b.0
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 15:06:22 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxZakXrk3FLfMoMumm+/M/bqhgz1H8AvqKwRmEewqeI2LB6ZrhSGXJZNAt3PLRDZ9VHXgnZFXhq4vtS5h0=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJkiU4NX8aUvvPbNEfiDE/ix37kvBjRz1CHC+oBu1sYvL1kuAFL
-	Vwg2uxIvVBIMMOvGKk7cE7TuBfH+iztSd9V2YnmfWPiexiEpU53lvQ1qeIixbMi+XLQ6sOo8zfQ
-	HGQHm17eaVOpitNsZ0cy1UGljVHmyyYE=
-X-Received: by 2002:a17:907:8692:b0:c2e:2720:8f68 with SMTP id
- a640c23a62f3a-c31aa01b41fmr1817223366b.46.1792101981739; Thu, 15 Oct 2026
- 15:06:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xc93N2Pa"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5ba3adf78f5so1832165e87.3
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 15:45:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792104319; cv=none;
+        d=google.com; s=arc-20260327;
+        b=E6QeigoOWqL8rTl/rCI1WA0qMIjxsCxZDA16hiAUdOtKQ5wQiOJwPYROJMwky0ECSI
+         FYXxQvxsethQxVfFvFdwtCVB/H8DXsnLY1mSd+aRLEC1MLBSnAPGrF/nxg3Mag4M0OTM
+         a6iagS9z0fKbbRZeupW4ZoWzkbemkiHiAyUkvWEf08M6p67fd02TaEFxDEzi8/uLH3h5
+         6ivbVsIaslqemf7XFbhzLjY34oHutveg130GOINXxj0X2WdC86AU0u5SZ+SKTVpMe16d
+         xoCxaAr9x0DMK4PK8sG6TjBkZvp8fFoxGdoJbF1+V3AdUz0esR18SO90bTpG8THtGgq/
+         i1dA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cDTDKMrdQwRgjoWMeyrkyF6DIGr4iKPuJqKn3z4+wB8=;
+        fh=k3l52tU73lSTDvVV/9F0xl9pbi/3qLn9FMcnflHv6tk=;
+        b=UPzwNxCSyyVEcNnVtDbidGYG9yV6iBy/vHuNm8V+CbcZCvuLSEkABIU3A13VYlxjC1
+         ZubKPRSSD4TlTeqcXBY0FAAvyO7sdBGgUvAIjo7bcvIzc8bNVM6jWXAlehA6rDl3muqk
+         aGZZ3pv9U9aRfcbmx0kKpysEgmAGKHg0Ne1ZCjkdZR8SIuNR+q6hoK0ytXt1DMzfSKYW
+         xvDRS3mQQUdCtHxaC9sLCSpqsa+76FH6wq2IxiDnvpkUdGnKvE1Gsq62tSSx6Q5mjcnJ
+         gqPmj8Z2JiSLZnmfthGijBRxHRuPjdrFuvOznLkz+iuaa5+wInbAM2VRrbVshzBZZMJc
+         Miug==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792104319; x=1792709119; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cDTDKMrdQwRgjoWMeyrkyF6DIGr4iKPuJqKn3z4+wB8=;
+        b=Xc93N2Paw2r4qyCyhqXFb+KKF8+qI3hlJiOc/ZByj4jMu1HK5sBmNO0AlVSSSqqGlS
+         k70ZRbVF6E+0MIsYqkQIaG5zj83j35rm1Dtxs4EAcPFanrijdgaN47i+U1wraVr6pElf
+         LlNt9y53wGugS4sSUCG/7GLRCSDmSX2flQrA6wfQdFRvuNklbBASCuCHCr3YCCmXiXP7
+         vXc/XT7TX9XbokyCUiYoh5psQ8udGnaTaMiMI+NGprSgxCiK+5agL5E6GcDU14g2nqkI
+         QQA9rh0+YpKlXTE8ZhDWVrHXODet4L5v0J/NR4/TcHWzsegsZSNLzaz2wq4w5E7cru8n
+         +INQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792104319; x=1792709119;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cDTDKMrdQwRgjoWMeyrkyF6DIGr4iKPuJqKn3z4+wB8=;
+        b=MhzUQXXa8zcLB4HOUEDKW6hkqIv4MUiBgShzC561PV5KwbCeQgj7rGX6mE0ZzgL3/Q
+         WBWEIxkxqZ8jXR/OjK3aiCVZ7dFRDLXUOAX1Kn+KAKATvJjdHqRvZMbZXDNbGan8uf5S
+         M4Afkmc5tWPTMZDzAbe8nGHOXeIk3q3zDd49fw+JjmoxIHKOp0TLUL0AGAatvJ3VKuVR
+         KeITHbyQdmiJ6zSXrVdF7UCJZlhHwbJzRp1EGgcyEaidjdFzv3dxwaM+D5vmtxFlgTLz
+         j8trzJEfRxpld4vzEqPkJ1Gix3JNfuqbWk2/mGDcqVJY61kcqJ+cn/Q5ToMnZnwzT3PA
+         czaQ==
+X-Forwarded-Encrypted: i=1; AKwUvBwbnaDOn9PZCZ1DLg1YbGNisBS4P+TInykKgm4cpV2rKQui4c0fbCAqERIzb5QnG6wP9YdDDIsf3Mi48zg=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKWp34rc48sz19pYl0Yz3MWEHTLbrxxQrAe9zP+vocGQ3OYr04X
+	VeWKHyhm8jlUpKfPW1skOQMVVHOZCMvpiYfr6xa+bDW4YSRHsx/RcnzB0cp10sJWdKgUdDMUXXK
+	ak2aOCT20vSqHD5xRu6FO0GqR0FWMUDs=
+X-Gm-Gg: AYBFou2YxieAN5WrUmN5zncvcGJeiC1o0JzSojDO5dkRjlwbQ69vwoOPgMD76QrvlzX
+	OdOyHaMUeeWdys/Crq9ZeVkU7TDcWk+W0Ze/A9qCRChmkVg7wkZET/pbQNtvqGUvdNkKvoJwd0/
+	M8ryUz7hjBmnRWXIyLVwfS3Pw9t9ehUVwbcnU9HifUz/YGDkppifjoD/w9hJRoX5PEeBTDe4xK3
+	ROni5czkO0LstCIAcrC/FDOUq016fjbP9nyyTiSZSOBKBnZH7XtzPPOnNsjz6zT67VzvIs1iY+B
+	uVseFI0vP6Ni9rJe5N7DO6+LGEVNjLBurOxG/oiOGE2JrjiOwjb3GlA=
+X-Received: by 2002:a05:6512:3f24:b0:5b8:f533:d439 with SMTP id
+ 2adb3069b0e04-5bcde8c1acdmr7282009e87.38.1792104319215; Thu, 15 Oct 2026
+ 15:45:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,70 +83,145 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20261008182814.27450-1-kanchanapsridhar2026@gmail.com>
- <20261008182814.27450-8-kanchanapsridhar2026@gmail.com> <as-izeIj5bP01bna@google.com>
- <CACpmpof++tM9MUYgqgenwEBfaaJ60VsDwptK7Ne_-b+-DKMRZg@mail.gmail.com>
-In-Reply-To: <CACpmpof++tM9MUYgqgenwEBfaaJ60VsDwptK7Ne_-b+-DKMRZg@mail.gmail.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Thu, 15 Oct 2026 15:06:09 -0700
-X-Gmail-Original-Message-ID: <CAO9r8zPpmLyMHF+yDb2ZHRmSdAHFTNvsu8PZsQ2Z-EVvF-dc3g@mail.gmail.com>
-X-Gm-Features: AclHuK-S4zsk6EqmhjsVui6ifjRKos1ouVvuuztrm3peIKBuRi4LD8-5u9AW2Mg
-Message-ID: <CAO9r8zPpmLyMHF+yDb2ZHRmSdAHFTNvsu8PZsQ2Z-EVvF-dc3g@mail.gmail.com>
-Subject: Re: [PATCH v1 7/8] mm: zswap: Optimally place members of struct
- zswap_pool, struct zswap_entry.
-To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+ <20261008182814.27450-6-kanchanapsridhar2026@gmail.com> <as7JC8o2kggiq_ss@google.com>
+ <CACpmpofXMGBP70Rn7jHLwOF38GRKMUGoW3rb1Jp2SPH7ygKcfw@mail.gmail.com>
+ <CAO9r8zOEcGmg8eVttu41htugnng0ahnVQbubiJfxVH+GfDe47Q@mail.gmail.com>
+ <CACpmpodDA=oqnVa_hsJpyhGt=4zxknYF=QX9L6-sJbxsRxtM2w@mail.gmail.com> <CAO9r8zNN6F01icKUFr8q_AgJvhxGw0MkGezKbBuKzFQV0NaAdg@mail.gmail.com>
+In-Reply-To: <CAO9r8zNN6F01icKUFr8q_AgJvhxGw0MkGezKbBuKzFQV0NaAdg@mail.gmail.com>
+From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Date: Thu, 15 Oct 2026 15:45:06 -0700
+X-Gm-Features: AclHuK8NXYRqg5T9PQ2fZ89a7chOTLHtC37Sjh9lMWynljXBN8yHgyQfD3XnlOE
+Message-ID: <CACpmpocCJWkA+zvZ9ivNCt8xSZWfViKQ2ZeYN+f1EmdVTewzRQ@mail.gmail.com>
+Subject: Re: [PATCH v1 5/8] mm: zswap: Store the folio's node id in the zswap_entry.
+To: Yosry Ahmed <yosry@kernel.org>
 Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
 	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
 	davem@davemloft.net, linux-crypto@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
-	senozhatsky@chromium.org
+	senozhatsky@chromium.org, 
+	"Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 15, 2026 at 2:49=E2=80=AFPM Kanchana P. Sridhar
-<kanchanapsridhar2026@gmail.com> wrote:
+On Thu, Oct 15, 2026 at 2:39=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrot=
+e:
 >
-> On Wed, Oct 14, 2026 at 8:43=E2=80=AFAM Yosry Ahmed <yosry@kernel.org> wr=
-ote:
-> >
-> > On Thu, Oct 08, 2026 at 11:28:13AM -0700, Kanchana P. Sridhar wrote:
-> > > Place and align the members of struct zswap_pool and struct zswap_ent=
-ry
-> > > such that members used together in compress/decompress hot paths are
-> > > able to share the same cacheline. Minimize holes within these structs
-> > > while doing so.
+> > > > > > @@ -1449,9 +1446,10 @@ static bool zswap_store_page(struct foli=
+o *folio, long index,
+> > > > > >  {
+> > > > > >       swp_entry_t page_swpentry =3D folio_swap_entry(folio, ind=
+ex);
+> > > > > >       struct zswap_entry *entry, *old;
+> > > > > > +     int nid =3D folio_nid(folio);
+> > > > > >
+> > > > > >       /* allocate entry */
+> > > > > > -     entry =3D zswap_entry_cache_alloc(GFP_KERNEL, folio_nid(f=
+olio));
+> > > > > > +     entry =3D zswap_entry_cache_alloc(GFP_KERNEL, nid);
+> > > > >
+> > > > > We don't need to allocate the entry on the same node anymore, sho=
+uld we
+> > > > > drop this and let the slab allocator handle it as it sees fit?
+> > > >
+> > > > Was this a recent change? I see the folio_nid(folio) on my version =
+of
+> > > > mm-unstable as of 10-3-2026. Let me check, and yes, allowing the sl=
+ab
+> > > > allocated handle this is probably a good idea.
 > > >
-> > > Signed-off-by: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
-> > > ---
-> > >  mm/zswap.c | 10 +++++-----
-> > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/mm/zswap.c b/mm/zswap.c
-> > > index 8ae67fd10522..ade84ac4076e 100644
-> > > --- a/mm/zswap.c
-> > > +++ b/mm/zswap.c
-> > > @@ -160,11 +160,11 @@ struct crypto_acomp_ctx {
-> > >  struct zswap_pool {
-> > >       struct zs_pool *zs_pool;
-> > >       struct crypto_acomp_ctx __percpu *acomp_ctx;
-> > > -     u8 compr_batch_size;
-> > >       struct percpu_ref ref;
-> > > -     struct rcu_work release_rwork;
-> > > -     struct hlist_node node;
-> > >       u8 idx;
-> > > +     u8 compr_batch_size;
-> > > +     struct hlist_node node;
-> > > +     struct rcu_work release_rwork;
+> > > We allocate the entry on the same node to avoid having to store nid i=
+n
+> > > the zswap entry (see entry_to_nid()). If we store it, then there's no
+> > > need to allocate on the node.
 > >
-> > compr_batch_size is added by this series, why not just add it before id=
-x
-> > to begin with?
+> > With patch 0006, we try to bulk allocate all entries for the batch.
+> > Only if this fails, we call zswap_entry_cache_alloc(gfp, nid). So
+> > patch 0006 addresses this already, and the nid is used on in the
+> > fallback case.
 >
-> In patch 0006, where compr_batch_size is introduced, I was attempting
-> to place it in the same cacheline as the acomp_ctx. This increased the
-> size of struct zswap_pool to 248 bytes. I later optimized this in
-> patch 0007, bringing back the size to 240 with the addition of
-> compr_batch_size.
+> If we are storing the nid in the zswap entry, there is no need for
+> zswap_entry_cache_alloc() to use the nid anymore.
 
-This doesn't make much sense, and the size of zswap_pool is not that
-important (usually only one globally). I would drop the patch and add
-compr_batch_size directly where it needs to end up.
+As of now, zswap_entry_cache_alloc() uses the nid for
+kmem_cache_alloc_node(). Is the suggestion to change this to be
+kmem_cache_alloc()?
+
+>
+> >
+> > >
+> > > >
+> > > > Along the same lines, I have been working on replacing zsmalloc wit=
+h
+> > > > direct SLAB allocations for the zswap compressed data storage and s=
+ee
+> > > > very promising results: memory savings and latency improvements. I
+> > > > will submit an RFC shortly.
+> > >
+> > > Keep in mind that zsmalloc is movable memory, while slab memory isn't=
+.
+> > > Zsmalloc may also be less likely to make a new allocation in the stor=
+e
+> > > path. There are other considerations beyond memory overhead and
+> > > latency here.
+> >
+> > I realize this means we trade off page migration for writeback for the
+> > pages representing zswap compressed data. This might not necessarily
+> > be a bad thing for 2 main reasons, the way I see it in this specific
+> > context:
+> >
+> > 1) Page migration would only be transferring a memory pressure problem
+> > elsewhere. Not sure how well this would work with memcgs or
+> > containers. At some point someone would need to do writeback.
+> > 2) I don't believe there is a zswap specific page migration flow in
+> > the kernel other than zsmalloc compaction. IOW, memory tiering
+> > components like CXL are handled directly in the reclaim path. From
+> > what I understand, things wouldn't break with slab memory for zswap
+> > compressed storage, but I could be wrong. I hope to include the
+> > architecture level considerations/trade-offs in the RFC.
+>
+> Zsmalloc memory is currently movable, so compaction can move it around
+> to free contiguous blocks (e.g. for THP allocations). Slab memory is
+> not movable. It can be reclaimable, but writing back memory from zswap
+> when we are not under memory pressure is also bad.
+
+All good points, thanks. I agree, writing back memory from zswap when
+not under memory pressure is bad, however I have not seen any
+writebacks in my experiments with usemem at 60% over-commit and with
+64kB mTHP.
+
+I am running these experiments in a memory constrained environment:
+
+QEMU VM: 7G RAM
+Swap: 3G
+cgroup memory.high: 3G
+4 usemem processes want to allocate 1200M each. To make the experiment
+even more stringent and representative of actual compression datasets,
+each usemem process reads the Silesia dataset from a
+pre-fork-allocated buffer into the 1200M. This causes realistic
+compression payloads in usemem.
+
+>
+> Note that compressed memory can be very large compared to slab
+> allocations (or kernel allocations in general), so it can increase
+> unmovable (or reclaimable but not movable) memory significantly,
+> causing fragmentation.
+
+It took me a while to experiment with compressed size bins, until I
+settled on a compromise between memory wasted per slab and zswap
+latency in finding the correct size bin to minimize fragmentation. I
+have been gathering extensive SLUB stats which indicate:
+
+1) Even under peak zswap compressed quota ("pool") utilization across
+10 consecutive iterations, SLUB comes out ahead in less overall memory
+overhead.
+
+2) At steady state (when 10 iterations of the workload are done), most
+of the slabs have been returned to the Buddy allocator, except for 3M
+worth of slab setup per compressed size bin (0 objects in use): this
+is as compared to 32K of zsmalloc slub metadata that remains at steady
+state.
+
+I learned some really interesting things from these experiments, which
+pose questions about the memory penalty due to latency that zsmalloc
+adds to zswap compress/decompress paths vs. "internal fragmentation".
+I expect to quantify this with data from my experimental setup.
