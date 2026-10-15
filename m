@@ -1,43 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B805581E8;
-	Thu, 15 Oct 2026 19:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A630A43C7C2;
+	Thu, 15 Oct 2026 19:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792093089; cv=none; b=aZirQG2KR99qO2Vf6RcYTbdSAyL4zZidIGIsJ/pbC7UaLnWzZioMRKFtSLYIEJub7colg81IgOVid/lIooFW7cDERfvBk5B2Wx8NjGmDdkCcJcSU2uzloS8D/VtWqbbLyRffg96RLj3QzLISmVHOpxHNAkVEwC6FQAXYS95k21U=
+	t=1792093880; cv=none; b=McZ8U4C33jHO+R3sIr6u0Ue7Q1FNcT0NbG/PfnyofdeSupzHDdfgkGpx5B/5hgMqkOUUFQ416ZH4HK67eCOSgBGOmNNmENFwmboDuXx8CsWa0mCMAJaXfE3xdCSA1qp/LzWR4q7uQmjXQ2Gc6cAwLkoFWVH5c4sCaxa89qehoBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792093089; c=relaxed/simple;
-	bh=c5h3wczMNCh936y2iGbQJ6+ioFXXwrnvB0nc/8VJQh8=;
+	s=arc-20240116; t=1792093880; c=relaxed/simple;
+	bh=ga6JYYLzzscZKA6V9O1XfWF5Uf0DD39/Nn3cQ8QDo/s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sCWY7GBDZ9XXkD8lyE/A5J3JBl9/+6T0eFyTshyEEkhCOxrgn/YO82jmwyl/A5lMg2D7vSi8jUwqExyuZ/Hsw1E4uYbRQQX4HuksTfdxHv45ahNY4BYV9G/5Ri5PIHBUTzqo9DOZ+gFWAqBt3jPKmFtlaxF5iC8oRP8IR9+CqQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HTsQh0xs; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=KkmelGwybMyiPyE0pdsJipQZQEvG21LXSoO7Zf+6c1vqgcOTeA6PX2qM/93vfUnEFaqxxuTbYLauS3OMf8ld2TWdZPbFKNYfJ1CMRGMFq1qPlwtEuTLLEjltEUmhI6adipSVWOlt8ZOiKKcTbQtwbWzIwrKZuyeMxnoOD/XNY0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FAfpDwii; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HTsQh0xs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D60CF1F000C4;
-	Thu, 15 Oct 2026 19:38:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FAfpDwii"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EBD61F000C4;
+	Thu, 15 Oct 2026 19:51:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792093087;
-	bh=ktHamms1PZ3sH7AhbC9zmSU27z/kVmWRHXgIXRPL5/0=;
+	s=k20260515; t=1792093879;
+	bh=jIGO386Z+1/YyIE6BOFStksGPSpSiXsQ9RgmeE/zm1Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HTsQh0xs4AeBk/FICm+aCABoHspVLMidcXogEDA+TCFRDMqPCCnpPHtwJwcdLkz4u
-	 QyNqW7d1l8HjyzhG6K+jDCIt2iHwu6G2dt1lAZmLBK8BhYZeGWf/Ay5kC9V48shjB7
-	 o3aHpyGPv5XuGcSmP7o8BS9OvA5GzolCl3XWqzLYYHUvuq5vFmV7IS2MifTtrjeqv4
-	 aunLqSjqAjOwQ035Fgrd6N0uy+SqR6hOhiTwNaZGgwsfZgew5P5Fz5/g2J5m1kgOgT
-	 MIIeWUfDpTMAAxddQ5Krts77OTMqZuQkj51/1IFmmTGjO128yEP9hmWfgwYn8RqTKs
-	 06lxb6FRQT3FQ==
-Date: Thu, 15 Oct 2026 13:38:04 -0600
-From: Tycho Andersen <tycho@kernel.org>
-To: "Pratik R. Sampat" <prsampat@amd.com>
-Cc: mcgrof@kernel.org, russ.weight@linux.dev, dakr@kernel.org, 
-	ashish.kalra@amd.com, thomas.lendacky@amd.com, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	gregkh@linuxfoundation.org, rafael@kernel.org, chao.gao@intel.com, aik@amd.com, 
-	nikunj@amd.com, michael.roth@amd.com, shansinha@google.com
-Subject: Re: [Patch v4 7/7] crypto/ccp: Implement SNP Download Firmware EX
-Message-ID: <atElnAcDQFTnmdVr@tycho.pizza>
-References: <cover.1792014060.git.prsampat@amd.com>
- <55c189e9130a7d22c0b756440f10a056415404e5.1792014060.git.prsampat@amd.com>
+	b=FAfpDwiimyOYzZ5JcENHIs5Vi+2y6MQ9waCDCqjQ5+IsJfkUSeldpuMERPh/ju+9C
+	 AmLFsYRx4ss/RQjY/bWbRusizOO22JZJyVNL7y9OrfXKArSLmo2eEK9R+IRfaM4DuI
+	 zy/7m5tTu5LXC9BM3BCyuvZ5W7IcKf7K9Pg6mLifvUxZHSedzm26VdWYvbvixTcnuf
+	 rwr/4AsRtD7ujDYGbxhGrNTq8Gp9V5d5z3AjS+c4MEV2RnQ8EhPHaqIMi6lzgKjf2l
+	 mCnpem+7WCa6NI6q4/DEoE/J0Ed0EUSU/S5PHY14wTr8pGPA7si/H/ns0p1C0yzx1i
+	 9bUpKICgHIs3g==
+Date: Thu, 15 Oct 2026 19:51:17 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Frank.Li@oss.nxp.com
+Cc: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>,
+	Li Nan <magiclinan@didiglobal.com>, Xiao Ni <xiao@kernel.org>,
+	Dan Williams <djbw@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>, dm-devel@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	Anatolij Gustschin <agust@denx.de>,
+	Saeed Bishara <saeed@marvell.com>,
+	Rameshwar Prasad Sahu <rsahu@apm.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Anup Patel <anup.patel@broadcom.com>, Frank Li <Frank.Li@nxp.com>
+Subject: Re: [PATCH RFC 0/4] async_tx/md: Remove async_tx framework
+Message-ID: <20261015195117.GI2170687@google.com>
+References: <20261015-asycn_tx_remove-v1-0-056a7085e0a1@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,105 +58,52 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <55c189e9130a7d22c0b756440f10a056415404e5.1792014060.git.prsampat@amd.com>
+In-Reply-To: <20261015-asycn_tx_remove-v1-0-056a7085e0a1@nxp.com>
 
-Hi Pratik,
+On Thu, Oct 15, 2026 at 03:22:24PM -0400, Frank.Li@oss.nxp.com wrote:
+> This RFC is collecting more feedbacks to device when is good time to remove
+> whole async_tx framework and how to remove it safely. And is overall
+> direction correction.
+> 
+> Little to no real hardware acceleration usage:
+>   Most systems run RAID5/6 parity calculations on the CPU using optimized
+>   XOR/PQ implementations, while DMAEngine-backed async_tx acceleration is
+>   rarely present or exercised.
+> 
+> Added abstraction and maintenance cost:
+>   async_tx introduces an extra layer between MD RAID and parity operations,
+>   making the code harder to understand, debug, and maintain.
+> 
+> Modern CPUs outperform DMA offload:
+>   SIMD implementations (SSE/AVX/NEON and architecture-specific RAID
+>   routines) often provide better performance than DMA descriptor setup and
+>   completion handling overhead.
+> 
+> Obsolete hardware dependencies:
+>   Many async_tx acceleration backends were designed for older DMA/XOR
+>   engines that are no longer common in contemporary systems.
+> 
+> Complex asynchronous execution model:
+>   Dependency chains, callback handling, and DMA transaction management
+>   increase code complexity without corresponding performance benefits on
+>   typical deployments.Simplifies RAID code paths: Removing async_tx allows
+>   direct use of synchronous XOR/PQ helpers, reducing indirection in raid5.c
+>   source code [linux/drivers/md/raid5.c].
+> 
+> Reduces testing burden:
+>   Eliminates rarely used code paths that are difficult to validate and more
+>   likely to accumulate latent bugs.
+> 
+> Aligns implementation with actual usage:
+>   The vast majority of MD RAID deployments already rely on software parity
+>   generation rather than DMA offload.
+[..]
+>  17 files changed, 281 insertions(+), 2843 deletions(-)
 
-Two small comments if you happen to respin this one, no worries if
-not.
+I haven't been paying much attention to the crypto/async_tx/ directory,
+but this makes sense to me.  This mirrors similar trends that we've seen
+with the crypto and CRC algorithms.  For these types of algorithms, just
+using the CPU is faster and much simpler than trying to offload the
+operation to some external hardware engine (which rarely even exist).
 
-On Thu, Oct 15, 2026 at 02:14:09AM +0000, Pratik R. Sampat wrote:
-> +static int sev_download_firmware_ex(const u8 *data, u32 size, int *psp_ret)
-> +{
-> +	struct sev_data_download_firmware_ex sev_data = {0};
-> +	int ret, order;
-> +	struct page *p;
-> +	void *fw_blob;
-> +
-> +	order = get_order(size);
-> +	p = alloc_pages(GFP_KERNEL | __GFP_ZERO, order);
-> +	if (!p)
-> +		return -ENOMEM;
-> +
-> +	fw_blob = page_address(p);
-> +	memcpy(fw_blob, data, size);
-> +
-> +	sev_data.len = sizeof(sev_data);
-> +	sev_data.fw_paddr = __psp_pa(fw_blob);
-> +	sev_data.fw_len = size;
-> +	/*
-> +	 * Don't commit the new firmware, an explicit SNP_COMMIT is required
-> +	 * after update.
-> +	 */
-> +	sev_data.commit = 0;
-> +
-> +	ret = __sev_do_cmd_locked(SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX, &sev_data, psp_ret);
-
-I guess this function could use a lockdep_assert_held(&sev_cmd_mutex),
-but maybe we should not do that and instead put it in
-__sev_do_cmd_locked()...
-
-> +static enum fw_upload_err sev_fw_upload_update(struct sev_device *sev,
-> +					       const u8 *data, u32 size,
-> +					       u32 *written)
-> +{
-> +	int cmd_ret, psp_ret = SEV_RET_NO_FW_CALL;
-> +	enum fw_upload_err fwl_ret;
-> +
-> +	guard(mutex)(&sev_cmd_mutex);
-> +
-> +	/*
-> +	 * SEV firmware will only successfully execute the DLFW_EX command if a
-> +	 * firmware rollback is required. Other commands may be processed, but
-> +	 * may not execute properly. Use the psp_dead boolean to restrict
-> +	 * execution to this path.
-> +	 */
-> +	if (psp_dead && !sev->fwl_rollback_required) {
-> +		dev_err_ratelimited(sev->dev, "DLFW_EX: PSP is not responding\n");
-> +		return FW_UPLOAD_ERR_HW_ERROR;
-> +	}
-> +
-> +	/*
-> +	 * If the last firmware update returned RESTORE_REQUIRED, retry DLFW_EX.
-> +	 * Being in this state means that the legacy firmware has previously
-> +	 * been shut down, so no need to do it again.
-> +	 */
-> +	if (sev->fwl_rollback_required) {
-> +		psp_dead = false;
-> +	} else {
-> +		cmd_ret = sev_fw_upload_shutdown_platform(sev);
-> +		if (cmd_ret)
-> +			return psp_dead ? FW_UPLOAD_ERR_HW_ERROR : FW_UPLOAD_ERR_BUSY;
-> +	}
-> +
-> +	cmd_ret = sev_download_firmware_ex(data, size, &psp_ret);
-> +	fwl_ret = sev_fw_upload_handle_err(sev, cmd_ret, psp_ret);
-> +	if (fwl_ret == FW_UPLOAD_ERR_NONE) {
-> +		*written = size;
-> +		sev->fwl_rollback_required = false;
-> +	}
-> +
-> +	/*
-> +	 * Firmware either just requested a rollback or a rollback attempt
-> +	 * failed. Keep the PSP dead for all other commands, only another
-> +	 * DLFW_EX attempt is allowed through.
-> +	 */
-> +	if (sev->fwl_rollback_required) {
-> +		psp_dead = true;
-> +		if (fwl_ret != FW_UPLOAD_ERR_HW_ERROR)
-> +			fwl_ret = FW_UPLOAD_ERR_RW_ERROR;
-
-I think this error switcharoo could use a comment (or maybe just be
-dropped?). e.g. if the user does something to set
-->fwl_rollback_required and then tries another firmware upload that is
-the wrong size, ERR_INVALID_SIZE -> ERR_RW_ERROR, which seems
-misleading to me.
-
-I saw some discussion about all this:
-https://lore.kernel.org/lkml/20260924213737.3833625-1-shansinha@google.com/
-
-but it's not clear to me why you need to reset the error code here.
-
-Thanks,
-
-Tycho
+- Eric
