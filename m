@@ -1,222 +1,321 @@
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011027.outbound.protection.outlook.com [40.107.130.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E278534443;
-	Thu, 15 Oct 2026 15:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B3D53D9DF
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 17:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792079537; cv=fail; b=I/mS10DOQe0CoDVY5P9z41SQvtz/u50aTMQPPxLyqOxhvVC1NgZaSR6LVq57qTZGZneW31hTnlSitr2BZFdCys8n8uJ3YRrGiWDXpZLQQKjgssiyO7ZcX8taKWB0Il9mcTgEKfn36XEUL+jnEkJ9hVJh9H73XzFFV9dOiMOiepQ=
+	t=1792086197; cv=pass; b=tKNFE1+adGA7Ci4t7AXkqi/1f3vjBRlVwcW/0HkZefPIJqtF//eNU0VFo+5qaXBzWs5CSje8BTAJxo+HoqpWyQZ5VpzpaZhxcLKI+lwQfwchOj8TVuw9IloWXlIuB4mCD6nQEbal1iLUZvIjtqXyecLFE93Vz4To1WcxCr8VSlM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792079537; c=relaxed/simple;
-	bh=DDuYHT/KVvZ0ZyxpFXQtXYCPGMJ0cpBasHyjwXaHb7M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Vttct6g3/hOvdTBSh6dYPltD4Vy+uIGjGeMd+08DmzpeMEjcfnFzyupWrUoamW/gfawDEqTb5L0Z1HDHMyW7kpvmheLEnQ31R0LIbxSPaJginV6KrGu9N5RUXvId5HcRZl7A92spYeDGwQ2+/3FvwT68HwkLdKi10OG998Lj8Qc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=rYX4D9g9; arc=fail smtp.client-ip=40.107.130.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+	s=arc-20240116; t=1792086197; c=relaxed/simple;
+	bh=ouZIw3iZo69Khbk3ADpLifIkS0RbQKYWlJW/NhSX2I8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Bz4v2ecdocIX86Dx8GE7wKsMVq1IPmY6F3jQrz7nYhTzhFi6R1N8aJgeHlGF8ySbySKLuqehbl6FqbO4eTU7BQiUTX8TvY876k4l5Vbp15gJq28uaP7g2h0KGA6TZ71Jg3RLq3imukVKkxuwU7OCCNILG6hVC9BLbvEm9/5724U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=PBjPsrMu; arc=pass smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="rYX4D9g9"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=szrjS/fblsBve9UISgb20ViZCC/UXteM9SUL1uqSwWP1qVSbEwCqn/DO+ac7Pm8xlvUJtqxS54SAU4PMIneCZYSkFnsqaa/hPYbA2WzJN3btRVjc4j3Uwxz2DRNb7+kUWpQBFNwnWFBSQAwWOZ/lYXaZCn8TquMsAqwA7C/OOA/INTWREdLDAqvGRZ6MXDjan7UPT0bPBWbiuu1MDl4LRRLH4YGHnsEgq97EiiDt5CNTDnUIl+oYdzXwXho9KyK4Xqul06IrwDc2YWIcMRwI4GKVbNQrVMMhzl1EJ9vHDx9fhNrki3qs8xAfwoL/UPKgZFuMRZzK4EmezbEzV7lJXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RjIhwYBVPXzSaoHhRosy5gf2ME7a7EmH4pXhuCR1nNg=;
- b=vClhMZqy3/UaUIa4hR96T4fuHaVKRDaTTrSP/Y5alaD5xT/PIOgmT1P3dWEVbVh0iCQmoVVLIybnt3hEYV91My6ox/cLal9L+ZJm1jRYnU13VoVa4G6Y9bD3Zgy+5fvE8UC/oXe/5LZi2vPgbWRKblh5j+Js+7bopvKrBHPLUiLRP1a2xgP8GWiaQ/Ri9OkJRNE+4ukhTqgbu4F/dozKsbE5R4x5Ug6ED7TAOZGS73zFbVB+B5JLpYfEIKqq+0llRlMWlBUUkvqkSJmgb16RfNgPzpkucnXZWDRHQsxIOjhq8Wn7ePO8HFXBmVv4XjoRjsbYwuuiE7ztwM+mbJH1Pg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RjIhwYBVPXzSaoHhRosy5gf2ME7a7EmH4pXhuCR1nNg=;
- b=rYX4D9g9z1cc70dzxZWW3gzNtWppH3vdNj3IdVFWtXs+r3fEkxjgeR1Ju0/kZuF71llJGsUZYkgn2rRxC8kbpoEtd+9tEZ8wIBKxJvrR92TsSUMRZQ+26EspxYkJK2wlX/DfhRL0EUaVwbqOoDQm0rrhhPYQsN67Rjd9KIyoE9YZGoB3A6J5C0gUWp/WvJoNoiUzTl8zBjXNSqylgQEsM+u1IwZ74zqgKqcqIpK3iGZUKz5+Uumiylm9RncxOvwfS6LykyqHVHORyTMuYyKnrcTaTLjlXVtqGu3aRa9nZdcoglj4HawM06f/5jGNhKMeR9m7m5pC6fbzyyZuZtI4Zw==
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
- by AM9PR04MB8472.eurprd04.prod.outlook.com (2603:10a6:20b:417::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.14; Thu, 15 Oct
- 2026 15:51:57 +0000
-Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
- ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
- ([fe80::2146:83a2:5329:b7c%7]) with mapi id 15.21.0522.012; Thu, 15 Oct 2026
- 15:51:56 +0000
-From: Frank.Li@oss.nxp.com
-To: Dan Williams <djbw@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vinod Koul <vkoul@kernel.org>,
-	Frank Li <Frank.Li@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Dave Jiang <dave.jiang@intel.com>,
-	linux-crypto@vger.kernel.org (open list:CRYPTO API),
-	linux-kernel@vger.kernel.org (open list),
-	dmaengine@vger.kernel.org (open list:DMA GENERIC OFFLOAD ENGINE SUBSYSTEM)
-Cc: imx@lists.linux.dev,
-	Frank Li <Frank.Li@nxp.com>
-Subject: [PATCH v4 2/2] dmaengine: replace dma_maxqp() with dmaengine_maxpq() taking struct dma_chan *
-Date: Thu, 15 Oct 2026 11:51:06 -0400
-Message-ID: <20261015155118.3063149-2-Frank.Li@oss.nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261015155118.3063149-1-Frank.Li@oss.nxp.com>
-References: <20261015155118.3063149-1-Frank.Li@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0092.namprd13.prod.outlook.com
- (2603:10b6:a03:2c5::7) To GV2PR04MB11799.eurprd04.prod.outlook.com
- (2603:10a6:150:2cf::9)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="PBjPsrMu"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-5350d9ea106so67567581cf.0
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 10:43:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792086190; cv=none;
+        d=google.com; s=arc-20260327;
+        b=krLZN6deCqOewxO2x8seyb5tBfGCPLjEFuqzGTgZS7lGbFScJtKXEK+qfqVaoCHdNg
+         r5Nb6fIbuZxCvZ7ELW1/vtK6Cx10K3QSjNrG6K0fRiesZNhrUYuKX4Rcej+ej9SFUDeD
+         K8TLucxKcN4NHbQinU9+XY4vA72QCIo0m9+VPdF/6RF127yEQPRg4RaTD97HM+mGYiSl
+         eobD1w5XGuGjI07N5mzZgumDeMGMh8Vv91klN8KPJ+sMW1RcJCjmb/1hJiiXLCu5ek0v
+         Y0KCgkRxxMQBsQYNM4LkWd+/Xrxg9yJRGmAwn9UXdEijnLpP7PG81aTSqHjj91RPOcZB
+         nlrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=DtehoLIZuXxFvvfEKkFhiUtbDfHZTL79xkMiYl5Ej+0=;
+        fh=OUpgHz8gu+EFyREjScBnwgXxe9p5hHef04jJGlkpTWE=;
+        b=Ul4iXv6Nlufl1qwmx8JS2U8peM22zVVEY/Dp407cWnk0wDU4P3n2txvTAdWwf0HPgX
+         p0N8kFxWlZM0qmA51yZwPYHBYcx4hBiC4zHVs6wKjojlLugDR1tZ8zwtXdOFtFAPEKHZ
+         rEmqRmI36ydVu/Z3+6z6YNbY3Iq1hmg+zdAcfIH4By3+uw/U7MxAgSZS/J9D/rNfnp8s
+         391Y5YgFWhryEm6nLLhXX0IoD+XjoEgHNjKirQ4E9c41qihHkiLTffQ3LTBWNNcPcdRP
+         XiZX/1AbVIg7OLcwhxENF7Lf57dYt+OBXkkaJRM7+hpj625MDgEHCPCLvhN7ili81RvS
+         +sMg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1792086190; x=1792690990; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=DtehoLIZuXxFvvfEKkFhiUtbDfHZTL79xkMiYl5Ej+0=;
+        b=PBjPsrMuKw3Cusj1fiHHBmkR1KWefRoQnYtYtcBlRClrgVzpTYdDqLhhiAZWX8Aei1
+         Ovl+CabqJMeT+7h41TwcTyb6ofwuHJhRlsVk8c6mqKO9lSn3g8QYOt1XlNJ/9bCK3rP5
+         /U2BuvHSP5yBiKj26d7H8im9GRo7d5wrdUAEA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792086190; x=1792690990;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=DtehoLIZuXxFvvfEKkFhiUtbDfHZTL79xkMiYl5Ej+0=;
+        b=t/ZPl0tyb6yL28aiGmMo5uhPUuj7sC0rM/ddYlMqhPP1c8wC1+bs0Yufbqlab2a5G3
+         pu4+JdVUFJoLbC0HtH3jY7Kl/1CWKG+6uAHZcfSb3kspuDOFPw+ZhJ99NQ1ZeTE1LD/h
+         BtI/zb7yQji8MKPvWbyu/yobvPlhzFNFu5JSIg/B1dFhcSscEs/W85gciWVrIHdFjgOZ
+         e7CxqHRGi8V8ARDJZJv6AzOQm+6vuEwTikDbqrhSTqHgm1UmUOQ9/bAwydNk7WHSpVrQ
+         cjBedGLyD+CwnxCpZNPk0tW8jyuKShQVyGfwN6s7tK/lGRIeXcPJr8eNxbKfLKOBld49
+         uEWg==
+X-Gm-Message-State: AFq9FYIrGjjemRYycQ3u5D215XLJveVtiBJXA9YMoC8eP3APje4DGDDT
+	lgxrXMxJfXotCEpnzLqphxMQBsfL7TNO3RXu6Gt0Ciq/t2Ix7fQnYhFK3XAgTRfs/quC0RasGUi
+	yBPkGESOYym0U0o2gaPdoWHA1u+u4nCKFgTbBE61HbA==
+X-Gm-Gg: AYBFou35phBsJh1r+pB1FmRhvqCrosKasQQbY3p1UU5E6MoIFC0JpkWQczuKQuXyZQo
+	uehzqxvyI8Jk0awC7ttF6U3i/fS8qsCFyfedcZyaawviAbN7OZm9R7dsMR9p4esCBKaCWPD7Dsz
+	C6XUZy8gaLe/vllZU4aByZKHeEGlFHCZa6hl2L6zirMBYpdmyJSRlmrmQ5PJRD92iB7kGL98z5i
+	bhRxmBPitHtd7f+V5OfH8+rTsjyxHj1Ph7o/haRdSZDlLxlz3dmT1LQ37grAxtRsuuIpN+7cgwX
+	RNytF1XLq5MJjt3fuDPZCV7g+tavCkrJW3ZR6oqYOxr4KOOst9t1V+/ASoVF+RkNWGP3QDonXxP
+	NzW8Pu9zHSucM2fMkSO0B2n1ORgqzSMbTOWFMzbe/lWe/JJXmTSarBsQdEYcYhGIpDQL7kq9i20
+	4jm9hMq4bOuxH2i1b5D+bbUPUyy5pJAS5lUpSQd2MBlxU=
+X-Received: by 2002:a05:622a:428b:b0:535:1cdd:a35a with SMTP id
+ d75a77b69052e-5359f4864c6mr333448061cf.3.1792086190123; Thu, 15 Oct 2026
+ 10:43:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|AM9PR04MB8472:EE_
-X-MS-Office365-Filtering-Correlation-Id: 98c12483-75df-48e6-bece-08df2ad43d44
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|23010399003|376014|7416014|19092799006|366016|921020|56012099006|11063799006|261009223027099003|10067099003|18002099003|22082099003|3023799007;
-X-Microsoft-Antispam-Message-Info:
-	+e4MAVp5dO5v/SD6DEaYt7mCsaETaNzip/MrD+xZO8vUh8LXMSI+uNAwVsUaoTC32HhaCldOQKZLsFVKUwRYsN3niEMizBG67FDBZkF23o+eLBjO0NFk9OSS88/gYDxBIiQRKdka4mkdKCkvHRCf4L0Q4UA5JYulI+h+P6yWasXc1Obl1ITUbucITI4ukWX6TyjzM3ndASHQ7VJze9Y603WwNexev6p7XTIUpY7DLZMMkJQj7Rba+gTrZDJjGvseI2oCPj/IJ0zgE4HQNTw8HSV/ZgVQFE2Gr72Lu0i9VITxzGdO8T5QO+0dfGZOOAsmeAFjmWzU3xQf2serbj+RaI8OV3u9S6vpuBOGYm9Vgdsh2VNDNmohZU5G7bChCLJ/m0HuJXBS99Qjmd897Aiw3Dsk+8A4cutgwCUI1J/rE1QcOATgK9zO3x3AyPMc6KdquW9XQH2JxZnTfsphoLe2nwnxpwUuHFWmcaBPF8daPdDxHNKVaazCh0/lbvGdmsVeVZ5giE0zIIznP5a1TBghYfdoO+PZ2BPSQ8wQuca0ar74moVGb+WQ9qI75qUMKwMsyEcSvyqvuAlyv4f0cEsokIOtxokoodaKGt3MVj7oJMPODoor4pi2VYbHtN7NxUzhmpCfn5kOGGZog+OMArkxh72zMkHanCz5P7VDCU10a/E=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(376014)(7416014)(19092799006)(366016)(921020)(56012099006)(11063799006)(261009223027099003)(10067099003)(18002099003)(22082099003)(3023799007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?A4Z5DILw8KulC2gd4yPBu1UEGravR1ZgZ1ULg/C84Jjp9Avg/etGLDYv0PL6?=
- =?us-ascii?Q?a+n1jRh1AuA1SnT234i3r2bUtF9rub/VgW5prZ7R/tVyC/kNVyqecQy/Jhtg?=
- =?us-ascii?Q?Vc8G7NVx2iwk7TuCJ+xkN0xN1ZEeGumgrl1yMuul+ALKze0oyj4Lux3WcXTi?=
- =?us-ascii?Q?/k0bhAIH8ltLvlHrqMt1vd6Oyo5bhDHJrOgUZVwkLXJ0DP0EMCv56fiCMXsR?=
- =?us-ascii?Q?QFhParmZZPsELz/mw8eM+mUkaVvHDNvCCUIomNjke21Vk953y2iEVyZ5mVdR?=
- =?us-ascii?Q?M7HI1w+bqt3LORkzuE+4r9Y24aeOUn5aFiDW2lYZ722yN2AWvUrAVpDmyVa5?=
- =?us-ascii?Q?vDBBRWF8WKlyMS0Ki/J6DFls15KJaducDfLWl7hLawhpqCtK5XgmSmYbTBw4?=
- =?us-ascii?Q?0Q+gHSG4FBfstp4mbZI7SFmrvHjEFwHmglzf2UdYOwx4NX19LF1pb0eTQwMo?=
- =?us-ascii?Q?ADetAC1Pb5jHvkwFKNb2ZdXPp4tX8SPFQOq/MSoECC8f4X8oJmhpbiXcOnFz?=
- =?us-ascii?Q?AWTy0tKGA8BYAj0lEKON4qFuS3WLONzwwL054r9+W3UJA3D30MpPCC7Z5QAZ?=
- =?us-ascii?Q?qtzTbexLCyruKx752g1sjBhCF6eA7oLLdfmhGLx6j8Bo68D7ICT33MY6FIbM?=
- =?us-ascii?Q?9KibPvgyM4nDHgXhPRCn8p7uLrkNL1thOkbM8Dvo+U7OtO1eUeagScXawUTk?=
- =?us-ascii?Q?af1pYbtqLbLrYJbvYeO0oZPIe6aRlhLPiMSgnffXbT8cqpcBFTqU83XR0qxQ?=
- =?us-ascii?Q?MkPXAyVVSG/ANNbo8zE6d5uhV2Jo0y9V/HEVGU3j71we8G25+duwXftNcneX?=
- =?us-ascii?Q?JEx00qfVChWDSu0u5Qqf3h0Engh3DTzW/QkVZ/cgWv4ITPPJqgtUOJqGx8dZ?=
- =?us-ascii?Q?C7hITZqMRIusCLq0BnvnmvZJUmV93S2sd37iSKybydrzsYMT2FhFcurY3XxD?=
- =?us-ascii?Q?0H6LvhoCWSCeygOdSLOeQY24oeRY19+T6Y4VJWIt6Y/kxUslEPN7XBlUxbrB?=
- =?us-ascii?Q?JRQ1RCV5AY/WDHMewJuGRw6C6KkY7mTJ9dYjKBmMhjn0CueWZPP8rKCVpdgG?=
- =?us-ascii?Q?PJ+AOJn3/6QCPWbZPvM9bwCBVfNMpfvX1nMKOr545YcjFEx+dsNYRa+eSMj4?=
- =?us-ascii?Q?J96XpcUAmhhMI7qvFRgt2MJVAVZPEI8SCiBnD5cSGjHpkbRpLJo9/HmYsRTW?=
- =?us-ascii?Q?YM1NO73kXJ+qepwK+ayR+0VsoJsSVslvhnYnw20F6rFjmo/NDh5G0ksCqkjA?=
- =?us-ascii?Q?CihD8hfN6gNfk2o5lkS4p63kQhcIQLiHj8yTXw1ldpbwJT6JYkpQosR8DDe4?=
- =?us-ascii?Q?r2UhtJ++Z11zcezkyBuKXfui1nrMQN5VOLPiQ67c71FaZZe84Yx/1MYRGGaP?=
- =?us-ascii?Q?UQsj/8xtrHtbb5TeVP2+i8p0PpMV8xzwse7V3Cxi5GmWZRDxnguUy2eKETCL?=
- =?us-ascii?Q?IlJK5m/Hnf5DpD3tqQsQJTkeqpp1Pcv+EXYHAkjbp6JoSPsfhaYhDFNy4aHY?=
- =?us-ascii?Q?RM58db3KlXNv5TftgN5dz4a58qzRahnJ3bvl0oHcYy4fIeKXTrRiuK9WZ3K9?=
- =?us-ascii?Q?2mwu6lEISLuGQyImEKWc7ZjbF2Ogwgrs9oB8wxF/D6tQoHHzeQGJbxAhlvKv?=
- =?us-ascii?Q?O7cptzbvL3KkYNCddsFLrGmQunTRmq95lSjXKpO2fQzdOVQxke3lYHFBQfQB?=
- =?us-ascii?Q?fQYoxqWEeYuKy5i1e+QwFjN1EVTQFP1G8YuACv2+mPMtlTMluS2HdzF0INU6?=
- =?us-ascii?Q?Waxm59mQjlIytjwZ0LE3kMA7istx0rg5KpiCsA6sPAfK2IwU/1DW?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98c12483-75df-48e6-bece-08df2ad43d44
-X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 15:51:56.0575
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yhWnxNZr/GHVhWkfraIvHtxX1SsM6pxCt6zTFXWMwFuH1F0WBT/2o8npSG++oSGneGIVTHd3IT4BY5xc401PWNVFcCx892zetC/eucnBRafGZQ106v3mDWvzO5+cj9qH
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8472
+References: <asjT87HAZ_UUbbvm@gondor.apana.org.au> <CALxtO0=TXw68akF3AFPT0=J4tZ2XV+G5kuTOELGBzhbgBdN0RA@mail.gmail.com>
+In-Reply-To: <CALxtO0=TXw68akF3AFPT0=J4tZ2XV+G5kuTOELGBzhbgBdN0RA@mail.gmail.com>
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Date: Thu, 15 Oct 2026 23:12:58 +0530
+X-Gm-Features: AclHuK9S-yUl0Qqf07TUN79vtCcxM0kHlsWIQ4CIm-7gE7zBj_4ZMYR_-IqEGGY
+Message-ID: <CALxtO0=w3jafDBj1gvoAZxcM8tRM0WRAiv-vc8c4+AjSmnOe8w@mail.gmail.com>
+Subject: Re: [PATCH] crypto: aes - Add import_core/export_core to cmac/xcbc/cbcmac
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Frank Li <Frank.Li@nxp.com>
+Hi Herbert,
+   I applied this patch on top of cryptodev-2.6/master and ran the
+crypto self-tests (CONFIG_CRYPTO_SELFTESTS=3Dy,
+CONFIG_CRYPTO_SELFTESTS_FULL=3Dy) with the SPAcc driver. cmac(aes) and
+xcbc(aes) now allocate their software fallback and pass all
+self-tests, with no regressions on the other SPAcc hash/HMAC
+algorithms.
+I will push the SPAcc v26 patches. Please suggest otherwise.
 
-Replace dma_maxpq() with  dmaengine_maxpq(chan, flags) as a channel-based
-API, consistent with the convention of other dmaengine_*() helpers that
-take struct dma_chan * rather than struct dma_device *.
+Tested-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
----
-change in v4: none, just respin because missed patch 2
-Change in v3
-split from original thread
-https://lore.kernel.org/dmaengine/20260923-dmaengine_prep_dma_pq-v2-0-32ed65b8a9b4@nxp.com/
----
- crypto/async_tx/async_pq.c | 8 ++++----
- drivers/dma/dmatest.c      | 2 +-
- include/linux/dmaengine.h  | 6 ++++--
- 3 files changed, 9 insertions(+), 7 deletions(-)
+Warm Regards,
+PK
+Vayavya Labs Pvt. Ltd.
 
-diff --git a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
-index 733af24a2762b..37bc48bbda821 100644
---- a/crypto/async_tx/async_pq.c
-+++ b/crypto/async_tx/async_pq.c
-@@ -51,7 +51,7 @@ do_async_gen_syndrome(struct dma_chan *chan,
- 
- 	while (src_cnt > 0) {
- 		submit->flags = flags_orig;
--		pq_src_cnt = min(src_cnt, dma_maxpq(dma, dma_flags));
-+		pq_src_cnt = min(src_cnt, dmaengine_maxpq(chan, dma_flags));
- 		/* if we are submitting additional pqs, leave the chain open,
- 		 * clear the callback parameters, and leave the destination
- 		 * buffers mapped
-@@ -192,8 +192,8 @@ async_gen_syndrome(struct page **blocks, unsigned int *offsets, int disks,
- 
- 	/* XORing P/Q is only implemented in software */
- 	if (unmap && !(submit->flags & ASYNC_TX_PQ_XOR_DST) &&
--	    (src_cnt <= dma_maxpq(device, 0) ||
--	     dma_maxpq(device, DMA_PREP_CONTINUE) > 0) &&
-+	    (src_cnt <= dmaengine_maxpq(chan, 0) ||
-+	     dmaengine_maxpq(chan, DMA_PREP_CONTINUE) > 0) &&
- 	    is_dma_pq_aligned_offs(device, offsets, disks, len)) {
- 		struct dma_async_tx_descriptor *tx;
- 		enum dma_ctrl_flags dma_flags = 0;
-@@ -312,7 +312,7 @@ async_syndrome_val(struct page **blocks, unsigned int *offsets, int disks,
- 	if (chan)
- 		unmap = dmaengine_get_unmap_data(chan, disks, GFP_NOWAIT);
- 
--	if (unmap && disks <= dma_maxpq(device, 0) &&
-+	if (unmap && disks <= dmaengine_maxpq(chan, 0) &&
- 	    is_dma_pq_aligned_offs(device, offsets, disks, len)) {
- 		struct device *dev = device->dev;
- 		dma_addr_t pq[2];
-diff --git a/drivers/dma/dmatest.c b/drivers/dma/dmatest.c
-index 043bb065dd68a..01ab33580da81 100644
---- a/drivers/dma/dmatest.c
-+++ b/drivers/dma/dmatest.c
-@@ -636,7 +636,7 @@ static int dmatest_func(void *data)
- 						params->alignment;
- 	} else if (thread->type == DMA_PQ) {
- 		/* force odd to ensure dst = src */
--		src->cnt = min_odd(params->pq_sources | 1, dma_maxpq(dev, 0));
-+		src->cnt = min_odd(params->pq_sources | 1, dmaengine_maxpq(chan, 0));
- 		dst->cnt = 2;
- 		align = params->alignment < 0 ? dev->pq_align :
- 						params->alignment;
-diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
-index 6d918ccf852f9..ef141892651d6 100644
---- a/include/linux/dmaengine.h
-+++ b/include/linux/dmaengine.h
-@@ -1720,7 +1720,7 @@ static inline unsigned short dma_dev_to_maxpq(struct dma_device *dma)
- 	return dma->max_pq & ~DMA_HAS_PQ_CONTINUE;
- }
- 
--/* dma_maxpq - reduce maxpq in the face of continued operations
-+/* dmaengine_maxpq - reduce maxpq in the face of continued operations
-  * @dma - dma device with PQ capability
-  * @flags - to check if DMA_PREP_CONTINUE and DMA_PREP_PQ_DISABLE_P are set
-  *
-@@ -1733,8 +1733,10 @@ static inline unsigned short dma_dev_to_maxpq(struct dma_device *dma)
-  * In the case where P is disabled we only need 1 extra source:
-  * 1/ {01} * Q : use Q to continue Q' calculation
-  */
--static inline int dma_maxpq(struct dma_device *dma, enum dma_ctrl_flags flags)
-+static inline int dmaengine_maxpq(struct dma_chan *chan, enum dma_ctrl_flags flags)
- {
-+	struct dma_device *dma = chan->device;
-+
- 	if (dma_dev_has_pq_continue(dma) || !dmaf_continue(flags))
- 		return dma_dev_to_maxpq(dma);
- 	if (dmaf_p_disabled_continue(flags))
--- 
-2.43.0
-
+On Mon, Oct 12, 2026 at 4:11=E2=80=AFPM Pavitrakumar Managutte
+<pavitrakumarm@vayavyalabs.com> wrote:
+>
+> Hi Herbert,
+>   I tested your patch with the SPAcc driver, all cmac(aes)/xcbc(aes)
+> tests pass.
+>
+> Warm regards,
+> PK
+> Vayavya Labs Pvt. Ltd.
+>
+> On Fri, Oct 9, 2026 at 5:16=E2=80=AFPM Herbert Xu <herbert@gondor.apana.o=
+rg.au> wrote:
+> >
+> > The export format for cmac-aes-lib, xcbc-aes-lib and cbcmac-aes-lib
+> > did not match that of the generic templates.  Add custom export and
+> > import functions to align with the generic tempaltes.
+> >
+> > For cmac and xcbc, perform an extra encryption on the withheld block
+> > for export_core so that the information isn't lost.
+> >
+> > Reported-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> >
+> > diff --git a/crypto/aes.c b/crypto/aes.c
+> > index 94791f481e98..a1af4d5a7608 100644
+> > --- a/crypto/aes.c
+> > +++ b/crypto/aes.c
+> > @@ -18,7 +18,10 @@
+> >  #include <crypto/internal/hash.h>
+> >  #include <crypto/internal/skcipher.h>
+> >  #include <crypto/scatterwalk.h>
+> > +#include <crypto/utils.h>
+> > +#include <linux/kernel.h>
+> >  #include <linux/module.h>
+> > +#include <linux/string.h>
+> >
+> >  static_assert(__alignof__(struct aes_key) <=3D CRYPTO_MINALIGN);
+> >  static_assert(__alignof__(struct aes_enckey) <=3D CRYPTO_MINALIGN);
+> > @@ -95,6 +98,71 @@ static int __maybe_unused crypto_aes_cmac_digest(str=
+uct shash_desc *desc,
+> >         return 0;
+> >  }
+> >
+> > +static int crypto_cmac_export_core(struct shash_desc *desc, void *out)
+> > +{
+> > +       struct aes_cmac_ctx *ctx =3D AES_CMAC_CTX(desc);
+> > +       struct aes_cmac_ctx ctx1;
+> > +       u8 *h =3D ctx->h;
+> > +
+> > +       if (!ctx->partial_len)
+> > +               ;
+> > +       else if (ctx->partial_len !=3D AES_BLOCK_SIZE)
+> > +               return -EINVAL;
+> > +       else {
+> > +               union {
+> > +                       long l;
+> > +                       char c;
+> > +               } u =3D {};
+> > +
+> > +               BUILD_BUG_ON(sizeof(u) >=3D AES_BLOCK_SIZE);
+> > +               ctx1 =3D *ctx;
+> > +               aes_cmac_update(&ctx1, &u.c, sizeof(u));
+> > +               h =3D ctx1.h;
+> > +       }
+> > +
+> > +       memcpy(out, h, AES_BLOCK_SIZE);
+> > +       memzero_explicit(&ctx1, sizeof(ctx1));
+> > +       return 0;
+> > +}
+> > +
+> > +static int crypto_cmac_import_core(struct shash_desc *desc, const void=
+ *in)
+> > +{
+> > +       struct aes_cmac_ctx *ctx =3D AES_CMAC_CTX(desc);
+> > +
+> > +       ctx->key =3D AES_CMAC_KEY(desc->tfm);
+> > +       memcpy(ctx->h, in, AES_BLOCK_SIZE);
+> > +       ctx->partial_len =3D 0;
+> > +       return 0;
+> > +}
+> > +
+> > +static int crypto_cmac_export(struct shash_desc *desc, void *out)
+> > +{
+> > +       struct aes_cmac_ctx *ctx =3D AES_CMAC_CTX(desc);
+> > +       unsigned int partial =3D ctx->partial_len;
+> > +       u8 *p =3D out;
+> > +
+> > +       memcpy(p, ctx->h, AES_BLOCK_SIZE);
+> > +       memset(p + AES_BLOCK_SIZE, 0, AES_BLOCK_SIZE);
+> > +       p[AES_BLOCK_SIZE * 2] =3D partial;
+> > +       return 0;
+> > +}
+> > +
+> > +static int crypto_cmac_import(struct shash_desc *desc, const void *in)
+> > +{
+> > +       struct aes_cmac_ctx *ctx =3D AES_CMAC_CTX(desc);
+> > +       unsigned int partial;
+> > +       const u8 *p =3D in;
+> > +
+> > +       crypto_cmac_import_core(desc, p);
+> > +       p +=3D AES_BLOCK_SIZE;
+> > +       partial =3D p[AES_BLOCK_SIZE];
+> > +       if (partial > AES_BLOCK_SIZE)
+> > +               return -EOVERFLOW;
+> > +       crypto_xor(ctx->h, p, partial);
+> > +       ctx->partial_len =3D partial;
+> > +       return 0;
+> > +}
+> > +
+> >  #define AES_CBCMAC_KEY(tfm) ((struct aes_enckey *)crypto_shash_ctx(tfm=
+))
+> >  #define AES_CBCMAC_CTX(desc) ((struct aes_cbcmac_ctx *)shash_desc_ctx(=
+desc))
+> >
+> > @@ -136,6 +204,49 @@ static int __maybe_unused crypto_aes_cbcmac_digest=
+(struct shash_desc *desc,
+> >         return 0;
+> >  }
+> >
+> > +static int crypto_cbcmac_export_core(struct shash_desc *desc, void *ou=
+t)
+> > +{
+> > +       memcpy(out, AES_CBCMAC_CTX(desc)->h, AES_BLOCK_SIZE);
+> > +       return 0;
+> > +}
+> > +
+> > +static int crypto_cbcmac_import_core(struct shash_desc *desc, const vo=
+id *in)
+> > +{
+> > +       struct aes_cbcmac_ctx *ctx =3D AES_CBCMAC_CTX(desc);
+> > +
+> > +       ctx->key =3D AES_CBCMAC_KEY(desc->tfm);
+> > +       memcpy(ctx->h, in, AES_BLOCK_SIZE);
+> > +       ctx->partial_len =3D 0;
+> > +       return 0;
+> > +}
+> > +
+> > +static int crypto_cbcmac_export(struct shash_desc *desc, void *out)
+> > +{
+> > +       struct aes_cbcmac_ctx *ctx =3D AES_CBCMAC_CTX(desc);
+> > +       unsigned int partial =3D ctx->partial_len;
+> > +       u8 *p =3D out;
+> > +
+> > +       memset(p + AES_BLOCK_SIZE, 0, AES_BLOCK_SIZE);
+> > +       p[AES_BLOCK_SIZE * 2] =3D partial;
+> > +       return crypto_cbcmac_export_core(desc, p);
+> > +}
+> > +
+> > +static int crypto_cbcmac_import(struct shash_desc *desc, const void *i=
+n)
+> > +{
+> > +       struct aes_cbcmac_ctx *ctx =3D AES_CBCMAC_CTX(desc);
+> > +       unsigned int partial;
+> > +       const u8 *p =3D in;
+> > +
+> > +       crypto_cbcmac_import_core(desc, p);
+> > +       p +=3D AES_BLOCK_SIZE;
+> > +       partial =3D p[AES_BLOCK_SIZE];
+> > +       if (partial > AES_BLOCK_SIZE)
+> > +               return -EOVERFLOW;
+> > +       crypto_xor(ctx->h, p, partial);
+> > +       ctx->partial_len =3D partial;
+> > +       return 0;
+> > +}
+> > +
+> >  static struct crypto_alg alg =3D {
+> >         .cra_name =3D "aes",
+> >         .cra_driver_name =3D "aes-lib",
+> > @@ -166,7 +277,12 @@ static struct shash_alg mac_algs[] =3D {
+> >                 .update =3D crypto_aes_cmac_update,
+> >                 .final =3D crypto_aes_cmac_final,
+> >                 .digest =3D crypto_aes_cmac_digest,
+> > +               .export =3D crypto_cmac_export,
+> > +               .import =3D crypto_cmac_import,
+> > +               .export_core =3D crypto_cmac_export_core,
+> > +               .import_core =3D crypto_cmac_import_core,
+> >                 .descsize =3D sizeof(struct aes_cmac_ctx),
+> > +               .statesize =3D AES_BLOCK_SIZE * 2 + 1,
+> >         },
+> >  #endif
+> >  #if IS_ENABLED(CONFIG_CRYPTO_XCBC)
+> > @@ -187,7 +303,12 @@ static struct shash_alg mac_algs[] =3D {
+> >                 .update =3D crypto_aes_cmac_update,
+> >                 .final =3D crypto_aes_cmac_final,
+> >                 .digest =3D crypto_aes_cmac_digest,
+> > +               .export =3D crypto_cmac_export,
+> > +               .import =3D crypto_cmac_import,
+> > +               .export_core =3D crypto_cmac_export_core,
+> > +               .import_core =3D crypto_cmac_import_core,
+> >                 .descsize =3D sizeof(struct aes_cmac_ctx),
+> > +               .statesize =3D AES_BLOCK_SIZE * 2 + 1,
+> >         },
+> >  #endif
+> >  #if IS_ENABLED(CONFIG_CRYPTO_CCM)
+> > @@ -204,7 +325,12 @@ static struct shash_alg mac_algs[] =3D {
+> >                 .update =3D crypto_aes_cbcmac_update,
+> >                 .final =3D crypto_aes_cbcmac_final,
+> >                 .digest =3D crypto_aes_cbcmac_digest,
+> > +               .export =3D crypto_cbcmac_export,
+> > +               .import =3D crypto_cbcmac_import,
+> > +               .export_core =3D crypto_cbcmac_export_core,
+> > +               .import_core =3D crypto_cbcmac_import_core,
+> >                 .descsize =3D sizeof(struct aes_cbcmac_ctx),
+> > +               .statesize =3D AES_BLOCK_SIZE * 2 + 1,
+> >         },
+> >  #endif
+> >  };
+> > --
+> > Email: Herbert Xu <herbert@gondor.apana.org.au>
+> > Home Page: http://gondor.apana.org.au/~herbert/
+> > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
