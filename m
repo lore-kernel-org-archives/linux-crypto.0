@@ -1,68 +1,66 @@
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013044.outbound.protection.outlook.com [40.93.196.44])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013068.outbound.protection.outlook.com [40.107.159.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECC054EEAA;
-	Thu, 15 Oct 2026 21:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0961348E0DD;
+	Thu, 15 Oct 2026 21:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792098588; cv=fail; b=lgZ1nzP3dSXByVzst4mixpkuTI6x8vtmVfFPpUMLamsp/FDPM7B1inA5P0DMPD6Qhp6zPUaeYIR6gHms8ONFklgjACjKtEzbAyfZt0ccgXZL0XPwMDoOK/x2Bes9Wp3NOZkssoGZhkWh/0ulqs9dXprCR5ufINF+lfvsoarFnI8=
+	t=1792099105; cv=fail; b=Lht5Z9SDYUkOHtXYlBZH8hYc9b2Us87szKigyJI4J+OzOptGaU8rSjyGc+O/ru+YyIuDjFnTcQbW0zpJXTlKQCAua6AD6k/Kowd4V0GygDnYcURhHROz5p3m2UDjmjgMeT2jgEjvmreqqDMaCvsWBUR28LaZIAAivxwf6cEdCYs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792098588; c=relaxed/simple;
-	bh=oCArmnS8qhiIFABPwj7/YJ/QsRHGESf8P1YaD4ctkZg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=f783qt7qyaZKhYOFGQX3wLHeLxgWVly7oDGVrhO+jNTgdSaBLYKsXQ5p2XytWU7iR3X3xFigljG6hXxrQThbrhtQakY/FFtMPvN5GFLp0n017u0bAzDRTPiQSLA/a93L7vwieW9j8ZdIQHhCePctWTVZ23xVJxmwcyabHwCSyEQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=t2NpByRR; arc=fail smtp.client-ip=40.93.196.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1792099105; c=relaxed/simple;
+	bh=ddjwtWjd3ELTRm6pOTTmcI7W347g/xLea1xnmOXXaLA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=g3FD44xj+Z/MREDaCVditVOPsb4ACOLch5bPhIQO71oZ3UtMDeUqTvYWphWsKsWNzGG0Y1VCJoAiHbzR4zJNdVZ4UK+0q3+sV56oCX/zVs+qOPJi4+0Rc3veSpesvelaXhLWMJ2BPDvJjspBxF5JLOLUOO1ua2Q2J2Wz+9gg1ck=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=ZD/k4j9E; arc=fail smtp.client-ip=40.107.159.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t2NpByRR"
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="ZD/k4j9E"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=S+mRrjGfpJbC8WXj+Apsc7lwoYPrrdVv66FOOEOOmJkCN6xLsIeT3DPhonIFUWVyDdwrsGOauOrwJ3WvdFR/vIDco6dADOkCiG849K7HAf43tWb7Z8i/8Y+4Dhy+yU5R2+ReuoL/0MXOqPyeWIvkngIIZbJa779j7XGnPN5WscxIvIeZl+JSJyN1rgLpBs9m0srLEFRTKA4wCIiXnkiPjGSUdDS05XlwiCXCVOdGtUs0K2ePT1HW1Ry6GszSpatI8/Eiff3yrGK+RTBedZMb38M2tW3r10VvL4KzvWXnj3Rd1HFnEOEMKDwyksYaTqJXM6CDWawgHHgxQKqlMB0ozg==
+ b=C/ldh7UgyoOf4SS/AAeyHP5Snl4Fi2NaikkHEXl2VPzkgAFhsCWeHK3ZKeYQM24rkGQ2XV8oyWDTh/rOhJq83Z11w7I+8oFMnnLmKApSJRlAU2COrQ7hXJhd7O5vTVe48zXzzN+vaKJgueaLz76vIXNRc3d9aqZTo5nkve/5oTDHN14+0yIxgf1qvJeZTi3okne6KabVZ/EIiLJXwgobBy1NK4v+A73Yb8viNuQew5MQozm84+HIvaSj2IZVkpFZi7nQtB3Dzns/MOh5PyLTRYJQFUymswQS/S9SyvoCDG+NJLLnwHOChAP7AtnebJVb6Jiq+vJ4dG5sDCgPYePVVA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S3J5bM91/85C+jFkhxkKgvgOe5sMjkd4ruR5iZ9J3a4=;
- b=D7cXR0A2/GrVRYQYDpOnyFdK6nTqAjyKKFz9moVbEXqkUhewqeO6Qt40ypVVHEMe/GE+x5aksMZ2d29sSUUCnMuwqlFF1FBFjd6FTjqcsu9IMX9o+JjY0PINDub5cz6Vf7XKXBow6TVtEozdQln2h355RAq5GQ4mcrrbHnJz1th3Kl6CT7rTy28cpFNW7f96FZ3AV3hsVXoJMu0gEF2GZIfn7gJ1INdEk9sCaTDstAY5UJuTxBl7ALTMB7/La0gF2AhkFjjRkvYMTEHuLdTsZrdmuVVRPhJY/C40vZPuqlf3UrR4l3pwWnk3uonWjCYG/m+J9zjQ3rdWNpdnxx2Oiw==
+ bh=xezBdtShoeA9x/WEvrBj4BmTw7DTrxf/9kI/jmS0448=;
+ b=G8FuAYHbTHTsbzOrdaBaqnXZE7KANG08ygwupv6aNNP4QYzp/rM8H35es0WllZRzAESSCXCHvYfOU8+Ez/3D+wPohSFp1mQU78x+VLtC5R3/pPtXSOciplmbxaZdxCQlsXnC+efg82N2CZ/Weuyf+468lmwTm9BahLHm+xedOzxd8MuV+IYQ7JMdGFzM1863C8ULm+XqTo2XxBh/h+c4VIiDVlyfc5JmFRg0T5xekkeWtcZo6AgzNh5JazHY0526Js24lZ1b9trzr7sJ2/hhRM91R5HiHXjplBMQyk2YGczxrp30MRdpLMjQLoV/BD3gnAKYEqGmvjJP2LHNEWanDA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S3J5bM91/85C+jFkhxkKgvgOe5sMjkd4ruR5iZ9J3a4=;
- b=t2NpByRR953RRd3IxCc4UCRwCiJC3Fx7Yowsyv3mRi1pFFsNp8l3hvYJKqUXaySd9rqwrSrCaWRoOHW03CcRs5PSxG1JiOPuKhK5jCxtneD1W0UTFwjCLnhBzH3sqXvnrIfCwNZjXzDhnNEtSFOd45kPJ5cxgaxsNDjsokVKyaE=
+ bh=xezBdtShoeA9x/WEvrBj4BmTw7DTrxf/9kI/jmS0448=;
+ b=ZD/k4j9EGfE4ECZfETKe42ksWppSFo9z8ACZDCgUMM7VehNpBmK7WZj96XRJo8VWiAXQvptsXjqkJY0YXlwtLMumWtVn28K/QX5TdXwWngNZvk/yjBKUgEHYDDQonvmrTKIoLe9spsUbBo7/MngjmKQ+TuBppB4Ar+DUca918Czck/Zg9DQD8dgZPmFIoj2en9Num0WedjUEpFXhAFJYwoeS25ZY3/aOPofiBH4OInkwSwk7+kdupd2rhdYF9mfmkS88lDWdBUqLTnU2PnZg6Cy3gD+Wso9/XW68leTqFdAyr/sNQUP5v/DKOPrNbp9dfLNmqy3bKo1RZZPpO/ZOqw==
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5310.namprd12.prod.outlook.com (2603:10b6:5:39e::10)
- by DM6PR12MB4057.namprd12.prod.outlook.com (2603:10b6:5:213::9) with
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from DU4PR04MB11791.eurprd04.prod.outlook.com (2603:10a6:10:623::11)
+ by DU4PR04MB10984.eurprd04.prod.outlook.com (2603:10a6:10:586::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.14; Thu, 15 Oct
- 2026 21:09:42 +0000
-Received: from DM4PR12MB5310.namprd12.prod.outlook.com
- ([fe80::1bf0:6a94:a990:14f5]) by DM4PR12MB5310.namprd12.prod.outlook.com
- ([fe80::1bf0:6a94:a990:14f5%6]) with mapi id 15.21.0496.021; Thu, 15 Oct 2026
- 21:09:42 +0000
-Message-ID: <267f5e92-651a-4874-936e-70f3fbfe1e16@amd.com>
-Date: Thu, 15 Oct 2026 17:09:38 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch v4 7/7] crypto/ccp: Implement SNP Download Firmware EX
-To: Tycho Andersen <tycho@kernel.org>
-Cc: mcgrof@kernel.org, russ.weight@linux.dev, dakr@kernel.org,
- ashish.kalra@amd.com, thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org, rafael@kernel.org,
- chao.gao@intel.com, aik@amd.com, nikunj@amd.com, michael.roth@amd.com,
- shansinha@google.com
-References: <cover.1792014060.git.prsampat@amd.com>
- <55c189e9130a7d22c0b756440f10a056415404e5.1792014060.git.prsampat@amd.com>
- <atElnAcDQFTnmdVr@tycho.pizza>
-Content-Language: en-US
-From: "Pratik R. Sampat" <prsampat@amd.com>
-In-Reply-To: <atElnAcDQFTnmdVr@tycho.pizza>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR04CA0026.namprd04.prod.outlook.com
- (2603:10b6:610:52::36) To DM4PR12MB5310.namprd12.prod.outlook.com
- (2603:10b6:5:39e::10)
+ 2026 21:18:13 +0000
+Received: from DU4PR04MB11791.eurprd04.prod.outlook.com
+ ([fe80::11ca:6b74:3234:d7de]) by DU4PR04MB11791.eurprd04.prod.outlook.com
+ ([fe80::11ca:6b74:3234:d7de%4]) with mapi id 15.21.0522.013; Thu, 15 Oct 2026
+ 21:18:13 +0000
+Date: Thu, 15 Oct 2026 16:17:49 -0500
+From: Frank Li <Frank.li@oss.nxp.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dmaengine@vger.kernel.org, imx@lists.linux.dev, vkoul@kernel.org,
+	Frank Li <Frank.Li@nxp.com>
+Subject: Re: [PATCH 6/6] async_tx: Mark as Deprecated in Kconfig
+Message-ID: <atFC_Yi75uRqac8w@SMW015318>
+References: <20261014-async_tx_dma-v1-0-35790d01e190@nxp.com>
+ <20261014-async_tx_dma-v1-6-35790d01e190@nxp.com>
+ <20261015205146.GA2331635@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261015205146.GA2331635@google.com>
+X-ClientProxiedBy: PH8P220CA0030.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:510:348::15) To GV2PR04MB11799.eurprd04.prod.outlook.com
+ (2603:10a6:150:2cf::9)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,187 +68,102 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5310:EE_|DM6PR12MB4057:EE_
-X-MS-Office365-Filtering-Correlation-Id: a9b2b4f9-16df-463c-c667-08df2b00a1a2
+X-MS-TrafficTypeDiagnostic: DU4PR04MB11791:EE_|DU4PR04MB10984:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88f04a02-f961-470b-1a71-08df2b01cb56
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|23010399003|56012099006|11063799006|4143699003|261009223027099003|10067099003|22082099003|18002099003|11146099003|32116099003|6133799003|3023799007;
+	BCL:0;ARA:13230040|23010399003|19092799006|1800799024|366016|376014|6133799003|22082099003|10067099003|18002099003|4143699003|5023799004|11063799006|261009223027099003|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	/s2HvEKeHcAnvO4M9mjJnHcWgFG9GIIzPpZBWCRFSmIwnUChTpePGu2bIH3+pnmEsrW2ZUvzryHLQFbJcNmlxwVYAzLDf1Cr/t44Hak5JFX4MzdfwD2G/UtJMxKTISayDrmu0kCU3QxDXRE2kjipGSK4uz8DnrYMr55cHZxHmVbXnUrnZrmv0VSrzn2giLIAVDSm1qrTc7XOHsj2OroR7cwvGWH3xX8wiD0kKb2CYOKsQyc76+xYeDF9EZfuxHRo/Pcj581TGy2xmqMw8wjmqL16paBDPGZLmNP8fA41u0oHssBUUtutWQTI11kCBaX/0iRfYxsHk8gouRPCVr54XS9YLumqFD6PH3eNM9S4Lxw67q2s5oh14Ra/bq0WeFul720t/j3EcBNt1yFMKy78suCui2aCEm6AUoDcPa5iUWqD5gUiAaqZsPSNIJGasrjd9cWzxJe7JwUEchsblbG7Avjs3CsKDDsk0M2vvtcOLOKz/3QgW3y+3haeGzknTPDCUZ1dETBERoedV7XePOb6h2JG1T8aHAveKQW9Bo2UkDFS739mp2g5qTZ4ohwIMWbZwXeHUokQhvAJo/KUezWpQOSUXuWcTRqNMJkT9MLg7zRth8dGE7y2Q3r6GOqsV1iC
+	K3JfN6dznlnv9ezDQqc07WHY0Ir4yBWtabvPMkOnjjsTT+VOHt55u5F0EDaebMD0WEUywjuE+oTXz9wN/wmj/8untqtmSkoEJVg1Hda4PIyHuoRkH0Ca8ydMduwbEVsrXxiGD3OMNKzR9bmHA2UZg6tGZrORZeEkTlu27uvvsq+bktNks9V6nO5l4wI5ePHnWZNBp6pfbVXMLzG4a/w0EaHbHNQRIR2vWvL0hdpsZtFpIzWsY2Z/TuWy8aEnY0NzVQVddDKuFXR819UIXxqtXCjRR0qa0wTy/PDjiy0acGWmLiU7hwc7qvl1jPJ0LWQWxsSE1qD9tkhfOhwh0FJO+u9emVXcuLINTzVpi/6u6H8FxYzeyizz3jV9dpYLls6OhRZGpsbPgKgcpsVv4U8rfzrjhUaK9PyUvJwKNqEVSq7gnTTdmedF30uTpYE4yrklyyc+35AbWYifp2WX5Q1/fUx9t59TWLk7baCdYDw4u1h+GE2UMSCEkskDuDOrPVImLdUPq4GQVCYbA44s2p4nuiEN6nmVPGO1ivb2U6rpWQVgJ3NIs14gncWAg1S2Qc7Lgsfj9LKrzLpXqitheGVDbaRIu3eDyLgNdXWxj1jMJDv931fUtj3nJAAcrJdyoDHV
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5310.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(23010399003)(56012099006)(11063799006)(4143699003)(261009223027099003)(10067099003)(22082099003)(18002099003)(11146099003)(32116099003)(6133799003)(3023799007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU4PR04MB11791.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(19092799006)(1800799024)(366016)(376014)(6133799003)(22082099003)(10067099003)(18002099003)(4143699003)(5023799004)(11063799006)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SnkvNERhQ2ozdUNKdlZCak11R2VGcXhHK3Y1L2FhQWFvalhxejJ2azFzb1pR?=
- =?utf-8?B?TjNpck1IZzNaN2UyWGRoZWk4c0F5OHZxNFFGRVZ4Z21EZy9nd1oxWU1yL0VT?=
- =?utf-8?B?amh6QjAvQmVQKzR5K0pIS2ExUS9ES2FZdFBhajVoV3I4cmsrSS9oUTVxanU4?=
- =?utf-8?B?SWh6Q1k1RU9EVXg2UnJxRXpaRWpQblZZbHNQL3F5bERhcFpaVWNLdGFnUDNZ?=
- =?utf-8?B?ZWFobWw1Yll5MTdNQzF5Rkx0cWJRcy9BbmNJcHArMGM5L05lTnJSRjZ6R0JN?=
- =?utf-8?B?aWcrZVlVWVVHaEhLSk04NXVhOUozYUl0OUJZMngxc3Y4a1JBYlVaK1dnRUoy?=
- =?utf-8?B?UDlIYk1tYzNCMjB0OWJjbC8xWWJjNFlNVFJpbXNoNXNhREF0QnZmZ3NPWGhq?=
- =?utf-8?B?dlNsclJLQW9mSlZEZ0dqUFNqNWNrOTI0aVIvMno1cHBjV1BaUlRURnlCUHp5?=
- =?utf-8?B?cE5WNjNjWDAwK21zWVNtcDBzRE1PUjljYTdTT1FTdDh4ZmVDeEd3Y3hnenM1?=
- =?utf-8?B?a0VvVmVXNlNBbGRRNEwyVkRScHhKbUphWTJOT3JxOW5UWWJSWkVLMjRMT2Iw?=
- =?utf-8?B?bWc2aU1vRWFFZ3RBemJCTjQxbDBYTFJjVTl6b1BzVDdEQVRYZXJ2L2NObXQ4?=
- =?utf-8?B?MUxuNmlvZWpzcGlMMURoTWxaWnVyL1Z2WE1CNEoyUUNycnZSTWJiaDFvejlN?=
- =?utf-8?B?c09PNDBSMnlXaHc5NStGaDAyVmczRFZSR1RTaC9YMkZIcXlJaURpZ1YvRENw?=
- =?utf-8?B?blpJLzhVYkhYRTU2TkVQdEQ1MldZdzZiUmJGM1RQWlZkenp1R09VVnhtRkdy?=
- =?utf-8?B?eXVlL0hxN2htc1UxK0VibzY5bVFoWUNGVkd4OEh3T2k3MFdKTS8reGI1Tlla?=
- =?utf-8?B?OEFOR2hVNmcyeHpvN0RheTg1S3htOG56aFNRYkp2eGg0Y0FaLzRlSnd1a3pu?=
- =?utf-8?B?OTQzZGRFamtPYm5zblI4NlpYWC9FVTdTWTlHa0JTOHd5OENoek1meWk4eW1a?=
- =?utf-8?B?MnJWZGpCVDlLV3g4WHBhMUFvREtzYUx1UTJWZURLSTZLQStGbzB2YWtXbndZ?=
- =?utf-8?B?VmxSeGRGbEtyVlRlUkZGZldURjR2MXpBK1NDenZsaUo1bWFuY0J1Rk12dHFx?=
- =?utf-8?B?d0EzazNmd2NpL0s1Q3VZMkhUQ1Y3RWlTL0FaVVhpajNsZWp1bnp2b3NvNHZX?=
- =?utf-8?B?S1hpZGJBTTgyemdyOVFNdllPb2lzeTg3ZkhrUGhCM1FkYytvRGxGeWkxcmF6?=
- =?utf-8?B?ZmJWRzF0dm5xM0IwbFBaM2FOd3NscFZCN1dPblpVWUpkOXFURHZEenFOWEtJ?=
- =?utf-8?B?QmZvREMzRW84NTc2Uk5xa0dvUkV4b0FiZWZtOVB5N256ZTh3RFgyOW9NNmIw?=
- =?utf-8?B?QjFDbW9LQ2kyRXA5SW1NaDBWeGpUeVk1SXBjMkt1c09tRjJxOXNkS3lBZERD?=
- =?utf-8?B?N0FjdlFWTXMzbkMrMjdZRFpQNER0SC9TT0tDd3FDNmNibWN1cU5tdUhJdTlW?=
- =?utf-8?B?UTBvWHlsNmlTT1NNTWxrcm81K01hcThlWUR4WVhCQTJiWHNMTkdreEdKZ1ls?=
- =?utf-8?B?d3lRSWhIdFNheDVub1cyV0xjM2FtL3NZL2t0eUtKTW4wR3hidWRRRTdhTkIy?=
- =?utf-8?B?SVV6Vml3WDRIZ1gzR2RWRlN1QWE5YzA5emZCTWxzRjlxRmFqdHZBa3RxR25Z?=
- =?utf-8?B?dW5VV0JjNzlGWVFYVXRtRytFZDl1SFY3SnBxMmdqLzdhdGVtYmFsTkxLSTJo?=
- =?utf-8?B?b21URTdseTdVMmt6dm1HV1pTelFDQjZrV1dwNHlvZTdPN1dBR1QxWWFiL1hq?=
- =?utf-8?B?WGRzYTFrZWg5c3BzN05YRDNidmJJMTlaaFI0d3luRG4ya2lsTmFNSjlnYThs?=
- =?utf-8?B?Y0ZyNE9HYk9OT0haR0c5NFVtUjk2bS9wazJ0Wk92L1NFMENzYzFhaFFib3R4?=
- =?utf-8?B?S21RWTBjdm4xcVRlanFYRFJVbFhyeW4xUjc2Vzcrd1FnbDBxKy9ZWVVlMXZW?=
- =?utf-8?B?V1c5clZBUHAyVmp2VlZLeXZKcm1ORnUrSXcwMUFpWk1UZXdQd0dmeXk4c3Iw?=
- =?utf-8?B?U2ErUUYxNFF6anJ3VEJ4UGdKR2IvWWpyeXNVTkFhbmJSMkFuc01OYyt1eU1T?=
- =?utf-8?B?anNmTnY5VmpnWTlMN0swWEJwOFdVWnZKRzljcFNKaFpDUUxXZWkxVk5BQ29V?=
- =?utf-8?B?Zi9KSFdNdm1NYXoydVRLdjJ1KzJDOS9CVU1UQ242Q2ZCTzd6UmJWblJ3eWo4?=
- =?utf-8?B?ei9VWDZMV1hUb0Uva0RtUnFHSFlhaUthWHJ5dXpvWUZvZUNvd0F1eFhNWmlu?=
- =?utf-8?Q?t568X4+sxvyBO+7hmG?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9b2b4f9-16df-463c-c667-08df2b00a1a2
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5310.namprd12.prod.outlook.com
+	=?us-ascii?Q?DVndO7kFythL75an7d143P5Jyk3TMZpxcS3noCn+zX/L6p9czt1UPRUQxXVL?=
+ =?us-ascii?Q?0E+IuyDkK/N9m5l8SlFZVolXDU6RkGP30wThgV8RX0ynZffKm63QOpPk7Jbc?=
+ =?us-ascii?Q?yX8z9exR79IZZJBQBe0bJID6BH53iJVp6dTSpXO25p/xQKE877VEI4jxjGL5?=
+ =?us-ascii?Q?e8g+CbN5sdqMLe/oEatR8sltTXDXDT6v2z2BouNEikDCKBDyRVzT62g2gQaN?=
+ =?us-ascii?Q?GPjtlL1Vf4v4qfhS3U/yXKOtoRXBg+F6aLJizFVEDUuvIPhuitU2OZQxH/z2?=
+ =?us-ascii?Q?GIiN7WNJbRSMKErtP/eQ6/F+0cQu/0KfNcvV4BUXvgB1gpzl0mySO7KOBePO?=
+ =?us-ascii?Q?l2xe1dqDmN1p0FM6CLEk/ch1mtepElVXXVPa/sFcFoUQLUizlo3NMjFA1APi?=
+ =?us-ascii?Q?T8KqbqsZ0RRn5V1eJAVeQgDaNmw68gaAKZ3SOBcouoISzase7m2vmQSJsLkC?=
+ =?us-ascii?Q?J65bSSEBFhUaXgjy5tWEIXFMUOspa574RxFOsFbT51JgR8hw/ml6VwUGPQdl?=
+ =?us-ascii?Q?8jNAfuxdq5bHiR4GNShe+FTyFE/PT9gRonnPuEFIAKjBN8LUdDiGw9Ksun0T?=
+ =?us-ascii?Q?clSZwQVcl3m4lQjQ5J6WVh7TPYTEEVq8kK+P9GrYfvDOXez6RThxckmgBPns?=
+ =?us-ascii?Q?8mkSRRtXHk68Ou/JjEOGJzZ/L+AGdhro05Z2Ffhvs1HYh1TaFJhlX0Ekv3Wk?=
+ =?us-ascii?Q?amNp1k3uFexJ8NEdUpdDDGh9oLxJm0DDkdw+ExV7lJ5aIjx+usA0ECxokuYA?=
+ =?us-ascii?Q?B/+DX1s63KRGgRV/as3qqAJFVA/Jgba2BzugsVQygFi+Ttq8CvrNivGkA5ba?=
+ =?us-ascii?Q?JbCjpkPG+f3vmIpNyZk0nv8d/xOxpxzn81UtPEGvy3h2Lhsh4yFd/GwBe/o2?=
+ =?us-ascii?Q?Io/8Gj8lBh07z6V38W+E+7Rih+G4VmeN2nDTmTihXdZuXDvn1Ic6gOPLp7Jn?=
+ =?us-ascii?Q?9nHNj6svztULqag1dHdKaQ0UcweNXQCUdghKe/TgOxtmHp58PphfpqurGWMn?=
+ =?us-ascii?Q?hx06GOt/eEKhqSC057ku//yHaXrdGGq7aTU1DTGB0qo6yWz0YoQIfKTG1Ob0?=
+ =?us-ascii?Q?MNGJe9zXBPX8D/cOpp6pim8tuI82PJQqfzFQHwT/0R3x8FWltB7r1tAEpIbl?=
+ =?us-ascii?Q?5HpBfjODZE2kzPZGxcjOGPsoGGKAtzi9UmvyYi7N/ft1oxklPf4GvVHqtZQG?=
+ =?us-ascii?Q?1XqOKAI6P26wRp7RUOux1ffa5b3m4W49dWmSd7AipatAfq2Z6AZ9oWXFSsLK?=
+ =?us-ascii?Q?fTnK6F2UlvsMMCAaMhbaS6G0Ko5h1DN03vhJYVIBFdJFUjUwAltJbNVWnpt3?=
+ =?us-ascii?Q?Eh4Pa9M0+jLvyGroTi7gGnzJNUNOXSdDysWw+o/hcGPR5+4CcVorPHGsPeMi?=
+ =?us-ascii?Q?C8yfHp8veHiF6kJG8HG8tMGIeM3mzpPi+YRJSPFLhoEmGp61IaXGFJUPRCe1?=
+ =?us-ascii?Q?fPWLdEi4AdlpiyPveoa5SQNRN/0TbnvmNHw/1Ys9FbZxcnO/y4erzzQ942ex?=
+ =?us-ascii?Q?S+tUdyuTCX1ajdMEXXcjH/1UTxzjIlWcG5968ez3DvgK2SJGEu0aL3F3rpM2?=
+ =?us-ascii?Q?FnjtsV3KITiz/FRamtnTHjY1TKa9uVnzFnxe7JjRk+uqFvwvNweJ9FsWaCpz?=
+ =?us-ascii?Q?Sw+2Y+208pgI95Hp3HL/FcD8x0dwbcw0IhKlcY4ouUg1UsWSCX0xU9TcvkWl?=
+ =?us-ascii?Q?vRk5wdsfdxEGjDnNuotgO2VoCBizn1NKrwzOWb5gCfIU+E8aPvlNzTERpxS+?=
+ =?us-ascii?Q?dwEz+JZniMjGyHWqlAUi5zXyQFwc3JJxCAPLASfDJdHJQDgxlK3E?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88f04a02-f961-470b-1a71-08df2b01cb56
+X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 21:09:42.3552
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 21:18:13.4356
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mmJXIoWmhBYiM6cIfg5k/1ncGlrK+ScGDfEIT32TCtcpxFjSeSedUVVA2YEyM8TJF3r5AYQzOLRBmisNSCBRCQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4057
+X-MS-Exchange-CrossTenant-UserPrincipalName: bFiKgkzDERkD95Nnd6ZUp7K77DsjculnZ18uUBPLHCou7cplQPpnFBe6idzeDZ+O03owNYK8t3WWanbw4iIoCohuzABIF8jJnGFeotzUZoNiGDwoNtMMhrsXTD9UREef
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10984
 
-Hi Tycho
+On Thu, Oct 15, 2026 at 08:51:46PM +0000, Eric Biggers wrote:
+> On Wed, Oct 14, 2026 at 03:43:50PM -0400, Frank.Li@oss.nxp.com wrote:
+> > From: Frank Li <Frank.Li@nxp.com>
+> >
+> > The async_tx framework was introduced to support asynchronous RAID
+> > memory operations and DMA offload engines that were common at the time.
+> > Today, adoption is limited, most clients use DMAEngine interfaces
+> > directly, and the framework's dependency-chaining and software fallback
+> > features provide little value for new users.
+> >
+> > Maintaining async_tx adds an extra abstraction layer and ongoing
+> > maintenance burden while serving a shrinking set of users. Deprecate the
+> > framework and discourage new users in favor of direct DMAEngine APIs.
+> >
+> > Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> > ---
+> >  crypto/async_tx/Kconfig | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/crypto/async_tx/Kconfig b/crypto/async_tx/Kconfig
+> > index 89bafa2efc300..02d472fc7a476 100644
+> > --- a/crypto/async_tx/Kconfig
+> > +++ b/crypto/async_tx/Kconfig
+> > @@ -1,6 +1,6 @@
+> >  # SPDX-License-Identifier: GPL-2.0
+> >  config ASYNC_CORE
+> > -	tristate
+> > +	tristate "Async tx core (DEPRECATED)"
+>
+> If possible we should just remove async_tx entirely
+> (https://lore.kernel.org/linux-crypto/20261015-asycn_tx_remove-v1-0-056a7085e0a1@nxp.com/)
+> as your other series does.
 
-On 10/15/26 3:38 PM, Tycho Andersen wrote:
-> Hi Pratik,
-> 
-> Two small comments if you happen to respin this one, no worries if
-> not.
-> 
-> On Thu, Oct 15, 2026 at 02:14:09AM +0000, Pratik R. Sampat wrote:
->> +static int sev_download_firmware_ex(const u8 *data, u32 size, int *psp_ret)
->> +{
->> +	struct sev_data_download_firmware_ex sev_data = {0};
->> +	int ret, order;
->> +	struct page *p;
->> +	void *fw_blob;
->> +
->> +	order = get_order(size);
->> +	p = alloc_pages(GFP_KERNEL | __GFP_ZERO, order);
->> +	if (!p)
->> +		return -ENOMEM;
->> +
->> +	fw_blob = page_address(p);
->> +	memcpy(fw_blob, data, size);
->> +
->> +	sev_data.len = sizeof(sev_data);
->> +	sev_data.fw_paddr = __psp_pa(fw_blob);
->> +	sev_data.fw_len = size;
->> +	/*
->> +	 * Don't commit the new firmware, an explicit SNP_COMMIT is required
->> +	 * after update.
->> +	 */
->> +	sev_data.commit = 0;
->> +
->> +	ret = __sev_do_cmd_locked(SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX, &sev_data, psp_ret);
-> 
-> I guess this function could use a lockdep_assert_held(&sev_cmd_mutex),
-> but maybe we should not do that and instead put it in
-> __sev_do_cmd_locked()...
+Yes, I am not sure if it can go smooth, some xor dmaengine added at 2017.
 
-Yeah doing the latter seems like a better idea for quite a few calls that use this.
-And I think maybe better so in a separate cleanup patch.
+> Adding the prompt here actually does the
+> opposite of deprecating it: it starts asking people to unnecessarily
+> enable it, while doing nothing to make it easier to disable.
 
-> 
->> +static enum fw_upload_err sev_fw_upload_update(struct sev_device *sev,
->> +					       const u8 *data, u32 size,
->> +					       u32 *written)
->> +{
->> +	int cmd_ret, psp_ret = SEV_RET_NO_FW_CALL;
->> +	enum fw_upload_err fwl_ret;
->> +
->> +	guard(mutex)(&sev_cmd_mutex);
->> +
->> +	/*
->> +	 * SEV firmware will only successfully execute the DLFW_EX command if a
->> +	 * firmware rollback is required. Other commands may be processed, but
->> +	 * may not execute properly. Use the psp_dead boolean to restrict
->> +	 * execution to this path.
->> +	 */
->> +	if (psp_dead && !sev->fwl_rollback_required) {
->> +		dev_err_ratelimited(sev->dev, "DLFW_EX: PSP is not responding\n");
->> +		return FW_UPLOAD_ERR_HW_ERROR;
->> +	}
->> +
->> +	/*
->> +	 * If the last firmware update returned RESTORE_REQUIRED, retry DLFW_EX.
->> +	 * Being in this state means that the legacy firmware has previously
->> +	 * been shut down, so no need to do it again.
->> +	 */
->> +	if (sev->fwl_rollback_required) {
->> +		psp_dead = false;
->> +	} else {
->> +		cmd_ret = sev_fw_upload_shutdown_platform(sev);
->> +		if (cmd_ret)
->> +			return psp_dead ? FW_UPLOAD_ERR_HW_ERROR : FW_UPLOAD_ERR_BUSY;
->> +	}
->> +
->> +	cmd_ret = sev_download_firmware_ex(data, size, &psp_ret);
->> +	fwl_ret = sev_fw_upload_handle_err(sev, cmd_ret, psp_ret);
->> +	if (fwl_ret == FW_UPLOAD_ERR_NONE) {
->> +		*written = size;
->> +		sev->fwl_rollback_required = false;
->> +	}
->> +
->> +	/*
->> +	 * Firmware either just requested a rollback or a rollback attempt
->> +	 * failed. Keep the PSP dead for all other commands, only another
->> +	 * DLFW_EX attempt is allowed through.
->> +	 */
->> +	if (sev->fwl_rollback_required) {
->> +		psp_dead = true;
->> +		if (fwl_ret != FW_UPLOAD_ERR_HW_ERROR)
->> +			fwl_ret = FW_UPLOAD_ERR_RW_ERROR;
-> 
-> I think this error switcharoo could use a comment (or maybe just be
-> dropped?). e.g. if the user does something to set
-> ->fwl_rollback_required and then tries another firmware upload that is
-> the wrong size, ERR_INVALID_SIZE -> ERR_RW_ERROR, which seems
-> misleading to me.
-> 
-> I saw some discussion about all this:
-> https://lore.kernel.org/lkml/20260924213737.3833625-1-shansinha@google.com/
-> 
-> but it's not clear to me why you need to reset the error code here.
-> 
+what's good ways if remove meet problem.
 
-My understanding from that discussion was that userspace errors should
-fall into clean buckets. read-write-error would mean "roll back",
-whether it came from the first failure or a later rollback attempt,
-since a failed rollback still leaves the PSP dead and needing a
-rollback. dmesg would still log the exact reason for the failure.
+Frank
 
-That said, I see how it can be misleading, and I'm fine with dropping
-the override or putting a comment and re-spinning this.
-
-Thanks
---Pratik
-
-> Thanks,
-> 
-> Tycho
-
+>
+> - Eric
