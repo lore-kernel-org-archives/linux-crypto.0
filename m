@@ -1,66 +1,82 @@
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010045.outbound.protection.outlook.com [52.101.201.45])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013067.outbound.protection.outlook.com [52.101.83.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE784CDDF3
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 19:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4FE4D0A0B;
+	Thu, 15 Oct 2026 19:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792091953; cv=fail; b=uN0bp516f1bCl0z+VFklyscCEFtg93kcrpfOUNo6rkWWZXeiaiZtYjLpXRD1WEpQajSrRCdJBmT5vw87fXgoLvm/lh+hac38XsAsOw8On8cT3KDsKFGyzQf+eLzw8NPhQ6GvL1TBR+JYS3SLao3nGALwRYtlQIuHk28s2XprWxs=
+	t=1792092178; cv=fail; b=CkudS+FZI2K9sFyFBM6vzao9YPaD7kcvVsKvrFahcqPU8IWzLaYFcnGBN+nTZklShHEAWRTUDlzYN9g6+cROe4Gq/0wCfv6EXoJrrM9lAI1n/bf30NKTSTnEPFMW8p2hJxg+cPeQBjn5FrGyZWPxBwbss0A5u6ARpvlqFU3Qo0Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792091953; c=relaxed/simple;
-	bh=bkD59+x49jlGOkrgsXF4C96XQg6UqSd1g0isUjLK49U=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rCTe50F2nGOPzwzq9+c5t4noPbWugdTOABenatcKsvulN4Ty0oZwpiiba1XkMLzC+GFjsvVZ/+OqL0bPnVhsrOHFdy6xml6/niknyACTrDSetRErUOenZWfoIfY6wo7tOeLeXmYCIIi+KWoo5AjytOxRA1nfc8079iilkBNUI0s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cr4Zghqt; arc=fail smtp.client-ip=52.101.201.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1792092178; c=relaxed/simple;
+	bh=504gSiKbgzIirt4PzRbrfHg8TzZ6PtC1YpvT1StGdt4=;
+	h=From:Subject:Date:Message-Id:Content-Type:To:Cc:MIME-Version; b=pSxgGr/opzrObVhqUz9WRHVFX6S4Ql9MSVd/eTL4RDDYhFLl0ywNqpFJHjcK/lwcFskz8LP4mTmRMpT8G790Z9JPq6vAoJeP6CSS35GzXIB526SztRwHPVyVo8JqjVo3VkLHu9Aa1z6qgg5+SXiuXrV3y5R2NXEBHsGhQYDwUcE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=FNbm9hp+; arc=fail smtp.client-ip=52.101.83.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cr4Zghqt"
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="FNbm9hp+"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=E8b1Kqh8YH2OXck4GPyqdLwd3LnpHk27tlWJodmmBVyvH4ZeKsBD9VFnGXJZQeR8BdV1XUeehwvpdDVxrIn5unRD5qsx5WGl6oI3v6NWvrBWl/V6zxV1tTd9r7e3emKJR/2Mg8YZ2l5+GfcgEWrc9gvd+hbrrNIZCZu2jQOegZQG+vBT1KBox9PR1huJERx8JuF9EOaI/sVWxu1bxzmoyA0xsQLijOEszaD3CUxrF29jSnDpXEjFQ+v323+l9XS0xF6Bv8IBRDQH9zgWGU92wNDpfAzWxomqHgClxn17AwMfVPjRYvmDDySshQ4zCTlhzUWVn6tW48hFtbrBf+lByA==
+ b=HjVXfggUCBD0V6iQZMiHxNw0Jg9IFzwahpdmPZ59CKtQ6wpxHk03t/bnfFA6ZQ4fLfjJJTszigTjwxcli/dA4S5DPlIi8Rnd1COiAIOVWltMNsyG8/sZICEoylfWVsag2NfE98yehdIKJFDNHUSx/QfLtlr3q9J7YBBOdQdEaBv/V5DEPgTToklpBC5lU8Yfte1f2Wa6y0/AP0Ov5Otsxip09C/+EOh/oOsyzLrdfvz/Zq82XzQWC7p/4sqF3LtZOg+yym3H/w1MNeogMrFSZ7DpY5zjmQd+ey3TKZGk5Il+Rwv4bw6sNQZonBWJAroFay9SRacfYaY+xkO+nKyorg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rAz+JcGVHR19B/xkBdpMeAfTYB4I4GO4IlN/hjTqQOo=;
- b=yMvoYsVXS+/ec98jbkgm8YJ+LdbGdxGXZMW10849iMic1pEaBVkvutzaSyidGEUho1c9WSqkmG8upvLOyT3Jn/kri4HARUSwkiiYmPPnkIyLSDXt0peRDkugveQ62edilVbUc4szHxqlK3c24GCWXbk5ZQC0n8S2z4M9Mlxkj/8u6HvJhbazUbdaeDAvO8mnrd8dZPoNCy1xlzp1fU2hFal/y1WBC6e5w38NdQHaODlZO47+dzWAynp8Zh2lOyMNSjLAptxC9ZAV678/hNHdfbumslh2/Ro/2sWYB8kAxf1v5DO+gwbJTdl/iljeBAyo97JtnBZAZ6HYTK83BtEqiA==
+ bh=Mb6Ykn3FCLqwUzITwfOKv7cpTHwi55sPkdzttBwbOHg=;
+ b=YtYReVGDi9KOpgWZTAD7KDMRJbC7O5YsEURSQ7BbARLbtuC8eDfpz8rboYp5MJvd05ZxvsH+SrhAuV2AdAegWuvqx4YGwDSn7rd6MYlcqXMJgNTncl73kHGNQoOZGzUKFVgEfxqgIWDTtTJit/3iOXrkJ6V9YcemAqKzgI33i7y1+Ww4+yb39N5coidOrJMHcLf5E9f7bi09dRikqBHasahWBXJ9tRwSi2mws73RSTK4HKBWvIahHIpPSW8zGwAdQwMI2rCCHyB9VoAXsurbwcaINfa6/VndBqYYPVQrHgUa6EeaRwPTCkSBLEANa5+NjfqUcB5Y+segliYT7KCsqA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rAz+JcGVHR19B/xkBdpMeAfTYB4I4GO4IlN/hjTqQOo=;
- b=cr4ZghqtyOyXMXmIArkXBGzIjEjSdmHeg0dWFdtFLcAFrj2797KxupV70EFDMCdv8CG654nfC6F4EgHiGcgZ3RC00MvW3pox4cIksGdEDDG5ISR1ZIuPBaLkxoFi/6hMEb3qYS1trmhQPuRpvcog9jME57MDZZZWJ9XffKZzQVs=
+ bh=Mb6Ykn3FCLqwUzITwfOKv7cpTHwi55sPkdzttBwbOHg=;
+ b=FNbm9hp+qgcwifqM8sRueRTXjI+9zgyNrxsKha+m5y9S5Yn3z/16ykLLLSJUpNMNT3/k/69rK0Y8E0Rq0Z9bKXAWq97vAjewS9dZpOUaL2bkQMz1KFludcsG20HBdxY7/5zummYxcM56FeZd1vTRaPCf4fKfDM2oJDOWCuXKuiRAkEhebQfW2W6IbY3FoGnzOACCV+yO4Pjswyty7yf6pPAyoCGJnPlyb5QiaQhC7sK/2vHnAHEVekRNrvY32fKj1a1/7xg1g4+UblRQ3MScgF2Gt3iEMseu5aXSs+ezz9qTiAGpHr+DcqV4XDn9w0MbR4gSwy3rXbvrZ64b5oV8rQ==
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5310.namprd12.prod.outlook.com (2603:10b6:5:39e::10)
- by LV0PR12MB268673.namprd12.prod.outlook.com (2603:10b6:408:60f::18) with
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
+ by MIWPR04MB358405.eurprd04.prod.outlook.com (2603:10a6:290:ab::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.14; Thu, 15 Oct
- 2026 19:19:05 +0000
-Received: from DM4PR12MB5310.namprd12.prod.outlook.com
- ([fe80::1bf0:6a94:a990:14f5]) by DM4PR12MB5310.namprd12.prod.outlook.com
- ([fe80::1bf0:6a94:a990:14f5%6]) with mapi id 15.21.0496.021; Thu, 15 Oct 2026
- 19:19:04 +0000
-Message-ID: <9d145d0d-7d68-4741-b8c2-3db989889a25@amd.com>
-Date: Thu, 15 Oct 2026 15:19:01 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] crypto: ccp - Allocate status page outside
- sev_cmd_mutex in SNP_PLATFORM_STATUS
-To: Tom Lendacky <thomas.lendacky@amd.com>,
- Michael Roth <michael.roth@amd.com>, linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, ackerleytng@google.com,
- ashish.kalra@amd.com, aik@amd.com, seanjc@google.com
-References: <20261014132145.1726322-1-michael.roth@amd.com>
- <20261014132145.1726322-5-michael.roth@amd.com>
- <552abfdd-fc3c-4a46-9595-bcc05146f3c6@amd.com>
-Content-Language: en-US
-From: "Pratik R. Sampat" <prsampat@amd.com>
-In-Reply-To: <552abfdd-fc3c-4a46-9595-bcc05146f3c6@amd.com>
-Content-Type: text/plain; charset=UTF-8
+ 2026 19:22:52 +0000
+Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
+ ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
+ ([fe80::2146:83a2:5329:b7c%7]) with mapi id 15.21.0522.012; Thu, 15 Oct 2026
+ 19:22:52 +0000
+From: Frank.Li@oss.nxp.com
+Subject: [PATCH RFC 0/4] async_tx/md: Remove async_tx framework
+Date: Thu, 15 Oct 2026 15:22:24 -0400
+Message-Id: <20261015-asycn_tx_remove-v1-0-056a7085e0a1@nxp.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR04CA0002.namprd04.prod.outlook.com
- (2603:10b6:610:52::12) To DM4PR12MB5310.namprd12.prod.outlook.com
- (2603:10b6:5:39e::10)
+X-B4-Tracking: v=1; b=H4sIAPAn0WoC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzNDA0NT3cTiyuS8+JKK+KLU3PyyVF1jC8PkFAMD4xTLNHMloK6CotS0zAq
+ widFKQW7OSrEQweLSpKzU5BKQWUq1tQAepbCGeAAAAA==
+X-Change-ID: 20261015-asycn_tx_remove-381cd003d9f7
+To: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>, 
+ Mikulas Patocka <mpatocka@redhat.com>, 
+ Benjamin Marzinski <bmarzins@redhat.com>, Song Liu <song@kernel.org>, 
+ Yu Kuai <yukuai@fygo.io>, Li Nan <magiclinan@didiglobal.com>, 
+ Xiao Ni <xiao@kernel.org>, Dan Williams <djbw@kernel.org>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, 
+ Randy Dunlap <rdunlap@infradead.org>
+Cc: dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ linux-doc@vger.kernel.org, Anatolij Gustschin <agust@denx.de>, 
+ Saeed Bishara <saeed@marvell.com>, Rameshwar Prasad Sahu <rsahu@apm.com>, 
+ Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, 
+ Anup Patel <anup.patel@broadcom.com>, Frank Li <Frank.Li@nxp.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1792092167; l=4698;
+ i=Frank.Li@nxp.com; s=20240130; h=from:subject:message-id;
+ bh=504gSiKbgzIirt4PzRbrfHg8TzZ6PtC1YpvT1StGdt4=;
+ b=2ooMhwISN5LNUNkLAL+zJtJStvfuvlYn7wrY9vrZ3etIyBvO1i8HwzrTiwQRqSOY+bE282hx9
+ eDQoNorGMMkCCaDTap1qRVAcEQ8ejb0UnhXvtSxU44SUgxn6na0IUw+
+X-Developer-Key: i=Frank.Li@nxp.com; a=ed25519;
+ pk=I0L1sDUfPxpAkRvPKy7MdauTuSENRq+DnA+G4qcS94Q=
+X-ClientProxiedBy: PH7P220CA0123.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:510:327::26) To GV2PR04MB11799.eurprd04.prod.outlook.com
+ (2603:10a6:150:2cf::9)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,241 +84,179 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5310:EE_|LV0PR12MB268673:EE_
-X-MS-Office365-Filtering-Correlation-Id: 83810f62-61a7-4859-c461-08df2af12d4f
+X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|MIWPR04MB358405:EE_
+X-MS-Office365-Filtering-Correlation-Id: 791e49ec-636c-465b-2e53-08df2af1b515
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|23010399003|56012099006|260925021311599003|260925021911599003|11063799006|4143699003|261009223027099003|260925022911599003|10067099003|22082099003|18002099003|6133799003;
+	BCL:0;ARA:13230040|376014|7416014|19092799006|1800799024|23010399003|366016|18002099003|10067099003|921020|11063799006|261009223027099003|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	dvGEjqSav7kXXgtmBdrlS7S+1q79uG2DeNetfoVXUWnKSy8p9O9kJqK+jH7efZDMSv0/1a+Yzv7Yx77oaWCO5y39TvOXuNfs0+1GAEael84wYdNpUm502L9I51tj3kb9q2sOmFiZak/puOKwUu5UJJVF8wIHS67aVUviWj9MfTfgarMA5QOvdnJJNaj1xWXrP+iOI4vT3YBLSKbd883z5ugo6E6wswUiPN3yCCnEhCTdCC8ubE7JimLwi9+xKWex35t3NlXuJ8VPesxxXaATQNIGxYzUn0jAvdHZTlhG6/DzVn6a9te3q51CkmpoQI24hYjNXqO8pRMSYh2TrQGZ37zzzvKAFuTEhJ3D9CBRHaq8n3HFaWImIuEkKCoTuUZhLEkvDB5dBEhYvwkfFL7aoocAKehVMUxd6Jc74BynkNBxSvHniOktAHFqnHP3xASdyW+IGTQQylXuXSi+vAaOpOsx2/rCIDsgwsr5WK5QSurJI9CaoDsElm/k/KCTc/TFH2yV47FWjhYi5GamNKoiNxl/fYAtdV+ZZKtuTKZouE+o+zDf8XeUK9HIzZeC5ikYYRQcA2ZkFyehWl1zx1mhA1Tvlq3EytOtTKrxTyHic0vvvGKaCwcVznfV26olwA4C
+	QwBP6n13Ba+oyStc2BY1Zekko/hH4geZgoHbq7J3LTK7TqTidcpEVuL5aBEdqGtJSfnhRSsl7KDpBUoCFR1NoPjlLeucTewDwlaUVG7E1IPNW8xYOfhlIinD8h41+enajmu/SiXYB8Pen+Le3JF+7JDmhhJFd0yRo4LdlbM2jIFwiInAywQB61Mw2uCSf8+J1vVqWfGt50EBtXOT2p7oNtp7fEMX/9SfGzDRvo3gAMjnTTsMAO2PtVVP9zDvjfDkl106e2v2VNkhx9NDiwPVKSXfjt2nlRqiHJO5GYA6cdYRRLHwGMDrku7+YHqBFZUCW8PMJV0j22UlDZfXyqD6oYD0z0Y5IAXAFYuxHBajAO9s/HabtIBr9oDnx1puPFwTi2rV9DFtCM4ZoCZkDz3xJweOlrphZ+kq3ogOqHWKMxIvk5lloe2WAtAUuVsEIFfSVmkLpXj8kll3C09zQQWGkl2R2W7foDKTaJTDhT9Szs6iihtmZgJoFpYf8LEmg9W2giUSsJpvWAOMaP6qaCOkLddwwpJjb6LsK4n21kqoHvgVsnvC93gxYDQ0DLH+N3AgsI31UOBqsqNZ0GXsAYLIccLuniwAwwMKeDpNlWFBjChbJ2ozfEP4piNeWTREjiEnGE7rlHCOjj6F10bub5bNH1DfZkPc487Rc0EvTKDTO4bFXtbLVhyjw4cdnc/lrMuwYj/KBaxz+A3yLSieIuFwmQ==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5310.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(23010399003)(56012099006)(260925021311599003)(260925021911599003)(11063799006)(4143699003)(261009223027099003)(260925022911599003)(10067099003)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(19092799006)(1800799024)(23010399003)(366016)(18002099003)(10067099003)(921020)(11063799006)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZkFJMzB1TmtYWmprekdEeEtSaEJSVXB0KzRGYUp0bzRvMUZhdnlDRnRiUzFP?=
- =?utf-8?B?UlZZdTJJMG5xayszWEprdFlUaFhqT2hPTWk0WThtYW9jaDE4K29XczFJQ1J5?=
- =?utf-8?B?WVM3dWhQeUFTb2g2clpQRGpHU2pEWjVJSks0cGxXa3F0UlJ4OGhSd0lxNkhy?=
- =?utf-8?B?RzJoYXFNNnppT0liNUt5T2I1K1VQcEttMzdTVFN3Qk53TDgrRmp1OFFSMGtu?=
- =?utf-8?B?MUpZZlZWT2lkS3hVa1FQZVFhSmk2SXpYdGpiam9SaUM5azRORzlxU3crMnFy?=
- =?utf-8?B?VjIvZ3N6V3JoeFZIN1gxUjJ5UTFSVWJMRzVFNlUwMXoxb2pmMkkzb05ZRkh0?=
- =?utf-8?B?WmlqVThwNmtON0dNQ204bGhZQ0lzK3lTNDFzS1k0eVFDQWFWU0pXU2FodEl4?=
- =?utf-8?B?dThYTUlYUXRaNzBIKzl5b1F3aitFRGJCYjljQSt3SHlLdi9GZnkvU01MdXNV?=
- =?utf-8?B?alhlMDVrWllnYjYxbTFvWmFVbDUxR0lmNEVDK1JPVW03WFNVNkRDSVRIS1cy?=
- =?utf-8?B?S2dvWlMwN1FYU0YzWWh5QnhsaFNHNXJ3TWl5NTFFb1BkLzdNQ0I0RTBxTjBG?=
- =?utf-8?B?WVVacDlPWjZXQUkvRXNLVE9sWDN0M0ZrR1EwdmNFMmd3Z1lYSWJsWHY4S2Zk?=
- =?utf-8?B?ZUF6TWpQZURTV1hoVXZWQWJmSW9ZUFJHYUFKd0lJNEhYYnZwN3dKdEllRm5P?=
- =?utf-8?B?clJ3STlvMHFua1RtOEVOVDd5eTJZZWRvdmZYN245cjFOU01aK0dVbXZHc05C?=
- =?utf-8?B?TFlwbDRBd1JobW04dEswcUNsQWlXKzltekhYM1JCSVpvQnZkSEJmMmMwc1E1?=
- =?utf-8?B?elJOd1krUTcyRjZHeDZWeTV2WHdpOWZOczRUK0k3VGlCbnNmWHhxaXQ3UmNW?=
- =?utf-8?B?TDExWVB4VVFIWE9MTncyVUZIOXJzUXNyN1JRZmRwMEtFc055RDMyS1BMRkE5?=
- =?utf-8?B?K1RHUjRDT2thejZTQmQvdHpyRmxrTzhGUE1aQTU2cy9tYmt2T3lQSmNyVmIv?=
- =?utf-8?B?K1c5QnNzdzJvelg3cmNvZWJTYy9KZGVSS3hHeWRJR3RwV1RobkNZb3FyMGJP?=
- =?utf-8?B?c2NtK1d6RGJhYnZyTFR3S3lLK2NrbFlXQi9EWVBPQ3l2S3RHVGFwYkJxelBI?=
- =?utf-8?B?YVdEMmU4dE1TT25oWVJDQ3dXQjgyZHc4bG5xMHJTNHB5V2lERnYrQUVUM1V1?=
- =?utf-8?B?VDNRMDJNM3JpbHhITVFrck5YNVp6Nms1aTBjU3VoWjlBcXVDSjZSeDIwRVZX?=
- =?utf-8?B?SkNGQ1pNNWwwREZHT0NwejFySWloRHpwU0FueDNZdjFtblc0UUh5QUJVL1Bu?=
- =?utf-8?B?QSt5UlNDT2xZbEJGWjJuanU2MERkeFREN1BaaDVTMHZpNkJTemR4cTZqSllI?=
- =?utf-8?B?UnZuUnNkcVJTZlZsbmFjc0FkZzgwTnltb21LVlRnZTgyV0Y3aFMwQkYycWo4?=
- =?utf-8?B?RW9nUnEwRDBqWFZvZnlGTVYwdFBPVmRDcVdUOUNoYWczRjBQZTZOdm9XczJ4?=
- =?utf-8?B?K2RJYXFQRE5oZVl3eHVLRVpMVitWU3YzaGY5R3laMGVHdU5LMHUyeXNhWDlO?=
- =?utf-8?B?TVpKM04wdS9Zc1kxV0xRYmpHcEQ3SlFXVmtoMk54WklQVmVwaWFoZkVjcFJX?=
- =?utf-8?B?WVRpK1lrWmdiM3piaHQvN056dXFHZm1sQ2o5d000L0NPUzg4Z1R6WGNnSTNN?=
- =?utf-8?B?cTFSUGIzVStGUmtxVHJkTHA2dW1zOHc5dHpVaTlTTFJ1UUZkeHlSSG5ld29t?=
- =?utf-8?B?OUo0Ynk1VkowZXN6VW9sSmdwb1lYNWR0c042TWl6cTYxQUt6K0VvZFdENnA2?=
- =?utf-8?B?TG1QRm5PVWxsalZsRzFndktkbGdXcGUwWmY5NGhOcWplV241YkRzL0EzRzdB?=
- =?utf-8?B?cVVQUE1WdWxQbXhlcXF4NzBiQks3c000NkpMVndsam56Qkl4YWVXVmY4d2E3?=
- =?utf-8?B?TWN4VmZLbGpoOUxwVkdpWUJqS3NEWmtvQWlQZVQxaG9ianNFQ0JWMzNNbnNq?=
- =?utf-8?B?c1lGM3kvaDZ2VGVYQmRqMzJzOWdjQmpISzdxN2NkTmVkS1dmYXgvK0ljdmFJ?=
- =?utf-8?B?MCtMdFhtcWJydWJGanVRcVpLUC9HdHVaRE85cXR1b2p2a09jOUtBN0pQVFMr?=
- =?utf-8?B?ODZZVjJPMENVNWRuLzJOcDFGZDRTYnVBUU1QUUk0NkhRUjBTN0x0MnFLbFQy?=
- =?utf-8?B?VEp3VmlmOEViVjZTRkRONlVURUFQMzBFSDl2MDVNU1NzUkRKUzZUM2QxcC9j?=
- =?utf-8?B?bHdGYXJTbHR0Vkd1NnVRN3kvSmFWUEFQcklHK3RqQTZNalhnMEtxaTl5RGUw?=
- =?utf-8?Q?EKI+XP6Uw2xY1BXdjq?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83810f62-61a7-4859-c461-08df2af12d4f
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5310.namprd12.prod.outlook.com
+	=?utf-8?B?VzVwYndadHVRM1BBY3VaZFpxZHVGbGtuMWpTSjhBVFBiclRYdklMUWVudGpL?=
+ =?utf-8?B?dlI2K3FxZzROa3ZxNnF0bmVuT05qdERhd3JtcmFOdFo1ejFST2ZMK21vdkp2?=
+ =?utf-8?B?dXd0d3hBNldnaHdvb1hpa25Gc290U3VuYjJVZ3ZYV2YrdVduY1MzdkJOOFlv?=
+ =?utf-8?B?OEhhT2hqK1Q0eG83QWg0bkttSTdJS0p2NkZsV1JFbEtySDV4aE9rSUJmRTZT?=
+ =?utf-8?B?MXJXMno4WjRlK1JHSHJRVmxWUWlkQS9vREtDWE5PYXpsc0Qyem81aG8wUlBO?=
+ =?utf-8?B?K0xFbHY5Ujg0c2NRSWxKZDFpYjhuNmpkbHlzNHJZb0Z3UjQ1R2MxZDQycGhy?=
+ =?utf-8?B?THliV29RckJiNU5SSHk3WlBydWt3NjFiYWFCMkJsTFlkdUlwaldPYy8vcWxn?=
+ =?utf-8?B?OXdqdnQxTmZ3NkNsR2FiMXo3VVFHK3U1L3ZVZWhkNDZucWM2NVBJRGlyL1pj?=
+ =?utf-8?B?VUFYZlJVbEpIMUZSYmVMc2NYMGxDY1ZacDJVRVpDRGNBbWRJYXhwYStMS2ZR?=
+ =?utf-8?B?ZWQwajk4akpyVlNzTkpwTFM3cUR2aXZlT0I1YmpSUkxSUWNnMTVyMG5HbVpZ?=
+ =?utf-8?B?REh0eHYwR3JsRWtiZ2NJZDdHOVVaVm8rNStKU1M0QktyNlpwN0t5VEVGbENM?=
+ =?utf-8?B?K2VmdHNzWWl0Mktqd1BscGNIWjdYdU5WYnRQS1JqcitiaDg5SFFtWGp5WDVL?=
+ =?utf-8?B?SHpFcFRvb09CbmFhSmZzT0VyZzJLNUVzWm9uektGdnVrY3A1VWpkQzdwQytW?=
+ =?utf-8?B?OWtJcVFLVGhFQVZxbHEyRFRLcU00V2I4M0RNVk1aWEQyL0JrYnBDSHJPNitp?=
+ =?utf-8?B?MHYwTnpMZHNCNEFreFlRaTQyNHVscWtFVmJYbXNBeGhaK0c2Q0VkZm5kZlZT?=
+ =?utf-8?B?LzArblU4MU0zTVNOZGEyc3RTQjRlajhaKzlCUnV3K1lWcjg5cUx1YmdyRWFG?=
+ =?utf-8?B?QzljZHU4V2pYSkJndC9nSW53RC9zbWlGcWhzUHI3RlAvNEg4WlNFWDlmeTk3?=
+ =?utf-8?B?bitPMG91S1NCT2xUTFh0N3JVc0xWa1k4SDNzRCtNbXpUL290aHpwUlMxQzZC?=
+ =?utf-8?B?Q2dYbVl5YzEwMXJ5STk2dHYxd2NYNVVYQWlJZlJUSldGdW9IZzgxc3h3RUlh?=
+ =?utf-8?B?cVBTN0F1NnRqVFZSY1dMS0VFbThSN3FCQ3EyUjFkc0prMFBycW1kcFBTdFZy?=
+ =?utf-8?B?ODhBMmJDS3hWV3E2blpnOHgyS0ZCWjlKenAxU1grY0VORnpYYXc2bllJWkNX?=
+ =?utf-8?B?R3FmZEIyQ2Npckh2Ti9WUlRKYmVuUkxXTHB6ZDc3dUxaS2JnakY0YXA3Y2xj?=
+ =?utf-8?B?UG1oU3MwSitjVm16TWNmZVZJMXFhcjNFT1N2NE9mYm81MHd5YXhQUnRjc2M2?=
+ =?utf-8?B?SG4rN1hwSk85a25zTUIxM3pzcE9WdWdBTEFEMEhZWnYxKzM0N2xDeExhZGJI?=
+ =?utf-8?B?RU1MWjBQK1VTV2JVdjB6Y0xFWU1xOEp3T0RMcUJ0N3N2MW9SVFBjSjdGUWQ3?=
+ =?utf-8?B?TlJPWWFNSW5Zei8zWGJjV25HdENjQnZBMzM2ZTQ1cVdVNXkvb1p3ZDNCQVI5?=
+ =?utf-8?B?Qnlhc29zNElWR1hsOUhhdjJwUjFmNm9Oc0NNckE3bmp6MjB2UHp4QW10UWp2?=
+ =?utf-8?B?cGd5WE4zeU9sdXJPR0daZlpkYklUb2ZYbUk1RjBzQW9aUGV4NENFMnF0K2Ix?=
+ =?utf-8?B?ZkUwMVBrcWxCTkFFWmpOMkx4UWhlWGllS2w2aEJwVXNrS05DVEdZakpQc2Y2?=
+ =?utf-8?B?bmZpRExtdkJrOTV5NFpXTmkzNHNWMC8yNkp2bTltZWVRd2NJTC9jUkxudmha?=
+ =?utf-8?B?K1F3aC90cGVicmNMeWhhM2swVFFkZlhOalBseXM1VnZqTGZMVmN2SDJWRnNi?=
+ =?utf-8?B?bWlRUjdFLzE0SmNuMzgxdE5SZUl5NzV5QThhRUo3WHAya3M2M2dwMGJuUFJw?=
+ =?utf-8?B?ZURTWnlqY0ZxS3BqUTg3bUsvbEJ4dEVEZ3IvTGRLUXVnd29QVW0zbjRGN0tM?=
+ =?utf-8?B?SVdNSWFQaHBRWHBjbFluNDh4QWh3bDQyTjlBcXdmQi9xQ2xmempVdGI3OVM0?=
+ =?utf-8?B?RWRzdkVmTGNmQ0JzbnIwWWwzaUxZa0FHQUwvc3BudVBIKzdjTWhCNVhPdzVN?=
+ =?utf-8?B?Z1lqRXI4RUdkSVNHOG9maHZLTUp2L1NXWGs5RnhkaUJidG85eWEzMkF2aFI0?=
+ =?utf-8?B?T2dua1N3S0pOOU94MDVQdStMMUx4YnNwZ1NkTkppT282cjJ1MzlndDZjTkFu?=
+ =?utf-8?B?Y21wYVRZOUFUTGxYcUFDbHl5MVp5K2NacW1LMFN6aUUwUUlYS1dydkdBV3lo?=
+ =?utf-8?B?bTh4NUFKdWJ3TlpVY1F0ZzJKZWtHUDNjZVhwek9Hc2ZXSURtVHEzajZ4aFh0?=
+ =?utf-8?Q?jSVru/n93vJ4QDeN21JAFtcuV+8jziBjaz4nq?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 791e49ec-636c-465b-2e53-08df2af1b515
+X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 19:19:04.7587
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 19:22:52.5372
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GwnNHirCcuM3WoyY5dH9TMW8YxbNnV3gA/6b3kY14e75lvi2YE+Ds+6LwKt5hRZ9qMvcunXkVflXSCmXoosh1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV0PR12MB268673
+X-MS-Exchange-CrossTenant-UserPrincipalName: sg1Fwgtaho4+Rbh1DS/ziOs1/py3pSAR1RIniy3fLLpdFmr6D2yzrhw/thyDOC+0ZSZdlaLvbNHv0TLqCr7rBIk1jCcPUkI0zDiHCzZzIYzLBDfG8h41YzkdDSYL00L0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MIWPR04MB358405
 
+This RFC is collecting more feedbacks to device when is good time to remove
+whole async_tx framework and how to remove it safely. And is overall
+direction correction.
 
-On 10/14/26 10:04 AM, Tom Lendacky wrote:
-> On 10/14/26 08:20, Michael Roth wrote:
->> Allocating memory while holding the global SEV command mutex
->> (sev_cmd_mutex) unnecessarily blocks concurrent SEV and SNP operations
->> across the system if page allocation stalls or triggers memory reclaim.
->>
->> Rename __sev_do_snp_platform_status() to sev_do_snp_platform_status()
->> and push the sev_cmd_mutex and firmware call down into a new routine so
->> that allocation/freeing of the status page can be done outside of the
->> mutex.
-> 
-> Seems a bit complex. Can you rename __sev_do_snp_platform_status() to
-> sev_do_snp_platform_status() and just put a scoped guard in after the
-> allocation up to just before the "if (ret) goto cleanup"?
-> 
+Little to no real hardware acceleration usage:
+  Most systems run RAID5/6 parity calculations on the CPU using optimized
+  XOR/PQ implementations, while DMAEngine-backed async_tx acceleration is
+  rarely present or exercised.
 
-The DLFW_EX series [1] calls sev_get_api_version() ->
-snp_get_platform_data() -> __sev_do_snp_platform_status() with
-sev_cmd_mutex held, so that the cached platform data is refreshed under
-a single hold of the lock.
+Added abstraction and maintenance cost:
+  async_tx introduces an extra layer between MD RAID and parity operations,
+  making the code harder to understand, debug, and maintain.
 
-The current split between __sev_do_snp_platform_status() and
-sev_do_snp_platform_status() lets that path reuse the helper with the
-mutex already held, so I'd prefer to keep it.
+Modern CPUs outperform DMA offload:
+  SIMD implementations (SSE/AVX/NEON and architecture-specific RAID
+  routines) often provide better performance than DMA descriptor setup and
+  completion handling overhead.
 
-If we go with Tom's suggestion instead, the single function takes
-sev_cmd_mutex itself. In that case, sev_get_api_version() would have to call
-sev_do_snp_platform_status() before taking the mutex, and pass the result to
-snp_get_platform_data() as an additional struct sev_user_data_snp_status
-parameter. That should be fine, since the cached values only change across a
-firmware update and updates are serialized.
+Obsolete hardware dependencies:
+  Many async_tx acceleration backends were designed for older DMA/XOR
+  engines that are no longer common in contemporary systems.
 
-Either way, whichever series lands second will need to rework
-snp_get_platform_data() for the new helper, and I can help take care of that.
+Complex asynchronous execution model:
+  Dependency chains, callback handling, and DMA transaction management
+  increase code complexity without corresponding performance benefits on
+  typical deployments.Simplifies RAID code paths: Removing async_tx allows
+  direct use of synchronous XOR/PQ helpers, reducing indirection in raid5.c
+  source code [linux/drivers/md/raid5.c].
 
-[1]: https://lore.kernel.org/linux-crypto/cover.1792014060.git.prsampat@amd.com/
+Reduces testing burden:
+  Eliminates rarely used code paths that are difficult to validate and more
+  likely to accumulate latent bugs.
 
-Thanks
---Pratik
+Aligns implementation with actual usage:
+  The vast majority of MD RAID deployments already rely on software parity
+  generation rather than DMA offload.
 
-> Thanks,
-> Tom
-> 
->>
->> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> Signed-off-by: Michael Roth <michael.roth@amd.com>
->> ---
->>  drivers/crypto/ccp/sev-dev.c | 60 +++++++++++++++++++++---------------
->>  1 file changed, 36 insertions(+), 24 deletions(-)
->>
->> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
->> index c8c229a6757c..37b948a81bc9 100644
->> --- a/drivers/crypto/ccp/sev-dev.c
->> +++ b/drivers/crypto/ccp/sev-dev.c
->> @@ -2554,20 +2554,13 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->>  	return ret;
->>  }
->>  
->> -static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
->> -					int *error)
->> +static int __sev_do_snp_platform_status(void *data, int *error, bool *free)
->>  {
->>  	struct sev_device *sev = psp_master->sev_data;
->>  	struct sev_data_snp_addr buf;
->> -	struct page *status_page;
->> -	void *data;
->>  	int ret;
->>  
->> -	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
->> -	if (!status_page)
->> -		return -ENOMEM;
->> -
->> -	data = page_address(status_page);
->> +	*free = true;
->>  
->>  	/*
->>  	 * SNP_PLATFORM_STATUS can be executed in any SNP state. But if executed
->> @@ -2578,10 +2571,8 @@ static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
->>  		 * Firmware expects the status page to be in Firmware state,
->>  		 * otherwise it will report an error INVALID_PAGE_STATE.
->>  		 */
->> -		if (rmp_mark_pages_firmware(__pa(data), 1, true)) {
->> -			ret = -EFAULT;
->> -			goto cleanup;
->> -		}
->> +		if (rmp_mark_pages_firmware(__pa(data), 1, true))
->> +			return -EFAULT;
->>  	}
->>  
->>  	buf.address = __psp_pa(data);
->> @@ -2591,19 +2582,45 @@ static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
->>  		/*
->>  		 * The status page will be in Reclaim state on success, or left
->>  		 * in Firmware state on failure. Use snp_reclaim_pages() to
->> -		 * transition either case back to Hypervisor-owned state.
->> +		 * transition either case back to Hypervisor-owned state. If
->> +		 * for some reason that fails, it will have been added to the
->> +		 * leaked pages list, so indicate to the caller to not free
->> +		 * the page.
->>  		 */
->> -		if (snp_reclaim_pages(__pa(data), 1, true))
->> +		if (snp_reclaim_pages(__pa(data), 1, true)) {
->> +			*free = false;
->>  			return -EFAULT;
->> +		}
->>  	}
->>  
->> +	return ret;
->> +}
->> +
->> +static int sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
->> +				      int *error)
->> +{
->> +	struct page *status_page;
->> +	void *data;
->> +	bool free;
->> +	int ret;
->> +
->> +	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
->> +	if (!status_page)
->> +		return -ENOMEM;
->> +
->> +	data = page_address(status_page);
->> +
->> +	scoped_guard(mutex, &sev_cmd_mutex)
->> +		ret = __sev_do_snp_platform_status(data, error, &free);
->> +
->>  	if (ret)
->>  		goto cleanup;
->>  
->>  	memcpy(status, data, sizeof(*status));
->>  
->>  cleanup:
->> -	__free_pages(status_page, 0);
->> +	if (free)
->> +		__free_pages(status_page, 0);
->>  	return ret;
->>  }
->>  
->> @@ -2615,8 +2632,7 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
->>  	if (!argp->data)
->>  		return -EINVAL;
->>  
->> -	scoped_guard(mutex, &sev_cmd_mutex)
->> -		ret = __sev_do_snp_platform_status(&status, &argp->error);
->> +	ret = sev_do_snp_platform_status(&status, &argp->error);
->>  	if (ret < 0)
->>  		return ret;
->>  
->> @@ -3114,9 +3130,7 @@ static int get_v1_svn(struct sev_device *sev)
->>  	struct sev_user_data_snp_status status;
->>  	int ret, error = 0;
->>  
->> -	mutex_lock(&sev_cmd_mutex);
->> -	ret = __sev_do_snp_platform_status(&status, &error);
->> -	mutex_unlock(&sev_cmd_mutex);
->> +	ret = sev_do_snp_platform_status(&status, &error);
->>  	if (ret < 0)
->>  		return ret;
->>  
->> @@ -3131,9 +3145,7 @@ static int get_v2_svn(struct sev_device *sev)
->>  	struct sev_snp_tcb_version_turin *tcb;
->>  	int ret, error = 0;
->>  
->> -	mutex_lock(&sev_cmd_mutex);
->> -	ret = __sev_do_snp_platform_status(&status, &error);
->> -	mutex_unlock(&sev_cmd_mutex);
->> +	ret = sev_do_snp_platform_status(&status, &error);
->>  	if (ret < 0)
->>  		return ret;
->>  
-> 
+Current dmaengine support xor is
+
+Driver File		Driver Name			First Added Date
+==========================================================================
+mv_xor.c		Marvell XOR Engine (mv_xor)	2008-07-08
+ppc4xx/adma.c		ppc440spe ADMA (PPC4xx)		2009-12-11
+fsl_raid.c		Freescale RAID Engine (fsl_re)	2015-03-03
+xgene-dma.c		APM X-Gene DMA			2015-03-18
+ioat/init.c		Intel IOAT DMA (ioatdma)	2015-08-11
+mv_xor_v2.c		Marvell XOR Engine v2		2016-06-16
+bcm-sba-raid.c		BCM SBA RAID (Broadcom)		2017-05-15
+
+fsl_raid is for power pc SoC, which already EOF.
+
+Patches is build test only now.
+
+To: Alasdair Kergon <agk@redhat.com>
+To: Mike Snitzer <snitzer@kernel.org>
+To: Mikulas Patocka <mpatocka@redhat.com>
+To: Benjamin Marzinski <bmarzins@redhat.com>
+To: Song Liu <song@kernel.org>
+To: Yu Kuai <yukuai@fygo.io>
+To: Li Nan <magiclinan@didiglobal.com>
+To: Xiao Ni <xiao@kernel.org>
+To: Dan Williams <djbw@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "David S. Miller" <davem@davemloft.net>
+To: Jonathan Corbet <corbet@lwn.net>
+To: Shuah Khan <skhan@linuxfoundation.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: dm-devel@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-raid@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: Anatolij Gustschin <agust@denx.de>
+Cc: Saeed Bishara <saeed@marvell.com>
+Cc: Rameshwar Prasad Sahu <rsahu@apm.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Cc: Anup Patel <anup.patel@broadcom.com>
+
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
+---
+Frank Li (4):
+      md/dm-integrity: replace async_tx with synchronous xor for journal
+      md/raid5-ppl: replace async_tx with synchronous xor
+      md/raid5: replace async_tx with synchronous xor/pq operations
+      crypto: remove async_tx framework
+
+ Documentation/crypto/async-tx-api.rst | 270 ---------------
+ Documentation/crypto/index.rst        |   1 -
+ crypto/Kconfig                        |   5 -
+ crypto/Makefile                       |   4 -
+ crypto/async_tx/Kconfig               |  28 --
+ crypto/async_tx/Makefile              |   7 -
+ crypto/async_tx/async_memcpy.c        |  97 ------
+ crypto/async_tx/async_pq.c            | 464 --------------------------
+ crypto/async_tx/async_raid6_recov.c   | 595 ----------------------------------
+ crypto/async_tx/async_tx.c            | 299 -----------------
+ crypto/async_tx/async_xor.c           | 380 ----------------------
+ crypto/async_tx/raid6test.c           | 250 --------------
+ drivers/md/dm-integrity.c             |  26 +-
+ drivers/md/raid5-log.h                |   4 +-
+ drivers/md/raid5-ppl.c                |  40 +--
+ drivers/md/raid5.c                    | 467 +++++++++++++-------------
+ include/linux/async_tx.h              | 187 -----------
+ 17 files changed, 281 insertions(+), 2843 deletions(-)
+---
+base-commit: 98a4f6276df67a1bb37b1be56a3ab4285155e3df
+change-id: 20261015-asycn_tx_remove-381cd003d9f7
+
+Best regards,
+--  
+Frank Li <Frank.Li@nxp.com>
 
