@@ -1,106 +1,77 @@
-Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4EE453E0B;
-	Thu, 15 Oct 2026 13:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7824378D8A
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 14:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792071229; cv=none; b=T0GgugnxbpvhfcKvrN6n5DJEfMf8UB05TsKujAv2mf5f9P/A+cctsb34ga++IVi7gdMPrH//bHQG7YJ3hWuSMzRncmCmtrL5Rua1Km9rgHQNQ0CQSBYWfYDxXZTOE4kRG4Tq/rqxcwuw8YiWU3+laa7Y9AD+yUmQLFlUbIe6Cwg=
+	t=1792075782; cv=none; b=ZyQx9rtrNiBRQEgh3Wa41iNJSsYjUCSqvj3UACKgOjfsVciMr9GV9Ndu/4BCeQCnCkDV7+7S2PjczH77maAlFmxNxppVZNo79dUnYpc7VVt0I7KsADWvi6NG0Tw0NJtPkiHZAXdLWFTuGvuU3xPlK5pxQ8Nj5F5rDD+4joZBBOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792071229; c=relaxed/simple;
-	bh=MviIMzC0Cf/AxfEYrjbzfHiXbHXPMrn0LhamOwpMwyU=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=oCnZ8uNRTIR+GoN6Zfdb/IrQaOMWvTRzSVLQ85jzVtLx8I+vWDqRi8ueMipfsLjghBEOEPPk46KkCUM5gWRuNdxVPDv8O24Bc4KsSGzcEVc0johDnKNYLla29OIc0MJwJYqwXXYN2AJmsfNXha8opVznr6EdbMwcIHD08jtgCJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=HbnnUYpm; arc=none smtp.client-ip=51.159.188.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
+	s=arc-20240116; t=1792075782; c=relaxed/simple;
+	bh=bXOaVPd7VhD3hx5c4q+vgR03AqUTjEWUn8n5s3ly05A=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gkFidkD/yNIV27Bo9wlOgFYm+iY/4SVlZY4M61A2EPpgS5WjajhOcN6sHDq3Xwq8uc8cDH8d+VNPeRykfmegWCtKytblp4Ud3lE6Aqe/7AQREozeU0mWnSKRDNx6gtuOwW+4Fm9micJEDtYPVZy9Mnea8dVjdXEi9TJLfs5O5rQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B8oA7GN6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="HbnnUYpm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
-	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:
-	Reply-To:Sender:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=EHP2hvFmy8UBCS8mi/U7rZKdSsnog2aToax2uD8CT8M=; b=HbnnUYpmc/zHm+HPVcGuA2VgOr
-	drLToSBff6qsrl+cNh+DbK1/aNuypJWcMdO3/c4zHJnhAOUpq8oYaWhuua6/sp55T4yJUaBB6iSN1
-	U7whGLajawfkxwISzjaZkV0sfC49Sc+aHl9ZfNRg5xXlBzcNISjAiIZCAV40l7ILg+hPLUAQq/28w
-	8RcJqXnDzcINU6Nuse//N241NqiZn/aQ6WyH6/q28h8vJSncmJovin7z0XgRdy6Ab6eDzZR3q+NJx
-	bem4EZgGIRWWE2OA/62K5qTd0B/dL4TEL8ZZimxSkkereDed75GZ7aMZmulNWaq68C+Gk92oO5sdv
-	H1L4XU2w==;
-Received: from [::1] (port=35902 helo=pf-012.whm.fr-par.scw.cloud)
-	by pf-012.whm.fr-par.scw.cloud with esmtpa (Exim 4.100.1)
-	(envelope-from <jeremy.jean@oss.cyber.gouv.fr>)
-	id 1xHLab-0000000G6B9-403f;
-	Thu, 15 Oct 2026 15:33:45 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B8oA7GN6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABF481F000C8
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 14:49:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792075781;
+	bh=bXOaVPd7VhD3hx5c4q+vgR03AqUTjEWUn8n5s3ly05A=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=B8oA7GN6JsazgwX9l+5E+BX3cveXGzUU5AaLdW/hyXwEN81ID2UO3P2hJFqtIdCtU
+	 LNaRJlToWhCmJP/p+0iV3qxkdEC91IuHyEoQehF9T2YQ1GXyX+hhfjWEYDHooJX7Qz
+	 jR0XuQSc/rZfG4Mq2JhJ1BoINejHBwzVuNXQRn8objGh1TPeoWjK6oDqDr8rN3k9/q
+	 OCxL28Vm5nR7NMuyeT1r6Woacyl+1XmV8WGqfG2gdOapWn+AaTyWMi8JQlqbMgwGJd
+	 I+5l+UxWKUzoaaiMsUIaoNGpoys60qHq88GFiQa7LvzmaIMK0wBWgB161E6hc2KwMh
+	 m/f7N8shAGqhw==
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5ba3fba0080so3805662e87.1
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 07:49:41 -0700 (PDT)
+X-Gm-Message-State: AFq9FYIaW3WIo7HDGuzpCcnUB2nuwQOSYqCq3MwQy1McopZ1rMiGdWfy
+	eAuu7jdY+NiHdEI42zMXPTbgZDzTwHgYmCPlU/4xqHdZUqe3h6UFrGbsKMPRZKCHk9HasimHab3
+	Wsr58/RbXVj8qYo3bntLolndyWlS7aTzQtOmu0NhWpQ==
+X-Received: by 2002:a05:6512:3e04:b0:5be:3db4:5665 with SMTP id
+ 2adb3069b0e04-5be3db4582cmr863547e87.7.1792075780254; Thu, 15 Oct 2026
+ 07:49:40 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 15 Oct 2026 10:49:37 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 15 Oct 2026 10:49:37 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20261013-qce-fix-self-tests-v10-0-57162a38a554@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 15 Oct 2026 15:33:45 +0200
-From: =?UTF-8?Q?J=C3=A9r=C3=A9my_Jean?= <jeremy.jean@oss.cyber.gouv.fr>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: essiv: fix use-after-free in AEAD path
-In-Reply-To: <atDE7dqBGm63pkde@gondor.apana.org.au>
-References: <20261015121743.3151400-2-Jeremy.Jean@oss.cyber.gouv.fr>
- <atDE7dqBGm63pkde@gondor.apana.org.au>
-User-Agent: Roundcube Webmail/1.6.19
-Message-ID: <32b563fa512a97b653bd06bc9bfc0ce0@oss.cyber.gouv.fr>
-X-Sender: jeremy.jean@oss.cyber.gouv.fr
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
-X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
-X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+References: <20261013-qce-fix-self-tests-v10-0-57162a38a554@oss.qualcomm.com>
+Date: Thu, 15 Oct 2026 10:49:37 -0400
+X-Gmail-Original-Message-ID: <CAMRc=MejhYpC6QNXwK_cG_NuJs5XpOviK2NPsEwtnK0RxDi61Q@mail.gmail.com>
+X-Gm-Features: AclHuK99R8-us8Fs2p5d0092H4vgTDHcFapELNpNx1Z9qKaqccwjS9iFs8yerts
+Message-ID: <CAMRc=MejhYpC6QNXwK_cG_NuJs5XpOviK2NPsEwtnK0RxDi61Q@mail.gmail.com>
+Subject: Re: [PATCH v10 00/14] crypto: qce - Fix crypto self-test failures
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, brgl@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, 
+	Pankaj Patil <pankaj.patil@oss.qualcomm.com>, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Stanimir Varbanov <svarbanov@mm-sol.com>, Eneas U de Queiroz <cotequeiroz@gmail.com>, 
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, Eric Biggers <ebiggers@kernel.org>, 
+	Demi Marie Obenour <demiobenour@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+	Abel Vesa <abelvesa@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2026-10-15 14:19, Herbert Xu wrote:
-> On Thu, Oct 15, 2026 at 12:17:43PM +0000, Jérémy Jean wrote:
->> 
->> @@ -247,11 +248,12 @@ static int essiv_aead_crypt(struct aead_request 
->> *req, bool enc)
->>  				  essiv_aead_done, req);
->>  	aead_request_set_crypt(subreq, src, req->dst, req->cryptlen, 
->> req->iv);
->> 
->> +	assoc = rctx->assoc;
->>  	err = enc ? crypto_aead_encrypt(subreq) :
->>  		    crypto_aead_decrypt(subreq);
->> 
->> -	if (rctx->assoc && err != -EINPROGRESS && err != -EBUSY)
->> -		kfree(rctx->assoc);
->> +	if (err != -EINPROGRESS && err != -EBUSY)
->> +		kfree(assoc);
-> 
-> There is no need for assoc at all once the rctx->assoc test is
-> dropped.  If the condition is true then rctx cannot have been
-> freed.
+On Tue, 13 Oct 2026 11:57:29 +0200, Bartosz Golaszewski
+<bartosz.golaszewski@oss.qualcomm.com> said:
+> This iteration addresses issues raised by sashiko.
+>
 
-Indeed, you are totally right, this is definitely simpler, thanks.
-Do you prefer I resend a v2 or send a v3?
+It came back with some more issues. And seems I have a build failure midway
+in the series so that needs fixing too.
 
-diff --git a/crypto/essiv.c b/crypto/essiv.c
-index a47a3eab6935..3505b2769d93 100644
---- a/crypto/essiv.c
-+++ b/crypto/essiv.c
-@@ -250,7 +250,7 @@ static int essiv_aead_crypt(struct aead_request 
-*req, bool enc)
-         err = enc ? crypto_aead_encrypt(subreq) :
-                     crypto_aead_decrypt(subreq);
-
--       if (rctx->assoc && err != -EINPROGRESS && err != -EBUSY)
--               kfree(rctx->assoc);
-+       if (err != -EINPROGRESS && err != -EBUSY)
-+               kfree(rctx->assoc);
-         return err;
-  }
+Bart
