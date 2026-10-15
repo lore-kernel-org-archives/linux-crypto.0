@@ -1,307 +1,531 @@
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013052.outbound.protection.outlook.com [40.93.196.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD0C43CEF3
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 21:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9B44E77FF
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 21:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792099643; cv=fail; b=p3b1dWInQkHKRpp/jA5wHMfVTShfo1gPYCOW4kVAwLfOmKngne+/86QsO8mBBsTRlED6vbXY7p3yifWBiZdn+tGe6in1qq6J6PYRdrqaTFRN8NLRBhudAjbxHQRsTATSIFphzDa7u9Rqr6PVocfdB57mfk672lM8FEwdWJtrp88=
+	t=1792099840; cv=pass; b=BTg0YI3jmOMBvIsXk0XTVq7jGhJfAKUuQfu8MuphnCLRYImamMu3aAQLzvA+KESWnoK6iVULHf1oIY3j/MPlRTDCmxcBIie0EYaloOUnHQqsRnfUBO12yRgViDw56fMhVu22j2pdSkM6oV6WxZEOnY19YBtRju8L5a4c7q8ThQs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792099643; c=relaxed/simple;
-	bh=qgNCrMKRQuNx3gY2PHTvVCmG9Bt/PTKZIu4i0nDB9O8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cINz5hL+5offUA5OwQTbVzXLq47OJ/hIhDW17WysPR8GnwTUxoVzeHHHmBmtwROtKw8LlwR3WxsQX0yfE4XQ707byXnjhTnKiBHBu/RvesGpT6sIY8oF0ird+3Vnf1FqDhF4tuChrccoDt1BmiAnuGF9PkqpHEHECIQKB/CxSMI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jln0gkQM; arc=fail smtp.client-ip=40.93.196.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1792099840; c=relaxed/simple;
+	bh=zJc1yHXSI8gYM/pd1YaPYoLdJGSzI/gziAdRlyZmKSs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Atbrv2cwb/BtNChAkJ9oBbs+YC4lLOnIYqbKzX58O5W92O1H+a+BOhIJXE6kkQpqHd9q9dGsQrQ6Htf+00hRW6g/3pKlUPLiXTiOoRaHzV7zqQIwQRuOmP/53NO/nple5RQhtx5YjVTi339+tf+NHRd9r0GKhg9grAMSpaxl/RE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cBmehTSX; arc=pass smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jln0gkQM"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JqzAlJpvjNFoylfI9BCAykX22jPXtWtzlXtB4sBLzah9enkBiteSeYOeGRTsUm1iMNwJFf1E5TlrmJrzOyyJp3ojMUnvK6vrRymGea3RCRZU4785VS6RGGPxqYg65DusafRwM3t8q7OMPQ3kKyorcHpg3xSpsfA4kUBluZHmyn9lDv/E5Dv2mpE3qa5/nv1RwQdn3UfoOMv8aTMyQK2md1i9D4gaLOxcPZJveUQsAdzm3+PkUBD690KHpWVLkv1OKVuhag/o7B4ZCHom0efcG5EyC4kIGom9djMMMYpqRc21goe/H3AqnLyu0XdU7lIOO+Jqzhtvu09sMiagjF6yng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uC034ze7QpJHjlyRFR5+yUqQYATn1Kg7FGHonQcP3vg=;
- b=DL3zHd9QoFKspdoaqDkShQSE8mvg4lx4S9cx7OOPMa3HNK1Tcc1QhTIi/ft7Hqz/dAJeP62wAF6yHyJM4oS5EAa0dSTTJE/vuXh8KElYFlhO0jlsCkFChKmhlUCF8XZTh8Yz5UxbXfLAIwH0vShcnMjAxjFOHDo416BJVQ1Z9YLgf9f5u4EF7bJPjoggGJrrces9GgHVNsiUHn7aUGk/7h2z7XkcLydVOA5LDAyR6M6joJdbQUBhmk3z+gPMRQLHgqAklYTrUwYwbG1G+bkpIsTTty7gEWJxZBqyINLQ4MWNiPX2u/HgSRLlOdL8ihH0VQ+aBDavLzaJc0au/Hfssg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uC034ze7QpJHjlyRFR5+yUqQYATn1Kg7FGHonQcP3vg=;
- b=jln0gkQMKInvAv7gdeQDXTt43hh7vwIbHL9fADxI1SQ+jgqVV0zAmsGnqOK7oiILxBnginC997CCU+/d1j5HSIHwHLcylitO7ebKp24Wva+zNHYalGKNFTIMpcHPu37E23Gdf6Sus2rdlippZxl3iMm3Dvf88cnBhXscB9WARp4=
-Received: from BN9PR03CA0620.namprd03.prod.outlook.com (2603:10b6:408:106::25)
- by BY5PR12MB4052.namprd12.prod.outlook.com (2603:10b6:a03:209::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.14; Thu, 15 Oct
- 2026 21:27:15 +0000
-Received: from IA0PEPF00000040.namprd04.prod.outlook.com
- (2603:10b6:408:106:cafe::84) by BN9PR03CA0620.outlook.office365.com
- (2603:10b6:408:106::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.522.4 via Frontend Transport; Thu, 15
- Oct 2026 21:27:15 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- IA0PEPF00000040.mail.protection.outlook.com (10.167.249.168) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.522.6 via Frontend Transport; Thu, 15 Oct 2026 21:27:15 +0000
-Received: from localhost (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.53; Thu, 15 Oct
- 2026 16:27:04 -0500
-Date: Thu, 15 Oct 2026 16:26:56 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: "Pratik R. Sampat" <prsampat@amd.com>
-CC: Tom Lendacky <thomas.lendacky@amd.com>, <linux-crypto@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<ackerleytng@google.com>, <ashish.kalra@amd.com>, <aik@amd.com>,
-	<seanjc@google.com>
-Subject: Re: [PATCH 4/4] crypto: ccp - Allocate status page outside
- sev_cmd_mutex in SNP_PLATFORM_STATUS
-Message-ID: <bh3qpp3cdnanwgdakflbhp3hnrs7h6p6r447paqyajjmll4gg5@nrj3wgdaf6b7>
-References: <20261014132145.1726322-1-michael.roth@amd.com>
- <20261014132145.1726322-5-michael.roth@amd.com>
- <552abfdd-fc3c-4a46-9595-bcc05146f3c6@amd.com>
- <9d145d0d-7d68-4741-b8c2-3db989889a25@amd.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cBmehTSX"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5b2b92065ffso2801329e87.1
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 14:30:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792099837; cv=none;
+        d=google.com; s=arc-20260327;
+        b=YezrfvJtRmZe/QEQA+y38zQiYmLMS9n7LQKz/QR8z9MgST/r6wF9ONyroSqaAsXjiS
+         hxGqJT4j3/DI0oxb1yEAioAtTr2U5AS8eAKpPWwK3m/miA+8uSeYjChgQmjvpb39nX/I
+         8fn2SYR0uCk91FoLAwNFWneyAzK+tJvJbDhCkBfN150XSZXiv0nqz7cJwZw5oAK7cQ+2
+         CBHyXfqxUbfGwu1CfklWvG2CDTwma3bDSgMrYj3StU5RETxP1y2QjFT4Yt80pLqtsZhv
+         LXFSD906BD8FHyDoQL0+zfBuFMb1FbnkLnNxF5W8PrvXzR6zD6Du96qUzlCk6cvElXNC
+         shpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6QOUwpYyaURolaGh43C2DQXMGVfTGXyyd22jdUdTcOM=;
+        fh=IMXjPzbnxlgwRGk8pLnwoSaVhtT4IiwaaLgYUKPWarc=;
+        b=HD3vJkSXn8AnmSsvYaHCI5+7vdGYhI9VYaldyiI5/VBuUlhRrDOAvWtK+NLgKjpdIh
+         RYcFbZnJN1gMZwQg1lzDhB5+KwvAbdTsNxRGRJZyjY2bAcDZkRCk1gHjxXKvbY6w73IU
+         85R+QL2jxkba8V1OtXxrfQsHdQWXlC/D8NJ//1mJgrmop4UzU+XWptXWe2tUJL1GtXc7
+         odLaRfyoCoZHaqqp3jNCDezBIGhCCSNiiLJwtNPBiXUht1g4NbLqdncjS9pDDwX/lD4/
+         DSfXqYoHTOj4b6JBpWqVECo8JdsXBA4M+Gu2X8SwPp/9OdMhECo7fwU4Wf6/3lJeSns4
+         /X/Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792099837; x=1792704637; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=6QOUwpYyaURolaGh43C2DQXMGVfTGXyyd22jdUdTcOM=;
+        b=cBmehTSXLOd5n8yK6AlJTXRGgTPtM89TfjIdUDj0psnsGOuSkNu2yXDajVdeBuWx/w
+         R3I0NK5aH2+hEw30PWNGn7sUY1eyaLYp8BMoKXwvbTWbko6kbyX623HBQ2PIxyayC4ZD
+         wnrsUjKDWTCP8VZBfGIOYkydwmHqs/L4X7yJM83tpiqEo53RqhE1qe9IbM75R4OnCA9v
+         fcFmyOijcEvVeAXNlti1c1fkrez+Jn6816mjqRDVDPqILnUJmg+1ABj46MO3KqkKWfoo
+         ctLCDVMLssuqZQPfkUs2aLvcpK0Oiy8iDcuq5Lv4j6k1hDDZNNUkJoJPoZM0XR0a93Yu
+         ahyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792099837; x=1792704637;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=6QOUwpYyaURolaGh43C2DQXMGVfTGXyyd22jdUdTcOM=;
+        b=aw5Yy9a4Bt11herWlelsgD3CUTk4r2NOdO+3bAGvuCAqymgKMflBCPPuTZtLIAOFif
+         rUM7mmGaUsC/pSnrxiGavP6FDqQfGt7+NM7KbcJh/OFbe8FYoTjh5OF9LhjCpyR55urj
+         Y79aU8GxbSasDYUR4kmO1PvhkZPTIRENglxo0BwwcJCbX+c0Ht+w76IeSqlcA3dzGTP2
+         7SI61N8mSmfXuBlWC+vLDSIPGBvgaEXG5hNorNgq9VkEZ5mGG4N2ngOJcwyEotMTZAYY
+         GUE4ar40xbJm5o1jR61EgdnjiKhJNNo8K4Igovf98OVYK6l7vdhIhgDLZsq15Xsjz++M
+         5tew==
+X-Forwarded-Encrypted: i=1; AKwUvBxW+woZTLLi/R/lx4zVxWcBFMXEZadTJ+wVIbZNNicU9+gEah/FOXAnfqgxQ+tXUp9VjNzuZqnxNiKcCCQ=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJhbEfN3JxOPsD0/kgE9AuOjXJYPxGqX9X/3REphXCMMn5iXpPy
+	FNXx2rSzoo1vrngP8IPckWIcXf0gR675oDrhWFpmzJmZd2rjsL8hbOq/av+4E/oChVAUkfYNea1
+	klX/rmu8g7r+LZJKfrxox7Gj45dpXqI0=
+X-Gm-Gg: AYBFou1pVry5c4nvYYd93hHN8Q9Qb3Cr68hVxr9jf5JL51v4yWcP4is5CBAQg01y6X7
+	3q/Uwd/mVnLzivdj3AkrcINJOVVLzsuPoLaDpeWDShDQz0Y05fHk9IWFIl0JIv6jP9TskHUrGdN
+	SbniyQATe1yrSB76pVIzbWok3tJLq/4KyN1vmwdh363JPn1g5wFKMnViSf7GuOD/OyNjMcO0fBJ
+	TXulLMMM49MaaXxJnrUySc4Erj2nZiKoz6cOyWvFMWiH/Dhhtx2iRPhZ98qsUkkzcNdLY8zd5fZ
+	GvUU3SZgkXkCIDDvDja9g22OSf7A3U2oNnJkn/DNf62hFPSTo6O3usc+e9J8GCX5fNhtxtCctWT
+	Q8TAonK5Unn6jFx1v46a2zht3Sqr3EKfcPgFa
+X-Received: by 2002:a05:6512:1151:b0:5be:41a1:d2ae with SMTP id
+ 2adb3069b0e04-5be41a1d3ebmr1107279e87.15.1792099836702; Thu, 15 Oct 2026
+ 14:30:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <9d145d0d-7d68-4741-b8c2-3db989889a25@amd.com>
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PEPF00000040:EE_|BY5PR12MB4052:EE_
-X-MS-Office365-Filtering-Correlation-Id: 710e3873-efc2-497a-54e1-08df2b031563
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|23010399003|1800799024|36860700016|261009223027099003|56012099006|11063799006|4143699003|260925022911599003|10067099003|18002099003|22082099003|6133799003|260925021911599003|260925021311599003|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	2/hzUHtZSE52FG97vaN2Y3pjkbrWR+sFc7jKBfHeusGuGg9jGk4f+GvHzTrurR8sRVvTyLciVdw3cnumDW+PDwjby7sj2jPoOKkKEUeeiP1kdmyI7zBowzoBsZ4SU1rKVfs0zzEcyLEgK8Zl117txFXuOZHiPHXtcw5IfJvDeygXid07PpUM2UceP5Vs7YIWqg3YJGVJgGBpN0QcaWhesYIsVun1j6y7GcKmWWtZiaNu1WujuTFJJR5Mdk+9x5sGGlYu7+C0z1J4ff5pK+vCmt+fHHdm3TgNX4n/SZltpegf4Uzr9dG4+fFOao48ScFSsq3H0/7FsR+9umMPQo4PuQzBCXtUMoy/VHBmrm7SQ6i6cYoVd83ceDYImZ20+sTiqNOoHwEyYLuWk4iXdLswykblDRnZLXM4KuTuLWy0MznzoQirKQ+fjOQhdVpYv0SXvfOY1ORYVy/UwBWI8ZTri0TU2usZ3ukGnfw+QRY1XejwdH3STDqLCq6yvWkWhfnoL9x/sEep+q0HJA/GU2rabT5mKjY/ThWC4Fm7CKNwb0VH9tpYvEfFR9Sv7eGUPtDx8n/8xxpTPKJAu1XCcr21gkqiKGo7cQOdfRV6lVw21QAqy6+sHO+Nz5ceidO18qpip99QtmM40cWtgUuML5YoR+nto2LxXYitEDJel56ZXEw=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(23010399003)(1800799024)(36860700016)(261009223027099003)(56012099006)(11063799006)(4143699003)(260925022911599003)(10067099003)(18002099003)(22082099003)(6133799003)(260925021911599003)(260925021311599003)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	SVECBJfCzc+FUaFLnY/0nAZCOOVWPnKc4ZiDhcCkaatKo3c//XBRdsqw6T1TRC2w88aeJPtxrwBvzjoSkOBy7XTm2epevT2zfz6fzsP981jtyEjezl+GxzNrcMgmfjZVu2vQ3iBLtud6B9+8slyvTPFDGqoheSI6e87ftnmRHTdAWdIYEpYuAINg7l4h2Bd/fGzreTKKpb07gfdEdq+VrGyxqoBbRAn0O4RchJDo+Ku0QGfe7gBK/LDh2iXUA7kB5RutiblTRRGz5hjLvyq6+P2cOHN9mxFINZnHKnae361l/h2ffwrxkNq2DuAePpNbO/keLbzh18vBfs9fQwnBhKCHgR3F7HnsSwdtmkjqr+TzHFzilywQQrxZ+/J9cpVBI7CIkfP9mhsvCtfPl/J96fC4WiTrCiNeLMhYr9rjitajLIRsdbQJXTHULAraMwsV
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2026 21:27:15.3286
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 710e3873-efc2-497a-54e1-08df2b031563
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	IA0PEPF00000040.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4052
+References: <20261008182814.27450-1-kanchanapsridhar2026@gmail.com>
+ <20261008182814.27450-6-kanchanapsridhar2026@gmail.com> <as7JC8o2kggiq_ss@google.com>
+ <CACpmpofXMGBP70Rn7jHLwOF38GRKMUGoW3rb1Jp2SPH7ygKcfw@mail.gmail.com> <CAO9r8zOEcGmg8eVttu41htugnng0ahnVQbubiJfxVH+GfDe47Q@mail.gmail.com>
+In-Reply-To: <CAO9r8zOEcGmg8eVttu41htugnng0ahnVQbubiJfxVH+GfDe47Q@mail.gmail.com>
+From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Date: Thu, 15 Oct 2026 14:30:22 -0700
+X-Gm-Features: AclHuK_VkvA5Ou--PjXINBAVxrFNqnCfphylRWwthtObaGmikBDgzUqpBnjQop4
+Message-ID: <CACpmpodDA=oqnVa_hsJpyhGt=4zxknYF=QX9L6-sJbxsRxtM2w@mail.gmail.com>
+Subject: Re: [PATCH v1 5/8] mm: zswap: Store the folio's node id in the zswap_entry.
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
+	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
+	senozhatsky@chromium.org, 
+	"Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 15, 2026 at 03:19:01PM -0400, Pratik R. Sampat wrote:
-> 
-> On 10/14/26 10:04 AM, Tom Lendacky wrote:
-> > On 10/14/26 08:20, Michael Roth wrote:
-> >> Allocating memory while holding the global SEV command mutex
-> >> (sev_cmd_mutex) unnecessarily blocks concurrent SEV and SNP operations
-> >> across the system if page allocation stalls or triggers memory reclaim.
-> >>
-> >> Rename __sev_do_snp_platform_status() to sev_do_snp_platform_status()
-> >> and push the sev_cmd_mutex and firmware call down into a new routine so
-> >> that allocation/freeing of the status page can be done outside of the
-> >> mutex.
-> > 
-> > Seems a bit complex. Can you rename __sev_do_snp_platform_status() to
-> > sev_do_snp_platform_status() and just put a scoped guard in after the
-> > allocation up to just before the "if (ret) goto cleanup"?
-> > 
-> 
-> The DLFW_EX series [1] calls sev_get_api_version() ->
-> snp_get_platform_data() -> __sev_do_snp_platform_status() with
-> sev_cmd_mutex held, so that the cached platform data is refreshed under
-> a single hold of the lock.
-> 
-> The current split between __sev_do_snp_platform_status() and
-> sev_do_snp_platform_status() lets that path reuse the helper with the
-> mutex already held, so I'd prefer to keep it.
+On Wed, Oct 14, 2026 at 8:17=E2=80=AFAM Yosry Ahmed <yosry@kernel.org> wrot=
+e:
+>
+> On Tue, Oct 13, 2026 at 6:17=E2=80=AFPM Kanchana P. Sridhar
+> <kanchanapsridhar2026@gmail.com> wrote:
+> >
+> > On Tue, Oct 13, 2026 at 5:18=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> =
+wrote:
+> > >
+> > > On Thu, Oct 08, 2026 at 11:28:11AM -0700, Kanchana P. Sridhar wrote:
+> > > > When storing a folio in zswap, save the folio's node id in the zswa=
+p
+> > > > entry instead of relying on the zswap_entry being allocated on the =
+same
+> > > > node. This enables optimizations such as batch allocation of zswap
+> > > > entries for large folios using kmem_cache_alloc_bulk() that does no=
+t
+> > > > support specifying a node id.
+> > > >
+> > > > The size of the zswap_entry remains unchanged as 'referenced' is lu=
+mped
+> > > > in with the 'length' (as it doesn't need a full unsigned int anyway=
+).
+> > > >
+> > > > Suggested-by: Nhat Pham <nphamcs@gmail.com>
+> > > > Suggested-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > > > Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+> > > > Signed-off-by: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
+> > > > ---
+> > > >  mm/zswap.c | 23 +++++++++++------------
+> > > >  1 file changed, 11 insertions(+), 12 deletions(-)
+> > > >
+> > > > diff --git a/mm/zswap.c b/mm/zswap.c
+> > > > index ca513a9f89e3..c2731d3acb2c 100644
+> > > > --- a/mm/zswap.c
+> > > > +++ b/mm/zswap.c
+> > > > @@ -194,6 +194,7 @@ static struct shrinker *zswap_shrinker;
+> > > >   *              writeback logic. The entry is only reclaimed by th=
+e writeback
+> > > >   *              logic if referenced is unset. See comments in the =
+shrinker
+> > > >   *              section for context.
+> > > > + * nid - NUMA node id of the page for which this is the zswap entr=
+y.
+> > > >   * pool_idx - id of the zswap_pool that the entry's data is in.
+> > > >   * handle - zsmalloc allocation handle that stores the compressed =
+page data
+> > > >   * objcg - the obj_cgroup that the compressed memory is charged to
+> > > > @@ -201,8 +202,11 @@ static struct shrinker *zswap_shrinker;
+> > > >   */
+> > > >  struct zswap_entry {
+> > > >       swp_entry_t swpentry;
+> > > > -     unsigned int length;
+> > > > -     bool referenced;
+> > > > +     struct {
+> > > > +             unsigned int length:31;
+> > > > +             bool referenced:1;
+> > > > +     };
+> > > > +     int nid;
+> > >
+> > > This will increase the size of the struct now with pool_idx, right?
+> >
+> > I was gathering the struct size with the struct {unsigned int
+> > length:31; bool referenced:1} as suggested in v14, for my before/after
+> > comparisons:
+> >
+> > before:
+> > struct zswap_entry {
+> >         swp_entry_t                swpentry;             /*     0     8=
+ */
+> >         struct {
+> >                 unsigned int       length:31;            /*     8: 0  4=
+ */
+> >
+> >                 /* Bitfield combined with next fields */
+> >
+> >                 bool               referenced:1;         /*    11: 7  1=
+ */
+> >         };                                               /*     8     4=
+ */
+> >         int                        nid;                  /*    12     4=
+ */
+> >         u8                         pool_idx;             /*    16     1=
+ */
+> >
+> >         /* XXX 7 bytes hole, try to pack */
+> >
+> >         long unsigned int          handle;               /*    24     8=
+ */
+> >         struct obj_cgroup *        objcg;                /*    32     8=
+ */
+> >         struct list_head           lru;                  /*    40    16=
+ */
+> >
+> >         /* size: 56, cachelines: 1, members: 7 */
+> >         /* sum members: 49, holes: 1, sum holes: 7 */
+> >         /* last cacheline: 56 bytes */
+> > };
+> >
+> > after:
+> > struct zswap_entry {
+> >         swp_entry_t                swpentry;             /*     0     8=
+ */
+> >         struct {
+> >                 unsigned int       length:31;            /*     8: 0  4=
+ */
+> >
+> >                 /* Bitfield combined with next fields */
+> >
+> >                 bool               referenced:1;         /*    11: 7  1=
+ */
+> >         };                                               /*     8     4=
+ */
+> >         int                        nid;                  /*    12     4=
+ */
+> >         long unsigned int          handle;               /*    16     8=
+ */
+> >         struct obj_cgroup *        objcg;                /*    24     8=
+ */
+> >         struct list_head           lru;                  /*    32    16=
+ */
+> >         u8                         pool_idx;             /*    48     1=
+ */
+> >
+> >         /* size: 56, cachelines: 1, members: 7 */
+> >         /* padding: 7 */
+> >         /* last cacheline: 56 bytes */
+> > };
+> >
+> > And decided to go with the placement in patch 7, since it also
+> > separates out members by compress/decompress path accesses. pool_idx
+> > is set once, and never changes. Further, moving pool_idx to the end
+> > gets rid of holes.
+>
+> Please look at the layout I pasted (quoted below). Your patch
+> increases the struct size from 48 bytes to 56 bytes, undoing the
+> optimization introduced by pool_idx. We need to pack length, pool_idx,
+> and referenced in a single u32 to keep the size constant.
 
-There's some awkwardness there in that __sev_do_snp_platform_status()
-would no longer handle allocating temp page that firmware writes to,
-that will have instead been hoisted up into
-sev_do_snp_platform_status(), so callers will need to duplicate that
-handling (and tracking the 'free' boolean).
+Thanks for the suggestion. I have modified the layout such that the
+size remains unchanged at 48 bytes. The "u8 pool_idx" requires byte
+alignment, so I moved the 1-bit "referenced" field to be before this:
 
-So, while that's originally the sort of use-case I had in mind by making
-it a separate helper, taking the approach below seems cleaner especially
-since it only cares about the sev_user_data_snp_status struct that
-sev_do_snp_platform_status() (in this patch) pulls out from the temp
-page.
+#define ZSWAP_MAX_COMPR_LENGTH_SHIFT 18U
+struct zswap_entry {
+  swp_entry_t swpentry;
+  struct {
+    unsigned int length:ZSWAP_MAX_COMPR_LENGTH_SHIFT;
+    bool referenced:1U;
+    u8 pool_idx;
+  };
+  int nid;
+  unsigned long handle;
+  struct obj_cgroup *objcg;
+  struct list_head lru;
+};
 
-> 
-> If we go with Tom's suggestion instead, the single function takes
-> sev_cmd_mutex itself. In that case, sev_get_api_version() would have to call
-> sev_do_snp_platform_status() before taking the mutex, and pass the result to
-> snp_get_platform_data() as an additional struct sev_user_data_snp_status
-> parameter. That should be fine, since the cached values only change across a
-> firmware update and updates are serialized.
-> 
-> Either way, whichever series lands second will need to rework
-> snp_get_platform_data() for the new helper, and I can help take care of that.
+struct zswap_entry {
+        swp_entry_t                swpentry;             /*     0     8 */
+        struct {
+                unsigned int       length:18;            /*     8: 0  4 */
 
-Makes sense. My plan is to send a v2 with Tom's suggestion in place, but
-will make sure to rework snp_get_platform_data() if your patches go in
-first.
+                /* Bitfield combined with next fields */
 
-Thanks,
+                bool               referenced:1;         /*    10: 2  1 */
 
-Mike
+                /* XXX 5 bits hole, try to pack */
 
-> 
-> [1]: https://lore.kernel.org/linux-crypto/cover.1792014060.git.prsampat@amd.com/
-> 
-> Thanks
-> --Pratik
-> 
-> > Thanks,
-> > Tom
-> > 
-> >>
-> >> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> >> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> >> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> >> ---
-> >>  drivers/crypto/ccp/sev-dev.c | 60 +++++++++++++++++++++---------------
-> >>  1 file changed, 36 insertions(+), 24 deletions(-)
-> >>
-> >> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> >> index c8c229a6757c..37b948a81bc9 100644
-> >> --- a/drivers/crypto/ccp/sev-dev.c
-> >> +++ b/drivers/crypto/ccp/sev-dev.c
-> >> @@ -2554,20 +2554,13 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
-> >>  	return ret;
-> >>  }
-> >>  
-> >> -static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
-> >> -					int *error)
-> >> +static int __sev_do_snp_platform_status(void *data, int *error, bool *free)
-> >>  {
-> >>  	struct sev_device *sev = psp_master->sev_data;
-> >>  	struct sev_data_snp_addr buf;
-> >> -	struct page *status_page;
-> >> -	void *data;
-> >>  	int ret;
-> >>  
-> >> -	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
-> >> -	if (!status_page)
-> >> -		return -ENOMEM;
-> >> -
-> >> -	data = page_address(status_page);
-> >> +	*free = true;
-> >>  
-> >>  	/*
-> >>  	 * SNP_PLATFORM_STATUS can be executed in any SNP state. But if executed
-> >> @@ -2578,10 +2571,8 @@ static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
-> >>  		 * Firmware expects the status page to be in Firmware state,
-> >>  		 * otherwise it will report an error INVALID_PAGE_STATE.
-> >>  		 */
-> >> -		if (rmp_mark_pages_firmware(__pa(data), 1, true)) {
-> >> -			ret = -EFAULT;
-> >> -			goto cleanup;
-> >> -		}
-> >> +		if (rmp_mark_pages_firmware(__pa(data), 1, true))
-> >> +			return -EFAULT;
-> >>  	}
-> >>  
-> >>  	buf.address = __psp_pa(data);
-> >> @@ -2591,19 +2582,45 @@ static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
-> >>  		/*
-> >>  		 * The status page will be in Reclaim state on success, or left
-> >>  		 * in Firmware state on failure. Use snp_reclaim_pages() to
-> >> -		 * transition either case back to Hypervisor-owned state.
-> >> +		 * transition either case back to Hypervisor-owned state. If
-> >> +		 * for some reason that fails, it will have been added to the
-> >> +		 * leaked pages list, so indicate to the caller to not free
-> >> +		 * the page.
-> >>  		 */
-> >> -		if (snp_reclaim_pages(__pa(data), 1, true))
-> >> +		if (snp_reclaim_pages(__pa(data), 1, true)) {
-> >> +			*free = false;
-> >>  			return -EFAULT;
-> >> +		}
-> >>  	}
-> >>  
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static int sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
-> >> +				      int *error)
-> >> +{
-> >> +	struct page *status_page;
-> >> +	void *data;
-> >> +	bool free;
-> >> +	int ret;
-> >> +
-> >> +	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
-> >> +	if (!status_page)
-> >> +		return -ENOMEM;
-> >> +
-> >> +	data = page_address(status_page);
-> >> +
-> >> +	scoped_guard(mutex, &sev_cmd_mutex)
-> >> +		ret = __sev_do_snp_platform_status(data, error, &free);
-> >> +
-> >>  	if (ret)
-> >>  		goto cleanup;
-> >>  
-> >>  	memcpy(status, data, sizeof(*status));
-> >>  
-> >>  cleanup:
-> >> -	__free_pages(status_page, 0);
-> >> +	if (free)
-> >> +		__free_pages(status_page, 0);
-> >>  	return ret;
-> >>  }
-> >>  
-> >> @@ -2615,8 +2632,7 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
-> >>  	if (!argp->data)
-> >>  		return -EINVAL;
-> >>  
-> >> -	scoped_guard(mutex, &sev_cmd_mutex)
-> >> -		ret = __sev_do_snp_platform_status(&status, &argp->error);
-> >> +	ret = sev_do_snp_platform_status(&status, &argp->error);
-> >>  	if (ret < 0)
-> >>  		return ret;
-> >>  
-> >> @@ -3114,9 +3130,7 @@ static int get_v1_svn(struct sev_device *sev)
-> >>  	struct sev_user_data_snp_status status;
-> >>  	int ret, error = 0;
-> >>  
-> >> -	mutex_lock(&sev_cmd_mutex);
-> >> -	ret = __sev_do_snp_platform_status(&status, &error);
-> >> -	mutex_unlock(&sev_cmd_mutex);
-> >> +	ret = sev_do_snp_platform_status(&status, &error);
-> >>  	if (ret < 0)
-> >>  		return ret;
-> >>  
-> >> @@ -3131,9 +3145,7 @@ static int get_v2_svn(struct sev_device *sev)
-> >>  	struct sev_snp_tcb_version_turin *tcb;
-> >>  	int ret, error = 0;
-> >>  
-> >> -	mutex_lock(&sev_cmd_mutex);
-> >> -	ret = __sev_do_snp_platform_status(&status, &error);
-> >> -	mutex_unlock(&sev_cmd_mutex);
-> >> +	ret = sev_do_snp_platform_status(&status, &error);
-> >>  	if (ret < 0)
-> >>  		return ret;
-> >>  
-> > 
-> 
+                u8                 pool_idx;             /*    11     1 */
+        };                                               /*     8     4 */
+        int                        nid;                  /*    12     4 */
+        long unsigned int          handle;               /*    16     8 */
+        struct obj_cgroup *        objcg;                /*    24     8 */
+        struct list_head           lru;                  /*    32    16 */
+
+        /* size: 48, cachelines: 1, members: 6 */
+        /* last cacheline: 48 bytes */
+};
+
+The macro is required to add a build time assertion in zswap_setup():
+
+ BUILD_BUG_ON(ZSWAP_MAX_COMPR_LENGTH_SHIFT < PAGE_SHIFT);
+
+>
+> FWIW, moving pool_idx to the end just trades holes for padding, I am
+> not sure if that's necessarily an improvement.
+>
+> >
+> > >
+> > > Before you patch on x86_64:
+> > >
+> > > struct zswap_entry {
+> > >         swp_entry_t                swpentry;             /*     0    =
+ 8 */
+> > >         unsigned int               length;               /*     8    =
+ 4 */
+> > >         bool                       referenced;           /*    12    =
+ 1 */
+> > >         u8                         pool_idx;             /*    13    =
+ 1 */
+> > >
+> > >         /* XXX 2 bytes hole, try to pack */
+> > >
+> > >         unsigned long              handle;               /*    16    =
+ 8 */
+> > >         struct obj_cgroup *        objcg;                /*    24    =
+ 8 */
+> > >         struct list_head           lru;                  /*    32    =
+16 */
+> > >
+> > >         /* size: 48, cachelines: 1, members: 7 */
+> > >         /* sum members: 46, holes: 1, sum holes: 2 */
+> > >         /* last cacheline: 48 bytes */
+> > > };
+> > >
+> > > After:
+> > >
+> > > struct zswap_entry {
+> > >         swp_entry_t                swpentry;             /*     0    =
+ 8 */
+> > >         struct {
+> > >                 unsigned int       length:31;            /*     8: 0 =
+ 4 */
+> > >
+> > >                 /* Bitfield combined with next fields */
+> > >
+> > >                 bool               referenced:1;         /*    11: 7 =
+ 1 */
+> > >         };                                               /*     8    =
+ 4 */
+> > >         struct {
+> > >                 unsigned int               length:31;            /*  =
+   0: 0  4 */
+> > >
+> > >                 /* Bitfield combined with next fields */
+> > >
+> > >                 bool                       referenced:1;         /*  =
+   3: 7  1 */
+> > >
+> > >                 /* size: 4, cachelines: 1, members: 2 */
+> > >                 /* last cacheline: 4 bytes */
+> > >         };
+> > >
+> > >         int                        nid;                  /*    12    =
+ 4 */
+> > >         u8                         pool_idx;             /*    16    =
+ 1 */
+> > >
+> > >         /* XXX 7 bytes hole, try to pack */
+> > >
+> > >         unsigned long              handle;               /*    24    =
+ 8 */
+> > >         struct obj_cgroup *        objcg;                /*    32    =
+ 8 */
+> > >         struct list_head           lru;                  /*    40    =
+16 */
+> > >
+> > >         /* size: 56, cachelines: 1, members: 7 */
+> > >         /* sum members: 49, holes: 1, sum holes: 7 */
+> > >         /* last cacheline: 56 bytes */
+> > > };
+> > >
+> > > I think we want to reorder the fields. We can probably also avoid the
+> > > bitfield if the maximum page size is 64K (is it?)
+> >
+> > It seems on ARM64, the max page size is 64K, however on PPC, it can be
+> > 256K. So it appears we need at least 18 bits on currently supported
+> > architectures.
+>
+> In this case unfortunately we need to stick with bitfields. We should
+> probably add a build-time assertion that the width of length is enough
+> to cover PAGE_SIZE.
+>
+> > If you agree with the pool_idx placement to be moved to the end as
+> > proposed in patch 7, I can try and optimize this further, by limiting
+> > the "unsigned int length:18", if you think this makes sense.
+>
+> I don't think we can put pool_idx to the end and keep the struct size
+> constant. For length, yeah let's use the minimum number of bits needed
+> and add an assertion, so that the free to use bits are obvious.
+
+This is all taken care of in my latest version.
+
+>
+> >
+> > >
+> > > struct zswap_entry {
+> > >         swp_entry_t                swpentry;             /*     0    =
+ 8 */
+> > >         u16                        length;               /*     8    =
+ 2 */
+> > >         u8                         pool_idx;             /*    10    =
+ 1 */
+> > >         bool                       referenced;           /*    11    =
+ 1 */
+> > >         int                        nid;                  /*    12    =
+ 4 */
+> > >         unsigned long              handle;               /*    16    =
+ 8 */
+> > >         struct obj_cgroup *        objcg;                /*    24    =
+ 8 */
+> > >         struct list_head           lru;                  /*    32    =
+16 */
+> > >
+> > >         /* size: 48, cachelines: 1, members: 8 */
+> > >         /* last cacheline: 48 bytes */
+> > > };
+> > >
+> > >
+> > > >       u8 pool_idx;
+> > > >       unsigned long handle;
+> > > >       struct obj_cgroup *objcg;
+> > > > @@ -672,14 +676,8 @@ static int zswap_enabled_param_set(const char =
+*val,
+> > > >  * lru functions
+> > > >  **********************************/
+> > > >
+> > > > -static inline int entry_to_nid(struct zswap_entry *entry)
+> > > > -{
+> > > > -     return page_to_nid(virt_to_page(entry));
+> > > > -}
+> > > > -
+> > > >  static void zswap_lru_add(struct zswap_entry *entry)
+> > > >  {
+> > > > -     int nid =3D entry_to_nid(entry);
+> > > >       struct mem_cgroup *memcg;
+> > > >
+> > > >       /*
+> > > > @@ -696,19 +694,18 @@ static void zswap_lru_add(struct zswap_entry =
+*entry)
+> > > >       rcu_read_lock();
+> > > >       memcg =3D obj_cgroup_memcg(entry->objcg);
+> > > >       /* will always succeed */
+> > > > -     list_lru_add(&zswap_list_lru, &entry->lru, nid, memcg);
+> > > > +     list_lru_add(&zswap_list_lru, &entry->lru, entry->nid, memcg)=
+;
+> > > >       rcu_read_unlock();
+> > > >  }
+> > > >
+> > > >  static void zswap_lru_del(struct zswap_entry *entry)
+> > > >  {
+> > > > -     int nid =3D entry_to_nid(entry);
+> > > >       struct mem_cgroup *memcg;
+> > > >
+> > > >       rcu_read_lock();
+> > > >       memcg =3D obj_cgroup_memcg(entry->objcg);
+> > > >       /* will always succeed */
+> > > > -     list_lru_del(&zswap_list_lru, &entry->lru, nid, memcg);
+> > > > +     list_lru_del(&zswap_list_lru, &entry->lru, entry->nid, memcg)=
+;
+> > > >       rcu_read_unlock();
+> > > >  }
+> > > >
+> > > > @@ -1449,9 +1446,10 @@ static bool zswap_store_page(struct folio *f=
+olio, long index,
+> > > >  {
+> > > >       swp_entry_t page_swpentry =3D folio_swap_entry(folio, index);
+> > > >       struct zswap_entry *entry, *old;
+> > > > +     int nid =3D folio_nid(folio);
+> > > >
+> > > >       /* allocate entry */
+> > > > -     entry =3D zswap_entry_cache_alloc(GFP_KERNEL, folio_nid(folio=
+));
+> > > > +     entry =3D zswap_entry_cache_alloc(GFP_KERNEL, nid);
+> > >
+> > > We don't need to allocate the entry on the same node anymore, should =
+we
+> > > drop this and let the slab allocator handle it as it sees fit?
+> >
+> > Was this a recent change? I see the folio_nid(folio) on my version of
+> > mm-unstable as of 10-3-2026. Let me check, and yes, allowing the slab
+> > allocated handle this is probably a good idea.
+>
+> We allocate the entry on the same node to avoid having to store nid in
+> the zswap entry (see entry_to_nid()). If we store it, then there's no
+> need to allocate on the node.
+
+With patch 0006, we try to bulk allocate all entries for the batch.
+Only if this fails, we call zswap_entry_cache_alloc(gfp, nid). So
+patch 0006 addresses this already, and the nid is used on in the
+fallback case.
+
+>
+> >
+> > Along the same lines, I have been working on replacing zsmalloc with
+> > direct SLAB allocations for the zswap compressed data storage and see
+> > very promising results: memory savings and latency improvements. I
+> > will submit an RFC shortly.
+>
+> Keep in mind that zsmalloc is movable memory, while slab memory isn't.
+> Zsmalloc may also be less likely to make a new allocation in the store
+> path. There are other considerations beyond memory overhead and
+> latency here.
+
+I realize this means we trade off page migration for writeback for the
+pages representing zswap compressed data. This might not necessarily
+be a bad thing for 2 main reasons, the way I see it in this specific
+context:
+
+1) Page migration would only be transferring a memory pressure problem
+elsewhere. Not sure how well this would work with memcgs or
+containers. At some point someone would need to do writeback.
+2) I don't believe there is a zswap specific page migration flow in
+the kernel other than zsmalloc compaction. IOW, memory tiering
+components like CXL are handled directly in the reclaim path. From
+what I understand, things wouldn't break with slab memory for zswap
+compressed storage, but I could be wrong. I hope to include the
+architecture level considerations/trade-offs in the RFC.
+
+>
+> >
+> > >
+> > > >       if (!entry) {
+> > > >               zswap_reject_kmemcache_fail++;
+> > > >               return false;
+> > > > @@ -1466,6 +1464,7 @@ static bool zswap_store_page(struct folio *fo=
+lio, long index,
+> > > >        * to an unrelated live pool.
+> > > >        */
+> > > >       entry->pool_idx =3D pool->idx;
+> > > > +     entry->nid =3D nid;
+> > > >
+> > > >       old =3D xa_store(swap_zswap_tree(page_swpentry),
+> > > >                      swp_offset(page_swpentry),
+> > > > --
+> > > > 2.39.5
+> > > >
