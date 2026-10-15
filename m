@@ -1,84 +1,81 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C96F4F4CF8;
-	Thu, 15 Oct 2026 09:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDE04FD79B;
+	Thu, 15 Oct 2026 09:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792056541; cv=none; b=fuTIFtXD86U6+q2i3PYRjXnSjBOFxpw/XSA6xdCqjLO4d73Hu6Vta19jvREjV4HsU9gfMy4fN05HSV1ZfPyl8wY3XEIbxtLAYjczzne7X4pMA/JUx/xgvFPTuZ2XJ00/BQUOEskTaYZSvAfjrICdxa2Q5RGwwHtIDQOQe27heFs=
+	t=1792056786; cv=none; b=U1QNVXQ9oaNR13as27sv2XIXAHmI9yssqSp3K/q5fd+zGOwmg2RiOYLqOIeVqRLhjoDHBTWu5jUwtu7ebkBt0aIb5a5mF2jP3ikcgGXA4Fqs8vhlcXeKaDczZGRli7bfNmbY/yul2oT9kbxEqUitkXispXy4KdT9ThWNDnkJRUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792056541; c=relaxed/simple;
-	bh=Nl8VkwGaBcP/N8FspndVAhEflLmE5wqIknTXtjCmsWY=;
+	s=arc-20240116; t=1792056786; c=relaxed/simple;
+	bh=LpNClCQP5Is+elo/pq8lLIDHPbjUVBpwERR2/acZ+h8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FLrbGijTQmWwe4dL75VB6zm7CJUEhrRUJ5rXlF9OZGTH17rQNJCk0VSxVrGe40wiFQ2lnQMNpOPogZ+HYnqVleYCuOLCxHpe2bQYVRIA+9tl2ZrJ+SD2RiwxFsG/WjQ3MbvscTCg9l3IZd96ozXOPVFA88mwU1nxnOWHRtLSlyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Dw4qs80Q; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=AfFkWvzc/bMVOSKda5julfi9hKmnpY4/j4SM8zU10m9D5uvAwwb2BifPetgsHSHIXuYooYFcCCT6A+sqC41kDzQkdnCaexXDZ1ZY4Euha9UOx0KTgARmjFtIXQ4BOMQbwpJOYlQ37sgLB22OXH4aJDQaafVm/4u69mlABogRPoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Td4Bk9E2; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Dw4qs80Q"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Td4Bk9E2"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=Fxg1YO8+1v3pgTZaMH0CQqYIAiEVWkzSl5zghob1uo4=; 
-	b=Dw4qs80QjEjfRqNgfYVRBjrN3bGbUW5KCArqu3/UP7/OpUhw6mLY/jkB/NfzbAKj8HJuyJN0TQU
-	1jvjqafIT72sK829tKvsoKVL4PsaMDAj88ufYXr7JJOzSvIYPFetuaXRkMYzCHN5rzFRpEryI6R7T
-	iXNN06q3N4cl5G+MhTb5gouUY7gRMkOzRHVMwyQVLwKalNAg3a/0qwTyKPPLQpWqtSvNQkYm68fUG
-	mHTCdbCigffKV4rvGtw45ocF2Ujxx/ChNLqewsQiMj++xoQ1qpsFOhqOGFssdE4d69orVr6znFW4S
-	D4dARR1ffGYvHYvVnSl2JxTUS3Rr/eDZNChQ==;
+	from:content-type:reply-to; bh=gqXL7E3N1x1LB8og9YdmknDi+YHVB1OXC5g35twuSCs=; 
+	b=Td4Bk9E29YBqTwLpaSyL0uIyAgwH02M2fYxO7/X8OGffbsCHsvS8iSS7ct97aWJGrzaJ5PQyXJN
+	Sttoq04OQLcRd8d8zV/VfBbv3RQ8Nszlc4RzYTeAFYVXltKZSzI4sOzjpHPLFdGqCFBKsjTsy+3td
+	LCvDeuCyk6TRikkn4XiDOQeHzmbeut56ydMyIxMNRMreUqgbGDNucUb/NrJ7+xNdX3TxKr29JjbVg
+	yorq1gQkKB3fml/e/rRZS0YJMrVUyCjVvTwhBukyGC5P2UC9XknakmfC28JZPa1dtCkN0LJe4BeKp
+	z/PqUycrslgimsUQMNdi4sILZP9fnGSVYDKw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xHHla-000000047Ip-1hPX;
-	Thu, 15 Oct 2026 17:28:51 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 Oct 2026 20:28:50 +1100
-Date: Thu, 15 Oct 2026 20:28:50 +1100
+	id 1xHHpa-000000047NJ-2kY4;
+	Thu, 15 Oct 2026 17:32:59 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 Oct 2026 20:32:58 +1100
+Date: Thu, 15 Oct 2026 20:32:58 +1100
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: =?iso-8859-1?B?Suly6W15?= Jean <Jeremy.Jean@oss.cyber.gouv.fr>
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Sahil Malhotra <sahil.malhotra@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Runyu Xiao <runyu.xiao@seu.edu.cn>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [REPOST PATCH] crypto: caam - reject overlong RSA CRT parameters
-Message-ID: <atCc0iL0RrDLwHHX@gondor.apana.org.au>
-References: <20261008093553.384608-2-Jeremy.Jean@oss.cyber.gouv.fr>
+	stable@vger.kernel.org, Jianhao Xu <jianhao.xu@seu.edu.cn>
+Subject: Re: [PATCH v2] crypto: inside-secure: initialize EIP93 state before
+ requesting IRQ
+Message-ID: <atCdyvlEqqhgK-Fz@gondor.apana.org.au>
+References: <asXl69ABi0_1ZKIJ@gondor.apana.org.au>
+ <20261009033149.1127441-1-runyu.xiao@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261008093553.384608-2-Jeremy.Jean@oss.cyber.gouv.fr>
+In-Reply-To: <20261009033149.1127441-1-runyu.xiao@seu.edu.cn>
 
-On Thu, Oct 08, 2026 at 09:35:53AM +0000, Jérémy Jean wrote:
-> caam_read_rsa_crt() right-aligns dP, dQ, and qInv in buffers sized
-> from the corresponding prime. rsa_parse_priv_key() only bounds these
-> integers against n, so a malformed key can provide, for example, a
-> two-byte dP with a one-byte p. dstlen - nbytes then underflows and
-> memcpy() writes outside the allocation during set_priv_key(). KASAN
-> reports a slab-out-of-bounds write in caam_read_rsa_crt().
+On Fri, Oct 09, 2026 at 11:31:49AM +0800, Runyu Xiao wrote:
+> devm_request_threaded_irq() can invoke the handler as soon as registration
+> starts. Initialize EIP93 state before requesting it and leave device
+> interrupts disabled until registration succeeds.
 > 
-> Reject empty or overlong CRT parameters after stripping leading zeros.
-> qInv is consumed by CAAM as a p-sized value, so size it from p rather
-> than q to match the DMA mapping in set_rsa_priv_f3_pdb(). Let the
-> top-level key cleanup handle partial form-3 allocations and return the
-> specific error to the caller.
+> If IRQ registration fails after the hardware and rings are initialized,
+> call eip93_cleanup() before returning. This shuts down the engine and
+> clears the ring registers before devres releases the DMA rings.
 > 
-> Also test nbytes before dereferencing it while stripping zeros, so an
-> all-zero integer does not read one byte beyond its input.
-> 
-> Fixes: 4a651b122adb ("crypto: caam - add support for RSA key form 3")
+> Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
 > Cc: stable@vger.kernel.org
 > Assisted-by: LLM
-> Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
 > ---
->  drivers/crypto/caam/caampkc.c | 69 +++++++++++++++--------------------
->  1 file changed, 30 insertions(+), 39 deletions(-)
+> Changes in v2:
+> - Call eip93_cleanup() if IRQ registration fails after device initialization.
+> 
+>  drivers/crypto/inside-secure/eip93/eip93-main.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
 
-Sahil, could you please review this patch?
+Please check the Sashiko comments:
+
+https://sashiko.dev/#/patchset/20261009033149.1127441-1-runyu.xiao%40seu.edu.cn
 
 Thanks,
 -- 
