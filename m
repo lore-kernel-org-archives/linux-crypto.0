@@ -1,120 +1,75 @@
-Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7461250AC16;
-	Thu, 15 Oct 2026 12:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D5E51DDE4;
+	Thu, 15 Oct 2026 12:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792066688; cv=none; b=lzdK/uorXzAfi4evzqYT7R7lbSd6ehDQDetyJRYgJpbQlYcvCs4QmjqLvtCmyrDFTNjVW8AC6X4Tbvi3DAoxVNPJraWMVWYFSu6SNYq0jUJOIwTvcKKkeL4YNySmxKMTCALEdAeT5IyDxWLXbEYC6RudswTRlB1XcagnynvUXwc=
+	t=1792066805; cv=none; b=ArC17B84kF5ouz121x1HnTLCe0Tbi32KmztaSgOjdrCBm05SXU86upScdV+vheEzJbhi85HxNK7b8bH2hgz+8oxFD38IGamFjAHPuITOIbAfetoy04MAtq6F7woEGf9Uu2RLd/qbX/BkYfLiRu1MRp8oDNir87lX979JpOnJYZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792066688; c=relaxed/simple;
-	bh=uFfsc/LL4b/iH319BQTBnPd1ZuW4g8jJxIvJfoiDeoQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pbm/dxv+mMEW4fH3eXgxJw2uOMQVCvMtBtKVdr1G8fAfgymDC+Cq/l+n+UoY2w9cy5b5Ty9l0GZX4SzGo/yt6ydHDgyJ2Y0CAcMgFMxfM/fbbMkntZmI9fw33TmxOEQKOR+wyRhB+FIfSqDABf4beWKnRGjmppwGblGvF+ctb8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=n6euxqdP; arc=none smtp.client-ip=51.159.188.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
+	s=arc-20240116; t=1792066805; c=relaxed/simple;
+	bh=VUDM9gtow3o4LRWb+E3zC51mYjtRZmtrBgYtfTqbMJI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ImMwqrON6IKuXzSpwlms0IJgfdDmKNIhnmLgO5iJTD1l/V+hMJ55VBLeyTit9wc6IrKYBXcrFk2pOnNa3a7Ncv0e2KdouF7EShv1pUcUC4somf7+bUijkFLqBJzwCYjw3UccTru/CBbhfJlsBblT1Z7HTGB+9egZ7p0uyyI4al4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Y/2AGAzG; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="n6euxqdP"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Y/2AGAzG"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Reply-To:Sender:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=lfoZsQALvUMmYEnTHCBAppb4AEAOhQSzIaYLEzo0HLg=; b=n6euxqdPcLU/zI+h4/ki2g3uk+
-	b8iEKOHO5fBjaTGHPrF4QhtPZVctthWakc6e1RxRQnup3zQ7pTkMJ17HBb7vpMFasr6A2WPY2z+aC
-	YB6OHDQVKP8FKLxpKXzYhPluX9OmBSYoVU58dNhtNF42XK5aeq8GYw5bZRbDaNKtZkJEiYdHiPZri
-	qbvI6ZYTiqLJBY/4KFCk7Ts0gamOVQTbynFDNds+MVaZ3XUPTUXfi1ZZ3cnbJq/IFSIvgAKxSiwtD
-	zVCe8H9OiJUb1sTfAVpF4Pkrjil/OTk8Mj3WQqhFflEjMLg0hS9zPFoE9QE4BTLmvasPF1fwf5cmb
-	hSPeYyFw==;
-Received: from [151.115.150.205] (port=50348 helo=gepetto..)
-	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.100.1)
-	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
-	id 1xHKPO-0000000E4hm-1KOt;
-	Thu, 15 Oct 2026 14:18:05 +0200
-From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] crypto: essiv: fix use-after-free in AEAD path
-Date: Thu, 15 Oct 2026 12:17:43 +0000
-Message-ID: <20261015121743.3151400-2-Jeremy.Jean@oss.cyber.gouv.fr>
-X-Mailer: git-send-email 2.47.3
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=Jd3nfwLVD1yY89LAQ7zdBuWux1fPDOKfqkLmrKOVgvs=; 
+	b=Y/2AGAzGGUWx9SX3XQo3/HpKTdPXoE7X16tgY9cMiJyGSL9wPKB5kH16xOw545LMvF2NONJm50I
+	nDbZtaiw9zEOP0LjWEETm9ql8qoYgX2IUfke8pvsPKrgOBHatk3OZEy9fNtn+8zZ12TV5voQk3HyM
+	WciN8M5ljQA/KxL1b/JblKx8qrz1NQXO7/nCtRkltiLbt22Zp+vGEp1zpqw0cOw2q4BQRuGd5dYP3
+	z/T1jqE1Zja4pCMfTax1YpYKMJKfDu3EbJ7H5Fi+LO6BQUpHMQhDOhUDJk3iHVRWIoY5bKsk564kP
+	8R0WI98CshKJ98Bd1pzT24uISu+OsUhBmIyg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xHKRB-00000004ArB-0W9x;
+	Thu, 15 Oct 2026 20:19:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 Oct 2026 23:19:57 +1100
+Date: Thu, 15 Oct 2026 23:19:57 +1100
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: =?iso-8859-1?B?Suly6W15?= Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: essiv: fix use-after-free in AEAD path
+Message-ID: <atDE7dqBGm63pkde@gondor.apana.org.au>
+References: <20261015121743.3151400-2-Jeremy.Jean@oss.cyber.gouv.fr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
-X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
-X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+In-Reply-To: <20261015121743.3151400-2-Jeremy.Jean@oss.cyber.gouv.fr>
 
-The request that ESSIV submits to its wrapped AEAD transform may
-finish before crypto_aead_encrypt() or crypto_aead_decrypt() returns.
-In case this happens, essiv_aead_done() calls aead_request_complete()
-on the original ESSIV request, which can end up freeing the request
-before essiv_aead_crypt() resumes, creating a UAF:
+On Thu, Oct 15, 2026 at 12:17:43PM +0000, JÈrÈmy Jean wrote:
+>
+> @@ -247,11 +248,12 @@ static int essiv_aead_crypt(struct aead_request *req, bool enc)
+>  				  essiv_aead_done, req);
+>  	aead_request_set_crypt(subreq, src, req->dst, req->cryptlen, req->iv);
+>  
+> +	assoc = rctx->assoc;
+>  	err = enc ? crypto_aead_encrypt(subreq) :
+>  		    crypto_aead_decrypt(subreq);
+>  
+> -	if (rctx->assoc && err != -EINPROGRESS && err != -EBUSY)
+> -		kfree(rctx->assoc);
+> +	if (err != -EINPROGRESS && err != -EBUSY)
+> +		kfree(assoc);
 
-  BUG: KASAN: slab-use-after-free in essiv_aead_crypt+0x8e6/0x950
-  Read of size 8 at addr ffff888102af1360 by task init/66
+There is no need for assoc at all once the rctx->assoc test is
+dropped.  If the condition is true then rctx cannot have been
+freed.
 
-Keep the temporary assoc pointer in a local variable before submitting
-that request.
-
-Fixes: be1eb7f78aa8 ("crypto: essiv - create wrapper template for ESSIV generation")
-Cc: stable@vger.kernel.org
-Assisted-by: LLM
-Signed-off-by: J√©r√©my Jean <Jeremy.Jean@oss.cyber.gouv.fr>
----
-
-Changes in v2:
- - Drop the NULL check before kfree(), as requested by Herbert Xu.
-
-v1: https://lore.kernel.org/linux-crypto/dcf362bd924d7090dbd03ef8af7a6ece@oss.cyber.gouv.fr/T/
-
- crypto/essiv.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/essiv.c b/crypto/essiv.c
-index a47a3eab6935..8dcaef823c05 100644
---- a/crypto/essiv.c
-+++ b/crypto/essiv.c
-@@ -189,6 +189,7 @@ static int essiv_aead_crypt(struct aead_request *req, bool enc)
- 	int ivsize = crypto_aead_ivsize(tfm);
- 	int ssize = req->assoclen - ivsize;
- 	struct scatterlist *src = req->src;
-+	u8 *assoc;
- 	int err;
- 
- 	if (ssize < 0)
-@@ -247,11 +248,12 @@ static int essiv_aead_crypt(struct aead_request *req, bool enc)
- 				  essiv_aead_done, req);
- 	aead_request_set_crypt(subreq, src, req->dst, req->cryptlen, req->iv);
- 
-+	assoc = rctx->assoc;
- 	err = enc ? crypto_aead_encrypt(subreq) :
- 		    crypto_aead_decrypt(subreq);
- 
--	if (rctx->assoc && err != -EINPROGRESS && err != -EBUSY)
--		kfree(rctx->assoc);
-+	if (err != -EINPROGRESS && err != -EBUSY)
-+		kfree(assoc);
- 	return err;
- }
- 
+Cheers,
 -- 
-2.47.3
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
