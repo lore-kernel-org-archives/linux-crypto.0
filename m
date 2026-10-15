@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347CD352037
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 22:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434E449A3A5
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 22:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792101880; cv=none; b=J16VzTZG7dFanvgw8flki05rxpUjcVaSd2bQH1UWlYjJmQk20y1JzZIRFpLZxhLxS7hfuwXTavp2NlF2gpK7dg7ey6DxnTeZPP+P7wsnbLirKwk9KqjasItJDYmWqA1TXQMqQGxdz1CgYgj5EmDn/0axAo6FPO+SAOcYgpIF9jA=
+	t=1792101984; cv=none; b=kY3HRifJHW1Yn8C09kU8BY9dsOWsHV9lybjtIZma2Q+4NkehuuiikiuL47xJjcnXJmiOquFjeBYNt25FtXvMn4kYqS8MWrhyG64lA3AFI6lLU670pcCMr8lcZvz+lMgSsT1vRIYGYbE5/1wZ1vCAGysYoUwVB8Gq7yD50/DozM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792101880; c=relaxed/simple;
-	bh=TBX5A67YSsWuxAB/4TO7PVxB29M1xxONXuyWhIREFeI=;
+	s=arc-20240116; t=1792101984; c=relaxed/simple;
+	bh=nrAOSkpfvvC53d8wyV+4GEFbopuHgXUDky8Zx5ZxtII=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=msTGLH3cY74IRmAbhW+AIiyFLuIvk6Dc81nZCkJjopoU+CE7tHYG1lkF1Y2kMmtFKo/F59xmGZBXF6LbFptKkeXfQUOzUaGWTtIsRJMpzs/H/qUVMtyrHYMb7Hqjv+F1riBikE5CyDl3PJ0rkVp3ZWUkq7ZOfgUnU/Y12kwgz1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DJT0+jrL; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=AoDlHZigcjzz9KGWkBeypzKluWDwVxuvzlGRVbVhuO2M8N7zmp5ULmVJBJDw3R/m8/zQaAu8HbosZV2uToHlaYNryvsOzq0zSr0NYUg1gjysynDBLdjrU8n3uAeP4UqhC0xmLD06+itOqZxEHYY8xk5bqVz1eV2VjjHWrqO3UvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itmch/aA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJT0+jrL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D32571F000CC
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 22:04:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itmch/aA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCCE51F000C7
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 22:06:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792101878;
-	bh=RlYzd0USpwg3JvbStBZnQdUC/IjyPKMmb+JkSAhgO4c=;
+	s=k20260515; t=1792101982;
+	bh=mJbsb6dU/XznSRrcG1GSuxTRuvW4/61fnYkUcg+ByiM=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=DJT0+jrLOGQd88lrqJAj8DabydJnd2u7QOrmT2Txk0viriqWFku9s8wrt5PECKnOs
-	 69hEyT85EXJ/EQiNhU1aPp6e0XCy+NQg9bdIIQabSSQRQqJ5ECf1WVPDG21nIIe+Ki
-	 rPnh5lg+hS5i6/uhd1UrMHRRrCZVxgoaVM9VnLYUZ85lOaZ6ONWn5D1HMoUkvcHtLp
-	 H6lPS6nxQIzY1ff3xdtZyF6VKoRRL/DTJdw8Te1P7VfQ2WGaXaDjASwxx+9nd0HuUO
-	 20Zyxjs8ZGUymprw0fADj/AXo+540TeHGZH7gkZ9zK83hFvc9YTivBuHzKKVRfnTt2
-	 HYXFjlBE91Zow==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c2e6df2742cso884599866b.2
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 15:04:38 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxoYgkSbSTYOYJOmZ9wRO0zWIyMzTpIOM+u+dbSGnXFjrMl1FH0GrDKPcC7X5Jwou5TjtsU4CuwkZyD2Ok=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ6JjtQ/XsGoAB6MaWqeoEqzIHRceZk19ODvUmX3Glr+GrrI/Zj
-	u762XTfyBbmQ42eWNaPAbOkoF5nZ2wSugpD36XsWMlZQyciFo8MnKH8mRPYmvzz/Nrw4Vcp396o
-	4mlGqvA3v20wxAn2zg4zGi5XSl0urQW0=
-X-Received: by 2002:a17:907:dab:b0:c2d:fade:e089 with SMTP id
- a640c23a62f3a-c31a96de49dmr1933015666b.0.1792101877742; Thu, 15 Oct 2026
- 15:04:37 -0700 (PDT)
+	b=itmch/aArHNeBR/ur+BnCI+m882cF1KxHAM9x0OT8uMYRvdLvVM1x0/qIeS151x5L
+	 Fyoo6cz7VRpbhDZKe915EUj0SEQmP9ybIJeRc0PFePcvDsOkr9Vp4CPO3d1xGYscXF
+	 dbfazzin059JqRPz3VadX8oAMj3XjSxudqglgs1/2e6P8WvVvJUi1DsKmNkiwdEjty
+	 NEouf7vKm/ktaNHDjyjQ3SOVQcRcHQ8iW/KPBaddWhbyemcvbzDeVFV419KEhJ1KeS
+	 M8ntuHWI6hkqyNPOCcAOVXFVhrJO4TJWxjMZt75aEm0U7ve0+2/aJE4ClWgWI3zSip
+	 MKTC1HRN8MPYQ==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c2e8c710847so728151766b.0
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 15:06:22 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxZakXrk3FLfMoMumm+/M/bqhgz1H8AvqKwRmEewqeI2LB6ZrhSGXJZNAt3PLRDZ9VHXgnZFXhq4vtS5h0=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJkiU4NX8aUvvPbNEfiDE/ix37kvBjRz1CHC+oBu1sYvL1kuAFL
+	Vwg2uxIvVBIMMOvGKk7cE7TuBfH+iztSd9V2YnmfWPiexiEpU53lvQ1qeIixbMi+XLQ6sOo8zfQ
+	HGQHm17eaVOpitNsZ0cy1UGljVHmyyYE=
+X-Received: by 2002:a17:907:8692:b0:c2e:2720:8f68 with SMTP id
+ a640c23a62f3a-c31aa01b41fmr1817223366b.46.1792101981739; Thu, 15 Oct 2026
+ 15:06:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,14 +42,16 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20261008182814.27450-1-kanchanapsridhar2026@gmail.com>
- <as-jZopKRfuYAiTE@google.com> <CACpmpoeS_cvXRWJXqiYZV9oykk=91efv8KtZgK2Pi-QwHnQH3A@mail.gmail.com>
-In-Reply-To: <CACpmpoeS_cvXRWJXqiYZV9oykk=91efv8KtZgK2Pi-QwHnQH3A@mail.gmail.com>
+ <20261008182814.27450-8-kanchanapsridhar2026@gmail.com> <as-izeIj5bP01bna@google.com>
+ <CACpmpof++tM9MUYgqgenwEBfaaJ60VsDwptK7Ne_-b+-DKMRZg@mail.gmail.com>
+In-Reply-To: <CACpmpof++tM9MUYgqgenwEBfaaJ60VsDwptK7Ne_-b+-DKMRZg@mail.gmail.com>
 From: Yosry Ahmed <yosry@kernel.org>
-Date: Thu, 15 Oct 2026 15:04:26 -0700
-X-Gmail-Original-Message-ID: <CAO9r8zN5n=9v4K+OtEEODg=e0kcFW99PreUcZm09q9CUMQc+ew@mail.gmail.com>
-X-Gm-Features: AclHuK9As4WppohD6ZJZNrzjy04-7wgYHo0FQv2W3Z0D8lo9pnmEnN3DgsfpTfg
-Message-ID: <CAO9r8zN5n=9v4K+OtEEODg=e0kcFW99PreUcZm09q9CUMQc+ew@mail.gmail.com>
-Subject: Re: [PATCH v1 0/8] Batched zswap_store() with compression batching
+Date: Thu, 15 Oct 2026 15:06:09 -0700
+X-Gmail-Original-Message-ID: <CAO9r8zPpmLyMHF+yDb2ZHRmSdAHFTNvsu8PZsQ2Z-EVvF-dc3g@mail.gmail.com>
+X-Gm-Features: AclHuK-S4zsk6EqmhjsVui6ifjRKos1ouVvuuztrm3peIKBuRi4LD8-5u9AW2Mg
+Message-ID: <CAO9r8zPpmLyMHF+yDb2ZHRmSdAHFTNvsu8PZsQ2Z-EVvF-dc3g@mail.gmail.com>
+Subject: Re: [PATCH v1 7/8] mm: zswap: Optimally place members of struct
+ zswap_pool, struct zswap_entry.
 To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
 Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
 	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
@@ -59,109 +61,51 @@ Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 15, 2026 at 3:00=E2=80=AFPM Kanchana P. Sridhar
+On Thu, Oct 15, 2026 at 2:49=E2=80=AFPM Kanchana P. Sridhar
 <kanchanapsridhar2026@gmail.com> wrote:
 >
-> On Wed, Oct 14, 2026 at 8:45=E2=80=AFAM Yosry Ahmed <yosry@kernel.org> wr=
+> On Wed, Oct 14, 2026 at 8:43=E2=80=AFAM Yosry Ahmed <yosry@kernel.org> wr=
 ote:
 > >
-> > On Thu, Oct 08, 2026 at 11:28:06AM -0700, Kanchana P. Sridhar wrote:
-> > > v1: Batched zswap_store() with compression batching
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
+> > On Thu, Oct 08, 2026 at 11:28:13AM -0700, Kanchana P. Sridhar wrote:
+> > > Place and align the members of struct zswap_pool and struct zswap_ent=
+ry
+> > > such that members used together in compress/decompress hot paths are
+> > > able to share the same cacheline. Minimize holes within these structs
+> > > while doing so.
 > > >
-> > > This series is a spin-off of "v14: zswap compression batching with op=
-timized
-> > > iaa_crypto driver" [1], and focuses on the generic crypto_acomp and z=
-swap
-> > > compression batching enablers. Resuming work on this series following=
- a gap
-> > > since v14 (January 2026). Please note that my email address and affil=
-iation have
-> > > changed from kanchana.p.sridhar@intel.com to kanchanapsridhar2026@gma=
-il.com. I
-> > > have retained the original Intel sign-offs on prior patches for histo=
-rical
-> > > attribution while signing off v1 of this series with my current addre=
-ss.
+> > > Signed-off-by: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
+> > > ---
+> > >  mm/zswap.c | 10 +++++-----
+> > >  1 file changed, 5 insertions(+), 5 deletions(-)
 > > >
-> > > To summarize the main contribution of this patch series: Batching is =
-introduced
-> > > in zswap_store() of large folios: we carve out a large folio into bat=
-ches of
-> > > ZSWAP_MAX_BATCH_SIZE (8 pages) for software compressors, and store ea=
-ch
-> > > batch. Moving the fundamental operations that need to be happen to st=
-ore a page
-> > > to now work at the granularity of a batch offers opportunities to opt=
-imize them
-> > > from these perspectives:
-> > >
-> > > 1) Utilize existing kernel API that minimize obtaining locks for bulk
-> > >    operations, e.g. kmem_cache_alloc_bulk()/kmem_cache_free_bulk().
-> > >
-> > > 2) We keep the working set for each of the core store functionalities=
- (alloc
-> > >    entries, compress pages, store pages in zsmalloc) to be focused on=
- a
-> > >    batch, thereby minimizing cache evictions and benefiting from cach=
-e
-> > >    locality.
-> > >
-> > > 3) Along the lines of (1), the main zswap_compress() batching routine=
- obtains
-> > >    the acomp_ctx mutex lock once per batch, and releases it after it =
-has
-> > >    processed all pages in that batch.
-> > >
-> > > 4) Any zswap store functionality that works on a batch can potentiall=
-y be
-> > >    parallelized as a next step, to further improve performance.
-> > >
-> > > Performance data: usemem with 60% over-commit:
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > diff --git a/mm/zswap.c b/mm/zswap.c
+> > > index 8ae67fd10522..ade84ac4076e 100644
+> > > --- a/mm/zswap.c
+> > > +++ b/mm/zswap.c
+> > > @@ -160,11 +160,11 @@ struct crypto_acomp_ctx {
+> > >  struct zswap_pool {
+> > >       struct zs_pool *zs_pool;
+> > >       struct crypto_acomp_ctx __percpu *acomp_ctx;
+> > > -     u8 compr_batch_size;
+> > >       struct percpu_ref ref;
+> > > -     struct rcu_work release_rwork;
+> > > -     struct hlist_node node;
+> > >       u8 idx;
+> > > +     u8 compr_batch_size;
+> > > +     struct hlist_node node;
+> > > +     struct rcu_work release_rwork;
 > >
-> > How much of the performance benefits come from patch 6 vs patch 8?
+> > compr_batch_size is added by this series, why not just add it before id=
+x
+> > to begin with?
 >
-> This is how the performance changes: Average throughput is averaged
-> from 10 iterations of usemem.
->
-> patch 6: 19,119 KB/s
-> patch 8: 17,593 KB/s
->
-> So the acomp_do_req_chain() path that ZSTD goes through with patch 8
-> causes a regression, even though it provides a generic batching
-> framework in acomp.
->
-> I was able to retrieve performance with the following change in acompress=
-.c:
+> In patch 0006, where compr_batch_size is introduced, I was attempting
+> to place it in the same cacheline as the acomp_ctx. This increased the
+> size of struct zswap_pool to 248 bytes. I later optimized this in
+> patch 0007, bringing back the size to 240 with the addition of
+> compr_batch_size.
 
-Why add it to begin with in this case?
-
->
-> patch 3 with this change in acompress.c: 19,578 KB/s
->
-> diff --git a/crypto/acompress.c b/crypto/acompress.c
-> index 192ea996e779..dc609bd7d927 100644
-> --- a/crypto/acompress.c
-> +++ b/crypto/acompress.c
-> @@ -293,8 +293,12 @@ int crypto_acomp_compress(struct acomp_req *req)
->                 return -EAGAIN;
->
->         if (likely(req->unit_size && acomp_request_issg(req))) {
-> -               if (!crypto_acomp_req_seg(tfm))
-> -                       return acomp_do_req_chain(req, true);
-> +               if (!crypto_acomp_req_seg(tfm)) {
-> +                       int err =3D tfm->compress(req);
-> +
-> +                       req->dst->length =3D unlikely(err) ? err : req->d=
-len;
-> +                       return err;
-> +               }
->
->                 return tfm->compress(req);
->         }
->
-> Herbert, would you be Ok with this change in patch 3?
+This doesn't make much sense, and the size of zswap_pool is not that
+important (usually only one globally). I would drop the patch and add
+compr_batch_size directly where it needs to end up.
