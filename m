@@ -1,238 +1,219 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85DC2931CB
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 02:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792119395; cv=none; b=f1cFkiMrmGuvdLZIOKaLBW3mP1fpqhQS2K9jW6x6NpYkdJ5ZjMs2xZOJAI6RRoqIJqeyI9wxxWeyFJ6wgkH2IMzmbo4iD2N9lgmw2bCfiteiT+5YDCgPpCReK4URHPfQTdhmar9SZb3K/t/vi/k0yyC69zgSQ8NF5KN7reovAQo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792119395; c=relaxed/simple;
-	bh=ly9Gp1edPrykZwMrtTjoN923qXipFzVP+nvyEDSatSw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hmA35Yf0M+0oCBwo48D+E/Qu3a+qD7JbsOPnIX6GL9Fkj/jMZKsb0/wNERlJnRDYtBYa5Mh2dk9yIpLGt609k+Pfft29VMoNcUZXYmxvuxK946HiHxWHi1AiYg1zPTWAwa7rwVe7M2x3Yaofz4RsMv1jbc2bv9fVlAHihG1s7RA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bc1vbril; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CDB2F7EE1
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 03:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792121558; cv=pass; b=Qo8ShagPo1RAU15zRBKpPVa4EVO9dVcsBEvXGR7f3rXkoh3I/CO+7/MkC1bZOMxpFUzqh0ot0zYogN2cY8SHxYqu0ezNuVGe8GR5brRJZUsSMHLZiwiMCRODvZYp6TgS72yK1fq5gYm99pySKKC7LB5wsvpPSWNnAzd6q+EFlss=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792121558; c=relaxed/simple;
+	bh=06zrE62fKrgiwoRcGb8h+2HCp2UBFMGvqy4x7WN+014=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LMDfWh0oLtGGINBLjlW16CyMfIeH9TBcoPVDxAf6q0CgqnFEd3oHXymV5mMlGHMsWnT2TX44uF98WIZozvVN+hbjOZYnXrcLr5pujp2K59lZk1flXwV13HmrJJTCwiqbMXExMB/Dx47/J+K96sNLaf19rLxcwGJquX4OIZoS3kU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qEBIBlM+; arc=pass smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bc1vbril"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3ab4178ee33so3511796a91.3
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 19:56:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qEBIBlM+"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5ba3ec92031so6184941e87.2
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 20:32:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792121554; cv=none;
+        d=google.com; s=arc-20260327;
+        b=sY+LAOmAW/26qff4/+pTaanMMNdKnF8AbfdFDEkGsyC9xKuCe9+PDP4j64NeotO92p
+         wJnRoU+MPMBchcOnK9S0Jucnw4KcpoBNqHkDhoRXtYx49RztPls6rwipw4D1uz4LQZok
+         mPkSCyTi0rcWdswB84HwzAtwdHhvDHBef5UnXl7GTP78VrTBufVyXKtruXwmWONti9Tf
+         aNS4GrztNDH2gQzObCZ0y7B2I1B2x3llryKah68lsRYfogyHlVOigk9RtWrJZgAenGfN
+         JtaLbKGjm8sat2MLpDbssPpoCUiCufybOcmBjtAWw+eNEIxuMKzmN3TwtueTnyKUu/rj
+         gK7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=mthJ2xXwzbGlymovK0MC30zhpam2OvKpb9vmh5KmEw0=;
+        fh=1LckI8XCX3n9+OPgRE1glmN9OCCBkySfxiA422DgmZI=;
+        b=Oiiv7pB3NZfeYGfTwoXyeym2/M+TH7Fr3Y1LC3WmY43m06C5w92UJDuOwcPJwhTGDj
+         rCcdFnff1rFAy+2eCNudQWvBFET/2AYFjdqzKu3AEwSXnhF4wShTZGBij+dqm5NL48O5
+         cqjMnz/hCi7Zw3MnKN1Q7IYf0aVjVvK4Zwc9NPvxy8bD6zliVDxT0yk158ZozJpYlO4U
+         tepOhw59SL72akiEcRAbNlRFmiRVk00BVIYFlDu3qYBxHH0+4uikGrFNjMExrLX7sCPh
+         oqYbTvjDQ47OlNUz8gPgX/rJbKC9tllNIHkGsWN6ldRgXcJV6VEgpwxOZZUu6Dp1aRXM
+         5oPw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792119393; x=1792724193; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YBCbS2lucYXeU4DN4VBsPd4Qhjg270QLVoP9SuEmw6w=;
-        b=bc1vbrilynUwrpnwHhAOjwbc6ov+/8dohY9r/UYwxeELQhlJyWtoV70fxOGtyf6hwE
-         KJa7k3xIFj8ovIfOgLaVDsTqUCQQcjY9qmtjxWImkFinp9N4nslBYC9dnyaFwxgmQlSK
-         SpftShmeta+hoKIY9NMwTZ3vDH6oD1eQmTglGC+/DrJ4VA6z3iMSmTRC1vY3R4qBe2FL
-         AJ4BAXtSrws1TxGHS4ZJAc46HKJPjl03Mt/b6AIYorZUGN36RvpHeRItLEHf5ExlFGnK
-         bsUoqV05FkZ4+1VYt9kBnzxUqIgpYYc+TTroO9uFvESc3ZbwniUFg2zIMd8idpBz7ZIj
-         tC+Q==
+        d=gmail.com; s=20251104; t=1792121554; x=1792726354; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=mthJ2xXwzbGlymovK0MC30zhpam2OvKpb9vmh5KmEw0=;
+        b=qEBIBlM+XtKRBkaWrZHx905ToXnVkqofsohd+gI5tyoKyiFKYXcUOtFiQxqzEJGBc7
+         vVR8AcBgwumHAYQl0V9dYhb/Yl+3yJ8yFLK5Ib+BRSU20qegSmuz/IN+ImLLltShMGXZ
+         ASdh5Wy4/PY8QIqH61cRft5nZYt0F049w7Txfmmufp+w8vUiStBXKI8C3MrZKaHsPibG
+         9AjZLX92ySlPTwoFJj36DIMczg7CBrDagjJTCOm8+h2H7/HMx584YVQtjUTuHEu+Vt2L
+         lyqtuu+4Wh/YUmKdukcpcIKxApKMPYmZfd7Nd4DrDiYxzwBp/zAXUPfvlDStqNRZpe8/
+         JAjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792119393; x=1792724193;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YBCbS2lucYXeU4DN4VBsPd4Qhjg270QLVoP9SuEmw6w=;
-        b=J7p9R6RoFNGVW96Omdeqhdv8qJRD/y7lg8tku/6BjnLlceu0OO0NgP7dQYZnDjMond
-         yWSnC7QEqFfw9gKshTC1a7wKdfwsEOn0brMvTi0kmlIEoX/EizC9X/iu7oDNogQnhf0h
-         9t+ZUznHtN0JMbqgCOAfjyrg6GClYUw0/odubFk8Sd47Btn4hnqpRcBVoEHui8jo+Oby
-         87Mm/cc9wTeDExlOK0I4lsnwrX5cxMmy66kWrzhgL+ylSmmiU6Kw6EE8Rw0dRmksWlDM
-         JoevszmYQ57ttQsOr20cJPCGbXgC8Iw/XeM/SbGZNWOcxlGJDb5OdDXv1gmaddFkO5yQ
-         +Hsg==
-X-Forwarded-Encrypted: i=1; AKwUvBxzGwGZyQX+DfVJhd1ydi3MdJAen2q2C6p2mggkCAEHSNXK5dj17/QA1p58SeQK1XSF2C6KNt6HdRaWpBk=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLz1ug4p95KcCoWVRLi8nDoOgrs6ETAyqrlWV5d9Hy6cDbW1ADD
-	jnSVFFyP8sq2+fxHEZ/q0PZU44l4E+F80jW3gY0af0NTnOPSVy8QM0sm
-X-Gm-Gg: AYBFou2wJYX1T/zJPQpwzGF8h6/6mvo5TaGS7cuG+uo8z8KUVseyk1BE2DYUVxti2y+
-	Ve3OjH400YmIFgPguEruPVXcoQbPrJ+67KrTOHZDIuMYRkfxL3QQXDVzaMwWkFd89qi2W5H5d0X
-	lKJRv3o1A4Z/o0XMq7Cb191iCXpcckBeaGCf1nMH/t6Y97Fj72+ZikP/7gFcu76bfm+0q7h32vA
-	qUxD9xXsI7PNW2+pmejNKVn4R46jz/jBG9PhNCMtq4zwQ1Ubd8W7Pdho4gLOTXLCMiGbsPHmxz1
-	9At4RDJmVp8/qF7DEyZF9/r7Z4Lu73SfJSDS7a3Pvl6J6xN9YlqSnyA0PhtwlJC7JmJyNNBDBHj
-	bNfytAHRoAxQ6dR/rIxiVb4JHg6rQWd3h/Nl0IBqtU+gdx0nxvwib7aQCYejQQWnsba/lvH2oGs
-	Ls7E93TDZIdfQA7UGOSQ5ArvUYjuzPwVQ2kwCOPQwjeeHVPBH+T3jiCXJfJz6AXHXLY4FMyFp88
-	42+Ra8dfzlxKQ==
-X-Received: by 2002:a17:90b:4d0f:b0:3ac:97e3:73a3 with SMTP id 98e67ed59e1d1-3ac97e3ca4bmr3748539a91.6.1792119393174;
-        Thu, 15 Oct 2026 19:56:33 -0700 (PDT)
-Received: from arm-a100.. ([140.112.28.118])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3acc43a1e1esm1917554a91.1.2026.10.15.19.56.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Oct 2026 19:56:32 -0700 (PDT)
-From: Tzu-Ching Yang <shingekinocore@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"Jose E. Marchesi" <jose.marchesi@oracle.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Simon Horman <horms@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] unroll: Make unrolled, unrolled_full and unrolled_none function-like
-Date: Fri, 16 Oct 2026 10:56:13 +0800
-Message-Id: <20261016025613.2690485-1-shingekinocore@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20260707; t=1792121554; x=1792726354;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=mthJ2xXwzbGlymovK0MC30zhpam2OvKpb9vmh5KmEw0=;
+        b=NBmle5CNbwCULfaxakBVPTT1IPEfkzPeMYIUs7BDmBIOut8bmuWkBmTy3RQJmZzXSp
+         /CJXr39oj7n8fO9xYdrhMGcLPHMaLcpyNedVcqrKbzmb+T3GClzM6s13UZX6CEyVGdHH
+         mxkdCr7oWCdr0/NL+as43t1wnNMeo4e6/1FrjNczlWCF+tijBEHSBaV0ZF6utPFFynCb
+         bUF9Rjp0vYpZH/sOeQ4f9LCKilJO6utZi6+PZ70ztJY0DA4xggVE8FAvWRY8Qb5z9Eor
+         UEa/3d/779YxBYaHAZs3h5aXjNSjlmzuTnj8gLbkAwDhVtJMdfMo0OjZQeqA/lR74bHc
+         ZkYg==
+X-Forwarded-Encrypted: i=1; AKwUvBz97ZqCjDFN0SsGeLMcW96CyIaQuVQI4GlvKofzBYqpNcP3nIZ/7G44rKHVaAL4mKybb6F+gQBQ7CEGXH4=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJIR6Cg3X9xylGdDaQJCeOGVsMCTiM7V0RcVD/t6e1a3ARdY61U
+	QYmd+vn04wVPMjmPZNl1umbMqS1iWFRiX9h7SRWu93fWs1jvtiz0jzKHTGrpcr3ygf0XC5dfrWr
+	VI0q79m0l+ywSBclGYaVruFRO6FjImZfR9b2R
+X-Gm-Gg: AYBFou3uhkOeSONl/diBDefQK5Ldmwqwgg/3bl7mn825GJ2VlDOvFrnkdQy7pzhoG/n
+	J85bAds+kkyFUL++HfaTbHJy2J3jHW0esExl841QpqqKM/TAMIbOR18t5agj0Dr58j5RNMiqYyG
+	qRJMwzhLJJOU8ElBYSMZdbt5sRRlbPiBE5UC5TeUQ4pGc2aIErlp2Ag9bm4bdFXowVA+wCA0Vt3
+	1S9p9M72uP+N9gRyaRRdPXqqrVGNqj4XPgt3yjDJrg8HXOLDI/oitBTAV/ybY8qvvteQs7LN0m1
+	ftBecUQzusnzP0towXPN4OpcGPwyUCDDo6ShZFVZaGBd3mEJdnwH5rU=
+X-Received: by 2002:a05:6512:6687:10b0:5bc:e472:11f9 with SMTP id
+ 2adb3069b0e04-5bce472122dmr4219021e87.20.1792121553829; Thu, 15 Oct 2026
+ 20:32:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261008182814.27450-1-kanchanapsridhar2026@gmail.com>
+ <as-jZopKRfuYAiTE@google.com> <CACpmpoeS_cvXRWJXqiYZV9oykk=91efv8KtZgK2Pi-QwHnQH3A@mail.gmail.com>
+ <CAO9r8zN5n=9v4K+OtEEODg=e0kcFW99PreUcZm09q9CUMQc+ew@mail.gmail.com>
+ <CACpmpofdoeVbbw7izCDeJ7eS+XpWj+3sp3teKEQWywyRB75jYQ@mail.gmail.com>
+ <CAO9r8zMaaUsBaS0TJumochRKt2ShV7nRaLnYPWv3=S-wUFgitw@mail.gmail.com>
+ <CACpmpoecz4tjr-qvFRy22CGuF+4NBWbE7HVjdTGFqQOheK3CLg@mail.gmail.com> <CAO9r8zOAcf4=TscCXjMYvowUx-_u9qLGqY2-p7cK-z5CUU_x8w@mail.gmail.com>
+In-Reply-To: <CAO9r8zOAcf4=TscCXjMYvowUx-_u9qLGqY2-p7cK-z5CUU_x8w@mail.gmail.com>
+From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Date: Thu, 15 Oct 2026 20:32:21 -0700
+X-Gm-Features: AclHuK8EwiGuB9ddUtL4cQ1Is2_v69m3igeGciRO29KLyhbEMLCUdPXew-h6hcg
+Message-ID: <CACpmpofYXDMviE6FS-BZdVntmQFvS+_xvfmOnJ2caZFerz6vyg@mail.gmail.com>
+Subject: Re: [PATCH v1 0/8] Batched zswap_store() with compression batching
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
+	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
+	senozhatsky@chromium.org, 
+	"Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-unrolled, unrolled_full and unrolled_none are object-like macros with
-lower-case names, so in a file that includes <linux/unroll.h> every
-later identifier with one of these names is replaced with a _Pragma()
-operator. A local variable or struct member with one of these names
-fails to build. A function parameter named "unrolled" is worse: GCC
-expands "unrolled" to an empty pragma, which leaves the parameter
-unnamed and removes the name from the expressions that use it, and
-GCC 11 and later accept that with only -Wunknown-pragmas warnings.
-For example, GCC compiles
+On Thu, Oct 15, 2026 at 4:45=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrot=
+e:
+>
+> > > > > > > How much of the performance benefits come from patch 6 vs pat=
+ch 8?
+> > > > > >
+> > > > > > This is how the performance changes: Average throughput is aver=
+aged
+> > > > > > from 10 iterations of usemem.
+> > > > > >
+> > > > > > patch 6: 19,119 KB/s
+> > > > > > patch 8: 17,593 KB/s
+> > > > > >
+> > > > > > So the acomp_do_req_chain() path that ZSTD goes through with pa=
+tch 8
+> > > > > > causes a regression, even though it provides a generic batching
+> > > > > > framework in acomp.
+> > > > > >
+> > > > > > I was able to retrieve performance with the following change in=
+ acompress.c:
+> > > > >
+> > > > > Why add it to begin with in this case?
+> > > >
+> > > > Patch 3 ("crypto: acomp - Add trivial segmentation wrapper.") was
+> > > > co-developed with Herbert. The request chaining for non-segmentatio=
+n
+> > > > algorithms was as in Herbert's original implementation. Since this
+> > > > causes a regression, I would like to get Herbert's Ok on replacing =
+the
+> > > > request chaining in this part of crypto_acomp_compress().
+> > >
+> > > I mean, why add patch 8 if it doesn't improve performance? Seems like
+> > > even with your diff, we only recover performance, but we don't improv=
+e
+> > > it after patch 6?
+> >
+> > Patch 8 does improve performance over patch 6 (19,578 KB/s vs. 19,119
+> > KB/s) by 2.4%. Besides, patch 8 provides a compress batching framework
+> > in zswap, which is the purpose of this patch series.
+>
+> No, the purpose of this patch series is to improve performance, be it
+> through the compression batching framework or otherwise. The
+> compression batching framework made sense as it provided greater
+> performance gains with HW batching/concurrency. Without that, I am
+> honestly skeptical. 2.4% can be within the noise.
 
-	static int add(int unrolled, int x)
-	{
-		return unrolled + x;
-	}
+I seem to have left out patch 8 after making the crypto_acomp change
+to not use request chaining.
+My apologies! This was an honest mistake..
 
-as "return +x;".
+I have regathered the 10 iterations average throughput of usemem after
+applying patch 8:
 
-No variable, member or parameter in the tree uses these names yet, but
-the header is already pulled in by <linux/lsm_hooks.h>, the vhost and
-libeth headers and a few .c files, and every new includer exposes more
-code to the clash.
+                                        patch 6: 19,119 KB/s
+crypto_acomp change + patch 8: 20,946 KB/s (+9.56%)
 
-Make the three macros function-like, as unrolled_count() and UNROLL()
-already are. A function-like macro is expanded only where its name is
-followed by '(', so variables, struct members and parameters with the
-same names are left alone. Convert the only users, lib/crypto/blake2b.c
-and lib/crypto/blake2s.c, to unrolled_full(), and explain the empty
-argument list in the header comment.
+The purpose of this patch series is still the same: to set the
+framework for batching of zswap compressions, and not just of zswap
+stores of large folios which is what stopping at patch 6 would do.
 
-No functional change: blake2b.c and blake2s.c preprocess to the same
-output as before, and every object that depends on <linux/unroll.h> is
-byte-identical in x86_64 (GCC 13, Clang 18), riscv64 (GCC 13) and arm64
-(Clang 18) builds, apart from the DWARF 5 checksum of the two edited
-source files in the arm64 debug info.
+With SW compressors (ZSTD), patch 8, i.e., batching of compressions
+and storing the compressed data in a pool, demonstrates significant
+performance improvement (sorry again for having missed applying the
+patch earlier today). This is because we isolate the working set to
+just these ops, which benefits from cache locality and minimizes
+evictions: as against the vectorized implementation without the patch.
 
-Signed-off-by: Tzu-Ching Yang <shingekinocore@gmail.com>
----
-unroll.h has no MAINTAINERS entry (hence Andrew on Cc), and the only
-users of these three macros are in lib/crypto/, so I think this fits
-the libcrypto tree best.
+One of the immediate benefits of this framework is that I am using it
+for bulk allocations of compressed data for a batch, for entries that
+map to the same slab bin. This proves the forward-looking benefits of
+isolating compression and storage from other zswap_store_pages() ops.
 
-Testing: x86_64, riscv64 and arm64 defconfig plus the includers of
-<linux/unroll.h> (all LSMs, IMA/EVM, BPF LSM, vhost, i40e/ice/idpf),
-built without the patch and then rebuilt with it in the same source and
-output directories. Make rebuilt exactly the 135 objects that depend on
-<linux/unroll.h> or blake2{b,s}.c, plus the composite objects that
-contain them, so those are the objects compared. lib/crypto/,
-security/, drivers/vhost/ and idpf give the same result with riscv64
-GCC 8.1 and 16.2, x86_64 Clang 17.0.1 and arm64 Clang 23.1.1. GCC and
-Clang still report the BLAKE2 round loops as completely unrolled.
+The crypto_acomp change I had mentioned earlier does not hinder HW
+compressors in any way. As mentioned in the commit logs, patches 1-4
+provide the API that can be used by HW compressors as they see fit, as
+long as they register the segmentation bit in the algorithm creation.
 
-Stand-alone, with only <linux/unroll.h>: GCC 11.5, 12.5, 13.3, 14.2 and
-16.2 build the add() example from the changelog, and it returns x; GCC
-8.1, 9.5, 10.5 and Clang 17, 18 and 23 reject it. With this patch, a
-variable, struct member or parameter with any of the three names builds
-without warnings and gives the right result with all of these
-compilers.
+If you are Ok with all this, we will need Herbert's Ok for this change
+in patch 3:
 
-The patch applies as is to next-20261014, libcrypto-next (40f47fa10a1d)
-and net-next (518bf436318e), and none of them has other users of these
-names. A user added elsewhere with the old spelling (unrolled_full
-without parentheses) fails to build rather than silently losing the
-hint.
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index 192ea996e779..db8e4c82b900 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -293,8 +293,12 @@ int crypto_acomp_compress(struct acomp_req *req)
+                return -EAGAIN;
 
-Not addressed: a use followed by '(' is still expanded, so a function
-or function pointer with one of these names still clashes when it is
-called. With arguments, that fails to build. Without arguments, GCC
-still turns unrolled() into an empty pragma, so a call to a
-zero-argument function unrolled() declared before the header is
-included is dropped with only warnings (Clang rejects it).
+        if (likely(req->unit_size && acomp_request_issg(req))) {
+-               if (!crypto_acomp_req_seg(tfm))
+-                       return acomp_do_req_chain(req, true);
++               if (likely(!crypto_acomp_req_seg(tfm))) {
++                       int err =3D tfm->compress(req);
++
++                       req->dst->length =3D unlikely(err) ? err : req->dle=
+n;
++                       return err;
++               }
 
-unrolled and unrolled_none still have no users. If preferred, I can
-instead remove them, as Simon and Maciej suggested when they were
-added, and convert only unrolled_full; that also removes the case
-above.
+                return tfm->compress(req);
+        }
 
- include/linux/unroll.h | 12 ++++++++----
- lib/crypto/blake2b.c   |  2 +-
- lib/crypto/blake2s.c   |  2 +-
- 3 files changed, 10 insertions(+), 6 deletions(-)
+>
+> > zswap is the
+> > first user of the crypto_acomp compress batching API provided earlier
+> > in this series, which I think, is a great starting point for us to
+> > evolve this further, as mentioned in the cover letter.
+>
+> Without a non-trivial performance benefit (e.g. with HW batching), I
+> don't see enough justification. My advice is to try to push 6 (and its
+> dependencies) separately.
 
-diff --git a/include/linux/unroll.h b/include/linux/unroll.h
-index 186b71de74..8fde8006eb 100644
---- a/include/linux/unroll.h
-+++ b/include/linux/unroll.h
-@@ -16,7 +16,7 @@
- #endif
- 
- /**
-- * unrolled - loop attributes to ask the compiler to unroll it
-+ * unrolled() - loop attributes to ask the compiler to unroll it
-  *
-  * Usage:
-  *
-@@ -33,10 +33,14 @@
-  * on what iter x will do with variables) is not a strict requirement, but
-  * provides best performance and object code size.
-  * Available only on Clang and GCC 8.x onwards.
-+ *
-+ * unrolled(), unrolled_full() and unrolled_none() take an empty argument
-+ * list so that only a use followed by '(' is expanded: variables, struct
-+ * members and function parameters with these names are left alone.
-  */
- 
- /* Ask the compiler to pick an optimal unroll count, Clang only */
--#define unrolled							\
-+#define unrolled()							\
- 	__pick_unrolled(clang loop unroll(enable), /* nothing */)
- 
- /* Unroll each @n iterations of the loop */
-@@ -44,11 +48,11 @@
- 	__pick_unrolled(clang loop unroll_count(n), GCC unroll n)
- 
- /* Unroll the whole loop */
--#define unrolled_full							\
-+#define unrolled_full()							\
- 	__pick_unrolled(clang loop unroll(full), GCC unroll 65534)
- 
- /* Never unroll the loop */
--#define unrolled_none							\
-+#define unrolled_none()							\
- 	__pick_unrolled(clang loop unroll(disable), GCC unroll 1)
- 
- #define UNROLL(N, MACRO, args...) CONCATENATE(__UNROLL_, N)(MACRO, args)
-diff --git a/lib/crypto/blake2b.c b/lib/crypto/blake2b.c
-index 55d6c437f3..1f885b1f83 100644
---- a/lib/crypto/blake2b.c
-+++ b/lib/crypto/blake2b.c
-@@ -81,7 +81,7 @@ blake2b_compress_generic(struct blake2b_ctx *ctx,
- 		 * Not worthwhile on 32-bit kernels because the code size is
- 		 * already so large there due to BLAKE2b using 64-bit words.
- 		 */
--		unrolled_full
-+		unrolled_full()
- #endif
- 		for (int r = 0; r < 12; r++) {
- 			G(r, 0, v[0], v[4], v[8], v[12]);
-diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
-index 24f7f34334..2260ed9a3d 100644
---- a/lib/crypto/blake2s.c
-+++ b/lib/crypto/blake2s.c
-@@ -76,7 +76,7 @@ blake2s_compress_generic(struct blake2s_ctx *ctx,
- 		 * Unroll the rounds loop to enable constant-folding of the
- 		 * blake2s_sigma values.
- 		 */
--		unrolled_full
-+		unrolled_full()
- 		for (int r = 0; r < 10; r++) {
- 			G(r, 0, v[0], v[4], v[8], v[12]);
- 			G(r, 1, v[1], v[5], v[9], v[13]);
-
-base-commit: 40f47fa10a1d19c74f48a13d97b2eb19d5fb938d
--- 
-2.34.1
-
+This doesn't penalize HW compressors, while representing the status of
+what exists today (sequential).
