@@ -1,219 +1,225 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012025.outbound.protection.outlook.com [40.93.195.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CDB2F7EE1
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 03:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10EB386561
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 04:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.25
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792121558; cv=pass; b=Qo8ShagPo1RAU15zRBKpPVa4EVO9dVcsBEvXGR7f3rXkoh3I/CO+7/MkC1bZOMxpFUzqh0ot0zYogN2cY8SHxYqu0ezNuVGe8GR5brRJZUsSMHLZiwiMCRODvZYp6TgS72yK1fq5gYm99pySKKC7LB5wsvpPSWNnAzd6q+EFlss=
+	t=1792124012; cv=fail; b=B6nA4MopqfsOUJhPkxgIGt06RUSeIGWlxlbOJxa/OOuYeEjALA9QUCZ4L6+Tmyb8Tk5+IYWbOaoWBmr1rAJRCC5PWPB4L9NhetnJL9TSoQ6z5QdhIFyN2Ymya4N4ENvZibkioRWAfDhhkr+AwzjZwKPjcgI8tFk9P8+UOdzzHtA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792121558; c=relaxed/simple;
-	bh=06zrE62fKrgiwoRcGb8h+2HCp2UBFMGvqy4x7WN+014=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LMDfWh0oLtGGINBLjlW16CyMfIeH9TBcoPVDxAf6q0CgqnFEd3oHXymV5mMlGHMsWnT2TX44uF98WIZozvVN+hbjOZYnXrcLr5pujp2K59lZk1flXwV13HmrJJTCwiqbMXExMB/Dx47/J+K96sNLaf19rLxcwGJquX4OIZoS3kU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qEBIBlM+; arc=pass smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1792124012; c=relaxed/simple;
+	bh=/cCB5RjYzl0oztZ4b4FhAaqYkTqGZL5AZrzYdauvUUE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C6YFdgP4tEF86dUNymeodKih8mMg1+YHRwFB0i1xG5kBPcz+iqsKyMRGGGedkkd8n7tAE30jjm5CIXIzj6uTCZxNuxRIjhtfCUjglfxyGm6gYFzl4DUx3D3iKHRjK/sL/XO6tdRXbIGpBTj8M/gzzbtKnhJIu6DO2LiCBRoTRtA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tQE4I6lE; arc=fail smtp.client-ip=40.93.195.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qEBIBlM+"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5ba3ec92031so6184941e87.2
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 20:32:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792121554; cv=none;
-        d=google.com; s=arc-20260327;
-        b=sY+LAOmAW/26qff4/+pTaanMMNdKnF8AbfdFDEkGsyC9xKuCe9+PDP4j64NeotO92p
-         wJnRoU+MPMBchcOnK9S0Jucnw4KcpoBNqHkDhoRXtYx49RztPls6rwipw4D1uz4LQZok
-         mPkSCyTi0rcWdswB84HwzAtwdHhvDHBef5UnXl7GTP78VrTBufVyXKtruXwmWONti9Tf
-         aNS4GrztNDH2gQzObCZ0y7B2I1B2x3llryKah68lsRYfogyHlVOigk9RtWrJZgAenGfN
-         JtaLbKGjm8sat2MLpDbssPpoCUiCufybOcmBjtAWw+eNEIxuMKzmN3TwtueTnyKUu/rj
-         gK7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=mthJ2xXwzbGlymovK0MC30zhpam2OvKpb9vmh5KmEw0=;
-        fh=1LckI8XCX3n9+OPgRE1glmN9OCCBkySfxiA422DgmZI=;
-        b=Oiiv7pB3NZfeYGfTwoXyeym2/M+TH7Fr3Y1LC3WmY43m06C5w92UJDuOwcPJwhTGDj
-         rCcdFnff1rFAy+2eCNudQWvBFET/2AYFjdqzKu3AEwSXnhF4wShTZGBij+dqm5NL48O5
-         cqjMnz/hCi7Zw3MnKN1Q7IYf0aVjVvK4Zwc9NPvxy8bD6zliVDxT0yk158ZozJpYlO4U
-         tepOhw59SL72akiEcRAbNlRFmiRVk00BVIYFlDu3qYBxHH0+4uikGrFNjMExrLX7sCPh
-         oqYbTvjDQ47OlNUz8gPgX/rJbKC9tllNIHkGsWN6ldRgXcJV6VEgpwxOZZUu6Dp1aRXM
-         5oPw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792121554; x=1792726354; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=mthJ2xXwzbGlymovK0MC30zhpam2OvKpb9vmh5KmEw0=;
-        b=qEBIBlM+XtKRBkaWrZHx905ToXnVkqofsohd+gI5tyoKyiFKYXcUOtFiQxqzEJGBc7
-         vVR8AcBgwumHAYQl0V9dYhb/Yl+3yJ8yFLK5Ib+BRSU20qegSmuz/IN+ImLLltShMGXZ
-         ASdh5Wy4/PY8QIqH61cRft5nZYt0F049w7Txfmmufp+w8vUiStBXKI8C3MrZKaHsPibG
-         9AjZLX92ySlPTwoFJj36DIMczg7CBrDagjJTCOm8+h2H7/HMx584YVQtjUTuHEu+Vt2L
-         lyqtuu+4Wh/YUmKdukcpcIKxApKMPYmZfd7Nd4DrDiYxzwBp/zAXUPfvlDStqNRZpe8/
-         JAjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792121554; x=1792726354;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=mthJ2xXwzbGlymovK0MC30zhpam2OvKpb9vmh5KmEw0=;
-        b=NBmle5CNbwCULfaxakBVPTT1IPEfkzPeMYIUs7BDmBIOut8bmuWkBmTy3RQJmZzXSp
-         /CJXr39oj7n8fO9xYdrhMGcLPHMaLcpyNedVcqrKbzmb+T3GClzM6s13UZX6CEyVGdHH
-         mxkdCr7oWCdr0/NL+as43t1wnNMeo4e6/1FrjNczlWCF+tijBEHSBaV0ZF6utPFFynCb
-         bUF9Rjp0vYpZH/sOeQ4f9LCKilJO6utZi6+PZ70ztJY0DA4xggVE8FAvWRY8Qb5z9Eor
-         UEa/3d/779YxBYaHAZs3h5aXjNSjlmzuTnj8gLbkAwDhVtJMdfMo0OjZQeqA/lR74bHc
-         ZkYg==
-X-Forwarded-Encrypted: i=1; AKwUvBz97ZqCjDFN0SsGeLMcW96CyIaQuVQI4GlvKofzBYqpNcP3nIZ/7G44rKHVaAL4mKybb6F+gQBQ7CEGXH4=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJIR6Cg3X9xylGdDaQJCeOGVsMCTiM7V0RcVD/t6e1a3ARdY61U
-	QYmd+vn04wVPMjmPZNl1umbMqS1iWFRiX9h7SRWu93fWs1jvtiz0jzKHTGrpcr3ygf0XC5dfrWr
-	VI0q79m0l+ywSBclGYaVruFRO6FjImZfR9b2R
-X-Gm-Gg: AYBFou3uhkOeSONl/diBDefQK5Ldmwqwgg/3bl7mn825GJ2VlDOvFrnkdQy7pzhoG/n
-	J85bAds+kkyFUL++HfaTbHJy2J3jHW0esExl841QpqqKM/TAMIbOR18t5agj0Dr58j5RNMiqYyG
-	qRJMwzhLJJOU8ElBYSMZdbt5sRRlbPiBE5UC5TeUQ4pGc2aIErlp2Ag9bm4bdFXowVA+wCA0Vt3
-	1S9p9M72uP+N9gRyaRRdPXqqrVGNqj4XPgt3yjDJrg8HXOLDI/oitBTAV/ybY8qvvteQs7LN0m1
-	ftBecUQzusnzP0towXPN4OpcGPwyUCDDo6ShZFVZaGBd3mEJdnwH5rU=
-X-Received: by 2002:a05:6512:6687:10b0:5bc:e472:11f9 with SMTP id
- 2adb3069b0e04-5bce472122dmr4219021e87.20.1792121553829; Thu, 15 Oct 2026
- 20:32:33 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tQE4I6lE"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sSaV46lnQWklXebC4cXAZz2JGC0H5HZhKfUi85XQwSpdO40Yvps6QnMD+khT4qjWI9Wu946EpNGI4KQweUQ2kJ4QWH5CizB3NmPPkxLXcVPF6bHOI7wzHdMvsKgtd+I0OYsbt1gFKscwfOKcJpMTXTTyhiGLQIKMhQ+ZHYCOrftwPB5gQRrwNf9VntJj6Ox8b1OLb7OojfmAMeoJsv7TqBzuwSLTKScfzwCjfpkToA87meGOzwi1QaQYDuVqhpt1oJXtf/G49GrJw3CPfcNTKAUE27I5vtjdZViG6rHrI4iq/He/c6izfrwHc4y9RgNTwn5kkivOcyLVXgkPwdqYLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Tu0VGytkEvfRGoUCwelNTs6PfqQ1Ngv3DuYUnJWZm7Y=;
+ b=xl8UB2ttoXjGF+yMVJ8Jb4WLvcNRCHB596MArOdrovqYnfPnTyPWtls+MQ9Cv9GfwhxIWazwBqS6jv+08iZSbBypXVyBxrUoQMZIKijRIMHpQGuCkq8432n08A/IsY/aU2WwSlXvYJBb3YZXEhQg/G64RpS/pneRZaFjSP9XLuF7n2NyoXTBCo8Y6La/6nLF42NQy88b01ao8NQgTLLjVIqdxFFf7YlgmU4eP/jvuvwM9bpal83gOVlioRXhm+/ZA+WJsQUEoZLYGJM4N8TCkYfd3CJuPkwlaBlE8d+NIn5el+TAf6b7KzF+Jhy9a5UWQaU/bKJ7a0tpZJaBwxL/UA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tu0VGytkEvfRGoUCwelNTs6PfqQ1Ngv3DuYUnJWZm7Y=;
+ b=tQE4I6lEh1uQmyITBSHDxbHEnTcQuzsKV6t6TwrPNwZWPIA3gstwpQtCj3Xo4YD7NMDnBmHi+QVrCw6b7W4vyfUXN4SNLRUjtm/GVkTnfD6yS88KaI0dkOuHgPgSjbDNdjd1IbdNJIPNbd0JZHK9xVyZQzo9jsQWQS/jL51DdFk=
+Received: from PH8P222CA0023.NAMP222.PROD.OUTLOOK.COM (2603:10b6:510:2d7::17)
+ by IA0PR12MB8746.namprd12.prod.outlook.com (2603:10b6:208:490::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.13; Fri, 16 Oct
+ 2026 04:13:27 +0000
+Received: from CY7PEPF000000F6.namprd05.prod.outlook.com
+ (2603:10b6:510:2d7:cafe::6d) by PH8P222CA0023.outlook.office365.com
+ (2603:10b6:510:2d7::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.496.5 via Frontend Transport; Fri, 16
+ Oct 2026 04:13:26 +0000
+X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
+ is 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ CY7PEPF000000F6.mail.protection.outlook.com (10.167.247.154) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.522.6 via Frontend Transport; Fri, 16 Oct 2026 04:13:26 +0000
+Received: from localhost (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.53; Thu, 15 Oct
+ 2026 23:13:19 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: <linux-crypto@vger.kernel.org>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<ackerleytng@google.com>, <thomas.lendacky@amd.com>, <ashish.kalra@amd.com>,
+	<aik@amd.com>, <seanjc@google.com>
+Subject: [PATCH v2 9/9] crypto: ccp - Allocate status page outside sev_cmd_mutex in SNP_PLATFORM_STATUS
+Date: Thu, 15 Oct 2026 23:09:37 -0500
+Message-ID: <20261016041109.1778673-10-michael.roth@amd.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261016041109.1778673-1-michael.roth@amd.com>
+References: <20261016041109.1778673-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261008182814.27450-1-kanchanapsridhar2026@gmail.com>
- <as-jZopKRfuYAiTE@google.com> <CACpmpoeS_cvXRWJXqiYZV9oykk=91efv8KtZgK2Pi-QwHnQH3A@mail.gmail.com>
- <CAO9r8zN5n=9v4K+OtEEODg=e0kcFW99PreUcZm09q9CUMQc+ew@mail.gmail.com>
- <CACpmpofdoeVbbw7izCDeJ7eS+XpWj+3sp3teKEQWywyRB75jYQ@mail.gmail.com>
- <CAO9r8zMaaUsBaS0TJumochRKt2ShV7nRaLnYPWv3=S-wUFgitw@mail.gmail.com>
- <CACpmpoecz4tjr-qvFRy22CGuF+4NBWbE7HVjdTGFqQOheK3CLg@mail.gmail.com> <CAO9r8zOAcf4=TscCXjMYvowUx-_u9qLGqY2-p7cK-z5CUU_x8w@mail.gmail.com>
-In-Reply-To: <CAO9r8zOAcf4=TscCXjMYvowUx-_u9qLGqY2-p7cK-z5CUU_x8w@mail.gmail.com>
-From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Date: Thu, 15 Oct 2026 20:32:21 -0700
-X-Gm-Features: AclHuK8EwiGuB9ddUtL4cQ1Is2_v69m3igeGciRO29KLyhbEMLCUdPXew-h6hcg
-Message-ID: <CACpmpofYXDMviE6FS-BZdVntmQFvS+_xvfmOnJ2caZFerz6vyg@mail.gmail.com>
-Subject: Re: [PATCH v1 0/8] Batched zswap_store() with compression batching
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
-	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
-	senozhatsky@chromium.org, 
-	"Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY7PEPF000000F6:EE_|IA0PR12MB8746:EE_
+X-MS-Office365-Filtering-Correlation-Id: 70fcd98d-1440-41ba-b309-08df2b3bd3f4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|376014|23010399003|1800799024|6133799003|22082099003|10067099003|18002099003|11063799006|261009223027099003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	V2LPYLGkTl3n0AO0sI3sTWomnGkTjwhKmcm7JIdTOudZhvDtf28qbHrfOPPmW7zIyTK3pbNj7P8xT8JPUher4aK3Us0xYlieqFqst9qTq28qEnQLd39U2Ppb63/C4vA1LQjyEm0sQfpRgjuTWCjyHYF05tSU+feNPV4cePeC0h4NkjNCHmMGg7z8giuEkvVBA8S8pGeBNqUa9woNKwcUVxGNYrNlMyIj63WvkF1z3atx+qOKiOs6b+28UCnNRCojJv5TMh+SktlyLdOkJWCyofXdB6fjrqMsTwiHtmyY3hqRVIK9bXmrpFMprnvdSMuuUm+d0mfenOlJUAy9rBrkEpC8rQkYLekyw1I/lSBR0UYpMQbK+icCMmGuMDduHvWGgjLfCVdpX1HVBcCFzXVKMx6xouQkD7IHLGh4+R9kj0kmmScgGQf1rNpqiyoTNHCqf79HOs5KIGksxzbPIFRZlEx1OLcf/lieGSd5V+vRIWC4HOon2XfUM0m6VuovX5F/XdjSLWIb6Vi0Z1Wojrud3r8RCwC3K5qPJvcYOOVvnSy6d3vNcmO9XPWmS3Ti7cbSyz+vsva0ZiU8sOE+2OaxTnqv2gaXM1hDbRGhtrv9l++rMq8bA+NnH6T0Y79E1RFXkxw/199IOICab9yqDPe+Ogf4Y7Zpr/ATXKyaTOcpw0nQWHNmI4dlZZ0zVu1E53VHrNO5SNiQDkaJGoDjaiwibg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(376014)(23010399003)(1800799024)(6133799003)(22082099003)(10067099003)(18002099003)(11063799006)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	7gf5jBNa0NVo2haob1kDED+YEFQSO7B7oAFWvMskisPSM7cinej5rs7TEsrkJESHejTDDlsgspPscKePqrQqa0Sp/Pn24jd5zGmSNi5t6fANt2xvWyU6d5GEhHk8Rx7yxRBetuXwRTa3c4tOQKbPOKcw2X4Ub5Gr9gfouLRDkR3laBojrq7xEB4dhKargM2OeNRoAlQimDPZd68RWg+vGgkkAjiPVzal2Cvwb7fNPbrkUsES2jiZXrmFdFmj1mzFbzXWtR34WAA0t+Jn1l5XI6kqHs155zx+GOKjn00OwCA+YklrMJhxyXzx6QTM0PH/pEKeYchIEZA0Zq8Ag7y15tzoDDksswV+a8PmIUqGcjIlXdHrzdmGBgXYQN0Tjty7XqQ2v/FNdSN/mizDDJryW9AXVvdoEZPiT4Ssgf74K9bsqiKa9c2tfuhe74pKsnrA
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2026 04:13:26.8099
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70fcd98d-1440-41ba-b309-08df2b3bd3f4
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY7PEPF000000F6.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8746
 
-On Thu, Oct 15, 2026 at 4:45=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrot=
-e:
->
-> > > > > > > How much of the performance benefits come from patch 6 vs pat=
-ch 8?
-> > > > > >
-> > > > > > This is how the performance changes: Average throughput is aver=
-aged
-> > > > > > from 10 iterations of usemem.
-> > > > > >
-> > > > > > patch 6: 19,119 KB/s
-> > > > > > patch 8: 17,593 KB/s
-> > > > > >
-> > > > > > So the acomp_do_req_chain() path that ZSTD goes through with pa=
-tch 8
-> > > > > > causes a regression, even though it provides a generic batching
-> > > > > > framework in acomp.
-> > > > > >
-> > > > > > I was able to retrieve performance with the following change in=
- acompress.c:
-> > > > >
-> > > > > Why add it to begin with in this case?
-> > > >
-> > > > Patch 3 ("crypto: acomp - Add trivial segmentation wrapper.") was
-> > > > co-developed with Herbert. The request chaining for non-segmentatio=
-n
-> > > > algorithms was as in Herbert's original implementation. Since this
-> > > > causes a regression, I would like to get Herbert's Ok on replacing =
-the
-> > > > request chaining in this part of crypto_acomp_compress().
-> > >
-> > > I mean, why add patch 8 if it doesn't improve performance? Seems like
-> > > even with your diff, we only recover performance, but we don't improv=
-e
-> > > it after patch 6?
-> >
-> > Patch 8 does improve performance over patch 6 (19,578 KB/s vs. 19,119
-> > KB/s) by 2.4%. Besides, patch 8 provides a compress batching framework
-> > in zswap, which is the purpose of this patch series.
->
-> No, the purpose of this patch series is to improve performance, be it
-> through the compression batching framework or otherwise. The
-> compression batching framework made sense as it provided greater
-> performance gains with HW batching/concurrency. Without that, I am
-> honestly skeptical. 2.4% can be within the noise.
+Allocating memory while holding the global SEV command mutex
+(sev_cmd_mutex) unnecessarily blocks concurrent SEV and SNP operations
+across the system if page allocation stalls. Handle allocation/freeing
+outside of the mutex instead.
 
-I seem to have left out patch 8 after making the crypto_acomp change
-to not use request chaining.
-My apologies! This was an honest mistake..
+Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+---
+ drivers/crypto/ccp/sev-dev.c | 62 ++++++++++++++++++------------------
+ 1 file changed, 31 insertions(+), 31 deletions(-)
 
-I have regathered the 10 iterations average throughput of usemem after
-applying patch 8:
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 1e017783dd03..aa4f0fd731c0 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -2532,8 +2532,8 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	return ret;
+ }
+ 
+-static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
+-					int *error)
++static int sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
++				      int *error)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	void *data __free(free_page) = NULL;
+@@ -2544,31 +2544,36 @@ static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
+ 	if (!data)
+ 		return -ENOMEM;
+ 
+-	/*
+-	 * SNP_PLATFORM_STATUS can be executed in any SNP state. But if executed
+-	 * when SNP has been initialized, the status page must be firmware-owned.
+-	 */
+-	if (sev->snp_initialized) {
++	scoped_guard(mutex, &sev_cmd_mutex) {
+ 		/*
+-		 * Firmware expects the status page to be in Firmware state,
+-		 * otherwise it will report an error INVALID_PAGE_STATE.
++		 * SNP_PLATFORM_STATUS can be executed in any SNP state. But if executed
++		 * when SNP has been initialized, the status page must be firmware-owned.
+ 		 */
+-		if (rmp_mark_pages_firmware(__pa(data), 1, true))
+-			return -EFAULT;
+-	}
++		if (sev->snp_initialized) {
++			/*
++			 * Firmware expects the status page to be in Firmware state,
++			 * otherwise it will report an error INVALID_PAGE_STATE.
++			 */
++			if (rmp_mark_pages_firmware(__pa(data), 1, true))
++				return -EFAULT;
++		}
+ 
+-	buf.address = __psp_pa(data);
+-	ret = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, error);
++		buf.address = __psp_pa(data);
++		ret = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, error);
+ 
+-	if (sev->snp_initialized) {
+-		/*
+-		 * The status page will be in Reclaim state on success, or left
+-		 * in Firmware state on failure. Use snp_reclaim_pages() to
+-		 * transition either case back to Hypervisor-owned state.
+-		 */
+-		if (snp_reclaim_pages(__pa(data), 1, true)) {
+-			data = NULL;
+-			return -EFAULT;
++		if (sev->snp_initialized) {
++			/*
++			 * The status page will be in Reclaim state on success, or left
++			 * in Firmware state on failure. Use snp_reclaim_pages() to
++			 * transition either case back to Hypervisor-owned state. If
++			 * for some reason that fails, it will have been added to the
++			 * leaked pages list, so indicate to the caller to not free
++			 * the page.
++			 */
++			if (snp_reclaim_pages(__pa(data), 1, true)) {
++				data = NULL;
++				return -EFAULT;
++			}
+ 		}
+ 	}
+ 
+@@ -2586,8 +2591,7 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+ 	if (!argp->data)
+ 		return -EINVAL;
+ 
+-	scoped_guard(mutex, &sev_cmd_mutex)
+-		ret = __sev_do_snp_platform_status(&status, &argp->error);
++	ret = sev_do_snp_platform_status(&status, &argp->error);
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -3086,9 +3090,7 @@ static int get_v1_svn(struct sev_device *sev)
+ 	struct sev_user_data_snp_status status;
+ 	int ret, error = 0;
+ 
+-	mutex_lock(&sev_cmd_mutex);
+-	ret = __sev_do_snp_platform_status(&status, &error);
+-	mutex_unlock(&sev_cmd_mutex);
++	ret = sev_do_snp_platform_status(&status, &error);
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -3103,9 +3105,7 @@ static int get_v2_svn(struct sev_device *sev)
+ 	struct sev_snp_tcb_version_turin *tcb;
+ 	int ret, error = 0;
+ 
+-	mutex_lock(&sev_cmd_mutex);
+-	ret = __sev_do_snp_platform_status(&status, &error);
+-	mutex_unlock(&sev_cmd_mutex);
++	ret = sev_do_snp_platform_status(&status, &error);
+ 	if (ret < 0)
+ 		return ret;
+ 
+-- 
+2.43.0
 
-                                        patch 6: 19,119 KB/s
-crypto_acomp change + patch 8: 20,946 KB/s (+9.56%)
-
-The purpose of this patch series is still the same: to set the
-framework for batching of zswap compressions, and not just of zswap
-stores of large folios which is what stopping at patch 6 would do.
-
-With SW compressors (ZSTD), patch 8, i.e., batching of compressions
-and storing the compressed data in a pool, demonstrates significant
-performance improvement (sorry again for having missed applying the
-patch earlier today). This is because we isolate the working set to
-just these ops, which benefits from cache locality and minimizes
-evictions: as against the vectorized implementation without the patch.
-
-One of the immediate benefits of this framework is that I am using it
-for bulk allocations of compressed data for a batch, for entries that
-map to the same slab bin. This proves the forward-looking benefits of
-isolating compression and storage from other zswap_store_pages() ops.
-
-The crypto_acomp change I had mentioned earlier does not hinder HW
-compressors in any way. As mentioned in the commit logs, patches 1-4
-provide the API that can be used by HW compressors as they see fit, as
-long as they register the segmentation bit in the algorithm creation.
-
-If you are Ok with all this, we will need Herbert's Ok for this change
-in patch 3:
-
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index 192ea996e779..db8e4c82b900 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -293,8 +293,12 @@ int crypto_acomp_compress(struct acomp_req *req)
-                return -EAGAIN;
-
-        if (likely(req->unit_size && acomp_request_issg(req))) {
--               if (!crypto_acomp_req_seg(tfm))
--                       return acomp_do_req_chain(req, true);
-+               if (likely(!crypto_acomp_req_seg(tfm))) {
-+                       int err =3D tfm->compress(req);
-+
-+                       req->dst->length =3D unlikely(err) ? err : req->dle=
-n;
-+                       return err;
-+               }
-
-                return tfm->compress(req);
-        }
-
->
-> > zswap is the
-> > first user of the crypto_acomp compress batching API provided earlier
-> > in this series, which I think, is a great starting point for us to
-> > evolve this further, as mentioned in the cover letter.
->
-> Without a non-trivial performance benefit (e.g. with HW batching), I
-> don't see enough justification. My advice is to try to push 6 (and its
-> dependencies) separately.
-
-This doesn't penalize HW compressors, while representing the status of
-what exists today (sequential).
