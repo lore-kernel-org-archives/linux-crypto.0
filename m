@@ -1,148 +1,91 @@
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BFD36F908;
-	Fri, 16 Oct 2026 08:30:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0366146D547;
+	Fri, 16 Oct 2026 09:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792139466; cv=none; b=BWP0V6FvFEMFBnQIpiXeMHuiElLA+R7xlrXh3UATOz+dOCllsjXp91M8iIVsuXTS1h6IQN12y7Rbhsir5zyGFe8cfn9gOePlsPbFzs2EX489zyALaWTAmBu6mALMGmea0nSWd0XR8chIVkL7IUdwjnWo/ciuS6Vn9Yiyw3N0k24=
+	t=1792142021; cv=none; b=U6ZaLCk+j53+UTK4C5FXA0yyvMW8jewzjT6Tqp1yDiF0VtP+y1xUDYg99eFQfXjGXMg+xEPOIQ1embAJqyRUhnInUm30m6iIdkx4dLZr1uizDKvCZODDybiS/Bu+Wo8bANSqJZujAA7LWTtRAHD970zGYsL4wymfVxbSGVTVcwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792139466; c=relaxed/simple;
-	bh=IlSuneC1Cft/iB5s9rOSqN+4WSgzm1GEv54QLb5xytY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=PPiKOOS+DR2lTYbjILqtS2ChSLZfy1qKqDOHDFV5DQiRncQNhRSkHVKkCk+whNvYM7ufxkBZ5gbUOgtxTvRCf8PISEs6mQfhQ6EN/TuV5uyf1uZENLgzqvZ++LR0eiXWfuhpfqELFefTmd9uOACQr0DeWRcnO7b0pOYwFGmaNN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=bsNvDAhJ; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1792142021; c=relaxed/simple;
+	bh=LVDS0HnD/QnD6zawSDbzNLWAnl5Fnm7/XjXBFyRWCMk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S0SuedPiRbODaMIw4uy6uCjTHmrVoEazPkih+dU2VfhtAUQniib4RC3RNLcxapf6NgzLgF5UUcUtZ64l/X/4wd1obUAhkzeY7b3wimDKSTS5fgIy/ELfRRWpBpmK8fwxC31BwMekw+N/c02QvebulgGBtCg5Lss/3yanj6BZih4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=cQGXqaHE; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="bsNvDAhJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1792139428;
-	bh=ppMqsg8mOhqDajSuDUyLaA9LHQl2I4uoxhDr7vbDmFg=;
-	h=From:Date:Subject:MIME-Version:Message-Id:To;
-	b=bsNvDAhJ0AGPT3sfnSseMcJWPvMjlbEcFL+y1lssPY/En7TTJt/ZtXeXx9Ca95vzY
-	 kwLdD67LmoI5xCdJTlATX+acyiQXBKPtEuAADpqI38ZlHKnsyEA/D3nM4M21bu5Ngr
-	 WnFHKXs2T6rzeMhROVS2nNwMibvhb/z3O4YV4xD4=
-X-QQ-mid: esmtpgz10t1792139423teed96f79
-X-QQ-Originating-IP: wZfX1lGB1Z8NTcK/WIg5W0MDwDDO+bHI93LwMgLMDYY=
-Received: from [10.10.7.69] ( [124.126.19.250])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 16 Oct 2026 16:30:04 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 12796268041263047358
-EX-QQ-RecipientCnt: 9
-From: ZhaoJinming <zhaojinming@uniontech.com>
-Date: Fri, 16 Oct 2026 16:30:04 +0800
-Subject: [PATCH] crypto: omap-aes - fix NULL pointer dereference in
- omap_aes_remove()
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="cQGXqaHE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=CejfQ7Xzl26VOk+jZ6vebpBL0jzLsbbVNEnQ7lsVEgY=; 
+	b=cQGXqaHExzLpVXXNIbtaido2iealZxfQ09rbjfTsZf4Yk0ysn09Do+dUteIXMeAhl5zKxOrlHPA
+	Dl8j4IFG14zmek0oo04j8kTvzGPFNQkRWfklgiW2+tJSLQa5Lp5o5xmfsLFfpUVwSWEi6jee3wP9s
+	ZLU+z/1Jhl5zMi+MC8DDHd0mBP7nZiLJnaaXEbdYa7EwbkyaASYW6PoC8BY8WQkIdy4v54zOkG43h
+	pQWtAcepIFE1zuRgQRhS+bcIGQxi1E6y6bHB9jIRaCU8mnAdrj2wgxZ9fEf73LxekwbKt7EjQVyLp
+	B84yREHtJQkD/wNNKbM6UOPl14GILZPbnXqw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xHe0I-00000004U7u-0dLc;
+	Fri, 16 Oct 2026 17:13:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Oct 2026 20:13:30 +1100
+Date: Fri, 16 Oct 2026 20:13:30 +1100
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ralf Lici <ralf@mandelbit.com>
+Cc: linux-crypto@vger.kernel.org, Antoine Tenart <atenart@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH crypto 2/2] crypto: safexcel - Map AEAD buffers with
+ accurate DMA directions
+Message-ID: <atHquk_AUj2Ys7Su@gondor.apana.org.au>
+References: <cover.1789469436.git.ralf@mandelbit.com>
+ <7bd0c89dd32e9712d7d08393842498698148064b.1789469436.git.ralf@mandelbit.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261016-omap-aes-remove-null-deref-v1-1-195d36295ed4@uniontech.com>
-X-B4-Tracking: v=1; b=H4sIAIvg0WoC/yXMQQqDMBBG4avIrDtgbFDoVUoXiflbRzSRjEpBv
- HvTdvm9xTtIkQVKt+qgjF1UUiwwl4r6wcUXWEIxNXXTmtq0nGa3sINyxpx2cNymiQMynuyu1lr
- feW+6QGWwlCjv3/z++Fs3P6Jfv0c6zw+wING7fgAAAA==
-X-Change-ID: 20261016-omap-aes-remove-null-deref-a3444b7bb17d
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, Lokesh Vutla <lokeshvutla@ti.com>, 
- Tero Kristo <t-kristo@ti.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-omap@vger.kernel.org, stable@vger.kernel.org, 
- ZhaoJinming <zhaojinming@uniontech.com>
-X-Mailer: b4 0.15.2
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: N3l5ASPewLWqgu8AT+ZV3VEidr1DX6qYII6LAxobg2AR5fr8alElaSEj
-	aqkyEd4A8tzTU2S69atPF9PqIRR/VkQhLK9KHv73xCMjQyEwRjFmBrSwuJdOBIrn+qcLQuP
-	mvHPC+mVbcAzGVQqo4iQU8Yb+A+FhXwsktGo/7nn9tZu4QsqQEeBag6deGHAErN15ycGkq7
-	0dn1uZ8GKbrb6QdHZzDqmxIfiR6YwTpwwQ/9+836ytzZC7rrvBDNkPNe27CSMyw4jQD08Cp
-	DaxNUAKah6RMHeySDTVG8Se8atbSRkLYQgh6hW4KCM+GUJzr4R/FEWNXzZ7tOTY4g+g18AM
-	1LfkVMYMEqRVdOGgA1PwSduBY/t6qG5FeZ6kWSL+KDggvgJE8l0rW31+PaLx3u7kLUzDSPJ
-	58XGv8YprnvfCSdgxWdGKLvFLOzNzTwhCCx//6binHUKasCDk1Pu3WdaZZHdrhEQYNPvsjb
-	TGtB1wdqyO8SYPkFB7iI/sRfvdC5l4dkQZ6JbFgZ4fLtVveEL2cTIvzIuUgWHBpsVMhFhiR
-	QNXP5PN6cdl2cAGhxBS6mvqpPyrsR/mzpmsyfQEeFewFv1LhRR8FTku1HZ+q9xk+0K7rRos
-	0vPYa3NsT6N+A5HK4U1yFxd7hlFdSKoDAm0msWy/f+EWcl9KBCASfTSMmEXnzpt7yp/CUZA
-	9sbVihQpk3ci7fX2bYBpYHkFZ0B6QM+4IHKrA74PlayDvsO0V7ygBiBGAkeMlEDGW7p3Knp
-	0jAoKi9Hlfgm95mtJO8YzjQXJ/egZSrsuEy/sRJNEfJBzJUKhQ3i4v6gltPHtk88goWasq6
-	RCk9hlYFnbTlJVLpku+uQqxFcYKBdfJDENQywtKz3w1LBDf9HxoPcLkz+VUJe4Xf95NqRWg
-	GyT45tpMn0azb30nOF99xpn5zVxZuDRMKqPzTjlg6AHsAKvJ6xEjdYSZQb6rInIewo+GtG8
-	P788ANuoT77Z46cufe9XZZvOby11L4Kju1+TIoZs/bpJpPYtjOIsC8lXdAhXBi+Qmr781I/
-	WjDykG0Yzrax3wBADX2Y/qxZZhxIop/f/Ypym5Qg==
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7bd0c89dd32e9712d7d08393842498698148064b.1789469436.git.ralf@mandelbit.com>
 
-omap_aes_remove() unconditionally dereferences dd->pdata->aead_algs_info,
-but only omap_aes_pdata_omap4 initializes that field:
+On Tue, Sep 15, 2026 at 01:32:12PM +0200, Ralf Lici wrote:
+>
+> @@ -748,8 +833,17 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
+>  			return -EINVAL;
+>  		}
+>  		if (sreq->nr_src > 0) {
+> -			src_mapped = dma_map_sg(priv->dev, src, sreq->nr_src,
+> -						DMA_BIDIRECTIONAL);
+> +			if (ctx->aead)
+> +				src_mapped =
+> +					safexcel_map_aead(priv->dev, src,
+> +							  sreq->nr_src,
+> +							  sreq->output_offset,
+> +							  sreq->output_len,
+> +							  true);
+> +			else
+> +				src_mapped = dma_map_sg(priv->dev, src,
+> +							sreq->nr_src,
+> +							DMA_BIDIRECTIONAL);
 
-	static const struct omap_aes_pdata omap_aes_pdata_omap2 = {
-		.algs_info	= omap_aes_algs_info_ecb_cbc,
-		...
-	};
+This path doesn't actualy matter because BIDIRECTIONAL is safe
+even if you use it unnecessarily.
 
-	static const struct omap_aes_pdata omap_aes_pdata_omap3 = {
-		.algs_info	= omap_aes_algs_info_ecb_cbc_ctr,
-		...
-	};
+> @@ -775,8 +869,17 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
+>  		}
+>  
+>  		if (sreq->nr_dst > 0) {
+> -			dst_mapped = dma_map_sg(priv->dev, dst, sreq->nr_dst,
+> -						DMA_FROM_DEVICE);
 
-	static const struct omap_aes_pdata omap_aes_pdata_omap4 = {
-		...
-		.aead_algs_info	= &omap_aes_aead_info,
-		...
-	};
+So this is the really buggy path.  Why don't you just change it to
+BIDRECTIONAL, perhaps with a comment referring to the assoc data?
 
-For omap2 and omap3 the field stays NULL, so on those SoCs unbinding
-the bound device (e.g. via sysfs unbind) or unloading the module (rmmod)
-dereferences a NULL pointer:
-
-	crypto_engine_unregister_aeads(dd->pdata->aead_algs_info->algs_list,
-				       dd->pdata->aead_algs_info->registered);
-	dd->pdata->aead_algs_info->registered = 0;
-
-This is a hard crash, reachable from the teardown path only; probe
-errors do not get here.  The asymmetry dates back to the commit that
-introduced GCM support, which guarded the registration of the AEAD
-algorithms but not their unregistration.  The registration path in
-omap_aes_probe() already guards the same access with
-"if (dd->pdata->aead_algs_info && ...)", so add the matching check to
-the remove path.
-
-Fixes: ad18cc9d0f91 ("crypto: omap-aes - Add support for GCM mode")
-Cc: stable@vger.kernel.org
-Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
----
- drivers/crypto/omap-aes.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index d40074e5a142..8a932451ccf9 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -1199,9 +1199,11 @@ static void omap_aes_remove(struct platform_device *pdev)
- 
- 	omap_aes_unregister_algs(dd->pdata);
- 
--	crypto_engine_unregister_aeads(dd->pdata->aead_algs_info->algs_list,
--				       dd->pdata->aead_algs_info->registered);
--	dd->pdata->aead_algs_info->registered = 0;
-+	if (dd->pdata->aead_algs_info) {
-+		crypto_engine_unregister_aeads(dd->pdata->aead_algs_info->algs_list,
-+					       dd->pdata->aead_algs_info->registered);
-+		dd->pdata->aead_algs_info->registered = 0;
-+	}
- 
- 	crypto_engine_exit(dd->engine);
- 
-
----
-base-commit: 2f2f7eeef8b0a1a9b9ca998231419873ccae8d4e
-change-id: 20261016-omap-aes-remove-null-deref-a3444b7bb17d
-
-Best regards,
---  
-ZhaoJinming <zhaojinming@uniontech.com>
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
