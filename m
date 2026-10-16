@@ -1,107 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084B547F3B6
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 23:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD632E282B
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 01:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792107906; cv=none; b=kXOdys7R57SJndE+tIDpyJEE1PQTrm/wwoslC9NYdWbOz3Zb+Q+13gNhykh1LYwy61d5McJcxddj4VinfiOldSFq0b9nRfbimcx+dkyZi331gKqMECefcne7MwaORhfhfh7sMyuFqmcK/ucyZg0+ZzMD6EqlF8pdy2G+dKSxM1M=
+	t=1792113749; cv=none; b=LPv9oLW7DWzZ08N2f1BnXpAUeIAcwCMzCr9xPZ4qd2FRIAnal2QHLSnD1ablyILxniXj/+UOxafAh/ESC2v066eDN8VSFMX1LzCw3P1Bgfv4IpNz0RE3c2R6LaefAUxXI49F5Iu6y+yODL3gKc1Uu84tTUxGlrLnLQJdKDidJsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792107906; c=relaxed/simple;
-	bh=FCVqDMzrGgpkq8WGhMSthtCX8+3wWMMPfMohVJNwoNw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jF5izZbXV/ESHbZ7G7HRwjt5Vroe9709WRH83R3Xr+OYsGTIcPP0HbVNrriDyge6va/eRTxRRhGbPm1pA5eA93uuvR86z0d92hEvFkRkG/+7B/yYfuNgjgIWbJ2b6DtIaW0XbMiKx/DEOZZdhlQYFy0ZADOpxbHVs9Pk00RkWnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C4sb3hyR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792113749; c=relaxed/simple;
+	bh=rDb5goVKNdHW+xAPg1TqVSjOt7aW12nFHUOXrwpErSM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Tx8OjnWTTlQ7c/RyEZPcynLeVKMCAGN5CUpCpH0wgnmLGOQ8PJd+zU+a9s2xOMcDicN7qyYXHy/wLk4ITaJeN7HwIMjDb35/ejCuGb6o/wQYG6FKqav0GsFSryPqWe1Fzk0w65Kr46xQFnduY5oTFq1lKYOWrtXo+vSHjeS+osI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shansinha.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E5w7Ft+t; arc=none smtp.client-ip=209.85.216.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shansinha.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C4sb3hyR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABC8E1F000C6
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 23:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792107905;
-	bh=FCVqDMzrGgpkq8WGhMSthtCX8+3wWMMPfMohVJNwoNw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=C4sb3hyRJFXiWbeZ/6XrHtDW54pSeydB8hmUsGSsctsu/OYM9RdHXcvZ6S0hBQo0k
-	 wYSA53xBFPJM2Kytf6kKVPFiQaxmoBwBI1CzheBzIfKk+00lVeyWeKt9ZEp6JpO6xw
-	 41OHUi866Dg4mI0A8DZh8m0X3T1L7uZrJmScX3LheLPhxQBf7qw9NvGDQtN1LhBP9m
-	 rnDaZDjo45TY5oOOHges+qBZYbOSRhVePaHoZLR5OoTGmPNwGLO7VoG01EIhCqabbz
-	 BnmfiJoHwXO/P6MUUF0Y7j+PBQhAJ9YBOPdPjwbH0sZQnil+Sk4bI2S7mL68TJ7+5e
-	 ojzxrAiqOH4jQ==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6b167ffd132so9505706a12.1
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 16:45:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzNjwGhgWXIIuYvjdhvCxbiq3ShgGjXSp03aGdRVggxWm2iIyh9LxyQbzvJ8Kvl03Bg6b0dGJzappOMixo=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKRxEKhr2WkPm0TjNvHB0fHkjY/+sN/6cUdbT1avRCsiPHf7wjk
-	IQGnVSNh6/lfLy5BHl5fUCV8mhKZI+Jc0SEnrQIJTEf7CawprngA/e6xkusho4fSZw7EDiWlXk4
-	HgAPg7guA0nQi6iPhW051HKv5hywRZU8=
-X-Received: by 2002:a17:907:3f2a:b0:c2d:fc0b:551c with SMTP id
- a640c23a62f3a-c31a9fcf4f2mr1949378066b.16.1792107904655; Thu, 15 Oct 2026
- 16:45:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E5w7Ft+t"
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3ab7f1efe5dso5121446a91.1
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Oct 2026 18:22:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792113747; x=1792718547; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=MS4gSCkqGtBHDPJdK563wHc/5/xO1UWE5Dvgu8PJM9A=;
+        b=E5w7Ft+tYtbLUcsdO2hUtxtFPhiNLdbMJUf/5KivqMHsqZlL7GsBduI/GybBYIbMsn
+         fscWIhUGtKb5owwVFNNu1h/H2nYEUN8iXmU4Tf9FYnFnzqiO8daEQ9B0v2kTiS+3BORb
+         YOO8iV6S9XEANp2BhErhLecm4T3XDF+/EHPLpj0cfbXyIkXpuXUgPzaEwCGMiUssyvkP
+         oC/NuDQ10kvxa+1YGk6L1IMtI5NrWSCFHPjt4/fh1mCfnI2VBt8scnmMlaVrx/FEiGN+
+         4ZyuJ4mMfM6wpDYjPgsVrrazqKP1XFzPMO7yNSoihJtYBJ/6RFxZxFGUkXTX9hR1Q46U
+         okVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792113747; x=1792718547;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=MS4gSCkqGtBHDPJdK563wHc/5/xO1UWE5Dvgu8PJM9A=;
+        b=hHbOZnwQ6p6Llh/rHyozP1n9pkLieA2AXrMiczkdaO4wJMVHtxVgo6kLOreOWoOE/D
+         /i4vwPoYFuXjyII6aUgG8Gtv9woR9ae+LXmUTZWGMO/sU2yy2JmR22aQwYSw1uk06uwM
+         LnWmbluNh+AjhqbWfq1ji1fb0SALYKeoPvJFY5Tq0TM48UowpCfZjMl50O0t4yoF9ZBl
+         /Mz6jbmDbC+PGTUlBZhfnvrHDnl+eqEXi4L4MSmP+sRPC5Tq4uJNTVLP3OyFNIEJtPcj
+         wtDRM9kv4Eqz4EnQOdvZbA773FN1ZYmlnh2t4a3C2V4dmTaAMwjP4IdMLHxgJjcabjp2
+         kjQw==
+X-Forwarded-Encrypted: i=1; AKwUvBwT4vrKz0MHH9QcUpUXIUq9y4SRxI54DTL8ziG9wdXizzXL8SuNWyRkq6KDxjklUk4cgB9OfPIVgM7/MB8=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLeePXgGMUDnUkDBRI6R/SXxICDk/RRC+nltIOEww1t9PxCri8Q
+	5xCFlRT6Z94mjWfS10z/C+M6jzpcjAcjnzj0uMRyGMbKxkPPHdmNcxbCYUmiQFiaOHEFCrN1m3q
+	FCeVSsHkNvuDHc2T8DQ==
+X-Received: from pjbgp15.prod.google.com ([2002:a17:90a:df0f:b0:3ac:3bb4:e960])
+ (user=shansinha job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90a:4ce3:b0:3ab:a188:b8b7 with SMTP id 98e67ed59e1d1-3aba188beb4mr9134720a91.22.1792113747146;
+ Thu, 15 Oct 2026 18:22:27 -0700 (PDT)
+Date: Fri, 16 Oct 2026 01:22:08 +0000
+In-Reply-To: <267f5e92-651a-4874-936e-70f3fbfe1e16@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20261008182814.27450-1-kanchanapsridhar2026@gmail.com>
- <as-jZopKRfuYAiTE@google.com> <CACpmpoeS_cvXRWJXqiYZV9oykk=91efv8KtZgK2Pi-QwHnQH3A@mail.gmail.com>
- <CAO9r8zN5n=9v4K+OtEEODg=e0kcFW99PreUcZm09q9CUMQc+ew@mail.gmail.com>
- <CACpmpofdoeVbbw7izCDeJ7eS+XpWj+3sp3teKEQWywyRB75jYQ@mail.gmail.com>
- <CAO9r8zMaaUsBaS0TJumochRKt2ShV7nRaLnYPWv3=S-wUFgitw@mail.gmail.com> <CACpmpoecz4tjr-qvFRy22CGuF+4NBWbE7HVjdTGFqQOheK3CLg@mail.gmail.com>
-In-Reply-To: <CACpmpoecz4tjr-qvFRy22CGuF+4NBWbE7HVjdTGFqQOheK3CLg@mail.gmail.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Thu, 15 Oct 2026 16:44:52 -0700
-X-Gmail-Original-Message-ID: <CAO9r8zOAcf4=TscCXjMYvowUx-_u9qLGqY2-p7cK-z5CUU_x8w@mail.gmail.com>
-X-Gm-Features: AclHuK8pqaYpWR70T_a5K64RldUi1KMaCsjej6fZWhQkmdzR1e8fyDYr4JkyQVk
-Message-ID: <CAO9r8zOAcf4=TscCXjMYvowUx-_u9qLGqY2-p7cK-z5CUU_x8w@mail.gmail.com>
-Subject: Re: [PATCH v1 0/8] Batched zswap_store() with compression batching
-To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
-	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
-	senozhatsky@chromium.org
+Mime-Version: 1.0
+References: <cover.1792014060.git.prsampat@amd.com> <55c189e9130a7d22c0b756440f10a056415404e5.1792014060.git.prsampat@amd.com>
+ <atElnAcDQFTnmdVr@tycho.pizza> <267f5e92-651a-4874-936e-70f3fbfe1e16@amd.com>
+X-Mailer: git-send-email 2.56.0.176.g3575e65682-goog
+Message-ID: <20261016012208.3220126-1-shansinha@google.com>
+Subject: Re: [Patch v4 7/7] crypto/ccp: Implement SNP Download Firmware EX
+From: Shantanu Sinha <shansinha@google.com>
+To: "Pratik R. Sampat" <prsampat@amd.com>
+Cc: Tycho Andersen <tycho@kernel.org>, mcgrof@kernel.org, russ.weight@linux.dev, 
+	dakr@kernel.org, ashish.kalra@amd.com, thomas.lendacky@amd.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	gregkh@linuxfoundation.org, rafael@kernel.org, chao.gao@intel.com, 
+	aik@amd.com, nikunj@amd.com, michael.roth@amd.com, shansinha@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-> > > > > > How much of the performance benefits come from patch 6 vs patch 8?
-> > > > >
-> > > > > This is how the performance changes: Average throughput is averaged
-> > > > > from 10 iterations of usemem.
-> > > > >
-> > > > > patch 6: 19,119 KB/s
-> > > > > patch 8: 17,593 KB/s
-> > > > >
-> > > > > So the acomp_do_req_chain() path that ZSTD goes through with patch 8
-> > > > > causes a regression, even though it provides a generic batching
-> > > > > framework in acomp.
-> > > > >
-> > > > > I was able to retrieve performance with the following change in acompress.c:
-> > > >
-> > > > Why add it to begin with in this case?
-> > >
-> > > Patch 3 ("crypto: acomp - Add trivial segmentation wrapper.") was
-> > > co-developed with Herbert. The request chaining for non-segmentation
-> > > algorithms was as in Herbert's original implementation. Since this
-> > > causes a regression, I would like to get Herbert's Ok on replacing the
-> > > request chaining in this part of crypto_acomp_compress().
+On Thu, Oct 15, 2026 at 05:09:38PM -0400, Pratik R. Sampat wrote:
+> On 10/15/26 3:38 PM, Tycho Andersen wrote:
+> >> +	/*
+> >> +	 * Firmware either just requested a rollback or a rollback attempt
+> >> +	 * failed. Keep the PSP dead for all other commands, only another
+> >> +	 * DLFW_EX attempt is allowed through.
+> >> +	 */
+> >> +	if (sev->fwl_rollback_required) {
+> >> +		psp_dead = true;
+> >> +		if (fwl_ret != FW_UPLOAD_ERR_HW_ERROR)
+> >> +			fwl_ret = FW_UPLOAD_ERR_RW_ERROR;
 > >
-> > I mean, why add patch 8 if it doesn't improve performance? Seems like
-> > even with your diff, we only recover performance, but we don't improve
-> > it after patch 6?
+> > I think this error switcharoo could use a comment (or maybe just be
+> > dropped?). e.g. if the user does something to set
+> > ->fwl_rollback_required and then tries another firmware upload that is
+> > the wrong size, ERR_INVALID_SIZE -> ERR_RW_ERROR, which seems
+> > misleading to me.
+> >
+> > I saw some discussion about all this:
+> > https://lore.kernel.org/lkml/20260924213737.3833625-1-shansinha@google.com/
+> > but it's not clear to me why you need to reset the error code here.
+> >
 >
-> Patch 8 does improve performance over patch 6 (19,578 KB/s vs. 19,119
-> KB/s) by 2.4%. Besides, patch 8 provides a compress batching framework
-> in zswap, which is the purpose of this patch series.
+> My understanding from that discussion was that userspace errors should
+> fall into clean buckets. read-write-error would mean "roll back",
+> whether it came from the first failure or a later rollback attempt,
+> since a failed rollback still leaves the PSP dead and needing a
+> rollback. dmesg would still log the exact reason for the failure.
+>
+> That said, I see how it can be misleading, and I'm fine with dropping
+> the override or putting a comment and re-spinning this.
 
-No, the purpose of this patch series is to improve performance, be it
-through the compression batching framework or otherwise. The
-compression batching framework made sense as it provided greater
-performance gains with HW batching/concurrency. Without that, I am
-honestly skeptical. 2.4% can be within the noise.
+I do see how it can be misleading.
 
-> zswap is the
-> first user of the crypto_acomp compress batching API provided earlier
-> in this series, which I think, is a great starting point for us to
-> evolve this further, as mentioned in the cover letter.
+I think dropping it makes sense. When I suggested the changes for v2,
+psp_ret was only logged via dev_dbg(), so the sysfs error was the only
+clean signal userspace had. Since the error code is reported in dmesg
+now, I think it's fine to keep the original error and have the sysfs
+error reflect what happened on the upload rather than the action
+tooling should take.
 
-Without a non-trivial performance benefit (e.g. with HW batching), I
-don't see enough justification. My advice is to try to push 6 (and its
-dependencies) separately.
+Thanks,
+Shantanu
