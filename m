@@ -1,208 +1,252 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0a-0002e601.pphosted.com (mx0a-0002e601.pphosted.com [148.163.150.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D30457E71
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 11:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792148940; cv=none; b=VU8zyp60llFv7vHpXxjBx/lVDlvEO0prtz5jdmz/6IV26WOGb7aqRmlFSxLTcVBq3gqNPJcThnzIEXBd7kzz7r8uPRyhJwHiIzTEZX2YykoNVMzQ1F9GCHEz+rwXA2JKOju+Z8yZuDHFpGQIrmLIFDwt2VMnCImpwFnhyaSbTno=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792148940; c=relaxed/simple;
-	bh=+Mqjw/52ocTM6ONRI+XSBSoq2w+qKyPB1f3+Wxqs0SI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tCp5AtINGNz4d/nEi6uST2zKic21wCfJL2IiTdPa/OSWtlmRogNDAbxT5CEPPtM7YSWd01wqk0W+eC3+c21qY2jRCTysSepktxf3V/KAvLboWYIYdWo3yGidFp0n/1Aw6wke1H1BTxRbLzMpIgmx3yEBxEs6a4JUZwcOi/V5C1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=BYSCw21T; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=RDd6ThCx; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F91D3EE1EE;
+	Fri, 16 Oct 2026 11:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.150.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792151321; cv=fail; b=P8N6pVA0wudqgF8yJ/keQxUDZJpR88r4QEy5eY+ekZdVZl/xiW4A/nEK9dJB8eeHiLYPAlmn8CcUrVzbDQy9fEm1PwVaamXiZdK7KZ0ddRxDwSg7splevswXxOhLRvf7Cf+zi1fEb7uFV3ZmVFQ35C8fz4S+VsIrBEH0IfjXUmE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792151321; c=relaxed/simple;
+	bh=nYUsW3gR/7I5FBULyFXa84lDGXX94V/Vpt+yy+lUz5g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Evyk2JdY+jImrRVxb4INIULDbN4wpCcJWwqTSMwCeuk1o9Ns6+M6v80pg5jJNPOG4q4fWQRaJ3qJwcaz+mQv0lnYQFYsDALVHH22nLdvPNCYAlL7YMGtbgMQJfhR5w/6cdT/ETu3Hv5WVYUeZhwjewgecZkqEQFbC4zu2vMvtno=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b=P0oHHRNG; dkim=pass (1024-bit key) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.b=mskrOXHJ; arc=fail smtp.client-ip=148.163.150.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="BYSCw21T";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="RDd6ThCx"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69GAAIgH2998528
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 11:08:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=gWl3ZUACDSH0+HI0Kf7AzS
-	vg7+UULz4toCsh4XD7F8g=; b=BYSCw21TXr+X39CJyRfxHmYgu+/2fDVtYI4ARd
-	UWsWKot+0Fdiae0kt708pyGihunSAmEmYUxJlscQzsKY2H7by+naeSSAjLLznQ9v
-	d2IJ8NrfEofyEkXqmxK2eJQykZ7FNiztLuw0pXTjD4sQUydpXaiivLoe2SnvGQwG
-	TSkMddyL8hzXGssPVhRLrpVvweS+66+QVMwN9Ze4JnqezHLJZEDBkCe6VjCkL/2f
-	OO2aEdvUvoM4bhTYFiZOj3b6gKz+JoIlUzD4Ucf+Imnoj/rejJAIYaZxVjrr4c7a
-	1ZUdF5Ot15KRHNQ14k/7uNyNizIvU53ahM56ATZD0eJ3ehQQ==
-Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hb8r1291b-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 11:08:57 +0000 (GMT)
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-3510d0baf63so9038487eec.1
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 04:08:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b="P0oHHRNG";
+	dkim=pass (1024-bit key) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.b="mskrOXHJ"
+Received: from pps.filterd (m0380145.ppops.net [127.0.0.1])
+	by m0380145.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 69GBOQbo492119;
+	Fri, 16 Oct 2026 06:48:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=proofpoint-05-2026; bh=tA2uHNnkXTpOI
+	fjaUq+0Oq926jlawI4Yh981qqq18Z4=; b=P0oHHRNGzBAGuSdk3LVAWAjpqcdyE
+	V0zVtbNNr36o/PRcpj8qrSGWv6MozNss1hqLIy96HmOoLJaTA7R27Nae6dSYdIX2
+	K4nkcgkJ8k8XqAzwOAaCe/32BBwATlMMZ+bVxb7XER+n5wf8IRm4WuTuUUxblJHp
+	zZOtd61WEFlNGmKyISN38KKsHiz2xh7UHvPN6jtlLx2EDI4bDotIGkVv0HgUKYA2
+	syq9lo8rKWKxVd6/qNQNcffHPleuaduei4JbxMPyfRlfYhzt63L/W1yBS0oPzinl
+	Da1/8j5JZpus9rwPsfYeJ8vu0kcmCadCK4ErZHeNqPMxGankXJg/tsxUg==
+Received: from sa9pr02cu001.outbound.protection.outlook.com (mail-southcentralusazon11013065.outbound.protection.outlook.com [40.93.196.65])
+	by m0380145.ppops.net (PPS) with ESMTPS id 4hbk12g3hr-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 16 Oct 2026 06:48:29 -0500 (CDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qYOeqZnQ8JaqTmrZt/b61Yi8sAlJuaxRuJ4/Zbw0cYdRS+VzaxG1J3+CK2wMX0Jy/ay/EUPMLRvtVKbrtH1thfcO2aCUJ2cALXY7jIXRdAJm7zPqiE85Cpk+qD7u4K72HMz3gO0jeUIl4Zso6SsU5G+veaw+2oJAV0/B3Oe5JRcUPDajiqK9paKEES31f6kKXj7hD0LyIWPXYLYenZ+icmRNez61Vp2OS2cysxaB4m4McKQWekda11dI+gBWOw/PWDFZptL57Lui02Qj5LQc/ipstpTVc4Ox/hTiP6icZITP+vHTT3hTk01a38ybJrLwMM5XjrFDq/CjJ1tbRJYlew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tA2uHNnkXTpOIfjaUq+0Oq926jlawI4Yh981qqq18Z4=;
+ b=UnbQflAw8ORhGFqz43QZQ6ifvKe2hZ+NvzaGCR98wWULaQHOX7W7VAJe8jET0Bksxs7PbQQnKyVe48nAt6hDD7Dctw6IsojSvpsCqQwKlQOhZpIRFnQgaktI81o2SUgHq+iqUZHEddFz1j21UPzS1HhrtE6LouSTrvCIhYZF/kV5nmutBRb37iUGPN1bK8yiPH0/+tEHYzQ+y/FvzQImZKDduUgAkZ1sIk6vDiqRHqVhgPuCXAS7p2GMi1qpzLbSJhZr6qOBk3Idft/xoZCOCOx1qSnWjalcfOQF0yHVH1UtWDZTJw2W5aoxL5j5LrLUEjX4yknFPSCzkHdgkLKBrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.195) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=ti.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
+ dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1792148937; x=1792753737; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=gWl3ZUACDSH0+HI0Kf7AzSvg7+UULz4toCsh4XD7F8g=;
-        b=RDd6ThCxEDKa3383MToKKmtoIINrp9aUL4YEsdh/7iFHhD8ElWr50KeLwYdoewrGgD
-         bLdmP8oTL6ftxeb3sh738nVl7xL9OCk5uefAeadsOtNCKTNCbCI+BQhyLvQRk9QtdQJS
-         qTJ9WT4L+t3b/GPxNO5VevbdZ42mnaxafmuM09/3lDmkukv32Wb2sGtOudUdc/wP33Y7
-         tmlRgjiTOqRYwP885CnBxObLfOn9/oIR8vT3OMMJLIOWhQlBDI1lJswposqBrY0kXujV
-         xkxtIEdP1Av7KwhZtZjfdMfTF8GR08fYN2HeaAOCuTIocUSvn7NFg4JjfriXee1LOXeq
-         WvHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792148937; x=1792753737;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=gWl3ZUACDSH0+HI0Kf7AzSvg7+UULz4toCsh4XD7F8g=;
-        b=10293dV/+SFYnEMOBpftYXeQRweXgEAw0xpuXSAsRkiMxXr1SEkPAMkmzVm2qF8L8Y
-         7e2a3vnviYhEMaufVHUpiZNI6TIR+V0CTlev3nWv5AlPAp8yG0HpbT1Eg5SRnVd4unSy
-         82PKNWAv1ugBp885UNIMmVNrWpnUNTEJFQubUFb7uxSj/KZ+mL2ZmleYklq+yqS8QnMI
-         ngRoFo3Rp0indDYmdTShPJy/IVTk/nq7AiQVeAs/NHL6U1BhHwBpEAhKpwu643mkL15o
-         GdgWirnPgvxW6Bx1zNC/9+EJpQDpX/MjQ1HPXoxrUecaNZ2zjztHYGYL7uNeAxV63Bbv
-         +V0g==
-X-Forwarded-Encrypted: i=1; AKwUvBzN7CUuelMWpVnxftmX9Mex70ImqMisvCUHezsoMt7VLqlPee8rizs/Ld3LO4xDsf1EPMaptbID4YTEj9Q=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLDH4iRFhBaR17UgOnHgXpmwC4VSHPXfhZFM/Wqmvl9VzmIHzKc
-	/2ovndzHF7LQ2ayYl3OF3M6K7Pg6ROxyV7B6c2B63+xte3c8/ZV9wLSdc7zqTHEa+WGzJjts75F
-	5EenuwposUDmZXbmxacC5M5bR2qZgCNYIkuT5T11o6OgGjEClxdtMEcMaq+73yHS/wEc=
-X-Gm-Gg: AYBFou0O32+lE9FzHzZpoO2Dqj57rb+YEZgMfVvy+Jdaf1LtZlkdID0nKtLg+LTYXBJ
-	Yy77G6wH6nt9qgitlXxC6W5m3MgYmJtH3wzZQiYVDxp1M5zP3Lg3THuslakq4b7X4YnQ1T54wEX
-	cCe/wtMlZVYxULl5QwsUa1IP6wRaLNhThFx0+3KBHEXgwcbngkDmM7gf1OTPRV3C4qIbinndl70
-	2ZVMuEjHwb140zgEeWS2N+Rz1vpavPsN85KvcivT+mwyjgBLBj6lUuqW/RCYNYxOfU5xvFDjlmu
-	gjzuyGJAELuruy8pDN+IzRYhTbAfPoQ6ubD1+TPEc14UAtAp7O4GvuA8V6XNj5LBzRYt8k1qmsP
-	L1hcOTqTAa1k2zMYouG1Jped9257ISdLNUjDsk9NXLystx3AH812R4r9ICtTRZq7DBhxmkL7l58
-	5eblZ6wc7ZL7zTZhwhVqVYwW2y34Tnrw==
-X-Received: by 2002:a05:7300:f814:b0:361:1dd6:531b with SMTP id 5a478bee46e88-3611dd661ccmr717543eec.26.1792148937218;
-        Fri, 16 Oct 2026 04:08:57 -0700 (PDT)
-X-Received: by 2002:a05:7300:f814:b0:361:1dd6:531b with SMTP id 5a478bee46e88-3611dd661ccmr717496eec.26.1792148936073;
-        Fri, 16 Oct 2026 04:08:56 -0700 (PDT)
-Received: from hu-varada-blr.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com. [103.229.18.19])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-360826875b3sm6487485eec.21.2026.10.16.04.08.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Oct 2026 04:08:55 -0700 (PDT)
-From: Varadarajan Narayanan <varadarajan.narayanan@oss.qualcomm.com>
-Date: Fri, 16 Oct 2026 16:38:46 +0530
-Subject: [PATCH] dt-bindings: crypto: qcom,inline-crypto-engine: Add
- IPQ5210, IPQ5424 and IPQ9650
+ d=ticloud.onmicrosoft.com; s=selector1-ticloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tA2uHNnkXTpOIfjaUq+0Oq926jlawI4Yh981qqq18Z4=;
+ b=mskrOXHJyXl8fA22VGabuzxnODWhy3PdyqM1yEu1g7Y5yH5MRcM2G+xtBS9uHMF2ZPOucSEGp0IiU+xqA/FHeWfdVR6oog94afTONp7T6Mt/FKoD0Pova+prNHjqYu+eYzFyTcsxuGAK+IetGQtrMuSnQ19j/sRCdcXvy/A11N8=
+Received: from CH0PR04CA0016.namprd04.prod.outlook.com (2603:10b6:610:76::21)
+ by SJ0PR10MB4526.namprd10.prod.outlook.com (2603:10b6:a03:2d6::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.12; Fri, 16 Oct
+ 2026 11:48:26 +0000
+Received: from CH2PEPF000166C2.namprd04.prod.outlook.com
+ (2603:10b6:610:76:cafe::94) by CH0PR04CA0016.outlook.office365.com
+ (2603:10b6:610:76::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.522.4 via Frontend Transport; Fri, 16
+ Oct 2026 11:48:25 +0000
+X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
+ is 198.47.23.195) smtp.mailfrom=ti.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
+Received: from lewvzet201.ext.ti.com (198.47.23.195) by
+ CH2PEPF000166C2.mail.protection.outlook.com (10.167.244.228) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.522.6 via Frontend Transport; Fri, 16 Oct 2026 11:48:24 +0000
+Received: from DLEE212.ent.ti.com (157.170.170.114) by lewvzet201.ext.ti.com
+ (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Fri, 16 Oct
+ 2026 06:48:19 -0500
+Received: from DLEE215.ent.ti.com (157.170.170.118) by DLEE212.ent.ti.com
+ (157.170.170.114) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Fri, 16 Oct
+ 2026 06:48:19 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE215.ent.ti.com
+ (157.170.170.118) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45 via Frontend
+ Transport; Fri, 16 Oct 2026 06:48:19 -0500
+Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.53.205])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 69GBmHvo1508449;
+	Fri, 16 Oct 2026 06:48:18 -0500
+From: T Pratham <t-pratham@ti.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>
+CC: T Pratham <t-pratham@ti.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Sebin Francis <sebin.francis@ti.com>,
+        "Manorit Chawdhry" <m-chawdhry@ti.com>,
+        Praneeth Bajjuri <praneeth@ti.com>, "Vishal Mahaveer" <vishalm@ti.com>
+Subject: [PATCH v9 00/15] Fix several issues in DTHEv2 driver
+Date: Fri, 16 Oct 2026 17:17:51 +0530
+Message-ID: <20261016114806.1749515-1-t-pratham@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261016-ice-v1-1-4098b1972f31@oss.qualcomm.com>
-X-B4-Tracking: v=1; b=H4sIAL0F0moC/y3MwQqDMBCE4VcJe+5CojaIr1I8xDjVPRhtkhZBf
- PeG2uM/DN9BCVGQqFMHRXwkyRpKmJsiP7swgWUsTZWurNHGsngwzNgOrtZNU1sqzy3iKftPefR
- XR7zeBcvXSINLYL8ui+ROBeyZ/+Cd+vP8AuPNL6OGAAAA
-X-Change-ID: 20261016-ice-e1d8ba304436
-To: Abel Vesa <abelvesa@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Varadarajan Narayanan <varadarajan.narayanan@oss.qualcomm.com>
-X-Mailer: b4 0.14.3
-X-Proofpoint-ORIG-GUID: vmx4CkqpzTRExn-xz_87DKyZGaveJ4WT
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDE2MDA0NCBTYWx0ZWRfX2UMRnvCObMTq
- QxqvxOFW4B72PiErBjCW3PigbDOTiON3vt9Xb3EY9iGuEDUOtJOhW8UFJy9TaCGeXER0CifDAxt
- xHHwT3H3HIi15gwFmHNkDZuyOxQ6X+c=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDE2MDA0NCBTYWx0ZWRfX5ljH4Z/3Q2DA
- Nj7JU1yCGllXF73iiYyfSFafZ//WF1Am5GD2TmfMzhfpcdp3NqLSALJ94aihaMlh64yeJNzHrR9
- zIpwLEp5u1FOej9qWOpnNy09Bns021ii9QZpOztlQETknkC3x2A5DATnRo1Tvz2QfIzUYw5omYj
- YR18JheqGfMyeSj0AnOiJRJWifn52l04hgkUknypoY9iee07amobAvr5JHLAZ9lKV6RBrXdYzXV
- AAAQGh8A8+hvpQPdrL7FVD1r7vAvWc7jKYnSny5ac1TwYKR4GW2jUWJTvyExXFxNukpcs3t5xtm
- BjVsL7goaTMlZgVPHBdDlj1q6yM56AcvlOL+QKdMAVYj29dTGIpgpi7BsEHX4kUEUS7TWMA8pCY
- tEcBdNHAgwktx0ly3+s4cO43VDstYSyknUBliBtHYtCoJXM00LAmNEibcEbCKe2Ck+SvTHZkfrJ
- TYlevFOG27RXU960Hiw==
-X-Proofpoint-GUID: vmx4CkqpzTRExn-xz_87DKyZGaveJ4WT
-X-Authority-Analysis: v=2.4 cv=L/CI0OT8 c=1 sm=1 tr=0 ts=6ad205ca cx=c_pps
- a=wEP8DlPgTf/vqF+yE6f9lg==:117 a=Ou0eQOY4+eZoSc0qltEV5Q==:17
- a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
- a=EUspDBNiAAAA:8 a=Xq4CliCqeop8EqABAtsA:9 a=QEXdDO2ut3YA:10
- a=bBxd6f-gb0O0v-kibOvt:22
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF000166C2:EE_|SJ0PR10MB4526:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52fd6868-dfdf-4d9f-cb33-08df2b7b62da
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|23010399003|36860700016|82310400026|56012099006|261009223027099003|10067099003|18002099003|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	1wtHXHyTEKy6BKv5Vi9uy8lS/Vcp6pLuYgjlQK9M51sRHRgnYDYrmz93CsMhfuqzbBbOohipJOR2FzLtXjV5ykbGq5l2WFoaSpIfRBFT4BQVISbZS1yc+8l9/m54dgGw5RDwtkBUanRvuqWTNCgJT7mSuN3GCuDs7nWeobjkuNneSLRFlMkDUrraOyf/2XFSHlzeJpBaZDVodxtWdR0khP7enCW+tJ9QRJomL7O72Eb29g1LA3EWfwTX84XFTgJcs3yAb/iGs+L5vkCyIFEs1Aeiu2NZvKN9GBN7vOPC+HK//24gAQTRKrrKySAKiw3Svffv0ROHKyxvUj5rOXFzAlMTsorSkHzc9DxtEuiBQqMjxsjOu0slTHSYp89T+Imc/usPUHwg7IbzCL6+OLXF+oC5eeWKXi7aeDLEzIFjB/Uciam34xU4N7bz6HNw8179/NG5Ja1QbOP7MJvMErZs7gQc31C84a5lh9gVIJEk3m/75w3U82hMlpoi0+52pcp9l9opYqDQhgwZQYjVpGw2qz+qscs1LPjbd6z7ChoF1oikJoTAzUoYSwqCZfB+6R+zAzFxgsWvq37A0P23OK/k9i9lEK0Q3/UILwanKjR8O1noDbjwyry3IfxFPD/KeZAnzaxh39/lQt2O6aER/kpSzg==
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(23010399003)(36860700016)(82310400026)(56012099006)(261009223027099003)(10067099003)(18002099003)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	f+JmGBoCvkarP8Dvnsw8Yra6cly79VkzHi8gj+lwQk3CrXa3isukoupt2dmPwrnl76vxdESOsVoaya9uRBvuQbaLnl3v7gg69PL0s1OPeeqtEaPJFtNQcyIOHk2x7nE079E7ZNN+YJfo63A7KVPaBCIFGovaeZcdV5mdHXNz4iFFWkKU991VT6z/4+cQvwaU+RAXjJ75Gehh8r2eF+qSp+2MB2w9/nO3304SsrJA3DEsJdyfZa9ksRaXnUhHyv27Sq12edNh9cDWLuBAuibERqHPgLg3S6EXoAbcwS8vCT4dylTttagtUrs0DWfzRGwiF4bRQ6ExzkDdVnXUTuHLNi+9fbQw+oVeM+69tSYnno8vnhj8kH0OEsynmdgbeVssjp9mWEk7Rmfble8y8etVIviAh2whDFDRKUmwOWm8o1IM39R7Wj01/HQe9p0GM3KD
+X-Exchange-RoutingPolicyChecked:
+	iteNBs4RMFHttN17rv5edBndJttud3oRouYnSiEuPngRZUhBbpywTwgjdX7QBnMGEiJpkuJF1L5DsXyZMFcDd6R/ZZNOAH+YfG2kexIrjB2Od8M7xDBiodDNAKbdbohxSU+9KGDy9hdOFmyJODO7gmg38XBCJ0bQZjwokHtOozbJq9O8qBU7mUkEdsp5fxKY8yHjsOOe79l6VElJDpy0M5HZN3a/jMuOjqWT3wthJffsPkxYRHJoPEVzickYrKnM5tPp7rAYpUvrn8TT78u6siJ6w8MkxbA3BlOQTYgzKD0pj+83+H9b2dapplUUo2p1YlgQ82NLyvAqNnFNW/LTaw==
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2026 11:48:24.8466
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52fd6868-dfdf-4d9f-cb33-08df2b7b62da
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF000166C2.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4526
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDE2MDA0NiBTYWx0ZWRfXz+lGu4d5YMmz
+ VD6/bouiulpGwrUahsjUPneFRoPW7F5KLmfTlPsBRPCME546FLzF11wrJrlVMK3omwV1EF90BhO
+ IP2iuyeLbXXZgX/ITPlSeAUqUShnXnWssgbbLigW//vV7lz/FP4iaPZi7Yq442rNA18+CDnc8pp
+ 8CYnmnlpQpxMPjzSK30+3Rcw1IQx1ONKMId+7CAVpvcFuS2EWO0mRX4hBYMHpd845Wb+sMC04/5
+ 4qku2yyYLwC+PqwH4O/icJblIX4PJbQ5XN+J1M28kmHM9j48qtkVS4GOLKM+buoM4WhgLRbb71e
+ pb+2CZv7w2wKgHFykKzoDJ1MFFRxmC+9sa+r6Q8EcjMjgmbtd1VAEgPA9W3W9QRHko+9F3bqu1v
+ gbTmvOxaIltANiheB3rJ3SodU+QVNM9ew4TQXSzPLsinEc78pDo2UoBwQyVR4VLicDI0Q7P7XUQ
+ 6VvXK7xyJQ+RkXisNxQ==
+X-Proofpoint-GUID: axLvMPvZK3h7LNfCIiXzKIre-lIj67xK
+X-Proofpoint-ORIG-GUID: axLvMPvZK3h7LNfCIiXzKIre-lIj67xK
+X-Authority-Analysis: v=2.4 cv=fspJ914f c=1 sm=1 tr=0 ts=6ad20f0d cx=c_pps
+ a=fgNoY2FrYBgJmLE9YDNrYg==:117 a=f+v6EHfkeJbVwR46tk4DMg==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=660iZSQnnn4A:10 a=s63m1ICgrNkA:10
+ a=AlMIdn_sM9wA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Z8NIEmU8O1QQgoT56wFK:22
+ a=gO1vWkAQAl3rybz1DQOp:22 a=c92rfblmAAAA:8 a=sozttTNsAAAA:8 a=VwQbUJbxAAAA:8
+ a=pGLkceISAAAA:8 a=UxwojoEslEplIN4H4qAA:9 a=GvGzcOZaWPEFPQC_NcjD:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDE2MDA0NiBTYWx0ZWRfX0Ua2Ie5yGLgj
+ UJF9JQrhSYyBC9q2QAgZoyCQBNC56+iWF71XL2lfSBE7lc113jgx0mAosXih0Xn6/QedYy5px4Y
+ Q73Tu++xisOlxZLJI12gG/5EmJPzDJw=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-10-16_01,2026-10-14_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 clxscore=1015 malwarescore=0 spamscore=0 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 phishscore=0 adultscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610160044
+ lowpriorityscore=0 priorityscore=1501 malwarescore=0 suspectscore=0
+ spamscore=0 phishscore=0 impostorscore=0 bulkscore=0 adultscore=0
+ clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2610080000
+ definitions=main-2610160046
 
-Document the Inline Crypto Engine compatibles for the Qualcomm IPQ5210,
-IPQ5424 and IPQ9650 SoCs.
+This series fixes a handful of independent and mostly benign till now
+issues in the DTHEv2 driver which were flagged by bots and AI agents.
+Except for the fifth patch in this series which was found in an
+internal testing.
 
-Separate the power-domains requirement from the two-clock requirement.
-IPQ5210/IPQ5424/IPQ9650 require two clocks but intentionally do not require
-power-domains because they have no RPM.
+The Sashiko review on DTHEv2 hashing driver patch series v5 pointed out
+some pre-existing issues which needed to be fixed [1].
 
-Preserve the existing requirements for other platforms.
+One of the issues had already been flagged by kernel test bot and a fix
+sent on the list by Mert [2].
 
-Signed-off-by: Varadarajan Narayanan <varadarajan.narayanan@oss.qualcomm.com>
+I included this patch in this series with minor edits. Then the Sashiko
+review page for [2] had more comments [3]
+
+Overall this resulted in a bunch of fixes patches which would have
+deviated the DTHEv2 hashing driver series had they been included with
+it. So I clubbed them together in a new patch series which is this.
+
+Signed-off-by: T Pratham <t-pratham@ti.com>
 ---
- .../bindings/crypto/qcom,inline-crypto-engine.yaml | 27 +++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+Links:
+[1]: https://sashiko.dev/#/patchset/20260807110501.975130-1-t-pratham%40ti.com
+[2]: https://lore.kernel.org/all/20260613085858.32580-1-mertsftl@gmail.com/
+[3]: https://sashiko.dev/#/patchset/20260613085858.32580-1-mertsftl%40gmail.com
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-index 23bf98c2b9fa..e838694bb70a 100644
---- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-@@ -15,6 +15,9 @@ properties:
-       - enum:
-           - qcom,eliza-inline-crypto-engine
-           - qcom,hawi-inline-crypto-engine
-+          - qcom,ipq5210-inline-crypto-engine
-+          - qcom,ipq5424-inline-crypto-engine
-+          - qcom,ipq9650-inline-crypto-engine
-           - qcom,kaanapali-inline-crypto-engine
-           - qcom,maili-inline-crypto-engine
-           - qcom,milos-inline-crypto-engine
-@@ -81,7 +84,6 @@ allOf:
- 
-     then:
-       required:
--        - power-domains
-         - clock-names
-       properties:
-         clocks:
-@@ -89,6 +91,29 @@ allOf:
-         clock-names:
-           minItems: 2
- 
-+  - if:
-+      not:
-+        properties:
-+          compatible:
-+            contains:
-+              enum:
-+                - qcom,ipq5424-inline-crypto-engine
-+                - qcom,ipq5210-inline-crypto-engine
-+                - qcom,ipq9650-inline-crypto-engine
-+                - qcom,kaanapali-inline-crypto-engine
-+                - qcom,qcs8300-inline-crypto-engine
-+                - qcom,sa8775p-inline-crypto-engine
-+                - qcom,sc7180-inline-crypto-engine
-+                - qcom,sc7280-inline-crypto-engine
-+                - qcom,sm8450-inline-crypto-engine
-+                - qcom,sm8550-inline-crypto-engine
-+                - qcom,sm8650-inline-crypto-engine
-+                - qcom,sm8750-inline-crypto-engine
-+
-+    then:
-+      required:
-+        - power-domains
-+
- examples:
-   - |
-     #include <dt-bindings/clock/qcom,sm8550-gcc.h>
+Changelog:
+v9:
+ - Changed extensive completion re-init based wait to using kref in
+   patch 04/15
+v8:
+ - Minor fix based on Sashiko comment (corrected spinlock)
+v7:
+ - Fixes based on Sashiko comments (added locking around
+   dthe_put_drvdata)
+v6:
+ - Fixes based on Sashiko comments (waitqueue -> completion; DMA
+   alignment for cache coherency)
+v5:
+ - Fix spinlock inconsistency patch
+v4:
+ - Fixes based on Sashiko comments
+v3:
+ - Fixes based on Sashiko comments
+ - Some reordering of patches
+v2:
+ - Fixes based on Sashiko comments
 
+Link to previous versions:
+v8: https://lore.kernel.org/all/20261001085245.2922974-1-t-pratham@ti.com/
+v7: https://lore.kernel.org/all/20260930125859.1749849-1-t-pratham@ti.com/
+v6: https://lore.kernel.org/all/20260930112533.1593952-1-t-pratham@ti.com/
+v5: https://lore.kernel.org/all/20260918102245.2784000-1-t-pratham@ti.com/
+v4: https://lore.kernel.org/all/20260910175619.2122149-1-t-pratham@ti.com/
+v3: https://lore.kernel.org/all/20260910104202.1537226-1-t-pratham@ti.com/
+v2: https://lore.kernel.org/all/20260827132318.613876-1-t-pratham@ti.com/
+v1: https://lore.kernel.org/all/20260827105711.527182-1-t-pratham@ti.com/
 ---
-base-commit: 525d50941ea7764239624e4c22ef4d2658ab20b0
-change-id: 20261016-ice-e1d8ba304436
 
-Best regards,
+
+Mert Seftali (1):
+  crypto: ti - Use list_first_entry_or_null() in dthe_get_dev()
+
+T Pratham (14):
+  crypto: ti - Fix spinlock inconsistency in DTHEv2
+  crypto: ti - Fix potential memory corruption on highmem pages
+  crypto: ti - Fix use-after-free of dev_data on DTHEv2 driver removal
+  crypto: ti - Trim scatterlists to correct length in AES
+  crypto: ti - Align buffers to cacheline for DMA
+  crypto: ti - Separate padding buffer for src and dst
+  crypto: ti - Validate sg_nents_for_len() return value in DTHEv2 AES
+  crypto: ti - Validate sg_nents_for_len() return value in DTHEv2 AEAD
+  crypto: ti - Terminate DMA on all error paths in AES to clear
+    descriptors
+  crypto: ti - Terminate DMA on all error paths in AEAD to clear
+    descriptors
+  crypto: ti - Do AEAD software fallback on only ENOMEM
+  crypto: ti - Correct AEAD tag operations against dma cache
+    invalidation
+  crypto: ti - Change lengths in AES to u64 to avoid potential overflows
+  crypto: ti - Change lengths in AEAD to u64 to avoid potential
+    overflows
+
+ drivers/crypto/ti/dthev2-aes.c    | 368 +++++++++++++++++++-----------
+ drivers/crypto/ti/dthev2-common.c |  65 ++++--
+ drivers/crypto/ti/dthev2-common.h |  66 +++++-
+ 3 files changed, 344 insertions(+), 155 deletions(-)
+
 -- 
-Varadarajan Narayanan <varadarajan.narayanan@oss.qualcomm.com>
+2.34.1
 
