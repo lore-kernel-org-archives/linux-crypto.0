@@ -1,32 +1,32 @@
-Received: from 15.mo584.mail-out.ovh.net (15.mo584.mail-out.ovh.net [91.121.62.11])
+Received: from 5.mo560.mail-out.ovh.net (5.mo560.mail-out.ovh.net [87.98.181.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90EE423E9E
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 10:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.121.62.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DED45D92B
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 10:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.98.181.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792145965; cv=none; b=TWqTQdfG4lJSuBSDusFZBFnkqixO95Zw+9NhW5A1zDa6erkJAy/clO7aVWT1ZXUk+Ons+ImqH8xPo2ctttRFNW0jjct1/gwlmAAcq6z07JGBZFBBgQWeAJLtzVDnLp2R65bqGo0PV7Ej1lSbpZdeKbBD7Ww+49wEi3Ne9u0BC6s=
+	t=1792146144; cv=none; b=p/JUo0fEzbDoDnRHnJtTt7HZEmn7uwil1sQASmJOpLQHfemNhnB/CGTSHIemOh9ubVffut/7CmvS0sBA/gBApsKjEG0yp6B9sQikdCixwdTIpQnjBH+nDtNE9uE+KQIA5BAqDZWyXTiJRDlcVZrTdlfzrV8B7pVhwH8gN207ISs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792145965; c=relaxed/simple;
-	bh=2itXlY4WWJcPLw4e4JalWJkACvlyR6sDXGe9P8c+phs=;
+	s=arc-20240116; t=1792146144; c=relaxed/simple;
+	bh=Q0ET48T5kgmvhDWW6V1583s0V4siUNHdEUiqObL6GsY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IA0zo30WN5kkNZvkF4xePSYNu1yKtWw9xMI4dlE3M5RGIlovmxv6X635dkYo+wW7lQuvOUr920zXkyzhhdm3SyaDDksSRnl7IGu2vdZ9qfYD37oMWlJRkAqJkXPG4myIdMncWn77SoQvGsBUHHO3Of8xRLhobo9O9tRF55SfRgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com; spf=pass smtp.mailfrom=cynove.com; dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b=RXn2gXGg; arc=none smtp.client-ip=91.121.62.11
+	 MIME-Version; b=uvLt82LpN9Ug3/2+wk8M3qbQG7cuQE9qKGQ4VSdt+5/cF9szK+midk8rmzdZVK+2BsHkNVfjNS+9RgANLld7VzpKRP7kb+4zBekDoavw9auRl0aG7TL+B3A5ws9Q/OQ6S7SBQE3soDilNO2o8oehMPCR7EhxsF+emlY9C8y/U6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com; spf=pass smtp.mailfrom=cynove.com; dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b=RViDwafa; arc=none smtp.client-ip=87.98.181.248
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cynove.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b="RXn2gXGg"
-Received: from director3.ghost.mail-out.ovh.net (unknown [10.109.231.242])
-	by mo584.mail-out.ovh.net (Postfix) with ESMTP id 4j5fBJ4ZHqz8WCQ
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 09:03:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b="RViDwafa"
+Received: from director3.ghost.mail-out.ovh.net (unknown [10.110.58.102])
+	by mo560.mail-out.ovh.net (Postfix) with ESMTP id 4j5fBH6rXbzBPsR
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 09:03:51 +0000 (UTC)
 Received: from ghost-submission-7ccd8bbbb6-4kjr4 (unknown [10.111.174.188])
-	by director3.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 05CA7C03E0;
+	by director3.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 46763C0D11;
 	Fri, 16 Oct 2026 09:03:51 +0000 (UTC)
 Received: from cynove.com ([37.59.142.97])
 	by ghost-submission-7ccd8bbbb6-4kjr4 with ESMTPSA
-	id fClPE3Xo0WpZ/AEAmtFogg:T3
+	id fClPE3Xo0WpZ/AEAmtFogg:T2
 	(envelope-from <stephane.debusne@cynove.com>); Fri, 16 Oct 2026 09:03:51 +0000
-Authentication-Results:garm.ovh; auth=pass (GARM-97G002e07fcbaa-f78b-4434-88ca-256de4d93e96,
+Authentication-Results:garm.ovh; auth=pass (GARM-97G002356f9ba6-d7b5-4ce0-a9a4-835329139dfb,
                     49BC7871EA8B080B249AF49F55FA702C3B4DE52D) smtp.auth=Stephane.Debusne@cynove.com
 X-OVh-ClientIp:176.150.47.247
 From: Stephane Debusne <stephane.debusne@cynove.com>
@@ -41,9 +41,9 @@ Cc: ignat@cloudflare.com,
 	linux-kernel@vger.kernel.org,
 	Stephane Debusne <stephane.debusne@cynove.com>,
 	stable@vger.kernel.org
-Subject: [PATCH 2/2] crypto: rsassa-pkcs1 - use a separate buffer for the RSA output
-Date: Fri, 16 Oct 2026 11:03:33 +0200
-Message-ID: <20261016090333.2247764-3-stephane.debusne@cynove.com>
+Subject: [PATCH 1/2] crypto: akcipher - use a separate buffer in the sync helpers
+Date: Fri, 16 Oct 2026 11:03:32 +0200
+Message-ID: <20261016090333.2247764-2-stephane.debusne@cynove.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261016090333.2247764-1-stephane.debusne@cynove.com>
 References: <20261016090333.2247764-1-stephane.debusne@cynove.com>
@@ -54,97 +54,100 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-x-ovh-tracer-id: 16751138816091151131
+x-ovh-tracer-id: 16750857340520291099
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: dmFkZTEiygRGNU7aSjjCr/ZAiYcYTgHXMxt4/JflRrCzHD3qOxzHfb5pQfpusp+JBzwljL+HMpOxDQYB2ee/PJAmhfqLMEp6lg3bpVJkdw0AY5wIV8axzoaxZJLPtRMgOcdGm+BJJFKHeIngGPFuY3Nmd9qH2GLV3sXSePjnSEKJkOAlNyJX9wIZfahkVUVafvWX+m/LXI3mGxNxBFOvDASvTagZ7aaJlkJgvh/KeA0nWMxo5h65X9khvsyYRw4nfdwqkNzk+Ido+RDVUuBbKHoAmFngfHdy+sL3siTySWt5HArsYaakIX0mKxN1hsJaf7H6k8VPoSPcnPGuvNuP980Vl/FegCDSB3FG9sUTo7m3+KUjQHCxpwrZeIOEgsSMIrJP6WEreamK7SB5CFobn5tNjiZhOhVv0vCmbL39u9pbfOk30Ygmcx+6HnjbB+aiOUjseHfG59DSUgoARJok8l8601owkI4pfuihkd2XHv+PXgCRiMbXCH8rYD8UAJBhuK+Ew9/qNTibJMNopb/HUbnM6E5E+0OqRmDfORhSA52aftjh1GhYWa7V7llDNBu1n+Jp76ZwvXSS9RlLijunOhz063MRbhojVzh1wS8wJWmloAxTpK9e44WkCJQStx5iB07REyFj7jNrBXz5BgCkwR9q/uUdItT321oG7dDqQQftlTkAng
-DKIM-Signature: a=rsa-sha256; bh=/nyx8E1BJm42jAE/tXOKFc+YlYeMaXu9CSxvpmY+cXU=;
+X-VR-SPAMCAUSE: dmFkZTGD4nW62LQB9KssNcZQuK5kWrFQh+w6Vz+V+RAD8MnUAde72M/FLWE8ieu2/logkQIvP3h+HxkwhNQElJPI8dksBAWHsBdG4nOBhE97wdBgSrq7i9Dr7HTzEIPNJ9r0nStZP+4SxoAOI00vFHP+uMc2VAR7sYwcGJsPfO6GsKeTbDbZqUoT/dClNmsHiZliUHARqZfNmZpbXqR+OyK7tCsyhTiGvjmRA5ZoJHO4AiXlGsWEh0ULl2YyjVayzCXrjJyQQpi+DCuYI7TAzwqHsddO0+B9C81cyWecg6aiOCtYZJ4PPYAinicFtLLV81oPd4bQfiHnVg0dZa0FsvCqAOufhcs8fgLROCFM8wS2bhRCkp1PTaUdw1OAZR5OjJEW40K21/6e1PvLxNd+l1HNLXDxKe+zatkuMfQXcBW9U2f2QTycWFFolOnzHitOc3DbiRgFEJXCfEOIoLIOak0i4bEBjIOPByzdHRUIrteEPgPvPJMCkPS7nw0uQtDiWc1oTMet22Wtqcr7zaESKR43lS7CANBUrhtZNfABU7lxSODWeLTWCKJKMWp54vHOl3zuLJu/QCwy/2ijcPNJkInIYeDf9z8klWqXmn1lE/u+9LWSvPZKr3rmgnBJbFGLft91BlKH+x51c2JegYPkBt3+hKwAxONk80Z11jXA8W+9r9uhzA
+DKIM-Signature: a=rsa-sha256; bh=1+xUyMr4KllGTv9LUAcboLMXAuFRnwjR1tKUjAHdUr0=;
  c=relaxed/relaxed; d=cynove.com; h=From; s=ovhmo4616632-selector1;
  t=1792141432; v=1;
- b=RXn2gXGg/TY5dpuxR6xz/xqezEYUB3lhXJ6eQdK3UTI+PPfHQGZzff+JAy7lMe0qCtqnaRNJ
- yen8cnJ007XQn9eKRTGmlcigU8EpRdPT9XymuCscm0k0gm0mDxBxFQ6ooWC7y5YB61NycCWvMLV
- AkZIwMvEtqKtZWXVyQL2lgl8A3uVzeY1T8A9X0ET5f6pmD0EhoJoWCSSYAQVGC3xoxqbs0z6fet
- hKiYVrMbefk7M15aMeFFEi21ImuU8I9zzyEPUAJ2wLAYiNkXExPKzegoXoVvNtmCvfLiBQm3lqH
- 0Pp3L3F+6ESinGOWY/deOez8Q2ehkPzQk3QWb2B+FbUlQ==
+ b=RViDwafaWZvbkymGTsEFVsp0D/sA2VLkQ5yXMVPU+0ab2DjdkjZ7ArW9HpdowsIlMrKBWuIc
+ N4BuszVt6vpR5fkg4kO10RQ03Xlxj8IqxozHFMtPozNgu4ALHB65M1yUeTdG66jjaBWdDdm1PtM
+ xg44ltqu2USgQva6QzALqWx79qm9xGrbSKVtIIdHWa9LuI0FQGqLRN3ATsMjdDsJvMj6ZzM8C3l
+ uZ0/lDfLjqFSSKDbV8N8bFPt9VgCn642kp7qJwJWvNz5IrcQg0pGuGruyoW5UxCyog7tIpf5yAd
+ SMmy7MqZSX+oBoxaolDqW35KtGKlokxnBOwA3xQiGHyNA==
 
-rsassa_pkcs1_verify() places the buffer it hands to the akcipher driver
-right after the driver's request context, in the same allocation, and
-since commit 8552cb04e083 ("crypto: rsassa-pkcs1 - Copy source data for
-SG list") uses it in place (src == dst).
+crypto_akcipher_sync_prep() places the data buffer right after the
+request context, in the same allocation, and passes it to the driver
+in place (src == dst).
 
 On non-coherent DMA, the start of this buffer may share a cache line
-with the end of the request context. The CAAM driver (caampkc) writes
-req_ctx->edesc and req_ctx->akcipher_op_done after dma_map_sg() of the
-destination, which dirties that line. On arm64,
-dma_unmap_sg(DMA_FROM_DEVICE) cleans and invalidates partial lines
-(dc civac), so the stale CPU copy is written back over the result
+with the end of the request context. A DMA-based driver such as the
+CAAM (caampkc) writes req_ctx->edesc and req_ctx->akcipher_op_done
+after dma_map_sg() of the destination, which dirties that line. On
+arm64, dma_unmap_sg(DMA_FROM_DEVICE) cleans and invalidates partial
+lines (dc civac), so the stale CPU copy is written back over the result
 written by the device.
 
-On i.MX8M Mini (CAAM era 9, rsa-caam, 6.18), the buffer starts 168 bytes
-into the allocation, at offset 40 of the 64-byte line that also holds
-edesc and akcipher_op_done: the first 24 bytes of the RSA output are
-replaced by the signature bytes, and rsassa_pkcs1_verify() returns
--EINVAL in 398 of 400 calls over two runs (the rare successes are
-consistent with the dirty line being evicted before the device writes).
-Visible effects: cfg80211 rejects regulatory.db ("loaded regulatory.db
-is malformed or signature is missing/invalid"), and adding a valid
-self-signed X.509 certificate to a keyring fails with EINVAL. The
-akcipher self-tests pass, as they use separate buffers.
+crypto_akcipher_sync_encrypt() and crypto_akcipher_sync_decrypt() are
+used by rsassa_pkcs1_sign() and by software_key_eds_op() (keyctl
+pkey_encrypt and pkey_decrypt), so RSA signing and encryption through
+rsa-caam are affected.
 
-A test module comparing rsa-caam with rsa-generic shows that only the
-position of the destination matters: separate or in-place buffers from
-their own kmalloc() give correct results, while a destination right
-after the request context is corrupted, in place or not (200 of 200
-calls, the 24 first bytes always holding the previous content of the
-buffer).
+On i.MX8M Mini (CAAM era 9, rsa-caam, 6.18), the buffer starts at
+offset 40 of a 64-byte line shared with the end of the request context,
+and crypto_akcipher_sync_encrypt() returns a result whose first 24
+bytes still hold the input in 199 of 200 calls.
 
-Allocate the output buffer separately, so that it is DMA-safe like any
+Allocate the data buffer separately, so that it is DMA-safe like any
 kmalloc() buffer.
 
-Fixes: 1e562deacecc ("crypto: rsassa-pkcs1 - Migrate to sig_alg backend")
+Fixes: addde1f2c966 ("crypto: akcipher - Add sync interface without SG lists")
 Cc: stable@vger.kernel.org
 Signed-off-by: Stephane Debusne <stephane.debusne@cynove.com>
 ---
- crypto/rsassa-pkcs1.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ crypto/akcipher.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
-index 94fa5e960..205493037 100644
---- a/crypto/rsassa-pkcs1.c
-+++ b/crypto/rsassa-pkcs1.c
-@@ -223,6 +223,7 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
- 	struct rsassa_pkcs1_ctx *ctx = crypto_sig_ctx(tfm);
- 	unsigned int child_reqsize = crypto_akcipher_reqsize(ctx->child);
- 	struct akcipher_request *child_req __free(kfree_sensitive) = NULL;
-+	u8 *out_alloc __free(kfree_sensitive) = NULL;
- 	struct crypto_wait cwait;
- 	struct scatterlist sg;
- 	unsigned int dst_len;
-@@ -237,12 +238,21 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
- 		return -EINVAL;
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index 630bb1973..2381ed43b 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -170,23 +170,29 @@ static int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data)
+ 	struct akcipher_request *req;
+ 	struct scatterlist *sg;
+ 	unsigned int mlen;
+-	unsigned int len;
+ 	u8 *buf;
  
- 	/* RFC 8017 sec 8.2.2 step 2 - RSA verification */
--	child_req = kmalloc(sizeof(*child_req) + child_reqsize + ctx->key_size,
--			    GFP_KERNEL);
-+	child_req = kmalloc(sizeof(*child_req) + child_reqsize, GFP_KERNEL);
- 	if (!child_req)
+ 	mlen = max(data->slen, data->dlen);
+ 
+-	len = sizeof(*req) + reqsize + mlen;
+-	if (len < mlen)
+-		return -EOVERFLOW;
+-
+-	req = kzalloc(len, GFP_KERNEL);
++	req = kzalloc(sizeof(*req) + reqsize, GFP_KERNEL);
+ 	if (!req)
  		return -ENOMEM;
  
--	out_buf = (u8 *)(child_req + 1) + child_reqsize;
 +	/*
-+	 * The output buffer is mapped for DMA by hardware RSA drivers. Keep
-+	 * it in its own allocation: placed right after the request context,
-+	 * it may share a cache line with fields the driver writes while the
-+	 * buffer is mapped, which corrupts the output on non-coherent DMA.
++	 * The data buffer is mapped for DMA by hardware drivers. Keep it in
++	 * its own allocation: placed right after the request context, it
++	 * may share a cache line with fields the driver writes while the
++	 * buffer is mapped, which corrupts the result on non-coherent DMA.
 +	 */
-+	out_alloc = kmalloc(ctx->key_size, GFP_KERNEL);
-+	if (!out_alloc)
++	buf = kzalloc(mlen, GFP_KERNEL);
++	if (!buf) {
++		kfree(req);
 +		return -ENOMEM;
++	}
 +
-+	out_buf = out_alloc;
- 	memcpy(out_buf, src, slen);
+ 	data->req = req;
+ 	akcipher_request_set_tfm(req, data->tfm);
  
- 	crypto_init_wait(&cwait);
+-	buf = (u8 *)(req + 1) + reqsize;
+ 	data->buf = buf;
+ 	memcpy(buf, data->src, data->slen);
+ 
+@@ -207,6 +213,7 @@ static int crypto_akcipher_sync_post(struct crypto_akcipher_sync_data *data,
+ 	err = crypto_wait_req(err, &data->cwait);
+ 	memcpy(data->dst, data->buf, data->dlen);
+ 	data->dlen = data->req->dst_len;
++	kfree_sensitive(data->buf);
+ 	kfree_sensitive(data->req);
+ 	return err;
+ }
 -- 
 2.43.0
 
