@@ -1,91 +1,150 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from 15.mo584.mail-out.ovh.net (15.mo584.mail-out.ovh.net [91.121.62.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0366146D547;
-	Fri, 16 Oct 2026 09:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90EE423E9E
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 10:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.121.62.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792142021; cv=none; b=U6ZaLCk+j53+UTK4C5FXA0yyvMW8jewzjT6Tqp1yDiF0VtP+y1xUDYg99eFQfXjGXMg+xEPOIQ1embAJqyRUhnInUm30m6iIdkx4dLZr1uizDKvCZODDybiS/Bu+Wo8bANSqJZujAA7LWTtRAHD970zGYsL4wymfVxbSGVTVcwo=
+	t=1792145965; cv=none; b=TWqTQdfG4lJSuBSDusFZBFnkqixO95Zw+9NhW5A1zDa6erkJAy/clO7aVWT1ZXUk+Ons+ImqH8xPo2ctttRFNW0jjct1/gwlmAAcq6z07JGBZFBBgQWeAJLtzVDnLp2R65bqGo0PV7Ej1lSbpZdeKbBD7Ww+49wEi3Ne9u0BC6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792142021; c=relaxed/simple;
-	bh=LVDS0HnD/QnD6zawSDbzNLWAnl5Fnm7/XjXBFyRWCMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S0SuedPiRbODaMIw4uy6uCjTHmrVoEazPkih+dU2VfhtAUQniib4RC3RNLcxapf6NgzLgF5UUcUtZ64l/X/4wd1obUAhkzeY7b3wimDKSTS5fgIy/ELfRRWpBpmK8fwxC31BwMekw+N/c02QvebulgGBtCg5Lss/3yanj6BZih4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=cQGXqaHE; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1792145965; c=relaxed/simple;
+	bh=2itXlY4WWJcPLw4e4JalWJkACvlyR6sDXGe9P8c+phs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IA0zo30WN5kkNZvkF4xePSYNu1yKtWw9xMI4dlE3M5RGIlovmxv6X635dkYo+wW7lQuvOUr920zXkyzhhdm3SyaDDksSRnl7IGu2vdZ9qfYD37oMWlJRkAqJkXPG4myIdMncWn77SoQvGsBUHHO3Of8xRLhobo9O9tRF55SfRgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com; spf=pass smtp.mailfrom=cynove.com; dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b=RXn2gXGg; arc=none smtp.client-ip=91.121.62.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cynove.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="cQGXqaHE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=CejfQ7Xzl26VOk+jZ6vebpBL0jzLsbbVNEnQ7lsVEgY=; 
-	b=cQGXqaHExzLpVXXNIbtaido2iealZxfQ09rbjfTsZf4Yk0ysn09Do+dUteIXMeAhl5zKxOrlHPA
-	Dl8j4IFG14zmek0oo04j8kTvzGPFNQkRWfklgiW2+tJSLQa5Lp5o5xmfsLFfpUVwSWEi6jee3wP9s
-	ZLU+z/1Jhl5zMi+MC8DDHd0mBP7nZiLJnaaXEbdYa7EwbkyaASYW6PoC8BY8WQkIdy4v54zOkG43h
-	pQWtAcepIFE1zuRgQRhS+bcIGQxi1E6y6bHB9jIRaCU8mnAdrj2wgxZ9fEf73LxekwbKt7EjQVyLp
-	B84yREHtJQkD/wNNKbM6UOPl14GILZPbnXqw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xHe0I-00000004U7u-0dLc;
-	Fri, 16 Oct 2026 17:13:31 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Oct 2026 20:13:30 +1100
-Date: Fri, 16 Oct 2026 20:13:30 +1100
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ralf Lici <ralf@mandelbit.com>
-Cc: linux-crypto@vger.kernel.org, Antoine Tenart <atenart@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH crypto 2/2] crypto: safexcel - Map AEAD buffers with
- accurate DMA directions
-Message-ID: <atHquk_AUj2Ys7Su@gondor.apana.org.au>
-References: <cover.1789469436.git.ralf@mandelbit.com>
- <7bd0c89dd32e9712d7d08393842498698148064b.1789469436.git.ralf@mandelbit.com>
+	dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b="RXn2gXGg"
+Received: from director3.ghost.mail-out.ovh.net (unknown [10.109.231.242])
+	by mo584.mail-out.ovh.net (Postfix) with ESMTP id 4j5fBJ4ZHqz8WCQ
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Oct 2026 09:03:52 +0000 (UTC)
+Received: from ghost-submission-7ccd8bbbb6-4kjr4 (unknown [10.111.174.188])
+	by director3.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 05CA7C03E0;
+	Fri, 16 Oct 2026 09:03:51 +0000 (UTC)
+Received: from cynove.com ([37.59.142.97])
+	by ghost-submission-7ccd8bbbb6-4kjr4 with ESMTPSA
+	id fClPE3Xo0WpZ/AEAmtFogg:T3
+	(envelope-from <stephane.debusne@cynove.com>); Fri, 16 Oct 2026 09:03:51 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-97G002e07fcbaa-f78b-4434-88ca-256de4d93e96,
+                    49BC7871EA8B080B249AF49F55FA702C3B4DE52D) smtp.auth=Stephane.Debusne@cynove.com
+X-OVh-ClientIp:176.150.47.247
+From: Stephane Debusne <stephane.debusne@cynove.com>
+To: herbert@gondor.apana.org.au,
+	lukas@wunner.de
+Cc: ignat@cloudflare.com,
+	davem@davemloft.net,
+	horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stephane Debusne <stephane.debusne@cynove.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 2/2] crypto: rsassa-pkcs1 - use a separate buffer for the RSA output
+Date: Fri, 16 Oct 2026 11:03:33 +0200
+Message-ID: <20261016090333.2247764-3-stephane.debusne@cynove.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261016090333.2247764-1-stephane.debusne@cynove.com>
+References: <20261016090333.2247764-1-stephane.debusne@cynove.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7bd0c89dd32e9712d7d08393842498698148064b.1789469436.git.ralf@mandelbit.com>
+Content-Transfer-Encoding: 8bit
+x-ovh-tracer-id: 16751138816091151131
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: dmFkZTEiygRGNU7aSjjCr/ZAiYcYTgHXMxt4/JflRrCzHD3qOxzHfb5pQfpusp+JBzwljL+HMpOxDQYB2ee/PJAmhfqLMEp6lg3bpVJkdw0AY5wIV8axzoaxZJLPtRMgOcdGm+BJJFKHeIngGPFuY3Nmd9qH2GLV3sXSePjnSEKJkOAlNyJX9wIZfahkVUVafvWX+m/LXI3mGxNxBFOvDASvTagZ7aaJlkJgvh/KeA0nWMxo5h65X9khvsyYRw4nfdwqkNzk+Ido+RDVUuBbKHoAmFngfHdy+sL3siTySWt5HArsYaakIX0mKxN1hsJaf7H6k8VPoSPcnPGuvNuP980Vl/FegCDSB3FG9sUTo7m3+KUjQHCxpwrZeIOEgsSMIrJP6WEreamK7SB5CFobn5tNjiZhOhVv0vCmbL39u9pbfOk30Ygmcx+6HnjbB+aiOUjseHfG59DSUgoARJok8l8601owkI4pfuihkd2XHv+PXgCRiMbXCH8rYD8UAJBhuK+Ew9/qNTibJMNopb/HUbnM6E5E+0OqRmDfORhSA52aftjh1GhYWa7V7llDNBu1n+Jp76ZwvXSS9RlLijunOhz063MRbhojVzh1wS8wJWmloAxTpK9e44WkCJQStx5iB07REyFj7jNrBXz5BgCkwR9q/uUdItT321oG7dDqQQftlTkAng
+DKIM-Signature: a=rsa-sha256; bh=/nyx8E1BJm42jAE/tXOKFc+YlYeMaXu9CSxvpmY+cXU=;
+ c=relaxed/relaxed; d=cynove.com; h=From; s=ovhmo4616632-selector1;
+ t=1792141432; v=1;
+ b=RXn2gXGg/TY5dpuxR6xz/xqezEYUB3lhXJ6eQdK3UTI+PPfHQGZzff+JAy7lMe0qCtqnaRNJ
+ yen8cnJ007XQn9eKRTGmlcigU8EpRdPT9XymuCscm0k0gm0mDxBxFQ6ooWC7y5YB61NycCWvMLV
+ AkZIwMvEtqKtZWXVyQL2lgl8A3uVzeY1T8A9X0ET5f6pmD0EhoJoWCSSYAQVGC3xoxqbs0z6fet
+ hKiYVrMbefk7M15aMeFFEi21ImuU8I9zzyEPUAJ2wLAYiNkXExPKzegoXoVvNtmCvfLiBQm3lqH
+ 0Pp3L3F+6ESinGOWY/deOez8Q2ehkPzQk3QWb2B+FbUlQ==
 
-On Tue, Sep 15, 2026 at 01:32:12PM +0200, Ralf Lici wrote:
->
-> @@ -748,8 +833,17 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
->  			return -EINVAL;
->  		}
->  		if (sreq->nr_src > 0) {
-> -			src_mapped = dma_map_sg(priv->dev, src, sreq->nr_src,
-> -						DMA_BIDIRECTIONAL);
-> +			if (ctx->aead)
-> +				src_mapped =
-> +					safexcel_map_aead(priv->dev, src,
-> +							  sreq->nr_src,
-> +							  sreq->output_offset,
-> +							  sreq->output_len,
-> +							  true);
-> +			else
-> +				src_mapped = dma_map_sg(priv->dev, src,
-> +							sreq->nr_src,
-> +							DMA_BIDIRECTIONAL);
+rsassa_pkcs1_verify() places the buffer it hands to the akcipher driver
+right after the driver's request context, in the same allocation, and
+since commit 8552cb04e083 ("crypto: rsassa-pkcs1 - Copy source data for
+SG list") uses it in place (src == dst).
 
-This path doesn't actualy matter because BIDIRECTIONAL is safe
-even if you use it unnecessarily.
+On non-coherent DMA, the start of this buffer may share a cache line
+with the end of the request context. The CAAM driver (caampkc) writes
+req_ctx->edesc and req_ctx->akcipher_op_done after dma_map_sg() of the
+destination, which dirties that line. On arm64,
+dma_unmap_sg(DMA_FROM_DEVICE) cleans and invalidates partial lines
+(dc civac), so the stale CPU copy is written back over the result
+written by the device.
 
-> @@ -775,8 +869,17 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
->  		}
->  
->  		if (sreq->nr_dst > 0) {
-> -			dst_mapped = dma_map_sg(priv->dev, dst, sreq->nr_dst,
-> -						DMA_FROM_DEVICE);
+On i.MX8M Mini (CAAM era 9, rsa-caam, 6.18), the buffer starts 168 bytes
+into the allocation, at offset 40 of the 64-byte line that also holds
+edesc and akcipher_op_done: the first 24 bytes of the RSA output are
+replaced by the signature bytes, and rsassa_pkcs1_verify() returns
+-EINVAL in 398 of 400 calls over two runs (the rare successes are
+consistent with the dirty line being evicted before the device writes).
+Visible effects: cfg80211 rejects regulatory.db ("loaded regulatory.db
+is malformed or signature is missing/invalid"), and adding a valid
+self-signed X.509 certificate to a keyring fails with EINVAL. The
+akcipher self-tests pass, as they use separate buffers.
 
-So this is the really buggy path.  Why don't you just change it to
-BIDRECTIONAL, perhaps with a comment referring to the assoc data?
+A test module comparing rsa-caam with rsa-generic shows that only the
+position of the destination matters: separate or in-place buffers from
+their own kmalloc() give correct results, while a destination right
+after the request context is corrupted, in place or not (200 of 200
+calls, the 24 first bytes always holding the previous content of the
+buffer).
 
-Thanks,
+Allocate the output buffer separately, so that it is DMA-safe like any
+kmalloc() buffer.
+
+Fixes: 1e562deacecc ("crypto: rsassa-pkcs1 - Migrate to sig_alg backend")
+Cc: stable@vger.kernel.org
+Signed-off-by: Stephane Debusne <stephane.debusne@cynove.com>
+---
+ crypto/rsassa-pkcs1.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
+index 94fa5e960..205493037 100644
+--- a/crypto/rsassa-pkcs1.c
++++ b/crypto/rsassa-pkcs1.c
+@@ -223,6 +223,7 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
+ 	struct rsassa_pkcs1_ctx *ctx = crypto_sig_ctx(tfm);
+ 	unsigned int child_reqsize = crypto_akcipher_reqsize(ctx->child);
+ 	struct akcipher_request *child_req __free(kfree_sensitive) = NULL;
++	u8 *out_alloc __free(kfree_sensitive) = NULL;
+ 	struct crypto_wait cwait;
+ 	struct scatterlist sg;
+ 	unsigned int dst_len;
+@@ -237,12 +238,21 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
+ 		return -EINVAL;
+ 
+ 	/* RFC 8017 sec 8.2.2 step 2 - RSA verification */
+-	child_req = kmalloc(sizeof(*child_req) + child_reqsize + ctx->key_size,
+-			    GFP_KERNEL);
++	child_req = kmalloc(sizeof(*child_req) + child_reqsize, GFP_KERNEL);
+ 	if (!child_req)
+ 		return -ENOMEM;
+ 
+-	out_buf = (u8 *)(child_req + 1) + child_reqsize;
++	/*
++	 * The output buffer is mapped for DMA by hardware RSA drivers. Keep
++	 * it in its own allocation: placed right after the request context,
++	 * it may share a cache line with fields the driver writes while the
++	 * buffer is mapped, which corrupts the output on non-coherent DMA.
++	 */
++	out_alloc = kmalloc(ctx->key_size, GFP_KERNEL);
++	if (!out_alloc)
++		return -ENOMEM;
++
++	out_buf = out_alloc;
+ 	memcpy(out_buf, src, slen);
+ 
+ 	crypto_init_wait(&cwait);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.43.0
+
