@@ -1,51 +1,54 @@
-Received: from 1.mo575.mail-out.ovh.net (1.mo575.mail-out.ovh.net [46.105.41.146])
+Received: from 13.mo583.mail-out.ovh.net (13.mo583.mail-out.ovh.net [87.98.182.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D781A6820
-	for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2026 10:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.105.41.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839824CF477
+	for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2026 15:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.98.182.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792233573; cv=none; b=sm7nOg0FJW4htDqd/QKDNWivEDPjEOu4O2opx3bs0Oh6VvzE6N96XVCXkNtvTiQEYhsKeQaqkylGZTOLS4eIofstcU1AaalEwhMQChsj3ARO+5stwAAupPT0CkrR0/7uL8HdvEeXMUzDVOQQ30abZz6bOe8upFQr5hKREKr2Rac=
+	t=1792252511; cv=none; b=odjlCBu0hl95YnIGzqbuArkUEfPxDBSASipSFCb/UGmx8D4sdBl1WbyVfi89FhKNrSQCoJlRHoSdTOXSD8d4SzNvqTnbd0WDlVLE2ZMEfn6Nr0CUh/x6+C8EEdSCDyrtZXoZm231y77jYkJjAZprbbM5bgfMBToCR1MZ5P/bdK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792233573; c=relaxed/simple;
-	bh=0OPx9zS/HbKkbSyq4RVUIFb0dtxQSmz1XqcSTLn4Wy4=;
+	s=arc-20240116; t=1792252511; c=relaxed/simple;
+	bh=uCQaig9rEgF3+aw2tds27Jcd3vh04Y8p7BFJnWSwwpQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X8dxR4evMLv1YI+9Skoyn1M7wdkf03ll/IFWod9c/29J47BXyjUUa/FbLKxFz+f7F/965/+BU4M5vAW3cDioKdJY+AmIl0kYLlMuIutNBghB9L0J0CCpBrPDazejKfNO3xyfWsXZvvaHvxuPj0xB/PhOmm0bn+ZprBFupwON+/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com; spf=pass smtp.mailfrom=cynove.com; dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b=YkiPdi+e; arc=none smtp.client-ip=46.105.41.146
+	 MIME-Version; b=UNaCYfn3AMckKSNHZx/oKSqWkH1qCckDiKZCfaN0yxzhoENm7I5fkTsfrzzRxbeUKkfWzsraxrrmyUG1UfddVaKfxgDDzbN413gbjGJKrOoTIbB8+7G24KQtXO8XB3wRAMhv3yJgZAt1/tziqFqkwWTCU9APAqtMUJ4XJ01xiA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com; spf=pass smtp.mailfrom=cynove.com; dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b=XUZFJnG1; arc=none smtp.client-ip=87.98.182.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cynove.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b="YkiPdi+e"
-Received: from director3.ghost.mail-out.ovh.net (unknown [10.110.37.251])
-	by mo575.mail-out.ovh.net (Postfix) with ESMTP id 4j6JG52JQ1z5vd3
-	for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2026 10:39:25 +0000 (UTC)
-Received: from ghost-submission-7ccd8bbbb6-c5nc5 (unknown [10.110.118.184])
-	by director3.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 84F15C03E4;
-	Sat, 17 Oct 2026 10:39:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b="XUZFJnG1"
+Received: from director11.ghost.mail-out.ovh.net (unknown [10.110.43.44])
+	by mo583.mail-out.ovh.net (Postfix) with ESMTP id 4j6Qw33Vztz5xy2
+	for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2026 15:39:15 +0000 (UTC)
+Received: from ghost-submission-7ccd8bbbb6-lmllg (unknown [10.110.54.2])
+	by director11.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 066D5C2921;
+	Sat, 17 Oct 2026 15:39:13 +0000 (UTC)
 Received: from cynove.com ([37.59.142.106])
-	by ghost-submission-7ccd8bbbb6-c5nc5 with ESMTPSA
-	id 6TukOltQ02q3BAQAR877oQ
-	(envelope-from <stephane.debusne@cynove.com>); Sat, 17 Oct 2026 10:39:24 +0000
-Authentication-Results:garm.ovh; auth=pass (GARM-106R006ff4de083-8d4f-47ea-98b0-cc69cabf982b,
+	by ghost-submission-7ccd8bbbb6-lmllg with ESMTPSA
+	id cwkeN6GW02rJaAQA3SBaag
+	(envelope-from <stephane.debusne@cynove.com>); Sat, 17 Oct 2026 15:39:13 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-106R00606d3a3a0-4c64-47ff-91af-fdab2a6dd61d,
                     E277A82C44659F51833474C02B8FDD9281845D64) smtp.auth=Stephane.Debusne@cynove.com
 X-OVh-ClientIp:176.150.47.247
 From: Stephane Debusne <stephane.debusne@cynove.com>
-To: herbert@gondor.apana.org.au
-Cc: lukas@wunner.de,
+To: changwei.zou@canonical.com
+Cc: herbert@gondor.apana.org.au,
 	davem@davemloft.net,
+	jeffbarnes@linux.microsoft.com,
+	lukas@wunner.de,
 	horia.geanta@nxp.com,
 	pankaj.gupta@nxp.com,
+	iuliana.prodan@nxp.com,
 	sahil.malhotra@nxp.com,
-	changwei.zou@canonical.com,
-	jeffbarnes@linux.microsoft.com,
+	sahil.malhotra@oss.nxp.com,
+	martin.kepplinger-novakovic@ginzinger.com,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] crypto: fix RSA results corrupted by non-coherent DMA
-Date: Sat, 17 Oct 2026 12:39:18 +0200
-Message-ID: <20261017103918.2797952-1-stephane.debusne@cynove.com>
+Subject: Re: [PATCH v2 2/2] crypto: caam - Use bounce buffer for unaligned RSA destination buffers
+Date: Sat, 17 Oct 2026 17:39:08 +0200
+Message-ID: <20261017153908.2813630-1-stephane.debusne@cynove.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261016090333.2247764-1-stephane.debusne@cynove.com>
-References: <20261016090333.2247764-1-stephane.debusne@cynove.com>
+In-Reply-To: <20261017102047.333792-1-changwei.zou@canonical.com>
+References: <20261017102047.333792-1-changwei.zou@canonical.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,28 +56,25 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-x-ovh-tracer-id: 5790784696703900476
+x-ovh-tracer-id: 10854519530342570812
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: dmFkZTE/KwknBQhqI+u/OBT3gRGYsILezjKJ5C03ZK+608YlbSLyHJ4FfE40bU/rGtsjUddEaH1JCvbfslRrBrqD9cVJMqKM9itFPT2ZW+d0WQxWdCq81h/Wv8+Lb0LcjLuIKg2+pGH7xWYwbR1TDWgDA8K+yJzjbNWvphiQrrGwg/1Lf779dtmtPeGzSoM4FBx54dYEXZ8/i734XI++JaQfRh60n2l0nvMjt5K4tPDpmsjhFnDE5BFPbt6Kqwxxpg73irjk6Wyaf4HhYWHPJtrd3h8+YXCV2FU5hbw367uvKu62bUQ4YGilhzx/x032Bqn9xM/Fo0EjNUnLrEN9cakdHip1oEy8x5Vz+PQJ30hefiowjUHEXGHIYcFAYvPaApP2gRCWakHFLQxkAI31h/4DQeOfjrNDy+ndLEZbSwIhnR9JmQ71YwYUpudwGEm35SjESrykkhi9xOsFGO2i2epHsyi0Scegnzxj3VGuYSoKGJWw/KJJ+3ZvYGRMWjkbmMIcFlE5l6E+nfQ1Jt3pdXlwqxjPFVXJKkpmMwEKSFojmWtvCYex8613ll30pt3fpauNWitce7vMTdpfu09E9LrpKUvDRaFpcOtAwB8T9CkoboOx8u81oRWu8DjGjklG5bhrmpqgwEI6cljrJDN25L2f3Qsm4xYSwqc9iRnqxY6cEO1W2g
-DKIM-Signature: a=rsa-sha256; bh=0OPx9zS/HbKkbSyq4RVUIFb0dtxQSmz1XqcSTLn4Wy4=;
+X-VR-SPAMCAUSE: dmFkZTFItG+dckT/CYq7g4nK61jBfak3V94fQHIvYK7SXdxWl7LpwJIUCm5QByplztHFQNN/lG1XP4gSF0UmDfDjreJDWVsXPcz+oE+3K6XkuCtP1ZNd2QH3dAqaKohcBtkU7KVYj92bY/7wuf68ev2MoAsp6qszwIKgHCJXHAWAMwo/9DttfYFwmB5v6etLK42WAatG+S99/R+PtEOBO8Wq7FaXcvO4P6UBSsVzixbYtpoMvwuLv6GnxU10qry4rLndw70Aq2h6SCE4nC/K9MOOImziXmzaIzrdE8Siinyi+rLHKPbgKlbbcYbiJ5Rs8gYaJFnjJ+88n+oD0Ce+2NiE75RRDPQkiCq1jsfSPBNgLcgg0qTe5BiWnDB++G9z9MZQ8rsv6xI65CsQe5WuALRyaKXD20yheMj6otO9nrBil+q/4P+jbfNde4gH8pvhGql5Qt66mL7NRTFUdDMVUtaYXpyO8r4Pe4w65r50CirFnHyOT2O3sFAKoMGgRgjbKGeKLxqFPoEj6GjziXnuXKuMsaF+Mi9HT72/URKEn9i0NV3E7b8wmjVR0eM72rnM7eaqX3Tyh/7qvQZu9cTOmCUTmBdUAWUbobS0SD5U81+au0HJ489OtD7lN/WFFvrLg3QcAoW4N6ICiQGlt4ee09ZSRgVZbHgGmgDDF4SR7GjFh0FGHw
+DKIM-Signature: a=rsa-sha256; bh=uCQaig9rEgF3+aw2tds27Jcd3vh04Y8p7BFJnWSwwpQ=;
  c=relaxed/relaxed; d=cynove.com; h=From; s=ovhmo4616632-selector1;
- t=1792233565; v=1;
- b=YkiPdi+eMcOdZj0Ytwow9a1IgjiY1H5eIIMI1LTrtUfTXbR0RHQYktsezscDnv8XHJSF9nFo
- GabhvK4skgIRtMPSQgiOXf4ve5cT+q7fMX9bUIhcdzTHOq7CYik+I1K9Yqjulf+hBvoxcoL53yW
- mSTPkVZNdL1vmkOui4D1rjNkjFjn006DU3yYtnY3DN1nztXN2q8Uj4yiPXvTyCaHBrrYEAUzbXK
- jUdbtpSSEjAG5MAH1LkwKY0o9CQdZ8quSvLs/wS602ZOEUL3tV11TlyCfF21GSveOPkOg6WIlUP
- rQlpGoZc7b94fa7lYQc7CDaGzY/R3gl0Y9YLdWTDEU9rQ==
+ t=1792251555; v=1;
+ b=XUZFJnG18D9d+4WJNzrc1qn2b9kDLvEeP3UsI9saQPpSqXrGKh2HHaTOQrdc82ukEo9Xe+0D
+ EOWhFaQM1/AMv2bkpNAlHorx8UfIBN3SdeNUuzwoEb9KcDMnSuPiQMdwtPq//s5fpD4NePIh9IJ
+ poW8jjASlKPcRXzvbkfknbyZHAcPoQ5urGALOybEPQoLx5tRotMQld7UdgndjMZn+mAen/GLgVL
+ ElSZbQ7YVPqabFonbck5H31FRs7TpAlIEfFOyEqP9UKz5H4CkigFgMHouQHWyxXctTL4Ze9cOdA
+ cDZyQhH+CLnJfg8HOG6LUTkMAhRDJP9whNaP9IjNP8l/A==
 
-Hi Herbert,
+Hi Changwei,
 
-Changwei pointed me to your answer on a similar caller-side fix [1]:
-alignment is the driver's responsibility. Please drop this series.
-Changwei's driver-side fix [2] corrects the same corruption, and I have
-tested it on the i.MX8M Mini.
+On Sat, Oct 17, 2026 at 09:20:47PM +1100, Changwei Zou wrote:
+> Therefore, I later switched to a driver-side solution.
 
-[1] https://lore.kernel.org/all/am2UMhd5CAhDiKBF@gondor.apana.org.au/
-[2] https://lore.kernel.org/linux-crypto/20261004210200.290119-3-changwei.zou@canonical.com/
+Thanks for the explanation and the links. I have asked Herbert to drop
+my series.
 
-Thanks,
 Stephane
