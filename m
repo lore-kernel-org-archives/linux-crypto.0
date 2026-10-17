@@ -1,54 +1,53 @@
-Received: from 6.mo581.mail-out.ovh.net (6.mo581.mail-out.ovh.net [188.165.39.218])
+Received: from 3.mo576.mail-out.ovh.net (3.mo576.mail-out.ovh.net [188.165.52.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C765D3C4B91
-	for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2026 08:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.39.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D580D3D47C3
+	for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2026 08:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.52.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792225371; cv=none; b=SIAketqy/N2J+tY70wZs8Cha7SxxD0ddVSS4xFBnlHrBtACk3DGX017ZxU0NA2M+EZrBlODQ30q2rYwfJywoJX6A4r93lcsmAHDvU7lC5A42T2kmnBo/rjlb+ZeBlw0wMn+hb5TYxD7yOy4RSgHadBzsmRg9dlgiP954ADOfF3Q=
+	t=1792225416; cv=none; b=KCttd9ZX7twHX7X6AwHy+lAI3TaW6Degj3HSbmjyrLsupyBSp/zE3aVAwDTEXYkJpPS+VQ14bmJ51oK0iuktFem3mT4k1cotiA+qTLVJPl49KvKEGNc9Be9HYuVwpJarViEOnB8VB2EKZTCruiPcc7OYtZgMcFvXDetVSlGH2KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792225371; c=relaxed/simple;
-	bh=a6c0USjinHB9gathqSBKb8kpDFWWcD9tj1Hs4696W6Q=;
+	s=arc-20240116; t=1792225416; c=relaxed/simple;
+	bh=/IHyucPgWJL238L3Cj1FRQRAX+5h0KJLX3Hygpqkc40=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nRF4kOenvfreZhGnTnrGmwFX1qJaGBUOSfgypwN4636V3/4PBJccPmuuBB8HT8WTsFyTJQM00ciBSXyx81pRF+YSVclcimynbCouq4ia1nu6CE+y+Lo0iD3msIxT3/4AXiQ0+M1OH/M2ccb4EqAjQOoNidI+iAdIsNp6uDRgPG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com; spf=pass smtp.mailfrom=cynove.com; dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b=E5bHMSox; arc=none smtp.client-ip=188.165.39.218
+	 MIME-Version; b=GX2Kt+d7qgpGD9Aj/tkJHXSpYT382vvMKH8272rAUnWZjYORJiCis9LK6KAz/mdp7y0X7OUE1/QcErFa8ZOMsxikTGv0d8qJiphI0BCI4xs6VQwhV8RHo95zvAxfz0WvmVJ3uR6nk6D78MiV5P6+lv4mv6EnsI1Fce1fd4Ss4Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com; spf=pass smtp.mailfrom=cynove.com; dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b=IXdsETz9; arc=none smtp.client-ip=188.165.52.203
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cynove.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cynove.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b="E5bHMSox"
-Received: from director1.ghost.mail-out.ovh.net (unknown [10.110.43.44])
-	by mo581.mail-out.ovh.net (Postfix) with ESMTP id 4j6F2v66Pwz5xFZ
-	for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2026 08:14:31 +0000 (UTC)
-Received: from ghost-submission-7ccd8bbbb6-8mxcr (unknown [10.110.188.109])
-	by director1.ghost.mail-out.ovh.net (Postfix) with ESMTPS id DCC9BC0F63;
-	Sat, 17 Oct 2026 08:14:29 +0000 (UTC)
-Received: from cynove.com ([37.59.142.98])
-	by ghost-submission-7ccd8bbbb6-8mxcr with ESMTPSA
-	id s5OhLmUu02p31QMAAxIPkA
-	(envelope-from <stephane.debusne@cynove.com>); Sat, 17 Oct 2026 08:14:29 +0000
-Authentication-Results:garm.ovh; auth=pass (GARM-98R002fd73e086-99a5-4ddc-ad6e-6f59f9efab80,
+	dkim=pass (2048-bit key) header.d=cynove.com header.i=@cynove.com header.b="IXdsETz9"
+Received: from director4.ghost.mail-out.ovh.net (unknown [10.109.231.137])
+	by mo576.mail-out.ovh.net (Postfix) with ESMTP id 4j6FFB3p9Wz5wyp
+	for <linux-crypto@vger.kernel.org>; Sat, 17 Oct 2026 08:23:26 +0000 (UTC)
+Received: from ghost-submission-7ccd8bbbb6-g6jb4 (unknown [10.108.54.81])
+	by director4.ghost.mail-out.ovh.net (Postfix) with ESMTPS id C07F7C21CB;
+	Sat, 17 Oct 2026 08:23:24 +0000 (UTC)
+Received: from cynove.com ([37.59.142.113])
+	by ghost-submission-7ccd8bbbb6-g6jb4 with ESMTPSA
+	id eIt3Inww02pz2QMAZOlizA
+	(envelope-from <stephane.debusne@cynove.com>); Sat, 17 Oct 2026 08:23:24 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-113S00773237b66-6d21-42ca-ae0b-f7fe8c6ad06d,
                     E277A82C44659F51833474C02B8FDD9281845D64) smtp.auth=Stephane.Debusne@cynove.com
 X-OVh-ClientIp:176.150.47.247
 From: Stephane Debusne <stephane.debusne@cynove.com>
-To: changwei.zou@canonical.com
+To: jeffbarnes@linux.microsoft.com
 Cc: herbert@gondor.apana.org.au,
-	sahil.malhotra@nxp.com,
-	sahil.malhotra@oss.nxp.com,
+	lukas@wunner.de,
+	changwei.zou@canonical.com,
 	davem@davemloft.net,
 	horia.geanta@nxp.com,
 	pankaj.gupta@nxp.com,
-	iuliana.prodan@nxp.com,
+	sahil.malhotra@nxp.com,
+	sahil.malhotra@oss.nxp.com,
 	martin.kepplinger-novakovic@ginzinger.com,
-	lukas@wunner.de,
 	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stephane Debusne <stephane.debusne@cynove.com>
-Subject: Re: [PATCH v2 2/2] crypto: caam - Use bounce buffer for unaligned RSA destination buffers
-Date: Sat, 17 Oct 2026 10:14:17 +0200
-Message-ID: <20261017081417.2775186-1-stephane.debusne@cynove.com>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] crypto: fix RSA results corrupted by non-coherent DMA
+Date: Sat, 17 Oct 2026 10:23:16 +0200
+Message-ID: <20261017082317.2775260-1-stephane.debusne@cynove.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261004210200.290119-3-changwei.zou@canonical.com>
-References: <20261004210200.290119-3-changwei.zou@canonical.com>
+In-Reply-To: <20261016221414.4139377-1-jeffbarnes@linux.microsoft.com>
+References: <20261016221414.4139377-1-jeffbarnes@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,52 +55,55 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-x-ovh-tracer-id: 3343641252612004827
+x-ovh-tracer-id: 3494230363695602492
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: dmFkZTFFWE3bBGPlIBJS3KeuP/5a5zGsiUfnbi/NOsRCn5timlvoAOq9ypHB65ZuJSXxJuiItvlq/xLZ6D/ap2YixEk5F5b4kNEsPQytdBC734i/aO/LcYiQNFsWSrXxb2iX+wKk6Sy7lPsSmpUV94F8jeYOrIib+BY9X94VRQUjlYH8IBaZG4tbYvVPzG4n7NN7jBnH8mf4z5CihVpBmKw82QSJnPrvSqC60vw6WSZ5fWrX5/lXHi1gCDDFmFwctxgaWxI5mRwQuRaDOJkU1JN363DldyPaQtJpIE0DJ6gsS959qWyCvXvbMx8mRzKXchqofVVpC+dOiQvM1D1h/uYs+tinLfonx9UeTwU755U4cF8NeYAIlXqAkmhxPwylaE9N5iNmqkuZ5eWDbNCMVY4B66gWXm3maqxzcjTsOP+Cbv0p5DRcM38Fa4GBtL+9EXbC+Ehcb+87ZIj30vjU4tjiWmbcSsBjI7NIJq1/Dh3QgJBsSyolilMIbax2KZBzDnZMOF6mhAGK3lCqUXZwpwUezA+oU0ruQR1i0wix+R8DVbpfDwkzuXlPUv1+F0P/dDVegAeoD//gtq86HO34hwoduYG9izY0hEMcK2SiF/Q+NuahxnZqbLHnwGBCvLHQ2wnqh3ApFuQHAhPiLtjexxtiQ8uogvpp3vVnEuT6HmcI6oxwlg
-DKIM-Signature: a=rsa-sha256; bh=3T5jwtWeKY4gi72mey1zyXo9lO+BeGEiZVaeBu83B1A=;
+X-VR-SPAMCAUSE: dmFkZTFC0NVPapUsqSmwlY+ug/ypEzIFW36uKGDnmDjmnkLgzhgj97q+qmgd7PEmAPr7td23YlDUwMpsY9yY1LCGDA/P8DKwYAM+uhoxtwJOZKyUUwcRTf8//ksd0oT6ohqxRn5wvhUYFHjN0nGHo6RpuLXsTt0YSBts/2ElvGIO+Kdg21+zQicV67+wTC/a2a8DfO8uSG2Cg4HUKcQAwUMjWjw4tpOgea3XsGWQNhYDN/QLp2C9OchayWuurujEHr2q25Qn8pabJGHIkU+nF10N7OXaf2+92AqUElN09yD0b2q+BV/+gsb2pGL8or6Rft8bHDSaYbI9WXKp0HncpB0s1DeCtRS+7ggZr1ed6Big6Uf4s6YL9mGgKEoqvWfa1QEcDDhw0NND6ka7E0rk8mmijT8/56gb1ysmdjb5HPi6pqHVoQzUA8AXwGuHb9a4F3vqnWU3zWHYdEg0OHMulB4rQSu+Y2jmo97PhryCfFqOig+5GKy4QFea/OLCtVayHQ27hGYwrltB3DdRN2m1gRIH418f4fUAmjXVH3ynOxdGj3lWnmqs0rjsIvlCYtulT4svg2frN08s7GcsqBf9pHLlxtDU8qQ4jx5WCRVQGA68FN7JxELRBIAfGRfvv8WyNkF/aFfLc152NcqkDwGonTEjqClpT6RHlfl5IrALr7epCWeszA
+DKIM-Signature: a=rsa-sha256; bh=/IHyucPgWJL238L3Cj1FRQRAX+5h0KJLX3Hygpqkc40=;
  c=relaxed/relaxed; d=cynove.com; h=From; s=ovhmo4616632-selector1;
- t=1792224871; v=1;
- b=E5bHMSoxpb+a6g92OX1ITZHoZR6H7+qsSKdtw3LdqYHdv92N7km+Bll0dRuhpe0LtVIJli6t
- S2o2po8VcRqmHPQAaK/uA198zQzf2uIxksS+klms5GbPX/xTTlzpuId7MKgYR8VTOF8JA3JUvFS
- u9XrKm71d/j4IgOADpvo5OODwWJdGabUnYZTGZrKXjSybU7/1pq3XYQG3tLeQA0hq8jWnuzLwKj
- PVjugAKT5MdNCeDdAcbwC2defCnLymb1TDuXIwAC70/3vyEKJ2Bmhlwfflrp4uB/uHIvUsiHyCT
- vNqYqqV1NIf41+rxMYdl464/1E0YP09BiIM+Bo52lllhA==
+ t=1792225406; v=1;
+ b=IXdsETz9GpYYT/z3LtBzxqDSUUol/5ro50tOwy0/KnAYutdDZgfaqJ10rFOJJzcZzfZJxdwi
+ S89IsPCqWbN9f5mdWgH5cc5yPNKWgLvxUfLMrtrQh7ZMndjSPkAS43XejRu0acBMZIElDv5RgR4
+ PVI6zeukmFYKE8VlitbZczjZbgFdl3oStWBYaUqxaRuPGeVvbuLlh+pBX6FwWgjV/VTUns2Jttd
+ lWKdT5AJTfSKeZLvqeg4asISuJX4o1yJopg15nW6qVJefBWl9M0EEIOmrOCEQX1kmdbuOFxstd8
+ keXLrl4HdeDk4ujea1cqKx8oL+0gPKNNfUS7wb1OswHsw==
 
-Hi Changwei,
+Hi Jeff,
 
-On i.MX8M Mini (CAAM era 9, non-coherent DMA, no IOMMU in front of the
-CAAM), with both patches of this series applied on 6.18.57, rsa-caam
-gives correct results again for callers whose destination buffer
-shares a cache line with the request context:
+On Fri, Oct 16, 2026 at 06:14:14PM -0400, Jeff Barnes wrote:
+> Your patches move the synchronous-helper and RSASSA-PKCS1 buffers into
+> separate allocations, while intentionally retaining src == dst.
 
-- cfg80211 loads regulatory.db, which was rejected before;
-- keyctl padd accepts a valid self-signed certificate, and
-  keyctl pkey_verify accepts 20 valid signatures (both failed with
-  EINVAL before);
-- a test module comparing rsa-caam with rsa-generic over 200 public-key
-  operations per case (2048-bit key) reports no wrong result in any
-  case, including a destination placed right after the request context
-  (in place or not), crypto_akcipher_sync_encrypt() and
-  pkcs1(rsa-caam,sha256) verification. Without the series, these cases
-  failed in 198 to 200 of 200 operations, with bytes 0 to 23 of the
-  output holding stale data.
+Yes. The in-place request shape predates this series (the sync helper
+has used it since it was introduced, rsassa_pkcs1_verify() since
+8552cb04e083), and I understand in-place requests to be valid for
+akcipher, so I kept the series limited to the placement of the buffer.
+I agree that the two issues are independent.
 
-Only the public-key path was exercised. The requests did not use
-CRYPTO_TFM_REQ_MAY_BACKLOG, so the crypto-engine path fixed by patch 1
-was not reached.
+One data point from the i.MX8M Mini (CAAM era 9, non-coherent, no IOMMU
+in front of the CAAM): with dma-direct, both mappings of the shared SG
+return the same address, so the double mapping has no visible effect
+there. In-place requests on a buffer from its own kmalloc() gave no
+wrong result out of 200 in my test module, and with this series
+applied, rsa-caam passes signature verification. I have not run with
+CONFIG_DMA_API_DEBUG, which should report the overlapping mappings even
+without an IOMMU; I can do so if that helps.
 
-Tested-by: Stephane Debusne <stephane.debusne@cynove.com>
+> Would the preferred direction be:
 
-I posted a series that addresses the same corruption on the caller
-side, in crypto_akcipher_sync_prep() and rsassa_pkcs1_verify(), which
-build these unaligned buffers:
-https://lore.kernel.org/linux-crypto/20261016090333.2247764-1-stephane.debusne@cynove.com/
-The two approaches are complementary: with my series, the buffers from
-these two callers are aligned and need no bounce, while your patch
-covers any other caller.
+I will leave the choice to Herbert and the CAAM maintainers. For what
+it is worth, a narrowly bounded RFC (your option 1) seems the easiest
+to review, and I can test it on the i.MX8M Mini as a regression check
+on a non-coherent system without an IOMMU.
+
+Thanks for the pointer to Changwei's series, which I had missed. It
+fixes the same corruption from the driver side. I have now tested it
+on the i.MX8M Mini: with it alone, the buffers built by the sync helper
+and by rsassa_pkcs1_verify(), which are not cacheline-aligned, are
+bounced, and rsa-caam gives correct results. I sent my Tested-by on his
+thread. The two approaches are complementary: with my series those
+buffers are aligned and need no bounce, while the driver change also
+covers other callers.
 
 Thanks,
 Stephane
-
