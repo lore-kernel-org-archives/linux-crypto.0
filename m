@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE3A4CDDD0
-	for <linux-crypto@vger.kernel.org>; Sun, 18 Oct 2026 20:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1638A3CF1ED
+	for <linux-crypto@vger.kernel.org>; Sun, 18 Oct 2026 20:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792356569; cv=none; b=apXPdEhV6f68UnN8DlM+j5Sb/nwPYOJXEh09cHzfNvzYUdNkjtMRaUnxkUnMT1xOdkJFaO83M9gV6sklHbp63M92vUzLCLUIAxZ5YWdPHNgExp/JASdmNQ6YMbsGtIo+0d+IUrlAm1Wp/FgmpNi0OvUkhkNw4oJnyk9fnoUtmz4=
+	t=1792356570; cv=none; b=DgsHZ+y/PX7WJ2T3ljwNusNj6b8hDQzTlYoFGo5yWAdhqZVsSg72wwOSoq15bHf/HZvzb2LYFkXLclWsDs2zN/BANfYm5od4gSunCOgVVzBida14RRh+o/DsnCreKpM/U+UaVkB0PFG3zSO+vkwiD6Srw2VEevLs6RYxZLkJDfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792356569; c=relaxed/simple;
-	bh=jbjyH9530ba9cj23ukEnEIFe6yt9TREtAk0k5jri9Jg=;
+	s=arc-20240116; t=1792356570; c=relaxed/simple;
+	bh=Foegg8pr8KX42cuCCCOkoz/hqDpQFoYkgMujzccH3cM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RXh+ya0kU2l1E3TeovCe/rkL0i5lMPCOsJFPPOKYxTADP1gDfc+gcObOnUZW1Z3YL24apit9egZ04KMADUEWAPUmJRAJ3j7UAhomBpvfFx0eN1IxkFTYn1vljIQgn1T+UOs/vWeb9UzfsWrj+xfoOoVgOTKxbQxHzBYfATeF4eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niYcRIZe; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=EqbuTZRxqAJIdD/39xTw3UEwFVpNb+tYA6YWkpmWf4Irr2b4H5Y9QeQgbmydKwGZGRHwrnRPFv6ZZe9uVrYNlL16vS6NKHLWpyy09MdH+xOBu2BidJNJ8/pjFmdvPrsOwHy0IjvsPzR76va0vo6/znuAMTng8yIUtOsW5Y3OV80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oo0IhI2R; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niYcRIZe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3141F000C7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oo0IhI2R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B889F1F000C8;
 	Sun, 18 Oct 2026 20:49:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792356568;
-	bh=ugezJdA9pECNx49coeIbvL25jFpoNE6t78V20o0WwUo=;
+	s=k20260515; t=1792356569;
+	bh=otcvChKaZYbqUJ3zyTMx5lnXHwoZ3Vr3tFlNyIMwgDc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=niYcRIZe8zgFYLW852vJFmitDVlIsMChXIr7GkcBD0tHGuonhIcQ04uuSjWIYoQNz
-	 ktme7NjC8um8E4lYXA0VNJ8zqEn6y2AyZnNAS2c9Pg+F2VCHKW3CowD4lSTVhpIBaj
-	 POXwi0Yq2XoAUfla0lmrI4YdmDBR1d1iZo12j0mmEn/6SWZU1S7hO1kVJHtnnNeuwo
-	 mYAvoySRodo/KMDPv6phzfDfkeAJ9sMdL9VOBwxZTPThOpQAkvjb5ysANOTbhbpPBY
-	 YEEfUXPWAQBVdZXEOvGYNh2ETS9eGvPjJz7VZBqS87YmjDgQhJPPqtixQdHf/ipERe
-	 bVeQUqSkpzJRg==
+	b=Oo0IhI2RgLjWngzswAn3JhBv082pA+CVxGRDhNQg3HQrXZNLY3lMENj+TtEfgPNk1
+	 i/Wyz9J+dLCByGU/DDwSMqb4tKwe+vBFozKD8uYbHB03KLNx23E2rQh1yumEs6j46I
+	 Z8ru/ezqo+0wplSC+6iJsvGBRiRd1M+hMs45smNYpLOZ5GeXAF9Sj7279mI8CSAY9n
+	 w3VBIIhT2F8Fb+SpPjJDXDbCjdWv7OFmvnrR4L0xeUee+ER8WOCPuXxics5NqnCPMn
+	 d1g0IBTfyrwVgGobSxzldRKcggMKCVduuYh0LgPm7RrwO2ZO4z7W1kQhCy9hj19ZiJ
+	 wtTNcj5QiWf/w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
 Cc: =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 08/14] crypto: algif_rng - Use DRBG and jitterentropy library APIs
-Date: Sun, 18 Oct 2026 13:46:12 -0700
-Message-ID: <20261018204618.104876-9-ebiggers@kernel.org>
+Subject: [PATCH 09/14] crypto: stdrng - Reimplement "stdrng" using direct DRBG calls
+Date: Sun, 18 Oct 2026 13:46:13 -0700
+Message-ID: <20261018204618.104876-10-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261018204618.104876-1-ebiggers@kernel.org>
 References: <20261018204618.104876-1-ebiggers@kernel.org>
@@ -45,268 +45,298 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since the overly-general crypto_rng API will be removed, reimplement the
-"rng" algorithm type of AF_ALG using the DRBG and jitterentropy library
-functions instead of crypto_rng.
+When fips=1, the so-called "stdrng" is always the NIST SP800-90A DRBG.
+Simplify the code by making __crypto_stdrng_get_bytes() call into the
+DRBG directly instead of going through the unnecessary crypto_rng API.
 
-This preserves the behavior of all algorithm names that actually worked
-with this API (assuming af_alg_restrict=0 to make it available in the
-first place).  Note: the only known use case for this is algorithm
-testing and entropy evaluation for FIPS 140-3 certification.
-
-Make CRYPTO_USER_API_RNG depend on CRYPTO_DRBG to reflect the
-now-explicit dependency.
+This required moving the shared DRBG instance (and the function to
+delete it) from rng.c to drbg.c.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/Kconfig     |   4 +-
- crypto/algif_rng.c | 109 +++++++++++++++++++++++++++++----------------
- 2 files changed, 73 insertions(+), 40 deletions(-)
+ crypto/Kconfig                |  1 -
+ crypto/crypto_user.c          |  2 +-
+ crypto/drbg.c                 | 66 ++++++++++++++++++++++++++
+ crypto/rng.c                  | 88 -----------------------------------
+ include/crypto/internal/rng.h |  9 ----
+ include/crypto/rng.h          | 14 ++++--
+ 6 files changed, 78 insertions(+), 102 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 981d5dc422d4c..5b0806432694f 100644
+index 5b0806432694f..c41c2f3475d0b 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1288,7 +1288,7 @@ config CRYPTO_USER_API_SKCIPHER
- config CRYPTO_USER_API_RNG
- 	tristate "Random number generation algorithms (deprecated)"
+@@ -158,7 +158,6 @@ config CRYPTO_USER
+ 	tristate "Userspace cryptographic algorithm configuration"
  	depends on NET
+ 	select CRYPTO_MANAGER
 -	select CRYPTO_RNG
-+	depends on CRYPTO_DRBG
- 	select CRYPTO_USER_API
  	help
- 	  Enable the AF_ALG userspace interface for random number generation
-@@ -1305,7 +1305,7 @@ config CRYPTO_USER_API_RNG
- 
- config CRYPTO_USER_API_RNG_CAVP
- 	bool "Enable CAVP testing of DRBG"
--	depends on CRYPTO_USER_API_RNG && CRYPTO_DRBG
-+	depends on CRYPTO_USER_API_RNG
- 	help
- 	  Enable extra APIs in the userspace interface for NIST CAVP
- 	  (Cryptographic Algorithm Validation Program) testing:
-diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-index bd522915d56d7..7fe76479a6bdc 100644
---- a/crypto/algif_rng.c
-+++ b/crypto/algif_rng.c
-@@ -40,11 +40,11 @@
- 
- #include <linux/capability.h>
- #include <linux/module.h>
--#include <crypto/rng.h>
--#include <linux/random.h>
- #include <crypto/if_alg.h>
- #include <linux/net.h>
+ 	  Userspace configuration for cryptographic instantiations such as
+ 	  cbc(aes).
+diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+index d3ccb507153b2..08e2b4fb9bf73 100644
+--- a/crypto/crypto_user.c
++++ b/crypto/crypto_user.c
+@@ -16,9 +16,9 @@
+ #include <net/net_namespace.h>
  #include <net/sock.h>
-+#include "drbg.h"
-+#include "jitterentropy-kcapi.h"
+ #include <crypto/internal/skcipher.h>
+-#include <crypto/internal/rng.h>
+ #include <crypto/akcipher.h>
+ #include <crypto/kpp.h>
++#include <crypto/rng.h>
  
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-@@ -54,17 +54,26 @@ static const struct af_alg_allowlist_entry rng_allowlist[] = {
- 	{},
- };
+ #include "internal.h"
  
-+enum rng_type {
-+	RNG_JITTERENTROPY = 1,
-+	RNG_DRBG = 2,
-+};
-+
-+struct rng_parent_ctx {
-+	enum rng_type type;
-+	union {
-+		struct jitterentropy *jent;
-+		struct drbg_state *drbg;
-+	};
-+	u8 *entropy;
-+};
-+
- struct rng_ctx {
- #define MAXSIZE 128
- 	unsigned int len;
--	struct crypto_rng *drng;
- 	u8 *addtl;
- 	size_t addtl_len;
--};
--
--struct rng_parent_ctx {
--	struct crypto_rng *drng;
--	u8 *entropy;
-+	struct rng_parent_ctx *pctx;
- };
- 
- static void rng_reset_addtl(struct rng_ctx *ctx)
-@@ -74,11 +83,10 @@ static void rng_reset_addtl(struct rng_ctx *ctx)
- 	ctx->addtl_len = 0;
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 9c99b2d510e0a..0f36aa45bfaca 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -638,6 +638,67 @@ void crypto_drbg_free(struct drbg_state *drbg)
  }
+ EXPORT_SYMBOL_NS_GPL(crypto_drbg_free, "CRYPTO_INTERNAL");
  
--static int _rng_recvmsg(struct crypto_rng *drng, struct msghdr *msg, size_t len,
-+static int _rng_recvmsg(struct rng_ctx *ctx, struct msghdr *msg, size_t len,
- 			u8 *addtl, size_t addtl_len)
- {
- 	int err = 0;
--	int genlen = 0;
- 	u8 result[MAXSIZE];
- 
- 	if (len == 0)
-@@ -92,15 +100,18 @@ static int _rng_recvmsg(struct crypto_rng *drng, struct msghdr *msg, size_t len,
- 	 */
- 	memset(result, 0, len);
- 
--	/*
--	 * The enforcement of a proper seeding of an RNG is done within an
--	 * RNG implementation. Some RNGs (DRBG, krng) do not need specific
--	 * seeding as they automatically seed. The X9.31 DRNG will return
--	 * an error if it was not seeded properly.
--	 */
--	genlen = crypto_rng_generate(drng, addtl, addtl_len, result, len);
--	if (genlen < 0)
--		return genlen;
-+	err = -EINVAL;
-+	switch (ctx->pctx->type) {
-+	case RNG_JITTERENTROPY:
-+		err = crypto_jent_get_bytes(ctx->pctx->jent, result, len);
-+		break;
-+	case RNG_DRBG:
-+		err = crypto_drbg_get_bytes(ctx->pctx->drbg, result, len, addtl,
-+					    addtl_len);
-+		break;
++#ifdef CONFIG_CRYPTO_FIPS
++static DEFINE_MUTEX(crypto_default_rng_lock);
++static struct drbg_state *crypto_default_rng;
++static int crypto_default_rng_refcnt;
++
++static int crypto_get_default_rng(void)
++{
++	struct drbg_state *drbg;
++	int err;
++
++	guard(mutex)(&crypto_default_rng_lock);
++	if (!crypto_default_rng) {
++		drbg = crypto_drbg_alloc();
++		if (IS_ERR(drbg))
++			return PTR_ERR(drbg);
++
++		err = crypto_drbg_seed(drbg, NULL, 0);
++		if (err) {
++			crypto_drbg_free(drbg);
++			return err;
++		}
++		crypto_default_rng = drbg;
 +	}
-+	if (err < 0)
++
++	crypto_default_rng_refcnt++;
++	return 0;
++}
++
++static void crypto_put_default_rng(void)
++{
++	guard(mutex)(&crypto_default_rng_lock);
++	crypto_default_rng_refcnt--;
++}
++
++int __crypto_stdrng_get_bytes(void *buf, unsigned int len)
++{
++	int err;
++
++	err = crypto_get_default_rng();
++	if (err)
 +		return err;
- 
- 	err = memcpy_to_msg(msg, result, len);
- 	memzero_explicit(result, len);
-@@ -115,7 +126,7 @@ static int rng_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct rng_ctx *ctx = ask->private;
- 
--	return _rng_recvmsg(ctx->drng, msg, len, NULL, 0);
-+	return _rng_recvmsg(ctx, msg, len, NULL, 0);
++
++	err = crypto_drbg_get_bytes(crypto_default_rng, buf, len, NULL, 0);
++	crypto_put_default_rng();
++	return err;
++}
++EXPORT_SYMBOL_GPL(__crypto_stdrng_get_bytes);
++
++int crypto_del_default_rng(void)
++{
++	guard(mutex)(&crypto_default_rng_lock);
++	if (crypto_default_rng_refcnt)
++		return -EBUSY;
++
++	crypto_drbg_free(crypto_default_rng);
++	crypto_default_rng = NULL;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(crypto_del_default_rng);
++#endif /* CONFIG_CRYPTO_FIPS */
++
+ /*
+  * Tests as defined in 11.3.2 in addition to the cipher tests: testing
+  * of the error handling.
+@@ -812,6 +873,11 @@ static int __init drbg_init(void)
+ static void __exit drbg_exit(void)
+ {
+ 	crypto_unregister_rng(&drbg_alg);
++
++	/*
++	 * Note there's no need to call crypto_del_default_rng() from here, as
++	 * it can exist only when this file is built-in.
++	 */
  }
  
- static int rng_test_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-@@ -127,7 +138,7 @@ static int rng_test_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	int ret;
+ module_init(drbg_init);
+diff --git a/crypto/rng.c b/crypto/rng.c
+index 828b0d8074738..be4873bec679b 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -23,10 +23,6 @@
  
- 	lock_sock(sock->sk);
--	ret = _rng_recvmsg(ctx->drng, msg, len, ctx->addtl, ctx->addtl_len);
-+	ret = _rng_recvmsg(ctx, msg, len, ctx->addtl, ctx->addtl_len);
- 	rng_reset_addtl(ctx);
- 	release_sock(sock->sk);
+ #include "internal.h"
  
-@@ -204,7 +215,6 @@ static struct proto_ops __maybe_unused algif_rng_test_ops = {
- static void *rng_bind(const char *name)
- {
- 	struct rng_parent_ctx *pctx;
--	struct crypto_rng *rng;
- 	int err;
- 
- 	err = af_alg_check_restriction(name, rng_allowlist);
-@@ -215,14 +225,30 @@ static void *rng_bind(const char *name)
- 	if (!pctx)
- 		return ERR_PTR(-ENOMEM);
- 
--	rng = crypto_alloc_rng(name, 0, AF_ALG_CRYPTOAPI_MASK);
--	if (IS_ERR(rng)) {
--		kfree(pctx);
--		return ERR_CAST(rng);
-+	if (strcmp(name, "jitterentropy_rng") == 0) {
-+		pctx->type = RNG_JITTERENTROPY;
-+		pctx->jent = crypto_jent_alloc();
-+		if (IS_ERR(pctx->jent)) {
-+			err = PTR_ERR(pctx->jent);
-+			goto error;
-+		}
-+	} else if (strcmp(name, "stdrng") == 0 ||
-+		   strcmp(name, "drbg_nopr_hmac_sha512") == 0) {
-+		pctx->type = RNG_DRBG;
-+		pctx->drbg = crypto_drbg_alloc();
-+		if (IS_ERR(pctx->drbg)) {
-+			err = PTR_ERR(pctx->drbg);
-+			goto error;
-+		}
-+	} else {
-+		err = -ENOENT;
-+		goto error;
- 	}
+-static DEFINE_MUTEX(crypto_default_rng_lock);
+-static struct crypto_rng *crypto_default_rng;
+-static int crypto_default_rng_refcnt;
 -
--	pctx->drng = rng;
- 	return pctx;
-+
-+error:
-+	kfree_sensitive(pctx);
-+	return ERR_PTR(err);
- }
- 
- static void rng_release(void *private)
-@@ -231,7 +257,14 @@ static void rng_release(void *private)
- 
- 	if (unlikely(!pctx))
- 		return;
--	crypto_free_rng(pctx->drng);
-+	switch (pctx->type) {
-+	case RNG_JITTERENTROPY:
-+		crypto_jent_free(pctx->jent);
-+		break;
-+	case RNG_DRBG:
-+		crypto_drbg_free(pctx->drbg);
-+		break;
-+	}
- 	kfree_sensitive(pctx->entropy);
- 	kfree_sensitive(pctx);
- }
-@@ -266,7 +299,7 @@ static int rng_accept_parent(void *private, struct sock *sk)
- 	 * state of the RNG.
- 	 */
- 
--	ctx->drng = pctx->drng;
-+	ctx->pctx = pctx;
- 	ask->private = ctx;
- 	sk->sk_destruct = rng_sock_destruct;
- 
-@@ -283,11 +316,10 @@ static int rng_accept_parent(void *private, struct sock *sk)
- static int rng_setkey(void *private, const u8 *seed, unsigned int seedlen)
+ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
  {
- 	struct rng_parent_ctx *pctx = private;
--	/*
--	 * Check whether seedlen is of sufficient size is done in RNG
--	 * implementations.
--	 */
--	return crypto_rng_reset(pctx->drng, seed, seedlen);
-+
-+	if (pctx->type != RNG_DRBG)
-+		return 0;
-+	return crypto_drbg_seed(pctx->drbg, seed, seedlen);
+ 	u8 *buf = NULL;
+@@ -103,79 +99,6 @@ struct crypto_rng *crypto_alloc_rng(const char *alg_name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_rng);
+ 
+-static int crypto_get_default_rng(void)
+-{
+-	struct crypto_rng *rng;
+-	int err;
+-
+-	mutex_lock(&crypto_default_rng_lock);
+-	if (!crypto_default_rng) {
+-		rng = crypto_alloc_rng("stdrng", 0, 0);
+-		err = PTR_ERR(rng);
+-		if (IS_ERR(rng))
+-			goto unlock;
+-
+-		err = crypto_rng_reset(rng, NULL, crypto_rng_seedsize(rng));
+-		if (err) {
+-			crypto_free_rng(rng);
+-			goto unlock;
+-		}
+-
+-		crypto_default_rng = rng;
+-	}
+-
+-	crypto_default_rng_refcnt++;
+-	err = 0;
+-
+-unlock:
+-	mutex_unlock(&crypto_default_rng_lock);
+-
+-	return err;
+-}
+-
+-static void crypto_put_default_rng(void)
+-{
+-	mutex_lock(&crypto_default_rng_lock);
+-	crypto_default_rng_refcnt--;
+-	mutex_unlock(&crypto_default_rng_lock);
+-}
+-
+-int __crypto_stdrng_get_bytes(void *buf, unsigned int len)
+-{
+-	int err;
+-
+-	err = crypto_get_default_rng();
+-	if (err)
+-		return err;
+-
+-	err = crypto_rng_get_bytes(crypto_default_rng, buf, len);
+-	crypto_put_default_rng();
+-	return err;
+-}
+-EXPORT_SYMBOL_GPL(__crypto_stdrng_get_bytes);
+-
+-#if defined(CONFIG_CRYPTO_RNG) || defined(CONFIG_CRYPTO_RNG_MODULE)
+-int crypto_del_default_rng(void)
+-{
+-	int err = -EBUSY;
+-
+-	mutex_lock(&crypto_default_rng_lock);
+-	if (crypto_default_rng_refcnt)
+-		goto out;
+-
+-	crypto_free_rng(crypto_default_rng);
+-	crypto_default_rng = NULL;
+-
+-	err = 0;
+-
+-out:
+-	mutex_unlock(&crypto_default_rng_lock);
+-
+-	return err;
+-}
+-EXPORT_SYMBOL_GPL(crypto_del_default_rng);
+-#endif
+-
+ static void rng_default_set_ent(struct crypto_rng *tfm, const u8 *data,
+ 				unsigned int len)
+ {
+@@ -230,16 +153,5 @@ void crypto_unregister_rngs(struct rng_alg *algs, int count)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_rngs);
+ 
+-static void __exit rng_exit(void)
+-{
+-	int err;
+-
+-	err = crypto_del_default_rng();
+-	if (err)
+-		pr_err("Failed delete default RNG: %d\n", err);
+-}
+-
+-module_exit(rng_exit);
+-
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Random Number Generator");
+diff --git a/include/crypto/internal/rng.h b/include/crypto/internal/rng.h
+index e0711b6a597fc..8c9f560d6449c 100644
+--- a/include/crypto/internal/rng.h
++++ b/include/crypto/internal/rng.h
+@@ -17,15 +17,6 @@ void crypto_unregister_rng(struct rng_alg *alg);
+ int crypto_register_rngs(struct rng_alg *algs, int count);
+ void crypto_unregister_rngs(struct rng_alg *algs, int count);
+ 
+-#if defined(CONFIG_CRYPTO_RNG) || defined(CONFIG_CRYPTO_RNG_MODULE)
+-int crypto_del_default_rng(void);
+-#else
+-static inline int crypto_del_default_rng(void)
+-{
+-	return 0;
+-}
+-#endif
+-
+ static inline void *crypto_rng_ctx(struct crypto_rng *tfm)
+ {
+ 	return crypto_tfm_ctx(&tfm->base);
+diff --git a/include/crypto/rng.h b/include/crypto/rng.h
+index 07f494b2c8817..463bbdce11c2c 100644
+--- a/include/crypto/rng.h
++++ b/include/crypto/rng.h
+@@ -66,9 +66,8 @@ int __crypto_stdrng_get_bytes(void *buf, unsigned int len);
+  * @buf: output buffer holding the random numbers
+  * @len: length of the output buffer
+  *
+- * This function fills the caller-allocated buffer with random numbers using the
+- * normal Linux RNG if fips_enabled=0, or the highest-priority "stdrng"
+- * algorithm in the crypto_rng subsystem if fips_enabled=1.
++ * This function fills the given buffer with random numbers using the normal
++ * Linux RNG if fips_enabled=0, or a NIST SP800-90A DRBG if fips_enabled=1.
+  *
+  * Context: May sleep
+  * Return: 0 function was successful; < 0 if an error occurred
+@@ -81,6 +80,15 @@ static inline int crypto_stdrng_get_bytes(void *buf, unsigned int len)
+ 	return get_random_bytes_wait(buf, len);
  }
  
- static int __maybe_unused rng_setentropy(void *private, sockptr_t entropy,
-@@ -299,7 +331,7 @@ static int __maybe_unused rng_setentropy(void *private, sockptr_t entropy,
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
- 
--	if (pctx->entropy)
-+	if (pctx->entropy || pctx->type != RNG_DRBG)
- 		return -EINVAL;
- 
- 	if (len > MAXSIZE)
-@@ -311,9 +343,9 @@ static int __maybe_unused rng_setentropy(void *private, sockptr_t entropy,
- 			return PTR_ERR(kentropy);
- 	}
- 
--	crypto_rng_alg(pctx->drng)->set_ent(pctx->drng, kentropy, len);
-+	crypto_drbg_set_entropy(pctx->drbg, kentropy, len);
- 	/*
--	 * Since rng doesn't perform any memory management for the entropy
-+	 * Since drbg doesn't perform any memory management for the entropy
- 	 * buffer, save kentropy pointer to pctx now to free it after use.
- 	 */
- 	pctx->entropy = kentropy;
-@@ -346,3 +378,4 @@ static void __exit rng_exit(void)
- 
- module_init(rng_init);
- module_exit(rng_exit);
-+MODULE_IMPORT_NS("CRYPTO_INTERNAL"); /* for drbg and jitterentropy */
++#ifdef CONFIG_CRYPTO_FIPS
++int crypto_del_default_rng(void);
++#else
++static inline int crypto_del_default_rng(void)
++{
++	return 0;
++}
++#endif
++
+ /**
+  * DOC: Random number generator API
+  *
 -- 
 2.56.0
 
