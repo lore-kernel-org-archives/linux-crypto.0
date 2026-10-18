@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1638A3CF1ED
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC934D37B8
 	for <linux-crypto@vger.kernel.org>; Sun, 18 Oct 2026 20:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792356570; cv=none; b=DgsHZ+y/PX7WJ2T3ljwNusNj6b8hDQzTlYoFGo5yWAdhqZVsSg72wwOSoq15bHf/HZvzb2LYFkXLclWsDs2zN/BANfYm5od4gSunCOgVVzBida14RRh+o/DsnCreKpM/U+UaVkB0PFG3zSO+vkwiD6Srw2VEevLs6RYxZLkJDfU=
+	t=1792356571; cv=none; b=UeX4lKi/GM+dbrtIB36lQQZhJiUvzdhfvp2gn0eYbPxTRt1687GHdY6RLRaJcOL2To/NR8hD306Zxmytou+t90sTOmNXJMlPkmxEGJvA0Mvgmx58aIwHc1twfCCLj/XDw+7vHN6t1qG3Wn3AQKOnrcMQu8qtJ6Uuz6vCYGbWekg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792356570; c=relaxed/simple;
-	bh=Foegg8pr8KX42cuCCCOkoz/hqDpQFoYkgMujzccH3cM=;
+	s=arc-20240116; t=1792356571; c=relaxed/simple;
+	bh=tiUOviZY4QR0fdbro6k0d3Q0lCM+331qxewRCRbMBx0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EqbuTZRxqAJIdD/39xTw3UEwFVpNb+tYA6YWkpmWf4Irr2b4H5Y9QeQgbmydKwGZGRHwrnRPFv6ZZe9uVrYNlL16vS6NKHLWpyy09MdH+xOBu2BidJNJ8/pjFmdvPrsOwHy0IjvsPzR76va0vo6/znuAMTng8yIUtOsW5Y3OV80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oo0IhI2R; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=BFxpsv+Ssqx/ibyKxtwdTtJFwenCBJsKzWfznjX9iOlwDxBz44hIsl6UincW8TlbfhJGWHSTLschGjFuGaLvoiBSFxxvwbkfOKQfeEtYtoJ3k8kdOFAAOVf92Z8HfkiqqQk+h94jDblf38+JxzXaAOuK5onGv2LesxZwt9S99Xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O0fN512h; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oo0IhI2R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B889F1F000C8;
-	Sun, 18 Oct 2026 20:49:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O0fN512h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981141F000C5;
+	Sun, 18 Oct 2026 20:49:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1792356569;
-	bh=otcvChKaZYbqUJ3zyTMx5lnXHwoZ3Vr3tFlNyIMwgDc=;
+	bh=WXsHFYFPUM2vzThKic0hBxYSMm6YDuUSA/DtewcwjVQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Oo0IhI2RgLjWngzswAn3JhBv082pA+CVxGRDhNQg3HQrXZNLY3lMENj+TtEfgPNk1
-	 i/Wyz9J+dLCByGU/DDwSMqb4tKwe+vBFozKD8uYbHB03KLNx23E2rQh1yumEs6j46I
-	 Z8ru/ezqo+0wplSC+6iJsvGBRiRd1M+hMs45smNYpLOZ5GeXAF9Sj7279mI8CSAY9n
-	 w3VBIIhT2F8Fb+SpPjJDXDbCjdWv7OFmvnrR4L0xeUee+ER8WOCPuXxics5NqnCPMn
-	 d1g0IBTfyrwVgGobSxzldRKcggMKCVduuYh0LgPm7RrwO2ZO4z7W1kQhCy9hj19ZiJ
-	 wtTNcj5QiWf/w==
+	b=O0fN512h6SJpG9UGV/plG0hp9bYOHY2FpOHE9gM/HiEu3ODIWsEZF2GwHbr5JfJzP
+	 2rkKiAAAS3Rz1v5B5qBaoQlqnx/ZXJjX+HnlTdOKYH5W7blJJwKEAbxkarZXaSynyG
+	 TrAYcSBfrYvKZdj/Ay7Uzxq8rllR0XrJ8q2dwEt6mmhmxYcMi1oGEgB5tFJK5etI21
+	 iTTvr+zXH+76iNVI5/L01nQAqhxqG9Y3ulzSsHpwD4AYy82lq+7KX+FppPbYCPqZYA
+	 jeP+pOPGifS0IU3S/tnPw4tT+bdRdCIAJAEbwg1J8se4Bi0AnfcjVxUXRKUTPjkm/X
+	 OoVpeS1r9qV3Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
 Cc: =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 09/14] crypto: stdrng - Reimplement "stdrng" using direct DRBG calls
-Date: Sun, 18 Oct 2026 13:46:13 -0700
-Message-ID: <20261018204618.104876-10-ebiggers@kernel.org>
+Subject: [PATCH 11/14] crypto: jitterentropy - Remove crypto_rng support
+Date: Sun, 18 Oct 2026 13:46:15 -0700
+Message-ID: <20261018204618.104876-12-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261018204618.104876-1-ebiggers@kernel.org>
 References: <20261018204618.104876-1-ebiggers@kernel.org>
@@ -45,298 +45,179 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When fips=1, the so-called "stdrng" is always the NIST SP800-90A DRBG.
-Simplify the code by making __crypto_stdrng_get_bytes() call into the
-DRBG directly instead of going through the unnecessary crypto_rng API.
-
-This required moving the shared DRBG instance (and the function to
-delete it) from rng.c to drbg.c.
+Now that jitterentropy is used only via its library API instead of
+crypto_rng, remove its obsolete crypto_rng support.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/Kconfig                |  1 -
- crypto/crypto_user.c          |  2 +-
- crypto/drbg.c                 | 66 ++++++++++++++++++++++++++
- crypto/rng.c                  | 88 -----------------------------------
- include/crypto/internal/rng.h |  9 ----
- include/crypto/rng.h          | 14 ++++--
- 6 files changed, 78 insertions(+), 102 deletions(-)
+ crypto/Kconfig               |   1 -
+ crypto/jitterentropy-kcapi.c | 106 +----------------------------------
+ crypto/testmgr.c             |   4 --
+ 3 files changed, 1 insertion(+), 110 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 5b0806432694f..c41c2f3475d0b 100644
+index ed8612dcc5212..c9d842706b9ff 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -158,7 +158,6 @@ config CRYPTO_USER
- 	tristate "Userspace cryptographic algorithm configuration"
- 	depends on NET
- 	select CRYPTO_MANAGER
+@@ -1117,7 +1117,6 @@ config CRYPTO_DRBG
+ config CRYPTO_JITTERENTROPY
+ 	tristate "CPU Jitter Non-Deterministic RNG (Random Number Generator)"
+ 	select CRYPTO_LIB_SHA3
 -	select CRYPTO_RNG
  	help
- 	  Userspace configuration for cryptographic instantiations such as
- 	  cbc(aes).
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index d3ccb507153b2..08e2b4fb9bf73 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -16,9 +16,9 @@
- #include <net/net_namespace.h>
- #include <net/sock.h>
- #include <crypto/internal/skcipher.h>
+ 	  CPU Jitter RNG (Random Number Generator) from the Jitterentropy library
+ 
+diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+index 2786303195950..1311df9882228 100644
+--- a/crypto/jitterentropy-kcapi.c
++++ b/crypto/jitterentropy-kcapi.c
+@@ -44,7 +44,6 @@
+ #include <linux/mutex.h>
+ #include <linux/slab.h>
+ #include <linux/time.h>
 -#include <crypto/internal/rng.h>
- #include <crypto/akcipher.h>
- #include <crypto/kpp.h>
-+#include <crypto/rng.h>
  
- #include "internal.h"
- 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 9c99b2d510e0a..0f36aa45bfaca 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -638,6 +638,67 @@ void crypto_drbg_free(struct drbg_state *drbg)
+ #include "jitterentropy.h"
+ #include "jitterentropy-kcapi.h"
+@@ -302,117 +301,15 @@ void crypto_jent_free(struct jitterentropy *rng)
  }
- EXPORT_SYMBOL_NS_GPL(crypto_drbg_free, "CRYPTO_INTERNAL");
+ EXPORT_SYMBOL_NS_GPL(crypto_jent_free, "CRYPTO_INTERNAL");
  
-+#ifdef CONFIG_CRYPTO_FIPS
-+static DEFINE_MUTEX(crypto_default_rng_lock);
-+static struct drbg_state *crypto_default_rng;
-+static int crypto_default_rng_refcnt;
-+
-+static int crypto_get_default_rng(void)
-+{
-+	struct drbg_state *drbg;
-+	int err;
-+
-+	guard(mutex)(&crypto_default_rng_lock);
-+	if (!crypto_default_rng) {
-+		drbg = crypto_drbg_alloc();
-+		if (IS_ERR(drbg))
-+			return PTR_ERR(drbg);
-+
-+		err = crypto_drbg_seed(drbg, NULL, 0);
-+		if (err) {
-+			crypto_drbg_free(drbg);
-+			return err;
-+		}
-+		crypto_default_rng = drbg;
-+	}
-+
-+	crypto_default_rng_refcnt++;
-+	return 0;
-+}
-+
-+static void crypto_put_default_rng(void)
-+{
-+	guard(mutex)(&crypto_default_rng_lock);
-+	crypto_default_rng_refcnt--;
-+}
-+
-+int __crypto_stdrng_get_bytes(void *buf, unsigned int len)
-+{
-+	int err;
-+
-+	err = crypto_get_default_rng();
-+	if (err)
-+		return err;
-+
-+	err = crypto_drbg_get_bytes(crypto_default_rng, buf, len, NULL, 0);
-+	crypto_put_default_rng();
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(__crypto_stdrng_get_bytes);
-+
-+int crypto_del_default_rng(void)
-+{
-+	guard(mutex)(&crypto_default_rng_lock);
-+	if (crypto_default_rng_refcnt)
-+		return -EBUSY;
-+
-+	crypto_drbg_free(crypto_default_rng);
-+	crypto_default_rng = NULL;
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(crypto_del_default_rng);
-+#endif /* CONFIG_CRYPTO_FIPS */
-+
- /*
-  * Tests as defined in 11.3.2 in addition to the cipher tests: testing
-  * of the error handling.
-@@ -812,6 +873,11 @@ static int __init drbg_init(void)
- static void __exit drbg_exit(void)
- {
- 	crypto_unregister_rng(&drbg_alg);
-+
-+	/*
-+	 * Note there's no need to call crypto_del_default_rng() from here, as
-+	 * it can exist only when this file is built-in.
-+	 */
- }
- 
- module_init(drbg_init);
-diff --git a/crypto/rng.c b/crypto/rng.c
-index 828b0d8074738..be4873bec679b 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -23,10 +23,6 @@
- 
- #include "internal.h"
- 
--static DEFINE_MUTEX(crypto_default_rng_lock);
--static struct crypto_rng *crypto_default_rng;
--static int crypto_default_rng_refcnt;
--
- int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
- {
- 	u8 *buf = NULL;
-@@ -103,79 +99,6 @@ struct crypto_rng *crypto_alloc_rng(const char *alg_name, u32 type, u32 mask)
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_rng);
- 
--static int crypto_get_default_rng(void)
+-static void jent_kcapi_cleanup(struct crypto_tfm *tfm)
 -{
--	struct crypto_rng *rng;
--	int err;
+-	struct jitterentropy *rng = crypto_tfm_ctx(tfm);
 -
--	mutex_lock(&crypto_default_rng_lock);
--	if (!crypto_default_rng) {
--		rng = crypto_alloc_rng("stdrng", 0, 0);
--		err = PTR_ERR(rng);
--		if (IS_ERR(rng))
--			goto unlock;
+-	mutex_lock(&rng->jent_lock);
 -
--		err = crypto_rng_reset(rng, NULL, crypto_rng_seedsize(rng));
--		if (err) {
--			crypto_free_rng(rng);
--			goto unlock;
--		}
+-	memzero_explicit(&rng->hash_state, sizeof(rng->hash_state));
 -
--		crypto_default_rng = rng;
+-	if (rng->entropy_collector)
+-		jent_entropy_collector_free(rng->entropy_collector);
+-	rng->entropy_collector = NULL;
+-	mutex_unlock(&rng->jent_lock);
+-}
+-
+-static int jent_kcapi_init(struct crypto_tfm *tfm)
+-{
+-	struct jitterentropy *rng = crypto_tfm_ctx(tfm);
+-	int ret;
+-
+-	ret = jent_init();
+-	if (ret)
+-		return ret;
+-
+-	mutex_init(&rng->jent_lock);
+-
+-	/* Use SHA3-256 as conditioner */
+-	sha3_256_init(&rng->hash_state);
+-
+-	rng->entropy_collector = jent_entropy_collector_alloc(
+-		CONFIG_CRYPTO_JITTERENTROPY_OSR, 0, &rng->hash_state);
+-	if (!rng->entropy_collector) {
+-		ret = -ENOMEM;
+-		goto err;
 -	}
 -
--	crypto_default_rng_refcnt++;
--	err = 0;
+-	return 0;
 -
--unlock:
--	mutex_unlock(&crypto_default_rng_lock);
--
--	return err;
+-err:
+-	jent_kcapi_cleanup(tfm);
+-	return ret;
 -}
 -
--static void crypto_put_default_rng(void)
+-static int jent_kcapi_random(struct crypto_rng *tfm,
+-			     const u8 *src, unsigned int slen,
+-			     u8 *rdata, unsigned int dlen)
 -{
--	mutex_lock(&crypto_default_rng_lock);
--	crypto_default_rng_refcnt--;
--	mutex_unlock(&crypto_default_rng_lock);
+-	struct jitterentropy *rng = crypto_rng_ctx(tfm);
+-	int ret = 0;
+-
+-	mutex_lock(&rng->jent_lock);
+-
+-	ret = jent_read_entropy(rng->entropy_collector, rdata, dlen);
+-
+-	if (ret == -3) {
+-		/* Handle permanent health test error */
+-		/*
+-		 * If the kernel was booted with fips=1, it implies that
+-		 * the entire kernel acts as a FIPS 140 module. In this case
+-		 * an SP800-90B permanent health test error is treated as
+-		 * a FIPS module error.
+-		 */
+-		if (fips_enabled)
+-			panic("Jitter RNG permanent health test failure\n");
+-
+-		pr_err("Jitter RNG permanent health test failure\n");
+-		ret = -EFAULT;
+-	} else if (ret == -2) {
+-		/* Handle intermittent health test error */
+-		pr_warn_ratelimited("Reset Jitter RNG due to intermittent health test failure\n");
+-		ret = -EAGAIN;
+-	} else if (ret == -1) {
+-		/* Handle other errors */
+-		ret = -EINVAL;
+-	}
+-
+-	mutex_unlock(&rng->jent_lock);
+-
+-	return ret;
 -}
 -
--int __crypto_stdrng_get_bytes(void *buf, unsigned int len)
--{
--	int err;
--
--	err = crypto_get_default_rng();
--	if (err)
--		return err;
--
--	err = crypto_rng_get_bytes(crypto_default_rng, buf, len);
--	crypto_put_default_rng();
--	return err;
--}
--EXPORT_SYMBOL_GPL(__crypto_stdrng_get_bytes);
--
--#if defined(CONFIG_CRYPTO_RNG) || defined(CONFIG_CRYPTO_RNG_MODULE)
--int crypto_del_default_rng(void)
--{
--	int err = -EBUSY;
--
--	mutex_lock(&crypto_default_rng_lock);
--	if (crypto_default_rng_refcnt)
--		goto out;
--
--	crypto_free_rng(crypto_default_rng);
--	crypto_default_rng = NULL;
--
--	err = 0;
--
--out:
--	mutex_unlock(&crypto_default_rng_lock);
--
--	return err;
--}
--EXPORT_SYMBOL_GPL(crypto_del_default_rng);
--#endif
--
- static void rng_default_set_ent(struct crypto_rng *tfm, const u8 *data,
- 				unsigned int len)
- {
-@@ -230,16 +153,5 @@ void crypto_unregister_rngs(struct rng_alg *algs, int count)
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_rngs);
- 
--static void __exit rng_exit(void)
--{
--	int err;
--
--	err = crypto_del_default_rng();
--	if (err)
--		pr_err("Failed delete default RNG: %d\n", err);
--}
--
--module_exit(rng_exit);
--
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Random Number Generator");
-diff --git a/include/crypto/internal/rng.h b/include/crypto/internal/rng.h
-index e0711b6a597fc..8c9f560d6449c 100644
---- a/include/crypto/internal/rng.h
-+++ b/include/crypto/internal/rng.h
-@@ -17,15 +17,6 @@ void crypto_unregister_rng(struct rng_alg *alg);
- int crypto_register_rngs(struct rng_alg *algs, int count);
- void crypto_unregister_rngs(struct rng_alg *algs, int count);
- 
--#if defined(CONFIG_CRYPTO_RNG) || defined(CONFIG_CRYPTO_RNG_MODULE)
--int crypto_del_default_rng(void);
--#else
--static inline int crypto_del_default_rng(void)
+-static int jent_kcapi_reset(struct crypto_rng *tfm,
+-			    const u8 *seed, unsigned int slen)
 -{
 -	return 0;
 -}
--#endif
 -
- static inline void *crypto_rng_ctx(struct crypto_rng *tfm)
+-static struct rng_alg jent_alg = {
+-	.generate		= jent_kcapi_random,
+-	.seed			= jent_kcapi_reset,
+-	.seedsize		= 0,
+-	.base			= {
+-		.cra_name               = "jitterentropy_rng",
+-		.cra_driver_name        = "jitterentropy_rng",
+-		.cra_priority           = 100,
+-		.cra_ctxsize            = sizeof(struct jitterentropy),
+-		.cra_module             = THIS_MODULE,
+-		.cra_init               = jent_kcapi_init,
+-		.cra_exit               = jent_kcapi_cleanup,
+-	}
+-};
+-
+ static int __init jent_mod_init(void)
  {
- 	return crypto_tfm_ctx(&tfm->base);
-diff --git a/include/crypto/rng.h b/include/crypto/rng.h
-index 07f494b2c8817..463bbdce11c2c 100644
---- a/include/crypto/rng.h
-+++ b/include/crypto/rng.h
-@@ -66,9 +66,8 @@ int __crypto_stdrng_get_bytes(void *buf, unsigned int len);
-  * @buf: output buffer holding the random numbers
-  * @len: length of the output buffer
-  *
-- * This function fills the caller-allocated buffer with random numbers using the
-- * normal Linux RNG if fips_enabled=0, or the highest-priority "stdrng"
-- * algorithm in the crypto_rng subsystem if fips_enabled=1.
-+ * This function fills the given buffer with random numbers using the normal
-+ * Linux RNG if fips_enabled=0, or a NIST SP800-90A DRBG if fips_enabled=1.
-  *
-  * Context: May sleep
-  * Return: 0 function was successful; < 0 if an error occurred
-@@ -81,6 +80,15 @@ static inline int crypto_stdrng_get_bytes(void *buf, unsigned int len)
- 	return get_random_bytes_wait(buf, len);
+ 	jent_testing_init();
+-	return crypto_register_rng(&jent_alg);
++	return 0;
  }
  
-+#ifdef CONFIG_CRYPTO_FIPS
-+int crypto_del_default_rng(void);
-+#else
-+static inline int crypto_del_default_rng(void)
-+{
-+	return 0;
-+}
-+#endif
-+
- /**
-  * DOC: Random number generator API
-  *
+ static void __exit jent_mod_exit(void)
+ {
+ 	jent_testing_exit();
+-	crypto_unregister_rng(&jent_alg);
+ }
+ 
+ module_init(jent_mod_init);
+@@ -421,4 +318,3 @@ module_exit(jent_mod_exit);
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
+ MODULE_DESCRIPTION("Non-physical True Random Number Generator based on CPU Jitter");
+-MODULE_ALIAS_CRYPTO("jitterentropy_rng");
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 4abb18bc2fa79..0e60702ab6a4c 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4923,10 +4923,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.hash = __VECS(hmac_streebog512_tv_template)
+ 		}
+-	}, {
+-		.alg = "jitterentropy_rng",
+-		.fips_allowed = 1,
+-		.test = alg_test_null,
+ 	}, {
+ 		.alg = "krb5enc(cmac(camellia),cts(cbc(camellia)))",
+ 		.test = alg_test_aead,
 -- 
 2.56.0
 
