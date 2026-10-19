@@ -1,223 +1,257 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013043.outbound.protection.outlook.com [40.93.196.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87F64F96C3
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 13:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792417713; cv=none; b=Yui1oFKYB0Dx48nN7P2tvSiIWPvh1KpMkezU+WsROcyiesvUIa1veEgyq4Qi1iZFm2QJzWKHcs5xJ5HDttulcYTDWGkwVIB5KtBT4VRfXGpcTqCb/LqVlqmKgjQHjpi79qxSI5h+bnDOs3jGi5buaPkpu5QVsTX68skd9QcuGgU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792417713; c=relaxed/simple;
-	bh=1hMzuROJV8vdtq+SPxtxFWcFHZLQfN64YbfzueOmtbk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J0AxTfKTWtR2aUQHgiO04J4mDmX+ljGfHrw4R1z3boQBYCYKbKoTFL8NUpOL142IS7I8U9ePw0h3bve4CEHcYAetdSXLxzLDZn4udIV505P0AHXZ44/k1wM26UvTHIO6rI6gwTua7SXG0X9TGTl5bXXBUCRWSjxg8Z3TmUw3UJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=octoAkzr; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=iG1MxK0j; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B754EA38C
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 13:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792417773; cv=fail; b=sIiauJcH5aiAqWVoH2dVGJHIK2IK76RxcmCaN3+Rhu46gFxzdKALc9ncOxqJrs2IQtS3xx8Sa1o69IIi46Ba/zLEWfD+ruzf14rIrPv/4hOo36J2cBbmiczFMW0MDzhYdFzRUsRIxcZSjm3rxOLgVOlBZiIieRFEP9U+swMrElE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792417773; c=relaxed/simple;
+	bh=Ti8EHCWHW1LTz/QJmVdNdt29F+PTTvTZxT+NWuMDGKk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UYyLH9GEsFp5xdjjc0IH9xTaNujEF4MfZ2U5C2UaFo4HoGETja0snGZvhJ03e336ZH5o3ttwO3O4p5xXubbBuPUx4ZaNofIM/1W+OYLr4cs/SQyOQxUfS7fC9VIRPrs/92p9DLQyboayb7ea1vHEh3Ex5ppk2WLgpwERW5JiePY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=08ITJUE3; arc=fail smtp.client-ip=40.93.196.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="octoAkzr";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="iG1MxK0j"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69J8Z1TK2689048
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 13:48:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	8MQmVTCoCCyaLYdia8eZ2MhXz2oL4yullhOBRKIMS4s=; b=octoAkzrATYM594x
-	o5fjh6aHB0CI/s39uHHJs9XbOBIVK8vV6w7rNiibtcg3KYz6uu25AB5rdz+6Kprf
-	iTDfSeo9ez1vmy7KiWpRHsvwucFQayCYNu9JGCJObHBUM/T66iz2YYQZ7vE09Mpu
-	M8/NAOfTcj0IYsz94xfUun1rMxiwearodti69J316yyXicsXuLFKmJ1SJqHQqKmd
-	42XNZ1lXgS1oFKDSK4oAHK4lt8ewwCKcvO8vKgOhmczNtWSoezwDOcw8l1QzdNhF
-	GUF/jkHvtkOxqFVu2pygBHEeocYA5pgoj0AQcm9Sp6ZduKuaCZqTd/VGlirO7O6x
-	WAYHFg==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hdftn162w-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 13:48:27 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-93dd3c3badbso510614085a.2
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 06:48:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1792417707; x=1793022507; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=8MQmVTCoCCyaLYdia8eZ2MhXz2oL4yullhOBRKIMS4s=;
-        b=iG1MxK0jY3Pn0m+QBM0VBeyuqeNvBJQGMqw5aymdGBKdcUKRomRYzr6HX3QoNaEyB3
-         oGX8i57DWjZrRZ1dFD2AiHBIL7Wlsfcw8Whd/NokQNerSiG0lN/caAouUaA7lLp/24+X
-         vm7yEfhUlIckp/+Rm/G9Qd19YJNnq8ImGBfWrjqTGYi6z3rYPmZbQBcpLLu5qiI1Irth
-         KDNSTbJ6zTTqfM+mTP/fFcOY9OsZ38sJcLEj64QEaLly35eHg5s21NsGBuhNuDO2WN1v
-         oBhV4sHs/2+JdJJsMTlRfu7u0BH6l4f09F0aOzX08pzpbM83Bw+ragHYn1/V2SFH5JoW
-         Df0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792417707; x=1793022507;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=8MQmVTCoCCyaLYdia8eZ2MhXz2oL4yullhOBRKIMS4s=;
-        b=c0Y6/jgnnDw2k+tObUpwrkEVEOhOdt4PnheIweISNDd6KCE2oyRb5P/iszGTxrF+7n
-         4CuzpuNjoxHmCfAC0j7ywaIiOCV/blEpb350ogd+XxlnU+BYhwNNdEYLH6nFQXJ5mDtp
-         0Oc+VZLHzXBVA8KMOM8PIsG9gT3XNncwiIHo5Oq6Iw4N9b0D61z3KV95AZuVRxGWKvw3
-         X8m957erOnsTixi/vMGwyJeCEq+T0/7f1LafjI3hdEOMxziEljZaT3K/qQ5xJcZUG02j
-         wfAP3pRVXJcaC5YZ8oQclyl6c9jY9XoNAHfaPWF+5/SuouokoggU+w+Js8S9Ihnl0obX
-         2Wng==
-X-Gm-Message-State: AFq9FYILuru0iTaL6zWkstpv+6NB7Ry05n02i8aMP8+CMtCb3LaVMOmG
-	ZtnN3oLTN/QK8NcGxg7RPLgKgV19/4QZA6mQreStpZmvDPauCQXSpv1L2yvtqyl5sv84iJLlZP1
-	+uBslcizitPlWD6N5XB7fKgKFqzEl8iPZ4oCW+rUS47RSn6CKgvMRNq+YJav/hwTuVfQ=
-X-Gm-Gg: AYBFou1O/oGnqShqyqvZjEmFylzzFeFXxX+G0nYopP9RII+SU1nTpz0A2VUlmTjxSIq
-	jmmaShkMEnvMuCcoGQnOGGHTKAgGP+tGMAnkuhTLsQK9U9X+DATt4iM0sIU7jeevLmele5ctwsi
-	owMMFPYfUbti/aGRdwWPJACLm5T57w9mmudJpr4zqIJesfzf1J+cMD9bJGVQ04jr23KzklTlnU2
-	S0oP5WoaG4Y4Xs94/yBVf/h0yEE2vcF8CxELXbEXvLJXaai0+sVTgwLxeNuu+IHNEW+7pxpLRIL
-	jqX7tEuXZ0MX8oaQw2QuEnOHBxsnVB6LCvn9RPrcT2oLy9971IV+j8ZMV0f5k/0dsaLT/AlA78e
-	id/jh08Nxdn4VnRoaHmu89hLcQd7v
-X-Received: by 2002:a05:620a:708d:b0:93e:96e0:25b8 with SMTP id af79cd13be357-93f29d3983bmr1284665285a.42.1792417706922;
-        Mon, 19 Oct 2026 06:48:26 -0700 (PDT)
-X-Received: by 2002:a05:620a:708d:b0:93e:96e0:25b8 with SMTP id af79cd13be357-93f29d3983bmr1284659685a.42.1792417706244;
-        Mon, 19 Oct 2026 06:48:26 -0700 (PDT)
-Received: from brgl-qcom.local ([2a01:cb1d:dc:7e00:8916:7b9b:97a2:6c96])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd4c4fc4sm20595574f8f.15.2026.10.19.06.48.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Oct 2026 06:48:25 -0700 (PDT)
-From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Date: Mon, 19 Oct 2026 15:48:10 +0200
-Subject: [PATCH v11 3/3] crypto: qce - Use fallback for CCM with a
- fragmented payload
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="08ITJUE3"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Mqde8hrmYcXGMBJ05NOHWJEStn3GfrMKKSNDP2Hn6dIGWyAQ9tGpvOSBTBthzVxdYyUmlt3+FhuDQTKAPUcbeq8y8Ri7GP5qZbZMjFPQd3ouQbPsXuhJXjiiuzhRa4hMjA8Waoh+h3IR9WFhO4asCbNK4mBt49vgxpeVht4o0EjTZmhRgcvm/skgmVDOq9jt06WP9M2DM5KPHan4Ua7rTKCZ2iCvx4Y7Jx8VBwYUU2d6/f9Q39vHo05lukOZnhmK7Oz6b8jOs9tDazZ3zueIZgm25bLYdknDY7UVqtuWRiYq5UpzoGZlehrkddLbKGlQPhAam3U6042F4N/Q+YawGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WC3SnbB8C8Eel7bwQx5hqlWnIEcKihJzSs2l0Bn540A=;
+ b=V9SrgE/P/vm2Tv4a1WBnL+aZky//7pi13cD2gzlSzx4xyYKHgyLAqG5+6Zv7iViXWPh1Pnd8FxI8PigTQcTksC/akXn2piV0sYPn2a20YZtrxT0fA+2ucYhPV16k93P/Nn6Fqady6yJcd+hyt+O+3lRVs0IUuYtssJD4BmMxHfStjxelnEyHi56TtnFdhJc2rScfms7Bp0l93hC9mZp3uprm9uwMYNIFkmf6lPykc0+E6jCnyzOe4E3ONhF4q+sueH7ax6a6eKQ/C0ypd9cruyFa2VjXDStFhCCCRiKSyIW4ZjMy3hceGdHw9Ab7HTMtGIOrNrWsoyk6I8Vyqs/mBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WC3SnbB8C8Eel7bwQx5hqlWnIEcKihJzSs2l0Bn540A=;
+ b=08ITJUE31jWOk9v/MPoOfujOAiv4piDCK0JgMEeITKGCsJE6Ipe7mtKK+ngh1l2qo8qUFt2YvYNsMf5610eakjQyI7jEikWrQK6LQL8D/Vi+SkOGJvnPdwqsCY/Nca9bBn1redYfe4OhfNgDfzIIBHuM6sRbmkomwaHaa1N0qz8=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN7PR12MB8131.namprd12.prod.outlook.com (2603:10b6:806:32d::12)
+ by SA1PR12MB8860.namprd12.prod.outlook.com (2603:10b6:806:38b::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.19; Mon, 19 Oct
+ 2026 13:49:25 +0000
+Received: from SN7PR12MB8131.namprd12.prod.outlook.com
+ ([fe80::c2dd:62c5:67fe:aa46]) by SN7PR12MB8131.namprd12.prod.outlook.com
+ ([fe80::c2dd:62c5:67fe:aa46%6]) with mapi id 15.21.0522.017; Mon, 19 Oct 2026
+ 13:49:25 +0000
+Message-ID: <46ad9e56-e24d-4047-8aff-6708548d9a2e@amd.com>
+Date: Mon, 19 Oct 2026 08:49:22 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 6/9] crypto: ccp: - Rework sev_ioctl_do_pdh_export() to
+ avoid goto usage
+To: Michael Roth <michael.roth@amd.com>, linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, ackerleytng@google.com,
+ ashish.kalra@amd.com, aik@amd.com, seanjc@google.com
+References: <20261016041109.1778673-1-michael.roth@amd.com>
+ <20261016041109.1778673-7-michael.roth@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Content-Language: en-US
+Autocrypt: addr=thomas.lendacky@amd.com; keydata=
+ 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
+ WiyqywZI5g==
+In-Reply-To: <20261016041109.1778673-7-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR19CA0029.namprd19.prod.outlook.com
+ (2603:10b6:610:4d::39) To SN7PR12MB8131.namprd12.prod.outlook.com
+ (2603:10b6:806:32d::12)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261019-qce-fixes-aead-v11-3-11c55cc7a695@oss.qualcomm.com>
-References: <20261019-qce-fixes-aead-v11-0-11c55cc7a695@oss.qualcomm.com>
-In-Reply-To: <20261019-qce-fixes-aead-v11-0-11c55cc7a695@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eneas U de Queiroz <cotequeiroz@gmail.com>,
-        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Demi Marie Obenour <demiobenour@gmail.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Russell King <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        stable@vger.kernel.org, Pankaj Patil <pankaj.patil@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2870;
- i=bartosz.golaszewski@oss.qualcomm.com; h=from:subject:message-id;
- bh=1hMzuROJV8vdtq+SPxtxFWcFHZLQfN64YbfzueOmtbk=;
- b=owEBbQKS/ZANAwAKAQWdLsv/NoTDAcsmYgBq1h+hpWfGBIuia6d4nh65sDa9I1HnX7UAYTmxX
- Qm8J54iRtaJAjMEAAEKAB0WIQSR5RMt5bVGHXuiZfwFnS7L/zaEwwUCatYfoQAKCRAFnS7L/zaE
- w/PGEACl3i46kg1CwlzXm6p0G837vMiZAHNmWcJ9otgezPC7qpCJS5XVeo59XpfZ+0VoHuRAZUs
- lVlhL7+Mzj8AoNHkdaLRkKuxHIRNt2nQNmZd0OnMXBHHceMcvrQmFYak5xuE0/dfT5ac+A5bZSs
- 5O8t8r9itJ4ozXLrUpwyiieTp7yb/LZ86a5PGx42L/deEhWkB/UWNN3y3dy53v+BVqSLUjsWjIJ
- ahIP7a3rCfbUHW91vuQ7kdcoLH7WVmlkOyL9Cxd+nGqUzqT/WQJy/0UYBWkKPTOrIh/RZ4GeVe0
- HUy4Yii9pS2xuDJKk8cboV7BaE6lBRaoYnhqzoyqgy1sA2K8836OcYP9QzQBEGi7R3BMlewL0GH
- mBXfFwzavEeOqY2JRsvjeDVWqOa5e4CAt05ghZe6OPeN6RTJM4kCfpUrMkLxoTJ8TcPN0BzfLjc
- gsx86zQHV9YBgH9vp4TdSUA9sBbEfvughVTYc1PN69bpUwFiOm0Hqux945Q12ZbK0EoOtm62Hwk
- IIgFQKPv7/dceFXCJzW28u2i7d+X1fk+rqG5hYCdMv/iPI4ZzCoc4pEjazfJYojoZG6OYrakz6Q
- D2gA8CT6L+JiVHJ50WkekWRAWAcuV/I/weDSjFDpbcrBLApNQwaiHX5I9uxEoHyl6zoaCI15CTI
- pAKLwAIQIRk4IzA==
-X-Developer-Key: i=bartosz.golaszewski@oss.qualcomm.com; a=openpgp;
- fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMDE5MDA1NCBTYWx0ZWRfX4bctWwUXSaqg
- 06vPNlM+nugQE16Q2pUKWgH/QHU9rDlIq3g9EP27ERjlN3Demcx+ZPl0u7npKE3wp6bxNU66vbO
- evvsnK+J70amy5Fy9NfGOnjPWGTPj74=
-X-Proofpoint-GUID: w_64eKZ_y4vurg7QdWTwe0c9_SUSnAm4
-X-Proofpoint-ORIG-GUID: w_64eKZ_y4vurg7QdWTwe0c9_SUSnAm4
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDE5MDA1NCBTYWx0ZWRfX3WsBOpO6+151
- A7p8eQglFRkCbwP+K694bRgVJr1fG0WYviOPwZAEegLag5ooe97PiTzdawkDtz1+WQ5wlorRyL8
- ACQfWk76Sb9MAqdVdjL5dS+Y14j4OJTs0NGo3YcmO6Ra3L7RNGx8ehmwuDOQ/vsgK267dvIbTbB
- bMJ2COq+HcSoQ9RSQTOQIEEFAG5gMPIzV/k4i60KdOuZaNJA2QtdM3BF/yOR+PHczxwESVCzLUo
- L5C/lzfpZCODwyozlF7u8SbRNIOyFiA1+NkPlqL+hSy0RBFI0/JkMLK7cSszDMIGTsygwWB/6xp
- uC1QCSThLxdG8WUHgPl0nHoYmEmHA0v4C2wSR1Eqvss7c49IS2ZYiJiAYkbXHZaXbKYlug7h39y
- qYss2AwwcWy7KHKL0oGt4ZMLFyvQ5Qz6KoY3ISVbtvnKzKCgdq/f/WJrGeuu4poOfeJzWtbOyGU
- Wo2FxFZwSWe7RMX1+0Q==
-X-Authority-Analysis: v=2.4 cv=OvTaWC/t c=1 sm=1 tr=0 ts=6ad61fab cx=c_pps
- a=qKBjSQ1v91RyAK45QCPf5w==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=phyxH6jkQibGXiXynFEA:9 a=QEXdDO2ut3YA:10
- a=NFOGd7dJGGMPyQGDc5-O:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-10-19_03,2026-10-14_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 adultscore=0 lowpriorityscore=0
- priorityscore=1501 malwarescore=0 bulkscore=0 impostorscore=0 spamscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2610080000
- definitions=main-2610190054
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR12MB8131:EE_|SA1PR12MB8860:EE_
+X-MS-Office365-Filtering-Correlation-Id: d27ed9bd-7ead-4d79-3a46-08df2de7c94f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|1800799024|23010399003|56012099006|4143699003|11063799006|261009223027099003|10067099003|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	cjywBykHPOSQ2ZzPAA0nOzhKTM1gEyXXaf/TRyljmyNuJxLeWSme7Hx8W54J0nzHdkjaZG/mkvf8PdICtrMmatJUfAWesbpcvk8RZ5r+dCjyp0Wkh4yMXl9mcwzziJWwLiYI8VSOP8k7FhmREiXZZ0n76a6cIp93z4K3Y/o7Xg0D5NPOghpycDxW6E/8gPnaDAImz9+9y+R4ecgkM7R9bGmgZJDb2/j+4pZVxQ13/2x2rOKtfbLFY6tniUwItd7urbZ2y0ZexI5QqjMMHZk2NwmdJ7B0U7eVIjEt8zFZpy65ir13SSacrB00hu7T22Dk9/sfq30X6XImzb8sG8ybaVirx8js4/817rxH0533IU9jRxpSf6nz/Yf/RH2fLwY1n2oSS26xEVJGqcq2N2dj7bjG86dO06Gg2Lb6FH7L0yB4POuxeKDCPhRuTXgtHhMGaWDqAdNeYKCtLHvWeTArYxTktX1ZSKnw9CxYE8T0xx1Y6AjOdpAi3ywSoIxeVaUD7v5Oxhneg25e0wmsQaHQAWlElcCrXhsLEdNB2m49+BBVOq0Ug1FLmRi485SceMo+wDqGz3Bcgs2l7jukl/hTTjxRg7caP/tF/GBcM9HsN9QJZjxONmadzjfG9aRnnxMMj50AaULdWCrvvg4/PrBbhoDOhv/XkR2oeZO1iPWQsDs=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(23010399003)(56012099006)(4143699003)(11063799006)(261009223027099003)(10067099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VkN3NEx2RllQS0dpaWI1Z3VTR21NSTZUMWdwamlaU0h0MFovVkdwQlhIQTNP?=
+ =?utf-8?B?NSs5VzhxQ0dvMERiQWJSN2wzdkJhOXIySWNTOTNFcFNVYWJWR3crY2Fjc1ZD?=
+ =?utf-8?B?OFdQSXU1MXFVeFZVM3paZS9JaWM2TFA3UVpVN3BValllZ085TzVJS0IwM2FH?=
+ =?utf-8?B?L3RUYzR1d2VpSTg0TFBjdUt3Y0JwTWs5dWFmY2FBVlEyTWJ6V2c1RUxGeEl2?=
+ =?utf-8?B?dHVXQTJDS1R1L25qU1FJWGtMcEcyMFRzWWQ0WFgrSzU4OS9xYWljZkxIUnpE?=
+ =?utf-8?B?cCtXNUw0MnpTUXdjK2tITjlicUdUVDNGQlBzaWVjTEJKaWh2VkNvWi9NSGlz?=
+ =?utf-8?B?L3R0MWtGaUZWZXhWM3kvVVFrNHBOZEpBbDNHdWNFN1dZbVIydmQ1VVcrM3Ra?=
+ =?utf-8?B?aUU3aUhRcHgyVnBYWjBVZ1ZuZDk5MVhQcWJFeDlHWmhHWmJsTXp3eGZXQXVL?=
+ =?utf-8?B?RjNzMmliejQxcEYzbG5WbWxSdExvZmRYZTRnNFhxSUhiTG5ObE1CcnJ1MURz?=
+ =?utf-8?B?Z3BmdjdQa3oweGpRT21MZkNpVTRQOUd4a3UyZURUeHZlb0hIVExXTnp6TERm?=
+ =?utf-8?B?RWV2dlh1VlhmUjBnSmxPNm41Z0hib2NvWlRyS2xzN2ZGbC9vcjRmVklNV1Fw?=
+ =?utf-8?B?QUR0M2RCMzVadlBLOUV1WXZvQ3YyOW1oYXY0OGJlVUlCRFBoTS96VWR4NDYy?=
+ =?utf-8?B?S2swU0xzaHc4WUR1aGxrcWhDbWczVDRIdmVSb3hNazcvQk9QQk8xSHpBU0V3?=
+ =?utf-8?B?VnlvcnJSbjRLbnBaaCt4dVBPOW80T2pndXVobG9Cd2Z3NHBJMStQSWRCb2l2?=
+ =?utf-8?B?d09pc1pudFFyZTNkWERIMlZLdlpRZnFsbnJnR2tlRFlzd3FSM3hYUzNjd0RE?=
+ =?utf-8?B?RXh2VU11aHlKOU52TjJadk9EYXBKY21yYzR4S0xHSzEvTHFscTNYb2J3Zy95?=
+ =?utf-8?B?U1dmYVh2UGtvZkZYYmZ0Zzk5VVZSZHNvcXpQVHVKNFRncjZKazZ5UUY1YmN0?=
+ =?utf-8?B?Z1E0SU1lVVE2RTFKSjhpdWFaV2x2WmtqbEp0MkgvNGRkOURXei9FbW5TelRx?=
+ =?utf-8?B?bGE4RVIrL1E4TTQvNHRucFVkZm5JVG10RWpCcTUxMDlFdHJkb0k5T2x6bXhs?=
+ =?utf-8?B?dG5YZjUvL3N4ekJPSi9ZRXB1ZkR2M2tZdkVXc0hJYitqS0lnc21JRnNwbTNS?=
+ =?utf-8?B?UzlteDFDVEtncVZOd1BIcXFPc2wwR1Y3MTllQk5ReFlRKzFiOEhvbkt4T3lC?=
+ =?utf-8?B?TkFLK2pQb1BiemJyTEczWk1JK2VXU2JKN2pLTFMvNEZDYU05RU00UkRYOUlw?=
+ =?utf-8?B?QUlRM3dwMnNtTk9MMFFIYWhRZkx5MTZadDRuSkZ2M2tPY2ZFOW5YTUVVeUlk?=
+ =?utf-8?B?cjhBRXNRT2t1L0xmWTVnMW9oOGZSUXFlZXcyVitHSU16dEVqSTFDR0dkYllD?=
+ =?utf-8?B?WENDNks1blM1aGRyYXhybEJSekFESU1XTExaTVc3Rm4vWEFQWHpONUNmaHRp?=
+ =?utf-8?B?UUdMZGNWSHAxWFBNMWswNWJXQUs2akxXRFM1VGZZdVdkeS9pZm9BZVREbjky?=
+ =?utf-8?B?aXBjUHpuT2h3ZWVwb011MlhySWFUV00vbHRWQzNGQkV5UkFlTGxXZHczS3hl?=
+ =?utf-8?B?dGc2Vmpra01jK29WMnhaQmFDQml6OUx5eEE4aVlZWU9NVGtTeWdMR050ampR?=
+ =?utf-8?B?UFdVRHZncGdwU3ZvREh1cHl1WUFXOTFkdnRiNWJJRm0rMTVvSWJJUG5Mek5D?=
+ =?utf-8?B?Ujd2RDhVcjVGT01xS1ErSGtDQ1p5VGZoeE9nbWJpb3NOT2NEV3VmN092Ly9M?=
+ =?utf-8?B?VEhIdUpab3FEREpuQnBieS92dmo4L2tTaXcwTUJnd0psY01FMEFVZy8wTm1B?=
+ =?utf-8?B?ZUNQOXJTNmt2RU9vN0ljcjllTjBCbS9DcFR0TFZMbjZpcFB5Zjl6bUNNMDhq?=
+ =?utf-8?B?WDJjMlRNQU80NjZjek5ZZGRhTnN0R2VGREgzd3lBU0FaSDNwVGRqR29YTHhL?=
+ =?utf-8?B?L2NRbjZUYlJmOXVWYUJqVW9keldNbXZnbk04UURPOTRCVmZ0L0d4Qm1yaGtv?=
+ =?utf-8?B?NUcyY2xLTS9ETVJsTGJ2d1JFSlBNTmE2eEZYbS9tWGxwM0lRZExhSGFHVDVj?=
+ =?utf-8?B?aGlUZDBJQW5tZXAyWVBtQUltaGkxS2NNMlRLWENkZTlwM3hCdEtPMkNaRGox?=
+ =?utf-8?B?c25NZ0FqblphSllIZDNDL0MrTWVRVzl3TXd1MzByOWt3M3RNZlk4Z3dBUlBk?=
+ =?utf-8?B?OVQzNDNpYWFWeWpvY2lFQ3FYQW5KRnFHd3Q2MDNINVNZNlF6bmQvN05tdHRG?=
+ =?utf-8?Q?UCWjKf+j+Uy3qglp4K?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d27ed9bd-7ead-4d79-3a46-08df2de7c94f
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB8131.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2026 13:49:24.9346
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: D4pLS9vBu7XH/M3r6Kw67rrsJjGVkyP+aPpctvx6C+Hwc9d1pBayeeHMZE6gYY7zzw1MPNwIDygaO2UPD8hLTQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8860
 
-The crypto engine reliably processes CCM only when the message payload
-is a single contiguous buffer. The associated data is already linearized
-into a bounce buffer before being submitted, but when the payload itself
-is split across multiple scatterlist entries the engine stalls waiting
-for input and the request fails with a hardware operation error. This
-was uncovered by the crypto self-tests, which feed the algorithms
-randomly fragmented buffers.
+On 10/15/26 23:09, Michael Roth wrote:
+> In preparation for switching the function to use mutex guard()'s, drop
+> the goto by relying on an if block instead.
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
-Detect a payload that spans more than one scatterlist entry (in either
-the source or the destination, skipping past the associated data) and
-route the request to the software fallback.
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-Cc: stable@vger.kernel.org
-Fixes: 9363efb4181c ("crypto: qce - Add support for AEAD algorithms")
-Tested-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Tested-by: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
----
- drivers/crypto/qce/aead.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
-index f34e4feb3004d9bf63c2c8b2aeb3975d86ac486b..ecc33570804fa435db9ec9fd6fbf38c3c8708e2e 100644
---- a/drivers/crypto/qce/aead.c
-+++ b/drivers/crypto/qce/aead.c
-@@ -498,7 +498,8 @@ static int qce_aead_crypt(struct aead_request *req, int encrypt)
- 	struct qce_aead_reqctx *rctx = aead_request_ctx_dma(req);
- 	struct qce_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct qce_alg_template *tmpl = to_aead_tmpl(tfm);
--	unsigned int blocksize = crypto_aead_blocksize(tfm);
-+	unsigned int blocksize = crypto_aead_blocksize(tfm), authsize;
-+	struct scatterlist __sg[2], *msg_sg;
- 	bool fallback = ctx->need_fallback;
- 
- 	rctx->flags  = tmpl->alg_flags;
-@@ -523,6 +524,27 @@ static int qce_aead_crypt(struct aead_request *req, int encrypt)
- 	if (IS_CCM(rctx->flags) && !IS_ALIGNED(rctx->cryptlen, AES_BLOCK_SIZE))
- 		fallback = true;
- 
-+	/*
-+	 * The CE reliably processes CCM only when the message payload is a
-+	 * single contiguous buffer. The associated data is linearized into a
-+	 * bounce buffer before being handed to the engine, but a fragmented
-+	 * payload makes the engine stall waiting for input, so route those
-+	 * requests to the fallback.
-+	 */
-+	if (IS_CCM(rctx->flags)) {
-+		authsize = ctx->authsize;
-+
-+		msg_sg = scatterwalk_ffwd(__sg, req->src, req->assoclen);
-+		if (sg_nents_for_len(msg_sg, rctx->cryptlen +
-+				     (encrypt ? 0 : authsize)) > 1)
-+			fallback = true;
-+
-+		msg_sg = scatterwalk_ffwd(__sg, req->dst, req->assoclen);
-+		if (sg_nents_for_len(msg_sg, rctx->cryptlen +
-+				     (encrypt ? authsize : 0)) > 1)
-+			fallback = true;
-+	}
-+
- 	/* If fallback is needed, schedule and exit */
- 	if (fallback) {
- 		aead_request_set_tfm(&rctx->fallback_req, ctx->fallback);
-
--- 
-2.47.3
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 49 +++++++++++++++++-------------------
+>  1 file changed, 23 insertions(+), 26 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index bea3c30f00b0..4375c0480e81 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -2451,41 +2451,38 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>  	input_pdh_cert_address = (void __user *)input.pdh_cert_address;
+>  	input_cert_chain_address = (void __user *)input.cert_chain_address;
+>  
+> -	/* Userspace wants to query the certificate length. */
+> -	if (!input.pdh_cert_address ||
+> -	    !input.pdh_cert_len ||
+> -	    !input.cert_chain_address ||
+> -	    !input.cert_chain_len)
+> -		goto cmd;
+> -
+> -	/* Allocate a physically contiguous buffer to store the PDH blob. */
+> -	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)
+> -		return -EFAULT;
+> +	/* Otherwise, userspace just wants to query the certificate length. */
+> +	if (input.pdh_cert_address &&
+> +	    input.pdh_cert_len &&
+> +	    input.cert_chain_address &&
+> +	    input.cert_chain_len) {
+> +		/* Allocate a physically contiguous buffer to store the PDH blob. */
+> +		if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)
+> +			return -EFAULT;
+>  
+> -	/* Allocate a physically contiguous buffer to store the cert chain blob. */
+> -	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
+> -		return -EFAULT;
+> +		/* Allocate a physically contiguous buffer to store the cert chain blob. */
+> +		if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
+> +			return -EFAULT;
+>  
+> -	pdh_blob = kzalloc(input.pdh_cert_len, GFP_KERNEL);
+> -	if (!pdh_blob)
+> -		return -ENOMEM;
+> +		pdh_blob = kzalloc(input.pdh_cert_len, GFP_KERNEL);
+> +		if (!pdh_blob)
+> +			return -ENOMEM;
+>  
+> -	data.pdh_cert_address = __psp_pa(pdh_blob);
+> -	data.pdh_cert_len = input.pdh_cert_len;
+> +		data.pdh_cert_address = __psp_pa(pdh_blob);
+> +		data.pdh_cert_len = input.pdh_cert_len;
+>  
+> -	cert_blob = kzalloc(input.cert_chain_len, GFP_KERNEL);
+> -	if (!cert_blob)
+> -		return -ENOMEM;
+> +		cert_blob = kzalloc(input.cert_chain_len, GFP_KERNEL);
+> +		if (!cert_blob)
+> +			return -ENOMEM;
+>  
+> -	data.cert_chain_address = __psp_pa(cert_blob);
+> -	data.cert_chain_len = input.cert_chain_len;
+> +		data.cert_chain_address = __psp_pa(cert_blob);
+> +		data.cert_chain_len = input.cert_chain_len;
+> +	}
+>  
+> -cmd:
+>  	/* If platform is not in INIT state then transition it to INIT. */
+>  	if (sev->sev_plat_status.state != SEV_STATE_INIT) {
+> -		if (!writable) {
+> +		if (!writable)
+>  			return -EPERM;
+> -		}
+>  		ret = sev_move_to_init_state(argp, &shutdown_required);
+>  		if (ret)
+>  			return ret;
 
