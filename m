@@ -1,71 +1,71 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.21
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792451200;
-	b=jS2RKuDNYLznNeVQJ28WqYv/UbjOw2zN7p2eCrD+5D+pS3WGlvNwUxTWVWdMS6FYs9GE
-	 qiqwawHF+iwLLFy/3158PVoz3ClSwAQpMRilW0+Va6afrr2k2xEL5/EfhyLUlrW5vnd5R
-	 aM2xs29O6dqPsmH02LRp3zlDWzDy4MxBiBbbAZpTCFavg5dMSY4SMOAGzXgH2kGZSR5HE
-	 Xiekf7c2vgY/3rfB+6E60kWwCq5FQEnfuK/rCsddJ1yDAw7+qqNlJuUNwYn9IjlOeWyNW
-	 0crts98HHk9LCDDdrnHOayZVc3MTeTlSpt967xvUSO7ffWJVJX6CX3bCf1Q4xo85apA==
+	t=1792451203;
+	b=vWSEZMvpTVeLLfhL1wCUFD/2f/0cXLlyekZvGjXBLKnPxsOHJgdoAYhaP7TfzcaLtAEc
+	 zUVEjQvcvngLZD6FcPnaK33n9p4W3I3Qr3CaPyWOTtoqsGQwPAUmRkjWEF+xruExco6uQ
+	 H6sGZnI+G3JSq7hgU8nfGq8nL05sSkS3WBHn4iaAI7YMb9ZMt6pQ/E5fhoQbb46qu0/3c
+	 /32tIQ38t2XE2UByaqcF8P2nVeD2bykArAUg7d5zRtoAPUCVUF7dV/QBZNI0bdbP0lG27
+	 IQTO9VozV/dzAl5SWo7SO0AVJ/eD3jBb7keTfG0vjVat+V6RgwhBxNBeAwg2YKIl/lQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792451200;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792451203;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
 	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:Date:Subject:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
 	 References:In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:
 	 X-Developer-Key;
-	bh=7cJoLE2Lypc2jiiuJXJQynyzOM3YS0iRe94GL9RodWU=;
-	b=QZGxF60ZJwerbLfeJH062hK1tGQEmIWw9wFdCY8ue02N9mCVPMHFvCIbqTxBUBTFlzTU
-	 xIO8J9AcQdMEOhZHJCpnQ1Le1/Iy4dgD2PK/AUh1ap0SfGA+WqWtIMZgwRvXll9cOY/+v
-	 tki2ITLAKc+9bziM3RnPd7SeJdtBSVlVLewU8gBaNs1SFgHcavwMDAw2XD/hWBOASZxib
-	 /uAzk6ZMJpzHEiH4kwmBo8DylP76ZQVIZdHcmmDWf3U0JTP+uLr+63uHu+OmUSMytruI9
-	 YvX6jOmd5fTbv9mJHXwsyfgJ45fjMGBfCz7rN/BCdPgtb+uVn6SVA7q8wWNsB5QkgmQ==
+	bh=8OzSBSKQBAQmP8x7/bKwGU98Enj16fS4z9hEf8giMac=;
+	b=yiaOAvsBiIUhdWSkQp0kv68H0e+8RDN7bUiJDvAG3RO6p6064zRgxhYGcNbOjyqu/S76
+	 tCaL4iSMCuzgyTBH2sWxUUkTVSqSsHD3z8TSk9W0FNItbVpw7LDSFxYQofePSaj2hBWDa
+	 4xdXHwrEC4w70G2IAOv+ejjLcPbNcoz9it8dIearFEqOBlP5SenTYrhQZM7/49AL8OL6s
+	 4s9QWfBtVwYLk546kxyhVYY6cTFPOBC5N4GAJLELc8iEbRXnN/oJt0XJc5S4HtB5SyOBb
+	 B5KcUgFbbaiZJsnB+7nByoVtzk1/XPYhWJcVIBm3i0dgOViDA5zlFfTsocV8qKO1FEQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=C4uIFey7;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=M53zdsuE;
 	arc=none smtp.remote-ip=198.175.65.21
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6943E606A328;
-	Mon, 19 Oct 2026 23:06:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6943E606A328
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1131C606A319;
+	Mon, 19 Oct 2026 23:06:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1131C606A319
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=C4uIFey7
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=M53zdsuE
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792451200; x=1823987200;
+  t=1792451198; x=1823987198;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=m547TdJwh+U4Jqv2xDPq6WBIWUFuCcjPrAL3helEQa0=;
-  b=C4uIFey7GvPEkvfepcEsUWvK2P42fsImxn3OjPfzBd/Fsh9NVaihPvcu
-   MGHOQbYdF4xFwUaQcAkE8wJ8dxSUJyPvoCI4Sgvc0dnpsB5qhxRgMVyi3
-   jirG1Oxri0qaYBmzvspTXmPUOglfafyJ4iUxEttBk/sfstLtFSetaN5bq
-   hk3EZRjbInT51GPd8BdNMzpOEoHD7wYZ4NTpuGYtqK794S4y1VH3oAgby
-   XabQ94TcEWv2Cp9YKwXgaG6k06aWKedumBx03OgjIL7tpijLL727P/yws
-   +iPeJAkVqp+fYjeUJ2hDIzUCz/l2GGNhjSWKq/+JBYPG4Wc80B+93a+/e
-   A==;
-X-CSE-ConnectionGUID: 6+hpYw3USEuDikHLyCZzcQ==
-X-CSE-MsgGUID: cpz0vo2CRAOMn2Xnz2Kk3Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="1249183"
+  bh=hRlLc+25IiT02qqUKtrDG21UjsoWBK02Oeivj/ogzp4=;
+  b=M53zdsuEEQ7fzJI9ZylYRHF91aLaujcF7Iao6Lt07BpIwsSCUGxJd/+J
+   MQ+/uFyt3BcDXXPgLw3xeESSUz63tgBhVRoXpybsQ5PZD8d+nvNocDjfW
+   HnQCOoLfCV+U10Kv9a4vZR4qSL1bMOCYokrlGDnXfSrCOUUIHyW1PtBXC
+   ObYwNUSzcPVCVKcbwplNBSLJ19T1txxTADDa24EhAP33x746H+os3TmD6
+   bmRzgdo0P1IrMBBB3UdmyBR0oTV1YxCEaabhVfuBE6JLefU4S4UOZCCvq
+   58/sY9BCOjr7TVYt6Ylm7LCOcTa3+keHUbwodYftzzjleV/3jf0/8hbxg
+   Q==;
+X-CSE-ConnectionGUID: pH1oazzySfG6JlJpKbPnIQ==
+X-CSE-MsgGUID: iRJAMi+ISF2R1RLNMO+ufA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="1249178"
 X-IronPort-AV: E=Sophos;i="6.27,168,1787036400"; 
-   d="scan'208";a="1249183"
+   d="scan'208";a="1249178"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
   by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 16:06:36 -0700
-X-CSE-ConnectionGUID: Vyehzfw9QneijvvPUyjILw==
-X-CSE-MsgGUID: I6AAMIRnTrO7tZ/MMXWM0Q==
+X-CSE-ConnectionGUID: 1nUGjk8kRbmneG4yXjRNhg==
+X-CSE-MsgGUID: MQZ1shB3TwSKl1QZuGrjVg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,168,1787036400"; 
-   d="scan'208";a="2989981"
+   d="scan'208";a="2989974"
 Received: from vcostago-desk1.jf.intel.com (HELO [10.98.24.84]) ([10.98.24.84])
   by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 16:06:35 -0700
 From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Date: Mon, 19 Oct 2026 16:06:23 -0700
-Subject: [PATCH 4/4] crypto: iaa - keep each CPU on one WQ for
- decompression
+Date: Mon, 19 Oct 2026 16:06:21 -0700
+Subject: [PATCH 2/4] crypto: iaa - take the WQ from the request in the
+ submit helpers
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -77,7 +77,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261019-iaa-crypto-wq-tables-v1-4-fab67b2a1538@intel.com>
+Message-Id: <20261019-iaa-crypto-wq-tables-v1-2-fab67b2a1538@intel.com>
 References: <20261019-iaa-crypto-wq-tables-v1-0-fab67b2a1538@intel.com>
 In-Reply-To: <20261019-iaa-crypto-wq-tables-v1-0-fab67b2a1538@intel.com>
 To: Kristen Accardi <kristen.c.accardi@intel.com>, 
@@ -86,143 +86,139 @@ To: Kristen Accardi <kristen.c.accardi@intel.com>,
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Vinicius Costa Gomes <vinicius.gomes@intel.com>
 X-Mailer: b4 0.17-dev-6be7c
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1792451190; l=4435;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1792451190; l=4691;
  i=vinicius.gomes@intel.com; s=20230921; h=from:subject:message-id;
- bh=m547TdJwh+U4Jqv2xDPq6WBIWUFuCcjPrAL3helEQa0=;
- b=sZhQFGq9WSl+lCp7VD7Xo1z0tgFKDtlfPTuWeXEyRGTjxU+ANGStwnPLXLggsu6xQKSZ3P7W1
- a8agC5QiEyBAnlxUHNkb94LvFpIicxZWS0YneSPOJgiMSO/XDwQWAlh
+ bh=hRlLc+25IiT02qqUKtrDG21UjsoWBK02Oeivj/ogzp4=;
+ b=J3cFfUC1vtYfgnhFeNuZpSxp5qsnqplgqEZfXAWnTWN6AqVtJQWYjXpxK4xn7bUHGVnZEmHe9
+ LpSiHU1BGcyCoL9HDov3lpKVMybtmYEmXYeY0YIg5ddIfbVeZlustgN
 X-Developer-Key: i=vinicius.gomes@intel.com; a=ed25519;
  pk=aJkrtgqgT6TZ8iIHSG8/rTPsmlYnjMrUjCsMYvCzntk=
 
-Decompressions round-robin over the package's WQs like compressions
-do. Decompressions are latency-sensitive, and do better staying on a
-warm engine.
+iaa_compress(), iaa_compress_verify() and iaa_decompress() take the WQ
+to submit to as a parameter, and also find the iaa_wq in the request
+context. Nothing ties the two together.
 
-Have each CPU pick one WQ of its package's table the first time it
-decompresses, spread over the table by a per-table counter, and stay on
-it.
-
-The CPU caches the index, not the WQ, so it cannot outlive the table it
-came from; rebalance makes every CPU pick again.
+Drop the parameter and use the request's iaa_wq->wq.
 
 Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 ---
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 40 +++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 6 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 2ce545e8df42..4f2c99c099df 100644
+index 0f5bd244b00a..7b02d3836623 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -35,12 +35,15 @@ static unsigned int nr_iaa;
- struct iaa_pkg_table {
- 	struct rcu_head	rcu;
- 	int		n_wqs;
-+	atomic_t	decomp_next;
- 	struct idxd_wq	*wqs[];
- };
+@@ -1049,7 +1049,6 @@ static int iaa_remap_for_verify(struct device *dev, struct iaa_wq *iaa_wq,
+ 				dma_addr_t *src_addr, dma_addr_t *dst_addr);
  
- /* Indexed by logical package id, the count is fixed at boot */
- static struct iaa_pkg_table __rcu **iaa_pkg_tables;
- static DEFINE_PER_CPU(unsigned int, iaa_wq_idx);
-+/* The WQ of its package's table a CPU decompresses on, -1 until it picks */
-+static DEFINE_PER_CPU(int, iaa_decomp_wq_idx) = -1;
+ static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
+-			       struct idxd_wq *wq,
+ 			       dma_addr_t src_addr, unsigned int slen,
+ 			       dma_addr_t dst_addr, unsigned int *dlen);
  
- static int iaa_cpu_pkg(int cpu)
- {
-@@ -49,16 +52,35 @@ static int iaa_cpu_pkg(int cpu)
- 	return (pkg >= 0 && pkg < topology_max_packages()) ? pkg : 0;
+@@ -1134,7 +1133,7 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
+ 			goto out;
+ 		}
+ 
+-		ret = iaa_compress_verify(ctx->tfm, ctx->req, iaa_wq->wq, src_addr,
++		ret = iaa_compress_verify(ctx->tfm, ctx->req, src_addr,
+ 					  ctx->req->slen, dst_addr, &ctx->req->dlen);
+ 		if (ret) {
+ 			dev_dbg(dev, "%s: compress verify failed ret=%d\n", __func__, ret);
+@@ -1162,7 +1161,6 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
  }
  
--/* Round-robins over the WQs of the caller's package */
--static struct idxd_wq *iaa_next_wq(void)
-+/* Pick the idx of the WQ on first usage on each CPU */
-+static unsigned int iaa_decomp_wq_pick(struct iaa_pkg_table *table)
-+{
-+	int idx = this_cpu_read(iaa_decomp_wq_idx);
-+
-+	/* An index left over from a wider table just means picking again */
-+	if (unlikely(idx < 0 || idx >= table->n_wqs)) {
-+		idx = (unsigned int)atomic_inc_return(&table->decomp_next) %
-+		      table->n_wqs;
-+		this_cpu_write(iaa_decomp_wq_idx, idx);
-+	}
-+
-+	return idx;
-+}
-+
-+/* Compression round-robins over the package's WQs, decompression keeps one */
-+static struct idxd_wq *iaa_next_wq(bool decomp)
+ static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
+-			struct idxd_wq *wq,
+ 			dma_addr_t src_addr, unsigned int slen,
+ 			dma_addr_t dst_addr, unsigned int *dlen)
  {
- 	struct iaa_pkg_table *table;
-+	unsigned int idx;
- 
- 	table = rcu_dereference(iaa_pkg_tables[iaa_cpu_pkg(raw_smp_processor_id())]);
- 	if (!table)
- 		return NULL;
- 
--	return table->wqs[this_cpu_inc_return(iaa_wq_idx) % table->n_wqs];
-+	idx = decomp ? iaa_decomp_wq_pick(table) :
-+		       this_cpu_inc_return(iaa_wq_idx) % table->n_wqs;
-+
-+	return table->wqs[idx];
- }
- 
- LIST_HEAD(iaa_devices);
-@@ -779,7 +801,7 @@ static int rebalance_pkg_tables(void)
- 	struct iaa_pkg_table **tables, *table, *first = NULL;
- 	struct iaa_device *iaa_device;
+@@ -1175,10 +1173,12 @@ static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
+ 	struct idxd_device *idxd;
  	struct iaa_wq *iaa_wq;
--	int pkg, n_wqs = 0;
-+	int cpu, pkg, n_wqs = 0;
- 
- 	if (nr_iaa == 0) {
- 		publish_pkg_tables(NULL);
-@@ -820,6 +842,10 @@ static int rebalance_pkg_tables(void)
- 	publish_pkg_tables(tables);
- 	kfree(tables);
- 
-+	/* Have every CPU pick its decompression WQ again, from the new table */
-+	for_each_possible_cpu(cpu)
-+		WRITE_ONCE(per_cpu(iaa_decomp_wq_idx, cpu), -1);
-+
- 	return 0;
- err:
- 	for (pkg = 0; pkg < topology_max_packages(); pkg++)
-@@ -1412,6 +1438,7 @@ static int iaa_comp_acompress(struct acomp_req *req)
- 	struct iaa_compression_ctx *compression_ctx;
- 	struct crypto_tfm *tfm = req->base.tfm;
- 	dma_addr_t src_addr, dst_addr;
-+	bool decomp = false;
- 	int ret = 0;
- 	struct iaa_wq *iaa_wq;
- 	struct idxd_wq *wq;
-@@ -1439,7 +1466,7 @@ static int iaa_comp_acompress(struct acomp_req *req)
- 
- 	/* The table, and its WQs until iaa_wq_get() returns, need RCU */
- 	rcu_read_lock();
--	wq = iaa_next_wq();
-+	wq = iaa_next_wq(decomp);
- 	ret = wq ? iaa_wq_get(wq) : -ENODEV;
- 	rcu_read_unlock();
- 	if (ret) {
-@@ -1512,6 +1539,7 @@ static int iaa_comp_adecompress(struct acomp_req *req)
- 	struct crypto_tfm *tfm = req->base.tfm;
- 	dma_addr_t src_addr, dst_addr;
- 	bool use_bounce_src = false;
-+	bool decomp = true;
- 	int ret = 0;
- 	struct iaa_wq *iaa_wq;
+ 	struct pci_dev *pdev;
++	struct idxd_wq *wq;
  	struct device *dev;
-@@ -1544,7 +1572,7 @@ static int iaa_comp_adecompress(struct acomp_req *req)
+ 	int ret = 0;
  
- 	/* The table, and its WQs until iaa_wq_get() returns, need RCU */
- 	rcu_read_lock();
--	wq = iaa_next_wq();
-+	wq = iaa_next_wq(decomp);
- 	ret = wq ? iaa_wq_get(wq) : -ENODEV;
- 	rcu_read_unlock();
- 	if (ret) {
+ 	iaa_wq = req_ctx->iaa_wq;
++	wq = iaa_wq->wq;
+ 	iaa_device = iaa_wq->iaa_device;
+ 	idxd = iaa_device->idxd;
+ 	pdev = idxd->pdev;
+@@ -1313,7 +1313,6 @@ static int iaa_remap_for_verify(struct device *dev, struct iaa_wq *iaa_wq,
+ }
+ 
+ static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
+-			       struct idxd_wq *wq,
+ 			       dma_addr_t src_addr, unsigned int slen,
+ 			       dma_addr_t dst_addr, unsigned int *dlen)
+ {
+@@ -1326,10 +1325,12 @@ static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
+ 	struct idxd_device *idxd;
+ 	struct iaa_wq *iaa_wq;
+ 	struct pci_dev *pdev;
++	struct idxd_wq *wq;
+ 	struct device *dev;
+ 	int ret = 0;
+ 
+ 	iaa_wq = req_ctx->iaa_wq;
++	wq = iaa_wq->wq;
+ 	iaa_device = iaa_wq->iaa_device;
+ 	idxd = iaa_device->idxd;
+ 	pdev = idxd->pdev;
+@@ -1400,7 +1401,6 @@ static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
+ }
+ 
+ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
+-			  struct idxd_wq *wq,
+ 			  dma_addr_t src_addr, unsigned int slen,
+ 			  dma_addr_t dst_addr, unsigned int *dlen)
+ {
+@@ -1413,10 +1413,12 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
+ 	struct idxd_device *idxd;
+ 	struct iaa_wq *iaa_wq;
+ 	struct pci_dev *pdev;
++	struct idxd_wq *wq;
+ 	struct device *dev;
+ 	int ret = 0;
+ 
+ 	iaa_wq = req_ctx->iaa_wq;
++	wq = iaa_wq->wq;
+ 	iaa_device = iaa_wq->iaa_device;
+ 	idxd = iaa_device->idxd;
+ 	pdev = idxd->pdev;
+@@ -1582,8 +1584,7 @@ static int iaa_comp_acompress(struct acomp_req *req)
+ 	dev_dbg(dev, "map dst %llx req->dst %p dlen %d sg_len %d\n", dst_addr,
+ 		req->dst, req->dlen, sg_dma_len(req->dst));
+ 
+-	ret = iaa_compress(tfm, req, wq, src_addr, req->slen, dst_addr,
+-			   &req->dlen);
++	ret = iaa_compress(tfm, req, src_addr, req->slen, dst_addr, &req->dlen);
+ 	if (ret == -EINPROGRESS)
+ 		return ret;
+ 
+@@ -1594,7 +1595,7 @@ static int iaa_comp_acompress(struct acomp_req *req)
+ 			goto out;
+ 		}
+ 
+-		ret = iaa_compress_verify(tfm, req, wq, src_addr, req->slen,
++		ret = iaa_compress_verify(tfm, req, src_addr, req->slen,
+ 					  dst_addr, &req->dlen);
+ 		if (ret)
+ 			dev_dbg(dev, "asynchronous compress verification failed ret=%d\n", ret);
+@@ -1719,8 +1720,8 @@ static int iaa_comp_adecompress(struct acomp_req *req)
+ 	dev_dbg(dev, "map dst %llx req->dst %p dlen %d sg_len %d\n", dst_addr,
+ 		req->dst, req->dlen, sg_dma_len(req->dst));
+ 
+-	ret = iaa_decompress(tfm, req, wq, src_addr, req->slen,
+-			     dst_addr, &req->dlen);
++	ret = iaa_decompress(tfm, req, src_addr, req->slen, dst_addr,
++			     &req->dlen);
+ 	if (ret == -EINPROGRESS)
+ 		return ret;
+ 
 
 -- 
 2.56.0
