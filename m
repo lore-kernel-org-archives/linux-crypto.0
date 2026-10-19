@@ -1,271 +1,212 @@
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011044.outbound.protection.outlook.com [52.101.52.44])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96874310784
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 13:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792417242; cv=fail; b=TtiRlAC8ade8peFjuDinytv+WxrHhK7MM0yTY7RCnyK4QS/oE2EX2bQDrAvGpsOe/lkjnAxOvSyvBSXoE31xQHxW2dk1xKZP2HUt35LXVK6lPNFjAbmnpW+qM0WsomNePZI564m8WF1ycZK1Nxxl/yZ8mA35L9b/MJK/Qx7qPPo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792417242; c=relaxed/simple;
-	bh=yND4ugS4uON2ABOh/DJgqKOi2CNH3GBpmgOwyO0xUQE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZOXKhQ5e3aCMZsNaFuIXO8pJTaOuPkl8HjahlZ+RZqRjO0UDjNhU4Ccv0lCp7VwMS24g+MSHRhw2Nu/8JHUIMLRwJ+pZrwFXYIoYmbOOG7raEoxkMpBPp1zH/Upon92uXF+32rHn4k5r5ekw06bc0FLMNtWwQnvmtqQspoMIidM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MdiAc7rd; arc=fail smtp.client-ip=52.101.52.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BED74F85D4
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 13:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792417707; cv=none; b=EYWlddVLdicHKcd3J5jqXp2uYNz+KmecaJh4xcsPEvMOG9dr7gMe5bEqTzqAxvT/DJxb0TqwF9u2exw9DYRB6HVSftSjtQaStySygeBGbi0gaYsGxklZMXZb1ucBqckIxKKBbjfRwcjXtg5Ih8r0NrQedlqIPAkY+RlxckDHUtY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792417707; c=relaxed/simple;
+	bh=5GHHihT8Q28Q2Z6IqnDJJLR49udVLHKyjwu/T6aBJ7g=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=VsM7y6RF4Qjm89QXuEF85BFKqSWBOQwOyvf2aa9rl1LaCmcYW1qY0CuNpo1OcW63f6iLC0CDvka8/yNZwd+SjGSFa4O5RPPPEfebBGer2ZjgAScY8HQ4fXXaskiO2KXY5nTylsStNUOAOxAd39nb0JUGRVNfWzzXm/el6cibrDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=eve5dmsK; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=JUTLbyvz; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MdiAc7rd"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AtiAHIIxUuYxvf/VUY/oa42XcrtNDaNCKT1tXz4MrsVcf9GRKbtif9DfsD/jgWcN7qubR7fOgoG/IiZjHimvisSw2DXwa0NYa5Dzldt+BZ79x8EqSPi7qmobxwfsDCRbMqMIRiP5aADdq0ddnIsV4P1V7GFaFpk9KkQwGp+rmAONlObyn3AU9uGZOgUuf/oJ60QyHZXo6THb1ye+GOKPioVWDJb7LHGYOmUym1m4Ufac71hzQo13oxxFjV19mB8BATHq2O12cIfeQcSEeoG/mwHhkCDNqIhSQcyJSGzIpDEOaHwJd6LNDYOVxFCEkEZ3kLT9pyk9AsVEIFzVGxEZsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=z2283xINtielyn4cRUm/r/lfbGXTrTeW1FMdEFgmDP0=;
- b=SHZ8nhg5ikJyflHXEYqhzpNzCYz4R5hu40h/+gl5YIhMVaobfkEgivuPB8imjT2DllxYkG/Er4e0puukG2Y8vReRYTlkvhyMW0QTcj6Oerr1KeroWeYotrAIMcmTNI2nbyQkOUW7tR01olqSp4cI/f5yGtDzLvM/wZttE0scDwvjWaxELiXE+Kvx8+FbEC3GONFNPMSW8JW8REt7xwwkeBCHKVSvGJtN5Bcb6mfgqyoJ0ejb95nRH0Fy+Y8gYCWwDGR6Qu1CO1LqTGiZ/nMjtIJ/alFbFBg7HryJYiRYs5j/SHKizutj6fk62TJzpb/wMaRoVnD7nKFASt/D8GaSmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z2283xINtielyn4cRUm/r/lfbGXTrTeW1FMdEFgmDP0=;
- b=MdiAc7rdN7O6MtIaFFOktCwy2lC+9DIUXs6UUxmPc+w8Oc0k3UmwCnoyDBIa0zbjUa3u2PG0lrMVCry1iI1mIYAf5BLBzEAWRxZ+FlLfWaD+UTLJ0qG+DLTeXR1tQlE6j119GW/9KOc0e8QG3a6p/3fWCVI07FKblPfOub25K3c=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN7PR12MB8131.namprd12.prod.outlook.com (2603:10b6:806:32d::12)
- by PH0PR12MB5677.namprd12.prod.outlook.com (2603:10b6:510:14d::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.522.19; Mon, 19 Oct
- 2026 13:40:38 +0000
-Received: from SN7PR12MB8131.namprd12.prod.outlook.com
- ([fe80::c2dd:62c5:67fe:aa46]) by SN7PR12MB8131.namprd12.prod.outlook.com
- ([fe80::c2dd:62c5:67fe:aa46%6]) with mapi id 15.21.0522.017; Mon, 19 Oct 2026
- 13:40:38 +0000
-Message-ID: <cdecbc99-9ae6-4f0b-999b-8e01d6925f1d@amd.com>
-Date: Mon, 19 Oct 2026 08:40:35 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/9] crypto: ccp - Use __free() handlers for
- sev_ioctl_do_pdh_export() allocations
-To: Michael Roth <michael.roth@amd.com>, linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, ackerleytng@google.com,
- ashish.kalra@amd.com, aik@amd.com, seanjc@google.com
-References: <20261016041109.1778673-1-michael.roth@amd.com>
- <20261016041109.1778673-6-michael.roth@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Content-Language: en-US
-Autocrypt: addr=thomas.lendacky@amd.com; keydata=
- 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
- WiyqywZI5g==
-In-Reply-To: <20261016041109.1778673-6-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR03CA0441.namprd03.prod.outlook.com
- (2603:10b6:610:10e::34) To SN7PR12MB8131.namprd12.prod.outlook.com
- (2603:10b6:806:32d::12)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="eve5dmsK";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="JUTLbyvz"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69J8P11c2042000
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 13:48:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	3z8i+KPSNZ2br0pM0JUREqSlK3MOF1iO3EQWQGWiPH4=; b=eve5dmsKKTHeRAik
+	/3vr2+iutwPPDVeub8pyF0Dt+QIu770JipWdLd7OrSqlxu5R4rXEnbJcCywz6vwc
+	vBB3+EwI3JairFp7cdDTWkL+xGnXqWDGQl6Zgh2ro0uhBuemdXG8oNCmieIa8yWv
+	kqqzG7ccjnATqjJtyuqtnNbWaAXKvpXBubmyXc6ppjSbeDPXlrF45vFcLxEerp6Z
+	xXmBOacReS33qdhEk5hxz4tsN/qgJknxV5TTAFkPfBYIUncqQyirIbT10C48gwGr
+	u0BL0LvlJvTAYd9cLxrrsWHSHGW4MGDJxpIqd0Vg9vV38cmObKktOWSGJP8U2+B7
+	BZpKXA==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hd5ur3038-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 13:48:22 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-93f13c143c8so404666085a.3
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 06:48:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1792417702; x=1793022502; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=3z8i+KPSNZ2br0pM0JUREqSlK3MOF1iO3EQWQGWiPH4=;
+        b=JUTLbyvz3CpDwhWSt0A6avupu4f61+inNrFvTYI4qgpQk6SsYQvDy5U+8nhKb6fS2s
+         gLQBdNboW9n8t9mmgEcy/OvNVAA4Fiq19jvzru0+wYSHnt2DfAVbcLKJ9UM3pu8dZLRp
+         ij7K7HUUVbpPXElzoLrg6rqQ+1fQbvkIAUej3FlUdpaLLqw8N5OC509FDN0AeD7po3vC
+         7f6QBAlsEaIIKhOV1ZiU+o2H5UgETVfysS0QsmNkzJHBRUZwZffcM1XCTc4asTddh+MY
+         ApY1P53/E3m+RTfOZHOI1B1qmwQSiVzwDy5sK4pf32qQswafAKapyE66899KcMFi+rGd
+         EChA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792417702; x=1793022502;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :content-type:mime-version:subject:date:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=3z8i+KPSNZ2br0pM0JUREqSlK3MOF1iO3EQWQGWiPH4=;
+        b=V3uGyyp1EsyHpi//2FayPHpexA+Ajx1qvKjdPtG3kicwLcqLEyAAFewPMCrTYHmBeM
+         aa3crUEkIHv05KHtDW3L96CS/bZZbabrtEHpCbHGNO+tA9ey2Rk74re/iwQSlBvJuIZe
+         IsnG+nChV4tlpfRD0UtS5BTuDTqbuHtpHZYJHeLJHdRYm0Zfd7Cs4EnHy/cv0v+m6PEF
+         cTkkSdNuipR/oe1Uq8agMeHm3LBLvzJJUlMvUUVrAhCfQ8LfOBtFR1Pm0hiWi5j79psk
+         pUezSIrcnasj47qpLilMfD0jNIepaBdzRUwaXh/oeUOSBQS9VhzcJsHt4GD9Y2idUjco
+         KVCg==
+X-Gm-Message-State: AFq9FYLw5ZW0GFBLGfXKG2o9YXikCgx3lbrsZbdO6QQzpeDpjOrzE5gA
+	NiwPpw3OnOLdNq9b1c2xdyCQUMKE2/ts5Ue87PDzcS+jdvvV4N6RR4zfDE/eKipety3zWRB6HAF
+	6ewBtoGCw7uxFJrqk3wMF5khYRU5pFSlA9Qc2aKgP7aV882Sk+S3Tsw/wxMObnS17ZBI=
+X-Gm-Gg: AYBFou2eksZLd1zZatI/nBzE34bZh0axhSl/U4wPP0N5j0JGREyEEuEbuTRTV5j2BYd
+	vGIUISmGFGS3Wmdp+n7DNJcWPbFh9bhxXCzE3OZaGKzhM/WyaUhu2r/wraGhOhTiRnMp1jTfYoJ
+	3Ksxw7rKvbfJh5W1jQC6D/yu2DdwBkgbrhYq97ZsxlxFfuWHMaXbYCQH07VMi2+QXsBckbPzhje
+	KQ2WxKpDTvrtMnqjiWuONqHR0TwG64IjYpUxRwM0Yih4z7JBjxBrPniyEXV2RgNNCTwp+3y9CWR
+	h9nYTOauhp3NZ20Iok5TIu7ejOoegw2uIV50uYFZqJ+8xYKBJ7/+LU1XCFOnAXkEoN1Ofswr50Y
+	bHAHZdCq/KZFa32leCB04WpeoWwhw
+X-Received: by 2002:a05:620a:4547:b0:93f:2610:fb6d with SMTP id af79cd13be357-93f29cc832bmr1363861185a.13.1792417702275;
+        Mon, 19 Oct 2026 06:48:22 -0700 (PDT)
+X-Received: by 2002:a05:620a:4547:b0:93f:2610:fb6d with SMTP id af79cd13be357-93f29cc832bmr1363855185a.13.1792417701785;
+        Mon, 19 Oct 2026 06:48:21 -0700 (PDT)
+Received: from brgl-qcom.local ([2a01:cb1d:dc:7e00:8916:7b9b:97a2:6c96])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48dfd4c4fc4sm20595574f8f.15.2026.10.19.06.48.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Oct 2026 06:48:20 -0700 (PDT)
+From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Date: Mon, 19 Oct 2026 15:48:08 +0200
+Subject: [PATCH v11 1/3] crypto: qce - Don't modify the TFM context for
+ per-request fallback
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR12MB8131:EE_|PH0PR12MB5677:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2f7cf27f-a9be-434e-ef84-08df2de68f39
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|23010399003|366016|22082099003|18002099003|4143699003|11063799006|10067099003|261009223027099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	dmubTvsFiKJcdQyD3DGozzYCaWLCC+PEeqPuUyWJmGiphgUUP8T5tDNuRg3AViEmXzPQ5FQPaCwNSVjDUw/JenWd15vqX0VuVIx414Rntu9FnkeWBOtdl9TKoT93A2SWu0MZH5zbtIXfSHvZzynUUPisshSCat2WJgmLv5AGpUMdq+6FKs1JG2dEvanZnRZzAnZWS6vTQXGzhfzLZB/s99ezsIBqyQu/zzZmNEcZbnuCEntfWxb1re/1S3jwOUbenvz5ZnUhs/uuqGVFyPa0msyIncEAfEgyH4Wl7WGopnnbV0u6RjTOLj4Q4a22ptbzw+UxYVJmL3gPexyzzZ4//PJw8FBsyjwHOqxjRDpgJToUG9C56ZdtjYD32Ec5F14fWSbujeCxLCMod3H95evnYlAiFXuTFRPPFwsGjDDampLi4JWBbUD0Ddpj6QywZFlmRq+/s9W0HgVR624fhemG2mNFnagWl1IbLSLQ654XIiKsRGbFPJ4qLC/hvT/YZknh42EYq03vbtAN2v369oqfD0U3d9H/y9dXdoPTdLJ7FjHH1c8V9dOY5dWAjka260N3/BM4dsCBMIQGLYfP8Qx9T17FK/uqR+8VmUtoAKryjNgrf52L2rhgGHxaBsMoCKFeHoPhxDKFq4BsV5MLiWfVqp/LndN2VxoDTomz9jMRrhA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(23010399003)(366016)(22082099003)(18002099003)(4143699003)(11063799006)(10067099003)(261009223027099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NmlxL3NOYnFhdWQrSVJvN2ZiVENXM0IxYU03cjg1bmx0SFV2aTRYZlVtUjl5?=
- =?utf-8?B?emJPQjY4V0VPL0JqeWc4SENGRHFIT3BINk1VRjRyaWRjOURPS0dWSTE1ZjFu?=
- =?utf-8?B?K1pDNHJFbm1mWlkrWDNqZndoQ01yK2I1OGl6aWJXRXQyczZQbEdpa3czbGdV?=
- =?utf-8?B?bk9nT3NsVnJpODYvNmJCMzhUMU5ja0lyV3ZDRWF4SEY1d2FDcm5naE1meWdu?=
- =?utf-8?B?dzBCdWhVeC91WGJmTlBVRkFSQi9BMS9tcEdJb29OYmh6OCt6T0lSSDk5RWJn?=
- =?utf-8?B?aGZkS3FGN0FSWS9GZ0lrS2RXMXorK2dFNDIrUmVyUEEycXUvZVlBZkFoMGdM?=
- =?utf-8?B?SnR4cTlpZ0hDNmlpeHdNd3c5NkJZMUtqR2VJOTdGeUZYMXkyeVRtQmc0MldV?=
- =?utf-8?B?L0dqbXY4dmtlTGc5QmYxbmVYR3RKcXdoM21uOHZvQ2x6MzNQVlVzeVNYVUsx?=
- =?utf-8?B?M1ZMK3J0RWhwcUI4b3pIaExzdHU1Z2NLTFlFTjV1REhTS3VITVAvVzlHZ3RM?=
- =?utf-8?B?akpORGV1T1l4VXJIRVppR21hWitENTh0ZmFYdTVHRjd0VktnanZaT2RZMnMy?=
- =?utf-8?B?T1dyeUJRL3o4Q0FiYmRURkx3anZacTkrTUs2SHZvNGVwbk5DVm9mWlBKMjVE?=
- =?utf-8?B?dGJPd0VnNFRZcVVKb3h1ZTRWYjhUQzkzTEQ4cGUweVo3amp0MDg4TVFtSjQv?=
- =?utf-8?B?OE1tWUVYVlRLODVUVjhJL3FVd1lTNUloakdCVDZmUW1iaEF6eDFNbzIvZnVF?=
- =?utf-8?B?ek1nK3NVZUxldmNhLy9OUW1pYlpmWVczODAyUGJNc0IyRk1MMGNaTVhUd2VN?=
- =?utf-8?B?NUdaMGxiY3A4d2YwVS9WdFFtQy9xL2xZZ1BENU93NHMxTXF0V2hTUlFPRm9L?=
- =?utf-8?B?SzJtT3pEci8wTGV3UFRDS0hHMmpEcDRoNlZwR2w4dUFtVzBUaGppdG1mYjQ1?=
- =?utf-8?B?WWJaZlBidnNlcTVsYWhJQlZGcWk0bnl2d3dvZzZtWktlemRqSmpiOW5LSDJD?=
- =?utf-8?B?TjlFZ2VaOFRDNGovc1BmY21IOVdnZWRFSVRtaTQ3RjBtZkVsZ240MUZZMDRD?=
- =?utf-8?B?bktrditxT0xCVGZHL080UjhKcUVRRkFKTHR6RXl3OW1kM3Nnb2VYMU1WMzk4?=
- =?utf-8?B?UTlnbVJKWVdnOVl5ZEIrSmdGcVcwMkxITVJ5L2xMcHd4Rmc4SzBkSzNmc1JL?=
- =?utf-8?B?Q25NeU5OemptTmw0RGxQTUhjWmEvZVhsN2NXV3QrUkNlaFp3VE9WNy9oelYy?=
- =?utf-8?B?bFNsMndtR2FLRy9BMWhOa2w0WFpZb2lkU3dFM2lpZkdPWVZIdDZLZ0FhenRM?=
- =?utf-8?B?NTZDSklLOHVvWEg2VGgwc00yTVVwNGwwSG10RWU0MkQybUY0ZGEydUs4YWVo?=
- =?utf-8?B?RnJ3OFYrbVVGZU9JMUFHdFhLU2thNE54NnpJMFZ3WkxQOW1CcFlWS2w5TExT?=
- =?utf-8?B?dGEvNDlTUXlwb2x6Y1M1cmNGZ0tCWmFJR0s3WnFtMmVJSk5FQndtZG9FcWRZ?=
- =?utf-8?B?aEF1YldoQkVkekttMHp4QkdzV3RjWU1idk1Oc0ZwU0lLQUc3SmRzNm1FNVlw?=
- =?utf-8?B?WTFFc09HWHlFdGpmZkNCOE4zcHZvb0RFamVYQUJnOGlMTkNVUkMrQlBRY2VT?=
- =?utf-8?B?KzRJRVRoTjhYRFVzNktyeEdocFRmeTFTVGFjMVFSSENpaWhPaDhIRjZYZ3hE?=
- =?utf-8?B?Y1JndzZ5ZFBrRDdXZHpxTHJ1bmo3M3JMc1pXN25DZW5BRnEyVGpRU2p5QUNB?=
- =?utf-8?B?R0hMQTNGQVU0OFovcnRhZmR4bzdtNE5XOVRMTTNJYmtiRnlrU0tHMW5oZU5T?=
- =?utf-8?B?NXV0YmdkTWhTYXJRWER6QkNmcW9pcVJ0SVZpUDBGc1h2bW5ia2taS3NaVTAr?=
- =?utf-8?B?eEg4RFBJKzdGOFY3UkFPOXJ2WmRybVc2S3dmN1pjOTVwTlVJaXVMRGJkWlI1?=
- =?utf-8?B?WjRVTHNxM1U1Mi9WbDlqVytBYTVRYTEzcTU4L2dqalNIMHhhV3FhYXRYMExj?=
- =?utf-8?B?OTJVdzFTVUk5MHBXRzNCYlJ0UkYzOUhUYTZRYm1lYlBKR0dVUmVFRjVqRFhl?=
- =?utf-8?B?V05IOFhCNlJVZXZQZFQwQVhCeXNUSmhobU54OENUMWRwNFRkUEgrMGcwcjE0?=
- =?utf-8?B?Nmprc0hnSVo4bW1OVk5nSGlCeUJjVjBQdlo3d0IzMFFQN25GNm9YUWpOdzY3?=
- =?utf-8?B?N2pJRVBueWpOTi9TbkhqcmNrVWVKRFJJQXBHaFl4TlN3SWhhZnljU2VTcHhG?=
- =?utf-8?B?ckVWdFBEeFZwSFJiM24vbGtPV3o4VXlITVJGc2M4ZEhRUTFFVEdySE1icVl4?=
- =?utf-8?Q?dpSCoBBK5z3JeGFUF6?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f7cf27f-a9be-434e-ef84-08df2de68f39
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB8131.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2026 13:40:37.9770
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: I4jl18SStiy7rGKDB8JLAU35SYdRoM7rfEJn4+YGpNAckYjB+rAO523qn4Mx2V9K3up+lSubKDBYlHTMFDWLtA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5677
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261019-qce-fixes-aead-v11-1-11c55cc7a695@oss.qualcomm.com>
+References: <20261019-qce-fixes-aead-v11-0-11c55cc7a695@oss.qualcomm.com>
+In-Reply-To: <20261019-qce-fixes-aead-v11-0-11c55cc7a695@oss.qualcomm.com>
+To: Bartosz Golaszewski <brgl@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eneas U de Queiroz <cotequeiroz@gmail.com>,
+        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Demi Marie Obenour <demiobenour@gmail.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Russell King <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2422;
+ i=bartosz.golaszewski@oss.qualcomm.com; h=from:subject:message-id;
+ bh=5GHHihT8Q28Q2Z6IqnDJJLR49udVLHKyjwu/T6aBJ7g=;
+ b=owEBbQKS/ZANAwAKAQWdLsv/NoTDAcsmYgBq1h+gMOTqjQt6l7IKLo91jf5mwj0P/GJHk24Py
+ KKqGkk9mZmJAjMEAAEKAB0WIQSR5RMt5bVGHXuiZfwFnS7L/zaEwwUCatYfoAAKCRAFnS7L/zaE
+ w94ND/4k+pDq8J3I5zsCSvWVpqkCQyoYt9nrtKvRWvKqvjlYsSe6yybcwAtZuig5BWOUTwzi3QC
+ 8KcSiGBv8klBVo3MBblAG8tByLMV5Y89PGJg/DKdpA5ULdhS/h6iNkMEV2m48n3WlU62ZPSPG0E
+ NEiBZHkqktVGjYaIxsWE3qhuHLfn+5zYV007HtvsmkRBLSUja/5uua+fZmpXiGujUe6pTTIec3O
+ qxQhIdPkEf+oNItFdiCJblNNtoL05mo2KHsaCgmJ77+UqozwZLZmUf2QvhxdFTt0oazP38Kun8a
+ Ci9CynxK5nB1X5s/QaPV6/Bp0/0FrWiQLMc0nhpGFgu3PBDBeLec1qq/sz1kFmp4eSl0IwzI9eA
+ 60hXOPVQbWUhg7klpEKfVDbE6iDY0OxtiBtt6H0JLWKFxmxlYHMcx+Q1EIpH5t073DKDdSOzvOH
+ 4gt1Zr3hEzKpin5+dRQBASjn6itMEOTMvqEHewA1VS0TAYYBW8g/5MoaxCp7g9VoR/KACh+xU+J
+ C6sxjVRND4U1me8UiGrGE6B6qjMXd0Escb3C+9BAn3XK+NRiWsq36r+v14K7Ox0JjbaU5JO3Tv/
+ Ag7qxUJ+ehUZM67aF14ifyFZS5VVZzC2mEVGjLdUfyfidpM8QPDEwrcS5i/GeOwNL/LcvJAQafN
+ kBCTaQrv9OgOMHg==
+X-Developer-Key: i=bartosz.golaszewski@oss.qualcomm.com; a=openpgp;
+ fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDE5MDA1NCBTYWx0ZWRfX2SYRpIvaT9GU
+ 1ZKRpWwboWeOKbYvfz3XMyhsNyifboCIEAaG6FsVm3kDPdlUn0gx4evknsEKtxS6ZVp2lc285In
+ iclWPeS6cr+XBisChBHL68r5M6O+d2M=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDE5MDA1NCBTYWx0ZWRfXxWs1bh2nXXZq
+ RKt+tKR70knGF4nff6V1/RjhqEp3zHiRJ3oPinC8jwLNG4KZ7a9uRDoilN9dd5XkgPCRePOlORi
+ yAaS6CI4MY1OYqaAn/JvZwbuyEQGBGyVIlYG2GKQEbL49SjwXvkif742H7qcA8wZgBP01F9YxQp
+ 6Yq7k3VYD2r9AwS6bd/zyvehuqUHrJ/9/hN2kJEfHsEbhm2ZNFnOq6A8Ls4RMt7LgR4kev/4uMJ
+ f1kYURV3zHD0cVLfjmcy8L8NgeSr5wHPAi69jtL+24J2pjHYvVEpFEhc1X0ESUVimVdmx3JzZrx
+ 4ZYueA3DcxeoSVZsj1lS7Yz6Kd1brWIyQEmi8JG5U7ggegvo3NHVF64KGv4CHUiQPXFUwnge0as
+ WAUQuZgB1gHgyY+LG1JS+DVm7fV/NiSez7c7VKJCgSEFXMigA5hRELn9zqqucXL+xSJwdLJV3SM
+ 4uHqVzD4B6Rdf08Pd9Q==
+X-Proofpoint-ORIG-GUID: y298kNijssMTasZUIyCN48kgc65jrY-S
+X-Proofpoint-GUID: y298kNijssMTasZUIyCN48kgc65jrY-S
+X-Authority-Analysis: v=2.4 cv=CP6/zhrD c=1 sm=1 tr=0 ts=6ad61fa6 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22 a=VwQbUJbxAAAA:8
+ a=EUspDBNiAAAA:8 a=8On1wDE6BETRpeAr_T4A:9 a=QEXdDO2ut3YA:10
+ a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-10-19_03,2026-10-14_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 bulkscore=0 clxscore=1015 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 phishscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610080000 definitions=main-2610190054
 
-On 10/15/26 23:09, Michael Roth wrote:
-> Make use of __free() handlers so that the related goto statements can be
-> dropped. This is in preparation for switching over to using mutex
-> guard()'s.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+qce_aead_crypt() records a per-request decision to use the software
+fallback (on zero-length message) in ctx->need_fallback, which lives in the
+TFM context shared by all concurrent requests on the transform, and then
+clears it again. This has two problems:
 
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+1. Concurrent requests race on the flag: one request can observe and
+clear the flag set for another, so that a request that needs the fallback
+is sent to the engine while an unrelated one is diverted to the fallback.
 
-> ---
->  drivers/crypto/ccp/sev-dev.c | 33 +++++++++++----------------------
->  1 file changed, 11 insertions(+), 22 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 6b483bdf0f0f..bea3c30f00b0 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -2434,9 +2434,9 @@ static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
->  
->  static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->  {
-> +	void *pdh_blob __free(kfree) = NULL, *cert_blob __free(kfree) = NULL;
->  	struct sev_device *sev = psp_master->sev_data;
->  	struct sev_user_data_pdh_cert_export input;
-> -	void *pdh_blob = NULL, *cert_blob = NULL;
->  	struct sev_data_pdh_cert_export data;
->  	void __user *input_cert_chain_address;
->  	void __user *input_pdh_cert_address;
-> @@ -2474,10 +2474,8 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->  	data.pdh_cert_len = input.pdh_cert_len;
->  
->  	cert_blob = kzalloc(input.cert_chain_len, GFP_KERNEL);
-> -	if (!cert_blob) {
-> -		ret = -ENOMEM;
-> -		goto e_free_pdh;
-> -	}
-> +	if (!cert_blob)
-> +		return -ENOMEM;
->  
->  	data.cert_chain_address = __psp_pa(cert_blob);
->  	data.cert_chain_len = input.cert_chain_len;
-> @@ -2486,12 +2484,11 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->  	/* If platform is not in INIT state then transition it to INIT. */
->  	if (sev->sev_plat_status.state != SEV_STATE_INIT) {
->  		if (!writable) {
-> -			ret = -EPERM;
-> -			goto e_free_cert;
-> +			return -EPERM;
->  		}
->  		ret = sev_move_to_init_state(argp, &shutdown_required);
->  		if (ret)
-> -			goto e_free_cert;
-> +			return ret;
->  	}
->  
->  	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
-> @@ -2506,32 +2503,24 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
->  	input.cert_chain_len = data.cert_chain_len;
->  	input.pdh_cert_len = data.pdh_cert_len;
->  
-> -	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
-> -		ret = -EFAULT;
-> -		goto e_free_cert;
-> -	}
-> +	if (copy_to_user((void __user *)argp->data, &input, sizeof(input)))
-> +		return -EFAULT;
->  
->  	if (ret || WARN_ON_ONCE(argp->error))
-> -		goto e_free_cert;
-> +		return ret;
->  
->  	if (pdh_blob) {
->  		if (copy_to_user(input_pdh_cert_address,
-> -				 pdh_blob, input.pdh_cert_len)) {
-> -			ret = -EFAULT;
-> -			goto e_free_cert;
-> -		}
-> +				 pdh_blob, input.pdh_cert_len))
-> +			return -EFAULT;
->  	}
->  
->  	if (cert_blob) {
->  		if (copy_to_user(input_cert_chain_address,
->  				 cert_blob, input.cert_chain_len))
-> -			ret = -EFAULT;
-> +			return -EFAULT;
->  	}
->  
-> -e_free_cert:
-> -	kfree(cert_blob);
-> -e_free_pdh:
-> -	kfree(pdh_blob);
->  	return ret;
->  }
->  
+2. ctx->need_fallback is also set by setkey() for AES-192 keys, which
+the engine cannot handle for any request. Clearing it after the first
+fallback request makes every following request on that TFM go to the
+hardware with an unsupported key size.
+
+Use a local variable seeded from the per-TFM flag for the per-request
+decision and stop clearing the flag.
+
+Fixes: b51dcf05c1e9 ("crypto: qce - Schedule fallback aead algorithm")
+Cc: stable@vger.kernel.org
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+---
+ drivers/crypto/qce/aead.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
+index e0061bfab216861444e36700d6530e7a3cd347e7..81c1a9598474c7c1623e71a9eac876fcc0c111b4 100644
+--- a/drivers/crypto/qce/aead.c
++++ b/drivers/crypto/qce/aead.c
+@@ -499,6 +499,7 @@ static int qce_aead_crypt(struct aead_request *req, int encrypt)
+ 	struct qce_aead_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct qce_alg_template *tmpl = to_aead_tmpl(tfm);
+ 	unsigned int blocksize = crypto_aead_blocksize(tfm);
++	bool fallback = ctx->need_fallback;
+ 
+ 	rctx->flags  = tmpl->alg_flags;
+ 	rctx->flags |= encrypt ? QCE_ENCRYPT : QCE_DECRYPT;
+@@ -511,14 +512,11 @@ static int qce_aead_crypt(struct aead_request *req, int encrypt)
+ 	/* CE does not handle 0 length messages */
+ 	if (!rctx->cryptlen) {
+ 		if (!(IS_CCM(rctx->flags) && IS_DECRYPT(rctx->flags)))
+-			ctx->need_fallback = true;
++			fallback = true;
+ 	}
+ 
+ 	/* If fallback is needed, schedule and exit */
+-	if (ctx->need_fallback) {
+-		/* Reset need_fallback in case the same ctx is used for another transaction */
+-		ctx->need_fallback = false;
+-
++	if (fallback) {
+ 		aead_request_set_tfm(&rctx->fallback_req, ctx->fallback);
+ 		aead_request_set_callback(&rctx->fallback_req, req->base.flags,
+ 					  req->base.complete, req->base.data);
+
+-- 
+2.47.3
 
