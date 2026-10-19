@@ -1,67 +1,66 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792422881;
-	b=bc4eHX5SCDiuMGjV84l7OMYzh2VcKnIGXRqSiyhPzpI3+Eedpim8pzX21iWfUx/F7Qcb
-	 RGloAz5OW5W6pRPbdaKcBYhRdBAEylRmuUoHbPdtZRA7Zh7xIcO9hfonsRNRxxPncvz4X
-	 kI5V2qdcK3F2IHU+BSmHXD392sK5gT1ZteWnvMRJW706JqFM6j+a7qA7K8gwVI+EQLvx/
-	 FptWG3zTdAvh/q7VEr3C6kbBIoKXIkdEjc9ur6UW965NY+RZKLJTzsPlpgMAkr4Vplksx
-	 KOEUuPFzX+5dKhHx2NLeeoGkwPtJycCYvHk1oqyW7HKON99OlXjFvWPD6Ox/J3VhpVg==
+	t=1792422878;
+	b=umPVcKQs95dRzQjOEHoWzSMM41hFTslD20oGyQ4w69T8L16mM+Ms7wYoHBvuvFOXD66i
+	 tBGdjNgE4usCzfu7nu25nT7NPBY0zaCfvfJ3xOVlS4zNQctbYrn0ZI0q+RZ1CzWwa/FCb
+	 Q5H3KYjP93Kc7FqhN31ZYQZOZaKDnAapt3/UNCXjyLnrRpq+YiovtFaQM/K9kNvIMeGsw
+	 DAEiU4UcMO4eq59pWNAC3vrgM1WihC75oswz/wgZaApTlT+fF1c8Ami2S9Jm/gV6zvskz
+	 cY/P5JsV4TQavityW4C1Q8vCuBvH9tsNwRtUjVBzzoA9yZSPT2bayDgblyeSzhtG/TQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792422881;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792422878;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-Ironport-Invalid-End-Of-Message:X-ExtLoop1:
-	 X-IronPort-AV:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=MQb8B/qhw+4yCI3Cj8R+lrtVqs8STV1i2INQuKnCvNw=;
-	b=0EhfHbKk18cIZDpB+Dnm54WrxFIaLmQf86sgRuGvaCjycoCs60yytX4KkhrUKhKQNAZ3
-	 +FD5ThRA7owWble/dk8+DtCXo0xeeWw5VxdJPEoIViL8mSyD8fmpnjgKLOyWzUMpYYCeJ
-	 Zq5s8KNQkRCgZHDoTRm6KsBkDyRlCz8PMQrn6R3LqcY9FfrIuob8DCXOapJHom4Vvn72d
-	 o/N8MmmRB+fE2rRlXemDDmYru3lAxQlyYBvuoGeNe1JdDkuwKO97LQ8rBOIsQiST+TBPF
-	 RGh6apuc+PAcEQgkVFLB4t7lTdeVnlFC0i9bAtXrJL2HHvaL+psB260T1CnNmN8c+hw==
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=wyMNmoV7LLQCe5NBcl4HLsDDXaPs+fkB0uZvlmUvPpk=;
+	b=5lDqgc6hMpBPjErUHEwp7FRZfiV+SJske6njyALFB+CCJGtE+XSsdijHVotkx9uIFFlt
+	 ZM8QxskjEiE1waWHSynDx4GwVpE2Zx/ehfwJ5zJ8ixafmBw62BtbLGh24nvs7IgzlVsEq
+	 88pX0Sf6rjbCvI4nivG6F9ulvs9xZOvbovziQjojHG86m2NP4OTKN4mX6FQBLYcmWC75Y
+	 ei/z5LlfLVRNAyhkFlgUCLFOtyh2A22HhpVeDNu9RmXdWBuFSNkDta1/GKJlmve5JiMSZ
+	 be5grZ+wsGTFMJfnP+StWGjyKKnHkWK3IhwmsxJlMHWBgOjLHUEig+OSRQTC54qvMeg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=CC46qBE9;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Rl9D987c;
 	arc=none smtp.remote-ip=198.175.65.12
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2458E609CEEA;
-	Mon, 19 Oct 2026 15:14:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2458E609CEEA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C82609CEDD;
+	Mon, 19 Oct 2026 15:14:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 21C82609CEDD
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=CC46qBE9
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Rl9D987c
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792422882; x=1823958882;
+  t=1792422878; x=1823958878;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=z0SkwW//ef7ZJBaFBPaI8edP8HDdXv5L0ptXLFoUlhA=;
-  b=CC46qBE90hvWXyDls/cD7sZtX1nDBEZzDiu1IfzRY2SDWrrI6HQvW46l
-   GznsHv2cXs5YUyTYVzNiSOjW5hkmweiIvQSg8fpDbbAE79otYhcppbJrq
-   V3HqfL+Q36wMJti9qrEOc6d+87FNjcorJEhY+VQoXKvkDXsvnxv7MH1In
-   +pZqkWPxkgvrcjJ1AWLnF8Tcex4SF8ko2UZFMSW1VI8KMUEyAqDZdG8Ah
-   ojKh0NRNJ4O90Ioe7oOlCHtK+BiwhLXdv9GhpAMxDiv9lyBzF2gBUxQjA
-   lq60KGjBzm/Y8GGr77dnc45Yt0nOgesx4M9+dUcjflZnpYu5LOCNu1o0/
-   g==;
-X-CSE-ConnectionGUID: jgmDl+l3SGq+yGwnXGQ8WQ==
-X-CSE-MsgGUID: JRqmPQ4DR0OLsLrOPgztqg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="986942"
+  bh=QgVVF5Nil8kjcN6fX6wTMPSDsxBuQH1tWzFFSyv8gGU=;
+  b=Rl9D987cQLXUlIl6L+kbGyP9YFXcJAIF7UsdkcdlNhsN8C4DxrgXKqSc
+   /vXoNejC8cwe0TGp7bzXJrBJo3SR5EkeNywCh2NyOvlMPPtR0EP3XaKmX
+   dpOAy0ZRFH421XM1ulKtAGSYGX7aUNm8mhtaMXtU6jKGFdp1TTG60/nWH
+   nrilSJrvDHW1JKLze5OJHYQ7fZkVCdhKjM8nuWh2jE8UU1CyJ1ow4ouCi
+   betzTIhNq7D9Uyh0Zx67Et2IVP1XEaQd1YxS1CSs88SJw8atXX6IzC9NR
+   OWs6dIzr65dObfPif81fpmxmK6cUI8/UMg9+UlrbPjEYbV7V/R3xhzey7
+   A==;
+X-CSE-ConnectionGUID: yhvr66Z5Re6Q5pKqsMBoHA==
+X-CSE-MsgGUID: ofFD/Pj0QVW1byhtQMBtYw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="986918"
 X-IronPort-AV: E=Sophos;i="6.27,167,1787036400"; 
-   d="scan'208";a="986942"
+   d="scan'208";a="986918"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 08:14:35 -0700
-X-CSE-ConnectionGUID: GGDSOwEDQZ61D8gwWWlfYQ==
-X-CSE-MsgGUID: qXaD5L4/QjeN7C8PwD3kgA==
-X-Ironport-Invalid-End-Of-Message: True
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 08:14:34 -0700
+X-CSE-ConnectionGUID: AaLch5cvQiq1SnRJDFgN6Q==
+X-CSE-MsgGUID: XyYt6r+vSMi0J3gzW3jB6Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,167,1787036400"; 
-   d="scan'208";a="2537007"
+   d="scan'208";a="2536974"
 Received: from jf5300-15a101203tc.jf.intel.com (HELO meta-crater2c.jf.intel.com) ([10.54.113.49])
-  by orviesa003.jf.intel.com with ESMTP; 19 Oct 2026 08:14:35 -0700
+  by orviesa003.jf.intel.com with ESMTP; 19 Oct 2026 08:14:34 -0700
 From: Daniel Byrne <daniel1.byrne@intel.com>
 To: Vinod Koul <vkoul@kernel.org>,
 	Dave Jiang <dave.jiang@intel.com>
@@ -76,9 +75,9 @@ Cc: Fenghua Yu <fenghua.yu@intel.com>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH 17/17] dmaengine: idxd: run the interrupt-handle revoke under the queue lock
-Date: Mon, 19 Oct 2026 08:06:30 -0700
-Message-ID: <20261019150630.4026341-18-daniel1.byrne@intel.com>
+Subject: [PATCH 09/17] dmaengine: idxd: quarantine terminate_all's descriptor slots until the device has drained
+Date: Mon, 19 Oct 2026 08:06:22 -0700
+Message-ID: <20261019150630.4026341-10-daniel1.byrne@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261019150630.4026341-1-daniel1.byrne@intel.com>
 References: <20261019150630.4026341-1-daniel1.byrne@intel.com>
@@ -93,119 +92,307 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The interrupt-handle revoke worker requests each new handle without
-wq_lock, so that a reset can end the request, and the queue may be
-unbound while it waits. It reads the queue's state without the lock,
-submits the drain after unlocking, and on a failed request quiesces the
-queue and completes the descriptors that carry the revoked handle
-outside the lock, so an unbind can unmap the portal under the drain, or
-free the descriptors, the allocator and the driver under the
-completions.
+idxd_dma_terminate_all() flushes the pending descriptors and frees their
+slots while the device still holds them. A late completion record then
+lands on the slot's next owner and completes it with the old
+descriptor's status, and the unmap data the client attached is released
+while the device may still access the memory it maps; with an IOMMU
+another mapping can reuse the released address and take the late
+access.
 
-The unbind invalidates the handle in the same wq_lock hold that tears
-the queue down, so after the request the worker takes wq_lock and goes
-on only if the handle is still valid. The handle swap and the drain, or
-the quiesce and the completions after a failed request, then run in
-that hold. A queue a halt already killed and did not revive is left
-dead rather than revived behind the halt.
+Keep those slots out of use instead. terminate_all now waits for the
+submitters in flight, so that every descriptor on the lists is in the
+device, and the flush moves the descriptors the device has not finished
+to a per-queue quarantine, with their unmap data, after it has completed
+their cookies. device_synchronize() takes the quarantine, drains the
+queue, which covers everything the device held when the drain was
+issued, and only then frees the slots and the unmap data. A descriptor
+terminated after the take waits for the next synchronize. The halt flush
+frees the quarantine itself, since the halt killed every descriptor the
+device held, and so does the queue disable once its drain and reset
+have completed.
 
-Assisted-by: Claude:claude-opus-5
+Fixes: 2a93f5747d0e ("dmaengine: idxd: Flush all pending descriptors")
 Assisted-by: Claude:claude-opus-5-5
 Assisted-by: Claude:claude-fable-5-1
 Signed-off-by: Daniel Byrne <daniel1.byrne@intel.com>
 ---
- drivers/dma/idxd/irq.c | 45 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 33 insertions(+), 12 deletions(-)
+ drivers/dma/idxd/device.c | 117 ++++++++++++++++++++++++++++++++++++--
+ drivers/dma/idxd/dma.c    |  12 +++-
+ drivers/dma/idxd/idxd.h   |  12 +++-
+ drivers/dma/idxd/init.c   |   1 +
+ drivers/dma/idxd/irq.c    |   3 +-
+ 5 files changed, 138 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/dma/idxd/irq.c b/drivers/dma/idxd/irq.c
-index 4517a09fcf1b..8217698056bb 100644
---- a/drivers/dma/idxd/irq.c
-+++ b/drivers/dma/idxd/irq.c
-@@ -115,6 +115,11 @@ static void idxd_abort_invalid_int_handle_descs(struct idxd_irq_entry *ie)
- 	struct idxd_desc *d, *t;
- 	struct llist_node *head;
+diff --git a/drivers/dma/idxd/device.c b/drivers/dma/idxd/device.c
+index 41223d2e20af..09475f5ea026 100644
+--- a/drivers/dma/idxd/device.c
++++ b/drivers/dma/idxd/device.c
+@@ -118,6 +118,8 @@ int idxd_wq_alloc_resources(struct idxd_wq *wq)
+ 	if (wq->type != IDXD_WQT_KERNEL)
+ 		return 0;
+ 
++	/* A fresh pool: nothing outstanding can land in it. */
++	INIT_LIST_HEAD(&wq->quarantine);
+ 	num_descs = wq_dedicated(wq) ? wq->size : wq->threshold;
+ 	wq->num_descs = num_descs;
+ 
+@@ -170,10 +172,18 @@ EXPORT_SYMBOL_NS_GPL(idxd_wq_alloc_resources, "IDXD");
+ void idxd_wq_free_resources(struct idxd_wq *wq)
+ {
+ 	struct device *dev = &wq->idxd->pdev->dev;
++	LIST_HEAD(dead_descs);
+ 
+ 	if (wq->type != IDXD_WQT_KERNEL)
+ 		return;
  
 +	/*
-+	 * An unbind frees the descriptors and the allocator under
-+	 * wq_lock, so they are completed under it as well.
++	 * The disable frees the pool only after its drain and its reset
++	 * completed, and a failed enable has run nothing, so the device no
++	 * longer reaches what a quarantined descriptor maps.
 +	 */
-+	lockdep_assert_held(&ie_to_wq(ie)->wq_lock);
++	idxd_wq_quarantine_take(wq, &dead_descs);
++	idxd_wq_quarantine_free(wq, &dead_descs);
+ 	free_hw_descs(wq);
+ 	free_descs(wq);
+ 	dma_free_coherent(dev, wq->compls_size, wq->compls, wq->compls_addr);
+@@ -1391,11 +1401,14 @@ int idxd_device_load_config(struct idxd_device *idxd)
+ 	return 0;
+ }
+ 
+-static void idxd_flush_pending_descs(struct idxd_irq_entry *ie)
++static void idxd_flush_pending_descs(struct idxd_irq_entry *ie,
++				     bool quarantine)
+ {
++	struct idxd_wq *wq = ie_to_wq(ie);
+ 	struct idxd_desc *desc, *itr;
+ 	struct llist_node *head;
+ 	LIST_HEAD(flist);
++	LIST_HEAD(qlist);
+ 	enum idxd_complete_type ctype;
+ 
  	spin_lock(&ie->list_lock);
- 	head = llist_del_all(&ie->pending_llist);
- 	if (head) {
-@@ -142,6 +147,7 @@ static void idxd_int_handle_revoke(struct work_struct *work)
- 	struct pci_dev *pdev = idxd->pdev;
- 	struct device *dev = &pdev->dev;
- 	int i, new_handle, rc;
-+	bool killed;
- 
- 	if (!idxd->request_int_handles) {
- 		kfree(revoke);
-@@ -166,15 +172,31 @@ static void idxd_int_handle_revoke(struct work_struct *work)
- 			continue;
- 
- 		rc = idxd_device_request_int_handle(idxd, i, &new_handle, IDXD_IRQ_MSIX);
--		if (rc < 0) {
-+		if (rc < 0)
- 			dev_warn(dev, "get int handle %d failed: %d\n", i, rc);
-+
+@@ -1423,8 +1436,82 @@ static void idxd_flush_pending_descs(struct idxd_irq_entry *ie)
+ 		tx = &desc->txd;
+ 		tx->callback = NULL;
+ 		tx->callback_result = NULL;
 +		/*
-+		 * The request runs without wq_lock, so that a reset can end
-+		 * it, and the queue may have been unbound meanwhile. An
-+		 * unbind invalidates the handle in the same wq_lock hold
-+		 * that unmaps the portal and frees the descriptors, so a
-+		 * handle still valid under the lock means that the queue
-+		 * still has its portal, its descriptors and its completion
-+		 * handler. Everything below, the drain included, stays in
-+		 * this hold.
++		 * A descriptor the device has not finished still has its
++		 * completion record to write. A flush that leaves the
++		 * device running keeps its slot out of use, or the record
++		 * would land on the slot's next owner and complete it with
++		 * this descriptor's status. Its unmap data stays with the
++		 * slot as well, since the device may still access what it
++		 * maps, and an address released now could be mapped again
++		 * for someone else before the late access.
 +		 */
-+		guard(mutex)(&wq->wq_lock);
-+		if (ie->int_handle == INVALID_INT_HANDLE)
++		if (quarantine && ctype == IDXD_COMPLETE_ABORT) {
++			struct dmaengine_unmap_data *unmap = tx->unmap;
++
++			tx->unmap = NULL;
++			idxd_dma_complete_txd(desc, ctype, false, NULL, NULL);
++			tx->unmap = unmap;
++			list_add_tail(&desc->list, &qlist);
 +			continue;
++		}
+ 		idxd_dma_complete_txd(desc, ctype, true, NULL, NULL);
+ 	}
 +
-+		if (rc < 0) {
- 			/*
- 			 * Failed to acquire new interrupt handle. Kill the WQ
- 			 * and release all the pending submitters. The submitters will
- 			 * get error return code and handle appropriately.
- 			 */
- 			ie->int_handle = INVALID_INT_HANDLE;
--			idxd_wq_quiesce(wq);
-+			__idxd_wq_quiesce(wq);
- 			idxd_abort_invalid_int_handle_descs(ie);
- 			continue;
- 		}
-@@ -193,21 +215,20 @@ static void idxd_int_handle_revoke(struct work_struct *work)
- 			continue;
- 		}
++	if (list_empty(&qlist))
++		return;
++	spin_lock(&ie->list_lock);
++	list_splice_tail(&qlist, &wq->quarantine);
++	spin_unlock(&ie->list_lock);
++}
++
++/*
++ * Take what terminate_all has quarantined so far. A drain covers only
++ * what the device held when it was issued, so a synchronize takes the
++ * quarantine before it drains and frees it if the drain completed. A
++ * descriptor terminated meanwhile waits for the next one. The list lock
++ * serialises this with the flush that adds to the quarantine and with a
++ * halt or a teardown that frees it all.
++ */
++void idxd_wq_quarantine_take(struct idxd_wq *wq, struct list_head *list)
++{
++	spin_lock(&wq->ie.list_lock);
++	list_splice_init(&wq->quarantine, list);
++	spin_unlock(&wq->ie.list_lock);
++}
++
++/*
++ * Nothing the device holds can write their completion records, or reach
++ * the memory their unmap data maps, any more. The unmap data goes before
++ * the slot, which a new owner may take at once.
++ */
++void idxd_wq_quarantine_free(struct idxd_wq *wq, struct list_head *list)
++{
++	struct idxd_desc *desc, *itr;
++
++	list_for_each_entry_safe(desc, itr, list, list) {
++		list_del(&desc->list);
++		dma_descriptor_unmap(&desc->txd);
++		idxd_free_desc(wq, desc);
++	}
++}
++
++/*
++ * A halt killed every descriptor the device held: the quarantined slots
++ * are free. Under wq_lock, since an unbind racing the halt may free the
++ * pool.
++ */
++void idxd_wq_halt_release(struct idxd_wq *wq)
++{
++	LIST_HEAD(dead_descs);
++
++	guard(mutex)(&wq->wq_lock);
++
++	if (wq->state != IDXD_WQ_ENABLED || wq->type != IDXD_WQT_KERNEL)
++		return;
++
++	idxd_wq_quarantine_take(wq, &dead_descs);
++	idxd_wq_quarantine_free(wq, &dead_descs);
+ }
  
--		mutex_lock(&wq->wq_lock);
--		reinit_completion(&wq->wq_resurrect);
--
--		/* Kill percpu_ref to pause additional descriptor submissions */
--		percpu_ref_kill(&wq->wq_active);
--
--		/* Wait for all submitters quiesce before we change interrupt handle */
--		wait_for_completion(&wq->wq_dead);
-+		/*
-+		 * Kill percpu_ref to pause additional descriptor submissions
-+		 * and wait for all submitters to quiesce before we change
-+		 * the interrupt handle. A queue a halt already killed and did
-+		 * not revive is left dead.
-+		 */
-+		killed = idxd_wq_kill(wq);
+ static void idxd_device_set_perm_entry(struct idxd_device *idxd,
+@@ -1456,7 +1543,7 @@ void idxd_wq_free_irq(struct idxd_wq *wq)
+ 		return;
  
- 		ie->int_handle = new_handle;
+ 	free_irq(ie->vector, ie);
+-	idxd_flush_pending_descs(ie);
++	idxd_flush_pending_descs(ie, false);
  
- 		/* Revive percpu ref and wake up all the waiting submitters */
--		percpu_ref_reinit(&wq->wq_active);
-+		if (killed)
-+			percpu_ref_reinit(&wq->wq_active);
- 		complete_all(&wq->wq_resurrect);
--		mutex_unlock(&wq->wq_lock);
+ 	/* FLR revokes every handle; the halt path marks them invalid. */
+ 	if (ie->int_handle == INVALID_INT_HANDLE)
+@@ -1476,16 +1563,38 @@ void idxd_wq_free_irq(struct idxd_wq *wq)
+ 	ie->pasid = IOMMU_PASID_INVALID;
+ }
  
- 		/*
- 		 * The delay here is to wait for all possible MOVDIR64B that
+-void idxd_wq_flush_descs(struct idxd_wq *wq)
++/*
++ * @quarantine: the device keeps running, so the slots of the descriptors
++ * it has not finished stay out of use until a drain covers them. A halt
++ * has killed them and frees their slots at once.
++ */
++void idxd_wq_flush_descs(struct idxd_wq *wq, bool quarantine)
+ {
+ 	struct idxd_irq_entry *ie = &wq->ie;
++	bool killed = false;
+ 
+ 	guard(mutex)(&wq->wq_lock);
+ 
+ 	if (wq->state != IDXD_WQ_ENABLED || wq->type != IDXD_WQT_KERNEL)
+ 		return;
+ 
+-	idxd_flush_pending_descs(ie);
++	/*
++	 * A submitter between its list add and its portal write holds
++	 * wq_active. Waiting for the reference to die puts every listed
++	 * descriptor in the device, where the drain that frees the
++	 * quarantine covers it. A halt flush has done this itself.
++	 */
++	if (quarantine && !percpu_ref_is_dying(&wq->wq_active)) {
++		reinit_completion(&wq->wq_resurrect);
++		percpu_ref_kill(&wq->wq_active);
++		wait_for_completion(&wq->wq_dead);
++		killed = true;
++	}
++	idxd_flush_pending_descs(ie, quarantine);
++	if (killed) {
++		percpu_ref_reinit(&wq->wq_active);
++		complete_all(&wq->wq_resurrect);
++	}
+ }
+ 
+ int idxd_wq_request_irq(struct idxd_wq *wq)
+diff --git a/drivers/dma/idxd/dma.c b/drivers/dma/idxd/dma.c
+index defd1af74c0a..196045cb9ef2 100644
+--- a/drivers/dma/idxd/dma.c
++++ b/drivers/dma/idxd/dma.c
+@@ -199,7 +199,8 @@ static int idxd_dma_terminate_all(struct dma_chan *c)
+ {
+ 	struct idxd_wq *wq = to_idxd_wq(c);
+ 
+-	idxd_wq_flush_descs(wq);
++	/* The device keeps running what the lists held. See synchronize. */
++	idxd_wq_flush_descs(wq, true);
+ 
+ 	return 0;
+ }
+@@ -207,8 +208,17 @@ static int idxd_dma_terminate_all(struct dma_chan *c)
+ static void idxd_dma_synchronize(struct dma_chan *c)
+ {
+ 	struct idxd_wq *wq = to_idxd_wq(c);
++	LIST_HEAD(quarantined);
+ 
++	/*
++	 * dmaengine_synchronize() promises the client that its memory may
++	 * be freed afterwards. The drain keeps that promise, and nothing
++	 * the device held before it is left to write a completion record,
++	 * so the slots terminate_all quarantined are free again.
++	 */
++	idxd_wq_quarantine_take(wq, &quarantined);
+ 	idxd_wq_drain(wq);
++	idxd_wq_quarantine_free(wq, &quarantined);
+ }
+ 
+ int idxd_register_dma_device(struct idxd_device *idxd)
+diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
+index 221a7302bb0c..31bc4a506225 100644
+--- a/drivers/dma/idxd/idxd.h
++++ b/drivers/dma/idxd/idxd.h
+@@ -224,6 +224,13 @@ struct idxd_wq {
+ 	struct idxd_desc **descs;
+ 	struct sbitmap_queue sbq;
+ 	struct idxd_dma_chan *idxd_chan;
++	struct list_head quarantine;	/* descriptors a terminate_all took
++					 * off the lists while the device
++					 * still held them. Their slots, with
++					 * their unmap data, are freed once a
++					 * drain that covers them completes or
++					 * the device stops. Under ie.list_lock.
++					 */
+ 	char name[WQ_NAME_SIZE + 1];
+ 	u64 max_xfer_bytes;
+ 	u32 max_batch_size;
+@@ -807,7 +814,10 @@ void idxd_wq_quiesce(struct idxd_wq *wq);
+ int idxd_wq_init_percpu_ref(struct idxd_wq *wq);
+ void idxd_wq_free_irq(struct idxd_wq *wq);
+ int idxd_wq_request_irq(struct idxd_wq *wq);
+-void idxd_wq_flush_descs(struct idxd_wq *wq);
++void idxd_wq_flush_descs(struct idxd_wq *wq, bool quarantine);
++void idxd_wq_quarantine_take(struct idxd_wq *wq, struct list_head *list);
++void idxd_wq_quarantine_free(struct idxd_wq *wq, struct list_head *list);
++void idxd_wq_halt_release(struct idxd_wq *wq);
+ 
+ /* submission */
+ int idxd_submit_desc(struct idxd_wq *wq, struct idxd_desc *desc);
+diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
+index 9c47a7b9e48e..c4319ac27bfb 100644
+--- a/drivers/dma/idxd/init.c
++++ b/drivers/dma/idxd/init.c
+@@ -213,6 +213,7 @@ static int idxd_setup_wqs(struct idxd_device *idxd)
+ 		init_waitqueue_head(&wq->err_queue);
+ 		init_completion(&wq->wq_dead);
+ 		init_completion(&wq->wq_resurrect);
++		INIT_LIST_HEAD(&wq->quarantine);
+ 		wq->max_xfer_bytes = WQ_DEFAULT_MAX_XFER;
+ 		idxd_wq_set_max_batch_size(idxd->data->type, wq, WQ_DEFAULT_MAX_BATCH);
+ 		idxd_wq_set_init_max_sgl_size(idxd, wq);
+diff --git a/drivers/dma/idxd/irq.c b/drivers/dma/idxd/irq.c
+index acb901e59a00..6f58d33b7297 100644
+--- a/drivers/dma/idxd/irq.c
++++ b/drivers/dma/idxd/irq.c
+@@ -427,7 +427,8 @@ static void idxd_wqs_flush_descs(struct idxd_device *idxd)
+ 	for (i = 0; i < idxd->max_wqs; i++) {
+ 		struct idxd_wq *wq = idxd->wqs[i];
+ 
+-		idxd_wq_flush_descs(wq);
++		idxd_wq_flush_descs(wq, false);
++		idxd_wq_halt_release(wq);
+ 	}
+ }
+ 
 -- 
 2.43.0
 
