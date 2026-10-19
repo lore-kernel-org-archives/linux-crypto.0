@@ -1,48 +1,48 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9704A3D55
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 11:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3D849B5B4
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 11:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792408070; cv=none; b=qXSbBukn5xQGgtSpj+FZoRNGxmJTn3CVK6mkXEMVkUo/iUxM7HQsO3z/caByhZD8ul5f1ig7Ww9/JvOso5p2VP3teGE2BiSP+CMhDvnJeT5UOwKbhPw8wCaFCyRs/v/xU5RZUiopR3dOSLYTVB1t66uHjg3a5rnf9ZlpjppoCk8=
+	t=1792408074; cv=none; b=tDKGw8dZ004sj3IDRe7b489jxyxPm+eSgrd2s0F5J+u7AhjM0KFsOc5U9QZKLl1GR1lXHLSTCo7oKWKad6EdrvFhnT6AWbB4aCaKnIQlfIm6f/3ZAiK7dIp2OF6cydtThXYzeFnxhocCA/UmeJjc/CAGsW++D2MadCpiehWA+Wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792408070; c=relaxed/simple;
-	bh=m4rI8Ex3FZOpXU5eQ2JmBeHZTKaC2QzhRQ2pwsjdTjA=;
+	s=arc-20240116; t=1792408074; c=relaxed/simple;
+	bh=6W0kBwd4uaMe84EL+OPefNcI4PD4qddXTPXbMcrNO5I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FNkOqLV52rG3gwoIAWdrMXEpKxgaFfglndGbkv5hGU1UrzNytvPsiY0mAGEW6/LtiyhGa9fdg6skWQCF3xo1HLCH4f5lGN49oYBDuihz4BAOtSY3ckSuDBD/Gv/LtkcwRCbkStKhwY18wtg+WEPFx6ihLsDbGEYVHfZLssPV7LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FBM6HdCe; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=UrqeHnx0lAGRcHJcj7xS1mW4Lz9Al36EPYQ0HzeinIeG434UIkXg/O1hs9c1h6rn53c4Q1oxNCE7W1vAan1xtLCJ/QydtlrrZ5GtMlpJ+s+RL08vSnAsYLhxMSnvnrI30HUKW5NnIeedsGYStkDdQWqrlYPH87262kfVlPNLtPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fcVirRAD; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FBM6HdCe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fcVirRAD"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792408069; x=1823944069;
+  t=1792408072; x=1823944072;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=m4rI8Ex3FZOpXU5eQ2JmBeHZTKaC2QzhRQ2pwsjdTjA=;
-  b=FBM6HdCeVP1z4AaIDu9cOVTfdpo0yMjD2nWIpkRysVlKtHSGmTqYjT5g
-   MpGXnYkoeP+AkZAJhd/1Ana7sx1tjBa6xiegtLqUBtWyThaT7wS74GJ3q
-   dlrIn0V1/sPbCDzZkQs9mMTMjSvFZ1tY4KHnSNGYUeb2Uv9eQDV1a5RFa
-   dQ95iENik4AmgPRQukWK82quyIRXiqABwwkcHu6/XH5gXZAfPiW1TjgI2
-   XYOAw+HkfAFjicFM7pH38QmvF7MIhl/EbzD1/qACc1nOYJwxw3UVryXyQ
-   Jn3fQ7SM57ySMBp3zj7RbE3ehRuQ3O8Ow773PwlYBZDb/ig8mWndVtlg/
+  bh=6W0kBwd4uaMe84EL+OPefNcI4PD4qddXTPXbMcrNO5I=;
+  b=fcVirRADiOrNTfKoEnEqy1j8iDHL71uSudDr05WHBngGBRhErqu5j5Yy
+   eAsnN6Jz/WNIMk+wot1FV1IV0QRdUCzqrTCilJheJYkPIHnoUMBoN3amj
+   WrvqmgKT5aUPtBC9JbWa7XkLmmxVcGjpes3izm4EMFuWSH+pIGtIwxRh+
+   FeTqXsUGqy5lgbwn1gLG23QThEqII9QL3Lto7tJrSbEvmLvrYZ9wOWzVz
+   zxk+hEU57oFeTwZ7bbOgZbx07mjva3iwdaRFx6Afyu/EO3tyy+JfXgrCP
+   gaBs3B//K3lSP+ipvc7whhiWdQuISSHCY5cRDNIOkCFWXuWNBeqMer6yJ
    A==;
-X-CSE-ConnectionGUID: bnQDvE42RPio36utZjqBkg==
-X-CSE-MsgGUID: DiTG43XwTQW+EMaNQTVgaA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11939"; a="1088252"
+X-CSE-ConnectionGUID: qIzZSHceRqyHvP+z+3jQ8Q==
+X-CSE-MsgGUID: cQhfWF+mRwyChWv4v+9RYg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11939"; a="1088257"
 X-IronPort-AV: E=Sophos;i="6.27,167,1787036400"; 
-   d="scan'208";a="1088252"
+   d="scan'208";a="1088257"
 Received: from fmviesa012.fm.intel.com ([10.60.135.152])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 04:07:49 -0700
-X-CSE-ConnectionGUID: yeF2JfxiSHGTuGUvc7AxjA==
-X-CSE-MsgGUID: yz2roeEDRyq4Prgp7U9Dqw==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 04:07:52 -0700
+X-CSE-ConnectionGUID: Cvy55Z3uTLCgWHznIfIz6A==
+X-CSE-MsgGUID: Xvm1nrtaRZWFxR6g4mSUpQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,167,1787036400"; 
-   d="scan'208";a="4267862"
+   d="scan'208";a="4267872"
 Received: from indlpbc065983.iind.intel.com ([10.49.120.87])
-  by fmviesa012.fm.intel.com with ESMTP; 19 Oct 2026 04:07:47 -0700
+  by fmviesa012.fm.intel.com with ESMTP; 19 Oct 2026 04:07:50 -0700
 From: George Abraham P <george.abraham.p@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: linux-crypto@vger.kernel.org,
 	George Abraham P <george.abraham.p@intel.com>,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Ahsan Atta <ahsan.atta@intel.com>
-Subject: [PATCH 2/3] crypto: qat - fix rate limiting for QAT GEN6 wireless
-Date: Mon, 19 Oct 2026 16:33:55 +0530
-Message-Id: <20261019110356.3781949-3-george.abraham.p@intel.com>
+Subject: [PATCH 3/3] crypto: qat - fix telemetry command queue counts
+Date: Mon, 19 Oct 2026 16:33:56 +0530
+Message-Id: <20261019110356.3781949-4-george.abraham.p@intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20261019110356.3781949-1-george.abraham.p@intel.com>
 References: <20261019110356.3781949-1-george.abraham.p@intel.com>
@@ -64,159 +64,113 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rate limiting initializes QAT GEN6 wireless devices with the same
-parameters used for the default configuration. Wireless mode supports
-only the symmetric service, uses WCP (wireless ciphers) rather than CPH
-(cipher) slices and loads firmware objects from adf_wcy_fw_config
-instead of adf_default_fw_config. This results in incorrect rate
-limiting parameters: the symmetric slice count is taken from the CPH
-slices, and throughput limits are set for services that are not
-available. In addition, init_num_svc_aes() derives the symmetric accel
-engine count from adf_default_fw_config, where ADF_FW_CY_OBJ is loaded on
-a single accel engine group, instead of the two groups used by
-ADF_FW_WCY_OBJ in wireless mode, undercounting the AE cycle budget for
-symmetric SLAs.
+QAT GEN6 telemetry derives the number of command queues for each slice
+type by multiplying the slice count reported by firmware by a per-slice
+multiplier. However, the number of command queues for a slice type is
+fixed and does not scale with the number of slices. For example, WAT
+(wireless auth) and WCP (wireless cipher) slices have 18 command queues
+across four slices. In addition, the per-slice queue counts for the PKE
+(public key encryption), WAT, WCP, UCS (crypto) and ATH (auth) slices do
+not match the hardware (for example, PKE has 18 command queues, not 1).
+This results in an incorrect number of command queue counters being
+reported.
 
-Store the firmware-reported WCP slice count in rl_slice_cnt and use it
-as the symmetric slice count in wireless mode. In wireless mode, set
-only the symmetric maximum throughput, using a wireless-specific value,
-and compute the number of accel engines for the symmetric service with
-the new function init_num_wcy_svc_aes(). This looks up ADF_FW_WCY_OBJ in
-adf_wcy_fw_config and accumulates the ae_mask across all matching
-entries, since that object is loaded on two accel engine groups
-(ADF_AE_GROUP_0 and ADF_AE_GROUP_1).
+Replace the per-slice multipliers with the total number of command
+queues for each slice type, and report that count only when the
+corresponding slice type is present. Update the PKE, WAT, WCP, UCS and
+ATH queue count constants, rename the multiplier field in struct
+adf_tl_hw_data to cmdq_cnt, and fix the USC_QUEUE_COUNT typo to
+UCS_QUEUE_COUNT.
 
-Pass hw_data to adf_gen6_init_rl_data() so that it can detect wireless
-mode, and report zero slices for services other than symmetric in that
-mode.
-
-Fixes: 464da0bf19fd ("crypto: qat - add wireless mode support for QAT GEN6")
+Fixes: 3ed63344657a ("crypto: qat - add command queue telemetry counters for GEN6")
 Signed-off-by: George Abraham P <george.abraham.p@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
 ---
- .../intel/qat/qat_6xxx/adf_6xxx_hw_data.c     | 38 +++++++++++++++----
- .../intel/qat/qat_6xxx/adf_6xxx_hw_data.h     |  1 +
- drivers/crypto/intel/qat/qat_common/adf_rl.h  |  1 +
- .../intel/qat/qat_common/adf_rl_admin.c       |  1 +
- 4 files changed, 33 insertions(+), 8 deletions(-)
+ .../crypto/intel/qat/qat_common/adf_gen6_tl.c | 24 +++++++++----------
+ .../intel/qat/qat_common/adf_telemetry.c      | 14 +++++------
+ .../intel/qat/qat_common/adf_telemetry.h      |  2 +-
+ 3 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
-index ca9bc5dccf67..27c813d1c6c3 100644
---- a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
-@@ -573,6 +573,19 @@ static int adf_gen6_init_thd2arb_map(struct adf_accel_dev *accel_dev)
- 	return 0;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen6_tl.c b/drivers/crypto/intel/qat/qat_common/adf_gen6_tl.c
+index faa60b04c406..2e5d909a3e3e 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen6_tl.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen6_tl.c
+@@ -34,11 +34,11 @@
+ 
+ #define CPR_QUEUE_COUNT		5
+ #define DCPR_QUEUE_COUNT	3
+-#define PKE_QUEUE_COUNT		1
+-#define WAT_QUEUE_COUNT		7
+-#define WCP_QUEUE_COUNT		7
+-#define USC_QUEUE_COUNT		3
+-#define ATH_QUEUE_COUNT		2
++#define PKE_QUEUE_COUNT		18
++#define WAT_QUEUE_COUNT		18
++#define WCP_QUEUE_COUNT		18
++#define UCS_QUEUE_COUNT		6
++#define ATH_QUEUE_COUNT		8
+ 
+ /* Device level counters. */
+ static const struct adf_tl_dbg_counter dev_counters[] = {
+@@ -247,12 +247,12 @@ void adf_gen6_init_tl_data(struct adf_tl_hw_data *tl_data)
+ 	tl_data->num_rp_counters = ARRAY_SIZE(rp_counters);
+ 	tl_data->max_sl_cnt = ADF_GEN6_TL_MAX_SLICES_PER_TYPE;
+ 
+-	tl_data->multiplier.cpr_cnt = CPR_QUEUE_COUNT;
+-	tl_data->multiplier.dcpr_cnt = DCPR_QUEUE_COUNT;
+-	tl_data->multiplier.pke_cnt = PKE_QUEUE_COUNT;
+-	tl_data->multiplier.wat_cnt = WAT_QUEUE_COUNT;
+-	tl_data->multiplier.wcp_cnt = WCP_QUEUE_COUNT;
+-	tl_data->multiplier.ucs_cnt = USC_QUEUE_COUNT;
+-	tl_data->multiplier.ath_cnt = ATH_QUEUE_COUNT;
++	tl_data->cmdq_cnt.cpr_cnt = CPR_QUEUE_COUNT;
++	tl_data->cmdq_cnt.dcpr_cnt = DCPR_QUEUE_COUNT;
++	tl_data->cmdq_cnt.pke_cnt = PKE_QUEUE_COUNT;
++	tl_data->cmdq_cnt.wat_cnt = WAT_QUEUE_COUNT;
++	tl_data->cmdq_cnt.wcp_cnt = WCP_QUEUE_COUNT;
++	tl_data->cmdq_cnt.ucs_cnt = UCS_QUEUE_COUNT;
++	tl_data->cmdq_cnt.ath_cnt = ATH_QUEUE_COUNT;
+ }
+ EXPORT_SYMBOL_GPL(adf_gen6_init_tl_data);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_telemetry.c b/drivers/crypto/intel/qat/qat_common/adf_telemetry.c
+index 8c575113cbcd..44e26ea8cd7f 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_telemetry.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_telemetry.c
+@@ -219,13 +219,13 @@ static void adf_set_cmdq_cnt(struct adf_accel_dev *accel_dev,
+ 	slice_cnt = &accel_dev->telemetry->slice_cnt;
+ 	cmdq_cnt = &accel_dev->telemetry->cmdq_cnt;
+ 
+-	cmdq_cnt->cpr_cnt = slice_cnt->cpr_cnt * tl_data->multiplier.cpr_cnt;
+-	cmdq_cnt->dcpr_cnt = slice_cnt->dcpr_cnt * tl_data->multiplier.dcpr_cnt;
+-	cmdq_cnt->pke_cnt = slice_cnt->pke_cnt * tl_data->multiplier.pke_cnt;
+-	cmdq_cnt->wat_cnt = slice_cnt->wat_cnt * tl_data->multiplier.wat_cnt;
+-	cmdq_cnt->wcp_cnt = slice_cnt->wcp_cnt * tl_data->multiplier.wcp_cnt;
+-	cmdq_cnt->ucs_cnt = slice_cnt->ucs_cnt * tl_data->multiplier.ucs_cnt;
+-	cmdq_cnt->ath_cnt = slice_cnt->ath_cnt * tl_data->multiplier.ath_cnt;
++	cmdq_cnt->cpr_cnt = slice_cnt->cpr_cnt ? tl_data->cmdq_cnt.cpr_cnt : 0;
++	cmdq_cnt->dcpr_cnt = slice_cnt->dcpr_cnt ? tl_data->cmdq_cnt.dcpr_cnt : 0;
++	cmdq_cnt->pke_cnt = slice_cnt->pke_cnt ? tl_data->cmdq_cnt.pke_cnt : 0;
++	cmdq_cnt->wat_cnt = slice_cnt->wat_cnt ? tl_data->cmdq_cnt.wat_cnt : 0;
++	cmdq_cnt->wcp_cnt = slice_cnt->wcp_cnt ? tl_data->cmdq_cnt.wcp_cnt : 0;
++	cmdq_cnt->ucs_cnt = slice_cnt->ucs_cnt ? tl_data->cmdq_cnt.ucs_cnt : 0;
++	cmdq_cnt->ath_cnt = slice_cnt->ath_cnt ? tl_data->cmdq_cnt.ath_cnt : 0;
  }
  
-+static void init_num_wcy_svc_aes(struct adf_rl_hw_data *device_data)
-+{
-+	u32 ae_mask = 0;
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(adf_wcy_fw_config); i++) {
-+		if (adf_wcy_fw_config[i].obj == ADF_FW_WCY_OBJ)
-+			ae_mask |= adf_wcy_fw_config[i].ae_mask;
-+	}
-+
-+	device_data->svc_ae_mask[SVC_SYM] = hweight32(ae_mask);
-+}
-+
- static void init_num_svc_aes(struct adf_rl_hw_data *device_data)
- {
- 	enum adf_fw_objs obj_type, obj_iter;
-@@ -608,6 +621,9 @@ static u32 adf_gen6_get_svc_slice_cnt(struct adf_accel_dev *accel_dev,
- {
- 	struct adf_rl_hw_data *device_data = &accel_dev->hw_device->rl_data;
- 
-+	if (adf_6xxx_is_wcy(GET_HW_DATA(accel_dev)))
-+		return (svc == SVC_SYM) ? device_data->slices.wcp_cnt : 0;
-+
- 	switch (svc) {
- 	case SVC_SYM:
- 		return device_data->slices.cph_cnt;
-@@ -973,8 +989,10 @@ static void adf_gen6_init_kpt(struct adf_kpt_hw_data *kpt_data)
- 	kpt_data->user_input.swk_cnt_per_pasid = ADF_6XXX_KPT_DEFAULT_SWK_CNT_PER_PASID;
- }
- 
--static void adf_gen6_init_rl_data(struct adf_rl_hw_data *rl_data)
-+static void adf_gen6_init_rl_data(struct adf_hw_device_data *hw_data)
- {
-+	struct adf_rl_hw_data *rl_data = &hw_data->rl_data;
-+
- 	rl_data->pciout_tb_offset = ADF_GEN6_RL_TOKEN_PCIEOUT_BUCKET_OFFSET;
- 	rl_data->pciin_tb_offset = ADF_GEN6_RL_TOKEN_PCIEIN_BUCKET_OFFSET;
- 	rl_data->r2l_offset = ADF_GEN6_RL_R2L_OFFSET;
-@@ -982,14 +1000,18 @@ static void adf_gen6_init_rl_data(struct adf_rl_hw_data *rl_data)
- 	rl_data->c2s_offset = ADF_GEN6_RL_C2S_OFFSET;
- 	rl_data->pcie_scale_div = ADF_6XXX_RL_PCIE_SCALE_FACTOR_DIV;
- 	rl_data->pcie_scale_mul = ADF_6XXX_RL_PCIE_SCALE_FACTOR_MUL;
--	rl_data->max_tp[SVC_ASYM] = ADF_6XXX_RL_MAX_TP_ASYM;
--	rl_data->max_tp[SVC_SYM] = ADF_6XXX_RL_MAX_TP_SYM;
--	rl_data->max_tp[SVC_DC] = ADF_6XXX_RL_MAX_TP_DC;
--	rl_data->max_tp[SVC_DECOMP] = ADF_6XXX_RL_MAX_TP_DECOMP;
- 	rl_data->scan_interval = ADF_6XXX_RL_SCANS_PER_SEC;
- 	rl_data->scale_ref = ADF_6XXX_RL_SLICE_REF;
--
--	init_num_svc_aes(rl_data);
-+	if (adf_6xxx_is_wcy(hw_data)) {
-+		rl_data->max_tp[SVC_SYM] = ADF_6XXX_RL_MAX_TP_WCY_SYM;
-+		init_num_wcy_svc_aes(rl_data);
-+	} else {
-+		rl_data->max_tp[SVC_ASYM] = ADF_6XXX_RL_MAX_TP_ASYM;
-+		rl_data->max_tp[SVC_SYM] = ADF_6XXX_RL_MAX_TP_SYM;
-+		rl_data->max_tp[SVC_DC] = ADF_6XXX_RL_MAX_TP_DC;
-+		rl_data->max_tp[SVC_DECOMP] = ADF_6XXX_RL_MAX_TP_DECOMP;
-+		init_num_svc_aes(rl_data);
-+	}
- }
- 
- static void adf_gen6_init_services_supported(struct adf_hw_device_data *hw_data)
-@@ -1067,7 +1089,7 @@ void adf_init_hw_data_6xxx(struct adf_hw_device_data *hw_data)
- 	adf_gen6_init_vf_mig_ops(&hw_data->vfmig_ops);
- 	adf_gen6_init_ras_ops(&hw_data->ras_ops);
- 	adf_gen6_init_tl_data(&hw_data->tl_data);
--	adf_gen6_init_rl_data(&hw_data->rl_data);
-+	adf_gen6_init_rl_data(hw_data);
- 	adf_gen6_init_anti_rb(&hw_data->anti_rb_data);
- 	adf_gen6_init_kpt(&hw_data->kpt_data);
- }
-diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h
-index 2719ddbc1e05..2bce8a3b0fcc 100644
---- a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h
-+++ b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.h
-@@ -158,6 +158,7 @@
- #define ADF_6XXX_RL_SCANS_PER_SEC		954
- #define ADF_6XXX_RL_MAX_TP_ASYM			173750UL
- #define ADF_6XXX_RL_MAX_TP_SYM			95000UL
-+#define ADF_6XXX_RL_MAX_TP_WCY_SYM		61000UL
- #define ADF_6XXX_RL_MAX_TP_DC			40000UL
- #define ADF_6XXX_RL_MAX_TP_DECOMP		40000UL
- #define ADF_6XXX_RL_SLICE_REF			1000UL
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.h b/drivers/crypto/intel/qat/qat_common/adf_rl.h
-index c1f3f9a51195..c8620c72cc97 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_rl.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_rl.h
-@@ -69,6 +69,7 @@ struct rl_slice_cnt {
- 	u8 pke_cnt;
- 	u8 cph_cnt;
- 	u8 cpr_cnt;
-+	u8 wcp_cnt;
+ int adf_tl_run(struct adf_accel_dev *accel_dev, int state)
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_telemetry.h b/drivers/crypto/intel/qat/qat_common/adf_telemetry.h
+index 02d75c3c214a..96879d02c4fa 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_telemetry.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_telemetry.h
+@@ -44,7 +44,7 @@ struct adf_tl_hw_data {
+ 	u8 num_cmdq_counters;
+ 	u8 max_rp;
+ 	u8 max_sl_cnt;
+-	struct icp_qat_fw_init_admin_slice_cnt multiplier;
++	struct icp_qat_fw_init_admin_slice_cnt cmdq_cnt;
  };
  
- struct adf_rl_interface_data {
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl_admin.c b/drivers/crypto/intel/qat/qat_common/adf_rl_admin.c
-index 4a3e0591fdba..d2bb4cc95ecf 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_rl_admin.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_rl_admin.c
-@@ -64,6 +64,7 @@ int adf_rl_send_admin_init_msg(struct adf_accel_dev *accel_dev,
- 	/* For symmetric crypto, slice tokens are relative to the UCS slice */
- 	slices_int->cph_cnt = slices_resp.ucs_cnt;
- 	slices_int->cpr_cnt = slices_resp.cpr_cnt;
-+	slices_int->wcp_cnt = slices_resp.wcp_cnt;
- 
- 	return 0;
- }
+ struct adf_telemetry {
 -- 
 2.40.1
 
