@@ -1,66 +1,67 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1792422881;
-	b=lzgaGlk4RI82LYIrlofhD+0PUybyky0V3jibzWJLB5849AkRdYTmE57qhlT4A4WyV5xb
-	 kuOlSuewmIw3QcI2Kf0qWNdTa+NgwjWQ8ez6z8BkacXOACjL3MIQ3zxrnVlOUr8lgrWNP
-	 RfQR1lR3RpCaJVJqjmlHl+URCIDI9Ev6c9+RTc8SyEHvhM8Az02c+tPEASbxVCouai/+S
-	 a/viH9k9/CLI68Io4FGwt6Qto/k6x05VIbYjJ4LA0ECA6vkcGlJ79J49QDTmHQ9wN4/W4
-	 8k+KGwdYoBxJ1NgoDf8S7CiE0+lOGs4EU/3XsY+1PuzhMjr4Djki1L+fe9YJ4YDOJ2Q==
+	b=bc4eHX5SCDiuMGjV84l7OMYzh2VcKnIGXRqSiyhPzpI3+Eedpim8pzX21iWfUx/F7Qcb
+	 RGloAz5OW5W6pRPbdaKcBYhRdBAEylRmuUoHbPdtZRA7Zh7xIcO9hfonsRNRxxPncvz4X
+	 kI5V2qdcK3F2IHU+BSmHXD392sK5gT1ZteWnvMRJW706JqFM6j+a7qA7K8gwVI+EQLvx/
+	 FptWG3zTdAvh/q7VEr3C6kbBIoKXIkdEjc9ur6UW965NY+RZKLJTzsPlpgMAkr4Vplksx
+	 KOEUuPFzX+5dKhHx2NLeeoGkwPtJycCYvHk1oqyW7HKON99OlXjFvWPD6Ox/J3VhpVg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1792422881;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=4KPYc3E+o50lGpfkZzyN+iidtBIGIosti2i/oeYJMK4=;
-	b=fTynAKvjvlLbD5a6I8rcyPf2QWRa7cV0OMn8XjJ+S2V46kY+/2PX80xTi0ercuxL7Nhn
-	 jfSaPPBPmyXXrh+n1URA7c6DWR9C0Jp6vGqTNPwn8v6eeFzplhvnxf51t6CsVjecWfW7e
-	 NAkuwYTGITUAJOGOhXT6VjyJlnxedSwJL3qGO5S1jvf2FyLKlaWVQo6zEeceVXehoJarW
-	 QuvjkiRpQmK/fkTLdk+gTpNtSF/7A8JHz+y5b2hsh+Mxvq5F8G4/1HwdN23D+xqMWPOyD
-	 ted4/UY1GdTPnVNlgdHANNW4lAKFnBIZuh2t8wRvD237LhguQi6JXQmsXeEs5tl6cEA==
+	 X-CSE-MsgGUID:X-Ironport-Invalid-End-Of-Message:X-ExtLoop1:
+	 X-IronPort-AV:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=MQb8B/qhw+4yCI3Cj8R+lrtVqs8STV1i2INQuKnCvNw=;
+	b=0EhfHbKk18cIZDpB+Dnm54WrxFIaLmQf86sgRuGvaCjycoCs60yytX4KkhrUKhKQNAZ3
+	 +FD5ThRA7owWble/dk8+DtCXo0xeeWw5VxdJPEoIViL8mSyD8fmpnjgKLOyWzUMpYYCeJ
+	 Zq5s8KNQkRCgZHDoTRm6KsBkDyRlCz8PMQrn6R3LqcY9FfrIuob8DCXOapJHom4Vvn72d
+	 o/N8MmmRB+fE2rRlXemDDmYru3lAxQlyYBvuoGeNe1JdDkuwKO97LQ8rBOIsQiST+TBPF
+	 RGh6apuc+PAcEQgkVFLB4t7lTdeVnlFC0i9bAtXrJL2HHvaL+psB260T1CnNmN8c+hw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=T1el7Yp9;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=CC46qBE9;
 	arc=none smtp.remote-ip=198.175.65.12
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8259609CEE0;
-	Mon, 19 Oct 2026 15:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8259609CEE0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2458E609CEEA;
+	Mon, 19 Oct 2026 15:14:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2458E609CEEA
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=T1el7Yp9
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=CC46qBE9
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792422879; x=1823958879;
+  t=1792422882; x=1823958882;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dC5QT0uihgVJxiEcFO1l7zrA7kQg0kL1a85c3o260k0=;
-  b=T1el7Yp96xy2zHu/WGfKjLbN/zKZwFNfnmrYOgQyD6CJ63FtdSlUSjCv
-   mZ2d/iQjBXHt8gd9MiGLikV2QMi1+b5AoCULyiw5rUEPojkooN1KdXgYn
-   NNDbzkzhjiAv+rXvauLZo1gjjIvy+Yu5UPBqPdHAunbb+tIVMl/aZTcmL
-   evH5hIsT4VDgLx5X7B68UMa0huHWDAHAUsrMEGKviK9YnE5rnO+18h/xu
-   dOTCp0c3S3PzhipIazBhxsmDaQVN49VYT0LQKWxvZn23b/bdnP3n72LFB
-   CXoBdLdgwf4Bb8a1WJ6wAOQUTbyHGzXnoV9TllCh0BwzkOrjOJNhHbSWQ
-   A==;
-X-CSE-ConnectionGUID: 5d0MSqvDT1K3NPPPQxTQ9A==
-X-CSE-MsgGUID: taK4wTd3TPCeJao8Jfi27Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="986930"
+  bh=z0SkwW//ef7ZJBaFBPaI8edP8HDdXv5L0ptXLFoUlhA=;
+  b=CC46qBE90hvWXyDls/cD7sZtX1nDBEZzDiu1IfzRY2SDWrrI6HQvW46l
+   GznsHv2cXs5YUyTYVzNiSOjW5hkmweiIvQSg8fpDbbAE79otYhcppbJrq
+   V3HqfL+Q36wMJti9qrEOc6d+87FNjcorJEhY+VQoXKvkDXsvnxv7MH1In
+   +pZqkWPxkgvrcjJ1AWLnF8Tcex4SF8ko2UZFMSW1VI8KMUEyAqDZdG8Ah
+   ojKh0NRNJ4O90Ioe7oOlCHtK+BiwhLXdv9GhpAMxDiv9lyBzF2gBUxQjA
+   lq60KGjBzm/Y8GGr77dnc45Yt0nOgesx4M9+dUcjflZnpYu5LOCNu1o0/
+   g==;
+X-CSE-ConnectionGUID: jgmDl+l3SGq+yGwnXGQ8WQ==
+X-CSE-MsgGUID: JRqmPQ4DR0OLsLrOPgztqg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="986942"
 X-IronPort-AV: E=Sophos;i="6.27,167,1787036400"; 
-   d="scan'208";a="986930"
+   d="scan'208";a="986942"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
   by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 08:14:35 -0700
-X-CSE-ConnectionGUID: Wt6oS79eS4SSxZvP5G77OA==
-X-CSE-MsgGUID: B203IircSgSMji9YVuFFnQ==
+X-CSE-ConnectionGUID: GGDSOwEDQZ61D8gwWWlfYQ==
+X-CSE-MsgGUID: qXaD5L4/QjeN7C8PwD3kgA==
+X-Ironport-Invalid-End-Of-Message: True
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,167,1787036400"; 
-   d="scan'208";a="2536991"
+   d="scan'208";a="2537007"
 Received: from jf5300-15a101203tc.jf.intel.com (HELO meta-crater2c.jf.intel.com) ([10.54.113.49])
-  by orviesa003.jf.intel.com with ESMTP; 19 Oct 2026 08:14:34 -0700
+  by orviesa003.jf.intel.com with ESMTP; 19 Oct 2026 08:14:35 -0700
 From: Daniel Byrne <daniel1.byrne@intel.com>
 To: Vinod Koul <vkoul@kernel.org>,
 	Dave Jiang <dave.jiang@intel.com>
@@ -75,9 +76,9 @@ Cc: Fenghua Yu <fenghua.yu@intel.com>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH 13/17] dmaengine: idxd: fix the double free of a descriptor whose submission failed
-Date: Mon, 19 Oct 2026 08:06:26 -0700
-Message-ID: <20261019150630.4026341-14-daniel1.byrne@intel.com>
+Subject: [PATCH 17/17] dmaengine: idxd: run the interrupt-handle revoke under the queue lock
+Date: Mon, 19 Oct 2026 08:06:30 -0700
+Message-ID: <20261019150630.4026341-18-daniel1.byrne@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261019150630.4026341-1-daniel1.byrne@intel.com>
 References: <20261019150630.4026341-1-daniel1.byrne@intel.com>
@@ -92,222 +93,119 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-llist_abort_desc() marks the failed descriptor aborted before it
-searches the lists for it. When the interrupt thread has just taken the
-pending list into a private batch, the search misses it, the thread
-completes and frees the descriptor on seeing the mark, and the caller
-frees it again: sbitmap_queue_clear() then stores through the per-cpu
-hint of cpu -1, or clears the bit of the slot's next owner, and a thread
-that read the record before the mark puts the freed descriptor on the
-work list. This needs only interrupt-armed descriptors in flight on a
-shared queue whose ENQCMDS fails, as in a guest whose shared queue other
-guests keep full.
+The interrupt-handle revoke worker requests each new handle without
+wq_lock, so that a reset can end the request, and the queue may be
+unbound while it waits. It reads the queue's state without the lock,
+submits the drain after unlocking, and on a failed request quiesces the
+queue and completes the descriptors that carry the revoked handle
+outside the lock, so an unbind can unmap the portal under the drain, or
+free the descriptors, the allocator and the driver under the
+completions.
 
-Sort the pending list under the list lock in the thread, as the abort
-does, so a descriptor still waiting on the hardware is always on one of
-the lists the abort searches. The device never took a failed
-descriptor, so its record stays clear and nothing completes it before
-the abort has taken it off the lists; from then on it is the
-submitter's alone and needs no mark. The finished descriptors the abort
-takes off the pending list go to the work list for the interrupt thread,
-which the abort wakes, instead of being completed in the submitter's
-context.
+The unbind invalidates the handle in the same wq_lock hold that tears
+the queue down, so after the request the worker takes wq_lock and goes
+on only if the handle is still valid. The handle swap and the drain, or
+the quiesce and the completions after a failed request, then run in
+that hold. A queue a halt already killed and did not revive is left
+dead rather than revived behind the halt.
 
-Fixes: 6b4b87f2c31a ("dmaengine: idxd: fix submission race window")
-Cc: stable@vger.kernel.org # 5.14+
 Assisted-by: Claude:claude-opus-5
 Assisted-by: Claude:claude-opus-5-5
 Assisted-by: Claude:claude-fable-5-1
 Signed-off-by: Daniel Byrne <daniel1.byrne@intel.com>
 ---
- drivers/dma/idxd/irq.c    | 63 ++++++++++++++++++++++-----------------
- drivers/dma/idxd/submit.c | 48 +++++++++++++++--------------
- 2 files changed, 62 insertions(+), 49 deletions(-)
+ drivers/dma/idxd/irq.c | 45 +++++++++++++++++++++++++++++++-----------
+ 1 file changed, 33 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/dma/idxd/irq.c b/drivers/dma/idxd/irq.c
-index e48f7c307ceb..1ec3d360eea8 100644
+index 4517a09fcf1b..8217698056bb 100644
 --- a/drivers/dma/idxd/irq.c
 +++ b/drivers/dma/idxd/irq.c
-@@ -651,31 +651,39 @@ static void irq_process_pending_llist(struct idxd_irq_entry *irq_entry)
- {
- 	struct idxd_desc *desc, *t;
+@@ -115,6 +115,11 @@ static void idxd_abort_invalid_int_handle_descs(struct idxd_irq_entry *ie)
+ 	struct idxd_desc *d, *t;
  	struct llist_node *head;
-+	LIST_HEAD(flist);
- 
--	head = llist_del_all(&irq_entry->pending_llist);
--	if (!head)
-+	if (llist_empty(&irq_entry->pending_llist))
- 		return;
  
 +	/*
-+	 * Sort under the list lock, as the submit abort does. A descriptor
-+	 * still waiting on the hardware reaches the work list within the
-+	 * same hold, so the abort of a failed submission, which searches
-+	 * both lists under the lock, always finds its own descriptor.
++	 * An unbind frees the descriptors and the allocator under
++	 * wq_lock, so they are completed under it as well.
 +	 */
-+	spin_lock(&irq_entry->list_lock);
-+	head = llist_del_all(&irq_entry->pending_llist);
- 	llist_for_each_entry_safe(desc, t, head, llnode) {
- 		u8 status = desc->completion->status & DSA_COMP_STATUS_MASK;
++	lockdep_assert_held(&ie_to_wq(ie)->wq_lock);
+ 	spin_lock(&ie->list_lock);
+ 	head = llist_del_all(&ie->pending_llist);
+ 	if (head) {
+@@ -142,6 +147,7 @@ static void idxd_int_handle_revoke(struct work_struct *work)
+ 	struct pci_dev *pdev = idxd->pdev;
+ 	struct device *dev = &pdev->dev;
+ 	int i, new_handle, rc;
++	bool killed;
  
--		if (status) {
--			/*
--			 * Check against the original status as ABORT is software defined
--			 * and 0xff, which DSA_COMP_STATUS_MASK can mask out.
--			 */
--			if (unlikely(desc->completion->status == IDXD_COMP_DESC_ABORT)) {
--				idxd_desc_complete(desc, IDXD_COMPLETE_ABORT, true);
--				continue;
--			}
-+		if (status)
-+			list_add_tail(&desc->list, &flist);
-+		else
-+			list_add_tail(&desc->list, &irq_entry->work_list);
-+	}
-+	spin_unlock(&irq_entry->list_lock);
+ 	if (!idxd->request_int_handles) {
+ 		kfree(revoke);
+@@ -166,15 +172,31 @@ static void idxd_int_handle_revoke(struct work_struct *work)
+ 			continue;
  
-+	list_for_each_entry_safe(desc, t, &flist, list) {
-+		list_del(&desc->list);
+ 		rc = idxd_device_request_int_handle(idxd, i, &new_handle, IDXD_IRQ_MSIX);
+-		if (rc < 0) {
++		if (rc < 0)
+ 			dev_warn(dev, "get int handle %d failed: %d\n", i, rc);
++
 +		/*
-+		 * Check against the original status as ABORT is software
-+		 * defined and 0xff, which DSA_COMP_STATUS_MASK can mask out.
++		 * The request runs without wq_lock, so that a reset can end
++		 * it, and the queue may have been unbound meanwhile. An
++		 * unbind invalidates the handle in the same wq_lock hold
++		 * that unmaps the portal and frees the descriptors, so a
++		 * handle still valid under the lock means that the queue
++		 * still has its portal, its descriptors and its completion
++		 * handler. Everything below, the drain included, stays in
++		 * this hold.
 +		 */
-+		if (unlikely(desc->completion->status == IDXD_COMP_DESC_ABORT))
-+			idxd_desc_complete(desc, IDXD_COMPLETE_ABORT, true);
-+		else
- 			idxd_desc_complete(desc, IDXD_COMPLETE_NORMAL, true);
--		} else {
--			spin_lock(&irq_entry->list_lock);
--			list_add_tail(&desc->list,
--				      &irq_entry->work_list);
--			spin_unlock(&irq_entry->list_lock);
--		}
- 	}
- }
- 
-@@ -727,18 +735,19 @@ irqreturn_t idxd_wq_thread(int irq, void *data)
- 	 * submmiter adds all the submitted descriptor after sending it to
- 	 * the workqueue. It's a lockless singly linked list. The work_list
- 	 * is the common linux double linked list. We are in a scenario of
--	 * multiple producers and a single consumer. The producers are all
--	 * the kernel submitters of descriptors, and the consumer is the
--	 * kernel irq handler thread for the msix vector when using threaded
--	 * irq. To work with the restrictions of llist to remain lockless,
--	 * we are doing the following steps:
-+	 * multiple producers and several consumers. The producers are all
-+	 * the kernel submitters of descriptors, and they add to the llist
-+	 * without a lock. The consumers are the kernel irq handler thread
-+	 * for the msix vector when using threaded irq, the abort of a
-+	 * failed submission, the interrupt handle abort and the flushes,
-+	 * and each empties the llist under the list lock. The thread does
-+	 * so in these steps:
- 	 * 1. Iterate through the work_list and process any completed
- 	 *    descriptor. Delete the completed entries during iteration.
--	 * 2. llist_del_all() from the pending list.
--	 * 3. Iterate through the llist that was deleted from the pending list
--	 *    and process the completed entries.
--	 * 4. If the entry is still waiting on hardware, list_add_tail() to
--	 *    the work_list.
-+	 * 2. Under the list lock, llist_del_all() from the pending list and
-+	 *    move each entry still waiting on hardware to the work_list and
-+	 *    each completed one to a private list.
-+	 * 3. Process the entries of the private list outside the lock.
- 	 */
- 	irq_process_work_list(irq_entry);
- 	irq_process_pending_llist(irq_entry);
-diff --git a/drivers/dma/idxd/submit.c b/drivers/dma/idxd/submit.c
-index 26dce0179d30..5806b1b74a2f 100644
---- a/drivers/dma/idxd/submit.c
-+++ b/drivers/dma/idxd/submit.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright(c) 2019 Intel Corporation. All rights rsvd. */
- #include <linux/init.h>
-+#include <linux/interrupt.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/pci.h>
-@@ -92,12 +93,6 @@ static struct idxd_desc *list_abort_desc(struct idxd_wq *wq, struct idxd_irq_ent
++		guard(mutex)(&wq->wq_lock);
++		if (ie->int_handle == INVALID_INT_HANDLE)
++			continue;
++
++		if (rc < 0) {
+ 			/*
+ 			 * Failed to acquire new interrupt handle. Kill the WQ
+ 			 * and release all the pending submitters. The submitters will
+ 			 * get error return code and handle appropriately.
+ 			 */
+ 			ie->int_handle = INVALID_INT_HANDLE;
+-			idxd_wq_quiesce(wq);
++			__idxd_wq_quiesce(wq);
+ 			idxd_abort_invalid_int_handle_descs(ie);
+ 			continue;
  		}
- 	}
- 
--	/*
--	 * At this point, the desc needs to be aborted is held by the completion
--	 * handler where it has taken it off the pending list but has not added to the
--	 * work list. It will be cleaned up by the interrupt handler when it sees the
--	 * IDXD_COMP_DESC_ABORT for completion status.
--	 */
- 	return NULL;
- }
- 
-@@ -106,9 +101,8 @@ static void llist_abort_desc(struct idxd_wq *wq, struct idxd_irq_entry *ie,
- {
- 	struct idxd_desc *d, *t, *found = NULL;
- 	struct llist_node *head;
--	LIST_HEAD(flist);
-+	bool wake = false;
- 
--	desc->completion->status = IDXD_COMP_DESC_ABORT;
- 	/*
- 	 * Grab the list lock so it will block the irq thread handler. This allows the
- 	 * abort code to locate the descriptor need to be aborted.
-@@ -122,10 +116,15 @@ static void llist_abort_desc(struct idxd_wq *wq, struct idxd_irq_entry *ie,
- 				continue;
- 			}
- 
-+			/*
-+			 * A finished descriptor goes on the work list for
-+			 * the interrupt thread, as one still in flight does,
-+			 * rather than being completed in the submitter's
-+			 * context.
-+			 */
- 			if (d->completion->status)
--				list_add_tail(&d->list, &flist);
--			else
--				list_add_tail(&d->list, &ie->work_list);
-+				wake = true;
-+			list_add_tail(&d->list, &ie->work_list);
+@@ -193,21 +215,20 @@ static void idxd_int_handle_revoke(struct work_struct *work)
+ 			continue;
  		}
- 	}
  
-@@ -133,21 +132,26 @@ static void llist_abort_desc(struct idxd_wq *wq, struct idxd_irq_entry *ie,
- 		found = list_abort_desc(wq, ie, desc);
- 	spin_unlock(&ie->list_lock);
+-		mutex_lock(&wq->wq_lock);
+-		reinit_completion(&wq->wq_resurrect);
+-
+-		/* Kill percpu_ref to pause additional descriptor submissions */
+-		percpu_ref_kill(&wq->wq_active);
+-
+-		/* Wait for all submitters quiesce before we change interrupt handle */
+-		wait_for_completion(&wq->wq_dead);
++		/*
++		 * Kill percpu_ref to pause additional descriptor submissions
++		 * and wait for all submitters to quiesce before we change
++		 * the interrupt handle. A queue a halt already killed and did
++		 * not revive is left dead.
++		 */
++		killed = idxd_wq_kill(wq);
  
--	if (found)
--		idxd_dma_complete_txd(found, IDXD_COMPLETE_ABORT, false,
--				      NULL, NULL);
-+	/*
-+	 * Their interrupts may have run the thread before they reached the
-+	 * work list, so it is woken again.
-+	 */
-+	if (wake)
-+		irq_wake_thread(ie->vector, ie);
+ 		ie->int_handle = new_handle;
  
- 	/*
--	 * completing the descriptor will return desc to allocator and
--	 * the desc can be acquired by a different process and the
--	 * desc->list can be modified.  Delete desc from list so the
--	 * list traversing does not get corrupted by the other process.
-+	 * The device never took the descriptor, so its record is still
-+	 * clear. The interrupt thread and another submitter's abort sort
-+	 * the lists under the list lock and leave one with a clear record
-+	 * on a list, so the search finds the descriptor, and once off the
-+	 * lists it is the submitter's alone. Marking it aborted before
-+	 * that would let another context that saw the mark on a list
-+	 * complete and free it, and the caller frees it as well.
- 	 */
--	list_for_each_entry_safe(d, t, &flist, list) {
--		list_del_init(&d->list);
--		idxd_dma_complete_txd(d, IDXD_COMPLETE_ABORT, true,
-+	WARN_ON_ONCE(!found);
-+	if (found)
-+		idxd_dma_complete_txd(desc, IDXD_COMPLETE_ABORT, false,
- 				      NULL, NULL);
--	}
- }
+ 		/* Revive percpu ref and wake up all the waiting submitters */
+-		percpu_ref_reinit(&wq->wq_active);
++		if (killed)
++			percpu_ref_reinit(&wq->wq_active);
+ 		complete_all(&wq->wq_resurrect);
+-		mutex_unlock(&wq->wq_lock);
  
- /*
+ 		/*
+ 		 * The delay here is to wait for all possible MOVDIR64B that
 -- 
 2.43.0
 
