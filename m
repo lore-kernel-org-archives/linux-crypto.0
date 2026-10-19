@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF6A5A681A;
-	Mon, 19 Oct 2026 13:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3C95013C5;
+	Mon, 19 Oct 2026 14:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418391; cv=none; b=aB+5M1e6unP2Ubnjbr5ypIbs7z7oZWUA6Tb0vVsGXr5tXZeXsqf+6ZGSLvuyMhpa8BU6xc+RdJMww0xRg79M6CDnhGjPMe74AlV9VB4TVJAfQ+y1vbGAw6PoYUEl7W8CKFR3WYVhYPiKTWLEkl2b/exjNM4yCk9QVkps51tkOEw=
+	t=1792418564; cv=none; b=M4clttfVdel4hzROTGEaZJJ1HLiEYpuH6UFhTSKzTc31Xa56uxokuUFgA1jhyx+epHTHvznC0jHfLKpWAxqKRcPIcbA/A0jwyGOurVkvUoQAZg07Aky8inePZJCVMyzK3J3Q/Vr7qXq6xwPfMV2H7zjcnzHG0QM3/wI6JbAsPeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418391; c=relaxed/simple;
-	bh=u8b9xUyqKxWbcf/9Z/3MgRdZdFL4wustq9U22fd38SA=;
+	s=arc-20240116; t=1792418564; c=relaxed/simple;
+	bh=4POMTHIBvXg/SOR+I7AJ8SqBO6G/q9XaINZnLi7s2r8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bKtxBGJ2boewyBaYvpFrb+fSv+P1H7mLoPUzRjqS9ooyboqpiCRKG2MSRdQJL7HUFXwDD0oRx4lUF7luUIl20H5yfk0JS5zryrq1gtczngjzwW5vPh2uc2SYkbXEUKBFLLCx4WZ1eR7AZ3Xa3ydE0ApmCabiS0LySzeT7TOjYAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hYOo4EAF; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=VcqMCK+NhZsb+m+Xdugs06T+4LyFfN2iugJDA7t4B+eO+OjzFtQLQtRygniPL4rs5cPn3qdtu8Y7eRkbXA5mVcLROjFrK9NnwjPmYonGorlKoXu/UWAltdk2dz1go69rza3ALf2Q4mp06H07hr+nfCrXWHLoHfKmDS5VdWRhgk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NjwnI7Tc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hYOo4EAF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE3A41F000CB;
-	Mon, 19 Oct 2026 13:59:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NjwnI7Tc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 894ED1F000C6;
+	Mon, 19 Oct 2026 14:02:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418388;
-	bh=lJo+3unty6q0nZ5U5gtEIutsiG4UGZp9XR9qE1PIJDw=;
+	s=k20260515; t=1792418562;
+	bh=Bu9DY7uZLrLR+Lg00GYJm3JAD91N7dPD8oGSr501Bqg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=hYOo4EAFyGjZHQLJaiRQkDeSayexw8kV8UKAMpW/QWriW1W6rM32WopfhY/5HNbq2
-	 MKO64dmoZYZuaoDgtHOTtRA1Pw79SB7PHxUUeDmKAYnG3ha3A9s+xZQO+7mFd5f39r
-	 Z1K48FQ7O/jkIv6umoNLgQJXa+UR6OGGSwYqImj0Pw2Y3SVAYQkMx0lYbRHELYdwD+
-	 xizS5TpRV/Y4863JLfu/nCBobiVkxfi34xoeG0nACVn9QreYgORwtfvgxtemtaM2E0
-	 EPnwVEvhgUHqqn2QgUi4Ftq1MRNXP4mdrlaV3YivPTEp+ZFx+fGiJWS2iEYMalN8gj
-	 GIuQwpJUa03lQ==
+	b=NjwnI7TcgPZGLjmBUM/0e/ASPPp49tO16upUy1A7fmEOf56lKkqzu3w7O0GtDHi5C
+	 aESiGmGmRrbiHWkcCSIv7K/J1D1YTPtEfuAu1uKgav+6BdUqILJZSGFVBHbSlqsqa1
+	 KUnQjLSBdjKFM4hBehpIWS8pmP3i3RXHeSSfBFGvaouH7e4JPE6E622+xSHp2LjpwE
+	 tzBGHtoP78IhJTZ1vVbKcHSuUMKFy6xPRf783QmHQsC9xQfGZ+aXbCxha2lCcIKWqU
+	 ymKKs9uD9teIczPvXKy8CgOTWsv5if84aw8zsE+99Mf2Jg1RghR+t3T/4XCafH0CqD
+	 v1sNbyUarhcUg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
+Cc: "David C.C.M. Gall" <david.ccm.gall@googlemail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
-	prabhjot.khurana@intel.com,
 	davem@davemloft.net,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.1] crypto: keembay - add missing MODULE_DEVICE_TABLE()
-Date: Mon, 19 Oct 2026 09:48:25 -0400
-Message-ID: <20261019135441.1420968-214-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.6] crypto: keembay - use crypto_memneq() to compare GCM AEAD tags
+Date: Mon, 19 Oct 2026 09:50:27 -0400
+Message-ID: <20261019135441.1420968-336-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -54,270 +53,334 @@ X-stable-base: Linux 6.18.57
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+From: "David C.C.M. Gall" <david.ccm.gall@googlemail.com>
 
-[ Upstream commit b73b71df4cb4ca241165ad31218c82dfe489147c ]
+[ Upstream commit 353b3a85136f2a0cf3e872acf8ad6c1dec0b7a8e ]
 
-The driver has an OF match table wired to .of_match_table, but does
-not export the table with MODULE_DEVICE_TABLE().
+Use crypto_memneq() for constant-time comparison.
 
-Add the missing MODULE_DEVICE_TABLE(of, ...) entry so module alias
-information is generated for OF based module autoloading.
+The GCM path in keembay-ocs-aes-core.c verifes the received
+authentication tag with memcmp(), which returns early on the first
+mismatched byte. This leaks valid-prefix length and allows for valid
+tag forgery which violates the INT-CTXT guarantee of AEAD.
 
-This is a source-level fix.  It does not claim dynamic hardware
-reproduction; the evidence is the driver-owned match table, its use by
-the platform driver, and the missing module alias publication.
-
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Assisted-by: gregkh_clanker_t1000
+Signed-off-by: David C.C.M. Gall <david.ccm.gall@googlemail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Local tree
-
-This checkout is **v7.3-rc4** (`7.3.0-rc4`, `git describe`:
-`v7.3-rc4-27-gf0100363d8c37`). The candidate is `b73b71df4cb4c`
-(`crypto: keembay - add missing MODULE_DEVICE_TABLE()`). The Keem Bay
-OCS ECC driver is present here. The verdict is for this tree’s lineage:
-does this one-line autoload fix meet stable rules given that the driver
-and the missing alias exist in this code.
+This is a 3-line constant-time tag compare for Keem Bay GCM decrypt. The
+local tree is **6.12.111** (`pending-6.12`, `p-6.12-3-gc504cf0baa3d8`).
+The buggy `memcmp()` is present; the candidate is not.
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
 **Step 1.1: PARSE THE SUBJECT LINE**
-Record: **[crypto: keembay] [add] [missing MODULE_DEVICE_TABLE() for OF
-module autoload]**
+
+Record: `[crypto: keembay] [use] [replace memcmp with crypto_memneq for
+GCM AEAD tag compare]`
+
+- Subsystem: `crypto: keembay` (Intel Keem Bay OCS AES driver)
+- Action verb: **use** (the body is a security fix: constant-time
+  compare)
+- Intent: stop early-exit `memcmp()` from leaking valid-tag prefix
+  length
 
 **Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
+
 Record:
-- No `Fixes:` tag (expected for this review)
-- No `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-by:`, `Link:`,
-  or `Cc: stable@vger.kernel.org`
-- `Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>` (author)
-- `Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>` (crypto
-  maintainer; applied the patch)
-- Ignore pipeline `Signed-off-by: Sasha Levin` / `[Upstream commit ...]`
-  if present; they are not in this git object
+- **Fixes:** none (expected)
+- **Reported-by:** none
+- **Tested-by:** none
+- **Reviewed-by:** none
+- **Acked-by:** none
+- **Link:** none
+- **Cc: stable:** none (expected)
+- **Assisted-by:** gregkh_clanker_t1000
+- **Signed-off-by:** David C.C.M. Gall `<david.ccm.gall@googlemail.com>`
+  (author)
+- **Signed-off-by:** Herbert Xu `<herbert@gondor.apana.org.au>` (crypto
+  maintainer, applied it)
+
+SHA: `353b3a85136f2a0cf3e872acf8ad6c1dec0b7a8e`
+AuthorDate: 2026-08-07. No syzbot, no multi-reporter pattern.
 
 **Step 1.3: ANALYZE THE COMMIT BODY TEXT**
+
 Record:
-- **Bug:** `kmb_ocs_ecc_of_match[]` is wired to `.of_match_table` but
-  not exported with `MODULE_DEVICE_TABLE(of, ...)`.
-- **Symptom:** OF `modules.alias` entries are not generated, so
-  udev/kmod will not autoload `keembay-ocs-ecc` from the DT compatible
-  `intel,keembay-ocs-ecc`.
+- **Bug:** GCM decrypt checks the received auth tag with `memcmp()`,
+  which returns on the first mismatch.
+- **Symptom/failure mode:** timing leak of matching-prefix length; that
+  leak can be used to forge a valid tag and break AEAD **INT-CTXT**
+  (integrity of ciphertext).
 - **Version info:** none in the message.
-- **Root cause:** missing module-alias publication for an existing match
-  table. Author states this is a source-level finding, not a live
-  hardware repro.
+- **Root cause (author):** non-constant-time compare of `in_tag` vs
+  `out_tag`.
 
 **Step 1.4: DETECT HIDDEN BUG FIXES**
-Record: Not disguised cleanup. It is an explicit autoload/enablement
-fix. Same class as adding a device ID for modular builds.
+
+Record: Not hidden. It is an explicit crypto security fix (timing side
+channel / AEAD integrity), even without the word “fix” in the subject.
 
 ---
 
 ## PHASE 2: DIFF ANALYSIS
 
 **Step 2.1: INVENTORY THE CHANGES**
+
 Record:
-- File: `drivers/crypto/intel/keembay/keembay-ocs-ecc.c` — **+1 / −0**
-- Function/scope: file-scope `kmb_ocs_ecc_of_match[]` (no function body
-  change)
-- Classification: **single-file surgical fix**
+- File: `drivers/crypto/intel/keembay/keembay-ocs-aes-core.c` (+2 / −1)
+- Functions: `#include` plus `kmb_ocs_aead_run()`
+- Scope: single-file surgical fix
 
 **Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
+
 Record:
-- **Before:** match table exists and is used for bind-time matching if
-  the driver is already loaded (built-in, or loaded some other way).
-- **After:** `modpost`/`file2alias` also emit `of:` aliases from that
-  table, so DT device appearance can load the module.
-- Path affected: **module autoload / init**, not the probe runtime path.
+- **Include hunk:** adds `#include <crypto/utils.h>` (declares
+  `crypto_memneq()`).
+- **Compare hunk (GCM decrypt only):** after `ocs_aes_gcm_op()`, if
+  `rctx->instruction == OCS_DECRYPT`:
+  - Before: `rc = memcmp(rctx->in_tag, rctx->out_tag, tag_size) ?
+    -EBADMSG : 0;`
+  - After: `rc = crypto_memneq(rctx->in_tag, rctx->out_tag, tag_size) ?
+    -EBADMSG : 0;`
+- Encrypt path, CCM path, and DMA cleanup are unchanged.
 
 **Step 2.3: IDENTIFY THE BUG MECHANISM**
+
 Record:
-- Category: **hardware enablement / missing device-ID publication** (OF
-  module aliases)
-- Mechanism: without `MODULE_DEVICE_TABLE`, `scripts/mod/file2alias.c`
-  does not emit aliases for `intel,keembay-ocs-ecc`. Built-in still
-  binds; **`CONFIG_CRYPTO_DEV_KEEMBAY_OCS_ECC=m` does not autoload from
-  DT**.
-- Confirmed in `include/linux/module.h`: `MODULE_DEVICE_TABLE` creates
-  the alias symbol `file2alias` scans.
+- **Category:** cryptographic timing / logic correctness (not UAF, leak,
+  race).
+- **Mechanism:** `memcmp()` is not constant-time. `crypto_memneq()` is
+  (`lib/crypto/memneq.c`, `noinline`). Both treat 0 as equal, so
+  `-EBADMSG` vs `0` is unchanged; only timing changes.
+
+CCM still uses `memcmp()` in `ocs-aes.c:ccm_compare_tag_to_yr()`; that
+is a sibling patch (`ff2ac77a034e0`), not a dependency of this one.
 
 **Step 2.4: ASSESS THE FIX QUALITY**
+
 Record:
-- Obviously correct: one standard macro next to the existing table,
-  matching sibling Keem Bay drivers (AES, HCU).
-- Minimal; no locking, no API, no data-structure change.
-- Regression risk: **very low**. Macro is a no-op for built-in; for
-  modules it only adds aliases.
+- Obviously correct: one-for-one substitution with the API crypto
+  drivers already use for MAC/tag compares (`talitos`, `nx`, `atmel-
+  aes`, `stm32-cryp`, etc. in this tree).
+- Minimal; no API/data-structure change.
+- Regression risk: very low. Return mapping matches. `crypto_memneq` is
+  slightly slower by design (no early exit); that is the fix.
 
 ---
 
 ## PHASE 3: GIT HISTORY INVESTIGATION
 
 **Step 3.1: BLAME THE CHANGED LINES**
+
 Record:
-- Match table introduced in **`c9f608c380090`** (“crypto: keembay-ocs-
-  ecc - Add Keem Bay OCS ECC Driver”, Prabhjot Khurana, 2021-10-20).
-- `git merge-base --is-ancestor c9f608c380090 v5.16` succeeded → first
-  appeared in **v5.16**.
-- Bug: table never had `MODULE_DEVICE_TABLE` until `b73b71df4cb4c`
-  (2026-07-13). Long-lived.
+- Introduced in `88574332451380f4b51f6ca88ab9810e714bfb9b` (“crypto:
+  keembay - Add support for Keem Bay OCS AES/SM4”), 2020-12-11, Mike
+  Healy.
+- Original hunk: `rc = memcmp(rctx->in_tag, rctx->out_tag, tag_size) ?`
+- Present since **v5.11** (`git merge-base --is-ancestor` vs `v5.10`
+  fails, vs `v5.11` succeeds). Long-standing, not recent.
 
 **Step 3.2: FOLLOW THE FIXES: TAG**
-Record: No `Fixes:` tag. Introducer is `c9f608c380090`, ancestor of
-HEAD.
+
+Record: No `Fixes:` tag. Functionally this fixes the original driver
+commit `8857433245138`, which **is** an ancestor of this 6.12 HEAD.
 
 **Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
-Record:
-- `86c85d6657e47` (2024-08-24): **“crypto: keembay - fix module
-  autoloading”** — same fix for HCU (`MODULE_DEVICE_TABLE(of,
-  kmb_ocs_hcu_of_match)`).
-- `0a94091e29f91`: same publication for OCS AES/SM4.
-- `fbf31dd599875` (v6.4-rc1): moved driver to
-  `drivers/crypto/intel/keembay/`.
-- Standalone one-liner; not patch N/M.
+
+Record (this tree, that file): OF alias, IRQ completion init, AEAD
+unregister count, platform-remove conversion, crypto_engine_op,
+prepare/unprepare removal, path move. None of those change the GCM
+`memcmp`. Standalone vs the CCM sibling (patch 2/2, different file).
 
 **Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
-Record: Pengpeng Hou is a regular contributor of
-missing-`MODULE_DEVICE_TABLE` and validation fixes (ixp4xx crypto,
-several RTC/vdpa/watchdog/hwmon drivers). Not the Keem Bay maintainer.
-Crypto maintainer Herbert Xu applied it.
+
+Record: David C.C.M. Gall is not the keembay maintainer. On `crypto-
+next` the same author has a batch of `crypto_memneq` conversions:
+keembay GCM, keembay CCM, sa2ul, octeontx, octeontx2, ccree. Crypto
+maintainer Herbert Xu applied this one.
 
 **Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
-Record: None. Uses existing `of_device_id` table and
-`MODULE_DEVICE_TABLE`. Applies standalone on this tree.
+
+Record:
+- Needs `crypto_memneq` / `crypto/utils.h` — both exist here
+  (`include/crypto/utils.h`, `lib/crypto/memneq.c`).
+- `crypto/internal/aead.h` already includes `crypto/algapi.h` →
+  `crypto/utils.h`, so the extra include is redundant but matches
+  mainline and is harmless.
+- No prerequisite series beyond this one hunk. `git apply --check` of
+  `353b3a85136f2` succeeded on this tree.
 
 ---
 
 ## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 
 **Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
+
 Record:
-- `b4 dig -c b73b71df4cb4c` →
-  https://patch.msgid.link/20260704124609.16628-1-pengpeng@iscas.ac.cn
-- `b4 dig -a`: **v1 only**; committed version is that v1.
-- Thread (mbox): Herbert Xu: **“Patch applied. Thanks.”** No NAK, no
-  requested changes, no `Cc: stable` from reviewers.
-- Direct lore HTTP fetch returned 403/Anubis; discussion recovered via
-  `b4 dig -m`.
+- `b4 dig -c 353b3a85136f2`:
+  https://patch.msgid.link/anYEQOzunX0Lm3N1@david.gall
+- `b4 dig -a`: single revision, **v1** `[PATCH 1/2]`. No v2/v3.
+- Saved thread `/tmp/keembay-gcm-memneq.mbox` (2 messages).
+- Herbert Xu (2026-08-15): “All applied. Thanks.” No NAK, no review
+  nits, **no Cc: stable**.
+- Direct lore WebFetch returned 403; discussion taken from the b4 mbox.
 
 **Step 4.2: CHECK WHO REVIEWED THE PATCH**
-Record (`b4 dig -w`): To/Cc included Prabhjot Khurana, Mark Gross,
-**Herbert Xu**, David S. Miller, `linux-crypto@`, `linux-kernel@`.
-Maintainer applied it. No extra Reviewed-by on the commit.
+
+Record (`b4 dig -w`): To/Cc Herbert Xu, David S. Miller, linux-crypto,
+linux-kernel, gregkh@linuxfoundation.org. Subsystem maintainer was
+included and applied the patch. No Reviewed-by tags.
 
 **Step 4.3: SEARCH FOR THE BUG REPORT**
-Record: No Reported-by / bugzilla / syzbot. Author calls it a source-
-level finding. No user crash report found.
+
+Record: No Reported-by, no syzbot, no bugzilla. Issue is from code
+review / known `memcmp`-vs-MAC pattern, not a user crash report.
 
 **Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
-Record: Same-day sibling `1e5004d5a3a80` (“crypto: ixp4xx - add missing
-MODULE_DEVICE_TABLE()”), same commit-message template. Systematic scan,
-still a real missing-alias bug.
+
+Record: Series is 2/2. Patch 2 is CCM `memcmp` in `ocs-aes.c`.
+Independent of this GCM change. Same pattern as historical stable-bound
+fixes:
+- `79960943fdc11` crypto: talitos - Fix timing leak in ESP ICV
+  verification (`Cc: stable`)
+- `cb8affb55c7e6` crypto: nx - Fix timing leak in GCM and CCM decryption
+  (`Cc: stable`)
+
+Both are already ancestors of this 6.12 HEAD.
 
 **Step 4.5: CHECK STABLE MAILING LIST HISTORY**
-Record: **UNVERIFIED** for lore.kernel.org/stable (Anubis bot-wall). No
-in-tree evidence this was rejected for stable.
+
+Record: lore.kernel.org/stable WebFetch returned 403. **UNVERIFIED**
+whether anyone already asked for this on stable@. Original crypto thread
+has no stable nomination.
 
 ---
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
+No semcode MCP tools. Used grep + file reads.
+
 **Step 5.1: IDENTIFY KEY FUNCTIONS**
-Record: No function body changed. Touches `kmb_ocs_ecc_of_match[]` used
-by `kmb_ocs_ecc_driver` (`module_platform_driver`).
+
+Record: `kmb_ocs_aead_run()` (only runtime change).
 
 **Step 5.2: TRACE CALLERS**
-Record: `kmb_ocs_ecc_probe()` is the platform `.probe`. Called by the
-platform bus when a device matches `intel,keembay-ocs-ecc`. Autoload is
-the missing step before probe for `=m`.
+
+Record:
+- `kmb_ocs_aes_aead_do_one_request()` → `kmb_ocs_aead_run()`
+- Engine op `.do_one_request` for `gcm(aes)`, `ccm(aes)`, `gcm(sm4)`,
+  `ccm(sm4)`
+- Encrypt/decrypt entry: `kmb_ocs_aes_gcm_decrypt` /
+  `kmb_ocs_sm4_gcm_decrypt` → `kmb_ocs_aead_common()` →
+  `crypto_transfer_aead_request_to_engine()`
+- CCM returns before the changed lines; only GCM decrypt hits
+  `memcmp`/`crypto_memneq`.
 
 **Step 5.3: TRACE CALLEES**
-Record: Probe ioremaps, requests IRQ, starts `crypto_engine`, registers
-ECDH P-256/P-384. Unchanged.
+
+Record: After `ocs_aes_gcm_op()`, compare tags, then
+`kmb_ocs_aead_dma_cleanup()`. No extra alloc/lock from this hunk.
 
 **Step 5.4: FOLLOW THE CALL CHAIN**
-Record: Reachable when `ARCH_KEEMBAY` (or `COMPILE_TEST`) and
-`CRYPTO_DEV_KEEMBAY_OCS_ECC=m`, and DT has `intel,keembay-ocs-ecc`.
-Kconfig: “Say Y or M if you are compiling for the Intel Keem Bay SoC.”
-In-tree DTS (`arch/arm64/boot/dts/intel/`) has **no** `ocs-ecc` node
-(only the binding example). Hardware is still a real SoC (`ARCH_KEEMBAY`
-in `arch/arm64/Kconfig.platforms`). Userspace does not trigger this via
-a generic syscall; DT device + modular driver does.
+
+Record:
+- Registered as `gcm(aes)` / `gcm(sm4)` with priority 350.
+- `CRYPTO_ALG_KERN_DRIVER_ONLY` means HW accel not via a userspace ISA;
+  it is **not** `CRYPTO_ALG_INTERNAL`. `af_alg.c` allows that flag, so
+  AF_ALG can still select the driver.
+- Also used by in-kernel AEAD (IPsec, TLS, etc.) when this HW is chosen.
+- Path is reachable whenever Keem Bay OCS AES is enabled and GCM decrypt
+  runs.
 
 **Step 5.5: SEARCH FOR SIMILAR PATTERNS**
-Record: Same omission later fixed in HCU (`86c85d6657e47`) and AES
-(`0a94091e29f91`). This is the remaining ECC sibling.
+
+Record: Remaining `memcmp` in this driver is CCM (`ocs-aes.c:1285`),
+sibling commit. Other HW AEAD drivers in this tree already use
+`crypto_memneq`.
 
 ---
 
 ## PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
 
 **Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
-Record: **Yes.** File and `kmb_ocs_ecc_of_match[]` are here. Pre-fix
-parent of `b73b71df4cb4c` had the table and `.of_match_table` assignment
-with no `MODULE_DEVICE_TABLE`. Introduced v5.16; this tree is 7.3-rc4.
-`git merge-base --is-ancestor b73b71df4cb4c HEAD` is true (landed by
-7.3-rc1). That does not make the fix unworthy of stable; it confirms the
-driver/bug lived in this lineage.
+
+Record: **Yes.** `drivers/crypto/intel/keembay/keembay-ocs-aes-
+core.c:922` still has `memcmp(rctx->in_tag, rctx->out_tag, tag_size)`.
+Introduced v5.11; present in 6.12. Candidate is **not** an ancestor of
+HEAD (`git merge-base --is-ancestor 353b3a85136f2 HEAD` failed).
+Kconfig: `CRYPTO_DEV_KEEMBAY_OCS_AES_SM4` depends on `ARCH_KEEMBAY ||
+COMPILE_TEST`. `ARCH_KEEMBAY` exists (`arch/arm64/Kconfig.platforms`).
 
 **Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
-Record: **Clean apply** on this tree (already applied as +1 line). Older
-stables before `fbf31dd599875` use `drivers/crypto/keembay/`; that is a
-path tweak only, not a semantic dependency for this checkout.
+
+Record: **Clean apply.** Surrounding GCM decrypt block matches the
+patch. `crypto/utils.h` exists.
 
 **Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
-Record: HCU and AES already publish OF aliases. No alternate ECC
-autoload fix besides this commit. Driver also has
-`MODULE_ALIAS_CRYPTO("ecdh-nist-p256")` etc., which can load the module
-on crypto-API request, **not** on DT device appearance.
+
+Record: No keembay `crypto_memneq` commit in this tree. GCM `memcmp`
+still there.
 
 ---
 
 ## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
 
 **Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
-Record: `drivers/crypto/intel/keembay/` — SoC crypto accelerator.
-**PERIPHERAL** (Keem Bay / Movidius only), but an existing in-tree
-driver, not staging.
+
+Record:
+- Subsystem: `drivers/crypto/intel/keembay` (platform crypto
+  accelerator)
+- Criticality: **PERIPHERAL** for most 6.12 users (Keem Bay / Movidius
+  SoC only), but the bug is a real AEAD integrity issue for those users.
 
 **Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
-Record: Moderate churn (crypto_engine API, remove-callback, directory
-move). Match table itself unchanged since 2021 except this alias line.
-Maintainer: Prabhjot Khurana; applied by Herbert Xu.
+
+Record: Mature driver (2020). Recent 6.12 commits are small
+correctness/build items, not a rewrite of GCM tag handling.
 
 ---
 
 ## PHASE 8: IMPACT AND RISK ASSESSMENT
 
 **Step 8.1: DETERMINE WHO IS AFFECTED**
-Record: **platform-specific / config-specific** —
-`CRYPTO_DEV_KEEMBAY_OCS_ECC=m` on Keem Bay with a DT node for OCS ECC.
+
+Record: Driver/platform-specific:
+`CONFIG_CRYPTO_DEV_KEEMBAY_OCS_AES_SM4` on Keem Bay, GCM(AES/SM4)
+decrypt on that HW.
 
 **Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
-Record: Boot/enumeration when the OF device is created and the driver is
-a module. Not a race. Unprivileged users do not trigger it directly.
-Common on that SoC if the node exists; rare globally.
+
+Record: Every successful GCM decrypt on this engine compares tags.
+Trigger is ordinary decrypt, not a rare error path. Unprivileged users
+can hit it via AF_ALG or via kernel users of `gcm(aes)`. Practical
+exploitation needs timing measurement (local is realistic; remote is
+harder). The integrity guarantee is still broken even if remote exploit
+is hard.
 
 **Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
-Record: Hardware crypto module does not autoload from DT; ECDH offload
-missing until manual `modprobe` or a crypto-alias load. Not
-panic/UAF/corruption. **MEDIUM** functional/enablement (stable’s “device
-ID” class).
+
+Record:
+- Failure: timing leak of valid-tag prefix → tag forgery → **INT-CTXT**
+  failure (forged ciphertext accepted).
+- Severity: **HIGH** (crypto/security). Not a panic/deadlock. Same class
+  historically sent to stable (talitos/nx).
 
 **Step 8.4: CALCULATE RISK-BENEFIT RATIO**
+
 Record:
-- **Benefit:** modular Keem Bay ECC actually binds at device discovery.
-  Same class as device-ID additions.
-- **Risk:** very low (one macro).
-- **Ratio:** favorable.
+- **Benefit:** restores AEAD integrity for Keem Bay GCM users on 6.12
+  LTS.
+- **Risk:** very low (3 lines, equivalent control flow, well-used
+  helper).
+- **Ratio:** benefit > risk. Niche HW lowers population, not the
+  correctness of backporting a tiny security fix.
 
 ---
 
@@ -325,108 +388,135 @@ Record:
 
 **Step 9.1: COMPILE THE EVIDENCE**
 
-FOR:
-- Real modular autoload bug: OF match table present, aliases not
-  published.
-- Official stable rules: *“fix a real bug that bothers people **or just
-  add a device ID**.”* This is publishing an existing OF ID for modules.
-- User-prompt exception: new/missing device IDs and hardware enablement
-  on an existing driver.
-- +1 line, obviously correct, maintainer-applied, v1 unchanged.
-- Same fix already used on sibling HCU/AES drivers.
-- Driver has been in this lineage since v5.16; no missing prerequisites
-  in this tree.
+**FOR backporting:**
+- Real AEAD security bug (non-constant-time tag compare / INT-CTXT).
+- Buggy `memcmp` is in this 6.12 tree since the v5.11 driver.
+- 3-line, obviously correct, applies cleanly.
+- `crypto_memneq` already in tree; same pattern used by other drivers
+  here.
+- Crypto maintainer applied it; historical sibling timing-leak fixes
+  were stable-bound.
+- No new API/feature.
 
-AGAINST:
-- No user/syzbot report; author says source-level only.
-- Niche SoC; no in-tree DTS node for this compatible.
-- `MODULE_ALIAS_CRYPTO` can still load the module on algorithm request.
-- Not a crash, leak, or security bug.
+**AGAINST:**
+- Peripheral SoC (`ARCH_KEEMBAY`), small user base.
+- No user/syzbot report, no CVE, no `Cc: stable`.
+- AI-assisted; no Tested-by/Reviewed-by besides maintainer apply.
+- CCM `memcmp` remains until the sibling patch (this GCM fix is still
+  complete on its own).
 
-UNRESOLVED:
-- Stable-list discussion (lore blocked).
-- Whether out-of-tree Keem Bay DTs include `intel,keembay-ocs-ecc`.
+**UNRESOLVED:**
+- Stable@ search 403 (whether anyone already nominated this).
+- No public measurement of exploitability on this SoC (generic
+  `memcmp`-MAC analysis still holds).
 
 **Step 9.2: APPLY THE STABLE RULES CHECKLIST**
-1. Obviously correct and tested? **PASS** — standard macro; applied by
-   Herbert Xu.
-2. Fixes a real bug that affects users? **PASS** — modular OF autoload
-   does not work; device-ID equivalent.
-3. Important issue? **PASS** under the device-ID / hardware-enablement
-   exception (not a panic).
-4. Small and contained? **PASS** — 1 line, 1 file.
-5. No new features or APIs? **PASS**.
-6. Can apply to the local tree? **PASS** — file and table exist; applies
-   as a single insertion.
+
+1. Obviously correct and tested? **PASS** — one helper swap; maintainer
+   applied; helper is the standard MAC compare. No extra runtime test
+   tags.
+2. Fixes a real bug that affects users? **PASS** — GCM decrypt on this
+   HW uses `memcmp` today.
+3. Important issue? **PASS** — AEAD integrity / timing side channel
+   (HIGH), not a crash.
+4. Small and contained? **PASS** — 3 lines, one file, one function.
+5. No new features or APIs? **PASS**
+6. Can apply to the local tree? **PASS** — `git apply --check`
+   succeeded.
 
 **Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
-Record: **Device ID / module-alias publication for an existing driver.**
+
+Record: Not a device-ID/quirk/DT/build/docs exception. Qualifies as a
+small security correctness fix.
 
 **Step 9.4: MAKE YOUR DECISION**
-This is a one-line, obviously correct enablement fix: the driver already
-matches `intel,keembay-ocs-ecc`, but modular builds never advertised
-that ID to userspace. That is the same class of change stable already
-takes for PCI/USB/OF IDs. Risk is negligible. This 7.3-rc4 tree contains
-the driver and the historical bug; the patch is appropriate to carry on
-this lineage’s stable trees.
 
-### What the commit solves
-Without `MODULE_DEVICE_TABLE(of, kmb_ocs_ecc_of_match)`, `modpost` does
-not emit OF aliases, so a modular `keembay-ocs-ecc` will not autoload
-when the DT device appears. Built-in still works. The fix only publishes
-the existing match table.
+The patch closes a real INT-CTXT hole with a 3-line, clean apply on this
+6.12 tree. Niche hardware is not a reason to leave a known AEAD tag-
+timing bug in LTS.
+
+### What it solves for this tree
+Keem Bay OCS GCM decrypt still uses early-exit `memcmp` on the auth tag.
+That leaks how much of the tag matched and can be used to forge tags.
+Replacing it with `crypto_memneq()` makes the compare constant-time
+without changing success/failure semantics.
 
 ### Risk vs benefit
-Benefit is hardware actually probing on modular Keem Bay systems. Risk
-is a compile-time alias with no runtime logic change.
+Benefit is restoring AEAD integrity for that decrypt path. Risk is
+negligible: same branch structure, established helper, no locking or API
+change.
 
-### Concerns
-Niche platform; no crash report. That does not disqualify a device-ID-
-class one-liner. No functional dependencies.
+---
 
 Verification:
-- [Phase 1] `git log -1 --format='%B' b73b71df4cb4c`: tags as listed; no
-  Fixes/Reported-by/Cc: stable
-- [Phase 2] `git show b73b71df4cb4c`: +1 line `MODULE_DEVICE_TABLE(of,
-  kmb_ocs_ecc_of_match)`
-- [Phase 2] `include/linux/module.h` and `scripts/mod/file2alias.c`:
-  alias generation confirmed
-- [Phase 3] `git blame` on match table: introducer `c9f608c380090`; `git
-  merge-base --is-ancestor c9f608c380090 v5.16` succeeded
-- [Phase 3] Sibling fixes `86c85d6657e47` (HCU) and `0a94091e29f91`
-  (AES) confirmed
-- [Phase 4] `b4 dig -c/-a/-w/-m`: v1 lore URL; Herbert “Patch applied.
-  Thanks.”; crypto list + original Intel authors
-- [Phase 4] lore HTTP: 403/Anubis — UNVERIFIED via WebFetch/curl
-- [Phase 5] Probe at `kmb_ocs_ecc_probe`; grep found no in-tree DTS
-  using `intel,keembay-ocs-ecc`
-- [Phase 6] `git describe HEAD` → v7.3-rc4-27-gf0100363d8c37; `make
-  kernelversion` → 7.3.0-rc4; pre-fix parent lacks the macro; driver
-  present
-- [Phase 6] `git merge-base --is-ancestor b73b71df4cb4c HEAD` succeeded
-- [Phase 7] Kconfig `CRYPTO_DEV_KEEMBAY_OCS_ECC` depends on
-  `ARCH_KEEMBAY || COMPILE_TEST`
-- [Phase 8] Failure mode: missing module autoload, not oops
-- UNVERIFIED: stable@ mailing-list discussion; live hardware
-  reproduction (author did not claim one)
+- [Phase 1] Parsed tags: Assisted-by gregkh_clanker_t1000; SOBs Gall +
+  Herbert Xu; no Fixes/Reported-by/Cc:stable
+- [Phase 1] SHA `353b3a85136f2a0cf3e872acf8ad6c1dec0b7a8e` on crypto-
+  next; not ancestor of HEAD
+- [Phase 2] Diff: +`crypto/utils.h`, `memcmp` → `crypto_memneq` in
+  `kmb_ocs_aead_run()` GCM decrypt
+- [Phase 2] Confirmed remaining CCM `memcmp` in `ocs-aes.c:1285` is
+  sibling `ff2ac77a034e0`, not required here
+- [Phase 2] `crypto_memneq` returns 0 equal / 1 unequal — same ternary
+  as `memcmp`
+- [Phase 3] `git blame`: memcmp from `8857433245138` (2020-12-11); in
+  tree since v5.11
+- [Phase 3] `git merge-base --is-ancestor 8857433245138 HEAD` succeeded
+- [Phase 3] `git apply --check` of the candidate on this tree: success
+- [Phase 3] Author’s related commits on crypto-next: keembay CCM, sa2ul,
+  octeontx, ccree memneq conversions
+- [Phase 4] `b4 dig -c`:
+  https://patch.msgid.link/anYEQOzunX0Lm3N1@david.gall
+- [Phase 4] `b4 dig -a`: v1 only, `[PATCH 1/2]`
+- [Phase 4] `b4 dig -w`: Herbert Xu, davem, linux-crypto, gregkh CC’d
+- [Phase 4] mbox: Herbert “All applied. Thanks.”; no NAK, no stable
+  nomination
+- [Phase 4] Direct lore/stable WebFetch: 403 — UNVERIFIED for stable@
+  archive
+- [Phase 4] Historical same-class fixes `79960943fdc11` (talitos) and
+  `cb8affb55c7e6` (nx) have `Cc: stable` and are in this tree
+- [Phase 5] Call chain: `kmb_ocs_aes_gcm_decrypt` →
+  `kmb_ocs_aead_common` → engine → `kmb_ocs_aes_aead_do_one_request` →
+  `kmb_ocs_aead_run`
+- [Phase 5] Algs: `gcm(aes)`/`gcm(sm4)` priority 350; `KERN_DRIVER_ONLY`
+  is not INTERNAL; AF_ALG allows that flag
+- [Phase 6] `git describe HEAD`: `p-6.12-3-gc504cf0baa3d8`; `make
+  kernelversion`: 6.12.111
+- [Phase 6] Line 922 still `memcmp(...)` in this checkout
+- [Phase 6] `include/crypto/utils.h` and `lib/crypto/memneq.c` present
+- [Phase 7] Kconfig `depends on ARCH_KEEMBAY || COMPILE_TEST`;
+  `ARCH_KEEMBAY` in arm64 Kconfig.platforms
+- [Phase 8] Failure mode: AEAD tag timing leak / possible tag forgery,
+  severity HIGH
+- UNVERIFIED: exploit practicality on Keem Bay specifically; whether
+  stable@ already discussed this commit
 
 **YES**
 
- drivers/crypto/intel/keembay/keembay-ocs-ecc.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/intel/keembay/keembay-ocs-aes-core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/intel/keembay/keembay-ocs-ecc.c b/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-index 59308926399d0..f31b5ae73f664 100644
---- a/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-+++ b/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-@@ -987,6 +987,7 @@ static const struct of_device_id kmb_ocs_ecc_of_match[] = {
- 	},
- 	{}
- };
-+MODULE_DEVICE_TABLE(of, kmb_ocs_ecc_of_match);
+diff --git a/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c b/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
+index 419f88af1031b..c4fd5e1849cdf 100644
+--- a/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
++++ b/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
+@@ -11,6 +11,7 @@
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
++#include <crypto/utils.h>
+ #include <linux/clk.h>
+ #include <linux/completion.h>
+ #include <linux/dma-mapping.h>
+@@ -919,7 +920,7 @@ static int kmb_ocs_aead_run(struct aead_request *req)
  
- /* The OCS driver is a platform device. */
- static struct platform_driver kmb_ocs_ecc_driver = {
+ 	/* For GCM decrypt, we have to compare in_tag with out_tag. */
+ 	if (rctx->instruction == OCS_DECRYPT) {
+-		rc = memcmp(rctx->in_tag, rctx->out_tag, tag_size) ?
++		rc = crypto_memneq(rctx->in_tag, rctx->out_tag, tag_size) ?
+ 		     -EBADMSG : 0;
+ 		goto exit;
+ 	}
 -- 
 2.53.0
 
