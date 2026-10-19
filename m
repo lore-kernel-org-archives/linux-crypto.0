@@ -1,64 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792422880;
-	b=PnQU7vqQH9PfOx/Cxe8ZPb7d1vAxLW+Lb87YaEWGifmBd6pOy+AHya2nF8s32G6/XtNd
-	 cCMB8CANfdvTJl3k4kVMzHWKQ4MLIyJBfjck++ruu+i6C5nbMJbh/2oVudbrSgzr1SnrQ
-	 l97Sjc6Q1URrN91Ufwp5e6xPexdKu1+ms6LLYy3lcO7XFrI06bKmTeSE1/z3nT4SBBiIp
-	 ExfREQqQBbA0I7DRplFbxH1/8b8z6sSomPCa2D1o/X1OuY+TuVIKZ6Of+v/4BSFhPh2LT
-	 13wfdGkS5URV5LPYY2VljDOdUCpfurGsv2OK/4287fsL4SZuaUAmnhH7scdK9pK3ciQ==
+	t=1792422878;
+	b=Tsf+n352ZH5Xm0ZbaJxUKvTmmB8SXm5cfIgT5hU60P29Yu8ZYMQS2H9N9ncqTGGbKFn5
+	 k6F1yfVZL57eGLuDWDaotSnBdPPYK0Tn1852JZ2Qg8n4CNvXhN3ei1G/XUrFj8oDUYtlX
+	 goeqXP3QeRiQ6bhOvto1mmZu9X9WT1ZXe51SQmpTqlMBAGiu79r7U8f8TZpQlK8OmOdQA
+	 hSu2vVJeLSgTFwmE6QYZiRSQE0S3VhBQaABzVC4a0R6xlRbj08iico72Z2bQvJFdn1Bue
+	 X9mxhlH7tYKra/id+M1FXX9wmCX91qjUWThZ6OcYzXScjMLrVn5tRBt1xgJ2GK90THA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792422880;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792422878;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
 	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=dIby/7eEgxDKQXQ2aHnI10S7wEmYaOf/FtXew4LHqHg=;
-	b=h/j+VLxMgNgJJNLilHirZcyqMPTWYthtiWSR/zEYMi2bfZg9jH0nGxdqOXzkGYBOQ38u
-	 1znDWgP40+ioejXtbA5XivgtlIRw88zWsX18skfgjA3miSnsISFfBd3nYo4QbYy7rYGP5
-	 +9WgX2nswinUdLEBJ1ZNieMRfxCqhwUdggMYLRWl5GIhYqQTDSnkA/KDCWpmdsgsJVh1u
-	 6YHAEzzoO/pt/yUI1HOT2KvpBUUu58ubCfTxFppY+vyEf7dd1S7r7KWGEwxBWYDslittY
-	 DLjnbl91vHUU5aU5g2S4TsXuL+DkOI5/UhLWn82tG+ZUeIftXvn+EKCVKn+w3pYzfBw==
+	bh=zcxxhcXJhcDcXdtYXJYhKWLsPyE/epxBeluTCvmeyJs=;
+	b=Y5qsxw3+NnSNgqJAH/5Qab+ZzZV44Hm9KE4WOSiy3Vvb5LQK4Bed1GOEtwjC5BxJXcx2
+	 fsLrzvdm9IoyZ3HtwuO9l/ReOz/EdmnkkxeFweDmoKnZibNhopGQm8d7OYaIKsPoXEnEz
+	 NaBC3bVRxGg+S2EVUT0O2NwSRe80VhgZs6HpZKoXGWIiU6sbhjPmALmTIlnoLrdYMlVhY
+	 GwbJJRNFrzoZAi7k2+EE6xGplisR01pPMq5g8GnxGM+CnZF/Lat7zES+SlZELv++dVlFd
+	 /vKxKrcwApUTEZMmRJn1L+vDeCr037/gyNYDi6hh6LKqUP5WldIfjJOtvR0r2u78XHg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Dw8TrsLf;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=FTNa7F+3;
 	arc=none smtp.remote-ip=198.175.65.12
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3EB609CED6;
-	Mon, 19 Oct 2026 15:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1A3EB609CED6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38CF609CEDC;
+	Mon, 19 Oct 2026 15:14:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F38CF609CEDC
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=Dw8TrsLf
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=FTNa7F+3
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792422879; x=1823958879;
+  t=1792422877; x=1823958877;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4YYmbMdv7rYBDlF6wNMCrgGAGvSKvKeBSWDj6XsK8PQ=;
-  b=Dw8TrsLf8vG9cG9e5Sq+X24Vp7HLTQMx1WbFUC6CK/nDHrixemkDJn0a
-   bfelpUF8n7x239ch2XnCpEmZyeUa7J/WKWGqWkoKJrIa2j6mApxNZ4sOb
-   GDFWmoBqpvknar6jI9WZBry0rlx7IE74H1pc9U4M4yjOt2DS6bqHGMsJ+
-   I6uL9bgmEFGC7jL+WCThslVrBmVtozzcoL2LOR+/yjRD3jTRwI0bL5eyg
-   PkejdLKEaGw55kvd8sVeyUxM7an6NN0CCcgXhmtLztPS/HBwpjVYOo9HK
-   EYzoe6jw3edyWOPjIBqL1tG9yxvh7QbVzWAoKgdiIS16jtBqJnzBkpmLH
-   Q==;
-X-CSE-ConnectionGUID: zX2t05orTamcRp9GLqjE4Q==
-X-CSE-MsgGUID: hYFBaDwpQzicDHdTyfTckQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="986924"
+  bh=dVDIQXlh36GTlWUkVsVPgEltTI3U6SNtoUvGqwX6zp4=;
+  b=FTNa7F+3Thxjs7PDfvEnV41SzX+RVq3m9TXx6Xl5deh28iNx3rrP34Cf
+   4o3NHuj5+8y56dU1awobBo4Qbk3hbko/hJCgXEXr7omYt4fv/1xm33J9q
+   qTIVCs//8RK6EL7SLrD6nQinadx2eAMB8bRGHwqhgWWPdsPoWuMliX03I
+   eEtWgx47LXuv5OPH9Xep0L97fyvQJT6TjWwVv7Jib5Mpz4TQ7oQG7YR9H
+   AM2imyzMuyXjOYtTwJLmQgQQpUQgsDiO5JJlLovkoZSFuAKo2rVJl5Npb
+   Difbn569uuOdMZByKgl8nHkv78t4CblR/+alZ5jo68OPVuXlBC5hzrxvH
+   w==;
+X-CSE-ConnectionGUID: F9d/7HK3TgqLCy23lezjYg==
+X-CSE-MsgGUID: 6VhEIeI6S2u45YX7sWft6Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11940"; a="986915"
 X-IronPort-AV: E=Sophos;i="6.27,167,1787036400"; 
-   d="scan'208";a="986924"
+   d="scan'208";a="986915"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
   by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2026 08:14:34 -0700
-X-CSE-ConnectionGUID: Twz+9YbeRxGoGQDIFINOnQ==
-X-CSE-MsgGUID: j8K7LmVvQROaVMgXqdtCWw==
+X-CSE-ConnectionGUID: dpwFed42TMyNI1Kh/zPkSA==
+X-CSE-MsgGUID: A4zHIWydTZGvmJiNotbxZA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,167,1787036400"; 
-   d="scan'208";a="2536981"
+   d="scan'208";a="2536970"
 Received: from jf5300-15a101203tc.jf.intel.com (HELO meta-crater2c.jf.intel.com) ([10.54.113.49])
   by orviesa003.jf.intel.com with ESMTP; 19 Oct 2026 08:14:34 -0700
 From: Daniel Byrne <daniel1.byrne@intel.com>
@@ -75,9 +75,9 @@ Cc: Fenghua Yu <fenghua.yu@intel.com>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH 11/17] dmaengine: idxd: disable the device before its work queues are unregistered
-Date: Mon, 19 Oct 2026 08:06:24 -0700
-Message-ID: <20261019150630.4026341-12-daniel1.byrne@intel.com>
+Subject: [PATCH 08/17] dmaengine: idxd: compare the device disable status code whole
+Date: Mon, 19 Oct 2026 08:06:21 -0700
+Message-ID: <20261019150630.4026341-9-daniel1.byrne@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261019150630.4026341-1-daniel1.byrne@intel.com>
 References: <20261019150630.4026341-1-daniel1.byrne@intel.com>
@@ -92,67 +92,48 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-idxd_remove() unregisters the work queues, and with them their
-software state, before idxd_shutdown() disables the device. The
-sub-driver's remove leaves the device enabled when a device command has
-timed out, and a late completion can clear that fail-fast state at any
-time, so the disable in idxd_shutdown() may be the one that runs. It
-then clears the software state of queues that no longer exist.
+idxd_device_disable() accepts the command's status when it is success
+or when `status & IDXD_CMDSTS_ERR_DIS_DEV_EN` is non-zero. The error
+code is a value, not a bit mask, so that test accepts every code that
+has bit 0 or bits 4-5 set, and IDXD_CMDSTS_HW_ERR (0x3), the code a
+refused or timed-out command reports, is one of them. A disable that
+the device refused then read as a device already disabled, after which
+the device-level remove cleared the software state and freed memory
+that the still-enabled device writes.
 
-Disable the device right after the sub-driver is unbound, while the
-queues still exist. Mark the device disabled once bus mastering is off,
-so that nothing reached through the device reads it as enabled, and do
-so before the reference taken for the cleanup is dropped: that
-reference is the last one, and its release frees the device.
+Compare the error code whole against the already-disabled code.
 
+Fixes: bfe1d56091c1 ("dmaengine: idxd: Init and probe for Intel data accelerators")
 Assisted-by: Claude:claude-opus-5-5
 Assisted-by: Claude:claude-fable-5-1
 Signed-off-by: Daniel Byrne <daniel1.byrne@intel.com>
 ---
- drivers/dma/idxd/init.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ drivers/dma/idxd/device.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
-index c4319ac27bfb..a037a6e76362 100644
---- a/drivers/dma/idxd/init.c
-+++ b/drivers/dma/idxd/init.c
-@@ -1296,6 +1296,13 @@ static void idxd_remove(struct pci_dev *pdev)
- 	 * that driver while the queues still exist.
- 	 */
- 	device_release_driver(idxd_confdev(idxd));
-+	/*
-+	 * Disable the device while the queues still exist too. The
-+	 * sub-driver's remove leaves the device enabled when a command has
-+	 * timed out, a late completion can clear that state at any time,
-+	 * and the disable below then clears the queues' software state.
-+	 */
-+	idxd_shutdown(pdev);
- 	idxd_unregister_devices(idxd);
- 	/*
- 	 * When ->release() is called for the idxd->conf_dev, it frees all
-@@ -1305,15 +1312,20 @@ static void idxd_remove(struct pci_dev *pdev)
- 	 */
- 	get_device(idxd_confdev(idxd));
- 	device_unregister(idxd_confdev(idxd));
--	idxd_shutdown(pdev);
- 	idxd_device_remove_debugfs(idxd);
- 	perfmon_pmu_remove(idxd);
- 	idxd_cleanup_interrupts(idxd);
- 	if (device_pasid_enabled(idxd))
- 		idxd_disable_system_pasid(idxd);
- 	pci_iounmap(pdev, idxd->reg_base);
--	put_device(idxd_confdev(idxd));
- 	pci_disable_device(pdev);
-+	/*
-+	 * Bus mastering is off, so nothing the device holds can complete.
-+	 * The store comes before the reference taken above is dropped:
-+	 * that reference is the last one, and its release frees the device.
-+	 */
-+	idxd->state = IDXD_DEV_DISABLED;
-+	put_device(idxd_confdev(idxd));
- }
+diff --git a/drivers/dma/idxd/device.c b/drivers/dma/idxd/device.c
+index 5ebc2c1a3859..41223d2e20af 100644
+--- a/drivers/dma/idxd/device.c
++++ b/drivers/dma/idxd/device.c
+@@ -704,9 +704,16 @@ int idxd_device_disable(struct idxd_device *idxd)
  
- static struct pci_driver idxd_pci_driver = {
+ 	idxd_cmd_exec(idxd, IDXD_CMD_DISABLE_DEVICE, 0, &status);
+ 
+-	/* If the command is successful or if the device was disabled */
++	/*
++	 * The command succeeded, or the device was already disabled. The
++	 * error code is a value, not a bit mask, so compare it whole. A
++	 * refused command reports IDXD_CMDSTS_HW_ERR, which shares a bit
++	 * with the already-disabled code but leaves the device enabled,
++	 * and clearing the software state of an enabled device lets a
++	 * later teardown free memory the device still writes.
++	 */
+ 	if (status != IDXD_CMDSTS_SUCCESS &&
+-	    !(status & IDXD_CMDSTS_ERR_DIS_DEV_EN)) {
++	    (status & IDXD_CMDSTS_ERR_MASK) != IDXD_CMDSTS_ERR_DIS_DEV_EN) {
+ 		dev_dbg(dev, "%s: err_code: %#x\n", __func__, status);
+ 		return -ENXIO;
+ 	}
 -- 
 2.43.0
 
