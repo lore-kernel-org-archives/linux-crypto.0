@@ -1,47 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=13.77.154.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792511688;
-	b=QukEbi44zHv2a7Yp0MYTtKOUXx5cbNtAM9smF/hBorLWz/mEVIRwTyKtJc/h9kOK8Z/D
-	 /6aJu8LK4dqMHQC2zMnq4xPIda3aYhTz+Bsnb98WngnXbUSFJn3Jj1f4FUGtt0ubtwlP+
-	 J4x+XxZthGSeOFgpWG0J+xvhfm5QhIk41eBNCKNVK8RfM/uMOnqM2zenhUMYxGBUucSrH
-	 wJF5t3vO9WTmkHZxH3DZAHy1/2/AfJ3wszfjubv0hWTA+GTAQGoq4YVx/1+ZzE1gwEBlN
-	 uIOZhHKFBx/txBqB8CkT42jnNPsswlj9qj5VAJVNGGvFzYsa4Ezu/FVRrTIckN7d1ig==
+	t=1792524329;
+	b=rbHMXOt7WEzVEcUq0prq1icwCS+GzWPWImyl/xuqyquU5drcK3CQeW2Fb8Lf07OKa6ln
+	 WQplbunvCMCeIK0sL1mLjQQaNCC3ymWsfNOafOFaSBAPit613VtOsat96hSF8oq6n87Qs
+	 +TTERRvGuL4G1ZNbhAf5NZBJnluvJ00e+dPrsYyWc+6IG9qLTe2KkNKg+bvIlhNCl1v3K
+	 rLDSe7Sl7ReOR/jYQtYByuJIWq5aP/fJ4KdR4DnQloShzrgNG1I59tOs0fadlu7Z9ndKP
+	 ckJiSdy2iLvUIxC16MiWnnrl55bhsXixPiIk1p5ZsmrtEmtAqh0sjFxrlqiCQB3c3eQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792511688;
-	h=Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=bD4jg+LJR83t+5Ev1f25chKLnVBKKwv+WsK5MzKinBw=;
-	b=1ERHdXy/20mwNhkPjL8MTTPQv4QfQPF0H44r+l2kbiwXzkgb9FxTcO2KYCo/MOh2fcWW
-	 b5ws2LefA8treIqIjkHtlkbKpzSH7uaT0/JjJSIC9xaG3PymXFMbUUutU1ZQBYGZWEOFe
-	 NMr0lhQMLafeuAi1yzR87fP4uZGYZqO0PbtCYCtifai6/ryKleCEpTFabBRXZw5gWU/S/
-	 BSymr4LqR+N4/hziUoKxuew52DHGfFFGlVGo3n8AcrpTgbxe1maWqXlEHbfff5ctLn1Qu
-	 UYx/y9e32txnvGskkN+XLzNmvFQjFKLRkmGjOd28pDOwXbMdvohNcE4UJ7iyaPsP79A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792524329;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-Spam-Status:X-Spam-Checker-Version;
+	bh=wMnlkFybsSYZisbKMqEXfYf08l8WhyMyTNYDad69ys0=;
+	b=Ln5OXchTesEgzOWS6x2oTF5BhJF1atSWGoLADSUufn5sgSVSkEitaWiapRGCgdak8H7B
+	 EqCoFcyOWIFykNYpKOoVK9PQeCugpODUNZ9LKHmUqQCba8udbvQ4LBHX41KckFsKSU9V5
+	 w2I0d/VEsCvTv71PpMb4YcowZKagUwNpoJQweT8C4BVbm+vJTIjOAMBH23fWuTSsWac2v
+	 KWNXjJkSHx0gMxLQqege2C4iDDGpVfhe41c4XhaoyIhOEPfcO2D3ibXbTbbsT2UN593kd
+	 ncFvhY/c4WcJciBUEqXDN5lYF6SyBwgQBw9YKSFr6QqGm6diEfvSZWOygDAlyYreiOw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57211606A31C;
-	Tue, 20 Oct 2026 15:54:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9040A1F000C7;
-	Tue, 20 Oct 2026 15:54:47 +0000 (UTC)
-Date: Tue, 20 Oct 2026 15:54:16 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Tzu-Ching Yang <shingekinocore@gmail.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"Jose E. Marchesi" <jose.marchesi@oracle.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Simon Horman <horms@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] unroll: Make unrolled, unrolled_full and unrolled_none
- function-like
-Message-ID: <20261020155416.GC699485@google.com>
-References: <20261016025613.2690485-1-shingekinocore@gmail.com>
+	dmarc=pass header.from=linux.microsoft.com;
+	spf=pass smtp.mailfrom=linux.microsoft.com;
+	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=BMUwYfdm;
+	arc=none smtp.remote-ip=13.77.154.182
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5CA606A31E;
+	Tue, 20 Oct 2026 19:25:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3F5CA606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key, unprotected) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=BMUwYfdm
+Received: from jeffbarnes-ThinkPad-P14s-Gen-2i.lan (unknown [52.177.6.131])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 5939A20B7166;
+	Tue, 20 Oct 2026 12:25:15 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5939A20B7166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1792524316;
+	bh=wMnlkFybsSYZisbKMqEXfYf08l8WhyMyTNYDad69ys0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BMUwYfdmgyINJJ/c3dP+e93eQ/hERMIM9q4hmv2CBTuDueagRgi5omkTHkAFBKozZ
+	 pHKyWAWXAkTWXRJPCh1QmMfj51NbOs92jMreGOvw3Y7ZXRZLh8tkOrCZF22/aoabGL
+	 4fqpy+Nx4GubSfRydDCGovW91ISZrAd7bmhzNrSQ=
+From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+To: horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/1] crypto: caam - fix in-place RSA payload DMA mapping
+Date: Tue, 20 Oct 2026 15:25:10 -0400
+Message-ID: <20261020192511.3389133-1-jeffbarnes@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -51,89 +62,104 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261016025613.2690485-1-shingekinocore@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 16, 2026 at 10:56:13AM +0800, Tzu-Ching Yang wrote:
-> unrolled, unrolled_full and unrolled_none are object-like macros with
-> lower-case names, so in a file that includes <linux/unroll.h> every
-> later identifier with one of these names is replaced with a _Pragma()
-> operator. A local variable or struct member with one of these names
-> fails to build. A function parameter named "unrolled" is worse: GCC
-> expands "unrolled" to an empty pragma, which leaves the parameter
-> unnamed and removes the name from the expressions that use it, and
-> GCC 11 and later accept that with only -Wunknown-pragmas warnings.
-> For example, GCC compiles
-> 
-> 	static int add(int unrolled, int x)
-> 	{
-> 		return unrolled + x;
-> 	}
-> 
-> as "return +x;".
-> 
-> No variable, member or parameter in the tree uses these names yet, but
-> the header is already pulled in by <linux/lsm_hooks.h>, the vhost and
-> libeth headers and a few .c files, and every new includer exposes more
-> code to the clash.
-> 
-> Make the three macros function-like, as unrolled_count() and UNROLL()
-> already are. A function-like macro is expanded only where its name is
-> followed by '(', so variables, struct members and parameters with the
-> same names are left alone. Convert the only users, lib/crypto/blake2b.c
-> and lib/crypto/blake2s.c, to unrolled_full(), and explain the empty
-> argument list in the header comment.
-> 
-> No functional change: blake2b.c and blake2s.c preprocess to the same
-> output as before, and every object that depends on <linux/unroll.h> is
-> byte-identical in x86_64 (GCC 13, Clang 18), riscv64 (GCC 13) and arm64
-> (Clang 18) builds, apart from the DWARF 5 checksum of the two edited
-> source files in the arm64 debug info.
-> 
-> Signed-off-by: Tzu-Ching Yang <shingekinocore@gmail.com>
-> ---
-> unroll.h has no MAINTAINERS entry (hence Andrew on Cc), and the only
-> users of these three macros are in lib/crypto/, so I think this fits
-> the libcrypto tree best.
-> 
-> Testing: x86_64, riscv64 and arm64 defconfig plus the includers of
-> <linux/unroll.h> (all LSMs, IMA/EVM, BPF LSM, vhost, i40e/ice/idpf),
-> built without the patch and then rebuilt with it in the same source and
-> output directories. Make rebuilt exactly the 135 objects that depend on
-> <linux/unroll.h> or blake2{b,s}.c, plus the composite objects that
-> contain them, so those are the objects compared. lib/crypto/,
-> security/, drivers/vhost/ and idpf give the same result with riscv64
-> GCC 8.1 and 16.2, x86_64 Clang 17.0.1 and arm64 Clang 23.1.1. GCC and
-> Clang still report the BLAKE2 round loops as completely unrolled.
-> 
-> Stand-alone, with only <linux/unroll.h>: GCC 11.5, 12.5, 13.3, 14.2 and
-> 16.2 build the add() example from the changelog, and it returns x; GCC
-> 8.1, 9.5, 10.5 and Clang 17, 18 and 23 reject it. With this patch, a
-> variable, struct member or parameter with any of the three names builds
-> without warnings and gives the right result with all of these
-> compilers.
-> 
-> The patch applies as is to next-20261014, libcrypto-next (40f47fa10a1d)
-> and net-next (518bf436318e), and none of them has other users of these
-> names. A user added elsewhere with the old spelling (unrolled_full
-> without parentheses) fails to build rather than silently losing the
-> hint.
-> 
-> Not addressed: a use followed by '(' is still expanded, so a function
-> or function pointer with one of these names still clashes when it is
-> called. With arguments, that fails to build. Without arguments, GCC
-> still turns unrolled() into an empty pragma, so a call to a
-> zero-argument function unrolled() declared before the header is
-> included is dropped with only warnings (Clang rejects it).
-> 
-> unrolled and unrolled_none still have no users. If preferred, I can
-> instead remove them, as Simon and Maciej suggested when they were
-> added, and convert only unrolled_full; that also removes the case
-> above.
+Hi,
 
-Thanks.  If there are no objections I'll take this patch via
-libcrypto-next.  It was too late to make the 7.4 pull request though, so
-just FYI it will be a couple weeks before I apply it.
+This RFC fixes a DMA ownership problem in the CAAM RSA driver when the
+effective source and destination are the same scatterlist.
 
-- Eric
+rsa_edesc_alloc() currently maps the effective source with DMA_TO_DEVICE
+and the destination with DMA_FROM_DEVICE. For an in-place request, this
+maps the same scatterlist twice concurrently with different DMA directions.
+
+dma_map_sg() is allowed to modify the scatterlist DMA metadata. On the
+arm64/IOMMU system where I reproduced this, the two mappings returned
+different DMA addresses. The second mapping replaced the metadata needed
+to tear down the first one.
+
+Completion subsequently unmapped the destination and then attempted to
+unmap the source using the overwritten scatterlist metadata. This resulted
+in ARM-LPAE/IOMMU unmap warnings from the CAAM RSA completion paths.
+
+The user-visible crypto self-test failure included:
+
+  alg: sig: sign test failed: invalid output
+  alg: sig: test 1 failed for pkcs1(rsa-caam,sha256): err -22
+
+The warnings were observed through the CAAM RSA public and private
+completion paths, rsa_pub_done() and rsa_priv_f_done().
+
+The patch gives an exact effective-head alias a single DMA owner.
+CAAM reads and writes the shared payload, so the scatterlist is mapped
+once with DMA_BIDIRECTIONAL and unmapped once with the original SG count.
+Requests with distinct effective source and destination heads retain the
+existing DMA_TO_DEVICE / DMA_FROM_DEVICE mappings.
+
+There is one intentional limitation in this RFC.
+
+For the existing direct hardware representation, a shared mapping
+returning one DMA segment is straightforward. A shared mapping returning
+multiple DMA segments is not. The logical source and destination may
+cover different extents of the shared scatterlist, while the existing
+SEC4/PDB bookkeeping uses the mapped source/destination counts to select
+and locate those hardware views.
+
+Source analysis found request shapes for which assigning the shared
+returned count to both views causes the destination SEC4 table position
+to differ from the offset reconstructed by PDB setup. Short-source
+public RSA also raises a separate source-view selection issue.
+
+Rather than send a representation known to be incorrect to CAAM, this
+RFC unmaps a shared mapping that returns more than one DMA segment and
+returns -EOPNOTSUPP before SEC4/PDB construction or job submission.
+
+I would particularly appreciate feedback on two questions:
+
+1. Is a single DMA_BIDIRECTIONAL mapping the preferred ownership model
+   for an exact effective source/destination alias?
+
+2. For a shared mapping returning multiple DMA segments, should CAAM
+   grow separately bounded source and destination SEC4 views, or should
+   such requests instead use a distinct destination, for example through
+   a bounce-buffer path?
+
+I tested the patch on an LX2160A arm64 system with CAAM Era 10 behind an
+ARM SMMU.
+
+The rsa-caam and pkcs1(rsa-caam,sha256) self-tests passed, and the
+certificate-verification RSA selftest completed successfully, with no
+recurrence of the original ARM-LPAE/IOMMU unmap warnings.
+
+I also exercised the RFC containment path with a targeted full-width
+2048-bit RSA request. The same two-entry scatterlist was supplied as
+source and destination, using two separately allocated 128-byte entries.
+This reached the multi-segment shared-mapping containment path.
+
+The operation returned -EOPNOTSUPP synchronously, no completion callback
+ran, and no CAAM descriptor/job-ring, DMA/IOMMU, WARN, Oops, panic, or
+invalid-output error occurred during the test interval. The test module
+unloaded cleanly.
+
+There are related RSA DMA fixes under discussion. CAAM work for unaligned
+RSA destinations uses a bounce-buffer approach, which may provide one
+possible direction for the general multi-segment alias case. Separately,
+work on RSA buffers on non-coherent DMA systems identified a cacheline
+sharing problem and also demonstrates legitimate in-place RSA requests.
+
+Neither is required by this RFC. This patch is based on current Linus
+master and addresses the independent problem of acquiring two streaming
+DMA mappings over the same live scatterlist.
+
+Thanks,
+Jeff
+
+Jeff Barnes (1):
+  crypto: caam - fix in-place RSA payload DMA mapping
+
+ drivers/crypto/caam/caampkc.c | 79 ++++++++++++++++++++++++++++++------
+ drivers/crypto/caam/caampkc.h |  3 ++
+ 2 files changed, 69 insertions(+), 13 deletions(-)
+
+-- 
+2.43.0
