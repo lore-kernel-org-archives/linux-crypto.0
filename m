@@ -1,61 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792503064;
-	b=L4lJdzYyNOWslolpIU0qKe9mUpApv3ditfhdnHSu7WAlhy//FIyyrA1yc/fbINnj1NXV
-	 jL01UbMsDcvrk9uuFZ1lJGgGCP4JNa07bNrbTM0Iy8i7AruDNt9kSLeDTRG4uCKBC004t
-	 G7PbRewBTKCb43TLTRjoFBbFhNfwQW4J4v/ljE0KFwIP7Jjozy9jz3/hW+jXtCJllgyMz
-	 5b+QPa82sAoZL7S+3LWodKN5sJa1D4wzpJAiOkZ7m3vd1rLMxPZx3C0muwkywWVp44j0Z
-	 Q1SBjRzLtMNPMWwko1zsXjtc8OemMmZy75mSO1Ot6jmPYz0TXLQnPecA5iKixotXkYQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792503064;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:Received:Received:From:In-Reply-To:
-	 MIME-Version:References:Date:X-Gmail-Original-Message-ID:
-	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
-	bh=fgA/Zhp68dHEavBmIayWw25ZtfdqSPSrDKUimhdzG9U=;
-	b=xFj9dmqwahRKS/duw8JmUOdLMtik8JxiKkux+Bux4iqvlgIyB3ZcGCLNkq6DM3rDZEF6
-	 I5RilB7uyNXjPnPT6xvjIsuu02o/aje2XOks/v61sjK8XWarODqVogxooIJFFyrf79QAu
-	 32rjvQGOAg6E7nfw/RSOdP6MJ/UFlbDTBH6GVOyqt17tWNOlquH86jPhBJYwDNa9UCDxD
-	 LCYA0rQ7KUdYVL9trRYb0mx5g7TKCLPsJ5wXwYYwLAVwrPU4GY7YxGsKa2i00IOxLkkjf
-	 y8GkSHyuqBAJ/dLDykIsEKSWQv+6BsxBuie3MCW4pb1x+00VICYtnsA5yewI6RtQngA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XPlXry69;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.181
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792505909;
+	b=NobpHj06PsNYhA1xCPpFBOAnILOSytAEe9Z/RX+OFzaVopad0bStNzcxcO5wojlHsBl4
+	 /8vp/H8b9QBI7zjFlgxdKAFUaQgvpNCAvFAi9vUqyHJxYOAqr0HZHXam6Fbs6BGPKUY7c
+	 CCjKVeUD5w8l00c5C5/fJw9ekfEV8YTXysqSSgCKlFYWocnvlaMV5sLYY3a8jhsn0yGa6
+	 bZoEroH5fzqK7k2PY07YHFhntOGv7iJpFioIqRhpSCTTihHnG1aJpPEwesWIjqShGLKCo
+	 T5wiDHT8GNQfecGQ6IFLk3XXswLhNGIvepk+hxxH2JdRAzavWBgpCwfspWhVUmUy7Mg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792505909;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=qZWHzH3NnPm+6fZ0ej6D+04oG74OayCVfZeDBxBBOhI=;
+	b=DrrNvjoJziKCwi7d986aQTQvUfhmEmG86/lYv09Ol7Kdw20EH/wexgNpfhol027MVhjS
+	 A2V2XdZH5Wh6bN4RCm26pBBbwmpZOWGEHpeZ9N3+HhhEO7XAvCGEukNQf7GzDdBvZI0OA
+	 q2eK+mQ4knmOrHjFkVbljSAUdpfYjjlQj6JwkYf8wwNmI6PPZz+7J3MxmX9Yb3vZkMA/6
+	 9t39jYtPS6fXp4BRQ2011Chss+R6G8EUdH3H1XhpgyipLqgMi5ZD3Ql1JXdl0oQmsJp6q
+	 Zi+bVRNhgrTCYMkmLTPdkszTitJ2DSoelqmdQxiqcGYKHZTxUvB2hgsuvLIcvat7RRQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=K76fK9aQ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.181
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C94660A2639
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 13:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944AC606A31C
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 14:18:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 944AC606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XPlXry69
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19E081F01807
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 13:31:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792503064;
-	bh=fgA/Zhp68dHEavBmIayWw25ZtfdqSPSrDKUimhdzG9U=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=XPlXry69G9PQ7JreqGMjCzfXo64H9ICYp6PlqLMX0ix32KcTuDYm2tuMdXcm5Qjyi
-	 zYoriCeI0+5/z1j+sKSkuvAjOfgF8XeRblPHFUEO/CdCInOwcerSMJ/qsnWeGQFnDc
-	 GQxTf5z2YtpsvOg1M8lIQxy75AHfYysuQs9Sa6PYHm331QEwgrU61uzytC4nyr8TCE
-	 LWpIjQGGGGqBjcg9ns5JxToqxheR2rcwME2ZspJuYEntTA2J3wnArW8Q95tN/oTbqZ
-	 T8tMxvuGj3DHuw1aLTLncnomdJyqybOYENU+iPec7w9Tt7vu5GJAtlJMuKHrDVQaiN
-	 iZ8yN98+El6sw==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-3a75f960be3so34721691fa.2
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 06:31:04 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzOdisGU9NwDyCBVYEvatrOnwe6t4vlIspGYKgdNrllp78H9V1Wj9P/3ksHbMe5z3gLBj/ImFHnThVZxas=@vger.kernel.org
-X-Gm-Message-State: AFq9FYIpwF59XW+VTxoo1ueZax5maU5NZdV5QrIjpoi7grJYbvBcBFVa
-	EyzuJs2Pj5ONP7+DSVaJpDiI1+bUtrJ+ambQGYrO4XbWXFZZ4J8v7LM4tmkcsOJiHEy4x+fRIb+
-	OqmX0N3DApswq07EirIref0gc7Yb4cC3swou6cvGE0w==
-X-Received: by 2002:a05:651c:2111:b0:3ac:41ca:1104 with SMTP id
- 38308e7fff4ca-3ac41ca13e1mr919641fa.0.1792503062833; Tue, 20 Oct 2026
- 06:31:02 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 20 Oct 2026 06:31:01 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 20 Oct 2026 06:31:01 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20261020-qce-fixes-aead-v12-0-77a2e09abd0c@oss.qualcomm.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=K76fK9aQ
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-3ab4354db11so13497571fa.1
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 07:18:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792505907; cv=none;
+        d=google.com; s=arc-20260327;
+        b=gXx2oKRuYmDxwCBukOps1XLVQQ6DUyA2OHMvpjyP6KWARPnUc7dbdd9dLPPMIO7QKR
+         vYX+JlaMPzEDW3Q/6dYM53GNBwq1iBlEVgXeciGxexV5Psikp0JMfoctoy0yIaEgglQm
+         wdU//7P9Kvkg5NBLk+/sjDoDKOKpkoAM6mn2ukNIzvf54KIoPmMukzNVKXf364X5gRF6
+         bcnD2BsoAcXE5aq7MgA5vG/ICtWuOcVstv/GTWmzBuL4bwxLagk8TmIRdwEXMwMXlJPE
+         acyLBy62BF9n/mFs9nFtrTBOjnMhoBRC++fcj+MkCaF4rf6tDFQ7MNsUb6UXqh6UTsHE
+         eXwg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=qZWHzH3NnPm+6fZ0ej6D+04oG74OayCVfZeDBxBBOhI=;
+        fh=3ZrAVPlvv3kNlXmXHjkpVspQWnzT2+0ey5bOOdN3Vzo=;
+        b=M1iKzP+ayorwKTzg+nihXDgnNMIUtZGbMZ4F9p0nLjPNRv6aOCeYP8jtfhAqd4ekWL
+         cJ+vXBi5VfsQs0uLjeIH6Gzk/2NN4j/ayKXtg55XqXD7ENnqVRUNXz5kga2CurWcpUI0
+         yRnjKA+R/Zw39mDM6M4m+38gJ1NoZwxw4zudLAPAz/0os96GvEoIpxUyNvW2crPUTHh4
+         QAaEU3WWBoOmEL9rJcRSg8RxPz6VtzFT5pDBFyAzI8kIibsFIlKxW7SSY//4HASEKx8d
+         FsNyJ0S7hz6riZKniLMHBa6UivkW8CgVNqptKQDaf2Pu18Q0yAG2XSs1+IFUQcnVikJj
+         C8cg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792505907; x=1793110707; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=qZWHzH3NnPm+6fZ0ej6D+04oG74OayCVfZeDBxBBOhI=;
+        b=K76fK9aQ2yZh/bg+z4R+HxnBnzycHF3ePrQlbafqp5IpPWxrtAWpMS/+IYJVoDzNa0
+         AzN7UmwFJutZy8cebCc1lyZJ7jdotTKmELyGbI7vIT4XRw2oolQHQ3kJIq0Mpl38pvLT
+         dopAgFZlQOAFHQTx06vD4fXxv+nbIDs8Hv75fqT5LoLN0L9Gy+SktDG0TIvd1cgJDsaV
+         oFQ+Nnftq3hLhTQav7fkwy/qtM/MX3mQLH+6d+O/xOfk04qZP3Xj8FNM2C0hdoZc2ITn
+         gmdfX1r2L+UQo8tDYhuC584DG+ILI4nnvFg+ci3lsOC7eWFPUtisk46H0NrxMH08d8aH
+         o8qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792505907; x=1793110707;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=qZWHzH3NnPm+6fZ0ej6D+04oG74OayCVfZeDBxBBOhI=;
+        b=tdXW3CqbMXx3qO9ypoN782B3v0+lej3B+aPfewngEVY0pkgI90tcli3yuAKSzUZhny
+         tCxd4AIyj9FHZJjloURnDniBYEwSSvsW0H5AKnYoN+5v21o/xmYtnPo3lL2PD6ZAHrkZ
+         jH1Zrsp+/+BChPEEq4Pg3yue8581Xl/NhTbuJV+dNNIVh64gMsFuYEaKNOsiVgyp/rnt
+         1rTcoiO+JMEKo/sSxk5GZRBqGVoemk8FFnBxxTAD8M4iM/mzSqn52HaCTbK6Z1D5Pz3m
+         FC8yCrd1dDnA9YYGSg+rQ9MK6a1Jz6FG/S+/9p7qSSZtw54FQSuhhUYIZD6Gbk+06xYm
+         LmyQ==
+X-Forwarded-Encrypted: i=1; AKwUvByE8CO4unsO16iM3uo4khFkwJ+fylZYCuEhplUzwYwu8qsaXd6dpfsyfU1U8O0U5qeueu0pqwmZ//5MpUw=@vger.kernel.org
+X-Gm-Message-State: AFq9FYIWynT5jisdb6tRrkCOXJohwkXY9IdusIDYplHmQqRK+quvo21v
+	8lfcnUTgF7juqoLgWmcD8qrs1RZ6L+oO0ymAfffeROBRF87Y5utDnTBUCaMl+Vh0FExfHsybYjJ
+	0wj/fbO7Llj2XimIHSNTNEGvP3eQbbSI=
+X-Gm-Gg: AYBFou1tgqtM92oKa5ISd3bTnsC9phb5ZBUWySm2VZsmuBf++onMf0fKadUhcBfk/gc
+	RqImzZsHAbQPatDJZ7fWJiDZV1Zr7FIluwRpH7G5P47CbTUig01QqpnpNO5mjxSnXmyvL22eVA2
+	NPIhfzaRtPw81tL1trQS5vllMH//uz/UsgjjoGyXzW7saLeWRtQDVNG5Cr6L7bDr4wR937AyaUB
+	KVEaFmwA4p1uwBe+hgcogAEkv+Yj2UnLomP0gHjuwC5CsTjYMTUAZA6XsFlf6MpaxLhVh7hBUUc
+	B9L4QbAHyPQZALGrmpiG+7EIpyzcaD2TLUiNs/rWGiZwTxPctGV6fBbPmbhpMP5gFgPryCNIMwf
+	E6aGjV6sZA5mXdqcM9On8+mebJ56pdpwJjeZa7vcGlJDB
+X-Received: by 2002:a05:651c:1502:b0:3ab:fecf:51f5 with SMTP id
+ 38308e7fff4ca-3abfecf5453mr2731441fa.14.1792505906296; Tue, 20 Oct 2026
+ 07:18:26 -0700 (PDT)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,34 +104,54 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261020-qce-fixes-aead-v12-0-77a2e09abd0c@oss.qualcomm.com>
-Date: Tue, 20 Oct 2026 06:31:01 -0700
-X-Gmail-Original-Message-ID: <CAMRc=Md+y1SRft0+qWpy2Pj=ZK6TL1hmBWCq0jnVBxYDmQnu_w@mail.gmail.com>
-X-Gm-Features: AclHuK8JpK4nWSYDUH42Iv3zGzmNhtB0xqKaw0hDbR_OOIMnU3XpnrmRoofeLP8
-Message-ID: <CAMRc=Md+y1SRft0+qWpy2Pj=ZK6TL1hmBWCq0jnVBxYDmQnu_w@mail.gmail.com>
-Subject: Re: [PATCH v12 0/3] crypto - qce: fix self-test issues in aead
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Eneas U de Queiroz <cotequeiroz@gmail.com>, 
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, Eric Biggers <ebiggers@kernel.org>, 
-	Demi Marie Obenour <demiobenour@gmail.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Russell King <linux@armlinux.org.uk>, 
-	Abel Vesa <abelvesa@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org, Pankaj Patil <pankaj.patil@oss.qualcomm.com>
+References: <CAOMZO5DgENq8RU6s2CPnKsf53i=7zoBeO38m_BtV=w54hr2hgQ@mail.gmail.com>
+ <VI0PR04MB122628C9AF157A9732C27068795F72@VI0PR04MB12262.eurprd04.prod.outlook.com>
+In-Reply-To: <VI0PR04MB122628C9AF157A9732C27068795F72@VI0PR04MB12262.eurprd04.prod.outlook.com>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Tue, 20 Oct 2026 11:18:14 -0300
+X-Gm-Features: AclHuK8hpD2Os0ESDXX9mxH4L7Jl1YEgykxYhPw0QzWjgIEF_lqhSiFkxHww6Ws
+Message-ID: <CAOMZO5D595NYX04sw=gkKSy0Chx4d6Rn9YB4SvJtcyUCGvU_ig@mail.gmail.com>
+Subject: Re: [EXT] i.MX95: EdgeLock Enclave secure storage
+To: Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc: Schrempf Frieder <frieder.schrempf@kontron.de>, 
+	"moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, 
+	"open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>, Peng Fan <peng.fan@nxp.com>, 
+	Stefano Babic <sbabic@nabladev.com>, Frank Li <frank.li@nxp.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 20 Oct 2026 14:47:00 +0200, Bartosz Golaszewski
-<bartosz.golaszewski@oss.qualcomm.com> said:
-> As requested by Herbert: this is the aead part of the QCE fixes sent
-> separately for easier review.
+Hi Pankaj,
+
+On Tue, Jun 30, 2026 at 9:06=E2=80=AFAM Pankaj Gupta <pankaj.gupta@nxp.com>=
+ wrote:
+
+> > - An ELE-backed trusted-key provider for the Linux trusted key framewor=
+k.
+> Work in this area is currently ongoing. The intention is to provide an EL=
+E-backed trusted key implementation that can integrate with the Linux trust=
+ed key framework.
 >
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
+> > - Integration allowing Linux to use ELE as a key-sealing/ unsealing bac=
+kend.
+> Support for using ELE as a backend for key sealing and unsealing is also =
+under development and is planned to build on top of the trusted key support=
+.
 
-Ok, looks like there are no more sashiko comments on this one as well. Could we
-get the three separate series with fixes upstream before v7.4-rc1 to enable
-further rework of the driver? Once in linux-next, I'll also resend the driver
-adding the new module parameter and removing the BROKEN label.
+> > Are you aware of any ongoing upstream or planned development activities=
+ in
+> > these areas, particularly for i.MX95?
+>
+> The activities mentioned above are the primary ongoing efforts related to=
+ secure storage and key management on i.MX95.
+> As these developments progress, they will be proposed and discussed throu=
+gh the relevant upstream mailing lists.
 
-Bart
+Do you know if there has been any progress on secure storage and key
+management on i.MX95?
+
+If so, could you point me to existing patches or git repos with this
+work-in-progress material so I can test it?
+
+Thanks,
+
+Fabio Estevam
