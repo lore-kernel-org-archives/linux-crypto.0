@@ -1,100 +1,113 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.54
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792462455;
-	b=EZaGFOP9A164+AYHX0JF+eO5Cabceg8Ln+Z7NUTgkhb6+jrSBJzf1FHHevYmrvzwREgs
-	 S8JbK7aYGaEKbHVYOm0vX0dORNNrHpUcXqcIRHwdG/Z0iBH2mzfnx79a9gBguuIMQeLTq
-	 1VPxW2VOvhkhB7rMiK3TChzutPbTK4hPlsO8MSgNG5At6sUCmyuDSK2BDSZC6G5DK1Qif
-	 LAYNpAShjzPp11KovAAAtLc4wtwjHCcR0ymbNGdWOm4FpcfM79HhBpCM5cCu786KeIFfT
-	 ZHDcndWc3TkOxRKK5Lzfpa3lpE1vPMZJ/iE0b5RRLcMzLrapcXhbiEA9xpIpYKaV3pA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792462455;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=/kTZQWUcpHzrJy9NMwC8XJWFAf9FL4EwlT1MlBIWbLU=;
-	b=1FVtvJgleG85x2sgD69DdLewh8ojU5huZGDs8pa2ucPSsf8b+I27hLuANnOo/9AUlQkW
-	 nFaL3xO52IaDMH0tWTSojHPm/I1DoO6dLjTettJPCZ3WA5cBD4Wq4fvc6c/erUZG2xiDz
-	 z0jqg+VICH8dccpZe63mWmtADxTbIu9hWiIzWPKtNyJiLEjbuiFhR8bDFfERIkjz8D8Y/
-	 1JH+2FGCGcRbF4CsqcooRBqY6YQoo23EVBageCqdpmYDe8s4XJgIJtc11XsYppWQWAqfH
-	 2BxZc9/V/1W4ASMx5XQkcXgTJb+42MS1Q/E/rxesDrCbxKnTiU0ej3ES6A1IiZhI3+A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=WN4jNdx2;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.54
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.123
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792464886;
+	b=ckDBkUmIMYKozaHCepYeLGDK5hgX5qDMJ2rlID2yOeetl+y2llPr5BGaJqgCLAC/LnJw
+	 Td87SIq3dks9P+0/rKoBcwWrExa0fXl+ZoGngLARmeWlDklQMH2pdjTS/biCwUWixKiZW
+	 4iMURXB7w7oI8Zz9TJa6e/v2rlXhVFLu6IdC6ebfvA+DRRfPisch/4HO/zAwZ5YxkYqqm
+	 I2KqPfGzxNUQJfuGs5eYGydLTec8hbkT0FcHF7sVqINdEARP+0kOFJpJS/GstN4GY56qa
+	 pFs3TbvXRakl3iuyHkm3wwzeeWfbAYXyRQGGf0MHMZxwGmKinJKN6Pp5bXvdymaFNJA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792464886;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:
+	 X-Google-DKIM-Signature:X-Forwarded-Encrypted:X-Gm-Message-State:
+	 X-Gm-Gg:X-Received:X-Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=qaK8zFu57aq74kEwOz4Te5AP+DwuCrGiq1hirbm0z9E=;
+	b=f4Ap+1Vz+2nl+WSVi+YUN1FEhRUsHIR+6wJKEmy2F7OCy1WFWpVviZSnSP15kktgBNA1
+	 qR8gdTZreJHtAZyBAaN/PfNc2MJrlIHGFagFfYCABNTGtypvnIDCIyD/eleYzC4X4EGyS
+	 0up6ENzkpjXnH5SCQNO9rijGREScbc1BH9/2xNPZX2LJUcRY8Z5l4qoDGaBaN1Ps/2wk5
+	 eQfGWo9j8eglbJ720QmCj9R74fHuzItUS6SkFw48M/kMTG5WmuBs1t2HIWIXWusygqEcb
+	 Wv+Fo4IkIL+yzs3q8Py7Fs0wjx/DWXXoDP2I+rlt8TikCLi/J4lgSvY18fVedh49XEw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=canonical.com;
+	spf=pass smtp.mailfrom=canonical.com;
+	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=WDwew8nB;
+	arc=none smtp.remote-ip=185.125.188.123
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EF9606A31A
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 02:14:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C4EF9606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7B7606A31A
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 02:54:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5C7B7606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=WN4jNdx2
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5be3cff0f6cso1976126e87.0
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 19:14:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792462453; cv=none;
-        d=google.com; s=arc-20260327;
-        b=m1bq0Y/YhbLGeWcwAni0Q/KuQ8IbzbAuXPaL6MVS4NbY8tylie0DKl91chl1C7qwRt
-         /LcxdsR9WlLPeBnhnif5cmGPS8OaaBeORj/7mY+OjlA5Zfw1MPwWzgu5RcLIE2fFFsFK
-         iIYPzxrj+A360LaLDg4HgNANM+k1HGodMnnmgViTMe7y4ATQJOPUHIEcYmunGW+XYQ8y
-         BlQAY/ChQyP3sNpd0UvJ4cLK2CG5sFfNEZPu1KiZzH1dFmOjZxk1+7uAdg8J5F/C4rVi
-         +KJP2d9hadU5k9NhK8SP/leHAUMGo4uMsIF3Ip2+8yhcIxfNsHWLq2LQ87Mr/uiJyQTa
-         N1Hg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=/kTZQWUcpHzrJy9NMwC8XJWFAf9FL4EwlT1MlBIWbLU=;
-        fh=Sw8bcCmf2v/tPChfhosIDRnHwyPzIUFJ8GMq0S69lS4=;
-        b=M//xG8n4uPKJLn1/T1YdVendD7rp66uwkAehg3+w9nc2hlRmi8yWbgHSkGaGLOo0Q5
-         +trx+hSSEQUIXZSfmLL7mrU2CmaTpnFFTkmtjoIxcZi0pYOGS6WZXSfs/1eGLTQNEcVW
-         5+w/vXB38k8+1LZJDnZOQ1+vJfww8E45zmskmTSLalHENYrJYDxJMcOtQxQ1pjcq8Qjs
-         QNqq3E4F4oJZx5w2aIBBIQQ8hZhN1dBRKhnNd/gHICE6sg5XD+V3DKmLZRK1/ue/lyyO
-         KGa+YS1lPmgRf75jWhEPRUBwAOekn2+dityCoiHw5vTOMYp7c/ouQFXu4GMQ2vOzWnIz
-         lNcQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792462453; x=1793067253; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=/kTZQWUcpHzrJy9NMwC8XJWFAf9FL4EwlT1MlBIWbLU=;
-        b=WN4jNdx2SAkt0uTHYg63ZoL7ZaeJj3ozqVSkPY3/axls7o3882RIHuo/UCXTMYCBZi
-         CUqZ6QS+wlDJtr+kUTD7sixIQMolxms7hab9GYwsGo+siC4ddCMxcvCaPPwuwnrCerux
-         yK93HZDDRjkFKtmSOqe7ANaCP5E271t+tCMMVPh6FWrTdp/2mebok59JpF/8yvo8/uY6
-         dtH/ksgZrinakTcuuACiuTl1r17QBTsOLRUIcQ/nWJnsa9Mh8ddz8dkjpzf9e6nr8qHV
-         Y6us8f6/rukxbuqzCUyMlXlmcDknnn6TDlxq2L+9reJCMDgIxTvz6HD73tc16qBBRqe8
-         eeww==
+	dkim=pass (4096-bit key, unprotected) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=WDwew8nB
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 5AA553F98D
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 02:54:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1792464877;
+	bh=qaK8zFu57aq74kEwOz4Te5AP+DwuCrGiq1hirbm0z9E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=WDwew8nBjdw0Dz09jSec5KT6hlRnZ9r7AdGFN3SBoyUj/4nb2VsuhcRFpSqa0c8Sd
+	 M8oLKH5sPAiK8+iReuCk9IS01ey59+d/nkMUGyEJw7HuQu/wtDa0knpru0xKUh8X9h
+	 +h2lwTxTdhggDRQwhDjEq4LrfcCvkyW8YfkT62NQqYO0vt8SQuJSXyVRVB3lAL5C/N
+	 1G2v4YDGpSfclTg4zMTaEL8hcNvm8nhBaRCV6w1QNrg/da0hkF3DHGD2tYJgCvG4hB
+	 WArEEJHohFXmR+K9lkQOrXgAJnr+n4zixW2uutk4YFBxYKy/A1uOrdz+s3SobWHnmQ
+	 wYlCvD7nAGrArJEYXYAPTX3u3ZpiK2Gzc06tbDKfdlMj8lhv5DAx7HiCynTq1oodJQ
+	 m89R+dxJFtsmF8osUbbfrB9s/lbN5FmliMtIYcp6v/E5jrqpPXYNlZhr8sOBXfo95i
+	 kBtKF1I/TnKKoRASvP5QqDXDwbI/CiH6tNe/zXPDrYoVT9hWMoIOeaMAHAlyFL60iz
+	 J6D8xLu2wJeSfzO4Xc7WYhnh6LBAk2MpuBHM89G53/AbaCBoUMy267diXlr44sTy4J
+	 SI6Z5y2XXaGH1DAPE51+GUCMjv8CoiuQXrI3KAlhdMNDNDWyKke2jY65snV67THc8T
+	 22pTB+zbNzG4+EMuElooQiOE=
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3ab27eb38d6so2994669a91.2
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Oct 2026 19:54:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792462453; x=1793067253;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/kTZQWUcpHzrJy9NMwC8XJWFAf9FL4EwlT1MlBIWbLU=;
-        b=2x9cptNTWecNetihLudA4CLhc2a+kB0RD0vJ4SEveuuHH5ttK4eb4HglXvkE8PFIvb
-         CXAjzReieHcQm+yzyN4Fp5/qvUsvNiEasV5fwzuopbGfLnvvPx/ScECbVysxZibxQMvV
-         b/4HFqwePYJEhVRQasfRZP6LOTOcqf2wc+tlMa3Haxl49Y2+wXKTaNkh6FVOHjlM3yvE
-         2zV9EGSmUUbZC5CRXAeApcFN4TqsCc4OmpvGT7PRpFGWmzHatGTNFQMZOMW1cPLBHrsJ
-         7zlFx/YGnxTz22sOJxPhBm7e2WtbGznkXC60MbJNBiOX7eNZIQalKqqSAmyet37IMjvY
-         JRbw==
-X-Forwarded-Encrypted: i=1; AKwUvBz0gIyvRKxXMgbA86a2kWTKsKudCxUf1BcO5kGuFI+swKfD33n/zySAxeryZGXjoPZvyhiuHFekgeGp1kA=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLb2RMS9gunNlrYZK7mzl1PGffSZhnZ7W/Q2vYgmvvEnbf3dE+i
-	O/dHzP1+cA8HX/XaZ0QVmV3KsKFjbIqKcDRF6CVgJmQC50F+EgF6TeZOM8kqLhOQ4iOgvtOR0Ma
-	bncUJKUQLPswCkNvYSnoQeHgGcZAJvNk=
-X-Gm-Gg: AYBFou1F0+avKYu4/0WsSMZuk0+w+pQ9AhbGfM/SRxieMSCl6tKR0gizQJKeQ72ATwF
-	jOmmWba6itGEWzan3OqTLoAyi5ypLAx029aLRI2Pn0dZSYFGkPtMK6YfHgnDTboL14lGb+Ckb1L
-	iAW3lpqqqRGYJU7zg2EU91vMOA7n/2AnbhO0iOfI/Y1L+O818W7GSdyyOvcaFRBBRM3oGjGto8h
-	myClM7XQpV7P8V0hrJedFIvgKbirelCdh9q+gY8+dTGVW7OTtxj3JIvdbL0uY3oA0vdyXsWa4JD
-	OnnzsduZFJLjjzCCZTNodgGER32vcuRMcG9hv8sNVkhsEunf2/lKQ42nXapdwH2z+/Ji8dmEVuI
-	BX+KNMHl17EmWVkwHgEXDqrjCtg2DTw6z4Aae
-X-Received: by 2002:ac2:51ce:0:b0:5be:598f:2736 with SMTP id
- 2adb3069b0e04-5be598f282bmr1905487e87.47.1792462452600; Mon, 19 Oct 2026
- 19:14:12 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1792464875; x=1793069675;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=qaK8zFu57aq74kEwOz4Te5AP+DwuCrGiq1hirbm0z9E=;
+        b=12rZcCW92Y1cnUm19Ydrz7Y4SWQPIsOBDG46wAcs6yZ3dcwXlXMJffdkOvwr2nyC+e
+         wTP3J4kgFzxXuzkrDl1G5i49A9VWWBOKcp1tUGBM+YGH+QG6Pr6TMXfUiFpMAOGWHgs9
+         bUyH9UEIEtwFPHTnBwik5nD6nMwGPyf61mRhqNzaYnqXvdi0OsCUkO7tBU/oQq0u4XaZ
+         PKaB656FRsbgCcK8r1+QQbRSonGMz+nS1yhhyOau0IJJarber+Vm6LSjssJbJA0u4f9B
+         6hMnk131yezNioKtSXCW8YjKOhFIdwvYY8+tmsjgODvDo//LSguODqWYRhMABbDlMBbp
+         DGGA==
+X-Forwarded-Encrypted: i=1; AKwUvBx3+Gv5JRjIDSkUW16hlWSLSrVOY5es+V5XPQh/GOYUX5/H9pTnX0ITWQuamb5UsaEjisYzfH+i7HYV48U=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKOB3VDIqdZwK8rYsh8tUi5cGAzE1k+pv32JAnmmG5gn1Y0OXQF
+	IVYrKpl7OvhK+NdkZ/1kN4WUAFLS3BJBUj4NRQe7dftuToFl9SwChXp6nDI5kj/Vl4H/S5pjUn7
+	TVVK6m8lXtrbZXWxO9dWsPj4m4kEcCfdTUXT5ynyow1gEB4qJUotPZO8VPa0k0ewsSl6e/bV8Yq
+	G563a1Dw==
+X-Gm-Gg: AYBFou2HLZQ+SKjxOJfXTPuqGeaIxPrlTl0+NOKwsbhHKf+pfNA/jIzKyObL1aI9LwH
+	5K+kgQTDnEJ5ngFekg89Q2Cv+nEekC8bjRtG72pAwZDxid7dcWKmtpKt5P8eagKo1rcdtMP6zx7
+	vVz50h4Cp54lcnn0iiMzViThHPNKX2KqbVci4dqMiMrclxiJej4aoiuVGEkVOnwKiCbXUBuyCkT
+	z8s4KiPfMBUzVFk8L5yDc2YOPuLwfy9nFOYykKMpAXJ9c7DZscEgBwL8VZjeUkdh8WgvRa+vSFX
+	vHz5uQrKEJU+4g8xDySFngyA7EmpgxIku3PKbZ+2CkJutpwdFizwrIu7adxqXAKBIKqjs4/BYsG
+	9gK4623sJIg==
+X-Received: by 2002:a17:90b:28d0:b0:3ac:83c1:2bd with SMTP id 98e67ed59e1d1-3acef13e5ccmr8407893a91.28.1792464875198;
+        Mon, 19 Oct 2026 19:54:35 -0700 (PDT)
+X-Received: by 2002:a17:90b:28d0:b0:3ac:83c1:2bd with SMTP id 98e67ed59e1d1-3acef13e5ccmr8407884a91.28.1792464874827;
+        Mon, 19 Oct 2026 19:54:34 -0700 (PDT)
+Received: from ZBook.gateway ([123.208.39.53])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ad5d5679d5sm1962994a91.7.2026.10.19.19.54.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Oct 2026 19:54:34 -0700 (PDT)
+From: Changwei Zou <changwei.zou@canonical.com>
+To: herbert@gondor.apana.org.au,
+	sahil.malhotra@nxp.com
+Cc: davem@davemloft.net,
+	horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com,
+	jeffbarnes@linux.microsoft.com,
+	stephane.debusne@cynove.com,
+	iuliana.prodan@nxp.com,
+	martin.kepplinger-novakovic@ginzinger.com,
+	lukas@wunner.de,
+	sahil.malhotra@oss.nxp.com,
+	changwei.zou@canonical.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/2] crypto: caam - Fix RSA error-path unmap and unaligned dst buffers
+Date: Tue, 20 Oct 2026 13:54:24 +1100
+Message-ID: <20261020025426.955531-1-changwei.zou@canonical.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -104,167 +117,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <CAO9r8zMaaUsBaS0TJumochRKt2ShV7nRaLnYPWv3=S-wUFgitw@mail.gmail.com>
- <CACpmpoecz4tjr-qvFRy22CGuF+4NBWbE7HVjdTGFqQOheK3CLg@mail.gmail.com>
- <CAO9r8zOAcf4=TscCXjMYvowUx-_u9qLGqY2-p7cK-z5CUU_x8w@mail.gmail.com>
- <CACpmpofYXDMviE6FS-BZdVntmQFvS+_xvfmOnJ2caZFerz6vyg@mail.gmail.com>
- <atGqPIpUfX0LDokV@gondor.apana.org.au> <CACpmpofyLW5z1DYEY2YAty0VOAhRR+Leic8O-B0N9hrzdW_=Ew@mail.gmail.com>
- <atL1ok1YkHbA4AaI@gondor.apana.org.au> <CACpmpoe_RXcJM42sTVwk_Qvt3zjAOZhzYZNsRD4xz_1HxDmadg@mail.gmail.com>
- <atMCfhB63koot230@gondor.apana.org.au> <CACpmpocZGHpTTOq+xa2bTnS-=gdUa8+E_KKJm41H_dSfbGikYQ@mail.gmail.com>
- <atadE_kZz45KAeuE@google.com>
-In-Reply-To: <atadE_kZz45KAeuE@google.com>
-From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Date: Mon, 19 Oct 2026 19:13:59 -0700
-X-Gm-Features: AclHuK-O5GRznQ-4uEfzEMIrac0t16SF_OufPYrMOIRqkz_NpjCJyWmJTsaVlc4
-Message-ID: <CACpmpofy3P7ukri8vukWte8x2sYz1pNCVXXAN9YtL6=A3BeejA@mail.gmail.com>
-Subject: Re: [PATCH v1 0/8] Batched zswap_store() with compression batching
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, hannes@cmpxchg.org, nphamcs@gmail.com, 
-	chengming.zhou@linux.dev, akpm@linux-foundation.org, linux-mm@kvack.org, 
-	davem@davemloft.net, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
-	senozhatsky@chromium.org, 
-	"Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 19, 2026 at 3:50=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrot=
-e:
->
-> On Sun, Oct 18, 2026 at 06:35:01PM -0700, Kanchana P. Sridhar wrote:
-> > On Fri, Oct 16, 2026 at 10:07=E2=80=AFPM Herbert Xu <herbert@gondor.apa=
-na.org.au> wrote:
-> > >
-> > > On Fri, Oct 16, 2026 at 10:02:13PM -0700, Kanchana P. Sridhar wrote:
-> > > [ .. ]
-> > >
-> > > That isn't quite right though.  We need to ensure that it really
-> > > is a singleton before taking the short-cut.  So you need at
-> > > least one conditional:
-> > >
-> > >         if (likely(req->unit_size =3D=3D req->slen))
-> > >                 take short-cut
-> >
-> > I added the check for the singleton req [2]. I hope this looks Ok.
-> >
-> > With the latest crypto_acomp_compress(), the batch compress latency
-> > improves considerably:
-> >
-> > usemem 10 iterations average throughput:
-> >
-> >    patch 6 (store batching only): 19,119 KB/s
-> > patch 8 (+ compress batching): 24,076 KB/s (+25.93%)
->
-> This is exactly what I mean by the numbers varying too much to draw
-> any conclusions. I am not sure if it's the VM setup or the usemem test
-> itself, but previously it was argued that the short-circuit in
-> crypto_acomp_compress() was ~10% faster than the one in
-> acomp_do_req_chain() (20,946 vs 19,058 KB/s) due to avoiding a function
-> call and two conditionals, and now *adding* a conditional improves
-> performance by 15% (20,946 -> 24,076 KB/s)?
+This series fixes two issues in the rsa-caam driver.
 
-I would like to clarify a few things:
+Patch 1 fixes wrong unmap operations where rsa_pub_unmap() was called
+regardless of the key type.
 
-1) The short-circuit in crypto_acomp_compress() that gave the 20,946
-KB/s was missing the req->unit_size =3D=3D req->slen "singleton check".
-However, it gave better performance than the baseline patch 3 in v1,
-which went through the complete acomp_do_req_chain() protocol (save
-req, do one req, finish req, etc.).
+Patch 2 adds a bounce buffer to handle unaligned RSA destination
+buffers on DMA-incoherent hardware such as i.MX8, fixing intermittent
+-EKEYREJECTED errors when loading signed kernel modules.
 
-2) When I added the same short-circuit in acomp_do_req_chain(), it did
-not give as good performance as (1).
+Changes in v3:
+- Patch 1: Dispatch the error-path unmap on the operation (the completion
+  callback rsa_pub_done vs rsa_priv_f_done) instead of key->d, so the
+  unmap always matches the map.
+- Patch 2: Bound the bounce-buffer copy-back to the RSA output size
+  (key->n_sz) instead of the full dst_len, so the trailing capacity of
+  the caller's destination buffer is left untouched; add Tested-by from
+  Stephane Debusne.
 
-3) Herbert pointed out the short-circuit was missing the singleton check.
+Changes in v2:
+- Patch 1: Add Fixes: tag; pick up Reviewed-by from Sahil Malhotra.
+- Patch 2: Move the !bounce_buf check out of do_rsa_bounce_buf() into
+  the caller rsa_bounce_buf_done() so the helper is only entered when a
+  bounce buffer actually exists; add Reported-by/Closes and Tested-by
+  from Martin Kepplinger-Novakovic.
 
-4) I added the singleton check into the original short-circuit (1),
-and this did not degrade performance. It meets the functional
-requirements for crypto, per Herbert's feedback.
+Link to v2:
+https://lore.kernel.org/linux-crypto/20261004210200.290119-1-changwei.zou@canonical.com/
 
-5) I cannot make comparisons between "a function call + 2
-conditionals" (2) and the functionally correct implementation in (4).
-The functionally correct solution is qualified with "likely"
-annotations, which can explain the performance improvement.
+Link to v1:
+https://lore.kernel.org/linux-crypto/20260821045555.806471-1-changwei.zou@canonical.com/
 
->
-> Moreover, for zswap with ZSTD the added check is always true: the batch
-> size is 1, so slen =3D=3D unit_size =3D=3D PAGE_SIZE for every request. T=
-he
-> previous version and this one execute the same code, so the 15%
-> difference can only be noise. With the stddev you reported (~5.4k KB/s
-> over 10 iterations), both differences are well within the noise.
->
-> I think something is wrong with the performance testing methodology
-> here. The results are self-contradicting and do not make much sense to
-> me. Did I miss something?
+Changwei Zou (2):
+  crypto: caam - Fix wrong unmap operations
+  crypto: caam - Use bounce buffer for unaligned RSA destination buffers
 
-The previous version and this one don't execute the same code, as
-clarified above.
+ drivers/crypto/caam/caampkc.c | 130 ++++++++++++++++++++++++++++++----
+ drivers/crypto/caam/caampkc.h |   6 ++
+ 2 files changed, 123 insertions(+), 13 deletions(-)
 
-I don't see how the results are self-contradicting. Can you clarify
-what you mean by this?
+-- 
+2.43.0
 
-OTOH, the zswap_compress() bpftrace results are clearly reinforcing
-the benefits of compress batching.
-
-"Sequential_zswap_compress" is stopping after patch 6.
-"Batched_zswap_compress" is stopping after patch 8.
-
-I hope we can agree based on the bpftrace data that
-Batched_zswap_compress outperforms Sequential_zswap_compress.
-
->
-> >
-> > bpftrace measurement of zswap compress latency per-page:
-> >
-> > Sequential_zswap_compress  nr_samples     p25     p50      p75
-> > p95       p99
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> > zswap_compress_ns_per_page  1,722,489  43,947  57,791   88,489
-> > 130,165   323,961
-> >
-> > Batched_zswap_compress     nr_samples     p25     p50      p75
-> > p95       p99
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> > zswap_compress_ns_per_page    665,267  41,511  54,915   77,707
-> > 124,648   213,962
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> >  Latency saving (ns)                   -2,435  -2,876  -10,782
-> > -5,517  -109,999
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
->
-> I measured zswap_store() (not zswap_compress()), to get the per-folio
-> latency, and it didn't seem to change much beyond noise in my testing. I
-> also notice that the number of samples is very different between cases.
->
-
-I was addressing your earlier question about why not just stop after
-store batching, and why batching of compressions is needed. I would
-greatly appreciate it if you can review the zswap_compress()
-sequential vs. batching per-page latency data from the bpftrace and
-let me know if this convinces you?
-
-I thought the overall zswap_store_pages() architecture had general
-buy-in, since we bulk allocate entries, etc optimizations to minimize
-locks. Please correct me if I am wrong. IOW, I am focusing on
-gathering bpftrace data of zswap_compress() with batching since this
-was the main patch that needs buy-in.
-
-If we are on the same page thus far, can you please let me know why
-bpftrace of zswap_store() is important, and if I should gather this in
-my environment. I am happy to do so, but not sure what it will
-prove/disprove.
-
-Thanks,
-Kanchana
