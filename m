@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792584931;
-	b=AzNF50vY09MDJLYN0NHxoFSfUYAUG2/+lzSt1N8LraLb5j+yuDHkKtuRyB3QOa2M4SzB
-	 XN8dxUEUNj5aljX45x1oz5USbweoaz9qKOOHdmGESgvObdksdsXEPap9t/O4S29TnMnBd
-	 M5Rx5VaHl40T/O+ULgKlWPNC/UJ0x2OmWu0PyAhDW/meK427nlG8rexQGdYQiV77LTObf
-	 Tn1HkACIw9w+L/Y+OnauyPn5HM0z9evVqsi0+npX0NF9Wb4VnOTVKK8z5Y8EBYNyQ3lq9
-	 syERuSxrnqnnjIJJrXQrxR6/yw5pm6FtE41VxrifzYZXpjsdH5tGjdlUemS3bkFEMRQ==
+	t=1792584937;
+	b=PKIKpcF2frtEik2gyxIP5UB8eLY+PCbyGznTmb9eFopgw6ZsJkTAlPBo0OXC1R+BtYh/
+	 1bIWgk71dPRYZ4MdeuYTOv7Uo8B2UT61yZfMBVvp1hqNJ0hcvWHiDPZOu7N3xoXPo3wSI
+	 wIitPuK/+ymUmbD0KpY5PF854eWiyuhkWI25NGBpcEKyg7FVuHKYOasHG/v+EsxDD//g1
+	 twnCx1nhDANIUu7HgcWMVwtYZ/B8nYCtIFcc9TS41t2HohhbRlTrv+d2XOM1N4oq+FvBk
+	 F7qKv9L9CxhN1EaAGKm0iESibCU/HQhGJg1obzvV5eWm9W8t9UsXfNE2Eu3uzcoFKFg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792584931;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792584937;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=X9lWh4O6O7Umzil2pxjsOPjFQX4WkHiI/3kxYZplzAY=;
-	b=T9y7VXKw2O1MlfyKHw0b6+v9U7bjyghniUDXysRXPCYMwvmuNO5CjK1mhJDOcrqs6Ui3
-	 XGwPqkv/qcw+cDWNkgxHhsqOMMBrGXAqEg81uuwJ8Pe4+I4jmwX9TJlXZysEuUjaane5Y
-	 o8DZGomtnJzAa3IUOqwegAr2VlBcB1g/OfmxWAnA5oT8aZPGgKnseQBIAFtq3XKCKFMjV
-	 EInf9OHeTDd97Y0gmqKwvzFg8+R6sbHS7GnC+JAg9lTof8NDPUiOR0wvCP75ejjHokCs0
-	 5wcGO5Lz3VuSJF9DGhNY6IKz/+Y8WG9I6ISx4q/SLT0iWUFaSh+A/7j9QObue7eLMCg==
+	bh=93EmsKWixLB2KPvdZzjAuggREVPcs9WaZPMfQhaLIaQ=;
+	b=J0Yv2LZTgaKyjTlOZ4TOuCMImgfmW8G4wuhNBmMjlOo0Tp0/VVKTjlPfYvZf6EX8TIkM
+	 z2MXUyc8Ebb9RVtbFSeRfP/1EQCCo4dLXQkydSflV5RF3wX1s4i9wZ75HGiUK8yrOxE5f
+	 sZLFNT7U253kNL6BqKgt49oGDVNi7WsADcNJ6ITf3eLcXKqf+0dl9WDpy87naghMOT0Bn
+	 5cQtlLRJnKInY9AdKVM2ET5mPZizWlzD5+pplaL0L7/BaQm3K2EkYfgdt6yVnWFs5EDAO
+	 zFPOH2hv6fIHZFiIqnBIFVUjZBgnC+CPZI8+JsjbIb+ga5KtEevJV3vnQoUacxPkOtQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=S97KVlOa;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kBFEDZcV;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABE1606A321;
-	Wed, 21 Oct 2026 12:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1786B60A380F;
+	Wed, 21 Oct 2026 12:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=S97KVlOa
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 390511F000C4;
-	Wed, 21 Oct 2026 12:15:29 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kBFEDZcV
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C9701F000C7;
+	Wed, 21 Oct 2026 12:15:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792584930;
-	bh=X9lWh4O6O7Umzil2pxjsOPjFQX4WkHiI/3kxYZplzAY=;
+	s=k20260515; t=1792584936;
+	bh=93EmsKWixLB2KPvdZzjAuggREVPcs9WaZPMfQhaLIaQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=S97KVlOaNk7UeV9V67X4hdY7yar3aMYGquTLgF/sf9CPyYn6wickeS7DDsV12lw7/
-	 Yl1IBvB/8Gv4VKc0O+VJWadzuD666BCmNy/yytqe8k7EHsh70NIW/apxE5S2hCdhTu
-	 nSHEHm1lxbLfjVq3Rho4NvJepBZ1ghQ2SJd7ijcjswzGKysmpUPlLmRzpOfj6KV4Hu
-	 qBwdIjPW7o5Yu75A7RIpocZLgLN8Y9PBHoaqcdOmHrnaNsUrQ5pqHi2Zp0S8uU87aK
-	 anpwftz0tEXdNjmybuCRtWbcoWtiqFNaxiDCM6ooy/jNcmzF2qGhBXb9pLiZkAOFk+
-	 10zw7k2T1k06g==
+	b=kBFEDZcVNrUWoOv05Hh2muxrzI0wXFCWU3ib4MutRAuaBlzINyFIAYYv7obYpf6M+
+	 xnzDbGUYFVty7jUsQPsXZtI3tLGZYmdt6Lx8Ayjx8ZzPvq0zHDkuRj8ar58OxyohN0
+	 J0qu2d1IVzLjHP3MT3pvXkoC0mrbpraDwIPEJ6CwyEfc11FgJNdPN6qFw4VpuFMJ51
+	 qfQXs9T586El0sN7Nn5LokrmwnQ7Uq1BwtOrET/UnA1nkv7zQcGyrNMXsHZ48W+0Fv
+	 aQRWDaJHwCmrxa0H37nSzSSl8kMOA81tNu/eUBTQoq9wz5dzaV66CYPlMRqO1tzbPn
+	 mf0Co8jz2skJg==
 From: Lee Jones <lee@kernel.org>
 To: lee@kernel.org,
 	Qunqin Zhao <zhaoqunqin@loongson.cn>,
@@ -48,9 +48,9 @@ To: lee@kernel.org,
 	mfd@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [PATCH 15/28] mfd: loongson-se: Check return value of dma_set_mask_and_coherent()
-Date: Wed, 21 Oct 2026 12:09:37 +0000
-Message-ID: <20261021121245.3111563-15-lee@kernel.org>
+Subject: [PATCH 16/28] mfd: loongson-se: Zero-initialise controller command structures
+Date: Wed, 21 Oct 2026 12:09:38 +0000
+Message-ID: <20261021121245.3111563-16-lee@kernel.org>
 X-Mailer: git-send-email 2.56.0.218.g1ec904b173-goog
 In-Reply-To: <20261021121245.3111563-1-lee@kernel.org>
 References: <20261021121245.3111563-1-lee@kernel.org>
@@ -65,35 +65,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-loongson_se_probe() ignores the return value of
-dma_set_mask_and_coherent() when requesting a 64-bit DMA mask before
-allocating coherent DMA memory.  Check the return value and abort probe
-if the platform cannot satisfy the 64-bit DMA mask requirement.
+loongson_se_init() and loongson_se_init_engine() declare struct
+loongson_se_controller_cmd on the stack without zero-initialising it
+and only populate a subset of its fields before
+loongson_se_send_controller_cmd() writes all eight 32-bit words to the
+controller MMIO registers.  Zero-initialise the stack command structures
+so that unused words do not leak residual kernel stack contents to the
+hardware.
 
 Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip controller")
-Closes: https://sashiko.dev/#/bug/linux-6685ee0c-b7ed-4f21-8800-cc705cec449b
+Closes: https://sashiko.dev/#/bug/linux-b81dca3d-6812-43b6-9ad9-912727674154
 Cc: stable@vger.kernel.org
 Signed-off-by: Lee Jones <lee@kernel.org>
 ---
- drivers/mfd/loongson-se.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/mfd/loongson-se.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-index 3902ba377d69..8dcb90a067b3 100644
+index 8dcb90a067b3..485ee4a6ca5e 100644
 --- a/drivers/mfd/loongson-se.c
 +++ b/drivers/mfd/loongson-se.c
-@@ -199,7 +199,10 @@ static int loongson_se_probe(struct platform_device *pdev)
- 	spin_lock_init(&se->dev_lock);
- 	mutex_init(&se->engine_init_lock);
+@@ -93,7 +93,7 @@ struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id)
+ {
+ 	struct loongson_se *se = dev_get_drvdata(dev);
+ 	struct loongson_se_engine *engine = &se->engines[id];
+-	struct loongson_se_controller_cmd cmd;
++	struct loongson_se_controller_cmd cmd = {};
  
--	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-+	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-+	if (err)
-+		return err;
-+
- 	if (device_property_read_u32(dev, "dmam_size", &se->dmam_size))
- 		return -ENODEV;
+ 	engine->se = se;
+ 	engine->id = id;
+@@ -162,7 +162,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
  
+ static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
+ {
+-	struct loongson_se_controller_cmd cmd;
++	struct loongson_se_controller_cmd cmd = {};
+ 	int err;
+ 
+ 	cmd.command_id = SE_CMD_START;
 -- 
 2.56.0.218.g1ec904b173-goog
 
