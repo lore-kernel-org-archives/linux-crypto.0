@@ -1,88 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792582724;
-	b=dxjDnXuMTQjfUFkF6PNuzh5AhPWzawDIqnR0zwDG4k6pUHu5xwL4Yn1QIpiy9EGniYWH
-	 MhY6cWXeh1xzCdsfPZ4Os+ti6LtM9LRJq9fg9dLDhthrLadwdpb1FWbdvQrTFLKtwt6km
-	 WPO0aMEFAPMowMYN/8wurq1pgRcMOmUdbJphHjC6zY8AiLLShatWh4jfdpVdDdiRHj3rE
-	 CK2yFhRKjGQdygfrrkjOrVPl4szPuKNheGnpSwy/lx4Mw2Onrv+Zfp8J5sALbt9EMnzXx
-	 RrcLnY5+lGOHGUvQzWVI1nXep5GzHGfh94TxFy603Sz4OCbIqUQg2Xg5dPhOHM1cvsg==
+	t=1792582738;
+	b=SJ1dG3x4Nfx/sT8tFsp6Rewpth1ZgGo+VPj7SJwhJeRLt2Qjf2hIAvXkQ6NU/h+UtxYp
+	 ym6lsnpemVizy3IF6UgCYbbBArf+LvLgCUGVrJyiSiescfo4VrwXBGzlywkaCKYEPDlDJ
+	 jl2l5dYwD0ZFdJVxS0xzd7w20z9nEkdwsDsjqmyQq2x6gZRdzB+9rqQbwIPA4sgpq76w0
+	 2PT1wLaVX6iHdf1P3YWdWjSyKO1YxQbgIZ8M9M17IhU65AktVClY26FDpTdMJg/qkuxOV
+	 xq33sqqRbPmPmQ+v9sc1/eHkptoWhgVPbqJcRK4xDAqh6JLIMlB6KEUwu8BDfyG7/WQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792582724;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792582738;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key;
-	bh=QkMjKxi7PissmuyV5kFOwmybhsIphWDBhboyLC3hABM=;
-	b=qn5qk9TtUBx7lD9TylTCMqsotbhsOvGCg0dLj3RBqx7etKgvyqa/u8D18zP30LTNDhCE
-	 PnlOCPvQNE1Dm2yanD2XZsi+lUyd0NvmKaUgWamzFwhUyc9TGGaJraIjhE8u6B1QiS4AQ
-	 RwN+SrBOtQhInAnc/SFOdHPXDnfvxBs45ELOtl6Pobc+0PmvrEobRwkxsiHO20oF8Gqnj
-	 5auXc3V4sLZR9O9OWQAKclqADLccRmnLwd+4D8pJowJPxnFkUA7SfFh49rI8xEz+vrcum
-	 xmEuU+Ou/SbVCCimPHjZbx+97fSv+zS0bXpfE6U4pO660unitpfuHcW7gF05TxGg9NA==
+	bh=fED4JpmOp61wjaCjNReVcAtx8yRLiX3HC88XsoVc9Q8=;
+	b=WZMLmV6UvBA6tG9dWsv0HlMr8Un5xuWlH2yC+PceAkyY2tatiy9YgkApS5mxj96zX5Zt
+	 b6dHfIvZev/hiHyfVtVLp8lg0YVnV9g1ukl266RJuULutRd8G5GvJoqJY13hGUEWjGB7x
+	 uA7qOusIR7t4vuve9F6//97i8/dUZohC+beSh4KxDFMyYZQiJDZ12iqaiNoN3xACThe9o
+	 tswbFF+IIfJnXCYuYAg6OoCMhKn3nI4PJqexbIVrKPc/ythvdx5OJS40B2YdEnBFTEBxk
+	 tV8rI5vNRCP0VAQDmJ+o98PVG0OHI95aYMNsgRFJH3eKnigL8fqaAT5Huz/K+j+PFNw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=beagleboard.org;
 	spf=fail smtp.mailfrom=beagleboard.org;
-	dkim=pass header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b=tm0fK6qI;
-	arc=none smtp.remote-ip=209.85.216.46
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	dkim=pass header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b="aaN/MsJr";
+	arc=none smtp.remote-ip=209.85.216.42
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE96606A31B
-	for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 11:38:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7EE96606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31463606A31B
+	for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 11:38:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 31463606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b=tm0fK6qI
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3ace9e6e1a5so1005881a91.0
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 04:38:43 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b=aaN/MsJr
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3a4b9732d5aso584533a91.3
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 04:38:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=beagleboard.org; s=google; t=1792582723; x=1793187523; darn=vger.kernel.org;
+        d=beagleboard.org; s=google; t=1792582736; x=1793187536; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=QkMjKxi7PissmuyV5kFOwmybhsIphWDBhboyLC3hABM=;
-        b=tm0fK6qIfGgF1Rmg5JO1HXa4+A5KvJUCurGrFOnp6Wiq6WHAaGkbMdCQ07gBOd+to2
-         CYJfYrIMoeZtatzkLsCpwm45r63Bd/+3EhO3ffJF83HrIkuBma+0DibO95BPfQU/jLqx
-         eKwtdPdoc56IxLegVQWtknl5GIj7NJ0pvaetQFa+CbwtnPnXu9NEB+wO2OO4kYplGfY7
-         YDH0FJ0OF68p87/sSuLo4OazFODgpe4kTfc/DeucOHcxfWTmuILiOaHijA3jXu1pYZm+
-         ziCxxHrRG5giYDGvhI4Gw0zMc1UVPgmqhfsznS03eqvfNhGyuCWIY1ssW4j+JpDbRmf0
-         i0xw==
+        bh=fED4JpmOp61wjaCjNReVcAtx8yRLiX3HC88XsoVc9Q8=;
+        b=aaN/MsJrsh8q/RAW7hA3Pn2XQn6NFMkR94uyo0VWuowASq1sFoLS2yB5swOceVgWRt
+         uyuqKBnnGdI9T9qN4I5FRDad0gxGGuTRolgqD2MTsPA3poAkMIepE1jS3Z/XFKhvUFki
+         UIUMSIQvECQ+WdnBia0CPjDt7uFwev0c4COQtyzQdGVnnCD2AUNuwOD7kBa3RPIfwtYe
+         BoV5CQlWG5S2IAcdHCzs4iR5ljmzjraqgMTDCMyYDU80S/KOV/4YJE50ULAKY4KvRrEZ
+         nwqTMfWAYaIkMlhik9RzUNRy9GEg3U6CwFowupP9FA2ixW6Kdj6j9am0J5ivFzIr+3A1
+         xtwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792582723; x=1793187523;
+        d=1e100.net; s=20260707; t=1792582736; x=1793187536;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=QkMjKxi7PissmuyV5kFOwmybhsIphWDBhboyLC3hABM=;
-        b=FscNl3xsIIao/ZvYebhfg4BPwh/MDWn1z8Xu41ExXZaWb7OgppnrvXWAXU6C/4kXf2
-         AHDbRtgzP3UeikPd/YlRkMTI08ZYEO/0TQORBu4sFH82Ah3/aMe7j2CtgqD/moFqjzOr
-         2gOt5AoLxaabAKVzUBKvXYVx6hAb8wzQW9IrSE1MYsMCoRbMj0pUTb/TavL1dPkzqIJa
-         6nqXATTXX1ikbHdX1bDXiojAe62jAzoqJ7bs4KgQqw0VrlPRTAK3LpS8gfgsS62COJGD
-         vSkMsS7hClb6H73+60I69Vn9jn3u0Pdb+/MjqbeMGiYL0vTMpxV5yvfVcCGvdTSNm8kV
-         JJCA==
-X-Forwarded-Encrypted: i=1; AKwUvBwmjC+Fvj7qEwh6CAlp8NL8nSsly8dvd3JZ1jpx19t4J1AY7hnjI+6mYO8t+8ylHU9eyZYLzxuiMd/Eem4=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJJoHmZClUQm8ijXJXpy6CUTLRQ0KcpyR4cLETc1eo5xZ4OChY/
-	PObKdgjBw7bx+fisrZ48T+A/1EeTcw7CASXQhr9LtSgb81Drnglcsi4dfCGc2/MI3A==
-X-Gm-Gg: AYBFou2FDAx+3bZuSFQl0/2mgEQ0bSoZ+HudY04wI9UdVRPEWmBrqyCuGlRf16liT6c
-	Pu4twdQ1YikgKD6lneMev9PivGnVRMDj9oWTqJVABcs7qot8Y8gNf1ciccsizu2sszfMiHP+Brr
-	4jfudDuI7V1E8L70j2GKTYuVWptbpMvXaaan6dX7QXfnytatNziTVvHk4l7lDWYASeSM8Klox/l
-	YL7MXCxeJzqojcde+5hZRPYpBPV30/qLAPMhVAEt/dEIZHVyORAm1W00blR+NOr3YAn3eamISeu
-	3sKBE9mtQSrLGMv5mwau6pK2mbopGiHP1mLkAdF78aimFfsoYMvIQZUhLcctO7jYqy5zteD3BiK
-	eDVh9vGdI6gzqaBdS1hDiu8n3QycS9hxl+GiiVv5wXDB85DCaIJepx08pN/Bl3SoIbD5sOnUCrn
-	++dozVhddi45DrF4ksIxSB/BgxgGmXLfCIXYnIFysRyaDQCFGuOMzccAio1ycjcx1sLX9P16hsm
-	stYvWCr8mwu94C7XkS+0PN0uuEDQNVFE0ebAw2y9AGaHXWHersD/EEeOJf4v5jjzJDyetbE4n2/
-	JQB1FMVGirB9
-X-Received: by 2002:a17:90b:3c92:b0:3a0:cca0:4a8c with SMTP id 98e67ed59e1d1-3ad86e96bfamr898506a91.7.1792582722278;
-        Wed, 21 Oct 2026 04:38:42 -0700 (PDT)
+        bh=fED4JpmOp61wjaCjNReVcAtx8yRLiX3HC88XsoVc9Q8=;
+        b=tN3FnzDv3cJJWzSnItOC9cZG87qvF/c4Shh0MFu2mSP1UovEy/1ayhM9oKIs0KUib2
+         UkUU9eaqvcTYzUPlJ88+a0YqaWBF2NBX8DgaYJiIRfd+ruBHQp1YQ+yMxusMQsvpWKhN
+         Dqvpmf6VaVz6AmzueFLiD+wDoX0SsdBXnRcUi8YIoK8JzV844irZJDdEDC4RHmfQTQ1x
+         ExJI+UJD5gwWw67fkyQnRN6aF6UDW/TvrGTEsII+Ar+15ZxIEuqnrU1fUh/fpSZVcZ54
+         U2A49b+naSU+FMfUbDkugy/5KoIHE6hc4Hu87XyNQvgfmkulcVCFAXu128frfLtYO5ok
+         Qo4A==
+X-Forwarded-Encrypted: i=1; AKwUvBy47UkuVp1+cRbeJjmBieK5ojGBqT2aGiZrVNVeQ5l5Shq84dIyHs+1DSLV0NAPG1CqUS/sXfUWC/Hv9hk=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLVRC+kryDC7pvWK8ZLmc8XHVj+gWfMc/KqNSaX+88yYwQVs0tl
+	9JDHfFaiao/pEova2/Nma3ZYIB4lsn7MaVBZgyhUStQdmDn9yKSqR9J+73nv/EiOmA==
+X-Gm-Gg: AYBFou0fra/xMjHDCWkw/5X01eoE5bJx/sN1QN6kELokogAtzLzBLcxSsZpzfvn6Amc
+	kA9x3KoNoF6ovOuiW5YX3wenUwYmCNhG8CL7g53jIue+DTvD4kU+B5MN7vij4jpHWx/5IyfeL5c
+	vDFDnOBi3b8hASrLBmi+TXZ+5Xfp7BiqUgJPUOJzpJYFN79sNCDTQVYNr6tzAlaa7lbhWO+Bjv+
+	UzHFUrhrTIEaYpz8WNe5xtOkY8AoWO/PTrnqRuRfLWl2J6a7BrGDBxZUusLp7S5HAM7qUtGaet7
+	WiUUaf8H7Z6L9bRzJBvg2MRkZA82YeaVhAH+mxitwB8JWWcyCwsg2FaV2JnhygAkztAcfTJfvE4
+	LxwmQ2R17/e1V5sOJouznTWrUXoJ+f6F+rZ+gInRvcCQhFID4Mmrowi4zar1UbfoQiJ9/0nwU9K
+	Dkhcpzdp0p5QOZxtNEaxCe1VsZF6LGsT+2tEU8ZHVoaqnwagQ9PUiovlMglTgloq2X5Lahmq9ly
+	3v/iQp/A4siwDLvd0IRxv3WClBgkXP2iP8tye4wVAqfV4a8CQKOIftmf2xzBtYJpPW5
+X-Received: by 2002:a17:90b:5645:b0:3ac:b7b9:6471 with SMTP id 98e67ed59e1d1-3ad8707b58bmr1366254a91.65.1792582736386;
+        Wed, 21 Oct 2026 04:38:56 -0700 (PDT)
 Received: from [192.168.29.54] ([2405:201:4019:32fc:3c55:6b24:5147:322b])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ad813eb9casm4023732a91.15.2026.10.21.04.38.32
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ad813eb9casm4023732a91.15.2026.10.21.04.38.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2026 04:38:41 -0700 (PDT)
+        Wed, 21 Oct 2026 04:38:53 -0700 (PDT)
 From: Ayush Singh <ayush@beagleboard.org>
-Date: Wed, 21 Oct 2026 17:07:51 +0530
-Subject: [PATCH v4 3/6] rust: kernel: Add greybus abstractions
+Date: Wed, 21 Oct 2026 17:07:52 +0530
+Subject: [PATCH v4 4/6] drivers: greybus: Add software SVC implementation
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -94,7 +93,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20261021-gb-uart-transport-v4-3-c308ce821d45@beagleboard.org>
+Message-Id: <20261021-gb-uart-transport-v4-4-c308ce821d45@beagleboard.org>
 References: <20261021-gb-uart-transport-v4-0-c308ce821d45@beagleboard.org>
 In-Reply-To: <20261021-gb-uart-transport-v4-0-c308ce821d45@beagleboard.org>
 To: Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com, 
@@ -121,1204 +120,697 @@ Cc: greybus-dev@lists.linaro.org, linux-kernel@vger.kernel.org,
  rust-for-linux@vger.kernel.org, linux-crypto@vger.kernel.org, 
  devicetree@vger.kernel.org, Ayush Singh <ayush@beagleboard.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=44591;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=23919;
  i=ayush@beagleboard.org; h=from:subject:message-id;
- bh=pLs2uysn0ZMsK64mgubWaRzMnBnOZebrNV/ZzjWpQ18=;
- b=owEBbQKS/ZANAwAKAQXO9ceJ5Vp0AcsmYgBq2KQUFlEfdajrzUDIYwdsgKaBsD62o+xnbwRaN
- UU4DHzEpUiJAjMEAAEKAB0WIQTfzBMe8k8tZW+lBNYFzvXHieVadAUCatikFAAKCRAFzvXHieVa
- dKLlD/4n2iXV7m+dSy76U8343rGXgsVNeuL5eGRMwfGMDfmtlp07B00Sb02CwSsPHEj18aLNPBP
- VFhp7pYr2T/vksNtA9oklEV1sB1f9JRlwDhPQ6vUuju6v2DoAT6yn7M3axU2E3Mp80fDl7q0X86
- ZOejSi0VUIHfZDyyuGBDQ/K89cw+7LwM4namV/cNWx8KvXjJeNMldSMxM4m0aNZQvya11g8coWC
- MSvdNm7CB4FBKhmfWmdqGISkhO9iiM6ir8vkWrj4Hr4S1Z+0ECjDrsXJQSfSabue3jYVROWtfI0
- WaKykwYLJ/NQ5a5OkKHoiHuNiKOUVtT+54kKDQibgEQWCXhj16O5ccU4mxn9X/REpV8ur1TzUUi
- U3lO/BsipS/MeifxpHoPxQSb5qUsvffv1fuFOkkR0xBC+nnyK/mxRyYbTaaguddFOQ2k1jMnYVH
- W1kM82YH1/Q/zbwT/O5XQ2MhDRTyTivcUbVKenKRw/p4byoANg81/QOlk2cxAhjOjHmVUrOPfJh
- 2ZaSC2zqDdYjFRWGOJXl/BSxNh9wkum4/yTk8OEirq6ZNy7Mub2mfqW+l9VCQKiCIkRGA0p2ttq
- k/VMjZ1V3AuVi6NOdbjPYCUpOfW+7Zt0i1WBC7yEPsOgCudd5KD4xSXfdzVG29stCq4/3rmKuPM
- 34lVGXFtXDFCC8w==
+ bh=fs4gndOXpFOPljF0g/QK2l8CP37jJuyhcx7I6Ghu6VQ=;
+ b=owEBbQKS/ZANAwAKAQXO9ceJ5Vp0AcsmYgBq2KQUOouQXbdkwjtujP/Xrpo3sCxSrBOiSNXNT
+ UH1e14JXlqJAjMEAAEKAB0WIQTfzBMe8k8tZW+lBNYFzvXHieVadAUCatikFAAKCRAFzvXHieVa
+ dFCHEACmMzPiIr9veD3FNodVRz1vIGJbXeO++YpvCGfcpM5s4mCbzth6uPCr0na1ENE4yFvRJkd
+ S/fWudm6Zy7nVz78yxNInE+PQFLm+Gq588oklyMXueu24VhAkQil/4ZjeLxAVepF8au1w+DEAGi
+ gv3R0/jLySF6GFUILyDVKAHDv6FtjD61lLyqOxtTDk0DTakeKKdubVuSMd/jz8N7Fd7+ctaZBDd
+ 7OuHkWLI44zjeUuPEIWX5kz9ciXgU+rsFEY7oFD4H1JRRWQ/vtp+qfJe63Um8oFgskpMtmNrmyJ
+ DFWRGjisQcWvr5WGT0D5JO40ibgf0pxKELYBvSgLilOoJIFWH3Ih4cIn9tGiGDWt69aLClSvIms
+ 3KTCVRVwb/Q7utxq426IVpcYOr7AybxDmcg3MLZAc2X+mXTGvW8LmwaTeKdJpvaqLvq5z/3pmxQ
+ LC4OK3hhMM+zCPvQEZb/adbVWURtq1a5IVIqdEAUPZUciiFV4DJbmOq8vQRrn5TTznV2eHN4UAy
+ 1gtqLZMc52GGb8lZCVAYZnuCNOYzMIrRUJ3eba9esQ+cuJ/zcd7xa+y3VwzL7/w3wPxIvgGnMR3
+ 3rJA8LiGdQg9QTRm1+PU26KA8pjVcZeLrlx3BLn7l4wsl58s0/pylZP50IqQBCEQY/lyjvNBdQ7
+ TgzJfziCybu4kZw==
 X-Developer-Key: i=ayush@beagleboard.org; a=openpgp;
  fpr=DFCC131EF24F2D656FA504D605CEF5C789E55A74
 
-Add Rust abstractions for the Greybus core, enough to implement a
-Greybus host driver in Rust.
+A Greybus network requires an SVC (Supervisory Controller) to bring
+interfaces up, assign device IDs and connect CPorts to the AP. On a
+UniPro network the SVC is a real entity on the bus, but transports that
+merely carry Greybus messages - a UART, an I2C bus, a network link -
+have no such entity, so every host driver for those transports ends up
+open-coding an SVC emulation of its own.
 
-The abstractions are split into 3 modules:
+Add gb-softsvc, a Rust implementation of the SVC that lives in the
+kernel and registers itself as a Greybus host device. It answers the
+SVC-side operations the core expects during interface bring-up and
+teardown.
 
-- Top level mod.rs: Basic abstractions greybus structures.
-- hd.rs: Greybus Host Device specific abstractions.
-- protocols.rs: Abstractions for greybus_protocols.h, i.e. greybus
-  protocol types and constants.
+Host drivers use it through a small in-kernel interface. A driver
+implements the NodeOps trait to send data towards its node and then
+calls module_insert() to announce a new node, submit_message() to hand
+incoming Greybus messages back to the core, and module_remove() on
+disconnect. Interface IDs are allocated by the SVC and returned from
+module_insert().
 
-Only the APIs used by gb-softsvc and gb-uart-node driver are covered.
-As such, protocols.rs also only contains abstractions for greybus
-structures that are used by SVC and some types such as Greybus Interface
-do not implement AlwaysRefCounted at the moment.
+Connection create/destroy and interface activate/resume currently just
+acknowledge the request; callbacks into NodeOps can be added later if
+transports need to act on them.
 
-HdDriver Note
-**************
+gb_softsvc_exports.c exports the Rust symbols for dependent modules, as
+the build system does not yet support Rust cross-module dependencies
+natively. This hack is taken from nova-core [0].
 
-- In C message_send callback, it is possible for the caller to defer
-  calling gb_message_sent. This is used in es2 driver. However, looking at
-  the internals, it does not seem like the message owenership is actually
-  transferred to the caller in real terms. Instead, it is more like the
-  caller is shared ownership. This is evident by the fact that
-  message_cancel can be called at any point, and depending on wheather the
-  message is request or response, the message can become invalid after the
-  message_cancel callback. Thus the driver is expected to ensure that no
-  dangling references to that message exist.
-
-  Since gb_message is not an internally ref counted structure in true
-  terms (it does seem to use the ref counting in the internal operation),
-  and since double calls to gb_message_sent are not really allowed, I have
-  made the decision to call gb_message_sent on a message in the
-  abstractions rather than making the driver call it. This means the
-  driver only gets a reference to the message, and never owns it. This
-  does prevent a driver to use it in the way es2 currently does, but seems
-  much less of a footgun.
-
-  Another possibility would be to implement AlwaysRefCounted on Message
-  and pass the calls to gb_operation_get/put, but I have not gone through
-  the internals enough to figure out if this is correct in all cases.
-
-- At the moment, nothing in-tree calls message_send from an atomic
-  context. However, since it does have gfp_mask in param, and an
-  exported function, it is possible to call it from atomic context. So
-  not sure if the doc comment should specific non-sleep requirement.
-
-- message_cancel does not directly provide access to driver data. This
-  was flagged by sashiko-bot. It actually is possible for the Rust
-  abstractions to provide the driver data though. This is because we can
-  do gb_message->operation->connection->host_device->priv_data. However,
-  not sure if we should do this just in Rust abstractions. Maybe it
-  would be preferable to change the C API itself instead.
+[0]: https://lore.kernel.org/all/20260622-nova-exports-v5-0-6191773fc977@nvidia.com/
 
 Signed-off-by: Ayush Singh <ayush@beagleboard.org>
 ---
- MAINTAINERS                      |   1 +
- drivers/greybus/Kconfig          |   8 +
- rust/bindings/bindings_helper.h  |   1 +
- rust/kernel/alloc.rs             |   6 +
- rust/kernel/greybus/hd.rs        | 362 ++++++++++++++++++++++++++++++++
- rust/kernel/greybus/mod.rs       | 220 +++++++++++++++++++
- rust/kernel/greybus/protocols.rs | 442 +++++++++++++++++++++++++++++++++++++++
- rust/kernel/lib.rs               |   2 +
- 8 files changed, 1042 insertions(+)
+ MAINTAINERS                          |   6 +
+ drivers/greybus/Kconfig              |  12 +
+ drivers/greybus/Makefile             |  40 +++
+ drivers/greybus/gb_softsvc.rs        | 520 +++++++++++++++++++++++++++++++++++
+ drivers/greybus/gb_softsvc_exports.c |  15 +
+ 5 files changed, 593 insertions(+)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 772023e0e5a4..4d98db7618c3 100644
+index 4d98db7618c3..c9126dc205db 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -11526,6 +11526,7 @@ F:	drivers/greybus/
- F:	drivers/staging/greybus/
- F:	include/linux/greybus.h
- F:	include/linux/greybus/
-+F:	rust/kernel/greybus/
+@@ -11516,6 +11516,12 @@ S:	Maintained
+ F:	Documentation/devicetree/bindings/net/ti,cc1352p7.yaml
+ F:	drivers/greybus/gb-beagleplay.c
  
- GREYBUS UART PROTOCOLS DRIVERS
- M:	David Lin <dtwlin@gmail.com>
++GREYBUS SOFTSVC DRIVERS
++M:	Ayush Singh <ayush@beagleboard.org>
++L:	greybus-dev@lists.linaro.org (moderated for non-subscribers)
++S:	Maintained
++F:	drivers/greybus/gb_softsvc.rs
++
+ GREYBUS SUBSYSTEM
+ M:	Johan Hovold <johan@kernel.org>
+ M:	Alex Elder <elder@kernel.org>
 diff --git a/drivers/greybus/Kconfig b/drivers/greybus/Kconfig
-index c3f056d28b01..d9f52024d1c2 100644
+index d9f52024d1c2..709563f8c0ad 100644
 --- a/drivers/greybus/Kconfig
 +++ b/drivers/greybus/Kconfig
-@@ -15,6 +15,14 @@ menuconfig GREYBUS
+@@ -49,5 +49,17 @@ config GREYBUS_ES2
  	  To compile this code as a module, choose M here: the module
- 	  will be called greybus.ko
+ 	  will be called gb-es2.ko
  
-+config RUST_GREYBUS_ABSTRACTIONS
-+	bool "Rust greybus abstractions"
-+	depends on RUST
-+	depends on SYSFS
-+	select GREYBUS
++config GREYBUS_SOFTSVC
++	tristate "Greybus software SVC"
++	depends on RUST_GREYBUS_ABSTRACTIONS
 +	help
-+	  This enables the Rust abstraction for the Greybus API.
++	  Select this option to enable a software implementation of the
++	  Greybus SVC (Supervisory Controller) running in the kernel. It can
++	  be used by host drivers that talk to a Greybus network which does
++	  not provide an SVC of its own.
 +
- if GREYBUS
- 
- config GREYBUS_BEAGLEPLAY
-diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
-index 55d1a2d7655a..91ac64687d23 100644
---- a/rust/bindings/bindings_helper.h
-+++ b/rust/bindings/bindings_helper.h
-@@ -64,6 +64,7 @@
- #include <linux/firmware.h>
- #include <linux/fwctl.h>
- #include <linux/fs.h>
-+#include <linux/greybus.h>
- #include <linux/i2c.h>
- #include <linux/interrupt.h>
- #include <linux/io-pgtable.h>
-diff --git a/rust/kernel/alloc.rs b/rust/kernel/alloc.rs
-index 68d80f3fa6c8..b3c55fb2c2f1 100644
---- a/rust/kernel/alloc.rs
-+++ b/rust/kernel/alloc.rs
-@@ -38,6 +38,12 @@
- pub struct Flags(u32);
- 
- impl Flags {
-+    /// Creates [`Flags`] from a raw `gfp_t`.
-+    #[cfg_attr(not(CONFIG_RUST_GREYBUS_ABSTRACTIONS), expect(dead_code))]
-+    pub(crate) fn new(v: bindings::gfp_t) -> Self {
-+        Self(v)
-+    }
++	  To compile this code as a module, choose M here: the module
++	  will be called gb-softsvc.ko
 +
-     /// Get the raw representation of this flag.
-     pub(crate) fn as_raw(self) -> u32 {
-         self.0
-diff --git a/rust/kernel/greybus/hd.rs b/rust/kernel/greybus/hd.rs
+ endif	# GREYBUS
+ 
+diff --git a/drivers/greybus/Makefile b/drivers/greybus/Makefile
+index d986e94f8897..0fa802fdf6ca 100644
+--- a/drivers/greybus/Makefile
++++ b/drivers/greybus/Makefile
+@@ -25,4 +25,44 @@ gb-es2-y := es2.o
+ 
+ obj-$(CONFIG_GREYBUS_ES2)	+= gb-es2.o
+ 
++obj-$(CONFIG_GREYBUS_SOFTSVC)	+= gb-softsvc.o
++gb-softsvc-y			+= gb_softsvc.o gb_softsvc_exports.o
+ 
++rust_needed_exports = \
++	{ $(if $(strip $(2)),$(NM) -u $(2);,) echo "__DEFINED_RUST_SYMBOLS__"; \
++	  $(NM) -p --defined-only $(1); } | \
++	awk -v fmt='$(3)' ' \
++		/^__DEFINED_RUST_SYMBOLS__$$/ { defs = 1; next } \
++		!defs { if ($$NF ~ /^_R/) needed[$$NF] = 1; next } \
++		defs && $$2 ~ /(T|R|D|B)/ && $$3 ~ /^_R/ && \
++			$$3 !~ /_(init|cleanup)_module$$/ && \
++			$$3 !~ /__(pfx|cfi|odr_asan)/ && \
++			$$3 in needed { printf fmt, $$3 } \
++	'
++
++quiet_cmd_exports = EXPORTS $@
++      cmd_exports = \
++	$(call rust_needed_exports,$<,$(gb-softsvc-export-deps),EXPORT_SYMBOL_RUST_GPL(%s);\n) > $@
++
++$(obj)/exports_gb_softsvc_generated.h: $(obj)/gb_softsvc.o $(gb-softsvc-export-deps) FORCE
++	$(call if_changed,exports)
++
++targets += exports_gb_softsvc_generated.h
++
++$(obj)/gb_softsvc_exports.o: $(obj)/exports_gb_softsvc_generated.h
++CFLAGS_gb_softsvc_exports.o := -I $(objtree)/$(obj)
++
++ifdef CONFIG_MODVERSIONS
++# The C export shim declares Rust symbols as `extern int`, so reuse its export
++# list but generate symbol CRCs from the Rust object instead of the shim's DWARF.
++$(obj)/gb_softsvc_exports.o: private cmd_gensymtypes_c = \
++	$(call getexportsymbols,\1) | \
++	$(objtree)/scripts/gendwarfksyms/gendwarfksyms \
++		$(if $(KBUILD_GENDWARFKSYMS_STABLE), --stable) \
++		$(if $(KBUILD_SYMTYPES), --symtypes $(@:.o=.symtypes),) \
++		$(obj)/gb_softsvc.o
++endif
++
++# Output gb_softsvc's crate metadata for use by gb_uart_node at compile time.
++RUSTFLAGS_gb_softsvc.o += \
++	--emit=metadata=$(objtree)/$(obj)/libgb_softsvc.rmeta
+diff --git a/drivers/greybus/gb_softsvc.rs b/drivers/greybus/gb_softsvc.rs
 new file mode 100644
-index 000000000000..45a2d53ee80f
+index 000000000000..f88d9b3fd565
 --- /dev/null
-+++ b/rust/kernel/greybus/hd.rs
-@@ -0,0 +1,362 @@
++++ b/drivers/greybus/gb_softsvc.rs
+@@ -0,0 +1,520 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
-+//! Greybus host device abstractions.
++//! Greybus software SVC.
 +//!
-+//! A driver implements the transmit path through [`HdDriver`] and feeds received data back into
-+//! the core with [`Device::data_rcvd`].
++//! A Greybus network needs an SVC to bring interfaces up and to connect their CPorts to the AP.
++//! Transports that carry Greybus without one - a UART or an I2C bus rather than a UniPro network -
++//! have to provide it themselves.
 +//!
-+//! A host device is created, populated with driver private data and added to the Greybus bus by
-+//! constructing a [`Registration`], which owns the underlying `struct gb_host_device`. Dropping
-+//! the registration drops the private data and removes the device from the bus, so it is normally
-+//! stored in the driver data of the parent device and torn down implicitly when that device goes
-+//! away.
-+//!
-+//! Individual references to a live host device are represented by
-+//! [`ARef<Device>`](crate::sync::aref::ARef), which keeps the embedded `struct device` reference
-+//! count balanced.
-+//!
-+//! C header: [`include/linux/greybus/hd.h`](srctree/include/linux/greybus/hd.h)
-+//!
-+//! # Examples
-+//!
-+//! ```ignore
-+//! use kernel::{device, prelude::*};
-+//!
-+//! struct MyHd {
-+//!     // transport state
-+//! }
-+//!
-+//! #[vtable]
-+//! impl HdDriver for MyHd {
-+//!     fn message_send(data: &Self, hd: &Device, dest_cport_id: u16, msg: Message) -> Result {
-+//!         // Copy what is needed out of `msg`, queue it, and return without sleeping.
-+//!         // Call `HostDevice::message_sent()` once the core may release the message.
-+//!         Ok(())
-+//!     }
-+//!
-+//!     fn message_cancel(_msg: Message) {}
-+//! }
-+//!
-+//! fn probe(parent: &device::Device) -> Result<Registration<MyHd>> {
-+//!     Registration::new(parent, BUFFER_SIZE_MAX, NUM_CPORTS, try_pin_init!(MyHd {}))
-+//! }
-+//! ```
++//! This module implements that SVC in software.
 +
-+use core::{
-+    marker::PhantomData,
-+    ptr::{
-+        addr_of_mut,
-+        NonNull, //
-+    },
-+};
-+
-+use crate::{
++use kernel::{
 +    alloc::Flags,
-+    device,
-+    error::{
-+        code,
-+        from_err_ptr,
-+        to_result, //
++    c_str,
++    error::code,
++    faux,
++    greybus::{
++        self,
++        hd,
++        protocols,
++        CPORT_ID_MAX,
++        GB_OPERATION_SIZE_MAX, //
 +    },
-+    greybus::Message,
++    id_pool::IdPool,
++    new_spinlock,
 +    prelude::*,
-+    sync::aref::AlwaysRefCounted,
-+    types::Opaque,
++    sync::{
++        aref::ARef,
++        Arc,
++        SpinLock, //
++    },
++    transmute::AsBytes,
 +};
++use pin_init::init_array_from_fn;
 +
-+/// The set of callbacks a Greybus host driver can provide.
++const SVC_VERSION_MAJOR: u8 = 0;
++const SVC_VERSION_MINOR: u8 = 1;
++
++const ENDO_ID: u16 = 0;
++const AP_INF_ID: u8 = 0;
++
++const TOSHIBA_DMID: u32 = 0x0126;
++
++const MAX_INTF_ID: u8 = u8::MAX;
++const INTF_ID_START: u8 = 1;
++const INTF_MAP_LEN: usize = (MAX_INTF_ID - INTF_ID_START) as usize;
++
++#[repr(C, packed)]
++struct Msg<P> {
++    hdr: protocols::GbOperationMsgHdr,
++    payload: P,
++}
++
++// SAFETY: `Msg` is `repr(C, packed)`, so it has no padding between its fields, and both fields
++// are `AsBytes`, so neither has uninitialized bytes of its own.
++unsafe impl<P: AsBytes> AsBytes for Msg<P> {}
++
++impl<P> Msg<P> {
++    const GB_SIZE: u16 = size_of::<Self>() as u16;
++
++    /// Builds a request of type `ty`.
++    ///
++    /// An `operation_id` of zero marks a unidirectional request, for which the AP sends no
++    /// response.
++    const fn request(operation_id: u16, ty: u8, payload: P) -> Self {
++        Self {
++            hdr: protocols::GbOperationMsgHdr::new(Self::GB_SIZE, operation_id, ty, 0),
++            payload,
++        }
++    }
++
++    /// Builds the response to `request`, carrying `result`.
++    const fn response(request: &protocols::GbOperationMsgHdr, result: u8, payload: P) -> Self {
++        Self {
++            hdr: protocols::GbOperationMsgHdr::new(
++                Self::GB_SIZE,
++                request.operation_id(),
++                request.msg_type() | protocols::MESSAGE_TYPE_RESPONSE,
++                result,
++            ),
++            payload,
++        }
++    }
++}
++
++const _: () = assert!(size_of::<Msg<()>>() == size_of::<protocols::GbOperationMsgHdr>());
++
++module! {
++    type: GreybusSoftSvc,
++    name: "gb_softsvc",
++    authors: ["Ayush Singh <ayush@beagleboard.org>"],
++    description: "Greybus software SVC implementation",
++    license: "GPL",
++}
++
++kernel::sync::global_lock! {
++    unsafe(uninit) static GLOBAL_STATE: Mutex<Option<GlobalState>> = None;
++}
++
++struct GlobalState {
++    svc: Arc<Svc>,
++    gb_hd: ARef<hd::Device>,
++}
++
++impl GlobalState {
++    fn new(svc: Arc<Svc>, gb_hd: ARef<hd::Device>) -> Self {
++        Self { svc, gb_hd }
++    }
++}
++
++#[pin_data]
++struct Svc {
++    #[pin]
++    svc_operation_id: SpinLock<IdPool>,
++    // Pos 0 = INTF_ID_START
++    #[pin]
++    intf_map: SpinLock<[Option<Arc<dyn InterfaceOps>>; INTF_MAP_LEN]>,
++}
++
++impl Svc {
++    fn new() -> impl PinInit<Self, Error> {
++        pin_init!(Self {
++            intf_map <- new_spinlock!(init_array_from_fn(|_| None)),
++            svc_operation_id <- new_spinlock!(IdPool::with_capacity(u16::MAX.into(), GFP_KERNEL)?)
++        }? Error)
++    }
++
++    fn new_operation_id(&self) -> Result<u16> {
++        let mut ida = self.svc_operation_id.lock();
++        let res = ida.find_unused_id(1).ok_or(code::EOVERFLOW)?.acquire() as u16;
++
++        Ok(res)
++    }
++
++    fn release_operation_id(&self, id: u16) {
++        let mut ida = self.svc_operation_id.lock();
++        ida.release_id(id as usize);
++    }
++
++    fn map_insert(&self, intfs: &[Arc<dyn InterfaceOps>]) -> Result<u8> {
++        fn find_empty_window(
++            intf_map: &[Option<Arc<dyn InterfaceOps>>; INTF_MAP_LEN],
++            count: usize,
++        ) -> Result<u8> {
++            for (id, window) in intf_map.windows(count).enumerate() {
++                if window.iter().all(|x| x.is_none()) {
++                    return Ok(id as u8);
++                }
++            }
++
++            Err(code::EOVERFLOW)
++        }
++
++        let mut guard = self.intf_map.lock();
++
++        let pos = find_empty_window(&guard, intfs.len())?;
++        for (i, intf) in intfs.iter().cloned().enumerate() {
++            guard[usize::from(pos) + i] = Some(intf);
++        }
++
++        Ok(pos + INTF_ID_START)
++    }
++
++    fn map_remove(&self, primary_id: u8, intf_count: u8, dev: &kernel::device::Device) {
++        let id = match primary_id.checked_sub(INTF_ID_START) {
++            Some(x) => x,
++            None => {
++                dev_warn!(dev, "Invalid interace id");
++                return;
++            }
++        };
++
++        for i in 0..intf_count {
++            let _ = self.intf_map.lock()[usize::from(id + i)].take();
++        }
++    }
++
++    fn intf_by_id(&self, id: u8) -> Result<Arc<dyn InterfaceOps>> {
++        let id = id - INTF_ID_START;
++        let guard = self.intf_map.lock();
++
++        guard
++            .get(usize::from(id))
++            .ok_or(code::ENODEV)?
++            .as_ref()
++            .ok_or(code::ENODEV)
++            .cloned()
++    }
++
++    fn send_request<P: AsBytes>(&self, hd: &hd::Device, ty: u8, payload: P) -> Result<()> {
++        let msg = Msg::request(self.new_operation_id()?, ty, payload);
++        hd.data_rcvd(protocols::GB_SVC_CPORT_ID, msg.as_bytes());
++        Ok(())
++    }
++
++    fn module_insert(&self, hd: &hd::Device, intfs: &[Arc<dyn InterfaceOps>]) -> Result<u8> {
++        let intf_id = self.map_insert(intfs)?;
++        // map_insert already checks that intf len fits in u8
++        let intf_count = intfs.len() as u8;
++
++        let payload = protocols::GbSvcModuleInsertedRequest::new(intf_id, intf_count, 0);
++        let res = self.send_request(hd, protocols::GB_SVC_TYPE_MODULE_INSERTED, payload);
++
++        if res.is_err() {
++            self.map_remove(intf_id, intf_count, hd.as_ref());
++        }
++
++        res.map(|()| intf_id)
++    }
++
++    fn module_remove(&self, hd: &hd::Device, intf_id: u8, intf_count: u8) -> Result<()> {
++        let payload = protocols::GbSvcModuleRemovedRequest::new(intf_id);
++        let res = self.send_request(hd, protocols::GB_SVC_TYPE_MODULE_REMOVED, payload);
++
++        if res.is_err() {
++            dev_warn!(
++                hd.as_ref(),
++                "Failed to send module_removed svc request for {}",
++                intf_id
++            );
++        }
++
++        self.map_remove(intf_id, intf_count, hd.as_ref());
++
++        Ok(())
++    }
++
++    fn send_version(&self, hd: &hd::Device) -> Result<()> {
++        dev_info!(hd.as_ref(), "Sending SVC version request");
++
++        let payload = protocols::GbSvcVersionRequest::new(SVC_VERSION_MAJOR, SVC_VERSION_MINOR);
++        self.send_request(hd, protocols::GB_SVC_TYPE_PROTOCOL_VERSION, payload)?;
++
++        Ok(())
++    }
++
++    fn send_svc_hello(&self, hd: &hd::Device) -> Result<()> {
++        dev_info!(hd.as_ref(), "Sending SVC Hello request");
++
++        let payload = protocols::GbSvcHelloRequest::new(ENDO_ID, AP_INF_ID);
++        self.send_request(hd, protocols::GB_SVC_TYPE_SVC_HELLO, payload)?;
++
++        Ok(())
++    }
++
++    fn send_response<P: AsBytes>(
++        &self,
++        hd: &hd::Device,
++        msg: &protocols::GbOperationMsgHdr,
++        payload: P,
++    ) {
++        let msg = Msg::response(msg, 0, payload);
++        hd.data_rcvd(protocols::GB_SVC_CPORT_ID, msg.as_bytes());
++    }
++
++    fn intf_set_pwrm(&self, hd: &hd::Device, msg: &greybus::Message) -> Result<()> {
++        let req_msg: &protocols::GbSvcIntfSetPwrmRequest = msg.payload().ok_or(code::EINVAL)?;
++        let result_code = if req_msg.tx_mode() == protocols::GB_SVC_UNIPRO_HIBERNATE_MODE
++            && req_msg.rx_mode() == protocols::GB_SVC_UNIPRO_HIBERNATE_MODE
++        {
++            protocols::GB_SVC_SETPWRM_PWR_OK
++        } else {
++            protocols::GB_SVC_SETPWRM_PWR_LOCAL
++        };
++
++        let payload = protocols::GbSvcIntfSetPwrmResponse::new(result_code);
++        self.send_response(hd, msg.header(), payload);
++
++        Ok(())
++    }
++
++    fn dme_peer_get(&self, hd: &hd::Device, hdr: &protocols::GbOperationMsgHdr) {
++        let payload = protocols::GbSvcDmePeerGetResponse::new(0, TOSHIBA_DMID);
++        self.send_response(hd, hdr, payload);
++    }
++
++    fn dme_peer_set(&self, hd: &hd::Device, hdr: &protocols::GbOperationMsgHdr) {
++        let payload = protocols::GbSvcDmePeerSetResponse::new(0);
++        self.send_response(hd, hdr, payload);
++    }
++
++    fn pwrmon_rail_count_get(&self, hd: &hd::Device, hdr: &protocols::GbOperationMsgHdr) {
++        let payload = protocols::GbSvcPwrmonRailCountGetResponse::new(0);
++        self.send_response(hd, hdr, payload);
++    }
++
++    fn intf_vsys_enable_disable(&self, hd: &hd::Device, hdr: &protocols::GbOperationMsgHdr) {
++        let payload = protocols::GbSvcIntfVsysResponse::new(protocols::GB_SVC_INTF_VSYS_OK);
++        self.send_response(hd, hdr, payload);
++    }
++
++    fn intf_refclk_enable_disable(&self, hd: &hd::Device, hdr: &protocols::GbOperationMsgHdr) {
++        let payload = protocols::GbSvcIntfRefclkResponse::new(protocols::GB_SVC_INTF_VSYS_OK);
++        self.send_response(hd, hdr, payload);
++    }
++
++    fn intf_unipro_enable_disable(&self, hd: &hd::Device, hdr: &protocols::GbOperationMsgHdr) {
++        let payload = protocols::GbSvcIntfUniproResponse::new(protocols::GB_SVC_INTF_UNIPRO_OK);
++        self.send_response(hd, hdr, payload);
++    }
++
++    fn intf_activate(&self, hd: &hd::Device, msg: &greybus::Message) {
++        let payload = protocols::GbSvcIntfActivateResponse::new(
++            protocols::GB_SVC_OP_SUCCESS,
++            protocols::GB_SVC_INTF_TYPE_GREYBUS,
++        );
++
++        // TODO: Maybe call a callback?
++
++        self.send_response(hd, msg.header(), payload);
++    }
++
++    fn intf_resume(&self, hd: &hd::Device, msg: &greybus::Message) {
++        let payload = protocols::GbSvcIntfResumeResponse::new(protocols::GB_SVC_OP_SUCCESS);
++
++        // TODO: Maybe call a callback?
++
++        self.send_response(hd, msg.header(), payload);
++    }
++
++    fn conn_create(&self, hd: &hd::Device, msg: &greybus::Message) -> Result<()> {
++        // TODO: Evaluate if we need to add callback to NodeOps
++        self.send_response(hd, msg.header(), ());
++
++        Ok(())
++    }
++
++    fn conn_destroy(&self, hd: &hd::Device, msg: &greybus::Message) -> Result<()> {
++        // TODO: Evaluate if we need to add callback to NodeOps
++        self.send_response(hd, msg.header(), ());
++
++        Ok(())
++    }
++
++    fn handler(&self, hd: &hd::Device, msg: &greybus::Message) -> Result<()> {
++        let hdr = msg.header();
++
++        if hdr.is_response() {
++            self.release_operation_id(hdr.operation_id());
++        }
++
++        match (hdr.is_response(), hdr.request_type()) {
++            (
++                false,
++                protocols::GB_SVC_TYPE_INTF_DEVICE_ID
++                | protocols::GB_SVC_TYPE_ROUTE_CREATE
++                | protocols::GB_SVC_TYPE_ROUTE_DESTROY
++                | protocols::GB_SVC_TYPE_PING,
++            ) => self.send_response(hd, hdr, ()),
++            (false, protocols::GB_SVC_TYPE_CONN_CREATE) => self.conn_create(hd, msg)?,
++            (false, protocols::GB_SVC_TYPE_CONN_DESTROY) => self.conn_destroy(hd, msg)?,
++            (false, protocols::GB_SVC_TYPE_DME_PEER_GET) => self.dme_peer_get(hd, hdr),
++            (false, protocols::GB_SVC_TYPE_DME_PEER_SET) => self.dme_peer_set(hd, hdr),
++            (false, protocols::GB_SVC_TYPE_INTF_SET_PWRM) => self.intf_set_pwrm(hd, msg)?,
++            (false, protocols::GB_SVC_TYPE_PWRMON_RAIL_COUNT_GET) => {
++                self.pwrmon_rail_count_get(hd, hdr)
++            }
++            (
++                false,
++                protocols::GB_SVC_TYPE_INTF_VSYS_ENABLE | protocols::GB_SVC_TYPE_INTF_VSYS_DISABLE,
++            ) => self.intf_vsys_enable_disable(hd, hdr),
++            (
++                false,
++                protocols::GB_SVC_TYPE_INTF_REFCLK_ENABLE
++                | protocols::GB_SVC_TYPE_INTF_REFCLK_DISABLE,
++            ) => self.intf_refclk_enable_disable(hd, hdr),
++            (
++                false,
++                protocols::GB_SVC_TYPE_INTF_UNIPRO_ENABLE
++                | protocols::GB_SVC_TYPE_INTF_UNIPRO_DISABLE,
++            ) => self.intf_unipro_enable_disable(hd, hdr),
++            (false, protocols::GB_SVC_TYPE_INTF_ACTIVATE) => self.intf_activate(hd, msg),
++            (false, protocols::GB_SVC_TYPE_INTF_RESUME) => self.intf_resume(hd, msg),
++            (true, protocols::GB_SVC_TYPE_PROTOCOL_VERSION) => self.send_svc_hello(hd)?,
++            (
++                true,
++                protocols::GB_SVC_TYPE_MODULE_INSERTED
++                | protocols::GB_SVC_TYPE_SVC_HELLO
++                | protocols::GB_SVC_TYPE_MODULE_REMOVED,
++            ) => {}
++            _ => return Err(code::ENOTSUPP),
++        };
++
++        Ok(())
++    }
++}
++
++struct GbHdDriver(Arc<Svc>);
++
 +#[vtable]
-+pub trait HdDriver: Send + Sync + Sized + 'static {
-+    /// Transmits `msg` to `dest_cport_id`.
-+    ///
-+    /// The message is only borrowed for the duration of this call: copy what is needed out of it,
-+    /// do not stash the reference.
-+    ///
-+    /// `hd` is the host device the message is sent on. It is only guaranteed to be alive for the
-+    /// duration of this call.
++impl hd::HdDriver for GbHdDriver {
 +    fn message_send(
 +        data: &Self,
-+        hd: &Device,
++        hd: &hd::Device,
 +        dest_cport_id: u16,
-+        msg: &Message,
++        msg: &greybus::Message,
 +        gfp_mask: Flags,
-+    ) -> Result;
++    ) -> Result {
++        if dest_cport_id == protocols::GB_SVC_CPORT_ID {
++            data.0.handler(hd, msg)
++        } else {
++            let conn = msg.operation().connection();
++            let intf = data.0.intf_by_id(conn.interface().unwrap().id())?;
 +
-+    /// Aborts the transmission of a message previously handed to [`HdDriver::message_send`].
-+    ///
-+    /// Always called in process context.
-+    fn message_cancel(msg: &Message);
-+}
++            let mut buf = KVec::with_capacity(msg.header().size().into(), gfp_mask)?;
 +
-+/// Builds the C callback table for a [`HdDriver`] implementation.
-+struct HdDriverVTable<T: HdDriver>(PhantomData<T>);
++            buf.extend_from_slice(msg.header().as_bytes(), gfp_mask)?;
++            buf.extend_from_slice(msg.payload_bytes(), gfp_mask)?;
 +
-+impl<T: HdDriver> HdDriverVTable<T> {
-+    const DRIVER: bindings::gb_hd_driver = bindings::gb_hd_driver {
-+        // Both are mandatory, hence no `HAS_*` check. See [`HdDriver`].
-+        message_send: Some(Self::message_send),
-+        message_cancel: Some(Self::message_cancel),
-+        // Every other callback is left `NULL`, which the Greybus core takes as "use the default
-+        // behaviour".
-+        ..pin_init::zeroed()
-+    };
-+
-+    const fn build() -> &'static bindings::gb_hd_driver {
-+        &Self::DRIVER
-+    }
-+
-+    /// # Safety
-+    ///
-+    /// `hd` must point at a registered host device whose private area holds a pointer to a live
-+    /// `T`, and `msg` must point at a valid message.
-+    unsafe extern "C" fn message_send(
-+        hd: *mut bindings::gb_host_device,
-+        dest_cport_id: u16,
-+        msg: *mut bindings::gb_message,
-+        gfp_mask: bindings::gfp_t,
-+    ) -> c_int {
-+        // SAFETY: `gb_host_device` and `HostDevice` have the same layout.
-+        let hd = unsafe { Device::<device::CoreInternal<'_>>::from_raw(hd) };
-+        // SAFETY: `message_send` is only ever called after a successful call to
-+        // `gb_hd_add`, hence it's guaranteed that `Device::set_drvdata()` has been called
-+        // and stored a `Pin<KBox<T>>`.
-+        let data = unsafe { hd.as_ref().drvdata_borrow() };
-+        // SAFETY: The caller guarantees `msg` is valid for the duration of this call.
-+        let msg = unsafe { Message::from_raw(msg) };
-+
-+        // SAFETY: The caller guarantees `hd` is a registered host device, alive for the duration
-+        // of this call.
-+        let hd_normal = unsafe { Device::<device::Normal>::from_raw(hd.as_raw()) };
-+
-+        match T::message_send(&data, hd_normal, dest_cport_id, msg, Flags::new(gfp_mask)) {
-+            Ok(()) => {
-+                // SAFETY: `msg` is still valid since `sent` is not called anywhere else.
-+                unsafe { msg.sent(hd, 0) };
-+                0
-+            }
-+            Err(e) => e.to_errno(),
++            intf.write(&buf, conn.intf_cport_id(), gfp_mask)
 +        }
 +    }
 +
-+    /// # Safety
-+    ///
-+    /// `msg` must point at a valid message of a registered host device of this driver.
-+    unsafe extern "C" fn message_cancel(msg: *mut bindings::gb_message) {
-+        // SAFETY: The caller guarantees `msg` is valid for the duration of this call.
-+        let msg = unsafe { Message::from_raw(msg) };
-+        T::message_cancel(msg);
-+    }
++    fn message_cancel(_msg: &greybus::Message) {}
 +}
 +
-+/// A Greybus host device.
-+///
-+/// # Invariants
-+///
-+/// The wrapped value is a valid `struct gb_host_device` created by `gb_hd_create()`, and every
-+/// [`ARef<HostDevice>`](crate::sync::aref::ARef) owns an increment on its reference count.
-+#[repr(transparent)]
-+pub struct Device<Ctx = device::Normal> {
-+    ptr: Opaque<bindings::gb_host_device>,
-+    _ctx: PhantomData<Ctx>,
++struct GreybusSoftSvc {
++    _hd: hd::Registration<GbHdDriver>,
++    _faux: faux::Registration,
 +}
 +
-+// SAFETY: `gb_host_device` is reference counted through its embedded `struct device`, which may be
-+// used from any thread.
-+unsafe impl<Ctx> Send for Device<Ctx> {}
++impl kernel::Module for GreybusSoftSvc {
++    fn init(_module: &'static ThisModule) -> Result<Self> {
++        pr_info!("gb_softsvc (init)\n");
 +
-+// SAFETY: `gb_host_device` has its own internal locking, so it is safe to share references to it
-+// across threads.
-+unsafe impl<Ctx> Sync for Device<Ctx> {}
++        // SAFETY: This runs once at module init, before anything else can reach `GLOBAL_STATE`.
++        unsafe { GLOBAL_STATE.init() };
 +
-+// SAFETY: The embedded `struct device` carries the reference count, and `gb_hd_put()` is just
-+// `put_device()` on it, so the object stays alive for as long as increments are outstanding.
-+unsafe impl<Ctx> AlwaysRefCounted for Device<Ctx> {
-+    #[inline]
-+    fn inc_ref(&self) {
-+        // SAFETY: By the type invariant there is a live reference to the host device, and `dev` is
-+        // its embedded `struct device`.
-+        unsafe { bindings::get_device(&raw mut (*self.ptr.get()).dev) };
-+    }
++        let faux = faux::Registration::new(c_str!("gb-softsvc"), None)?;
++        let svc = Arc::pin_init(Svc::new(), GFP_KERNEL)?;
++        let data = GbHdDriver(svc.clone());
 +
-+    #[inline]
-+    unsafe fn dec_ref(obj: NonNull<Self>) {
-+        // SAFETY: The caller guarantees it owns an increment on the reference count.
-+        unsafe { bindings::gb_hd_put(obj.as_ptr().cast()) }
-+    }
-+}
++        let dev = faux.as_ref().as_ref();
++        let hd = hd::Registration::new(dev, GB_OPERATION_SIZE_MAX, CPORT_ID_MAX + 1, Ok(data))?;
 +
-+impl<Ctx> Device<Ctx> {
-+    /// # Safety
-+    ///
-+    /// `ptr` must be a valid pointer to a `struct gb_host_device`.
-+    #[inline]
-+    pub(crate) const unsafe fn from_raw<'a>(ptr: *mut bindings::gb_host_device) -> &'a Self {
-+        // SAFETY: `Device` is a transparent wrapper of `Opaque<bindings::gb_host_device>`.
-+        unsafe { &*ptr.cast() }
-+    }
++        svc.send_version(hd.as_ref())?;
 +
-+    #[inline]
-+    pub(crate) fn as_raw(&self) -> *mut bindings::gb_host_device {
-+        self.ptr.get()
-+    }
++        let global_state = GlobalState::new(svc.clone(), hd.as_ref().into());
++        let _ = GLOBAL_STATE.lock().replace(global_state);
 +
-+    /// Hands a message received on `hd_cport_id` to the Greybus core.
-+    #[inline]
-+    pub fn data_rcvd(&self, cport_id: u16, msg: &[u8]) {
-+        // SAFETY: By the type invariant of `Self`, `self.as_raw()` is a pointer to a valid
-+        // `struct gb_host_device`. `msg` is valid for reads of ``msg.len()` bytes for the duration
-+        // of the call, and the core only reads through the pointer — it copies the payload into
-+        // the operation before returning — so handing it a `*mut` derived from a shared reference
-+        // is sound.
-+        //
-+        // TODO: The C signature of this function should be changed to take const pointer for msg.
-+        unsafe {
-+            bindings::greybus_data_rcvd(self.as_raw(), cport_id, msg.as_ptr().cast_mut(), msg.len())
-+        }
-+    }
-+
-+    /// Hands `msg`, received from CPort `cport` of interface `intf_id`, to the Greybus core.
-+    ///
-+    /// Fails with `EINVAL` if no connection is bound to that pair.
-+    #[inline]
-+    pub fn data_rcvd_by_intf(&self, intf_id: u8, cport: u16, msg: &[u8]) -> Result {
-+        // SAFETY: By the type invariant of `Self`, `self.as_raw()` is a pointer to a valid
-+        // `struct gb_host_device`. `msg` is valid for reads of `msg.len()` bytes for the duration
-+        // of the call, and the core only reads through the pointer — it copies the payload into
-+        // the operation before returning — so handing it a `*mut` derived from a shared reference
-+        // is sound.
-+        //
-+        // TODO: The C signature of this function should be changed to take const pointer for msg.
-+        to_result(unsafe {
-+            bindings::greybus_data_rcvd_by_intf(
-+                self.as_raw(),
-+                intf_id,
-+                cport,
-+                msg.as_ptr().cast_mut(),
-+                msg.len(),
-+            )
++        Ok(GreybusSoftSvc {
++            _hd: hd,
++            _faux: faux,
 +        })
 +    }
 +}
 +
-+impl<Ctx: device::DeviceContext> AsRef<device::Device<Ctx>> for Device<Ctx> {
-+    #[inline]
-+    fn as_ref(&self) -> &device::Device<Ctx> {
-+        // SAFETY: By the type invariant of `Self`, `self.as_raw()` is a pointer to a valid
-+        // `struct gb_host_device`. `dev` points to a valid `struct device`.
-+        unsafe { device::Device::from_raw(addr_of_mut!((*self.as_raw()).dev)) }
++impl Drop for GreybusSoftSvc {
++    fn drop(&mut self) {
++        let _ = GLOBAL_STATE.lock().take();
++        pr_info!("gb_softsvc (exit)\n");
 +    }
 +}
 +
-+/// A host device owned by its driver, together with the driver's private data `T`.
++/// The operations a Greybus interface provides.
 +///
-+/// Created and added to the Greybus bus on construction, removed on drop.
-+///
-+/// # Invariants
-+///
-+/// `ptr` points at a valid `struct gb_host_device` obtained from `gb_hd_create()`, whose driver
-+/// data holds a live `T`
-+#[repr(transparent)]
-+pub struct Registration<T> {
-+    ptr: NonNull<bindings::gb_host_device>,
-+    _data: PhantomData<T>,
++/// A node is whatever sits behind an interface — a real transport, an in-kernel emulation, or
++/// anything else that can accept Greybus traffic. This module does not care which.
++pub trait InterfaceOps: Send + Sync {
++    /// Delivers `data` to the node's `cport`.
++    fn write(&self, data: &[u8], cport: u16, gfp_mask: Flags) -> Result<()>;
 +}
 +
-+impl<T: HdDriver> Registration<T> {
-+    /// Creates a host device under `parent` and adds it to the Greybus bus.
-+    ///
-+    /// `buffer_size_max` is the largest message the transport can carry in one go, header
-+    /// included. `num_cports` is the number of cports that the greybus host device can connect to.
-+    ///
-+    /// `data` is initialised in place before the device is added, so callbacks may run against it
-+    /// from the moment `gb_hd_add()` succeeds.
-+    pub fn new(
-+        parent: &device::Device,
-+        buffer_size_max: usize,
-+        num_cports: usize,
-+        data: impl PinInit<T, Error>,
-+    ) -> Result<Self> {
-+        // SAFETY: `parent` is a valid device, and the driver table is `'static`. The core only
-+        // ever reads through the driver pointer, so casting away `const` is fine.
-+        let hd = from_err_ptr(unsafe {
-+            bindings::gb_hd_create(
-+                core::ptr::from_ref(HdDriverVTable::<T>::build()).cast_mut(),
-+                parent.as_raw(),
-+                buffer_size_max,
-+                num_cports,
-+            )
-+        })?;
++/// A module attached to the Greybus network.
++pub struct Module {
++    id: u8,
++    intf_count: u8,
++    gb_hd: ARef<hd::Device>,
++    svc: Arc<Svc>,
++}
 +
-+        // SAFETY: `hd` is a valid pointer to `gb_host_device`.
-+        let hd_dev: &Device<device::CoreInternal<'_>> = unsafe { Device::from_raw(hd) };
-+        if let Err(e) = hd_dev.as_ref().set_drvdata(data) {
-+            // SAFETY: `hd` is a pointer to a valid `struct gb_host_device`.
-+            unsafe { bindings::gb_hd_put(hd) };
++impl Module {
++    /// Attaches `node` as a new module and returns the interface id assigned to it.
++    pub fn new(intfs: &[Arc<dyn InterfaceOps>]) -> Result<Self> {
++        let Ok(intf_count) = u8::try_from(intfs.len()) else {
++            return Err(code::E2BIG);
++        };
 +
-+            return Err(e);
++        if intf_count == 0 {
++            return Err(code::EINVAL);
 +        }
 +
-+        // SAFETY: By the type invariant the host device is valid, and it has not been added yet.
-+        let res = to_result(unsafe { bindings::gb_hd_add(hd) });
-+        if let Err(e) = res {
-+            // SAFETY: The driver data was set to a `T` above and has not been taken since.
-+            drop(unsafe { hd_dev.as_ref().drvdata_obtain::<T>() });
-+            // SAFETY: `hd` is a pointer to a valid `struct gb_host_device`.
-+            unsafe { bindings::gb_hd_put(hd) };
++        let guard = GLOBAL_STATE.lock();
++        let state = guard.as_ref().ok_or(code::EAGAIN)?;
++        let id = state.svc.module_insert(&state.gb_hd, intfs)?;
 +
-+            return Err(e);
-+        }
-+
-+        // INVARIANT: `gb_hd_create()` returns a valid `gb_host_device` on success,
-+        // and we own the reference it returns until `Drop`.
 +        Ok(Self {
-+            ptr: NonNull::new(hd).ok_or(code::ENOMEM)?,
-+            _data: PhantomData,
-+        })
-+    }
-+}
-+
-+impl<T> Registration<T> {
-+    #[inline]
-+    fn as_raw(&self) -> *mut bindings::gb_host_device {
-+        self.ptr.as_ptr()
-+    }
-+}
-+
-+impl<T> AsRef<Device> for Registration<T> {
-+    #[inline]
-+    fn as_ref(&self) -> &Device {
-+        // SAFETY: By the type invariant the host device is valid.
-+        unsafe { Device::from_raw(self.as_raw()) }
-+    }
-+}
-+
-+impl<T> Drop for Registration<T> {
-+    fn drop<'a>(&'a mut self) {
-+        // SAFETY: By the type invariant of `Self`, `self.as_raw()` is a pointer to a valid
-+        // `struct gb_host_device`.
-+        unsafe { bindings::gb_hd_del(self.as_raw()) }
-+
-+        {
-+            // SAFETY: `hd` is a valid pointer to `gb_host_device`.
-+            let hd_dev = unsafe { Device::<device::CoreInternal<'_>>::from_raw(self.as_raw()) };
-+            // SAFETY: The driver data was set to a `T` in `Registration::new()` and has not been
-+            // taken since, and this is the only place that takes it.
-+            drop(unsafe { hd_dev.as_ref().drvdata_obtain::<T>() });
-+        }
-+
-+        // SAFETY: By the type invariant of `Self`, `self.as_raw()` is a pointer to a valid
-+        // `struct gb_host_device`.
-+        unsafe { bindings::gb_hd_put(self.as_raw()) };
-+    }
-+}
-+
-+// SAFETY: The greybus host device API is thread-safe as guaranteed by the device core, as long as
-+// gb_hd_del() is guaranteed to only be called once - which is guaranteed by our type not
-+// having Copy/Clone.
-+unsafe impl<T: Send> Send for Registration<T> {}
-+
-+// SAFETY: The greybus device API is thread-safe as guaranteed by the device core, as long as
-+// gb_hd_del() is guaranteed to only be called once - which is guaranteed by our type not
-+// having Copy/Clone.
-+unsafe impl<T: Sync> Sync for Registration<T> {}
-diff --git a/rust/kernel/greybus/mod.rs b/rust/kernel/greybus/mod.rs
-new file mode 100644
-index 000000000000..ea9dc954d063
---- /dev/null
-+++ b/rust/kernel/greybus/mod.rs
-@@ -0,0 +1,220 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Abstractions for the Greybus core.
-+//!
-+//! C header: [`include/linux/greybus.h`](srctree/include/linux/greybus.h)
-+//!
-+//! Greybus host drivers ("host devices") bridge the Greybus core to whatever transport actually
-+//! carries the traffic. A host driver creates a [`HostDevice`], registers it, and implements
-+//! [`HdDriver`] to transmit the messages the core hands it.
-+
-+use core::ptr::NonNull;
-+
-+use crate::{
-+    sync::aref::AlwaysRefCounted,
-+    transmute::FromBytes,
-+    types::Opaque, //
-+};
-+
-+pub mod hd;
-+pub mod protocols;
-+
-+/// The largest Greybus message, header included.
-+///
-+/// Bounded by the 16-bit `size` field in the operation header.
-+pub const GB_OPERATION_SIZE_MAX: usize = u16::MAX as usize;
-+
-+/// The largest valid CPort id.
-+///
-+/// Ids above this are reserved by the protocol; a host device's `num_cports` cannot exceed
-+/// `CPORT_ID_MAX + 1`.
-+pub const CPORT_ID_MAX: usize = bindings::CPORT_ID_MAX as usize;
-+
-+/// A Greybus message handed to a host driver for transmission.
-+///
-+/// # Invariants
-+///
-+/// The shared reference is only ever handed out for the duration of a [`HdDriver`] callback, during
-+/// which the Greybus core guarantees the message and its buffer stay alive.
-+#[repr(transparent)]
-+pub struct Message(Opaque<bindings::gb_message>);
-+
-+impl Message {
-+    /// # Safety
-+    ///
-+    /// `ptr` must be non-null and point at a valid `struct gb_message` which outlives the
-+    /// returned `Self`.
-+    #[inline]
-+    pub(crate) const unsafe fn from_raw<'a>(ptr: *mut bindings::gb_message) -> &'a Self {
-+        // SAFETY: `Message` is a transparent wrapper of `Opaque<bindings::gb_message>`.
-+        unsafe { &*ptr.cast() }
-+    }
-+
-+    /// Returns the operation header at the start of the message.
-+    #[inline]
-+    pub const fn header(&self) -> &protocols::GbOperationMsgHdr {
-+        // SAFETY: `header` points at a valid `gb_operation_msg_hdr` for as long as the message is
-+        // alive, and `GbOperationMsgHdr` is a transparent wrapper of it.
-+        unsafe { &*(*self.0.get()).header.cast() }
-+    }
-+
-+    /// # Safety
-+    ///
-+    /// `Message` is not valid after this call.
-+    #[inline]
-+    pub(crate) unsafe fn sent<Ctx>(&self, hd: &hd::Device<Ctx>, status: i32) {
-+        // SAFETY: By the type invariant the message is valid and still owned by the transport,
-+        // and its connection and host device are alive for as long as it is.
-+        unsafe {
-+            bindings::greybus_message_sent(hd.as_raw(), self.0.get(), status);
-+        }
-+    }
-+
-+    /// Returns the payload, i.e. the message without its operation header.
-+    #[inline]
-+    pub const fn payload_bytes(&self) -> &[u8] {
-+        // SAFETY: By the type invariant the message is valid.
-+        let payload = unsafe { (*self.0.get()).payload };
-+        // SAFETY: By the type invariant the message is valid.
-+        let payload_size = unsafe { (*self.0.get()).payload_size };
-+
-+        if payload.is_null() || payload_size == 0 {
-+            return &[];
-+        }
-+
-+        // SAFETY: A non-null `payload` points at `payload_size` initialized bytes.
-+        unsafe { core::slice::from_raw_parts(payload.cast::<u8>(), payload_size) }
-+    }
-+
-+    /// Interprets the message payload as a `T`.
-+    ///
-+    /// Returns `None` if the payload is too short or misaligned for `T`.
-+    #[inline]
-+    pub fn payload<T: FromBytes>(&self) -> Option<&T> {
-+        T::from_bytes(self.payload_bytes())
-+    }
-+
-+    /// Returns the operation this message belongs to.
-+    #[inline]
-+    pub const fn operation(&self) -> &Operation {
-+        // SAFETY: By the type invariant the message is valid, and its `operation` is set for as
-+        // long as the message is alive.
-+        unsafe { Operation::from_raw((*self.0.get()).operation) }
-+    }
-+}
-+
-+/// A Greybus operation.
-+///
-+/// # Invariants
-+///
-+/// The wrapped value is a valid `struct gb_operation`.
-+#[repr(transparent)]
-+pub struct Operation(Opaque<bindings::gb_operation>);
-+
-+impl Operation {
-+    /// # Safety
-+    ///
-+    /// `ptr` must be a valid pointer to a `struct gb_operation`.
-+    #[inline]
-+    pub(crate) const unsafe fn from_raw<'a>(ptr: *mut bindings::gb_operation) -> &'a Self {
-+        // SAFETY: `Operation` is a transparent wrapper of `Opaque<bindings::gb_operation>`.
-+        unsafe { &*ptr.cast() }
-+    }
-+
-+    /// Returns the connection this operation travels on.
-+    #[inline]
-+    pub const fn connection(&self) -> &Connection {
-+        // SAFETY: By the type invariant the operation is valid, and its `connection` is alive for
-+        // as long as the operation is. The returned borrow is tied to `&self`, so it cannot
-+        // outlive the host-device callback that handed out the operation, as `Connection`'s
-+        // invariant requires.
-+        unsafe { Connection::from_raw((*self.0.get()).connection) }
-+    }
-+}
-+
-+/// A Greybus connection.
-+///
-+/// # Invariants
-+///
-+/// The wrapped value is a valid `struct gb_connection`.
-+///
-+/// References to a `Connection` are only handed out for the duration of a host-device callback on
-+/// a message travelling over it. During that time the connection is enabled, and its interface,
-+/// if any, is alive: the core disables and destroys a bundle's connections before it tears down
-+/// their interface.
-+#[repr(transparent)]
-+pub struct Connection(Opaque<bindings::gb_connection>);
-+
-+impl Connection {
-+    /// # Safety
-+    ///
-+    /// `ptr` must be a valid pointer to a `struct gb_connection`.
-+    #[inline]
-+    pub(crate) const unsafe fn from_raw<'a>(ptr: *mut bindings::gb_connection) -> &'a Self {
-+        // SAFETY: `Connection` is a transparent wrapper of `Opaque<bindings::gb_connection>`.
-+        unsafe { &*ptr.cast() }
-+    }
-+
-+    /// Returns the interface at the far end of the connection. In cases like SVC connection,
-+    /// interface can be NULL.
-+    #[inline]
-+    pub fn interface(&self) -> Option<&Interface> {
-+        // SAFETY: By the type invariant the connection is valid.
-+        let intf_ptr = NonNull::new(unsafe { (*self.0.get()).intf })?;
-+
-+        // SAFETY: `intf_ptr` is non-NULL, and by the type invariant the interface is alive for as
-+        // long as `&self` is. `Interface` is a transparent wrapper of
-+        // `Opaque<bindings::gb_interface>`.
-+        Some(unsafe { intf_ptr.cast().as_ref() })
-+    }
-+
-+    /// Returns the CPort id this connection uses on the interface.
-+    #[inline]
-+    pub const fn intf_cport_id(&self) -> u16 {
-+        // SAFETY: By the type invariant the connection is valid.
-+        unsafe { (*self.0.get()).intf_cport_id }
-+    }
-+
-+    /// Returns the CPort id this connection uses on the host device.
-+    #[inline]
-+    pub const fn hd_cport_id(&self) -> u16 {
-+        // SAFETY: By the type invariant the connection is valid.
-+        unsafe { (*self.0.get()).hd_cport_id }
-+    }
-+}
-+
-+/// A Greybus interface.
-+///
-+/// # Invariants
-+///
-+/// The wrapped value is a valid `struct gb_interface`.
-+#[repr(transparent)]
-+pub struct Interface(Opaque<bindings::gb_interface>);
-+
-+impl Interface {
-+    /// Returns the interface id, unique within its host device.
-+    #[inline]
-+    pub const fn id(&self) -> u8 {
-+        // SAFETY: By the type invariant the interface is valid.
-+        unsafe { (*self.0.get()).interface_id }
-+    }
-+}
-+
-+// SAFETY: The embedded `struct device` carries the reference count, which `get_device()` and
-+// `put_device()` manipulate, so the object stays alive for as long as increments are outstanding.
-+unsafe impl AlwaysRefCounted for Interface {
-+    #[inline]
-+    fn inc_ref(&self) {
-+        // SAFETY: By the type invariant there is a live reference to the interface, and `dev` is
-+        // its embedded `struct device`.
-+        unsafe { bindings::get_device(&raw mut (*self.0.get()).dev) };
-+    }
-+
-+    #[inline]
-+    unsafe fn dec_ref(obj: NonNull<Self>) {
-+        // SAFETY: The caller guarantees it owns an increment on the reference count.
-+        unsafe {
-+            bindings::put_device(&raw mut (*obj.as_ptr().cast::<bindings::gb_interface>()).dev)
-+        }
-+    }
-+}
-diff --git a/rust/kernel/greybus/protocols.rs b/rust/kernel/greybus/protocols.rs
-new file mode 100644
-index 000000000000..21c35b9d8ca1
---- /dev/null
-+++ b/rust/kernel/greybus/protocols.rs
-@@ -0,0 +1,442 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Greybus wire format definitions.
-+//!
-+//! Thin `repr(transparent)` wrappers over the generated bindings for the operation header and the
-+//! SVC protocol messages, plus the constants that go in their type and result fields. The
-+//! wrappers exist to keep the byte-order conversions in one place: constructors take native-endian
-+//! values and store little-endian, accessors convert back.
-+
-+/// Set in the header type field to mark a message as a response to the operation of the same id.
-+pub const MESSAGE_TYPE_RESPONSE: u8 = 0x80;
-+
-+/// The CPort id reserved for the SVC connection on every host device.
-+pub const GB_SVC_CPORT_ID: u16 = bindings::GB_SVC_CPORT_ID as u16;
-+
-+/// Defines `u8` constants from same-named `bindings` values.
-+macro_rules! gb_u8_consts {
-+    ($($name:ident),* $(,)?) => {
-+        $(
-+            #[allow(missing_docs)]
-+            pub const $name: u8 = bindings::$name as u8;
-+        )*
-+    };
-+}
-+
-+// SVC Operation Types
-+gb_u8_consts! {
-+    GB_SVC_TYPE_PROTOCOL_VERSION,
-+    GB_SVC_TYPE_SVC_HELLO,
-+    GB_SVC_TYPE_INTF_DEVICE_ID,
-+    GB_SVC_TYPE_INTF_RESET,
-+    GB_SVC_TYPE_CONN_CREATE,
-+    GB_SVC_TYPE_CONN_DESTROY,
-+    GB_SVC_TYPE_DME_PEER_GET,
-+    GB_SVC_TYPE_DME_PEER_SET,
-+    GB_SVC_TYPE_ROUTE_CREATE,
-+    GB_SVC_TYPE_ROUTE_DESTROY,
-+    GB_SVC_TYPE_TIMESYNC_ENABLE,
-+    GB_SVC_TYPE_TIMESYNC_DISABLE,
-+    GB_SVC_TYPE_TIMESYNC_AUTHORITATIVE,
-+    GB_SVC_TYPE_INTF_SET_PWRM,
-+    GB_SVC_TYPE_INTF_EJECT,
-+    GB_SVC_TYPE_PING,
-+    GB_SVC_TYPE_PWRMON_RAIL_COUNT_GET,
-+    GB_SVC_TYPE_PWRMON_RAIL_NAMES_GET,
-+    GB_SVC_TYPE_PWRMON_SAMPLE_GET,
-+    GB_SVC_TYPE_PWRMON_INTF_SAMPLE_GET,
-+    GB_SVC_TYPE_TIMESYNC_WAKE_PINS_ACQUIRE,
-+    GB_SVC_TYPE_TIMESYNC_WAKE_PINS_RELEASE,
-+    GB_SVC_TYPE_TIMESYNC_PING,
-+    GB_SVC_TYPE_MODULE_INSERTED,
-+    GB_SVC_TYPE_MODULE_REMOVED,
-+    GB_SVC_TYPE_INTF_VSYS_ENABLE,
-+    GB_SVC_TYPE_INTF_VSYS_DISABLE,
-+    GB_SVC_TYPE_INTF_REFCLK_ENABLE,
-+    GB_SVC_TYPE_INTF_REFCLK_DISABLE,
-+    GB_SVC_TYPE_INTF_UNIPRO_ENABLE,
-+    GB_SVC_TYPE_INTF_UNIPRO_DISABLE,
-+    GB_SVC_TYPE_INTF_ACTIVATE,
-+    GB_SVC_TYPE_INTF_RESUME,
-+    GB_SVC_TYPE_INTF_MAILBOX_EVENT,
-+    GB_SVC_TYPE_INTF_OOPS,
-+}
-+
-+// UNIPRO modes
-+gb_u8_consts! {
-+    GB_SVC_UNIPRO_FAST_MODE,
-+    GB_SVC_UNIPRO_SLOW_MODE,
-+    GB_SVC_UNIPRO_FAST_AUTO_MODE,
-+    GB_SVC_UNIPRO_SLOW_AUTO_MODE,
-+    GB_SVC_UNIPRO_MODE_UNCHANGED,
-+    GB_SVC_UNIPRO_HIBERNATE_MODE,
-+    GB_SVC_UNIPRO_OFF_MODE,
-+}
-+
-+// PWR States
-+gb_u8_consts! {
-+    GB_SVC_SETPWRM_PWR_OK,
-+    GB_SVC_SETPWRM_PWR_LOCAL,
-+    GB_SVC_SETPWRM_PWR_REMOTE,
-+    GB_SVC_SETPWRM_PWR_BUSY,
-+    GB_SVC_SETPWRM_PWR_ERROR_CAP,
-+    GB_SVC_SETPWRM_PWR_FATAL_ERROR,
-+}
-+
-+// Vsys Result
-+gb_u8_consts! {
-+    GB_SVC_INTF_VSYS_OK,
-+    GB_SVC_INTF_VSYS_FAIL,
-+}
-+
-+// Refclk Result
-+gb_u8_consts! {
-+    GB_SVC_INTF_REFCLK_OK,
-+    GB_SVC_INTF_REFCLK_FAIL,
-+}
-+
-+// Unipro Result
-+gb_u8_consts! {
-+    GB_SVC_INTF_UNIPRO_OK,
-+    GB_SVC_INTF_UNIPRO_FAIL,
-+    GB_SVC_INTF_UNIPRO_NOT_OFF,
-+}
-+
-+// Op Codes
-+gb_u8_consts! {
-+    GB_SVC_OP_SUCCESS,
-+    GB_SVC_OP_UNKNOWN_ERROR,
-+    GB_SVC_INTF_NOT_DETECTED,
-+    GB_SVC_INTF_NO_UPRO_LINK,
-+    GB_SVC_INTF_UPRO_NOT_DOWN,
-+    GB_SVC_INTF_UPRO_NOT_HIBERNATED,
-+    GB_SVC_INTF_NO_V_SYS,
-+    GB_SVC_INTF_V_CHG,
-+    GB_SVC_INTF_WAKE_BUSY,
-+    GB_SVC_INTF_NO_REFCLK,
-+    GB_SVC_INTF_RELEASING,
-+    GB_SVC_INTF_NO_ORDER,
-+    GB_SVC_INTF_MBOX_SET,
-+    GB_SVC_INTF_BAD_MBOX,
-+    GB_SVC_INTF_OP_TIMEOUT,
-+    GB_SVC_PWRMON_OP_NOT_PRESENT,
-+}
-+
-+// Greybus Interface Types
-+gb_u8_consts! {
-+    GB_SVC_INTF_TYPE_UNKNOWN,
-+    GB_SVC_INTF_TYPE_DUMMY,
-+    GB_SVC_INTF_TYPE_UNIPRO,
-+    GB_SVC_INTF_TYPE_GREYBUS,
-+}
-+
-+/// The header every Greybus message starts with.
-+///
-+/// Its `size` field is the size of the whole message, this header included.
-+#[repr(transparent)]
-+pub struct GbOperationMsgHdr(bindings::gb_operation_msg_hdr);
-+
-+// SAFETY: `gb_operation_msg_hdr` is a POD type with no padding and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbOperationMsgHdr {}
-+
-+impl GbOperationMsgHdr {
-+    /// Builds a header. `size` is the whole message, this header included.
-+    #[inline]
-+    pub const fn new(size: u16, operation_id: u16, type_: u8, result: u8) -> Self {
-+        Self(bindings::gb_operation_msg_hdr {
-+            size: size.to_le(),
-+            operation_id: operation_id.to_le(),
-+            type_,
-+            result,
-+            pad: [0u8; 2],
-+        })
-+    }
-+
-+    /// Returns the type field, response bit included.
-+    #[inline]
-+    pub const fn msg_type(&self) -> u8 {
-+        self.0.type_
-+    }
-+
-+    /// Returns whether this is a response rather than a request.
-+    #[inline]
-+    pub const fn is_response(&self) -> bool {
-+        self.0.type_ & MESSAGE_TYPE_RESPONSE != 0
-+    }
-+
-+    /// Returns the operation id pairing a response with its request. Zero for unidirectional
-+    /// messages.
-+    #[inline]
-+    pub const fn operation_id(&self) -> u16 {
-+        u16::from_le(self.0.operation_id)
-+    }
-+
-+    /// Returns the type field with the response bit cleared.
-+    #[inline]
-+    pub const fn request_type(&self) -> u8 {
-+        self.msg_type() & !MESSAGE_TYPE_RESPONSE
-+    }
-+
-+    /// Returns the whole message size, this header included.
-+    #[inline]
-+    pub const fn size(&self) -> u16 {
-+        u16::from_le(self.0.size)
-+    }
-+}
-+
-+/// Request for [`GB_SVC_TYPE_PROTOCOL_VERSION`].
-+#[repr(transparent)]
-+pub struct GbSvcVersionRequest(bindings::gb_svc_version_request);
-+
-+// SAFETY: `gb_svc_version_request` is a packed struct of integer fields, so it has no padding and
-+// no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcVersionRequest {}
-+
-+impl GbSvcVersionRequest {
-+    /// Creates a request advertising SVC protocol version `major`.`minor`.
-+    #[inline]
-+    pub const fn new(major: u8, minor: u8) -> Self {
-+        Self(bindings::gb_svc_version_request { major, minor })
-+    }
-+}
-+
-+/// Request for [`GB_SVC_TYPE_SVC_HELLO`].
-+#[repr(transparent)]
-+pub struct GbSvcHelloRequest(bindings::gb_svc_hello_request);
-+
-+// SAFETY: `gb_svc_hello_request` is a packed struct of integer fields, so it has no padding and
-+// no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcHelloRequest {}
-+
-+impl GbSvcHelloRequest {
-+    /// Creates a hello request identifying the endo as `endo_id` and the AP's own interface as
-+    /// `interface_id`.
-+    #[inline]
-+    pub const fn new(endo_id: u16, interface_id: u8) -> Self {
-+        Self(bindings::gb_svc_hello_request {
-+            endo_id: endo_id.to_le(),
-+            interface_id,
-+        })
-+    }
-+}
-+
-+/// Request for [`GB_SVC_TYPE_INTF_SET_PWRM`].
-+#[repr(transparent)]
-+pub struct GbSvcIntfSetPwrmRequest(bindings::gb_svc_intf_set_pwrm_request);
-+
-+// SAFETY: `gb_svc_intf_set_pwrm_request` is a packed struct of sized fields, so every bit pattern
-+// of its size is a valid instance.
-+unsafe impl kernel::transmute::FromBytes for GbSvcIntfSetPwrmRequest {}
-+
-+impl GbSvcIntfSetPwrmRequest {
-+    /// Returns the requested TX gear, one of the `GB_SVC_UNIPRO_*` modes.
-+    #[inline]
-+    pub const fn tx_mode(&self) -> u8 {
-+        self.0.tx_mode
-+    }
-+
-+    /// Returns the requested RX gear, one of the `GB_SVC_UNIPRO_*` modes.
-+    #[inline]
-+    pub const fn rx_mode(&self) -> u8 {
-+        self.0.rx_mode
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_INTF_SET_PWRM`].
-+#[repr(transparent)]
-+pub struct GbSvcIntfSetPwrmResponse(bindings::gb_svc_intf_set_pwrm_response);
-+
-+// SAFETY: `gb_svc_intf_set_pwrm_response` is a packed struct of integer fields, so it has no
-+// padding and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcIntfSetPwrmResponse {}
-+
-+impl GbSvcIntfSetPwrmResponse {
-+    /// `result_code` is one of the `GB_SVC_SETPWRM_PWR_*` codes.
-+    #[inline]
-+    pub const fn new(result_code: u8) -> Self {
-+        Self(bindings::gb_svc_intf_set_pwrm_response { result_code })
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_DME_PEER_GET`].
-+#[repr(transparent)]
-+pub struct GbSvcDmePeerGetResponse(bindings::gb_svc_dme_peer_get_response);
-+
-+// SAFETY: `gb_svc_dme_peer_get_response` is a packed struct of integer fields, so it has no
-+// padding and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcDmePeerGetResponse {}
-+
-+impl GbSvcDmePeerGetResponse {
-+    /// `result_code` is the UniPro `ConfigResultCode`; `attr_value` is the UniPro attribute
-+    /// value.
-+    #[inline]
-+    pub const fn new(result_code: u16, attr_value: u32) -> Self {
-+        Self(bindings::gb_svc_dme_peer_get_response {
-+            result_code: result_code.to_le(),
-+            attr_value: attr_value.to_le(),
-+        })
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_DME_PEER_SET`].
-+#[repr(transparent)]
-+pub struct GbSvcDmePeerSetResponse(bindings::gb_svc_dme_peer_set_response);
-+
-+// SAFETY: `gb_svc_dme_peer_set_response` is a packed struct of integer fields, so it has no padding
-+// and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcDmePeerSetResponse {}
-+
-+impl GbSvcDmePeerSetResponse {
-+    /// `result_code` is the UniPro `ConfigResultCode`.
-+    #[inline]
-+    pub const fn new(result_code: u16) -> Self {
-+        Self(bindings::gb_svc_dme_peer_set_response {
-+            result_code: result_code.to_le(),
-+        })
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_PWRMON_RAIL_COUNT_GET`].
-+#[repr(transparent)]
-+pub struct GbSvcPwrmonRailCountGetResponse(bindings::gb_svc_pwrmon_rail_count_get_response);
-+
-+// SAFETY: `gb_svc_pwrmon_rail_count_get_response` is a packed struct of integer fields, so it has
-+// no padding and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcPwrmonRailCountGetResponse {}
-+
-+impl GbSvcPwrmonRailCountGetResponse {
-+    /// Creates a response reporting `rail_count` available rails.
-+    #[inline]
-+    pub const fn new(rail_count: u8) -> Self {
-+        Self(bindings::gb_svc_pwrmon_rail_count_get_response { rail_count })
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_INTF_VSYS_ENABLE`] and [`GB_SVC_TYPE_INTF_VSYS_DISABLE`].
-+#[repr(transparent)]
-+pub struct GbSvcIntfVsysResponse(bindings::gb_svc_intf_vsys_response);
-+
-+// SAFETY: `gb_svc_intf_vsys_response` is a packed struct of integer fields, so it has no padding
-+// and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcIntfVsysResponse {}
-+
-+impl GbSvcIntfVsysResponse {
-+    /// `result_code` is [`GB_SVC_INTF_VSYS_OK`] or [`GB_SVC_INTF_VSYS_FAIL`].
-+    #[inline]
-+    pub const fn new(result_code: u8) -> Self {
-+        Self(bindings::gb_svc_intf_vsys_response { result_code })
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_INTF_REFCLK_ENABLE`] and [`GB_SVC_TYPE_INTF_REFCLK_DISABLE`].
-+#[repr(transparent)]
-+pub struct GbSvcIntfRefclkResponse(bindings::gb_svc_intf_refclk_response);
-+
-+// SAFETY: `gb_svc_intf_refclk_response` is a packed struct of integer fields, so it has no padding
-+// and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcIntfRefclkResponse {}
-+
-+impl GbSvcIntfRefclkResponse {
-+    /// `result_code` is [`GB_SVC_INTF_REFCLK_OK`] or [`GB_SVC_INTF_REFCLK_FAIL`].
-+    #[inline]
-+    pub const fn new(result_code: u8) -> Self {
-+        Self(bindings::gb_svc_intf_refclk_response { result_code })
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_INTF_UNIPRO_ENABLE`] and [`GB_SVC_TYPE_INTF_UNIPRO_DISABLE`].
-+#[repr(transparent)]
-+pub struct GbSvcIntfUniproResponse(bindings::gb_svc_intf_unipro_response);
-+
-+// SAFETY: `gb_svc_intf_unipro_response` is a packed struct of integer fields, so it has no padding
-+// and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcIntfUniproResponse {}
-+
-+impl GbSvcIntfUniproResponse {
-+    /// `result_code` is one of the `GB_SVC_INTF_UNIPRO_*` codes.
-+    #[inline]
-+    pub const fn new(result_code: u8) -> Self {
-+        Self(bindings::gb_svc_intf_unipro_response { result_code })
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_INTF_ACTIVATE`].
-+#[repr(transparent)]
-+pub struct GbSvcIntfActivateResponse(bindings::gb_svc_intf_activate_response);
-+
-+// SAFETY: `gb_svc_intf_activate_response` is a packed struct of integer fields, so it has no
-+// padding and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcIntfActivateResponse {}
-+
-+impl GbSvcIntfActivateResponse {
-+    /// `status` is one of the `GB_SVC_OP_*` codes; `intf_type` is one of the
-+    /// `GB_SVC_INTF_TYPE_*` values and is only meaningful when `status` is
-+    /// [`GB_SVC_OP_SUCCESS`].
-+    #[inline]
-+    pub const fn new(status: u8, intf_type: u8) -> Self {
-+        Self(bindings::gb_svc_intf_activate_response { status, intf_type })
-+    }
-+}
-+
-+/// Response to [`GB_SVC_TYPE_INTF_RESUME`].
-+#[repr(transparent)]
-+pub struct GbSvcIntfResumeResponse(bindings::gb_svc_intf_resume_response);
-+
-+// SAFETY: `gb_svc_intf_resume_response` is a packed struct of integer fields, so it has no padding
-+// and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcIntfResumeResponse {}
-+
-+impl GbSvcIntfResumeResponse {
-+    /// `status` is one of the `GB_SVC_OP_*` codes.
-+    #[inline]
-+    pub const fn new(status: u8) -> Self {
-+        Self(bindings::gb_svc_intf_resume_response { status })
-+    }
-+}
-+
-+/// Request for [`GB_SVC_TYPE_MODULE_INSERTED`].
-+#[repr(transparent)]
-+pub struct GbSvcModuleInsertedRequest(bindings::gb_svc_module_inserted_request);
-+
-+// SAFETY: `gb_svc_module_inserted_request` is a packed struct of integer fields, so it has no
-+// padding and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcModuleInsertedRequest {}
-+
-+impl GbSvcModuleInsertedRequest {
-+    /// The module spans `intf_count` consecutive interfaces starting at `primary_intf_id`.
-+    /// `flags` is a mask of `GB_SVC_MODULE_INSERTED_FLAG_*` values.
-+    #[inline]
-+    pub const fn new(primary_intf_id: u8, intf_count: u8, flags: u16) -> Self {
-+        Self(bindings::gb_svc_module_inserted_request {
-+            primary_intf_id,
++            id,
 +            intf_count,
-+            flags: flags.to_le(),
++            gb_hd: state.gb_hd.clone(),
++            svc: state.svc.clone(),
 +        })
 +    }
-+}
 +
-+/// Request for [`GB_SVC_TYPE_MODULE_REMOVED`].
-+#[repr(transparent)]
-+pub struct GbSvcModuleRemovedRequest(bindings::gb_svc_module_removed_request);
++    /// Delivers `msg`, received from interface `id` on its `cport`, to the Greybus core.
++    ///
++    /// `intf_id_rel` is the id relative to the actual interface. Eq, if an Module has 3 interfaces
++    /// then the relative id will be 0 or 1 or 2
++    /// `cport` is the interface-side CPort id.
++    ///
++    /// Fails with `EINVAL` if no connection is bound to that pair, or `EAGAIN` if the
++    /// host device has not been brought up yet.
++    pub fn submit_message(&self, intf_id_rel: u8, cport: u16, msg: &[u8]) -> Result<()> {
++        if intf_id_rel >= self.intf_count {
++            return Err(code::EINVAL);
++        }
 +
-+// SAFETY: `gb_svc_module_removed_request` is a packed struct of integer fields, so it has no
-+// padding and no interior mutability.
-+unsafe impl kernel::transmute::AsBytes for GbSvcModuleRemovedRequest {}
-+
-+// SAFETY: `gb_svc_module_removed_request` is a struct of `u8` field, so every bit pattern of its
-+// size is a valid instance.
-+unsafe impl kernel::transmute::FromBytes for GbSvcModuleRemovedRequest {}
-+
-+impl GbSvcModuleRemovedRequest {
-+    /// `primary_intf_id` identifies the module, and matches the one given when it was inserted.
-+    #[inline]
-+    pub const fn new(primary_intf_id: u8) -> Self {
-+        Self(bindings::gb_svc_module_removed_request { primary_intf_id })
-+    }
-+
-+    /// Returns the primary_intf_id field.
-+    #[inline]
-+    pub const fn primary_intf_id(&self) -> u8 {
-+        self.0.primary_intf_id
++        self.gb_hd
++            .data_rcvd_by_intf(self.id + intf_id_rel, cport, msg)
 +    }
 +}
-diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-index 637442761d34..931831343fd3 100644
---- a/rust/kernel/lib.rs
-+++ b/rust/kernel/lib.rs
-@@ -84,6 +84,8 @@
- pub mod fwctl;
- #[cfg(CONFIG_GPU_BUDDY = "y")]
- pub mod gpu;
-+#[cfg(CONFIG_RUST_GREYBUS_ABSTRACTIONS)]
-+pub mod greybus;
- #[cfg(CONFIG_I2C = "y")]
- pub mod i2c;
- pub mod id_pool;
++
++/// Dropping the module drops all the interfaces of the module. So none of the interface ops should
++/// be called after this point.
++impl Drop for Module {
++    fn drop(&mut self) {
++        let _ = self
++            .svc
++            .module_remove(&self.gb_hd, self.id, self.intf_count);
++    }
++}
+diff --git a/drivers/greybus/gb_softsvc_exports.c b/drivers/greybus/gb_softsvc_exports.c
+new file mode 100644
+index 000000000000..a0e360c4d137
+--- /dev/null
++++ b/drivers/greybus/gb_softsvc_exports.c
+@@ -0,0 +1,15 @@
++// SPDX-License-Identifier: GPL-2.0
++// SPDX-FileCopyrightText: Copyright (c) 2026 BeagleBoard.org. All rights reserved.
++
++/*
++ * Exports Rust symbols from the `gb_softsvc` crate for use by dependent modules.
++ *
++ * This is a workaround until the build system supports Rust cross-module
++ * dependencies natively.
++ */
++
++#include <linux/export.h>
++
++#define EXPORT_SYMBOL_RUST_GPL(sym) extern int sym; EXPORT_SYMBOL_GPL(sym)
++
++#include "exports_gb_softsvc_generated.h"
 
 -- 
 2.56.0
