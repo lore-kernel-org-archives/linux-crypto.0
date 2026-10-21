@@ -1,64 +1,122 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.148
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792547665;
-	b=lD9JBRE+3glgsl4yYrGNyumWR5/2PFl5aBxFlBANZ8JEwVQBCZCzIQeFbm4KEN1KDbnn
-	 WYwrq0ifd5krfe9j3ERv+LZ/U2cOXvsoXluJPtSeYMZZVsQZ9gcA/0wTH+JFYwmiJ2khU
-	 kkwo2mYL5H/UXPFbpanxEABPXFizKXH0IF45ab7c2o44covlueU9kMS8vRTM9oBWDtN6Y
-	 jSARbkWP3XlOfIWjwEOZNi8l+y36Vj7obUmhPvTOcwh+MyfUqm2pZGmvvP/987d2dIhsg
-	 44Gj3jhO5f7bJC1SIk9OIwP8ws48JC27ahlDUeM/z9VIAERgwUMFklKrQ2IBWdoutLg==
+	t=1792551050;
+	b=IrOzr34oget3EYrAuq9l7TMhyIhNG0ffNkNAaRTulLJiwh3VKagU/g+aDblUMFeL1vIZ
+	 PlO0RUgnmUXFRFEZEIIks4/WJRRW5y2DP01gWFaA5Lkk3b272+Z6Kcslo/DmaXX6G5Bs/
+	 9/rHLiVVlxtaYiAQgWQYZrag33IJGiojxep6o0T8Sl5pxrfZNb262ViBKtPdTPZbZtIBe
+	 AC5rLeGF+Vpl7ehzQ53Ew+TVxhSKJ+YYlbZfzdTqbG9saEUM+WKe484ksoVUXbgUhnS6L
+	 S7djfhVbH/E6MJyNgn9VOY2Hyzln/RWfsiqj7P+zMXXTh7aEfp8zZL4D+QmPoeQSHWg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792547665;
-	h=Received:DKIM-Signature:Received:Subject:From:In-Reply-To:References:
-	 X-PR-Tracked-List-Id:X-PR-Tracked-Message-Id:X-PR-Tracked-Remote:
-	 X-PR-Tracked-Commit-Id:X-PR-Merge-Tree:X-PR-Merge-Refname:
-	 X-PR-Merge-Commit-Id:Message-Id:Date:To:Cc;
-	bh=mO1yiG8KJmLePJg/SvpwmBNa+JmQD/Jhxq9a0QBKaE4=;
-	b=zlpImeqHC1XtHUunKWdHzTMwAcogLMAyqpy0hGq0KTA0qhfnxDCiWqjqPFjyqiL0J1zf
-	 DaO5yM/huVFZvWlEhLvc9MigUUXFQqrik5RTHkrQHtTv+wcJa53CNgSusiYag9VUfyw08
-	 TW8UtvZpAUTdi7EnZYlbF35AhwR9eEsl+u2PgL1qkfXUECLJkKQHCKva9i9I2oRwH2Ohm
-	 X5ajDPrNl2B8/xoh3Ra6wCD1ET7MnVPk6XUU2Ejc+oUjuKoZMMACgySthnbZCDR/EO0K6
-	 Sc0dtXhjxvO0g8poH40Lu3v57LhjrXi0gQBb+H5PKDH+75voLm/8VGoN0PGCxnPUkDA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792551050;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:Date:From:To:Cc:Subject:Message-ID:Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
+	bh=/BDUCV75ecZnIf7L+uEa+NmPiDbUKsl6LVs/lrdqGok=;
+	b=aVqq4P5k9xF/J1fFhyZHB7EJwy2dFTm5uSPWM9Qsgm+NVXMp7eTssMUJuPPHOscddmFy
+	 I6DrOUs/NIM6K3u78rUjVnhVKqg44WW32wI3JJoFzySKM4xFt9sQ7Y4928YpfFNU0nXSB
+	 +I4j6gR73WzoJvVAXCvRO+nSbwLvxHuoaFVFrInzmABETCXqmmgU8wlW9jTOmm5lT8/2o
+	 AAqf1Kmbq35ZrNii107Dd+l/kU9SQLvhcgUBopoRkYTyf6SXGfj3SNAUibteGZWwCCJaX
+	 6sFl65Q7tQo7mgDQY022MM0PuCcIgBv85FgwLENyN4SNNgF/aGqqN/6ouC94pLYuHTw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bd7YZZNk;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=none header.from=benboeckel.net;
+	spf=pass smtp.mailfrom=benboeckel.net;
+	dkim=pass header.d=benboeckel.net header.i=@benboeckel.net header.a=rsa-sha256 header.s=fm1 header.b=Xy3RkWb+;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=Uz2Yaavz;
+	arc=none smtp.remote-ip=202.12.124.148
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC6B606A319;
-	Wed, 21 Oct 2026 01:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957C4606A31B
+	for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 02:50:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 957C4606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=benboeckel.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=benboeckel.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bd7YZZNk
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 076641F000C9;
-	Wed, 21 Oct 2026 01:54:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792547665;
-	bh=mO1yiG8KJmLePJg/SvpwmBNa+JmQD/Jhxq9a0QBKaE4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=bd7YZZNkTdEljQHcNF/TSi8HMKm1zoPVyWLITMJR+l48LR4E1xI4KlBYp/rrrb2FT
-	 BGLt2E5jP8MYw5p4Aoi2AXCswIS3LevIOGCSZUFYPhBCo8bAbqGYWaLHYgWG30LlxR
-	 Br1w/0R3gXK/KS+h64nnRSGDG4zu9nCoQYysHesGIBEy/yYJBoWJsxRixefjLstY4C
-	 4qx9C+JE+1ZKIqhVmAmM95BCIxfjRg6BOCMUbTXj1kED1oDInQs5sWJYQV09ByTDRP
-	 WIYdPm94/LOFee7RtPqIxAMKE7vnMYiokbAjBb0elk6YcMtVkVP4i5abIlPfGDIMy8
-	 5QKJqRz7Uc1eA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F14F93809A0D;
-	Wed, 21 Oct 2026 01:54:24 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto library updates for 7.4
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20261019023341.GA3270@sol>
-References: <20261019023341.GA3270@sol>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20261019023341.GA3270@sol>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
-X-PR-Tracked-Commit-Id: 20ec6916d8712e84d58e8c688a25cd368ddeb82b
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 95615dd9ff28148e40a3889e813de00274929448
-Message-Id: <179254766356.320300.10426801402142180321.pr-tracker-bot@kernel.org>
-Date: Wed, 21 Oct 2026 01:54:23 +0000
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>, Stian Halseth <stian@itx.no>, Thomas Huth <thuth@redhat.com>, Vladimir Kukharenko <vladimir@genproof.com>
+	dkim=pass (2048-bit key, unprotected) header.d=benboeckel.net header.i=@benboeckel.net header.a=rsa-sha256 header.s=fm1 header.b=Xy3RkWb+;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=Uz2Yaavz
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfout.stl.internal (Postfix) with ESMTP id ED3971D000F7
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Oct 2026 22:50:48 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Tue, 20 Oct 2026 22:50:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:reply-to:subject:subject:to:to; s=fm1; t=1792551047;
+	 x=1792637447; bh=/BDUCV75ecZnIf7L+uEa+NmPiDbUKsl6LVs/lrdqGok=; b=
+	Xy3RkWb+6LhY/fN6uWisXpOCPY5PMwCaPUAkEIS9JZPyJtSgvLgVDuCJduJR+P+R
+	cZ2khCV88BgECOieOFbX7KWAxk3DtGwij6t8/1dPpPc0b/R9fokNNS9aCU1Ns7tw
+	K9mb7wYSdJL5ucsGC2JrwIy4G1UUWnQ/b921MBlBNA7sQyJJLKo5481E2KOBZ0Zf
+	1RLZLHNCMeoleSd0MYonVJCRtFXxnGwPNsCQy5nREIer9+FYJGF6HSD1Az5iYHFf
+	0qAiNXDyFLKZV1LBCeXP9XiG6z52M2CbUKV8rpAtQkaQChz1ULKJqJV0MW/+6YJk
+	TjsPnPpdZr+2ngk10RibEw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1792551047; x=1792637447; bh=/BDUCV75ecZnIf7L+uEa+NmPiDbU
+	Ksl6LVs/lrdqGok=; b=Uz2YaavzGyxINWUTzPg1waBjqcfzkoKdv8vqMc6PIDFm
+	bPYSk7GpZ8Jb4y9MyxQ4qk05szyy5MvkSzktig6AhZAe+OTLbZEg3Ntp3/gE7NyP
+	v+g0T55mFvQR95LiET1jwksiKEKgqeGywieHIKvmBKMtDBHkj5Dk5BWvSum4ogQI
+	vERsufnsqDL+etKN49i5d5wqqdXLBvr75dhzM12cKy3o9iVeBZG91x2ncDSKpda/
+	M+Ddq+KWrJP3CcRg5FUNgo6LyIOuLWd2J2n65MYFrIMYSTOGuL3nEf8PESUxOJUt
+	HKHBd+bVlNYOk+xXpyWVP7DWU7c4hakhAk/yLQMWRA==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=sign d=benboeckel.net a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1792551047; d=benboeckel.net;
+	mf=PG1lQGJlbmJvZWNrZWwubmV0Pg==;
+	rt=PGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc+;
+	s=fm1:rsa-sha256:G3pJpyxCVsdNr6Rmc0yoPg84MXZTWoBxxJMmo9yZc/5uPuX
+	yBZ5j3zZtvWjh4B+CTQLvGTHR39jOIwo1qLjdRgYG+u/7fD+A2TeZzE2p4+Hua5Z
+	lIAjN8vHFhB1fFG3RE+a4G2+wrHlDJlH9yyV7Ju81wGbbMkTrOUwKWbBEzldcjp+
+	lgLKZfAgr3A2N33Xvdb3ICc5KHD2j74G0axfw3kayWC7DNXIWZMyTtXJqJTgupke
+	iSYiF26pPxULhsI0NLpmN7etqJy+s8f7U0q1BYw6dVLCvrzzYWFRRRJ4MUlB/sjo
+	dYgarFu1+6/IUnQ3i/VPTuABgw+VwAMegeQlhgg==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=mi-m=1; hc=14;
+	hn=cc,content-disposition,content-type,date,feedback-id,from,
+	in-reply-to,message-id,mime-version,references,reply-to,subject,
+	to,user-agent;
+Message-Instance: m=1; h=sha256:6jnct6a2NNXk6u0eIPv1rlZUTH6XS+zGMm316R32Guc=:sfDckac9qktk2NiIdiLnIKvK25r78Cban5dx0WaOIrw=;
+X-ME-Sender: <xms:hijYaigcN-6hXr_PVZngWS-D8UEt3uiVBSneHXbbD0z13fS8ccoqUw>
+    <xme:hijYamHuF8YPo6e8fFJkFiBwueYe9oYpwhs_WpfNhhtGIiGpOTPMic9ZdSg5r3mnl
+    fNSYdY083DCClY_yBwqs_Ph1Fy63fRr1MtexYjQ0QgKot2FMvgR5-sF>
+X-ME-Received: <xmr:hijYakt95RN4EjqmqG_qbFt3Bp0YWH7lDMT1ofnhy6i1W8X9Xoert6Mjew>
+X-ME-Proxy-Cause: dmFkZTEX6teufzxfbx3q3Nq8vrCK28j75Fa5daFWBH0MBVYghVtw3ryevWqQZVyTIofoWE
+    eJZ43bYcfl4TkW6ehRKXR8Hu2mJx20x0GBvs7nhM0Q4MIBFTgswbBawRdERJ8uo//5DTcG
+    oridkpkRRatEzW8aaFOMGlnrvMTb3IozkCawqs/PbNxlj5TE2ye87Z2y0sT+H0meu1U/EZ
+    VAxcyWySRuy7p/klLmELrcsS0K9wLpv0p9U3G7dFtxdBL1dc4f8XOEZoXvkQZ6men/yhlw
+    AJO7Jynm8McCZKwO0DAdcQKO1PTnaN2xebK1HqKtOJjj2spRaH8Db24XET2cscA7mdhRRz
+    xLVu2Vuf6rXjRL6WAFVFw1aazsy+cLTjxZs9sX9+UXz40n+QrYwgUQ8GqdkgDJrKOiJQOM
+    MHfncNPrlllyW7hfHBBRAHZnedIfTyb025SzwsfQkTc+thld+8tcoJJvkefvsLcoBq2NI8
+    UrjnA1PozaW4u7mw3IdUgrCdjwFbYOOpT+ZSHE8EjDrtEI5LNaX3/Mtj4j1RX+57upWhbG
+    5Kg+s85OIA2WRv0HlxNRDeS1hxSXfJLNqVE/EMVmypIwd9dKVq1eV7fUa5bGDhbIMyjK9B
+    piJOdqOz/FC291iBmxpc9NeX1IImTqL6LHoBi8KGF2qzW3oj5ZwgTctsOwBA
+X-ME-Proxy: <xmx:hijYancybgvusLad9eU62CgDQhiL04qHdR3i8QBibjceLeZ0ikjXqg>
+    <xmx:hijYaqnPtioQ37Q3wmWpAvTWg1jc8V2ynPqz63oRv2LFgtIfAr7L5A>
+    <xmx:hijYaqBRpi6QaSyiQ66JVbOFaTBwirbfBRi7uckRKxTU7Db226OPBA>
+    <xmx:hijYakNDIdN5dd9MibEIm4bmg-ThFoDcGCRwvNaFtRK6k_utrn3xYA>
+    <xmx:hyjYakXBe-hlndAAnM7mVkXQSMKXigOIGTvdO8n2u3pyHrsH2jhUJxie>
+Feedback-ID: iffc1478b:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 20 Oct 2026 22:50:45 -0400 (EDT)
+Date: Tue, 20 Oct 2026 22:50:42 -0400
+From: Ben Boeckel <me@benboeckel.net>
+To: m-amirpour <ampr.mhd@gmail.com>
+Cc: keyrings@vger.kernel.org, dhowells@redhat.com, lukas@wunner.de,
+	ignat@linux.win, herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: asymmetric_keys: Fix PKCS#7 selftest error
+ reporting
+Message-ID: <atgogp7ea-UCQLbO@rotor.dev.benboeckel.internal>
+Reply-To: list.lkml.keyrings@me.benboeckel.net
+References: <20261017210513.135540-1-ampr.mhd@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,16 +125,40 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20261017210513.135540-1-ampr.mhd@gmail.com>
+User-Agent: Mutt/2.4.2 (2026-08-30)
 
-The pull request you sent on Sun, 18 Oct 2026 19:33:41 -0700:
+On Sun, Oct 18, 2026 at 00:35:13 +0330, m-amirpour wrote:
+> From: Muhammad Mahdi Amirpour <ampr.mhd@gmail.com>
+> 
+> pkcs7_parse_message() returns an error pointer on failure, but the
+> selftest prints ret, which still contains the result of the previous
+> x509_load_certificate_list() call.
+> 
+> Print the parser's error pointer with %pe so that a failure reports
+> the actual parsing error.
+> 
+> Signed-off-by: Muhammad Mahdi Amirpour <ampr.mhd@gmail.com>
+> ---
+>  crypto/asymmetric_keys/selftest.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/asymmetric_keys/selftest.c b/crypto/asymmetric_keys/selftest.c
+> index 98dc5cdfdeb..42857b02258 100644
+> --- a/crypto/asymmetric_keys/selftest.c
+> +++ b/crypto/asymmetric_keys/selftest.c
+> @@ -41,7 +41,7 @@ void fips_signature_selftest(const char *name,
+>  
+>  	pkcs7 = pkcs7_parse_message(sig, sig_len);
+>  	if (IS_ERR(pkcs7))
+> -		panic("Certs %s selftest: pkcs7_parse_message() = %d\n", name, ret);
+> +		panic("Certs %s selftest: pkcs7_parse_message() = %pe\n", name, pkcs7);
+>  
+>  	pkcs7_supply_detached_data(pkcs7, data, data_len);
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+Reviewed-by: Ben Boeckel <mathstuf@gmail.com>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/95615dd9ff28148e40a3889e813de00274929448
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--Ben
