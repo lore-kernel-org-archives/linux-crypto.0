@@ -1,98 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.181
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792605250;
-	b=dzgE36UDTSkbZhJaJmkbvNktfFSTchLdFPYEIA9Ffgp9ZxH8i5lyxYXrqAHzwWQnytfo
-	 X3gV1OeTEpN8/PwAVS+jPSt6UONo5RRYSFHfSEvjU61qyNFkIbuqlG91asMRT8IzTbHs3
-	 l1oUTGOOhqHJmsDBTEySidVt3tBXlKtg49Z8pm6yVJsr1TXwTJb33Dr/ZSj4vjsoJDdZS
-	 GNB0Q6EkhmwgfIRvPuomgVjvkc3HmJaBYedv4UGC/g3Q/iRXxA4u/+K1nor1qLpZCfRJZ
-	 CJnPObu2aqtJsgjElji4fepR2skAJDDWmkSEmzgJSAuj95XyyhJVRQW9GcA6a2e7Hpg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792605250;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=5PqjLYJUgUiokTOvnfFlSVLgSp4XVLZwVNOD0zgcVgw=;
-	b=nj0cSDht2IYKMxxP9JK7mwW4tBzvZrteG3WLKYD4qCgsouZUqbauKMCpewHSN3F++Png
-	 Wu/A385EKOCgi/ZXddDVkZ6P4kR/KLOQM+6lFn8Up5a8RolUBgwaB4pQZO3xq+VSh8R4h
-	 zUi0AMj/UfXjjHk8b6o2Kk6rGYvZ1JeU76e55dhJrC3EsMIgKgsu60RQvlBsX/WgX1H78
-	 izwEE2P6tfzkBZHAB86eMhO4wN6DgQ1m2ge4cwUozOGL6lAnzwJy5WEQc9SKuNNx/jSe1
-	 k7IHI4XbiS0/ucUvdvVqy7twL45dsOWaG4r4ypkGOCql2c2KwoRlSOjR0GePe2kRcXQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=trailofbits.com;
-	spf=pass smtp.mailfrom=trailofbits.com;
-	dkim=pass header.d=trailofbits.com header.i=@trailofbits.com header.a=rsa-sha256 header.s=google header.b=JcpocVIS;
-	arc=none smtp.remote-ip=74.125.82.181
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.43.39
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792610756;
+	b=BOQ4B7BbKRIV9cAt0W2Rln7OVnvoCgDdb4dh25EUaHFWF9bIxp7CFPct8ore8Va/rLmI
+	 /xp9Wm2Hg076nfQwV/dkvnID5822I6n/7NXB7rCqM2v7uWO+FQCkrkK5iI/sCDZJmGBj5
+	 ioJn3G/tIfn7+qeI1F+RmHAZdpZ1JBMwlhquf4RTm5m8BJk5kY7CpqsZzZ1+DmkKQhx4U
+	 aeC5ItSQ7GAEC9RxGR1UvfPhZt85h+t1ZC4Qvxsj7tb1ZbIzsDsOnZvDzazeuBkaZamUs
+	 sNpC0hhMuYeRfJRI+XL5aaT67biuYApvJ5/ZXFMrAllnmmXWU2g1JtwLfRxK4K8VYWg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792610756;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:
+	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
+	 From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy:X-EOPAttributedMessage:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=5dV4DyJL2oznY8rJLIhMTKAJybKS890F0tOUvQ9dYRY=;
+	b=Qpgm3/1C3UCvvlEUpAeN6Ygy5VchmBGDdrdggCCJWnJJG3/FHQUG91/K6R4jkzXBG6jW
+	 LwkzLxGTR3uMX/TmqH918IhJDqyCzDiwlaUHdsRsn9yGxAoJu0HH0tmRdUy5eI9PfhuTw
+	 6miNJOdYGRNpRR61ZWwYawyysTtyrQT86c3+SZzqkCCyj4/AiU4xvVFFhnlWoWrSxxkVQ
+	 7wGk66sTbxzX58QMCd2r07kLS/CAzP+Z6Xn1Pqnn+AaQ4qwNG3m3D7+nsZJmvjddp9O3Y
+	 gj0kCe6Z0fZ35U99cO5DpWB41b8no9dGY5jQr6Aks2jYhxiYbddbZS7EDHzv2L57hRA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=amd.com;
+	spf=fail smtp.mailfrom=amd.com;
+	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=5ZsXd+WJ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.43.39
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012039.outbound.protection.outlook.com [52.101.43.39])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA53E606A31A
-	for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 17:54:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BA53E606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=trailofbits.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trailofbits.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7AE606A31F
+	for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 19:25:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C7AE606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=trailofbits.com header.i=@trailofbits.com header.a=rsa-sha256 header.s=google header.b=JcpocVIS
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-3550c917fd3so1305709eec.0
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 10:54:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=trailofbits.com; s=google; t=1792605249; x=1793210049; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5PqjLYJUgUiokTOvnfFlSVLgSp4XVLZwVNOD0zgcVgw=;
-        b=JcpocVISGPYKnrqPOePf1IjPWVkOdMt+vqMiqK6675evji8SrVn43ad1vly8ipbMKk
-         ioH3OmdSkiYoRTq6bTJ0nasbwHTF7cxKPKLWLhYu+AUkTMYd4h8hdnIpfnXzzG7laeqs
-         SImsnVR2K6ziy8+63x9g7rmLQY5xdzxSTk8lZG7E1BHnFpqwLVXwv/tRmLYn611qDpKk
-         8PuKs6IldcLrfv6QnuOJgK5t+38ZMwnEJ3aKY+9sTNYXyyQ1rm2T+Kag6tpIaAwomBQA
-         IwHYp4JJqh1/hOgTPbmnRQhkq1pbxkxks5QbB/W33gNVmMfitcS+/l3pS/2rt91GInG1
-         31ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792605249; x=1793210049;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=5PqjLYJUgUiokTOvnfFlSVLgSp4XVLZwVNOD0zgcVgw=;
-        b=GEN08fcqAmt3UhG9/RDEuKZTI65mFqmsoYhx7HmyhapQ+b5mACD5ah6iSBWz1QYjJS
-         4gGrciO0LnJIDn2vQS5ncEkf4jEkMAioDBt/ID4+VlGpgMgWD5xsYgosVYi9ZEuIqHBi
-         9LJ45qFA0azA+Iu/JAH0gBG16pVtgw/XiWmGQ2OhteyjrfiWr4dG+5sRoxhxwz9bmzVg
-         ZXzs7TPd+utoMGG7dr+tFG929StH1BjU+30QCaNuxAhUrK7h7HBBUwu2c5jftHh4dyZn
-         QJaqtewnrvAJZEVW4ccOL9ibBo7H9q7cYv0c/uhJXy6pbwIVPj+d0t9xvblJrT+AYRse
-         PPNg==
-X-Forwarded-Encrypted: i=1; AKwUvBxgTKMtgk71DAoRmkwp9Gez/NFBIntjH+A4aK+8qoVejf+RmmSBobVWzdSl+kmVCOJU60jfCOvfn5lybQs=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJcDXTNkmTWRkc+14CkU8zP0jKjErtGnWNS/6cIuoLMuY3URoTL
-	0S5Wblqe9cTBQ8SvThur0uGon6Yuo4s0i8qs0Bj2zNpobB3QQ4ZU67qL8yS2XlvPx0pJ6Vm8Aev
-	7nvP3SMzUfg==
-X-Gm-Gg: AYBFou0M/Ldxn52WD+WT9nM0hJ+e9CDnf+3Xxr7nZVcoI7BtILz+SBftCibttnndVW2
-	reTR08bC6aAufyyZH++S4/2DGwaFVXymSD1iUNZY2d3vkqTgXm9sGsgWQu0ovDGgluZoTenDbtD
-	PWZpwQ4Il4WIfyIWcpL21W6k96MovXHGIJ3hdnt0my6xvMVi9aTE4aH3Rgtm1ey8OrMGMtsxLtk
-	fraXoYp40E8Nf1Iag9clkP1FOPvSOfgIMoq/U1ubnlCtFP9bNmMmEbC3PPbpn/w8bpuFCkJLraR
-	oRDfKPtpPhAUSURyWgHQ7l2IDrmBWTcVu2Jv/qlnvKOwpvuDnwXWOwVcKPzdWKOA1ZwcTMiULk3
-	zdLxPPnpLMl0Zxwybwrxk/oDYkR1UnXLBuljKgiCGwKoNPUeQJBqFLlCQptAOEpzq7W46zoGYVO
-	T/JoEFC3BZuihUfPa5m4L0htCuskVL/sewrlrAPVrEBHjaqrxqNTN9ZdVEzmb1bFx4eBscJ80Hl
-	viUTyTrr+auMlTjFGdiRrmOT/JZdQLayVXO9KoMx091zouPiSgvdv4GiZ0cjzO9auRM9KfA47g5
-	iVRuAp6T/ThfRlvXqtJkJjKu9M08t03oOa6KaRbD9AKqpKx7NOBO
-X-Received: by 2002:a05:693c:42d9:b0:367:e68b:c047 with SMTP id 5a478bee46e88-367e68bc08cmr2811480eec.40.1792605248757;
-        Wed, 21 Oct 2026 10:54:08 -0700 (PDT)
-Received: from localhost.localdomain ([2603:8001:5f01:8bab:d059:e601:becb:a5ad])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-368b4b8e9c6sm17395eec.1.2026.10.21.10.54.07
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 21 Oct 2026 10:54:08 -0700 (PDT)
-From: Artem Dinaburg <artem@trailofbits.com>
-To: stable@vger.kernel.org
-Cc: davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	ldy3087146292@gmail.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	n05ec@lzu.edu.cn,
-	tomapufckgml@gmail.com,
-	yifanwucs@gmail.com,
-	yuantan098@gmail.com
-Subject: [PATCH 6.6.y] crypto: af_alg - limit RX SG extraction by receive buffer budget
-Date: Wed, 21 Oct 2026 13:54:05 -0400
-Message-ID: <20261021175405.1542-1-artem@trailofbits.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=5ZsXd+WJ
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PP1+zgi8J7h6KJuAdCXAZnRRTfg3xUG6x482riLuAv5qrab6/1/RaR3+2pjmBnBE0AuVoT9Mi3le/RrpfksCsD5IdR8i/UvH0KZvgcQXlftxScUidaSmMkgOLlaTAUOYVXfHOtHOOPn9YUENT1VH9TXUOIwYsrqYRe6aQW9Sbk2eJDKtxkIBYNDCAYE0FUGb/6IGoHPszki6S0s4EayOyvWEMcZY5gRyQYpfupbQRYKf9L/WaaTH24RkJ/wDuRtsUlbZrqsGFwUWLNUIM+EUk7h6q7xCYSpwe+FXsRO+m6/Ty7d/6E39RQU002IQmk+iLrgb+on4gHY9EQQtpmY1CA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5dV4DyJL2oznY8rJLIhMTKAJybKS890F0tOUvQ9dYRY=;
+ b=iozkjqKpIZSbHfFKtS6pwzJCJ3U2w9J+WWeUVl/24EwSwh6WllpN59wA77uTe5h70W83N6ARVvtDoqSFtcEPgu02YrU497BVWlJrLkvnNBQFzAE1oo4opJqWiz8QP+Ok7LqjZ6mr/mZL6e+UdfWQG0by9+67mXeU2FJKZ0dON5zdpA2Jp+DKZF3PiFAeGdwj+oNHIjsrACA3zUzK7kOfKk4vJvqJqmtjtxW/PWoRPauYu0J3hTbQYczDhDzpnreB8dytVLqUWlVbiz1eA1wV5B0LqsvJjSh+uLu36VuEFs7gg5k5GKxLzZyXDYbAchZLKi8mhhdzWjXWSWLu7dORUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5dV4DyJL2oznY8rJLIhMTKAJybKS890F0tOUvQ9dYRY=;
+ b=5ZsXd+WJ41MumExxoy69DcYJef3QAZg3lVFrbXzKLF7QyCY7RgX3EsQZQjsYPK3b51arQTyI9tC2YG28f95LIgcvMbBQu47P9gY57sVLwmH1PjN1ZQzdpxjLKr64fKQ2MJykZlqC72fNsXDJ76Ae+kCcIzjfsE/Y62Uwfqj05Bs=
+Received: from CH0PR03CA0333.namprd03.prod.outlook.com (2603:10b6:610:11a::7)
+ by SA3PR12MB598757.namprd12.prod.outlook.com (2603:10b6:806:52d::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.15; Wed, 21 Oct
+ 2026 19:25:49 +0000
+Received: from CH1PEPF0005BD61.namprd02.prod.outlook.com
+ (2603:10b6:610:11a:cafe::e) by CH0PR03CA0333.outlook.office365.com
+ (2603:10b6:610:11a::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.546.16 via Frontend Transport; Wed,
+ 21 Oct 2026 19:25:49 +0000
+X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
+ is 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ CH1PEPF0005BD61.mail.protection.outlook.com (10.167.244.250) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.546.15 via Frontend Transport; Wed, 21 Oct 2026 19:25:49 +0000
+Received: from localhost (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.53; Wed, 21 Oct
+ 2026 14:25:49 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: <linux-crypto@vger.kernel.org>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<ackerleytng@google.com>, <thomas.lendacky@amd.com>, <ashish.kalra@amd.com>,
+	<aik@amd.com>, <seanjc@google.com>, <pbonzini@redhat.com>
+Subject: [PATCH v3 0/1] crypto: ccp - Make sev_cmd_mutex more granular
+Date: Wed, 21 Oct 2026 14:15:16 -0500
+Message-ID: <20261021192434.1924950-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -103,87 +106,96 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0005BD61:EE_|SA3PR12MB598757:EE_
+X-MS-Office365-Filtering-Correlation-Id: 022873bc-0552-4158-fc62-08df2fa91d45
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|376014|1800799024|36860700016|82310400026|261021121427099003|56012099006|11063799006|261009223027099003|18002099003|10067099003|261021123027099003|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	XE7gEMis42Y94OqmQLGtI2Isz5p7vihnrn8Gc3MeAS2hNGDQSmRzNV7o9E42ZwDzEM+U2fDnYVR27xrKRceUG7XjCrY8YxTrXlUiF4VNlbdN5nCQAvMxw9YmaDWwMvN++BsvpCPFS/cnjxzZyVR7Y+nl6VYSmu49Jz5C4Yo/Wh8lpKxX1awVYv4Vl2ueCnVn9+Q9d1wpfSBwLU2IZch2Ws3rKFKaZCNxjGq70BFewwRZTiqLhfVnOWPh+bShGTKnKThYRTAyzSniQS7cxeWLer/4lp0u255UQY5jALOmkfzfyMstIKlQWOYeuOEJuSkXlWTLLrajlDhi+BxmLRGFowYN73PbQw1FG1r03ME2+9gy83YMC6UMf/16S6nu0Zmh4ej8JwcMlZ5+GRPdPzkkV//qiee3zEX4D6M7xmx1IuZjf2WkOOYys+41nkIR0lgJn5Tek3jY40FXnvg+NiIHrdrY/ka7Tgh/c1ml0JKKzJJN6+ZNuO8XAsN5iTvp6u2vSJXM43ZFXwOM7r3B+8/C8QP2bsjNInyB+0UDo8VBWNQYU8lVTFrfB19LpBcVGGsWk6/I0K6WxApMdoOdmImZnoxoKckb0PdmNqubqAeZyVvTpRfSbvBzTzj1+9bg2RoHY8sGThXT5xyQTUOoOPHC/g==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(376014)(1800799024)(36860700016)(82310400026)(261021121427099003)(56012099006)(11063799006)(261009223027099003)(18002099003)(10067099003)(261021123027099003)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	Duhe2V58ZyDGl3AJNV6APm0zvrXdHpaAv68K0aUCQNPeR72Io4OiDCAfbqgYNRlnUniXY2ovJoq+0y+MOt9RNJAh0/4nwbV1DOiQx3T08IVqtDU2Y84K9KRPhGDzEB1a6CsFtXNxBe0pPdWOi5Ok5IWwJAK5/dmjgA/ICHlamHF8O9nV8RXJo11w0SDjspL6Ft/wD/jWVwT/TBk5JqmmTqgrD3ojQP+NMp3oaxTGXxA7ebAQ+KQCFlhVodYeVLuFM0mK3AJHQB3zPmIwwGh9tOfz85EFGzXTCA0VwSuU5r/g01EfvE2IK+/PZVq9AmqBdAiT5VxG4vKUkixu7to9UGT1qioKPZKegt4KRffwb+5OZ9dBsn1Nyc/9T3VBtu+IHbIiKTWXPxu6YHq8j/VGbprJiSOSxvjzGgeT13B5u2pQp8H921DM3sPM5yXOY7un
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2026 19:25:49.6454
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 022873bc-0552-4158-fc62-08df2fa91d45
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0005BD61.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB598757
 
-From: Douya Le <ldy3087146292@gmail.com>
+This patchset is also available at:
 
-[ Upstream commit 8eceab19eba9dcbfd2a0daec72e1bf48aa100170 ]
+  https://github.com/amdese/linux/commits/ccp-mutex-rework-v3
 
-Make af_alg_get_rsgl() limit each RX scatterlist extraction to the
-remaining receive buffer budget.
+and is based on cryptodev-2.6 master (178aff4cf425).
 
-af_alg_get_rsgl() currently uses af_alg_readable() only as a gate
-before extracting data into the RX scatterlist. Limit each extraction
-to the remaining af_alg_rcvbuf(sk) budget so that receive-side
-accounting matches the amount of data attached to the request.
+v1: https://lore.kernel.org/linux-crypto/20261014132145.1726322-1-michael.roth@amd.com/
+v2: https://lore.kernel.org/linux-crypto/20261016041109.1778673-1-michael.roth@amd.com/
+v3:
+ - drop all unnecessary refactorings to make patches more appropriate for 7.4
+   (Herbert, Sean)
+ - retest CCP both with and without kvm/queue in-place conversion support
+   present, re-verify no deadlocks/regressions. Testing done primarilly with
+   the following kselftest:
+     https://github.com/AMDESE/linux/commit/33ddcbd756b3db5bd2bd5737e48c9084e715cd38
+ - rebase on latest cryptodev master (178aff4cf425)
 
-If skcipher cannot obtain enough RX space for at least one chunk while
-more data remains to be processed, reject the recvmsg call instead of
-rounding the request length down to zero.
 
-Fixes: e870456d8e7c8d57c059ea479b5aadbb55ff4c3a ("crypto: algif_skcipher - overhaul memory management")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Douya Le <ldy3087146292@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Assisted-by: LLM
-[ Backport to 6.6.y: Add braces to the older block-size conditional so the
-  new short-block error check and existing rounding remain under the same
-  condition. ]
-Signed-off-by: Artem Dinaburg <artem@trailofbits.com>
----
-Hi,
+OVERVIEW
+--------
 
-Please consider this backport of the fix for CVE-2026-31677 to 6.6.y.
+The current code makes very coarse usage of the sev_cmd_mutex; for SEV
+firmware ioctls, it is essentially taken upon entry, and ends up wrapping
+a lot of potentially time-consuming prep/cleanup work that may need to be
+done before/after issuing the actual firmware call, which is the main
+thing the mutex is meant to protect.
 
-The code changes match upstream, with braces added to the older block-size
-conditional. See the bracketed backport note above.
+Additionally, some of that prep work involves
+copy_from_user()/copy_to_user() calls which can generate page faults and
+unecessarily lead to potential deadlock scenarios. No known case exists
+in current upstream, but with the upcoming KVM/guest_memfd support for
+in-place conversion of the same PFN between shared/private state (which
+is currently targeted for kernel 7.4), a special fault handler is added
+that could theoretically deadlock if a malicious user tries to use
+guest_memfd pages as the source/target of target of said
+copy_from_user()/copy_to_user() scenarios[1].
 
-The complete fix is already present in 6.12.y, 6.18.y and 7.2.y.
+So this series is a prereq to enabling the above-mentioned KVM/guest_memfd
+in-place conversion support on SNP-enabled hosts, as well as a cleanup
+for SEV ioctls in general.
 
-Build-tested only as part of a cumulative 6.6.y series on x86_64
-(allmodconfig, CONFIG_WERROR=y); no runtime testing.
+Thank you to Sean for suggesting this approach and Ackerley for wrangling
+the changes into a (hopefully) presentable patchset.
 
-Thanks,
-Artem Dinaburg
 
- crypto/af_alg.c         |    2 ++
- crypto/algif_skcipher.c |    8 +++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+REFERENCES
+----------
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index e7fea668473d9ede47c7d0e2005c333d34147b29..e6e94b34e0afe78f4d2a8a60c6a194bd0a958beb 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -1207,6 +1207,8 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
- 
- 		seglen = min_t(size_t, (maxsize - len),
- 			       msg_data_left(msg));
-+		/* Never pin more pages than the remaining RX accounting budget. */
-+		seglen = min_t(size_t, seglen, af_alg_rcvbuf(sk));
- 
- 		if (list_empty(&areq->rsgl_list)) {
- 			rsgl = &areq->first_rsgl;
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index b12df4544d0bbba3f3d156f0e279ac896cd81ec0..8729ef268d9d83cea537abaf23c6cdbb45f59ccd 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -82,8 +82,14 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	 * If more buffers are to be expected to be processed, process only
- 	 * full block size buffers.
- 	 */
--	if (ctx->more || len < ctx->used)
-+	if (ctx->more || len < ctx->used) {
-+		if (len < bs) {
-+			err = -EINVAL;
-+			goto free;
-+		}
-+
- 		len -= len % bs;
-+	}
- 
- 	/*
- 	 * Create a per request TX SGL for this request which tracks the
+[1] https://lore.kernel.org/kvm/asz8GKNO9aQANr5E@google.com/
+
+
+Thanks!
+
+-Mike
+
+
+----------------------------------------------------------------
+Michael Roth (1):
+      crypto: ccp - Make usage of sev_cmd_mutex more granular
+
+ drivers/crypto/ccp/sev-dev.c | 101 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 76 insertions(+), 25 deletions(-)
+
