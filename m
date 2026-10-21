@@ -1,102 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.48.10
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792619853;
-	b=UlTkJIQVHcezF3ZeV32K0PW4168+sknBsc1FKBIEx2Sg7o2CrW9p6bqc7Ol1bB5uUX4n
-	 IS2ap4nTijI/wu4GgB/77m1NCKSUTUhDuC3hbOwUt5+UbaviCRitgEyUDWVXLWK/4/sUa
-	 Kx0fbyX/tMQxv5JsIPwJUoZFFIhlu2k3xyz9gunVlUJTm130WRS0K3zbOu6Z9vO59XECR
-	 65VU5eviFkE+ZaGIfmkU5bAMqMP/pzghe1LDzmnUFk1S3EozzyrPYMtcQFe3++9S/REn+
-	 fLZc2QCCheTxg3Di8oJ/qj6XfmJC5misikhfSZb/Z6StC3hTDIadgVrVBAlcvdEcbeg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792619853;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:
-	 X-MS-Exchange-Authentication-Results:Received-SPF:Received:Received:
-	 From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
-	 X-ClientProxiedBy:X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=vQHJAznGp/je5ytACKOZiS1UtIKNgRL/SL71t8jdxAM=;
-	b=hei3nW2jCohznk6LeuqSdc4PAUSIYmJlXnJn1Ru0OtxrOdfKb6lY22ifE0kcsH/nMCbr
-	 dAjWK9xrEiielK7hAHL93uSI1RyKv/Is0T5g+Lw+4tCTLYWBpEdm4HDJRM4k++RKPyOd+
-	 GoCUsffiOBuqQAtVXFr2u4MGsBY8G2MeYp0EPliHxA9k9AkfN7yxut+CzIkm3ETlz+YkC
-	 GquXCFGOfkM82EBJRuX3fJtkpemMlRlDfFimkwsc/+t9wWcTOHSTIG0U9KtMZifw/YJ7B
-	 gttrMVkGQMVGDFMCAkVjzqITGS6kA7LJ44YJRaik62OAFQs8TFnyQJrZz38rDGLJZAA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=amd.com;
-	spf=fail smtp.mailfrom=amd.com;
-	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=cGlU7Mrz;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.48.10
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012010.outbound.protection.outlook.com [52.101.48.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.54
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792624651;
+	b=EbyFYUidvop2sucp6cTv8ssTpgDApSzUyMDi0Shy68NaWLQDBgEGOuye5Zl5f4gqcBKa
+	 qTwqAlhGnVttGZqInrZmzx5qYejqCHX+FFSmGMMDdCt4SdWtHuZeRaLd+V1TwE3/plBYF
+	 2d30LgxvmIK/RpR9ZdnOJ1EY2uldzrb0FTqUCT4anpk6jSAY9THggL232Q6f9E6h5a+lv
+	 NQoOerDTXwA7p1zfzi9cewg420DmHyertM2Zh+qB/I6JEfk/eDZy2qsVfeVZlkCFOnuex
+	 uPdz8sx7VLll2wgWywkd10DfQEtl0YEe3eh9xg/Rhn0LbwnjH86/uoaU1t2m7m5H5kg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792624651;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=lY6ateJ8HoOldOVrxlHhBNu0dJYaIqqKKUkZiKAttn0=;
+	b=22TRyiEFcSm47+slupWzmsKS7Ys55NVifZbVyeQf1dS8GcqnCUE8MV/tCOR9IVvR0J41
+	 c8tUKuItjz/qIzgftiC5CPEdzoc4bVdhtRJz52n97GNR+2+Paz+CqQHf9dlcSWrCzUKfV
+	 WrZn0HwdjjRJssqkGJN/174nQAbbNRnWlDiavApVUeU+/PsENxlqP73uicIBaEwRqqT8W
+	 t76SUAqr8ZJLt9RGzM390J6VVoNRvV7VXut6otkAyvM1Vw+Utw2Yjy5MMJm2HuyF0H6xI
+	 v9FWOtUQTdbYRJyoB47wj1QYfjMLi7z5n6kB66nbbKRYSeARgpeldtZWEqpavPtfang==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b="g/bQ6o/7";
+	arc=none smtp.remote-ip=209.85.216.54
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531EB606A31A;
-	Wed, 21 Oct 2026 21:57:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 531EB606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC919606A31B
+	for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 23:17:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC919606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=cGlU7Mrz
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Cyyrk8ONzgcLZCuNHslYLQ9mxm4TLjkbP+jwAhqAxc5pR7lmZxjNPDMyDi23AWobke9dJU793gw3Lbae6/NLo4zp1SjyPBFIrgKEPxL86ua9TC7KBs/plz3g33sJLPDPLyDayeusW1WnzSQwrT0Zg4sZxgkgeftA4ymhlb+nm/Aa3fJdQxfHoCFKS75ovmNAdMwWOBGn6am4XNcWUn9Hm08fX3uDQZrKtSyv3F2mUIUXMBnq0jjiaoPedzyl5m69QJASat8uGUeTxbuSHbrXATfIigknmcEX/DbFI1+oRn2sFVkS1B7NNosaIDgzZMWmfxe90uVReNaxN1pF8zVLaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vQHJAznGp/je5ytACKOZiS1UtIKNgRL/SL71t8jdxAM=;
- b=op7/7C2zNxPdM7YNEePzz9iG6024FSI4gKT7d7eX3YVL82rhzLEtD0T6DKbBiXt23wHveQ3MVD+xaLUXilVb36OiIAj4Pdvqq8JOpajYfP176FJgQ/nIr0OtUxaoDjiDaS4NuL4uXgKrZYaMXxigdSKsC+8BiKUI9bc6pzi4urdGnRv8OgYfIda98aGFd+ksMNxN796f4OCXbhS6imJis3sVeaBEOkJLf7LgQsK9daHP//ebRQA15H/TbALhNw1jYeX6gZ6LNk0AcBZW4CBIPdGzb5+chAAcgphpSCDSlFbRX6z1INSDBxufzV3V5uhuAnnmJk8HLuV82podW+xgGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vQHJAznGp/je5ytACKOZiS1UtIKNgRL/SL71t8jdxAM=;
- b=cGlU7MrzY2e4YyY/6l4RRpvLZnerNXWce+X602h2te8Gk7PRW5QrYrULkdfQ3KCM8nYNdB7kPvXga/nxmntTJG2aeE4l7Ku35zB2iaAwoeJBfs/D2zF748qShMVaqL0ONUpX6ftAGy8gKz3qRm35GyWXRHUw+rsE0UIbdWOcmjQ=
-Received: from PH8PR07CA0016.namprd07.prod.outlook.com (2603:10b6:510:2cd::24)
- by CH3PR12MB8658.namprd12.prod.outlook.com (2603:10b6:610:175::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.15; Wed, 21 Oct
- 2026 21:57:29 +0000
-Received: from PH3PEPF0005961B.namprd05.prod.outlook.com
- (2603:10b6:510:2cd:cafe::3c) by PH8PR07CA0016.outlook.office365.com
- (2603:10b6:510:2cd::24) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.522.20 via Frontend Transport; Wed,
- 21 Oct 2026 21:57:28 +0000
-X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- PH3PEPF0005961B.mail.protection.outlook.com (10.167.243.25) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.546.15 via Frontend Transport; Wed, 21 Oct 2026 21:57:27 +0000
-Received: from dryer.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.53; Wed, 21 Oct
- 2026 16:57:27 -0500
-From: Kim Phillips <kim.phillips@amd.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>
-CC: Mario Limonciello <mario.limonciello@amd.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Kim Phillips
-	<kim.phillips@amd.com>
-Subject: [PATCH] crypto: ccp - Run the destroy callbacks when psp_init() fails
-Date: Wed, 21 Oct 2026 16:57:16 -0500
-Message-ID: <20261021215716.1076732-1-kim.phillips@amd.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=g/bQ6o/7
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3acb11973c3so1030651a91.3
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Oct 2026 16:17:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792624650; x=1793229450; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=lY6ateJ8HoOldOVrxlHhBNu0dJYaIqqKKUkZiKAttn0=;
+        b=g/bQ6o/7g4dMFGgqWKRYEYUUXHE6B+8vGdyVy7kua5ZduXUK9y57+JSv1pe8l8EoVs
+         tF2VNhDi51sKdqkUUdwOhN26Nmr8dhoq3cNfBMzq19qs55I8IF5r0DbWT4Aayclm4RMi
+         8ZjjLe1qtfxPbwTdKCrrcs77KtcNasXI2KPOdFIzquHE0SazyyT1uuc2/Ns2zKjKcFk1
+         SdGMvJzJQIsiFutvLRlPCr6Lw4S1oVyYIGGV8j0yShYp6ZkzVvPqUY+pEPvraMGzGD2x
+         GDmyE1cZLg1pmhWsYZIhB8oW4w/DBViZQWnGHQQJwjfN6P8W4fO31VBU1cok/2djVHPI
+         2Fsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792624650; x=1793229450;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=lY6ateJ8HoOldOVrxlHhBNu0dJYaIqqKKUkZiKAttn0=;
+        b=iOjrncoQHj8aP3mX8FuFHdX/v2r6JDj8ho2vaP9i594eeWcasNaqq3u/qKOlX+pCvj
+         Wz+aUxvViNL6ozL0bfcK6D59O1Ahd9JBBd2sgY2mi57opo8gVynPsReyU8Ue/tvs0+Eq
+         EnMGKWHnM7UxbGnxc48N/6s/klZHmHKN7IgNi33RMOkOzyWQcDbWBZ7H/5uH9SPBA/cj
+         hS5Kf90h1qtJI/D6KzythuJF2/qib5NLs+4kOi+l4jLvwFrUenVtYG+KsI+ecPY4vdm4
+         zTrbUXTPmMwduMDALE8saUKaDfkrn856Ve2WCSRXjGJYVJcrAF5HQ4ExP2x+Cn/0A/pC
+         RWFQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxZJtKHPBWsOV4MWu3xmZbgHwHZuIR6ejhqprS2yIljZ8F26dz4ZhBOioUj/IJr2DNQTs5ISlIc9c9BwDs=@vger.kernel.org
+X-Gm-Message-State: AFq9FYKlxegyXklRwky6lW44Ri2tEnyKErfvt5gqkEF9SFfKLQ+y5lBb
+	KcVG0VUgAx8FI9dbpHVr56CEgWHSDY4+BpVsjN2sKWY5035zGiWLstwN
+X-Gm-Gg: AYBFou1yQwzE4hhMecoEFtpZI4I32CSocyRVypHKk7DAJ/3kO2IPTs29Fx+vUk9vmQd
+	jkdI35pK9xvywKFDQ+bHqlOQGsXhgB28zjJ9WyNtWvC0RpOvtGlglXDRajHOaMt2URfln8TrqZh
+	Dd8wiiqkq2yYMWwNaDh7pi2w7Tz09cykrH/BP4JmWN6uWM00Pm3qTrNrMcU4vX0zMGY7e5cOH0B
+	ewA2djYV3+rixCgrjhgZwXysAd7OmkcW0ZqdM0ii1ezF/xNi6EeuIhMjxzqqB584+NjRfZgsj47
+	FSqFsqAC+IyN8UQ2zRTdOUHShyIzvC/9VBhU+hN4wp3mRkjnECeYQ9eRhYORESFg3pOdU3J2u0k
+	nb5hexS3RTt9OJajnB5jHoaoQDeDW1PLlm9KZpr9hOizTeB5AKvmN3uWmnqpyYPSBOxqwxQSEDr
+	NGo2MmE14f42lPwtkVk/heeuVnHWjhCQyYnhvpPBn+nqQ4OVMqLBlUROkQHU5SCnZ6hNiszo1FD
+	w7sJj9mICjvubIbWg/wDQcbBu0qwbPoM5Hb2s+HypFPrCz85I2oFz3ExFds
+X-Received: by 2002:a17:90b:4b8b:b0:3ac:c03a:38b0 with SMTP id 98e67ed59e1d1-3ad86dcaf71mr2917316a91.8.1792624650002;
+        Wed, 21 Oct 2026 16:17:30 -0700 (PDT)
+Received: from arm-a100.. ([140.112.28.118])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ada47f1b8fsm1343576a91.0.2026.10.21.16.17.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Oct 2026 16:17:27 -0700 (PDT)
+From: Tzu-Ching Yang <shingekinocore@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jose E. Marchesi" <jose.marchesi@oracle.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Simon Horman <horms@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] unroll: Make unrolled, unrolled_full and unrolled_none function-like
+Date: Thu, 22 Oct 2026 07:16:32 +0800
+Message-Id: <20261021231632.687227-1-shingekinocore@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <0a38e0b0-2508-41c1-bd99-d15c27579307@intel.com>
+References: <20261016025613.2690485-1-shingekinocore@gmail.com> <0a38e0b0-2508-41c1-bd99-d15c27579307@intel.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -107,102 +105,44 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH3PEPF0005961B:EE_|CH3PR12MB8658:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ebe9929-c919-4b0b-eac4-08df2fbe4c21
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|23010399003|82310400026|1800799024|376014|10067099003|18002099003|261021121427099003|261021123027099003|261009223027099003|11063799006|261009221227099003|56012099006;
-X-Microsoft-Antispam-Message-Info:
-	ohqy1zEDe7RV0EKOI9ZewG8UIZKuSX0vT0llBJP7GzMTilyWnl0fq1pLjtpbApb7H+BFaQJOQ59QvVDICKfgI93+ElAw1kZxvWUf5/mEjwDLl5vI+6O0Ds6oYwuiG6fPXe+umW+U80qbKi3PmUa/qX9IgNz9Q2FX0tNiXQrdPClZmXyudoXbx73iaNCNAxouOAoUkZ73NDE7E5dwvKAFpommx+E7p7N33mu/gdY8lHEw/zHNC/nDfG+BIJsKi4FSdhKYjAQCbubLqrcTvj3EMq4y1Ip2d75uYaXtBK3X6KCBAPZm/0NrzVBAZSKivpdNBxi40hlnEE9GGqEdrGzk++9Wwr+FJ27tTdaC+7LqmSZ/xEbqAwN+XtizEmq2AYksAboOeFUmQXtGKnioQCOBegjt2fJmxSiJ3BhezVl9qsqVUTgoKRs21TiXnSWuvJaTFGVPyF/RzmKqIurF3CTmVAMF1a3r/GlOV2FR/1wQ1s3BG3FK/z2lK/SUUql1yzVmA2eYb7xTISXtwRhE9D5DyU1QnnMZtvWBmlvmXU28cNWHc1veWosm8D1WhBHW94yVqEsQcrUR2G+pw/Hjajh9Wbk43wsCGPTobIw3f1bOopRn++h/rriekAwwMLQgIR+RnPytBHMrT1JsJHUfejuND1M8lxvId4wIT08UnqbPNlAT0Xb3LJPXzmPTZ/2GCld+xuB/AQYVoPTv0VBxK7phCQ==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(23010399003)(82310400026)(1800799024)(376014)(10067099003)(18002099003)(261021121427099003)(261021123027099003)(261009223027099003)(11063799006)(261009221227099003)(56012099006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	BRLJBhJNeRFpoM2TbqneA3ku6XLsWZ8qGIRRbOi+YBtn+tnzkyE2oS6unb5XA9u/LMS7yee7mzmlyxzVysb8qlmMKzIeHdni7RjHKgt2QRyMikYh2Dfm3yufg2l2/jnUUTkxsQnaczoTJU67uCqNndf6e02Vo08UiCK7njHRGyok/p9/i6Y3L2AqcaIyHHMepO1f40rE9dKneoZcbL/y5n3kbNEwWWbrphQXkki3TXx68hQhmc+Z3dEGDuALCm3vTHCq1YP5Tfbfd/UEWBgyXsDa6EbMAOtmZ0r4LU2QmkoNL4rNPS/p4RLpvneTZBICieDdvB+/WimXb29PY2GPeHUOVYBK849zMcMTIWaA2pzKjY6kl2O5rY6XKc8Z4hoKLGbK5130GSXK0I7j5Q7zK3GVViZ3zawQpd9wDqksGSymjc2vq+cHmIWFpsL16lB1
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2026 21:57:27.6822
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ebe9929-c919-4b0b-eac4-08df2fbe4c21
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	PH3PEPF0005961B.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8658
 
-psp_init() brings up SEV, TEE, SFS, platform access, DBC and HSTI in
-turn, returning on the first failure.  psp_dev_init() then clears
-sp->psp_data, and sp_init() ignores its return value, so the device stays
-bound.  At unbind, sp_destroy() calls psp_dev_destroy(), which returns
-early on the now NULL psp_data, and no subsystem destroy callback ever
-runs.
+On Wed, Oct 21, 2026 at 05:02:30PM +0200, Alexander Lobakin wrote:
+> We have either plain-named attributes like `notrace` (BTW what if you
+> name your variable as `notrace`?) or underscored like `__always_inline`.
+> If you really need to name your variables `unrolled`, then I'd expect
+> changing these macros to `__unrolled` etc, not to `unrolled()`.
+> Although I'm not sure we really need it, there's tons of such macros in
+> the kernel -- try naming your variable `current`.
 
-Whatever came up before the failing subsystem is therefore abandoned.  Not
-everything it owns is devres-managed: tee_dev_init() allocates its ring
-with __get_free_pages() and it is freed only by tee_destroy_ring(), so a
-failure anywhere after TEE leaks the ring.  DBC and SFS are worse than a
-leak.  Both register a misc device during init, and both deregister it
-from their destroy callback, so a psp_init_hsti() failure leaves a live
-/dev node whose backing state devres frees at unbind.
+A variable named notrace or current fails to build, and so does one
+named unrolled_full. The one that worries me is unrolled: on GCC it
+expands to an empty _Pragma(), so a function parameter of that name
+compiles with only -Wunknown-pragmas warnings (not errors without
+CONFIG_WERROR) and silently loses its name:
 
-Call psp_dev_destroy() on that path instead of open-coding the IRQ and
-master device teardown.  Every destroy callback returns early when its
-subsystem pointer is NULL, and psp is devm_kzalloc()'d, so unwinding a
-partial init is safe.  This also fixes the teardown order: the callbacks
-now run before the master device is cleared, which matters because
-__sev_platform_shutdown_locked() reaches the device through psp_master.
+	int add(int unrolled, int x) { return unrolled + x; }
 
-sev_dev_destroy() is reachable here without interrupts having been enabled
-yet, but it does not issue a command: firmware INIT happens later in
-sev_pci_init(), so the state is still SEV_STATE_UNINIT and
-__sev_platform_shutdown_locked() returns without touching the mailbox.
+builds as "return x;" with GCC 11 to 16 (Clang rejects it). Nothing in
+the tree does that today; this is about not leaving the trap for the
+next file that includes <linux/unroll.h>.
 
-Signed-off-by: Kim Phillips <kim.phillips@amd.com>
----
- drivers/crypto/ccp/psp-dev.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+I see three ways to close it:
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index b14ce51065d5..4eb49eff9590 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -282,7 +282,7 @@ int psp_dev_init(struct sp_device *sp)
- 
- 	ret = psp_init(psp);
- 	if (ret)
--		goto e_irq;
-+		goto e_destroy;
- 
- 	/* Enable interrupt */
- 	iowrite32(-1, psp->io_regs + psp->vdata->inten_reg);
-@@ -291,11 +291,15 @@ int psp_dev_init(struct sp_device *sp)
- 
- 	return 0;
- 
--e_irq:
--	if (sp->clear_psp_master_device)
--		sp->clear_psp_master_device(sp);
--
--	sp_free_psp_irq(psp->sp, psp);
-+e_destroy:
-+	/*
-+	 * Subsystems that came up before the failure own resources devres
-+	 * cannot reclaim - TEE's ring pages, the DBC and SFS misc devices -
-+	 * and psp_data is cleared below, which puts them out of reach of
-+	 * sp_destroy(). Each destroy no-ops on a subsystem that never
-+	 * initialized, and this also drops the IRQ and master device.
-+	 */
-+	psp_dev_destroy(sp);
- e_err:
- 	sp->psp_data = NULL;
- 
--- 
-2.43.0
+1. This patch: make the three macros function-like, as unrolled_count()
+   and UNROLL() already are. Variables, members and parameters with
+   these names are then left alone. Cost: an attribute that looks like
+   a call.
 
+2. Your suggestion: rename them to __unrolled, __unrolled_full and
+   __unrolled_none, like __always_inline. The attribute syntax stays,
+   and nobody names a variable that way. Cost: inconsistent names,
+   unless unrolled_count() is renamed as well.
+
+3. Drop unrolled and unrolled_none, which have no users. This removes
+   the silent case and touches only unroll.h; a variable named
+   unrolled_full still fails to build, but with an error, not silently.
+
+Which would you prefer? I can send v2 for 2 or 3, or leave 1 as posted.
+
+Thanks,
+Tzu-Ching
