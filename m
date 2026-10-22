@@ -1,58 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792647957;
-	b=Y0GkYt/nRShdUk+eai7ewQc3huQJkHEjsNhX345aLmSRuUigmFG556xCFeKyIkj7h1bc
-	 Lec+mVEqur+cPypsI+G8AlitubzxY4knsGSjWKEjxUNUy+wXJLRl0Z71H9cdD1X/5eFTC
-	 FPQjVjE0mGM6TZ9xSMyt5TeAFOMPs/eEZZo0ItdSiBemyLIDBynP8Ay1dIIhqwoYpKAsP
-	 uySyjsbiCH+omVS5At7Lcin0IBkFhNRyPDpEVkJ+rgMm4TpT6a+VIjKx6LleVorwD7Vg1
-	 UbV21yrDrg9DLpJ8wWBHXCaU0SvCbWbzlXhLI6FO3CcprUv9S73aRZKgxsFE0iRkz4w==
+	t=1792655139;
+	b=KBr1EMe9JFIy2D4WZ+gcno3X6ad12uJh0XsLtvAQLvFmrKUFyjhGwTRDlz3eCMhAezqZ
+	 ZA3Q1sRq7nBYrgVJKHq4cwdy7ipCF8anCmmT5XN6KwH5wlhwu3MQwtYOZt3E7WNSa7fUW
+	 /2RQo5n/on8aM2nhWNicygCNLYF5AATucobHhJiRj0eiqKqpquKt0z5z607/C/PilcnUD
+	 rKCYGfLm7pGhOpWVhaux4///GALTo9ubHt5EnpyrdpDt7HHnqlm4LpKHuUg+qNFzCD8Gj
+	 RuNWJnx/toY7tpE9/F4DavJgyFTk6YvVuD6p7kdgrNMJuO20YCH9SsdAJkZf+mM5UCA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792647957;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=+DEgi/8NrTUM8tcUILyBiIkZL/IAs9wdlvFiHXOeDbE=;
-	b=BWbAH6hYkPhk+yVHwQK3l5Mncy8y8iVXTa9ZlP9NFXrvvW92Sae/DBd1YEKChwW+Z6O8
-	 7Xq0i0L7fu6b7lZWC4E/zZ/ZB2GHEC6WJkqrZxUdxX1RWOOFXZI8RKB5FuRiHGCwL4wj+
-	 LlWeEYb5CgBiSzcQ1Z1sHGQAJ0g6Jn+APdzH7MEKpQqYIh24YiUMvc2yG/FqUPRmISK49
-	 PWga2RtEMi7RdtWfsOWFKfJQSZxGMqJv1abJeBHu334TcNqwuNRi6c4A7w0kvc1H0A9Oh
-	 hxJRSicqMGYbYBoLaD2rKHDMrTPCQL6Jq+hPDcvcr1EzzZPbvbxlccLbZ18eYiPwFpg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792655139;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-GUID:X-Authority-Analysis:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=VWNhUBbEj98a0eKk1XOTo+BnFUwSU0QxEzvHKDZ337I=;
+	b=ikthEvoh20kO/9TwuIhTppbgnZA65vO+Ka65+l3o3EibXyggtYyO6LEywomo/jdkY3oS
+	 XFFsjYjS2ltBF8oSYH4V10JtmtP/wntlp7UrLxo0X3LcgZLqVr72C7kDN8+dXy1bQX6Et
+	 LLDOy4Q+9bUbfDIpnQP59/Li3DnKfGytTmiGJ5g+Wb9MEQGFkBObVcHjl6hr+xXCS0Kwz
+	 rmOCMaU+OIEszR9ifnGv3EE2Gl3w/tFNsPDn7BYFpt8r9lIgYr9gozqhUcX0URxknaiJw
+	 W00UUVmFZ2OAWXzgMFUtssumI5G77DCHDfLkJODRDbzmYVgP7O+6VY4SddC/YdzF56w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=byntnXkd;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=daya9Fgv;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=PaV+ukH7;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2348606A31A;
-	Thu, 22 Oct 2026 05:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B95606A319
+	for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 07:45:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 10B95606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=byntnXkd
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 321F41F000C1;
-	Thu, 22 Oct 2026 05:45:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792647956;
-	bh=+DEgi/8NrTUM8tcUILyBiIkZL/IAs9wdlvFiHXOeDbE=;
-	h=From:To:Cc:Subject:Date;
-	b=byntnXkd2/OOaj8g+9r1MFRzXa8JRqoR3YbHK9gX3Q/E6LV1ksbBTx5bcwIlaPScV
-	 qvpwDrp1yEs3Wl2XxysQJqQYVt/6zkNPHGr0/16LxDUE4dSr0I50qxBYak1rYzb/9W
-	 6OmghZwwlM96UmMhYvC1fj8+sh5rBT9zs5REfJE5hvC/hjs9LkezBrJ1V7r01P8/jg
-	 kMPYr7UK1ilMR+1HQ0oiQt5cPcVIDHsiCwE+/kRyanFBmVyKwzHuwBDC4+P/Sik8mh
-	 o8n/aOpM+tAzukPM4Io+PIoyBU1yp8eBnju3lxXKsKwj4Cs2QzcivhOQud2G6xZscc
-	 8x64QvTQIUz7Q==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-mips@vger.kernel.org,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Eric Biggers <ebiggers@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] lib/crypto: mips: Disable Octeon SHA code on little-endian kernels
-Date: Wed, 21 Oct 2026 22:44:50 -0700
-Message-ID: <20261022054450.20746-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=daya9Fgv;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=PaV+ukH7
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69M6xu581560103
+	for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 07:45:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	VWNhUBbEj98a0eKk1XOTo+BnFUwSU0QxEzvHKDZ337I=; b=daya9FgvA3PourQb
+	baUmIc9oFQBTsU/VeU8tgdghMEXnbBsqOktM/8Ftk6g94URWdBADi3HSWuFk1d8l
+	ozeS4fNIcWYXJ9gVVvet9SiOZPUODXfO1zOM0fBk4ZQ/NRXa8qW/ktrLXZ7haueF
+	frwOElWV9U31UPNoAq+JfGmGuiJR1qOnAC4wUFslxCfCkvE5OxeEz8//ZK1uTbhI
+	a3qfw71ZmhzYacKpTYP1ydWzKZSlodWTBwrZQ94wexk7KI7OfW/yInRWdcf+Tn+J
+	yRRuy/75xC4hR8ruji4zHGW4pn4ZRKVZUp6ENqtALpsW0/TYANWgAQRnL3E2R3C4
+	ZEPp3A==
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hf93ahafr-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 07:45:37 +0000 (GMT)
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-5338bd59032so2479951cf.1
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 00:45:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1792655137; x=1793259937; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VWNhUBbEj98a0eKk1XOTo+BnFUwSU0QxEzvHKDZ337I=;
+        b=PaV+ukH7ZvMqvdlZZjGTiO422mxvNxeYfxXOL5hnyqYVE3hsOrm7skEPc6n1kJSvK9
+         YzSWBzd2CDBKL63OdFPzcQUDLnT5HSl5L1bUxXWAwW9Dezg1NvS3bzTnU/enb2VodoDf
+         q/VL+eGYOaUzZwtYz4Aot3oTqD+OeA9czv+BYoq4PLwTsOny1FtJ67gW16iCKw6WlQhk
+         Vx38M5MYV0wvtczMgF6iwKwJFYuhyXpuhnlcLo9m9lxfFKMzjBPKPebrjObwCmOI7lCt
+         b4mOgNjn7jubBGhcmr8S0wPNy2DHJqQP+Nr1EPGqQxwUqmmbBRmq+h+dLiPg1lx8WXrK
+         /Wbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792655137; x=1793259937;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=VWNhUBbEj98a0eKk1XOTo+BnFUwSU0QxEzvHKDZ337I=;
+        b=ChFWFGFl31PTqdpoRKuYap7xOlhg726KNxRtAGJ6pUGpRhGxX6WposN5Z3wT1JfZnz
+         Y3E/+Uj80dapt2+xVUaORtKieWqctIV5j7NECGe03DLgEQWe2ekc0otZB8VE8io+ACg6
+         8aDnHSh07o/7S8clHu4dNXF+ZXo1LPc4WdTHUjZ6APBlVOKd27fX720w8gLP56FqVPfL
+         PH7XJE85w2aqQ83LJFJkvvPAghajrzQ9OlR+7917NXdaVcBbBQN/pVtd7IMI+/bcuQzR
+         5pqROl//TX4/cu98HRwNUXU43WqA3wOsrDZ35fkZTWjv4Oso/wPIqP8t4z6pNluUlGYW
+         wexQ==
+X-Forwarded-Encrypted: i=1; AKwUvBypYoc6HKKt0qFKUVASS5ZCLESzli9AXdhTsFaNA3196egw6cXqGf/IpI4Sp5saAmw4b80Uyf4GxhiQPX4=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLrJMne0SPkkKGCQTGPiDs4J816RArN6PtBLaAiudD7PRmC9GBi
+	tOGpFbyP4gr3+KNiQazjKGbK1i2wamqL+AJVq4v+INquVnOhM1Ie9+Vjdxa5Yf/vGTe+y2zDwox
+	Fm1aJUFGWL5+31hvyppfYkbMZdKQ/zVew0vJd6QxJ89jlZgn28Z0JWuN0MKANixMWjI8=
+X-Gm-Gg: AYBFou2V/kO8qGSZg8LjxkBGqrReLdwEctqtXmGyVK5FP10SvFzTH8OD2dUlKOzxWy5
+	Yv/kMt4hQYLOcWHlnZiBQlqRXm4JkypACz2y7h+wpeSKFLIRAowyREDw88PDmM9MyLKkoGVdp0a
+	oyHH02c5xOxfOAtF5M98HDxpUQRG1Lr2AhXsHrRDXZfm4vSwFFLotDeFfgIfuYjRn0nbY7lr5Ui
+	mdPg2G3gv+PZKDs1haXLpyGmEYQsMlaWrQDwa5WKj69aHG9/vFf/u0VI8hOzZB/Io7TeJfhssqR
+	iDT3yjl/o5CjEQ17Qdnlnjto2WfzUknC6xCWt7051pxOGmKO/17MIWhtfp/p5IPZ1wFaoXddL0j
+	nTkj/LOXH1qgb9rTt904FPw==
+X-Received: by 2002:a05:622a:138e:b0:536:662:3776 with SMTP id d75a77b69052e-5369b857ce9mr84820291cf.3.1792655136802;
+        Thu, 22 Oct 2026 00:45:36 -0700 (PDT)
+X-Received: by 2002:a05:622a:138e:b0:536:662:3776 with SMTP id d75a77b69052e-5369b857ce9mr84820081cf.3.1792655136379;
+        Thu, 22 Oct 2026 00:45:36 -0700 (PDT)
+Received: from [192.168.226.26] ([178.235.128.140])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c468a59689bsm76332866b.48.2026.10.22.00.45.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Oct 2026 00:45:35 -0700 (PDT)
+Message-ID: <6b539621-20a4-42a4-bf1f-1fd58f803581@oss.qualcomm.com>
+Date: Thu, 22 Oct 2026 09:45:33 +0200
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -62,95 +115,85 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] firmware: qcom: Add a generic ICE service
+To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Abel Vesa <abelvesa@kernel.org>,
+        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+        Sumit Garg <sumit.garg@oss.qualcomm.com>,
+        Selvam Sathappan Periakaruppan <selvam.periakaruppan@oss.qualcomm.com>
+Cc: Basant Kumar <basantk@qti.qualcomm.com>, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20261021-ice-migrate-tee-svc-v1-0-b035be7aab0a@oss.qualcomm.com>
+ <20261021-ice-migrate-tee-svc-v1-1-b035be7aab0a@oss.qualcomm.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20261021-ice-migrate-tee-svc-v1-1-b035be7aab0a@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDIyMDAzMCBTYWx0ZWRfXzXlL1wyApscU
+ QO6EDzY77yc6BjP9p+WUuHmSL8na+ZH6A+71TA3aGeurs5GjLmCxEuhsJ/of56jWuXNARU+QVCt
+ NrL4Rpk6PRxzabR7Ei8/LRTq1WcG6883ZrdfteAKJHVFy1N9tGfARJcQa8Xo2uCm19v6aWasfBA
+ tfs+eRV2xBFWNkI5jkJxQEjzIVSf9hsQZgg7zrgUuI+TAReLYMWR7hVu0V6V2fTPbZBCPZnTlbb
+ 7G1Dnevi+F/p8QI6gSfCuzUErEhSH4yuqagquh6XuuXWWSPZnzXCuW1WizRn2GePqY3ysNVonrG
+ InLXja1plCBO/RxG9IRKTUIsV+2Cx1NktX97eSfH+sla1L45IgtUtKLE5RNXkeESzKZEdWE2mMD
+ aX4QKDHa9/gaz4qZ4c9oIonXL+QFGapZRurG+q3BAO5m32AP7WrwpvDh0p4vD3Yg1fe5iYZ42rw
+ UiGgwCjGZVNJHPsy6xg==
+X-Proofpoint-GUID: etQfi24qezSnhTyRqGMvuSIi7iAeVPpP
+X-Authority-Analysis: v=2.4 cv=feg4WEQF c=1 sm=1 tr=0 ts=6ad9bf21 cx=c_pps
+ a=JbAStetqSzwMeJznSMzCyw==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=EUspDBNiAAAA:8 a=IgLHovSQZjQVHc4R8FYA:9 a=QEXdDO2ut3YA:10
+ a=uxP6HrT_eTzRwkO_Te1X:22
+X-Proofpoint-ORIG-GUID: etQfi24qezSnhTyRqGMvuSIi7iAeVPpP
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDIyMDAzMCBTYWx0ZWRfX9gTyzkkac2Lh
+ KvMFTYwfQYF05GpGtlldnIpNXIVP+4IgzaQ0EjAdmSsnzEdq54+qC97rQ7XyPqz+3fMdADZKCTV
+ gAKJ8PhBtGRdQvVjlekSRTMh8MZhel0=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-22_03,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0 suspectscore=0
+ spamscore=0 adultscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2610190000 definitions=main-2610220030
 
-Kernels built for the MIPS64-based Cavium Octeon SoCs are normally
-big-endian, but little-endian builds are also supported.  Currently, the
-SHA-1, SHA-256, and SHA-512 code using the Octeon crypto co-processor is
-enabled in both builds.
+On 10/21/26 5:43 PM, Harshal Dev wrote:
+> Qualcomm platforms such as the IQ-9075 EVK now boot with both QTEE and
+> OPTEE. However, the Qualcomm Inline Crypto Engine (ICE) driver
+> currently only makes SCM calls into QTEE. With the arrival of ICE
+> support on OPTEE for Qualcomm platforms, there is a need for a generic
+> layer which re-directs the call to the correct TEE at runtime.
+> 
+> Add a generic ICE service which acts as a common layer with different
+> TEE backends plugged in whether it's an SCM implementation or a proper
+> TEE bus based implementation (such as for OPTEE).
+> 
+> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+> ---
 
-This code is untestable without the hardware.  However, based on the
-code itself, it is implausible that it computes hash values correctly in
-little-endian builds.  Such builds write many incorrect values to COP2:
+[...]
 
-  - SHA-1 and SHA-256: The 64-bit integer that contains the last two
-    32-bit message words of each block is written to COP2 entirely
-    byte-reflected, due to missing endianness conversion in
-    octeon_sha1_start() and octeon_sha256_start() to compensate for
-    using native 64-bit loads from the message bytes.  This differs from
-    all the earlier message words which are written correctly.
+> +bool qcom_ice_svc_ops_registered(void)
+> +{
+> +	/*
+> +	 * The barrier for ops_ptr is intended to synchronize the data stores
+> +	 * for the ops data structure when client drivers are in parallel
+> +	 * checking for ICE service availability.
+> +	 */
+> +	return !!smp_load_acquire(&ops_ptr);
+> +}
+> +EXPORT_SYMBOL_GPL(qcom_ice_svc_ops_registered);
+> +
+> +bool qcom_ice_svc_available(void)
+> +{
+> +	if (!ops_ptr)
 
-    Furthermore, the state is written to COP2 with each 32-bit word
-    byte-reflected within each 64-bit integer, due to incorrect use of
-    64-bit endianness conversion in write_octeon_64bit_hash_dword() when
-    the state is kept in memory in native-endian 32-bit words.
+Should this also be a barrier read?
 
-  - SHA-512: All the 64-bit message words are written to COP2
-    byte-reflected, due to missing endianness conversion in
-    write_octeon_64bit_block_sha512() and octeon_sha512_start().  The
-    SHA-512 state words seem to be written correctly.
-
-Big-endian kernels aren't affected by these bugs.  These bugs also
-aren't new; this code has been broken on little-endian ever since it and
-Octeon little-endian support were first added in v4.1.
-
-Commit d2a948d2db68 ("MIPS: Octeon: Make octeon-md5 driver
-endian-agnostic") made the MD5 code work on little-endian kernels by
-adding 64-bit endianness conversions to the COP2 macros used by MD5
-(some of which are shared by SHA-1 and SHA-256, despite those algorithms
-keeping the state words in native-endian instead of MD5's little-endian,
-causing some of the strange behavior described above).  However, SHA-1,
-SHA-256, and SHA-512 were never fixed to work on little-endian kernels.
-
-Therefore, disable the Octeon SHA-1, SHA-256, and SHA-512 code in
-little-endian kernels.  This causes the generic code that actually
-computes hash values correctly to be used instead.
-
-Fixes: 82be2dcfa6a1 ("crypto: octeon - add SHA1 module")
-Fixes: c3d0def62001 ("crypto: octeon - add SHA256 module")
-Fixes: fbaa4dfd51a0 ("crypto: octeon - add SHA512 module")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
-
-This patch is intended to be taken through libcrypto-fixes.
-
- lib/crypto/Kconfig | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 56f308dd02731..83b4a211c15d6 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -237,7 +237,7 @@ config CRYPTO_LIB_SHA1_ARCH
- 	depends on CRYPTO_LIB_SHA1 && !UML
- 	default y if ARM
- 	default y if ARM64
--	default y if MIPS && CPU_CAVIUM_OCTEON
-+	default y if MIPS && CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
- 	default y if PPC
- 	default y if S390
- 	default y if SPARC64
-@@ -255,7 +255,7 @@ config CRYPTO_LIB_SHA256_ARCH
- 	depends on CRYPTO_LIB_SHA256 && !UML
- 	default y if ARM && !CPU_V7M
- 	default y if ARM64
--	default y if MIPS && CPU_CAVIUM_OCTEON
-+	default y if MIPS && CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
- 	default y if PPC && SPE
- 	default y if RISCV && 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
- 		     RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
-@@ -275,7 +275,7 @@ config CRYPTO_LIB_SHA512_ARCH
- 	depends on CRYPTO_LIB_SHA512 && !UML
- 	default y if ARM && !CPU_V7M
- 	default y if ARM64
--	default y if MIPS && CPU_CAVIUM_OCTEON
-+	default y if MIPS && CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
- 	default y if RISCV && 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
- 		     RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
- 	default y if S390
-
-base-commit: 4403278e4ea2f654f8130a5c03eb8b4516a0f201
--- 
-2.56.0
-
+Konrad
