@@ -1,48 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792659902;
-	b=NHoHYqyRStfYisgYT8Mt9lHWPJ0pcpfV/jXtlplZx2LMKz25KcqeujHYz3PBzXbgRh9B
-	 ILa1MN3uJYkGbdM6zTtzSCqX8PDHpOqGrLzC0EDBu9E/E58hBWIq+B4tCbxUzCzPVU2ZP
-	 5JFHsYgbHScorCMJrGfOfUe2w388vAaDvgGWCP24V9e8quVCMhka/loXDMMFqoRvdw3H5
-	 masOYt+d6wcVKXOF152m4gixbJbUrBuUgzw3T/9pIvzVMhhyQKgdJi1zACW5O1AK3nifM
-	 RjjCo7trUymBLPJllN2IUsKTKrp3FKgDDhMV3kmhSbJD4ClqcPd/NODsqIoe/ak6Z2Q==
+	t=1792660024;
+	b=q9QPhBw854gHW3wVh3PrP++29ic9zAFfwePMHQhEfMQjlKUWoE4CZl/Fr0kiM7n4sHu4
+	 EYjbQ3sjHRpoTVIpO35JmiEKnYi/kWtXH8XYsju41Tf8zyqGhczmEQ0h5Qaiga7q7ipSh
+	 wDlZTN3yrTI1eMIfHaa2X4B2WJC6NpYJE+Gd10lBvS99TAP2xbaK6PkIaFASMNwLAyM1b
+	 nu8MS5AtmIAQmymjEdzo3xZheJZGJwfBJLH2KtoKqkNV7jRBlkTs0mgbCapO8rZmeSwpL
+	 DNqBXBKgjJkwILtqz+L132ctbVoo8hHuvBRB/J8lg7mqg0i4qq8uxwmlC2h/PlB2eOg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792659902;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792660024;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=k6a2k6+bok+Su2QyvWInPfvhOUYNQ0l5xS1haQ288Hg=;
-	b=b3mQvHH6GTZY670Dd+6q/HX2oDldysZe7/+z7TmNFvaePbpGlTAiMYSKmqzuUmp1si/D
-	 dROQcLUvUzcUyivwMSSIvQiRzXtVzJtczITLU/AJUUT35aV1B3JFoE7sgAG+rLt9gXgzd
-	 4zw7w+tm3Ef/zqhuAuvHmJFSKym2RFZepsnUn6CC4o0PZBuBC+nkiUzBn3qJ4ln/N21J3
-	 ZLar+s0m0qlWaxR0RjfPzUHnafUf6YP8WBNhvdZNfSnOZLMC9sNn+FsTy7ny0ypJJ429F
-	 VErNbKaEsh9PTKpsNor4vTOYei4XqVd+TvxyUujq9iG8F8+R5OFkbJeOJLyz+d8YsoQ==
+	bh=rD6igMSJ74QvpTdVNRSuo11IRXt2E2oOsBOksy+Goo0=;
+	b=BLTf45MfLYRvOcisuhvZ4jRv+NXRuEELLk2vEM/htaQojTZSYKaX1H4iKtxGk4OFXNDm
+	 ys5lFBxILO0BpYjUgrPIaCp4RgE9pLwakdcyrElvCSUPkKT133Y/36c/G2wzc0A9yUJVJ
+	 65mEKZuQCGdauFOwh/pWgZU0SOGs9XOFc8fBnMkCi+d6HqeyzKmrGWcBdqkOM+M1n8oTy
+	 UQ6XRub166tzyRsOCMLmFNNhAnFLgzklvnHQCXa6l8y1DeQIXJ5H/0i3iXzgFmoAv+kZK
+	 wDRLQAxo5OxiJjJUD+5ykrsjqLtMAI7q/pfDMMSrIVaENETCh9Kt3wb0OaWpe6jCL0Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R9gRE+Rx;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=el13Ewvz;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A30F606A31D
-	for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 09:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13CE606A31D
+	for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 09:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R9gRE+Rx
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89AB41F000C3;
-	Thu, 22 Oct 2026 09:05:01 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=el13Ewvz
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE381F000C1;
+	Thu, 22 Oct 2026 09:07:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792659902;
-	bh=k6a2k6+bok+Su2QyvWInPfvhOUYNQ0l5xS1haQ288Hg=;
+	s=k20260515; t=1792660023;
+	bh=rD6igMSJ74QvpTdVNRSuo11IRXt2E2oOsBOksy+Goo0=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=R9gRE+RxLvLxr+V9AltCRxaZ+G4pdN5mhTI3YGnOXOmR2z37X4AjbYOKHEMHtL+H+
-	 mN22TftScuPdxqjiTfa0yZr9oDabCyV7imI/NssBInTL3fUaPUJmPDYbDm+KQ9JuQb
-	 9zWjK8bkB9uSR1OTfLO4PUPT4u4MaQ//rFSU+e+ayGzoxsa0WGPnC+FJoOAfptz3fv
-	 en1kdz/f+xy7vtphVOImuM94t3MdP+d3MUNpb45GB8IxD+Y6eZ7HLMonb9r+DahA9d
-	 1Gq8/MemkRu2d7H+VvTwVYUy+NTxh7GnERN/uXYYr2W9gso6nQVz3Oy9ipPXAMMy/x
-	 zt0REJrDiVT9A==
-Message-ID: <sashiko-outbox-181233@kernel.org>
+	b=el13EwvzuHt44hWnzMzHxxhILfeJSNIr67hJv4n0WRQcDThR4KFpWeZc59sbTotkI
+	 CPZIy/bmznMqEGrU1rxPC/qH4JmETnriuRaqSif8aX/Hcj6qyCRwQ5vP+5GcrWgF8+
+	 pe2iNIyYfAftXTtPjP4UYNORtGsdL1G2N055qJTMIoXn5D28MoEltfBtiysB52vN4a
+	 6sGOgR7IGa/yjacNec+Klyg1BdjzjCHqRkAp0XwIWmsKiSHqFfD8Mp/2x6GFT4Xcaj
+	 dqpiPZu/K7f6kT8b0lNG16z58Xjj5Sal2BvAsCs0nv0RrWygbzv5VcwwZJPtnPY3Vw
+	 RvcVrvewv8ztQ==
+Message-ID: <sashiko-outbox-181234@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v11 1/2] crypto: qce - Only register algos if the user
- really wants it
+Subject: Re: [PATCH v11 2/2] Revert "crypto: qce - Mark QCE as BROKEN"
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Bartosz Golaszewski" <bartosz.golaszewski@oss.qualcomm.com>, "Bartosz
  Golaszewski" <brgl@kernel.org>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
@@ -51,12 +50,12 @@ To: "Bartosz Golaszewski" <bartosz.golaszewski@oss.qualcomm.com>, "Bartosz
  Singh" <kuldeep.singh@oss.qualcomm.com>, "Pankaj Patil" <pankaj.patil@oss.qualcomm.com>, "Birk
  Skyum" <birk.skyum@pm.me>
 Cc: linux-crypto@vger.kernel.org
-In-Reply-To: <20261022-qce-fixes-broken-label-v11-1-0d33c34fd0c3@oss.qualcomm.com>
+In-Reply-To: <20261022-qce-fixes-broken-label-v11-2-0d33c34fd0c3@oss.qualcomm.com>
 References: <20261022-qce-fixes-broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com>
- <20261022-qce-fixes-broken-label-v11-1-0d33c34fd0c3@oss.qualcomm.com>
+ <20261022-qce-fixes-broken-label-v11-2-0d33c34fd0c3@oss.qualcomm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Oct 2026 09:05:01 +0000
+Date: Thu, 22 Oct 2026 09:07:02 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -68,62 +67,80 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Low] crypto: qce: missing kernel-parameters.txt doc for do_register_algos
+- [Low] crypto: qce: missing documentation for qcrypto.do_register_algos pa=
+rameter
 --
 
-commit 47675c12b3c6637f5e62afe90e1fb4f153328b57
+commit 7402540901cd549c757f6e4846f133d63cd4febc
 Author: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
-crypto: qce - Only register algos if the user really wants it
+Revert "crypto: qce - Mark QCE as BROKEN"
 
-This commit adds a do_register_algos module parameter to the QCE crypto
-driver so that crypto algorithms are not registered by default during
-probe unless explicitly enabled by the user.
+This commit reverts marking the Qualcomm crypto engine driver as broken now
+that self-tests are fixed and algorithm registration is gated behind the
+do_register_algos module parameter. It also updates the Kconfig help text to
+describe the parameter and re-enables the driver in arm and arm64 defconfig=
+s.
 
-> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> index bf3c1bc3ba7bd..5b1bf7a50f88c 100644
-> --- a/drivers/crypto/qce/core.c
-> +++ b/drivers/crypto/qce/core.c
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 0189dfdcbbe11..adcbe15851899 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -527,17 +527,21 @@ source "drivers/crypto/marvell/Kconfig"
+>  source "drivers/crypto/intel/Kconfig"
+> =20
+>  config CRYPTO_DEV_QCE
+> -	tristate "Qualcomm crypto engine accelerator"
+> -	depends on (BROKEN && ARCH_QCOM) || COMPILE_TEST
+> +	tristate "Qualcomm crypto engine offloader"
+> +	depends on ARCH_QCOM || COMPILE_TEST
+>  	depends on HAS_IOMEM
+>  	help
+> -	  This driver supports Qualcomm crypto engine accelerator
+> -	  hardware. To compile this driver as a module, choose M here. The
+> -	  module will be called qcrypto.
+> -
+> -	  This driver does not have exclusive access to the
+> -	  hardware, causing races with the secure world.  It
+> -	  is also slower than the CPU.
+> +	  This driver supports Qualcomm crypto engine offloader hardware. To
+> +	  compile this driver as a module, choose M here. The module will be
+> +	  called qcrypto.
+> +
+> +	  NOTE: With qcrypto.do_register_algos module parameter set to true,
+> +	  this driver does not have exclusive access to the hardware, and may
+> +	  cause races with the secure world. It is also *slower* than the
+> +	  CPU for the same algorithms. By default it will not register crypto
+> +	  algorithms and only scale down the interconnect bandwidth and disable
+> +	  the relevant clocks. Use qcrypto.do_register_algos=3D1 at your own
+> +	  risk!
+
+[Severity: Low]
+The help text for CRYPTO_DEV_QCE in drivers/crypto/Kconfig instructs users =
+to
+pass the qcrypto.do_register_algos=3D1 parameter, which was introduced in
+commit 47675c12b3c6 ("crypto: qce - Only register algos if the user really
+wants it"):
+
+drivers/crypto/qce/core.c:
+    static bool do_register_algos;
+    module_param(do_register_algos, bool, 0444);
+
+However, neither commit adds an entry for qcrypto.do_register_algos to
+Documentation/admin-guide/kernel-parameters.txt or provides a
+MODULE_PARM_DESC() in drivers/crypto/qce/core.c (unlike aes_sw_max_len in
+drivers/crypto/qce/skcipher.c).
+
+Should qcrypto.do_register_algos be documented in
+Documentation/admin-guide/kernel-parameters.txt and given a
+MODULE_PARM_DESC() entry?
+
+> =20
+>  config CRYPTO_DEV_QCE_SKCIPHER
+>  	bool
 
 [ ... ]
 
-> @@ -22,6 +23,9 @@
->  #include "sha.h"
->  #include "aead.h"
-> =20
-> +static bool do_register_algos;
-> +module_param(do_register_algos, bool, 0444);
-
-[Severity: Low]
-In drivers/crypto/qce/core.c, module_param(do_register_algos, bool, 0444)
-exposes qcrypto.do_register_algos as a kernel command-line and module
-parameter to gate devm_qce_register_algs(qce) in qce_crypto_probe().
-
-Should Documentation/admin-guide/kernel-parameters.txt also be updated to
-document qcrypto.do_register_algos, along with a parameter description in
-drivers/crypto/qce/core.c?
-
-> +
->  #define QCE_QUEUE_LENGTH	1
-> =20
->  #define QCE_DEFAULT_MEM_BANDWIDTH	393600
-> @@ -259,9 +263,11 @@ static int qce_crypto_probe(struct platform_device *=
-pdev)
->  	qce->async_req_enqueue =3D qce_async_request_enqueue;
->  	qce->async_req_done =3D qce_async_request_done;
-> =20
-> -	ret =3D devm_qce_register_algs(qce);
-> -	if (ret)
-> -		return ret;
-> +	if (do_register_algos) {
-> +		ret =3D devm_qce_register_algs(qce);
-> +		if (ret)
-> +			return ret;
-> +	}
-> =20
->  	/* Configure autosuspend after successful init */
->  	pm_runtime_set_autosuspend_delay(dev, 100);
-
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261022-qce-fixes-=
-broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com?part=3D1
+broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com?part=3D2
