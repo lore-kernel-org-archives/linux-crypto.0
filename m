@@ -1,61 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792655910;
-	b=DryQpE8hwUqMVgP+vBf5yF4/7mzlbGb4wnEckUMyINS0aGcg3138FThIwv/V6GzcGnSO
-	 nZ6UwbYR5eAT51v0wP4UgimZkC+XynGwebChkb7dFqzZxHXkVi6GSNThAHNNmF7mUCt2s
-	 xO0aqiM6XfQjG7FlYLMmc9QTIBM8+ujj+6hSk9O4ibYpQFBVra3BNBLPRu0Igwwrd2Cc+
-	 1DRuATgaPncbkcVOJZA+8ST/VucNKrA6DTB46GDRvTbJvgUQmdyCCEf8G7dD6OKem28og
-	 m/z80C66Y8vP+K+9qv2BIuOh8ny0yQJwM9rnN0yD2g/SVGUPQxAI/Xfk3BcWs63QfLA==
+	t=1792656876;
+	b=qt3sHT1/WMHdqHYT6rinJ9teCHNArCSryvsglMdGmJHxfMTSpHywZt1S0gRdbqzNjjjM
+	 GpVI40qz9/yGcT19RqTj5lOMnYa6UT+ymE499hGnwJnGOxQmuh20eZPhxBqANlxElxYnW
+	 qULLZ8T7nJNIfBueHMFUcSVTEH+a+FT0rwYWcS7UF8p6XznSsWgXg7t5x7hPc7Z+SUDPg
+	 QKQfplE7EPYmJyoYvoQ/YZySzHo1jJjzDtmoKOuhJB1K9d9wBzCbk/vDavrnH9FIiN/3T
+	 0Ok6o2QOFagOTPIdgvZQOvLNXfIk+9VFEDMDsD81nmoNe/gGfGRTTKxbdej18CfvOIQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792655910;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:Received:Received:From:In-Reply-To:
-	 MIME-Version:References:Date:X-Gmail-Original-Message-ID:
-	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
-	bh=DOGsbHPV9Q6LEJI4bp7YU9lC5DA9e4STqXoDKb5ejb0=;
-	b=uFEBROFk4Ykt1Ir+U7Vt0sdXTKpHVRmffRrUywZHJ7w0eLj4beDYXv6BAtlHld7xC9Sv
-	 o1j5Zp8ye8rzffBMsrCkoNGmrPkC9HKcsXnQj4w2iaYKijF5NQrI2uHEHYMbAbEEZas3y
-	 DIxZ/+dkVffYRGRVcsiwd61Rz1HzTjLJlGGeGnP/stagN83V+ebdJJlFt6y5aRzarDXBI
-	 88/I+Z22Zk8JeKUbHhD8UpytNmtqiPBomI62KYWZJU0sCt2XbWuGRXI33H2HDREBl4hWS
-	 1Kl8VUIszhvrT34F5X+f4VmBJDOFT4Z3RV6xOCNKobMNYv6Hdkp2XfUC7aZBXsiUJsw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792656876;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=3sD0G4G8uCR6QoPuFMFokC4gDJ/4LjJ7maE0ec9iXuw=;
+	b=nISmTdqSeDOHP9gZqwoM9pnl5XrXijpk2ux63YFZI/+D13C65qXKCS1TbKGzNBQE39kV
+	 N0y4Ek9qUANRvLHJIUz3Wu4GVTiG+vyTSkXTf+PhkuBx6sqFS16dafTfI3fz/3W4NoU//
+	 qgMkFDXtVBIOnNbFcmJ9Lu4NgqWRFB/K6Z8z5j2MtkxD1NA1w/rBkcZZm3XaIE1xvw+iA
+	 3EkM5jGsLOvvRcGfrjPWjKMhWvimFAkvRkzCcVQtpPdbOlgKfrBmp/9BrAXynXE/tu4rW
+	 /SU2a5AqttSIP4Fn2CAMotY86UNY8wmMHd2qFblmQPeuM5Dn4nbzEz9DKEQ3f3ZldXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=M76WzVlP;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=a6C+nt7i;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61386606A31A
-	for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 07:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEFC606A31A;
+	Thu, 22 Oct 2026 08:14:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EFEFC606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=M76WzVlP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03F351F000C2
-	for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 07:58:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792655910;
-	bh=DOGsbHPV9Q6LEJI4bp7YU9lC5DA9e4STqXoDKb5ejb0=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=M76WzVlPBD5y4IqVS2atl7PqIsbChiueyPRFZxYypwtus+8TtzwLM94gtwqzkzIi7
-	 Uynjkei/JU0SDmBsWe1Nk8I3NJSux6STZOQjVQ1eQfOQZz6HffJeHfd/TzpY15o8kc
-	 8WhqCoOFQ0jxu+kkVBQNE/Yx7na5wbewb9gOJL1F8njrh6otFV4Qkg5psTGcxAq8/C
-	 +zth5lBobhZL4ML2CkEKJIHNRBU6e0m6mO5QdVaQxiZpgQzE1zsViAQ+u4M5ONY3Mo
-	 Uzi2d8bmao4mA3WvpxO2Ei34QzcdEAV4CGMARW/VfVP8A622QmeMYJgRcAo4DAgXmF
-	 o7l9TiqPsA39A==
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3a65ed9c7cfso14019321fa.3
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 00:58:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwLuCWWKLv2DphKAWJK9EsD3eV/keG7koPlOJ2l2dI9e6WFS+UVO5uNwXtcmGLvnXiGIiif4Mc6ErxnkJI=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKHzQej+p8Q4pwdb1Hp988W9dFgZqBibj2Jvo7Rc1ob/okJ+KvY
-	QMzNgDlteU6WuWkqGtyCS2OHC0AgYfUk1efsh4mzQoxgZFdzrWDBRlhz7J2MQKtmLyb6Krz4il4
-	Yhf92SoPc7s8OqKhT4JYGrJ2hF7KkXWAL8zLdPU2MEg==
-X-Received: by 2002:a2e:a9a5:0:b0:3ab:48e6:6789 with SMTP id
- 38308e7fff4ca-3ac4414620dmr13295841fa.8.1792655908769; Thu, 22 Oct 2026
- 00:58:28 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 22 Oct 2026 00:58:26 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 22 Oct 2026 00:58:26 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <179261435862.92690.4559755086697722828@pm.me>
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=a6C+nt7i
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=3sD0G4G8uCR6QoPuFMFokC4gDJ/4LjJ7maE0ec9iXuw=; 
+	b=a6C+nt7iqTVvYfxU6QjSdBPTeQZyNPTtqpAaRGegAEHnBAgGiGQM2em8ubMFe1+mi0LpiuxjZQ1
+	qLGSJSv9CpXaRcaIPaU2lN4fTgfJz/Gl9500tuBzTazyvIeYgAhC4rZxMYr+14zYXZcSHuXpwxYB+
+	C4uP7b6XHYzOuIy1PydxpFYJR1ppAkLStuM3jRxtNCRirVs8nkTiRvGvwHTUE56Z0YwUXsqMx0XR4
+	Ts3zuI4z+xMgD/QjZIShvMPQv4Dc1RAg4zE0Hb3mJ/ySFIs9ZDS9zf63dF4+YXPknPIDlROiP2rr2
+	1FpGMsIHAtCV6LFjeG57eTbtesmtOiF5znOg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xJnw2-00000006Sw6-1DCV;
+	Thu, 22 Oct 2026 16:14:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 22 Oct 2026 16:14:02 +0800
+Date: Thu, 22 Oct 2026 16:14:02 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Suseendran Bhaskaran <suseendranb@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Yosry Ahmed <yosry@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
+	Chengming Zhou <chengming.zhou@linux.dev>,
+	Nick Terrell <terrelln@fb.com>, David Sterba <dsterba@suse.com>,
+	SJ Park <sj@kernel.org>, Chris Li <chrisl@kernel.org>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
+	linux-crypto@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: return -ENOSPC on compression destination
+ overflow
+Message-ID: <atnFygk8xsQ-8Mj5@gondor.apana.org.au>
+References: <20261021205626.3286270-1-suseendranb@google.com>
+ <20261021205626.3286270-2-suseendranb@google.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,58 +75,52 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261013-qce-fix-self-tests-v10-0-57162a38a554@oss.qualcomm.com>
- <20261013-qce-fix-self-tests-v10-10-57162a38a554@oss.qualcomm.com> <179261435862.92690.4559755086697722828@pm.me>
-Date: Thu, 22 Oct 2026 00:58:26 -0700
-X-Gmail-Original-Message-ID: <CAMRc=Mc1O-xSOt9RNTTF-ue_3skkNoQ4a0h7RovbCbQtexKkdA@mail.gmail.com>
-X-Gm-Features: AclHuK-ddH3eyHdZmxCdnhGchR5nIcmlb3fM-yPWg22T-Acg-ykEAHgaJMn9PAk
-Message-ID: <CAMRc=Mc1O-xSOt9RNTTF-ue_3skkNoQ4a0h7RovbCbQtexKkdA@mail.gmail.com>
-Subject: Re: [PATCH v10 10/14] Revert "crypto: qce - Mark QCE as BROKEN"
-To: Birk Skyum <birk.skyum@pm.me>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Stanimir Varbanov <svarbanov@mm-sol.com>, 
-	Eneas U de Queiroz <cotequeiroz@gmail.com>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Demi Marie Obenour <demiobenour@gmail.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>, 
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, brgl@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Pankaj Patil <pankaj.patil@oss.qualcomm.com>, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261021205626.3286270-2-suseendranb@google.com>
 
-On Wed, 21 Oct 2026 22:26:23 +0200, Birk Skyum <birk.skyum@pm.me> said:
-> On Tue, 13 Oct 2026 11:57:39 +0200, Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com> wrote:
->> The self-tests for this driver have been fixed. The crypto algorithms
->> are only registered if the user explicitly requests it with the provided
->> module parameter defaulting to false. There's no reason to further keep
->> it unbuildable with the BROKEN label.
->
-> On X1E80100 the BROKEN label also costs deep sleep in suspend. With
-> nothing bound to the crypto node, aggre2_noc and mc_virt never reach
-> sync_state() ("sync_state() pending due to 1dfa000.crypto"), and on a
-> Lenovo Yoga Slim 7x a deep suspend on 7.3 never counts aosd, cxsd or
-> ddr in qcom_stats.
->
-> I built qcrypto out of tree from 7.3 with 09 applied, which is what
-> this patch makes possible in tree, and loaded it on 7.3 (with distro
-> patches, none in QCE, the interconnect drivers or the driver core) and
-> the crypto node as in mainline, with ALWAYS tags on its paths. It bound
-> without registering any algorithms, went to runtime suspend with both
-> crypto paths at 0, and both providers synced. The next deep suspend
-> counted aosd, cxsd and ddr, with about 13.7 s in them during an 18 s
-> suspend.
->
+On Wed, Oct 21, 2026 at 08:56:25PM +0000, Suseendran Bhaskaran wrote:
+> In the acomp/scomp compression interface, callers pass a bounded
+> destination buffer and rely on the return code to distinguish a
+> destination buffer overflow (incompressible input) from genuine
+> compressor failures (such as invalid parameters, uninitialized state, or
+> hardware errors).
+> 
+> While the multi-segment streaming path in zstd_compress(),
+> crypto/deflate.c, and lib/842/842_compress.c returns -ENOSPC when the
+> destination buffer runs out of space, the single-buffer path
+> zstd_compress_one() (taken when input and output are contiguous single
+> pages, such as in zswap) as well as lz4, lz4hc, lzo, and lzo-rle return
+> -EINVAL instead of -ENOSPC on destination buffer overflow.
+> 
+> For users such as zswap, which reduced its per-CPU compression buffer to
+> a single page in commit 0b1bf60c324a ("mm/zswap: reduce the size of the
+> compression buffer to a single page"), incompressible pages typically
+> overflow the PAGE_SIZE destination buffer due to compressor header/token
+> overhead. Because these compressors return -EINVAL rather than -ENOSPC,
+> zswap cannot distinguish a destination buffer overflow from a compressor
+> failure, causing broken debugfs error accounting (reject_compress_fail
+> vs. reject_compress_poor) or masking real compressor errors.
+> 
+> Update zstd_compress_one(), lz4, lz4hc, lzo, and lzo-rle to return
+> -ENOSPC when the compressed output overflows the destination buffer,
+> matching the streaming path in zstd_compress(), deflate, and 842.
+> 
+> Fixes: f5ad93ffb541 ("crypto: zstd - convert to acomp")
+> Signed-off-by: Suseendran Bhaskaran <suseendranb@google.com>
+> ---
+>  crypto/lz4.c     | 2 +-
+>  crypto/lz4hc.c   | 2 +-
+>  crypto/lzo-rle.c | 2 +-
+>  crypto/lzo.c     | 2 +-
+>  crypto/zstd.c    | 5 ++++-
+>  5 files changed, 8 insertions(+), 5 deletions(-)
 
-Thanks for testing!
+I can take this patch through the cryptodev tree.  Is that OK with
+you Yosry?
 
-> Herbert asked for the series to be split, and the resends since then
-> don't carry 09 and this one. Both should come back as fixes, for 7.3.y
-> as well.
->
-
-Yes, I'm waiting for the fixes to be picked up before re-sending the remaining
-two patches that depend on them.
-
-Bart
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
