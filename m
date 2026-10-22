@@ -1,94 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.201.39
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792689994;
-	b=txCKqRG3oWHzEWQNfBdaYTUjIJWBG9qem+ivlRjYBXSkXBINsPKpYlE0BFXYZIqvaMsq
-	 OJmZjYcibh143yD86zIHQ8iAsXdYnvwXrdJFCjg9fAS7zd8t0r0/tQyMabYsSzSX/iNXv
-	 dINxLwAP3nBc4YhcS/F61gz/mjDWF45nVWP9Fokf3hkdMV8TTlpHVQEVkFHkeZwnoEVBL
-	 CJnCAid3BxqkiOPstrF1WOAZ5KkAkQKBQIDe/jMkwmmdNj2vywEWa62yhC5HbhfXiUML4
-	 bJhGUAzEHGjddtN/5KWWtK7KY8rUzmNO++y+H0YPHJT4OZ7dV9TSW5Q6biLnSOwAjuw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792689994;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Message-ID:Date:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
-	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
-	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=Ibmvayihy6xl3Tz7teqJDQg35S/kntBeRF6CQsL4rxs=;
-	b=FGEi964YSz3dlWp1KrWxkMOaVR0DEMh9CBq3AKATz7IMQAmctNvGWSYuKG+irsrP0W3t
-	 izZZq1Pzbodfvx1Z66d3IClqKLg4roUOMJod60nRrXHLjbrXt2nGziHiPPoy0J4hFbjq0
-	 IDq4mB1Lri9nqqg3tizRIC8Lmu7qhuQXrJNEtIkOoy3W5KcB+LlIRsxpPOykzzNUX6s2o
-	 0R3m1GdPptCw71TMrmh+BXw6j68Han/GjzBIukMUVSNHVn1VOk+HsM21wdK5OBCHzJJgF
-	 XX9WEEfOncULD40EGKhESJlhZo2rd/2TebAMzs2nTkdsUULYTINocxvZrDubFoHSkPg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=amd.com;
-	spf=fail smtp.mailfrom=amd.com;
-	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=5MKfd+NF;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.201.39
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013039.outbound.protection.outlook.com [40.93.201.39])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.199
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792694007;
+	b=nXL+JpOQO/21k3FWQD7FcwxNL/W9dCB42XVinYO2lpVslwm685cCQlYBgq3SXsNgJr2v
+	 3uRWNxfpDYseRIP9Y7r7NHUKxquXlvM0wiBPEejneURkKoKcTX5x/Ml8f0SRfvaDzDkI+
+	 s6SE1wKJNzv+/69v2otP0y+NFKg8wehxYuyQlSRhBBXzoqt+S+W9f/p/sIwEaVGd/Lxg6
+	 CflI6J9IxjjtzNJ/dUf8gRzBnCbeaxs0IK16eEmhMpWL6pBxtIOZ5rLEjHghGtZujHkjj
+	 cB1upwxE0sRm3Jbwf1oi2bqTQTqnVNXUMpyWbJyLJcuIzAzjETEdQG8JJUiG04Fd5rg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792694007;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type;
+	bh=kMc2eNn/OrrFKUYMVyLnIB+VtX1ihRJBTMeBnYRefLE=;
+	b=jknzUplIsxR+SSJT3LJu3lrXZ7GXutLAjM3ox8mC850f7MLtK8Jg0WrLdpzmLJyD69cM
+	 eiTUYN1UpuZjQNlArkE2pNI0zndqazIbQ5opZ8mbM/6NIK9nET3JJjMEWHnazNx2pqdx3
+	 xtVNn7M5Rz/RKKFVXvWKKbjr6tMF6W04u/+i412AhUVB5ZFEY04/2Iv6fAQVhYjcK+Uz+
+	 zX7xUSLjcnaiLjipoWoi1ib6urus4xWPxG5c6xLHAI9KaFhmso1/rlpmhi3W9rWDrWuak
+	 iQvzwRIBhZDE7yMDEEkwff7c6BQxeqxZk8RlilGSBmlH7pccIGVsqZ8BDpoi65vzX9w==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--suseendranb.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b="Eug/YSgE";
+	arc=none smtp.remote-ip=209.85.210.199
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CDB606A319;
-	Thu, 22 Oct 2026 17:26:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 25CDB606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C1060A262F
+	for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 18:33:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3C1060A262F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--suseendranb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=5MKfd+NF
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qWDJqT2abLC5qRP+WocUF+dmYfHKhVEo6Nuh+JumuVcgEFTOb/GQWYz1Whz6yq0hNID/a9X3b9ep0M5vCU/nkArAIZ/t+Fra3EjMpEDMGWaexYv1FYSyKihYFoH7Q8IaY9wByb1ArZTtG7jJV++2lsgKbKauw5tAPyyizFzPuKNKSl3a3KkmyKuU6CpE6XBCvkjK+iaxXEHM7mYYwmDfazaTxQ+5lVGgxPpUsN8tT4JgPlx+inwUW4PP8KAjJhFn4i7De2IbD59LIaAhGzoyvn2sVZ+RkqbytOZPNl9hW9XP71EmGFZtcV2jG7WGPfQtqMhysK61hhWET8NFa/cbrw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ibmvayihy6xl3Tz7teqJDQg35S/kntBeRF6CQsL4rxs=;
- b=gfxXsAKeB1V93GDeOAjjLeB9G60yLQSKQFSoeoEU1/Bc9opGB2uKnTDB8gtVicbduLjRasXqiJonMeO4UFyyrRnT6KJwSDnr20BHvG7hnvB3jxk657Px9P8lkZWpcoW05ftwBU+kBCCH5VTHLZ8CresB6veQ8lO6Ki/kswpASYs/OOTJDwC7nB0AHVLOL3puQGPL+juc7qfzjlxwK1a0lBhCc+QTpKV2bMIFS5YqLTHA8wWkEAlQ/SUD47/oCL0XZWNqTISmRQjdNTW8FLXOI91lXNfnx44dOFgONG199S0NUG5HHznWyDIFrd0mahE6eJ3tMXzwLf+4SInaX9ICYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ibmvayihy6xl3Tz7teqJDQg35S/kntBeRF6CQsL4rxs=;
- b=5MKfd+NFHmvdL7vyxLUK0dvuGn9r+UwMmoWsK6n8KaARDouQ3tGdk3nSNC9ljVQr2xOhQYR3wD27MDgCNYo6Aqe3r+IWpEXp/vxJ8074F6bsdSt6s1v89CpUE2TJJvP0/Wl1gm3kTKO+Z0vq2eNaBUl92P+MOnF9ESMpxrnm5ok=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB7851.namprd12.prod.outlook.com (2603:10b6:8:14a::8) by
- SA1PR12MB7272.namprd12.prod.outlook.com (2603:10b6:806:2b6::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.496.23; Thu, 22 Oct 2026 17:26:30 +0000
-Received: from DS0PR12MB7851.namprd12.prod.outlook.com
- ([fe80::2c07:7091:41c7:c0c9]) by DS0PR12MB7851.namprd12.prod.outlook.com
- ([fe80::2c07:7091:41c7:c0c9%4]) with mapi id 15.21.0546.012; Thu, 22 Oct 2026
- 17:26:30 +0000
-Message-ID: <732791ab-378b-4889-9277-fe361fcb7cf7@amd.com>
-Date: Thu, 22 Oct 2026 12:26:27 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ccp - Run the destroy callbacks when psp_init()
- fails
-To: Tom Lendacky <thomas.lendacky@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>
-Cc: Mario Limonciello <mario.limonciello@amd.com>,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20261021215716.1076732-1-kim.phillips@amd.com>
-Content-Language: en-US
-From: Kim Phillips <kim.phillips@amd.com>
-In-Reply-To: <20261021215716.1076732-1-kim.phillips@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BN9PR03CA0907.namprd03.prod.outlook.com
- (2603:10b6:408:107::12) To DS0PR12MB7851.namprd12.prod.outlook.com
- (2603:10b6:8:14a::8)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20251104 header.b=Eug/YSgE
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-8a0522cdaf3so148824b3a.0
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Oct 2026 11:33:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1792694006; x=1793298806; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=kMc2eNn/OrrFKUYMVyLnIB+VtX1ihRJBTMeBnYRefLE=;
+        b=Eug/YSgEIQnYwSVtyRNMhnyB45nYUyzLnZ3BgbnyHX1QFDPFX3RcBM/RGQwCH8vRwv
+         bz7Z145Joh0s6NanCfDRFKgpkjeiLGoqIgyjQig1YQIQnnoUzD00vkPO9J55x/PAFZg9
+         kTEmREnsVedJpcap1gMH0iH/5CdS6g2hk4O2GgjNtlT3BE14/Yo/5jCE1vvoZvfSsEvm
+         +GYmd//fVmMKcbuNtc9JAwsn40hUjji65QLUohBLh9FlzrtDbytYk2/5O6PalS/TDp9S
+         5co3pPBaVUYHZAW7Au7JkgQTAePmb6kl9bSV7tG2DhdkMYvKx60vMlcWLp+SQqAPnJO2
+         mQVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792694006; x=1793298806;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=kMc2eNn/OrrFKUYMVyLnIB+VtX1ihRJBTMeBnYRefLE=;
+        b=Ptmty5TXEZjJ0Bc1JQQnjXE07ulQW5UWoxG24QMDX6pdiMS2Lci/17raPRZ7PrsnkI
+         89o/GHlnxO0YiiPWowuV9IXvGZKeNvIC7CAVdaglcjOqryL1jZz8T1wi1N26pyIlH+FM
+         eIJZSGDr0qgI0dazRvUPdx0jeelwDX29q08It/ICfP500w4UXc7BZfmuIN9eLtECAxvI
+         KBEH0LyQABnFFq3stk2JB5/rGOIv00XvnmblbUqtt0Bq/Off9jIlVBUGz9+e5VQGVaLm
+         k1DOhCVPmNImNmeS1gbaB6bg9dSE1sSLRshZtdDfYtuFhnR3TfLNT9UAUZJj6U68g1vl
+         ss5A==
+X-Forwarded-Encrypted: i=1; AKwUvBwEVuBVkmTC/wWnMPCs3ok0aFEyQAk3BJu32VIOC26Fif/K6r3YCGPUX2yuTZGtAFExq67T1koOW+eOPIU=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLpVgZVKwP+FHwQi0/VpdG6Q1ZXGqnwIDlotA/dNMiUPZnkqVeT
+	XXTJ/KehgZa+1s04WvgKyNJqGft+n0EhYj4Nb2HPiz+8geMbqLMf6WUwjR4x6idh610EzZXnsmA
+	UdYD96A9DhU+KKgRJm11XBSuYsA==
+X-Received: from pfdc25.prod.google.com ([2002:aa7:8c19:0:b0:89d:3267:4348])
+ (user=suseendranb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:2395:b0:857:7317:cff5 with SMTP id d2e1a72fcca58-8a2c5f488famr51343b3a.22.1792694005807;
+ Thu, 22 Oct 2026 11:33:25 -0700 (PDT)
+Date: Thu, 22 Oct 2026 18:33:18 +0000
+In-Reply-To: <CAO9r8zP+GUE-hcGWSGzhLNLcchFoZ38EMVCAtX5yZ78tZ0bbgA@mail.gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -97,144 +78,115 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB7851:EE_|SA1PR12MB7272:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3058214c-00d2-43b6-bfb2-08df30619c44
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|366016|376014|1800799024|56012099006|11063799006|261021123027099003|261022105027099002|22082099003|18002099003|261009221227099003|261009223027099003|261021121427099003|261022075727099002|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	0bsuCQKeagEAVN8A0kab+KIW8hDu2JusX0+PCQ5mr5l04B1SjJyZWnTtNhECZFN7KtmOw2Ov7CEVTy+M45Y7cSMU0MxtZpLN6HynUYnfFSBQ21Pe981UiioZpkOexFuYwAtGfzhinyVj2+uSQXxCUjGpPMsAcWlDLZqoKhAovDoCPlDHf/Gcda72kkff6QP3jNRxNa4/RiW3e9lsvguj4gjvQY5rafuPdJeaRrq5nLSM1nvXATxVKrkfxLthMDTTUD3/Y6TZ20tM3gnXdo7i5Ods/7g5EUl2rRZHo114LW4ujS7QciQCz/KskX6ZLh2jzh4AdltYKPvmwFbBXVHd7YXHt341XIIQqtfL3ZNoj4mFEKWZU7ScScSXJei6NBCTJsRyidLnew+BDnL25TMU0pzQ2YE+Sns3qcSdh7j0N42AT+8DHHJ7m0w+Kn9h7NhEnqFaIXpv84ok2FT+kgov1JZIGpCpPcpgV77lQuubVnNzlT5tQB0AGazUEGDjZpz5DRTOhh0Z1O70cEeimiYh/qQdr/fwiCHsFysa7QAPxJ3rG3e74+/Iee5TXo4EMQoTcVF6ztcNVViKGkO5vpJQIHlRWsgAnuvboWS8zhHUHcqv/8V50A7WxRvyxNpcGXYzpb/ZRc+hYZh/xvoc9p7ZtsVeK0TQIw1bJiXno5WnJ/g=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7851.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(376014)(1800799024)(56012099006)(11063799006)(261021123027099003)(261022105027099002)(22082099003)(18002099003)(261009221227099003)(261009223027099003)(261021121427099003)(261022075727099002)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VmJyeXFsdlVxTVdCOW9IZU5Vdm9vYStkNjU3ci9sZXFMTnVnWFRhYzlCTWdW?=
- =?utf-8?B?c3dkdHZlN0ZhcERNc2JHL0hOaXNBZ3JDNHhLbUZqZU9BQWl4SjZMUWk1NmtJ?=
- =?utf-8?B?eDZibTN4M0wzWnh1ZTBGRm5oWGFWZm42MnVZaTNyaEZBV3ZieVZ3Qm9FSHF5?=
- =?utf-8?B?NGJuUFY0cWxScXk1MjY0blBwVjN1dkFaQzFaMG9xWTBjUVJEdW1XbVlUVEVP?=
- =?utf-8?B?NlNQTFZOZEZpV2htQ20vZkYzcEE5UWN0QkNIWVNIN1IwWDJZY1ZsczJJZHJv?=
- =?utf-8?B?RDBSelFFbzNzaXVYK2c5dmRyMzFLcllBeTlIWEFUd1dnNHJWZ2xMRCs0bWdZ?=
- =?utf-8?B?RUlmdmlRRVptU3hJUXRibTlyODBWRXpNQkMyZjV6dTVFM0FXbE1Ub2hXczFK?=
- =?utf-8?B?b0owZFphT0tQREQrSzNRZG5KQlZBV1RDTlNhb3F5anBhUEQwTHNjVEZCdnkv?=
- =?utf-8?B?K25lRXZ2WGg0c1cxOWpFaGZucUR0YTFYK1ZhYmxidlppNmJBNEFrbjYrMGYy?=
- =?utf-8?B?STlSSTY2VU90ZEQ1RGxDek9oZUdWTDR6T21NT2xvZmFNeXg2OEx6L0p0Mm1r?=
- =?utf-8?B?d3BPcXV2MzVUMGZpblFMejVhM1ZhOGZlbXluZHVlKzJFRGJaUkFjUis1K281?=
- =?utf-8?B?QnNiZEw1dTkwMGpXZXhac0cxRnByOEFFQW9NUkFzT2R2anhwblFnVTBJQTAy?=
- =?utf-8?B?SktCM2dyOGxJVXJjV054T3hWekdVNnZRNXpDV3lMYm5IN0RXdDQ3MzFGNysz?=
- =?utf-8?B?VGl4YiszN01XNTU1aHBCYXNzVzc0YkJSWFRnVVZ4WkM2bjRUVzZzd1E3OGNM?=
- =?utf-8?B?anA3OW5NbEE2dHd2dURMbUEwaEtsWnJTQmQvNFZwVkgvVmZLei9QNldJOUxC?=
- =?utf-8?B?Smp0N0FlTW5XSVlPRWpPWnBsZURmbkd1eFZaYURLSVZTYVMydmIzR2JjdmJv?=
- =?utf-8?B?UnMvTEsvQnZCaUdjN0x2bGhSeWpZcDVYYW1vYzJIUG5OWHlyZ2hjTDBzaGpl?=
- =?utf-8?B?NnBlUFdsY01BdXhGenBOd1FRc2REOTNSRk9Tc01sbXBQa0RNaGxVV3J2SXd6?=
- =?utf-8?B?VFZDQ2FCaE4wVnk0eUV2OFhTempzTjl1VkJIdThLaEFEQTlxWkdrakMwYjF3?=
- =?utf-8?B?bUhVWks2N1Y2UVBnZmNVc0REUmFpTmtNZHdyRU4xb0d2WC9pZklYZDdZOWV0?=
- =?utf-8?B?WFZ0SkxVU3crVEorTEZpQVNXSVM0djYrVkN6NTVIUnoyOEZFSlhsUXNRRDRJ?=
- =?utf-8?B?Q0lSS0pBZVNUdkRCVUxzOHppQ3hOM3A1RWhMdUxJSGt1TGVTUW1uak91dzV4?=
- =?utf-8?B?dW1rbWtRNkROS2NIakNmUmtJOFl5SDVzRlZpQ1ZCbVJuRk5CNEpmM0lSbUN3?=
- =?utf-8?B?aFB6Z1JwN3RsSXBMZ2lBaGE1eHZnT0hrTVVHdmxHM0xUV21xVXZBOXNHNkQ0?=
- =?utf-8?B?V1YxZ1FySm8zRlZKaVpXVk1yNENHR1lNVXAzY2lkVXF6Rmh0TXdEcWJkTTg4?=
- =?utf-8?B?UGk1QXkrRXJsLzJaZnVjYjlOazUyZVJHcFRwU1M2dFR2eHdlVEw3MDZPeUVR?=
- =?utf-8?B?V2lyZG15cTN3ajh0SVQzbGhzR0c3ci9sb3hEd0wrcWxQYmZJVWJYb3k0RnY3?=
- =?utf-8?B?TGo2M3RmNkF4emQxdU0wWElXTG9OQjh6Q1dNcVRDdEFVVTE4WVdqajNKRHRN?=
- =?utf-8?B?NHlnS2xxZW5rN2VBZW1FZVBTeXhTeFlTS2VUV2p2U2J2R3M4aWx4YUgvZitw?=
- =?utf-8?B?MUNyZmhaM1RRYXJaaWw5dU0xaTVFQzhLQVZHc0VJbC9rWEFUT0pOaUNvQnI2?=
- =?utf-8?B?ZDIwVDcrQ3RoekZrM2I2ZHRIcmFmQTZjL1lJYUt1ZkJsUlRSREFQNFlnVDZO?=
- =?utf-8?B?NHJsSTVUaERzMjlISlgzSHVtdm1zbktWWDhmaENiaEhaTE5ZRjBxK1JDQ1Nu?=
- =?utf-8?B?cC9ZeVJqQVRrbFhBNEdQVkNKUnVtcklkc1BiVGUyQ0ZiMHUreDhhRE9LYXVY?=
- =?utf-8?B?L1dJNHBnakd2NU8xeEI1YkxrdWR6Wi9Md2tBOWtEV3kxc01pNG5YYjVhTC9Y?=
- =?utf-8?B?N001djBwb2JTb3JXY3RCMDRaM3A5cnlUODg2T3R3K2JnRllHV0xnWUsxaTBv?=
- =?utf-8?B?bVZQZzFXdFdZSy9laXl3VXpJdjB6a2ZPQUVocXJjcVJRRWdMR285R0dWbElU?=
- =?utf-8?B?MWpJczZIRVNnTmVucEdNLzJkRmZDQXllQ2dvczB6YU9HK3VocHlvcVB1R2hl?=
- =?utf-8?B?bE1DUTJ0NTZXZEo4ODFUMnB2TG0yU1Y5eDFoNitzR2ptMjlRV3BOeUViUzFS?=
- =?utf-8?B?bmNuamMxT3FWOEJUWnBtU09OODMrNjVWSXBwZmJDU3V2QW1jc3RNZz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3058214c-00d2-43b6-bfb2-08df30619c44
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7851.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2026 17:26:30.4314
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p3bdgtcTSxGbKLib8bl6DG00YNCbbOkNUGS4PAIjtVjAZHslQ1F/WSj4jxEvNW/kYdDXMB7ufWTAjlJJ60QQNQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7272
+Mime-Version: 1.0
+References: <20261021205626.3286270-1-suseendranb@google.com>
+ <20261021205626.3286270-3-suseendranb@google.com> <CAO9r8zNtuN=_BTV53oHqaTqE0Bo2qiDSrgTBzEZo5oyOnWyeYA@mail.gmail.com>
+ <20261022155144.4177200-1-suseendranb@google.com> <CAO9r8zP+GUE-hcGWSGzhLNLcchFoZ38EMVCAtX5yZ78tZ0bbgA@mail.gmail.com>
+X-Mailer: git-send-email 2.56.0.257.gf7497c7d27-goog
+Message-ID: <20261022183319.163484-1-suseendranb@google.com>
+Subject: Re: [PATCH 2/2] mm/zswap: classify compression dst overflow as poor compression
+From: Suseendran Bhaskaran <suseendranb@google.com>
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: Suseendran Bhaskaran <suseendranb@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Nhat Pham <nphamcs@gmail.com>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, Nick Terrell <terrelln@fb.com>, 
+	David Sterba <dsterba@suse.com>, SJ Park <sj@kernel.org>, Chris Li <chrisl@kernel.org>, 
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, 
+	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>, linux-crypto@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi all,
+On Thu, Oct 22, 2026 at 09:01:02AM -0700, Yosry Ahmed wrote:
+> On Thu, Oct 22, 2026 at 8:51 AM Suseendran Bhaskaran
+> <suseendranb@google.com> wrote:
+[...]
+> > With that unchanged, existing zswap_compress() already accounts -ENOSPC
+> > vs other error codes when writeback is disabled, except for the
+> > !comp_ret && dlen >= PAGE_SIZE case mentioned above:
+>
+> Is this actually possible? When we changed the buffer size to
+> PAGE_SIZE, I thought we made sure all compressors wouldn't write
+> beyond the buffer size. dlen > PAGE_SIZE means buffer overflow, which
+> is a bigger problem than debugfs stats. Or maybe compressors can set
+> dlen > PAGE_SIZE but won't actually write to the buffer? I didn't
+> check.
 
-Please ignore this patch.
+dlen > PAGE_SIZE isn't possible, since all compressors bound their
+output by the input req->dlen (PAGE_SIZE) as you mentioned, and only
+set req->dlen <= PAGE_SIZE. The 'dlen >= PAGE_SIZE' check in commit
+dca4437a5861 ("mm/zswap: store <PAGE_SIZE compression failed page
+as-is") was written when the buffer was still 2 * PAGE_SIZE prior to
+commit 0b1bf60c324a ("mm/zswap: reduce the size of the compression
+buffer to a single page").
 
-Thank you,
+> As for the (!comp_ret && dlen == PAGE_SIZE) case specifically, yeah we
+> should probably use -ENOSPC to count it as poor compression.
 
-Kim
+Ack.
 
-On 10/21/26 4:57 PM, Kim Phillips wrote:
-> psp_init() brings up SEV, TEE, SFS, platform access, DBC and HSTI in
-> turn, returning on the first failure.  psp_dev_init() then clears
-> sp->psp_data, and sp_init() ignores its return value, so the device stays
-> bound.  At unbind, sp_destroy() calls psp_dev_destroy(), which returns
-> early on the now NULL psp_data, and no subsystem destroy callback ever
-> runs.
-> 
-> Whatever came up before the failing subsystem is therefore abandoned.  Not
-> everything it owns is devres-managed: tee_dev_init() allocates its ring
-> with __get_free_pages() and it is freed only by tee_destroy_ring(), so a
-> failure anywhere after TEE leaks the ring.  DBC and SFS are worse than a
-> leak.  Both register a misc device during init, and both deregister it
-> from their destroy callback, so a psp_init_hsti() failure leaves a live
-> /dev node whose backing state devres frees at unbind.
-> 
-> Call psp_dev_destroy() on that path instead of open-coding the IRQ and
-> master device teardown.  Every destroy callback returns early when its
-> subsystem pointer is NULL, and psp is devm_kzalloc()'d, so unwinding a
-> partial init is safe.  This also fixes the teardown order: the callbacks
-> now run before the master device is cleared, which matters because
-> __sev_platform_shutdown_locked() reaches the device through psp_master.
-> 
-> sev_dev_destroy() is reachable here without interrupts having been enabled
-> yet, but it does not issue a command: firmware INIT happens later in
-> sev_pci_init(), so the state is still SEV_STATE_UNINIT and
-> __sev_platform_shutdown_locked() returns without touching the mailbox.
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-> ---
->   drivers/crypto/ccp/psp-dev.c | 16 ++++++++++------
->   1 file changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index b14ce51065d5..4eb49eff9590 100644
-> --- a/drivers/crypto/ccp/psp-dev.c
-> +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -282,7 +282,7 @@ int psp_dev_init(struct sp_device *sp)
->   
->   	ret = psp_init(psp);
->   	if (ret)
-> -		goto e_irq;
-> +		goto e_destroy;
->   
->   	/* Enable interrupt */
->   	iowrite32(-1, psp->io_regs + psp->vdata->inten_reg);
-> @@ -291,11 +291,15 @@ int psp_dev_init(struct sp_device *sp)
->   
->   	return 0;
->   
-> -e_irq:
-> -	if (sp->clear_psp_master_device)
-> -		sp->clear_psp_master_device(sp);
-> -
-> -	sp_free_psp_irq(psp->sp, psp);
-> +e_destroy:
-> +	/*
-> +	 * Subsystems that came up before the failure own resources devres
-> +	 * cannot reclaim - TEE's ring pages, the DBC and SFS misc devices -
-> +	 * and psp_data is cleared below, which puts them out of reach of
-> +	 * sp_destroy(). Each destroy no-ops on a subsystem that never
-> +	 * initialized, and this also drops the IRQ and master device.
-> +	 */
-> +	psp_dev_destroy(sp);
->   e_err:
->   	sp->psp_data = NULL;
->   
+> The compt_ret and dlen checks are not super intuitive tbh, I wonder
+> how they should relate. What is the expected value of dlen if comp_ret
+> is an error? Is it always 0, or can the compressor set it as a
+> non-zero value if compression fails?
 
+On error (comp_ret != 0), dlen is not guaranteed to be 0. The value
+left in dlen depends on the compressor used. For example:
+- zstd, 842, and qat set dlen = 0 on error.
+- lz4, lz4hc, lzo, lzo-rle (via scomp_acomp_comp_decomp()), deflate,
+  and iaa return the error code without modifying dlen, so dlen
+  remains at its input value (PAGE_SIZE).
+- hisi_zip sets dlen to the hardware-reported produced bytes even
+  on error.
+
+So dlen is only meaningful when !comp_ret. The !dlen check was
+added in commit dca4437a5861 ("mm/zswap: store <PAGE_SIZE
+compression failed page as-is") as a defensive check for the case when
+comp_ret is 0 with 0 dlen which shouldn't happen unless the compressor
+is faulty.
+
+> >
+> > -                       comp_ret = comp_ret ? comp_ret : -EINVAL;
+> > +                       comp_ret = comp_ret ? comp_ret :
+> > +                                  (dlen >= PAGE_SIZE ? -ENOSPC : -EINVAL);
+> >
+> > Would you prefer that I narrow Patch 2 to just that change in v2, or drop
+> > Patch 2 and only send Patch 1?
+>
+> Let's figure out what needs to be done for patch 2 first, if anything.
+
+Since dlen is only valid when !comp_ret, we could normalize comp_ret
+first when !comp_ret and then just check 'if (comp_ret)':
+
+diff --git a/mm/zswap.c b/mm/zswap.c
+--- a/mm/zswap.c
++++ b/mm/zswap.c
+@@ -874,19 +874,24 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+ 	 */
+ 	comp_ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req), &acomp_ctx->wait);
+ 	dlen = acomp_ctx->req->dlen;
++	if (!comp_ret) {
++		if (dlen == PAGE_SIZE)
++			comp_ret = -ENOSPC;
++		else if (WARN_ON_ONCE(!dlen || dlen > PAGE_SIZE))
++			comp_ret = -EINVAL;
++	}
+ 
+ 	/*
+ 	 * If a page cannot be compressed into a size smaller than PAGE_SIZE,
+ 	 * save the content as is without a compression, to keep the LRU order
+ 	 * of writebacks.  If writeback is disabled, reject the page since it
+ 	 * only adds metadata overhead.  swap_writeout() will put the page back
+ 	 * to the active LRU list in the case.
+ 	 */
+-	if (comp_ret || !dlen || dlen >= PAGE_SIZE) {
++	if (comp_ret) {
+ 		rcu_read_lock();
+ 		if (!mem_cgroup_zswap_writeback_enabled(
+ 					folio_memcg(page_folio(page)))) {
+ 			rcu_read_unlock();
+-			comp_ret = comp_ret ? comp_ret : -EINVAL;
+ 			goto unlock;
+ 		}
+
+Does this look good to you?
