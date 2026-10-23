@@ -1,88 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=139.219.17.121
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792721593;
-	b=lCSYEbM6hLXtcSArVIHVKaWDsAfVrRSjYFY5JBLRdqpaTRiKzRJ4LspMVdvOYRfEfhnE
-	 VPi/PTOu2wgIZN5kjbPfkx6FHFnWH+jEkNR1UEWeYJEkjyLmA8Wgr31TMfm0tGBA2u8IG
-	 uDKNT8iPrdCt+22ZbtlrPCAul5pttwS5ftcjuMtD7/y9AdASlKtRXjA72ynDJtRFeVWdn
-	 JGKkHLDRC0i+PRtWdsm+F63uCdTDM2YtCMlLhJmDAmk8DH74DCixUembDBLVWz49JzPWW
-	 Z5iLhqXQxkg7Z0o2ohTqdVqUMuLK79+58goxQ2jz1GJ87Y3iPa7k8zptyJ5yswChk4A==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792721593;
-	h=DMARC-Filter:Received:Received:From:To:Cc:Subject:Date:Message-Id:
-	 X-Mailer:In-Reply-To:References:Content-Transfer-Encoding:
-	 Content-Type:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=BYeiqVioAvu2AAjmCUZfwu6UVT2OJxDF97usFNixLAQ=;
-	b=RSl64KcWWikC4Q+2oiqlMYk3cGGBFL9RAo7G2ffc6Q7DlFRN4sTDeClZHCXPF43uespp
-	 emVfMZMD8VCjiHmx3vYV6oUjy7Ca7yWGHtkwTAP8hYLEm4oIJfCe6c+WcwTfaigfjrQk/
-	 V4CGSjer7wqLScNkLJ0dNCXV/rfeyvxbdt3OjtG6+tKJhoegBrtgaRWLbFlF07i21Il7G
-	 aJtXstpHD3LKHl0bDzNOZemZsrRHKYgqSpSJBHq/8VccNuWBahSaWHXe2h2JgjlMUGi2r
-	 TKg0F10TbWYe7ixgn960OY22pcChc9yvJZbdhCJgZMgciIfxCZyeN7WVJw9KzoJadAQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=starfivetech.com;
-	spf=pass smtp.mailfrom=starfivetech.com;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=139.219.17.121
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2121.outbound.protection.partner.outlook.cn [139.219.17.121])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792722673;
+	b=h/ZhabmcfPCVMa0t1MsHC9vLtjpVv4bDlAXU3jgUcyxf26Fi1NZVnef5G7uyFs5lkQS+
+	 qZuzRht262TfKyDh6NHlLlV426kG6njf1q654gda8X02kEkC+5aZBVHaahlR78EQjLYb9
+	 AkN4HmABiYc13R7rWWtTsSgtwPQIZkE0QriZOQAGAQCx7YiXJbV54lLSSVthHta3GEZV+
+	 E+6Ve4NW2ot0rZ7C6i4Vu2eSIQdbZkNLO4JttaWTdfQ4vHyogqhM40OSxH3UH4Ij1cUcF
+	 zGHENNiA8N++KZEIf/9nkLaDKpCFxVjjum75ydvNArdf9dkdbnzMHnNUFJSxO556lPA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792722673;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=LaWfGEg3F0yGus45XEi1G/VZakxdpTsIbwri8yzeDMA=;
+	b=ceBZDSTuA/Nmud26NzSopwrP5MCTFyF96ZH8zHZrkBYpKZsXVpFcXehZ+IRQQIjkTQg5
+	 Cl4QzNM2oRfRpK2xW+yk+FXAl8o5AUfRgnMoBgMhmrfqJyiuqVpD8LXr+ivTUDCSyTX2X
+	 u8oPoe+U2dJnjhnYyLBUsvifKD8Q1Nka0iF5hbPEIZiumj24JCnJSd8aKHlAD0B5pCxOU
+	 ur6x6gnkfC6IOyl7ZhtWsqp4Or53Y1qSJcPJYww6dHICqNF06Ic54+aayp1HRGzoiIWmN
+	 Sy1vfXyB+MqX8y6+qAxezlkFxaDdAtY2kip8aSVxTXJrWQTT2c9Mxcqp2Z6ipp+6rcw==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EUEi1Ywk;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6E6606A323;
-	Fri, 23 Oct 2026 02:13:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0B6E6606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lOhs77X5ioYIB8zY/MYSYtgZ3vV+MRkcbRA8iZ3Vo07nbfUgpCPn320dxP1fcGCh1F5mQDarKNaa0U9wyozg0YYhlJujxXgBXIO26oEYOwGMk/C1VTvoeY6a+Bj7S1pF8IeqhGvOGB7MuvYMWz9ea/jQNi4US8f0KsjI4zBZSTuDKfwvyYiNvFwZjJ5c/m1SwmN+LBCC6tAUBuJghyiVduPPBuZLd9OMj9nZM+h7MiaQOtfO92XZN4ijHMhr346yRL9cNh6WuY5+e6mEre6nWQkACB2xqAc59EuyKhqBGarQjgSO9nyJFxel11rcO0wSCKC1LXQZ20RTsuKDZLu+GA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BYeiqVioAvu2AAjmCUZfwu6UVT2OJxDF97usFNixLAQ=;
- b=RZLhgq3c7aR5/iOHAz4sT1N7s2PXJCA+aeqzUoscIZNGpV/tlGKyoO3o6VYIWtXVBJ2Q32+LIZflMsmYQ7SOhci5OHIWLGfZQA5izECXrFFA8GVaabkDHw91ICC6YLT3DkfkMn1vbtbgHb57F9X+En79BZGl1RHxqdE5uNggPLryTMcX9FDDswhyGSvVg0rpwKniXFokBqsuNAQZ5RXxf6Rkse2GCqEnYypzO9dyVlgCumJq4M9F6aVCBBk0B8j/hoM/OX15VcSD40E7MWlwTtpxJ9xwSWPJVxHbTVtYlz5SeSgm05fZQCIgZf2GYXQZJdoccZ2wleJo/KWzWPa+tQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:18::6) by ZQ0PR01MB1303.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:1c::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.16; Fri, 23 Oct
- 2026 02:12:57 +0000
-Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- ([fe80::973:272c:ab11:7570]) by ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- ([fe80::973:272c:ab11:7570%4]) with mapi id 15.21.0546.017; Fri, 23 Oct 2026
- 02:12:56 +0000
-From: "lianfeng.ouyang" <lianfeng.ouyang@starfivetech.com>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
-Subject: [PATCH v10 1/6] dt-bindings: rng: starfive,jh7110-trng: add jhb100, drop jh8100
-Date: Fri, 23 Oct 2026 10:12:43 +0800
-Message-Id: <20261023021248.3763-2-lianfeng.ouyang@starfivetech.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261023021248.3763-1-lianfeng.ouyang@starfivetech.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F7F606A31A;
+	Fri, 23 Oct 2026 02:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EUEi1Ywk
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F28171F01825;
+	Fri, 23 Oct 2026 02:31:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792722673;
+	bh=LaWfGEg3F0yGus45XEi1G/VZakxdpTsIbwri8yzeDMA=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=EUEi1YwkPRMnXdlba5EQpsxgK0PPQrCMIeEL0MDvwKr5HK/yqqQAeiFYO6sxbGnNe
+	 Xabtm4FE2AySQNZcDGrYhG2AUTZBKwMUrKlYR7YiMvL96fPeXQIObxeOqLEUAVEQtH
+	 GT4FoNz9117WWLBjMbn+zzSA9JZYmukuKVca3lFlMIO1t7buLF8NYvNknznXiksyL+
+	 3boomsZO4Xyj3dyy/UKBhCuWAWK0b8t1TTuBfvlzeu0OP4tm2wUuZ7aWohfGYY2qHc
+	 beTB08D3+NvL254recGe+EuOAmpZfWM45BtlM/AFhU4UTxeptsyN3ogndI9f76LlQl
+	 Lecds9cC5V0Lg==
+Message-ID: <sashiko-outbox-182235@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v10 3/6] hwrng: starfive - move the SEU reseed out of
+ the interrupt handler
+Reply-To: sashiko-reviews@lists.linux.dev
+To: lianfeng.ouyang <lianfeng.ouyang@starfivetech.com>, "Olivia Mackall" <olivia@selenic.com>, "Herbert
+ Xu" <herbert@gondor.apana.org.au>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Philipp
+ Zabel" <p.zabel@pengutronix.de>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
+In-Reply-To: <20261023021248.3763-4-lianfeng.ouyang@starfivetech.com>
 References: <20261023021248.3763-1-lianfeng.ouyang@starfivetech.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SH0PR01CA0008.CHNPR01.prod.partner.outlook.cn
- (10.43.109.84) To ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn (10.2.3.134)
+ <20261023021248.3763-4-lianfeng.ouyang@starfivetech.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 23 Oct 2026 02:31:12 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -91,102 +63,331 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: ZQ0PR01MB1269:EE_|ZQ0PR01MB1303:EE_
-X-MS-Office365-Filtering-Correlation-Id: 46d7bd3e-5fc4-40eb-11f2-08df30ab2706
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|23010399003|261022105027099003|261022075727099003|38350700014|56012099006|261021121427099003|261021123027099003|261009223027099003|10067099003|3023799007|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	OETF+2EpgXn222QbGBAamRXiSnSJin8XMSpEnifHxuI5BBUOQh/bxYaskQNPfQf6rmN+f8cRNVNNXY1C17vkHvq3YkYZqXRm4PLqf6SsWSOf7zskT4Wue+ATOQ75Ze2zJWhI1RD0ZlL7mspMgj5V1gjO/e2/hkSVHAAOEoFyIvGmd2ibmF1quU+PDYYyABd1DVUXSnt/o94TVqAEpl6B0SAA0URzAut0eQZePr3eeCgUOSRWZkalK6+ppM33K9IuK4FhIxQMCcPbnsRfUprBsPipdsY8iL6DLdoXrJ37Lu0UkgXf/hqvxXIfNUkeO733Vp1m25vwj7UE5MBIefR5Q4wXcjwjrtKeDGIX0SvwhJG0KsPFUEomjD5nZ8Oec0iTakL1VN+m01FO8DwExqUQyNlEX6a2otsLF6Ysa3LksixlA/l91TP16i+Cgno/NzponfiJ5bZstJxLMildbVR959dv/OEJFy6kvKVigsRT9q8N9TaDqhxDK/R1p0OI2+QgF2zl7FM+CQ4E331wedsBDarmz4HyyItbXSwoxjse6gzE9cE8qpkXfT3n56gpR3Pq
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(23010399003)(261022105027099003)(261022075727099003)(38350700014)(56012099006)(261021121427099003)(261021123027099003)(261009223027099003)(10067099003)(3023799007)(18002099003)(22082099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?RCodadUwb6i9ULUTXFjIHwLHJhVZHxPSp7xXwf3bA6HJaGkwDG4HQMv6CNKH?=
- =?us-ascii?Q?iQumWWzVZJX/ulmBSFxTSHNNoub3DBgqL+43/0s8x7E7NEAgTnWV+HMu4uqj?=
- =?us-ascii?Q?qj3tcrxKuYmNAAuRIUWno0rabkPyaGADyIBSV2yPcdTyQO8aKS7IGCC6Cw+E?=
- =?us-ascii?Q?3Ku12zuDX9v7icOR+kauGHatFzTAcTVVDS+n8q82+9JG/aCY1YTiluIpY+ZK?=
- =?us-ascii?Q?aw8G0eQp9MCYNh7mqu/xgQpu3eWwYA4vYBqXLJOiDtzwTkpazzDwepPflWgu?=
- =?us-ascii?Q?ZAjSrVWoeOGYV2X0Ts8ekD1nmFyK0TPKNBX9kxSmAZTay6Ad5rWKKmx8Et4q?=
- =?us-ascii?Q?eZ+P7BNorFl5Irx7ZlW3q4Ufzu8C68bwG+JtwhzzE4HuoPeznELbAL83QVCA?=
- =?us-ascii?Q?4k+bfMqWkFq4V601sTEEXUL6aHMEM8jdMTr7c3dYl7YwRNfQmp6Tw9wN3tzd?=
- =?us-ascii?Q?BlNxNRnq2AAh6XhFw+gn2Ed6HC1XQ2mLGxMOYOIdoJFEBSRTM/gtdKyWBNic?=
- =?us-ascii?Q?ZsorFYSMqc5HdP7WIjwPxz9ra8xZu2rOED4HLn0ecybiuFBQBlcTJAh1WRMH?=
- =?us-ascii?Q?0qpPVDxVoVUNZZdIPOjbDO9rFUmi4IFkbQBbUg/kE2Lm1W4fYE8wuHOUbdEx?=
- =?us-ascii?Q?Fb/VNkCB+f0DW3cxl8joc5Tbx7OJxfobFpQDOU1A0bE5bCRaowsMSqI9N6MI?=
- =?us-ascii?Q?L0V8lc2EgVP3EQK6XOLhR+dIpH1JCiQcKe1r6Ji4vqX2oiAHw17m28VccjCK?=
- =?us-ascii?Q?e99rGKO6Pyo9V5qtxvNnQQD1tMJWRZikB3R91020HxP5Rfdhpa+JtO6yWjKD?=
- =?us-ascii?Q?3wX2qTXusQFNRZGRHnhbl7U+4hUjGGovCXORLIzmRvmijO8dyFerIpwnot6W?=
- =?us-ascii?Q?nzOdUz0uyCx43+sSxIoc73sxgc1ieAVG0VnhFw+dv6etE7aPGi2mESBaNKZ9?=
- =?us-ascii?Q?2Oy3Kfg+DO3DoQz5yHTE7yPp5sbtv7I52TXjY2PmegOR/MQm2IQZ/QFnOpH7?=
- =?us-ascii?Q?/cB1TtIwO8+G99mQQ/I7irba9bAZqXjlnKAfADvzQq4EkL9AHcNU6zC1YFYa?=
- =?us-ascii?Q?f8c0mviETA4DElnZUoDHsl/a3M7kHyN9H13tOicJdO5zi+9ZxWbm++WWd3wT?=
- =?us-ascii?Q?sC+sYCS0/rtTz0/HEnf6lL+G4vepmtP4E2j7cIVnqIh+iNf4Xppn3K8KEi2K?=
- =?us-ascii?Q?A4i51qya6epn+QR31qv4tA3bvlcN90eUD9UE6iE6TdXyzLpXgHw16+FwJpJp?=
- =?us-ascii?Q?vUs3ubumExo/HHbF8rmA2MmqKWVTKuKvSDFKGGLpouMGI3vNp7bKgb9dBxqV?=
- =?us-ascii?Q?fjqJZRUo2f42FkzXmx/7IR/t4bfk+mSHmecWTcGxwYGBCETd2Yz7Zuw80caL?=
- =?us-ascii?Q?p3J06/OX/Gfpms8phg+bywr81/gvwvzoW9ByRhXcFvMlwoBBIA6BsM3eF+cx?=
- =?us-ascii?Q?DXs0e4M0pPcR7n28BBoaDUqwoKAOuAfH4ayIsyJxLGF1FoKjYZKCKYn31YrG?=
- =?us-ascii?Q?BMlrqt9AtsPoXpLOSqmU12JlGvBfVqfbi92wu4C/WEZFp1jO+ITi4S00eup6?=
- =?us-ascii?Q?xY//x+VkSOf516jt16OTXZBUP5y+aJva501bvuVPCC29/cbC6JEFGB/jCf3R?=
- =?us-ascii?Q?Dole8upASeYMtoOZbx9pZmg0aB+Hiv5+acHttbrbcsrxaLHH+DxLecJn31yD?=
- =?us-ascii?Q?DmnReaHyBemMQDaBSPz3dTWI4UsSmbbJWCEkbuZ5zI2Smr11SMLT8lailY5G?=
- =?us-ascii?Q?uDG0d0G+Z4EL7Ii7Bid5+369Q9Yxi39b4yopXScvCK8C8ouH24jN?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46d7bd3e-5fc4-40eb-11f2-08df30ab2706
-X-MS-Exchange-CrossTenant-AuthSource: ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2026 02:12:56.2978
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lLjZfWRBAFSBmYpQURT69jXyiM8WH+e5Amhcq5dVn01bFB14imcJ3+r1xLT4inU1rjXNe0XJ3fWPlmn7whGN3PpouFyTVBiMYWNPArkzTs97p5NWl4JSADTzSg6gu3NJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ0PR01MB1303
 
-From: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [High] hwrng: starfive - premature completion race in starfive_trng_cmd()
+- [High] hwrng: starfive - uncancelled reseed work in starfive_trng_irq_cle=
+ar()
+--
 
-Update the StarFive TRNG DT bindings to reflect current SoC support.
+commit 23b2ffaa5e6bbeefc785bc18a08d6497566a4c9b
+Author: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
 
-The obsolete "starfive,jh8100-trng" compatible string is removed since
-  JH8100 SoC is no longer supported. A new "starfive,jhb100-trng"
-  compatible string is added for JHB100 SoC TRNG support.
+hwrng: starfive - move the SEU reseed out of the interrupt handler
 
-The maintainer entry is also updated to reflect current ownership as the
-  previous maintainer has resigned.
+This commit reworks command handling in the StarFive TRNG driver around a
+mutex that serialises command sequences and moves LFSR lockup reseeding
+from the interrupt handler to a work item and the read path. It also manages
+the interrupt lifecycle across init, cleanup, and runtime suspend/resume.
 
-Signed-off-by: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
----
- .../devicetree/bindings/rng/starfive,jh7110-trng.yaml  | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+> diff --git a/drivers/char/hw_random/jh7110-trng.c b/drivers/char/hw_rando=
+m/jh7110-trng.c
+> index 17932cc6d7aa4..8e0e7865453b0 100644
+> --- a/drivers/char/hw_random/jh7110-trng.c
+> +++ b/drivers/char/hw_random/jh7110-trng.c
+[ ... ]
+> @@ -122,22 +141,38 @@ MODULE_PARM_DESC(autoage, "Auto-reseeding after spe=
+cified timer countdowns to 0:
+>  				" 0 - disable timer\n"
+>  				" other - reload value for internal timer");
+> =20
+> -static inline int starfive_trng_wait_idle(struct starfive_trng *trng)
+> +static bool starfive_trng_idle(struct starfive_trng *trng, bool wait)
+>  {
+> -	u32 stat;
+> +	u32 stat, busy =3D STARFIVE_STAT_RAND_GENERATING | STARFIVE_STAT_RAND_S=
+EEDING;
+> =20
+> -	return readl_relaxed_poll_timeout(trng->base + STARFIVE_STAT, stat,
+> -					  !(stat & (STARFIVE_STAT_RAND_GENERATING |
+> -						    STARFIVE_STAT_RAND_SEEDING)),
+> -					  10, 100000);
+> +	if (!wait)
+> +		return !(readl_relaxed(trng->base + STARFIVE_STAT) & busy);
+> +
+> +	return !readl_relaxed_poll_timeout(trng->base + STARFIVE_STAT, stat,
+> +					   !(stat & busy),
+> +					   10, 100000);
+>  }
+> =20
+> -static inline void starfive_trng_irq_mask_clear(struct starfive_trng *tr=
+ng)
+> +/*
+> + * Record a pending LFSR lockup and make sure it gets serviced. queue_wo=
+rk()
+> + * is a no-op while the work is already pending, so this is safe to call
+> + * from any context that notices the lockup.
+> + */
+> +static void starfive_trng_request_reseed(struct starfive_trng *trng)
+>  {
+> -	/* clear register: ISTAT */
+> -	u32 data =3D readl(trng->base + STARFIVE_ISTAT);
+> +	WRITE_ONCE(trng->need_reseed, true);
+> +	queue_work(system_freezable_wq, &trng->work);
+> +}
+> +
+> +static void starfive_trng_irq_clear(struct starfive_trng *trng)
+> +{
+> +	u32 istat =3D readl(trng->base + STARFIVE_ISTAT);
+> +
+> +	/* Do not lose an LFSR lockup that has not been serviced yet. */
+> +	if (istat & STARFIVE_ISTAT_LFSR_LOCKUP)
+> +		starfive_trng_request_reseed(trng);
+> =20
+> -	writel(data, trng->base + STARFIVE_ISTAT);
+> +	writel(istat, trng->base + STARFIVE_ISTAT);
+>  }
+[ ... ]
+> @@ -194,42 +229,71 @@ static void starfive_trng_power_off_action(void *da=
+ta)
+>  	starfive_trng_power_off(data, true);
+>  }
+> =20
+> -static int starfive_trng_cmd(struct starfive_trng *trng, u32 cmd, bool w=
+ait)
+> +static int starfive_trng_cmd(struct starfive_trng *trng, u32 cmd, unsign=
+ed long timeout, bool wait)
+>  {
+> -	int wait_time =3D 1000;
+> +	struct completion *done;
+> =20
+> -	/* allow up to 40 us for wait =3D=3D 0 */
+> -	if (!wait)
+> -		wait_time =3D 40;
+> +	lockdep_assert_held(&trng->lock);
+> +
+> +	if (!starfive_trng_idle(trng, wait))
+> +		return wait ? -ETIMEDOUT : -EBUSY;
+> =20
+>  	switch (cmd) {
+>  	case STARFIVE_CTRL_GENE_RANDNUM:
+> -		reinit_completion(&trng->random_done);
+> -		spin_lock_irq(&trng->write_lock);
+> -		writel(cmd, trng->base + STARFIVE_CTRL);
+> -		spin_unlock_irq(&trng->write_lock);
+> -		if (!wait_for_completion_timeout(&trng->random_done, usecs_to_jiffies(=
+wait_time)))
+> -			return -ETIMEDOUT;
+> +		done =3D &trng->random_done;
+>  		break;
+>  	case STARFIVE_CTRL_EXEC_RANDRESEED:
+> -		reinit_completion(&trng->reseed_done);
+> -		spin_lock_irq(&trng->write_lock);
+> -		writel(cmd, trng->base + STARFIVE_CTRL);
+> -		spin_unlock_irq(&trng->write_lock);
+> -		if (!wait_for_completion_timeout(&trng->reseed_done, usecs_to_jiffies(=
+wait_time)))
+> -			return -ETIMEDOUT;
+> +		done =3D &trng->reseed_done;
+>  		break;
+>  	default:
+>  		return -EINVAL;
+>  	}
+> =20
+> +	reinit_completion(done);
+> +	writel(cmd, trng->base + STARFIVE_CTRL);
+> +	if (!wait_for_completion_timeout(done, timeout)) {
+> +		synchronize_irq(trng->irq);
+> +		if (!try_wait_for_completion(done))
+> +			return -ETIMEDOUT;
+> +	}
+> =20
+>  	return 0;
+>  }
 
-diff --git a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
-index 4639247e9e51..d21769b7d54e 100644
---- a/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
-+++ b/Documentation/devicetree/bindings/rng/starfive,jh7110-trng.yaml
-@@ -7,15 +7,13 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
- title: StarFive SoC TRNG Module
- 
- maintainers:
--  - Jia Jie Ho <jiajie.ho@starfivetech.com>
-+  - Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
- 
- properties:
-   compatible:
--    oneOf:
--      - items:
--          - const: starfive,jh8100-trng
--          - const: starfive,jh7110-trng
--      - const: starfive,jh7110-trng
-+    enum:
-+      - starfive,jh7110-trng
-+      - starfive,jhb100-trng
- 
-   reg:
-     maxItems: 1
--- 
-2.43.0
+[Severity: High]
+Can a command that times out while the hardware is still busy leave a late
+completion for the next command in starfive_trng_cmd()?
 
+In starfive_trng_read(), non-blocking reads (wait =3D=3D false) pass
+timeout =3D STARFIVE_RANDGEN_NOWAIT_TIMEOUT (1 jiffy) to starfive_trng_cmd(=
+).
+Because wait_for_completion_timeout(done, 1) expires on the very next timer
+tick, a call issued right before a tick can time out in microseconds while
+the hardware is still executing STARFIVE_CTRL_GENE_RANDNUM
+(STARFIVE_STAT_RAND_GENERATING is still set and STARFIVE_ISTAT_RAND_RDY has
+not been asserted yet).
+
+When wait_for_completion_timeout() returns 0 while the hardware command is
+still in flight, synchronize_irq(trng->irq) returns immediately because the
+IRQ line has not been asserted yet, try_wait_for_completion(done) returns
+false, and starfive_trng_cmd() returns -ETIMEDOUT and drops trng->lock while
+the hardware continues running.
+
+When the next caller enters starfive_trng_cmd(), starfive_trng_idle() only
+polls STARFIVE_STAT until STARFIVE_STAT_RAND_GENERATING and
+STARFIVE_STAT_RAND_SEEDING clear:
+
+  starfive_trng_cmd()
+    starfive_trng_idle() -> returns true once previous command finishes
+    reinit_completion(done)
+    writel(cmd, trng->base + STARFIVE_CTRL)
+
+If starfive_trng_irq() services the first command's STARFIVE_ISTAT_RAND_RDY
+interrupt after reinit_completion(done), it completes trng->random_done for
+the second command before the new generation finishes, causing
+starfive_trng_read() to copy stale or in-progress data from STARFIVE_RAND0.
+
+A similar race can also affect trng->reseed_done when autoreq or autoage is
+configured: an automatic hardware reseed sets STARFIVE_ISTAT_SEED_DONE when
+STARFIVE_STAT_RAND_SEEDING clears, which can fire after
+starfive_trng_idle() and race with reinit_completion(&trng->reseed_done).
+
+> @@ -238,37 +302,62 @@ static int starfive_trng_init(struct hwrng *rng)
+>  		return ret;
+>  	}
+> =20
+> -	/* setup Auto Request/Age register */
+> -	writel(autoage, trng->base + STARFIVE_AUTO_AGE);
+> -	writel(autoreq, trng->base + STARFIVE_AUTO_RQSTS);
+> +	mutex_lock(&trng->lock);
+> +
+> +	/*
+> +	 * The hwrng core can call init again without an intervening
+> +	 * cleanup: deselecting and quickly reselecting the device makes
+> +	 * cleanup_rng_work() skip ->cleanup() once the refcount is back up.
+> +	 * Only bring up the interrupt line once in that case.
+> +	 */
+> +	if (!trng->initialized) {
+> +		starfive_trng_irq_clear(trng);
+> +		starfive_trng_hw_setup(trng);
+> +
+> +		enable_irq(trng->irq);
+> +		writel(STARFIVE_IE_ALL, trng->base + STARFIVE_IE);
+> +		trng->initialized =3D true;
+> +	}
+> +
+> +	ret =3D starfive_trng_reseed(trng);
+> +	if (ret) {
+> +		trng->initialized =3D false;
+> +		writel(0, trng->base + STARFIVE_IE);
+> +		starfive_trng_irq_clear(trng);
+> +		disable_irq(trng->irq);
+> +	}
+[ ... ]
+> @@ -301,15 +387,36 @@ static irqreturn_t starfive_trng_irq(int irq, void =
+*priv)
+>  static void starfive_trng_cleanup(struct hwrng *rng)
+>  {
+>  	struct starfive_trng *trng =3D to_trng(rng);
+> +	bool initialized;
+>  	int ret;
+> =20
+>  	ret =3D pm_runtime_resume_and_get(trng->dev);
+> -	if (ret < 0) {
+> +	if (ret < 0)
+>  		dev_err(trng->dev, "Failed to wake device for cleanup: %d\n", ret);
+> -		return;
+> +
+> +	mutex_lock(&trng->lock);
+> +	initialized =3D trng->initialized;
+> +	trng->initialized =3D false;
+> +	if (ret >=3D 0 && initialized) {
+> +		writel(0, trng->base + STARFIVE_IE);
+> +		starfive_trng_irq_clear(trng);
+>  	}
+> +	mutex_unlock(&trng->lock);
+> +
+> +	/*
+> +	 * cleanup also runs after a failed init, which has already undone
+> +	 * its enable_irq(). Only disable the line if init left it enabled.
+> +	 */
+> +	if (initialized)
+> +		disable_irq(trng->irq);
+> +	cancel_work_sync(&trng->work);
+> =20
+> +	if (ret < 0)
+> +		return;
+> +
+> +	mutex_lock(&trng->lock);
+>  	writel(STARFIVE_CTRL_EXEC_NOP, trng->base + STARFIVE_CTRL);
+> +	mutex_unlock(&trng->lock);
+> =20
+>  	pm_runtime_put_sync_suspend(trng->dev);
+>  }
+[ ... ]
+> @@ -420,6 +566,15 @@ static int starfive_trng_probe(struct platform_devic=
+e *pdev)
+>  	if (ret)
+>  		return dev_err_probe(&pdev->dev, ret, "Failed to enable runtime PM\n");
+> =20
+> +	ret =3D devm_work_autocancel(&pdev->dev, &trng->work, starfive_trng_res=
+eed_work);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret =3D devm_request_irq(&pdev->dev, trng->irq, starfive_trng_irq, IRQF=
+_NO_AUTOEN,
+> +			       pdev->name, (void *)trng);
+> +	if (ret)
+> +		return ret;
+> +
+>  	ret =3D devm_hwrng_register(&pdev->dev, &trng->rng);
+>  	if (ret)
+>  		return dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
+> @@ -432,8 +587,16 @@ static int starfive_trng_probe(struct platform_devic=
+e *pdev)
+>  static int starfive_trng_suspend(struct device *dev)
+>  {
+>  	struct starfive_trng *trng =3D dev_get_drvdata(dev);
+> +	bool assert_rst;
+> +
+> +	mutex_lock(&trng->lock);
+> +	assert_rst =3D !trng->initialized;
+> +	writel(0, trng->base + STARFIVE_IE);
+> +	starfive_trng_irq_clear(trng);
+> +	mutex_unlock(&trng->lock);
+> =20
+> -	starfive_trng_power_off(trng, false);
+> +	synchronize_irq(trng->irq);
+> +	starfive_trng_power_off(trng, assert_rst);
+> =20
+>  	return 0;
+>  }
+
+[Severity: High]
+Does calling starfive_trng_irq_clear() when trng->initialized is false allow
+trng->work to be queued after it has already been cancelled, leading to a
+use-after-free of struct starfive_trng during teardown?
+
+In starfive_trng_irq_clear(), if STARFIVE_ISTAT_LFSR_LOCKUP is set in
+STARFIVE_ISTAT, starfive_trng_request_reseed() unconditionally queues
+trng->work on system_freezable_wq even when trng->initialized is false.
+
+In starfive_trng_probe(), devm_pm_runtime_set_active_enabled() is registered
+before devm_work_autocancel() and devm_request_irq(). During devres teardown
+(for example, if devm_hwrng_register() fails after starfive_trng_init()
+leaves the device RPM_ACTIVE via pm_runtime_put_autosuspend(), or on driver
+unbind after __device_release_driver() resumes the device), devres actions
+run in reverse order:
+
+  devm_irq_release() -> frees trng->irq
+  devm_work_drop() -> cancel_work_sync(&trng->work)
+  pm_runtime_disable_action()
+    pm_runtime_dont_use_autosuspend()
+      rpm_idle() -> rpm_suspend()
+        starfive_trng_suspend()
+          starfive_trng_irq_clear() -> queues trng->work
+          synchronize_irq(trng->irq)
+
+Because starfive_trng_suspend() runs after devm_irq_release() and
+devm_work_drop(), it calls synchronize_irq() on an already-freed IRQ and can
+re-queue trng->work right before devres frees struct starfive_trng, causing
+starfive_trng_reseed_work() to access freed memory.
+
+Similarly, in starfive_trng_cleanup(), cancel_work_sync(&trng->work) runs
+before pm_runtime_put_sync_suspend(trng->dev), which synchronously invokes
+starfive_trng_suspend() -> starfive_trng_irq_clear() and can re-queue
+trng->work after cleanup cancelled it. And if starfive_trng_reseed() fails
+in starfive_trng_init(), the error path calls starfive_trng_irq_clear()
+without cancelling trng->work (while hwrng_init() in
+drivers/char/hw_random/core.c does not call ->cleanup() on normal ->init()
+failure), allowing starfive_trng_reseed_work() to run while
+!trng->initialized and call pm_runtime_resume_and_get() ->
+starfive_trng_resume() -> starfive_trng_power_on(), deasserting the hardware
+reset on an uninitialized device.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261023021248.3763=
+-1-lianfeng.ouyang@starfivetech.com?part=3D3
