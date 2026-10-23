@@ -1,19 +1,19 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=139.219.17.128
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792721594;
-	b=0TWXLIihDOMRYm8pcLVD+xNETGbvPa1DP8Y8rkRC1+VVEdmotDCdgUgVKPxoYe1ycift
-	 qjFV9VMK6MI32QQdJRku0+x/KWS/tQRUt2exsRYuQtVP80Xd4Z4d/Ql73fc6ziOA97H+0
-	 VI7xLUl8W0MwhHLBD7UadoTpdqXVvI98HBjCOnmqkGOY9W9OGk25j6UskIa7UVUHKd6ZD
-	 9WimOuoBNsjM66oIYIJGrbNplnkYjCP60DPY3OZ2s8rp4gDyQWnmt9zjioYsmzx7rii0N
-	 ud675OUCWI6ZmSxphKiBo8IjoneVhjrZ6f4xnwdgmvcoQR7i1N0wLtwohUeA0S571WA==
+	t=1792721590;
+	b=nh7/2HzbFBe6//WDvA+5Gml+HxfpuHXz8jpi7dBWOmkM5PLHF6EBzJMRuJn/y5NoJ+gU
+	 uvmsF1q0SrdeCwcAV1rWDng562rW+H0avy73Oj877uqheEBUpHY1yAp45Z9GzExU5EJCQ
+	 ef/zywRq9IyKUBxNnSwUAfLWIyVx7ERJkVpFlU6yRKsOTSm3aift25wYWijy0F8vAHwTV
+	 2RSSRsx/CIcLrH+RMX/KBAV6/ruRcgaiV24e8ZAPhawRC5bWmF6eU+TyopKn2Wg77FwZO
+	 Q2U8vCc0W6deLbNj9nW6Xw8nmhxUbN8vA31HkA7DiLGic9Sxg13w3zTb3pvmhx4w/kA==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792721594;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792721590;
 	h=DMARC-Filter:Received:Received:From:To:Cc:Subject:Date:Message-Id:
-	 X-Mailer:In-Reply-To:References:Content-Transfer-Encoding:
-	 Content-Type:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-Mailer:Content-Transfer-Encoding:Content-Type:X-ClientProxiedBy:
+	 MIME-Version:X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
 	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
 	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
 	 X-MS-Exchange-CrossTenant-Network-Message-Id:
@@ -23,12 +23,12 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=J+wbIvMG9EBK1SsFtX9ZFKi3ZFdETFD2cKHZYgo2dvY=;
-	b=tQO7/HXkVdfonDlrv0qVLQBe3wqV+z81R9VsPJ/kvY9fwItjPw9iWKKjmnFzjdGdx0vr
-	 0Co8kFRt/PrxZuqcp3K6PbuqckDL+5wiDbQt7nF/lBdJhZhMaK5RKgU8BJeUjh3KyX8nu
-	 HMt3WQHKDw2tw+G2I1/Zk2Z8aqaAoQRW1QOS9ucGBQPV0u9RTqpVbW8mbmoC0E7e6q6+e
-	 nFNwsur/RVZ012BufMC43h5gqNZeH9TiKnY1HL4zwLU3eem4jWqX60KrNVFsrAObGGuyA
-	 XCDABJEQgcSbfSdozEwN2xPQ4QpgOgsdPoo0Y0uUkbs6G7laeZU3penIiNPjhRxfOwA==
+	bh=1LLaSsJ/NMlfvykRTb2Z15w4jd8ryB24H9bJe/HqqG4=;
+	b=Z4MX2OItoCRlBUhOnJvgLPMQpHeiHFodCcHu71+f0LkelFE1bLwFW3X+VnuleykgWtkz
+	 TQ1Av/dvPL9I0cDVWFWrbS6wKLZ7M3TrlU650vhqm5J1StnTxdiF6C4bOiIyY81p3MltI
+	 S0f+iIwrIprLImZg++qJXuZNhgnOEKJUTr3xsO0S2XzN/2i+jWM8N5f5aOXubGwVtreWl
+	 ArRIeOPNn0cjQstCO7x5bP6n6eI46C3ulSmWPuY/VgxaHZuMFmeL9QlssK5wSPpMgHEEJ
+	 xDWIeMNLmza0qm4D3aDdBbpV29UiI0u0vs+lYxJZyl5RsFrNIJBYrdR9nIRAQoUUzgQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=starfivetech.com;
 	spf=pass smtp.mailfrom=starfivetech.com;
@@ -36,18 +36,18 @@ ARC-Authentication-Results: i=2; smtp.subspace.kernel.org;
 Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2128.outbound.protection.partner.outlook.cn [139.219.17.128])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C3E606A32F;
-	Fri, 23 Oct 2026 02:13:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 86C3E606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D654A606A319;
+	Fri, 23 Oct 2026 02:13:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D654A606A319
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aXAdkpt1HQB23JKJhCSSUkiZUWm3lUQiI2O953dUvIDocVYTVgNRNQTEL0jISUayMBcsbOw/LvgZQ2Jf0Vhw814P7JLUBPLUFtiU5RZCkQ9bxtCSbbe0/he955wDskDRlKC/Na8pJ2bskMneWZc3O/ogLUEWecU0R8GIboEkKaBiizW0EP7W1SOKg8yqeee8ZfizhMHMsOoLhsM3l3PaeFRAp/mcbXM2ctvUju3DpjDJxD2Rc2ajKWKh+ieMpc+hTDqmbJC6TXV2rS1kVUc/mHyGYjzj1wPSVNHFM7wnW+/oTWw+5pikQOoMfb3pCgskteBxdruppF7Ad3OdkYCvRw==
+ b=UaEggxSu9yTUjb5u+LLcZcGoOEFG//Pj1ng1EJFqHUnhvzMInpNr7ilMI1wN9Z2yAnNGu6KwxFycYpn55GMRU52//3xyULJQVaE5WIxzHRO2N+bJkrCzM5LO8cTQV7hZF86jIFBfI5cf7S/wWXQ7KWTGfOhYz3HGASJs4y1x27F993WGC2tzEC4SA+Lzka1oehw9saQpfdWEB6NS0zUf1IDNFvJFVtQ3uq7qHjuSO6S5T+ivgis1HkLgIggP7u3KdO1CCdSoo4Pl1VUSyZ6GDoF+ivOLCvXXpW6T2rsZNd7dmixjkqPeCx47wn8pWO1KHsjJaQrQqDe3Rkte8asxJQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J+wbIvMG9EBK1SsFtX9ZFKi3ZFdETFD2cKHZYgo2dvY=;
- b=SJZvVR9Dk+hrcYfRTM2HopdopiO26651m7/WNEP0Lv6d/hTTk4+DC1ta1ekH0EgjOghm7QBdisFPz1kntzh4zqv3Yn0ZQIRnp6OXDSFz1Q0UDMDt5qrNECVUip64iANjo1pfBDdXaJZkRN2WXi3AftKpZhLYR3CpWJXkKxwEZnDX+H/GP5RCJ+MUcd0sg0YzpF4W645pnZQBNYDi5Lj0csf4vx7TXUuhHr6Pt1LWSjGnCqgvowDi0Gp4HaJFvnhIvov9mlG9cQaHPci+BFRke3k3uyZSr2rYxbE6ekcBDHbnQUZsR2TP+U3850m84PsiaDpDSbGJdwOmT3R6TA2JQw==
+ bh=1LLaSsJ/NMlfvykRTb2Z15w4jd8ryB24H9bJe/HqqG4=;
+ b=h3zvGaQ5n58+rycEwlMFBBRWBQCx/G//Vnwr3HcO0HsQCjQpzAaIHMDY5X0KrqPFwjxg+wDGIW8Vf9Xan+VJndHYuqSzDjKJijlF0ZvLCI8a9yXc+7qV1FWT+53dGrU+LT1JkKxqiE7UnP6ZhMBeUqtyNXXzrSbItV51HI7/1I+9tiURB1SV/TxXuFjjRYncmk9NELkA1XPyaFf99Mh/LavRQ67fh1wKRrxgDAaTfc3rvHrLHeFnwFXqacVK+FXAoNGc2mCarhipw8MaoIwH3uJeyuUr4opcdifnlPXQ3AbSBWU7omJQzND1xcNyjVjIqQW4DtdLmLfjRqemGjMiZA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=starfivetech.com; dmarc=pass action=none
  header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
@@ -57,11 +57,11 @@ Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:18::6) by ZQ0PR01MB1303.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:1c::6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.16; Fri, 23 Oct
- 2026 02:13:00 +0000
+ 2026 02:12:56 +0000
 Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
  ([fe80::973:272c:ab11:7570]) by ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
  ([fe80::973:272c:ab11:7570%4]) with mapi id 15.21.0546.017; Fri, 23 Oct 2026
- 02:12:59 +0000
+ 02:12:55 +0000
 From: "lianfeng.ouyang" <lianfeng.ouyang@starfivetech.com>
 To: Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -73,12 +73,10 @@ Cc: linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
-Subject: [PATCH v10 4/6] hwrng: starfive - tidy up includes and drop unused code
-Date: Fri, 23 Oct 2026 10:12:46 +0800
-Message-Id: <20261023021248.3763-5-lianfeng.ouyang@starfivetech.com>
+Subject: [PATCH v10 0/6] hwrng: starfive - fixes and JHB100 support
+Date: Fri, 23 Oct 2026 10:12:42 +0800
+Message-Id: <20261023021248.3763-1-lianfeng.ouyang@starfivetech.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20261023021248.3763-1-lianfeng.ouyang@starfivetech.com>
-References: <20261023021248.3763-1-lianfeng.ouyang@starfivetech.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: SH0PR01CA0008.CHNPR01.prod.partner.outlook.cn
@@ -94,290 +92,175 @@ Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: ZQ0PR01MB1269:EE_|ZQ0PR01MB1303:EE_
-X-MS-Office365-Filtering-Correlation-Id: 414db054-e09e-4844-bf42-08df30ab28a7
+X-MS-Office365-Filtering-Correlation-Id: 6bece97a-2ecf-4986-390e-08df30ab2674
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|23010399003|261022105027099003|261022075727099003|38350700014|56012099006|261009223327099003|5023799004|261021130227099003|261021121427099003|261009221227099003|261009221727099003|261009220027099003|261021123027099003|261021135927099003|261021133027099003|261009223027099003|10067099003|18002099003|22082099003|261022115727099003|261022113327099003;
+	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|23010399003|261022105027099003|261022075727099003|38350700014|56012099006|261021121427099003|261021123027099003|261009223027099003|10067099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	S+SlqX3Qkv4ey+Oi3wIT6vr8Ul+jrPTzyy38wTRGx2lnKIMQi7jW5NJ7T5WbeAu6i1Vedx51jLtw2qe1QRThDY1/C8aM/Mp2yk7uNrh4/4bO8l8FRzq1nLMvMyM7OI6EYCgLlAR4xBhLle7NdyciGgouIR2KAkYW/qeha1B922a+YRme3sK9UEPXRXNLQumrjQ5a168upUk9wyky5CVb7o+sup04ZqsDfVWKF+p4PCq55OsUkqwtLRdyYEmQOBIxi8V048WYSRV+AER9hKg3mKjvU5xZOOhnQ2fZiEN0L1yWBj78a3EQpchNTIP5KNoIOKQ8S9e5/Wo9CnsBWQTuYlJbTi9T3sAkwYw8vn2iECZSYYcNIB/WMZjbBDi9APKuD3ciH+45l77hNouJ6mM5w9HIMdTMSYg9mTIXnSDrY1Uu2Hq2POcP4kadKpam7dvGhKWI083oyAsdn/Kn+/h/3M0RQyV0hSPMgrO4wWVonwdzcanIVXBoSsy9va9yqw2mOoIq6CgR+22ay4sOk+EAp0iXGaB75hYGm39Eehtk38rJ5JVoOMpdFDCN1Qo5SDZz
+	JuU7CBHWiDbFqVn3RU1S9XpPQ2Y7o0zGJCUW574LRftyBwtoP4RVxo5r2lPaQX44bFGcRNvMVA51/m/ch9xtmLu1ERa5ejJBkOABRnYf5/ZDUME6Xo8olT6vPfIVYyPVYkZhTqbmspfeygoyXutwtAGTu/DjnvgKuB1qCkZ+Uvtnrd/W/FZZidg+mXAkB1Fc3OeIQSpyVlw9HbT54+sUbN1bxsdpuf6Ch4ouyJ5MO5rchOaao7tB3NUIYyXCPVdkkiFDpTyNGgCgE5bSi/76JeBpT7sF1vrU6ZhS8yQ0hK/Qx+8IqSvVEcjvhs/vFeCdHIS0nIplPYoYu3N+/Bn3fM0bHHeTDAMZ7qEciUaFYgwOLJ+AR6eYGnUApT0tagPBZWVcK18RvRSy1Vbd67igh/0OeCGxr4W5QzikMgpwVnIUpLn55i9FtIanZTEchvzbCYyMghLeynl2efGd23ps/cs2v4j4E3E2xLqhvtAVIXR/PZrm6N4E4zyWjnn4+55BYk11T6Svg6qjGP/rz9GYwNfNG9UhwCcSekp/2UH/QemT1YxsN39pt1v8oqm5/u1m
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(23010399003)(261022105027099003)(261022075727099003)(38350700014)(56012099006)(261009223327099003)(5023799004)(261021130227099003)(261021121427099003)(261009221227099003)(261009221727099003)(261009220027099003)(261021123027099003)(261021135927099003)(261021133027099003)(261009223027099003)(10067099003)(18002099003)(22082099003)(261022115727099003)(261022113327099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(23010399003)(261022105027099003)(261022075727099003)(38350700014)(56012099006)(261021121427099003)(261021123027099003)(261009223027099003)(10067099003)(18002099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rztiprQho2U0bPFq7yANjbxy+XJoXWJAiWL29T/A5N5hB5smmxS2Agu8IXm7?=
- =?us-ascii?Q?EGO+2cqvc4V0OSJMFagKrq9L87VFuWvpo5pT1OFsbng26/TevIXtHEBKvhdK?=
- =?us-ascii?Q?h1b+6bJ6FCBJg7uJ8g7nc3Yb1OTo++hQpmovbPjifb4PnCIP6i1gH3lj9vR7?=
- =?us-ascii?Q?4J06zxAnqyWq+Kgfe4N6SgeZSU1QVV8Teg9Zbfen9ydM22A2M9/4Dc/dQph9?=
- =?us-ascii?Q?7bUbxblsdWkJz6eQoifVvvrlmdmtvzBqoocaHXk65yG6D/63l0j8DQCuI2gS?=
- =?us-ascii?Q?TTB8gr/qcHBPOm4Q2IGXpJYsN8Bp+qR3Xb8H/tYHMLx28aAxqmDH+SXf5432?=
- =?us-ascii?Q?ddxIn2o2NOioBvrh+RRmBVvzBL+Bc3qblY6iie6rat3D4mcPO/+EF0dm1g2V?=
- =?us-ascii?Q?XL++wTlpX/cgtmI96j9IblMevwsnaXqZH2xZPRYKDD9fDYi/L4+JayFy7pzm?=
- =?us-ascii?Q?m2sRycONnGuUOXULniSEw+57vrbzbouKySFeDbGNdQ43Wk9N84GRNy7ysrL0?=
- =?us-ascii?Q?uv1IGmmARh9Siffixnr86ZzEgvTSLbOxv5JlVTUbuAKJ3Yiy1Tjsu1RimmMH?=
- =?us-ascii?Q?dpRH9hdG/6FI0PAvWL5ri5CmHbhejIG4xjPiet79ccMWg8ZMUbYxEvr+sRfK?=
- =?us-ascii?Q?Eq8xu4xU/JGNq9MZ1XIodc9K/MdzHcajzmFZK42eEcONx1Z6epy7TCz9o824?=
- =?us-ascii?Q?+RxUpwrGTNmP69rPPUUpbel0JOscUfgTmwr6WgAbcOzCW8f+ePfR0vfc3LQx?=
- =?us-ascii?Q?3ynqbP8XvwKboRvS8Cj6FkzgAbBmJDfMTDTIvQpOxhkWineuS6puQXZE6IqN?=
- =?us-ascii?Q?A2qGgV2tbkLHM8hPfgmeQZrBx3ungvlXML3f4QLATTL89l6/VSJAqdAi0Dj7?=
- =?us-ascii?Q?Nas+IW+MDtDs+HHnDRn/ETqH3hTT/O7LGgq2dk4Q6fLLGa6kUmZqHALRJVmv?=
- =?us-ascii?Q?klina8UrrjeoDBRKid22w2/9uEI6Yikvdfbk/AViWMAmFzTxBUmr0ppZLglS?=
- =?us-ascii?Q?nMX7P0yZKDGgo2krlkbbN/lleBkLoDiWhgHysgbyDhyW11VWVV6hp7K7lb80?=
- =?us-ascii?Q?ZWSMlQCm4LmZXhawrg0q0OgOqaMmrT10YOHfqGCLXlX4GaMlqRVRW+1feZrw?=
- =?us-ascii?Q?Y3luCk3WTgUBlDZtpZ+7MunLh/P6dY/j0GvNTFyacOxXZvYguhIttyK5fBH8?=
- =?us-ascii?Q?8RkXZAwszQE1uCMpB56akIDi6t2JP2q3xL3yqI6iBgcKY2JPyruY6FLhskXB?=
- =?us-ascii?Q?hRCQY6GX70Bo5yBH5bnJx+z4DTMy0UXIacC4U9xgHo+6RWzmfm+8mg1KFY7h?=
- =?us-ascii?Q?8m8CHTvRTFEOv6AnZTKMq6s2dGdd2lOnM0PLP/A+nYmzntXcsxjPRbt7djfF?=
- =?us-ascii?Q?Hg0plsu29IJdMbe9g1ugqvGV7PhT8ohftOiPLLIrSE6stJuJ8zHUqV9hRYaC?=
- =?us-ascii?Q?T78YRKkDixODZXTlSIa3FmonUqxFE0MHymV6VM6XAiQhK+CMOg3L3/IjpTwz?=
- =?us-ascii?Q?8HgxYWxnIZeAWV+EHQcAxoV/XL+zCaoUBY5mvML9XFO0MPy28diwH+Z+SrUJ?=
- =?us-ascii?Q?BxVGc1rOXiSSjGRIWTQ8+LQQqNZrTw3eFUaMQ2oICt+8TC7VJsh59MR4mlin?=
- =?us-ascii?Q?zq7HVRAPEEc2VuEoV0ut9vyOTpOT424LpVy9PNXFeJmG1e0BuQqeQhC32zpl?=
- =?us-ascii?Q?c158YYHHEDKesKUCUlaRIfhGCWpxAJ4c7KWuTATgPrk4+nII4639Xh3JJmw4?=
- =?us-ascii?Q?gN7ewnSA6q2T5EYV3CSBzpDwAbaUHfeCTDHREhnDkZ7/s0WJITho?=
+	=?us-ascii?Q?vhFXgoocMOCUMiTsC0rrTgYZ93V2VUHS61WC2Ec/6qLI7ifGS1fQh/izwibk?=
+ =?us-ascii?Q?VWp1gi/kD1oJOun73Kkec2E5ZxEFafMzxNA/nmTlAzEYoB79gm6ZNS/m5ial?=
+ =?us-ascii?Q?wezDxWyS1EeMFTnvT5EXjim3TzENCzvJ0gDecuAsNuN4UMJpwceLUpFNWbOq?=
+ =?us-ascii?Q?M+2nvkxJJpZFofQpF1CfIoD3BhFxmhxzNMwI01O04JrfdM2eHlJHwI1va/n9?=
+ =?us-ascii?Q?SSgkN0I/gNBff9Wv/FZRB3l/bnCdqdi1nkTjln9JLFoAKlyDHve2gYF7492C?=
+ =?us-ascii?Q?P0/3S/FWfIKkcomQnuu+IunZm6G5W8rL3fwmPoI3lOwM6a/lykq6dU5LUG3r?=
+ =?us-ascii?Q?FXu7WlLQs59ZGhXA/YevnebJOc4Ff+8bM1D5HJSxUSZPg4J2UcD4GeKFTBfj?=
+ =?us-ascii?Q?1y+VahLNUOGKiRNiLlNmbRSWrLnpBTK31wAog+x9BYOpm2w4EjuHHIcbNPuV?=
+ =?us-ascii?Q?jro4BjTjXj8pLtQjxexWoD+9hk1V73dgDT4Y7pJZc+LKjwR6xsIfZPoyvekV?=
+ =?us-ascii?Q?CDjxiRJb3ht5AVu4yj3tLCeN3GqxtG9zoCIH+t3e0feWyuxb7tITGzf5OrTs?=
+ =?us-ascii?Q?hJRTgdeAv7k8IlaYN3BZ4rhr3WneX9/8vUkWjhBQLuuZzHgqiXGzu6dQJt6G?=
+ =?us-ascii?Q?W+Wpm3tvRfyLHemqJuacTKQ/wg4/QNcvf1PLmJujqrJtrbbX4gfvTW5UaWYl?=
+ =?us-ascii?Q?ntNkFvQ7fYC7l5y8phVsrKTec0e9JcoiJPrH2ybx2IrdWir/kCx6mAW9iMY+?=
+ =?us-ascii?Q?QKcGII+4RKLGiUkYwRitnqlBvbNVJ0L74iGgSXElvQP4HW7n7Ipz5+M74CU2?=
+ =?us-ascii?Q?7ge1uMI1THiNcLkmW6A8/DBiut2544V/U/yNIvcEi/Z2TXq+SF5fiAVmV3DX?=
+ =?us-ascii?Q?rCs9hqH9QpiOeXbmbIIIzOOlj3kmhSTSbL3Z8tAx1OPd6vlpXpUzzsQO7vMr?=
+ =?us-ascii?Q?jZtk/gvL9ClZ08t5SHjZn2gK97roVJym0Or7l3OBfAel3RpRU3pZDTAp3YuN?=
+ =?us-ascii?Q?cqGIE2pXQLF9GD8ZgMZvx10wukbBSjLYGr2abESBjprFWzwbxJLME8ZGH866?=
+ =?us-ascii?Q?mj5H4Okq7/4Fj3WbjZsEO/CvWPNLtbtbmhIjO0CVW651rGEUpC2qVcqmGhZ8?=
+ =?us-ascii?Q?A1BrriwDuIIkmpmog/5jouspI08X/vhxdJMnw4JadWR6Y2HtVRPu0tFqoD7x?=
+ =?us-ascii?Q?KkAopcqqz018lqPY3opjUQj+5y74rJVPCFe8nk57Kzc7OM1hvsr6K4MpVGEH?=
+ =?us-ascii?Q?FoayJhYAw5RsyvdBxTRW5LIHfw4Ogf+KalbqElI/8fSf9kWGtm44FJBulE28?=
+ =?us-ascii?Q?AWzBxRhAg2D0+TqpvTdenYTsypBGKbewiONOWwPRHjKmS0lBcBGucESBfBpz?=
+ =?us-ascii?Q?sKRxtvJNsQN7gjf7+ZdEOJkHwlLyT+7zYPd+I1+SpYo3FnFYVNeVSIX3XBXZ?=
+ =?us-ascii?Q?faYbFSNU1k8HS6xUca7l9KhtW+ht1NFEB0zMfCNTWOUrbaRy/sVgVM8yja+x?=
+ =?us-ascii?Q?vR50x3F6dnpbQ+8qksqZcYr6EbInk7jdDVIJAy/nMnPRtOQ48FEmjAJiXPQA?=
+ =?us-ascii?Q?sHRIjnbmGceKO8K+fV11HDdjRZ6Zw27fMUuHmooFg4YinqYMRwcmAq1wQ7sG?=
+ =?us-ascii?Q?zmgPRcJawtF671ktb01TPWotJ0CePH6+f6jY1cEGT2TszYcdCIR0Kg0WdsdK?=
+ =?us-ascii?Q?+ISfXr4Op4IZccR/RPPOvFaGZlVUygKMlIk+EqKSqzuZdz0L8shFeQmwQput?=
+ =?us-ascii?Q?gZkzUovfxG6CBxSu9L2x7RXH3CFT8QXxW3bLjUOkuiXow9hswDou?=
 X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 414db054-e09e-4844-bf42-08df30ab28a7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bece97a-2ecf-4986-390e-08df30ab2674
 X-MS-Exchange-CrossTenant-AuthSource: ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2026 02:12:59.1352
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2026 02:12:55.4111
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fNhq1IgbRlMnIMuM85jHOQxWH8hETAUX488QSxNZJzcN0JInmECjv/vIq0oL1T+MYTTnVJRcC7SH84uIaIduE631jD53zytyFXIQm0+FyqcWgbbKBOwkn8MkQyblZ/rd
+X-MS-Exchange-CrossTenant-UserPrincipalName: LLFhIvrT5k5n6iacKopkNbpLFH8iWJ4vApVE5l70cR1xs9vfPgQ8oLvDKqgJ4IR9oTbr1y3cigt44JL1+FzL8lUeyRKPYUCziHo9sFmvYOJlZ2lI9oWMEtmmKGix8JYu
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ0PR01MB1303
 
 From: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
 
-Make the driver include what it uses: add <linux/bits.h>,
-<linux/container_of.h>, <linux/device.h>, <linux/errno.h>,
-<linux/jiffies.h>, <linux/minmax.h> and <linux/types.h>, and drop
-<linux/delay.h>, <linux/kernel.h>, <linux/of.h> and <linux/random.h>,
-which nothing in the driver needs. struct of_device_id is already
-provided through <linux/platform_device.h>, so <linux/mod_devicetable.h>
-is not needed either.
+This series adds support for the TRNG on the StarFive JHB100 SoC. The
+JHB100 needs the clocks gated before the reset is asserted, so the
+driver grows per-compatible match data describing the power-down
+ordering.
 
-With <linux/of.h> gone, stop wrapping the match table in of_match_ptr()
-and drop its __maybe_unused annotation.
+Earlier versions of this series carried all of that in the
+JHB100 patch, which made it hard to review. v10 splits it up:
 
-Also drop the unused reseed enum and struct member, name the mode enum
-after the driver, use a local struct device pointer in probe, name the
-interrupt after the device and replace min_t() with min().
+  1: dt-bindings for the new compatible (unchanged)
+  2: runtime PM / power teardown fix (backportable)
+  3: SEU reseed moved out of the interrupt handler, command
+     serialisation, IRQ lifecycle (backportable)
+  4: include and cleanup tidy-up, no functional change
+  5: match data and the JHB100 compatible
+  6: MAINTAINERS
 
-No functional change.
+This patch series adds support for the JHB100 SoC TRNG and fixes
+  clock/reset teardown ordering issues.
 
-Signed-off-by: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
----
- drivers/char/hw_random/jh7110-trng.c | 81 ++++++++++++++--------------
- 1 file changed, 39 insertions(+), 42 deletions(-)
+The first patch updates the device tree bindings by removing the
+  obsolete JH8100 compatible string and adding JHB100 support
+  while updating the maintainer.
 
-diff --git a/drivers/char/hw_random/jh7110-trng.c b/drivers/char/hw_random/jh7110-trng.c
-index 8e0e7865453b..3bec7b53770e 100644
---- a/drivers/char/hw_random/jh7110-trng.c
-+++ b/drivers/char/hw_random/jh7110-trng.c
-@@ -5,24 +5,27 @@
-  * Copyright (C) 2022 StarFive Technology Co.
-  */
- 
-+#include <linux/bits.h>
- #include <linux/clk.h>
- #include <linux/completion.h>
--#include <linux/delay.h>
-+#include <linux/container_of.h>
-+#include <linux/device.h>
- #include <linux/devm-helpers.h>
- #include <linux/err.h>
-+#include <linux/errno.h>
- #include <linux/hw_random.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/iopoll.h>
--#include <linux/kernel.h>
-+#include <linux/jiffies.h>
- #include <linux/lockdep.h>
-+#include <linux/minmax.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
--#include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
--#include <linux/random.h>
- #include <linux/reset.h>
-+#include <linux/types.h>
- #include <linux/workqueue.h>
- 
- /* trng register offset */
-@@ -93,12 +96,7 @@
- 
- #define to_trng(p)			container_of(p, struct starfive_trng, rng)
- 
--enum reseed {
--	RANDOM_RESEED,
--	NONCE_RESEED,
--};
--
--enum mode {
-+enum starfive_trng_mode {
- 	PRNG_128BIT,
- 	PRNG_256BIT,
- };
-@@ -116,7 +114,6 @@ struct starfive_trng {
- 	struct work_struct	work;
- 	u32			mode;
- 	u32			mission;
--	u32			reseed;
- 	bool			need_reseed;
- 	bool			initialized;
- 	bool			clk_on;
-@@ -363,7 +360,7 @@ static void starfive_trng_reseed_work(struct work_struct *work)
- static irqreturn_t starfive_trng_irq(int irq, void *priv)
- {
- 	u32 status;
--	struct starfive_trng *trng = (struct starfive_trng *)priv;
-+	struct starfive_trng *trng = priv;
- 
- 	status = readl(trng->base + STARFIVE_ISTAT) & STARFIVE_ISTAT_ALL;
- 	if (!status)
-@@ -482,9 +479,9 @@ static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wai
- 	}
- 
- 	if (trng->mode == PRNG_256BIT)
--		max = min_t(size_t, max, (STARFIVE_RAND_LEN * 8));
-+		max = min(max, STARFIVE_RAND_LEN * 8);
- 	else
--		max = min_t(size_t, max, (STARFIVE_RAND_LEN * 4));
-+		max = min(max, STARFIVE_RAND_LEN * 4);
- 
- 	memcpy_fromio(buf, trng->base + STARFIVE_RAND0, max);
- 
-@@ -501,20 +498,21 @@ static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wai
- 
- static int starfive_trng_probe(struct platform_device *pdev)
- {
--	int ret;
-+	struct device *dev = &pdev->dev;
- 	struct starfive_trng *trng;
-+	int ret;
- 
--	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
-+	trng = devm_kzalloc(dev, sizeof(*trng), GFP_KERNEL);
- 	if (!trng)
- 		return -ENOMEM;
- 
- 	platform_set_drvdata(pdev, trng);
--	trng->dev = &pdev->dev;
-+	trng->dev = dev;
- 
- 	trng->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(trng->base))
--		return dev_err_probe(&pdev->dev, PTR_ERR(trng->base),
--				     "Error remapping memory for platform device.\n");
-+		return dev_err_probe(dev, PTR_ERR(trng->base),
-+				     "Error remapping memory for platform device\n");
- 
- 	trng->irq = platform_get_irq(pdev, 0);
- 	if (trng->irq < 0)
-@@ -523,63 +521,62 @@ static int starfive_trng_probe(struct platform_device *pdev)
- 	init_completion(&trng->random_done);
- 	init_completion(&trng->reseed_done);
- 
--	ret = devm_mutex_init(&pdev->dev, &trng->lock);
-+	ret = devm_mutex_init(dev, &trng->lock);
- 	if (ret)
- 		return ret;
- 
--	trng->hclk = devm_clk_get(&pdev->dev, "hclk");
-+	trng->hclk = devm_clk_get(dev, "hclk");
- 	if (IS_ERR(trng->hclk))
--		return dev_err_probe(&pdev->dev, PTR_ERR(trng->hclk),
-+		return dev_err_probe(dev, PTR_ERR(trng->hclk),
- 				     "Error getting hardware reference clock\n");
- 
--	trng->ahb = devm_clk_get(&pdev->dev, "ahb");
-+	trng->ahb = devm_clk_get(dev, "ahb");
- 	if (IS_ERR(trng->ahb))
--		return dev_err_probe(&pdev->dev, PTR_ERR(trng->ahb),
-+		return dev_err_probe(dev, PTR_ERR(trng->ahb),
- 				     "Error getting ahb reference clock\n");
- 
--	trng->rst = devm_reset_control_get_shared(&pdev->dev, NULL);
-+	trng->rst = devm_reset_control_get_shared(dev, NULL);
- 	if (IS_ERR(trng->rst))
--		return dev_err_probe(&pdev->dev, PTR_ERR(trng->rst),
-+		return dev_err_probe(dev, PTR_ERR(trng->rst),
- 				     "Error getting hardware reset line\n");
- 
- 	ret = starfive_trng_power_on(trng);
- 	if (ret)
--		return dev_err_probe(&pdev->dev, ret, "Failed to power on\n");
-+		return dev_err_probe(dev, ret, "Failed to power on\n");
- 
--	ret = devm_add_action_or_reset(&pdev->dev, starfive_trng_power_off_action, trng);
-+	ret = devm_add_action_or_reset(dev, starfive_trng_power_off_action, trng);
- 	if (ret)
- 		return ret;
- 
--	trng->rng.name = dev_driver_string(&pdev->dev);
-+	trng->rng.name = dev_driver_string(dev);
- 	trng->rng.init = starfive_trng_init;
- 	trng->rng.cleanup = starfive_trng_cleanup;
- 	trng->rng.read = starfive_trng_read;
- 
- 	trng->mode = PRNG_256BIT;
- 	trng->mission = 1;
--	trng->reseed = RANDOM_RESEED;
- 
--	pm_runtime_use_autosuspend(&pdev->dev);
--	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
-+	pm_runtime_use_autosuspend(dev);
-+	pm_runtime_set_autosuspend_delay(dev, 100);
- 
--	ret = devm_pm_runtime_set_active_enabled(&pdev->dev);
-+	ret = devm_pm_runtime_set_active_enabled(dev);
- 	if (ret)
--		return dev_err_probe(&pdev->dev, ret, "Failed to enable runtime PM\n");
-+		return dev_err_probe(dev, ret, "Failed to enable runtime PM\n");
- 
--	ret = devm_work_autocancel(&pdev->dev, &trng->work, starfive_trng_reseed_work);
-+	ret = devm_work_autocancel(dev, &trng->work, starfive_trng_reseed_work);
- 	if (ret)
- 		return ret;
- 
--	ret = devm_request_irq(&pdev->dev, trng->irq, starfive_trng_irq, IRQF_NO_AUTOEN,
--			       pdev->name, (void *)trng);
-+	ret = devm_request_irq(dev, trng->irq, starfive_trng_irq, IRQF_NO_AUTOEN,
-+			       dev_name(dev), trng);
- 	if (ret)
- 		return ret;
- 
--	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
-+	ret = devm_hwrng_register(dev, &trng->rng);
- 	if (ret)
--		return dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
-+		return dev_err_probe(dev, ret, "Failed to register hwrng\n");
- 
--	pm_runtime_idle(&pdev->dev);
-+	pm_runtime_idle(dev);
- 
- 	return 0;
- }
-@@ -620,7 +617,7 @@ static int starfive_trng_resume(struct device *dev)
- 	return 0;
- }
- 
--static const struct of_device_id trng_dt_ids[] __maybe_unused = {
-+static const struct of_device_id trng_dt_ids[] = {
- 	{ .compatible = "starfive,jh7110-trng" },
- 	{ }
- };
-@@ -634,7 +631,7 @@ static struct platform_driver starfive_trng_driver = {
- 	.driver	= {
- 		.name		= "jh7110-trng",
- 		.pm		= pm_ptr(&starfive_trng_pm_ops),
--		.of_match_table	= of_match_ptr(trng_dt_ids),
-+		.of_match_table	= trng_dt_ids,
- 	},
- };
- 
--- 
+The second patch reworks the driver to ensure proper clock gating
+  before reset assertion for JHB100 to avoid reset-domain crossing
+  glitches, fixes RPM usage count handling, and improves error
+  path cleanup through devm actions.
+
+Changes in v1:
+ - Remove jh8100-trng and Fix the compatible description in .yaml
+ - add JHB100 and fix clk/reset teardown logic code
+
+Changes in v2:
+ - Balance the PM via pm_runtime_set_active() in ->probe
+ - Add devm_add_action_or_reset() to register a resource rollback function
+
+Changes in v3:
+ - Supplement .yaml commit message
+ - Add pm_runtime_get_if_active() to check PM in irq
+ - Balances pm_runtime_get/put calls in init, read, and cleanup paths
+ - Add per-compatible match data for the teardown order
+
+Changes in v4:
+ - Modify .yaml commit information to non point description
+ - serialise the command sequences with a mutex.
+
+Changes in v5:
+ - Run the reseed from a workqueue instead of hard IRQ context.
+ - Balance the probe reset_control_deassert() via a ->cleanup flag in the
+   PM suspend/resume callbacks (was skipped when already suspended).
+ - Use devm_pm_runtime_set_active_enabled() instead of manual PM enable.
+ - Register the IRQ after clk/reset/PM setup; reuse
+    starfive_trng_release() on request_irq() failure.
+ - Check reset_control_deassert();
+ - drop of_match_ptr() from the match table.
+
+Changes in v6:
+ - check lock in starfive_trng_read() using mutex_trylock when wait is 0
+
+Changes in v7:
+ - using mutex_trylock when wait is 0, otherwise use mutex_lock()
+
+Changes in v8:
+ - rebase patches against the latest tree
+
+Changes in v9:
+ - Fixed the PM runtime reference leak in starfive_trng_read()
+ - Drop redundant pm_runtime_get/put calls from the interrupt
+     handler (starfive_trng_irq).
+ - Use DEFINE_RUNTIME_DEV_PM_OPS() and pm_ptr() for power
+     management operations.
+ - Split clock/reset control into starfive_trng_power_on/off()
+ - Track power state with clk_on/rst_deassert/initialized/need_reseed
+      instead of open-coded clk control.
+ - IRQ now requested with IRQF_NO_AUTOEN and enabled only after init
+      succeeds.
+ - LFSR_LOCKUP no longer schedules work from hard IRQ: set need_reseed
+      flag and let starfive_trng_reseed_work() handle reseed on a
+      freezable workqueue.
+ - starfive_trng_cmd() takes timeout + wait args; read path checks idle,
+      reseeds on need_reseed, retries once on lockup, returns 0 for
+      non-blocking.
+ - Protect ctrl-cmd sequences with mutex + lockdep_assert_held.
+ - Cleanup/suspend disables IE, clears ISTAT, synchronize_irq() before
+      gating clocks/reset.
+
+Changes in v10:
+ - Split the driver change into fixes, cleanup and the JHB100 addition.
+ - starfive_trng_init() only enables the interrupt line once and clears
+   trng->initialized on failure; starfive_trng_cleanup() only disables
+   the line if init left it enabled. Fixes the unbalanced enable_irq()
+   when the device is deselected and quickly reselected, and the double
+   disable_irq() after a failed init.
+ - Non-blocking reads re-queue the reseed work instead of assuming it
+   is pending, and starfive_trng_irq_clear() queues it when it clears a
+   lockup. Fixes the stall of non-blocking reads after a lockup seen
+   outside the interrupt handler or a failed reseed.
+ - Do not include <linux/mod_devicetable.h>, <linux/platform_device.h>
+   already provides struct of_device_id.
+ - Describe the header rearrangement in the commit log.
+ - Rebased on top of ace145efdd80.
+
+Lianfeng Ouyang (6):
+  dt-bindings: rng: starfive,jh7110-trng: add jhb100, drop jh8100
+  hwrng: starfive - fix runtime PM and power teardown handling
+  hwrng: starfive - move the SEU reseed out of the interrupt handler
+  hwrng: starfive - tidy up includes and drop unused code
+  hwrng: starfive - add JHB100 support
+  MAINTAINERS: update the StarFive TRNG driver maintainer
+
+ .../bindings/rng/starfive,jh7110-trng.yaml    |  10 +-
+ MAINTAINERS                                   |   2 +-
+ drivers/char/hw_random/jh7110-trng.c          | 578 +++++++++++++-----
+ 3 files changed, 425 insertions(+), 165 deletions(-)
+
+--
 2.43.0
 
