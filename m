@@ -1,13 +1,13 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=139.219.17.128
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=139.219.17.121
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792721591;
-	b=Psd3DmkBi4w84W991V27defRpAJkFtudXNntXcGld9tbR5w9irMEk3+Wfpoi2p4bpglh
-	 wsMYvSDtvF6tp8ABcTB60gIhTsBQvRJA5ToO420xU39b/MVRkzmC8heegT0/lP3rfiBPg
-	 fnsjTfPn1cMfFYkKCVPhlJ8+TkUkPFD9tzNj2kmW9Lq9eK/MNnVO61S0WqmeouLLAFGz5
-	 ccuCMC5TLrLxqhLkJKg1mPvn7EA/hETNrN9L7qYeTxY0XtosPl6kExeKSA3iTIuRdkTwm
-	 7qy4JAJ8tdkZLqs8n/ZOmhKKmJMAur/9sURCjFoACPZ3HvXEoz/YXlMfPld5asYaLCA==
+	t=1792721594;
+	b=Lsddli3/s2KJU/muyLspVmXq8CNovYWs57pB2ouHx771T8eRsmtiFIG1hXa07KnIvwe5
+	 w5P86h3C4l3bBhAgNUZLAbkSmx8F6cJrAMdGGdjRVhwN2QSk+kIQLpxipMxx1TOaWtnU8
+	 uXS+ruL9+IjxwKpNg2eocp2wZ7+xJk5iKW6a/ZwSA7WwFYLfGpwxFwTOY3ti3yrW3gXZT
+	 UmTrItnXccH7CFanvbE/yJbwWZ+Y+Wvuyy9GbRscEZWkp/J1rLsYS9tF8RNKwtN9EnSQK
+	 1dzSoO5JH0tKTA7MG8Hv+UaTbzgZlx3unLdib3NRqZSAgfaLvPnC7Yy2CTpLaxGC0Qw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792721591;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792721594;
 	h=DMARC-Filter:Received:Received:From:To:Cc:Subject:Date:Message-Id:
 	 X-Mailer:In-Reply-To:References:Content-Transfer-Encoding:
 	 Content-Type:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
@@ -23,31 +23,31 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=QsU4mr3Kv9r5bfuUP1A8XUJYkeK/qGgkK8UIRGgfLy0=;
-	b=b+jZvf9nswG0EM4vPG6QbhyFjXkzqooBtnS72E+CyPf+Ffcooejf5zIUcm3vu4GzO4uE
-	 DzwXXaQlLzCl7h6lsacff4/8PWZDmkUgW86n8lAaff7zIZuZA8dCdEjJZWhtYHZyzF9Al
-	 ff14Dlr9RfvVjM4TCIPSF2m2O4djfkfdlBrV0qH9/6T+oinwkxt/Z9aEc+XHb269gBN9L
-	 0Z4FIk/majNoU3ht3AjX3dhChlPTQnFJWsdInJ4p5c4SioiVXJGnpTpD4b7JtOut/lQjM
-	 XQ/cTD1pbatM6EMnBTFja86/wcuexemvIjb2UYciYlIDYw4GnueVxf55lhFXlPLrMXw==
+	bh=7W3B2TsYykKDQp00DvO4PfqV/nxgOiDtiBHqiLwkqk0=;
+	b=daRqbkyTvaKDjo5K1kb+Rq7VJJrY7h37MIiRXQvdtxRZS23D0h5JofeFW9gKnfH9qdQH
+	 HWdyX2uuz3L2ChQIn5m+QSjHujxTQqzLXbKk6jBKdkVbmejXqXywDhRPt6Xq4YxLlqqr4
+	 s8x+zT453YCxq28Ok8qlkUd2vRBkJfzkm6u1nC4/VTNkFY4haPtG8UgZkuUnLWa0wA8K/
+	 dSp/gOlN567RWqFmxOtBQUzBcPrGgiBqkkR4trEJjcm7nIa8yTOVaWIvoShRnjncZQPr2
+	 yLxJsG9wSdZ+hVfRxgCmpdj6QYMms7WXpFoQ+bi/0k9bov82XnCYG2MagtKdfCr4+Wg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=starfivetech.com;
 	spf=pass smtp.mailfrom=starfivetech.com;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=139.219.17.128
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2128.outbound.protection.partner.outlook.cn [139.219.17.128])
+	arc=pass header.oldest-pass=0 smtp.remote-ip=139.219.17.121
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2121.outbound.protection.partner.outlook.cn [139.219.17.121])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5790C606A31E;
-	Fri, 23 Oct 2026 02:13:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5790C606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F399606A330;
+	Fri, 23 Oct 2026 02:13:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F399606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nyX23C+31L/burfKA67WkatsNLD8JrGrT2aW+Kd2dPNvT/ZCFEsRfCU0pyGT3B0dQ3Aan2kX+eyBfrA6cRe9usqnewzZZhoPhld23A8gc9bO0MhMEuQ7QmcHhlqN/MApDGB3lvuR7XbmLVZY8eAlDhiho692O56NXUPr+VaXhbrP2/81czF4iN8M7aKXMtHDV7DE73X1ju60+Jr2nrnzYP1EVAXYXyvgHG8/hqGX/hZxNvpMLjKhcV3tlYTsIL55qJ643PW2t8qtDl128n/Vn1CZBqQ4U61Ik9BFTfVZ1TPIHSsdiOsMnmRMrppselnMINR4OMGXJExff05+OcV9sQ==
+ b=conR1iVJAKUS1susVwiaJuREw6nEYOy8cshuZuQoqngapQBMgCRobTUBQUbv5UBvA4+j3U9YP+G1EpIZr0D5+3iWflud+kBSJLLkKJHO/91eoSxxk7+vxk0S2YT++ILRQdtIvDqYiDgf0esDkpsSYBoVWL5Rk7UeUVxvegQS2yLDLKwX6+oyjeMSL4WrGYzN4w+mA26RAcY98WDO34tK3tIfGqa0+bx2O6/cOhf94mpe0oLM1wGVnAiWwYFdID+/tNDag2pMbKlqg3JlJWHwjYGqdLhlKYVnVPHhJoQjnxJ5q79CexOW7CuFgy5y9nAWSBlEccqvyWgaZVkTMOioZQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QsU4mr3Kv9r5bfuUP1A8XUJYkeK/qGgkK8UIRGgfLy0=;
- b=WUoTEGwfo/kCXSOq675e+4LZcd4S0Z5yWG8IDR9e95nVV46rIYMGrcSoMnbI3iYnky0a7C90c7f12QMvRldKK5l5GDM/P7HzBVIk9BS41m95CUYNtJa9gpRFig39Z1nf/1mS5GKtsmKpp8vUSiMahs0jzDXKr0kusWLL1LmxcRxCsG3M2YMO+T9eVqvgU31zyP7SlVwA9AT3pdqPhQA8U2B3420jm5Cbo1XLuyInkM/BqVHJEFA2X/y1Yxn1rvxNgOoEDtiehn4iHQUhjtd1jlcg/HXjm1hyQyrXE68fxXbUvou4XnLgph/lmzyZ1jA279mEQtiOknnVKXwQ1iD15w==
+ bh=7W3B2TsYykKDQp00DvO4PfqV/nxgOiDtiBHqiLwkqk0=;
+ b=jrxh1U4mwcSqnmeaAC7drWDyNw/W5LURnwSIWlYUu4YJ3nSUS2+SO6GlnkGduI+Lx/UJAdN+iOJWlqnpcrVmvcQvVt5bmLTbVL5/JY8sFjk3xnLuLg4J2UcweISMVXotjt4cqSOwkwQaFlZYYjhO5YZYrZgxSr6A1Nj356CC9DJRjdAnz1emjqzVF/BuFGj1Exba+ucViQHJMW+FVjb1fckPfp/BuAmxQwk2x/FhSHp/V2kN2ay25KNI3d+Ek3DyALrjnZOw70uA9sonUoBu/gg2OzJv0f12Rj6L0CPE967zK1xB8tqBr6OC7HKX9mKf20IG8PcpXhphimIMRpmsOg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=starfivetech.com; dmarc=pass action=none
  header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
@@ -57,11 +57,11 @@ Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:18::6) by ZQ0PR01MB1303.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:1c::6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.16; Fri, 23 Oct
- 2026 02:12:58 +0000
+ 2026 02:13:01 +0000
 Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
  ([fe80::973:272c:ab11:7570]) by ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
  ([fe80::973:272c:ab11:7570%4]) with mapi id 15.21.0546.017; Fri, 23 Oct 2026
- 02:12:57 +0000
+ 02:13:00 +0000
 From: "lianfeng.ouyang" <lianfeng.ouyang@starfivetech.com>
 To: Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -73,9 +73,9 @@ Cc: linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
-Subject: [PATCH v10 2/6] hwrng: starfive - fix runtime PM and power teardown handling
-Date: Fri, 23 Oct 2026 10:12:44 +0800
-Message-Id: <20261023021248.3763-3-lianfeng.ouyang@starfivetech.com>
+Subject: [PATCH v10 5/6] hwrng: starfive - add JHB100 support
+Date: Fri, 23 Oct 2026 10:12:47 +0800
+Message-Id: <20261023021248.3763-6-lianfeng.ouyang@starfivetech.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261023021248.3763-1-lianfeng.ouyang@starfivetech.com>
 References: <20261023021248.3763-1-lianfeng.ouyang@starfivetech.com>
@@ -94,355 +94,181 @@ Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: ZQ0PR01MB1269:EE_|ZQ0PR01MB1303:EE_
-X-MS-Office365-Filtering-Correlation-Id: d92d97de-e59c-4c8e-55e6-08df30ab278c
+X-MS-Office365-Filtering-Correlation-Id: d2794b37-9d84-4d8c-92f1-08df30ab293d
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|23010399003|261022105027099003|261022075727099003|38350700014|56012099006|261009223327099003|261021121427099003|261009221227099003|261009221727099003|261009220027099003|261021123027099003|261009223027099003|10067099003|18002099003|22082099003|261022113327099003;
+	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|23010399003|261022105027099003|261022075727099003|38350700014|56012099006|261021121427099003|261021123027099003|261009223027099003|10067099003|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	/0gnth8Luup8arbInOtuRgVjW+QlPM18lsBE44K3G7MZ3+g/kyfP4QxIiIu95B7NEzdCdIT87WM1e9dJ+83wt7wxVL8RDn4wozOeRNWHnFXcddzZqeKbWZhyhfQao5lwm0CCHxNNTw2h/ue8B+X4aUDjnITzsNhLBu0MyVlV76/7wCC/AYSV/4fqbvrM9qYwgh8JG8xeYcxgbbY+X1BYplD2VHuwPI0+hC1srDOonCDXC0/ZPHLDaGC5Nxo9LSngtnCfdAh+jbTUY2aJoYkcFglT6/D4lq98MS8tQy2q5/9na3cDGRlexe0gV4ZDeZpy9wJw8zrB6xlzq3+vijKAU6bAhdIoWk94/X4OwqFvLuzWuiCl9cq7gcRniwKb/jmj79q5aDZVp9DHWQrLmaIYmLcCvUNi7jE9/aUo9AwyH01bY4+DZxjNn+5CpSRaSW2yB8YeQKOr0dsS21dL9UGzJI3Q3HISuy5YUMDQ5SVvKPUioxdcjhhba4hwFEReoAjgQrxbbleuwvN9REl2jg6vKrLKbYIpdQnenv4Lmk5AQ/o=
+	YdPWYVsOAtc23XiM9lHLJyddbQtF/0PyMqnxTWDiaKgvMaZA1SbKmzyMd2kw8DAgfqQtn7fLlX4/+wnVRwzRbfDw/aie/q8V6AvUCqGlsDhbAdRXYOFZyA4n6ihWzK1XV6Rjn4B7vQlshhOAo0lJHxP3IaxWO6PrpcLXl8otJTCjqNRWh2sfFmnyEu5jVVAO+6whbWb9nd2cEmo3G3idlnMS1B2gTuHRB0n4zfwLaH0J/DtjyD7rku/qoLFV7rayxiuWr0Y0rXyxnOkgGG0shMjh/+RVGZOxq8Lj2A1g1mYXfB3I8qVX7Ps/8lNV2kH3Q7kmbZJJG8YI2FipGbtAGxth7ZrYJKGCG/ZVsdIYZqPjijTwI8zPzMCrCktuwhqSpPIDIltQdr7AL+OAPOpehaHP6KDdVOC5V++530M/1hbvkJ9GBIl2JfzJqjyINNhg7Trx1rq8wRli+gsSxhkut1ZrhZA85KQZtqAO+bmdrt9xFwCVRQnFkInCTPyvchQx21Vr0XIsyidDIz7/1LLrgvTSK2fn1QYnvZIkGJltYKP2DNw73Y6RwULBBgorNNaH
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(23010399003)(261022105027099003)(261022075727099003)(38350700014)(56012099006)(261009223327099003)(261021121427099003)(261009221227099003)(261009221727099003)(261009220027099003)(261021123027099003)(261009223027099003)(10067099003)(18002099003)(22082099003)(261022113327099003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(23010399003)(261022105027099003)(261022075727099003)(38350700014)(56012099006)(261021121427099003)(261021123027099003)(261009223027099003)(10067099003)(18002099003)(22082099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6dQ4paXqnWQiTbRpPrs0j515AyonYpLp2LOPCU6pZ9gZf9s2KJa5ymET+5rF?=
- =?us-ascii?Q?CJSjwvmDDC5Bw0F6qzucXRW0gbAdO7EyucdwdR/V7y+K72c/2ebGBVXXmhfk?=
- =?us-ascii?Q?+LuuCHSYoFXeo7tIDV94fKVnAYyHUKVLrMe4FG8GvYqHshHd6z8WlOLQRBwa?=
- =?us-ascii?Q?OVcpFLFYxxA09i5D+Pwa2idf930H8Q+4MBfXWQoQMsZm8dIarIjK9TRh3fbz?=
- =?us-ascii?Q?AWEvBpRiSdgQ8M2Txl3iZKtnqq0J2q83FRZ/fSGtudc2OX39QQbvGHR2gEg5?=
- =?us-ascii?Q?f0qAUEaUgJQUzrivaEhrelLwMHzV3tT6MNS4FlcYnlhhduQj/Lvfc+z//CaG?=
- =?us-ascii?Q?9nvtSdTo1gXI04WyE+qlvlDfawup6wy1zAMM+LraAvxn8kg/kbniUnDNdMob?=
- =?us-ascii?Q?4utltt/OyMdF6wOHGdU/Bu69VYImOncH8cjBZL3iQPlU9DHRJglRdboHBjTI?=
- =?us-ascii?Q?4lU0NqyEhznMcQifHD+jbExGqjwWPQla5PdpO6+Pc8ni3a9no18KHIsAQjhG?=
- =?us-ascii?Q?vK/p+9fRVQjyuRQBycUpDINF0vpRFbCg0+vinFTEQ1Bs4dElsi3JsJ5O1yq3?=
- =?us-ascii?Q?xh9Z1fpOGovS/w2PWD3izuXGyc9MuhJrAkst1hCkPHKCwCL2fpXIxN/Dfqe4?=
- =?us-ascii?Q?Tc5sard48Anf4t6b989CGFs6QH2hLtq1yuAJUtBBIk9IpmefM5hZNUy91QQa?=
- =?us-ascii?Q?bJgC39IILwcDlOzy7IJTPVAZpGwPIkf3VTUh/NCvfzym+pFc23WUIjrwRPW3?=
- =?us-ascii?Q?CLM6mhEIsi19fvMAqeRU7pzmrWX2kBwUzdRvFVnCvlKoKT6zQXsaoqKC40p4?=
- =?us-ascii?Q?c5s/VMKCtVJlikjXEy8R58hsYiu3DEFwuL3OLMKc/V9c8Gg8wWFUBdDxrZ2R?=
- =?us-ascii?Q?4aBgJnMeK8SczDAnGHJFlUtrYow+OZc06CmAdgKvi/PpxSSwnnTTAATyiwO8?=
- =?us-ascii?Q?hFoc6WIfgSUhYPM/NAuG1Pb4htyNdKxGpv+K54oQcYdKxSZM1eEqcG77G8/q?=
- =?us-ascii?Q?wLPyiQFiLXmGTJM7YQEuSJc2mTRsOE4Iq0XoEocl84qUtn6TfnMT5sEFHOvP?=
- =?us-ascii?Q?6X2vqtnoO+usBwZrrbJ6jxyPOuHLQxP899KY+BN+2HcD/9uhSwm+oBMLnq+L?=
- =?us-ascii?Q?2GjtdgX9L0P/+TVTgQhHcIGcHo/Z6DvrPDyNKmyxOqV5dBKAm7bz4j/mJkDB?=
- =?us-ascii?Q?g9kpc76lnu/XZN9OCi7/xsNglkwb9vNcgv+nN2IJI/8YmpKD5fpuAiEzvgMQ?=
- =?us-ascii?Q?Gy3CLivQsf21MzQRWJVzGheIiLbFWbFnlvM3jyULEU6p1rCAWBI0PuMP0lO5?=
- =?us-ascii?Q?kbHv+VFSF6bAowJ44gqti+hXZfhaVQQMlblO0XKSpcxZMtyABp/tUGPYTrmB?=
- =?us-ascii?Q?MWQSN/ZIfq+S3gnU++eIvrK8dvoMbwcuK3AvW4zY9ZLDbHGmEdqXzwq0+Khm?=
- =?us-ascii?Q?nQn5fR7Rj7X1lJ72PUuV4DY1S/hr8HPUWAtA0/vpjJEHvKvOrtJXCTIOe5x4?=
- =?us-ascii?Q?93cGgYkH1sCq9eMb+MFto0vXugu/CXYUGIW9k83roDMG69gsyHJNTPySTu3b?=
- =?us-ascii?Q?fn4c8Sg4i1zXrZE/3kWWHbY9jHCZZUpK0wA8BuFN33QsnME49I+fTz8LlUJV?=
- =?us-ascii?Q?mmnb/PfMt4QcumCu7RR6sGJgvZbvl3kffNVcqLJZwM9FcNZ7DcMKtp1N4xg3?=
- =?us-ascii?Q?Y4nbmBrC87JFzh5y9hH0xjVPexBLFLej2Hupcdulyqt1LgPZQ1/9W3IUF14c?=
- =?us-ascii?Q?wFJFSSv2AhjcwSSbcqIj1fNM5OT0ieNSo1lop98i4T3i4U8530rZ?=
+	=?us-ascii?Q?zvENLPiPwJiBhxuoh+gwhKkzkIGsSwsj4PJatz1c+Gl65FmbODhbPzlOWe0W?=
+ =?us-ascii?Q?5ijB9XgR/MPP9mTW9mupaDElUn2BFPEIuS8RRuqvtVqmYf25W/oKwX0uUCNw?=
+ =?us-ascii?Q?N7ILUr91ix8ODlO/Fcy2m/7cSkKWnt+Ymrv1kg7P+XFMAmRyIM1X/Rr85sSK?=
+ =?us-ascii?Q?GUtXpl6sAP60xMgte48KEYSBTQmwBWDaA6b+2HcJBaSslahRMvcxYUaLyRrX?=
+ =?us-ascii?Q?9GjK/FoxqIDjwonYMkYsNrQMfcmg7AL56EWz9ojFqZqRYGBxn0UvfE/9eitP?=
+ =?us-ascii?Q?q9nASbkd+/8TUmoT/4GM7LvK3lPaX4WuZ9nv2OFt04dGW/nsdOq0lHHzUfZQ?=
+ =?us-ascii?Q?PIHkjF0dCHHprPrXEjBiOf/ND8DShEwkSsDQ+f8dhHwHH5LTyWBBH9tSMkk9?=
+ =?us-ascii?Q?c+UVXjI59pi4qR7o369IF5/cJ3XXGlH7kxP6q3P0oK3agsXkQC3btIcHXT+p?=
+ =?us-ascii?Q?NVUw5Sf3A+gDEMPxnmxhc9j+BzF9w9BKeQhuglPD/S6epnhbr3FItQDrUxD2?=
+ =?us-ascii?Q?KfEZlMixjGogbheN2exEJQ/FgIQ7ta5UfaNCBFJjUY/PD+gyyUMZmp3IK4ok?=
+ =?us-ascii?Q?iV5whZvBYpFOGVssm/CqoqUcRl6MyPXaZpYe097YK17mJIySUI515zfYpGHg?=
+ =?us-ascii?Q?U07IYBlyug55L203P6Je0vsYjxDQ/HFXTxDIkvLJO7qgztyQopWk8b8Fm/Ge?=
+ =?us-ascii?Q?DeXROD6Dkup9IYZQJ7BldYECvfN0ddY4fVEa3IQ9x01IaJJUvk/EBB4PRCqq?=
+ =?us-ascii?Q?GfxQSkTqFqktpbRT74SYMhDGc6rfPOh+as+eWetanCrxFjeYdtJuE0J0e2ZU?=
+ =?us-ascii?Q?ABhkut6R3UrwuXx9NDzQniWBdyYb+EAaU+Xty/7x1xlidr/BrfpVIrbRSoFn?=
+ =?us-ascii?Q?92vMzC7kyVWpZy9HNRG4lMnrvV4Zglqc+03vu4RledRJe4RVltNQ9cDJ2OHy?=
+ =?us-ascii?Q?IWmZjcO1o4FOTeWJNAfeJpmqx0Rz10t36xZrrgyAiAbMt3trJg82hWIx550G?=
+ =?us-ascii?Q?/QWJc3urrzXBCoUEQEcg1ELMrUKzA/GilCRyz6gOX4sJ4p3+Lsw4fN4jua+F?=
+ =?us-ascii?Q?XqUbMqhfBPAId5sgegS79ML1fZ0SCTN/NdwMQbbVW0t+i7LsQS1/9dhzHm12?=
+ =?us-ascii?Q?O9Y040hGrnLPIhrb8bc21+sNh9uvhI95Gbm00ueTvK8m7zbX+IwBhbIRK/Nj?=
+ =?us-ascii?Q?1W6xenAp3i0ZqZ+nbUMlAYtnzomADOtGSrXXSXym07XPCuTKglOFZ5FguCts?=
+ =?us-ascii?Q?4mnOppCaoJP+l9yqUXFC/qyGS5d0zBk5kpxwB8jqQpQBatyWI7MvCVuhhAXt?=
+ =?us-ascii?Q?xbODavffIIVaIRWf1k3RCArIg7oS3otyVApcZseRvrA7XoEfk5oVIawBBI3D?=
+ =?us-ascii?Q?6eEXXZiH0iamq5+rIh0y2m5BVApzvo2GczzbBIOnvK59YBEwojNA8L/8V9Cp?=
+ =?us-ascii?Q?BvktC3p7FdaEGTpLX8DwPf6DLDdaxjhz+gT1bu4cJQtKzYagFkMaE7wxWVfO?=
+ =?us-ascii?Q?DXH7MCS1e/drQc17P+Ktt++GiSrzz60nLIBn9Heii3Ud9cqNJqvUoh35AEOQ?=
+ =?us-ascii?Q?bsnWis5r029XjrIE4gtoCW9e81kPCWny4aKbJQEkv6HPt/PWaP31AA0DqOcF?=
+ =?us-ascii?Q?aGU1Ah8/BhOikfgYmtnRLNw+EqB7dfUjMJ0dGHUTevYoZW+Qw2mkERAwKOi8?=
+ =?us-ascii?Q?5/5AzgqwpdEENx3ADX/zolXgItkrA+85pwQXaiWhXxYUi33yv6u9tJtDS5E9?=
+ =?us-ascii?Q?vdRsDuHNOOtEOIL8RH8Ku+XqAASmhu0=3D?=
 X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d92d97de-e59c-4c8e-55e6-08df30ab278c
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2794b37-9d84-4d8c-92f1-08df30ab293d
 X-MS-Exchange-CrossTenant-AuthSource: ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2026 02:12:57.1953
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2026 02:13:00.0945
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6lmMwjAvMuC6xtkosJ9LvDDNIy7yhbCgJGpLdnJuSodZDTxuF8FpbieozvtaUdkPNjyCwyYNkwzNR71c+MA8kAbvt6/AwJ/3AqiVKuRntyTsHvCBo+Niriz78TjLVSfK
+X-MS-Exchange-CrossTenant-UserPrincipalName: b6KEtb5q4miTecDDNGz35aTeqs5M3e5hozB7yLF7Dxg4hv7x+3qNzLCaK+6CY29rdw6je8zjxSx8PYJYf8w45xq2C8jevOsfHNhDdwqQhWzfdqbz/Q3Gzgl9QPBKF3lE
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ0PR01MB1303
 
 From: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
 
-The runtime PM bookkeeping of the driver does not match the hardware
-state it leaves behind:
+The JHB100 SoC has the same TRNG as the JH7110, but asserting its reset
+while the clocks are still running causes reset-domain-crossing
+glitches that can affect downstream IPs. It needs the clocks gated
+before the reset is asserted, whereas the JH7110 keeps the original
+reset-first order.
 
- - probe enables the clocks and deasserts the reset, but then calls
-   pm_runtime_enable() without marking the device active. The first
-   pm_runtime_get_sync() in ->read() therefore runs the resume callback
-   and enables the clocks a second time, and the autosuspend only ever
-   drops that extra reference, so the clocks are never gated.
+Describe the power-down ordering in per-compatible match data, select
+it with device_get_match_data(), and add the "starfive,jhb100-trng"
+compatible.
 
- - the system sleep ops point at the runtime callbacks. When the device
-   is already runtime suspended, a system suspend gates the clocks a
-   second time.
-
- - ->cleanup() asserts the reset and gates the clocks, but ->init()
-   never undoes that. Deselecting and reselecting the device through
-   rng_current reinitialises it with the clocks off. On remove, the
-   clocks taken in probe are only dropped if ->cleanup() happened to
-   run.
-
- - ->init() and ->cleanup() access the registers without holding a
-   runtime PM reference.
-
-Move the clock and reset handling into starfive_trng_power_on() and
-starfive_trng_power_off(), which track what is currently enabled, and
-tear the hardware down from a devm action so that every probe error
-path and remove unwind it. Mark the device active before enabling
-runtime PM with devm_pm_runtime_set_active_enabled() and let it
-autosuspend from pm_runtime_idle(). Use DEFINE_RUNTIME_DEV_PM_OPS() so
-that system sleep goes through pm_runtime_force_suspend() and
-pm_runtime_force_resume(). Take a runtime PM reference in ->init() and
-->cleanup(), and make ->cleanup() only quiesce the hardware; runtime PM
-and the devm action take care of powering it down.
-
-Fixes: 9b2b61126a06 ("hwrng: starfive - Add runtime pm ops")
-Fixes: c388f458bc34 ("hwrng: starfive - Add TRNG driver for StarFive SoC")
 Signed-off-by: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
 ---
- drivers/char/hw_random/jh7110-trng.c | 150 ++++++++++++++++++---------
- 1 file changed, 103 insertions(+), 47 deletions(-)
+ drivers/char/hw_random/jh7110-trng.c | 45 ++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/char/hw_random/jh7110-trng.c b/drivers/char/hw_random/jh7110-trng.c
-index 61eb4db7ac01..17932cc6d7aa 100644
+index 3bec7b53770e..1018a28f291d 100644
 --- a/drivers/char/hw_random/jh7110-trng.c
 +++ b/drivers/char/hw_random/jh7110-trng.c
-@@ -104,6 +104,8 @@ struct starfive_trng {
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * TRNG driver for the StarFive JH7110 SoC
++ * TRNG driver for the StarFive JH7110/JHB100 SoCs
+  *
+  * Copyright (C) 2022 StarFive Technology Co.
+  */
+@@ -24,6 +24,7 @@
+ #include <linux/mutex.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
++#include <linux/property.h>
+ #include <linux/reset.h>
+ #include <linux/types.h>
+ #include <linux/workqueue.h>
+@@ -101,6 +102,22 @@ enum starfive_trng_mode {
+ 	PRNG_256BIT,
+ };
+ 
++/*
++ * Power-down ordering of reset assertion vs. clock gating:
++ * SEQ_RST_FIRST - assert reset, then gate the clocks (JH7110).
++ * SEQ_CLK_FIRST - gate the clocks, then assert reset (JHB100). Asserting
++ *                 reset with the clocks running causes reset-domain-crossing
++ *                 glitches that can affect downstream IPs.
++ */
++enum seq_rst_clk {
++	SEQ_RST_FIRST,
++	SEQ_CLK_FIRST,
++};
++
++struct starfive_trng_data {
++	enum seq_rst_clk	seq_rst_clk;
++};
++
+ struct starfive_trng {
+ 	struct device		*dev;
+ 	void __iomem		*base;
+@@ -112,6 +129,7 @@ struct starfive_trng {
+ 	struct completion	random_done;
+ 	struct completion	reseed_done;
+ 	struct work_struct	work;
++	const struct starfive_trng_data *data;
  	u32			mode;
  	u32			mission;
- 	u32			reseed;
-+	bool			clk_on;
-+	bool			rst_deassert;
- 	/* protects against concurrent write to ctrl register */
- 	spinlock_t		write_lock;
- };
-@@ -138,6 +140,60 @@ static inline void starfive_trng_irq_mask_clear(struct starfive_trng *trng)
- 	writel(data, trng->base + STARFIVE_ISTAT);
- }
+ 	bool			need_reseed;
+@@ -209,7 +227,10 @@ static int starfive_trng_power_on(struct starfive_trng *trng)
  
-+static int starfive_trng_power_on(struct starfive_trng *trng)
-+{
-+	int ret;
+ static void starfive_trng_power_off(struct starfive_trng *trng, bool assert_rst)
+ {
+-	if (assert_rst && trng->rst_deassert) {
++	bool clk_first = trng->data->seq_rst_clk == SEQ_CLK_FIRST;
++	bool do_rst = assert_rst && trng->rst_deassert;
 +
-+	if (!trng->clk_on) {
-+		ret = clk_prepare_enable(trng->hclk);
-+		if (ret)
-+			goto err_hclk;
++	if (do_rst && !clk_first) {
+ 		reset_control_assert(trng->rst);
+ 		trng->rst_deassert = false;
+ 	}
+@@ -219,6 +240,11 @@ static void starfive_trng_power_off(struct starfive_trng *trng, bool assert_rst)
+ 		clk_disable_unprepare(trng->hclk);
+ 		trng->clk_on = false;
+ 	}
 +
-+		ret = clk_prepare_enable(trng->ahb);
-+		if (ret)
-+			goto err_ahb;
-+
-+		trng->clk_on = true;
-+	}
-+
-+	if (!trng->rst_deassert) {
-+		ret = reset_control_deassert(trng->rst);
-+		if (ret)
-+			goto err_rst;
-+
-+		trng->rst_deassert = true;
-+	}
-+
-+	return 0;
-+
-+err_rst:
-+	clk_disable_unprepare(trng->ahb);
-+err_ahb:
-+	clk_disable_unprepare(trng->hclk);
-+	trng->clk_on = false;
-+err_hclk:
-+	return ret;
-+}
-+
-+static void starfive_trng_power_off(struct starfive_trng *trng, bool assert_rst)
-+{
-+	if (assert_rst && trng->rst_deassert) {
++	if (do_rst && clk_first) {
 +		reset_control_assert(trng->rst);
 +		trng->rst_deassert = false;
 +	}
-+
-+	if (trng->clk_on) {
-+		clk_disable_unprepare(trng->ahb);
-+		clk_disable_unprepare(trng->hclk);
-+		trng->clk_on = false;
-+	}
-+}
-+
-+static void starfive_trng_power_off_action(void *data)
-+{
-+	starfive_trng_power_off(data, true);
-+}
-+
- static int starfive_trng_cmd(struct starfive_trng *trng, u32 cmd, bool wait)
- {
- 	int wait_time = 1000;
-@@ -174,6 +230,13 @@ static int starfive_trng_init(struct hwrng *rng)
- {
- 	struct starfive_trng *trng = to_trng(rng);
- 	u32 mode, intr = 0;
-+	int ret;
-+
-+	ret = pm_runtime_resume_and_get(trng->dev);
-+	if (ret < 0) {
-+		dev_err(trng->dev, "Failed to wake device for init: %d\n", ret);
-+		return ret;
-+	}
- 
- 	/* setup Auto Request/Age register */
- 	writel(autoage, trng->base + STARFIVE_AUTO_AGE);
-@@ -201,7 +264,11 @@ static int starfive_trng_init(struct hwrng *rng)
- 
- 	writel(mode, trng->base + STARFIVE_MODE);
- 
--	return starfive_trng_cmd(trng, STARFIVE_CTRL_EXEC_RANDRESEED, 1);
-+	ret = starfive_trng_cmd(trng, STARFIVE_CTRL_EXEC_RANDRESEED, 1);
-+
-+	pm_runtime_put_autosuspend(trng->dev);
-+
-+	return ret;
  }
  
- static irqreturn_t starfive_trng_irq(int irq, void *priv)
-@@ -234,12 +301,17 @@ static irqreturn_t starfive_trng_irq(int irq, void *priv)
- static void starfive_trng_cleanup(struct hwrng *rng)
- {
- 	struct starfive_trng *trng = to_trng(rng);
-+	int ret;
+ static void starfive_trng_power_off_action(void *data)
+@@ -507,7 +533,11 @@ static int starfive_trng_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+ 	platform_set_drvdata(pdev, trng);
 +
-+	ret = pm_runtime_resume_and_get(trng->dev);
-+	if (ret < 0) {
-+		dev_err(trng->dev, "Failed to wake device for cleanup: %d\n", ret);
-+		return;
-+	}
+ 	trng->dev = dev;
++	trng->data = device_get_match_data(dev);
++	if (!trng->data)
++		return dev_err_probe(dev, -ENODEV, "No match data\n");
  
--	writel(0, trng->base + STARFIVE_CTRL);
-+	writel(STARFIVE_CTRL_EXEC_NOP, trng->base + STARFIVE_CTRL);
- 
--	reset_control_assert(trng->rst);
--	clk_disable_unprepare(trng->hclk);
--	clk_disable_unprepare(trng->ahb);
-+	pm_runtime_put_sync_suspend(trng->dev);
- }
- 
- static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-@@ -247,7 +319,11 @@ static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wai
- 	struct starfive_trng *trng = to_trng(rng);
- 	int ret;
- 
--	pm_runtime_get_sync(trng->dev);
-+	ret = pm_runtime_resume_and_get(trng->dev);
-+	if (ret < 0) {
-+		dev_warn_ratelimited(trng->dev, "Failed to wake device for read: %d\n", ret);
-+		return ret;
-+	}
- 
- 	if (trng->mode == PRNG_256BIT)
- 		max = min_t(size_t, max, (STARFIVE_RAND_LEN * 8));
-@@ -270,7 +346,7 @@ static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wai
- 	ret = max;
- 
- out_put:
--	pm_runtime_put_sync_autosuspend(trng->dev);
-+	pm_runtime_put_autosuspend(trng->dev);
- 	return ret;
- }
- 
-@@ -320,17 +396,13 @@ static int starfive_trng_probe(struct platform_device *pdev)
- 		return dev_err_probe(&pdev->dev, PTR_ERR(trng->rst),
- 				     "Error getting hardware reset line\n");
- 
--	ret = clk_prepare_enable(trng->hclk);
--	if (ret)
--		return ret;
--
--	ret = clk_prepare_enable(trng->ahb);
-+	ret = starfive_trng_power_on(trng);
- 	if (ret)
--		goto disable_hclk;
-+		return dev_err_probe(&pdev->dev, ret, "Failed to power on\n");
- 
--	ret = reset_control_deassert(trng->rst);
-+	ret = devm_add_action_or_reset(&pdev->dev, starfive_trng_power_off_action, trng);
- 	if (ret)
--		goto disable_ahb;
-+		return ret;
- 
- 	trng->rng.name = dev_driver_string(&pdev->dev);
- 	trng->rng.init = starfive_trng_init;
-@@ -343,71 +415,55 @@ static int starfive_trng_probe(struct platform_device *pdev)
- 
- 	pm_runtime_use_autosuspend(&pdev->dev);
- 	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
--	pm_runtime_enable(&pdev->dev);
-+
-+	ret = devm_pm_runtime_set_active_enabled(&pdev->dev);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to enable runtime PM\n");
- 
- 	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
--	if (ret) {
--		pm_runtime_disable(&pdev->dev);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
- 
--		reset_control_assert(trng->rst);
--		ret = dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
--		goto disable_ahb;
--	}
-+	pm_runtime_idle(&pdev->dev);
- 
- 	return 0;
--
--disable_ahb:
--	clk_disable_unprepare(trng->ahb);
--disable_hclk:
--	clk_disable_unprepare(trng->hclk);
--
--	return ret;
- }
- 
--static int __maybe_unused starfive_trng_suspend(struct device *dev)
-+static int starfive_trng_suspend(struct device *dev)
- {
- 	struct starfive_trng *trng = dev_get_drvdata(dev);
- 
--	clk_disable_unprepare(trng->hclk);
--	clk_disable_unprepare(trng->ahb);
-+	starfive_trng_power_off(trng, false);
- 
+ 	trng->base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(trng->base))
+@@ -617,8 +647,17 @@ static int starfive_trng_resume(struct device *dev)
  	return 0;
  }
  
--static int __maybe_unused starfive_trng_resume(struct device *dev)
-+static int starfive_trng_resume(struct device *dev)
- {
- 	struct starfive_trng *trng = dev_get_drvdata(dev);
- 	int ret;
- 
--	ret = clk_prepare_enable(trng->hclk);
--	if (ret)
--		return ret;
--
--	ret = clk_prepare_enable(trng->ahb);
-+	ret = starfive_trng_power_on(trng);
- 	if (ret)
--		clk_disable_unprepare(trng->hclk);
-+		dev_err(dev, "Failed to power on: %d\n", ret);
- 
- 	return ret;
- }
- 
--static const struct dev_pm_ops starfive_trng_pm_ops = {
--	SET_SYSTEM_SLEEP_PM_OPS(starfive_trng_suspend,
--				starfive_trng_resume)
--	SET_RUNTIME_PM_OPS(starfive_trng_suspend,
--			   starfive_trng_resume, NULL)
--};
--
- static const struct of_device_id trng_dt_ids[] __maybe_unused = {
- 	{ .compatible = "starfive,jh7110-trng" },
++static const struct starfive_trng_data jh7110_data = {
++	.seq_rst_clk = SEQ_RST_FIRST,
++};
++
++static const struct starfive_trng_data jhb100_data = {
++	.seq_rst_clk = SEQ_CLK_FIRST,
++};
++
+ static const struct of_device_id trng_dt_ids[] = {
+-	{ .compatible = "starfive,jh7110-trng" },
++	{ .compatible = "starfive,jh7110-trng", .data = &jh7110_data },
++	{ .compatible = "starfive,jhb100-trng", .data = &jhb100_data },
  	{ }
  };
  MODULE_DEVICE_TABLE(of, trng_dt_ids);
- 
-+static DEFINE_RUNTIME_DEV_PM_OPS(starfive_trng_pm_ops,
-+				 starfive_trng_suspend, starfive_trng_resume, NULL);
-+
- static struct platform_driver starfive_trng_driver = {
- 	.probe	= starfive_trng_probe,
- 	.driver	= {
- 		.name		= "jh7110-trng",
--		.pm		= &starfive_trng_pm_ops,
-+		.pm		= pm_ptr(&starfive_trng_pm_ops),
- 		.of_match_table	= of_match_ptr(trng_dt_ids),
- 	},
- };
 -- 
 2.43.0
 
