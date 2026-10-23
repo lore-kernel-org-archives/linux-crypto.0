@@ -1,58 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792767729;
-	b=wHHWPtbV4xWHCzAgbjiKF+illjujxOpclAdZA5aDX9EZtvBEQ0aoFfvByAxri5D6Eizq
-	 0EdauW6Vtu3wHqnupY49iv36b7GhCyXloCtF+qJf2dep7y0Qd6gUCJwgzhCMrLKNpl35y
-	 3oOvIoiIYiHq7BfqpCn6TikiY1GWeCTW9NG+z+veelNm3BroD13vEKOJR0Q2Xo3MNt9iF
-	 R5XZxTOscrMGNEdLEO5jY1l8dKkI4U9Y+J/Aez4xyMjvPXscd0wNjA2cZVj47ICGXtZjo
-	 NYhfEdUAuJaIVSnQKa3IKMrQLpy1g6XZI1FJmKAKxvjN6wM5J+6wu0uAkcu29ZA4pfA==
+	t=1792767790;
+	b=ID40DpmFCmUBoEMyKKVLc86qlVW+NB2GX7kBXNWKnR69n/IwQrMfN8c26tlQ0yCUjbpY
+	 IJbbNqSdGToFAbqPWpvxbhb0bW9/wl7HKxnfxlt0uHfao+xSo8wPMo8sBpho6b43+TlrT
+	 eWlIL9pvwS/7jRke+WHVqADWQgXZT2OELlbHVM6NEHHXMMRyhiL0uLzx/XmSJxckQnmyl
+	 kRhhhIODPmLqEQJ1Sg4CrA4Err0yJRm2IZfcbzy6UiRPT764lJeHjBXoKgH8BDvtruifQ
+	 Yr7DNRMmuXvdSrqJe4VZh/zCygg55bsHDEb1GmHem30H3BpAzA3aMLz2p5yKIooRhJw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792767729;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792767790;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=40npNaO/CAIYgaafFVlOFrpqvGXYpB6rCNNlSz+oZlI=;
-	b=ECWtSIg4CMItes2V9kbUVQvzM8k8csh8A1s+RS77Vvg9v6syg2ugXf6kX6rPWYija7Qs
-	 z+x5jasiWndYpe3l6pfgO5DrI9HzXljzHKbAVbXu1IhIIifM9mSCZWX6Ejdo/aPsFC035
-	 MUzVpz1j5oxJk0UPPr/bYBildBDBHwTpYnuLLdsstBQhfE/9TP0otnyNHR/6nfMpVX731
-	 PCmjLMPuLSUyvGydR0/f98tRFbBM94MDtzomAhtovXwWamG8koF3Ort0JEH+DFAZYLg1/
-	 6lVGphoQE+8KirOkEZta85rQsw7ClxMgwV2XN9n7pd3lDc6KjHa2l27y4vEXP81Y30g==
+	bh=z7qR/v0wocJ0R3JNIRj87WuyPyBlIUOLaKSV/MnntGc=;
+	b=4dVmJ2izGWQeROl9zEs9h6xIWDvb5EUrDjLYERJuWgFjx2wDtrShJmhU1KT+T1maSYBY
+	 pxmyYkucttgpPrINBPMkY3grkvEU+I0LcVvhCSDp2Sylz0Zg13PoXNskT6/TXByOQ2UEv
+	 ydrrDp+3rmeWuT12sjGDhLtuhYglC+Iru0v1ASW1o01wnDOEMzY3Cuk0vPv5zfU8V9gcV
+	 p8wUUr59iFCmbk+Oh1nD5y3yPsYsEj1WWo5cJzJf1+/DQv+2Njlq5SLTBVu/Idul683eG
+	 w+yieF8Twgcp7GFP7n1pANizQCWKbWn6swJzNEgZLQeUtrJI9ejPSXsHRaFAwNyKNSQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="UsI/kHRK";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P5QIUU6v;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BE3606A31B
-	for <linux-crypto@vger.kernel.org>; Fri, 23 Oct 2026 15:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED01606A31A
+	for <linux-crypto@vger.kernel.org>; Fri, 23 Oct 2026 15:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UsI/kHRK
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50FF31F01825;
-	Fri, 23 Oct 2026 15:02:08 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P5QIUU6v
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E5741F01825;
+	Fri, 23 Oct 2026 15:03:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792767728;
-	bh=40npNaO/CAIYgaafFVlOFrpqvGXYpB6rCNNlSz+oZlI=;
+	s=k20260515; t=1792767789;
+	bh=z7qR/v0wocJ0R3JNIRj87WuyPyBlIUOLaKSV/MnntGc=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=UsI/kHRKVvy5B0X45pDxIep+XAywRrtKzCLsA7AKKeRR4k/mpKi+xsbQprQD/6bko
-	 N07beNh2V7aAj3U/WkELVqvKk9hDs7d5jhIC/sKG9tXYTcunBE58xckWo5c6y1vXEr
-	 q4kTm8N6EwNbzXxYcF1El/9/ISt2KYatsV/sG71SEOR/oMkomlJtwA0kGMEn5uBvO/
-	 goY+L9B4eutV6cKt69uzFajRRoO5MURCXkrKt3+OME0GHZL1OK3OyKFJZROriglnVC
-	 DfoMMA+J/PAH/RnnA0dE0WXSPffu36e1qtDRNwFYYAQNr8v26CFeBiMPBWjrriSeBF
-	 xFcV9lz7XIqcQ==
-Message-ID: <sashiko-outbox-182888@kernel.org>
+	b=P5QIUU6vqN5MvC2GMA/8+YbXDMDSclbTncdYjzVztXYRLM9gA1hxtKsgFKGRiPPCz
+	 gCejJZyP9EdqErSYh6eFrON5mxWYrXdc7E3dYCM0Po7Bf7X1NniV7MnmPQSjVYATnz
+	 jgsqT1T2JupesuzanUzKMDwTqF6TQFahyXF6LlM93mrq0fiFhYYoFwmGdDOzwTH2+t
+	 Tn68xQjuAzLZsF1KwyEv0eGSU0IMThdnp8u6uZ3GCVFwxXYV7WqRNEwCB5eK+85ct3
+	 3EnpVxEG3rJDOoArDdTlSOmGunDqlY8N3BbRMBbE8M18YV0ac9P0Rw9aPPnW+zvP30
+	 DDDwO7IDe2xUA==
+Message-ID: <sashiko-outbox-182890@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH RESEND 2/2] Documentation: qat: document three-service
- mode for QAT GEN5 devices
+Subject: Re: [PATCH RESEND 1/2] crypto: qat - enable three-service mode for
+ QAT GEN5 devices
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Ahsan Atta" <ahsan.atta@intel.com>, herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com, "Bairavi Alagappan" <bairavix.alagappan@intel.com>, "Giovanni
  Cabiddu" <giovanni.cabiddu@intel.com>
-In-Reply-To: <20261023144835.170453-3-ahsan.atta@intel.com>
+In-Reply-To: <20261023144835.170453-2-ahsan.atta@intel.com>
 References: <20261023144835.170453-1-ahsan.atta@intel.com>
- <20261023144835.170453-3-ahsan.atta@intel.com>
+ <20261023144835.170453-2-ahsan.atta@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 Oct 2026 15:02:07 +0000
+Date: Fri, 23 Oct 2026 15:03:08 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,72 +64,110 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Medium] crypto: qat - stale rl_data.svc_ae_mask in adf_420xx_dev_config()
+- [Medium] crypto: qat - unrestored rl_data.svc_ae_mask in adf_420xx_dev_co=
+nfig()
 --
 
-commit 0c0ee10ffff8629021fbc1b8499eb78f471d4264
+commit 84452d0273c635ae08ee4c142e1d46cbf85da2de
 Author: Bairavi Alagappan <bairavix.alagappan@intel.com>
 
-Documentation: qat: document three-service mode for QAT GEN5 devices
+crypto: qat - enable three-service mode for QAT GEN5 devices
 
-This commit updates the sysfs ABI documentation for cfg_services to note
-that QAT GEN5 devices (qat_420xx driver) support combining up to three
-concurrent services.
+This commit adds support for enabling symmetric crypto, asymmetric crypto,
+and compression services concurrently on QAT GEN5 (qat_420xx) devices. It
+defines the firmware object layout, ring-to-service mapping,
+thread-to-arbiter mapping, and rate-limiting accelerator engine accounting
+for three-service mode.
 
-> diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/A=
-BI/testing/sysfs-driver-qat
-> index b0561b9fc4eb9..48e17de3e0fdb 100644
-> --- a/Documentation/ABI/testing/sysfs-driver-qat
-> +++ b/Documentation/ABI/testing/sysfs-driver-qat
-> @@ -41,8 +41,8 @@ Description:	(RW) Reports the current configuration of =
-the QAT device.
-> =20
->  		Service combinations are permitted for all services except dcc.
->  		On QAT GEN4 devices (qat_4xxx driver) a maximum of two services can be
-> -		combined and on QAT GEN6 devices (qat_6xxx driver ) a maximum of three
-> -		services can be combined.
-> +		combined. On QAT GEN5 devices (qat_420xx driver) and GEN6 devices
-> +		(qat_6xxx driver) a maximum of three services can be combined.
+> diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c b/dri=
+vers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
+> index 19f9f738630b1..281067f5b60c5 100644
+> --- a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
+> +++ b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
+
+[ ... ]
+
+> @@ -425,6 +450,79 @@ static void adf_gen4_set_err_mask(struct adf_dev_err=
+_mask *dev_err_mask)
+
+[ ... ]
+
+> +static void adf_update_rl_data(struct adf_rl_hw_data *rl_data)
+> +{
+> +	unsigned int num_groups;
+> +	unsigned int i;
+> +
+> +	num_groups =3D ARRAY_SIZE(adf_fw_asym_sym_dc_config) - ADF_GEN4_ADMIN_A=
+CCELENGINES;
+> +
+> +	memset(rl_data->svc_ae_mask, 0, sizeof(rl_data->svc_ae_mask));
+> +
+> +	for (i =3D 0; i < num_groups; i++) {
+> +		switch (adf_fw_asym_sym_dc_config[i].obj) {
+> +		case ADF_FW_ASYM_OBJ:
+> +			rl_data->svc_ae_mask[SVC_ASYM] +=3D
+> +				hweight32(adf_fw_asym_sym_dc_config[i].ae_mask);
+> +			break;
+> +		case ADF_FW_SYM_OBJ:
+> +			rl_data->svc_ae_mask[SVC_SYM] +=3D
+> +				hweight32(adf_fw_asym_sym_dc_config[i].ae_mask);
+> +			break;
+> +		case ADF_FW_DC_OBJ:
+> +			rl_data->svc_ae_mask[SVC_DC] +=3D
+> +				hweight32(adf_fw_asym_sym_dc_config[i].ae_mask);
+> +			break;
+> +		default:
+> +			break;
+> +		}
+> +	}
+> +}
+> +
+> +static int adf_420xx_dev_config(struct adf_accel_dev *accel_dev)
+> +{
+> +	int ret;
+> +
+> +	ret =3D adf_gen4_dev_config(accel_dev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (adf_get_service_enabled(accel_dev) =3D=3D SVC_SYM_ASYM_DC)
+> +		adf_update_rl_data(&GET_HW_DATA(accel_dev)->rl_data);
+> +
+> +	return 0;
+> +}
 
 [Severity: Medium]
-When reconfiguring cfg_services on a QAT 420xx device from three-service
-mode (sym;asym;dc) back to a one- or two-service mode via sysfs, does
-rl_data.svc_ae_mask retain stale three-service engine counts?
+During probe, adf_init_hw_data_420xx() -> adf_init_rl_data() ->
+adf_gen4_init_num_svc_aes() initializes rl_data.svc_ae_mask to ae_cnt - 1
+(16 on an unfused 420xx device) for SVC_ASYM, SVC_SYM, and SVC_DC.
 
-During probe, adf_probe() -> adf_init_hw_data_420xx() -> adf_init_rl_data()
-calls adf_gen4_init_num_svc_aes(), initializing hw_data->rl_data.svc_ae_mask
-to 16 worker engines for each service.
+When the device is brought down via sysfs, configured to SVC_SYM_ASYM_DC,
+and brought back up via state_store() -> adf_dev_up(accel_dev, true) ->
+adf_420xx_dev_config(), adf_update_rl_data() overwrites rl_data.svc_ae_mask
+in-place with {SVC_ASYM: 4, SVC_SYM: 4, SVC_DC: 8, SVC_DECOMP: 0}.
 
-When a user configures three-service mode via cfg_services and brings the
-device up via state_store() -> adf_dev_up() -> adf_420xx_dev_config(),
-rl_data.svc_ae_mask is overwritten in-place by adf_update_rl_data() with the
-three-service engine counts (4 for asym, 4 for sym, and 8 for dc):
+If the device is subsequently brought down, reconfigured via cfg_services
+to a 1-service or 2-service mode, and brought back up,
+adf_420xx_dev_config() has no else branch (such as calling
+adf_gen4_init_num_svc_aes()) to restore rl_data.svc_ae_mask.
 
-drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c:
-static int adf_420xx_dev_config(struct adf_accel_dev *accel_dev)
-{
-	int ret;
+Additionally, if cfg_services is modified while the device is down and
+SR-IOV is then enabled, adf_sriov_configure() -> adf_do_enable_sriov()
+brings the device up with config set to false:
 
-	ret =3D adf_gen4_dev_config(accel_dev);
-	if (ret)
-		return ret;
-
-	if (adf_get_service_enabled(accel_dev) =3D=3D SVC_SYM_ASYM_DC)
-		adf_update_rl_data(&GET_HW_DATA(accel_dev)->rl_data);
-
-	return 0;
+drivers/crypto/intel/qat/qat_common/adf_sriov.c:adf_do_enable_sriov() {
+	...
+	ret =3D adf_dev_up(accel_dev, false);
+	...
 }
 
-If the user then brings the device down, changes cfg_services back to a
-one- or two-service configuration (such as sym;asym or dc), and brings the
-device up again, adf_get_service_enabled(accel_dev) is no longer
-SVC_SYM_ASYM_DC, and nothing in adf_420xx_dev_config(), adf_dev_down(), or
-adf_dev_up() resets rl_data.svc_ae_mask.
+which bypasses adf_420xx_dev_config() and adf_update_rl_data() before
+adf_rl_start() initializes rate limiting.
 
-When adf_rl_start() or subsequent SLA operations calculate rate-limiting
-cycle budgets in drivers/crypto/intel/qat/qat_common/adf_rl.c:
+In both cases, adf_rl_calculate_ae_cycles() will read stale AE counts via
+adf_rl_get_num_svc_aes():
 
-adf_rl_calculate_ae_cycles() {
+drivers/crypto/intel/qat/qat_common/adf_rl.c:adf_rl_calculate_ae_cycles() {
 	...
 	avail_ae_cycles =3D hw_data->clock_frequency;
 	avail_ae_cycles *=3D adf_rl_get_num_svc_aes(accel_dev, svc_type);
@@ -137,12 +175,10 @@ adf_rl_calculate_ae_cycles() {
 	...
 }
 
-wouldn't adf_rl_get_num_svc_aes() read the stale three-service svc_ae_mask
-values and under-allocate SLA cycle budgets (1/4 of the intended budget for
-sym/asym and 1/2 for dc), and should adf_420xx_dev_config() have an else
-branch calling adf_gen4_init_num_svc_aes(&GET_HW_DATA(accel_dev)->rl_data)
-to restore svc_ae_mask?
+Can this cause miscalculated rate-limiting AE cycle budgets (ae_util_cir
+and ae_util_pir) to be programmed into firmware after service
+reconfiguration or when enabling SR-IOV?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261023144835.1704=
-53-1-ahsan.atta@intel.com?part=3D2
+53-1-ahsan.atta@intel.com?part=3D1
