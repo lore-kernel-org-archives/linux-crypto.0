@@ -1,54 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792970869;
-	b=k8lSRiXRg8EQ+nD7l8PkYFdmmgV9sJPANC9SYKGrbys3qIhnQCniI2Hs9rtVJ1HG2N0J
-	 SBMcPFxjb4VfTRfURk2dUihP6+WlrZwcehC3JW1WgW67Fl5kp/fN028L2gsQE4XScVLwt
-	 K1KbeS+EAL75t2LXXvb2Zi9+AndE96Z2xMPg7dfS6rLWZw43wBuKO1reL9GHRChCsFHlw
-	 IShgXtwunyZHAdVLDC773Lr0iSf/87Hal7rfjhKXI9yJsQeVq/lTJeMKXibnsJfr3dVVP
-	 /mvwy2Q0dUAOMjYGTIax78JIxqlyC9VMN2bKAYw8UoU07Twtn7Ctq51nksHVnk26iKQ==
+	t=1792970925;
+	b=G19vOtxj1HuCSsO/ZOFyCXSO1BQcDbZkP/Z99Gc3RmHIN+kvHCcQWqQfPxyMI7zh8+TU
+	 uKQ/2VD/UNJnutpOguSprtg0PL9nQ6P3+jqGCRquAexwVxiUMVXxMfBpDTDEuk7z9tFBM
+	 LOKjuuFAQ3D7UArXl4ie8OmVbJkWPJsU8l+dgH1izVPVDtBKmcyOyaPUeu2aak9NxU1a1
+	 0phd3PcCSxh1B3WWRrgpGrcwXjMCaaKoL7gR/Bf9vtjWC/pNMwGW0etJJzTge6WR2zVUd
+	 +sqsaWg5+HFT0fAoUfa7FV3N8BrUdA6xrpij250DkXzxa3cZkp3mOZiCKZFwMlpbtKQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792970869;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792970925;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=749F1kNMvONRb00QECAoqsVJNtCXAyhqfBI03/TRF+Q=;
-	b=zDHN7axJXe4HpNdvlmf+PX0mN0fUo/bApr9+RwLJQ9AFK+mtRhXg9KXW6kl2dlQKlqz2
-	 wAxdHSsa5WYWQWwLv4PU29OqqI8e/0VJiI4IWxwuzPTfGnRjWktGzblGfG0qFsmVgYs52
-	 V5enuH0O8eRAInEyRL9UhkzKs6hEN/J+UJd/Vq1xNR3Nrx32e/TRTeasYBUi//O4rKsAU
-	 PRYSJ10ibcfvA3CWfYsq+g2sP1Qa3n3tEH2+Ti48nIGaQctd/vIGW5IGv/Xlc9aspoG46
-	 /cO2UMqLIFs/gCPspoQVd/DfrCPXaB7As5Q0v2VZKzKR3AD+HdPymiwDW+vc+RaFTIQ==
+	bh=iEFI99ZyRARrz+clfOCd9HOuHHG5pJ8vfkDQ7OOdfSo=;
+	b=Jerp4rKiYfX+SZr2zLPDYiRI8z9gCTHydeENwLehIp7pCLAuTYQdiThxX3eSoW9eVrRw
+	 l3PRlWLBJJ79gyWsfUIk1qphuMgr8KzlL0baO9eCZh2efw5yX4XJtkTch3t3netSQo7Mj
+	 LMHNyRenyskYchaGmrTteur3r6mod3k6idtVxXCeF+9YX7vI0uYTDtQMknou5aoBJ9ILe
+	 8QoeiMdyE2VkESwT4K0exiJp09+pir/ePLoaJz1nXd3Bp+rVJHxVZ9HfJSkntoK06aYSo
+	 Zek8l2/Zr5V4SwyuaY85l60C+LOL2ti1Vey8dLBhfOb2I80owB2RnQd/sdhmQyRJodA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jZaigJSZ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d9sK3mpQ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE74C606A31A;
-	Sun, 25 Oct 2026 23:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 712D0606A31A;
+	Sun, 25 Oct 2026 23:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jZaigJSZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39C081F01825;
-	Sun, 25 Oct 2026 23:27:48 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d9sK3mpQ
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 6F7BD1F01825;
+	Sun, 25 Oct 2026 23:28:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792970868;
-	bh=749F1kNMvONRb00QECAoqsVJNtCXAyhqfBI03/TRF+Q=;
+	s=k20260515; t=1792970925;
+	bh=iEFI99ZyRARrz+clfOCd9HOuHHG5pJ8vfkDQ7OOdfSo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jZaigJSZwL7yGLaLiqgMfXUpeXaWekbhNHRqoHeQY4Vp0sG8lH8VJwO4QCsu/bV39
-	 MevoG+esrRiIHwiwRVoQeDX08/+NmXYcQxoSnck04aKhAAx8W7Q4I4pD+Rs0nsnxgl
-	 rm5a4H18XiVBmnFE+RSQJEKeHf/esvQ0bxW9KjWOaSK+ifut5acrNlxY9mR2pM2+4F
-	 LTYl4z7NsoMV7XpdOpNfxXZBI1AlhKWyJQzpqtm+BgenDyQjzkt9Yo/jZQZTrCKEXy
-	 rZ8I54cmR+/cjCIdK0s3yi8v/v4RuMM1wEB744OlcJCGaAyF8viaYaJck2b2mhgKxx
-	 O3VJfq8NeiuPA==
-Date: Sun, 25 Oct 2026 16:27:46 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Yuqi Xu <xuyuqiabc@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH RESEND] wifi: mac80211: Fix cryptographic MAC comparison
- to be constant-time
-Message-ID: <20261025232746.GB148998@quark>
-References: <20261025210032.134911-1-ebiggers@kernel.org>
- <676effaff715929da980158820833c18a3a2845c.camel@sipsolutions.net>
+	b=d9sK3mpQsKcEaXApFMwJIPwqCQE4dCIlv8zM+5Jajz71RXH/7OVSjeoTSpu149hSx
+	 zNNb05tZGEm3EMqefMWzkaqf8gSha0Cs6H8UsNCa1rpuATeaJJcJLe5/7rKu387820
+	 mg1p4GEUSeKwehMWx/B0zckxM/NO7c/c39LHFHRia+LStyQWE4dR3zD9IIPZ7yeDq0
+	 7eIR010xxbrhbVwDn6GuIo2TqK8fcWKKaxpsvretOyKwS/A61P2w0jcpnzzORugtRz
+	 uih8UQ2BF+YmPxyUlqc7Wx2nbFOpBG78DBL5dnPltoHHYHqyNoUaR/P8g1kEdb6a8O
+	 yQjX6erBxolmA==
+Date: Mon, 26 Oct 2026 01:28:41 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] tpm: Check return value of crypto_kpp_set_secret()
+Message-ID: <at6QqYWELUtDqUUT@kernel.org>
+References: <20261025211119.138277-1-ebiggers@kernel.org>
+ <at5-ve5Ap7Oyp1Fo@kernel.org>
+ <20261025224723.GA148998@quark>
+ <at6MlY1kpfa01tr4@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,43 +63,69 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <676effaff715929da980158820833c18a3a2845c.camel@sipsolutions.net>
+In-Reply-To: <at6MlY1kpfa01tr4@kernel.org>
 
-On Sun, Oct 25, 2026 at 10:37:47PM +0100, Johannes Berg wrote:
-> On Sun, 2026-10-25 at 14:00 -0700, Eric Biggers wrote:
-> > To prevent timing attacks, the comparison of cryptographic message
-> > authentication codes (MACs) needs to have data-independent timing.
-> > Replace the memcmp() with the correct function, crypto_memneq().
+On Mon, Oct 26, 2026 at 01:11:21AM +0200, Jarkko Sakkinen wrote:
+> On Sun, Oct 25, 2026 at 03:47:23PM -0700, Eric Biggers wrote:
+> > On Mon, Oct 26, 2026 at 12:12:13AM +0200, Jarkko Sakkinen wrote:
+> > > On Sun, Oct 25, 2026 at 02:11:19PM -0700, Eric Biggers wrote:
+> > > > crypto_kpp_set_secret() can fail, for example if the kernel is booted
+> > > > with fips=1 and the broken-by-design FIPS RNG used for ECC private key
+> > > > generation doesn't feel like generating random bytes at the moment.
+> > > > Check for error, cancelling the TPM session creation rather than
+> > > > proceeding with a zero or uninitialized private key.
+> > > > 
+> > > > Fixes: 699e3efd6c64 ("tpm: Add HMAC session start and end functions")
+> > > > Cc: stable@vger.kernel.org
+> > > > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> > > > ---
+> > > >  drivers/char/tpm/tpm2-sessions.c | 4 +++-
+> > > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
+> > > > index ca1e2bf424e14..2aaaad69760dc 100644
+> > > > --- a/drivers/char/tpm/tpm2-sessions.c
+> > > > +++ b/drivers/char/tpm/tpm2-sessions.c
+> > > > @@ -527,7 +527,9 @@ static int tpm_buf_append_salt(struct tpm_buf *buf, struct tpm_chip *chip,
+> > > >  	}
+> > > >  	crypto_ecdh_encode_key(encoded_key, buf_len, &p);
+> > > >  	/* this generates a random private key */
+> > > 
+> > > Could you delete this comment while at it? It's not helping with
+> > > anything.
+> > > 
+> > > > -	crypto_kpp_set_secret(kpp, encoded_key, buf_len);
+> > > > +	rc = crypto_kpp_set_secret(kpp, encoded_key, buf_len);
+> > > > +	if (rc)
+> > > > +		goto err_free_kpp;
+> > > >  
+> > > >  	/* salt is now the public point of this private key */
+> > > >  	req = kpp_request_alloc(kpp, GFP_KERNEL);
+> > > > 
 > > 
-> > Fixes: 39404feee691 ("mac80211: FILS AEAD protection for station mode association frames")
-> > Cc: stable@vger.kernel.org
+> > I actually think the comment is helpful, because of how unreadable the
+> > crypto_kpp API is.  It's generating a private key, but to request that,
+> > crypto_kpp apparently requires that an empty key be encoded into a byte
+> > string.  Then that key is "set", which actually generates a new key.
 > > 
+> > In comparison, the Curve25519 equivalent is
+> > curve25519_generate_secret(), which is clearly named and also always
+> > succeeds.  At some point we need to fix the ECDH API...
 > 
-> I'll apply this if you either come up with an actual attack, or stop
-> pretending it's a bug.
+> Ah, right it gets zero filled echd. I've not consciously thought this
+> detail before, thanks :-)
+> 
+> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > 
+> > - Eric
+> 
+> tpm2-sessions overall would need some refurbishing work now that also
+> Matthew's hibernate patches depend on it. I have to take a serious
+> look at it some point.
 
-I don't have time to set up a system using IEEE 802.11ai and try to
-exploit this to forge a frame, sorry.  Especially when we fix timing
-bugs like this all the time.  Realistically, these types of bugs are
-usually hard to exploit (e.g., involving sending a lot of packets and
-doing statistical analysis) and can be the topic of a research paper.
-But that doesn't mean they don't exist or aren't obvious bugs.
+I'll apply this after Linus has accepted/rejected my TPM pull request.
 
-You can find more details about such bugs at external sources such as
-https://blog.canutethegreat.com/index.php/2026/10/04/timing-side-channels-constant-time-comparison/
-A memcmp of HMAC values (16 bytes, which coincidentally is the same
-length here) was also exploited in the Xbox 360 to install arbitrary
-code.  That example is covered in cryptography textbooks.
+I'm not sure if it already is but if it isn't, probably also at
+linux-integrity turning on Sashiko would make sense.
 
-The use of AES-SIV here does seem to remove some flexibility for the
-attacker over a MAC by itself, due to the synthetic IV.  But that gets
-defeated by frames with zero-length ciphertexts, as far as I can tell,
-which can still include arbitrary IEs as associated data in addr[4].
-
-Understood that you don't want to fix this bug now, though you've
-accepted similar fixes in the past such as 98c67d187db7.  It will still
-need to be fixed at some point anyway unless this code is dropped.
-Perhaps you could consider at least applying it without the tags for
-now, and we can consider the stable backport separately later.
-
-- Eric
+Br, Jarkko
