@@ -1,62 +1,71 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792887155;
-	b=cid9ebUoXSjJYsdEelqwM/DUDni9PJKj0Jl63A5iaIvi1XmqrPiTJucvD4W5wD8fVeyD
-	 drNyg1gZhXP+urhk23yE1rsmexILK1wSBvWQ9GNPlJCuEmqYYgHEElW5a/Balnx3OOGQ8
-	 BxNxG7OFDYEC3VUN72WRiHv/mYSLGx4RxKuxKUv7LZ/iPM1SRTWIv3skP2Hx9IbSQJxxx
-	 pQNqwZLaw88+2XP8KV53+ylBXLuz34dZ1sxcCFgu951sHDYHOlFX/vvzWblbEXHXD8EBN
-	 rNVdLh/wyQR79JRyDKj3VZp8fUaBj+etDqO7AW7Cz0yL0q1oXRtUAYLKQfCJwxGtnXA==
+	t=1792887176;
+	b=NwKnKY2fFuhH8gLBZ1TmFNqveR1PExQI5Kv6Muzd2dgxbTH6/ACikFfaf0BUSrgEYf3k
+	 LAUc+74BwNB6q2Fb4wZkcXwMPuorxAcpp1zm1/8Rqz9XvU41uQMpb+NyrPsFvjScNXfPV
+	 hy+xGJCQq0a30EichY9rjtEupbdsStdyeHLMD6YN8Jf5T+K8roYb0cUD8cEtorkz9onDX
+	 ki17mXfFLZEzWXyKAXD/9V+RyJQ+1owOrsD9TKMYBAaAFww7Uh7lZ9PVEA++DmC9Un7+u
+	 zz4iLApgWswotE0utrsiKVIMqNOtrbAxN+fImxql7p/DZTJeK4/rQPxDuDowOemW/7w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792887155;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792887176;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=b+eILJFlDV6llSi+zsKcgcT/a5uVxyCuHIFWGw5xWyM=;
-	b=2Pzdxe7NR0RX7FgLWoUzDXIFsIbZJQOEdwc+7MWFAiPoXMrEPU+Cdw1R9OXqI4svptMp
-	 DIr9Lou+rdMN/swuEumD03eQ9EQFzml3Fj/xHJSQDsQDqxYGLN/hRGlb6ky99eBaaKIi8
-	 fPVI6uBFryls/jD8cofRAu66JT0GwUPtH9TkmRFF1LDFKcC7V0080IoL0qUFtjf8k5pm0
-	 DoJrelcP0Yez1YWzRl1oWwATkcI3k4ZJn7EIdwew9sOyYrBphkOOaXmt3So/+qasRsAkL
-	 L6AJaRuIorjnbETGu6w3m1BOAgWICXT02AOg/oLN86ivipd/hzfjicdcx5BQ0IZjPZg==
+	 In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=nsjfoidfR9qoxO6Yj3BXsJZWq/dthhO95vRlMQjqpFA=;
+	b=xnmkEivVVAWjXOH7/rcQg2QfWmOfKNg2V/+C2TErDUTblCLiN0AWI3zLZToRt8EnAHDW
+	 KacTChoTb6sSxlZBb/5ilu/6aIkLmzVwIazMkuoetZMOsLJSqt35L1V46/B+O0qmDhysU
+	 wTpBW6NDu+LAnXT6XSsrWUzGVWO4ZH7rxEpQecBduqKKAT7mSN08gJ7WYfe1b07YJg7bj
+	 BomZMatPHluhr+gVJt2f2Gyd3kdDKQU7Dd6n/MKSy5QRQVufK3VHNA99PJdpwdmlWLBwG
+	 QNbZWiLY1FEo29DHMO4toiosR7ylt+TvHV55lWYTjqUDJ8qCgHH+ZN6REdH3lQaBBtg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aPQrAZqD;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OsqX34kV;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id ACA51606A31E;
-	Sun, 25 Oct 2026 00:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 2F3DD606A31F;
+	Sun, 25 Oct 2026 00:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aPQrAZqD
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 722A91F031E0;
-	Sun, 25 Oct 2026 00:12:33 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OsqX34kV
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 82AC81F01828;
+	Sun, 25 Oct 2026 00:12:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792887154;
-	bh=b+eILJFlDV6llSi+zsKcgcT/a5uVxyCuHIFWGw5xWyM=;
+	s=k20260515; t=1792887174;
+	bh=nsjfoidfR9qoxO6Yj3BXsJZWq/dthhO95vRlMQjqpFA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=aPQrAZqDOJ0eO0M9QwcKkTmSfsQuzoz18vCsGkzxSma4vW8btcYI3hwkhRsvLKDRq
-	 LKGgUVH1Jh5ByBjzR6l/97dWwBDMLNWTdPrkYlK8jmMVEPLVPmn3pvXORlkLIFcOda
-	 wNVO6ZkloUM/kRJJ1mcH7JYLeYXkCNrN73jpSaVuzK9xxJrnHE+3ujsnBHznAOgun3
-	 PYslnN38ewyvGvCJyEAHEElJ2Ql9ZS1NVrU1dNcx3FGlUi3YGlt/nj1Avn4pUpJIVq
-	 Ycr5os8hPNmgz8OlFQGNjEKvF6eQGvh9iRifkS6EnLgFDtWd/CFiPdfa7pWynr4Qg9
-	 DeI+50VprtKBw==
+	b=OsqX34kVK6Fohu6M+lrcMXLcpiW0pLb5GySYxRj6X2evehxiLtucmy7v8HXbg5SSa
+	 2uHkJtRv1TG2FeIfCym445Bd8t+HhQYCTQKiL8tlpjEYvywl+zvEHbzrgpg0+Imf35
+	 U6IfrxGBS3m3UY9l1rSsniw/zYR7M4O9+ZwWJFZI74Y/X1bcDpz+9TzkrTSIDFbAoy
+	 1haoEZgBokGFOTYqJdLEiiSpDEptcc7pCDabvONcNPNKlFtHKmDM/Cf/dGGxgBJLTW
+	 JD786Mvzu/ZUdqnbGEZHboU8iWxwSDNL89q/wv7af8lB4O/96KsN9tYMqaef6SDX5H
+	 XZreDaK6/91tg==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: David Howells <dhowells@redhat.com>
 Cc: keyrings@vger.kernel.org,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	Eric Biggers <ebiggers@kernel.org>,
 	Jarkko Sakkinen <jarkko@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Alex Shi <alexs@kernel.org>,
+	Yanteng Si <si.yanteng@linux.dev>,
+	Dongliang Mu <dzm91@hust.edu.cn>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Thomas Graf <tgraf@suug.ch>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Jani Nikula <jani.nikula@intel.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
 	linux-kernel@vger.kernel.org (open list),
-	linux-crypto@vger.kernel.org (open list:RHASHTABLE),
-	linux-security-module@vger.kernel.org (open list:SECURITY SUBSYSTEM)
-Subject: [PATCH v3 5/6] KEYS: Replace assoc_array with rhashtable
-Date: Sun, 25 Oct 2026 03:10:13 +0300
-Message-ID: <20261025001105.1824178-6-jarkko@kernel.org>
+	linux-crypto@vger.kernel.org (open list:RHASHTABLE)
+Subject: [PATCH v3 6/6] lib: Remove assoc_array
+Date: Sun, 25 Oct 2026 03:10:14 +0300
+Message-ID: <20261025001105.1824178-7-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261025001105.1824178-1-jarkko@kernel.org>
 References: <20261025001105.1824178-1-jarkko@kernel.org>
@@ -69,1677 +78,3148 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The keyring subsystem depends on assoc_array for searching keys by their
-description, type and domain. It is the sole user of this data structure,
-which has during the age of LLMs transformed into a maintenance nightmare.
+As assoc_array has no longer in-kernel users, remove assoc_array
+implementation, includes and documentation.
 
-assoc_array needs to be replaced with a data structure meeting the
-following criteria:
-
-1. Must be suitable for a sparse key-value store.
-2. Must have multiple in-kernel users.
-3. Would be nice if it had dedicated maintainers.
-
-rhashtable is likely the best pick from the available options as it is
-designed for a sparse key space, has dedicated maintainers, and multiple
-in-kernel users.
-
-assoc_array is replaced with two new data types:
-
-- keyring_index: contains a searchable index of links to keys and an RCU
-  protected list for active links, which is used to provide stable walks.
-- keyring_link: a keyring node and its contents. Multiple of these can be
-  associated with a key as it can belong to multiple keyrings.
-
-assoc_array_edit is substituted with two-element array of keyring_link
-pointers with no specific data type defined.
-
-Jhashes used by rhashtable are rehashed from the SipHash digests of the
-search keys and links.
-
-Suggested-by: Eric Biggers <ebiggers@kernel.org>
-Co-developed-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- include/keys/keyring-type.h |   1 -
- include/linux/key.h         |  19 +-
- security/keys/Kconfig       |   1 -
- security/keys/internal.h    |   9 +-
- security/keys/key.c         |  22 +-
- security/keys/keyring.c     | 929 ++++++++++++++++--------------------
- security/keys/request_key.c |  10 +-
- 7 files changed, 442 insertions(+), 549 deletions(-)
+ Documentation/core-api/assoc_array.rst        |  564 ------
+ Documentation/core-api/index.rst              |    1 -
+ .../zh_CN/core-api/assoc_array.rst            |  473 -----
+ .../translations/zh_CN/core-api/index.rst     |    1 -
+ include/linux/assoc_array.h                   |   88 -
+ include/linux/assoc_array_priv.h              |  178 --
+ lib/Kconfig                                   |   14 -
+ lib/Makefile                                  |    1 -
+ lib/assoc_array.c                             | 1724 -----------------
+ 9 files changed, 3044 deletions(-)
+ delete mode 100644 Documentation/core-api/assoc_array.rst
+ delete mode 100644 Documentation/translations/zh_CN/core-api/assoc_array.rst
+ delete mode 100644 include/linux/assoc_array.h
+ delete mode 100644 include/linux/assoc_array_priv.h
+ delete mode 100644 lib/assoc_array.c
 
-diff --git a/include/keys/keyring-type.h b/include/keys/keyring-type.h
-index 1dc83862f519..314832f5dc4a 100644
---- a/include/keys/keyring-type.h
-+++ b/include/keys/keyring-type.h
-@@ -9,6 +9,5 @@
- #define _KEYS_KEYRING_TYPE_H
- 
- #include <linux/key.h>
--#include <linux/assoc_array.h>
- 
- #endif /* _KEYS_KEYRING_TYPE_H */
-diff --git a/include/linux/key.h b/include/linux/key.h
-index df2034fc5436..c4dcbb21bd03 100644
---- a/include/linux/key.h
-+++ b/include/linux/key.h
-@@ -17,7 +17,6 @@
- #include <linux/sysctl.h>
- #include <linux/rwsem.h>
- #include <linux/atomic.h>
--#include <linux/assoc_array.h>
- #include <linux/refcount.h>
- #include <linux/time64.h>
- 
-@@ -107,6 +106,7 @@ struct key_owner;
- struct key_tag;
- struct keyring_list;
- struct keyring_name;
-+struct keyring_index;
- 
- struct key_tag {
- 	struct rcu_head		rcu;
-@@ -118,18 +118,7 @@ struct key_tag {
- struct keyring_index_key {
- 	/* [!] If this structure is altered, the union in struct key must change too! */
- 	unsigned long		hash;			/* Hash value */
--	union {
--		struct {
--#ifdef __LITTLE_ENDIAN /* Put desc_len at the LSB of x */
--			u16	desc_len;
--			char	desc[sizeof(long) - 2];	/* First few chars of description */
--#else
--			char	desc[sizeof(long) - 2];	/* First few chars of description */
--			u16	desc_len;
--#endif
--		};
--		unsigned long x;
--	};
-+	unsigned int		desc_len;
- 	struct key_type		*type;
- 	struct key_tag		*domain_tag;	/* Domain of operation */
- 	const char		*description;
-@@ -253,7 +242,7 @@ struct key {
- 		struct keyring_index_key index_key;
- 		struct {
- 			unsigned long	hash;
--			unsigned long	len_desc;
-+			unsigned int	desc_len;
- 			struct key_type	*type;		/* type of key */
- 			struct key_tag	*domain_tag;	/* Domain of operation */
- 			char		*description;
-@@ -271,7 +260,7 @@ struct key {
- 		struct {
- 			/* Keyring bits */
- 			struct list_head name_link;
--			struct assoc_array keys;
-+			struct keyring_index __rcu *index;
- 		};
- 	};
- 
-diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-index f4510d8cb485..3f64d60d0f8a 100644
---- a/security/keys/Kconfig
-+++ b/security/keys/Kconfig
-@@ -5,7 +5,6 @@
- 
- menuconfig KEYS
- 	bool "Enable access key retention support"
--	select ASSOCIATIVE_ARRAY
- 	help
- 	  This option provides support for retaining authentication tokens and
- 	  access keys in the kernel.
-diff --git a/security/keys/internal.h b/security/keys/internal.h
-index b7b622bc36a1..0edd4b0bd94b 100644
---- a/security/keys/internal.h
-+++ b/security/keys/internal.h
-@@ -21,6 +21,7 @@
- #include <linux/vmalloc.h>
- 
- struct iovec;
-+struct keyring_link;
- 
- #ifdef __KDEBUG
- #define kenter(FMT, ...) \
-@@ -98,13 +99,13 @@ extern int __key_move_lock(struct key *l_keyring, struct key *u_keyring,
- 			   const struct keyring_index_key *index_key);
- extern int __key_link_begin(struct key *keyring,
- 			    const struct keyring_index_key *index_key,
--			    struct assoc_array_edit **_edit);
-+			    struct keyring_link *edit[2]);
- extern int __key_link_check_live_key(struct key *keyring, struct key *key);
- extern void __key_link(struct key *keyring, struct key *key,
--		       struct assoc_array_edit **_edit);
-+		       struct keyring_link *edit[2]);
- extern void __key_link_end(struct key *keyring,
- 			   const struct keyring_index_key *index_key,
--			   struct assoc_array_edit *edit);
-+			   struct keyring_link *edit[2]);
- 
- extern key_ref_t find_key_to_update(key_ref_t keyring_ref,
- 				    const struct keyring_index_key *index_key);
-@@ -122,7 +123,7 @@ struct keyring_search_context {
- #define KEYRING_SEARCH_SKIP_EXPIRED	0x0020	/* Ignore expired keys (intention to replace) */
- #define KEYRING_SEARCH_RECURSE		0x0040	/* Search child keyrings also */
- 
--	int (*iterator)(const void *object, void *iterator_data);
-+	int (*iterator)(const struct key *key, void *iterator_data);
- 
- 	/* Internal stuff */
- 	int			skipped_ret;
-diff --git a/security/keys/key.c b/security/keys/key.c
-index e88548f1a704..8867b36f1ec6 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -430,7 +430,7 @@ static int __key_instantiate_and_link(struct key *key,
- 				      struct key_preparsed_payload *prep,
- 				      struct key *keyring,
- 				      struct key *authkey,
--				      struct assoc_array_edit **_edit)
-+				      struct keyring_link *edit[2])
- {
- 	int ret, awaken;
- 
-@@ -461,7 +461,7 @@ static int __key_instantiate_and_link(struct key *key,
- 				if (test_bit(KEY_FLAG_KEEP, &keyring->flags))
- 					set_bit(KEY_FLAG_KEEP, &key->flags);
- 
--				__key_link(keyring, key, _edit);
-+				__key_link(keyring, key, edit);
- 			}
- 
- 			/* disable the authorisation key */
-@@ -505,7 +505,7 @@ int key_instantiate_and_link(struct key *key,
- 			     struct key *authkey)
- {
- 	struct key_preparsed_payload prep;
--	struct assoc_array_edit *edit = NULL;
-+	struct keyring_link *edit[2] = {};
- 	int ret;
- 
- 	memset(&prep, 0, sizeof(prep));
-@@ -525,7 +525,7 @@ int key_instantiate_and_link(struct key *key,
- 		if (ret < 0)
- 			goto error;
- 
--		ret = __key_link_begin(keyring, &key->index_key, &edit);
-+		ret = __key_link_begin(keyring, &key->index_key, edit);
- 		if (ret < 0)
- 			goto error_link_end;
- 
-@@ -539,7 +539,7 @@ int key_instantiate_and_link(struct key *key,
- 		}
- 	}
- 
--	ret = __key_instantiate_and_link(key, &prep, keyring, authkey, &edit);
-+	ret = __key_instantiate_and_link(key, &prep, keyring, authkey, edit);
- 
- error_link_end:
- 	if (keyring)
-@@ -580,7 +580,7 @@ int key_reject_and_link(struct key *key,
- 			struct key *keyring,
- 			struct key *authkey)
- {
--	struct assoc_array_edit *edit = NULL;
-+	struct keyring_link *edit[2] = {};
- 	int ret, awaken, link_ret = 0;
- 
- 	key_check(key);
-@@ -602,7 +602,7 @@ int key_reject_and_link(struct key *key,
- 				__key_link_end(keyring, &key->index_key, edit);
- 				return -EPERM;
- 			}
--			link_ret = __key_link_begin(keyring, &key->index_key, &edit);
-+			link_ret = __key_link_begin(keyring, &key->index_key, edit);
- 			if (link_ret < 0)
- 				__key_link_end(keyring, &key->index_key, edit);
- 		}
-@@ -625,7 +625,7 @@ int key_reject_and_link(struct key *key,
- 
- 		/* and link it into the destination keyring */
- 		if (keyring && link_ret == 0)
--			__key_link(keyring, key, &edit);
-+			__key_link(keyring, key, edit);
- 
- 		/* disable the authorisation key */
- 		if (authkey)
-@@ -825,7 +825,7 @@ static key_ref_t __key_create_or_update(key_ref_t keyring_ref,
- 		.description	= description,
- 	};
- 	struct key_preparsed_payload prep;
--	struct assoc_array_edit *edit = NULL;
-+	struct keyring_link *edit[2] = {};
- 	const struct cred *cred = current_cred();
- 	struct key *keyring, *key = NULL;
- 	key_ref_t key_ref;
-@@ -886,7 +886,7 @@ static key_ref_t __key_create_or_update(key_ref_t keyring_ref,
- 		goto error_free_prep;
- 	}
- 
--	ret = __key_link_begin(keyring, &index_key, &edit);
-+	ret = __key_link_begin(keyring, &index_key, edit);
- 	if (ret < 0) {
- 		key_ref = ERR_PTR(ret);
- 		goto error_link_end;
-@@ -953,7 +953,7 @@ static key_ref_t __key_create_or_update(key_ref_t keyring_ref,
- 	}
- 
- 	/* instantiate it and link it into the target keyring */
--	ret = __key_instantiate_and_link(key, &prep, keyring, NULL, &edit);
-+	ret = __key_instantiate_and_link(key, &prep, keyring, NULL, edit);
- 	if (ret < 0) {
- 		key_put(key);
- 		key_ref = ERR_PTR(ret);
-diff --git a/security/keys/keyring.c b/security/keys/keyring.c
-index 4642754db6bf..1ec1b677eb89 100644
---- a/security/keys/keyring.c
-+++ b/security/keys/keyring.c
-@@ -16,10 +16,10 @@
- #include <linux/nsproxy.h>
- #include <linux/once.h>
- #include <linux/random.h>
-+#include <linux/rhashtable.h>
- #include <linux/siphash.h>
-+#include <linux/workqueue.h>
- #include <keys/keyring-type.h>
--#include <keys/user-type.h>
--#include <linux/assoc_array_priv.h>
- #include <linux/uaccess.h>
- #include <net/net_namespace.h>
- #include "internal.h"
-@@ -31,25 +31,151 @@
- #define KEYRING_SEARCH_MAX_DEPTH 6
- 
- /*
-- * We mark pointers we pass to the associative array with bit 1 set if
-- * they're keyrings and clear otherwise.
-+ * Keyrings are inserted at the head of @list, other keys at the tail, so
-+ * recursive search can stop at the first non-keyring.
-  */
--#define KEYRING_PTR_SUBTYPE	0x2UL
-+struct keyring_index {
-+	struct rhashtable	ht;
-+	struct list_head	list;		/* Active keys */
-+	unsigned long		nr;		/* Number of active keys */
-+	struct rcu_work		rcu_work;
-+};
-+
-+/*
-+ * __key_link_begin() inserts new links with @key NULL so allocation happens
-+ * before __key_link().  @hash is cached so resizing can hash links while @key
-+ * is NULL.
-+ */
-+struct keyring_link {
-+	struct rcu_head		rcu;
-+	struct rhash_head	node;
-+	struct key __rcu	*key;		/* NULL while inactive */
-+	struct list_head	list;
-+	u32			hash;
-+};
- 
--static inline bool keyring_ptr_is_keyring(const struct assoc_array_ptr *x)
-+static u32 keyring_hashfn(const void *data, u32 len, u32 seed)
- {
--	return (unsigned long)x & KEYRING_PTR_SUBTYPE;
-+	const struct keyring_index_key *index_key = data;
-+
-+	return jhash_1word(index_key->hash, seed);
- }
--static inline struct key *keyring_ptr_to_key(const struct assoc_array_ptr *x)
-+
-+static u32 keyring_obj_hashfn(const void *data, u32 len, u32 seed)
- {
--	void *object = assoc_array_ptr_to_leaf(x);
--	return (struct key *)((unsigned long)object & ~KEYRING_PTR_SUBTYPE);
-+	const struct keyring_link *link = data;
-+
-+	return jhash_1word(link->hash, seed);
- }
--static inline void *keyring_key_to_ptr(struct key *key)
-+
-+static bool keyring_index_key_equal(const struct keyring_index_key *a,
-+				    const struct keyring_index_key *b)
- {
--	if (key->type == &key_type_keyring)
--		return (void *)((unsigned long)key | KEYRING_PTR_SUBTYPE);
--	return key;
-+	return a->type == b->type &&
-+		a->domain_tag == b->domain_tag &&
-+		a->desc_len == b->desc_len &&
-+		memcmp(a->description, b->description, a->desc_len) == 0;
-+}
-+
-+static int keyring_obj_cmpfn(struct rhashtable_compare_arg *arg,
-+			     const void *obj)
-+{
-+	const struct keyring_link *link = obj;
-+	const struct key *key = rcu_dereference_check(link->key, true);
-+
-+	return !key || !keyring_index_key_equal(&key->index_key, arg->key);
-+}
-+
-+static const struct rhashtable_params keyring_link_params = {
-+	.head_offset		= offsetof(struct keyring_link, node),
-+	.hashfn			= keyring_hashfn,
-+	.obj_hashfn		= keyring_obj_hashfn,
-+	.obj_cmpfn		= keyring_obj_cmpfn,
-+	.min_size		= 4,
-+	.nelem_hint		= 3,
-+	.automatic_shrinking	= true,
-+};
-+
-+static struct keyring_index *keyring_index_locked(const struct key *keyring)
-+{
-+	return rcu_dereference_protected(keyring->index,
-+					 lockdep_is_held(&keyring->sem));
-+}
-+
-+static struct keyring_link *keyring_find_link(struct keyring_index *index,
-+					      const struct keyring_index_key *index_key)
-+{
-+	if (!index)
-+		return NULL;
-+
-+	return rhashtable_lookup_fast(&index->ht, index_key, keyring_link_params);
-+}
-+
-+static struct key *keyring_link_key(const struct keyring_link *link)
-+{
-+	return rcu_dereference_check(link->key, true);
-+}
-+
-+static int keyring_iterate(const struct key *keyring,
-+			   int (*iterator)(const struct key *key, void *data),
-+			   void *data)
-+{
-+	struct keyring_index *index;
-+	struct keyring_link *link;
-+	int ret;
-+
-+	guard(rcu)();
-+	index = rcu_dereference(keyring->index);
-+	if (index) {
-+		list_for_each_entry_rcu(link, &index->list, list) {
-+			ret = iterator(keyring_link_key(link), data);
-+			if (ret)
-+				return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void keyring_link_free_rcu(struct rcu_head *rcu)
-+{
-+	struct keyring_link *link = container_of(rcu, struct keyring_link, rcu);
-+
-+	key_put(rcu_dereference_raw(link->key));
-+	kfree(link);
-+}
-+
-+static void __keyring_index_free(struct keyring_index *index)
-+{
-+	struct keyring_link *link, *tmp;
-+
-+	rhashtable_destroy(&index->ht);
-+
-+	list_for_each_entry_safe(link, tmp, &index->list, list) {
-+		key_put(rcu_dereference_protected(link->key, true));
-+		kfree(link);
-+	}
-+
-+	kfree(index);
-+}
-+
-+static void keyring_index_free_work(struct work_struct *work)
-+{
-+	struct keyring_index *index = container_of(to_rcu_work(work),
-+						 struct keyring_index, rcu_work);
-+
-+	__keyring_index_free(index);
-+}
-+
-+static void keyring_index_free(struct key *keyring)
-+{
-+	struct keyring_index *index = keyring_index_locked(keyring);
-+
-+	if (!index)
-+		return;
-+
-+	rcu_assign_pointer(keyring->index, NULL);
-+	queue_rcu_work(system_dfl_wq, &index->rcu_work);
- }
- 
- static DEFINE_RWLOCK(keyring_name_lock);
-@@ -143,7 +269,7 @@ static void keyring_free_preparse(struct key_preparsed_payload *prep)
- static int keyring_instantiate(struct key *keyring,
- 			       struct key_preparsed_payload *prep)
- {
--	assoc_array_init(&keyring->keys);
-+	RCU_INIT_POINTER(keyring->index, NULL);
- 	/* make the keyring available by name if it has one */
- 	keyring_publish_name(keyring);
- 	return 0;
-@@ -175,13 +301,10 @@ static u64 key_index_id(atomic64_t *id)
- }
- 
- /*
-- * Hash a key type, domain and description.  KEYCTL_READ exposes the tree's
-- * traversal order, so no part of the index may contain kernel addresses.
-+ * Hash a key type, domain and description.
-  */
- static void hash_key_type_and_desc(struct keyring_index_key *index_key)
- {
--	const unsigned level_shift = ASSOC_ARRAY_LEVEL_STEP;
--	const unsigned long fan_mask = ASSOC_ARRAY_FAN_MASK;
- 	static siphash_key_t hash_key __read_mostly;
- 	unsigned long hash;
- 	u64 acc;
-@@ -193,30 +316,19 @@ static void hash_key_type_and_desc(struct keyring_index_key *index_key)
- 
- 	/* Fold the hash down to 32 bits if need be. */
- 	hash = acc;
--	if (ASSOC_ARRAY_KEY_CHUNK_SIZE == 32)
-+	if (BITS_PER_LONG == 32)
- 		hash ^= acc >> 32;
- 
--	/* Squidge all the keyrings into a separate part of the tree to
--	 * ordinary keys by making sure the lowest level segment in the hash is
--	 * zero for keyrings and non-zero otherwise.
--	 */
--	if (index_key->type != &key_type_keyring && (hash & fan_mask) == 0)
--		hash |= (hash >> (ASSOC_ARRAY_KEY_CHUNK_SIZE - level_shift)) | 1;
--	else if (index_key->type == &key_type_keyring && (hash & fan_mask) != 0)
--		hash = (hash + (hash << level_shift)) & ~fan_mask;
- 	index_key->hash = hash;
- }
- 
- /*
-- * Finalise an index key to include a part of the description actually in the
-- * index key, to set the domain tag and index IDs, and to calculate the hash.
-+ * Finalise an index key to set the domain tag and index IDs, and to calculate
-+ * the hash.
-  */
- void key_set_index_key(struct keyring_index_key *index_key)
- {
- 	static struct key_tag default_domain_tag = { .usage = REFCOUNT_INIT(1), };
--	size_t n = min_t(size_t, index_key->desc_len, sizeof(index_key->desc));
+diff --git a/Documentation/core-api/assoc_array.rst b/Documentation/core-api/assoc_array.rst
+deleted file mode 100644
+index 19d89f92bf8d..000000000000
+--- a/Documentation/core-api/assoc_array.rst
++++ /dev/null
+@@ -1,564 +0,0 @@
+-========================================
+-Generic Associative Array Implementation
+-========================================
 -
--	memcpy(index_key->desc, index_key->description, n);
+-Overview
+-========
+-
+-This associative array implementation is an object container with the following
+-properties:
+-
+-1. Objects are opaque pointers.  The implementation does not care where they
+-   point (if anywhere) or what they point to (if anything).
+-
+-   .. note::
+-
+-      Pointers to objects _must_ be zero in the least significant bit.
+-
+-2. Objects do not need to contain linkage blocks for use by the array.  This
+-   permits an object to be located in multiple arrays simultaneously.
+-   Rather, the array is made up of metadata blocks that point to objects.
+-
+-3. Objects require index keys to locate them within the array.
+-
+-4. Index keys must be unique.  Inserting an object with the same key as one
+-   already in the array will replace the old object.
+-
+-5. Index keys can be of any length and can be of different lengths.
+-
+-6. Index keys should encode the length early on, before any variation due to
+-   length is seen.
+-
+-7. Index keys can include a hash to scatter objects throughout the array.
+-
+-8. The array can iterated over.  The objects will not necessarily come out in
+-   key order.
+-
+-9. The array can be iterated over while it is being modified, provided the
+-   RCU readlock is being held by the iterator.  Note, however, under these
+-   circumstances, some objects may be seen more than once.  If this is a
+-   problem, the iterator should lock against modification.  Objects will not
+-   be missed, however, unless deleted.
+-
+-10. Objects in the array can be looked up by means of their index key.
+-
+-11. Objects can be looked up while the array is being modified, provided the
+-    RCU readlock is being held by the thread doing the look up.
+-
+-The implementation uses a tree of 16-pointer nodes internally that are indexed
+-on each level by nibbles from the index key in the same manner as in a radix
+-tree.  To improve memory efficiency, shortcuts can be emplaced to skip over
+-what would otherwise be a series of single-occupancy nodes.  Further, nodes
+-pack leaf object pointers into spare space in the node rather than making an
+-extra branch until as such time an object needs to be added to a full node.
+-
+-
+-The Public API
+-==============
+-
+-The public API can be found in ``<linux/assoc_array.h>``.  The associative
+-array is rooted on the following structure::
+-
+-    struct assoc_array {
+-            ...
+-    };
+-
+-The code is selected by enabling ``CONFIG_ASSOCIATIVE_ARRAY`` with::
+-
+-    ./script/config -e ASSOCIATIVE_ARRAY
+-
+-
+-Edit Script
+------------
+-
+-The insertion and deletion functions produce an 'edit script' that can later be
+-applied to effect the changes without risking ``ENOMEM``. This retains the
+-preallocated metadata blocks that will be installed in the internal tree and
+-keeps track of the metadata blocks that will be removed from the tree when the
+-script is applied.
+-
+-This is also used to keep track of dead blocks and dead objects after the
+-script has been applied so that they can be freed later.  The freeing is done
+-after an RCU grace period has passed - thus allowing access functions to
+-proceed under the RCU read lock.
+-
+-The script appears as outside of the API as a pointer of the type::
+-
+-    struct assoc_array_edit;
+-
+-There are two functions for dealing with the script:
+-
+-1. Apply an edit script::
+-
+-    void assoc_array_apply_edit(struct assoc_array_edit *edit);
+-
+-   This will perform the edit functions, interpolating various write barriers
+-   to permit accesses under the RCU read lock to continue.  The edit script
+-   will then be passed to ``call_rcu()`` to free it and any dead stuff it
+-   points to.
+-
+-2. Cancel an edit script::
+-
+-    void assoc_array_cancel_edit(struct assoc_array_edit *edit);
+-
+-   This frees the edit script and all preallocated memory immediately. If
+-   this was for insertion, the new object is *not* released by this function,
+-   but must rather be released by the caller.
+-
+-These functions are guaranteed not to fail.
+-
+-
+-Operations Table
+-----------------
+-
+-Various functions take a table of operations::
+-
+-    struct assoc_array_ops {
+-            ...
+-    };
+-
+-This points to a number of methods, all of which need to be provided:
+-
+-1. Get a chunk of index key from caller data::
+-
+-    unsigned long (*get_key_chunk)(const void *index_key, int level);
+-
+-   This should return a chunk of caller-supplied index key starting at the
+-   *bit* position given by the level argument.  The level argument will be a
+-   multiple of ``ASSOC_ARRAY_KEY_CHUNK_SIZE`` and the function should return
+-   ``ASSOC_ARRAY_KEY_CHUNK_SIZE bits``.  No error is possible.
+-
+-
+-2. Get a chunk of an object's index key::
+-
+-    unsigned long (*get_object_key_chunk)(const void *object, int level);
+-
+-   As the previous function, but gets its data from an object in the array
+-   rather than from a caller-supplied index key.
+-
+-
+-3. See if this is the object we're looking for::
+-
+-    bool (*compare_object)(const void *object, const void *index_key);
+-
+-   Compare the object against an index key and return ``true`` if it matches
+-   and ``false`` if it doesn't.
+-
+-
+-4. Diff the index keys of two objects::
+-
+-    int (*diff_objects)(const void *object, const void *index_key);
+-
+-   Return the bit position at which the index key of the specified object
+-   differs from the given index key or -1 if they are the same.
+-
+-
+-5. Free an object::
+-
+-    void (*free_object)(void *object);
+-
+-   Free the specified object.  Note that this may be called an RCU grace period
+-   after ``assoc_array_apply_edit()`` was called, so ``synchronize_rcu()`` may
+-   be necessary on module unloading.
+-
+-
+-Manipulation Functions
+-----------------------
+-
+-There are a number of functions for manipulating an associative array:
+-
+-1. Initialise an associative array::
+-
+-    void assoc_array_init(struct assoc_array *array);
+-
+-   This initialises the base structure for an associative array.  It can't fail.
+-
+-
+-2. Insert/replace an object in an associative array::
+-
+-    struct assoc_array_edit *
+-    assoc_array_insert(struct assoc_array *array,
+-                       const struct assoc_array_ops *ops,
+-                       const void *index_key,
+-                       void *object);
+-
+-   This inserts the given object into the array.  Note that the least
+-   significant bit of the pointer must be zero as it's used to type-mark
+-   pointers internally.
+-
+-   If an object already exists for that key then it will be replaced with the
+-   new object and the old one will be freed automatically.
+-
+-   The ``index_key`` argument should hold index key information and is
+-   passed to the methods in the ops table when they are called.
+-
+-   This function makes no alteration to the array itself, but rather returns
+-   an edit script that must be applied.  ``-ENOMEM`` is returned in the case of
+-   an out-of-memory error.
+-
+-   The caller should lock exclusively against other modifiers of the array.
+-
+-
+-3. Delete an object from an associative array::
+-
+-    struct assoc_array_edit *
+-    assoc_array_delete(struct assoc_array *array,
+-                       const struct assoc_array_ops *ops,
+-                       const void *index_key);
+-
+-   This deletes an object that matches the specified data from the array.
+-
+-   The ``index_key`` argument should hold index key information and is
+-   passed to the methods in the ops table when they are called.
+-
+-   This function makes no alteration to the array itself, but rather returns
+-   an edit script that must be applied.  ``-ENOMEM`` is returned in the case of
+-   an out-of-memory error.  ``NULL`` will be returned if the specified object
+-   is not found within the array.
+-
+-The caller should lock exclusively against other modifiers of the array.
+-
+-
+-4. Delete all objects from an associative array::
+-
+-    struct assoc_array_edit *
+-    assoc_array_clear(struct assoc_array *array,
+-                      const struct assoc_array_ops *ops);
+-
+-   This deletes all the objects from an associative array and leaves it
+-   completely empty.
+-
+-   This function makes no alteration to the array itself, but rather returns
+-   an edit script that must be applied.  ``-ENOMEM`` is returned in the case of
+-   an out-of-memory error.
+-
+-   The caller should lock exclusively against other modifiers of the array.
+-
+-
+-5. Destroy an associative array, deleting all objects::
+-
+-    void assoc_array_destroy(struct assoc_array *array,
+-                             const struct assoc_array_ops *ops);
+-
+-   This destroys the contents of the associative array and leaves it
+-   completely empty.  It is not permitted for another thread to be traversing
+-   the array under the RCU read lock at the same time as this function is
+-   destroying it as no RCU deferral is performed on memory release -
+-   something that would require memory to be allocated.
+-
+-   The caller should lock exclusively against other modifiers and accessors
+-   of the array.
+-
+-
+-6. Garbage collect an associative array::
+-
+-    int assoc_array_gc(struct assoc_array *array,
+-                       const struct assoc_array_ops *ops,
+-                       bool (*iterator)(void *object, void *iterator_data),
+-                       void *iterator_data);
+-
+-   This iterates over the objects in an associative array and passes each one
+-   to ``iterator()``.  If ``iterator()`` returns ``true``, the object is kept.
+-   If it returns ``false``, the object will be freed.  If the ``iterator()``
+-   function returns ``true``, it must perform any appropriate refcount
+-   incrementing on the object before returning.
+-
+-   The internal tree will be packed down if possible as part of the iteration
+-   to reduce the number of nodes in it.
+-
+-   The ``iterator_data`` is passed directly to ``iterator()`` and is otherwise
+-   ignored by the function.
+-
+-   The function will return ``0`` if successful and ``-ENOMEM`` if there wasn't
+-   enough memory.
+-
+-   It is possible for other threads to iterate over or search the array under
+-   the RCU read lock while this function is in progress.  The caller should
+-   lock exclusively against other modifiers of the array.
+-
+-
+-Access Functions
+-----------------
+-
+-There are two functions for accessing an associative array:
+-
+-1. Iterate over all the objects in an associative array::
+-
+-    int assoc_array_iterate(const struct assoc_array *array,
+-                            int (*iterator)(const void *object,
+-                                            void *iterator_data),
+-                            void *iterator_data);
+-
+-   This passes each object in the array to the iterator callback function.
+-   ``iterator_data`` is private data for that function.
+-
+-   This may be used on an array at the same time as the array is being
+-   modified, provided the RCU read lock is held.  Under such circumstances,
+-   it is possible for the iteration function to see some objects twice.  If
+-   this is a problem, then modification should be locked against.  The
+-   iteration algorithm should not, however, miss any objects.
+-
+-   The function will return ``0`` if no objects were in the array or else it
+-   will return the result of the last iterator function called.  Iteration
+-   stops immediately if any call to the iteration function results in a
+-   non-zero return.
+-
+-
+-2. Find an object in an associative array::
+-
+-    void *assoc_array_find(const struct assoc_array *array,
+-                           const struct assoc_array_ops *ops,
+-                           const void *index_key);
+-
+-   This walks through the array's internal tree directly to the object
+-   specified by the index key.
+-
+-   This may be used on an array at the same time as the array is being
+-   modified, provided the RCU read lock is held.
+-
+-   The function will return the object if found (and set ``*_type`` to the
+-   object type) or will return ``NULL`` if the object was not found.
+-
+-
+-Index Key Form
+---------------
+-
+-The index key can be of any form, but since the algorithms aren't told how long
+-the key is, it is strongly recommended that the index key includes its length
+-very early on before any variation due to the length would have an effect on
+-comparisons.
+-
+-This will cause leaves with different length keys to scatter away from each
+-other - and those with the same length keys to cluster together.
+-
+-It is also recommended that the index key begin with a hash of the rest of the
+-key to maximise scattering throughout keyspace.
+-
+-The better the scattering, the wider and lower the internal tree will be.
+-
+-Poor scattering isn't too much of a problem as there are shortcuts and nodes
+-can contain mixtures of leaves and metadata pointers.
+-
+-The index key is read in chunks of machine word.  Each chunk is subdivided into
+-one nibble (4 bits) per level, so on a 32-bit CPU this is good for 8 levels and
+-on a 64-bit CPU, 16 levels.  Unless the scattering is really poor, it is
+-unlikely that more than one word of any particular index key will have to be
+-used.
+-
+-
+-Internal Workings
+-=================
+-
+-The associative array data structure has an internal tree.  This tree is
+-constructed of two types of metadata blocks: nodes and shortcuts.
+-
+-A node is an array of slots.  Each slot can contain one of four things:
+-
+-* A NULL pointer, indicating that the slot is empty.
+-* A pointer to an object (a leaf).
+-* A pointer to a node at the next level.
+-* A pointer to a shortcut.
+-
+-
+-Basic Internal Tree Layout
+---------------------------
+-
+-Ignoring shortcuts for the moment, the nodes form a multilevel tree.  The index
+-key space is strictly subdivided by the nodes in the tree and nodes occur on
+-fixed levels.  For example::
+-
+- Level: 0               1               2               3
+-        =============== =============== =============== ===============
+-                                                        NODE D
+-                        NODE B          NODE C  +------>+---+
+-                +------>+---+   +------>+---+   |       | 0 |
+-        NODE A  |       | 0 |   |       | 0 |   |       +---+
+-        +---+   |       +---+   |       +---+   |       :   :
+-        | 0 |   |       :   :   |       :   :   |       +---+
+-        +---+   |       +---+   |       +---+   |       | f |
+-        | 1 |---+       | 3 |---+       | 7 |---+       +---+
+-        +---+           +---+           +---+
+-        :   :           :   :           | 8 |---+
+-        +---+           +---+           +---+   |       NODE E
+-        | e |---+       | f |           :   :   +------>+---+
+-        +---+   |       +---+           +---+           | 0 |
+-        | f |   |                       | f |           +---+
+-        +---+   |                       +---+           :   :
+-                |       NODE F                          +---+
+-                +------>+---+                           | f |
+-                        | 0 |           NODE G          +---+
+-                        +---+   +------>+---+
+-                        :   :   |       | 0 |
+-                        +---+   |       +---+
+-                        | 6 |---+       :   :
+-                        +---+           +---+
+-                        :   :           | f |
+-                        +---+           +---+
+-                        | f |
+-                        +---+
+-
+-In the above example, there are 7 nodes (A-G), each with 16 slots (0-f).
+-Assuming no other meta data nodes in the tree, the key space is divided
+-thusly:
+-
+-    ===========     ====
+-    KEY PREFIX      NODE
+-    ===========     ====
+-    137*            D
+-    138*            E
+-    13[0-69-f]*     C
+-    1[0-24-f]*      B
+-    e6*             G
+-    e[0-57-f]*      F
+-    [02-df]*        A
+-    ===========     ====
+-
+-So, for instance, keys with the following example index keys will be found in
+-the appropriate nodes:
+-
+-    =============== ======= ====
+-    INDEX KEY       PREFIX  NODE
+-    =============== ======= ====
+-    13694892892489  13      C
+-    13795289025897  137     D
+-    13889dde88793   138     E
+-    138bbb89003093  138     E
+-    1394879524789   12      C
+-    1458952489      1       B
+-    9431809de993ba  \-      A
+-    b4542910809cd   \-      A
+-    e5284310def98   e       F
+-    e68428974237    e6      G
+-    e7fffcbd443     e       F
+-    f3842239082     \-      A
+-    =============== ======= ====
+-
+-To save memory, if a node can hold all the leaves in its portion of keyspace,
+-then the node will have all those leaves in it and will not have any metadata
+-pointers - even if some of those leaves would like to be in the same slot.
+-
+-A node can contain a heterogeneous mix of leaves and metadata pointers.
+-Metadata pointers must be in the slots that match their subdivisions of key
+-space.  The leaves can be in any slot not occupied by a metadata pointer.  It
+-is guaranteed that none of the leaves in a node will match a slot occupied by a
+-metadata pointer.  If the metadata pointer is there, any leaf whose key matches
+-the metadata key prefix must be in the subtree that the metadata pointer points
+-to.
+-
+-In the above example list of index keys, node A will contain:
+-
+-    ====    =============== ==================
+-    SLOT    CONTENT         INDEX KEY (PREFIX)
+-    ====    =============== ==================
+-    1       PTR TO NODE B   1*
+-    any     LEAF            9431809de993ba
+-    any     LEAF            b4542910809cd
+-    e       PTR TO NODE F   e*
+-    any     LEAF            f3842239082
+-    ====    =============== ==================
+-
+-and node B:
+-
+-    ====    =============== ==================
+-    SLOT    CONTENT         INDEX KEY (PREFIX)
+-    ====    =============== ==================
+-    3       PTR TO NODE C   13*
+-    any     LEAF            1458952489
+-    ====    =============== ==================
+-
+-
+-Shortcuts
+----------
+-
+-Shortcuts are metadata records that jump over a piece of keyspace.  A shortcut
+-is a replacement for a series of single-occupancy nodes ascending through the
+-levels.  Shortcuts exist to save memory and to speed up traversal.
+-
+-It is possible for the root of the tree to be a shortcut - say, for example,
+-the tree contains at least 17 nodes all with key prefix ``1111``.  The
+-insertion algorithm will insert a shortcut to skip over the ``1111`` keyspace
+-in a single bound and get to the fourth level where these actually become
+-different.
+-
+-
+-Splitting And Collapsing Nodes
+-------------------------------
+-
+-Each node has a maximum capacity of 16 leaves and metadata pointers.  If the
+-insertion algorithm finds that it is trying to insert a 17th object into a
+-node, that node will be split such that at least two leaves that have a common
+-key segment at that level end up in a separate node rooted on that slot for
+-that common key segment.
+-
+-If the leaves in a full node and the leaf that is being inserted are
+-sufficiently similar, then a shortcut will be inserted into the tree.
+-
+-When the number of objects in the subtree rooted at a node falls to 16 or
+-fewer, then the subtree will be collapsed down to a single node - and this will
+-ripple towards the root if possible.
+-
+-
+-Non-Recursive Iteration
+------------------------
+-
+-Each node and shortcut contains a back pointer to its parent and the number of
+-slot in that parent that points to it.  None-recursive iteration uses these to
+-proceed rootwards through the tree, going to the parent node, slot N + 1 to
+-make sure progress is made without the need for a stack.
+-
+-The backpointers, however, make simultaneous alteration and iteration tricky.
+-
+-
+-Simultaneous Alteration And Iteration
+--------------------------------------
+-
+-There are a number of cases to consider:
+-
+-1. Simple insert/replace.  This involves simply replacing a NULL or old
+-   matching leaf pointer with the pointer to the new leaf after a barrier.
+-   The metadata blocks don't change otherwise.  An old leaf won't be freed
+-   until after the RCU grace period.
+-
+-2. Simple delete.  This involves just clearing an old matching leaf.  The
+-   metadata blocks don't change otherwise.  The old leaf won't be freed until
+-   after the RCU grace period.
+-
+-3. Insertion replacing part of a subtree that we haven't yet entered.  This
+-   may involve replacement of part of that subtree - but that won't affect
+-   the iteration as we won't have reached the pointer to it yet and the
+-   ancestry blocks are not replaced (the layout of those does not change).
+-
+-4. Insertion replacing nodes that we're actively processing.  This isn't a
+-   problem as we've passed the anchoring pointer and won't switch onto the
+-   new layout until we follow the back pointers - at which point we've
+-   already examined the leaves in the replaced node (we iterate over all the
+-   leaves in a node before following any of its metadata pointers).
+-
+-   We might, however, re-see some leaves that have been split out into a new
+-   branch that's in a slot further along than we were at.
+-
+-5. Insertion replacing nodes that we're processing a dependent branch of.
+-   This won't affect us until we follow the back pointers.  Similar to (4).
+-
+-6. Deletion collapsing a branch under us.  This doesn't affect us because the
+-   back pointers will get us back to the parent of the new node before we
+-   could see the new node.  The entire collapsed subtree is thrown away
+-   unchanged - and will still be rooted on the same slot, so we shouldn't
+-   process it a second time as we'll go back to slot + 1.
+-
+-.. note::
+-
+-   Under some circumstances, we need to simultaneously change the parent
+-   pointer and the parent slot pointer on a node (say, for example, we
+-   inserted another node before it and moved it up a level).  We cannot do
+-   this without locking against a read - so we have to replace that node too.
+-
+-   However, when we're changing a shortcut into a node this isn't a problem
+-   as shortcuts only have one slot and so the parent slot number isn't used
+-   when traversing backwards over one.  This means that it's okay to change
+-   the slot number first - provided suitable barriers are used to make sure
+-   the parent slot number is read after the back pointer.
+-
+-Obsolete blocks and leaves are freed up after an RCU grace period has passed,
+-so as long as anyone doing walking or iteration holds the RCU read lock, the
+-old superstructure should not go away on them.
+diff --git a/Documentation/core-api/index.rst b/Documentation/core-api/index.rst
+index 92f91c6a0d79..d56c60663b0c 100644
+--- a/Documentation/core-api/index.rst
++++ b/Documentation/core-api/index.rst
+@@ -38,7 +38,6 @@ Library functionality that is used throughout the kernel.
+    kobject
+    kref
+    cleanup
+-   assoc_array
+    folio_queue
+    xarray
+    maple_tree
+diff --git a/Documentation/translations/zh_CN/core-api/assoc_array.rst b/Documentation/translations/zh_CN/core-api/assoc_array.rst
+deleted file mode 100644
+index 3649bf0d1488..000000000000
+--- a/Documentation/translations/zh_CN/core-api/assoc_array.rst
++++ /dev/null
+@@ -1,473 +0,0 @@
+-.. include:: ../disclaimer-zh_CN.rst
+-
+-:Original: Documentation/core-api/assoc_array.rst
+-
+-:翻译:
+-
+- 司延腾 Yanteng Si <siyanteng@loongson.cn>
+-
+-:校译:
+-
+-
+-
+-.. _cn_core-api_assoc_array:
+-
+-==================
+-通用关联数组的实现
+-==================
+-
+-简介
+-====
+-
+-这个关联数组的实现是一个具有以下属性的对象容器:
+-
+-1. 对象是不透明的指针。该实现不关心它们指向哪里（如果有的话）或它们指向什么（如果有的
+-   话）。
+-
+-   .. note::
+-
+-      指向对象的指针 *必须* 在最小有效位为零。
+-
+-2. 对象不需要包含供数组使用的链接块。这允许一个对象同时位于多个数组中。相反，数组是
+-   由指向对象的元数据块组成的。
+-
+-3. 对象需要索引键来定位它们在阵列中的位置。
+-
+-4. 索引键必须是唯一的。插入一个与已经在数组中的且具有相同键值的对象将取代旧的对象。
+-
+-5. 索引键可以是任何长度，也可以是不同的长度。
+-
+-6. 索引键应该在早期就对长度进行编码，即在任何由于长度引起的变化出现之前。
+-
+-7. 索引键可以包括一个哈希值，以便将对象分散到整个数组中。
+-
+-8. 该数组可以迭代。对象不一定会按索引键的顺序出现。
+-
+-9.  数组可以在被修改的时候进行迭代，只要RCU的读锁被迭代器持有。然而，请注意，在这种情
+-    况下，一些对象可能会被看到不止一次。如果这是个问题，迭代器应该锁定以防止修改。然
+-    而，除非删除，否则对象不会被错过。
+-
+-10. 数组中的对象可以通过其索引键进行查询。
+-
+-11. 当数组被修改时，对象可以被查询，前提是进行查询的线程持有RCU的读锁。
+-
+-该实现在内部使用了一棵由16个指针节点组成的树，这些节点在每一层都由索引键的小数点进行索
+-引，其方式与基数树相同。为了提高内存效率，可以放置快捷键，以跳过本来是一系列单占节点的地
+-方。此外，节点将叶子对象指针打包到节点的空闲空间中，而不是做一个额外的分支，直到有对象
+-需要被添加到一个完整的节点中。
+-
+-公用API
+-=======
+-
+-公用API可以在 ``<linux/assoc_array.h>`` 中找到。关联数组的根是以下结构::
+-
+-    struct assoc_array {
+-            ...
+-    };
+-
+-该代码是通过启用 ``CONFIG_ASSOCIATIVE_ARRAY`` 来选择的，以::
+-
+-    ./script/config -e ASSOCIATIVE_ARRAY
+-
+-
+-编辑脚本
+---------
+-
+-插入和删除功能会产生一个“编辑脚本”，以后可以应用这个脚本来实现更改，而不会造成 ``ENOMEM``
+-风险。这保留了将被安装在内部树中的预分配的元数据块，并跟踪应用脚本时将从树中删除的元数
+-据块。
+-
+-在脚本应用后，这也被用来跟踪死块和死对象，以便以后可以释放它们。释放是在RCU宽限期过后
+-进行的--因此允许访问功能在RCU读锁下进行。
+-
+-脚本在API之外显示为一个类型为::
+-
+-    struct assoc_array_edit;
+-
+-有两个处理脚本的功能:
+-
+-1. 应用一个编辑脚本::
+-
+-    void assoc_array_apply_edit(struct assoc_array_edit *edit);
+-
+-这将执行编辑功能，插值各种写屏障，以允许在RCU读锁下的访问继续进行。然后，编辑脚本将被
+-传递给 ``call_rcu()`` ，以释放它和它所指向的任何死的东西。
+-
+-2. Cancel an edit script::
+-
+-    void assoc_array_cancel_edit(struct assoc_array_edit *edit);
+-
+-这将立即释放编辑脚本和所有预分配的内存。如果这是为了插入，新的对象不会被这个函数释放，
+-而是必须由调用者释放。
+-
+-这些函数保证不会失败。
+-
+-
+-操作表
+-------
+-
+-各种功能采用了一个操作表::
+-
+-    struct assoc_array_ops {
+-            ...
+-    };
+-
+-这指出了一些方法，所有这些方法都需要提供:
+-
+-1. 从调用者数据中获取索引键的一个块::
+-
+-    unsigned long (*get_key_chunk)(const void *index_key, int level);
+-
+-这应该返回一个由调用者提供的索引键的块，从level参数给出的 *比特* 位置开始。level参数将
+-是 ``ASSOC_ARRAY_KEY_CHUNK_SIZE`` 的倍数，该函数应返回 ``ASSOC_ARRAY_KEY_CHUNK_SIZE``
+-位。不可能出现错误。
+-
+-
+-2. 获取一个对象的索引键的一个块::
+-
+-    unsigned long (*get_object_key_chunk)(const void *object, int level);
+-
+-和前面的函数一样，但是从数组中的一个对象而不是从调用者提供的索引键中获取数据。
+-
+-
+-3. 看看这是否是我们要找的对象::
+-
+-    bool (*compare_object)(const void *object, const void *index_key);
+-
+-将对象与一个索引键进行比较，如果匹配则返回 ``true`` ，不匹配则返回 ``false`` 。
+-
+-
+-4. 对两个对象的索引键进行比较::
+-
+-    int (*diff_objects)(const void *object, const void *index_key);
+-
+-返回指定对象的索引键与给定索引键不同的比特位置，如果它们相同，则返回-1。
+-
+-
+-5. 释放一个对象::
+-
+-    void (*free_object)(void *object);
+-
+-释放指定的对象。注意，这可能是在调用 ``assoc_array_apply_edit()`` 后的一个RCU宽限期内
+-调用的，所以在模块卸载时可能需要 ``synchronize_rcu()`` 。
+-
+-
+-操控函数
+---------
+-
+-有一些函数用于操控关联数组:
+-
+-1. 初始化一个关联数组::
+-
+-    void assoc_array_init(struct assoc_array *array);
+-
+-这将初始化一个关联数组的基础结构。它不会失败。
+-
+-
+-2. 在一个关联数组中插入/替换一个对象::
+-
+-    struct assoc_array_edit *
+-    assoc_array_insert(struct assoc_array *array,
+-                       const struct assoc_array_ops *ops,
+-                       const void *index_key,
+-                       void *object);
+-
+-这将把给定的对象插入数组中。注意，指针的最小有效位必须是0，因为它被用来在内部标记指针的类
+-型。
+-
+-如果该键已经存在一个对象，那么它将被新的对象所取代，旧的对象将被自动释放。
+-
+-``index_key`` 参数应持有索引键信息，并在调用OPP表中的方法时传递给它们。
+-
+-这个函数不对数组本身做任何改动，而是返回一个必须应用的编辑脚本。如果出现内存不足的错误，会
+-返回 ``-ENOMEM`` 。
+-
+-调用者应专门锁定数组的其他修改器。
+-
+-
+-3. 从一个关联数组中删除一个对象::
+-
+-    struct assoc_array_edit *
+-    assoc_array_delete(struct assoc_array *array,
+-                       const struct assoc_array_ops *ops,
+-                       const void *index_key);
+-
+-这将从数组中删除一个符合指定数据的对象。
+-
+-``index_key`` 参数应持有索引键信息，并在调用OPP表中的方法时传递给它们。
+-
+-这个函数不对数组本身做任何改动，而是返回一个必须应用的编辑脚本。 ``-ENOMEM`` 在出现内存不足
+-的错误时返回。如果在数组中没有找到指定的对象，将返回 ``NULL`` 。
+-
+-调用者应该对数组的其他修改者进行专门锁定。
+-
+-
+-4. 从一个关联数组中删除所有对象::
+-
+-    struct assoc_array_edit *
+-    assoc_array_clear(struct assoc_array *array,
+-                      const struct assoc_array_ops *ops);
+-
+-这个函数删除了一个关联数组中的所有对象，使其完全为空。
+-
+-这个函数没有对数组本身做任何改动，而是返回一个必须应用的编辑脚本。如果出现内存不足
+-的错误，则返回 ``-ENOMEM`` 。
+-
+-调用者应专门锁定数组的其他修改者。
+-
+-
+-5. 销毁一个关联数组，删除所有对象::
+-
+-    void assoc_array_destroy(struct assoc_array *array,
+-                             const struct assoc_array_ops *ops);
+-
+-这将破坏关联数组的内容，使其完全为空。在这个函数销毁数组的同时，不允许另一个线程在RCU读锁
+-下遍历数组，因为在内存释放时不执行RCU延迟，这需要分配内存。
+-
+-调用者应该专门针对数组的其他修改者和访问者进行锁定。
+-
+-
+-6. 垃圾回收一个关联数组::
+-
+-    int assoc_array_gc(struct assoc_array *array,
+-                       const struct assoc_array_ops *ops,
+-                       bool (*iterator)(void *object, void *iterator_data),
+-                       void *iterator_data);
+-
+-这是对一个关联数组中的对象进行迭代，并将每个对象传递给 ``iterator()`` 。如果 ``iterator()`` 返回
+-true，该对象被保留。如果它返回 ``false`` ，该对象将被释放。如果 ``iterator()`` 函数返回 ``true`` ，它必须
+-在返回之前对该对象进行适当的 ``refcount`` 递增。
+-
+-如果可能的话，内部树将被打包下来，作为迭代的一部分，以减少其中的节点数量。
+-
+-``iterator_data`` 被直接传递给 ``iterator()`` ，否则会被函数忽略。
+-
+-如果成功，该函数将返回 ``0`` ，如果没有足够的内存，则返回 ``-ENOMEM`` 。
+-
+-在这个函数执行过程中，其他线程有可能在RCU读锁下迭代或搜索阵列。调用者应该专门针对数组的其他
+-修改者进行锁定。
+-
+-
+-访问函数
+---------
+-
+-有两个函数用于访问一个关联数组:
+-
+-1. 遍历一个关联数组中的所有对象::
+-
+-    int assoc_array_iterate(const struct assoc_array *array,
+-                            int (*iterator)(const void *object,
+-                                            void *iterator_data),
+-                            void *iterator_data);
+-
+-这将数组中的每个对象传递给迭代器回调函数。 ``iterator_data`` 是该函数的私有数据。
+-
+-在数组被修改的同时，可以在数组上使用这个方法，前提是RCU读锁被持有。在这种情况下，迭代函数有
+-可能两次看到某些对象。如果这是个问题，那么修改应该被锁定。然而，迭代算法不应该错过任何对象。
+-
+-如果数组中没有对象，该函数将返回 ``0`` ，否则将返回最后一次调用的迭代器函数的结果。如果对迭代函数
+-的任何调用导致非零返回，迭代立即停止。
+-
+-
+-2. 在一个关联数组中寻找一个对象::
+-
+-    void *assoc_array_find(const struct assoc_array *array,
+-                           const struct assoc_array_ops *ops,
+-                           const void *index_key);
+-
+-这将直接穿过数组的内部树，到达索引键所指定的对象。
+-
+-这个函数可以在修改数组的同时用在数组上，前提是RCU读锁被持有。
+-
+-如果找到对象，该函数将返回对象（并将 ``*_type`` 设置为对象的类型），如果没有找到对象，将返回 ``NULL`` 。
+-
+-
+-索引键形式
+-----------
+-
+-索引键可以是任何形式的，但是由于算法没有被告知键有多长，所以强烈建议在任何由于长度而产生的变化
+-对比较产生影响之前，索引键应该很早就包括其长度。
+-
+-这将导致具有不同长度键的叶子相互分散，而具有相同长度键的叶子则聚集在一起。
+-
+-我们还建议索引键以键的其余部分的哈希值开始，以最大限度地提高整个键空间的散布情况。
+-
+-分散性越好，内部树就越宽，越低。
+-
+-分散性差并不是一个太大的问题，因为有快捷键，节点可以包含叶子和元数据指针的混合物。
+-
+-索引键是以机器字的块状来读取的。每个块被细分为每层一个nibble（4比特），所以在32位CPU上这适合8层，
+-在64位CPU上适合16层。除非散布情况真的很差，否则不太可能有超过一个字的任何特定索引键需要被使用。
+-
+-
+-内部工作机制
+-============
+-
+-关联数组数据结构有一个内部树。这个树由两种类型的元数据块构成：节点和快捷键。
+-
+-一个节点是一个槽的数组。每个槽可以包含以下四种东西之一:
+-
+-* 一个NULL的指针，表示槽是空的。
+-* 一个指向对象（叶子）的指针。
+-* 一个指向下一级节点的指针。
+-* 一个指向快捷键的指针。
+-
+-
+-基本的内部树形布局
+-------------------
+-
+-暂时不考虑快捷键，节点形成一个多级树。索引键空间被树上的节点严格细分，节点出现在固定的层次上。例如::
+-
+- Level: 0               1               2               3
+-        =============== =============== =============== ===============
+-                                                        NODE D
+-                        NODE B          NODE C  +------>+---+
+-                +------>+---+   +------>+---+   |       | 0 |
+-        NODE A  |       | 0 |   |       | 0 |   |       +---+
+-        +---+   |       +---+   |       +---+   |       :   :
+-        | 0 |   |       :   :   |       :   :   |       +---+
+-        +---+   |       +---+   |       +---+   |       | f |
+-        | 1 |---+       | 3 |---+       | 7 |---+       +---+
+-        +---+           +---+           +---+
+-        :   :           :   :           | 8 |---+
+-        +---+           +---+           +---+   |       NODE E
+-        | e |---+       | f |           :   :   +------>+---+
+-        +---+   |       +---+           +---+           | 0 |
+-        | f |   |                       | f |           +---+
+-        +---+   |                       +---+           :   :
+-                |       NODE F                          +---+
+-                +------>+---+                           | f |
+-                        | 0 |           NODE G          +---+
+-                        +---+   +------>+---+
+-                        :   :   |       | 0 |
+-                        +---+   |       +---+
+-                        | 6 |---+       :   :
+-                        +---+           +---+
+-                        :   :           | f |
+-                        +---+           +---+
+-                        | f |
+-                        +---+
+-
+-在上述例子中，有7个节点（A-G），每个节点有16个槽（0-f）。假设树上没有其他元数据节点，那么密钥空间
+-是这样划分的::
+-
+-    KEY PREFIX      NODE
+-    ==========      ====
+-    137*            D
+-    138*            E
+-    13[0-69-f]*     C
+-    1[0-24-f]*      B
+-    e6*             G
+-    e[0-57-f]*      F
+-    [02-df]*        A
+-
+-因此，例如，具有以下示例索引键的键将在适当的节点中被找到::
+-
+-    INDEX KEY       PREFIX  NODE
+-    =============== ======= ====
+-    13694892892489  13      C
+-    13795289025897  137     D
+-    13889dde88793   138     E
+-    138bbb89003093  138     E
+-    1394879524789   12      C
+-    1458952489      1       B
+-    9431809de993ba  -       A
+-    b4542910809cd   -       A
+-    e5284310def98   e       F
+-    e68428974237    e6      G
+-    e7fffcbd443     e       F
+-    f3842239082     -       A
+-
+-为了节省内存，如果一个节点可以容纳它的那部分键空间中的所有叶子，那么这个节点将有所有这些叶子，而不
+-会有任何元数据指针——即使其中一些叶子想在同一个槽中。
+-
+-一个节点可以包含叶子和元数据指针的异质性混合。元数据指针必须在与它们的关键空间的细分相匹配的槽中。
+-叶子可以在任何没有被元数据指针占据的槽中。保证一个节点中没有一个叶子会与元数据指针占据的槽相匹配。
+-如果元数据指针在那里，任何键与元数据键前缀相匹配的叶必须在元数据指针指向的子树中。
+-
+-在上面的索引键的例子列表中，节点A将包含::
+-
+-    SLOT    CONTENT         INDEX KEY (PREFIX)
+-    ====    =============== ==================
+-    1       PTR TO NODE B   1*
+-    any     LEAF            9431809de993ba
+-    any     LEAF            b4542910809cd
+-    e       PTR TO NODE F   e*
+-    any     LEAF            f3842239082
+-
+-和节点B::
+-
+-    3	PTR TO NODE C	13*
+-    any	LEAF		1458952489
+-
+-
+-快捷键
+----------
+-
+-快捷键是跳过一块键空间的元数据记录。快捷键是一系列通过层次上升的单占节点的替代物。快捷键的存在是
+-为了节省内存和加快遍历速度。
+-
+-树的根部有可能是一个快捷键——比如说，树至少包含17个节点，都有键前缀 ``1111`` 。插入算法将插入一个快捷键，
+-以单次跳过 ``1111`` 的键位，并到达第四层，在这里，这些键位实际上变得不同。
+-
+-
+-拆分和合并节点
+-------------------------------
+-
+-每个节点的最大容量为16个叶子和元数据指针。如果插入算法发现它正试图将一个第17个对象插入到一个节点中，
+-该节点将被拆分，使得至少两个在该层有一个共同的关键段的叶子最终在一个单独的节点中，该共同的关键段的根
+-在该槽上。
+-
+-如果一个完整的节点中的叶子和被插入的叶子足够相似，那么就会在树中插入一个快捷键。
+-
+-当根植于某个节点的子树中的对象数量下降到16个或更少时，那么该子树将被合并成一个单独的节点——如果可能的
+-话，这将向根部扩散。
+-
+-
+-非递归式迭代
+-------------
+-
+-每个节点和快捷键都包含一个指向其父节点的后置指针，以及该父节点中指向它的槽数。非递归迭代使用这些来
+-通过树的根部进行，前往父节点，槽N+1，以确保在没有堆栈的情况下取得进展。
+-
+-然而，反向指针使得同时改变和迭代变得很棘手。
+-
+-
+-同时改变和迭代
+---------------
+-
+-有一些情况需要考虑:
+-
+-1. 简单的插入/替换。这涉及到简单地将一个NULL或旧的匹配叶子的指针替换为屏障后的新叶子的指针。否则元数
+-   据块不会改变。一个旧的叶子直到RCU宽限期过后才会被释放。
+-
+-2. 简单删除。这只是涉及到清除一个旧的匹配叶子。元数据块不会有其他变化。旧的叶子直到RCU宽限期之后才会
+-   被释放。
+-
+-3. 插入，替换我们还没有进入的子树的一部分。这可能涉及到替换该子树的一部分——但这不会影响迭代，因为我们
+-   还没有到达它的指针，而且祖先块也不会被替换（这些块的布局不会改变）。
+-
+-4. 插入替换了我们正在处理的节点。这不是一个问题，因为我们已经通过了锚定指针，直到我们跟随后面的指针才
+-   会切换到新的布局上——这时我们已经检查了被替换节点的叶子（在跟随任何元数据指针之前，我们会迭代一个节
+-   点的所有叶子）。
+-
+-   然而，我们可能会重新看到一些叶子，这些叶子已经被分割成一个新的分支，而这个分支的位置比我们之前的位
+-   置更远。
+-
+-5. 插入替换了我们正在处理的依赖分支的节点。这不会影响到我们，直到我们跟随后面的指针。与（4）类似。
+-
+-6. 删掉我们下面的一个分支。这不会影响我们，因为在我们看到新节点之前，回溯指针会让我们回到新节点的父节
+-   点。整个崩溃的子树被扔掉了，没有任何变化——而且仍然会在同一个槽上生根，所以我们不应该第二次处理它，
+-   因为我们会回到槽+1。
+-
+-.. note::
+-
+-    在某些情况下，我们需要同时改变一个节点的父指针和父槽指针（比如说，我们在它之前插入了另一个节点，
+-    并把它往上移了一层）。我们不能在不锁定读取的情况下这样做——所以我们必须同时替换该节点。
+-
+-    然而，当我们把一个快捷键改成一个节点时，这不是一个问题，因为快捷键只有一个槽，所以当向后遍
+-    历一个槽时，不会使用父槽号。这意味着先改变槽位号是可以的——只要使用适当的屏障来确保父槽位号在后
+-    退指针之后被读取。
+-
+-过时的块和叶子在RCU宽限期过后会被释放，所以只要任何进行遍历或迭代的人持有RCU读锁，旧的上层建筑就不
+-应该在他们身上消失。
+diff --git a/Documentation/translations/zh_CN/core-api/index.rst b/Documentation/translations/zh_CN/core-api/index.rst
+index 453a02cd1f44..ec4b03b2a0a6 100644
+--- a/Documentation/translations/zh_CN/core-api/index.rst
++++ b/Documentation/translations/zh_CN/core-api/index.rst
+@@ -41,7 +41,6 @@
  
- 	if (!index_key->domain_tag) {
- 		if (index_key->type->flags & KEY_TYPE_NET_DOMAIN)
-@@ -268,150 +380,6 @@ void key_remove_domain(struct key_tag *domain_tag)
- 		key_schedule_gc_links();
- }
- 
--/*
-- * Build the next index key chunk.
+    kobject
+    kref
+-   assoc_array
+    xarray
+    rbtree
+    idr
+diff --git a/include/linux/assoc_array.h b/include/linux/assoc_array.h
+deleted file mode 100644
+index 8b3f230ce894..000000000000
+--- a/include/linux/assoc_array.h
++++ /dev/null
+@@ -1,88 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/* Generic associative array implementation.
 - *
-- * The hash and inline description are followed by the 64-bit type and domain
-- * IDs, low word first, and then by the rest of the description.
-- * We return it one word-sized chunk at a time.
+- * See Documentation/core-api/assoc_array.rst for information.
+- *
+- * Copyright (C) 2013 Red Hat, Inc. All Rights Reserved.
+- * Written by David Howells (dhowells@redhat.com)
 - */
--static unsigned long keyring_get_key_chunk(const void *data, int level)
--{
--	const unsigned int id_chunks = sizeof(u64) / sizeof(unsigned long);
--	const struct keyring_index_key *index_key = data;
--	int desc_len = index_key->desc_len;
--	unsigned long chunk = 0;
--	int n = sizeof(chunk);
--	unsigned int offset;
--	const u8 *d;
 -
--	level /= ASSOC_ARRAY_KEY_CHUNK_SIZE;
--	switch (level) {
--	case 0:
--		return index_key->hash;
--	case 1:
--		return index_key->x;
--	}
+-#ifndef _LINUX_ASSOC_ARRAY_H
+-#define _LINUX_ASSOC_ARRAY_H
 -
--	level -= 2;
--	if (level < id_chunks)
--		return index_key->type_id >> (level * ASSOC_ARRAY_KEY_CHUNK_SIZE);
--	level -= id_chunks;
--	if (level < id_chunks)
--		return index_key->domain_id >> (level * ASSOC_ARRAY_KEY_CHUNK_SIZE);
--	level -= id_chunks;
+-#ifdef CONFIG_ASSOCIATIVE_ARRAY
 -
--	offset = sizeof(index_key->desc) + level * sizeof(long);
--	if (desc_len <= offset)
--		return 0;
+-#include <linux/types.h>
 -
--	d = index_key->description + offset;
--	desc_len -= offset;
--	if (desc_len > n)
--		desc_len = n;
--	d += desc_len;
--	do {
--		chunk <<= 8;
--		chunk |= *--d;
--	} while (--desc_len > 0);
--	return chunk;
--}
--
--static unsigned long keyring_get_object_key_chunk(const void *object, int level)
--{
--	const struct key *key = keyring_ptr_to_key(object);
--	return keyring_get_key_chunk(&key->index_key, level);
--}
--
--static bool keyring_compare_object(const void *object, const void *data)
--{
--	const struct keyring_index_key *index_key = data;
--	const struct key *key = keyring_ptr_to_key(object);
--
--	return key->index_key.type == index_key->type &&
--		key->index_key.domain_tag == index_key->domain_tag &&
--		key->index_key.desc_len == index_key->desc_len &&
--		memcmp(key->index_key.description, index_key->description,
--		       index_key->desc_len) == 0;
--}
+-#define ASSOC_ARRAY_KEY_CHUNK_SIZE BITS_PER_LONG /* Key data retrieved in chunks of this size */
 -
 -/*
-- * Compare the index keys of a pair of objects and determine the bit position
-- * at which they differ - if they differ.
+- * Generic associative array.
 - */
--static int keyring_diff_objects(const void *object, const void *data)
--{
--	const struct key *key_a = keyring_ptr_to_key(object);
--	const struct keyring_index_key *a = &key_a->index_key;
--	const struct keyring_index_key *b = data;
--	unsigned long seg_a, seg_b;
--	int level, i;
--	u64 diff;
--
--	level = 0;
--	seg_a = a->hash;
--	seg_b = b->hash;
--	if ((seg_a ^ seg_b) != 0)
--		goto differ;
--	level += ASSOC_ARRAY_KEY_CHUNK_SIZE / 8;
--
--	/* The inline description contributes one machine-word-sized chunk. */
--	seg_a = a->x;
--	seg_b = b->x;
--	if ((seg_a ^ seg_b) != 0)
--		goto differ;
--	level += sizeof(unsigned long);
--
--	diff = a->type_id ^ b->type_id;
--	if (diff)
--		return level * 8 + __ffs64(diff);
--	level += sizeof(u64);
--
--	diff = a->domain_id ^ b->domain_id;
--	if (diff)
--		return level * 8 + __ffs64(diff);
--	level += sizeof(u64);
--
--	i = sizeof(a->desc);
--	if (a->desc_len <= i)
--		goto same;
--
--	for (; i < a->desc_len; i++) {
--		seg_a = *(unsigned char *)(a->description + i);
--		seg_b = *(unsigned char *)(b->description + i);
--		if ((seg_a ^ seg_b) != 0)
--			goto differ_plus_i;
--	}
--
--same:
--	return -1;
--
--differ_plus_i:
--	level += i - (int)sizeof(a->desc);
--differ:
--	i = level * 8 + __ffs(seg_a ^ seg_b);
--	return i;
--}
--
--/*
-- * Free an object after stripping the keyring flag off of the pointer.
-- */
--static void keyring_free_object(void *object)
--{
--	key_put(keyring_ptr_to_key(object));
--}
--
--/*
-- * Operations for keyring management by the index-tree routines.
-- */
--static const struct assoc_array_ops keyring_assoc_array_ops = {
--	.get_key_chunk		= keyring_get_key_chunk,
--	.get_object_key_chunk	= keyring_get_object_key_chunk,
--	.compare_object		= keyring_compare_object,
--	.diff_objects		= keyring_diff_objects,
--	.free_object		= keyring_free_object,
+-struct assoc_array {
+-	struct assoc_array_ptr	*root;		/* The node at the root of the tree */
+-	unsigned long		nr_leaves_on_tree;
 -};
 -
- /*
-  * Clean up a keyring when it is destroyed.  Unpublish its name if it had one
-  * and dispose of its data.
-@@ -423,6 +391,8 @@ static const struct assoc_array_ops keyring_assoc_array_ops = {
-  */
- static void keyring_destroy(struct key *keyring)
- {
-+	struct keyring_index *index;
-+
- 	if (keyring->description) {
- 		write_lock(&keyring_name_lock);
- 
-@@ -440,7 +410,18 @@ static void keyring_destroy(struct key *keyring)
- 		kfree(keyres);
- 	}
- 
--	assoc_array_destroy(&keyring->keys, &keyring_assoc_array_ops);
-+	index = rcu_dereference_protected(keyring->index, true);
-+	if (index)
-+		__keyring_index_free(index);
-+}
-+
-+static unsigned long keyring_nr_links(const struct key *keyring)
-+{
-+	const struct keyring_index *index;
-+
-+	guard(rcu)();
-+	index = rcu_dereference(keyring->index);
-+	return index ? READ_ONCE(index->nr) : 0;
- }
- 
- /**
-@@ -449,7 +430,7 @@ static void keyring_destroy(struct key *keyring)
-  */
- bool keyring_is_empty(const struct key *keyring)
- {
--	return READ_ONCE(keyring->keys.nr_leaves_on_tree) == 0;
-+	return keyring_nr_links(keyring) == 0;
- }
- EXPORT_SYMBOL(keyring_is_empty);
- 
-@@ -458,41 +439,22 @@ EXPORT_SYMBOL(keyring_is_empty);
-  */
- static void keyring_describe(const struct key *keyring, struct seq_file *m)
- {
-+	unsigned long nr;
-+
- 	if (keyring->description)
- 		seq_puts(m, keyring->description);
- 	else
- 		seq_puts(m, "[anon]");
- 
- 	if (key_is_positive(keyring)) {
--		if (keyring->keys.nr_leaves_on_tree != 0)
--			seq_printf(m, ": %lu", keyring->keys.nr_leaves_on_tree);
-+		nr = keyring_nr_links(keyring);
-+		if (nr != 0)
-+			seq_printf(m, ": %lu", nr);
- 		else
- 			seq_puts(m, ": empty");
- 	}
- }
- 
--struct keyring_read_iterator_context {
--	size_t			buflen;
--	size_t			count;
--	key_serial_t		*buffer;
+-/*
+- * Operations on objects and index keys for use by array manipulation routines.
+- */
+-struct assoc_array_ops {
+-	/* Method to get a chunk of an index key from caller-supplied data */
+-	unsigned long (*get_key_chunk)(const void *index_key, int level);
+-
+-	/* Method to get a piece of an object's index key */
+-	unsigned long (*get_object_key_chunk)(const void *object, int level);
+-
+-	/* Is this the object we're looking for? */
+-	bool (*compare_object)(const void *object, const void *index_key);
+-
+-	/* How different is an object from an index key, to a bit position in
+-	 * their keys? (or -1 if they're the same)
+-	 */
+-	int (*diff_objects)(const void *object, const void *index_key);
+-
+-	/* Method to free an object. */
+-	void (*free_object)(void *object);
 -};
 -
--static int keyring_read_iterator(const void *object, void *data)
+-/*
+- * Access and manipulation functions.
+- */
+-struct assoc_array_edit;
+-
+-static inline void assoc_array_init(struct assoc_array *array)
 -{
--	struct keyring_read_iterator_context *ctx = data;
--	const struct key *key = keyring_ptr_to_key(object);
--
--	kenter("{%s,%d},,{%zu/%zu}",
--	       key->type->name, key->serial, ctx->count, ctx->buflen);
--
--	if (ctx->count >= ctx->buflen)
--		return 1;
--
--	*ctx->buffer++ = key->serial;
--	ctx->count += sizeof(key->serial);
--	return 0;
+-	array->root = NULL;
+-	array->nr_leaves_on_tree = 0;
 -}
 -
- /*
-  * Read a list of key IDs from the keyring's contents in binary form
-  *
-@@ -503,7 +465,10 @@ static int keyring_read_iterator(const void *object, void *data)
- static long keyring_read(const struct key *keyring,
- 			 char *buffer, size_t buflen)
- {
--	struct keyring_read_iterator_context ctx;
-+	struct keyring_index *links = keyring_index_locked(keyring);
-+	key_serial_t *serials = (key_serial_t *)buffer;
-+	struct keyring_link *link;
-+	size_t count = 0;
- 	long ret;
- 
- 	kenter("{%d},,%zu", key_serial(keyring), buflen);
-@@ -511,25 +476,22 @@ static long keyring_read(const struct key *keyring,
- 	if (buflen & (sizeof(key_serial_t) - 1))
- 		return -EINVAL;
- 
--	/* Copy as many key IDs as fit into the buffer */
--	if (buffer && buflen) {
--		ctx.buffer = (key_serial_t *)buffer;
--		ctx.buflen = buflen;
--		ctx.count = 0;
--		ret = assoc_array_iterate(&keyring->keys,
--					  keyring_read_iterator, &ctx);
--		if (ret < 0) {
--			kleave(" = %ld [iterate]", ret);
--			return ret;
-+	if (buffer && buflen && links) {
-+		list_for_each_entry(link, &links->list, list) {
-+			if (count == buflen / sizeof(*serials))
-+				break;
-+
-+			serials[count++] = keyring_link_key(link)->serial;
-+			cond_resched();
- 		}
- 	}
- 
--	/* Return the size of the buffer needed */
--	ret = keyring->keys.nr_leaves_on_tree * sizeof(key_serial_t);
-+	ret = links ? links->nr * sizeof(key_serial_t) : 0;
- 	if (ret <= buflen)
- 		kleave("= %ld [ok]", ret);
- 	else
- 		kleave("= %ld [buffer too small]", ret);
-+
- 	return ret;
- }
- 
-@@ -593,10 +555,9 @@ bool key_default_cmp(const struct key *key,
- /*
-  * Iteration function to consider each key found.
-  */
--static int keyring_search_iterator(const void *object, void *iterator_data)
-+static int keyring_search_iterator(const struct key *key, void *iterator_data)
- {
- 	struct keyring_search_context *ctx = iterator_data;
--	const struct key *key = keyring_ptr_to_key(object);
- 	unsigned long kflags = READ_ONCE(key->flags);
- 	short state = key_read_state(key);
- 
-@@ -663,19 +624,78 @@ static int keyring_search_iterator(const void *object, void *iterator_data)
- /*
-  * Search inside a keyring for a key.  We can search by walking to it
-  * directly based on its index-key or we can iterate over the entire
-- * tree looking for it, based on the match function.
-+ * list looking for it, based on the match function.
-  */
- static int search_keyring(struct key *keyring, struct keyring_search_context *ctx)
- {
- 	if (ctx->match_data.lookup_type == KEYRING_SEARCH_LOOKUP_DIRECT) {
--		const void *object;
-+		struct keyring_link *link;
-+		struct key *key;
-+
-+		link = keyring_find_link(rcu_dereference(keyring->index),
-+					 &ctx->index_key);
-+		if (!link)
-+			return 0;
-+		key = keyring_link_key(link);
-+		return ctx->iterator(key, ctx);
-+	}
-+
-+	return keyring_iterate(keyring, ctx->iterator, ctx);
-+}
-+
-+/*
-+ * Depth-first search of @keyring and its nested keyrings.
-+ */
-+static int search_keyring_tree(struct key *keyring,
-+			       struct keyring_search_context *ctx, int depth)
-+{
-+	struct keyring_index *links;
-+	struct keyring_link *link;
-+	int ret;
-+
-+	if (keyring->flags & ((1 << KEY_FLAG_INVALIDATED) |
-+			      (1 << KEY_FLAG_REVOKED)))
-+		return 0;
-+
-+	if (search_keyring(keyring, ctx))
-+		goto found;
- 
--		object = assoc_array_find(&keyring->keys,
--					  &keyring_assoc_array_ops,
--					  &ctx->index_key);
--		return object ? ctx->iterator(object, ctx) : 0;
-+	if (!(ctx->flags & KEYRING_SEARCH_RECURSE))
-+		return 0;
-+	links = rcu_dereference(keyring->index);
-+	if (!links)
-+		return 0;
-+
-+	list_for_each_entry_rcu(link, &links->list, list) {
-+		struct key *key = keyring_link_key(link);
-+
-+		if (key->type != &key_type_keyring)
-+			break;
-+		if (depth >= KEYRING_SEARCH_MAX_DEPTH) {
-+			if (!(ctx->flags & KEYRING_SEARCH_DETECT_TOO_DEEP))
-+				return 0;
-+			ctx->result = ERR_PTR(-ELOOP);
-+			return -ELOOP;
-+		}
-+
-+		if (!(ctx->flags & KEYRING_SEARCH_NO_CHECK_PERM) &&
-+		    key_task_permission(make_key_ref(key, ctx->possessed),
-+					ctx->cred, KEY_NEED_SEARCH) < 0)
-+			continue;
-+
-+		ret = search_keyring_tree(key, ctx, depth + 1);
-+		if (ret < 0)
-+			return ret;
-+		if (ret)
-+			goto found;
- 	}
--	return assoc_array_iterate(&keyring->keys, ctx->iterator, ctx);
-+
-+	return 0;
-+
-+found:
-+	if (!(ctx->flags & KEYRING_SEARCH_NO_UPDATE_TIME))
-+		keyring->last_used_at = ctx->now;
-+	return 1;
- }
- 
- /*
-@@ -685,17 +705,7 @@ static int search_keyring(struct key *keyring, struct keyring_search_context *ct
- static bool search_nested_keyrings(struct key *keyring,
- 				   struct keyring_search_context *ctx)
- {
+-extern int assoc_array_iterate(const struct assoc_array *array,
+-			       int (*iterator)(const void *object,
+-					       void *iterator_data),
+-			       void *iterator_data);
+-extern void *assoc_array_find(const struct assoc_array *array,
+-			      const struct assoc_array_ops *ops,
+-			      const void *index_key);
+-extern void assoc_array_destroy(struct assoc_array *array,
+-				const struct assoc_array_ops *ops);
+-extern struct assoc_array_edit *assoc_array_insert(struct assoc_array *array,
+-						   const struct assoc_array_ops *ops,
+-						   const void *index_key,
+-						   void *object);
+-extern void assoc_array_insert_set_object(struct assoc_array_edit *edit,
+-					  void *object);
+-extern struct assoc_array_edit *assoc_array_delete(struct assoc_array *array,
+-						   const struct assoc_array_ops *ops,
+-						   const void *index_key);
+-extern struct assoc_array_edit *assoc_array_clear(struct assoc_array *array,
+-						  const struct assoc_array_ops *ops);
+-extern void assoc_array_apply_edit(struct assoc_array_edit *edit);
+-extern void assoc_array_cancel_edit(struct assoc_array_edit *edit);
+-extern int assoc_array_gc(struct assoc_array *array,
+-			  const struct assoc_array_ops *ops,
+-			  bool (*iterator)(void *object, void *iterator_data),
+-			  void *iterator_data);
+-
+-#endif /* CONFIG_ASSOCIATIVE_ARRAY */
+-#endif /* _LINUX_ASSOC_ARRAY_H */
+diff --git a/include/linux/assoc_array_priv.h b/include/linux/assoc_array_priv.h
+deleted file mode 100644
+index dca733ef6750..000000000000
+--- a/include/linux/assoc_array_priv.h
++++ /dev/null
+@@ -1,178 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/* Private definitions for the generic associative array implementation.
+- *
+- * See Documentation/core-api/assoc_array.rst for information.
+- *
+- * Copyright (C) 2013 Red Hat, Inc. All Rights Reserved.
+- * Written by David Howells (dhowells@redhat.com)
+- */
+-
+-#ifndef _LINUX_ASSOC_ARRAY_PRIV_H
+-#define _LINUX_ASSOC_ARRAY_PRIV_H
+-
+-#ifdef CONFIG_ASSOCIATIVE_ARRAY
+-
+-#include <linux/assoc_array.h>
+-
+-#define ASSOC_ARRAY_FAN_OUT		16	/* Number of slots per node */
+-#define ASSOC_ARRAY_FAN_MASK		(ASSOC_ARRAY_FAN_OUT - 1)
+-#define ASSOC_ARRAY_LEVEL_STEP		(ilog2(ASSOC_ARRAY_FAN_OUT))
+-#define ASSOC_ARRAY_LEVEL_STEP_MASK	(ASSOC_ARRAY_LEVEL_STEP - 1)
+-#define ASSOC_ARRAY_KEY_CHUNK_MASK	(ASSOC_ARRAY_KEY_CHUNK_SIZE - 1)
+-#define ASSOC_ARRAY_KEY_CHUNK_SHIFT	(ilog2(BITS_PER_LONG))
+-
+-/*
+- * Undefined type representing a pointer with type information in the bottom
+- * two bits.
+- */
+-struct assoc_array_ptr;
+-
+-/*
+- * An N-way node in the tree.
+- *
+- * Each slot contains one of four things:
+- *
+- *	(1) Nothing (NULL).
+- *
+- *	(2) A leaf object (pointer types 0).
+- *
+- *	(3) A next-level node (pointer type 1, subtype 0).
+- *
+- *	(4) A shortcut (pointer type 1, subtype 1).
+- *
+- * The tree is optimised for search-by-ID, but permits reasonable iteration
+- * also.
+- *
+- * The tree is navigated by constructing an index key consisting of an array of
+- * segments, where each segment is ilog2(ASSOC_ARRAY_FAN_OUT) bits in size.
+- *
+- * The segments correspond to levels of the tree (the first segment is used at
+- * level 0, the second at level 1, etc.).
+- */
+-struct assoc_array_node {
+-	struct assoc_array_ptr	*back_pointer;
+-	u8			parent_slot;
+-	struct assoc_array_ptr	*slots[ASSOC_ARRAY_FAN_OUT];
+-	unsigned long		nr_leaves_on_branch;
+-};
+-
+-/*
+- * A shortcut through the index space out to where a collection of nodes/leaves
+- * with the same IDs live.
+- */
+-struct assoc_array_shortcut {
+-	struct assoc_array_ptr	*back_pointer;
+-	int			parent_slot;
+-	int			skip_to_level;
+-	struct assoc_array_ptr	*next_node;
+-	unsigned long		index_key[];
+-};
+-
+-/*
+- * Preallocation cache.
+- */
+-struct assoc_array_edit {
+-	struct rcu_head			rcu;
+-	struct assoc_array		*array;
+-	const struct assoc_array_ops	*ops;
+-	const struct assoc_array_ops	*ops_for_excised_subtree;
+-	struct assoc_array_ptr		*leaf;
+-	struct assoc_array_ptr		**leaf_p;
+-	struct assoc_array_ptr		*dead_leaf;
+-	struct assoc_array_ptr		*new_meta[3];
+-	struct assoc_array_ptr		*excised_meta[1];
+-	struct assoc_array_ptr		*excised_subtree;
+-	struct assoc_array_ptr		**set_backpointers[ASSOC_ARRAY_FAN_OUT];
+-	struct assoc_array_ptr		*set_backpointers_to;
+-	struct assoc_array_node		*adjust_count_on;
+-	long				adjust_count_by;
 -	struct {
--		struct key *keyring;
--		struct assoc_array_node *node;
--		int slot;
--	} stack[KEYRING_SEARCH_MAX_DEPTH];
+-		struct assoc_array_ptr	**ptr;
+-		struct assoc_array_ptr	*to;
+-	} set[2];
+-	struct {
+-		u8			*p;
+-		u8			to;
+-	} set_parent_slot[1];
+-	u8				segment_cache[ASSOC_ARRAY_FAN_OUT + 1];
+-};
 -
--	struct assoc_array_shortcut *shortcut;
--	struct assoc_array_node *node;
--	struct assoc_array_ptr *ptr;
- 	struct key *key;
--	int sp = 0, slot;
+-/*
+- * Internal tree member pointers are marked in the bottom one or two bits to
+- * indicate what type they are so that we don't have to look behind every
+- * pointer to see what it points to.
+- *
+- * We provide functions to test type annotations and to create and translate
+- * the annotated pointers.
+- */
+-#define ASSOC_ARRAY_PTR_TYPE_MASK 0x1UL
+-#define ASSOC_ARRAY_PTR_LEAF_TYPE 0x0UL	/* Points to leaf (or nowhere) */
+-#define ASSOC_ARRAY_PTR_META_TYPE 0x1UL	/* Points to node or shortcut */
+-#define ASSOC_ARRAY_PTR_SUBTYPE_MASK	0x2UL
+-#define ASSOC_ARRAY_PTR_NODE_SUBTYPE	0x0UL
+-#define ASSOC_ARRAY_PTR_SHORTCUT_SUBTYPE 0x2UL
+-
+-static inline bool assoc_array_ptr_is_meta(const struct assoc_array_ptr *x)
+-{
+-	return (unsigned long)x & ASSOC_ARRAY_PTR_TYPE_MASK;
+-}
+-static inline bool assoc_array_ptr_is_leaf(const struct assoc_array_ptr *x)
+-{
+-	return !assoc_array_ptr_is_meta(x);
+-}
+-static inline bool assoc_array_ptr_is_shortcut(const struct assoc_array_ptr *x)
+-{
+-	return (unsigned long)x & ASSOC_ARRAY_PTR_SUBTYPE_MASK;
+-}
+-static inline bool assoc_array_ptr_is_node(const struct assoc_array_ptr *x)
+-{
+-	return !assoc_array_ptr_is_shortcut(x);
+-}
+-
+-static inline void *assoc_array_ptr_to_leaf(const struct assoc_array_ptr *x)
+-{
+-	return (void *)((unsigned long)x & ~ASSOC_ARRAY_PTR_TYPE_MASK);
+-}
+-
+-static inline
+-unsigned long __assoc_array_ptr_to_meta(const struct assoc_array_ptr *x)
+-{
+-	return (unsigned long)x &
+-		~(ASSOC_ARRAY_PTR_SUBTYPE_MASK | ASSOC_ARRAY_PTR_TYPE_MASK);
+-}
+-static inline
+-struct assoc_array_node *assoc_array_ptr_to_node(const struct assoc_array_ptr *x)
+-{
+-	return (struct assoc_array_node *)__assoc_array_ptr_to_meta(x);
+-}
+-static inline
+-struct assoc_array_shortcut *assoc_array_ptr_to_shortcut(const struct assoc_array_ptr *x)
+-{
+-	return (struct assoc_array_shortcut *)__assoc_array_ptr_to_meta(x);
+-}
+-
+-static inline
+-struct assoc_array_ptr *__assoc_array_x_to_ptr(const void *p, unsigned long t)
+-{
+-	return (struct assoc_array_ptr *)((unsigned long)p | t);
+-}
+-static inline
+-struct assoc_array_ptr *assoc_array_leaf_to_ptr(const void *p)
+-{
+-	return __assoc_array_x_to_ptr(p, ASSOC_ARRAY_PTR_LEAF_TYPE);
+-}
+-static inline
+-struct assoc_array_ptr *assoc_array_node_to_ptr(const struct assoc_array_node *p)
+-{
+-	return __assoc_array_x_to_ptr(
+-		p, ASSOC_ARRAY_PTR_META_TYPE | ASSOC_ARRAY_PTR_NODE_SUBTYPE);
+-}
+-static inline
+-struct assoc_array_ptr *assoc_array_shortcut_to_ptr(const struct assoc_array_shortcut *p)
+-{
+-	return __assoc_array_x_to_ptr(
+-		p, ASSOC_ARRAY_PTR_META_TYPE | ASSOC_ARRAY_PTR_SHORTCUT_SUBTYPE);
+-}
+-
+-#endif /* CONFIG_ASSOCIATIVE_ARRAY */
+-#endif /* _LINUX_ASSOC_ARRAY_PRIV_H */
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 4e6b34c3346d..9b3dd46c6799 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -349,20 +349,6 @@ config XARRAY_MULTI
+ 	  Support entries which occupy multiple consecutive indices in the
+ 	  XArray.
  
- 	kenter("{%d},{%s,%s}",
- 	       keyring->serial,
-@@ -713,9 +723,9 @@ static bool search_nested_keyrings(struct key *keyring,
- 	 * and whether it is valid or not.
- 	 */
- 	if (ctx->match_data.lookup_type == KEYRING_SEARCH_LOOKUP_ITERATE ||
--	    keyring_compare_object(keyring, &ctx->index_key)) {
-+	    keyring_index_key_equal(&keyring->index_key, &ctx->index_key)) {
- 		ctx->skipped_ret = 2;
--		switch (ctx->iterator(keyring_key_to_ptr(keyring), ctx)) {
-+		switch (ctx->iterator(keyring, ctx)) {
- 		case 1:
- 			goto found;
- 		case 2:
-@@ -727,152 +737,11 @@ static bool search_nested_keyrings(struct key *keyring,
+-config ASSOCIATIVE_ARRAY
+-	bool
+-	help
+-	  Generic associative array.  Can be searched and iterated over whilst
+-	  it is being modified.  It is also reasonably quick to search and
+-	  modify.  The algorithms are non-recursive, and the trees are highly
+-	  capacious.
+-
+-	  See:
+-
+-		Documentation/core-api/assoc_array.rst
+-
+-	  for more information.
+-
+ config CLOSURES
+ 	bool
  
- 	ctx->skipped_ret = 0;
+diff --git a/lib/Makefile b/lib/Makefile
+index 3104710e1e68..a8edb942e146 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -142,7 +142,6 @@ obj-$(CONFIG_GENERIC_HWEIGHT) += hweight.o
  
--	/* Start processing a new keyring */
--descend_to_keyring:
--	kdebug("descend to %d", keyring->serial);
--	if (keyring->flags & ((1 << KEY_FLAG_INVALIDATED) |
--			      (1 << KEY_FLAG_REVOKED)))
--		goto not_this_keyring;
+ obj-$(CONFIG_BTREE) += btree.o
+ obj-$(CONFIG_INTERVAL_TREE) += interval_tree.o
+-obj-$(CONFIG_ASSOCIATIVE_ARRAY) += assoc_array.o
+ obj-$(CONFIG_DEBUG_PREEMPT) += smp_processor_id.o
+ obj-$(CONFIG_LIST_HARDENED) += list_debug.o
+ obj-$(CONFIG_DEBUG_OBJECTS) += debugobjects.o
+diff --git a/lib/assoc_array.c b/lib/assoc_array.c
+deleted file mode 100644
+index b6c9723e12ce..000000000000
+--- a/lib/assoc_array.c
++++ /dev/null
+@@ -1,1724 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/* Generic associative array implementation.
+- *
+- * See Documentation/core-api/assoc_array.rst for information.
+- *
+- * Copyright (C) 2013 Red Hat, Inc. All Rights Reserved.
+- * Written by David Howells (dhowells@redhat.com)
+- */
+-//#define DEBUG
+-#include <linux/rcupdate.h>
+-#include <linux/slab.h>
+-#include <linux/err.h>
+-#include <linux/assoc_array_priv.h>
 -
--	/* Search through the keys in this keyring before its searching its
--	 * subtrees.
--	 */
--	if (search_keyring(keyring, ctx))
--		goto found;
+-/*
+- * Iterate over an associative array.  The caller must hold the RCU read lock
+- * or better.
+- */
+-static int assoc_array_subtree_iterate(const struct assoc_array_ptr *root,
+-				       const struct assoc_array_ptr *stop,
+-				       int (*iterator)(const void *leaf,
+-						       void *iterator_data),
+-				       void *iterator_data)
+-{
+-	const struct assoc_array_shortcut *shortcut;
+-	const struct assoc_array_node *node;
+-	const struct assoc_array_ptr *cursor, *ptr, *parent;
+-	unsigned long has_meta;
+-	int slot, ret;
 -
--	/* Then manually iterate through the keyrings nested in this one.
--	 *
--	 * Start from the root node of the index tree.  Because of the way the
--	 * hash function has been set up, keyrings cluster on the leftmost
--	 * branch of the root node (root slot 0) or in the root node itself.
--	 * Non-keyrings avoid the leftmost branch of the root entirely (root
--	 * slots 1-15).
--	 */
--	if (!(ctx->flags & KEYRING_SEARCH_RECURSE))
--		goto not_this_keyring;
--
--	ptr = READ_ONCE(keyring->keys.root);
--	if (!ptr)
--		goto not_this_keyring;
--
--	if (assoc_array_ptr_is_shortcut(ptr)) {
--		/* If the root is a shortcut, either the keyring only contains
--		 * keyring pointers (everything clusters behind root slot 0) or
--		 * doesn't contain any keyring pointers.
--		 */
--		shortcut = assoc_array_ptr_to_shortcut(ptr);
--		if ((shortcut->index_key[0] & ASSOC_ARRAY_FAN_MASK) != 0)
--			goto not_this_keyring;
--
--		ptr = READ_ONCE(shortcut->next_node);
--		node = assoc_array_ptr_to_node(ptr);
--		goto begin_node;
--	}
--
--	node = assoc_array_ptr_to_node(ptr);
--	ptr = node->slots[0];
--	if (!assoc_array_ptr_is_meta(ptr))
--		goto begin_node;
--
--descend_to_node:
--	/* Descend to a more distal node in this keyring's content tree and go
--	 * through that.
--	 */
--	kdebug("descend");
--	if (assoc_array_ptr_is_shortcut(ptr)) {
--		shortcut = assoc_array_ptr_to_shortcut(ptr);
--		ptr = READ_ONCE(shortcut->next_node);
--		BUG_ON(!assoc_array_ptr_is_node(ptr));
--	}
--	node = assoc_array_ptr_to_node(ptr);
+-	cursor = root;
 -
 -begin_node:
--	kdebug("begin_node");
+-	if (assoc_array_ptr_is_shortcut(cursor)) {
+-		/* Descend through a shortcut */
+-		shortcut = assoc_array_ptr_to_shortcut(cursor);
+-		cursor = READ_ONCE(shortcut->next_node); /* Address dependency. */
+-	}
+-
+-	node = assoc_array_ptr_to_node(cursor);
 -	slot = 0;
--ascend_to_node:
--	/* Go through the slots in a node */
+-
+-	/* We perform two passes of each node.
+-	 *
+-	 * The first pass does all the leaves in this node.  This means we
+-	 * don't miss any leaves if the node is split up by insertion whilst
+-	 * we're iterating over the branches rooted here (we may, however, see
+-	 * some leaves twice).
+-	 */
+-	has_meta = 0;
 -	for (; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
--		ptr = READ_ONCE(node->slots[slot]);
+-		ptr = READ_ONCE(node->slots[slot]); /* Address dependency. */
+-		has_meta |= (unsigned long)ptr;
+-		if (ptr && assoc_array_ptr_is_leaf(ptr)) {
+-			/* We need a barrier between the read of the pointer,
+-			 * which is supplied by the above READ_ONCE().
+-			 */
+-			/* Invoke the callback */
+-			ret = iterator(assoc_array_ptr_to_leaf(ptr),
+-				       iterator_data);
+-			if (ret)
+-				return ret;
+-		}
+-	}
 -
+-	/* The second pass attends to all the metadata pointers.  If we follow
+-	 * one of these we may find that we don't come back here, but rather go
+-	 * back to a replacement node with the leaves in a different layout.
+-	 *
+-	 * We are guaranteed to make progress, however, as the slot number for
+-	 * a particular portion of the key space cannot change - and we
+-	 * continue at the back pointer + 1.
+-	 */
+-	if (!(has_meta & ASSOC_ARRAY_PTR_META_TYPE))
+-		goto finished_node;
+-	slot = 0;
+-
+-continue_node:
+-	node = assoc_array_ptr_to_node(cursor);
+-	for (; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
+-		ptr = READ_ONCE(node->slots[slot]); /* Address dependency. */
 -		if (assoc_array_ptr_is_meta(ptr)) {
--			if (node->back_pointer ||
--			    assoc_array_ptr_is_shortcut(ptr))
--				goto descend_to_node;
+-			cursor = ptr;
+-			goto begin_node;
 -		}
--
--		if (!keyring_ptr_is_keyring(ptr))
--			continue;
--
--		key = keyring_ptr_to_key(ptr);
--
--		if (sp >= KEYRING_SEARCH_MAX_DEPTH) {
--			if (ctx->flags & KEYRING_SEARCH_DETECT_TOO_DEEP) {
--				ctx->result = ERR_PTR(-ELOOP);
--				return false;
--			}
--			goto not_this_keyring;
--		}
--
--		/* Search a nested keyring */
--		if (!(ctx->flags & KEYRING_SEARCH_NO_CHECK_PERM) &&
--		    key_task_permission(make_key_ref(key, ctx->possessed),
--					ctx->cred, KEY_NEED_SEARCH) < 0)
--			continue;
--
--		/* stack the current position */
--		stack[sp].keyring = keyring;
--		stack[sp].node = node;
--		stack[sp].slot = slot;
--		sp++;
--
--		/* begin again with the new keyring */
--		keyring = key;
--		goto descend_to_keyring;
 -	}
 -
--	/* We've dealt with all the slots in the current node, so now we need
--	 * to ascend to the parent and continue processing there.
--	 */
--	ptr = READ_ONCE(node->back_pointer);
+-finished_node:
+-	/* Move up to the parent (may need to skip back over a shortcut) */
+-	parent = READ_ONCE(node->back_pointer); /* Address dependency. */
 -	slot = node->parent_slot;
+-	if (parent == stop)
+-		return 0;
 -
--	if (ptr && assoc_array_ptr_is_shortcut(ptr)) {
--		shortcut = assoc_array_ptr_to_shortcut(ptr);
--		ptr = READ_ONCE(shortcut->back_pointer);
+-	if (assoc_array_ptr_is_shortcut(parent)) {
+-		shortcut = assoc_array_ptr_to_shortcut(parent);
+-		cursor = parent;
+-		parent = READ_ONCE(shortcut->back_pointer); /* Address dependency. */
 -		slot = shortcut->parent_slot;
+-		if (parent == stop)
+-			return 0;
 -	}
--	if (!ptr)
--		goto not_this_keyring;
--	node = assoc_array_ptr_to_node(ptr);
+-
+-	/* Ascend to next slot in parent node */
+-	cursor = parent;
 -	slot++;
--
--	/* If we've ascended to the root (zero backpointer), we must have just
--	 * finished processing the leftmost branch rather than the root slots -
--	 * so there can't be any more keyrings for us to find.
--	 */
--	if (node->back_pointer) {
--		kdebug("ascend %d", slot);
--		goto ascend_to_node;
--	}
--
--	/* The keyring we're looking at was disqualified or didn't contain a
--	 * matching key.
--	 */
--not_this_keyring:
--	kdebug("not_this_keyring %d", sp);
--	if (sp <= 0) {
-+	if (search_keyring_tree(keyring, ctx, 0) <= 0) {
- 		kleave(" = false");
- 		return false;
- 	}
- 
--	/* Resume the processing of a keyring higher up in the tree */
--	sp--;
--	keyring = stack[sp].keyring;
--	node = stack[sp].node;
--	slot = stack[sp].slot + 1;
--	kdebug("ascend to %d [%d]", keyring->serial, slot);
--	goto ascend_to_node;
--
- 	/* We found a viable match */
- found:
- 	key = key_ref_to_ptr(ctx->result);
-@@ -880,8 +749,6 @@ static bool search_nested_keyrings(struct key *keyring,
- 	if (!(ctx->flags & KEYRING_SEARCH_NO_UPDATE_TIME)) {
- 		key->last_used_at = ctx->now;
- 		keyring->last_used_at = ctx->now;
--		while (sp > 0)
--			stack[--sp].keyring->last_used_at = ctx->now;
- 	}
- 	kleave(" = true");
- 	return true;
-@@ -1128,8 +995,8 @@ EXPORT_SYMBOL(keyring_restrict);
- key_ref_t find_key_to_update(key_ref_t keyring_ref,
- 			     const struct keyring_index_key *index_key)
- {
-+	struct keyring_link *link;
- 	struct key *keyring, *key;
--	const void *object;
- 
- 	keyring = key_ref_to_ptr(keyring_ref);
- 
-@@ -1137,17 +1004,16 @@ key_ref_t find_key_to_update(key_ref_t keyring_ref,
- 	       keyring->serial, index_key->type->name, index_key->description);
- 
- 	guard(rcu)();
--	object = assoc_array_find(&keyring->keys, &keyring_assoc_array_ops,
--				  index_key);
-+	link = keyring_find_link(rcu_dereference(keyring->index), index_key);
- 
--	if (object)
-+	if (link)
- 		goto found;
- 
- 	kleave(" = NULL");
- 	return NULL;
- 
- found:
--	key = keyring_ptr_to_key(object);
-+	key = keyring_link_key(link);
- 	if (key->flags & ((1 << KEY_FLAG_INVALIDATED) |
- 			  (1 << KEY_FLAG_REVOKED))) {
- 		kleave(" = NULL [x]");
-@@ -1217,11 +1083,10 @@ struct key *find_keyring_by_name(const char *name, bool uid_keyring)
- 	return keyring;
- }
- 
--static int keyring_detect_cycle_iterator(const void *object,
-+static int keyring_detect_cycle_iterator(const struct key *key,
- 					 void *iterator_data)
- {
- 	struct keyring_search_context *ctx = iterator_data;
--	const struct key *key = keyring_ptr_to_key(object);
- 
- 	kenter("{%d}", key->serial);
- 
-@@ -1317,56 +1182,89 @@ int __key_move_lock(struct key *l_keyring, struct key *u_keyring,
- 	return 0;
- }
- 
-+static struct keyring_index *keyring_get_index(struct key *keyring)
-+{
-+	struct keyring_index *links __free(kfree) =
-+		keyring_index_locked(keyring);
-+	int ret;
-+
-+	if (links)
-+		return_ptr(links);
-+
-+	links = kzalloc_obj(struct keyring_index);
-+	if (!links)
-+		return ERR_PTR(-ENOMEM);
-+	ret = rhashtable_init(&links->ht, &keyring_link_params);
-+	if (ret < 0)
-+		return ERR_PTR(ret);
-+
-+	INIT_LIST_HEAD(&links->list);
-+	INIT_RCU_WORK(&links->rcu_work, keyring_index_free_work);
-+	rcu_assign_pointer(keyring->index, links);
-+	return_ptr(links);
-+}
-+
- /*
-  * Preallocate memory so that a key can be linked into to a keyring.
-  */
- int __key_link_begin(struct key *keyring,
- 		     const struct keyring_index_key *index_key,
--		     struct assoc_array_edit **_edit)
-+		     struct keyring_link *edit[2])
- {
--	struct assoc_array_edit *edit;
-+	struct keyring_link *link __free(kfree) = NULL;
-+	struct keyring_link *replace;
-+	struct keyring_index *links;
- 	int ret;
- 
- 	kenter("%d,%s,%s,",
- 	       keyring->serial, index_key->type->name, index_key->description);
- 
--	BUG_ON(index_key->desc_len == 0);
--	BUG_ON(*_edit != NULL);
-+	if (WARN_ON(index_key->desc_len == 0) || WARN_ON(edit[0]))
-+		return -EINVAL;
- 
--	*_edit = NULL;
-+	edit[0] = NULL;
-+	edit[1] = NULL;
- 
- 	ret = -EKEYREVOKED;
- 	if (test_bit(KEY_FLAG_REVOKED, &keyring->flags))
- 		goto error;
- 
--	/* Create an edit script that will insert/replace the key in the
--	 * keyring tree.
--	 */
--	edit = assoc_array_insert(&keyring->keys,
--				  &keyring_assoc_array_ops,
--				  index_key,
--				  NULL);
--	if (IS_ERR(edit)) {
--		ret = PTR_ERR(edit);
-+	links = keyring_get_index(keyring);
-+	if (IS_ERR(links)) {
-+		ret = PTR_ERR(links);
- 		goto error;
- 	}
- 
-+	ret = -ENOMEM;
-+	link = kzalloc_obj(struct keyring_link);
-+	if (!link)
-+		goto error;
-+	link->hash = index_key->hash;
-+
-+	replace = keyring_find_link(links, index_key);
- 	/* If we're not replacing a link in-place then we're going to need some
- 	 * extra quota.
- 	 */
--	if (!edit->dead_leaf) {
-+	if (!replace) {
- 		ret = key_payload_reserve(keyring,
- 					  keyring->datalen + KEYQUOTA_LINK_BYTES);
- 		if (ret < 0)
--			goto error_cancel;
-+			goto error;
-+
-+		ret = rhashtable_insert_fast(&links->ht, &link->node,
-+					     keyring_link_params);
-+		if (ret < 0) {
-+			key_payload_reserve(keyring,
-+					    keyring->datalen - KEYQUOTA_LINK_BYTES);
-+			goto error;
-+		}
- 	}
- 
--	*_edit = edit;
-+	edit[0] = no_free_ptr(link);
-+	edit[1] = replace;
- 	kleave(" = 0");
- 	return 0;
- 
--error_cancel:
--	assoc_array_cancel_edit(edit);
- error:
- 	kleave(" = %d", ret);
- 	return ret;
-@@ -1395,14 +1293,37 @@ int __key_link_check_live_key(struct key *keyring, struct key *key)
-  * holds at most one link to any given key of a particular type+description
-  * combination.
-  */
--void __key_link(struct key *keyring, struct key *key,
--		struct assoc_array_edit **_edit)
-+void __key_link(struct key *keyring, struct key *key, struct keyring_link *edit[2])
- {
-+	struct keyring_index *index = keyring_index_locked(keyring);
-+	int ret = 0;
-+
- 	__key_get(key);
--	assoc_array_insert_set_object(*_edit, keyring_key_to_ptr(key));
--	assoc_array_apply_edit(*_edit);
--	*_edit = NULL;
-+	rcu_assign_pointer(edit[0]->key, key);
-+
-+	if (edit[1]) {
-+		ret = rhashtable_replace_fast(&index->ht, &edit[1]->node,
-+					      &edit[0]->node, keyring_link_params);
-+		if (ret)
-+			goto out;
-+
-+		list_replace_rcu(&edit[1]->list, &edit[0]->list);
-+		call_rcu(&edit[1]->rcu, keyring_link_free_rcu);
-+	} else {
-+		if (key->type == &key_type_keyring)
-+			list_add_rcu(&edit[0]->list, &index->list);
-+		else
-+			list_add_tail_rcu(&edit[0]->list, &index->list);
-+
-+		WRITE_ONCE(index->nr, index->nr + 1);
-+	}
-+
-+	edit[0] = NULL;
-+	edit[1] = NULL;
- 	notify_key(keyring, NOTIFY_KEY_LINKED, key_serial(key));
-+
-+out:
-+	WARN_ON(ret);
- }
- 
- /*
-@@ -1412,20 +1333,31 @@ void __key_link(struct key *keyring, struct key *key,
-  */
- void __key_link_end(struct key *keyring,
- 		    const struct keyring_index_key *index_key,
--		    struct assoc_array_edit *edit)
-+		    struct keyring_link *edit[2])
- 	__releases(&keyring->sem)
- 	__releases(&keyring_serialise_link_lock)
- {
-+	struct keyring_link *link = edit[0];
-+
- 	BUG_ON(index_key->type == NULL);
- 	kenter("%d,%s,", keyring->serial, index_key->type->name);
- 
--	if (edit) {
--		if (!edit->dead_leaf) {
-+	if (link) {
-+		if (!edit[1]) {
- 			key_payload_reserve(keyring,
- 				keyring->datalen - KEYQUOTA_LINK_BYTES);
-+			WARN_ON(rhashtable_remove_fast(&keyring_index_locked(keyring)->ht,
-+						       &link->node,
-+						       keyring_link_params));
-+			call_rcu(&link->rcu, keyring_link_free_rcu);
-+		} else {
-+			kfree(link);
- 		}
--		assoc_array_cancel_edit(edit);
-+
-+		edit[0] = NULL;
-+		edit[1] = NULL;
- 	}
-+
- 	up_write(&keyring->sem);
- 
- 	if (index_key->type == &key_type_keyring)
-@@ -1455,9 +1387,9 @@ static int __key_link_check_restriction(struct key *keyring, struct key *key)
-  * of the user's key data quota to hold the link.
-  *
-  * Returns 0 if successful, -ENOTDIR if the keyring isn't a keyring,
-- * -EKEYREVOKED if the keyring has been revoked, -ENFILE if the keyring is
-- * full, -EDQUOT if there is insufficient key data quota remaining to add
-- * another link or -ENOMEM if there's insufficient memory.
-+ * -EKEYREVOKED if the keyring has been revoked, -EDQUOT if there is insufficient
-+ * key data quota remaining to add another link or -ENOMEM if there's
-+ * insufficient memory.
-  *
-  * It is assumed that the caller has checked that it is permitted for a link to
-  * be made (the keyring should have Write permission and the key Link
-@@ -1465,7 +1397,7 @@ static int __key_link_check_restriction(struct key *keyring, struct key *key)
-  */
- int key_link(struct key *keyring, struct key *key)
- {
--	struct assoc_array_edit *edit = NULL;
-+	struct keyring_link *edit[2] = {};
- 	int ret;
- 
- 	kenter("{%d,%d}", keyring->serial, refcount_read(&keyring->usage));
-@@ -1477,7 +1409,7 @@ int key_link(struct key *keyring, struct key *key)
- 	if (ret < 0)
- 		goto error;
- 
--	ret = __key_link_begin(keyring, &key->index_key, &edit);
-+	ret = __key_link_begin(keyring, &key->index_key, edit);
- 	if (ret < 0)
- 		goto error_end;
- 
-@@ -1486,7 +1418,7 @@ int key_link(struct key *keyring, struct key *key)
- 	if (ret == 0)
- 		ret = __key_link_check_live_key(keyring, key);
- 	if (ret == 0)
--		__key_link(keyring, key, &edit);
-+		__key_link(keyring, key, edit);
- 
- error_end:
- 	__key_link_end(keyring, &key->index_key, edit);
-@@ -1513,27 +1445,21 @@ static int __key_unlink_lock(struct key *keyring)
-  * Begin the process of unlinking a key from a keyring.
-  */
- static int __key_unlink_begin(struct key *keyring, struct key *key,
--			      struct assoc_array_edit **_edit)
-+			      struct keyring_link **edit)
- {
--	struct assoc_array_edit *edit;
--	const void *object;
-+	struct keyring_link *link;
- 
--	BUG_ON(*_edit != NULL);
-+	if (WARN_ON(edit[0]))
-+		return -EINVAL;
- 
--	object = assoc_array_find(&keyring->keys, &keyring_assoc_array_ops,
--				  &key->index_key);
--	if (!object || keyring_ptr_to_key(object) != key)
-+	link = keyring_find_link(keyring_index_locked(keyring), &key->index_key);
-+	if (!link)
- 		return -ENOENT;
- 
--	edit = assoc_array_delete(&keyring->keys, &keyring_assoc_array_ops,
--				  &key->index_key);
--	if (IS_ERR(edit))
--		return PTR_ERR(edit);
--
--	if (!edit)
-+	if (keyring_link_key(link) != key)
- 		return -ENOENT;
- 
--	*_edit = edit;
-+	edit[0] = link;
- 	return 0;
- }
- 
-@@ -1541,27 +1467,22 @@ static int __key_unlink_begin(struct key *keyring, struct key *key,
-  * Apply an unlink change.
-  */
- static void __key_unlink(struct key *keyring, struct key *key,
--			 struct assoc_array_edit **_edit)
-+			 struct keyring_link *link)
- {
--	assoc_array_apply_edit(*_edit);
-+	struct keyring_index *index = keyring_index_locked(keyring);
-+	int ret;
-+
-+	ret = rhashtable_remove_fast(&index->ht, &link->node, keyring_link_params);
-+	if (WARN_ON(ret))
-+		return;
-+
-+	list_del_rcu(&link->list);
-+	WRITE_ONCE(index->nr, index->nr - 1);
-+	call_rcu(&link->rcu, keyring_link_free_rcu);
- 	notify_key(keyring, NOTIFY_KEY_UNLINKED, key_serial(key));
--	*_edit = NULL;
- 	key_payload_reserve(keyring, keyring->datalen - KEYQUOTA_LINK_BYTES);
- }
- 
--/*
-- * Finish unlinking a key from to a keyring.
-- */
--static void __key_unlink_end(struct key *keyring,
--			     struct key *key,
--			     struct assoc_array_edit *edit)
--	__releases(&keyring->sem)
--{
--	if (edit)
--		assoc_array_cancel_edit(edit);
--	up_write(&keyring->sem);
+-	goto continue_node;
 -}
 -
- /**
-  * key_unlink - Unlink the first link to a key from a keyring.
-  * @keyring: The keyring to remove the link from.
-@@ -1571,9 +1492,8 @@ static void __key_unlink_end(struct key *keyring,
-  *
-  * This function will write-lock the keyring's semaphore.
-  *
-- * Returns 0 if successful, -ENOTDIR if the keyring isn't a keyring, -ENOENT if
-- * the key isn't linked to by the keyring or -ENOMEM if there's insufficient
-- * memory.
-+ * Returns 0 if successful, -ENOTDIR if the keyring isn't a keyring or -ENOENT if
-+ * the key isn't linked to by the keyring.
-  *
-  * It is assumed that the caller has checked that it is permitted for a link to
-  * be removed (the keyring should have Write permission; no permissions are
-@@ -1581,7 +1501,7 @@ static void __key_unlink_end(struct key *keyring,
-  */
- int key_unlink(struct key *keyring, struct key *key)
- {
--	struct assoc_array_edit *edit = NULL;
-+	struct keyring_link *edit = NULL;
- 	int ret;
- 
- 	key_check(keyring);
-@@ -1593,8 +1513,8 @@ int key_unlink(struct key *keyring, struct key *key)
- 
- 	ret = __key_unlink_begin(keyring, key, &edit);
- 	if (ret == 0)
--		__key_unlink(keyring, key, &edit);
--	__key_unlink_end(keyring, key, edit);
-+		__key_unlink(keyring, key, edit);
-+	up_write(&keyring->sem);
- 	return ret;
- }
- EXPORT_SYMBOL(key_unlink);
-@@ -1614,11 +1534,10 @@ EXPORT_SYMBOL(key_unlink);
-  * some of the user's key data quota to hold the link on @to_keyring.
-  *
-  * Returns 0 if successful, -ENOTDIR if either keyring isn't a keyring,
-- * -EKEYREVOKED if either keyring has been revoked, -ENFILE if the second
-- * keyring is full, -EDQUOT if there is insufficient key data quota remaining
-- * to add another link or -ENOMEM if there's insufficient memory.  If
-- * KEYCTL_MOVE_EXCL is set, then -EEXIST will be returned if there's already a
-- * matching key in @to_keyring.
-+ * -EKEYREVOKED if either keyring has been revoked, -EDQUOT if there is
-+ * insufficient key data quota remaining to add another link or -ENOMEM if
-+ * there's insufficient memory.  If KEYCTL_MOVE_EXCL is set, then -EEXIST will
-+ * be returned if there's already a matching key in @to_keyring.
-  *
-  * It is assumed that the caller has checked that it is permitted for a link to
-  * be made (the keyring should have Write permission and the key Link
-@@ -1629,7 +1548,8 @@ int key_move(struct key *key,
- 	     struct key *to_keyring,
- 	     unsigned int flags)
- {
--	struct assoc_array_edit *from_edit = NULL, *to_edit = NULL;
-+	struct keyring_link *from_edit = NULL;
-+	struct keyring_link *to_edit[2] = {};
- 	int ret;
- 
- 	kenter("%d,%d,%d", key->serial, from_keyring->serial, to_keyring->serial);
-@@ -1647,12 +1567,12 @@ int key_move(struct key *key,
- 	ret = __key_unlink_begin(from_keyring, key, &from_edit);
- 	if (ret < 0)
- 		goto error;
--	ret = __key_link_begin(to_keyring, &key->index_key, &to_edit);
-+	ret = __key_link_begin(to_keyring, &key->index_key, to_edit);
- 	if (ret < 0)
- 		goto error;
- 
- 	ret = -EEXIST;
--	if (to_edit->dead_leaf && (flags & KEYCTL_MOVE_EXCL))
-+	if (to_edit[1] && (flags & KEYCTL_MOVE_EXCL))
- 		goto error;
- 
- 	ret = __key_link_check_restriction(to_keyring, key);
-@@ -1662,11 +1582,11 @@ int key_move(struct key *key,
- 	if (ret < 0)
- 		goto error;
- 
--	__key_unlink(from_keyring, key, &from_edit);
--	__key_link(to_keyring, key, &to_edit);
-+	__key_unlink(from_keyring, key, from_edit);
-+	__key_link(to_keyring, key, to_edit);
- error:
- 	__key_link_end(to_keyring, &key->index_key, to_edit);
--	__key_unlink_end(from_keyring, key, from_edit);
-+	up_write(&from_keyring->sem);
- out:
- 	kleave(" = %d", ret);
- 	return ret;
-@@ -1683,27 +1603,17 @@ EXPORT_SYMBOL(key_move);
-  */
- int keyring_clear(struct key *keyring)
- {
--	struct assoc_array_edit *edit;
--	int ret;
+-/**
+- * assoc_array_iterate - Pass all objects in the array to a callback
+- * @array: The array to iterate over.
+- * @iterator: The callback function.
+- * @iterator_data: Private data for the callback function.
+- *
+- * Iterate over all the objects in an associative array.  Each one will be
+- * presented to the iterator function.
+- *
+- * If the array is being modified concurrently with the iteration then it is
+- * possible that some objects in the array will be passed to the iterator
+- * callback more than once - though every object should be passed at least
+- * once.  If this is undesirable then the caller must lock against modification
+- * for the duration of this function.
+- *
+- * The function will return 0 if no objects were in the array or else it will
+- * return the result of the last iterator function called.  Iteration stops
+- * immediately if any call to the iteration function results in a non-zero
+- * return.
+- *
+- * The caller should hold the RCU read lock or better if concurrent
+- * modification is possible.
+- */
+-int assoc_array_iterate(const struct assoc_array *array,
+-			int (*iterator)(const void *object,
+-					void *iterator_data),
+-			void *iterator_data)
+-{
+-	struct assoc_array_ptr *root = READ_ONCE(array->root); /* Address dependency. */
 -
- 	if (keyring->type != &key_type_keyring)
- 		return -ENOTDIR;
- 
- 	down_write(&keyring->sem);
- 
--	edit = assoc_array_clear(&keyring->keys, &keyring_assoc_array_ops);
--	if (IS_ERR(edit)) {
--		ret = PTR_ERR(edit);
+-	if (!root)
+-		return 0;
+-	return assoc_array_subtree_iterate(root, NULL, iterator, iterator_data);
+-}
+-
+-enum assoc_array_walk_status {
+-	assoc_array_walk_tree_empty,
+-	assoc_array_walk_found_terminal_node,
+-	assoc_array_walk_found_wrong_shortcut,
+-};
+-
+-struct assoc_array_walk_result {
+-	struct {
+-		struct assoc_array_node	*node;	/* Node in which leaf might be found */
+-		int		level;
+-		int		slot;
+-	} terminal_node;
+-	struct {
+-		struct assoc_array_shortcut *shortcut;
+-		int		level;
+-		int		sc_level;
+-		unsigned long	sc_segments;
+-		unsigned long	dissimilarity;
+-	} wrong_shortcut;
+-};
+-
+-/*
+- * Navigate through the internal tree looking for the closest node to the key.
+- */
+-static enum assoc_array_walk_status
+-assoc_array_walk(const struct assoc_array *array,
+-		 const struct assoc_array_ops *ops,
+-		 const void *index_key,
+-		 struct assoc_array_walk_result *result)
+-{
+-	struct assoc_array_shortcut *shortcut;
+-	struct assoc_array_node *node;
+-	struct assoc_array_ptr *cursor, *ptr;
+-	unsigned long sc_segments, dissimilarity;
+-	unsigned long segments;
+-	int level, sc_level, next_sc_level;
+-	int slot;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	cursor = READ_ONCE(array->root);  /* Address dependency. */
+-	if (!cursor)
+-		return assoc_array_walk_tree_empty;
+-
+-	level = 0;
+-
+-	/* Use segments from the key for the new leaf to navigate through the
+-	 * internal tree, skipping through nodes and shortcuts that are on
+-	 * route to the destination.  Eventually we'll come to a slot that is
+-	 * either empty or contains a leaf at which point we've found a node in
+-	 * which the leaf we're looking for might be found or into which it
+-	 * should be inserted.
+-	 */
+-jumped:
+-	segments = ops->get_key_chunk(index_key, level);
+-	pr_devel("segments[%d]: %lx\n", level, segments);
+-
+-	if (assoc_array_ptr_is_shortcut(cursor))
+-		goto follow_shortcut;
+-
+-consider_node:
+-	node = assoc_array_ptr_to_node(cursor);
+-	slot = segments >> (level & ASSOC_ARRAY_KEY_CHUNK_MASK);
+-	slot &= ASSOC_ARRAY_FAN_MASK;
+-	ptr = READ_ONCE(node->slots[slot]); /* Address dependency. */
+-
+-	pr_devel("consider slot %x [ix=%d type=%lu]\n",
+-		 slot, level, (unsigned long)ptr & 3);
+-
+-	if (!assoc_array_ptr_is_meta(ptr)) {
+-		/* The node doesn't have a node/shortcut pointer in the slot
+-		 * corresponding to the index key that we have to follow.
+-		 */
+-		result->terminal_node.node = node;
+-		result->terminal_node.level = level;
+-		result->terminal_node.slot = slot;
+-		pr_devel("<--%s() = terminal_node\n", __func__);
+-		return assoc_array_walk_found_terminal_node;
+-	}
+-
+-	if (assoc_array_ptr_is_node(ptr)) {
+-		/* There is a pointer to a node in the slot corresponding to
+-		 * this index key segment, so we need to follow it.
+-		 */
+-		cursor = ptr;
+-		level += ASSOC_ARRAY_LEVEL_STEP;
+-		if ((level & ASSOC_ARRAY_KEY_CHUNK_MASK) != 0)
+-			goto consider_node;
+-		goto jumped;
+-	}
+-
+-	/* There is a shortcut in the slot corresponding to the index key
+-	 * segment.  We follow the shortcut if its partial index key matches
+-	 * this leaf's.  Otherwise we need to split the shortcut.
+-	 */
+-	cursor = ptr;
+-follow_shortcut:
+-	shortcut = assoc_array_ptr_to_shortcut(cursor);
+-	pr_devel("shortcut to %d\n", shortcut->skip_to_level);
+-	sc_level = level + ASSOC_ARRAY_LEVEL_STEP;
+-	BUG_ON(sc_level > shortcut->skip_to_level);
+-
+-	do {
+-		/* Check the leaf against the shortcut's index key a word at a
+-		 * time, trimming the final word (the shortcut stores the index
+-		 * key completely from the root to the shortcut's target).
+-		 */
+-		if ((sc_level & ASSOC_ARRAY_KEY_CHUNK_MASK) == 0)
+-			segments = ops->get_key_chunk(index_key, sc_level);
+-
+-		sc_segments = shortcut->index_key[sc_level >> ASSOC_ARRAY_KEY_CHUNK_SHIFT];
+-		dissimilarity = segments ^ sc_segments;
+-
+-		if (shortcut->skip_to_level < round_down(sc_level,
+-				ASSOC_ARRAY_KEY_CHUNK_SIZE) + ASSOC_ARRAY_KEY_CHUNK_SIZE) {
+-			/* Trim segments that are beyond the shortcut */
+-			int shift = shortcut->skip_to_level & ASSOC_ARRAY_KEY_CHUNK_MASK;
+-			dissimilarity &= ~(ULONG_MAX << shift);
+-			next_sc_level = shortcut->skip_to_level;
+-		} else {
+-			next_sc_level = sc_level + ASSOC_ARRAY_KEY_CHUNK_SIZE;
+-			next_sc_level = round_down(next_sc_level, ASSOC_ARRAY_KEY_CHUNK_SIZE);
+-		}
+-
+-		if (dissimilarity != 0) {
+-			/* This shortcut points elsewhere */
+-			result->wrong_shortcut.shortcut = shortcut;
+-			result->wrong_shortcut.level = level;
+-			result->wrong_shortcut.sc_level = sc_level;
+-			result->wrong_shortcut.sc_segments = sc_segments;
+-			result->wrong_shortcut.dissimilarity = dissimilarity;
+-			return assoc_array_walk_found_wrong_shortcut;
+-		}
+-
+-		sc_level = next_sc_level;
+-	} while (sc_level < shortcut->skip_to_level);
+-
+-	/* The shortcut matches the leaf's index to this point. */
+-	cursor = READ_ONCE(shortcut->next_node); /* Address dependency. */
+-	if (((level ^ sc_level) & ~ASSOC_ARRAY_KEY_CHUNK_MASK) != 0) {
+-		level = sc_level;
+-		goto jumped;
 -	} else {
--		if (edit)
--			assoc_array_apply_edit(edit);
--		notify_key(keyring, NOTIFY_KEY_CLEARED, 0);
--		key_payload_reserve(keyring, 0);
--		ret = 0;
+-		level = sc_level;
+-		goto consider_node;
 -	}
-+	keyring_index_free(keyring);
-+	notify_key(keyring, NOTIFY_KEY_CLEARED, 0);
-+	key_payload_reserve(keyring, 0);
- 
- 	up_write(&keyring->sem);
--	return ret;
-+	return 0;
- }
- EXPORT_SYMBOL(keyring_clear);
- 
-@@ -1714,30 +1624,12 @@ EXPORT_SYMBOL(keyring_clear);
-  */
- static void keyring_revoke(struct key *keyring)
- {
--	struct assoc_array_edit *edit;
+-}
 -
--	edit = assoc_array_clear(&keyring->keys, &keyring_assoc_array_ops);
--	if (!IS_ERR(edit)) {
--		if (edit)
--			assoc_array_apply_edit(edit);
--		key_payload_reserve(keyring, 0);
+-/**
+- * assoc_array_find - Find an object by index key
+- * @array: The associative array to search.
+- * @ops: The operations to use.
+- * @index_key: The key to the object.
+- *
+- * Find an object in an associative array by walking through the internal tree
+- * to the node that should contain the object and then searching the leaves
+- * there.  NULL is returned if the requested object was not found in the array.
+- *
+- * The caller must hold the RCU read lock or better.
+- */
+-void *assoc_array_find(const struct assoc_array *array,
+-		       const struct assoc_array_ops *ops,
+-		       const void *index_key)
+-{
+-	struct assoc_array_walk_result result;
+-	const struct assoc_array_node *node;
+-	const struct assoc_array_ptr *ptr;
+-	const void *leaf;
+-	int slot;
+-
+-	if (assoc_array_walk(array, ops, index_key, &result) !=
+-	    assoc_array_walk_found_terminal_node)
+-		return NULL;
+-
+-	node = result.terminal_node.node;
+-
+-	/* If the target key is available to us, it's has to be pointed to by
+-	 * the terminal node.
+-	 */
+-	for (slot = 0; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
+-		ptr = READ_ONCE(node->slots[slot]); /* Address dependency. */
+-		if (ptr && assoc_array_ptr_is_leaf(ptr)) {
+-			/* We need a barrier between the read of the pointer
+-			 * and dereferencing the pointer - but only if we are
+-			 * actually going to dereference it.
+-			 */
+-			leaf = assoc_array_ptr_to_leaf(ptr);
+-			if (ops->compare_object(leaf, index_key))
+-				return (void *)leaf;
+-		}
 -	}
-+	keyring_index_free(keyring);
-+	key_payload_reserve(keyring, 0);
- }
- 
--static bool keyring_gc_select_iterator(void *object, void *iterator_data)
-+static int keyring_gc_check_iterator(const struct key *key, void *iterator_data)
- {
--	struct key *key = keyring_ptr_to_key(object);
--	time64_t *limit = iterator_data;
 -
--	if (key_is_dead(key, *limit))
+-	return NULL;
+-}
+-
+-/*
+- * Destructively iterate over an associative array.  The caller must prevent
+- * other simultaneous accesses.
+- */
+-static void assoc_array_destroy_subtree(struct assoc_array_ptr *root,
+-					const struct assoc_array_ops *ops)
+-{
+-	struct assoc_array_shortcut *shortcut;
+-	struct assoc_array_node *node;
+-	struct assoc_array_ptr *cursor, *parent = NULL;
+-	int slot = -1;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	cursor = root;
+-	if (!cursor) {
+-		pr_devel("empty\n");
+-		return;
+-	}
+-
+-move_to_meta:
+-	if (assoc_array_ptr_is_shortcut(cursor)) {
+-		/* Descend through a shortcut */
+-		pr_devel("[%d] shortcut\n", slot);
+-		BUG_ON(!assoc_array_ptr_is_shortcut(cursor));
+-		shortcut = assoc_array_ptr_to_shortcut(cursor);
+-		BUG_ON(shortcut->back_pointer != parent);
+-		BUG_ON(slot != -1 && shortcut->parent_slot != slot);
+-		parent = cursor;
+-		cursor = shortcut->next_node;
+-		slot = -1;
+-		BUG_ON(!assoc_array_ptr_is_node(cursor));
+-	}
+-
+-	pr_devel("[%d] node\n", slot);
+-	node = assoc_array_ptr_to_node(cursor);
+-	BUG_ON(node->back_pointer != parent);
+-	BUG_ON(slot != -1 && node->parent_slot != slot);
+-	slot = 0;
+-
+-continue_node:
+-	pr_devel("Node %p [back=%p]\n", node, node->back_pointer);
+-	for (; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
+-		struct assoc_array_ptr *ptr = node->slots[slot];
+-		if (!ptr)
+-			continue;
+-		if (assoc_array_ptr_is_meta(ptr)) {
+-			parent = cursor;
+-			cursor = ptr;
+-			goto move_to_meta;
+-		}
+-
+-		if (ops) {
+-			pr_devel("[%d] free leaf\n", slot);
+-			ops->free_object(assoc_array_ptr_to_leaf(ptr));
+-		}
+-	}
+-
+-	parent = node->back_pointer;
+-	slot = node->parent_slot;
+-	pr_devel("free node\n");
+-	kfree(node);
+-	if (!parent)
+-		return; /* Done */
+-
+-	/* Move back up to the parent (may need to free a shortcut on
+-	 * the way up) */
+-	if (assoc_array_ptr_is_shortcut(parent)) {
+-		shortcut = assoc_array_ptr_to_shortcut(parent);
+-		BUG_ON(shortcut->next_node != cursor);
+-		cursor = parent;
+-		parent = shortcut->back_pointer;
+-		slot = shortcut->parent_slot;
+-		pr_devel("free shortcut\n");
+-		kfree(shortcut);
+-		if (!parent)
+-			return;
+-
+-		BUG_ON(!assoc_array_ptr_is_node(parent));
+-	}
+-
+-	/* Ascend to next slot in parent node */
+-	pr_devel("ascend to %p[%d]\n", parent, slot);
+-	cursor = parent;
+-	node = assoc_array_ptr_to_node(cursor);
+-	slot++;
+-	goto continue_node;
+-}
+-
+-/**
+- * assoc_array_destroy - Destroy an associative array
+- * @array: The array to destroy.
+- * @ops: The operations to use.
+- *
+- * Discard all metadata and free all objects in an associative array.  The
+- * array will be empty and ready to use again upon completion.  This function
+- * cannot fail.
+- *
+- * The caller must prevent all other accesses whilst this takes place as no
+- * attempt is made to adjust pointers gracefully to permit RCU readlock-holding
+- * accesses to continue.  On the other hand, no memory allocation is required.
+- */
+-void assoc_array_destroy(struct assoc_array *array,
+-			 const struct assoc_array_ops *ops)
+-{
+-	assoc_array_destroy_subtree(array->root, ops);
+-	array->root = NULL;
+-}
+-
+-/*
+- * Handle insertion into an empty tree.
+- */
+-static bool assoc_array_insert_in_empty_tree(struct assoc_array_edit *edit)
+-{
+-	struct assoc_array_node *new_n0;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	new_n0 = kzalloc_obj(struct assoc_array_node);
+-	if (!new_n0)
 -		return false;
--	key_get(key);
+-
+-	edit->new_meta[0] = assoc_array_node_to_ptr(new_n0);
+-	edit->leaf_p = &new_n0->slots[0];
+-	edit->adjust_count_on = new_n0;
+-	edit->set[0].ptr = &edit->array->root;
+-	edit->set[0].to = assoc_array_node_to_ptr(new_n0);
+-
+-	pr_devel("<--%s() = ok [no root]\n", __func__);
 -	return true;
 -}
 -
--static int keyring_gc_check_iterator(const void *object, void *iterator_data)
+-/*
+- * Handle insertion into a terminal node.
+- */
+-static bool assoc_array_insert_into_terminal_node(struct assoc_array_edit *edit,
+-						  const struct assoc_array_ops *ops,
+-						  const void *index_key,
+-						  struct assoc_array_walk_result *result)
 -{
--	const struct key *key = keyring_ptr_to_key(object);
- 	time64_t *limit = iterator_data;
- 
- 	key_check(key);
-@@ -1752,7 +1644,9 @@ static int keyring_gc_check_iterator(const void *object, void *iterator_data)
-  */
- void keyring_gc(struct key *keyring, time64_t limit)
- {
--	int result;
-+	struct keyring_link *link, *tmp;
-+	struct keyring_index *index;
-+	int ret;
- 
- 	kenter("%x{%s}", keyring->serial, keyring->description ?: "");
- 
-@@ -1761,11 +1655,7 @@ void keyring_gc(struct key *keyring, time64_t limit)
- 		goto dont_gc;
- 
- 	/* scan the keyring looking for dead keys */
--	rcu_read_lock();
--	result = assoc_array_iterate(&keyring->keys,
--				     keyring_gc_check_iterator, &limit);
--	rcu_read_unlock();
--	if (result == true)
-+	if (keyring_iterate(keyring, keyring_gc_check_iterator, &limit))
- 		goto do_gc;
- 
- dont_gc:
-@@ -1774,8 +1664,23 @@ void keyring_gc(struct key *keyring, time64_t limit)
- 
- do_gc:
- 	down_write(&keyring->sem);
--	assoc_array_gc(&keyring->keys, &keyring_assoc_array_ops,
--		       keyring_gc_select_iterator, &limit);
-+	index = keyring_index_locked(keyring);
-+	if (index) {
-+		list_for_each_entry_safe(link, tmp, &index->list, list) {
-+			if (!key_is_dead(keyring_link_key(link), limit))
-+				continue;
-+
-+			ret = rhashtable_remove_fast(&index->ht, &link->node,
-+						     keyring_link_params);
-+			if (WARN_ON(ret))
-+				break;
-+
-+			list_del_rcu(&link->list);
-+			WRITE_ONCE(index->nr, index->nr - 1);
-+			call_rcu(&link->rcu, keyring_link_free_rcu);
-+		}
-+	}
-+
- 	up_write(&keyring->sem);
- 	kleave(" [gc]");
- }
-diff --git a/security/keys/request_key.c b/security/keys/request_key.c
-index ef00c2b08fe0..6394c40539ee 100644
---- a/security/keys/request_key.c
-+++ b/security/keys/request_key.c
-@@ -372,7 +372,7 @@ static int construct_alloc_key(struct keyring_search_context *ctx,
- 			       struct key_user *user,
- 			       struct key **_key)
- {
--	struct assoc_array_edit *edit = NULL;
-+	struct keyring_link *edit[2] = {};
- 	struct key *key;
- 	key_perm_t perm;
- 	key_ref_t key_ref;
-@@ -425,10 +425,10 @@ static int construct_alloc_key(struct keyring_search_context *ctx,
- 		goto key_already_present;
- 
- 	if (dest_keyring) {
--		ret = __key_link_begin(dest_keyring, &key->index_key, &edit);
-+		ret = __key_link_begin(dest_keyring, &key->index_key, edit);
- 		if (ret < 0)
- 			goto link_alloc_failed;
--		__key_link(dest_keyring, key, &edit);
-+		__key_link(dest_keyring, key, edit);
- 	}
- 
- 	mutex_unlock(&key_construction_mutex);
-@@ -446,12 +446,12 @@ static int construct_alloc_key(struct keyring_search_context *ctx,
- 	mutex_unlock(&key_construction_mutex);
- 	key = key_ref_to_ptr(key_ref);
- 	if (dest_keyring) {
--		ret = __key_link_begin(dest_keyring, &key->index_key, &edit);
-+		ret = __key_link_begin(dest_keyring, &key->index_key, edit);
- 		if (ret < 0)
- 			goto link_alloc_failed_unlocked;
- 		ret = __key_link_check_live_key(dest_keyring, key);
- 		if (ret == 0)
--			__key_link(dest_keyring, key, &edit);
-+			__key_link(dest_keyring, key, edit);
- 		__key_link_end(dest_keyring, &key->index_key, edit);
- 		if (ret < 0)
- 			goto link_check_failed;
+-	struct assoc_array_shortcut *shortcut, *new_s0;
+-	struct assoc_array_node *node, *new_n0, *new_n1, *side;
+-	struct assoc_array_ptr *ptr;
+-	unsigned long dissimilarity, base_seg, blank;
+-	size_t keylen;
+-	bool have_meta;
+-	int level, diff;
+-	int slot, next_slot, free_slot, i, j;
+-
+-	node	= result->terminal_node.node;
+-	level	= result->terminal_node.level;
+-	edit->segment_cache[ASSOC_ARRAY_FAN_OUT] = result->terminal_node.slot;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	/* We arrived at a node which doesn't have an onward node or shortcut
+-	 * pointer that we have to follow.  This means that (a) the leaf we
+-	 * want must go here (either by insertion or replacement) or (b) we
+-	 * need to split this node and insert in one of the fragments.
+-	 */
+-	free_slot = -1;
+-
+-	/* Firstly, we have to check the leaves in this node to see if there's
+-	 * a matching one we should replace in place.
+-	 */
+-	for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-		ptr = node->slots[i];
+-		if (!ptr) {
+-			free_slot = i;
+-			continue;
+-		}
+-		if (assoc_array_ptr_is_leaf(ptr) &&
+-		    ops->compare_object(assoc_array_ptr_to_leaf(ptr),
+-					index_key)) {
+-			pr_devel("replace in slot %d\n", i);
+-			edit->leaf_p = &node->slots[i];
+-			edit->dead_leaf = node->slots[i];
+-			pr_devel("<--%s() = ok [replace]\n", __func__);
+-			return true;
+-		}
+-	}
+-
+-	/* If there is a free slot in this node then we can just insert the
+-	 * leaf here.
+-	 */
+-	if (free_slot >= 0) {
+-		pr_devel("insert in free slot %d\n", free_slot);
+-		edit->leaf_p = &node->slots[free_slot];
+-		edit->adjust_count_on = node;
+-		pr_devel("<--%s() = ok [insert]\n", __func__);
+-		return true;
+-	}
+-
+-	/* The node has no spare slots - so we're either going to have to split
+-	 * it or insert another node before it.
+-	 *
+-	 * Whatever, we're going to need at least two new nodes - so allocate
+-	 * those now.  We may also need a new shortcut, but we deal with that
+-	 * when we need it.
+-	 */
+-	new_n0 = kzalloc_obj(struct assoc_array_node);
+-	if (!new_n0)
+-		return false;
+-	edit->new_meta[0] = assoc_array_node_to_ptr(new_n0);
+-	new_n1 = kzalloc_obj(struct assoc_array_node);
+-	if (!new_n1)
+-		return false;
+-	edit->new_meta[1] = assoc_array_node_to_ptr(new_n1);
+-
+-	/* We need to find out how similar the leaves are. */
+-	pr_devel("no spare slots\n");
+-	have_meta = false;
+-	for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-		ptr = node->slots[i];
+-		if (assoc_array_ptr_is_meta(ptr)) {
+-			edit->segment_cache[i] = 0xff;
+-			have_meta = true;
+-			continue;
+-		}
+-		base_seg = ops->get_object_key_chunk(
+-			assoc_array_ptr_to_leaf(ptr), level);
+-		base_seg >>= level & ASSOC_ARRAY_KEY_CHUNK_MASK;
+-		edit->segment_cache[i] = base_seg & ASSOC_ARRAY_FAN_MASK;
+-	}
+-
+-	if (have_meta) {
+-		pr_devel("have meta\n");
+-		goto split_node;
+-	}
+-
+-	/* The node contains only leaves */
+-	dissimilarity = 0;
+-	base_seg = edit->segment_cache[0];
+-	for (i = 1; i < ASSOC_ARRAY_FAN_OUT; i++)
+-		dissimilarity |= edit->segment_cache[i] ^ base_seg;
+-
+-	pr_devel("only leaves; dissimilarity=%lx\n", dissimilarity);
+-
+-	if ((dissimilarity & ASSOC_ARRAY_FAN_MASK) == 0) {
+-		/* The old leaves all cluster in the same slot.  We will need
+-		 * to insert a shortcut if the new node wants to cluster with them.
+-		 */
+-		if ((edit->segment_cache[ASSOC_ARRAY_FAN_OUT] ^ base_seg) == 0)
+-			goto all_leaves_cluster_together;
+-
+-		/* Otherwise all the old leaves cluster in the same slot, but
+-		 * the new leaf wants to go into a different slot - so we
+-		 * create a new node (n0) to hold the new leaf and a pointer to
+-		 * a new node (n1) holding all the old leaves.
+-		 *
+-		 * This can be done by falling through to the node splitting
+-		 * path.
+-		 */
+-		pr_devel("present leaves cluster but not new leaf\n");
+-	}
+-
+-split_node:
+-	pr_devel("split node\n");
+-
+-	/* We need to split the current node.  The node must contain anything
+-	 * from a single leaf (in the one leaf case, this leaf will cluster
+-	 * with the new leaf) and the rest meta-pointers, to all leaves, some
+-	 * of which may cluster.
+-	 *
+-	 * It won't contain the case in which all the current leaves plus the
+-	 * new leaves want to cluster in the same slot.
+-	 *
+-	 * We need to expel at least two leaves out of a set consisting of the
+-	 * leaves in the node and the new leaf.  The current meta pointers can
+-	 * just be copied as they shouldn't cluster with any of the leaves.
+-	 *
+-	 * We need a new node (n0) to replace the current one and a new node to
+-	 * take the expelled nodes (n1).
+-	 */
+-	edit->set[0].to = assoc_array_node_to_ptr(new_n0);
+-	new_n0->back_pointer = node->back_pointer;
+-	new_n0->parent_slot = node->parent_slot;
+-	new_n1->back_pointer = assoc_array_node_to_ptr(new_n0);
+-	new_n1->parent_slot = -1; /* Need to calculate this */
+-
+-do_split_node:
+-	pr_devel("do_split_node\n");
+-
+-	new_n0->nr_leaves_on_branch = node->nr_leaves_on_branch;
+-	new_n1->nr_leaves_on_branch = 0;
+-
+-	/* Begin by finding two matching leaves.  There have to be at least two
+-	 * that match - even if there are meta pointers - because any leaf that
+-	 * would match a slot with a meta pointer in it must be somewhere
+-	 * behind that meta pointer and cannot be here.  Further, given N
+-	 * remaining leaf slots, we now have N+1 leaves to go in them.
+-	 */
+-	for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-		slot = edit->segment_cache[i];
+-		if (slot != 0xff)
+-			for (j = i + 1; j < ASSOC_ARRAY_FAN_OUT + 1; j++)
+-				if (edit->segment_cache[j] == slot)
+-					goto found_slot_for_multiple_occupancy;
+-	}
+-found_slot_for_multiple_occupancy:
+-	pr_devel("same slot: %x %x [%02x]\n", i, j, slot);
+-	BUG_ON(i >= ASSOC_ARRAY_FAN_OUT);
+-	BUG_ON(j >= ASSOC_ARRAY_FAN_OUT + 1);
+-	BUG_ON(slot >= ASSOC_ARRAY_FAN_OUT);
+-
+-	new_n1->parent_slot = slot;
+-
+-	/* Metadata pointers cannot change slot */
+-	for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++)
+-		if (assoc_array_ptr_is_meta(node->slots[i]))
+-			new_n0->slots[i] = node->slots[i];
+-		else
+-			new_n0->slots[i] = NULL;
+-	BUG_ON(new_n0->slots[slot] != NULL);
+-	new_n0->slots[slot] = assoc_array_node_to_ptr(new_n1);
+-
+-	/* Filter the leaf pointers between the new nodes */
+-	free_slot = -1;
+-	next_slot = 0;
+-	for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-		if (assoc_array_ptr_is_meta(node->slots[i]))
+-			continue;
+-		if (edit->segment_cache[i] == slot) {
+-			new_n1->slots[next_slot++] = node->slots[i];
+-			new_n1->nr_leaves_on_branch++;
+-		} else {
+-			do {
+-				free_slot++;
+-			} while (new_n0->slots[free_slot] != NULL);
+-			new_n0->slots[free_slot] = node->slots[i];
+-		}
+-	}
+-
+-	pr_devel("filtered: f=%x n=%x\n", free_slot, next_slot);
+-
+-	if (edit->segment_cache[ASSOC_ARRAY_FAN_OUT] != slot) {
+-		do {
+-			free_slot++;
+-		} while (new_n0->slots[free_slot] != NULL);
+-		edit->leaf_p = &new_n0->slots[free_slot];
+-		edit->adjust_count_on = new_n0;
+-	} else {
+-		edit->leaf_p = &new_n1->slots[next_slot++];
+-		edit->adjust_count_on = new_n1;
+-	}
+-
+-	BUG_ON(next_slot <= 1);
+-
+-	edit->set_backpointers_to = assoc_array_node_to_ptr(new_n0);
+-	for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-		if (edit->segment_cache[i] == 0xff) {
+-			ptr = node->slots[i];
+-			BUG_ON(assoc_array_ptr_is_leaf(ptr));
+-			if (assoc_array_ptr_is_node(ptr)) {
+-				side = assoc_array_ptr_to_node(ptr);
+-				edit->set_backpointers[i] = &side->back_pointer;
+-			} else {
+-				shortcut = assoc_array_ptr_to_shortcut(ptr);
+-				edit->set_backpointers[i] = &shortcut->back_pointer;
+-			}
+-		}
+-	}
+-
+-	ptr = node->back_pointer;
+-	if (!ptr)
+-		edit->set[0].ptr = &edit->array->root;
+-	else if (assoc_array_ptr_is_node(ptr))
+-		edit->set[0].ptr = &assoc_array_ptr_to_node(ptr)->slots[node->parent_slot];
+-	else
+-		edit->set[0].ptr = &assoc_array_ptr_to_shortcut(ptr)->next_node;
+-	edit->excised_meta[0] = assoc_array_node_to_ptr(node);
+-	pr_devel("<--%s() = ok [split node]\n", __func__);
+-	return true;
+-
+-all_leaves_cluster_together:
+-	/* All the leaves, new and old, want to cluster together in this node
+-	 * in the same slot, so we have to replace this node with a shortcut to
+-	 * skip over the identical parts of the key and then place a pair of
+-	 * nodes, one inside the other, at the end of the shortcut and
+-	 * distribute the keys between them.
+-	 *
+-	 * Firstly we need to work out where the leaves start diverging as a
+-	 * bit position into their keys so that we know how big the shortcut
+-	 * needs to be.
+-	 *
+-	 * We only need to make a single pass of N of the N+1 leaves because if
+-	 * any keys differ between themselves at bit X then at least one of
+-	 * them must also differ with the base key at bit X or before.
+-	 */
+-	pr_devel("all leaves cluster together\n");
+-	diff = INT_MAX;
+-	for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-		int x = ops->diff_objects(assoc_array_ptr_to_leaf(node->slots[i]),
+-					  index_key);
+-		if (x < diff) {
+-			BUG_ON(x < 0);
+-			diff = x;
+-		}
+-	}
+-	BUG_ON(diff == INT_MAX);
+-	BUG_ON(diff < level + ASSOC_ARRAY_LEVEL_STEP);
+-
+-	keylen = round_up(diff, ASSOC_ARRAY_KEY_CHUNK_SIZE);
+-	keylen >>= ASSOC_ARRAY_KEY_CHUNK_SHIFT;
+-
+-	new_s0 = kzalloc_flex(*new_s0, index_key, keylen);
+-	if (!new_s0)
+-		return false;
+-	edit->new_meta[2] = assoc_array_shortcut_to_ptr(new_s0);
+-
+-	edit->set[0].to = assoc_array_shortcut_to_ptr(new_s0);
+-	new_s0->back_pointer = node->back_pointer;
+-	new_s0->parent_slot = node->parent_slot;
+-	new_s0->next_node = assoc_array_node_to_ptr(new_n0);
+-	new_n0->back_pointer = assoc_array_shortcut_to_ptr(new_s0);
+-	new_n0->parent_slot = 0;
+-	new_n1->back_pointer = assoc_array_node_to_ptr(new_n0);
+-	new_n1->parent_slot = -1; /* Need to calculate this */
+-
+-	new_s0->skip_to_level = level = diff & ~ASSOC_ARRAY_LEVEL_STEP_MASK;
+-	pr_devel("skip_to_level = %d [diff %d]\n", level, diff);
+-	BUG_ON(level <= 0);
+-
+-	for (i = 0; i < keylen; i++)
+-		new_s0->index_key[i] =
+-			ops->get_key_chunk(index_key, i * ASSOC_ARRAY_KEY_CHUNK_SIZE);
+-
+-	if (level & ASSOC_ARRAY_KEY_CHUNK_MASK) {
+-		blank = ULONG_MAX << (level & ASSOC_ARRAY_KEY_CHUNK_MASK);
+-		pr_devel("blank off [%zu] %d: %lx\n", keylen - 1, level, blank);
+-		new_s0->index_key[keylen - 1] &= ~blank;
+-	}
+-
+-	/* This now reduces to a node splitting exercise for which we'll need
+-	 * to regenerate the disparity table.
+-	 */
+-	for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-		ptr = node->slots[i];
+-		base_seg = ops->get_object_key_chunk(assoc_array_ptr_to_leaf(ptr),
+-						     level);
+-		base_seg >>= level & ASSOC_ARRAY_KEY_CHUNK_MASK;
+-		edit->segment_cache[i] = base_seg & ASSOC_ARRAY_FAN_MASK;
+-	}
+-
+-	base_seg = ops->get_key_chunk(index_key, level);
+-	base_seg >>= level & ASSOC_ARRAY_KEY_CHUNK_MASK;
+-	edit->segment_cache[ASSOC_ARRAY_FAN_OUT] = base_seg & ASSOC_ARRAY_FAN_MASK;
+-	goto do_split_node;
+-}
+-
+-/*
+- * Handle insertion into the middle of a shortcut.
+- */
+-static bool assoc_array_insert_mid_shortcut(struct assoc_array_edit *edit,
+-					    const struct assoc_array_ops *ops,
+-					    struct assoc_array_walk_result *result)
+-{
+-	struct assoc_array_shortcut *shortcut, *new_s0, *new_s1;
+-	struct assoc_array_node *node, *new_n0, *side;
+-	unsigned long sc_segments, dissimilarity, blank;
+-	size_t keylen;
+-	int level, sc_level, diff;
+-	int sc_slot;
+-
+-	shortcut	= result->wrong_shortcut.shortcut;
+-	level		= result->wrong_shortcut.level;
+-	sc_level	= result->wrong_shortcut.sc_level;
+-	sc_segments	= result->wrong_shortcut.sc_segments;
+-	dissimilarity	= result->wrong_shortcut.dissimilarity;
+-
+-	pr_devel("-->%s(ix=%d dis=%lx scix=%d)\n",
+-		 __func__, level, dissimilarity, sc_level);
+-
+-	/* We need to split a shortcut and insert a node between the two
+-	 * pieces.  Zero-length pieces will be dispensed with entirely.
+-	 *
+-	 * First of all, we need to find out in which level the first
+-	 * difference was.
+-	 */
+-	diff = __ffs(dissimilarity);
+-	diff &= ~ASSOC_ARRAY_LEVEL_STEP_MASK;
+-	diff += sc_level & ~ASSOC_ARRAY_KEY_CHUNK_MASK;
+-	pr_devel("diff=%d\n", diff);
+-
+-	if (!shortcut->back_pointer) {
+-		edit->set[0].ptr = &edit->array->root;
+-	} else if (assoc_array_ptr_is_node(shortcut->back_pointer)) {
+-		node = assoc_array_ptr_to_node(shortcut->back_pointer);
+-		edit->set[0].ptr = &node->slots[shortcut->parent_slot];
+-	} else {
+-		BUG();
+-	}
+-
+-	edit->excised_meta[0] = assoc_array_shortcut_to_ptr(shortcut);
+-
+-	/* Create a new node now since we're going to need it anyway */
+-	new_n0 = kzalloc_obj(struct assoc_array_node);
+-	if (!new_n0)
+-		return false;
+-	edit->new_meta[0] = assoc_array_node_to_ptr(new_n0);
+-	edit->adjust_count_on = new_n0;
+-
+-	/* Insert a new shortcut before the new node if this segment isn't of
+-	 * zero length - otherwise we just connect the new node directly to the
+-	 * parent.
+-	 */
+-	level += ASSOC_ARRAY_LEVEL_STEP;
+-	if (diff > level) {
+-		pr_devel("pre-shortcut %d...%d\n", level, diff);
+-		keylen = round_up(diff, ASSOC_ARRAY_KEY_CHUNK_SIZE);
+-		keylen >>= ASSOC_ARRAY_KEY_CHUNK_SHIFT;
+-
+-		new_s0 = kzalloc_flex(*new_s0, index_key, keylen);
+-		if (!new_s0)
+-			return false;
+-		edit->new_meta[1] = assoc_array_shortcut_to_ptr(new_s0);
+-		edit->set[0].to = assoc_array_shortcut_to_ptr(new_s0);
+-		new_s0->back_pointer = shortcut->back_pointer;
+-		new_s0->parent_slot = shortcut->parent_slot;
+-		new_s0->next_node = assoc_array_node_to_ptr(new_n0);
+-		new_s0->skip_to_level = diff;
+-
+-		new_n0->back_pointer = assoc_array_shortcut_to_ptr(new_s0);
+-		new_n0->parent_slot = 0;
+-
+-		memcpy(new_s0->index_key, shortcut->index_key,
+-		       flex_array_size(new_s0, index_key, keylen));
+-
+-		blank = ULONG_MAX << (diff & ASSOC_ARRAY_KEY_CHUNK_MASK);
+-		pr_devel("blank off [%zu] %d: %lx\n", keylen - 1, diff, blank);
+-		new_s0->index_key[keylen - 1] &= ~blank;
+-	} else {
+-		pr_devel("no pre-shortcut\n");
+-		edit->set[0].to = assoc_array_node_to_ptr(new_n0);
+-		new_n0->back_pointer = shortcut->back_pointer;
+-		new_n0->parent_slot = shortcut->parent_slot;
+-	}
+-
+-	side = assoc_array_ptr_to_node(shortcut->next_node);
+-	new_n0->nr_leaves_on_branch = side->nr_leaves_on_branch;
+-
+-	/* We need to know which slot in the new node is going to take a
+-	 * metadata pointer.
+-	 */
+-	sc_slot = sc_segments >> (diff & ASSOC_ARRAY_KEY_CHUNK_MASK);
+-	sc_slot &= ASSOC_ARRAY_FAN_MASK;
+-
+-	pr_devel("new slot %lx >> %d -> %d\n",
+-		 sc_segments, diff & ASSOC_ARRAY_KEY_CHUNK_MASK, sc_slot);
+-
+-	/* Determine whether we need to follow the new node with a replacement
+-	 * for the current shortcut.  We could in theory reuse the current
+-	 * shortcut if its parent slot number doesn't change - but that's a
+-	 * 1-in-16 chance so not worth expending the code upon.
+-	 */
+-	level = diff + ASSOC_ARRAY_LEVEL_STEP;
+-	if (level < shortcut->skip_to_level) {
+-		pr_devel("post-shortcut %d...%d\n", level, shortcut->skip_to_level);
+-		keylen = round_up(shortcut->skip_to_level, ASSOC_ARRAY_KEY_CHUNK_SIZE);
+-		keylen >>= ASSOC_ARRAY_KEY_CHUNK_SHIFT;
+-
+-		new_s1 = kzalloc_flex(*new_s1, index_key, keylen);
+-		if (!new_s1)
+-			return false;
+-		edit->new_meta[2] = assoc_array_shortcut_to_ptr(new_s1);
+-
+-		new_s1->back_pointer = assoc_array_node_to_ptr(new_n0);
+-		new_s1->parent_slot = sc_slot;
+-		new_s1->next_node = shortcut->next_node;
+-		new_s1->skip_to_level = shortcut->skip_to_level;
+-
+-		new_n0->slots[sc_slot] = assoc_array_shortcut_to_ptr(new_s1);
+-
+-		memcpy(new_s1->index_key, shortcut->index_key,
+-		       flex_array_size(new_s1, index_key, keylen));
+-
+-		edit->set[1].ptr = &side->back_pointer;
+-		edit->set[1].to = assoc_array_shortcut_to_ptr(new_s1);
+-	} else {
+-		pr_devel("no post-shortcut\n");
+-
+-		/* We don't have to replace the pointed-to node as long as we
+-		 * use memory barriers to make sure the parent slot number is
+-		 * changed before the back pointer (the parent slot number is
+-		 * irrelevant to the old parent shortcut).
+-		 */
+-		new_n0->slots[sc_slot] = shortcut->next_node;
+-		edit->set_parent_slot[0].p = &side->parent_slot;
+-		edit->set_parent_slot[0].to = sc_slot;
+-		edit->set[1].ptr = &side->back_pointer;
+-		edit->set[1].to = assoc_array_node_to_ptr(new_n0);
+-	}
+-
+-	/* Install the new leaf in a spare slot in the new node. */
+-	if (sc_slot == 0)
+-		edit->leaf_p = &new_n0->slots[1];
+-	else
+-		edit->leaf_p = &new_n0->slots[0];
+-
+-	pr_devel("<--%s() = ok [split shortcut]\n", __func__);
+-	return true;
+-}
+-
+-/**
+- * assoc_array_insert - Script insertion of an object into an associative array
+- * @array: The array to insert into.
+- * @ops: The operations to use.
+- * @index_key: The key to insert at.
+- * @object: The object to insert.
+- *
+- * Precalculate and preallocate a script for the insertion or replacement of an
+- * object in an associative array.  This results in an edit script that can
+- * either be applied or cancelled.
+- *
+- * The function returns a pointer to an edit script or -ENOMEM.
+- *
+- * The caller should lock against other modifications and must continue to hold
+- * the lock until assoc_array_apply_edit() has been called.
+- *
+- * Accesses to the tree may take place concurrently with this function,
+- * provided they hold the RCU read lock.
+- */
+-struct assoc_array_edit *assoc_array_insert(struct assoc_array *array,
+-					    const struct assoc_array_ops *ops,
+-					    const void *index_key,
+-					    void *object)
+-{
+-	struct assoc_array_walk_result result;
+-	struct assoc_array_edit *edit;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	/* The leaf pointer we're given must not have the bottom bit set as we
+-	 * use those for type-marking the pointer.  NULL pointers are also not
+-	 * allowed as they indicate an empty slot but we have to allow them
+-	 * here as they can be updated later.
+-	 */
+-	BUG_ON(assoc_array_ptr_is_meta(object));
+-
+-	edit = kzalloc_obj(struct assoc_array_edit);
+-	if (!edit)
+-		return ERR_PTR(-ENOMEM);
+-	edit->array = array;
+-	edit->ops = ops;
+-	edit->leaf = assoc_array_leaf_to_ptr(object);
+-	edit->adjust_count_by = 1;
+-
+-	switch (assoc_array_walk(array, ops, index_key, &result)) {
+-	case assoc_array_walk_tree_empty:
+-		/* Allocate a root node if there isn't one yet */
+-		if (!assoc_array_insert_in_empty_tree(edit))
+-			goto enomem;
+-		return edit;
+-
+-	case assoc_array_walk_found_terminal_node:
+-		/* We found a node that doesn't have a node/shortcut pointer in
+-		 * the slot corresponding to the index key that we have to
+-		 * follow.
+-		 */
+-		if (!assoc_array_insert_into_terminal_node(edit, ops, index_key,
+-							   &result))
+-			goto enomem;
+-		return edit;
+-
+-	case assoc_array_walk_found_wrong_shortcut:
+-		/* We found a shortcut that didn't match our key in a slot we
+-		 * needed to follow.
+-		 */
+-		if (!assoc_array_insert_mid_shortcut(edit, ops, &result))
+-			goto enomem;
+-		return edit;
+-	}
+-
+-enomem:
+-	/* Clean up after an out of memory error */
+-	pr_devel("enomem\n");
+-	assoc_array_cancel_edit(edit);
+-	return ERR_PTR(-ENOMEM);
+-}
+-
+-/**
+- * assoc_array_insert_set_object - Set the new object pointer in an edit script
+- * @edit: The edit script to modify.
+- * @object: The object pointer to set.
+- *
+- * Change the object to be inserted in an edit script.  The object pointed to
+- * by the old object is not freed.  This must be done prior to applying the
+- * script.
+- */
+-void assoc_array_insert_set_object(struct assoc_array_edit *edit, void *object)
+-{
+-	BUG_ON(!object);
+-	edit->leaf = assoc_array_leaf_to_ptr(object);
+-}
+-
+-struct assoc_array_delete_collapse_context {
+-	struct assoc_array_node	*node;
+-	const void		*skip_leaf;
+-	int			slot;
+-};
+-
+-/*
+- * Subtree collapse to node iterator.
+- */
+-static int assoc_array_delete_collapse_iterator(const void *leaf,
+-						void *iterator_data)
+-{
+-	struct assoc_array_delete_collapse_context *collapse = iterator_data;
+-
+-	if (leaf == collapse->skip_leaf)
+-		return 0;
+-
+-	BUG_ON(collapse->slot >= ASSOC_ARRAY_FAN_OUT);
+-
+-	collapse->node->slots[collapse->slot++] = assoc_array_leaf_to_ptr(leaf);
+-	return 0;
+-}
+-
+-/**
+- * assoc_array_delete - Script deletion of an object from an associative array
+- * @array: The array to search.
+- * @ops: The operations to use.
+- * @index_key: The key to the object.
+- *
+- * Precalculate and preallocate a script for the deletion of an object from an
+- * associative array.  This results in an edit script that can either be
+- * applied or cancelled.
+- *
+- * The function returns a pointer to an edit script if the object was found,
+- * NULL if the object was not found or -ENOMEM.
+- *
+- * The caller should lock against other modifications and must continue to hold
+- * the lock until assoc_array_apply_edit() has been called.
+- *
+- * Accesses to the tree may take place concurrently with this function,
+- * provided they hold the RCU read lock.
+- */
+-struct assoc_array_edit *assoc_array_delete(struct assoc_array *array,
+-					    const struct assoc_array_ops *ops,
+-					    const void *index_key)
+-{
+-	struct assoc_array_delete_collapse_context collapse;
+-	struct assoc_array_walk_result result;
+-	struct assoc_array_node *node, *new_n0;
+-	struct assoc_array_edit *edit;
+-	struct assoc_array_ptr *ptr;
+-	bool has_meta;
+-	int slot, i;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	edit = kzalloc_obj(struct assoc_array_edit);
+-	if (!edit)
+-		return ERR_PTR(-ENOMEM);
+-	edit->array = array;
+-	edit->ops = ops;
+-	edit->adjust_count_by = -1;
+-
+-	switch (assoc_array_walk(array, ops, index_key, &result)) {
+-	case assoc_array_walk_found_terminal_node:
+-		/* We found a node that should contain the leaf we've been
+-		 * asked to remove - *if* it's in the tree.
+-		 */
+-		pr_devel("terminal_node\n");
+-		node = result.terminal_node.node;
+-
+-		for (slot = 0; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
+-			ptr = node->slots[slot];
+-			if (ptr &&
+-			    assoc_array_ptr_is_leaf(ptr) &&
+-			    ops->compare_object(assoc_array_ptr_to_leaf(ptr),
+-						index_key))
+-				goto found_leaf;
+-		}
+-		fallthrough;
+-	case assoc_array_walk_tree_empty:
+-	case assoc_array_walk_found_wrong_shortcut:
+-	default:
+-		assoc_array_cancel_edit(edit);
+-		pr_devel("not found\n");
+-		return NULL;
+-	}
+-
+-found_leaf:
+-	BUG_ON(array->nr_leaves_on_tree <= 0);
+-
+-	/* In the simplest form of deletion we just clear the slot and release
+-	 * the leaf after a suitable interval.
+-	 */
+-	edit->dead_leaf = node->slots[slot];
+-	edit->set[0].ptr = &node->slots[slot];
+-	edit->set[0].to = NULL;
+-	edit->adjust_count_on = node;
+-
+-	/* If that concludes erasure of the last leaf, then delete the entire
+-	 * internal array.
+-	 */
+-	if (array->nr_leaves_on_tree == 1) {
+-		edit->set[1].ptr = &array->root;
+-		edit->set[1].to = NULL;
+-		edit->adjust_count_on = NULL;
+-		edit->excised_subtree = array->root;
+-		pr_devel("all gone\n");
+-		return edit;
+-	}
+-
+-	/* However, we'd also like to clear up some metadata blocks if we
+-	 * possibly can.
+-	 *
+-	 * We go for a simple algorithm of: if this node has FAN_OUT or fewer
+-	 * leaves in it, then attempt to collapse it - and attempt to
+-	 * recursively collapse up the tree.
+-	 *
+-	 * We could also try and collapse in partially filled subtrees to take
+-	 * up space in this node.
+-	 */
+-	if (node->nr_leaves_on_branch <= ASSOC_ARRAY_FAN_OUT + 1) {
+-		struct assoc_array_node *parent, *grandparent;
+-		struct assoc_array_ptr *ptr;
+-
+-		/* First of all, we need to know if this node has metadata so
+-		 * that we don't try collapsing if all the leaves are already
+-		 * here.
+-		 */
+-		has_meta = false;
+-		for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-			ptr = node->slots[i];
+-			if (assoc_array_ptr_is_meta(ptr)) {
+-				has_meta = true;
+-				break;
+-			}
+-		}
+-
+-		pr_devel("leaves: %ld [m=%d]\n",
+-			 node->nr_leaves_on_branch - 1, has_meta);
+-
+-		/* Look further up the tree to see if we can collapse this node
+-		 * into a more proximal node too.
+-		 */
+-		parent = node;
+-	collapse_up:
+-		pr_devel("collapse subtree: %ld\n", parent->nr_leaves_on_branch);
+-
+-		ptr = parent->back_pointer;
+-		if (!ptr)
+-			goto do_collapse;
+-		if (assoc_array_ptr_is_shortcut(ptr)) {
+-			struct assoc_array_shortcut *s = assoc_array_ptr_to_shortcut(ptr);
+-			ptr = s->back_pointer;
+-			if (!ptr)
+-				goto do_collapse;
+-		}
+-
+-		grandparent = assoc_array_ptr_to_node(ptr);
+-		if (grandparent->nr_leaves_on_branch <= ASSOC_ARRAY_FAN_OUT + 1) {
+-			parent = grandparent;
+-			goto collapse_up;
+-		}
+-
+-	do_collapse:
+-		/* There's no point collapsing if the original node has no meta
+-		 * pointers to discard and if we didn't merge into one of that
+-		 * node's ancestry.
+-		 */
+-		if (has_meta || parent != node) {
+-			node = parent;
+-
+-			/* Create a new node to collapse into */
+-			new_n0 = kzalloc_obj(struct assoc_array_node);
+-			if (!new_n0)
+-				goto enomem;
+-			edit->new_meta[0] = assoc_array_node_to_ptr(new_n0);
+-
+-			new_n0->back_pointer = node->back_pointer;
+-			new_n0->parent_slot = node->parent_slot;
+-			new_n0->nr_leaves_on_branch = node->nr_leaves_on_branch;
+-			edit->adjust_count_on = new_n0;
+-
+-			collapse.node = new_n0;
+-			collapse.skip_leaf = assoc_array_ptr_to_leaf(edit->dead_leaf);
+-			collapse.slot = 0;
+-			assoc_array_subtree_iterate(assoc_array_node_to_ptr(node),
+-						    node->back_pointer,
+-						    assoc_array_delete_collapse_iterator,
+-						    &collapse);
+-			pr_devel("collapsed %d,%lu\n", collapse.slot, new_n0->nr_leaves_on_branch);
+-			BUG_ON(collapse.slot != new_n0->nr_leaves_on_branch - 1);
+-
+-			if (!node->back_pointer) {
+-				edit->set[1].ptr = &array->root;
+-			} else if (assoc_array_ptr_is_leaf(node->back_pointer)) {
+-				BUG();
+-			} else if (assoc_array_ptr_is_node(node->back_pointer)) {
+-				struct assoc_array_node *p =
+-					assoc_array_ptr_to_node(node->back_pointer);
+-				edit->set[1].ptr = &p->slots[node->parent_slot];
+-			} else if (assoc_array_ptr_is_shortcut(node->back_pointer)) {
+-				struct assoc_array_shortcut *s =
+-					assoc_array_ptr_to_shortcut(node->back_pointer);
+-				edit->set[1].ptr = &s->next_node;
+-			}
+-			edit->set[1].to = assoc_array_node_to_ptr(new_n0);
+-			edit->excised_subtree = assoc_array_node_to_ptr(node);
+-		}
+-	}
+-
+-	return edit;
+-
+-enomem:
+-	/* Clean up after an out of memory error */
+-	pr_devel("enomem\n");
+-	assoc_array_cancel_edit(edit);
+-	return ERR_PTR(-ENOMEM);
+-}
+-
+-/**
+- * assoc_array_clear - Script deletion of all objects from an associative array
+- * @array: The array to clear.
+- * @ops: The operations to use.
+- *
+- * Precalculate and preallocate a script for the deletion of all the objects
+- * from an associative array.  This results in an edit script that can either
+- * be applied or cancelled.
+- *
+- * The function returns a pointer to an edit script if there are objects to be
+- * deleted, NULL if there are no objects in the array or -ENOMEM.
+- *
+- * The caller should lock against other modifications and must continue to hold
+- * the lock until assoc_array_apply_edit() has been called.
+- *
+- * Accesses to the tree may take place concurrently with this function,
+- * provided they hold the RCU read lock.
+- */
+-struct assoc_array_edit *assoc_array_clear(struct assoc_array *array,
+-					   const struct assoc_array_ops *ops)
+-{
+-	struct assoc_array_edit *edit;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	if (!array->root)
+-		return NULL;
+-
+-	edit = kzalloc_obj(struct assoc_array_edit);
+-	if (!edit)
+-		return ERR_PTR(-ENOMEM);
+-	edit->array = array;
+-	edit->ops = ops;
+-	edit->set[1].ptr = &array->root;
+-	edit->set[1].to = NULL;
+-	edit->excised_subtree = array->root;
+-	edit->ops_for_excised_subtree = ops;
+-	pr_devel("all gone\n");
+-	return edit;
+-}
+-
+-/*
+- * Handle the deferred destruction after an applied edit.
+- */
+-static void assoc_array_rcu_cleanup(struct rcu_head *head)
+-{
+-	struct assoc_array_edit *edit =
+-		container_of(head, struct assoc_array_edit, rcu);
+-	int i;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	if (edit->dead_leaf)
+-		edit->ops->free_object(assoc_array_ptr_to_leaf(edit->dead_leaf));
+-	for (i = 0; i < ARRAY_SIZE(edit->excised_meta); i++)
+-		if (edit->excised_meta[i])
+-			kfree(assoc_array_ptr_to_node(edit->excised_meta[i]));
+-
+-	if (edit->excised_subtree) {
+-		BUG_ON(assoc_array_ptr_is_leaf(edit->excised_subtree));
+-		if (assoc_array_ptr_is_node(edit->excised_subtree)) {
+-			struct assoc_array_node *n =
+-				assoc_array_ptr_to_node(edit->excised_subtree);
+-			n->back_pointer = NULL;
+-		} else {
+-			struct assoc_array_shortcut *s =
+-				assoc_array_ptr_to_shortcut(edit->excised_subtree);
+-			s->back_pointer = NULL;
+-		}
+-		assoc_array_destroy_subtree(edit->excised_subtree,
+-					    edit->ops_for_excised_subtree);
+-	}
+-
+-	kfree(edit);
+-}
+-
+-/**
+- * assoc_array_apply_edit - Apply an edit script to an associative array
+- * @edit: The script to apply.
+- *
+- * Apply an edit script to an associative array to effect an insertion,
+- * deletion or clearance.  As the edit script includes preallocated memory,
+- * this is guaranteed not to fail.
+- *
+- * The edit script, dead objects and dead metadata will be scheduled for
+- * destruction after an RCU grace period to permit those doing read-only
+- * accesses on the array to continue to do so under the RCU read lock whilst
+- * the edit is taking place.
+- */
+-void assoc_array_apply_edit(struct assoc_array_edit *edit)
+-{
+-	struct assoc_array_shortcut *shortcut;
+-	struct assoc_array_node *node;
+-	struct assoc_array_ptr *ptr;
+-	int i;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	smp_wmb();
+-	if (edit->leaf_p)
+-		*edit->leaf_p = edit->leaf;
+-
+-	smp_wmb();
+-	for (i = 0; i < ARRAY_SIZE(edit->set_parent_slot); i++)
+-		if (edit->set_parent_slot[i].p)
+-			*edit->set_parent_slot[i].p = edit->set_parent_slot[i].to;
+-
+-	smp_wmb();
+-	for (i = 0; i < ARRAY_SIZE(edit->set_backpointers); i++)
+-		if (edit->set_backpointers[i])
+-			*edit->set_backpointers[i] = edit->set_backpointers_to;
+-
+-	smp_wmb();
+-	for (i = 0; i < ARRAY_SIZE(edit->set); i++)
+-		if (edit->set[i].ptr)
+-			*edit->set[i].ptr = edit->set[i].to;
+-
+-	if (edit->array->root == NULL) {
+-		edit->array->nr_leaves_on_tree = 0;
+-	} else if (edit->adjust_count_on) {
+-		node = edit->adjust_count_on;
+-		for (;;) {
+-			node->nr_leaves_on_branch += edit->adjust_count_by;
+-
+-			ptr = node->back_pointer;
+-			if (!ptr)
+-				break;
+-			if (assoc_array_ptr_is_shortcut(ptr)) {
+-				shortcut = assoc_array_ptr_to_shortcut(ptr);
+-				ptr = shortcut->back_pointer;
+-				if (!ptr)
+-					break;
+-			}
+-			BUG_ON(!assoc_array_ptr_is_node(ptr));
+-			node = assoc_array_ptr_to_node(ptr);
+-		}
+-
+-		edit->array->nr_leaves_on_tree += edit->adjust_count_by;
+-	}
+-
+-	call_rcu(&edit->rcu, assoc_array_rcu_cleanup);
+-}
+-
+-/**
+- * assoc_array_cancel_edit - Discard an edit script.
+- * @edit: The script to discard.
+- *
+- * Free an edit script and all the preallocated data it holds without making
+- * any changes to the associative array it was intended for.
+- *
+- * NOTE!  In the case of an insertion script, this does _not_ release the leaf
+- * that was to be inserted.  That is left to the caller.
+- */
+-void assoc_array_cancel_edit(struct assoc_array_edit *edit)
+-{
+-	struct assoc_array_ptr *ptr;
+-	int i;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	/* Clean up after an out of memory error */
+-	for (i = 0; i < ARRAY_SIZE(edit->new_meta); i++) {
+-		ptr = edit->new_meta[i];
+-		if (ptr) {
+-			if (assoc_array_ptr_is_node(ptr))
+-				kfree(assoc_array_ptr_to_node(ptr));
+-			else
+-				kfree(assoc_array_ptr_to_shortcut(ptr));
+-		}
+-	}
+-	kfree(edit);
+-}
+-
+-/**
+- * assoc_array_gc - Garbage collect an associative array.
+- * @array: The array to clean.
+- * @ops: The operations to use.
+- * @iterator: A callback function to pass judgement on each object.
+- * @iterator_data: Private data for the callback function.
+- *
+- * Collect garbage from an associative array and pack down the internal tree to
+- * save memory.
+- *
+- * The iterator function is asked to pass judgement upon each object in the
+- * array.  If it returns false, the object is discard and if it returns true,
+- * the object is kept.  If it returns true, it must increment the object's
+- * usage count (or whatever it needs to do to retain it) before returning.
+- *
+- * This function returns 0 if successful or -ENOMEM if out of memory.  In the
+- * latter case, the array is not changed.
+- *
+- * The caller should lock against other modifications and must continue to hold
+- * the lock until assoc_array_apply_edit() has been called.
+- *
+- * Accesses to the tree may take place concurrently with this function,
+- * provided they hold the RCU read lock.
+- */
+-int assoc_array_gc(struct assoc_array *array,
+-		   const struct assoc_array_ops *ops,
+-		   bool (*iterator)(void *object, void *iterator_data),
+-		   void *iterator_data)
+-{
+-	struct assoc_array_shortcut *shortcut, *new_s;
+-	struct assoc_array_node *node, *new_n;
+-	struct assoc_array_edit *edit;
+-	struct assoc_array_ptr *cursor, *ptr;
+-	struct assoc_array_ptr *new_root, *new_parent, **new_ptr_pp;
+-	unsigned long nr_leaves_on_tree;
+-	bool retained;
+-	int keylen, slot, nr_free, next_slot, i;
+-
+-	pr_devel("-->%s()\n", __func__);
+-
+-	if (!array->root)
+-		return 0;
+-
+-	edit = kzalloc_obj(struct assoc_array_edit);
+-	if (!edit)
+-		return -ENOMEM;
+-	edit->array = array;
+-	edit->ops = ops;
+-	edit->ops_for_excised_subtree = ops;
+-	edit->set[0].ptr = &array->root;
+-	edit->excised_subtree = array->root;
+-
+-	new_root = new_parent = NULL;
+-	new_ptr_pp = &new_root;
+-	cursor = array->root;
+-
+-descend:
+-	/* If this point is a shortcut, then we need to duplicate it and
+-	 * advance the target cursor.
+-	 */
+-	if (assoc_array_ptr_is_shortcut(cursor)) {
+-		shortcut = assoc_array_ptr_to_shortcut(cursor);
+-		keylen = round_up(shortcut->skip_to_level, ASSOC_ARRAY_KEY_CHUNK_SIZE);
+-		keylen >>= ASSOC_ARRAY_KEY_CHUNK_SHIFT;
+-		new_s = kmalloc_flex(*new_s, index_key, keylen);
+-		if (!new_s)
+-			goto enomem;
+-		pr_devel("dup shortcut %p -> %p\n", shortcut, new_s);
+-		memcpy(new_s, shortcut, struct_size(new_s, index_key, keylen));
+-		new_s->back_pointer = new_parent;
+-		new_s->parent_slot = shortcut->parent_slot;
+-		*new_ptr_pp = new_parent = assoc_array_shortcut_to_ptr(new_s);
+-		new_ptr_pp = &new_s->next_node;
+-		cursor = shortcut->next_node;
+-	}
+-
+-	/* Duplicate the node at this position */
+-	node = assoc_array_ptr_to_node(cursor);
+-	new_n = kzalloc_obj(struct assoc_array_node);
+-	if (!new_n)
+-		goto enomem;
+-	pr_devel("dup node %p -> %p\n", node, new_n);
+-	new_n->back_pointer = new_parent;
+-	new_n->parent_slot = node->parent_slot;
+-	*new_ptr_pp = new_parent = assoc_array_node_to_ptr(new_n);
+-	new_ptr_pp = NULL;
+-	slot = 0;
+-
+-continue_node:
+-	/* Filter across any leaves and gc any subtrees */
+-	for (; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
+-		ptr = node->slots[slot];
+-		if (!ptr)
+-			continue;
+-
+-		if (assoc_array_ptr_is_leaf(ptr)) {
+-			if (iterator(assoc_array_ptr_to_leaf(ptr),
+-				     iterator_data))
+-				/* The iterator will have done any reference
+-				 * counting on the object for us.
+-				 */
+-				new_n->slots[slot] = ptr;
+-			continue;
+-		}
+-
+-		new_ptr_pp = &new_n->slots[slot];
+-		cursor = ptr;
+-		goto descend;
+-	}
+-
+-retry_compress:
+-	pr_devel("-- compress node %p --\n", new_n);
+-
+-	/* Count up the number of empty slots in this node and work out the
+-	 * subtree leaf count.
+-	 */
+-	new_n->nr_leaves_on_branch = 0;
+-	nr_free = 0;
+-	for (slot = 0; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
+-		ptr = new_n->slots[slot];
+-		if (!ptr)
+-			nr_free++;
+-		else if (assoc_array_ptr_is_leaf(ptr))
+-			new_n->nr_leaves_on_branch++;
+-	}
+-	pr_devel("free=%d, leaves=%lu\n", nr_free, new_n->nr_leaves_on_branch);
+-
+-	/* See what we can fold in */
+-	retained = false;
+-	next_slot = 0;
+-	for (slot = 0; slot < ASSOC_ARRAY_FAN_OUT; slot++) {
+-		struct assoc_array_shortcut *s;
+-		struct assoc_array_node *child;
+-
+-		ptr = new_n->slots[slot];
+-		if (!ptr || assoc_array_ptr_is_leaf(ptr))
+-			continue;
+-
+-		s = NULL;
+-		if (assoc_array_ptr_is_shortcut(ptr)) {
+-			s = assoc_array_ptr_to_shortcut(ptr);
+-			ptr = s->next_node;
+-		}
+-
+-		child = assoc_array_ptr_to_node(ptr);
+-		new_n->nr_leaves_on_branch += child->nr_leaves_on_branch;
+-
+-		if (child->nr_leaves_on_branch <= nr_free + 1) {
+-			/* Fold the child node into this one */
+-			pr_devel("[%d] fold node %lu/%d [nx %d]\n",
+-				 slot, child->nr_leaves_on_branch, nr_free + 1,
+-				 next_slot);
+-
+-			/* We would already have reaped an intervening shortcut
+-			 * on the way back up the tree.
+-			 */
+-			BUG_ON(s);
+-
+-			new_n->slots[slot] = NULL;
+-			nr_free++;
+-			if (slot < next_slot)
+-				next_slot = slot;
+-			for (i = 0; i < ASSOC_ARRAY_FAN_OUT; i++) {
+-				struct assoc_array_ptr *p = child->slots[i];
+-				if (!p)
+-					continue;
+-				BUG_ON(assoc_array_ptr_is_meta(p));
+-				while (new_n->slots[next_slot])
+-					next_slot++;
+-				BUG_ON(next_slot >= ASSOC_ARRAY_FAN_OUT);
+-				new_n->slots[next_slot++] = p;
+-				nr_free--;
+-			}
+-			kfree(child);
+-		} else {
+-			pr_devel("[%d] retain node %lu/%d [nx %d]\n",
+-				 slot, child->nr_leaves_on_branch, nr_free + 1,
+-				 next_slot);
+-			retained = true;
+-		}
+-	}
+-
+-	if (retained && new_n->nr_leaves_on_branch <= ASSOC_ARRAY_FAN_OUT) {
+-		pr_devel("internal nodes remain despite enough space, retrying\n");
+-		goto retry_compress;
+-	}
+-	pr_devel("after: %lu\n", new_n->nr_leaves_on_branch);
+-
+-	nr_leaves_on_tree = new_n->nr_leaves_on_branch;
+-
+-	/* Excise this node if it is singly occupied by a shortcut */
+-	if (nr_free == ASSOC_ARRAY_FAN_OUT - 1) {
+-		for (slot = 0; slot < ASSOC_ARRAY_FAN_OUT; slot++)
+-			if ((ptr = new_n->slots[slot]))
+-				break;
+-
+-		if (assoc_array_ptr_is_meta(ptr) &&
+-		    assoc_array_ptr_is_shortcut(ptr)) {
+-			pr_devel("excise node %p with 1 shortcut\n", new_n);
+-			new_s = assoc_array_ptr_to_shortcut(ptr);
+-			new_parent = new_n->back_pointer;
+-			slot = new_n->parent_slot;
+-			kfree(new_n);
+-			if (!new_parent) {
+-				new_s->back_pointer = NULL;
+-				new_s->parent_slot = 0;
+-				new_root = ptr;
+-				goto gc_complete;
+-			}
+-
+-			if (assoc_array_ptr_is_shortcut(new_parent)) {
+-				/* We can discard any preceding shortcut also */
+-				struct assoc_array_shortcut *s =
+-					assoc_array_ptr_to_shortcut(new_parent);
+-
+-				pr_devel("excise preceding shortcut\n");
+-
+-				new_parent = new_s->back_pointer = s->back_pointer;
+-				slot = new_s->parent_slot = s->parent_slot;
+-				kfree(s);
+-				if (!new_parent) {
+-					new_s->back_pointer = NULL;
+-					new_s->parent_slot = 0;
+-					new_root = ptr;
+-					goto gc_complete;
+-				}
+-			}
+-
+-			new_s->back_pointer = new_parent;
+-			new_s->parent_slot = slot;
+-			new_n = assoc_array_ptr_to_node(new_parent);
+-			new_n->slots[slot] = ptr;
+-			goto ascend_old_tree;
+-		}
+-	}
+-
+-	/* Excise any shortcuts we might encounter that point to nodes that
+-	 * only contain leaves.
+-	 */
+-	ptr = new_n->back_pointer;
+-	if (!ptr)
+-		goto gc_complete;
+-
+-	if (assoc_array_ptr_is_shortcut(ptr)) {
+-		new_s = assoc_array_ptr_to_shortcut(ptr);
+-		new_parent = new_s->back_pointer;
+-		slot = new_s->parent_slot;
+-
+-		if (new_n->nr_leaves_on_branch <= ASSOC_ARRAY_FAN_OUT) {
+-			struct assoc_array_node *n;
+-
+-			pr_devel("excise shortcut\n");
+-			new_n->back_pointer = new_parent;
+-			new_n->parent_slot = slot;
+-			kfree(new_s);
+-			if (!new_parent) {
+-				new_root = assoc_array_node_to_ptr(new_n);
+-				goto gc_complete;
+-			}
+-
+-			n = assoc_array_ptr_to_node(new_parent);
+-			n->slots[slot] = assoc_array_node_to_ptr(new_n);
+-		}
+-	} else {
+-		new_parent = ptr;
+-	}
+-	new_n = assoc_array_ptr_to_node(new_parent);
+-
+-ascend_old_tree:
+-	ptr = node->back_pointer;
+-	if (assoc_array_ptr_is_shortcut(ptr)) {
+-		shortcut = assoc_array_ptr_to_shortcut(ptr);
+-		slot = shortcut->parent_slot;
+-		cursor = shortcut->back_pointer;
+-		if (!cursor)
+-			goto gc_complete;
+-	} else {
+-		slot = node->parent_slot;
+-		cursor = ptr;
+-	}
+-	BUG_ON(!cursor);
+-	node = assoc_array_ptr_to_node(cursor);
+-	slot++;
+-	goto continue_node;
+-
+-gc_complete:
+-	edit->set[0].to = new_root;
+-	assoc_array_apply_edit(edit);
+-	array->nr_leaves_on_tree = nr_leaves_on_tree;
+-	return 0;
+-
+-enomem:
+-	pr_devel("enomem\n");
+-	assoc_array_destroy_subtree(new_root, edit->ops);
+-	kfree(edit);
+-	return -ENOMEM;
+-}
 -- 
 2.47.3
 
