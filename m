@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792955552;
-	b=yjnhty1bwVImsizAzBBZwcmusYcEZ4WnKelRliPZ112La/B8+L1oPbUuAGUHa0aPcd4E
-	 GfraFbbWdnMk4mCgp6qAK4ZjJB+TmljM2TUM0c1YaFfm2fLwQY+qO9Zm3+EFfZ5B+dErW
-	 uso+0kIsDjA1+JXspdHcWFbSG42bw4Mri/XzhZibcZVMTaGxuxhtVDmH2uJnS/5vRlwTB
-	 pZK5Mfnc0mC4v85suT2eNbOxOpAN7bkjd1HJpl41mwl+K6+HUs39lb2hTVyah0Rp1/r1b
-	 F025iAeWHQsUgMwnUzvij0GKjn4iAHuuekk5YJEWfKYOEEg9P5W0+B/LjdtkrkdckVw==
+	t=1792955551;
+	b=C0D54WStqsru9cIIkT0U/t2jTKZC+GsUNR7+4LJDEoWGHO0/1pcZmEV+Rg1Xb+7qKZrh
+	 cSkrUG0fqGC0ErLAVlN6OnKmicvrtvGGNxSTMukHVFpqm80s+IDywyKrdPYSQQ723u3Cz
+	 bfQRiFLHgQMmf90XfAWT6J+8QxyQsJnF1SNLl1sjkFYps7RtaLBGCGPXKoI1LukAzQaA+
+	 QcEwclNCi8JPtqh/Rl6NpIBoImiMjmHpyI+tVyBuIDghzb/KgZkjox3zfPWBuqz2T8TrA
+	 yjCifeFc5MLOuY/61lL140P1xNvLdGJ5j21+2YSRZJc64r0HA/vhT6+r6KR5ODosDgA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792955552;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792955551;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=v0LYqB6Jt6uRD00774esn5EXeYWxhHT8u99cd+Yt3vs=;
-	b=NFnaaCjuV+qWAvDD0TefcbveyksKpUAgQOn3dKD9R1/HH8f6P3FXIOiH1YQeJamsXJwk
-	 ALeOVxx+ScgIlTWYCwBklRNG+fSUCuAqojyl5wN196EOkX9JUEBtGWJhn4nBs/th7wV+q
-	 qok12OvR+kcDLg0ZMHKd6NnedlLqdcmGfA0bhaDTCy4VbhfOAlDhb3KxPqvEBVnK2iLGm
-	 ubB72R6foUrVcePU5elRnWECfVE0QI+akcoNvCY8VC1pmlEvvyAlKih6qLXPgrsoioOzz
-	 Y29CylrR05PFyyODhCcfneP+hdXjTtyMG4kG6bcNbII+/NNitL0sSK504MI0d16TRqQ==
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=b1bEpNAUSZi6CYvRzi6aLNZ/xOZsJuz2nnCH7hlv1W4=;
+	b=nPm4s0NzWbCE8Jnct80GxLuSNkKzdUisnMYmkrIbbze4yTSm4TsOx0uDplOq276umHJc
+	 Y6IlAaH7vwPnxfCTB+Ng3h80Yu51sfa4kkw3aGZx55iHvCh6vOhdLLy9YOZtP+9THYSyR
+	 Wu7cmGsufMajEiUkjCcnnwu7G9oCjK+BkgMOxoXO6lHWNJMJjs2D8EQc2Lrl5iVijxgiz
+	 9h8d632sBWSJ1ckuhCd/v7I4yhLGDUG//5XsRebUntOXWgWpcADCgCtmZZluf7NapxMV9
+	 EeTIRa2di4Mo0LXegv35pUFjJBqBHnwkCCLOIkbH25FjieKSIOp5ZHBMqKmqkVdYQjg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cglSjbBd;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QC8DzALF;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF91A606A32D;
-	Sun, 25 Oct 2026 19:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43BB606A31A;
+	Sun, 25 Oct 2026 19:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cglSjbBd
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BA3A1F01825;
-	Sun, 25 Oct 2026 19:12:31 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QC8DzALF
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46F171F01825;
+	Sun, 25 Oct 2026 19:12:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792955551;
-	bh=v0LYqB6Jt6uRD00774esn5EXeYWxhHT8u99cd+Yt3vs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cglSjbBd0jqDdPwp9/osaeJaI2HVx+dw02TH9oEmCotqnlqvB2QABZA5yASnY/vkR
-	 4Qiuq3erAV84cESSlOBqRbiPV5QfLS3ZqPm4crU1iq+sTqXDLDIx3IkvbprzCbI1nN
-	 lLSLQBn7LQ3GIpqeZpDHBW2n+JOoStzfAbq6e+11y3V5fWtRAZCnuEl/JspfP6eXeU
-	 DsKFDc6wK47rSzzdRiS8Vric37KfL6sLQYolZjg8DRs+f7SOU24vImaYjMPn5Wc9h8
-	 /POaOEWVuPsVVUxy14hYyUHNWjhW3DJkcZ5yQX1UbvihcP+obGVOkbkFnrvGm8aQAm
-	 1ZYfPGF5IpoMQ==
+	s=k20260515; t=1792955550;
+	bh=b1bEpNAUSZi6CYvRzi6aLNZ/xOZsJuz2nnCH7hlv1W4=;
+	h=From:To:Cc:Subject:Date;
+	b=QC8DzALFg55K1kTN77G56NT5Ph1biGGe478L1rcSyxSSmNGwllrlf6QXz/qqorUov
+	 7DA2U7RhpYfaUgN4AOZl4nIdUZoSPeQ2trw8wWOmQJBIZyFeC3k+cALwd0CudFhJfd
+	 3+RJPw4OBXxabhJid06sRwnZDMWGzVTzfQF1TrGOWdZ+KYcwmj653KsKLn9Fir9aoD
+	 diYlrwYxWaN3zea74pm65BRva0e0whUR4AutBHTfJ2MUgYM01q7+HRFWi0kIaCMW70
+	 A6Q2nS/FovJMVKKhWJJgqy6Ru9KenpCzEpPF17BIIJH6WjB/pgyZI7DanpBYZzzTlJ
+	 ZGh9PpV4vGqdg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-raid@vger.kernel.org,
 	Andrew Morton <akpm@linux-foundation.org>
@@ -47,12 +47,10 @@ Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Christoph Hellwig <hch@lst.de>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 3/3] raid6: simplify CPU feature checks
-Date: Sun, 25 Oct 2026 12:12:07 -0700
-Message-ID: <20261025191207.86590-4-ebiggers@kernel.org>
+Subject: [PATCH 0/3] raid: remove obsolete MMX optimized code
+Date: Sun, 25 Oct 2026 12:12:04 -0700
+Message-ID: <20261025191207.86590-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261025191207.86590-1-ebiggers@kernel.org>
-References: <20261025191207.86590-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,100 +62,39 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove unnecessary checks for features that are prerequisites for other
-features, such as AVX which is a prerequisite for AVX2.
+This series retires 32-bit MMX optimizations for RAID.
 
-(Note: in most cases arch/x86/kernel/cpu/cpuid-deps.c warns about
-missing prerequisites rather than enforcing them.  This is intentional,
-and it does not mean the prerequisites should be checked elsewhere.)
+Affected CPUs, such as the Pentium MMX and Pentium II, will just fall
+back to the existing well-tested scalar code instead.
 
-Then, move the raid6_recov_algo_add() lines into the appropriate places
-just above so that the same CPU features aren't checked multiple times.
+This was the only remaining MMX optimized code in the kernel.  MMX
+optimizations for the much more commonly called functions memcpy(),
+copy_page(), and clear_page() were already removed years ago by commit
+c6dbd3e5e69c ("x86/mmx_32: Remove X86_USE_3DNOW").  There are zero MMX
+optimizations for anything else, like crypto or CRC, which left the RAID
+code as an outlier.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- lib/raid/raid6/x86/pq_arch.h | 51 ++++++++----------------------------
- 1 file changed, 11 insertions(+), 40 deletions(-)
+Patch 3 also cleans up the CPU feature checks in the RAID6 code.
 
-diff --git a/lib/raid/raid6/x86/pq_arch.h b/lib/raid/raid6/x86/pq_arch.h
-index 4a863b253b909..418e4d4a2930f 100644
---- a/lib/raid/raid6/x86/pq_arch.h
-+++ b/lib/raid/raid6/x86/pq_arch.h
-@@ -16,63 +16,34 @@ extern const struct raid6_recov_calls raid6_recov_ssse3;
- extern const struct raid6_recov_calls raid6_recov_avx2;
- extern const struct raid6_recov_calls raid6_recov_avx512;
- 
--static inline int raid6_has_avx512(void)
--{
--	return boot_cpu_has(X86_FEATURE_AVX2) &&
--		boot_cpu_has(X86_FEATURE_AVX) &&
--		boot_cpu_has(X86_FEATURE_AVX512F) &&
--		boot_cpu_has(X86_FEATURE_AVX512BW) &&
--		boot_cpu_has(X86_FEATURE_AVX512VL) &&
--		boot_cpu_has(X86_FEATURE_AVX512DQ);
--}
--
--static inline bool raid6_has_avx2(void)
--{
--	return boot_cpu_has(X86_FEATURE_AVX2) && boot_cpu_has(X86_FEATURE_AVX);
--}
--
--static inline bool raid6_has_ssse3(void)
--{
--	return boot_cpu_has(X86_FEATURE_XMM) &&
--		boot_cpu_has(X86_FEATURE_XMM2) &&
--		boot_cpu_has(X86_FEATURE_SSSE3);
--}
--
--static inline bool raid6_has_sse2(void)
--{
--	return boot_cpu_has(X86_FEATURE_MMX) &&
--		    boot_cpu_has(X86_FEATURE_FXSR) &&
--		    boot_cpu_has(X86_FEATURE_XMM) &&
--		    boot_cpu_has(X86_FEATURE_XMM2);
--}
--
- static __always_inline void __init arch_raid6_init(void)
- {
--	if (raid6_has_avx2()) {
-+	if (boot_cpu_has(X86_FEATURE_AVX2)) {
- 		raid6_algo_add(&raid6_avx2x1);
- 		raid6_algo_add(&raid6_avx2x2);
- 		if (IS_ENABLED(CONFIG_X86_64))
- 			raid6_algo_add(&raid6_avx2x4);
--		if (raid6_has_avx512()) {
-+		if (boot_cpu_has(X86_FEATURE_AVX512BW) &&
-+		    boot_cpu_has(X86_FEATURE_AVX512VL) &&
-+		    boot_cpu_has(X86_FEATURE_AVX512DQ)) {
- 			raid6_algo_add(&raid6_avx512x1);
- 			raid6_algo_add(&raid6_avx512x2);
- 			if (IS_ENABLED(CONFIG_X86_64))
- 				raid6_algo_add(&raid6_avx512x4);
-+			raid6_recov_algo_add(&raid6_recov_avx512);
-+		} else {
-+			raid6_recov_algo_add(&raid6_recov_avx2);
- 		}
--	} else if (IS_ENABLED(CONFIG_X86_64) || raid6_has_sse2()) {
-+	} else if (IS_ENABLED(CONFIG_X86_64) ||
-+		   boot_cpu_has(X86_FEATURE_XMM2)) {
- 		/* x86_64 can assume SSE2 as baseline */
- 		raid6_algo_add(&raid6_sse2x1);
- 		raid6_algo_add(&raid6_sse2x2);
- 		if (IS_ENABLED(CONFIG_X86_64))
- 			raid6_algo_add(&raid6_sse2x4);
-+		if (boot_cpu_has(X86_FEATURE_SSSE3))
-+			raid6_recov_algo_add(&raid6_recov_ssse3);
- 	} else {
- 		raid6_algo_add_default();
- 	}
--
--	if (raid6_has_avx512())
--		raid6_recov_algo_add(&raid6_recov_avx512);
--	else if (raid6_has_avx2())
--		raid6_recov_algo_add(&raid6_recov_avx2);
--	else if (raid6_has_ssse3())
--		raid6_recov_algo_add(&raid6_recov_ssse3);
- }
+Eric Biggers (3):
+  xor: remove MMX optimized code
+  raid6: remove MMX optimized code
+  raid6: simplify CPU feature checks
+
+ lib/raid/raid6/Makefile      |   4 -
+ lib/raid/raid6/x86/mmx.c     | 118 --------
+ lib/raid/raid6/x86/pq_arch.h |  69 +----
+ lib/raid/raid6/x86/sse1.c    | 136 ---------
+ lib/raid/xor/Makefile        |   2 +-
+ lib/raid/xor/x86/xor-mmx.c   | 515 -----------------------------------
+ lib/raid/xor/x86/xor_arch.h  |   5 -
+ 7 files changed, 12 insertions(+), 837 deletions(-)
+ delete mode 100644 lib/raid/raid6/x86/mmx.c
+ delete mode 100644 lib/raid/raid6/x86/sse1.c
+ delete mode 100644 lib/raid/xor/x86/xor-mmx.c
+
+
+base-commit: 21a7f44fd0765fcc5194130b28767786eba1d1e7
 -- 
 2.56.0
 
