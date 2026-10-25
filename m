@@ -1,59 +1,70 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792887102;
-	b=08uiorJfrOivaNpFTw9H6Uz3FbI1sy1h3UrDQnvMcULtiw1+wINYfroG7ELWN7T4GVj2
-	 ypAoobbcpMq8+I1sCBVekRKCiaefxA0VBlaYMwu1fTKtDvL/FdKjSnn6YzO5IrLpcJM0k
-	 /sSaz8r4AcFfK3I0tDNrBmZR+ELRn/JH5NM0jvSQfv0mHU/5RqtkT1Gl4VQV0RptOJtv0
-	 a8lsH5sz1AepY4dQAxz0BqjaCl5jBDruQw8932qA8Y5UOfFOijKiiX/i4aYn1bdeHCr4n
-	 JUzc+FqFvshnaExgARDcPzbaKxFp3/JRPhFrvrjFdImxffSVmRKx3aEY/2CzDQZs3OQ==
+	t=1792887114;
+	b=P990m3ZJ8Ps4jhzdHQaQ3l2V1kaCxg6aBEiaqz+PhRnt2BkeAZ23etYzbUEbDtIqOfEK
+	 fT3TMlgn2ngEkQh51qrzct5pw9z0vFzJXT5P4ofSDNDayg3Z0qBFBSjdCi5XqsVlfawSQ
+	 XKb1cyRYLrJ/1O2/6BuBqzI/oBtC7hSBKEfctasOCivWxBaG0V754QIxvQDkengyZQgQB
+	 +yKWCJY/U4Q/hNWYvJkbehbBT1WjUPtYNNfK+1Enydoo1/jpX5vhb8QkVHX1GPHAK/jyX
+	 AJwGYe4ZYB5vBpzV7aLI6aBeBhMbNlUaHmKoIC/yixPQTIq2gq2bJARQ3sczENfzoqA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792887102;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792887114;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=hyNNUZaRnakcEtdBWh6hHPbyrLmmMxNp/bH3C2xcpVY=;
-	b=Xinz17cI85m32a6WMyDbkvJh4s7di2wnaPkrRUi0TrnGv8cer6zRn5fG3eKEFiiVZOJW
-	 NMHyYY+7GgRkQ9Pc2GWMdYhA10GBiSIvejAnMh2luneFqEVzF3gcjWm3yuxpNYSfB8uBG
-	 zcxvrX6ug6qGw1nYiLeFu5YOaJGeVPjcloQL3VXxuerkaIGsGt5xN40h4JkJF9gm0tcmj
-	 mfSUg7r4TlEAzaXCgElz5OiCMSdoZgk1HWG7s5JAB3XE4uFwV4dBDoIcUttKh9Uz83r5Q
-	 4M0BqxYjTKmxwXCKy3kXKpKEe0gcdcfSos1waIaWYUeURoFOfoZPWFYDojujPQKJa3A==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=ixYsrcS47Q6Me2TtjEpHNH50KI+aO9TZVihgf9TNOE0=;
+	b=qz9AhD0OO8QKndl3cUqiOzaluq21WKzi3Eib9SnZI9pzq7zCtbdR/dWKwVw8QKN/2/rR
+	 gEw6kfDijNGZaZjkeLxfkUg040zpAlOLEzeP/6e24o04Ac6JCErP14PRIRyDBP3Psq8HP
+	 8m6nVVUmMg22bn+SFtMPc+ny+X2kBOTNY89aj1jARb1xOUz9L/+suD6WZFS5BZVcBcB7h
+	 OSm/oa8TeDvCbjNGT+pnYdaLyQC2nHjAoJggAfCf+G98Lc6PNEbo+a1WV40rE1Jn6vMM5
+	 UFpG39Y/vU2zQ07C3lne/JWsNMAP1wzATKA0EX2KNFS6lOSSnwy0g8gBwFp3ijwNlfw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="cyrrfm/L";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TjI6A4f3;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 6F04D606A31A;
-	Sun, 25 Oct 2026 00:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 77E31606A31A;
+	Sun, 25 Oct 2026 00:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cyrrfm/L
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 59BBF1F01825;
-	Sun, 25 Oct 2026 00:11:41 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TjI6A4f3
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 4862C1F01825;
+	Sun, 25 Oct 2026 00:11:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792887102;
-	bh=hyNNUZaRnakcEtdBWh6hHPbyrLmmMxNp/bH3C2xcpVY=;
-	h=From:To:Cc:Subject:Date;
-	b=cyrrfm/LuHwFLpOhIU5gkEif0YoAZzHEpEjo2eDLOvxhmjkTgSTqRDabx7jjPWZbY
-	 OOn5vgrh10DqH2TSmFBu2b86u8+YlNu8OgTNyfUDDcz21n3bPpZ2KoBll9bBBokLJV
-	 A6KTLmAs97hXSqu4L5JKYZrko3l2i0x9bBjE4PoW9MlYu2vxivxEvsJmeJ6ahQs5rF
-	 ZhjVPPwZMIPkT8NGiCiVL4DB2nezv0RTCwpw6O8edRPPp/B4U5d96hU7DmI7fxM6ee
-	 VYt1y0yEEUSjspHj2NJbOLKhVLjd9OcR/hsRw6z6nNL4kcgBAnTrQGlzEGvbg6Fw3w
-	 4ROW54479cdlQ==
+	s=k20260515; t=1792887114;
+	bh=ixYsrcS47Q6Me2TtjEpHNH50KI+aO9TZVihgf9TNOE0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=TjI6A4f3KtclIMBaINOmlusAfhZNSinL6uIb/vUhH7/q+470s8Kw/0gO1qxBqv9H6
+	 YSfD2DM8duHlZpbzOkrrW4hNiF9qCe0wrN0GdyS7UXJJ7cIj5wVpTT7JcuOsJN/F6R
+	 ijqJ1ORFWgt5aVdEpwZUaaelqYairNCXhFKidz113W/qxXyMS/YBwCPfzpKYiYBasJ
+	 P/HNpWlylnQ3WDKKUPcMuhEraO6xmZ2LY1hRzMOFJPtqEj3PD5ICJzjC87R6qizyAC
+	 8Z71mzLf3cePv87hUzQ0rIHOAn1Nb6lgBKRRlUXTQ66ZDU3Dp81sSfX4pz/uU/87ty
+	 nta80/ssS68vA==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: David Howells <dhowells@redhat.com>
 Cc: keyrings@vger.kernel.org,
 	Linus Torvalds <torvalds@linux-foundation.org>,
 	Eric Biggers <ebiggers@kernel.org>,
 	Jarkko Sakkinen <jarkko@kernel.org>,
+	stable@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
 	Thomas Graf <tgraf@suug.ch>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-crypto@vger.kernel.org (open list:RHASHTABLE),
-	linux-kernel@vger.kernel.org (open list:LIBRARY CODE)
-Subject: [PATCH v3 0/6] KEYS: Replace assoc_array with rhashtable
-Date: Sun, 25 Oct 2026 03:10:08 +0300
-Message-ID: <20261025001105.1824178-1-jarkko@kernel.org>
+	linux-cifs@vger.kernel.org (open list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)),
+	samba-technical@lists.samba.org (moderated list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)),
+	linux-kernel@vger.kernel.org (open list),
+	linux-crypto@vger.kernel.org (open list:RHASHTABLE)
+Subject: [PATCH v3 1/6] KEYS: Expand key->{datalen,quotalen} to unsigned int
+Date: Sun, 25 Oct 2026 03:10:09 +0300
+Message-ID: <20261025001105.1824178-2-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261025001105.1824178-1-jarkko@kernel.org>
+References: <20261025001105.1824178-1-jarkko@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,96 +76,88 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The keyring subsystem depends on assoc_array for searching keys by their
-description, type and domain. It is the sole user of this data structure,
-which has during the age of LLMs transformed into a maintenance nightmare.
+In key_alloc() and key_payload_reserve(), key->quotalen and key->datalen
+can receive values larger than USHRT_MAX.
 
-assoc_array needs to be replaced with a data structure meeting the
-following criteria:
+Example:
 
-1. Must be suitable for a sparse key-value store.
-2. Must have multiple in-kernel users.
-3. Would be nice if it had dedicated maintainers.
+  keyctl new_session >/dev/null
+  owner=$(keyctl newring owner @s)
+  keeper=$(keyctl newring keeper @s)
 
-rhashtable is likely the best pick from the available options as it is
-designed for a sparse key space, has dedicated maintainers, and multiple
-in-kernel users.
+  for ((i=0; i<16384; i++)); do
+      key=$(keyctl add user "k$i" x "$keeper")
+      keyctl link "$key" "$owner"
+  done
 
-CHANGES
-=======
+  awk -v uid="$(id -u):" '$1 == uid {print $NF}' /proc/key-users
+  keyctl clear "$owner"
+  awk -v uid="$(id -u):" '$1 == uid {print $NF}' /proc/key-users
 
-v3:
-- Since David is away for the next week I decided to address the
-  low hanging fruit that I reported myself.
-- Unified and sanitized function and variable naming and removed
-  unnecessary asymmetry e.g., by renaming keyring_remove_all_links
-  as keyring_index_free, 'links' as 'index' and '_edit' as 'edit'.
-- Flattened the implementation by refactoring out some useless
-  wrappers and other constructs.
-- Addressed continuation after triggered WARN_ON() on at the three
-  sites that I've described in my email response to the previous
-  patch set version.
-- Reworked keyring_read() so that it triggers the scheduler between
-  the iterations.
-- Dropped "Assisted-by: LLM" tag because checkpatch.pl told me so.
+Because key->datalen wraps around 65535, the quota refunded upon clearing
+is truncated, causing quota bytes to leak in /proc/key-users.
 
-v2:
-- Tried to address all the issues pointed out by David and Eric. Tell me
-  if something was ignored, as that would be an unintentional mishap.
-- Updated and trimmed the source code comments.
-- For assoc_array_edit I decided to go with two-element pointer array,
-  which shifts a bit what David suggested.
-- Dropped is_keyring flag. It was so obvious call so I mention it here
-  just in case because too obvious maxes out my self-doubt ;-)
-- Used cleanup.h primitives where I possibly could especially in order
-  to make fallible initializations more bug-resistant.
-- The already-ack'd bug fixes are included but will be dropped as soon
-  as I've sent them over to Linus.
+Change the types of key->datalen and key->quotalen from unsigned short to
+unsigned int so that they can carry the full payload length without
+truncation.
 
-VERSIONS
-========
+Cc: stable@vger.kernel.org
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reviewed-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+Link: https://lore.kernel.org/r/20261020174325.2229448-2-jarkko@kernel.org
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+---
+ fs/smb/client/cifsacl.c | 6 +++---
+ include/linux/key.h     | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-- v2: https://lore.kernel.org/keyrings/20261023120953.1206778-1-jarkko@kernel.org/
-- v1: https://lore.kernel.org/keyrings/20261016215326.4110064-1-jarkko@kernel.org/
-
-
-
-Jarkko Sakkinen (6):
-  KEYS: Expand key->{datalen,quotalen} to unsigned int
-  KEYS: Reject descriptions larger than KEY_MAX_DESC_SIZE
-  KEYS: Verify the key identity in __key_unlink_begin
-  KEYS: Introduce keyring_is_empty()
-  KEYS: Replace assoc_array with rhashtable
-  lib: Remove assoc_array
-
- Documentation/core-api/assoc_array.rst        |  564 ------
- Documentation/core-api/index.rst              |    1 -
- .../zh_CN/core-api/assoc_array.rst            |  473 -----
- .../translations/zh_CN/core-api/index.rst     |    1 -
- drivers/md/dm-verity-verify-sig.c             |    2 +-
- fs/smb/client/cifsacl.c                       |    6 +-
- fs/verity/signature.c                         |    2 +-
- include/keys/keyring-type.h                   |    1 -
- include/linux/assoc_array.h                   |   88 -
- include/linux/assoc_array_priv.h              |  178 --
- include/linux/key.h                           |   27 +-
- lib/Kconfig                                   |   14 -
- lib/Makefile                                  |    1 -
- lib/assoc_array.c                             | 1724 -----------------
- security/keys/Kconfig                         |    1 -
- security/keys/internal.h                      |    9 +-
- security/keys/key.c                           |   32 +-
- security/keys/keyctl.c                        |    2 -
- security/keys/keyring.c                       |  940 +++++----
- security/keys/request_key.c                   |   24 +-
- .../dm-verity/test-dm-verity-keyring.sh       |    2 +-
- 21 files changed, 491 insertions(+), 3601 deletions(-)
- delete mode 100644 Documentation/core-api/assoc_array.rst
- delete mode 100644 Documentation/translations/zh_CN/core-api/assoc_array.rst
- delete mode 100644 include/linux/assoc_array.h
- delete mode 100644 include/linux/assoc_array_priv.h
- delete mode 100644 lib/assoc_array.c
-
+diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
+index d1a92bb4d9a5..e7f7ccf2a158 100644
+--- a/fs/smb/client/cifsacl.c
++++ b/fs/smb/client/cifsacl.c
+@@ -385,7 +385,7 @@ id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
+ 		goto out_revert_creds;
+ 	} else if (sidkey->datalen < CIFS_SID_BASE_SIZE) {
+ 		rc = smb_EIO1(smb_eio_trace_malformed_sid_key, sidkey->datalen);
+-		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu)\n",
++		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u)\n",
+ 			 __func__, sidkey->datalen);
+ 		goto invalidate_key;
+ 	}
+@@ -403,7 +403,7 @@ id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
+ 	if (ksid_size > sidkey->datalen) {
+ 		rc = smb_EIO2(smb_eio_trace_malformed_ksid_key,
+ 			      ksid_size, sidkey->datalen);
+-		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu, ksid_size=%u)\n",
++		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u, ksid_size=%u)\n",
+ 			 __func__, sidkey->datalen, ksid_size);
+ 		goto invalidate_key;
+ 	}
+@@ -498,7 +498,7 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct smb_sid *psid,
+ 	 */
+ 	BUILD_BUG_ON(sizeof(uid_t) != sizeof(gid_t));
+ 	if (sidkey->datalen != sizeof(uid_t)) {
+-		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu)\n",
++		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u)\n",
+ 			 __func__, sidkey->datalen);
+ 		key_invalidate(sidkey);
+ 		goto out_key_put;
+diff --git a/include/linux/key.h b/include/linux/key.h
+index e40b5267658f..26139c3adf62 100644
+--- a/include/linux/key.h
++++ b/include/linux/key.h
+@@ -216,8 +216,8 @@ struct key {
+ 	kuid_t			uid;
+ 	kgid_t			gid;
+ 	key_perm_t		perm;		/* access permissions */
+-	unsigned short		quotalen;	/* length added to quota */
+-	unsigned short		datalen;	/* payload data length
++	unsigned int		quotalen;	/* length added to quota */
++	unsigned int		datalen;	/* payload data length
+ 						 * - may not match RCU dereferenced payload
+ 						 * - payload should contain own length
+ 						 */
 -- 
 2.47.3
 
