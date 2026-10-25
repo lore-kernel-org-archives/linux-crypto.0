@@ -1,58 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792884138;
-	b=mxl/Hqw/YApBUFP8FxjmYwyKSTWhRvNy54HZpzRrQGsA79LxjsOOl75vAfaFHFyH8rml
-	 BMUDJL8C8Uln/6NBzYA/qUj/zWFUy9EqiHg9tnTH/LBEMN5lKG0b1x4XIbFpsVUOzyv25
-	 rD8g5FbydMYb0RVemi/l/MQygy6RClch+J/XEaqwXTWkKfRAcp2mWAZKYrf0QlbuADGBz
-	 Uy1pV0BarbqPsaiR58SInag30ph1fxaGEzJzOHB2R46jGR4GgW6MM++VMXr7mvNhX4cgV
-	 JLrj5yjCM4P0rikVc3yW7l3YQa6WE8/FS2uf2NDoA8xeILW3+IdHlUIPXVsWBldq6Ag==
+	t=1792887102;
+	b=08uiorJfrOivaNpFTw9H6Uz3FbI1sy1h3UrDQnvMcULtiw1+wINYfroG7ELWN7T4GVj2
+	 ypAoobbcpMq8+I1sCBVekRKCiaefxA0VBlaYMwu1fTKtDvL/FdKjSnn6YzO5IrLpcJM0k
+	 /sSaz8r4AcFfK3I0tDNrBmZR+ELRn/JH5NM0jvSQfv0mHU/5RqtkT1Gl4VQV0RptOJtv0
+	 a8lsH5sz1AepY4dQAxz0BqjaCl5jBDruQw8932qA8Y5UOfFOijKiiX/i4aYn1bdeHCr4n
+	 JUzc+FqFvshnaExgARDcPzbaKxFp3/JRPhFrvrjFdImxffSVmRKx3aEY/2CzDQZs3OQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792884138;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=5MaoT/8ksd5IsjEEmV0ldmSolxIyl6QJJxD+GIBwMwE=;
-	b=KEXECmt2WNt33b3jDankEE8JgXM3LCWhfvv8tBHQXojfR/uwJVlqzmvUi3u+Hpi6N4oi
-	 hO5hQfM9ZTGB43FunjL+TW6NSeNIlIocdpD/Hn5JfmJuH/Z/7JB86mfkqKlMAxTdKOdPM
-	 abQSvla7HXXSBcBomcvFXKVsS8k5Ks4NKNlYx1GNNBUYTk0wjIPjlxVS0VBZeNOi22tz7
-	 T+R94DoJ42KmIxru22zYDJo9Larr+U8ugv/gPjwY5kdrc/z3sWO+91tGPQI87h2cnnPqy
-	 3n2KH4xahKZEvcY68dpMbmvU+zRZrVnaggOTs7JXmthgIG538/PQ8Hd4XLqxlAJ3RZA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792887102;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=hyNNUZaRnakcEtdBWh6hHPbyrLmmMxNp/bH3C2xcpVY=;
+	b=Xinz17cI85m32a6WMyDbkvJh4s7di2wnaPkrRUi0TrnGv8cer6zRn5fG3eKEFiiVZOJW
+	 NMHyYY+7GgRkQ9Pc2GWMdYhA10GBiSIvejAnMh2luneFqEVzF3gcjWm3yuxpNYSfB8uBG
+	 zcxvrX6ug6qGw1nYiLeFu5YOaJGeVPjcloQL3VXxuerkaIGsGt5xN40h4JkJF9gm0tcmj
+	 mfSUg7r4TlEAzaXCgElz5OiCMSdoZgk1HWG7s5JAB3XE4uFwV4dBDoIcUttKh9Uz83r5Q
+	 4M0BqxYjTKmxwXCKy3kXKpKEe0gcdcfSos1waIaWYUeURoFOfoZPWFYDojujPQKJa3A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EXYS2+DJ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="cyrrfm/L";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D260606A31A;
-	Sat, 24 Oct 2026 23:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 6F04D606A31A;
+	Sun, 25 Oct 2026 00:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EXYS2+DJ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32CD81F01825;
-	Sat, 24 Oct 2026 23:22:17 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cyrrfm/L
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 59BBF1F01825;
+	Sun, 25 Oct 2026 00:11:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792884137;
-	bh=5MaoT/8ksd5IsjEEmV0ldmSolxIyl6QJJxD+GIBwMwE=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=EXYS2+DJFWQOCXum7CIb934dxkSdKYNVFBnz5OIN9cQf9r0RWZ0RONAqTSBsxaON4
-	 hEf8R2Tr2fleLnNcbZ8j7mo5Pfx+tsryRqPELiS4kLzm1ktWamRUHnPQCrdYUAqgZe
-	 eOg5cs2yvGh12ujtfLQZ9EJ/w7MGO+rggVweNsnlpcjG0C/9xg9KqMfItk2rO+cjK4
-	 dKaSOVOpq+2KvK/I3T7DASqVw8G8S3ZNWFJwTKif0sbzQRNB/I0TOyFT3bapU0+2GU
-	 DAqzzFuNlbPkdKvGEvedfebWAfqbYJZDZm1s6U14rGzH3mbQ0t6iFVLnxWKIIL4Sns
-	 4ETMrIWBkDClQ==
-Message-ID: <sashiko-outbox-183943@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/3] hwrng: rng90: add KUnit tests
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Patrick Tudor" <ptudor@ptudor.net>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Olivia
- Mackall" <olivia@selenic.com>, "Herbert Xu" <herbert@gondor.apana.org.au>
-Cc: devicetree@vger.kernel.org, linux-crypto@vger.kernel.org
-In-Reply-To: <20261024-rng90-submit-v1-v1-3-e265cfabc9af@ptudor.net>
-References: <20261024-rng90-submit-v1-v1-0-e265cfabc9af@ptudor.net>
- <20261024-rng90-submit-v1-v1-3-e265cfabc9af@ptudor.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 24 Oct 2026 23:22:16 +0000
+	s=k20260515; t=1792887102;
+	bh=hyNNUZaRnakcEtdBWh6hHPbyrLmmMxNp/bH3C2xcpVY=;
+	h=From:To:Cc:Subject:Date;
+	b=cyrrfm/LuHwFLpOhIU5gkEif0YoAZzHEpEjo2eDLOvxhmjkTgSTqRDabx7jjPWZbY
+	 OOn5vgrh10DqH2TSmFBu2b86u8+YlNu8OgTNyfUDDcz21n3bPpZ2KoBll9bBBokLJV
+	 A6KTLmAs97hXSqu4L5JKYZrko3l2i0x9bBjE4PoW9MlYu2vxivxEvsJmeJ6ahQs5rF
+	 ZhjVPPwZMIPkT8NGiCiVL4DB2nezv0RTCwpw6O8edRPPp/B4U5d96hU7DmI7fxM6ee
+	 VYt1y0yEEUSjspHj2NJbOLKhVLjd9OcR/hsRw6z6nNL4kcgBAnTrQGlzEGvbg6Fw3w
+	 4ROW54479cdlQ==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: keyrings@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-crypto@vger.kernel.org (open list:RHASHTABLE),
+	linux-kernel@vger.kernel.org (open list:LIBRARY CODE)
+Subject: [PATCH v3 0/6] KEYS: Replace assoc_array with rhashtable
+Date: Sun, 25 Oct 2026 03:10:08 +0300
+Message-ID: <20261025001105.1824178-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,105 +62,99 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Medium] hwrng: rng90: NULL dereference in rng90_test_exit() if rng90_tes=
-t_init() fails
---
+The keyring subsystem depends on assoc_array for searching keys by their
+description, type and domain. It is the sole user of this data structure,
+which has during the age of LLMs transformed into a maintenance nightmare.
 
-commit 738c911c8957ee3bcb09ed18f6daa72a41daed79
-Author: Patrick Tudor <ptudor@ptudor.net>
+assoc_array needs to be replaced with a data structure meeting the
+following criteria:
 
-hwrng: rng90: add KUnit tests
+1. Must be suitable for a sparse key-value store.
+2. Must have multiple in-kernel users.
+3. Would be nice if it had dedicated maintainers.
 
-This commit adds built-in KUnit tests for the RNG90 hardware random number
-generator driver using a scripted I2C adapter to exercise command framing,
-CRC validation, polling, recovery, health failures, and power management.
+rhashtable is likely the best pick from the available options as it is
+designed for a sparse key space, has dedicated maintainers, and multiple
+in-kernel users.
 
-> diff --git a/drivers/char/hw_random/rng90-kunit.c b/drivers/char/hw_rando=
-m/rng90-kunit.c
-> new file mode 100644
-> index 0000000000000..f6daffb2e3d97
-> --- /dev/null
-> +++ b/drivers/char/hw_random/rng90-kunit.c
-> @@ -0,0 +1,820 @@
+CHANGES
+=======
 
-[ ... ]
+v3:
+- Since David is away for the next week I decided to address the
+  low hanging fruit that I reported myself.
+- Unified and sanitized function and variable naming and removed
+  unnecessary asymmetry e.g., by renaming keyring_remove_all_links
+  as keyring_index_free, 'links' as 'index' and '_edit' as 'edit'.
+- Flattened the implementation by refactoring out some useless
+  wrappers and other constructs.
+- Addressed continuation after triggered WARN_ON() on at the three
+  sites that I've described in my email response to the previous
+  patch set version.
+- Reworked keyring_read() so that it triggers the scheduler between
+  the iterations.
+- Dropped "Assisted-by: LLM" tag because checkpatch.pl told me so.
 
-> +static int rng90_test_init(struct kunit *test)
-> +{
-> +	struct rng90_test_context *ctx;
-> +	int ret;
-> +
-> +	ctx =3D kunit_kzalloc(test, sizeof(*ctx), GFP_KERNEL);
-> +	if (!ctx)
-> +		return -ENOMEM;
-> +	test->priv =3D ctx;
-> +	ctx->test =3D test;
-> +	ctx->adapter.owner =3D THIS_MODULE;
-> +	ctx->adapter.algo =3D &rng90_test_algorithm;
-> +	ctx->adapter.algo_data =3D ctx;
-> +	strscpy(ctx->adapter.name, "rng90-kunit", sizeof(ctx->adapter.name));
-> +	ret =3D i2c_add_adapter(&ctx->adapter);
-> +	if (ret)
-> +		return ret;
-> +	ctx->client =3D i2c_new_dummy_device(&ctx->adapter, RNG90_ADDRESS);
-> +	if (IS_ERR(ctx->client)) {
-> +		ret =3D PTR_ERR(ctx->client);
-> +		i2c_del_adapter(&ctx->adapter);
-> +		return ret;
-> +	}
-> +	ctx->priv.client =3D ctx->client;
-> +	mutex_init(&ctx->priv.lock);
-> +	i2c_set_clientdata(ctx->client, &ctx->priv);
-> +	/* Never register this predictable test source with the hwrng core. */
-> +	return 0;
-> +}
-> +
-> +/* Verify the script was consumed, allowing a final busy step at the dea=
-dline. */
-> +static void rng90_test_settled(struct rng90_test_context *ctx)
-> +{
-> +	if (ctx->next < ctx->count &&
-> +	    ctx->steps[ctx->next].repeat =3D=3D RNG90_TEST_BUSY &&
-> +	    ctx->steps[ctx->next].hits)
-> +		ctx->next++;
-> +	KUNIT_EXPECT_EQ(ctx->test, ctx->next, ctx->count);
-> +}
-> +
-> +static void rng90_test_exit(struct kunit *test)
-> +{
-> +	struct rng90_test_context *ctx =3D test->priv;
-> +
-> +	rng90_test_settled(ctx);
-> +	i2c_unregister_device(ctx->client);
-> +	i2c_del_adapter(&ctx->adapter);
-> +}
+v2:
+- Tried to address all the issues pointed out by David and Eric. Tell me
+  if something was ignored, as that would be an unintentional mishap.
+- Updated and trimmed the source code comments.
+- For assoc_array_edit I decided to go with two-element pointer array,
+  which shifts a bit what David suggested.
+- Dropped is_keyring flag. It was so obvious call so I mention it here
+  just in case because too obvious maxes out my self-doubt ;-)
+- Used cleanup.h primitives where I possibly could especially in order
+  to make fallible initializations more bug-resistant.
+- The already-ack'd bug fixes are included but will be dropped as soon
+  as I've sent them over to Linus.
 
-[Severity: Medium]
-Can rng90_test_exit() dereference a null pointer or repeat adapter teardown
-if rng90_test_init() fails?
+VERSIONS
+========
 
-In KUnit, kunit_run_case_catch_errors() invokes kunit_try_run_case_cleanup()
--> kunit_run_case_cleanup() -> suite->exit(test) even when suite->init(test)
-returns a non-zero error code.
+- v2: https://lore.kernel.org/keyrings/20261023120953.1206778-1-jarkko@kernel.org/
+- v1: https://lore.kernel.org/keyrings/20261016215326.4110064-1-jarkko@kernel.org/
 
-If kunit_kzalloc() fails in rng90_test_init(), test->priv remains NULL, and
-rng90_test_exit() will dereference ctx in rng90_test_settled(ctx),
-i2c_unregister_device(ctx->client), and i2c_del_adapter(&ctx->adapter).
 
-Additionally, test->priv =3D ctx is assigned before i2c_add_adapter() and
-i2c_new_dummy_device(). If i2c_new_dummy_device() fails, rng90_test_init()
-calls i2c_del_adapter(&ctx->adapter) and leaves ctx->client as an error
-pointer, after which rng90_test_exit() will run and call
-i2c_del_adapter(&ctx->adapter) a second time.
 
-Would it make sense to assign test->priv =3D ctx only after initialization
-succeeds in rng90_test_init(), and check for !ctx in rng90_test_exit() befo=
-re
-cleaning up?
+Jarkko Sakkinen (6):
+  KEYS: Expand key->{datalen,quotalen} to unsigned int
+  KEYS: Reject descriptions larger than KEY_MAX_DESC_SIZE
+  KEYS: Verify the key identity in __key_unlink_begin
+  KEYS: Introduce keyring_is_empty()
+  KEYS: Replace assoc_array with rhashtable
+  lib: Remove assoc_array
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261024-rng90-subm=
-it-v1-v1-0-e265cfabc9af@ptudor.net?part=3D3
+ Documentation/core-api/assoc_array.rst        |  564 ------
+ Documentation/core-api/index.rst              |    1 -
+ .../zh_CN/core-api/assoc_array.rst            |  473 -----
+ .../translations/zh_CN/core-api/index.rst     |    1 -
+ drivers/md/dm-verity-verify-sig.c             |    2 +-
+ fs/smb/client/cifsacl.c                       |    6 +-
+ fs/verity/signature.c                         |    2 +-
+ include/keys/keyring-type.h                   |    1 -
+ include/linux/assoc_array.h                   |   88 -
+ include/linux/assoc_array_priv.h              |  178 --
+ include/linux/key.h                           |   27 +-
+ lib/Kconfig                                   |   14 -
+ lib/Makefile                                  |    1 -
+ lib/assoc_array.c                             | 1724 -----------------
+ security/keys/Kconfig                         |    1 -
+ security/keys/internal.h                      |    9 +-
+ security/keys/key.c                           |   32 +-
+ security/keys/keyctl.c                        |    2 -
+ security/keys/keyring.c                       |  940 +++++----
+ security/keys/request_key.c                   |   24 +-
+ .../dm-verity/test-dm-verity-keyring.sh       |    2 +-
+ 21 files changed, 491 insertions(+), 3601 deletions(-)
+ delete mode 100644 Documentation/core-api/assoc_array.rst
+ delete mode 100644 Documentation/translations/zh_CN/core-api/assoc_array.rst
+ delete mode 100644 include/linux/assoc_array.h
+ delete mode 100644 include/linux/assoc_array_priv.h
+ delete mode 100644 lib/assoc_array.c
+
+-- 
+2.47.3
+
