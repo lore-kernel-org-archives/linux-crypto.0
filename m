@@ -1,54 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792962094;
-	b=h3PopuhMdFzKyNYuj+JABvs2L8m8kIi6N7EX0XC4NWCsHgbODKxdLdTgc1uR5cq/9bfD
-	 OdpBwj2Ml2fYiDuWbHxcS4x833BHxzDtiJ6x6+t9IwGwdvNNLeueVUhhSyGpefABTn1DM
-	 MXJohtpkIPnE0XKPK3EDYMgigQErxg8opBzKN/CdHXXiouBpoAHfBfa1+uSUC9kwBp6bJ
-	 jDv4lqWlrmyy+ko9aiBP4ESY20mCf33dWUUg5bqiOXlixKK/QoPzGv/uY0tr2YVwYl/ht
-	 pH1l0CyAOH8eQVeK14bRHYbsdcAlDCVd1vfn/1zMeguzWGm+rk0+CmeEf81ZvvUjA8Q==
+	t=1792962781;
+	b=2dgTeIA4Q6C63Ar9R4vTtkt4hpSh7g/R5cUMNON8zrRXelL/aENMTBKHc7aozpCtlMYy
+	 mVHl7kDXZcuC7Zb05AvXXPevk4FVPehsZmBb1lLsTGaq+WNjZtoK+5F2xcdcaDJh8Pk/c
+	 F2H3xyn/mm9eJ2onyGsXsnUCwOudJUBGvld+7PpP7LFjk0R5+rub5WHlwC+zLgba942MG
+	 8LnNA3f+81ZaRKbffCdH7SEU+11xh3tbl5wb9OyM3AfZurY0SU5rR0volzkFGiKJ6DXdL
+	 AK5vJyWnLJIHYTpFT3w4je6nSrAbPOqAqRxsT8XPyc2u9lqxpChBbrONjis8nRn1mgQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792962094;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792962781;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=3g+p5AOGdITDii67J24gqDoEuR4BTYwLoBIHBXhPWsQ=;
-	b=rG0xyamRtdP/xso3O9jql4mE8SjuKXGhVKcv0LxkQMxdhq27poNBTwQkKXtj5vqeMcRo
-	 N6enjfYTdGB2OrVbhMxozZIn6dHnNukAvVHXspBNzKQIzXCpJckFEXVFxeMyx9QPhP2vx
-	 qu4uFTXFzFO4KCQk2ynxA7EninPeYixLAI+l6O3UVDu4WZ09C+XhqQSI5jgu67wpJMyRH
-	 cY/Bg2f82Gc7xI336+fzmTDa3UkiLYWTR7c8nETYdlBHOaL13FCOGnabjMJ1tHQgQgYHx
-	 xF1SIE4QR71N2rQz8miXvQCszqNUNhbY2Wp/3tBbStH7S462D0egPvOfM73qDUJef4A==
+	bh=mUa32GQ7mZ4BJLOWdMWsKmD7PZePHSIH7PdJ14EI5oU=;
+	b=GjeKWJUX/kFYDtWBhJ3NbgJxUrq3Pcwf0xqGfk8wwQlYjJqEf1aSWJqJmYSYO1OVL/52
+	 xknk2/0liTc+50kUBC2qCLdludMXggAU+08W0AlmiwGykKfiYUqnyYeVhNtmyp+sU4SuO
+	 ds5bd4psRwq4jpPKDr2toPQz7XaErdS6szrrdy6IL3rUlhS2rNlIRYgJSSat/4s5P+yoQ
+	 KiRilrH2HKAur9ujddb+q3RRnKsJfGTudtIcrNDaIG7PmPNlBtWMDPBk2x4oyoaXoeo8b
+	 Gz7oOW2Jn8Yy9PDEjjFR0JY0CjoBSiuM24v1B+R7knap+bj1WIFhERfZ7PEXuotIn+A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Zq5UW2wz;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jb6aORsx;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369EF606A31B;
-	Sun, 25 Oct 2026 21:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FEE606A31A;
+	Sun, 25 Oct 2026 21:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Zq5UW2wz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 963C61F01828;
-	Sun, 25 Oct 2026 21:01:33 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Jb6aORsx
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43E9E1F01825;
+	Sun, 25 Oct 2026 21:13:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792962093;
-	bh=3g+p5AOGdITDii67J24gqDoEuR4BTYwLoBIHBXhPWsQ=;
+	s=k20260515; t=1792962780;
+	bh=mUa32GQ7mZ4BJLOWdMWsKmD7PZePHSIH7PdJ14EI5oU=;
 	h=From:To:Cc:Subject:Date;
-	b=Zq5UW2wzz4PCxEJn/n0U9WKwpvOhyWp6XVdu/xZ03rvbqfNg0hpKNnFU+crLagyB8
-	 bbtWZ7nYxr/+sIZj90p64xI7uouW7s4K3WYU+7Azdss4dNV1mT13bssZJKZkTEmluC
-	 6qq1M8N67sD9jsX+OiAIwO8td5e+aK5tF59tLPI9N/y1e/7ModiZcP0Rvo22dpPOu+
-	 zbuQUtORGUFXOUPGV/eq7oEQJU5luHXl7MbXAVGkUFflLHlZnlz7/v58AYr+Osr1w9
-	 o7nu7sBPu9uarzzD14XlsSJHftiv7M9J0/U0TXyo4wa/kAaVteNTHSS6x+wG/waqzc
-	 JyNR0Vov1WqVg==
+	b=Jb6aORsxYZ44zg+/Mp6nXU0Kz8ZhlMJOQG+pKhcB+PIopid+GvmsHsYs8GB2KemRB
+	 wbz1aKsli1WZuox23PgIsVktCg8utm0B0Rze8XIvrfxXIf+QuESPfbPHjmlBLOmwMW
+	 7r+qas50cQzAws6tjOF0Byi1yCC0dcEdQoa7PwB+h8DmpxsSZ2qmEhJeA8OdPYMUVj
+	 lgspy9e6zKNn8NURsuoVB2cL0VAqRrAryK3iyxKf7phcTtoVGP1ogr9thTFHxgzVtf
+	 rGGJ6ee7hsFyF+bs22Fy8A/38HU5wTZwEJFP/jnrrEbRJYsOOs1Z8HLIX8TaqZmhmN
+	 n7TpeEja51VhA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-wireless@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-crypto@vger.kernel.org,
-	Yuqi Xu <xuyuqiabc@gmail.com>,
+To: Peter Huewe <peterhuewe@gmx.de>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: linux-integrity@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH RESEND] wifi: mac80211: Fix cryptographic MAC comparison to be constant-time
-Date: Sun, 25 Oct 2026 14:00:32 -0700
-Message-ID: <20261025210032.134911-1-ebiggers@kernel.org>
+Subject: [PATCH] tpm: Check return value of crypto_kpp_set_secret()
+Date: Sun, 25 Oct 2026 14:11:19 -0700
+Message-ID: <20261025211119.138277-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,30 +63,34 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To prevent timing attacks, the comparison of cryptographic message
-authentication codes (MACs) needs to have data-independent timing.
-Replace the memcmp() with the correct function, crypto_memneq().
+crypto_kpp_set_secret() can fail, for example if the kernel is booted
+with fips=1 and the broken-by-design FIPS RNG used for ECC private key
+generation doesn't feel like generating random bytes at the moment.
+Check for error, cancelling the TPM session creation rather than
+proceeding with a zero or uninitialized private key.
 
-Fixes: 39404feee691 ("mac80211: FILS AEAD protection for station mode association frames")
+Fixes: 699e3efd6c64 ("tpm: Add HMAC session start and end functions")
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- net/mac80211/fils_aead.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/char/tpm/tpm2-sessions.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/mac80211/fils_aead.c b/net/mac80211/fils_aead.c
-index 9c4f00d61981d..638ced7685af6 100644
---- a/net/mac80211/fils_aead.c
-+++ b/net/mac80211/fils_aead.c
-@@ -202,7 +202,7 @@ static int aes_siv_decrypt(const u8 *key, size_t key_len,
- 	res = aes_s2v(key /* K1 */, key_len, num_elem, addr, len, check);
- 	if (res)
- 		return res;
--	if (memcmp(check, frame_iv, AES_BLOCK_SIZE) != 0)
-+	if (crypto_memneq(check, frame_iv, AES_BLOCK_SIZE))
- 		return -EINVAL;
- 	return 0;
- }
+diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
+index ca1e2bf424e14..2aaaad69760dc 100644
+--- a/drivers/char/tpm/tpm2-sessions.c
++++ b/drivers/char/tpm/tpm2-sessions.c
+@@ -527,7 +527,9 @@ static int tpm_buf_append_salt(struct tpm_buf *buf, struct tpm_chip *chip,
+ 	}
+ 	crypto_ecdh_encode_key(encoded_key, buf_len, &p);
+ 	/* this generates a random private key */
+-	crypto_kpp_set_secret(kpp, encoded_key, buf_len);
++	rc = crypto_kpp_set_secret(kpp, encoded_key, buf_len);
++	if (rc)
++		goto err_free_kpp;
+ 
+ 	/* salt is now the public point of this private key */
+ 	req = kpp_request_alloc(kpp, GFP_KERNEL);
 
 base-commit: 21a7f44fd0765fcc5194130b28767786eba1d1e7
 -- 
