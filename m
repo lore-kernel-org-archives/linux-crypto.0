@@ -1,56 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.10.208.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.10.208.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792972099;
-	b=Lo6SE5gWj086cSvRFvG6hZSxv6qhj7MTzd3a2sYFlTrebZmrOZGaxOWEu7Y7pPDPIjf8
-	 4Hl7JHq3j06JBlH0nmZfCFeMNHy7dWfO0xGgiUplv0iKmZNgaSAmX/5PrVPM2Tkxg33GJ
-	 DwX4vhT6GClTyeFom/VNsVzR4Ehtb76YAcUeJPIgrHn2TxyY4DxsHIJXXbfFWDL5WLnSJ
-	 PsfDZhuJfQTMq7w2I9j9x54zrbUO/GDkq1Ac/Ts7jcPW01i4BO0qP4mmihtUF3jKL3LBn
-	 3P6c2iMWGKBUCKlOTBXsht6+WIkyHdh8kWhVVuODjAmPrA8pAuAg7lwYEqByILvCX7g==
+	t=1792972098;
+	b=K9TshBUI0vmutBojIphHFLfpS0rWzUXSH8lbHLjb6FE9/6pViqezdnKVzdPiHEasw/wK
+	 t5XmOecI8U9LfgdrR8kqrFzm28eAbtqOJhKSpiJoKOlHUGV3qMmZOyWnfCFJLYnWPUpVh
+	 fPAydj9VfTa9Dib/xrbdt87Hn92YhNj8+Yn10xd6KYv9L0JY+O5vFe0llO0Zw4TC0xA3u
+	 sMFPAwZTs1l+9tVZ+dMLVN6Yy7Ftfpt8PMkWpE0zZhHpkrW2lQyHFcQbPHPzh2uLE79WM
+	 b4OWoOuc3Msw0xiQvQTIG/WaZeO+zLtGmLB2Xy3nEHsmfkQ9O1LKZYlXrfjAayM7HBQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792972099;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792972098;
 	h=DMARC-Filter:Received:DKIM-Signature:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Rspamd-Queue-Id;
-	bh=6pstzyH5IFQinFfm6bSMTIlAqhEdkkzj61wYOwB1wWc=;
-	b=3aDemENZAhbu3rnL7rs6F64EZESsK7nQ1qqq0EXERyAoYZcutJalxZQVsDfOB7fqROjV
-	 bYOkM8zw6kSBVslpuh/cQaygxayHjorRFFK622T60aYhcB5fSgAebJT3rx9c5urBhxSSk
-	 RSjnuJZZJu0SFUfVTfNYt+Uqu95f2r4dYgXmI5xbtSOwX5dIkRWgYvJzqab56R8X1EETz
-	 xpC3azqgKKpASaUtDYKD7/8EqmrkBugnDFTJsjey1k8r0IuTBmCgXfkz2Pv4oSlMihVYQ
-	 kicynZwCZt4fW0Lfq8k/5zhCxG5BhwZEcZ8/zDqGKpaIZ+zTXVLOqVEJIsGayLXGDBw==
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-Rspamd-Queue-Id;
+	bh=FiQEWvS3B2xCrzNDlQOd1LW5c1tre05LfYV4xTUsYmQ=;
+	b=3L2pj2/NY/5O7L8aplBEV1MGoiR0cPEWT3iZsnMejbkO0eMjC9Y9Z/gAW4iA3qthicXW
+	 iwVeNH8TLNX1+5zCYV4+hIVy1JgHQUOD+XA48QS2oBxFTLFH98Toi8bnjjBHXi5gBof+T
+	 BBs51tJL1bYG1bUBBhXIX+W1oc6FbaZabeUzC+aM4LugfxVDZmXgKsBn2VRp63YJv0fVW
+	 Y9zBOjHOrR9eYklbjT2+n6kigui3Wgl/iEyqn3Ztt7K+Kh6gN/wlW5xR0UsLWkATrYsXh
+	 D3lT2Zxwcg0jDYtZjAi/vJ0pYF8DQYM2W9vCvtOAfUTC+kuRFkWl5YNPFCd9YdUR0xg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=mandelbit.com;
 	spf=pass smtp.mailfrom=mandelbit.com;
-	dkim=pass header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=d6qE40V7;
-	arc=none smtp.remote-ip=195.10.208.51
-Received: from mout-b-206.mailbox.org (mout-b-206.mailbox.org [195.10.208.51])
+	dkim=pass header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=IU1tcXDX;
+	arc=none smtp.remote-ip=195.10.208.52
+Received: from mout-b-203.mailbox.org (mout-b-203.mailbox.org [195.10.208.52])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A9E606A31B;
-	Sun, 25 Oct 2026 23:48:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A9A9E606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CAB606A31A;
+	Sun, 25 Oct 2026 23:48:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 81CAB606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=d6qE40V7
+	dkim=pass (2048-bit key, unprotected) header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=IU1tcXDX
 Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA512)
 	(No client certificate requested)
-	by mout-b-206.mailbox.org (Postfix) with ESMTPS id 4jCYNT2vcHzJf;
-	Mon, 26 Oct 2026 00:48:09 +0100 (CET)
+	by mout-b-203.mailbox.org (Postfix) with ESMTPS id 4jCYNS4NYnzLm3c;
+	Mon, 26 Oct 2026 00:48:08 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1792972089;
+	s=MBO0001; t=1792972088;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6pstzyH5IFQinFfm6bSMTIlAqhEdkkzj61wYOwB1wWc=;
-	b=d6qE40V7PJAwGV4jNuGD/itI/WRZlijAYloj265g5HYsVrP4JpBOBwqI/axF9AdV04K7oC
-	ZJ0EAlh8rtSv7cfgdBLoh73zvQidS90AVVWkDrxaLd/2Onns+REYhj8kp8cREK+BF7cejr
-	G99pOzzlBwh9r5pIRPdsubcQrauffSKy14n2tYRONvfCjrNXEV7/8crveS4i2VfkkM3CVF
-	WVbHzXYwSiseQNFNhYnSKAAE3WuvTI511ekF3twtEkuAYKbnRheZh4rAE3a1gqYRBKR56M
-	+5eRRpl7szh9k/Y0UtXfV9BbGEEEor+Ko81l1wRDf9pMVAbCHXEbNVU6K2akIw==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FiQEWvS3B2xCrzNDlQOd1LW5c1tre05LfYV4xTUsYmQ=;
+	b=IU1tcXDXOQzJdlaYuanL6JZ+g5E0hqpmhKvr+Wp/2RHxx1IRGvmhBNY2ReFHmNx6hIoiOp
+	VXLRvhu4lrOLVN1PPZghAN2NyJtNoCpSPVyLlIE6GM9Ucnpw3M52wuiRtTyyZtg0p+r1ln
+	adworJTrJjzknNC6ThgrG/+2NYIdefUIVPswUyhj+tiaVossg+/RmD3TUm97orE4TD6lMN
+	TRdZzFEkrX3oB9Q7PgcKXY77bSx/akVwyiuNFUgMYPP2gl4hXxwuGcoeLZtJGpS0yD7/Ny
+	lS0aLRJsd8IJHcD2a55j/l277NHQo3BY+EzcBv6XaxiTHFaeFq2Pt+aM14CKaQ==
 Authentication-Results: outgoing_mbo_mout;
 	dkim=none;
 	spf=pass (outgoing_mbo_mout: domain of antonio@mandelbit.com designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=antonio@mandelbit.com
@@ -61,12 +60,10 @@ To: Eric Biggers <ebiggers@kernel.org>,
 Cc: Antonio Quartulli <antonio@mandelbit.com>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] lib/crypto: tests: Add KUnit tests and benchmark for ChaCha
-Date: Mon, 26 Oct 2026 00:47:54 +0100
-Message-ID: <20261025234758.3219829-2-antonio@mandelbit.com>
+Subject: [PATCH 0/2] lib/crypto: x86/chacha: Add 16-block AVX-512 implementation
+Date: Mon, 26 Oct 2026 00:47:53 +0100
+Message-ID: <20261025234758.3219829-1-antonio@mandelbit.com>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20261025234758.3219829-1-antonio@mandelbit.com>
-References: <20261025234758.3219829-1-antonio@mandelbit.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -77,356 +74,47 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4jCYNT2vcHzJf
+X-Rspamd-Queue-Id: 4jCYNS4NYnzLm3c
 
-Add a KUnit suite for chacha_crypt(), comparing the (possibly
-architecture-optimized) implementation against a reference built on top
-of chacha_block_generic(). Both are checked against the RFC 7539
-section 2.4.2 test vector.
+Hi all,
 
-The comparison covers every length from 0 to 4100 bytes and random
-lengths up to 12 KiB + 200 bytes, with 20 and 12 rounds, random buffer
-alignments, in-place operation, buffers ending right before an unmapped
-page, block counters close to wrapping around, and multi-call usage
-continuing the keystream at block boundaries. It checks the output, the
-source, the bytes around the destination and the resulting cipher
-state.
+this series adds a 16-block ChaCha implementation for x86 using 512-bit
+registers. It is preceded by a KUnit suite and benchmark for
+chacha_crypt(), as lib/crypto has none for plain ChaCha yet.
 
-The suite is architecture-independent and exercises whichever ChaCha
-code the architecture provides. On x86, this includes the SSSE3, AVX2
-and AVX-512VL functions and the splitting of the input into 4 KiB SIMD
-sections, hence the lengths tested.
+Patch 1 stands on its own and passes with and without patch 2.
 
-A benchmark is included when CONFIG_CRYPTO_LIB_BENCHMARK is enabled.
+On AMD Zen 5, the new code doubles chacha_crypt() throughput for inputs
+of 1 KiB and more, from about 5.2 GB/s to about 10.2 GB/s. It came out
+of work on the OpenVPN data channel offload driver (ovpn), whose
+ChaCha20-Poly1305 throughput is CPU-bound: in a VM benchmark it gained
+about 10% at a 1500-byte MTU and 35% at 9000.
 
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Antonio Quartulli <antonio@mandelbit.com>
----
- lib/crypto/.kunitconfig         |   1 +
- lib/crypto/tests/Kconfig        |   8 +
- lib/crypto/tests/Makefile       |   1 +
- lib/crypto/tests/chacha_kunit.c | 269 ++++++++++++++++++++++++++++++++
- 4 files changed, 279 insertions(+)
+iPlease note that I could only measure Zen 5.
+The new code is not used on the CPUs setting X86_FEATURE_PREFER_YMM
+(Skylake-X, Ice Lake and Tiger Lake), but it is on
+Rocket Lake, Sapphire Rapids and later, and on Zen 4, where 512-bit
+operations are split into two halves. Numbers from any of those would be
+very welcome.
+
+Regards,
+	Antonio
+
+Antonio Quartulli (2):
+  lib/crypto: tests: Add KUnit tests and benchmark for ChaCha
+  lib/crypto: x86/chacha: Add 16-block AVX-512 (zmm) implementation
+
+ lib/crypto/.kunitconfig                 |   1 +
+ lib/crypto/tests/Kconfig                |   8 +
+ lib/crypto/tests/Makefile               |   1 +
+ lib/crypto/tests/chacha_kunit.c         | 269 +++++++++++++++
+ lib/crypto/x86/chacha-avx512vl-x86_64.S | 413 +++++++++++++++++++++++-
+ lib/crypto/x86/chacha.h                 |  29 +-
+ 6 files changed, 719 insertions(+), 2 deletions(-)
  create mode 100644 lib/crypto/tests/chacha_kunit.c
 
-diff --git a/lib/crypto/.kunitconfig b/lib/crypto/.kunitconfig
-index 6f218cd2d0c3..6d83badf4292 100644
---- a/lib/crypto/.kunitconfig
-+++ b/lib/crypto/.kunitconfig
-@@ -7,6 +7,7 @@ CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST=y
-+CONFIG_CRYPTO_LIB_CHACHA_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_CHACHA20POLY1305_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_CURVE25519_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_GHASH_KUNIT_TEST=y
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 67026ef1e8f6..5a86a02d25b7 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -45,6 +45,14 @@ config CRYPTO_LIB_BLAKE2S_KUNIT_TEST
- 	help
- 	  KUnit tests for the BLAKE2s cryptographic hash function.
- 
-+config CRYPTO_LIB_CHACHA_KUNIT_TEST
-+	tristate "KUnit tests for ChaCha" if !KUNIT_ALL_TESTS
-+	depends on KUNIT && CRYPTO_LIB_CHACHA
-+	default KUNIT_ALL_TESTS
-+	select CRYPTO_LIB_BENCHMARK_VISIBLE
-+	help
-+	  KUnit tests for the ChaCha stream cipher.
-+
- config CRYPTO_LIB_CHACHA20POLY1305_KUNIT_TEST
- 	tristate "KUnit tests for ChaCha20Poly1305" if !KUNIT_ALL_TESTS
- 	depends on KUNIT && CRYPTO_LIB_CHACHA20POLY1305
-diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index f639d76a8fb7..40c9624eaaa8 100644
---- a/lib/crypto/tests/Makefile
-+++ b/lib/crypto/tests/Makefile
-@@ -5,6 +5,7 @@ obj-$(CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST) += aes_ccm_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST) += aes_gcm_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST) += blake2b_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST) += blake2s_kunit.o
-+obj-$(CONFIG_CRYPTO_LIB_CHACHA_KUNIT_TEST) += chacha_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_CHACHA20POLY1305_KUNIT_TEST) += chacha20poly1305_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_CURVE25519_KUNIT_TEST) += curve25519_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_GHASH_KUNIT_TEST) += ghash_kunit.o
-diff --git a/lib/crypto/tests/chacha_kunit.c b/lib/crypto/tests/chacha_kunit.c
-new file mode 100644
-index 000000000000..fb369055f304
---- /dev/null
-+++ b/lib/crypto/tests/chacha_kunit.c
-@@ -0,0 +1,269 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * KUnit tests and benchmark for the ChaCha stream cipher library.
-+ *
-+ * The (possibly architecture-optimized) chacha_crypt() is compared against a
-+ * reference built on top of chacha_block_generic(), for all lengths in a
-+ * range covering the multi-block SIMD code paths, random buffer alignments,
-+ * random block counters (including counters that wrap around) and both 20 and
-+ * 12 rounds. Both are checked against the RFC 7539 test vector.
-+ */
-+#include <crypto/chacha.h>
-+#include <kunit/test.h>
-+#include <linux/timekeeping.h>
-+#include <linux/unaligned.h>
-+#include "test-utils.h"
-+
-+/* three 4 KiB chunks, as processed by some SIMD code, plus a partial one */
-+#define CHACHA_TEST_MAX_LEN	(3 * SZ_4K + 200)
-+#define CHACHA_TEST_MAX_OFFSET	64
-+
-+static void chacha_ref(struct chacha_state *state, u8 *dst, const u8 *src,
-+		       size_t len, int nrounds)
-+{
-+	u8 stream[CHACHA_BLOCK_SIZE];
-+
-+	while (len) {
-+		size_t n = min_t(size_t, len, CHACHA_BLOCK_SIZE);
-+
-+		chacha_block_generic(state, stream, nrounds);
-+		for (size_t i = 0; i < n; i++)
-+			dst[i] = src[i] ^ stream[i];
-+		len -= n;
-+		src += n;
-+		dst += n;
-+	}
-+}
-+
-+static void rand_state(struct chacha_state *state)
-+{
-+	u32 key[CHACHA_KEY_WORDS];
-+	u8 iv[CHACHA_IV_SIZE];
-+
-+	rand_bytes((u8 *)key, sizeof(key));
-+	rand_bytes(iv, sizeof(iv));
-+	chacha_init(state, key, iv);
-+	/* Exercise 32-bit counter wraparound from time to time. */
-+	if (rand32() % 8 == 0)
-+		state->x[12] = 0xffffffff - rand32() % 32;
-+}
-+
-+struct chacha_test_bufs {
-+	u8 *src_guarded;	/* ends right before an unmapped page */
-+	u8 *dst_guarded;
-+	u8 *ref;
-+	u8 *orig;
-+};
-+
-+#define CHACHA_TEST_BUF_LEN	(CHACHA_TEST_MAX_LEN + CHACHA_TEST_MAX_OFFSET)
-+#define CHACHA_TEST_POISON	0xa5
-+
-+static void chacha_test_one(struct kunit *test, struct chacha_test_bufs *b,
-+			    size_t len, int nrounds, bool split, bool at_guard)
-+{
-+	struct chacha_state st, st_ref;
-+	bool inplace = rand_bool();
-+	size_t src_off, dst_off;
-+	u8 *src, *dst;
-+
-+	if (at_guard) {
-+		src_off = CHACHA_TEST_BUF_LEN - len;
-+		dst_off = src_off;
-+	} else {
-+		src_off = rand_offset(CHACHA_TEST_MAX_OFFSET);
-+		dst_off = rand_offset(CHACHA_TEST_MAX_OFFSET);
-+	}
-+	src = b->src_guarded + src_off;
-+	dst = inplace ? src : b->dst_guarded + dst_off;
-+
-+	rand_state(&st);
-+	st_ref = st;
-+
-+	rand_bytes(b->orig, len);
-+	memcpy(src, b->orig, len);
-+	/* detect writes outside the destination */
-+	if (!inplace)
-+		memset(b->dst_guarded, CHACHA_TEST_POISON, CHACHA_TEST_BUF_LEN);
-+
-+	chacha_ref(&st_ref, b->ref, b->orig, len, nrounds);
-+
-+	if (split) {
-+		/* Continuing the stream only works at block boundaries. */
-+		size_t done = 0;
-+
-+		while (done < len) {
-+			size_t n = len - done;
-+
-+			/* zero-length calls included */
-+			if (rand_bool()) {
-+				size_t part = rand_length(len - done);
-+
-+				n = min(n, round_up(part, CHACHA_BLOCK_SIZE));
-+			}
-+			chacha_crypt(&st, dst + done, src + done, n, nrounds);
-+			done += n;
-+		}
-+	} else {
-+		chacha_crypt(&st, dst, src, len, nrounds);
-+	}
-+
-+	KUNIT_ASSERT_MEMEQ_MSG(test, dst, b->ref, len,
-+			       "len=%zu nrounds=%d inplace=%d split=%d src_off=%zu dst_off=%zu",
-+			       len, nrounds, inplace, split, src_off, dst_off);
-+	if (!inplace) {
-+		KUNIT_ASSERT_MEMEQ_MSG(test, src, b->orig, len,
-+				       "source modified, len=%zu", len);
-+		KUNIT_ASSERT_NULL_MSG(test,
-+				      memchr_inv(b->dst_guarded,
-+						 CHACHA_TEST_POISON, dst_off),
-+				      "write before dst, len=%zu", len);
-+		KUNIT_ASSERT_NULL_MSG(test,
-+				      memchr_inv(dst + len, CHACHA_TEST_POISON,
-+						 CHACHA_TEST_BUF_LEN - dst_off -
-+						 len),
-+				      "write after dst, len=%zu", len);
-+	}
-+	KUNIT_ASSERT_MEMEQ_MSG(test, &st, &st_ref, sizeof(st),
-+			       "state mismatch, len=%zu nrounds=%d", len,
-+			       nrounds);
-+}
-+
-+static void chacha_alloc_bufs(struct kunit *test, struct chacha_test_bufs *b)
-+{
-+	b->src_guarded = alloc_guarded_buf(test, CHACHA_TEST_BUF_LEN);
-+	b->dst_guarded = alloc_guarded_buf(test, CHACHA_TEST_BUF_LEN);
-+	b->ref = alloc_buf(test, CHACHA_TEST_MAX_LEN);
-+	b->orig = alloc_buf(test, CHACHA_TEST_MAX_LEN);
-+}
-+
-+/*
-+ * Every length from 0 to 4100, with 20 and 12 rounds, ending right before an
-+ * unmapped page and at a random offset.
-+ */
-+static void test_chacha_all_lengths(struct kunit *test)
-+{
-+	struct chacha_test_bufs b;
-+
-+	chacha_alloc_bufs(test, &b);
-+	for (size_t len = 0; len <= 4100; len++) {
-+		chacha_test_one(test, &b, len, 20, false, true);
-+		chacha_test_one(test, &b, len, 12, false, false);
-+	}
-+}
-+
-+/* Random lengths up to the maximum, including multi-call usage. */
-+static void test_chacha_random(struct kunit *test)
-+{
-+	struct chacha_test_bufs b;
-+
-+	chacha_alloc_bufs(test, &b);
-+	for (int i = 0; i < 4000; i++) {
-+		size_t len = rand_length(CHACHA_TEST_MAX_LEN);
-+
-+		chacha_test_one(test, &b, len, rand_bool() ? 20 : 12,
-+				rand_bool(), rand_bool());
-+	}
-+}
-+
-+/* Known answer test: RFC 7539 section 2.4.2, also anchoring the reference. */
-+static void test_chacha_rfc7539(struct kunit *test)
-+{
-+	static const u8 key[CHACHA_KEY_SIZE] = {
-+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-+		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-+	};
-+	static const u8 iv[CHACHA_IV_SIZE] = {
-+		0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		0x00, 0x00, 0x00, 0x4a, 0x00, 0x00, 0x00, 0x00,
-+	};
-+	static const u8 pt[] =
-+		"Ladies and Gentlemen of the class of '99: If I could offer you "
-+		"only one tip for the future, sunscreen would be it.";
-+	static const u8 ct[sizeof(pt) - 1] = {
-+		0x6e, 0x2e, 0x35, 0x9a, 0x25, 0x68, 0xf9, 0x80,
-+		0x41, 0xba, 0x07, 0x28, 0xdd, 0x0d, 0x69, 0x81,
-+		0xe9, 0x7e, 0x7a, 0xec, 0x1d, 0x43, 0x60, 0xc2,
-+		0x0a, 0x27, 0xaf, 0xcc, 0xfd, 0x9f, 0xae, 0x0b,
-+		0xf9, 0x1b, 0x65, 0xc5, 0x52, 0x47, 0x33, 0xab,
-+		0x8f, 0x59, 0x3d, 0xab, 0xcd, 0x62, 0xb3, 0x57,
-+		0x16, 0x39, 0xd6, 0x24, 0xe6, 0x51, 0x52, 0xab,
-+		0x8f, 0x53, 0x0c, 0x35, 0x9f, 0x08, 0x61, 0xd8,
-+		0x07, 0xca, 0x0d, 0xbf, 0x50, 0x0d, 0x6a, 0x61,
-+		0x56, 0xa3, 0x8e, 0x08, 0x8a, 0x22, 0xb6, 0x5e,
-+		0x52, 0xbc, 0x51, 0x4d, 0x16, 0xcc, 0xf8, 0x06,
-+		0x81, 0x8c, 0xe9, 0x1a, 0xb7, 0x79, 0x37, 0x36,
-+		0x5a, 0xf9, 0x0b, 0xbf, 0x74, 0xa3, 0x5b, 0xe6,
-+		0xb4, 0x0b, 0x8e, 0xed, 0xf2, 0x78, 0x5e, 0x42,
-+		0x87, 0x4d,
-+	};
-+	struct chacha_state st;
-+	u32 k[CHACHA_KEY_WORDS];
-+	u8 out[sizeof(ct)];
-+
-+	for (int i = 0; i < CHACHA_KEY_WORDS; i++)
-+		k[i] = get_unaligned_le32(key + 4 * i);
-+
-+	chacha_init(&st, k, iv);
-+	chacha_crypt(&st, out, pt, sizeof(out), 20);
-+	KUNIT_ASSERT_MEMEQ(test, out, ct, sizeof(ct));
-+
-+	chacha_init(&st, k, iv);
-+	chacha_ref(&st, out, pt, sizeof(out), 20);
-+	KUNIT_ASSERT_MEMEQ(test, out, ct, sizeof(ct));
-+}
-+
-+static void benchmark_chacha(struct kunit *test)
-+{
-+	static const size_t lens_to_test[] = {
-+		64, 256, 512, 1024, 1420, 2048, 4096, 8920, 16384,
-+	};
-+	const size_t max_len = 16384;
-+	u8 *data = alloc_buf(test, max_len);
-+	u32 key[CHACHA_KEY_WORDS] = {};
-+	u8 iv[CHACHA_IV_SIZE] = {};
-+	struct chacha_state st;
-+
-+	if (!IS_ENABLED(CONFIG_CRYPTO_LIB_BENCHMARK))
-+		kunit_skip(test, "not enabled");
-+
-+	/* Warm-up */
-+	chacha_init(&st, key, iv);
-+	memset(data, 0, max_len);
-+	for (size_t i = 0; i < 10000000; i += max_len)
-+		chacha_crypt(&st, data, data, max_len, 20);
-+
-+	for (size_t i = 0; i < ARRAY_SIZE(lens_to_test); i++) {
-+		size_t len = lens_to_test[i];
-+		/* The '+ 64' tries to account for per-call overhead. */
-+		size_t num_iters = 10000000 / (len + 64);
-+		u64 t;
-+
-+		preempt_disable();
-+		t = ktime_get_ns();
-+		for (size_t j = 0; j < num_iters; j++)
-+			chacha_crypt(&st, data, data, len, 20);
-+		t = ktime_get_ns() - t;
-+		preempt_enable();
-+		kunit_info(test, "len=%zu: %llu MB/s", len,
-+			   div64_u64((u64)len * num_iters * 1000, t ?: 1));
-+	}
-+}
-+
-+static struct kunit_case chacha_test_cases[] = {
-+	KUNIT_CASE(test_chacha_rfc7539),
-+	KUNIT_CASE(test_chacha_all_lengths),
-+	KUNIT_CASE(test_chacha_random),
-+	KUNIT_CASE(benchmark_chacha),
-+	{},
-+};
-+
-+static struct kunit_suite chacha_test_suite = {
-+	.name = "chacha",
-+	.test_cases = chacha_test_cases,
-+};
-+kunit_test_suite(chacha_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit tests and benchmark for ChaCha");
-+MODULE_LICENSE("GPL");
+
+base-commit: 20ec6916d8712e84d58e8c688a25cd368ddeb82b
 -- 
 2.55.0
 
