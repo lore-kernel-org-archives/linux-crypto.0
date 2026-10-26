@@ -1,52 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793043616;
-	b=ndg6iW9AP6aVYkF8nQJWwY3c2Lch2ty39pPCH96SHIIqiFaFwJ3Qs1h6/40a6DsljAGR
-	 GZcPj2rMVkSsE5ftmFdEkAp5rSQ1qxc2uvTrUgqGQRPaeeZkfXIxPM8v+vkVn0RjOTVgT
-	 pD4QMXy5XAG/Uw4FQt517eAQIHsUVdC/dzHzflynSw/SMWVWtscXpH2VRyEj9qAzzY3yp
-	 0t+4cQz5jdRoCmfz7zFDZDm28f+2ILK4AuYcsuDGgUeXwtmfpK+OpS6Sba/S7OqgZybUX
-	 236nS8R5fOeSNltQ7eNEjNDAHBwKleqrkGgF3pWcz2Msd/9+jF5V0mYI/s7H0nGpHkQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793043616;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=5zeSAVyul8PribcuBt1yupgPNfcXDczgj3KI8imKVjY=;
-	b=eWNU1YzTztBF5HrycdBDyg2ZsUlmX1YeDF8gRvjPe+MfNJ0Be1hKloiLBtuULkzIOwKb
-	 Xp0qBlZyXlEAuXXvNYZQKFqnxeWQnfw8LYkE+EXoxclPAJYpypLXWwKBemlR/TXgPyn1A
-	 TYEmiMKDgn5Ufk5N3jW9HFbnpZzO9reiN15DNUSta6WMXP2Q4O/BnWytmHvMd1hK3TUIu
-	 zKNNboocY+0o+0HUcoXa3ZJWalGPlTWgBp2WVPe3GZMZFe6SQz2IwbNRe302/liAUyjWr
-	 I0zMu0ZVZSnNn5rW5CwPH92U/NvoOJOolLdO90pM6jLJj1B9jSSFW5q8K+kVhfhX9Kg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ecH0GVtd;
-	arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793043906;
+	b=vIHqEy7DZRYF6/UzDs0TFetYV5/+C+me7yKUW5GkDQVr5J9FEj4qCqL/89kwYQjMhGrJ
+	 Ij2F2ydPxTi1xq+dBUvxe4ZS3dc5/cFzqV5POCmWi2qpqx9gxbpu7EhnVvyDxyzKogBy3
+	 XRT3ptEaLMr8dUxxvqnf5SQjt97jhwcNrCj0UAXR8D4LSS3tRW6lPLDhxYA9hJl3Dv8dE
+	 H0VGUHr4/9oSTg5VVU5Bw8UwaoZ2fh7EqlEEDl2FosZkrA+q1UNunZgSk2V3PTZaNZUXx
+	 bPMKHxMJz3neBmBu/5m6GeDuZVUbKt2bHW7ZhKH7NL8AENPSkQZy6FDLYsZGNBW6ImA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793043906;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=WRB3kp2zfg/I1dGl0HrgzRa2RnMe1q9qDNgnwDkdTP0=;
+	b=sY85piaUElhCfvBlyxr2VHWQHRsqTR3NVZKK0OaodJhntlXrTCc7bnLHW2l68zVOfDa1
+	 jBW8yOiD4cAZpyo4gm44k1au8CGoFH2vq2PRnatjobNSYgUWdjYpyfvtXnzJUisLfdHoW
+	 SOcJtEi4GR69yFOxZuAduvwHbPr+ijHYMybsIi1uDeBhJZ+oSewTl0E4JYnQzFvZnUwKe
+	 bJum7HLHoB/WncaaGKM1IYeGR2n2VZCeEAt/zflHLL+nL5SUdEqXUUMXGTvMGitJvbCGc
+	 cotZyicQGj1s7TbXPwUlVp3CWY60tN3RfQzlBqEeSDshfCCMszxpfKJuvSOyOhkYcXA==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e3SwdKx8;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 8F639606A329
-	for <linux-crypto@vger.kernel.org>; Mon, 26 Oct 2026 19:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A87F606A331;
+	Mon, 26 Oct 2026 19:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ecH0GVtd
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id DD6881F01825;
-	Mon, 26 Oct 2026 19:40:15 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e3SwdKx8
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1793043905;
+	b=NhS24vPNcL4PrthnOZe7O1RJ/16qfLX4aiuuThMV9cOcIdBiRrp+p60sFEMqenI85x/h
+	 UNC4sZS0fotRFR2XJGStvVfU/oQ7uS0+uMjv1EmB2QgWi0Ir0aD+DsEiqpy9KXNBclhXs
+	 ArMwUWQUNhcW3DPrkI7oqgbHPzLGNqAHADuI5EL69IRWnlMPFheo/wmdbiWd5OecnALPx
+	 0yPUHoIwh8UoTvHF63FmgWd8xRLEdHPVFgG/j/oeM/aY0XsDdx2sIAd1N/4YFoP9RHFR4
+	 s8D9nAC1rN/mEFKgNwYrQV4/VEcyhCqHTeCdQjLFcuKkTHi+RSl6zC2r5zUPBAhpSpg==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1793043905;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=WRB3kp2zfg/I1dGl0HrgzRa2RnMe1q9qDNgnwDkdTP0=;
+	b=zGuOpeAMkYt8wuW0aU4TzkXLOzf7Is2LE2Y08PHpFObn1mXLOSZp04NODiCnFXoRxy+y
+	 xMumoc8ZD/zliPXwFOugsJuvietPW7qdQPTOtx0Fca9ZdoLhVK3PX0lC+G1jFahYkjtbA
+	 Ii8QpsWWOMSmpJ5GqlVi7R6TOEGLU1CsA1KUJrCDgvnDD4CQ0pEp61krquizzYdT0iGuV
+	 78PuQ+7bEpToUW4ZeeRcY1EXGAXdYfyP6Uv+CzmWCy1lPJWHAJY0OEA1ztxQau2y8eDEU
+	 ns2TpM6P8fLhk72bc2jF5GUBP2k9+xlysF7XiOB+fQ1ISV6ZcKt0Fal1ldIZQXR6VjQ==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id F2A741F031E2;
+	Mon, 26 Oct 2026 19:45:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793043616;
-	bh=5zeSAVyul8PribcuBt1yupgPNfcXDczgj3KI8imKVjY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ecH0GVtdfEmlUEp2Gs0nsfnDvNJHNJAntBbCMOzMyN62Z2w/5jUEVmPs4vSoh3ogr
-	 EiRScIn5DCqvby7STCsv2nRAXFCCIY5voBBNmFnoBghwaJL+Dk1i637QSvtG1tAlAS
-	 A7ZVzLA1SlKDIvjfkhGO4gHmo4tqITu0ZmfoB8sl7uG8gWqaVZLN0dFTrHaeV1lNGn
-	 iOVhLjdCk7KWGxlzh27wxPpAUNAbmExUn7BIhiBh+fUcq8SF4f2ss4bAJ34142IJLW
-	 9/gBdKfT9h8oeFt7Ee3XqeWMJpv4s7Skw2ZgUox2jd5g2ZrkPRTZ8GHCu9CBFbzUMR
-	 UZsCXRrzXhY1g==
-Date: Mon, 26 Oct 2026 21:40:12 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: stdrng - Mitigate FIPS RNG failures
-Message-ID: <at-snHAJ69YzcMTc@kernel.org>
-References: <20261026183332.11402-1-ebiggers@kernel.org>
+	s=k20260515; t=1793043905;
+	bh=WRB3kp2zfg/I1dGl0HrgzRa2RnMe1q9qDNgnwDkdTP0=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=e3SwdKx8PedB78cH24lTdQOC/FPzv9JMXLRDHS09X6yogDa8BEROGmUBzvbE6hh9O
+	 OAK+g6o5P5+vZR8ky07XXy2SsLxFMO9gLZIAMh/7ZezHAGan6lmKjXKoRItwLWlMOv
+	 gfWjt92oozLiXxUpwhv5b/1hVHISA7X5onWIEm8n2WmA3KxjnetW9+w9l9WoJNzFru
+	 lb4Wsa1IJFLUM4rVEzNXQeezZSBqA7XvvyR5QCo101HvIZdtSj/2qmxNGI+RJwrqOG
+	 7NRK8trZFp/XqVYTFJkH5Oc25ynyVFUkeF4+GjFz9VZMP9Xtof5N2iB20cV1CkS0yn
+	 i0CuZ/+VFk2Nw==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 2EBC844E81;
+	Mon, 26 Oct 2026 19:45:03 +0000 (UTC)
+From: Alex Ousherovitch via B4 Relay <devnull+aousherovitch.rambus.com@kernel.org>
+Date: Mon, 26 Oct 2026 12:45:01 -0700
+Subject: [PATCH v7 5/5] MAINTAINERS: add Rambus CryptoManager Hub (CMH)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -56,85 +82,73 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261026183332.11402-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261026-cmh-b4-a-v7-v7-5-500a83faf500@rambus.com>
+References: <20261026-cmh-b4-a-v7-v7-0-500a83faf500@rambus.com>
+In-Reply-To: <20261026-cmh-b4-a-v7-v7-0-500a83faf500@rambus.com>
+To: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>, 
+ Joel Wittenauer <Joel.Wittenauer@cryptography.com>, 
+ Thi Nguyen <thin@rambus.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, 
+ Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Alex Ousherovitch <aousherovitch@rambus.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793043902; l=1310;
+ i=aousherovitch@rambus.com; s=20261026; h=from:subject:message-id;
+ bh=dgueTQsK9wIwgcKIQgHilK9irQV6fL/qq/pSePk/7A4=;
+ b=q/GuuokYWIbpwqksRzqM3X32r7VqWkn4efeSgdkdwBn6ropn0yPBy5LfoFXISxNtq0gZ7imvY
+ rEviUpwk5t5Ds9ytvDqNztVdA5O4bKsc+sfLleBU9Q71NcYDtRKd7Bp
+X-Developer-Key: i=aousherovitch@rambus.com; a=ed25519;
+ pk=ECFtTdQUPAolK+qGZ6v7Xm3sRf7rnM7wxpTeFzbqpmA=
+X-Endpoint-Received: by B4 Relay for aousherovitch@rambus.com/20261026 with
+ auth_id=1330
+X-Original-From: Alex Ousherovitch <aousherovitch@rambus.com>
+Reply-To: aousherovitch@rambus.com
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 26, 2026 at 11:33:32AM -0700, Eric Biggers wrote:
-> If the kernel is booted with fips=1 and jitterentropy fails its health
-> check, crypto_stdrng_get_bytes() can return an error and leave its
-> output buffer uninitialized.
-> 
-> While the fallibility of the FIPS RNG is by design, leaving the output
-> buffer uninitialized lacks practical defense-in-depth, as callers can
-> forget to check the error code.  For example, the TPM2 driver didn't
-> check the error code from ECDH private key generation
-> (https://lore.kernel.org/r/20261025211119.138277-1-ebiggers@kernel.org/).
-> Thus, fips=1 mode (ironically) caused a vulnerability.
-> 
-> Mitigate such bugs by filling the buffer with get_random_bytes_wait() in
-> case of failure.  This helps in practice.  (For FIPS certifiability it
-> makes no difference, as no "approved" entropy is claimed on failure.)
-> 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+From: Alex Ousherovitch <aousherovitch@rambus.com>
 
-Agree with the "practical DoD" part.
+Add MAINTAINERS entry for the Rambus CryptoManager Hub (CMH) hardware
+crypto accelerator driver under drivers/crypto/cmh/.
 
-> ---
-> 
-> This applies on top of
-> https://lore.kernel.org/linux-crypto/20261018204618.104876-1-ebiggers@kernel.org/
-> 
->  crypto/drbg.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/drbg.c b/crypto/drbg.c
-> index faa39045bdc6b..f3fed6ded5b5f 100644
-> --- a/crypto/drbg.c
-> +++ b/crypto/drbg.c
-> @@ -561,10 +561,20 @@ int __crypto_stdrng_get_bytes(void *buf, size_t len)
->  
->  	err = crypto_get_default_rng();
->  	if (err)
-> -		return err;
-> +		goto out;
->  
->  	err = crypto_drbg_get_bytes(crypto_default_rng, buf, len, NULL, 0);
->  	crypto_put_default_rng();
-> +
-> +out:
-> +	/*
-> +	 * On failure, fill the buffer using the normal Linux RNG rather than
-> +	 * leave it uninitialized.  This provides practical defense-in-depth for
-> +	 * callers that forget to check the error code.  (It makes no difference
-> +	 * for FIPS certifications; no entropy is claimed on failure anyway.)
-> +	 */
-> +	if (err)
-> +		get_random_bytes_wait(buf, len);
->  	return err;
->  }
->  EXPORT_SYMBOL_GPL(__crypto_stdrng_get_bytes);
-> 
-> base-commit: 666d66df25253070cb297cb920b0bcfcfe5eb871
-> prerequisite-patch-id: 4c318ab271fa6443e9fe0ac47537515cc2dc6999
-> prerequisite-patch-id: 5992995f4dea89d9332b0e33ca1248e3dd672bd8
-> prerequisite-patch-id: c38f29a49c34d0fdfdc8466fd64c3d69fb4f0626
-> prerequisite-patch-id: 424590a4282a04c94a095d4f059ac0d3a8af44b1
-> prerequisite-patch-id: b5e762e41f7f6a68e70f6540ab07ff2a23ae6880
-> prerequisite-patch-id: bc08a9f0be6e4f1e25c0e6ab0881f39df60aa632
-> prerequisite-patch-id: 487bd5a23a597d190e2794e178266fcb6fc92849
-> prerequisite-patch-id: 3c6f92ab77fee4702702f8760514a1bb55a409cb
-> prerequisite-patch-id: 1536028517d2aa0bcbc4ec601c18cd8cf5f7d0ad
-> prerequisite-patch-id: cb214555f3c44cf2a2e610adfbf60311a3647aa5
-> prerequisite-patch-id: cc0998aae8d75e7b09562f8623c132bc21e77a2b
-> prerequisite-patch-id: 351a1bcfe1ac87d42c5aa46b867f291aba49caa0
-> prerequisite-patch-id: f71bbeee6d6644ca1b464e22f4df891bab45680f
-> prerequisite-patch-id: 2f726ebd0df8d5a420cf4a870e0b6973248bf6be
-> -- 
-> 2.56.0
-> 
+Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
+---
+ MAINTAINERS | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c3bcdcaa9b92..a803cd2a3c9a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22760,6 +22760,19 @@ L:	linux-wireless@vger.kernel.org
+ S:	Maintained
+ F:	drivers/net/wireless/ralink/
+ 
++RAMBUS CRYPTOMANAGER HUB (CMH) HARDWARE CRYPTO ACCELERATOR
++M:	Alex Ousherovitch <aousherovitch@rambus.com>
++M:	Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
++R:	Joel Wittenauer <Joel.Wittenauer@cryptography.com>
++R:	Thi Nguyen <thin@rambus.com>
++L:	linux-crypto@vger.kernel.org
++S:	Maintained
++F:	Documentation/ABI/testing/debugfs-driver-cmh
++F:	Documentation/ABI/testing/sysfs-driver-cmh
++F:	Documentation/crypto/device_drivers/cmh.rst
++F:	Documentation/devicetree/bindings/crypto/rambus,cmh-v1030.yaml
++F:	drivers/crypto/cmh/
++
+ RAMDISK RAM BLOCK DEVICE DRIVER
+ M:	Jens Axboe <axboe@kernel.dk>
+ S:	Maintained
+
+-- 
+2.43.7
 
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-
-Br, Jarkko
