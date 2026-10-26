@@ -1,86 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.231.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793040428;
-	b=ddg8HvExp2Oa0NLukWIyZmPl8fKtZaX1jbMFPZQ/w/bfyLBrrteThLNpiHA1X+2Ua0jK
-	 rR1FimCf4tcWm7A1yfoeEsWpIgd7M1hjbXr8JE2ui5Za5TbfOtjQ1fNaugjDARDP2AVqb
-	 7+/rltxKgDoU4P6v56j3IMMqqG2tFpB5KPKdLopCdUIuew9eLdNRnlCcTrZkg+S0U0Ln+
-	 tyAZBxvcjCiG/UqCV9lrzVQIKGQ/IFhyskec7rlL+pvjJBsP234U8bdRFIvkKfWWXGm9a
-	 mVX/tlBF36xwYCybiNVBAkI/xwjly8LDP17Dl2D0oYD5BQdYpaolfn4yteF1aRbuieA==
+	t=1793040436;
+	b=b/e7JLg/PRt6hQHOSacNPG7ztDHhpmDOJyiT1b8gxt+cg4SQiZ9e2O3c/FQRRXQTB+kw
+	 /o0rVqBBd6FKVLjPn6K45yhcQTC2uDtgCIhJ/atdIqfdW2DCx/DaNBk3AhJOyFJq5mCWg
+	 T8IWI1uoNnogb7A5MomcGi2FvTP6eunF6DoNOeS2EgyRbl3VjegYbOtgWnefHLtbJUhpP
+	 LL9vxKSDavrP8Th0JYmmpOkKF2fmjcVDAU4GogETp3R1lRts4034mcigbsoBshlzzU8w+
+	 RWT1N6coruiVVB9++52klAXLVgG52PMJWgDEtq4pRd/at8SGGUBCDcGI1b9aCwPoShg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793040428;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:Date:Subject:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:
-	 X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:
-	 X-Developer-Key;
-	bh=K0dSi+SfJKu/Kug/ygTHayPfRWfFTV7dvh+nhItaXNc=;
-	b=09zuqoY9GxdawfqpXimT0nmvzZI9BTqGsa2caxkWSG7Pg6rH7RtdOuZUobRdLFdcsDoe
-	 aGqfiZUOyCyzLzGz+Mequdh5O68TVRDXKAqPqZAy6HNBb0vUulLZWrrCxphrCSEIIcZzg
-	 lW3LnkACHtB5aWJyJbK4/p2HDoxT2hrt+eYzfPdk8Zqpb0bPslv9v3GukaxGTshlWeJhL
-	 L9TLPEd4NLGNLzOVtrzMrfbPFOWhmbioUrUM92BLjy1WVTzN/Z664iZezQQYUjnAP18ER
-	 lp5WkilGNsGMRQrb2Q4ILgBtukFBbyoHP8XksNmiY2yDIfTuLkfcVA8KYXSNh/k1qEA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793040436;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=U//eGvYDF2+/yYUB5pO51EtZ64gK1iprB2hzIuimqus=;
+	b=LFbOKw8fAi37fuR1c8KUWVZ/EDuAGwp5VL2nz/qheUBirGy8yugkDVY2LjyVFnFLxiab
+	 af3N/PCPSS3/WXhUMOGj4FpalhfZB1jWBLoWxHlsfwZiTHeb9WeB9RNGo+7gB/OMRf+Iv
+	 yQ6F9CpiQz0qK5EHtlboORqkfWXTGBh5vWOylmo4fY1ybLXDF5uu98foEXPW+vv+OtFv+
+	 4uhCwgy0ek24QGP2rtteRQurdEyeUI3F9KTtmpVw+gW8MmPIqg0PdME69r4xyateFG0gD
+	 5YIjb2XJFv9jJ95BuZjAXCQVGuvj1InK2Eiu/41Nx4esRidRA6zOI/QzcUcYN4xMR/g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=dRCH6OLd;
-	arc=none smtp.remote-ip=74.125.231.133
-Received: from mail-oo2-f5.google.com (mail-oo2-f5.google.com [74.125.231.133])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=j7BZuj4H;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382FA606A31F
-	for <linux-crypto@vger.kernel.org>; Mon, 26 Oct 2026 18:47:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 382FA606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4466C606A31A;
+	Mon, 26 Oct 2026 18:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=dRCH6OLd
-Received: by mail-oo2-f5.google.com with SMTP id 46e09a7af769-8458555b6a8so946157a34.0
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Oct 2026 11:47:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1793040427; x=1793645227; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=K0dSi+SfJKu/Kug/ygTHayPfRWfFTV7dvh+nhItaXNc=;
-        b=dRCH6OLdzPrd9nZCZ/r6mfboGts+ya6BjDUQTIpg8NoFp+9Qz86mEWxLl9t8kuGgHO
-         SytMk7qDNrkdis+jCPlo9gzMHHqLcZfOkGenavWgV31A0ccI5UfQ3UDxL7IeZ8P9PynO
-         6aCuu/r4034YjoQG1l1DoOfgpTgae6OJWECpVtylNOZTDmVhimBicN8z9GVllsW3Pz9V
-         +mRlEz8Q4Gf7Xu0uQO2nYHWsUMok9lRloMgy/i9gXs8kWZ/DevVF2l0FE+PykMkgP0li
-         Bsz2IKmlBoGjJBuDBN886m+Ba40xmiGimT2Nf87zkExVt6pSJdMcxrDMqSH5//ltfdKO
-         zBIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793040427; x=1793645227;
-        h=cc:to:message-id:content-transfer-encoding:content-type
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=K0dSi+SfJKu/Kug/ygTHayPfRWfFTV7dvh+nhItaXNc=;
-        b=FjvBEU3DefcKIIUFZrDTTCsgnsSXYEJ/eL7ROhtnkqsStJ2+46uH0gJU7DdgeMWy/p
-         DAbGAbVvJJoNAqr3sag+o3cqyfYBz3DU8RcKCL7pcYkAsIXjqtxgfFXNDk7f0Aq2n4I3
-         T9GLJETS8HKkpX+joEY6zW8V4KJBIQaSOgSz3GdpT4vGlgTq078/bAYYNm4dvMB530HH
-         sCM17aHGuoxtuA1X2QuEyk8VmSLIM1dCTrJN0gvJiQiyvYKt4UkFBvpKGXMN75BMzvD5
-         b5bkejnUXymzZz7WvXSevhOmIXS7FgjLwlPaLPzbMnF1nxQ3yEBEuI0VMan6HUswZiFz
-         ku5Q==
-X-Gm-Message-State: AFq9FYLC2XfoGU8yhzg+Dmu+se+8SepTwqM394bOCfi3EOh+orXdMS2i
-	PtCkkUePn8suj6lZxG5DoDNo/dAYmqW7QLJ2mICf7u1lFNfh36eTM5Lb
-X-Gm-Gg: AYBFou050baXTiA72mmows46qHn4kb4EDbyLH8YSS2lSUCqUFUpZ7ftkd5/FRHjymtM
-	O1sqj7IqIyJZaWwx/oY72s/DLLqQLK9uATc1YWDXI/543RFyR65TCSAUopfeYPzyAM11VCIosWh
-	+uPeXNFk2fI/fescmb8H/nCJP7GPfHCjhKToQwSVuNWxHve1QIKNPkJ5/i/dQHTUWTV+fXyf3yx
-	noZQmmH0e2XDqE/PZX+Ijd7SODlMCpp/sd5yNUuiOVDQqIucmgIw/2guy+yYU+MjzJu9lN54VOA
-	A/+N4HKqa2TefGdIt+5G7jv2KtpTZT2/Mz9pGZrTGtDy9+Cg8+InBsTJBNDeiw2IZKc3q9JfmvZ
-	Bkua7aMYasirLelrCGLxg3Gp0l0Amv+8+O5gD+gDmYjslcWOW8s0DbbluZ87xv9UPbA7Gau8qjT
-	nAHPS8yD5Lo7ODnicg6NBV3Q6Hkj9+BRNVgJ2oVpP98f3N1efvFo9SWiu2+6II+QE108aGz5whn
-	NDXxGSfsiaXw+sJ/8Q952LGWkH/ZNWexritRi2caSx8oyHjHyVZIGf0z9subzTBN9kRIsdravJB
-	vNjsFI4jYO2nflpBwCNGoY6mFyGyBuJPpWDkhme9bvXJpw==
-X-Received: by 2002:a05:6830:7199:b0:7e9:5022:3639 with SMTP id 46e09a7af769-850fe7e59f0mr5417002a34.15.1793040427069;
-        Mon, 26 Oct 2026 11:47:07 -0700 (PDT)
-Received: from [10.10.18.223] (wsip-64-207-253-118.tu.ok.cox.net. [64.207.253.118])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-850fb64a8c4sm9452605a34.15.2026.10.26.11.47.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Oct 2026 11:47:06 -0700 (PDT)
-From: Ryan Brue <ryanbrue.dev@gmail.com>
-Date: Mon, 26 Oct 2026 13:47:05 -0500
-Subject: [PATCH] hwrng: mtk - wait long enough for the next word
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=j7BZuj4H
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB301F01825;
+	Mon, 26 Oct 2026 18:47:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793040436;
+	bh=U//eGvYDF2+/yYUB5pO51EtZ64gK1iprB2hzIuimqus=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=j7BZuj4HerJfS21FoyC8+8SuiNC4IVV6qP3vjQELuaNqFNONlo3huyIk2dFtHEHZo
+	 qYhnU+gCJ7PLVabMK6xmy/5nZ9Ef0Cii1VWo1jh/eMvEzsseVz+fIfS1R7XAGNFJaL
+	 4G/sTBvTW6Vd2qd5plxVPe1WwdtsVgFiFPz61phz8n5DBGC7zuvECXjYgGFpWeMQym
+	 jfxAdWGR3dckQvvYd5DMogiaae70ChnaTcsjnAzJf/GT571UAcEhF+DssmjkJ4aJu6
+	 DiR7IAMvtbf0JLuH1MHaiX4iATFbtZJFSbW5Y3KRv/DcFAZCfvEft4KcfnA8GSE2x3
+	 Pg36Cbh7s1qyg==
+Date: Mon, 26 Oct 2026 11:47:14 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: linux-raid@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 3/3] raid6: simplify CPU feature checks
+Message-ID: <20261026184714.GB1876@quark>
+References: <20261025191207.86590-1-ebiggers@kernel.org>
+ <20261025191207.86590-4-ebiggers@kernel.org>
+ <20261026145704.5601466f@pumpkin>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -90,69 +59,74 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261026-rbrue-sheldon-upstreaming-mtk-rng-timeout-v1-1-551b4b6b4f86@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAA/x3NWwrDIBAF0K3IfGcgSh/gVko/Yr0xQ6sJo4ZCy
- N4LPRs4B1WooJI3Byl2qbIW8sYOhl7LVBJYInlDbnQ3OzrLGrSD64JPXAv3rTbFlKUkzu3NWhI
- 3yVh7Y8wuXOLV3kMADYY2xSzf//V4nucPzSaWZXsAAAA=
-X-Change-ID: 20261021-rbrue-sheldon-upstreaming-mtk-rng-timeout-ef2b4d517bbe
-To: Sean Wang <sean.wang@mediatek.com>, Olivia Mackall <olivia@selenic.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- Ryan Brue <ryanbrue.dev@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793040426; l=1620;
- i=ryanbrue.dev@gmail.com; s=20260906; h=from:subject:message-id;
- bh=IuMYyT08pr1KbGdmcYeCjFIAs9aPWMDDQq2g+dBxKsA=;
- b=BCpb00G2sXtwWwzQtszJ4RUJd1Ta33TQmQcTVF3zzAPw45ys60thfOxpVhdvg3QQhvsHJxJ9z
- 6H7v43IoIqiBTpDoHSkWDe9HxC6IzvLm5WkBpWdBPuigVdYwpCdGc8M
-X-Developer-Key: i=ryanbrue.dev@gmail.com; a=ed25519;
- pk=KsUvVaP//v/2q+ZBuacc7cLbsyEYn+AD71Sn28oZWKo=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261026145704.5601466f@pumpkin>
 
-mtk_rng_wait_ready() gives the generator 60 us to produce the next
-32-bit word. On MT8695 it takes longer: timed over 1421 waits, the
-median was 82 us, the 99th percentile 92 us and the longest 225 us. So
-most waits time out. A read that fails on its first word returns -EIO,
-which a read from /dev/hwrng after a short idle period does more often
-than not, and longer reads come back short.
+On Mon, Oct 26, 2026 at 02:57:04PM +0000, David Laight wrote:
+> On Sun, 25 Oct 2026 12:12:07 -0700
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> 
+> > Remove unnecessary checks for features that are prerequisites for other
+> > features, such as AVX which is a prerequisite for AVX2.
+> > 
+> > (Note: in most cases arch/x86/kernel/cpu/cpuid-deps.c warns about
+> > missing prerequisites rather than enforcing them.  This is intentional,
+> > and it does not mean the prerequisites should be checked elsewhere.)
+> > 
+> > Then, move the raid6_recov_algo_add() lines into the appropriate places
+> > just above so that the same CPU features aren't checked multiple times.
+> > 
+> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> > ---
+> >  lib/raid/raid6/x86/pq_arch.h | 51 ++++++++----------------------------
+> >  1 file changed, 11 insertions(+), 40 deletions(-)
+> > 
+> > diff --git a/lib/raid/raid6/x86/pq_arch.h b/lib/raid/raid6/x86/pq_arch.h
+> > index 4a863b253b909..418e4d4a2930f 100644
+> > --- a/lib/raid/raid6/x86/pq_arch.h
+> > +++ b/lib/raid/raid6/x86/pq_arch.h
+> > @@ -16,63 +16,34 @@ extern const struct raid6_recov_calls raid6_recov_ssse3;
+> >  extern const struct raid6_recov_calls raid6_recov_avx2;
+> >  extern const struct raid6_recov_calls raid6_recov_avx512;
+> >  
+> > ...
+> >  static __always_inline void __init arch_raid6_init(void)
+> >  {
+> > -	if (raid6_has_avx2()) {
+> > +	if (boot_cpu_has(X86_FEATURE_AVX2)) {
+> >  		raid6_algo_add(&raid6_avx2x1);
+> >  		raid6_algo_add(&raid6_avx2x2);
+> >  		if (IS_ENABLED(CONFIG_X86_64))
+> >  			raid6_algo_add(&raid6_avx2x4);
+> > -		if (raid6_has_avx512()) {
+> > +		if (boot_cpu_has(X86_FEATURE_AVX512BW) &&
+> > +		    boot_cpu_has(X86_FEATURE_AVX512VL) &&
+> > +		    boot_cpu_has(X86_FEATURE_AVX512DQ)) {
+> >  			raid6_algo_add(&raid6_avx512x1);
+> >  			raid6_algo_add(&raid6_avx512x2);
+> >  			if (IS_ENABLED(CONFIG_X86_64))
+> >  				raid6_algo_add(&raid6_avx512x4);
+> > +			raid6_recov_algo_add(&raid6_recov_avx512);
+> > +		} else {
+> > +			raid6_recov_algo_add(&raid6_recov_avx2);
+> 
+> Is that right (you haven't changed it)?
+> You get both the avx2 and axv512 normal algorithms, but only one
+> of the recov ones.
+> 
+> I presume these are added in addition to the generic C code and
+> some startup test decides which is fastest and so used?
 
-Raise the timeout to 1 ms. Generators that are faster still return as
-soon as the word is ready. On MT8695, 20 reads after idle periods all
-succeeded, and a 256 KiB read returned in full at the same 63 KB/s.
+Yes, it's unchanged from before.
 
-Signed-off-by: Ryan Brue <ryanbrue.dev@gmail.com>
----
-Found while bringing up mainline on the Amazon Fire TV Stick (3rd
-generation, MT8695), whose RNG uses the mediatek,mt7623-rng compatible.
-The board's devicetree is not upstream yet. The timings were taken with
-a temporary print in mtk_rng_wait_ready().
----
- drivers/char/hw_random/mtk-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The raid6 library implements runtime benchmark-based selection for
+struct raid6_algo, but not for struct raid6_recov_algo where only one
+can be registered.  As always, you're welcome to check the code rather
+than speculate; see lib/raid/raid6/algos.c.
 
-diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
-index 1f9793010e6c..8e3c99e5db3b 100644
---- a/drivers/char/hw_random/mtk-rng.c
-+++ b/drivers/char/hw_random/mtk-rng.c
-@@ -25,7 +25,7 @@
- #define RNG_AUTOSUSPEND_TIMEOUT		100
- 
- #define USEC_POLL			2
--#define TIMEOUT_POLL			60
-+#define TIMEOUT_POLL			1000
- 
- #define RNG_CTRL			0x00
- #define RNG_EN				BIT(0)
+Yes, it's inconsistent.  However, changing that is outside the scope of
+this series.  (FWIW, none of the crypto or CRC code uses runtime
+benchmark-based selection.  I think it's not worth it.)
 
----
-base-commit: 178aff4cf425b3fc51ff09c571fa1bfbc1eb8ea4
-change-id: 20261021-rbrue-sheldon-upstreaming-mtk-rng-timeout-ef2b4d517bbe
-
-Best regards,
--- 
-Ryan Brue <ryanbrue.dev@gmail.com>
-
+- Eric
