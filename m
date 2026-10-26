@@ -1,60 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792974761;
-	b=gz6Jp436AQYxYuzp0RVxTpTNqOZOIeYQKtN5bwzJVaxmok5fsYpl2+MT7udH15p/VyoX
-	 qETWTztQj8i1Ng5bPDv0u6tJz44OxyXlLs6NUQu42n3yQUWBeoP7gXmhjMS6VpUMUzi0x
-	 Yc9FE+tJQ/YBxr6X/Q1FwEq/E4h5Zea/x0rlolo7loVSFChrJgHqO7wi91qoJu8l3qdO8
-	 8TIQMD+pXSncg3JLbduDb/pzCQ9zody5sItHbkL3nYWLPvcLKDE4bB5reng5CVa5wXa1R
-	 CYpAUk0GZZbC0WvNiqvmkPQ+TR1Py4ooPG109OsrcJMBboXQCR/aFX5SEzgyolyG82g==
+	t=1792974912;
+	b=LeCJ94OMZO6UBpxEtDvQO9VLBfFuOOOqL+TV4gvDq5RFZyLVboqPeAojrF6KRDX9BLXu
+	 MtZq5VEBKgqrRRiZCL4BaD9PdbUgPp/FyrgVE+93LDMl2IZCSpNPPLjuu+XxDrdlqwZ/s
+	 A3ShImvEtVob8rLXZsHQsEmUqjbn0BZjRs4Ik86OfcjJX0pSy6GA/F9IXtPWXK47O3nPK
+	 9M0k2DqItY2WjWWH2OMW7bG79U5Uw0f0ZijakwwL7cYRXyqcl8O5KbTDyAddm7qyAd+eM
+	 yfhNNTr8pBeFa2kEbtR5KKT/GdJ2O8p8j6oc7DzOxWztS3CjTPVzewvyWLcfYXtoKYw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792974761;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792974912;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=ItPNGm3M23Yt+NV6y8kRZpOJm7IEZSj6Rf/E4XgKtL0=;
-	b=lFWYx4kzh5/7bXbGSjUTxSUYupNddTja9tlD5stvUiwpg1qMQr5V0dOcDsuzRpuk65vR
-	 U51kJz9KHuohy0phDpHpDnpuwh9+0Ox74Oz1XNjmY6VE8+uAgn/8tAt/n2jyOhDHNmzsw
-	 u/QX7jxuZ9ZRte8i06IimoD6OWeVkA8TwH/MgUEHVVaEi24FogLypIPOxchG5KoUyOc6a
-	 ml2qzGUvH9uolRcbWRpeQMXtJycdLYojfrBBu3ljEGxbl+1/UENrj9WWUHr5ThK4tiSo8
-	 +XneYDJzGirfh8M2Wc5+o8zThle0tGDsJxJrDQPwQ4E4fCIy/8JsR1JtUTn7Hvm/o2Q==
+	bh=xsz+D0rxREBPPKrNprIr1l+jlvD9CjCwuJ5XVICmXro=;
+	b=3b/w8y6sPLwVX4BrxoINubuVnPhXmM0zwqoYLCMRve+ffbQtkC5P3CQB5dleZegMoLrT
+	 XqhlWf04xzYt0uarL+miTXr0tl1ISFO/FjbZu4U46mTUixGLgvvNkMvcFj50MZOjdn38l
+	 NvropaQm1FhhLqbcu0dKXouMWzzXCHSlpnbLTYI/xdCM3p5+M6b9qdYnEffZ8utehBaqh
+	 A71ANFVIAA0besTP/w0svs+Zl6dtn1RlehSoWG3iQBMc1m/H3O3jOvkLIuWseFSWrq5l9
+	 FXaZVm+QX2PlczB5gkP8cGdM+1HxI2njeoxJfiHY2uBiz8dCbx391ETojEt7DAE0Zkg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LDT0AKRr;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MJbEdvfg;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 94979606A31A;
-	Mon, 26 Oct 2026 00:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99278606A31A;
+	Mon, 26 Oct 2026 00:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LDT0AKRr
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id B24881F01825;
-	Mon, 26 Oct 2026 00:32:40 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MJbEdvfg
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05F8D1F01825;
+	Mon, 26 Oct 2026 00:35:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792974761;
-	bh=ItPNGm3M23Yt+NV6y8kRZpOJm7IEZSj6Rf/E4XgKtL0=;
+	s=k20260515; t=1792974912;
+	bh=xsz+D0rxREBPPKrNprIr1l+jlvD9CjCwuJ5XVICmXro=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=LDT0AKRr2h+0Bk0yMQ3JpDAIz8wiCjaPfsPiySbQp3Vau4vUgp7eHZBtQUTUIVYYq
-	 aXAZCw7tRXvmW9zxR1/jAQh7AxMKfGbCIwWCtLqKjLTN8yXcnTfW6QOKprb05qyVZP
-	 ImOJTIocZGH2bPvWSLOZQaq/VQCdaIvrplAOTlpfyGrrViOeZKAPwB7LK4W86LLO5b
-	 x8rMRwUY1oB1bzzSvcQkLyEJqVmOSDZs2/qbIxbuNyH2Gufm6sABprTEAtXV+8y3Fk
-	 gEVdAxCsxVoo16mrj5q2WpYJwX2GYjtTRuyfJpG/3ZjSJBZtkFsGOTKZw5FlRTTzbc
-	 O6sX1lesphLOA==
-Date: Mon, 26 Oct 2026 02:32:37 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>
-Cc: Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] tpm: Check return value of crypto_kpp_set_secret()
-Message-ID: <at6fpcT5EJIZD8DD@kernel.org>
-References: <20261025211119.138277-1-ebiggers@kernel.org>
- <at5-ve5Ap7Oyp1Fo@kernel.org>
- <20261025224723.GA148998@quark>
- <at6MlY1kpfa01tr4@kernel.org>
- <at6QqYWELUtDqUUT@kernel.org>
- <20261025234009.GC148998@quark>
+	b=MJbEdvfgfr+wIBLEh1fINhAWov1u12ZlkOFomcdI6t0RZOPUEqtj4wipbZbtRCPj3
+	 2TM5ba4XkYgpi5ng/L/E7hdm398leODdkJ1yuQd6NNfCZ5RsuyxxJl2+BInxu8dCr7
+	 ZSdvj3gtWdFSRsLSehNM2GLxqT+vjgKg/oWAXVGxOB2m8ktDR9Ry1iMoYfs5ivypZ0
+	 aXY6f+uqnGaz8kFJEvssf+Kgc+K/XPMV1aXoRvtL4voQz+XAyzZkHHQ/7K3a1REhzO
+	 PY3eo9SJEcatpSpLP1e2RK4W66OPUmgJvL90kLTTKMMX0lebcXQdad5UsHmsk9HfGE
+	 u4zjHwln4OXuA==
+Date: Sun, 25 Oct 2026 17:35:10 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Antonio Quartulli <antonio@mandelbit.com>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Martin Willi <martin@strongswan.org>
+Subject: Re: [PATCH 0/2] lib/crypto: x86/chacha: Add 16-block AVX-512
+ implementation
+Message-ID: <20261026003510.GA1843@sol>
+References: <20261025234758.3219829-1-antonio@mandelbit.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -66,33 +60,41 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261025234009.GC148998@quark>
+In-Reply-To: <20261025234758.3219829-1-antonio@mandelbit.com>
 
-Adding Mimi and Roberto.
+[+Cc Martin Willi <martin@strongswan.org>]
 
-On Sun, Oct 25, 2026 at 04:40:09PM -0700, Eric Biggers wrote:
-> On Mon, Oct 26, 2026 at 01:28:41AM +0200, Jarkko Sakkinen wrote:
-> > I'm not sure if it already is but if it isn't, probably also at
-> > linux-integrity turning on Sashiko would make sense.
+On Mon, Oct 26, 2026 at 12:47:53AM +0100, Antonio Quartulli wrote:
+> Hi all,
 > 
-> Sashiko currently has monitoring enabled for linux-integrity, but not
-> email replies
-> (https://github.com/sashiko-dev/sashiko/blob/main/projects/linux/mailing_lists.toml#L45).
+> this series adds a 16-block ChaCha implementation for x86 using 512-bit
+> registers. It is preceded by a KUnit suite and benchmark for
+> chacha_crypt(), as lib/crypto has none for plain ChaCha yet.
 > 
-> (Note: this particular patch was Cc'ed to linux-crypto, which does have
-> Sashiko email replies enabled.  So Sashiko would have replied if it had
-> found an issue anyway.)
+> Patch 1 stands on its own and passes with and without patch 2.
 > 
-> I definitely would support enabling email replies on linux-integrity
-> (for issues found only), like a lot of other lists already do:
+> On AMD Zen 5, the new code doubles chacha_crypt() throughput for inputs
+> of 1 KiB and more, from about 5.2 GB/s to about 10.2 GB/s. It came out
+> of work on the OpenVPN data channel offload driver (ovpn), whose
+> ChaCha20-Poly1305 throughput is CPU-bound: in a VM benchmark it gained
+> about 10% at a 1500-byte MTU and 35% at 9000.
 > 
->    ["linux-integrity@vger.kernel.org"]
->    reply_to = ["author", "list", "recipients"]         
-> 
-> If the maintainers of security/integrity/ would ack that, I can open a
-> pull request to the Sashiko GitHub repo that changes it.  Or someone
-> else can go ahead and do it if they want.
-> 
-> - Eric
+> iPlease note that I could only measure Zen 5.
+> The new code is not used on the CPUs setting X86_FEATURE_PREFER_YMM
+> (Skylake-X, Ice Lake and Tiger Lake), but it is on
+> Rocket Lake, Sapphire Rapids and later, and on Zen 4, where 512-bit
+> operations are split into two halves. Numbers from any of those would be
+> very welcome.
 
-Br, Jarkko
+Can you clarify how your AVX-512 implementation differs from
+https://lore.kernel.org/linux-crypto/20260722153247.630519-1-martin@strongswan.org/
+?  See also the feedback I left on it here:
+https://lore.kernel.org/linux-crypto/20260722232424.GA50619@quark/
+That applies to this one too, it looks like.
+
+Side note: "Zen 5" needs clarification.  The vector execution units
+aren't as wide on the Zen 5 mobile processors as on Zen 5 desktop and
+server.  Probably your numbers apply to desktop and server only.  (I've
+made that mistake in the past before, but they are indeed different.)
+
+- Eric
