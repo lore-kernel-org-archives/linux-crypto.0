@@ -1,57 +1,41 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=114.242.206.163
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793005177;
-	b=eVwfhbYsRFC/OOjPpOlL/SeYhjTusThbRZWUXhlsj6g89Iw8xnLSh20fZNr8cWo2B6jQ
-	 gYeyQ3xhJpbZcXGZ/ElVFKPKjLjfxuKV47/BE14Mp+ZmRSmpZabkxbaqPKs2CaWYOs/Qx
-	 Kne6jj5kkG+8oIa512kJncaN59TwB78NHnDBIlOymdWI+3ae3RQhE+IBzGJrM6m9ILoaG
-	 0KI6wgjIZgKoW9yXAalMQz5J2ePfQ3p7/C4T0tsp4jOG1ki6+a+gT0/HiJIZW00N0iYCC
-	 B/5YWv9xZp64Ij+e0txysUp0UdmijX84Npcu1RcqS1RFvafri9tTrwNc4qLShg7BYQg==
+	t=1793006880;
+	b=z3JIwa6OfJV2Lg45QX8g2gohruIE+C1efoQwFFLhik+DQPLfbJoH1y9lQbENHiUVRkUl
+	 5ZEIO3hmtM92ieTDUZ+tQ2Fl8fcdPY7OriHnWYIPVJHcZftm+Nfi+wpXCllLM2Dy7VXlP
+	 V7M+8xOuHaT7olmPlnYcBT9ZIMRHe7k5ab8LATrRjqx9Y6UO0nCJ+0sD8RnpbeTSauhOJ
+	 rC9N4Hu6dIrb8xl9N1jgwlGhWjSp6JI8zIjnnmUr06ICRi6QX9CUmFuYlC5PaFHHuYwtT
+	 iMuGtUO4Jsi3ZyuBfvq2jwIXiZVlNxnPeUUp8Qa1W+mAccnydI9adAgOJJ+qWykNzdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793005177;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=l1mnqCn4BmGu8ewdxcbpE/BgyGtayOJ1f2zuV/xugEk=;
-	b=xN37tgMBSCvmpruqFmF8hwF9DUHfcLik4rBmRvtoyaCLcCVSb2rVYPdC/nyfj7L2A+xs
-	 vUzvzRaE/GK2B1dH624wiH4xKE//G/IthEj4/FMw3/kzhDzKvqHV4CG7PH3LnKrcE9caW
-	 McrrjxyLyRAD23dZXKry6lKVyB3N+ydGn8RMm4HLv1NI2OzvvKNm9m5SB9G2DUmCW5Rps
-	 bJKWtn1qtQORkip1ZK1T25FTmzjYtxXjwEi9/0h27lHLmYw28QFtOB1a+aAwpXag0DaVA
-	 jOzIbtNp+GCq2acTdze8/gaAy07GoqrRv3euLfOT3bI29oL5Tj+Xjjl3vBUKmM078mg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793006880;
+	h=DMARC-Filter:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-CM-TRANSID:X-CM-SenderInfo:
+	 X-Coremail-Antispam;
+	bh=qywe0Yi/+oq++LNMQYKiGg4TEZMBeNNx2BnHrKwc8Sg=;
+	b=qCyVuQwExLEN5kWz1oULO/LgEo1dBm2x7od+eH9l+EezNgVl1SVhgHB6stJd9JGrOVpz
+	 Ni2Kxq9jC8mA9JkeUy3EUJ6EG0G8UlqgaObRCMb3G3UyLwEG3SSv6rlQphi54hC9GQvOJ
+	 /GyrXE3NwDnNtZjMKnDq4x8Julbbo6egrx2uCZCwwT6elN9B8ejbeRg/6depAIUXTWVNj
+	 k1pXoOq017rxk5bqKsrnJ5zUeGbPjA+Nm6e4GxP8dYDKjoR0nMqUhzWhFRDbjPNsZ+kg5
+	 3zEl2J5UFtTsBS+oyo/L0Z90vuaww1ViSnF3FHd98covMnEHBtBHXabuaGtUtAOlBNg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NOWu6WIQ;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A6C606A31A
-	for <linux-crypto@vger.kernel.org>; Mon, 26 Oct 2026 08:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NOWu6WIQ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7AB31F01825;
-	Mon, 26 Oct 2026 08:59:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793005176;
-	bh=l1mnqCn4BmGu8ewdxcbpE/BgyGtayOJ1f2zuV/xugEk=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=NOWu6WIQ51i/WQq9c38j7WrjOZWpcna+W9oBx/DxfyX7ZN+hE21js7un+pa8/g8O3
-	 JVV3hy+NcP2chiX9zwPhXy5AEzwUKyhfHqGjkfXpGshn+DR4w4ic/g585j6nA71cDZ
-	 LY98VZv/gWvKp55GsuIZ/btBLpZg9TsVTShASIVMfIQIM7sfNFIg9627I2onMHW2hj
-	 5+0JljOM6L/1Kcz9otgwhtLTWTTtk8dlO/fJVbiYzPwpviO4keTqrWNqBGvYmw1atE
-	 Hc91P+mdTZ41tOaRPBqhPVszmQ1G/bNzUnB6rV8zB3/9P1JEQrRDtdsfgb6pRPr6XC
-	 wdZUdWE0s8s+A==
-Message-ID: <sashiko-outbox-184716@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] crypto: qat - add support for enhanced decompression
- mode on GEN6 devices
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Suman Kumar Chakraborty" <suman.kumar.chakraborty@intel.com>, herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com, "Karthikeyan Gopal" <karthikeyan.gopal@intel.com>, "Giovanni
- Cabiddu" <giovanni.cabiddu@intel.com>
-In-Reply-To: <20261026035501.1627846-1-suman.kumar.chakraborty@intel.com>
-References: <20261026035501.1627846-1-suman.kumar.chakraborty@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Oct 2026 08:59:36 +0000
+	dmarc=none header.from=loongson.cn;
+	spf=pass smtp.mailfrom=loongson.cn;
+	arc=none smtp.remote-ip=114.242.206.163
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4888E606A31E;
+	Mon, 26 Oct 2026 09:27:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4888E606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.102])
+	by gateway (Coremail) with SMTP id _____8DxOvAcHd9qwW0ZAA--.8631S3;
+	Mon, 26 Oct 2026 17:27:56 +0800 (CST)
+Received: from [127.0.0.1] (unknown [127.0.0.1])
+	by front1 (Coremail) with SMTP id qMiowJCxf88ZHd9qI0wwAA--.37303S2;
+	Mon, 26 Oct 2026 17:27:55 +0800 (CST)
+Message-ID: <f2857967-ccec-4ea7-b46b-bfa3d3b7d805@loongson.cn>
+Date: Mon, 26 Oct 2026 17:25:08 +0800
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,202 +44,58 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 15/28] mfd: loongson-se: Check return value of
+ dma_set_mask_and_coherent()
+To: Lee Jones <lee@kernel.org>
+Cc: stable@vger.kernel.org, Yinggang Gu <guyinggang@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, linux-crypto@vger.kernel.org,
+ mfd@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20261021121245.3111563-1-lee@kernel.org>
+ <20261021121245.3111563-15-lee@kernel.org>
+Content-Language: en-US
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+In-Reply-To: <20261021121245.3111563-15-lee@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJCxf88ZHd9qI0wwAA--.37303S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj9xXoWrKrWxuw4xGr4xXFyDAryfXwc_yoWxZFX_Ca
+	42934kWrykWr4qya4jgrn3CrZaqa4UW34fu3W5JF4Sga45AFsYv3WfGayUtw47XrZ5Ar1Y
+	9w1DWr9Y9r1rZosvyTuYvTs0mTUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUb78YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
+	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
+	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCF04k20xvY0x0EwI
+	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7
+	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k2
+	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8j-e5UUUUU==
 
-Thank you for your contribution! Sashiko AI review found 3 potential issue(=
-s) to consider:
-- [High] crypto: qat - missing state_lock in decomp_enhanced_store() races =
-with down/up
-- [Medium] crypto: qat - decomp_enhanced_store() sends FW cmd without dc or=
- decomp
-- [Medium] crypto: qat: missing firmware rollback in decomp_enhanced_store()
---
 
-commit 2bd7b68e36bc7513f2621d0b0db284e20b70faca
-Author: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+在 2026/10/21 20:09, Lee Jones 写道:
+> loongson_se_probe() ignores the return value of
+> dma_set_mask_and_coherent() when requesting a 64-bit DMA mask before
+> allocating coherent DMA memory.  Check the return value and abort probe
+> if the platform cannot satisfy the 64-bit DMA mask requirement.
+>
+> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip controller")
+> Closes: https://sashiko.dev/#/bug/linux-6685ee0c-b7ed-4f21-8800-cc705cec449b
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Lee Jones <lee@kernel.org>
 
-crypto: qat - add support for enhanced decompression mode on GEN6 devices
+Reviewed-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
 
-This commit adds support for enhanced decompression mode on QAT GEN6
-devices via the ICP_QAT_FW_CNV_BYPASS_MODE_SET firmware admin command and
-exposes it through a new decomp_enhanced sysfs attribute.
+Thanks for fixing this!
 
-> diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c b/drive=
-rs/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
-> index 388087e64540e..0bf4907a32764 100644
-> --- a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
-> +++ b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
 
-[ ... ]
+Best Regards,
 
-> @@ -1064,7 +1080,8 @@ void adf_init_hw_data_6xxx(struct adf_hw_device_dat=
-a *hw_data)
->  	hw_data->num_rps =3D ADF_GEN6_ETR_MAX_BANKS;
->  	hw_data->clock_frequency =3D ADF_6XXX_AE_FREQ;
->  	hw_data->get_svc_slice_cnt =3D adf_gen6_get_svc_slice_cnt;
-> -	hw_data->accel_capabilities_ext_mask =3D ADF_ACCEL_CAPABILITIES_EXT_ZST=
-D;
-> +	hw_data->accel_capabilities_ext_mask =3D ADF_ACCEL_CAPABILITIES_EXT_ZST=
-D |
-> +					       ADF_ACCEL_CAPABILITIES_EXT_ENHANCED_DECOMP;
-> =20
->  	adf_gen6_init_services_supported(hw_data);
->  	adf_gen6_init_hw_csr_ops(&hw_data->csr_ops);
+Qunqin.
 
-[Severity: Medium]
-Does setting ADF_ACCEL_CAPABILITIES_EXT_ENHANCED_DECOMP unconditionally in
-adf_init_hw_data_6xxx() expose the decomp_enhanced sysfs attribute on GEN6
-SKUs that do not support compression, such as wireless crypto SKUs where
-adf_6xxx_is_wcy(hw_data) is true or devices with ICP_ACCEL_GEN6_MASK_CPR_SL=
-ICE
-set in hw_data->fuses[ADF_FUSECTL1]?
-
-> diff --git a/drivers/crypto/intel/qat/qat_common/adf_sysfs.c b/drivers/cr=
-ypto/intel/qat/qat_common/adf_sysfs.c
-> index 8daa69a76b01a..ab3f17c878bb7 100644
-> --- a/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-> +++ b/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-
-[ ... ]
-
-> @@ -321,6 +322,70 @@ static ssize_t num_rps_show(struct device *dev, stru=
-ct device_attribute *attr,
->  }
->  static DEVICE_ATTR_RO(num_rps);
-> =20
-> +static ssize_t decomp_enhanced_show(struct device *dev, struct device_at=
-tribute *attr,
-> +				    char *buf)
-> +{
-> +	struct adf_accel_dev *accel_dev;
-> +
-> +	accel_dev =3D adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
-> +	if (!accel_dev)
-> +		return -EINVAL;
-> +
-> +	return sysfs_emit(buf, "%s\n", str_on_off(adf_is_decomp_enhanced(accel_=
-dev)));
-> +}
-> +
-> +static ssize_t decomp_enhanced_store(struct device *dev, struct device_a=
-ttribute *attr,
-> +				     const char *buf, size_t count)
-> +{
-> +	struct adf_accel_dev *accel_dev;
-> +	unsigned long mask;
-> +	bool enabled;
-> +	int ret;
-> +
-> +	ret =3D kstrtobool(buf, &enabled);
-> +	if (ret)
-> +		return ret;
-> +
-> +	accel_dev =3D adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
-> +	if (!accel_dev)
-> +		return -EINVAL;
-> +
-> +	if (adf_devmgr_in_reset(accel_dev))
-> +		return -EBUSY;
-> +
-> +	if (enabled) {
-> +		ret =3D adf_get_service_mask(accel_dev, &mask);
-> +		if (ret)
-> +			return ret;
-> +
-> +		if (!(mask & (BIT(SVC_DC) | BIT(SVC_DECOMP)))) {
-> +			dev_err(&GET_DEV(accel_dev),
-> +				"decomp_enhanced requires dc or decomp service\n");
-> +			return -EINVAL;
-> +		}
-> +	}
-> +
-> +	/* If the device is down the value is picked up by adf_send_admin_init(=
-). */
-> +	if (adf_dev_started(accel_dev)) {
-> +		ret =3D adf_send_admin_decomp_enhanced(accel_dev, enabled);
-
-[Severity: Medium]
-When enabled is false and the device is started without dc or decomp
-configured (for example, sym;asym, dcc, or sym on a WCY SKU), will this
-still send ICP_QAT_FW_CNV_BYPASS_MODE_SET to the firmware?
-
-Because the service mask check is only performed inside the if (enabled)
-block, writing 0 or off on a started device without dc or decomp still
-calls adf_send_admin_decomp_enhanced(accel_dev, false), whereas the ABI
-documentation in Documentation/ABI/testing/sysfs-driver-qat states that
-the setting has no effect while neither dc nor decomp is configured.
-
-> +		if (ret) {
-> +			dev_err(&GET_DEV(accel_dev),
-> +				"Failed to program enhanced decompression: %d\n",
-> +				ret);
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	ret =3D adf_cfg_add_key_value_param(accel_dev, ADF_GENERAL_SEC,
-> +					  ADF_DECOMP_ENHANCED,
-> +					  enabled ? "1" : "0", ADF_STR);
-> +	if (ret)
-> +		return ret;
-
-[Severity: High]
-Can decomp_enhanced_store() race with adf_dev_down() and adf_dev_up()
-because it does not hold accel_dev->state_lock?
-
-In drivers/crypto/intel/qat/qat_common/adf_init.c, adf_dev_down() holds
-accel_dev->state_lock while calling adf_dev_stop() and adf_dev_shutdown():
-
-drivers/crypto/intel/qat/qat_common/adf_init.c:adf_dev_down() {
-	mutex_lock(&accel_dev->state_lock);
-
-	adf_dev_stop(accel_dev);
-	adf_dev_shutdown(accel_dev);
-
-	mutex_unlock(&accel_dev->state_lock);
-}
-
-And adf_dev_shutdown() calls adf_exit_admin_comms(), which frees
-accel_dev->admin and sets it to NULL:
-
-drivers/crypto/intel/qat/qat_common/adf_admin.c:adf_exit_admin_comms() {
-	...
-	if (admin->virt_addr)
-		dma_free_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
-				  admin->virt_addr, admin->phy_addr);
-	...
-	mutex_destroy(&admin->lock);
-	kfree(admin);
-	accel_dev->admin =3D NULL;
-}
-
-If decomp_enhanced_store() checks adf_dev_started(accel_dev) without
-holding accel_dev->state_lock, a concurrent adf_dev_down() can stop the
-engines and run adf_exit_admin_comms() while decomp_enhanced_store() calls
-adf_send_admin_decomp_enhanced() -> adf_send_admin() ->
-adf_put_admin_msg_sync(), which unconditionally dereferences
-accel_dev->admin.
-
-Similarly, during adf_dev_up() -> adf_dev_start(), hw_data->send_admin_init=
-()
-runs while ADF_STATUS_STARTING is set and before ADF_STATUS_STARTED is
-set. If decomp_enhanced_store() runs in that window, adf_dev_started()
-returns false, so it skips adf_send_admin_decomp_enhanced() and updates
-ADF_DECOMP_ENHANCED in accel_dev->cfg after adf_send_admin_init() has
-already completed, leaving the firmware and configuration out of sync
-(which can also happen if two concurrent writers on separate file
-descriptors interleave adf_send_admin_decomp_enhanced() and
-adf_cfg_add_key_value_param()).
-
-[Severity: Medium]
-Also in decomp_enhanced_store(), what happens if
-adf_cfg_add_key_value_param() fails with -ENOMEM when kzalloc_obj(*key_val)
-fails in drivers/crypto/intel/qat/qat_common/adf_cfg.c after
-adf_send_admin_decomp_enhanced() has already reprogrammed the firmware?
-
-Would that leave the running firmware's enhanced decompression mode out of
-sync with the configuration stored in accel_dev->cfg and reported by
-decomp_enhanced_show()?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261026035501.1627=
-846-1-suman.kumar.chakraborty@intel.com?part=3D1
