@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793097482;
-	b=gJOJNjgLhvppGkOguc7tGnWhI8qKnBIzBCGM6FX89hVXg4FW2YrXonUi2PKFwrtdio3o
-	 rbUGdrbXJKgEfkYhOBa7tcmTh3XLP/LaCb3X54tG3O8A5sa/hAzBlotQyY2zdRriAvlTD
-	 ABNE9v2xGN5nlzzMxsLF83XmUHxgD97P1p7NteWTSpdOSwssy+Nbb7y8Sr0KWqe+fJhWs
-	 7512mHjjSPj6H4KPEbEbFPnH0bcaFDfCZnWg2hYq8Yyo/Yv2Cc5JthrhrFDpV9mvChdKV
-	 sSWm7lsbiQ5eV+H2oz5rBIkIvJ2VwtXTIb6Ri68rsR0vThxgKaokEfFkV+Am+MCG0Rg==
+	t=1793097492;
+	b=P+5VWPFc4n72yhastAeEyGcAHMdEXcQ7aGeXd9JcqNtlhs87KxMJj7/qcLql0MK5zLvF
+	 IxyMpn5J43YeGFWRxcdH3hF4j9m7OmQEAwuK0hJvZiIugpTmMa5CjJYxjaBT5eplbpffE
+	 nBfklbUgHYfuw2V/6n2m2XtQU7tSdS7Gk+8maudDhz5wEsp3KUyFJg70NOkZxXw7FDJaB
+	 9zAC/Cd4JjOFA5yff724ZzpTg3QMH6VQT35ZkmVhoI04J00TYCZU3za+kuavn8dtBamqv
+	 cIeYd5Fr+b4qCSq+wU36SzaYcBp+mDFnMFXt2FHC87atc8BrID447EYrU43PFEXD/2Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793097482;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793097492;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=i118X57VQLBcZZyXtQ2xwoBySl67TE23jZgcwtlPfoc=;
-	b=FjrWYH/6+b6Ypfq5LJuQz8X9KHTX0pkSzMCWe8FjtjpY01ohj+tPaPhBr8mlNWrozgHT
-	 Al/EvCseVD/1WWr+RcHBALFEc2nl2wnbFJem7ZoNfH5QbU6aPTfoehfAVMFgp2OoArLTI
-	 qnuP0V69hE6rB8V8Qjqkqs2DlV/QQ9YmWPArfCPHW7WC0+b/N/BKmCWSnzv8pwz8z2H7K
-	 XT8whGWlHnQw+1bUh+7ErKObbaVRJKor5cnjnQ5REDYXAO3FcGXjep/TqU/NYy6Bc2j51
-	 7uWs1DuEoA6Ewq7gcWtKhHDNAhS2zr5xgjGwL/p/XWY3ejFWSMxQ5l8VCJRf4vIsOag==
+	bh=6ZqnaHaUS4JVuYK4+S2laGLI8DaJ0zLPxhW7BuLfhYQ=;
+	b=KcvhIlwGkUEKu/xbHVWG59C6b/E/mNFeU4AdWjWkBuKXeGW6ZtAXNto5RJKk6uKFlAs8
+	 smrTZ0+T69HST4wFuxRDR9kzuB4+fo4hgK25BdRmM4vRjV8iqIAUd6L8S4if5qj8XDN3y
+	 UZOq6V+zjpzznJJYHPs1LPDkG5sNbBYfTSrUsMyCS2EQ5cd6ledv+4rdROawIDUhWuAUf
+	 osdTWds/EWXF6b9ZqLwdRflh7CjVw9TAt09oGW5Do1Ey2+xsKI0lmsGS/Rne2DJ8GG6OD
+	 bohLXCeEcTjBFd12LlSsmYUmE8utv3jFEwag1o123kvCq4L1Fx4bx7O3JFlmxOpfqYQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IjFYTPxY;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KQqhyX1w;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F92C606A31A;
-	Tue, 27 Oct 2026 10:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7961606A31A;
+	Tue, 27 Oct 2026 10:38:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IjFYTPxY
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4CE81F01825;
-	Tue, 27 Oct 2026 10:38:00 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=KQqhyX1w
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB6B11F01825;
+	Tue, 27 Oct 2026 10:38:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793097482;
-	bh=i118X57VQLBcZZyXtQ2xwoBySl67TE23jZgcwtlPfoc=;
+	s=k20260515; t=1793097491;
+	bh=6ZqnaHaUS4JVuYK4+S2laGLI8DaJ0zLPxhW7BuLfhYQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=IjFYTPxYg1dhlWJUisOTs+EIqSyE1qDv5EXijvM1jfekzm7mQoDepfqFT0k/7sms6
-	 8la8D1QdYEjybTUl8WjdM/XPLhrNUbSz3nw2oo65Xocyn2kiitlQ6ue+skpI2dwPLG
-	 djOcyHofv6jvD4YjpPWRYZ/xNMUYazSW7pdiw7jMQwoow8MzgMs2wLiKVQq+AolDID
-	 NBI4M5Oj4yosUOH/OusSfvAueLpgyZetxmCJMYTN8hZ7uJpKWTUbCOxu1Te1PxIiRe
-	 xybq2PbOfCEC6KEgK7y/B806yj2M8TPcvWptBQzhCgt0QofyDhr9riXOLnB8UIHReQ
-	 e0CmKmG07q5dQ==
+	b=KQqhyX1wiz6R4rIaGGbBzKwiQss+QP2CmiUcMM4nk3YV554fOSIjtwoNbw004fqOH
+	 iMld+tkAVYqJ4XRikgsLoZunVxzU2Te+EQ4F4+vCZhaJA/rQfy8mZfQNFY/MCtgCeX
+	 CuV1hBR/pKKG7fo2inzoRr6+TUhAWNprq+uSJiJnK0uOf19ZAZj0X3yjI91ZOwdikj
+	 6GmcWXn0Pg+QqDKrelTXM8/iAdhg2grCphIkfUgzMeIC1PbBGQDkUtaHKGnMnt0yFi
+	 gdJC6RCyPx93koLsxBUCdJ8DiwF1Hc/fAvKNu3QFXD6shCtk4pannUzlR/S5pEUEnO
+	 PjxptKVC7mirQ==
 From: Lee Jones <lee@kernel.org>
 To: lee@kernel.org,
 	Qunqin Zhao <zhaoqunqin@loongson.cn>,
@@ -48,9 +48,9 @@ To: lee@kernel.org,
 	mfd@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [PATCH v2 18/27] mfd: loongson-se: Prevent out-of-bounds engine access in se_irq_handler()
-Date: Tue, 27 Oct 2026 09:30:47 +0000
-Message-ID: <20261027093306.2812695-19-lee@kernel.org>
+Subject: [PATCH v2 19/27] mfd: loongson-se: Stop controller and mask interrupts on teardown and shutdown
+Date: Tue, 27 Oct 2026 09:30:48 +0000
+Message-ID: <20261027093306.2812695-20-lee@kernel.org>
 X-Mailer: git-send-email 2.56.0.307.g5fe7bd680c-goog
 In-Reply-To: <20261027093306.2812695-1-lee@kernel.org>
 References: <20261027093306.2812695-1-lee@kernel.org>
@@ -65,65 +65,153 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-loongson_se_probe() enables all 32 interrupt bits via SE_INT_ALL
-(0xffffffff), and se_irq_handler() uses the set bit index from the
-32-bit status register directly to index se->engines, which only holds
-SE_ENGINE_MAX (16) entries.  Any interrupt bit asserted at index 16 or
-above triggers an out-of-bounds access on se->engines.
+loongson_se_probe() enables hardware interrupts before registering IRQ
+handlers and starts the controller via loongson_se_init(), but provides
+no teardown or shutdown handler to stop the controller and mask
+interrupts.  If probe fails after loongson_se_init(), if the driver is
+unbound, or during a system reboot or kexec transition, the controller
+remains active with DMA configured to memory that is reclaimed.
 
-Restrict SE_INT_ALL to GENMASK(SE_ENGINE_MAX - 1, 0) and bounds-check
-the bit index against SE_ENGINE_MAX before completing the engine in
-se_irq_handler().
+Clear pending interrupts before requesting IRQs, unmask interrupts only
+after IRQ handlers are registered, clean up on failure inside
+loongson_se_init(), register a devres action after loongson_se_init()
+succeeds to issue SE_CMD_STOP and mask interrupts on teardown, and wire
+up the platform driver .shutdown callback.
 
 Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip controller")
-Closes: https://sashiko.dev/#/bug/linux-bc962408-5c42-40af-8111-a8463a05ccdf
+Closes: https://sashiko.dev/#/bug/linux-15511672-7569-4eac-96a0-c08581925710
+Closes: https://sashiko.dev/#/bug/linux-e6ed8d33-d641-4969-a5ea-959f21ae3696
 Cc: stable@vger.kernel.org
 Reviewed-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
 Signed-off-by: Lee Jones <lee@kernel.org>
 ---
- drivers/mfd/loongson-se.c       | 3 ++-
- include/linux/mfd/loongson-se.h | 7 ++++---
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ drivers/mfd/loongson-se.c       | 51 +++++++++++++++++++++++++++++----
+ include/linux/mfd/loongson-se.h |  1 +
+ 2 files changed, 46 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-index 187ebbed0422..10af13c3b7cc 100644
+index 10af13c3b7cc..bdbab4b91729 100644
 --- a/drivers/mfd/loongson-se.c
 +++ b/drivers/mfd/loongson-se.c
-@@ -158,7 +158,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
- 	/* For engines */
- 	while (int_status) {
- 		id = __ffs(int_status);
--		complete(&se->engines[id].completion);
-+		if (id < SE_ENGINE_MAX)
-+			complete(&se->engines[id].completion);
- 		int_status &= ~BIT(id);
- 		writel(BIT(id), se->base + SE_S2LINT_CL);
+@@ -169,6 +169,23 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+ 
++static void loongson_se_stop(void *data)
++{
++	struct loongson_se *se = data;
++	struct loongson_se_controller_cmd cmd = {};
++
++	mutex_lock(&se->engine_init_lock);
++
++	cmd.command_id = SE_CMD_STOP;
++	loongson_se_send_controller_cmd(se, &cmd);
++
++	spin_lock_irq(&se->dev_lock);
++	writel(0, se->base + SE_S2LINT_EN);
++	spin_unlock_irq(&se->dev_lock);
++
++	mutex_unlock(&se->engine_init_lock);
++}
++
+ static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
+ {
+ 	struct loongson_se_controller_cmd cmd = {};
+@@ -176,15 +193,23 @@ static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
+ 
+ 	cmd.command_id = SE_CMD_START;
+ 	err = loongson_se_send_controller_cmd(se, &cmd);
+-	if (err)
++	if (err) {
++		writel(0, se->base + SE_S2LINT_EN);
+ 		return err;
++	}
+ 
+ 	cmd.command_id = SE_CMD_SET_DMA;
+ 	cmd.info[0] = lower_32_bits(addr);
+ 	cmd.info[1] = upper_32_bits(addr);
+ 	cmd.info[2] = size;
+ 
+-	return loongson_se_send_controller_cmd(se, &cmd);
++	err = loongson_se_send_controller_cmd(se, &cmd);
++	if (err) {
++		loongson_se_stop(se);
++		return err;
++	}
++
++	return 0;
+ }
+ 
+ static const struct mfd_cell engines[] = {
+@@ -192,6 +217,13 @@ static const struct mfd_cell engines[] = {
+ 	{ .name = "tpm_loongson" },
+ };
+ 
++static void loongson_se_shutdown(struct platform_device *pdev)
++{
++	struct loongson_se *se = platform_get_drvdata(pdev);
++
++	loongson_se_stop(se);
++}
++
+ static int loongson_se_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+@@ -225,12 +257,12 @@ static int loongson_se_probe(struct platform_device *pdev)
+ 	if (IS_ERR(se->base))
+ 		return PTR_ERR(se->base);
+ 
+-	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+-
+ 	nr_irq = platform_irq_count(pdev);
+ 	if (nr_irq <= 0)
+ 		return -ENODEV;
+ 
++	writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
++
+ 	for (i = 0; i < nr_irq; i++) {
+ 		irq = platform_get_irq(pdev, i);
+ 		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
+@@ -238,10 +270,16 @@ static int loongson_se_probe(struct platform_device *pdev)
+ 			dev_err(dev, "failed to request IRQ: %d\n", irq);
  	}
+ 
++	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
++
+ 	err = loongson_se_init(se, paddr, se->dmam_size);
+ 	if (err)
+ 		return err;
+ 
++	err = devm_add_action_or_reset(dev, loongson_se_stop, se);
++	if (err)
++		return err;
++
+ 	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
+ 				    ARRAY_SIZE(engines), NULL, 0, NULL);
+ }
+@@ -253,8 +291,9 @@ static const struct acpi_device_id loongson_se_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, loongson_se_acpi_match);
+ 
+ static struct platform_driver loongson_se_driver = {
+-	.probe   = loongson_se_probe,
+-	.driver  = {
++	.probe    = loongson_se_probe,
++	.shutdown = loongson_se_shutdown,
++	.driver   = {
+ 		.name  = "loongson-se",
+ 		.acpi_match_table = loongson_se_acpi_match,
+ 	},
 diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
-index 07afa0c2524d..2d0a8b1e5c9e 100644
+index 2d0a8b1e5c9e..dbe5992bd435 100644
 --- a/include/linux/mfd/loongson-se.h
 +++ b/include/linux/mfd/loongson-se.h
-@@ -4,6 +4,8 @@
- #ifndef __MFD_LOONGSON_SE_H__
- #define __MFD_LOONGSON_SE_H__
- 
-+#include <linux/bits.h>
-+
- #define LOONGSON_ENGINE_CMD_TIMEOUT_US	10000
- #define SE_SEND_CMD_REG			0x0
+@@ -11,6 +11,7 @@
  #define SE_SEND_CMD_REG_LEN		0x8
-@@ -18,10 +20,9 @@
- #define SE_L2SINT_STAT			0x98
- #define SE_L2SINT_SET			0xa0
- 
--#define SE_INT_ALL			0xffffffff
--#define SE_INT_CONTROLLER		BIT(0)
--
- #define SE_ENGINE_MAX			16
-+#define SE_INT_ALL			GENMASK(SE_ENGINE_MAX - 1, 0)
-+#define SE_INT_CONTROLLER		BIT(0)
- #define SE_ENGINE_RNG			1
- #define SE_CMD_RNG			0x100
+ /* Controller command ID */
+ #define SE_CMD_START			0x0
++#define SE_CMD_STOP			0x1
+ #define SE_CMD_SET_DMA			0x3
+ #define SE_CMD_SET_ENGINE_CMDBUF	0x4
  
 -- 
 2.56.0.307.g5fe7bd680c-goog
