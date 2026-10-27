@@ -1,67 +1,69 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793059070;
-	b=w3BJFQg98yLzvjqqyb/j7x0muCBloHwNw3flRmuKJnWWktlAQ+fIdk1tFB6kgKxJ5toN
-	 8mbDfUnbLd4r3+TMCEU+MLSYWpJ1SafIWjt6RYRMClD9yl8evAnoW3WmjRBVTAaFHz59Q
-	 sBRHa2HL3Kq6JdPVypCOIv8DkZTcI4iEL3gMLRDo3+TjN3i/Ci+S+c6eBRYqCRWlSaIwq
-	 ewN17zsCZoacnmL9qAEAEVGGVfFng+qBiq3yS61ySiVR1jJ8m4UwgbkhGRrV/p/y/lo2O
-	 8TSsJhpAF6xBtw6TWnsantoEI6JHGCJgJWiFZPxNGg25LJ4xE7oYSpZqKIgSzXalO2A==
+	t=1793059285;
+	b=tFJBiT0Plvje1rXjzrASFxYxulS94ZOUJRyOYvSP76eXAysdhzWLTUp57ZrVTc3vsqR7
+	 u6nPNbA16gTmzqaLf10Nb3/ZCv/sfAP73ldtMfIBPDZfkT1PAe7nyMjbZZKNdxENQvbYV
+	 jFSUcJAGLbU7/pPynM2i/MPHv9HZKGoSfqQ8t03esFMZ8/ygPMoil9CzwyoipEcmtMEQv
+	 4bWBzYm+VdEpvQtrpFwBkZJwLnZV9oG3qCSvFzxFsz8eEzzeJU6G/eXoERyfWorgNeu1/
+	 CdqVJWfvFC9WrIanIVtcV7oF+XD1GR9Xuf5E8UuyvbW1WDzWD2tfItARO2AGwWnodfA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793059070;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793059285;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=7WMtPtdK1lzlrp4rQzyLZbJevL2RrG4eQh3LkZ7hUGo=;
-	b=X35ppmRmWllOUa6ZhzzudJ3uFVeviADveDNQ24rEUX108S2oKkum0/28dpq4Nx+40FUt
-	 kRlP8waoXocdC9PEL0wLEn/AR0wDawzQrP3pqkUVkV/D9afOcudSXfGsWgieavNop3sB0
-	 pVKsSc096HA4K6QVQ0HLwTYVPTffhgxC7ag3Qy56d5DlvV6rsmm/qwFyH/qKN7XyuF3O1
-	 iFVjHTym7soXMDb3FST9QptVScEbXGy3oHpBTCxfcmvE1rKyBB4qGj61YdO9zQT0IhvOj
-	 cgNOus/cAYjwJrjPyyF38scnVTlQDEXXuzOixql6DvNV1q4jA4/qf40EFAEHmiZjXNA==
+	bh=0LRJqBrRZu8I7CaiJXMHZVTdIs/++2cjuvZ3KSCYX24=;
+	b=w5jhnkKTBJ7512ZH9NWwxEG8v4RHpe2IUSUzhCNrHb4ncmJOcQrajsMqMDcwjKkQ3Eyo
+	 ce9mFqr8nGwJW2hBfgxyvyqr5iJO4VoWZUh45OXwvni8pcCgMaTDGi+VIzHiG/H9w4SQi
+	 oppPxd9n2r6X5aSY5GBL1EjEh00CQJKInKYpS7NRIdadd3MHH6QOZr9i37vKhTvzsmNwC
+	 2BbtXKKNzEnOXxRP4z++IkEv98noJgVXraVVfr0zS7hAmLtXW4Dt+z2DDqSWdRRVEHpRr
+	 t3ChATGn9pQsBRBVgFtwwO19IabKh1KWumVpS4seIeAh9PW6vM18HroSdHvEQpc2Xkw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oLcqO6x0;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lGHGuc5d;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC1A606A31A;
-	Mon, 26 Oct 2026 23:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 41EC7606A31A;
+	Tue, 27 Oct 2026 00:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oLcqO6x0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 319DF1F01825;
-	Mon, 26 Oct 2026 23:57:49 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lGHGuc5d
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 464D81F031E0;
+	Tue, 27 Oct 2026 00:01:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793059070;
-	bh=7WMtPtdK1lzlrp4rQzyLZbJevL2RrG4eQh3LkZ7hUGo=;
+	s=k20260515; t=1793059284;
+	bh=0LRJqBrRZu8I7CaiJXMHZVTdIs/++2cjuvZ3KSCYX24=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oLcqO6x0oulfxlcnAKCrFhFbMWlL5/QD7QCywadLB6JldFjE5lm2gqVIo3EU5BbVg
-	 WYbGn9mKBdKjVaFUnCUPMqmQXyqRsZwQop2IpmMILLdNuZamSlXfmPxYl42b21GzTY
-	 9c8f7D782s7UBlXziEhUe3XlyW1YBlvEXrGm6xYB6GL+5gUeqWT7L1pqYWRG9v5w+E
-	 +VifU758renDR/uattP2SNPTrFZJhcuUi/cb9IDF/QiOSCMe867XqHT0vgKsaUIMek
-	 6lXfWErJGtfUayfFoTlL630dCbVmDt+MmVmDBEU6l7pz/vDDsqVL1levZTprqzETzI
-	 2rE7a1V4u9WBw==
-Date: Mon, 26 Oct 2026 16:57:47 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Jarkko Sakkinen <jarkko@kernel.org>
+	b=lGHGuc5dcRkAffdeH2WdifKM6MiqYDJ94AyVLlffNPp+eUdT5k+99mhaU+/bhy4Re
+	 n4+j6x8DIQM4lkKLxXBYDJJ7aL3M3nCU7SaAXSiyP6dhH4P5cyeavBR8QM2fKDBDc3
+	 RGUwUYtZoVFcAjH+wDEzgcBHLgbzoFs4NZhstuExzdEBLuXC9pL5G533krFDJ2ODri
+	 QbS1TcKVy8ZIHm90MqubYovU3DvzElKK8+zK5mEO1QGE7g4ZOU0xKYNAZoZsHSPeab
+	 /FCCwXrim3GvhhLoQMaKOxlxGla2WfbijmjWTuGclw9oaaMlDWoHdHHDFqj16G665C
+	 KQNJuk4czJiyw==
+Date: Tue, 27 Oct 2026 02:01:21 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
 Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
 	Linus Torvalds <torvalds@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, Alex Shi <alexs@kernel.org>,
-	Yanteng Si <si.yanteng@linux.dev>, Dongliang Mu <dzm91@hust.edu.cn>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Thomas Graf <tgraf@suug.ch>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Thomas Gleixner <tglx@kernel.org>, Waiman Long <longman@redhat.com>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Jani Nikula <jani.nikula@intel.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>, Shuah Khan <shuah@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"open list:DEVICE-MAPPER (LVM)" <dm-devel@lists.linux.dev>,
 	open list <linux-kernel@vger.kernel.org>,
-	"open list:RHASHTABLE" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v3 6/6] lib: Remove assoc_array
-Message-ID: <20261026235747.GB2395@quark>
+	"open list:FSVERITY: READ-ONLY FILE-BASED AUTHENTICITY PRO..." <fsverity@lists.linux.dev>,
+	"open list:RHASHTABLE" <linux-crypto@vger.kernel.org>,
+	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH v3 4/6] KEYS: Introduce keyring_is_empty()
+Message-ID: <at_p0VD-PsPmIq-u@kernel.org>
 References: <20261025001105.1824178-1-jarkko@kernel.org>
- <20261025001105.1824178-7-jarkko@kernel.org>
+ <20261025001105.1824178-5-jarkko@kernel.org>
+ <20261026235528.GA2395@quark>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -73,14 +75,28 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261025001105.1824178-7-jarkko@kernel.org>
+In-Reply-To: <20261026235528.GA2395@quark>
 
-On Sun, Oct 25, 2026 at 03:10:14AM +0300, Jarkko Sakkinen wrote:
-> As assoc_array has no longer in-kernel users, remove assoc_array
-> implementation, includes and documentation.
+On Mon, Oct 26, 2026 at 04:55:28PM -0700, Eric Biggers wrote:
+> On Sun, Oct 25, 2026 at 03:10:12AM +0300, Jarkko Sakkinen wrote:
+> > +/**
+> > + * keyring_is_empty - Check whether a keyring contains any links
+> > + * @keyring: The keyring to check.
+> > + */
 > 
-> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> "contains any links" => "contains no links"?  Or even just "is empty".
+> Otherwise it sounds backwards.
+> 
+> Note that another "is the keyring empty" check just showed up in
+> mainline in kernel/bpf/keys.c.  So a new version of this patch will be
+> needed to update that one too.
+> 
+> Otherwise this patch looks good.
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+I'll fix that up. Related, bpf_keyring_lookup() also needs to be
+addressed now that I have it in my tree. 
 
-- Eric
+> 
+> - Eric
+
+Br, Jarkko
