@@ -1,41 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793073590;
-	b=L1SYTI+AI/9KGiMJtVVTB28/NazIQQbJBLJvGGHBs0F2YUh97QnbEGHdaQXwirS/1knS
-	 3XHCD9XEiy2JFCwMGxhwCGA1/zVwhVq5JqVydmnFtD/fDgO0hczcV9LGwaHipvWeF/zQg
-	 FyRx4XJ+7gzL4vQx9xcuuezVvyB3xsCc4DMJY4+vYoRX5MPSB2goA+aVOMeg0yzrqEoeC
-	 ZpvAypPQ0STIzyRd8d/3yKgtpUHxZCwyOrcgwQ+rFa92BxNqk1tCC2WN9VvGAcruUP1c+
-	 CPxA64TdgAdX2GQVBJ5TALudF5cVKEa+3rp6+D9TXxRgsuKLRcq9/hEqyRREQ8/rc8g==
+	t=1793082844;
+	b=rq1UkD9ze5geJxCxbAdCQbH0SUaWHK4jTasOsLiBE9j0KtnTFw1d8HjDCHdUrn9hVQSx
+	 BOpzaGUpWhEkzh52LUGIey3SfkpjG/kCuO+qIL63QDezjHjEwG8Jt/uAqHPOvp/m99q/o
+	 jyhoR1GdVdPIsZbRatg5KMJDhKsR8BklNp3KiKoLHphM1IZFgR7kF2ln2MktNzHDVoJZ7
+	 es/+HUUI87COrS+7hbsE0nH0vZdkISf8CKOgj6bKqoR2MKV8SDeIjKONG+JU8w1eCO8jj
+	 eiKjHBZBugoHw9xbBsSUScTW1zp8XnNi49kq4O+rxNFZwc8Zn7Y3kqQliMVffxb2i1g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793073590;
-	h=DMARC-Filter:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-CM-TRANSID:X-CM-SenderInfo:
-	 X-Coremail-Antispam;
-	bh=yNjVGzNCe/dUhA+Uvzx9OfKhmHV1qkPYX987us1hODA=;
-	b=y6RiXFNVErz9Pn0s+7FoUofsKUOBOcSx8QyowrSdy6lgJ+k8zncO5Dltq+Ybc79oYr7Z
-	 zkjbTTsMojHhsu22tkNyBRpGCCPOPlfOYJ1zsy2G4mOv6C3j2zk5OEAxJn2NwjSvp9ySM
-	 iOa5/LpXJs6VPR74P2yipm/SgFWPMun6eB9Y3i4dZR71JVsikVi627HpXfusXdexhnqFu
-	 uXJeIZG1KuziauNQi63bZJ3GdesiDYga9O3iuXcVRb1linW0Q8rPlF5ZKPUZ1kk3hdyNX
-	 HxzRlcVt8RUW+iL3dQ7Ef2aHOIQfyn5LycqiXuaynu0lfEI9PLjukr1QS2XaSKRieCw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793082844;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:Organization:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Proofpoint-Spam-Info:X-Authority-Analysis:
+	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=ZtzWFSKtvsdQlpx1vNzzCA9A+CSSMDGzxEbgDk/QeEM=;
+	b=xhTfAicR4lGq00fV5UXCjVwMGQ8cIf3X6r2kSy/tVm2XFWiCytGL31qLcrFEUe+cnJ2M
+	 P0PAuxK7KtdIFOnc8iI3nviyr+rD/ukfw45loR1ZCuy8yVfkDZz+Ghkbw24vCEvFMNzVv
+	 iWvd38odhwQrBIkNKm53QISW3XGYyG32ePKvByc0zr8TFVvzulnwZJWIrhAGsuPSnZNM5
+	 cPVYoxm4s4fjefLNh9VhL9nm+x4t3KjbUNBWcfbxY3B4w4k2AK8Hqa+lUyoSbRRcGGZ2w
+	 rsD/elORrsGpBoY7ridf+XqkJ68SuMLF4u5a7+j0hSGPBEe2zJ3YKhZ2CK/IMb4VKSA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=loongson.cn;
-	spf=pass smtp.mailfrom=loongson.cn;
-	arc=none smtp.remote-ip=114.242.206.163
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35180606A31A;
-	Tue, 27 Oct 2026 03:59:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 35180606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.102])
-	by gateway (Coremail) with SMTP id _____8DxjdKxIeBqUbIZAA--.8827S3;
-	Tue, 27 Oct 2026 11:59:45 +0800 (CST)
-Received: from [127.0.0.1] (unknown [127.0.0.1])
-	by front1 (Coremail) with SMTP id qMiowJBxpMyrIeBqK40wAA--.9167S2;
-	Tue, 27 Oct 2026 11:59:42 +0800 (CST)
-Message-ID: <aa36b32b-5702-42e9-b27a-19dcf373b777@loongson.cn>
-Date: Tue, 27 Oct 2026 11:56:54 +0800
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=g5m6F+dr;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=Mm3BCJUM;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FDBE606A31E
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Oct 2026 06:34:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3FDBE606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=g5m6F+dr;
+	dkim=pass (2048-bit key, unprotected) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=Mm3BCJUM
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 69R5ZKuD1850635
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Oct 2026 06:34:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ZtzWFSKtvsdQlpx1vNzzCA9A+CSSMDGzxEbgDk/QeEM=; b=g5m6F+drEHQbgNHy
+	PdD/eoai3n3Zr7ZOTf5sb5iN1PqIXksIwhCzg3Xtya0lrXb19GZlI9NCAWnF1fyl
+	+id/BU9W+R6wI+DU1TKG6jPyLN4hT8hXezSFPvHnHDOarSjzJ3BgwaIA03spEyD6
+	bQlXNZomSGWrXBqzgprMSqfVqkgg/xYYuVG3AVuFNQoPH18AfAPUN706bNIsfYmG
+	lvhg005Lf9NLbMqvSWx3dKSr+pD67iQREJtf0eRjYygaC7PXWqE9IvckZYyJq3s9
+	q0pterFffdOCDi/onRvaZUAJtm3oNg2kys9UezdXJWV2b3Pwv2Cl5vQCPK03Ep1O
+	wJ34zA==
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hj4sf43yp-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Oct 2026 06:34:03 +0000 (GMT)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3abfcf726dcso5644781a91.2
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Oct 2026 23:34:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1793082842; x=1793687642; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:organization
+         :from:content-language:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=ZtzWFSKtvsdQlpx1vNzzCA9A+CSSMDGzxEbgDk/QeEM=;
+        b=Mm3BCJUMtzIz/7AEdB86oiDIG+ymZlln4Q+zgLFFa9nD/LPQJFfNf1FeByLYbv1cmm
+         hfQP3UHgiDQZ+G1RMVomfpkTMo0VcWPxpWKpJfrt0McTcHZp+v54Apjedv9ReU3sRtzd
+         VpuB6G5hNozt9Kkne6EO7zSN4kl8RkRGnQYDDdja0uMSxGwGxAei1TcFxoCAxWRR74TY
+         /ZUFSGXw3wCqzuXhSPEnj5QhEiyiC/BUAo8feNYrRBbYpxBM6a59JRYCjf+ojBIdbmZq
+         hWiMVHktZYOkwX1syED7E8lNunbPJtuD0fqIMgQ9AfmqUkkZdcLoCVrRYlwgjf5Ao8iB
+         zSSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793082842; x=1793687642;
+        h=content-transfer-encoding:content-type:in-reply-to:organization
+         :from:content-language:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=ZtzWFSKtvsdQlpx1vNzzCA9A+CSSMDGzxEbgDk/QeEM=;
+        b=hxpSg8o3GOChIJtO7P0W3utlF4vHQtNuRPUr+vxePFwOeV6Vr4YHaS+XSCps8bhZ9O
+         f1WwHIq/VkWuZuo/kkuR6tSUNRnhuSPNwUi2aLMD5TMm2yZ5hPpPO5PK7TQf6KJooIcU
+         0t60p9ngi46YbO8QP+WTGnqPza7BnWbdDJu4Hzovi+sxxh0hQC7XaVA1CwzpOyKdQN7Y
+         kYJnkFpmdfbY1SHNexIAK0M0lunU6zPvUE+uYTgobShnPJqmrMgfk6alPqTMUMQetl9k
+         8IdC/wjLLA50q4k8p2leUk00x+IoVYkzlmPfSWw93uFqE7+D3tNvxOrZdpDH5R/1QTDY
+         0s6w==
+X-Forwarded-Encrypted: i=1; AKwUvBxuAJs+ExmpTqgY8JzVNxphtBG+y8BEUA2Ztb53QJcmepUpNXweLPp/3Lzv1b7RYnwh19hd4LOQobREifI=@vger.kernel.org
+X-Gm-Message-State: AFq9FYLfztuh/rBXm/PFrEwQHti4Y09DmJHJH150ITQZ2C+1kNPef/eG
+	/6rpW1Yxh3mlUaSuv02V8VRPJVTUiUAB8m5fVrtmQZj4IqfnucxtqgqFTW8UQamw1mfDu021hHo
+	IY3f7GBfnofE9sI9DiVCqTAjj0pMvBhBUeCEO27PpLk9gY97LsrJtSLdpHV8s7uRnFXM=
+X-Gm-Gg: AYBFou01G1cnW0bl20KOTT1mkXLfac2wx3+5x3dKBLAne58WV2rE+5NR24APWM7/+Ac
+	eOHuJilXyytBdgiETe/zrRS0UyAe8+Bi3RVT6JCGe5tvKzYWf45AsaRsHTaWykMbnxh9GWq4lZn
+	JG+C5PdkFMPOKKzAH1J1wPU8rTFqKZLvuMmtgv2jyOKWCZuw9m4vwwmjbOzhBCW8qGwqOPGBDwf
+	hXM6N+HuCNUsFjCdp4ggdG2xXRUQwnbuvtvgtB2KR+RLTLtZQeRC7dkWr9iByo5jvp8NWC3BeoQ
+	mfnuav1OEkBancMinN4I+u+5IAs2/7D/38sYRlYBmqV/HWqDqddFv6OtpeMacHIV6RGh6rDLxdF
+	RVl2/X7vhZuR3nxCTKpGsDUNfnw==
+X-Received: by 2002:a17:90b:3803:b0:3ac:a204:aa27 with SMTP id 98e67ed59e1d1-3adeb101a2dmr7179863a91.66.1793082841940;
+        Mon, 26 Oct 2026 23:34:01 -0700 (PDT)
+X-Received: by 2002:a17:90b:3803:b0:3ac:a204:aa27 with SMTP id 98e67ed59e1d1-3adeb101a2dmr7179851a91.66.1793082841527;
+        Mon, 26 Oct 2026 23:34:01 -0700 (PDT)
+Received: from [10.218.26.96] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ae404274b2sm2238992a91.5.2026.10.26.23.33.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Oct 2026 23:34:01 -0700 (PDT)
+Message-ID: <236471c7-cf05-4019-a590-b803fc471484@oss.qualcomm.com>
+Date: Tue, 27 Oct 2026 12:03:55 +0530
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -46,195 +116,75 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 20/28] mfd: loongson-se: Stop controller and mask
- interrupts on teardown and shutdown
-To: Lee Jones <lee@kernel.org>
-Cc: Yinggang Gu <guyinggang@loongson.cn>, Huacai Chen
- <chenhuacai@kernel.org>, linux-crypto@vger.kernel.org, mfd@lists.linux.dev,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20261021121245.3111563-1-lee@kernel.org>
- <20261021121245.3111563-20-lee@kernel.org>
+Subject: Re: [PATCH 0/5] Add support for a TEE agnostic Inline Crypto Engine
+ service
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Abel Vesa <abelvesa@kernel.org>,
+        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+        Sumit Garg <sumit.garg@oss.qualcomm.com>,
+        Selvam Sathappan Periakaruppan <selvam.periakaruppan@oss.qualcomm.com>,
+        Basant Kumar <basantk@qti.qualcomm.com>, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20261021-ice-migrate-tee-svc-v1-0-b035be7aab0a@oss.qualcomm.com>
+ <20261024185602.GF2553@quark>
+ <b5cc804e-0f73-4ec9-88bf-ef6dd04eea83@oss.qualcomm.com>
+ <20261025171903.GA2212@quark>
 Content-Language: en-US
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-In-Reply-To: <20261021121245.3111563-20-lee@kernel.org>
+From: Harshal Dev <harshal.dev@oss.qualcomm.com>
+Organization: Qualcomm
+In-Reply-To: <20261025171903.GA2212@quark>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxpMyrIeBqK40wAA--.9167S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3XrW7uF4DWF48Gw4ftryxJFc_yoW7Wr48pF
-	4DAa4a9r4Yyr42kwsxXrZ09F1Y934ftry7CrZ7Ww4xCryDtw18Wry5KF18GFs3Cr4UXF48
-	XrW8GrZ5CF48uFgCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
-	14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCF04k20xvY0x0EwI
-	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j0sjUUUUUU=
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMDI3MDAyNSBTYWx0ZWRfX2g1oKmHEVPGg
+ +vLI1dYoqcpdX6yxP8Nkuogwuq+vNbBSg+FaghpaDGuVS/7JOXYqlYApjZRJQhhjA0h22RQIJkF
+ dSolgDWC7mkje2RgwR+5P4rzMXYA6xs=
+X-Authority-Analysis: v=2.4 cv=ZOdCCn7b c=1 sm=1 tr=0 ts=6ae045db cx=c_pps
+ a=UNFcQwm+pnOIJct1K4W+Mw==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=660iZSQnnn4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
+ a=_ITZaPDcee3h4uv5GAYA:9 a=QEXdDO2ut3YA:10 a=uKXjsCUrEbL0IQVhDsJ9:22
+X-Proofpoint-GUID: WFpSwnq_0brpohDgfeVo1Ucww5_74P6Q
+X-Proofpoint-ORIG-GUID: WFpSwnq_0brpohDgfeVo1Ucww5_74P6Q
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMDI3MDAyNSBTYWx0ZWRfXynrxbhXCXnOf
+ iK5Z/bIxmyiUi7JVkezw2SEmt1+pojen17E5/h62f9KbMZBV6hqepJxy/IdbTzvKAvwEaPD3ZiS
+ 0s3pl0gOHkLafbX8wj+L9GlzfneO90EGRWA9VKCVDtqm+R46+VkVzAEK8Uin7SxQJ0uzqQgM7m4
+ M62PHGtan0Q05SZdjtxoIgEWQdQzJIV3Ti+wiGNP3ueIswo6uhWTX69i8AKjxVMcE+01YYhnXRJ
+ DAtBM9/VbDSemIt+ZL60+iDc+igt5HpZXMcJ6yf/AFlulMqSxPxZdYiCmskjWYsRkK7HEDov90S
+ y9dMWuhz5gS4LTv3tLEDDcO9tqMZJWBll9BdtSF9k/ZQ7JFx2N4V9kQcVeP8E9cfSLQlqOu2Wn2
+ dVTlTJTmczqbN2S5CWFkJ+lnkSsSsoMs2cIWa8kGbqBLtxw90NKGgFiUI5RiAWlGVD3aSEIXtmV
+ JGqjLRiQVJZEc5+FhaQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-10-27_02,2026-10-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501
+ malwarescore=0 adultscore=0 spamscore=0 bulkscore=0 impostorscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2610190000
+ definitions=main-2610270025
 
-
-在 2026/10/21 20:09, Lee Jones 写道:
-> loongson_se_probe() enables hardware interrupts before registering IRQ
-> handlers and starts the controller via loongson_se_init(), but provides
-> no teardown or shutdown handler to stop the controller and mask
-> interrupts.  If probe fails after loongson_se_init(), if the driver is
-> unbound, or during a system reboot or kexec transition, the controller
-> remains active with DMA configured to memory that is reclaimed.
+On 25-10-2026 10:49 pm, Eric Biggers wrote:
+> On Sun, Oct 25, 2026 at 10:16:49PM +0530, Harshal Dev wrote:
+>> By moving the TEE call re-direction to a separate middleware we are ensuring
+>> that we only touch the 9-10 lines in the driver which depend on the TEE firmware.
+>> Merging this functionality in the ICE driver would substantially increases
+>> the total file size.
+> 
+> Again, it would be simpler to handle it directly in the existing
+> qcom_ice module.  Yes, there will then be more code in that module, but
+> then the new single-user middleware module wouldn't be needed.
 >
-> Clear pending interrupts before requesting IRQs, unmask interrupts only
-> after IRQ handlers are registered, clean up on failure inside
-> loongson_se_init(), register a devres action after loongson_se_init()
-> succeeds to issue SE_CMD_STOP and mask interrupts on teardown, and wire
-> up the platform driver .shutdown callback.
->
-> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip controller")
-> Closes: https://sashiko.dev/#/bug/linux-15511672-7569-4eac-96a0-c08581925710
-> Closes: https://sashiko.dev/#/bug/linux-e6ed8d33-d641-4969-a5ea-959f21ae3696
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Lee Jones <lee@kernel.org>
 
-Reviewed-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Sure Eric, I don't have any deep preferences here. I will move the middleware
+to the ICE driver itself.
 
-Thanks for fixing this!
+Ack.
 
-
-Best Regards,
-
-Qunqin.
-
-> ---
->  drivers/mfd/loongson-se.c       | 51 +++++++++++++++++++++++++++++----
->  include/linux/mfd/loongson-se.h |  1 +
->  2 files changed, 46 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-> index 10af13c3b7cc..bdbab4b91729 100644
-> --- a/drivers/mfd/loongson-se.c
-> +++ b/drivers/mfd/loongson-se.c
-> @@ -169,6 +169,23 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
->  	return IRQ_HANDLED;
->  }
->  
-> +static void loongson_se_stop(void *data)
-> +{
-> +	struct loongson_se *se = data;
-> +	struct loongson_se_controller_cmd cmd = {};
-> +
-> +	mutex_lock(&se->engine_init_lock);
-> +
-> +	cmd.command_id = SE_CMD_STOP;
-> +	loongson_se_send_controller_cmd(se, &cmd);
-> +
-> +	spin_lock_irq(&se->dev_lock);
-> +	writel(0, se->base + SE_S2LINT_EN);
-> +	spin_unlock_irq(&se->dev_lock);
-> +
-> +	mutex_unlock(&se->engine_init_lock);
-> +}
-> +
->  static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
->  {
->  	struct loongson_se_controller_cmd cmd = {};
-> @@ -176,15 +193,23 @@ static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
->  
->  	cmd.command_id = SE_CMD_START;
->  	err = loongson_se_send_controller_cmd(se, &cmd);
-> -	if (err)
-> +	if (err) {
-> +		writel(0, se->base + SE_S2LINT_EN);
->  		return err;
-> +	}
->  
->  	cmd.command_id = SE_CMD_SET_DMA;
->  	cmd.info[0] = lower_32_bits(addr);
->  	cmd.info[1] = upper_32_bits(addr);
->  	cmd.info[2] = size;
->  
-> -	return loongson_se_send_controller_cmd(se, &cmd);
-> +	err = loongson_se_send_controller_cmd(se, &cmd);
-> +	if (err) {
-> +		loongson_se_stop(se);
-> +		return err;
-> +	}
-> +
-> +	return 0;
->  }
->  
->  static const struct mfd_cell engines[] = {
-> @@ -192,6 +217,13 @@ static const struct mfd_cell engines[] = {
->  	{ .name = "tpm_loongson" },
->  };
->  
-> +static void loongson_se_shutdown(struct platform_device *pdev)
-> +{
-> +	struct loongson_se *se = platform_get_drvdata(pdev);
-> +
-> +	loongson_se_stop(se);
-> +}
-> +
->  static int loongson_se_probe(struct platform_device *pdev)
->  {
->  	struct device *dev = &pdev->dev;
-> @@ -225,12 +257,12 @@ static int loongson_se_probe(struct platform_device *pdev)
->  	if (IS_ERR(se->base))
->  		return PTR_ERR(se->base);
->  
-> -	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
-> -
->  	nr_irq = platform_irq_count(pdev);
->  	if (nr_irq <= 0)
->  		return -ENODEV;
->  
-> +	writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
-> +
->  	for (i = 0; i < nr_irq; i++) {
->  		irq = platform_get_irq(pdev, i);
->  		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
-> @@ -238,10 +270,16 @@ static int loongson_se_probe(struct platform_device *pdev)
->  			dev_err(dev, "failed to request IRQ: %d\n", irq);
->  	}
->  
-> +	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
-> +
->  	err = loongson_se_init(se, paddr, se->dmam_size);
->  	if (err)
->  		return err;
->  
-> +	err = devm_add_action_or_reset(dev, loongson_se_stop, se);
-> +	if (err)
-> +		return err;
-> +
->  	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
->  				    ARRAY_SIZE(engines), NULL, 0, NULL);
->  }
-> @@ -253,8 +291,9 @@ static const struct acpi_device_id loongson_se_acpi_match[] = {
->  MODULE_DEVICE_TABLE(acpi, loongson_se_acpi_match);
->  
->  static struct platform_driver loongson_se_driver = {
-> -	.probe   = loongson_se_probe,
-> -	.driver  = {
-> +	.probe    = loongson_se_probe,
-> +	.shutdown = loongson_se_shutdown,
-> +	.driver   = {
->  		.name  = "loongson-se",
->  		.acpi_match_table = loongson_se_acpi_match,
->  	},
-> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
-> index 2d0a8b1e5c9e..dbe5992bd435 100644
-> --- a/include/linux/mfd/loongson-se.h
-> +++ b/include/linux/mfd/loongson-se.h
-> @@ -11,6 +11,7 @@
->  #define SE_SEND_CMD_REG_LEN		0x8
->  /* Controller command ID */
->  #define SE_CMD_START			0x0
-> +#define SE_CMD_STOP			0x1
->  #define SE_CMD_SET_DMA			0x3
->  #define SE_CMD_SET_ENGINE_CMDBUF	0x4
->  
+Regards,
+Harshal 
+> - Eric
 
