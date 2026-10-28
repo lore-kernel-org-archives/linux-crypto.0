@@ -1,93 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.178
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793197609;
-	b=VeZeR2gZSOxXDmw6Kl9JeRn/Gqd6gvBpnXbQBJVUGrBhyfHJZThvppsotICmvkrMDBnb
-	 stYeEvrfO9sDbihIov6KBjsTGestn6ngj2MpqaMi18vFuECojLdk1zQpK9f7i3FpAXdLg
-	 rzajybDkt9VPpU7P0UukAoIuoXmL0ewZMewLcc1abSjVnAwmA5vToDr6XdvucspBODOza
-	 bMW5NkFePw0xraCz9EvYoyfZo5WriQ0llyAl9+HgDFpvgD8BC4ZesqglJ9uXncdhIGIEL
-	 3PpJgfkCm1ygQVJQIIKeIgcirdITcwMB3mtIzBfNOKeZtRjDgL9qWPMXILcv6abmjqg==
+	t=1793199071;
+	b=3XOivYT4dqMC7a83JEr02uO3Z21yyrgZUlWPbpFQynj9anHAtw9Il0GPRxZNSgWC+PQs
+	 IzGdC8+13M5uR6SBomfO53eHOhP2st8YzQBbWbOfhXUGTAvWTQgBLNZA+0rKet/uUmbwk
+	 rHKE3k0atE91752fCNt5XDUPxdlUNk0QM50LqJcqcFD2vQrRvuYbF+XSFXkTS9sA5l37W
+	 5Xxzph8qgM/5V04PYVZoVX2fFc3Oo3cUmnCcydm2Soh/ul/iK+dPl/szcvGM1DaE1cUyw
+	 w3aWOQDjqXWz529VKR4Yo7IN5dMgRQP0Vm22wUnWn/i30tS5VFkAdCBDHPUu71cEtcw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793197609;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=mAUpM9hp2JPWH7qVzCiMmZQ9MdNMzKuSufpGFP57zjI=;
-	b=IR4fQdjnJHTO8io1Tx0BEIP2YK/7g/LKFBWS1WKSsp0On9RQd2SYMBFDsaPzry1T5SZW
-	 dp99Mn5GbttJDIKGG+4T9bClQTDxs71HYrKI3UB/x2zzmTzcTV+6CwZvYg+0rWkst0L+U
-	 1oXefVDh43MJdCyelkgkq8xCrmOPrKJR3i0EmXzxagTXO7dDHD9eRWYLZ7hCd4HKgSmhx
-	 qGWTy/GFJyq7tAlygNyVma0CNRpzza6qs1ANxaYizYp0j91F4jPCIGgrWFEmoZ15aWuJ/
-	 hSPinfVD5s0NbLt0PgWMgv/d88VZkM7PLJ9i8JYK9LuBTk6MDYPQoh9wzaOjY5s17AQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793199071;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=ug43qQts6gDuZkuchi5FUzqrEwboOJCBBSHYXZMY/S4=;
+	b=xn3E7bSoUwMrgC+xYG7nkM69JnF5reEdvERgPQrV2GrcxoV35f9M8qpG29IwG17XCOV8
+	 bdWWm3mQvPZzayQY7Mqrz6lFUW3YoaprFZCAZSHULYOf05zyP0tYhJ/eP5EaB7vacrbln
+	 kfwpUXeaP2xjqAOf5eXNuE1Go1sN+Nsc42Nk1Bwut5Mov0HI6BqSJd0T1AQlvdarkEXKs
+	 /PWXuliCJpo0tyqXBtdb2a0pP2W0i1ruUHjW9S7kD5vmHGh/JYXBzUEXGF5RX35ZXDrq3
+	 +Cpb61P0CvXpRsjDLJIsN9V1se5FJsJ4OBnGIaPAHtPCGd8Nlg3C5V2DhOJYkNES11Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pdVan7rM;
-	arc=none smtp.remote-ip=74.125.82.178
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RMluKOLv;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17871606A329
-	for <linux-crypto@vger.kernel.org>; Wed, 28 Oct 2026 14:26:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 17871606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A23606A31E;
+	Wed, 28 Oct 2026 14:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pdVan7rM
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-36a1947498bso2990573eec.1
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Oct 2026 07:26:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793197608; x=1793802408; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mAUpM9hp2JPWH7qVzCiMmZQ9MdNMzKuSufpGFP57zjI=;
-        b=pdVan7rMDZM7NKWH+O5IGlX1yGDtitzpKHJQxhL4R8ucesVs9X8Xcb30l6Jc5MZLJk
-         GPjhbUTOJAjYFnyBmASUngPocuIpIqc+qR6vbklKDkpwAdrzSSllz3QXrmJpGRf7kIvO
-         /0YCqMMljVU9dCUO+41AAKOehtwZ1ApgNSz39cjVHuDwcaVTFk8R3npdvuuvw0yUKyY+
-         JyQzs23d53KMIVuHuUNr3unkc/qpAE0HwdNnOEGGeoCecqE+yDMCWTlGPx85xL2rtqZN
-         oZfsERiBkL0aXBcHa/Dd+q8MCzJtuzdR9QfsHe5+EiRw6yjBNCJLnsMKBc5Yn+lCvAW1
-         OYtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793197608; x=1793802408;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mAUpM9hp2JPWH7qVzCiMmZQ9MdNMzKuSufpGFP57zjI=;
-        b=ttGmDKIVjgCY519qDO+8mc4DPnwuX1FmW+BUEcxHFDKQVNn9ZrZF3iMqDhmgn7U7Al
-         CQP/FbFC9huDFnDkG3hZQFawYYb3rwDCrrgfo7BcQrVM9Pg34vZLXmcXXyX5CZ3Y7jTT
-         QKKgI6dBMhR2IoyCbkyeO4+i2Ir5an8Ey2RP8blIF+cikvmTI9+cS38W7/lIyVsN5hQc
-         sZwEvzEYzyzD7gQ4dXEZBXoex4TE7+t+laUgr1Z8pdJjY5psYO9g5ACGgjviHfT3QEAK
-         zPGoC8Mhyb9gNgS+dXGUVrLcIsabk3nMkSoDZfIHqRS1IHRKL4nXN1bUTIpUwsIbCHPS
-         Dmcw==
-X-Forwarded-Encrypted: i=1; AKwUvBzLPsySlCV2x1luc20DVAV5+S8nz5gne7AhrtLTiKg55aniVANYbt/gzkFA1R1CvWnNgql9cu1Jvl2vPgs=@vger.kernel.org
-X-Gm-Message-State: AFq9FYLoDmIn/iLvylJSUorn4iqGwf89W8/77lIGx7Uc0TYjW0nMczI4
-	S3aNpLV6xSUo0iPNYKSBXZcyYNM4t2F/7+AyxCR4c/Ot75ZK3F6H0f6z
-X-Gm-Gg: AYBFou3jzYUzSNVF+kqamiqUVZxsRpsYEmw2xNwT3xZ/z1h8hyYrYhhM8rLq8rxs9yL
-	LR/z5kg30SZGpfvuyCpqLy5Qiz5tWRHL65myJ1wHi/ZUEoyiE/khHyZVaFyW5sws54sKykzv6F6
-	9v6U/3RDAitRB4l/sX27arFnCbcMISFMVVQx0Hs2x0khew30buJHx4PtIXnP/sfl91ouaBgvnob
-	pjokCuE4Vxe3ALy0EWk/UvV5UIm/CWSfD9T/wK1vUnxyIUJeTFZE318E+CxiHhOCBP4NYb4R2XW
-	mwC41R8AEXpQoeq41xADrIynk5eLtg5C8fum9q0wa66+TKFkFnsq9ZBL1+weWt79PjY9/VJmSKf
-	OO+KRnrJ075eW6fhDp/50eyjA41KgI1tMxHkPA2F6AkSdMAkFOpcrmW/qB67vF8FQZU0Z6OElHq
-	ENuNIdEPGVVHJXtYXzNL8jm45vrY3+4CfuMIAHzAC38H7uhAmGGrQ3UFJoo6STA/a0Bef9+h332
-	JwEV3r5fZf8NmeTJFEdLN5EE+V8l0sGegzOMJI3C/dPp+idfLaKsvL/cTRtCAE1gWuNiRfd9Hbl
-	07tUfUQdHwXuZDTx/wFi6VTHawEcMer34rFEE54ngznCVjhhPAoc0X7XYDA419C6ary+fmA=
-X-Received: by 2002:a05:7300:f0ce:b0:35d:d9a9:e455 with SMTP id 5a478bee46e88-36a203f3c8bmr3950191eec.21.1793197607827;
-        Wed, 28 Oct 2026 07:26:47 -0700 (PDT)
-Received: from kernel ([223.181.214.113])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a2398fa4csm8689638eec.24.2026.10.28.07.26.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Oct 2026 07:26:47 -0700 (PDT)
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: ebiggers@kernel.org
-Cc: ardb@kernel.org,
-	Jason@zx2c4.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-Subject: [PATCH] lib/crypto: aes: use memzero_explicit() instead of memset()
-Date: Wed, 28 Oct 2026 19:56:36 +0530
-Message-ID: <20261028142636.5888-1-raizudeen.kerneldev@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RMluKOLv
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 465101F01828;
+	Wed, 28 Oct 2026 14:51:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793199070;
+	bh=ug43qQts6gDuZkuchi5FUzqrEwboOJCBBSHYXZMY/S4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=RMluKOLviz+Ct3J2Wy3Xk3+fpXHwBN8wkd2rTQFVpk8MDEY3An467I6G1waDkLfUb
+	 VkGRs+h2B24EJvrK0ySisYsWH+cQbnAUlxksG4EQRljv43zjUYjw8f6Z0XfSO38yxF
+	 xAFii0j6cA3Ug37MbkJTm67Xg6KVeH/0hfR8R1CIz58f/vGWi8QA9c1Ke67u+MODf2
+	 KJp32HqJMqsSJYYEQ3z2VpFioZ6wGVBHcdFfv0jaIQMZP6aMBO21RB68+MWDxFumal
+	 ZMPd0LXmnTCPjSOQoxliQAU0dTjzjSjKisolkDVK6y5wew9t3QxPGZmwXG0eNSd2VT
+	 BmQ23rn6E5RvQ==
+Message-ID: <76e47b43-2f00-4b29-bf2b-afb6fa0387d7@kernel.org>
+Date: Wed, 28 Oct 2026 15:51:04 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -97,43 +51,99 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 1/5] dt-bindings: crypto: add Rambus CryptoManager Hub
+To: aousherovitch@rambus.com,
+ Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>,
+ Joel Wittenauer <Joel.Wittenauer@cryptography.com>,
+ Thi Nguyen <thin@rambus.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+References: <20261026-cmh-b4-a-v7-v7-0-500a83faf500@rambus.com>
+ <20261026-cmh-b4-a-v7-v7-1-500a83faf500@rambus.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <20261026-cmh-b4-a-v7-v7-1-500a83faf500@rambus.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-aes_gcm_decrypt() and aes_ccm_decrypt() use plain memset() to wipe the
-output buffer when authentication fails. But the compiler can optimize
-that wipe away, so use memzero_explicit() instead of memset().
+On 26/10/2026 20:44, Alex Ousherovitch via B4 Relay wrote:
+> From: Alex Ousherovitch <aousherovitch@rambus.com>
+> 
+> Add device tree binding schema for the Rambus CryptoManager Hub (CMH)
+> hardware crypto accelerator.  The binding describes the parent
+> SoC-level node with its SIC register region and one queue@N child
+> node per mailbox the host owns, each carrying a reg (mailbox instance
+> index), an optional interrupt, VCQ ring geometry (rambus,num-slots /
+> rambus,slot-stride-bytes) and a rambus,cores affinity list.  Which
+> crypto cores are present is discovered from the SIC CORE_ENABLE
+> register at probe, not described in the device tree.
+> 
+> Register the 'rambus' vendor prefix for Rambus Inc.
+> 
+> Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+> Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+> Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
 
-This matches every other sensitive wipes in this file, which already
-uses memzero_explicit() for keystream blocks, tmp buffers, ctx
-teardowns.
+Why is this sent multiple times?
 
-Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+b4 diff '<20261026-cmh-b4-a-v7-v7-1-500a83faf500@rambus.com>'
+Looking up 20261026-cmh-b4-a-v7-v7-1-500a83faf500@rambus.com
+Checking for older revisions
+Grabbing search results from lore.kernel.org
 ---
- lib/crypto/aes.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Analyzing 8 messages in the thread
+Could not find lower series to compare against.
 
-diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-index e1c191551736..7814ef525239 100644
---- a/lib/crypto/aes.c
-+++ b/lib/crypto/aes.c
-@@ -1733,7 +1733,7 @@ int aes_gcm_decrypt(u8 *dst, const u8 *src, size_t data_len, const u8 *authtag,
- 		 * Clear the inauthentic decrypted data so that callers won't
- 		 * receive it even if they fail to correctly handle errors.
- 		 */
--		memset(dst, 0, data_len);
-+		memzero_explicit(dst, data_len);
- 	}
- 	return err;
- }
-@@ -2074,7 +2074,7 @@ int aes_ccm_decrypt(u8 *dst, const u8 *src, size_t data_len, const u8 *authtag,
- 		 * Clear the inauthentic decrypted data so that callers won't
- 		 * receive it even if they fail to correctly handle errors.
- 		 */
--		memset(dst, 0, data_len);
-+		memzero_explicit(dst, data_len);
- 	}
- 	return err;
- }
--- 
-2.53.0
+And both variants are present in Patchwork, so not sure what you want us
+to do here.
 
+Best regards,
+Krzysztof
