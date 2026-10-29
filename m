@@ -1,57 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793243161;
-	b=CPFlW2mcGezUg29eqUlPNwljLK60oMDGiTRipYOC+vFcGQ8+1pUuIemeW3pHvPdOEFJ1
-	 BnIiw4bk2p6ubnFb6Y813sLAXnbJVU+rbWSJD1vCU1oCyP27VaXnPaOiWRHpcEgRBiMHb
-	 K46mXC8KjO5+IGk39GGuLGcPqL79OkspESV/wyu3f52rMpJ/cLjDw7cuENOHiDKvkuZKl
-	 xCWto9CTVIx9/1S/zUdHK+NmhccPWXE+wo60sbK4pGrT139Bh8Zfr1nzJz4234SXTHj/c
-	 hPxltF7yTYPmXWkKG6y9VvBzcymP5fZLEk7p9nC9NUX0IV9GqLoklM5dN0pW7g27QBw==
+	t=1793243162;
+	b=vlXcOo2eUp6J8G4r167w8XGHXuqkSj0iONWzopkdQ/FP2xGsQrvVuv9aBmKP6Oj8JGwU
+	 22BDEUpUt/TCI1PTdZSOJka0M/vgqj9Hm7qOWXoTBduwuSaGuUdw5JUMlyO/0sgcOKp7f
+	 g+FrDJLb9qRqKfyIlnnyi3HzL2v9zUjZS+hidjwF54Y2xfAolQiISg4QrySq7IjtkcBWa
+	 hQvfCocBvQMIC2Htq9nHaCGrTR5ULVpe1nZpiiH+/Q41/Hh4rhf1QzM3lLYSCm9DFwHtL
+	 z7CGxWF04lPhKofZIEX62xC8UG5w53iA7eLtACdf7/wH1efSs8dBD8F8TD6kMHFgMwg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793243161;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793243162;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=eBnn/OUg7PxXvo8p3nJ/SroKfFD1H0Hr92Nww3NdOjM=;
-	b=IlgdSRZ470NIlOUxKcLGJmnDavR/YEgKgls+rHZ88VCKuEQjV3Q0UbOQa0PFdDVGRPQc
-	 5FtXihPjQkX9OAql0xBejAYycBqruSS3TIYyM0CdbjcfYZ0mbjrzMoL8VqxmQa0iaFy3c
-	 bH7Kymhwjd98+kQTBxrQ4GvRcgE5TfmfgUP6mTd3fasdYVXqo9H5AUZbPD7zBPErLHnkL
-	 3HTr0bimY8OGrWjeF64mfE8c6165ibcf0Mo92LKLffkwvOaJhc7VKKVILI5bDxoYTpoxS
-	 yOj+ouQn2m/PHgAWgvFLEhfefQARGVfYLDjpoas+dmXkKmC9JsS6U0i4aXsd+Q5CkdA==
+	bh=ggG4r95jRpXsMfothCtjRrBypmbpmfyn2VhHQxaSWzg=;
+	b=YMZ2cTvv6Gam3GV8kbcvlxy715lnU7Z8Gs8t0ZE20t0TtBMmkfaKldZO5mIfqtYyX2j5
+	 zEJGt+EbcHxzcPBqMO5IAGwfPJ+GRxMIA2lqRyTuM/0aTZO2EJnsHi1gZmKMW1yq8QPlm
+	 ydpN22IJ3gsQzcMJKm7TkMQrKR1CiJeasmsenD2yPQdKJA70ffsC50oPXRmTZESFOPlq9
+	 64f2dTvvNGlY0VFixbXLU/gGn6Gc5b0CboJ3DKKUGWlbMg6bvVeHADKrelxUIqUZz4ZS2
+	 4/13Kknkstza0Op0sNc1vm4OlCoUc1F+sf4gyPJYDqIi0a7BZLOYf7eSFy3WVKMCb2Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B1v3ooI7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y7lp57MK;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CA8606A31A
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 03:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74ECC606A31A
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 03:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B1v3ooI7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D8141F01825;
-	Thu, 29 Oct 2026 03:06:00 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y7lp57MK
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 736571F01828;
+	Thu, 29 Oct 2026 03:06:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793243160;
-	bh=eBnn/OUg7PxXvo8p3nJ/SroKfFD1H0Hr92Nww3NdOjM=;
+	s=k20260515; t=1793243162;
+	bh=ggG4r95jRpXsMfothCtjRrBypmbpmfyn2VhHQxaSWzg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=B1v3ooI7lpqk6Men20s5ikVdhaQOBtMk3DcYDpo1whk+KkTP3E6j+lRTgzxXS2eAC
-	 k0WMhkatNRdifPO2fA8vfanB4te8HhYIK2SkYgcM+i8MoeJiyQqCAlwPyfJ6R9eitt
-	 XJOl1m4HfKsdG9f7r9JrzuFRlTpjlpogx1xwBYQyHWobyob+EOTV4v1Ny7wtbIemkS
-	 +OFP/wU4POmBxBK7OhO7J3GTDl/vTbCmVOw2tQEC+q47TwZToOe7cmuE05a4sIz9Dw
-	 HCxWzcsuhPZL4wGRWyAdjyxiH/Fww6nne+H3+zm92JHSgs7WzX+NXex7i5hk/Scm1H
-	 HnrG3ZT/IIUJw==
-Message-ID: <sashiko-outbox-188655@kernel.org>
+	b=Y7lp57MKZLMxO3H+K4fbVfkqtVUqRlQTdj/Of3/59DVjyHO0+juWpvLT7mymEUhQ7
+	 L4bnB00pgB6xGFa2J0jjNEzfRxlky7YY49UfJdOIkzOmYrYMmxHdvOl5YiFszCGM8l
+	 HzURJ4lvae41Ov5iaPE9CZOQDTe5dD/s6F3NrNVZ1PCkxeG2cwjf/uU7DS+Fiu8K5G
+	 og21V/CXNibuCXCwMPJtNBlMRTeWJAkreDRofu39yMF6JBxp2ybTuG0bc7Ag/GrCWE
+	 548nNOptaYOo3O/kfOQ1M1fzok4ImkU+oO3rSpTcf90ohUEI/VGgxwV/2e2aTY3h13
+	 Ru9Z0zFP0t51w==
+Message-ID: <sashiko-outbox-188656@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 3/8] crypto: acomp - Add trivial segmentation
- wrapper.
+Subject: Re: [PATCH v2 4/8] crypto: acomp - Add API to get a compression
+ algorithm's batch-size.
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>, hannes@cmpxchg.org, yosry@kernel.org, nphamcs@gmail.com, chengming.zhou@linux.dev, akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, davem@davemloft.net, linux-crypto@vger.kernel.org
 Cc: rientjes@google.com, willy@infradead.org, senozhatsky@chromium.org
-In-Reply-To: <20261028030503.17923-4-kanchanapsridhar2026@gmail.com>
+In-Reply-To: <20261028030503.17923-5-kanchanapsridhar2026@gmail.com>
 References: <20261028030503.17923-1-kanchanapsridhar2026@gmail.com>
- <20261028030503.17923-4-kanchanapsridhar2026@gmail.com>
+ <20261028030503.17923-5-kanchanapsridhar2026@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 29 Oct 2026 03:05:59 +0000
+Date: Thu, 29 Oct 2026 03:06:01 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,131 +61,83 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Critical] crypto: acomp - missing async check in crypto_acomp_compress()=
- fast path
-- [High] crypto: acomp: uninitialized state->src/dst restore in acomp_reqch=
-ain_virt()
+- [Medium] crypto: acomp: broken type check and async gate in crypto_acomp_=
+batch_size()
 --
 
-commit 7144b07b2cc5b6704699fb53fac44c4270d31f7b
+commit a38b95e87019ff2c11b51ebf159a082ec340456f
 Author: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
 
-crypto: acomp - Add trivial segmentation wrapper.
+crypto: acomp - Add API to get a compression algorithm's batch-size.
 
-This commit adds a single-segment compression wrapper in crypto/acompress.c
-that stores the compressed length or error code into req->dst->length when
-req->unit_size is set on transforms that do not support segmentation. It al=
-so
-adds an inline fast path in crypto_acomp_compress() for single-segment
-scatterlist requests.
+This commit adds a batch_size member to struct acomp_alg and introduces
+crypto_acomp_batch_size() so callers such as zswap can query the maximum
+number of requests an acomp algorithm can process in a batch.
 
 > diff --git a/crypto/acompress.c b/crypto/acompress.c
-> index c8b4b8589769e..c55b0e8eff3d8 100644
+> index c55b0e8eff3d8..8e285cb7477e9 100644
 > --- a/crypto/acompress.c
 > +++ b/crypto/acompress.c
-> @@ -166,14 +166,20 @@ static void acomp_save_req(struct acomp_req *req, c=
-rypto_completion_t cplt)
+> @@ -326,6 +326,20 @@ int crypto_acomp_decompress(struct acomp_req *req)
+>  }
+>  EXPORT_SYMBOL_GPL(crypto_acomp_decompress);
 > =20
->  	state->compl =3D req->base.complete;
->  	state->data =3D req->base.data;
-> +	state->unit_size =3D req->unit_size;
-> +	state->flags =3D req->base.flags & (CRYPTO_ACOMP_REQ_SRC_VIRT |
-> +					  CRYPTO_ACOMP_REQ_DST_VIRT);
-
-[Severity: High]
-Can moving the state->flags assignment from acomp_virt_to_sg() into
-acomp_save_req() corrupt req->svirt and req->dvirt when a request is
-configured with acomp_request_set_src_nondma() or
-acomp_request_set_dst_nondma()?
-
-When a caller sets up a non-dma virtual request via
-acomp_request_set_src_nondma() or acomp_request_set_dst_nondma(), both the
-non-dma and virtual request flags are set in req->base.flags. When
-crypto_acomp_compress() or crypto_acomp_decompress() calls
-acomp_do_req_chain(), the call chain is:
-
-crypto_acomp_compress()
-  acomp_do_req_chain()
-    acomp_save_req()
-      state->flags =3D req->base.flags & (CRYPTO_ACOMP_REQ_SRC_VIRT |
-                                        CRYPTO_ACOMP_REQ_DST_VIRT);
-    acomp_do_one_req()
-      if (acomp_request_isnondma(req))
-          return acomp_do_nondma(req, comp);
-
-Because acomp_do_one_req() returns early through acomp_do_nondma() without
-calling acomp_virt_to_sg(), state->src and state->dst are never initialized
-from req->svirt and req->dvirt.
-
-When acomp_reqchain_finish() then calls acomp_reqchain_virt() in
-crypto/acompress.c:
-
-static void acomp_reqchain_virt(struct acomp_req *req)
-{
-	struct acomp_req_chain *state =3D &req->chain;
-	unsigned int slen =3D req->slen;
-	unsigned int dlen =3D req->dlen;
-
-	if (state->flags & CRYPTO_ACOMP_REQ_SRC_VIRT)
-		acomp_request_set_src_dma(req, state->src, slen);
-	if (state->flags & CRYPTO_ACOMP_REQ_DST_VIRT)
-		acomp_request_set_dst_dma(req, state->dst, dlen);
-}
-
-won't acomp_reqchain_virt() see the virtual flags set in state->flags and
-overwrite req->svirt and req->dvirt with the uninitialized state->src and
-state->dst pointers (while also clearing the non-dma flags), causing a null
-or wild pointer dereference if acomp_reqchain_finish() then writes to
-req->dst->length when req->unit_size is non-zero?
-
-[ ... ]
-
-> @@ -279,10 +289,27 @@ int crypto_acomp_compress(struct acomp_req *req)
->  {
->  	struct crypto_acomp *tfm =3D crypto_acomp_reqtfm(req);
-> =20
-> +	if (likely((req->unit_size =3D=3D req->slen) && acomp_request_issg(req)=
- &&
-> +		    !crypto_acomp_req_seg(tfm) && !acomp_req_on_stack(req))) {
-> +		int err =3D tfm->compress(req);
+> +unsigned int crypto_acomp_batch_size(struct crypto_acomp *tfm)
+> +{
+> +	if (acomp_is_async(tfm) &&
+> +		(crypto_comp_alg_common(tfm)->base.cra_flags & CRYPTO_ALG_TYPE_ACOMPRE=
+SS)) {
+> +		struct acomp_alg *alg =3D crypto_acomp_alg(tfm);
 > +
-> +		req->dst->length =3D unlikely(err) ? err : req->dlen;
-> +		return err;
+> +		if (alg && alg->batch_size > 1)
+> +			return alg->batch_size;
 > +	}
 
-[Severity: Critical]
-Should this fast path in crypto_acomp_compress() in crypto/acompress.c check
-!acomp_is_async(tfm) instead of !acomp_req_on_stack(req)?
+[Severity: Medium]
+Does the cra_flags check in crypto_acomp_batch_size() distinguish
+struct acomp_alg from struct scomp_alg as intended?
 
-Callers using asynchronous hardware compression transforms (where
-acomp_is_async(tfm) is true, such as qat, hisi_zip, or iaa in async mode)
-allocate requests on the heap with acomp_request_alloc(), so
-!acomp_req_on_stack(req) is true for asynchronous requests.
+In include/linux/crypto.h, algorithm types are 4-bit values under
+CRYPTO_ALG_TYPE_MASK rather than single-bit flags:
 
-When zswap_compress() submits a single-segment scatterlist request with
-req->unit_size =3D=3D req->slen to an asynchronous transform that does not
-support segmentation, this fast path will be taken instead of
-acomp_do_req_chain(req, true):
+    #define CRYPTO_ALG_TYPE_MASK		0x0000000f
+    ...
+    #define CRYPTO_ALG_TYPE_ACOMPRESS	0x0000000a
+    #define CRYPTO_ALG_TYPE_SCOMPRESS	0x0000000b
 
-crypto/acompress.c:crypto_acomp_compress() {
-	if (likely((req->unit_size =3D=3D req->slen) && acomp_request_issg(req) &&
-		    !crypto_acomp_req_seg(tfm) && !acomp_req_on_stack(req))) {
-		int err =3D tfm->compress(req);
+Because (0x0b & 0x0a) =3D=3D 0x0a, testing cra_flags & CRYPTO_ALG_TYPE_ACOM=
+PRESS
+without masking by CRYPTO_ALG_TYPE_MASK evaluates to true for both
+CRYPTO_ALG_TYPE_ACOMPRESS and CRYPTO_ALG_TYPE_SCOMPRESS.
 
-		req->dst->length =3D unlikely(err) ? err : req->dlen;
-		return err;
-	}
-}
+A struct crypto_acomp *tfm allocated via crypto_alloc_acomp() can wrap eith=
+er
+a struct acomp_alg or a struct scomp_alg. If an scomp_alg has CRYPTO_ALG_AS=
+YNC
+set in cra_flags (or if the acomp_is_async(tfm) check is removed), calling
+crypto_acomp_alg(tfm) performs container_of() to struct acomp_alg on a
+struct scomp_alg and reads alg->batch_size from unrelated memory inside
+struct scomp_alg::streams.
 
-When tfm->compress(req) submits the descriptor to hardware and returns an
-in-progress or busy status, won't this immediately overwrite req->dst->leng=
-th
-with the negative error value while hardware dma is still in flight on
-req->dst, and skip registering acomp_reqchain_done() via acomp_save_req() so
-that req->dst->length is never updated to req->dlen upon async completion?
+Elsewhere in crypto/acompress.c, such as in crypto_acomp_init_tfm():
+
+    if (tfm->__crt_alg->cra_type !=3D &crypto_acomp_type)
+        return crypto_init_scomp_ops_async(tfm);
+
+the code checks cra_type =3D=3D &crypto_acomp_type (or masks cra_flags with
+CRYPTO_ALG_TYPE_MASK before comparing against CRYPTO_ALG_TYPE_ACOMPRESS) to
+verify that the tfm is backed by a struct acomp_alg.
+
+Also, should crypto_acomp_batch_size() gate on acomp_is_async(tfm)? A
+synchronous struct acomp_alg registered via crypto_register_acomp() does not
+set CRYPTO_ALG_ASYNC, which causes crypto_acomp_batch_size() to always retu=
+rn 1
+even when batch_size > 1, whereas segmented request handling in
+crypto_acomp_compress() and acomp_do_req_chain() checks
+crypto_acomp_req_seg(tfm) (CRYPTO_ALG_REQ_SEG) instead.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261028030503.1792=
-3-1-kanchanapsridhar2026@gmail.com?part=3D3
+3-1-kanchanapsridhar2026@gmail.com?part=3D4
