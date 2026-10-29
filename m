@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.72
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.70
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793281840;
-	b=zxi45WIxdNniXFcJ2/CHRN0A4CwjgMINqEaK3qjiDu9LIE2PYAT6gZobcO/UXM02rALC
-	 hMEYK0etTm6PFpXqCay0G0MsgK73XFml8V/IrlEI/gHPfdjW5RYulMKU/z0FSKBIxCakd
-	 /xX6C0yoz0hl92CTWT1HGCdaMY/ctSWJcVlX7i46NH8TS71A0K2V3Zair6q21hdiOf7b9
-	 /ARSSDxeBP5CdugyMkLnsuGja5tUrnwmJYo+Iui/Ae5jlGc9KxtqBvjLdTbEkJ7PZ7H4u
-	 WOrnzd32E+zelDMpd6+zbOKZj6p6thsG0M1pDNJVMo+xzxcQVeZ01BBJ5YVV2PicLxw==
+	t=1793281841;
+	b=tvMBKzBZ4fBxk629jG3v28SqyOms9h4W+mlKbBULwnEDYKBcwxqyksn0VR7WRXzeRdbf
+	 P56Gc4T2KhWDs87zh0q99JrICWTXNmeySRtYRfBXLqFFwvFacnrAAWe4NVvY03WAilEXS
+	 kn+QIcq/tIaG5twiil0DplmDIhUGm+ogd1nj/MEpnBxbu46eMVIW2qWjXbpuqiBG9GVWT
+	 Dc5wCZUWHiq4Gs4Xg0Gpycyig4kQbeMAbCWf+WFmPmDqCRd5GNsZyArdo0Rs8YZLBv3O/
+	 sPcFX4EYurKHhBhWabjOwcGzUwaWiDlOV7hRA/h9XXaKiPO0BdmygPGxogBm4uHTfmg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793281840;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793281841;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=rHmC9nnHSs/HBIYFqAJimZ70eQd4OJw7JCv9j7P9OZ4=;
-	b=kfs/YL0fUtacFnbdq9js9BhRUTXmA4EVK8OAj3otuTONd6UjOvh60s7a/tqIC+SRFZGJ
-	 Kv13RlWz0Bofmg+ygop3zb2DHzDfK7fIBYoKIZau/vWoirkzHn0WUaVkov2sVGD1mEXu8
-	 EWrg6o41cY04kJWeRaTtV68qF4KWFcFPl8Ka7S0GYamxoWsSntdY3kbAf60d1KmgjPOD4
-	 yazny+JFPcRGomY6eWtj6HSS0sa04pWjCaoSo/roEX29R8vn5ePBIWC3azEvE+u6LOKy4
-	 nQ32bUGYlGvJNlNLPLypCvnOQvnin4nlfkI01nObmmTuKoIuWV2okcSoFccHMgbq8ww==
+	bh=exWtIBRZ56EySSgogA875Ex4m63J1/CXAzQ1NHtAG7s=;
+	b=oDaq271f93zkEc8Cfuh4oazIPnC4h82miSB8ycC35+e70qVGmGajMl/WAWv8bNs6442a
+	 LhWi393axydgkCA3PvUeaXBHBl2LOZA6rPgVuHAMlebGIxrW8vBdQuJbar6NKYSVGZa7d
+	 HRk9p/Ws0QmvX9hdY5Jl4oPZS9kmBYtRB8vTJIZ2v8XY8cqiUE0wITb7xq61wtgzjZTpc
+	 53YBLRGbfSP0GkMnFvM+74cezC3ytTPBjce6bDABZTTpWAebshSxKrvNKDx1ktrZh3SV6
+	 CosobJMhSPsq+2oj+PP0VGJssh20LrEpmxaVgdwog7l9a6EaCr4zXXDb412d9jCtmkQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--ardb.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=pye7StVF;
-	arc=none smtp.remote-ip=209.85.128.72
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Lu5TxXdQ;
+	arc=none smtp.remote-ip=209.85.128.70
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5C460A2619
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 13:50:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4C5C460A2619
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7819A60A2623
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 13:50:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7819A60A2623
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=pye7StVF
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4a1d1f26a63so18910055e9.1
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 06:50:40 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Lu5TxXdQ
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a17741243eso15682515e9.0
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 06:50:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793281839; x=1793886639; darn=vger.kernel.org;
+        d=google.com; s=20260707; t=1793281840; x=1793886640; darn=vger.kernel.org;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=rHmC9nnHSs/HBIYFqAJimZ70eQd4OJw7JCv9j7P9OZ4=;
-        b=pye7StVFKtRSkDKooVu6T0zv1CXbTCcB1Ru2v0/T9uZ52RN6jiqnXmmJHFdxoMUjDW
-         bk6Zvfhf9r11Y6V3eWWClkLZ8WG3TEZLu/DF0/lUnkvASEiyXZeulv8C86il9/yNaJeG
-         LNl/+7fS6JKbKDOEgWCA8F7oD0YNdQY8KX0jqPP4G5QlzwDnuFHfqaxTmWDUZ340yLI5
-         3Ea2CUUO9syqqfS0z/p3BDwiDuPybOrZlIYQfIksS5jloXtUPwm04ChpE1b5j9JKAESD
-         xNAYB0pYKdGugETh9GXghEq37MzZhFGEMWdvH/cCN5iBFGheiXiwbB/zLvYZZlUoVBBs
-         XJjw==
+        bh=exWtIBRZ56EySSgogA875Ex4m63J1/CXAzQ1NHtAG7s=;
+        b=Lu5TxXdQ8bJxkxwIkFPt/7A7+cY1pSTP03qpBeulydbqj0z6Gh4/VvUzI5fGlMyZQS
+         o160QygY/3dCMt9UTQOQxE2wxAxgjD1MSXP8D6d0QSvq9j5gH7MHR5hX8KSsf2B2Vx4w
+         6RShPfRWF+rvbqjEm2ES6f6tqVa1QtcPpgcFwZGhb8Qrhrs8s7gfBQvELy7gX4fNDPfd
+         1I/E4yyxscX27/IGzX4TUr0xCtr8oxX7qB1YbPuRUrIjYKnAKp0BcdBXkktQeDdhRKnA
+         v+clKdtb5tddxzxR9mo0uXJU72U1pyh/Ve+tlhN0blh6VjktEWPnvzo/BcXjlZTPpA36
+         HcyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793281839; x=1793886639;
+        d=1e100.net; s=20260707; t=1793281840; x=1793886640;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=rHmC9nnHSs/HBIYFqAJimZ70eQd4OJw7JCv9j7P9OZ4=;
-        b=nG+N0kDx59hH9rM8tN78jV3yXbSZ+kSvLYCwVbLYEkPD5KLz3EWN0eg5uz/nM5Hhi3
-         RCsMyDk88Zj4yVhysvGgXKeqatnxQwRJjmdS3WAEggOdBAWQWQZDXA1eQvyKKiaO1vi0
-         NGRZ924AWOmyKqTN5UjjIdCtt2vrUGuOUxudWZu/Bdc4zF6oh9Eo/TIDtTcZeQmYXUFh
-         KFkVGubLr+DtAbu+rzM+dd3LkK/e4an+824o8seijfK9dmTc66U00KntSOMRWf3S/ygD
-         F0wvmkanJ2AlBFC9/tmb4G+7XsQ88H5ay6fD5iRBofvvIitSGMB7pWPw+zZVwXsyMPTK
-         EyUA==
-X-Forwarded-Encrypted: i=1; AKwUvByasO28N9jomAnaLI3E/bROhGUoy2sbIlvstzASWF/k8xqurdb+Kisu89GdAVVtKg88RLMJynMKVKrbGes=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJCr+uLpydm4HH6S4OYTJReSW8eP1Qc7X6YOSVS4yJVz1EzUwxf
-	eHy6NYC0IGj8NPwFdnlwjqcnc0LvaRV5xY8pSd4Tv2xJZPmAtOhkjd85oIj8Kn9dp3wDi4d2BQ=
+        bh=exWtIBRZ56EySSgogA875Ex4m63J1/CXAzQ1NHtAG7s=;
+        b=qkl7Jnwdqrfick3qaXf9ayGSrTJJ8r/FoRob3eX3Gaxc6e+YcCEqbDYxr5pEv03gZo
+         bN834GRIUSEamFwaeXFhr1Iv7eq54ogp6f8EYmE3774ibPIWFu1WtunHfiBSszAN2x09
+         e1zZCMwb/I2Ok8Vn4qMfhUQqFMxK+Hp3vnn4El6ddcWdRVoH0YNhN5QWVTBQV4xI+h8B
+         5FMOHiHmbNkFm4Xqk1FE8MUolT1bB9J7WiLIRU+kox8U8lOEMdXi3DPgDQ2Rq6qzqAm9
+         AaxU6AyrwipWz38KGs6qFM0iIVePTknFXBW+YcrT2QVC1dDqES6abGHp0E88GKPPVD6q
+         gPxA==
+X-Forwarded-Encrypted: i=1; AKwUvBzTQkKv8Z1SAiKEfrFXX9To8XyqCaypYNDNvAjrNUlY2uM+x338cWxCXdVFPxBQHVW1bVpSXAvq8J4SCPg=@vger.kernel.org
+X-Gm-Message-State: AFq9FYK6H8n79mBULbGnvbiGTj9ColK3568haqm5mFKiZmIUwxo70o0A
+	g1FQ0qhPmrsJxn08c5KHj49SxJ8n7XGeNJp/cVENnAEQ+vmV5PeCW3UC/7tojyct9F9U5ITFzA=
 	=
-X-Received: from wmbdx18.prod.google.com ([2002:a05:600c:63d2:b0:4a7:a5bc:d876])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:8183:b0:4a4:fc8c:cfd9
- with SMTP id 5b1f17b1804b1-4a96710c712mr106879715e9.25.1793281838064; Thu, 29
- Oct 2026 06:50:38 -0700 (PDT)
-Date: Thu, 29 Oct 2026 14:50:23 +0100
+X-Received: from wman14.prod.google.com ([2002:a05:600c:6c4e:b0:4a1:bec2:1cfe])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4454:b0:4a3:2f35:38b6
+ with SMTP id 5b1f17b1804b1-4a967017cf8mr130515735e9.24.1793281839636; Thu, 29
+ Oct 2026 06:50:39 -0700 (PDT)
+Date: Thu, 29 Oct 2026 14:50:24 +0100
 In-Reply-To: <20261029135020.272082-6-ardb+git@google.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -81,8 +81,8 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261029135020.272082-6-ardb+git@google.com>
 X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
-Message-ID: <20261029135020.272082-9-ardb+git@google.com>
-Subject: [PATCH 3/4] arm64: Drop stdint.h type overrides from asm/neon-intrinsics.h
+Message-ID: <20261029135020.272082-10-ardb+git@google.com>
+Subject: [PATCH 4/4] ARM: Drop stdint.h type overrides from asm/neon-intrinsics.h
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-crypto@vger.kernel.org
@@ -93,64 +93,93 @@ Content-Type: text/plain; charset="UTF-8"
 From: Ard Biesheuvel <ardb@kernel.org>
 
 None of the users of NEON intrinsics include <linux/types.h> anymore,
-and so there is no longer a need to override __INT64_TYPE__ and
-__UINT64_TYPE__ in order to make the definitions of int64_t and uint64_t
-provided by the compiler's freestanding <stdint.h> compatible with the
-kernel's. So drop the overrides.
+and so there is no longer a need to override the compiler's predefined
+macros that are used to define the C99 [u]int32_t and [u]intptr_t types
+in order to make them compatible with the kernel's definitions. So drop
+the overrides from asm/neon-intrinsics.h.
 
-This also means that uint64_t now matches the type that Clang uses for
-64-bit quantities in the prototypes of its NEON builtins, and so the
--Wincompatible-pointer-types warnings that are currently being disabled
-for all NEON intrinsics code will no longer occur. So drop the pragma
-that disables them as well.
+Update the documentation accordingly.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/include/asm/neon-intrinsics.h | 24 ++++----------------
- 1 file changed, 5 insertions(+), 19 deletions(-)
+ Documentation/arch/arm/kernel_mode_neon.rst | 10 +++--
+ arch/arm/include/asm/neon-intrinsics.h      | 43 +++-----------------
+ 2 files changed, 12 insertions(+), 41 deletions(-)
 
-diff --git a/arch/arm64/include/asm/neon-intrinsics.h b/arch/arm64/include/asm/neon-intrinsics.h
-index 5f13505d39fc..43cdf4d16170 100644
---- a/arch/arm64/include/asm/neon-intrinsics.h
-+++ b/arch/arm64/include/asm/neon-intrinsics.h
-@@ -6,23 +6,13 @@
- #ifndef __ASM_NEON_INTRINSICS_H
- #define __ASM_NEON_INTRINSICS_H
+diff --git a/Documentation/arch/arm/kernel_mode_neon.rst b/Documentation/arch/arm/kernel_mode_neon.rst
+index 1efb6d35b7bd..73331f17b2c0 100644
+--- a/Documentation/arch/arm/kernel_mode_neon.rst
++++ b/Documentation/arch/arm/kernel_mode_neon.rst
+@@ -121,6 +121,10 @@ observe the following in addition to the rules above:
+ * Compile the unit containing the NEON intrinsics with '-ffreestanding' so GCC
+   uses its builtin version of <stdint.h> (this is a C99 header which the kernel
+   does not supply);
+-* Do not include <arm_neon.h> directly: instead, include <asm/neon-intrinsics.h>,
+-  which tweaks some macro definitions so that system headers can be included
+-  safely.
++* Do not include <arm_neon.h> directly: instead, include <asm/neon-intrinsics.h>;
++* Do not include <linux/types.h>, or any other kernel header that includes it,
++  into the same compilation unit: some of the C99 types it defines (e.g.,
++  intptr_t) are incompatible with the ones defined by <stdint.h>. The kernel's
++  own u8, u16, u32 and u64 types are provided by <asm/neon-intrinsics.h>, and
++  can be used safely in the prototypes of functions that are called from code
++  that does include <linux/types.h>.
+diff --git a/arch/arm/include/asm/neon-intrinsics.h b/arch/arm/include/asm/neon-intrinsics.h
+index 8b80c05ce1d7..449f6556ac67 100644
+--- a/arch/arm/include/asm/neon-intrinsics.h
++++ b/arch/arm/include/asm/neon-intrinsics.h
+@@ -7,46 +7,13 @@
+ #error You should compile this file with '-march=armv7-a -mfloat-abi=softfp -mfpu=neon'
+ #endif
  
 -#include <asm-generic/int-ll64.h>
 -
  /*
-- * In the kernel, u64/s64 are [un]signed long long, not [un]signed long.
-- * So by redefining these macros to the former, we can force gcc-stdint.h
-- * to define uint64_t / in64_t in a compatible manner.
+- * The C99 types uintXX_t that are usually defined in 'stdint.h' are not as
+- * unambiguous on ARM as you would expect. For the types below, there is a
+- * difference on ARM between GCC built for bare metal ARM, GCC built for glibc
+- * and the kernel itself, which results in build errors if you try to build
+- * with -ffreestanding and include 'stdint.h' (such as when you include
+- * 'arm_neon.h' in order to use NEON intrinsics)
+- *
+- * As the typedefs for these types in 'stdint.h' are based on builtin defines
+- * supplied by GCC, we can tweak these to align with the kernel's idea of those
+- * types, so 'linux/types.h' and 'stdint.h' can be safely included from the
+- * same source file (provided that -ffreestanding is used).
+- *
+- *                    int32_t     uint32_t          intptr_t     uintptr_t
+- * bare metal GCC     long        unsigned long     int          unsigned int
+- * glibc GCC          int         unsigned int      int          unsigned int
+- * kernel             int         unsigned int      long         unsigned long
 + * <arm_neon.h> includes <stdint.h>, which defines some C99 types differently
 + * from <linux/types.h>, so the latter must not be included into code that uses
 + * NEON intrinsics. The kernel's u8/u16/u32/u64 types can be used alongside the
 + * C99 ones, so provide those instead.
   */
 -
--#ifdef __INT64_TYPE__
--#undef __INT64_TYPE__
--#define __INT64_TYPE__		long long
+-#ifdef __INT32_TYPE__
+-#undef __INT32_TYPE__
+-#define __INT32_TYPE__		int
 -#endif
 -
--#ifdef __UINT64_TYPE__
--#undef __UINT64_TYPE__
--#define __UINT64_TYPE__		unsigned long long
+-#ifdef __UINT32_TYPE__
+-#undef __UINT32_TYPE__
+-#define __UINT32_TYPE__		unsigned int
+-#endif
+-
+-#ifdef __INTPTR_TYPE__
+-#undef __INTPTR_TYPE__
+-#define __INTPTR_TYPE__		long
+-#endif
+-
+-#ifdef __UINTPTR_TYPE__
+-#undef __UINTPTR_TYPE__
+-#define __UINTPTR_TYPE__	unsigned long
 -#endif
 +#include <asm-generic/int-ll64.h>
  
  /*
   * genksyms chokes on the ARM NEON instrinsics system header, but we
-@@ -33,8 +23,4 @@
- #include <arm_neon.h>
- #endif
- 
--#ifdef CONFIG_CC_IS_CLANG
--#pragma clang diagnostic ignored "-Wincompatible-pointer-types"
--#endif
--
- #endif /* __ASM_NEON_INTRINSICS_H */
 -- 
 2.56.0.313.g2479322e68-goog
 
