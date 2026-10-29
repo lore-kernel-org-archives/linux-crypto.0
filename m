@@ -1,55 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793301144;
-	b=K9nm1qRZncO79738sNMuUAmh4bDsNsEdMyRhkVA6d/WJguZBbF4M+51oxWGCfIfx2FcX
-	 lxAsYRzLITucY9oAYOgVRDge4OIQ8fmJvLD8eB89oxoA6+71k9lJzjAnk1B2LQ3j4ATU5
-	 +hQltvFJ1JYsX1FQXDS8shTT90mFs5OM11KMLtV+5e/xHlR4oaC2LsXuZ5iH0fMznwboY
-	 gjWTcc4NHFQaTzqaXiiZHn4l3kQ9M4HwYDhd51i8S/SBkxKzZB/+YGioIjnqVAPw80lo7
-	 fLqJJIYRWpRtqK54hPqWOiYZrp3/m4j8ceJbxUbAQSJxN50VfUnpZfKvgCHqD0COeEQ==
+	t=1793305309;
+	b=qvo+q+FPFbgHsZCmtCYyelpukjmcqR2Hmxk4Tiav6sGJ91ysELsA+4LLblI7pgoA0v6B
+	 cxYy3pvtQSXg+IfdpOl6YJ8ZdzIPxCmrWiyGaT2aS3i23L3tS7vWEnhpVRzCtSz+6apPN
+	 ilL7wp1rk/zTvGWDkuGI295AoZt4dqZ3rLPE8/oWIaTpdu1MP/VHF5H6EszxxFG/F9AE1
+	 otAUOlU0b+SRX156hRhxu2hAGx3GYmyamXUmSOjdkBDqqjt8MIXlUqykk2JfQDYTK9v9+
+	 Tl4oe+tq26XwLEKnfnt6E7jwqGD5r8EVcHnJpc/eADU8/L/dVsdJ0gHGWRNZYfrsSTA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793301144;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=SnGkcBSoxO1qg6e+mIm2ZjnwnYuiHewsm9s9apLqRbE=;
-	b=GiDATsceK5XI9MVed85gQcgA6xBZ0Ed9Vy8SGu4H0np3NoY78rVXPAEjTgoD96KWunvo
-	 tsCsMFwBDVJedjdtk9T00pg7VwVx8NuBk/r84jjZmKxdo3/zfhEKPpO7Yetp1vHFwWqoH
-	 MC6fHnbf4QbD11IAP2dMvIUXGljys9i80t+7Ki0iIbW2KQMD21kQdiUo/vCJ+2G+eOdiD
-	 yC2bEJjsllnDXqI83l7zosa9kLBr+Sc7bSeTQ6Ojyn9kDFGQ3GXfEn7Dh9lNQmzlbNmSH
-	 ww6cIEPxOJ791TxHbTpF8ZCGT4x8xEa+EsE+/P1LgCh4oyGJ4vyPyu0v0GkDP+2dkuQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793305309;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=NG0rcom/ENkoFyoDk/mPLZtYS0KiuQXHp5StsiKbwa0=;
+	b=OYB6sVr7wD4k163w2DFCBSszgAoSpVGIhdi+NMyZqu2goVtD2mRGQOcX1fF5s99v502d
+	 qbmRl1xwWiHQOpBpcvWjMkiBv/0P9rO8K/UqHLeLNBmjLNzFXLc8P9LOzP95S4qQwNxNN
+	 BH7mr2fQ/kOrTrRs4Eu2Qj8V5x4gDiFwuSMUH8NTw19qmJxXbdACEE143ZcicrZ+9U8Dl
+	 wPPPimJHh0F5vrXI+7F66pnkqQBAAEmSTn9qNxasXnzwotjoNN96tPK3IPYESA2TvYrC3
+	 ZomGJ9ssd3h2eQDMIaAv5hjwM4wKB4V0ylNGR9buBEj3u3HNjXRHoj5ydYTCeg8AI6A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Rb3CYL53;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aMAEgbat;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E673A606A31D;
-	Thu, 29 Oct 2026 19:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B891606A31A;
+	Thu, 29 Oct 2026 20:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Rb3CYL53
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDEFE1F01816;
-	Thu, 29 Oct 2026 19:12:22 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aMAEgbat
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0A651F01824;
+	Thu, 29 Oct 2026 20:21:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793301143;
-	bh=SnGkcBSoxO1qg6e+mIm2ZjnwnYuiHewsm9s9apLqRbE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Rb3CYL53RIcciYxSZiawLVDUdyakhf2hNs1VYKt0wlOXoHDN/B4rIwelSImNphBob
-	 7A3ue5eWxrlxNEVWF/dVqlFZh5xIN2dIpM9m+ZKFk0AV5Ts2Y4rre6jTYMr1aXn8Bp
-	 qRi66ltRFii7c8p0ry/J4045S+ndNFOF790670QA9tivmgcUEf601tGUqKgDvQxSke
-	 iKlFGaW3vt1NE4TMe6YzSsC/OWt3kBlnAFazGbwB7gWruDhQiZc6Wk4Cdm/bR4/YXo
-	 JTKhs/274CRnWfrbD706jxcYiuN/BHVR0py0Ku9L1p+WDfkUtqZtO9AR7QnOiZ6da9
-	 yk6odrBEbNVvA==
-Date: Thu, 29 Oct 2026 19:12:21 +0000
-From: Yosry Ahmed <yosry@kernel.org>
-To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
-	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rientjes@google.com, willy@infradead.org, senozhatsky@chromium.org
-Subject: Re: [PATCH v2 0/8] Batched zswap_store() framework with compression
- batching
-Message-ID: <auOZBtRqQGzFcbAT@google.com>
-References: <20261028030503.17923-1-kanchanapsridhar2026@gmail.com>
+	s=k20260515; t=1793305308;
+	bh=NG0rcom/ENkoFyoDk/mPLZtYS0KiuQXHp5StsiKbwa0=;
+	h=From:To:Cc:Subject:Date;
+	b=aMAEgbatqidp4Sh9pQm3Be0xzXLa4NYSh5zhsmHTEj9++DmK19Zy8f+y0832Dga/9
+	 3+pwUw2wCOa8N1e5akRA74BEpKuztAXuQ5dRWuhm3A5YdqH2UGQclLe1hKR78Oexld
+	 HfpfQ/VNX+Tkmk1tucZWf90ZF+rTpPPfNILM3Dtr4fGKp8sP1zizaIsO0z51XmuSex
+	 xKcBgka54K10/GK6kOMzWWs9UD7rj867JSG84V0x99lSSY+4p06gT2JyToX7tDtWF4
+	 pylNw2x8mbQwcJaED82syZ9wqZgqZYCEeTd3hxHv0BoK+eGkou/VHLiewS19azN+51
+	 J0B2nhA/WLG4g==
+From: Eric Biggers <ebiggers@kernel.org>
+To: stable@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 6.12,6.6,6.1,5.15,5.10] lib/crypto: arm64: Fix lost Poly1305 carry when resuming NEON state
+Date: Thu, 29 Oct 2026 13:20:14 -0700
+Message-ID: <20261029202014.51014-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -59,241 +58,87 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261028030503.17923-1-kanchanapsridhar2026@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 27, 2026 at 08:04:55PM -0700, Kanchana P. Sridhar wrote:
-> 
-> v2: Batched zswap_store() framework with compression batching
-> =============================================================
-> 
-> This series is a spin-off of "v14: zswap compression batching with optimized
-> iaa_crypto driver" [1], and focuses on the generic crypto_acomp and zswap
-> compression batching enablers. Resuming work on this series following a gap
-> since v14 (January 2026). Please note that my email address and affiliation have
-> changed from kanchana.p.sridhar@intel.com to kanchanapsridhar2026@gmail.com. I
-> have retained the original Intel sign-offs on prior patches for historical
-> attribution while signing off v2 of this series with my current address.
-> 
-> The main focus of v2 was to establish a reliable and accurate performance
-> measurement methodology, that addressed the problems with variation in v1. This
-> is accomplished and used to validate v2, by reducing usemem to 2 processes and
-> enabling PMD THP. As the data shows, we get exactly the same "2048kB-zswpout"
-> counts in the baseline and with this series.
-> 
-> To summarize the main contribution of this patch series: Batching is introduced
-> in zswap_store() of large folios: we carve out a large folio into batches of
-> ZSWAP_MAX_BATCH_SIZE (8 pages) for software compressors, and store each
-> batch. Moving the fundamental operations that need to be happen to store a page
-> to now work at the granularity of a batch offers opportunities to optimize them
-> from these perspectives:
-> 
-> 1) Utilize existing kernel API that minimize obtaining locks for bulk
->    operations, e.g. kmem_cache_alloc_bulk()/kmem_cache_free_bulk().
-> 
-> 2) We keep the working set for each of the core store functionalities
->    (alloc/initialize zswap entries, compress pages, store pages in zsmalloc,
->    pool/objcg reference increments, objcg charging) to be focused on a
->    batch, thereby minimizing cache evictions and benefiting from cache
->    locality.
-> 
-> 3) Along the lines of (1), the main zswap_compress() batching routine obtains
->    the comp_ctx mutex lock once per batch, and releases it after it has
->    processed all pages in that batch.
-> 
-> 4) Any zswap store functionality that works on a batch can potentially be
->    optimized via bulk-processing/parallelized as a next step, to further improve
->    performance.
-> 
-> Performance data: usemem with 56% over-commit:
-> ==============================================
-> Validation was done with mm-unstable as of 10-25-2026 (Baseline) and with this
-> patch series. To minimize variation in the data, I made these changes to my
-> performance measurement methodology:
-> 
-> 1) Reduced the number of usemem processes to 2. Each process tried to allocate
->    2400M, in a 3G cgroup memory.high budget, effectively accomplishing a 56.25%
->    over-commit.
-> 
-> 2) Increased the runtime of the workload to ~9 minutes by enabling PMD THP,
->    i.e., 2048kB mTHP folios.
-> 
-> 3) The use of PMD THP forces zswap_store()/zswap_compress() latency to be in the
->    critical path, and thus enables very reliable measurements with bpftrace.
-> 
-> 4) I used lhist() instead of hist() in bpftrace to gather latencies at a finer
->    level of granularity and accuracy.
-> 
-> Testing was done on a Chromebook with a QEMU "vng" VM running in Crostini.
->     
-> Chromebook Diagnostics reports:
->   Intel(R) Core(TM) Ultra 5 115U (10 CPUs, 4.200GHz)
->   RAM: 16GB
-> 
-> vng setup:
->          Memory: 7G
->            Swap: 3G
->     Pinned CPUs: 2 (E-Cores: 2,3)
-> 
-> zswap compressor:
->   ZSTD
-> 
-> mTHP enabled:
->   2048kB (PMD THP)
-> 
-> I used the help of an LLM to write the bpftrace data post-processing scripts
-> that generate latency percentiles.
-> 
-> vm-scalability/usemem setup:
-> 
->   cgroup memory.high: 3G
->   2 usemem processes, each allocates 2400M anonymous memory, reads the
->   Silesia dataset [2] from a pre-fork-allocated buffer into the 2400M,
->   writes to each unsigned long in the 2400M, sleeps for 10 sec, then
->   frees the memory and exits.
-> 
->     usemem -w --read-silesia -O -b 1 -s 10 -n 2 2400M
-> 
->  usemem metrics are reported from a single run after starting the QEMU VM.
->  Further, I have tabulated the bpftrace p50/p95/p99 latencies with these labels:
-> 
->  "zswap_store_higher_order":
->     zswap_store() of PMD folios.
-> 
->  "zswap_store_order_0":
->     zswap_store() of order-0 folios.
-> 
->  "zswap_batch_compress_per_page":
->     zswap_compress() per-page latency of store batches generated from PMD
->     folios.
-> 
->  "zswap_single_compress_per_page":
->     zswap_compress() per-page latency of order-0 folios.
-> 
->  
->  ----------------------------------------------------------------------------
->  usemem                       Baseline      zswap        zswap   Change with
->  PMD THP                   mm-unstable      store     compress      compress
->                             10-25-2026   batching     batching      batching
->                                         (patch 6)    (patch 8)          %
->  ----------------------------------------------------------------------------
->  usemem process 1                6,353      7,240        7,428
->   Throughput (KB/s)
-> 
->  usemem process 2                6,352      7,236        7,422   
->   Throughput (KB/s)
-> 
->  Average Throughput (KB/s)       6,353      7,238        7,425        17%
->  ----------------------------------------------------------------------------
->  usemem process 1              484,580    308,903      257,230
->   Time to free memory (usecs)
-> 
->  usemem process 2              518,928    438,585      446,958 
->   Time to free memory (usecs)
-> 
->  Average Time to               501,754    373,744      352,094       -30%
->   Free Memory (usecs)
->  -------------------------------------------------------------------------------
-> 
->  -------------------------------------------------------------------------------
->  usemem                          Baseline        zswap        zswap       Change
->  PMD THP                      mm-unstable        store     compress         with
->  BPFTRACE                      10-25-2026     batching     batching     compress
->                                              (patch 6)    (patch 8)     batching
->                                                                             (ns)
->  -------------------------------------------------------------------------------
->  zswap_batch_compress_per_page (ns):            
->                          p50                                 40,086        1,569
->                          p95                                 54,689      -64,505
->                          p99                                 83,248      -88,488
->  -------------------------------------------------------------------------------
->  zswap_single_compress_per_page (ns):
->                          p50       38,517       38,352       36,650       -1,867
->                          p95      119,194      121,174      133,678       14,484
->                          p99      171,736      158,601      169,010       -2,726
->  -------------------------------------------------------------------------------
->  zswap_store_higher_order (ns):
->                          p50   21,012,222   21,322,885   20,176,667     -835,556
->                          p95   25,643,500   26,204,375   24,485,000   -1,158,500
->                          p99   28,567,400   38,577,750   26,158,000   -2,409,400
->  -------------------------------------------------------------------------------
->  zswap_store_order_0 (ns):
->                          p50       37,601       36,994       37,568          -33
->                          p95      123,731      137,034      128,366        4,635
->                          p99      159,965      169,282      175,618       15,653
->  -------------------------------------------------------------------------------
->  vmstat summary:
->  -------------------------------------------------------------------------------
->  zswpin                         1,104,226      993,412    1,091,146       
->  zswpout                        1,688,181    1,582,664    1,669,671       
->  2048kB-alloc                       2,500        2,505        2,500   
->  2048kB-zswpout                     1,535        1,535        1,535   
->  2048kB-swpout-fallback               927          929          875     
->  -------------------------------------------------------------------------------
-> 
->  Detailed vmstat & zswap stats after workload finishes:
->  ======================================================
-> 
->  ------------------------------------------------------
->  usemem                          Baseline        zswap
->  PMD THP                      mm-unstable     compress
->                                10-25-2026     batching
->                                              (patch 8)
->                                                       
->  ------------------------------------------------------
->  vmstat:
->  ------------------------------------------------------
->  pswpin                               0              0
->  pswpout                              0              0
->  thp_swpout                           0              0
->  thp_swpout_fallback                927            875
->  swpin_zero                           0              0
->  swpout_zero                          0              0
->  zswpin                       1,104,226      1,091,146
->  zswpout                      1,688,181      1,669,671
->  zswpwb                               0              0
->  nrswpin                              0              0
->  nrswpout                             0              0
->  pgmajfault                     173,554        173,774
->  nr_free_pages                1,753,879      1,755,195
->  nr_free_pages_blocks         1,651,712      1,667,072
->  2048kB-alloc                     2,500          2,500
->  2048kB-zswpout                   1,535          1,535
->  2048kB-swpout                        0              0
->  2048kB-swpout-fallback             927            875
->  2048kB-swpin                         0              0
->  memory.current                 352,256        499,712
->  memory.swap.current                  0              0
->  ------------------------------------------------------
->  zswap stats:                                         
->  ------------------------------------------------------
->  pool_limit_hit                       0              0
->  written_back_pages                   0              0
->  reject_alloc_fail                    0              0
->  reject_kmemcache_fail                0              0
->  reject_reclaim_fail                  0              0
->  reject_compress_fail                 0              0
->  reject_compress_poor                 0              0
->  decompress_fail                      0              0
->  stored_incompressible_pages          0              0
->  stored_pages                         0              0
->  pool_total_size                      0              0
->  ------------------------------------------------------
+From: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
 
-As mentioned in the previous version, I cannot reproduce these results,
-mainly because the noise is too high. Digging a bit deeper, it's because
-the throttling from memory.high varies. Hacking in a change to make
-calculate_high_delay() always return 0 (no memory.high stalls) paints a
-clearer picture about throughput improvements from the series up to
-patch 6 and patch 8. With that, I see 1-2% improvement in throughput
-with patch 6, and almost no improvement with patch 8 on top. Similarly,
-for zswap store latency for high-order folios, I see a slight (~1-2%)
-improvement with patch 6, but almost none with patch 8 on top.
+commit 24f07e8c07a0c0dd275331cbb41c79a78741eef9 upstream.
 
-In order to make meaningful progress, can you send patches 5-6
-separately? I assume that 1-4 are prep for 7-8, so 5-6 are standalone. I
-also think patch 6 will be simplified if we drop the prep work for
-patches 7-8?
+When poly1305_blocks_neon() resumes from a base 2^26 accumulator and the
+next update contains an odd number of full 16-byte blocks, it processes
+one leading block through poly1305_mult() so that the remaining NEON
+work has an even block count.  That requires converting the accumulator
+to the base 2^64 form used by poly1305_mult().  The final ADC of that
+conversion stores the carry into d2, but the following accumulation and
+poly1305_mult() use h2.  If the conversion carries across bit 128, the
+carry is dropped and the emitted tag is wrong.
 
-Also, PTAL at Sashiko reviews before respinning.
+This was introduced by Cryptogams commit 03dc4adf91c8
+("arm/poly1305-armv*.pl: optimize branches."), which removed the
+reduction that consumed d2 shortly before Linux imported the code.
+OpenSSL's copy did not take that change.
+
+The carry is possible because the NEON code stores the accumulator [h0,
+h1, h2, h3, h4] in a lazily reduced, redundant base 2^26 form: its final
+carry chain leaves h0, h2, h3 < 2^26, but h1 and h4 may slightly exceed
+2^26 - 1.  For example, the reachable state
+
+  h0 = 4
+  h1 = 2^26
+  h2 = 2^26 - 1
+  h3 = 2^26 - 1
+  h4 = 2^24 - 1
+
+represents 4 + 2^26*2^26 + (2^26-1)*2^52 + (2^26-1)*2^78 +
+(2^24-1)*2^104 = 2^128 + 4, despite the bit representing the 2^128 term
+(bit 24 of h4) not being set; the extra comes from the h1 limb being
+above the normal base 2^26 range.  When this value is converted into the
+non-redundant base 2^64 form, a carry into the new 2^128 bit (in bit 0
+of h2) is necessary to preserve the value.
+
+Given the above bounds, a carry into bit 128 happens exactly when
+h1 >= 2^26, h2 = h3 = 2^26 - 1, and h4 mod 2^24 = 2^24 - 1.
+
+Store the carry into h2, matching the other base 2^26 to base 2^64
+conversions in poly1305_blocks() and poly1305_emit().
+
+This bug causes an incorrect tag to be emitted.  However, this is
+unlikely to happen in practice where Poly1305 is used with a random key,
+since the random key tends to distribute the accumulator values
+throughout their valid range.  There isn't an obvious way for an
+attacker without knowledge of the r_key to cause [h0, h1, h2, h3, h4] to
+land on the precise values where this bug occurs.
+
+[EB: Rewrote the commit message to more clearly describe the bug and
+ its impact, and simplified explanation about why there's a carry bit.]
+
+Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+Link: https://patch.msgid.link/20261009125354.315476-2-ebiggers@kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ arch/arm64/crypto/poly1305-armv8.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/crypto/poly1305-armv8.pl b/arch/arm64/crypto/poly1305-armv8.pl
+index 22c9069c06505..e69419b0ca01e 100644
+--- a/arch/arm64/crypto/poly1305-armv8.pl
++++ b/arch/arm64/crypto/poly1305-armv8.pl
+@@ -372,7 +372,7 @@ poly1305_blocks_neon:
+ 	adc	$h1,$h1,xzr
+ 	lsr	$h2,x14,#24
+ 	adds	$h1,$h1,x14,lsl#40
+-	adc	$d2,$h2,xzr		// can be partially reduced...
++	adc	$h2,$h2,xzr		// preserve carry into top limb
+ 
+ 	ldp	$d0,$d1,[$inp],#16	// load input
+ 	sub	$len,$len,#16
+
+base-commit: 85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e
+-- 
+2.56.0
+
