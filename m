@@ -1,65 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793238278;
-	b=alCaMyPWBIAlWnbEvKj41y+chEOLLr3MUBOkDMTeBpFEAyKUPnsUa69ho8TIOSFclctH
-	 BsmiG3ZWrt9R2/GNcQ4j8Blgs4GbJHZimjHzsI/iWGx/QmEFif6NtQcOCrLqH/qsooRWh
-	 cCvjglM9v34GZUJX9qOXMjwSY4F3O9Aly80IPO+UkTPFtwZQIWfFnNdtfFizTmVu/BmI2
-	 ump35hCh1kFTyOM/pWkp4E+7mIJf9wZy6o8ndg3LYJ2xE3T2+4dKtnAI8t9jpvtD0NiTg
-	 ywTt1NdM82dRo3lEqa7N4XEwjHXN8vLP1fnf5URQWgOJPm4BBQX2hKDFYQpnkJP3VtA==
+	t=1793240227;
+	b=SqD+evpwSIOoFiSdrDDvVgzdtaPT+NdHtespF8wXbkC83zZei51Eq0urwQmqXhCfA33+
+	 eXGoF1fyUMZXBM6mBazX839kcV3YS/uFFSQwB4EvoXR4chA0FiajiYc9dtFLk9z1Xt2M3
+	 B7Fnxljy3PZt2eErE8RCJEteVfvmZzGTHIhwnOk17BFQ0+N9XuWm0VKWrVPQe3ETBHsaB
+	 xyFtr6wbzYZje/3gJkYj3pl7gpEb3C0jYFjAcAbwZVh/UZWlOduMb1oMGbsF3VZbp0jxm
+	 Iya8+Hmo8AScAindc2JhGiXp2ekmWOAFU8RI85krW2Xb6BuNU44SX7XUt9V8n6Ud0Zg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793238278;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=fi0YROWxKAfCaR/6RwO5ahpQ059B/d1L1wzMqOaDnTI=;
-	b=Y2lohxiIZtaQMXMA+6r01N9iMy3j6LVJ/FhOQ+tU8xIXqS24EYhsn5x+Db6h1nq/mGUc
-	 w6dLgIhAsm+FuHCWUmkyyr8qgS3yp+4Cmf4UX/uGs7OZc5lWLPPlhAwy3dIgLCQwEvSnn
-	 mFKOCDMtlicSca1ckFzCFEIlJR0pDgb23NKqaaP1PIrKo6th5+Fb5vecqP8fFYn9Y4BbC
-	 yXmkv7+IorHjhMNW6YYv888WBxSLLfsrwxqJDcdP8Qgy2an+EuXyGE2dAwi9zk67wuviB
-	 hFVZ8DBNgvQGZfw2wE4NYRHti7fSH/Z/m2WWSRx3uoOwIBSdM0ld53KhLm8/8EpJYVg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793240227;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=m9kc8yIzx2usw0N2+/yj9nIikY372WFees0PGb9Zlj0=;
+	b=RtEf6eN6TaPqgrfR9KC49jpnMkWlYEiLbl/miQBwVXkvqkpaGpK/dkf99tMnY1qZTCwU
+	 iEQ14ewIgHJBeaD+kKIGu4gl/QWyc3o0sYISax6Pfi0eaYc4Jf/bOP4TteA2rGnk/aDDc
+	 bAy25DP1h8cv5qy3MnNha0+hm1AKqKR1wA6OCVgSRlNRVS0nbGXdZz2zlJ+4rJRPp8XLy
+	 1QQ3ARzp+pNWG3SeVd7rc6+djaCggzoc3irfSVILeItvtM4i9ZE1n1mNM5zBHRKiiALj8
+	 ubpw7zXZuIuDK/zGUkp9nImqtiHpunQisHNAopefMEiXQpSD2MT9lJMux0FI54ccx/Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=d27Okpss;
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=BulVXfD7;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2D3606A31A;
-	Thu, 29 Oct 2026 01:44:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9F2D3606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85995606A31A;
+	Thu, 29 Oct 2026 02:17:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 85995606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=d27Okpss
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=BulVXfD7
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=fi0YROWxKAfCaR/6RwO5ahpQ059B/d1L1wzMqOaDnTI=; b=d27OkpssG9O6lP1E7oerEdfH0g
-	z7N/Rr5eBE9xEsAt2M6rs0WCWpqSmP1faavvIMguqsvRoZmSVPxCnfvxQB09I2F6PoKhXZrXdhoG6
-	28w0z6d+Z3+hmeh9CSQDXVkqvvAA/13yKn5oR3LYaNrfXXLNJ1znSQIMmXS4Fjuh881mv0pjXqtxl
-	d8VTscXgeXdsTJUHeYglj/o6VtJ4ocjf7GPaBlaW5HbFjnlBWjKC+T0exMLzw8KX2EgczukbsT+yJ
-	SOPhPf9owCueDa9eNZ/gUB46zAc9MgjXS/e8udYx8TXrY6vZI14l0kz1N4c7n09RW83pL40VtyyLs
-	B6PybQKA==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xMFBt-000000089ch-2gZz;
-	Thu, 29 Oct 2026 01:44:29 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	linux-mips@vger.kernel.org
-Subject: [PATCH] hwrng: octeon: add missing MODULE_DESCRIPTION()
-Date: Wed, 28 Oct 2026 18:44:27 -0700
-Message-ID: <20261029014427.2364317-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.56.0
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=m9kc8yIzx2usw0N2+/yj9nIikY372WFees0PGb9Zlj0=; 
+	b=BulVXfD773yLT3qc9u1NANNhJ98Vm6/aRxcwh5PfDZELbo1U/FSB2M/85ZgFhlhiBCV2IvuwAM+
+	RvNJIsDMBW/NCmIYF/xef7aWde69p7ClT0iqQY7Lu0MjujY1pK8DLGdr5YwRbgqIID1pc8tLx/sQC
+	Izh291VahFbHvOu6WEzhVy7BZOfCUnK5ylxT0cAbh9T4j+b6AlTNngiUvXcQvIrA+2rthRivGcZuB
+	NNMsNYkt3FtQEZLRM/nlMsVyeOBmfcEjf2loV3mHj5UYVQ8drR+LgID2bwLDoSLvqe8gUgcburL8P
+	tIjNocrWc2A34HmdV5jrxW9im4x2We6R30RQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xMFgy-00000008bSP-0k3I;
+	Thu, 29 Oct 2026 10:16:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 29 Oct 2026 10:16:36 +0800
+Date: Thu, 29 Oct 2026 10:16:36 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Liam R. Howlett (Google)" <liam@infradead.org>,
+	Uladzislau Rezki <urezki@gmail.com>, Michal Hocko <mhocko@suse.com>,
+	Baoquan He <bhe@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	maple-tree@lists.infradead.org, Lorenzo Stoakes <ljs@kernel.org>,
+	Chris Mason <mason@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
+	"David Hildenbrand (Arm)" <david@kernel.org>
+Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
+Message-ID: <auKshDXKQXt1kvjy@gondor.apana.org.au>
+References: <20261028154218.1668182-1-liam@infradead.org>
+ <20261028154218.1668182-5-liam@infradead.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -69,27 +75,42 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261028154218.1668182-5-liam@infradead.org>
 
-Add missing MODULE_DESCRIPTION() that is now required.
+On Wed, Oct 28, 2026 at 11:42:18AM -0400, Liam R. Howlett (Google) wrote:
+>
+> Below, one CPU adds an FDB entry for an RTM_NEWNEIGH netlink request,
+> while another CPU is inside vmalloc() or vfree():
+> 
+>     RTM_NEWNEIGH                      vmalloc() or vfree()
+>     ============                      ====================
+>     spin_lock_bh(&br->hash_lock)
+>                                       spin_lock(&vn->busy.lock)
+>     rhashtable_insert_rehash()
+>       kvmalloc(GFP_ATOMIC)
+>         vmalloc()
+>           spin_lock(&vn->busy.lock)
+>             waits for the other CPU
+>                                       softirq: a frame for the bridge
+>                                         spin_lock(&br->hash_lock)
+>                                           waits for RTM_NEWNEIGH
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-Cc: Olivia Mackall <olivia@selenic.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc: linux-mips@vger.kernel.org
+I think this is a fundamental bug in the kvmalloc non-blocking
+support patch.  How can it be used at all if it is susceptible
+to such dead-locks?
 
- drivers/char/hw_random/octeon-rng.c |    1 +
- 1 file changed, 1 insertion(+)
-
---- linux-next-20261028.orig/drivers/char/hw_random/octeon-rng.c
-+++ linux-next-20261028/drivers/char/hw_random/octeon-rng.c
-@@ -116,3 +116,4 @@ module_platform_driver(octeon_rng_driver
+And if you can't use it safely why don't we just get rid of the
+broken kvmalloc non-block path and have it always go to kmalloc
+like it did before?
  
- MODULE_AUTHOR("David Daney");
- MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Cavium Octeon HW random number generator");
+> Fixes: c6307674ed82 ("mm: kvmalloc: add non-blocking support for vmalloc")
+
+BTW, rhashtable patches should be sent to linux-crypto.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
