@@ -1,72 +1,75 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.71
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.69
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793281835;
-	b=h6Pn11l/h6M0BR/GOWiAWptZOJJl2pdKRhRjnM7RtZaFJve5SLJOoBaVKe64/PR4WGdw
-	 VAGdYcwIrgaaN9eynK7Fojhzx+orPUSfhk5AjZGZAUsJ6W+ZS9wlpkX0A2OzFnfHzJ37b
-	 31hFQ/djOEa+MIEg8OP64UY28AS2njB2WW2YQouyNTB4cgvWLmn9/iZw6JUt/vuBOtvYe
-	 irPthBzxgCgoy15tUxuQuomrHfBBeceXMCKh5eG6F6oE2LHW7noIpreymsXCiWhamt4aV
-	 yK+18YKvOPlpI4bRql4HpKPSRzsBBhAGnHjXDtRPoCayX5/dHTfKmSE9Q5M3WfTir+A==
+	b=Uh3BOUKBzmxCdBW+/a1vKoVXqXaOoKR8enRhZN+ZB5D+1LLxRCuGjP3OOiHlhV+sLTSV
+	 0D6Nb2yKuGO+7waZhXRtzVhFLHWerobMRrNnJU0q7MMlo4FNU7fo6Iut8f6Tn2CbwrsRl
+	 IHKRyE+i6D57LK4XWETadTcRzFmU/0ki7yYVpUBLy4ygm/VuPnOT2dQkW7KpvgnJoaNkJ
+	 mVgHjVrt/0bowccaj4UxY+mXgZzSXNHvS15ptJ6xp37v0SX1QeCbtTO6TCx5L2juYe0P0
+	 LTfPczY3mj7NtoGjCNpaUmfCDHVqdex2a/hPsrlN2BWgq6A34wGOiMlHhnTt+EpaO9Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793281835;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
-	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
-	bh=L70Byn5v8ZFkrMF0OAudmvIVEZ2EuogOofsD9gsL04E=;
-	b=k8wJdiixf98pZi3Sp+GXtV1rd93ZCOroEJRiz9E8/GdOm9xn2rJPbkUdWBCsSbf/zicR
-	 D0chJ6ZgCPk5lnW0Of30PW5N6UQEpdlafmPVMnAn1lOmoaYvosp8QoTlRe33Ja4YMtVRw
-	 VRlrXEyUNqFOmdTCTBhvRI6KMlf02zeuoqhrHBFXgqhghTKPVwprf6BSQb9iAt8pcDPGn
-	 7iCRgIpyozATzD5dYadTHl9qBmdIJIxe8k43jJ13lMAUBPdzFjh/7ci3Mz/rc+Z2Z6wgv
-	 shVGu8GOA/IhM3m4ohNzxj8O3U0Ir6ORIRiMpP/6SJVA93ZgvMx3pkVjgwu4/u8P1HA==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
+	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type;
+	bh=WZCcOUUIhCEQ9Fj14Fk6W+WsOHHcMABIP8ZRGfIzWVM=;
+	b=HQqRfsO2+nwya6qJ8/ajjZZYj+pYXQR2R4ue7m5u7aRTm9LgH+PJEFjmGNPNhqE5US5b
+	 GgXX6t3Ra6E9Kqz0iyON2qVGR+bYY4k2nWa9hpfIlnUszmZ8KcLo5IDVKkBELu1Wiz2Tt
+	 qXi8vgK1zocSyaONc7u1gEMeZa4BYjROEa0zKqQntwShzlGrIzz+SKTWJ74Ne6BvMqcSv
+	 2js7RH+svDK0jKoQphv5XjwHW+L2KhBzjGm22ZsMks5yYLxVH/guhVhhTPr2zuaYzSQek
+	 u+VKM3LupRwIgKodEckvycmjz4Q48nG9QLjdn7jUew/8W5tRXM4SnxS102lxEgNzt4w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--ardb.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Zuqno8QW;
-	arc=none smtp.remote-ip=209.85.128.71
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=IqAJaMq4;
+	arc=none smtp.remote-ip=209.85.221.69
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86EF606A33F
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 13:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C86EF606A33F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7928F60A260D
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 13:50:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7928F60A260D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Zuqno8QW
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a2001e85c8so15919225e9.1
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 06:50:34 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=IqAJaMq4
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-48e00f3929bso481435f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 06:50:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1793281833; x=1793886633; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=L70Byn5v8ZFkrMF0OAudmvIVEZ2EuogOofsD9gsL04E=;
-        b=Zuqno8QWGdM4HcfmTqzXaTvYRoQXFk8DU6M/7++6ldWU6V7snx6jc/xDwcJkDo0Z59
-         FOYwOzLbPkjIHCmOEy2dM3SH0J4vMM97Q7IPAltISCQninP84XnasYbk/IfFEG4/7ynq
-         AY2U3/HPYg3qzb6pMIQrLZs71UUvuu8o8U2pVfXTtYnCfYp6rRE49IkAB0WcEQaQZ9IS
-         Z8sceOO4WjdOngdWsJ7yKk0RBA2fjYa5tF+W3f4IAzWPUzzXTjiPbXXiwx3vG8qh125D
-         wVkSBrwwdiVzZkspQKlsUzPlk2Zj3XdGjFkOD/MDi7egwMdTG/SxOEnFOi+5YJKTJoPK
-         uurw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793281833; x=1793886633;
-        h=content-type:cc:to:from:subject:message-id:mime-version:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=google.com; s=20260707; t=1793281834; x=1793886634; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=L70Byn5v8ZFkrMF0OAudmvIVEZ2EuogOofsD9gsL04E=;
-        b=WOi2QBtGpCv9+DBcQEGZOEc2WZKJhAcB4lJAwmf3XPxhGH640QEgymQkjoPHwhxe3/
-         XbooHfjHSpGR80IpXA+BnkF8ejoCOjcqspt+DH33FNv0ki+vJ31SNtvuX9fvVs6/zpjN
-         EY4HPQX+ZazZKxEJ/hMtpC3uLt+OjRJHPSuv5+eoAZF9zBby0IxJfmina24qXWVAnwZ7
-         qcsi3mCAXGyq0Up/v25crPsc1uLV2LJszciMBaU8JecepnLzDjj1a4Xl/qbSsTt0k98+
-         S/ml7TXZdHH7q+M0Dt1IjNffbHGIURE74kMsIIQA219sAl0fx4pvoGntfmpL5D0d2aDk
-         2KvA==
-X-Forwarded-Encrypted: i=1; AKwUvByGqyFjad4CXC8v9J4WhHxba3607DrvHKhUQmaZcdMQnMvmO7As9hUeyeb6hSHrXqF9RPd3c6ML/68PWO0=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJsWnb+QxGyzzXskhF4+fmd9sN7cK2ryI3xOJZ38ihYsHbtzDcy
-	pDpmRlkOnifPmCxfo4HFojxISNMsfA57FSxdTZfZ2cLrbP+LzTDC+59/oATF0beO14kalvd9ZA=
+        bh=WZCcOUUIhCEQ9Fj14Fk6W+WsOHHcMABIP8ZRGfIzWVM=;
+        b=IqAJaMq4BV/Ll2fiQyMHuL2nK3v64E+DdyblAjWICx5rYZobrR9NQLIdooBP2V6bwC
+         rFcOrJq5cDzofv/YEDzeNlZiPSNn+BeyvWRo0q6GJva3nU5/pahAsfIwy/02LIoFILao
+         1IfraPy77kWM6gS2vVKPHa3XDif+Hs1FLghni6Mq1lIdVsXdcNDnfGCITqcXGfplmAa/
+         Uf4uSdQ0N8hH+hasVomPX4Su+limB/IXN+TZ6vS1TYLZtPO1bnFuR/k29Vv6CFTU3Sxk
+         WbHaS62sxVw00Z5TquImrGgzVlJMiTMVwwIEPYPcvHQeBrITPOqQWH5QYqlU+mgsERtH
+         JjiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793281834; x=1793886634;
+        h=content-type:cc:to:from:subject:message-id:references:mime-version
+         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WZCcOUUIhCEQ9Fj14Fk6W+WsOHHcMABIP8ZRGfIzWVM=;
+        b=AQ8eIf46bWCPyffr4AMjyuDLQdTnar/eT76UPGkzPFezxlDt7UvrkiQGtXqzq4ZJJ3
+         S0YtDrM87dhWnLft269RAomf//puk16tVJ04a9DrKUpXzlqIcGVBdme8yXb5ctAGEfp0
+         WAS/h1aasUEdS9I56+9IB0AwRF7MtXsjPRGixa0BXs617rT959cc1Y9QA9RKco08GE/+
+         ZhvPD03YLi6m9BUsZgu+Ul783lCgdFIXwWL+gZ48BRG+OoJ6ac7SONHygQEQCbN0VESS
+         s4r6ZABpBQbM/P7bCxpnROajIhx4siEAhBz3YyX5Nmqx2ZVj1ENj5dO+mV7fvnEnKwlQ
+         Q9hQ==
+X-Forwarded-Encrypted: i=1; AKwUvBx075YcFG/XQjqraF7h1TxYLByM3cn1MloM7Dr1q7A85BXqCypRYBWL61eDMLFq5wwvnYUc3maBzJ0kwbk=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJaJCmEFD7qywZAns0pN7+2FhHt/mfazV8t1DSkL05ag3dPahZR
+	MWtFNOe0kQCW8tb+48B/kLlC/g2qpDqII+G/HA6a39lzRHvUemZFc1jv9BBTPDrd2NFxZGSSEA=
 	=
-X-Received: from wmdd24.prod.google.com ([2002:a05:600c:a218:b0:4a1:e51d:9268])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:e493:b0:4aa:2339:a375
- with SMTP id 5b1f17b1804b1-4aa2339a4a1mr77860825e9.13.1793281832038; Thu, 29
- Oct 2026 06:50:32 -0700 (PDT)
-Date: Thu, 29 Oct 2026 14:50:20 +0100
+X-Received: from wmcq2.prod.google.com ([2002:a05:600c:c102:b0:4a1:d8be:ba51])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:540f:b0:49e:65f2:db64
+ with SMTP id 5b1f17b1804b1-4aa871e8bd4mr66653385e9.5.1793281833756; Thu, 29
+ Oct 2026 06:50:33 -0700 (PDT)
+Date: Thu, 29 Oct 2026 14:50:21 +0100
+In-Reply-To: <20261029135020.272082-6-ardb+git@google.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -76,9 +79,10 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 Mime-Version: 1.0
+References: <20261029135020.272082-6-ardb+git@google.com>
 X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
-Message-ID: <20261029135020.272082-6-ardb+git@google.com>
-Subject: [PATCH 0/4] Get rid of all NEON intrinsics stdint.h type hacks
+Message-ID: <20261029135020.272082-7-ardb+git@google.com>
+Subject: [PATCH 1/4] lib/crc: Don't include <linux/types.h> in NEON intrinsics code
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-crypto@vger.kernel.org
@@ -88,42 +92,60 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-Recent Clang has become more finicky when it comes to overriding the
-type macros that the freestanding stdint.h consumes when defining the
-uintXX_t types, and so it is time to finally get rid of this entirely.
+The kernel's definitions of uint64_t and int64_t in <linux/types.h> are based
+on [unsigned] long long, whereas the ones provided by <stdint.h>, which is
+included by <arm_neon.h>, are based on [unsigned] long on arm64. On 32-bit ARM,
+a similar mismatch exists for intptr_t.
 
-So instead of making stdint.h (which comes from the compiler when
--ffreestanding is set on the command line) agree with the kernel's
-linux/types.h header, avoid the latter entirely in the compilation units
-that actually use the NEON intrinsics (which are always leaf functions
-that are not tightly coupled to kernel APIs).
+Including both into the same compilation unit currently only works because
+asm/neon-intrinsics.h overrides the predefined macros that the compiler's
+freestanding <stdint.h> uses to define these types. In order to be able to get
+rid of those overrides, stop including <linux/types.h> into the CRC64 NEON
+intrinsics code.
 
-Note that the disagreements are about long vs. long long on arm64, and
-long vs. int on 32-bit ARM, so never about types that actually have
-conflicting representations.
+Instead, use <stddef.h> for the definition of size_t, and rely on
+<asm/neon-intrinsics.h> to provide the u8 and u64 types used in the prototype
+of crc64_nvme_neon(), which is shared with code that does include
+<linux/types.h>. Use uint64_t for the arrays of constants that are passed to
+vld1q_u64(), so that they match its prototype regardless of how uint64_t is
+defined.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>
+No change in generated code.
 
-Ard Biesheuvel (4):
-  lib/crc: Don't include <linux/types.h> in NEON intrinsics code
-  xor: arm/arm64: Move NEON xor_gen() dispatch into the glue code
-  arm64: Drop stdint.h type overrides from asm/neon-intrinsics.h
-  ARM: Drop stdint.h type overrides from asm/neon-intrinsics.h
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ lib/crc/crc64-neon.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
- Documentation/arch/arm/kernel_mode_neon.rst | 10 +++--
- arch/arm/include/asm/neon-intrinsics.h      | 43 +++-----------------
- arch/arm64/include/asm/neon-intrinsics.h    | 24 +++--------
- lib/crc/crc64-neon.c                        | 10 ++---
- lib/raid/xor/arm/xor-neon-glue.c            |  3 ++
- lib/raid/xor/arm/xor-neon.h                 | 16 +++++++-
- lib/raid/xor/arm64/xor-eor3.c               | 15 ++-----
- lib/raid/xor/arm64/xor-neon-glue.c          |  5 +++
- lib/raid/xor/arm64/xor-neon.h               | 31 ++++++++++++--
- lib/raid/xor/xor-neon.c                     | 16 ++------
- 10 files changed, 78 insertions(+), 95 deletions(-)
-
+diff --git a/lib/crc/crc64-neon.c b/lib/crc/crc64-neon.c
+index 4753fb94a4be..1267df1310be 100644
+--- a/lib/crc/crc64-neon.c
++++ b/lib/crc/crc64-neon.c
+@@ -3,7 +3,7 @@
+  * Accelerated CRC64 (NVMe) using ARM NEON C intrinsics
+  */
+ 
+-#include <linux/types.h>
++#include <stddef.h>
+ #include <asm/neon-intrinsics.h>
+ 
+ #include "crc64-neon.h"
+@@ -11,11 +11,11 @@
+ u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
+ 
+ /* x^191 mod G, x^127 mod G */
+-static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
+-					0x21e9761e252621acULL };
++static const uint64_t fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
++					     0x21e9761e252621acULL };
+ /* floor(x^127 / G), (G - x^64) / x */
+-static const u64 bconsts_val[2] = { 0x27ecfa329aef9f77ULL,
+-				    0x34d926535897936aULL };
++static const uint64_t bconsts_val[2] = { 0x27ecfa329aef9f77ULL,
++					 0x34d926535897936aULL };
+ 
+ u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len)
+ {
 -- 
 2.56.0.313.g2479322e68-goog
 
