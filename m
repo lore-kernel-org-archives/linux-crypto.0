@@ -1,97 +1,87 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.12
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793262379;
-	b=gEpd6YKAGuvrUIAiLtLVxIiroucaUBcf8ulVqqIb3VWe6qWti5tA6JzI2OD/JVx8KAzE
-	 4SrGCE7akaX1pRgPj9pg2G4vK603vUmFIN9D5yyoSbG+3SNXMb61O0Q+ZGdWj/0iET0e+
-	 zzZogX3HT07Qft8P6+LfrxIOxsX1b3q13pZ7GUOcvzmkbBahvXOFoArWKrHyywxKY3DxF
-	 Hz+l78cSh44ZhaDDI8tKPu49NHMh6VfYJQnUyFCIh29051rpfn3gXueWOh8g3i2E4enYM
-	 yiKiLnIuD4mGJItnfRJK6qz15FGNl1aVh/lQ/K3QeAFyuC4Xz7PPm3iPoN8yf2wBd1g==
+	t=1793263476;
+	b=DMSR0ar6Ba/Gyn5kDjFFKfMS3vvmMcr1Xw9mLEqtAuhAGTg4gEwS7IXpOiJqvR5/KHzQ
+	 p39uq4xwT3J00sJlRZ9EGrE6hMmB10Q/HF2wOEjWVgL3hXxCWF81D64sBfyNrmaceNkK4
+	 v9c8Kz/lAlW9XhQ/SHPgrmBUlGUgHY14VXQqi76Riw+eC/E9n0q+81aHfusrTN/xG3fdY
+	 TEfHjoayxYiYvcviQnzqg80ijlaPY/TMiuw/kHZoq2PPeDhNvdV0Q7WrkEhfhc4X8cJlp
+	 Kc6n7mJEN5t+Nk0bzGT55BByYUkQ4H18OLLj5nF4BE2/0UqvL/UFHFVCfgEuum2vW+A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793262379;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=zErrqnlEG6xc6cNz8Rb/DdY5GOFsAT42rGi6nItA13g=;
-	b=XYqtuBDG8M7b8hhFOXww7+6ZQ5ALUgwLv4+kJF+abY6xnyQh/tIzdjKDYnqa0FZac7Z1
-	 r2FPj+T6Io99IhLiJDzWpCEexXA7fjFBbrrf3XwWg2pWXTvkln7EwC2QC4xHjtzoLGreA
-	 CGeXsznan/wMwKcY73pke+soGvJp+LwLXEO4bCgguV85W9Sefd6gYAhQQPXi0z1z0HrdR
-	 zEfLy2kBV/0HyTviq/qYREaEax4yHY65LKXE+7i7TnI/yYf7ElSciP6dgq/ZfpdFlJPwy
-	 8uZpfB19PQ79TiPxf/7muHa3PPi8v9FgX/W91dOoYQpFTp2FM8i4pjMQmbSlnCUjq6Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793263476;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=/oWraMZQPV6fMMEjMwIgrElFPlULY+ClRBpUMakebME=;
+	b=02GvyR4uN4qTKIkJ0NiO9PdF+s1mfZf12vj0Xx8YlRokuvWcBoKDjFgyodhFkOa+FvC3
+	 PWsmfbgwBPhZGSPuYKdpMaigvgfHgQjNTjJhJpJVbia+5Wy4u5IsCl+BiPtRQGv5+FiUM
+	 Y9r2syk3eAiKlYCyi91vJeNxyOLqkc5XWVr/AQzuHBrboPEZW5XTnOjN3vbQxAbm32J0E
+	 +EUlMi82Q2Kj0YNRjwPP1IVOt/qu2CmDi6YQgbNOkVyr0uQq8kVhsD4/e5BJx/D8Bmwwu
+	 SJJu8vBFJU/i89H/QQrmPUwE1S+XqVl4HGhdbzk2/T2CUP7SZPURoSxpL9K7rvY08+A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="A/oy4t6q";
-	arc=none smtp.remote-ip=209.85.221.42
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b="N/YldqI7";
+	arc=none smtp.remote-ip=198.175.65.12
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB98606A322
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 08:26:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8EB98606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFA0606A31C;
+	Thu, 29 Oct 2026 08:44:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0FFA0606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=A/oy4t6q
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-48c45111bebso837908f8f.0
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 01:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793262378; x=1793867178; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=zErrqnlEG6xc6cNz8Rb/DdY5GOFsAT42rGi6nItA13g=;
-        b=A/oy4t6qN+Q/bG/BT5S3XsYMMsIM3P1jN1hF29agMxtIGsrEbca0X6xjGsEs5usWK7
-         fByw/wpS0IjDrbmi851J+QuRREOTbxlXXGdW+oBNND3Moq5OH/pGUuZvd7c0rMoNcpDO
-         PQlUTXvq3B8UtGF7fO7oPmU1wcQPSshBhM/yOCh6BB2y7ILc6nYSFu5TPSJ63ReaGoOA
-         t+Fx6ht/fvzMUyxV8NjcHs8oZfzmcCnvbMx6gyndTXdoxS+tJ+0+2qJQlFGA17/shZQ9
-         QJonzhPnh6/OmjIF8VHbs9xBWv0MAr/Zyf125CJUAaKG45/6EomZ2X50oGaHN/433EvI
-         INwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793262378; x=1793867178;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=zErrqnlEG6xc6cNz8Rb/DdY5GOFsAT42rGi6nItA13g=;
-        b=VoHtGZcx7cooR25lU2VGm9Kz1K/s9Y05U8K9yMvBUKYXVGYQsntxEKN4qVJF2vZNvb
-         qwDyK4NrYG2Qk12pbtKkeXrLgb7DqCGTzZ/eIs74Jdz2AZMwmY30uBBJReRPMXdPLujj
-         vx+N3xVUgNkR6aIv6Yu190Udbwj6oWVKkT6kLNQ//I+bYTMX4eSGhzmqNuWiJTATVsCE
-         aZCXNtObbdQKg0WwK65XbPHunDWw3KBZzOT5xi7YJ++DICvtuLVMrQEmkHYuu9Hdal4j
-         XCI5kJowaT4M53qBvQsO2JHA5terKd3h5xT6iwyoVP9HdXTnHmuJ8GDrleZMb7nqKH+B
-         RwAQ==
-X-Forwarded-Encrypted: i=1; AKwUvBy0BwzQwJRKaD/aLIYOZ0koJ9bWanWBRlLNBWEFyfbdEtmqzXUdHo8bSUA5FLyu6rmhWTDJGW9mkRgIROs=@vger.kernel.org
-X-Gm-Message-State: AFq9FYKTx4dTUUdxDNag+cfGncPaSndXaY44//v8pO9Tc/ncETwm5K4E
-	1ju9I2XwZ7XkFSYRmxPovKdB/1wPzgpUyR6dt70hAComqJDTmsQVoCke
-X-Gm-Gg: AYBFou15nNyXlAHoaCp1yry54UM+NdufZwAytJ5sAV8J5n7vZqJHFoiVAYJJ4zvrY/q
-	tVLiLLj3ncw981IqV2Kd4QS1gYhMVA4sB/NxoRblTiXWfyvXFxuRjKYECcNaXX49DJQkovjW+DU
-	zAb0uB+VjOXPMsz4cTVLwa8I+d/D1XpmvS8InpSyU76mYE8BFMqu+2p6TQHdlCaJWjB6sAtV7Rs
-	nDRPvhzGQn0+uPv+ptvYuRa7P6Nvn3OkBUm+TRwNWuANg1qBLw9nvKIvKvz/WhUxeM7di67NHX0
-	apSbr1SGPIYkR5bsyQIPpd5auKsl9cwq5cZqNaSwxAZ7RRdboG4RznmdDqq6hZJ0SG3EvV1bxpQ
-	+h41XE8WKZYbVEmgmcfc7UOAfvP0rVizOBLz/VQcwKGZlGfVa2HMRDtj42s+uznGjxVLIymouay
-	0gvUtfI+Yz7QAQHZYlhuj4Kfj5TUX24uTN/DjWHD5BBeFgE2gfyaVwKc5fho/V/BgdTGaO8Ujeo
-	vGjjUaase4VwFi7VzAjOxwtBNU7u43R08UGVieX921lJ26bxmqWjXgret0BU0ryZ1Z9PNt5M3uW
-	qiDn5DQja2a03Kg1BpmeHi6HmiLPqb2BkYQfThq1gbAdDLgwq6iHKvkNA5NLci3j9VUGCaaFkzy
-	ublV4c9TI0BVsGUXkcEqpTV6S5exsRvBPC9KD4XynkJ8bk8r47KVj1wSenr9YcTI4U/i2QoSluQ
-	pmU90ZW/52scEF7i8pKW6tKea1mhXeGLosOxSO7krp/rKLS3JvP/FxT/U=
-X-Received: by 2002:a5d:5e92:0:b0:48e:5db7:fd6c with SMTP id ffacd0b85a97d-48e5db7fd9amr9968747f8f.4.1793262377778;
-        Thu, 29 Oct 2026 01:26:17 -0700 (PDT)
-Received: from localhost.localdomain (dynamic-2a00-1028-8388-a84e-ddd3-b021-e674-5520.ipv6.o2.cz. [2a00:1028:8388:a84e:ddd3:b021:e674:5520])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e3ebcb90dsm31125184f8f.22.2026.10.29.01.26.16
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 29 Oct 2026 01:26:17 -0700 (PDT)
-From: Josef Schlehofer <pepe.schlehofer@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <blum@kernel.org>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Marius Dinu <m95d@psihoexpert.ro>
-Subject: [PATCH] crypto: atmel-i2c - find the bus speed behind an I2C mux
-Date: Thu, 29 Oct 2026 09:26:16 +0100
-Message-ID: <20261029082616.53365-1-pepe.schlehofer@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=N/YldqI7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1793263475; x=1824799475;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zP6j9o6F/w03axY+MsD6UxM7gNTFpqrQ1pytm/sRx+k=;
+  b=N/YldqI7ne2V98PNHu6FXMXomdG9cX9o9cei0knZRPnhzS9ANauYcKxs
+   g9Lbc8aXnAGnJGji+3hS5sP5IHfxrVQ7/0eLI9slrjmBxPpIOlfpiWFL4
+   6Tc0DQkrvNBO6ukCp1UvDbEr3DLOYddyqZXT5n61Cwuju1t2nvdwghm5n
+   geUrS+vsgGxR9JDSsZK+8nnNwW1HLEZINriC7usDVTt20B+m7a12Rh7ks
+   bIvlAX7QY8EfVhCmvzt266Z5UstxKvqtmqLd4QQL+bvRa9e/aiw298m3T
+   QMChIara4DR2ODRVRQYnHQjxo1yeW4BblGG11tDLXnYoLP7DzAOv3qsf5
+   w==;
+X-CSE-ConnectionGUID: F9urCpzVSbeJAwhG/kfrYw==
+X-CSE-MsgGUID: kF81pAjhTz6Y7LirktJ+PQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11949"; a="1883081"
+X-IronPort-AV: E=Sophos;i="6.27,184,1787036400"; 
+   d="scan'208";a="1883081"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2026 01:44:34 -0700
+X-CSE-ConnectionGUID: 4rCsOan0TAGSv25eri71LQ==
+X-CSE-MsgGUID: rzUW03PeSzOCgCTooWn4jw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,184,1787036400"; 
+   d="scan'208";a="4986244"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 29 Oct 2026 01:44:31 -0700
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xMLkK-00000000Zqq-0ZYA;
+	Thu, 29 Oct 2026 08:44:28 +0000
+Date: Thu, 29 Oct 2026 16:43:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jarkko Sakkinen <jarkko@kernel.org>,
+	David Howells <dhowells@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, keyrings@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v3 5/6] KEYS: Replace assoc_array with rhashtable
+Message-ID: <202610291634.MckYHsJq-lkp@intel.com>
+References: <20261025001105.1824178-6-jarkko@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -101,88 +91,190 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261025001105.1824178-6-jarkko@kernel.org>
 
-On the Turris Omnia, the ATSHA204A sits behind a PCA9547 I2C mux. The
-driver reads "clock-frequency" from the mux channel, which has no such
-property, so the probe fails with -EINVAL:
+Hi Jarkko,
 
-  atmel-sha204a 6-0064: failed to read clock-frequency property
+kernel test robot noticed the following build errors:
 
-A device tree patch in 2024 added the property to the mux channel. The
-review rejected it, because the I2C core ignores the property there. The
-driver would then compute the wake token for a wrong bus speed. The
-review asked for a fix in the driver, but none was sent.
+[auto build test ERROR on linus/master]
+[cannot apply to akpm-mm/mm-nonmm-unstable manguebit/cifs-next manguebit/cifs-fixes device-mapper-dm/for-next fsverity/for-next fsverity/for-current shuah-kselftest/next shuah-kselftest/fixes dhowells-fs/fscache-next dhowells-fs/keys-next v7.3 next-20261028]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Keep reading the property of the client's adapter first, as before. If
-it has none, look at the parent adapters. If no adapter has it, use
-100 kHz, the default of most I2C controller drivers.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jarkko-Sakkinen/KEYS-Expand-key-datalen-quotalen-to-unsigned-int/20261025-031009
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20261025001105.1824178-6-jarkko%40kernel.org
+patch subject: [PATCH v3 5/6] KEYS: Replace assoc_array with rhashtable
+config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20261029/202610291634.MckYHsJq-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261029/202610291634.MckYHsJq-lkp@intel.com/reproduce)
 
-Fixes: 11105693fa05 ("crypto: atmel-ecc - introduce Microchip / Atmel ECC driver")
-Cc: stable@vger.kernel.org # v5.19+
-Reported-by: Marius Dinu <m95d@psihoexpert.ro>
-Closes: https://lore.kernel.org/all/46ea55652f8bcdef51d5c552902fd0cc@psihoexpert.ro/
-Link: https://lore.kernel.org/all/20240515104149.2ce3566e@dellmb/
-Signed-off-by: Josef Schlehofer <pepe.schlehofer@gmail.com>
----
-Tested on a Turris Omnia with 7.2.13 and 6.18.59: the driver probes, and
-/dev/hwrng reads random data from the ATSHA204A. The mv64xxx controller
-stops at the address NAK, so this test does not exercise the token size.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202610291634.MckYHsJq-lkp@intel.com/
 
- drivers/crypto/atmel-i2c.c | 29 ++++++++++++++++++++---------
- 1 file changed, 20 insertions(+), 9 deletions(-)
+All errors (new ones prefixed by >>):
 
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index 24bded4..5ff7bf5 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -347,11 +347,28 @@ free_cmd:
- 	return ret;
- }
- 
-+/*
-+ * A device behind an I2C mux sits on a channel adapter. Try the adapter of
-+ * the client first, as before, then its parents. Without the property,
-+ * assume 100 kHz, the default of most I2C controller drivers.
-+ */
-+static u32 atmel_i2c_bus_speed(struct i2c_adapter *adap)
-+{
-+	u32 bus_clk_rate;
-+
-+	for (; adap; adap = i2c_parent_is_i2c_adapter(adap)) {
-+		if (!device_property_read_u32(&adap->dev, "clock-frequency",
-+					      &bus_clk_rate) && bus_clk_rate)
-+			return bus_clk_rate;
-+	}
-+
-+	return I2C_MAX_STANDARD_MODE_FREQ;
-+}
-+
- int atmel_i2c_probe(struct i2c_client *client)
- {
- 	struct atmel_i2c_client_priv *i2c_priv;
- 	struct device *dev = &client->dev;
--	int ret;
- 	u32 bus_clk_rate;
- 
- 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-@@ -360,14 +377,8 @@ int atmel_i2c_probe(struct i2c_client *client)
- 	}
- 
- 	bus_clk_rate = i2c_acpi_find_bus_speed(&client->adapter->dev);
--	if (!bus_clk_rate) {
--		ret = device_property_read_u32(&client->adapter->dev,
--					       "clock-frequency", &bus_clk_rate);
--		if (ret) {
--			dev_err(dev, "failed to read clock-frequency property\n");
--			return ret;
--		}
--	}
-+	if (!bus_clk_rate)
-+		bus_clk_rate = atmel_i2c_bus_speed(client->adapter);
- 
- 	if (bus_clk_rate > I2C_MAX_FAST_MODE_PLUS_FREQ) {
- 		dev_err(dev, "%u exceeds maximum supported clock frequency (1MHz)\n",
--- 
-2.54.0 (Apple Git-157)
+   In file included from <command-line>:
+   kernel/bpf/keys.c: In function 'bpf_lookup_keyring':
+>> kernel/bpf/keys.c:32:35: error: 'struct key' has no member named 'keys'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |                                   ^~
+   include/linux/compiler_types.h:682:23: note: in definition of macro '__compiletime_assert'
+     682 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:702:9: note: in expansion of macro '_compiletime_assert'
+     702 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/keys.c:32:14: note: in expansion of macro 'READ_ONCE'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |              ^~~~~~~~~
+>> kernel/bpf/keys.c:32:35: error: 'struct key' has no member named 'keys'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |                                   ^~
+   include/linux/compiler_types.h:682:23: note: in definition of macro '__compiletime_assert'
+     682 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:702:9: note: in expansion of macro '_compiletime_assert'
+     702 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/keys.c:32:14: note: in expansion of macro 'READ_ONCE'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |              ^~~~~~~~~
+>> kernel/bpf/keys.c:32:35: error: 'struct key' has no member named 'keys'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |                                   ^~
+   include/linux/compiler_types.h:682:23: note: in definition of macro '__compiletime_assert'
+     682 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:702:9: note: in expansion of macro '_compiletime_assert'
+     702 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/keys.c:32:14: note: in expansion of macro 'READ_ONCE'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |              ^~~~~~~~~
+>> kernel/bpf/keys.c:32:35: error: 'struct key' has no member named 'keys'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |                                   ^~
+   include/linux/compiler_types.h:682:23: note: in definition of macro '__compiletime_assert'
+     682 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:702:9: note: in expansion of macro '_compiletime_assert'
+     702 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/keys.c:32:14: note: in expansion of macro 'READ_ONCE'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |              ^~~~~~~~~
+>> kernel/bpf/keys.c:32:35: error: 'struct key' has no member named 'keys'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |                                   ^~
+   include/linux/compiler_types.h:682:23: note: in definition of macro '__compiletime_assert'
+     682 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:702:9: note: in expansion of macro '_compiletime_assert'
+     702 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   kernel/bpf/keys.c:32:14: note: in expansion of macro 'READ_ONCE'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |              ^~~~~~~~~
+>> kernel/bpf/keys.c:32:35: error: 'struct key' has no member named 'keys'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |                                   ^~
+   include/linux/compiler_types.h:635:53: note: in definition of macro '__unqual_scalar_typeof'
+     635 | #define __unqual_scalar_typeof(x) __typeof_unqual__(x)
+         |                                                     ^
+   include/asm-generic/rwonce.h:50:9: note: in expansion of macro '__READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |         ^~~~~~~~~~~
+   kernel/bpf/keys.c:32:14: note: in expansion of macro 'READ_ONCE'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |              ^~~~~~~~~
+   In file included from ./arch/x86/include/generated/asm/rwonce.h:1,
+                    from include/linux/compiler.h:391,
+                    from include/uapi/linux/filter.h:9,
+                    from include/linux/bpf.h:8,
+                    from kernel/bpf/keys.c:4:
+>> kernel/bpf/keys.c:32:35: error: 'struct key' has no member named 'keys'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |                                   ^~
+   include/asm-generic/rwonce.h:44:73: note: in definition of macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                         ^
+   kernel/bpf/keys.c:32:14: note: in expansion of macro 'READ_ONCE'
+      32 |         if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+         |              ^~~~~~~~~
 
+
+vim +32 kernel/bpf/keys.c
+
+abaa0835b4f3810 Daniel Borkmann 2026-08-28  25  
+264d8fd2794fabe Daniel Borkmann 2026-08-28  26  struct bpf_key *bpf_lookup_keyring(void)
+264d8fd2794fabe Daniel Borkmann 2026-08-28  27  {
+264d8fd2794fabe Daniel Borkmann 2026-08-28  28  	struct bpf_key *bkey;
+264d8fd2794fabe Daniel Borkmann 2026-08-28  29  
+264d8fd2794fabe Daniel Borkmann 2026-08-28  30  	if (!bpf_keyring)
+264d8fd2794fabe Daniel Borkmann 2026-08-28  31  		return NULL;
+264d8fd2794fabe Daniel Borkmann 2026-08-28 @32  	if (!READ_ONCE(bpf_keyring->keys.nr_leaves_on_tree) ||
+264d8fd2794fabe Daniel Borkmann 2026-08-28  33  	    !READ_ONCE(bpf_keyring->restrict_link))
+264d8fd2794fabe Daniel Borkmann 2026-08-28  34  		return NULL;
+264d8fd2794fabe Daniel Borkmann 2026-08-28  35  
+264d8fd2794fabe Daniel Borkmann 2026-08-28  36  	bkey = kmalloc_obj(*bkey);
+264d8fd2794fabe Daniel Borkmann 2026-08-28  37  	if (!bkey)
+264d8fd2794fabe Daniel Borkmann 2026-08-28  38  		return NULL;
+264d8fd2794fabe Daniel Borkmann 2026-08-28  39  
+264d8fd2794fabe Daniel Borkmann 2026-08-28  40  	bkey->key = bpf_keyring;
+264d8fd2794fabe Daniel Borkmann 2026-08-28  41  	bkey->has_ref = false;
+264d8fd2794fabe Daniel Borkmann 2026-08-28  42  	return bkey;
+264d8fd2794fabe Daniel Borkmann 2026-08-28  43  }
+264d8fd2794fabe Daniel Borkmann 2026-08-28  44  
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
