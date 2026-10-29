@@ -1,52 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=152.53.16.207
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793261865;
-	b=O+lt7IF/chHRS00G+Jgz+suhaIRMn2kzmC0MxmtUwpfMpWI8OQy1Xoy73PtFrvanAlYI
-	 Od8qJLrBxw/PmhdgrqvQ4EXHEpaFMigRtN3ASgJSB9hwfar/lwsDsuS64PINHvHV6qoVL
-	 5Oyw2xPXfzD3U4ok5VII1NfQLvL5bADacPB0kGP4S7w/1HMOWcXNJLhz77G8IQnk3yliR
-	 jgYOxDykxC7eXh9rRCoOknns67bUDZiwfFjlgGogR13Tff1w3mTzZsbKFQqt6+F5FBusx
-	 nPDsaUOaBXmOk2EUfkb6GF6r5YW7l0m4RJ2tfBJLlWC+6utM15sfWvzul0U6eHyAGPg==
+	t=1793262178;
+	b=2/XHweQq7/E49WpzxoM68htXugT++8gfcEmjbfd+kvi7m1QTYalQM5yNYxUzHcmKDZNo
+	 3i1gLG8t6THO4eRVub8SvD0wV2s+fCIlO98avxqto459JP5cQEKNJBFM4nRWDN+UCLx8z
+	 5yVsowwr5D0OY9WfeyqLFVS3ilMa6YZSISzeqxKvgsjhNclGW5NAkp3lCO00gIwpDKWTZ
+	 pw8DOrwYBEhJ6nDtTZUtrIkkbz7jzWTybu+72Z7YhlO+gDZV8XD/l8MLRp7SC8xhfFaJA
+	 0BG8etGm/QbI4eFVMjuFyOMBxLJApjeNUtzdhQLNbuxtoCi6/a4zFnpIGYnm5AQNSpw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793261865;
-	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=eaLXaFDiT+JD0gpjw1PqvYETYiZWeo+rCz60su31FNE=;
-	b=3L8deM+FGcenl9iUr0qEBVjngocVx6v/K6eweZklnLhhFtS/pNkU/yhp2s5zmUJethIy
-	 COwz1r2soBEUd03Xwq1YfrCqNFlFrBRKjTALDjEFbs/96btSzCCzB2yX91WkQGTP/LW3d
-	 wiy5XWnjtkddtjiNvCVPsDcARBEGucNNco5PulNWJBKkvjtPO9Y8YhXaVkLfErFEXUjR/
-	 OXzWIk14UbUMdi0j+R1uo5O6vEXGordI5bs5L1ITB6e0x285d863kYYa1CAmRBnYbhasi
-	 c7VZ4uLVXaQOueIn5WZUCv7nxyPBoSGWaI3QahjBvjD8RXX4AL7yzDIrhbr4vXZQMZw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793262178;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=2apa8Mr/pCcSFyuTTcmI9mAPuP1EGz22opH+X2kB18Y=;
+	b=EiUc7dVk652t/kTZUfngxT1q6ueuEUZ0x+ZONB71FQeuFpxyl2aA4IhK0fjUDPCu+18h
+	 JFU4SWexqq1X0P59hc2chRBxxeuCrTjO4ljp3WKpNhqeYiwYtUB9UYYqoRiWTin+6JDKY
+	 THPrT69P486cFbJHeoHDTuAIvdA4Ye6QNN3T98PeiOjXWG97nrihNbItKtpPmF2c+n2KM
+	 oSy5MrWrz8d3f1qP+2qwiEPTkdOgf9VGTkAMDDHbhAfby8K6NLkSigbEmdhdiPJZkmT4g
+	 wAcPYSpZscHCY0f8+UlMex6zVWW2GLH2yG/HjAbOhIFn8Xkhv3ZIyJHTDQipa1yy2PQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=kaiser.cx;
-	spf=pass smtp.mailfrom=kaiser.cx;
-	arc=none smtp.remote-ip=152.53.16.207
-Received: from akranes.kaiser.cx (akranes.kaiser.cx [152.53.16.207])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=UHmLTmmx;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86396606A31D;
-	Thu, 29 Oct 2026 08:17:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 86396606A31D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kaiser.cx
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaiser.cx
-Received: from ipservice-092-209-185-051.092.209.pools.vodafone-ip.de ([92.209.185.51] helo=nb282.user.codasip.com)
-	by akranes.kaiser.cx with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <martin@kaiser.cx>)
-	id 1xMLKD-00000001lfj-0vRa;
-	Thu, 29 Oct 2026 09:17:29 +0100
-From: Martin Kaiser <martin@kaiser.cx>
-To: Hadar Gat <hadar.gat@arm.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Martin Kaiser <martin@kaiser.cx>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] hwrng: cctrng - fix usage counter in error path
-Date: Thu, 29 Oct 2026 09:15:31 +0100
-Message-ID: <20261029081644.1897897-1-martin@kaiser.cx>
-X-Mailer: git-send-email 2.43.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5B7606A31C;
+	Thu, 29 Oct 2026 08:22:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2F5B7606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=UHmLTmmx
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=2apa8Mr/pCcSFyuTTcmI9mAPuP1EGz22opH+X2kB18Y=; 
+	b=UHmLTmmxsQXWP79uUgFoAw2NJDK2NcG91qq8NUxO8PYoCNxAbqtAn5bxrjB3K3d6fhnDZf35Nh/
+	7ayNPUu4q6o/SOeRc31+HInmDlj0qLHaWuh4ikJZ2H/qa3CFz20nWDAlMc394xpqr3538+KzpiMoD
+	Uh56gWhTFg12MubXPjP0caNCb+dlFP0UKOTUwwAtXOVxhyKx/WfGHReQ5Aj2FVOGjHTlbsMMylb/t
+	bb4VRAaYPYGo86gFO15cfVyAbrsiz/YgUVwBCZ4caDV/SbMzozdIMaNFDh7O9ySIyQNjuG2ZLLGvG
+	NV7T0J/LrWlMLnvPgl42t9aRP6wloAC00xXg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xMLPL-00000008gDW-1lPL;
+	Thu, 29 Oct 2026 16:22:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 29 Oct 2026 16:22:47 +0800
+Date: Thu, 29 Oct 2026 16:22:47 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Cc: sashiko-reviews@lists.linux.dev, hannes@cmpxchg.org, yosry@kernel.org,
+	nphamcs@gmail.com, chengming.zhou@linux.dev,
+	akpm@linux-foundation.org, linux-mm@kvack.org, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, rientjes@google.com,
+	willy@infradead.org, senozhatsky@chromium.org
+Subject: Re: [PATCH v2 3/8] crypto: acomp - Add trivial segmentation wrapper.
+Message-ID: <auMCV1AFlEFuJnk7@gondor.apana.org.au>
+References: <20261028030503.17923-1-kanchanapsridhar2026@gmail.com>
+ <20261028030503.17923-4-kanchanapsridhar2026@gmail.com>
+ <sashiko-outbox-188655@kernel.org>
+ <CACpmpodu3C=uYH6dmFM-xkvdJxiRDjamRKs1Q4jU6_KKjFWNqA@mail.gmail.com>
+ <auLbyon-KaV5Sw5_@gondor.apana.org.au>
+ <CACpmpofcd=ZPKhAoHJfvJU_JZshKs1GGJZf5JhjAW1PZzDq-Lw@mail.gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -56,42 +72,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACpmpofcd=ZPKhAoHJfvJU_JZshKs1GGJZf5JhjAW1PZzDq-Lw@mail.gmail.com>
 
-If probe fails after the runtime pm usage counter was incremented,
-we have to decrement it before we exit.
+On Wed, Oct 28, 2026 at 11:03:55PM -0700, Kanchana P. Sridhar wrote:
+> 
+> I was under the impression that if acomp_req_on_stack and synchronous
+> tfm, it would go through acomp_do_req_chain(). Please correct me if I
+> am wrong, and I can modify the conditional accordingly.
 
-Remove the cc_trng_pm_fini call in the error path. It calls
-pm_runtime_disable before runtime pm is enabled.
+It's perfectly fine for a stack request to go to a sync tfm.  What
+isn't legal is for a stack request to go through an async tfm.
 
-Fixes: a583ed310bb6 ("hwrng: cctrng - introduce Arm CryptoCell driver")
-Signed-off-by: Martin Kaiser <martin@kaiser.cx>
----
-based on sashiko review
-https://lore.kernel.org/linux-crypto/67844d9d-d4d4-4026-9549-73589afcc1ff@wanadoo.fr/T/#m1a770f5f9eeed95b48cad7545580aed4fa74e6fa
-
-compile-tested only
-
- drivers/char/hw_random/cctrng.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
-index 03401ee59a8e..d9492d25ecbb 100644
---- a/drivers/char/hw_random/cctrng.c
-+++ b/drivers/char/hw_random/cctrng.c
-@@ -533,9 +533,9 @@ static int cctrng_probe(struct platform_device *pdev)
- 	/* registration of the hwrng device */
- 	rc = devm_hwrng_register(dev, &drvdata->rng);
- 	if (rc) {
--		dev_err(dev, "Could not register hwrng device.\n");
--		cc_trng_pm_fini(drvdata);
--		return rc;
-+		pm_runtime_put_noidle(dev);
-+		return dev_err_probe(dev, rc,
-+				     "Could not register hwrng device: %d\n", rc);
- 	}
- 
- 	/* trigger HW to start generate data */
+Cheers,
 -- 
-2.43.7
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
