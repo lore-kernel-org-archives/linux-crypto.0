@@ -1,100 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.48
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793297523;
-	b=Akbn+NtPVg0i/QCE7Dba+nM7XmptZ+HjJs0FiPKbQPCceGy6YXL26ZI6Y7jZ0cOlMKEs
-	 HxwMRcoOEWktpusng/6MlkSTVMTz2ntNrDEldn/OKxAQPL/4f9T7kpZQOWNm9lNDp+Ew7
-	 Mr60tl3p/dx7o9QCPQoDPw90a3m9LN6okm+fT6uAuYck5kY6AqBqwIBISZt9urUTqjMQo
-	 IC12Q7TY5V1dWzklUwDYrD2WrL9kwBHb4JyzLAJ1Qbq/z8RF1p2lO9Gl0cZXe2tf8Yau0
-	 iA0w+stu1sHmsNa3t8E4AhJHYr9AkTbHsxdaBx2semwn//Oz8dWAYsQ5RxPsLpLm/3w==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793297523;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=PLUjYNTvLoS6IRSrAP5hbUmJYyA56qlS0xnG+YeH+uo=;
-	b=NSECeqKDpYcQyfJuQwx/1QTQiXhWPYwWsXSXfJW6LaLNvld5BsrnAbiu78xZGTFcWXXt
-	 RLewAXQh+Ef05ybNHs9rZVjfYar99BRqZRmX6CDE4BuDh9YDeh/brD82CIbZWmqt+Fx4I
-	 WzBzao6hzuUeHEhwiZKhM1lYk9Sis4aTfMkBT7hMMe0JYwWVLBDGcUpd3SBkxv5CG4bum
-	 3OeSHSx5VmFcvghJcnHc9YiiTJOYCe1T/sI2zF6anluTaApnkVJQ4T9t9QGH3fP17Mf6g
-	 YQ30CfU5KuqepmIYUQ5IUge4Vic9+OeU8v0ywz8Jx2AF+5/JkvT/6BT5WfkKQc7kl/w==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=jdz1y9Sa;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.48
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=80.12.242.73
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793300672;
+	b=kRbM0rHPUDHq6/KUqrtHVdYYG7pv8vcwkAVmTquiA/5TI4qS5KwWT0lbv7g7Y5I7zsKB
+	 bFDKGSfUYj7V4mPQl6hk6ASM8dR21fhUiG9TpieHns+JzyxWEUnf/sw3NiRuEpMb1dUwD
+	 O0n60gouFcokpmYahfwqRpcnk8fpQy02YJHSiuu8Qhd49qMiuSesNG+mYELA7JZ7bOZIt
+	 t3oOyWqTcr5H0mhBw6NCHSQsU+9NrKd36dLApIb1D4tJk/iuK6EJlN2FjQ+8JjIcBmIrR
+	 QF6XLT+adyhbNd3x0SBwjo5qnk6lX3hTKhmA3yWCk+3jPOxbvKvtWbjEExkWZCYgfmA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793300672;
+	h=DMARC-Filter:Received:DKIM-Signature:X-ME-Helo:X-ME-Auth:X-ME-Date:
+	 X-ME-IP:Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 References:From:Content-Language:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=9ZavZJ0tM0u2Q8xdkZbjoOrQwlHby02WagG8hWWt2mI=;
+	b=O2Z8uyFdRBH+oObjSdslT1Gzh5ddsL5+lkVx4ghEwp2h6v716UKJxlEieegdpUfeWQyA
+	 ZBnYbf5wwvkGyzXsH9/0qiJFEHUzLp60YSUypp1L2NauVCXAT7oh8grknVYqNu3WSjWrZ
+	 4LGHM0izYzL00ejA2/JFIrcLZ57b4eQ+2IP9BKfZYSUDvz9gJeR4CElHhJVtgqTkLmOR/
+	 TKNTsy96yj6NNqNg4749Qo+QUZPBjMs3qHUqzxnFmnyL6FOIgo21rdtSqhdQltiUqPkpB
+	 TKw7MARThNKdSiZDC8XgCRwR64w7iWtiVjMobpAbGlVw3xxmQGpkP5gwI8hlCaqtF+A==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=wanadoo.fr;
+	spf=pass smtp.mailfrom=wanadoo.fr;
+	dkim=pass header.d=wanadoo.fr header.i=@wanadoo.fr header.a=rsa-sha256 header.s=t20230301 header.b=A160Bh6O;
+	arc=none smtp.remote-ip=80.12.242.73
+Received: from smtp.smtpout.orange.fr (smtp-73.smtpout.orange.fr [80.12.242.73])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75FA606A31C
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 18:12:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B75FA606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108DC606A31A;
+	Thu, 29 Oct 2026 19:04:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 108DC606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=jdz1y9Sa
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5ba3b1199f6so2582724e87.3
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 11:12:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1793297520; cv=none;
-        d=google.com; s=arc-20260327;
-        b=FUceLXn/t1HpBi9VecWx/PprgNTN9b5AOFRiaSZxL0kDSXRDqWXDvTD6qtU7w626dJ
-         Ec1gOOvgJMddXhiTEAd52joODQcTfKExbO/9vMx5vTYmymTDWt6u7Q5QlULAq/cIEg/W
-         jFj52t4GmsW7iV1aH25CgKFmqoIyKVwW5JlZYOC46ZKqweRXWOuiBXQNfQkXcwZr1nXs
-         EmQsc9AOf0/w5X/13MuDa8aTIBVbsXe9EeFJpL9jeJRp40TqpmpHxaf+3WLz067iwZnR
-         277EjAKal+/WyC9mSO8kKCSKt4UV7S0sHDFStr85+QqhbAKvX3gtgB+EOlVbKKtow/o/
-         6EkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=PLUjYNTvLoS6IRSrAP5hbUmJYyA56qlS0xnG+YeH+uo=;
-        fh=KDQpy2Di5QssKFBEWpY3Sk3SnP+sgQSsaWmGzdUnJBw=;
-        b=IGY2LvmW6RJGSmEHoCQqFBYIKuWL/8aqmwXPZ6IOWfGBekhAAD13tN3P7WmMoVwlVK
-         WitnKG8RjLWTf/AAbWRCUBYQAMfe17cXbTlV6RL/jH0CIcIWOisByMBz4RFZhM17JZ63
-         y/5Lg73V/KX7maK859cxGKTPXuVBzGA8cR9f1jRlpCuEp/hdzRXfpTVirXA5BI+/+bB+
-         pEETCcX6k1lDSPxphbiB2twEe/9fNeDPCGaEKZyQT0lnybs1gU5dNctz0Bn0M1BDMVOC
-         L1apTU1S7KLSZSAsHRe23c5WliQRKMDnZZYG9jdVXiMrRlFyttlnghMVGIpvS3p1Zq3/
-         TvkQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793297520; x=1793902320; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=PLUjYNTvLoS6IRSrAP5hbUmJYyA56qlS0xnG+YeH+uo=;
-        b=jdz1y9SaM7AMp594Gnw1ZOQjhquT1A/dXVp7Ykq3r13e/Xz7zjva0wMKofBUKkdk0I
-         FB8JUEimAGyNGrnw/z22gx83h+X1LKyj/k4O4wq75TC9ZigHa8Q/IlRAkKhNBztmaRGi
-         zgRMRMzGc/PsDEz084HK2j+EdBUhdz8WgHs8ZLt9e8cmDMlVFWr0xWrrSc3NUWnSrXvB
-         nGprRivT0OhNPzD9Be6yjUBHYJjFqJTBDdwz1CHqKenXJWspwMpsEh1SlO/td6INZhWV
-         R8yHueOfoBu5gr0vELx7gM8aNu2oFZeJa36tNTID4CgMtA0PoNDc+oxMqahvjnw+/3In
-         NNuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793297520; x=1793902320;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=PLUjYNTvLoS6IRSrAP5hbUmJYyA56qlS0xnG+YeH+uo=;
-        b=nWQZjr/jfHIE6F1EHy3k2rk9O+Hac0VKv4yioMCeQ6bApXW97EGRNblSZ/cSxCx76Z
-         +V4oCeDXDgBB9RMeFiZ1U6HGxtSScuwl3xLl0j4DbgNfyRAJ5t6zvc9IhTdZBpbRHzUo
-         jX6XS+pYw+UiDDh/s2NheJBKU44GAvacQXlRCu6u1edFcJRILIbRXdlQ8GUgEZ4Wiiap
-         BA1BdYyYLh7nOsJfTpJeoX3TgIU4VKMUe3S0vhkoIqqjQ1dvpJpLf7H7vSri0MVUx8s2
-         IDH4x6Aq6aRmluuroBn10mDVB0Ykz2+86avd8f8zvwdKzcu+t6yuC4y/KG7HbJA5VoCH
-         xadQ==
-X-Forwarded-Encrypted: i=1; AKwUvBycOzPF0aKUy3i28Np+t5pXy4e75HyIEmTd/hMnJBIO5QM3WRORZJDJDF+XXULftzxeLzLJfhIzLzCdwwU=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJrPld+dw4us/9x5o6K/QTOcMylf+yX+gbUbxU542Lolo3lpivV
-	hjmO1c1FaeDIU1z5sFB/uAL4EbfslnPh2rUoQXF2XB5g1jcoU41hFF3BLhvrAx7WlYE1NGCvVgU
-	CkE9k+kawEI6QzZt1taONqK4+obrK3vg=
-X-Gm-Gg: AYBFou0lvlyQ5OajaMGSNPVvYXhX3Zx1Retv4bPQc37w9EzHfqAQuTKNvzE/d0YhA2t
-	nada5C46DsWc0q9uwHhbQVX/8UTpn32eB6s2sI+SfOiePoGfLTPwvr6CfY2l2XfKHRlkWprxK1a
-	NzYyjYTjy+BuQf2WIBgkIVHkdKMY4yB0T2w4fh8HiY7Xa8Jemm0MbPRDPKz63X6VqEZYQv3kW8y
-	uWuXmgao7Dl1LT9nvKJ1XsOdhs9F6I/9fZxNzB+YXxYzRoyazZdcidyDVyzp2Z9IGICbPz6F2BB
-	PTWh9sWAZpXERNIu33wYZRIy0qKSvULEuqrB6siknaiP43HijlJCXbYNNnsEBEKP4KskmWMF3vs
-	DUBE0lL1f1ThEpbMf45YgYfq2JPr/ju8fDL5S
-X-Received: by 2002:a05:6512:23a5:b0:5be:414b:9032 with SMTP id
- 2adb3069b0e04-5bfcad46342mr2523158e87.31.1793297520237; Thu, 29 Oct 2026
- 11:12:00 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=wanadoo.fr header.i=@wanadoo.fr header.a=rsa-sha256 header.s=t20230301 header.b=A160Bh6O
+Received: from [IPV6:2a01:cb10:785:b00:26fb:aefb:6cd2:db0e]
+ ([IPv6:2a01:cb10:785:b00:26fb:aefb:6cd2:db0e])
+	by smtp.orange.fr with ESMTPSA
+	id MVQAxrOxkL6ZKMVQAxzCqb; Thu, 29 Oct 2026 20:04:23 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1793300663;
+	bh=9ZavZJ0tM0u2Q8xdkZbjoOrQwlHby02WagG8hWWt2mI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=A160Bh6O5IquSjuq+6L5If12MEcwxBcgaNRH+zPk/3SCaVQpCKQFx4pdltWUwx3am
+	 FZC2/dorznW+TbEDrWy5BU4Ay4yD4EI1z9HD5wY1qw8zX10m+fYOgln0hkszDYEV9I
+	 wMVWbXVHLTct1j05ElcRm/q2zLu4BO3Kqu4AG8U/Eo9lfaEryVcVR5PHF9607NG9Zw
+	 fyO+7ns0Zz4Hcs8L3Uy5wOFxqQslxQtcV/uwswYYQurBILYxEarLisgPzEtIjSRGOh
+	 rHd5L3nHqDIMrtYrs51RqiF4BWkZuSMtxmS3dof70G7s3xDCuvEZuZHhw4rQc+OBhn
+	 NejPkiRhoh+iA==
+X-ME-Helo: [IPV6:2a01:cb10:785:b00:26fb:aefb:6cd2:db0e]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Thu, 29 Oct 2026 20:04:23 +0100
+X-ME-IP: 2a01:cb10:785:b00:26fb:aefb:6cd2:db0e
+Message-ID: <0f44dca1-fd95-4b41-93b5-e5b71a4c07cb@wanadoo.fr>
+Date: Thu, 29 Oct 2026 20:04:18 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -104,43 +63,56 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261028030503.17923-1-kanchanapsridhar2026@gmail.com>
- <20261028030503.17923-4-kanchanapsridhar2026@gmail.com> <sashiko-outbox-188655@kernel.org>
- <CACpmpodu3C=uYH6dmFM-xkvdJxiRDjamRKs1Q4jU6_KKjFWNqA@mail.gmail.com>
- <auLbyon-KaV5Sw5_@gondor.apana.org.au> <CACpmpofcd=ZPKhAoHJfvJU_JZshKs1GGJZf5JhjAW1PZzDq-Lw@mail.gmail.com>
- <auMCV1AFlEFuJnk7@gondor.apana.org.au>
-In-Reply-To: <auMCV1AFlEFuJnk7@gondor.apana.org.au>
-From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Date: Thu, 29 Oct 2026 11:11:47 -0700
-X-Gm-Features: AclHuK8R6xznrwfhDJPyC02DpxmXLxT-47zHrOdZ1Ogvg0ySBRqlzEwjpCqqoJ0
-Message-ID: <CACpmpofnUbi7gf=eBdCH1k6ZpeiNQUdt_tRRZhvipmhwkhwRqg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/8] crypto: acomp - Add trivial segmentation wrapper.
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: sashiko-reviews@lists.linux.dev, hannes@cmpxchg.org, yosry@kernel.org, 
-	nphamcs@gmail.com, chengming.zhou@linux.dev, akpm@linux-foundation.org, 
-	linux-mm@kvack.org, davem@davemloft.net, linux-crypto@vger.kernel.org, 
-	rientjes@google.com, willy@infradead.org, senozhatsky@chromium.org, 
-	"Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] hwrng: cctrng - fix usage counter in error path
+To: Martin Kaiser <martin@kaiser.cx>, Hadar Gat <hadar.gat@arm.com>,
+ Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20261029081644.1897897-1-martin@kaiser.cx>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Content-Language: en-US, fr-FR
+In-Reply-To: <20261029081644.1897897-1-martin@kaiser.cx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 29, 2026 at 1:23=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Wed, Oct 28, 2026 at 11:03:55PM -0700, Kanchana P. Sridhar wrote:
-> >
-> > I was under the impression that if acomp_req_on_stack and synchronous
-> > tfm, it would go through acomp_do_req_chain(). Please correct me if I
-> > am wrong, and I can modify the conditional accordingly.
->
-> It's perfectly fine for a stack request to go to a sync tfm.  What
-> isn't legal is for a stack request to go through an async tfm.
 
-Ok, thanks for the explanation. I will change this as you suggested.
-
+Le 29/10/2026 à 09:15, Martin Kaiser a écrit :
+> If probe fails after the runtime pm usage counter was incremented,
+> we have to decrement it before we exit.
 >
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Remove the cc_trng_pm_fini call in the error path. It calls
+> pm_runtime_disable before runtime pm is enabled.
+>
+> Fixes: a583ed310bb6 ("hwrng: cctrng - introduce Arm CryptoCell driver")
+> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+> ---
+> based on sashiko review
+> https://lore.kernel.org/linux-crypto/67844d9d-d4d4-4026-9549-73589afcc1ff@wanadoo.fr/T/#m1a770f5f9eeed95b48cad7545580aed4fa74e6fa
+>
+> compile-tested only
+>
+>   drivers/char/hw_random/cctrng.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
+> index 03401ee59a8e..d9492d25ecbb 100644
+> --- a/drivers/char/hw_random/cctrng.c
+> +++ b/drivers/char/hw_random/cctrng.c
+> @@ -533,9 +533,9 @@ static int cctrng_probe(struct platform_device *pdev)
+>   	/* registration of the hwrng device */
+>   	rc = devm_hwrng_register(dev, &drvdata->rng);
+>   	if (rc) {
+> -		dev_err(dev, "Could not register hwrng device.\n");
+> -		cc_trng_pm_fini(drvdata);
+> -		return rc;
+> +		pm_runtime_put_noidle(dev);
+> +		return dev_err_probe(dev, rc,
+> +				     "Could not register hwrng device: %d\n", rc);
+
+No need to duplicate rc in a dev_err_probe() call.
+
+CJ
+
+>   	}
+>   
+>   	/* trigger HW to start generate data */
