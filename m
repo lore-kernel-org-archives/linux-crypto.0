@@ -1,71 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793240227;
-	b=SqD+evpwSIOoFiSdrDDvVgzdtaPT+NdHtespF8wXbkC83zZei51Eq0urwQmqXhCfA33+
-	 eXGoF1fyUMZXBM6mBazX839kcV3YS/uFFSQwB4EvoXR4chA0FiajiYc9dtFLk9z1Xt2M3
-	 B7Fnxljy3PZt2eErE8RCJEteVfvmZzGTHIhwnOk17BFQ0+N9XuWm0VKWrVPQe3ETBHsaB
-	 xyFtr6wbzYZje/3gJkYj3pl7gpEb3C0jYFjAcAbwZVh/UZWlOduMb1oMGbsF3VZbp0jxm
-	 Iya8+Hmo8AScAindc2JhGiXp2ekmWOAFU8RI85krW2Xb6BuNU44SX7XUt9V8n6Ud0Zg==
+	t=1793243161;
+	b=CPFlW2mcGezUg29eqUlPNwljLK60oMDGiTRipYOC+vFcGQ8+1pUuIemeW3pHvPdOEFJ1
+	 BnIiw4bk2p6ubnFb6Y813sLAXnbJVU+rbWSJD1vCU1oCyP27VaXnPaOiWRHpcEgRBiMHb
+	 K46mXC8KjO5+IGk39GGuLGcPqL79OkspESV/wyu3f52rMpJ/cLjDw7cuENOHiDKvkuZKl
+	 xCWto9CTVIx9/1S/zUdHK+NmhccPWXE+wo60sbK4pGrT139Bh8Zfr1nzJz4234SXTHj/c
+	 hPxltF7yTYPmXWkKG6y9VvBzcymP5fZLEk7p9nC9NUX0IV9GqLoklM5dN0pW7g27QBw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793240227;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=m9kc8yIzx2usw0N2+/yj9nIikY372WFees0PGb9Zlj0=;
-	b=RtEf6eN6TaPqgrfR9KC49jpnMkWlYEiLbl/miQBwVXkvqkpaGpK/dkf99tMnY1qZTCwU
-	 iEQ14ewIgHJBeaD+kKIGu4gl/QWyc3o0sYISax6Pfi0eaYc4Jf/bOP4TteA2rGnk/aDDc
-	 bAy25DP1h8cv5qy3MnNha0+hm1AKqKR1wA6OCVgSRlNRVS0nbGXdZz2zlJ+4rJRPp8XLy
-	 1QQ3ARzp+pNWG3SeVd7rc6+djaCggzoc3irfSVILeItvtM4i9ZE1n1mNM5zBHRKiiALj8
-	 ubpw7zXZuIuDK/zGUkp9nImqtiHpunQisHNAopefMEiXQpSD2MT9lJMux0FI54ccx/Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793243161;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=eBnn/OUg7PxXvo8p3nJ/SroKfFD1H0Hr92Nww3NdOjM=;
+	b=IlgdSRZ470NIlOUxKcLGJmnDavR/YEgKgls+rHZ88VCKuEQjV3Q0UbOQa0PFdDVGRPQc
+	 5FtXihPjQkX9OAql0xBejAYycBqruSS3TIYyM0CdbjcfYZ0mbjrzMoL8VqxmQa0iaFy3c
+	 bH7Kymhwjd98+kQTBxrQ4GvRcgE5TfmfgUP6mTd3fasdYVXqo9H5AUZbPD7zBPErLHnkL
+	 3HTr0bimY8OGrWjeF64mfE8c6165ibcf0Mo92LKLffkwvOaJhc7VKKVILI5bDxoYTpoxS
+	 yOj+ouQn2m/PHgAWgvFLEhfefQARGVfYLDjpoas+dmXkKmC9JsS6U0i4aXsd+Q5CkdA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gondor.apana.org.au;
-	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=BulVXfD7;
-	arc=none smtp.remote-ip=180.181.231.80
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B1v3ooI7;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85995606A31A;
-	Thu, 29 Oct 2026 02:17:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 85995606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CA8606A31A
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 03:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=BulVXfD7
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=m9kc8yIzx2usw0N2+/yj9nIikY372WFees0PGb9Zlj0=; 
-	b=BulVXfD773yLT3qc9u1NANNhJ98Vm6/aRxcwh5PfDZELbo1U/FSB2M/85ZgFhlhiBCV2IvuwAM+
-	RvNJIsDMBW/NCmIYF/xef7aWde69p7ClT0iqQY7Lu0MjujY1pK8DLGdr5YwRbgqIID1pc8tLx/sQC
-	Izh291VahFbHvOu6WEzhVy7BZOfCUnK5ylxT0cAbh9T4j+b6AlTNngiUvXcQvIrA+2rthRivGcZuB
-	NNMsNYkt3FtQEZLRM/nlMsVyeOBmfcEjf2loV3mHj5UYVQ8drR+LgID2bwLDoSLvqe8gUgcburL8P
-	tIjNocrWc2A34HmdV5jrxW9im4x2We6R30RQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xMFgy-00000008bSP-0k3I;
-	Thu, 29 Oct 2026 10:16:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 29 Oct 2026 10:16:36 +0800
-Date: Thu, 29 Oct 2026 10:16:36 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Liam R. Howlett (Google)" <liam@infradead.org>,
-	Uladzislau Rezki <urezki@gmail.com>, Michal Hocko <mhocko@suse.com>,
-	Baoquan He <bhe@redhat.com>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	maple-tree@lists.infradead.org, Lorenzo Stoakes <ljs@kernel.org>,
-	Chris Mason <mason@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
-	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
-	"David Hildenbrand (Arm)" <david@kernel.org>
-Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
-Message-ID: <auKshDXKQXt1kvjy@gondor.apana.org.au>
-References: <20261028154218.1668182-1-liam@infradead.org>
- <20261028154218.1668182-5-liam@infradead.org>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B1v3ooI7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D8141F01825;
+	Thu, 29 Oct 2026 03:06:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793243160;
+	bh=eBnn/OUg7PxXvo8p3nJ/SroKfFD1H0Hr92Nww3NdOjM=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=B1v3ooI7lpqk6Men20s5ikVdhaQOBtMk3DcYDpo1whk+KkTP3E6j+lRTgzxXS2eAC
+	 k0WMhkatNRdifPO2fA8vfanB4te8HhYIK2SkYgcM+i8MoeJiyQqCAlwPyfJ6R9eitt
+	 XJOl1m4HfKsdG9f7r9JrzuFRlTpjlpogx1xwBYQyHWobyob+EOTV4v1Ny7wtbIemkS
+	 +OFP/wU4POmBxBK7OhO7J3GTDl/vTbCmVOw2tQEC+q47TwZToOe7cmuE05a4sIz9Dw
+	 HCxWzcsuhPZL4wGRWyAdjyxiH/Fww6nne+H3+zm92JHSgs7WzX+NXex7i5hk/Scm1H
+	 HnrG3ZT/IIUJw==
+Message-ID: <sashiko-outbox-188655@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 3/8] crypto: acomp - Add trivial segmentation
+ wrapper.
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>, hannes@cmpxchg.org, yosry@kernel.org, nphamcs@gmail.com, chengming.zhou@linux.dev, akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, davem@davemloft.net, linux-crypto@vger.kernel.org
+Cc: rientjes@google.com, willy@infradead.org, senozhatsky@chromium.org
+In-Reply-To: <20261028030503.17923-4-kanchanapsridhar2026@gmail.com>
+References: <20261028030503.17923-1-kanchanapsridhar2026@gmail.com>
+ <20261028030503.17923-4-kanchanapsridhar2026@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 29 Oct 2026 03:05:59 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -74,43 +60,132 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261028154218.1668182-5-liam@infradead.org>
 
-On Wed, Oct 28, 2026 at 11:42:18AM -0400, Liam R. Howlett (Google) wrote:
->
-> Below, one CPU adds an FDB entry for an RTM_NEWNEIGH netlink request,
-> while another CPU is inside vmalloc() or vfree():
-> 
->     RTM_NEWNEIGH                      vmalloc() or vfree()
->     ============                      ====================
->     spin_lock_bh(&br->hash_lock)
->                                       spin_lock(&vn->busy.lock)
->     rhashtable_insert_rehash()
->       kvmalloc(GFP_ATOMIC)
->         vmalloc()
->           spin_lock(&vn->busy.lock)
->             waits for the other CPU
->                                       softirq: a frame for the bridge
->                                         spin_lock(&br->hash_lock)
->                                           waits for RTM_NEWNEIGH
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+s) to consider:
+- [Critical] crypto: acomp - missing async check in crypto_acomp_compress()=
+ fast path
+- [High] crypto: acomp: uninitialized state->src/dst restore in acomp_reqch=
+ain_virt()
+--
 
-I think this is a fundamental bug in the kvmalloc non-blocking
-support patch.  How can it be used at all if it is susceptible
-to such dead-locks?
+commit 7144b07b2cc5b6704699fb53fac44c4270d31f7b
+Author: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
 
-And if you can't use it safely why don't we just get rid of the
-broken kvmalloc non-block path and have it always go to kmalloc
-like it did before?
- 
-> Fixes: c6307674ed82 ("mm: kvmalloc: add non-blocking support for vmalloc")
+crypto: acomp - Add trivial segmentation wrapper.
 
-BTW, rhashtable patches should be sent to linux-crypto.
+This commit adds a single-segment compression wrapper in crypto/acompress.c
+that stores the compressed length or error code into req->dst->length when
+req->unit_size is set on transforms that do not support segmentation. It al=
+so
+adds an inline fast path in crypto_acomp_compress() for single-segment
+scatterlist requests.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> diff --git a/crypto/acompress.c b/crypto/acompress.c
+> index c8b4b8589769e..c55b0e8eff3d8 100644
+> --- a/crypto/acompress.c
+> +++ b/crypto/acompress.c
+> @@ -166,14 +166,20 @@ static void acomp_save_req(struct acomp_req *req, c=
+rypto_completion_t cplt)
+> =20
+>  	state->compl =3D req->base.complete;
+>  	state->data =3D req->base.data;
+> +	state->unit_size =3D req->unit_size;
+> +	state->flags =3D req->base.flags & (CRYPTO_ACOMP_REQ_SRC_VIRT |
+> +					  CRYPTO_ACOMP_REQ_DST_VIRT);
+
+[Severity: High]
+Can moving the state->flags assignment from acomp_virt_to_sg() into
+acomp_save_req() corrupt req->svirt and req->dvirt when a request is
+configured with acomp_request_set_src_nondma() or
+acomp_request_set_dst_nondma()?
+
+When a caller sets up a non-dma virtual request via
+acomp_request_set_src_nondma() or acomp_request_set_dst_nondma(), both the
+non-dma and virtual request flags are set in req->base.flags. When
+crypto_acomp_compress() or crypto_acomp_decompress() calls
+acomp_do_req_chain(), the call chain is:
+
+crypto_acomp_compress()
+  acomp_do_req_chain()
+    acomp_save_req()
+      state->flags =3D req->base.flags & (CRYPTO_ACOMP_REQ_SRC_VIRT |
+                                        CRYPTO_ACOMP_REQ_DST_VIRT);
+    acomp_do_one_req()
+      if (acomp_request_isnondma(req))
+          return acomp_do_nondma(req, comp);
+
+Because acomp_do_one_req() returns early through acomp_do_nondma() without
+calling acomp_virt_to_sg(), state->src and state->dst are never initialized
+from req->svirt and req->dvirt.
+
+When acomp_reqchain_finish() then calls acomp_reqchain_virt() in
+crypto/acompress.c:
+
+static void acomp_reqchain_virt(struct acomp_req *req)
+{
+	struct acomp_req_chain *state =3D &req->chain;
+	unsigned int slen =3D req->slen;
+	unsigned int dlen =3D req->dlen;
+
+	if (state->flags & CRYPTO_ACOMP_REQ_SRC_VIRT)
+		acomp_request_set_src_dma(req, state->src, slen);
+	if (state->flags & CRYPTO_ACOMP_REQ_DST_VIRT)
+		acomp_request_set_dst_dma(req, state->dst, dlen);
+}
+
+won't acomp_reqchain_virt() see the virtual flags set in state->flags and
+overwrite req->svirt and req->dvirt with the uninitialized state->src and
+state->dst pointers (while also clearing the non-dma flags), causing a null
+or wild pointer dereference if acomp_reqchain_finish() then writes to
+req->dst->length when req->unit_size is non-zero?
+
+[ ... ]
+
+> @@ -279,10 +289,27 @@ int crypto_acomp_compress(struct acomp_req *req)
+>  {
+>  	struct crypto_acomp *tfm =3D crypto_acomp_reqtfm(req);
+> =20
+> +	if (likely((req->unit_size =3D=3D req->slen) && acomp_request_issg(req)=
+ &&
+> +		    !crypto_acomp_req_seg(tfm) && !acomp_req_on_stack(req))) {
+> +		int err =3D tfm->compress(req);
+> +
+> +		req->dst->length =3D unlikely(err) ? err : req->dlen;
+> +		return err;
+> +	}
+
+[Severity: Critical]
+Should this fast path in crypto_acomp_compress() in crypto/acompress.c check
+!acomp_is_async(tfm) instead of !acomp_req_on_stack(req)?
+
+Callers using asynchronous hardware compression transforms (where
+acomp_is_async(tfm) is true, such as qat, hisi_zip, or iaa in async mode)
+allocate requests on the heap with acomp_request_alloc(), so
+!acomp_req_on_stack(req) is true for asynchronous requests.
+
+When zswap_compress() submits a single-segment scatterlist request with
+req->unit_size =3D=3D req->slen to an asynchronous transform that does not
+support segmentation, this fast path will be taken instead of
+acomp_do_req_chain(req, true):
+
+crypto/acompress.c:crypto_acomp_compress() {
+	if (likely((req->unit_size =3D=3D req->slen) && acomp_request_issg(req) &&
+		    !crypto_acomp_req_seg(tfm) && !acomp_req_on_stack(req))) {
+		int err =3D tfm->compress(req);
+
+		req->dst->length =3D unlikely(err) ? err : req->dlen;
+		return err;
+	}
+}
+
+When tfm->compress(req) submits the descriptor to hardware and returns an
+in-progress or busy status, won't this immediately overwrite req->dst->leng=
+th
+with the negative error value while hardware dma is still in flight on
+req->dst, and skip registering acomp_reqchain_done() via acomp_save_req() so
+that req->dst->length is never updated to req->dlen upon async completion?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261028030503.1792=
+3-1-kanchanapsridhar2026@gmail.com?part=3D3
