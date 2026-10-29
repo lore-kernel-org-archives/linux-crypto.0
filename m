@@ -1,108 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.71
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793268496;
-	b=CPmEhDFnXbGhLQ6LlFNdfF5q6Jck/74qd3Se85F8IgD7SYsI5RD4I8WEMFqKAnvKIkEB
-	 ob/nfkmPPiuqRlOUfQQv1qC2Y86L/inWzpjbDBHHW090DjHCc/jy/2Hc20ypg2b8S1Rs1
-	 E5Q6QtEp/0sP9+Tm7z6dRfFAhcwAlaKlR7MuR/A5NFiThdbYuOfkfr0Ava1vYOsIDsVLl
-	 1hVC3BJ41qf9J7UL2fWsk3JcspV/m62FkyQxQmar3vD3EyP+A7j1VOFft1w24faC0S1Qn
-	 aijnNLAd4GqOXxHTYd6Rtnpi2T0zbMElt3jyslXptj6nUVv9gbTQbwcAPN5weOFWMwg==
+	t=1793281835;
+	b=h6Pn11l/h6M0BR/GOWiAWptZOJJl2pdKRhRjnM7RtZaFJve5SLJOoBaVKe64/PR4WGdw
+	 VAGdYcwIrgaaN9eynK7Fojhzx+orPUSfhk5AjZGZAUsJ6W+ZS9wlpkX0A2OzFnfHzJ37b
+	 31hFQ/djOEa+MIEg8OP64UY28AS2njB2WW2YQouyNTB4cgvWLmn9/iZw6JUt/vuBOtvYe
+	 irPthBzxgCgoy15tUxuQuomrHfBBeceXMCKh5eG6F6oE2LHW7noIpreymsXCiWhamt4aV
+	 yK+18YKvOPlpI4bRql4HpKPSRzsBBhAGnHjXDtRPoCayX5/dHTfKmSE9Q5M3WfTir+A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793268496;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793281835;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:X-Google-Original-From:Date:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=YqJZ0P7+7fLRIuROPGM5CtyVNeaoNZ5CLQZzkAwMRGI=;
-	b=CSwqpVGqVphkhkxVi6b39urjeMA5Gt2VBT6r2QXHDU2LEB4SXChxEfpW2SBWsb7Pji0h
-	 w+1kn1zO+qK/IVIgEqeH3L35UvDTqvWxSzTsTV/b1nXeIrruzWQRLbW6hAVB70mk8OW/2
-	 hvapLy09MOR4Bijz6ncGzIpyAsykoMSW8uVnmnZh/feuKVXPAwwykQ8g9JRQKoTViZifs
-	 +F4pD3AE32xlsTDHKUiRu0aM65J2HuHzQj5xUhXu9OveDFhXs8Os91372B1No6ERHso42
-	 0ZtiGIcNNg76haN3X6jW+M08gC2T7xzimOzclJFPZw/3043fL3Pz4l/hgf3dk9dFAGA==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=L70Byn5v8ZFkrMF0OAudmvIVEZ2EuogOofsD9gsL04E=;
+	b=k8wJdiixf98pZi3Sp+GXtV1rd93ZCOroEJRiz9E8/GdOm9xn2rJPbkUdWBCsSbf/zicR
+	 D0chJ6ZgCPk5lnW0Of30PW5N6UQEpdlafmPVMnAn1lOmoaYvosp8QoTlRe33Ja4YMtVRw
+	 VRlrXEyUNqFOmdTCTBhvRI6KMlf02zeuoqhrHBFXgqhghTKPVwprf6BSQb9iAt8pcDPGn
+	 7iCRgIpyozATzD5dYadTHl9qBmdIJIxe8k43jJ13lMAUBPdzFjh/7ci3Mz/rc+Z2Z6wgv
+	 shVGu8GOA/IhM3m4ohNzxj8O3U0Ir6ORIRiMpP/6SJVA93ZgvMx3pkVjgwu4/u8P1HA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="W+1f/+mm";
-	arc=none smtp.remote-ip=209.85.167.42
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--ardb.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Zuqno8QW;
+	arc=none smtp.remote-ip=209.85.128.71
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3464C606A31C
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 10:08:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3464C606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86EF606A33F
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 13:50:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C86EF606A33F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=W+1f/+mm
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5ba3b1199f6so2028445e87.3
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 03:08:16 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Zuqno8QW
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a2001e85c8so15919225e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 06:50:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793268494; x=1793873294; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:date:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=YqJZ0P7+7fLRIuROPGM5CtyVNeaoNZ5CLQZzkAwMRGI=;
-        b=W+1f/+mmtUVeicMuk/ydwLlfIFytKQiJMmkoEo3ynnRRfaKT7HiLSfDiAd1/Y+PwhD
-         8cfrCfRXamJpaAPt+sWuYsp7BdH5yz6uF3NU77u0Zj7LMibQRIglvylRCLJ0Qntw7rM2
-         BbzvZSf5xbOzbQHuDIBrzREi0Ymns/KxwgPqynRUeTyJI+rxoHwyStZYDt7QrGJ2Hegd
-         WwS3AFgQWxpcrih0E8/Dm+q0179BJUhZnSNN0Lgaw8UxVWfyauTB3/Q1gcCe4/aTuHXP
-         DI20dQ62MiGtD07UdkgLwuEEcMmCwBlFxBXbVPyL2eFRAKI1y+W33XmqlUpXNupMzcss
-         ws9g==
+        d=google.com; s=20260707; t=1793281833; x=1793886633; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=L70Byn5v8ZFkrMF0OAudmvIVEZ2EuogOofsD9gsL04E=;
+        b=Zuqno8QWGdM4HcfmTqzXaTvYRoQXFk8DU6M/7++6ldWU6V7snx6jc/xDwcJkDo0Z59
+         FOYwOzLbPkjIHCmOEy2dM3SH0J4vMM97Q7IPAltISCQninP84XnasYbk/IfFEG4/7ynq
+         AY2U3/HPYg3qzb6pMIQrLZs71UUvuu8o8U2pVfXTtYnCfYp6rRE49IkAB0WcEQaQZ9IS
+         Z8sceOO4WjdOngdWsJ7yKk0RBA2fjYa5tF+W3f4IAzWPUzzXTjiPbXXiwx3vG8qh125D
+         wVkSBrwwdiVzZkspQKlsUzPlk2Zj3XdGjFkOD/MDi7egwMdTG/SxOEnFOi+5YJKTJoPK
+         uurw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793268494; x=1793873294;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:date:from:x-gm-gg
+        d=1e100.net; s=20260707; t=1793281833; x=1793886633;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=YqJZ0P7+7fLRIuROPGM5CtyVNeaoNZ5CLQZzkAwMRGI=;
-        b=fmBWwoMglf1rt8SWJAU0QsK5LWgJMayaY/6VFZLMGE3c5pPwArrZTSbGvCU+lnrzZS
-         abHAnPO1+5XhgAuvnoCwUMzNR3OFqeQGy0FghCdOUN4s7N9JR6tcKK+XDyBn4EmBX/86
-         IuIiXIBP/bUeiV3DENhVY7KYABziCHSRbJ5doZaC43puDXF8POSO8lqtkZUnxLk33RqY
-         SY2OFOP+dfBiuTXceGQuBFcWcKN/MFL6AsXcZ2EP++Xycw4FEHcter0K8oqK9p4944uX
-         w9tTC9kq++20D7mTQRJO02icf3fgiYIk2dgHk1oFbVLyUTLQyfchyHM8ZlrguWRhclZM
-         7AnA==
-X-Forwarded-Encrypted: i=1; AKwUvBwRsB0SB4VEHlqcn6htdhz/KfV2R7F0uZ8eo1GwXJ3Y2jm1MKxzzHHmPZR/oS3zrWe6SbahJF68eNlDITI=@vger.kernel.org
-X-Gm-Message-State: AFq9FYJpJGQl/6FQb4c8WiyEKkgcmon4Ve67uZ6uN67iIAK5MGkNa60O
-	WnJCjg/pNlE1RW56jGXOJlON7ujHwlmFWzBvCATOXwJqWzVKDyl1a/X5
-X-Gm-Gg: AYBFou0t1OZEs8emMU33HNG5WN0k5zD4ZlAc7rer9EXUbRGvZ7axSbmYrZc69z4BwDr
-	+164Q/aekN7GztrpgqYNruofcNoXhuNEbzMLMyq5KfXK7QinHco0oReB4miX16tnGO3pefgA5XZ
-	++8c+oukT21Ym5wYOWf0saPKLAOHOdrkVJ/3Wl6EiF4BQ6RwLrYV5bNThKKnRpIc8uyhZGwsaVF
-	RIeBrsTMDmdaSM+n59pvLBI7IXip8La3YiLUrTTu3xCSqsDL+GMN8PiomdnVqSz3V+hgFx4w0Vs
-	1mw3ztASmmLejiB5m+J5CI26rDEPKlyGzaa6DaZ6TLO0gwscFqSYehvIiK3c011BMyHHw2FZQev
-	rJ8TOKZnG5cGr8biwqYCOjuiQ0dn6LOv86WMGj+kGI7S8h7QMgkBtF30j7XP41rD9O6slcHO6eZ
-	iNJGYw0cC8OPFO2eVJYwyi0bcsejw/X4tnakp5Dq+km30TD5VYgaY4+kB5om3CCKRV43SP2/ylK
-	mlG/Kful9psJ9lMRa7raWHKsHc9dtsTG4sF4tvqfD4c4NQ8ZB07B/wnzozjFBr0EjdHoKzsTsnr
-	UEKfL3NUBvpbbSDooFff1LxBRsasnBDsRAYE4zfSQ2KYvrOMzNI84a/OeE1VxpjeLbRDjh8rXPk
-	neqcg
-X-Received: by 2002:a05:6512:2512:b0:5bf:d56b:a71d with SMTP id 2adb3069b0e04-5bfd56ba77emr273419e87.46.1793268494124;
-        Thu, 29 Oct 2026 03:08:14 -0700 (PDT)
-Received: from pc636 (host-217-213-144-15.mobileonline.telia.com. [217.213.144.15])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5bfca5bb57asm1109637e87.74.2026.10.29.03.08.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Oct 2026 03:08:13 -0700 (PDT)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Thu, 29 Oct 2026 11:08:10 +0100
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "Liam R. Howlett (Google)" <liam@infradead.org>,
-	Uladzislau Rezki <urezki@gmail.com>, Michal Hocko <mhocko@suse.com>,
-	Baoquan He <bhe@redhat.com>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
-	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
-	"David Hildenbrand (Arm)" <david@kernel.org>
-Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
-Message-ID: <auMbCuecFeRmBFSK@pc636>
-References: <20261028154218.1668182-1-liam@infradead.org>
- <20261028154218.1668182-5-liam@infradead.org>
- <auKshDXKQXt1kvjy@gondor.apana.org.au>
+        bh=L70Byn5v8ZFkrMF0OAudmvIVEZ2EuogOofsD9gsL04E=;
+        b=WOi2QBtGpCv9+DBcQEGZOEc2WZKJhAcB4lJAwmf3XPxhGH640QEgymQkjoPHwhxe3/
+         XbooHfjHSpGR80IpXA+BnkF8ejoCOjcqspt+DH33FNv0ki+vJ31SNtvuX9fvVs6/zpjN
+         EY4HPQX+ZazZKxEJ/hMtpC3uLt+OjRJHPSuv5+eoAZF9zBby0IxJfmina24qXWVAnwZ7
+         qcsi3mCAXGyq0Up/v25crPsc1uLV2LJszciMBaU8JecepnLzDjj1a4Xl/qbSsTt0k98+
+         S/ml7TXZdHH7q+M0Dt1IjNffbHGIURE74kMsIIQA219sAl0fx4pvoGntfmpL5D0d2aDk
+         2KvA==
+X-Forwarded-Encrypted: i=1; AKwUvByGqyFjad4CXC8v9J4WhHxba3607DrvHKhUQmaZcdMQnMvmO7As9hUeyeb6hSHrXqF9RPd3c6ML/68PWO0=@vger.kernel.org
+X-Gm-Message-State: AFq9FYJsWnb+QxGyzzXskhF4+fmd9sN7cK2ryI3xOJZ38ihYsHbtzDcy
+	pDpmRlkOnifPmCxfo4HFojxISNMsfA57FSxdTZfZ2cLrbP+LzTDC+59/oATF0beO14kalvd9ZA=
+	=
+X-Received: from wmdd24.prod.google.com ([2002:a05:600c:a218:b0:4a1:e51d:9268])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:e493:b0:4aa:2339:a375
+ with SMTP id 5b1f17b1804b1-4aa2339a4a1mr77860825e9.13.1793281832038; Thu, 29
+ Oct 2026 06:50:32 -0700 (PDT)
+Date: Thu, 29 Oct 2026 14:50:20 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -111,60 +75,55 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <auKshDXKQXt1kvjy@gondor.apana.org.au>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.313.g2479322e68-goog
+Message-ID: <20261029135020.272082-6-ardb+git@google.com>
+Subject: [PATCH 0/4] Get rid of all NEON intrinsics stdint.h type hacks
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>, Christoph Hellwig <hch@lst.de>, Eric Biggers <ebiggers@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 29, 2026 at 10:16:36AM +0800, Herbert Xu wrote:
-> On Wed, Oct 28, 2026 at 11:42:18AM -0400, Liam R. Howlett (Google) wrote:
-> >
-> > Below, one CPU adds an FDB entry for an RTM_NEWNEIGH netlink request,
-> > while another CPU is inside vmalloc() or vfree():
-> > 
-> >     RTM_NEWNEIGH                      vmalloc() or vfree()
-> >     ============                      ====================
-> >     spin_lock_bh(&br->hash_lock)
-> >                                       spin_lock(&vn->busy.lock)
-> >     rhashtable_insert_rehash()
-> >       kvmalloc(GFP_ATOMIC)
-> >         vmalloc()
-> >           spin_lock(&vn->busy.lock)
-> >             waits for the other CPU
-> >                                       softirq: a frame for the bridge
-> >                                         spin_lock(&br->hash_lock)
-> >                                           waits for RTM_NEWNEIGH
-> 
-> I think this is a fundamental bug in the kvmalloc non-blocking
-> support patch.  How can it be used at all if it is susceptible
-> to such dead-locks?
-> 
-> And if you can't use it safely why don't we just get rid of the
-> broken kvmalloc non-block path and have it always go to kmalloc
-> like it did before?
->  
-If we have a look at this as we did not have vmalloc() here:
+From: Ard Biesheuvel <ardb@kernel.org>
 
+Recent Clang has become more finicky when it comes to overriding the
+type macros that the freestanding stdint.h consumes when defining the
+uintXX_t types, and so it is time to finally get rid of this entirely.
 
-     RTM_NEWNEIGH                      foo() or ...
-     ============                      ====================
-     lock_bh(&br->hash_lock)
-                                       foo()
-                                        lock(B)
-     rhashtable_insert_rehash()
-         foo()
-           lock(B)
-             waits for the other CPU
-                                       softirq: a frame for the bridge
-                                         lock(&br->hash_lock)
-                                           waits for RTM_NEWNEIGH
+So instead of making stdint.h (which comes from the compiler when
+-ffreestanding is set on the command line) agree with the kernel's
+linux/types.h header, avoid the latter entirely in the compilation units
+that actually use the NEON intrinsics (which are always leaf functions
+that are not tightly coupled to kernel APIs).
 
-Same issue?
+Note that the disagreements are about long vs. long long on arm64, and
+long vs. int on 32-bit ARM, so never about types that actually have
+conflicting representations.
 
-I have a question:
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
 
-GFP_ATOMIC/GFP_NOWAIT guarantee they do not sleep. Do they guarantee
-not hitting ABBA dead-locks or they are not interrupted?
+Ard Biesheuvel (4):
+  lib/crc: Don't include <linux/types.h> in NEON intrinsics code
+  xor: arm/arm64: Move NEON xor_gen() dispatch into the glue code
+  arm64: Drop stdint.h type overrides from asm/neon-intrinsics.h
+  ARM: Drop stdint.h type overrides from asm/neon-intrinsics.h
 
---
-Uladzislau Rezki
+ Documentation/arch/arm/kernel_mode_neon.rst | 10 +++--
+ arch/arm/include/asm/neon-intrinsics.h      | 43 +++-----------------
+ arch/arm64/include/asm/neon-intrinsics.h    | 24 +++--------
+ lib/crc/crc64-neon.c                        | 10 ++---
+ lib/raid/xor/arm/xor-neon-glue.c            |  3 ++
+ lib/raid/xor/arm/xor-neon.h                 | 16 +++++++-
+ lib/raid/xor/arm64/xor-eor3.c               | 15 ++-----
+ lib/raid/xor/arm64/xor-neon-glue.c          |  5 +++
+ lib/raid/xor/arm64/xor-neon.h               | 31 ++++++++++++--
+ lib/raid/xor/xor-neon.c                     | 16 ++------
+ 10 files changed, 78 insertions(+), 95 deletions(-)
+
+-- 
+2.56.0.313.g2479322e68-goog
+
