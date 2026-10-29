@@ -1,54 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793305309;
-	b=qvo+q+FPFbgHsZCmtCYyelpukjmcqR2Hmxk4Tiav6sGJ91ysELsA+4LLblI7pgoA0v6B
-	 cxYy3pvtQSXg+IfdpOl6YJ8ZdzIPxCmrWiyGaT2aS3i23L3tS7vWEnhpVRzCtSz+6apPN
-	 ilL7wp1rk/zTvGWDkuGI295AoZt4dqZ3rLPE8/oWIaTpdu1MP/VHF5H6EszxxFG/F9AE1
-	 otAUOlU0b+SRX156hRhxu2hAGx3GYmyamXUmSOjdkBDqqjt8MIXlUqykk2JfQDYTK9v9+
-	 Tl4oe+tq26XwLEKnfnt6E7jwqGD5r8EVcHnJpc/eADU8/L/dVsdJ0gHGWRNZYfrsSTA==
+	t=1793306147;
+	b=JNN1uef7l8n6LkhCex4O7R17x690ED1XoE8Zh5HoYjE6yDlanF/Efjg2RnCB/kRzqht9
+	 acrE6Pt903SNX2Ff4DABTFxzpYfLdF5WKT+EsO3Lxtd37bPfc+Y/yE42586uKT3dZNstz
+	 0STLucW4ME353MreAjF2A68SaoxXs0b8epCl8wgvq6v++fh182vk6aXjM2D85nUCem/jb
+	 YfCZ1Br+ECKH2GJUbokrKH5tnshxiT3GSIYV+oI5OzSqM8/bQuEH9GAgoVBpZi36SG9LQ
+	 wPY1RRLqYKScn56zY7foKVfmaEkv0h5TB2yV2MxVwcG9A6ytGroRGqa0F9d4APNIZSg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793305309;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=NG0rcom/ENkoFyoDk/mPLZtYS0KiuQXHp5StsiKbwa0=;
-	b=OYB6sVr7wD4k163w2DFCBSszgAoSpVGIhdi+NMyZqu2goVtD2mRGQOcX1fF5s99v502d
-	 qbmRl1xwWiHQOpBpcvWjMkiBv/0P9rO8K/UqHLeLNBmjLNzFXLc8P9LOzP95S4qQwNxNN
-	 BH7mr2fQ/kOrTrRs4Eu2Qj8V5x4gDiFwuSMUH8NTw19qmJxXbdACEE143ZcicrZ+9U8Dl
-	 wPPPimJHh0F5vrXI+7F66pnkqQBAAEmSTn9qNxasXnzwotjoNN96tPK3IPYESA2TvYrC3
-	 ZomGJ9ssd3h2eQDMIaAv5hjwM4wKB4V0ylNGR9buBEj3u3HNjXRHoj5ydYTCeg8AI6A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793306147;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=UF42Vdd/T1B9YjxSSq5RVbRzD5IK/OVjqsPpDVNv/08=;
+	b=VV3EhlZrE975Vkh5Wm8AeRpfi/hTzSyRXlIxdMoFjYeDBj5AVpEUOGV37aDy11Ggqvdk
+	 4GTuVVGZ47+g6d0j7t8TLwca/JGyNcKm0zIfVIdcrzYRWfWDHevyQkVFFOWfSeHVExE8T
+	 Bzl8VP9d4yLzTr3KxzV4Y8lMYG38WJkVxLNbS7CvFV9dgn14VSelvztNJQ6j5jlrqct7Y
+	 gqp6xusOzgacnEijeJEEfe6+PxCRXvktuIyXp0jYLQGN2nOhwUbVb1M5hIrs6vYY5xBgk
+	 ewXGSWq49Oue+o+quM1tfAYoe4DBUscsn46tMUiol2r4wopzomDviNaVhj3rS+QvGYw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aMAEgbat;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZMApxRFQ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B891606A31A;
-	Thu, 29 Oct 2026 20:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBF2606A322;
+	Thu, 29 Oct 2026 20:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aMAEgbat
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0A651F01824;
-	Thu, 29 Oct 2026 20:21:48 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZMApxRFQ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E15161F01825;
+	Thu, 29 Oct 2026 20:35:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793305308;
-	bh=NG0rcom/ENkoFyoDk/mPLZtYS0KiuQXHp5StsiKbwa0=;
-	h=From:To:Cc:Subject:Date;
-	b=aMAEgbatqidp4Sh9pQm3Be0xzXLa4NYSh5zhsmHTEj9++DmK19Zy8f+y0832Dga/9
-	 3+pwUw2wCOa8N1e5akRA74BEpKuztAXuQ5dRWuhm3A5YdqH2UGQclLe1hKR78Oexld
-	 HfpfQ/VNX+Tkmk1tucZWf90ZF+rTpPPfNILM3Dtr4fGKp8sP1zizaIsO0z51XmuSex
-	 xKcBgka54K10/GK6kOMzWWs9UD7rj867JSG84V0x99lSSY+4p06gT2JyToX7tDtWF4
-	 pylNw2x8mbQwcJaED82syZ9wqZgqZYCEeTd3hxHv0BoK+eGkou/VHLiewS19azN+51
-	 J0B2nhA/WLG4g==
+	s=k20260515; t=1793306147;
+	bh=UF42Vdd/T1B9YjxSSq5RVbRzD5IK/OVjqsPpDVNv/08=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ZMApxRFQTk+S76CBfWT7CNZwk5dCrPQJzX7H3ALrZrk9iChWiolLW+eXi/jqyBZGG
+	 YvcwBHj/O1o7+Q8856jfgSvfCFwlGWIDlz4ENsyGk2R3BbXFuiArq1DTolspZOkrWK
+	 6TuAtsGx6epzIBkzBvgmq5OjmJs4/9V0gw5UbIhde+8Nf2iCOw9vLUD1vyF6ThWkCm
+	 LdkPQEQ7W1KDfiy8srDlUecH7tfUZ8GZWn1VXMZmkqYWs+fKljH6nyFvyr4fZw60qb
+	 cDm4VQp7EeR22PK0gIy2f/JOEbaVHyS3oSy4IlEpWI/Kvv6u2NlC7vvlxYIwaO7WO7
+	 fXCJjm0IWgNNg==
+Date: Thu, 29 Oct 2026 13:35:45 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: stable@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6.12,6.6,6.1,5.15,5.10] lib/crypto: arm64: Fix lost Poly1305 carry when resuming NEON state
-Date: Thu, 29 Oct 2026 13:20:14 -0700
-Message-ID: <20261029202014.51014-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.0
+To: gregkh@linuxfoundation.org
+Cc: Jeremy.Jean@oss.cyber.gouv.fr, Jason@zx2c4.com, stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: FAILED: patch "[PATCH] lib/crypto: arm64: Fix lost Poly1305
+ carry when resuming NEON" failed to apply to 6.12-stable tree
+Message-ID: <20261029203545.GA49373@quark>
+References: <2026102137-contently-unshaven-7da4@gregkh>
+ <20261021154806.GA1879@quark>
+ <20261021164836.GB1879@quark>
+ <20261028182014.GE1876@quark>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -58,87 +60,87 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261028182014.GE1876@quark>
 
-From: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+On Wed, Oct 28, 2026 at 11:20:14AM -0700, Eric Biggers wrote:
+> On Wed, Oct 21, 2026 at 09:48:36AM -0700, Eric Biggers wrote:
+> > On Wed, Oct 21, 2026 at 08:48:08AM -0700, Eric Biggers wrote:
+> > > [+Cc linux-crypto@vger.kernel.org]
+> > > 
+> > > On Wed, Oct 21, 2026 at 04:40:37PM +0200, gregkh@linuxfoundation.org wrote:
+> > > > 
+> > > > The patch below does not apply to the 6.12-stable tree.
+> > > > If someone wants it applied there, or to any other stable or longterm
+> > > > tree, then please email the backport, including the original git commit
+> > > > id to <stable@vger.kernel.org>.
+> > > 
+> > > It's a clean cherry-pick, as git detects the rename of
+> > > poly1305-armv8.pl.  So there should be no need to require this to be
+> > > resent.  Also, missing Cc to linux-crypto.
+> > > 
+> > > Same for 6.12, 6.6, 6.1, 5.15, and 5.10.
+> > 
+> > As I've said before, the reason this keeps happening is that Greg's
+> > stable scripts perform a cherry-pick by first formatting the commit as a
+> > patch file with the default 3 lines of context, then applying it with
+> > 'patch' using the default fuzz of 2.
+> > 
+> > (The second step seems to occur in the 'apply_it' script, which isn't
+> > public.  But based on the observed behavior, it must be what it does.)
+> > 
+> > This process is buggy compared to simply using 'git cherry-pick':
+> > 
+> > - It has no rename detection.  Any file rename, like what happened for
+> >   this commit where poly1305-armv8.pl is in different locations in
+> >   different branches, results in FAILED.  This happens regularly.
+> > 
+> > - Incorrect backports due to only *one* line of context being
+> >   considered (since 3 - 2 = 1).  For examples of this, see
+> >   https://lore.kernel.org/all/20260512173933.811124271@linuxfoundation.org/
+> >   and
+> >   https://lore.kernel.org/all/20260515154719.961677988@linuxfoundation.org/
+> > 
+> >   This is easily reproducible.  For example for the first one:
+> > 
+> >   git checkout -d v6.12.87
+> >   git cherry-pick 2909f0d4994fb4306bf116df5ccee797791fce2c
+> >   git show # correct backport
+> > 
+> >   git checkout -d v6.12.87
+> >   git format-patch -1 --no-base 2909f0d4994fb4306bf116df5ccee797791fce2c
+> >   patch -p1 < 0001-usb-typec-tcpm-reset-internal-port-states-on-soft-re.patch
+> >   git diff # incorrect backport that was actually sent out
+> > 
+> >   The second example is even worse, as there the incorrect backport was
+> >   actually released.
+> > 
+> > Just using 'git cherry-pick', as contributors are already being asked to
+> > do in the FAILED emails themselves, avoids these problems.
+> > 
+> > Can this please be fixed?  This outdated cherry-pick process is reducing
+> > the quality of the stable releases.
+> 
+> Any update on this from the stable maintainers?  Requiring resends for
+> clean cherry-picks is a waste of time for everyone, among other issues I
+> mentioned.
 
-commit 24f07e8c07a0c0dd275331cbb41c79a78741eef9 upstream.
+Seems there's no choice but to work around the process by sending out
+clean cherry picks, so I've done so.
 
-When poly1305_blocks_neon() resumes from a base 2^26 accumulator and the
-next update contains an odd number of full 16-byte blocks, it processes
-one leading block through poly1305_mult() so that the remaining NEON
-work has an even block count.  That requires converting the accumulator
-to the base 2^64 form used by poly1305_mult().  The final ADC of that
-conversion stores the carry into d2, but the following accumulation and
-poly1305_mult() use h2.  If the conversion carries across bit 128, the
-carry is dropped and the emitted tag is wrong.
+I guess I need to start using lei as well to get stable emails for
+subsystems I'm interested in as well, to work around the apparent
+deprecation of the subsystem mailing lists.
 
-This was introduced by Cryptogams commit 03dc4adf91c8
-("arm/poly1305-armv*.pl: optimize branches."), which removed the
-reduction that consumed d2 shortly before Linux imported the code.
-OpenSSL's copy did not take that change.
+As for Greg/Sasha creating incorrect backports by using 'patch' instead
+of 'git cherry-pick', I guess the workaround, at least for my own
+commits that I might have time to check this for, is that I need to redo
+every clean cherry-pick myself and verify that what was sent by
+Greg/Sasha actually matches, as Greg/Sasha's process may instead patch a
+different place in the file that has the same 1 line of context.
 
-The carry is possible because the NEON code stores the accumulator [h0,
-h1, h2, h3, h4] in a lazily reduced, redundant base 2^26 form: its final
-carry chain leaves h0, h2, h3 < 2^26, but h1 and h4 may slightly exceed
-2^26 - 1.  For example, the reachable state
+Just seems really time consuming for everyone involved to be working
+around these unnecessary issues.
 
-  h0 = 4
-  h1 = 2^26
-  h2 = 2^26 - 1
-  h3 = 2^26 - 1
-  h4 = 2^24 - 1
-
-represents 4 + 2^26*2^26 + (2^26-1)*2^52 + (2^26-1)*2^78 +
-(2^24-1)*2^104 = 2^128 + 4, despite the bit representing the 2^128 term
-(bit 24 of h4) not being set; the extra comes from the h1 limb being
-above the normal base 2^26 range.  When this value is converted into the
-non-redundant base 2^64 form, a carry into the new 2^128 bit (in bit 0
-of h2) is necessary to preserve the value.
-
-Given the above bounds, a carry into bit 128 happens exactly when
-h1 >= 2^26, h2 = h3 = 2^26 - 1, and h4 mod 2^24 = 2^24 - 1.
-
-Store the carry into h2, matching the other base 2^26 to base 2^64
-conversions in poly1305_blocks() and poly1305_emit().
-
-This bug causes an incorrect tag to be emitted.  However, this is
-unlikely to happen in practice where Poly1305 is used with a random key,
-since the random key tends to distribute the accumulator values
-throughout their valid range.  There isn't an obvious way for an
-attacker without knowledge of the r_key to cause [h0, h1, h2, h3, h4] to
-land on the precise values where this bug occurs.
-
-[EB: Rewrote the commit message to more clearly describe the bug and
- its impact, and simplified explanation about why there's a carry bit.]
-
-Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
-Cc: stable@vger.kernel.org
-Assisted-by: LLM
-Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
-Link: https://patch.msgid.link/20261009125354.315476-2-ebiggers@kernel.org
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- arch/arm64/crypto/poly1305-armv8.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/crypto/poly1305-armv8.pl b/arch/arm64/crypto/poly1305-armv8.pl
-index 22c9069c06505..e69419b0ca01e 100644
---- a/arch/arm64/crypto/poly1305-armv8.pl
-+++ b/arch/arm64/crypto/poly1305-armv8.pl
-@@ -372,7 +372,7 @@ poly1305_blocks_neon:
- 	adc	$h1,$h1,xzr
- 	lsr	$h2,x14,#24
- 	adds	$h1,$h1,x14,lsl#40
--	adc	$d2,$h2,xzr		// can be partially reduced...
-+	adc	$h2,$h2,xzr		// preserve carry into top limb
- 
- 	ldp	$d0,$d1,[$inp],#16	// load input
- 	sub	$len,$len,#16
-
-base-commit: 85d82e0d7c2dfd3e75d34f35b7ebbf41f45c9c4e
--- 
-2.56.0
-
+- Eric
