@@ -1,72 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793266987;
-	b=Qug5EBDs4sdsrZ8XD4HOXB4O+6NViXJqbSu9LSFBtbsQUDHh2fBNnM13yGTRDdkaUZh5
-	 homNTPS7RhgTvLV7xBe0vBx8IMPr9GxrNAXb0xryC+pp7+lf50K3V6n68+JGg7a04Kd95
-	 gAlR1/dB+KmRwGUe/QWcMIVdJvSIxA2y6LwNPvK9NJJZCshhFgnuoHNsHoi5lWDasNAIc
-	 Xnag+Z4Eo/yV+o31Ey7rK176RLMfJAQl8mVi0jmdwC8fHpVcPaYn5iMaWwoKDpBU5veC+
-	 7H34IVaSJ8UVGJsGmiXE8VRvsEbmwv+eexgO28pJpPNL1ozmpePjCD2avDLn6u8P2Jg==
+	t=1793267080;
+	b=LQgN9+y1oC6gLhDXQo6KBogw3Za3w1yAGrmlWE6qtgEBLe4cLZE4M+Tr5Vjtfag/nyIb
+	 NGrhoOi6ul3eHlUbZE1zuBR7Reo4k67cvLIlGWauJzxKOEWX3JdFEo8AyEznJP/j3pUQh
+	 t/QAF8ftNn2GJsfD3aHVlga+ASC/MMg3i6RTNjIS6wQWsjakH7VJPNxN2TmfMH5dxqU23
+	 ACeyNu2V+S5Pw/vBC5Jn+jk7A4ujI4CjcRNRCAz8KdEXUBH7NhxdRT5go290mPx61y5VN
+	 CrDflz5k/k3srzxjByleDKz4i/Se9UsLUD6LeUui03sMVC31KcBQmoVP74Oe+iB/KoA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793266987;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793267080;
 	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
 	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
 	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
 	 Subject:Content-Type:Content-Transfer-Encoding;
-	bh=Pk4zFqn/UyIKjiaJnLG62AKImUGVwfG051wF5wLegNQ=;
-	b=XvjR1UVlgg/6QE1UQpmRbdLpjVnQBr4J31YKbJhOd5wqYZk3MG/223DhQOl8FGG+nBF8
-	 lBWwEcYjW5M8RgfIZ9EkLkHz2oacVXX6W7P7OsCpCXIG7wh+C47OaYlynyVsiu3cKhywB
-	 iaYY43Ailru44ctP782JHiGwDPtD1xENcH8ayur+8iKCTe/36d2tUxGUu3GjsZ+J+CyIc
-	 rdPFYGD6g9htLljxzWVToQlCyV9ytQ6dLh2WabCk4FppnvMqtSpwukn5zC7N5rGb2kgRB
-	 Ae0PD+6q7AGtWI5w8teqnmcU/NNK5KhAKLNYTlW047OjIqBbDM9sMl6EkzHLBaXbiZA==
+	bh=uPXD7QeS0HskGZ/AVkbvcgMY9zKIqVFFNn44kIMWSxg=;
+	b=iyQt2ZornvTM6bWFpuo9quDQfpzDtAhKEI4tJiXq+cMrf0jUG9DUXNw5GGIoG46Vvibr
+	 HOC84DceW017fp9ryARGRGf/RCvJFxLDU60CMBBh+ldpG3Y1sotAb5z5UIBvbq+OiSlII
+	 yD5L0neTXismerci1m9Hq945WwhgEZcCfXTBhYQTKnayJztQi9U3cavxODjjczJ4oSL4N
+	 Rx8SirNMFU+d0Fa4wwm5m3KgQB1trmcwUrjzSjJdTWoC+OIrqAuGwQuZ9viR+xH/riKpS
+	 k2QCImlycYrMxrWwxDMBvk25L2N5/1K0DMabsN3ebusq7WNfwz8NQbTqnXUkT/HfX+Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DVg4RrHK;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gsb0NUfq;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB87606A31A
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 09:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7580D606A31A
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Oct 2026 09:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DVg4RrHK
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F551F031E9;
-	Thu, 29 Oct 2026 09:43:05 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gsb0NUfq
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D931F01828;
+	Thu, 29 Oct 2026 09:44:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793266986;
-	bh=Pk4zFqn/UyIKjiaJnLG62AKImUGVwfG051wF5wLegNQ=;
+	s=k20260515; t=1793267080;
+	bh=uPXD7QeS0HskGZ/AVkbvcgMY9zKIqVFFNn44kIMWSxg=;
 	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=DVg4RrHKT2rRWKbf+UR9G77yboK9JaKBUd/jNjwyWIUyVkvQKzKFtsIBhwe4RngmT
-	 vEzYZkA/nOGl0g3OhPgYN2KyZe/wYePHf+6xUHs+U1jhOclRbRwAnjtrnJBdIob836
-	 /z+Zi8kB03FYQxPGodH9lREV+7fOIf9mZikMLgwvBCdAa7fdBnEvw+k1XQr9uss/H5
-	 A7SmIHRbYWNL9e/34WOfBu9kY2VDUeYjwjlEMMNS4QssO2C3994jKgkzdByMS2uH3w
-	 Bihfr2if3Bs/tjoPdgoCVWEAeWipDX3mQTxrh+LkUBNPmTxRiNS8t9AFUmu7535TYk
-	 FKfH3eDcwCmTw==
+	b=gsb0NUfqD3a3jDl27uu23uCxj8v1tXsxsKAz4ieLS0DhiC8WIn7N8weaH7ONi3PZV
+	 +3RqHM3NSpN6POsj3qE1Oo1tkCCKpNHOrWh/5d4IFgtWHYAG62pV37RchKZxCUyFrf
+	 M7jWOleUT3gRPDjSTJA6KKh9rjXiA2GX13OuP1cgAVRXO202eNFS4uJ9seLw8Mp7vg
+	 6zh1R2IYbmaQ5/ZB5/tc4uN894gVwZYeIpZzdrQVyeyEim11u153e0jkiAbGiRK/4r
+	 Deu590FZTZaX54Eln8OUWIojcXAbjr+cMNB8k4aS+hI3idq9g7LLFbIsc/6j0v4re+
+	 z/SaZn7vORhUg==
 Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id D8AC2198003A;
-	Thu, 29 Oct 2026 05:43:03 -0400 (EDT)
+	by mailfauth.ams.internal (Postfix) with ESMTP id D5438198003A;
+	Thu, 29 Oct 2026 05:44:37 -0400 (EDT)
 Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Thu, 29 Oct 2026 05:43:03 -0400
-X-ME-Sender: <xms:JRXjagBdqoCb4A901YT8uFvhfHLK_EONpxtW4IYqhzfi8XZPhpWljw>
-    <xme:JRXjatVspm8iH3VjonJGNb0e7kkJau1a4GwNGwlm13iSwxJPAjfMRxbKpRTq2XhjL
-    1JyIsobqhhIb0_LmAG0OqQlmr8w6RjWRUcHrWbcNMRz4ggqtC25ZP4>
-X-ME-Proxy-Cause: dmFkZTFdH5K86TO5l4Iy21yiAduYztn1KeEr8K0PR258Yp1mqFENX2a3vNGUa++hBrWAPu
-    0WRLvg7v+HxQt60shJW1k+pFmU6UYFagGV5H14ce6bZzXkVsQfzfod1jQ+76s7B9vwRdEZ
-    tNaHc5DgCi5LgLlUTABOab5QaRVVq85lbjLs6L0MNtj+S17jTWE5SAk3pG9dxs1bN8s6uC
-    ehXJzkZt0d30Hj5Ib/55VJLDAHUyXPMWONrQwd2mVcLXrfS1bL5V5uP9A5hAlPaTcEGSde
-    0qRe+HNBY9uLkRpzlauPohIA8tWps62V6KbZcBhLAsGp9ondLVmDAQs9hRYlMbKuuRRRMP
-    bkDmNmwBeZrjzWExEVqx/xEdrpV/U+u2AKVvwHixKCKgDz25Zb4Npkb+GwJxspDVnkkgIC
-    M4OYNDyeuB1OJvi9LXbHvSviqyr++5t6ICdGqA1QS0Ju5wXZhjD0jH3U0Yf8UVp4dFV6el
-    ygeIu8ttuJgRPi0vlKEl+Dvv7j0eXjNzndjE9tcevdhGheyWykDJik2gfs1D9SJn88Ll88
-    yByRNMzV3ARPx3Mc4n/iY2Vq8eAqoZ2G/OM4WUKaivWhpNZDVUhORSLD6ufRGswZHo1DAI
-    K0Qy1znaQohPzaKd1BUuCvqhgNwLe0dbu7wEFXM14eEe1BqU0o1SAsW9p9kw
-X-ME-Proxy: <xmx:JxXjatRlZFTwWB8U_hRQjhN_XctTgFUsYAO1RkOL3A2IpjJWhGq9bg>
-    <xmx:JxXjatRyGT856UZEMx_0ZZixixJv-9iTuXliM4Njr67MCRgzzE6FJg>
-    <xmx:JxXjag1nWgcCBjgS1Q3t5bstgPy6qt1cgrICnDWabMiQKg7s3MtZ9w>
-    <xmx:JxXjanzaua3350MuK4690CF4CdcTAz58oUhBNFfAViZ2-oXYnLjlrg>
-    <xmx:JxXjasxRq14-5UOlyO0LzvXvSsUKZx0Gs8ckJwLO9u_Fxe865EL2_WNF>
+  by ams-compute-02.internal (MEProxy); Thu, 29 Oct 2026 05:44:37 -0400
+X-ME-Sender: <xms:hBXjatGMgWBzvxw1Q_lExQjz8SbfE7dNelRMuwjGP91RIsGuBe-dAQ>
+    <xme:hBXjatKO52W1SFRsRKoMALUv4LtJ_-DMYFapw3CFsmRm6KNA4SbcY0UY658v-XCmT
+    phO12dLK9ssbPtNEUM3yqNoGxtFWsYdnwhoeAXBgQhfywYSFF9FizqN>
+X-ME-Proxy-Cause: dmFkZTGjlIgHXMKEZYBOHTsLlp7+Kzuvn3BTGybXF/g1Jzx+jT+GDp2KVjZm5736TSeq8V
+    3R1aCV47VRC7j9tuumrbwSGEikDWAjsDvlom4aR8HMlh4R2mC76eHAT1e9r06VPgwkzBEB
+    X3xa1khPBAIvpkkjFI8zkDLmPMBwWzV2K0pvlYLBjQyU7G4sfon1Hp3XGHnAIBWF3AeFLl
+    ik5Et66z/5aiaRVbcKhaSEXqOdTulKRyquid7goHwBSqUNdljYN09vLkgFJMfMRhopDCcQ
+    d/Txmq5TFv74lui9Wi+GKgCE2AeZwRdrOyzFJRKjUuWBYADDABIZp2FZF4ybF04tl8SJJK
+    gOC2+U9koFWTft3jqdeTVC4lFjamdpQbJ2r6IO+zwjp9z96lXQZVJ+tbv5ff396vhRyjnK
+    +P6VJ4Wt4oqvsz1SwXL2xi8heEQm3SBfJZWLhTxJQzeWtPxnsq3WbRqWEm11b/Y/CNUldn
+    SoCszZrorypgJTQXDAS3HSMqtbsrG+lX5Xq5UVS5rE6EswQdvhXuJrTObu1JvAIFw4xJvC
+    J24FNlYYqzT81vr9ZJpR/EDgl+Gkj8vTH2lfv3eV8T4O1e8KyoEQDROr+2GIEXpLYgKu6J
+    09BwVxpN4f9OmI8388vQLGN2O3974MJio7lwYJ/uz+ymiT+PVUp2my1qyCXg
+X-ME-Proxy: <xmx:hRXjauxjDQd6-erI-UCq72-LyWdP8mVBbQhK9ljHml8PNJbe-mFufQ>
+    <xmx:hRXjahJ6Nul1m8rKhCOk7QPfSip_KwZkYmG5-9GWsj_ZdPb14tk0_w>
+    <xmx:hRXjaoq4iAUe7Af4BYeVuqtzbkVEpKNFLzmRoZL8YrDmy4139yUZTg>
+    <xmx:hRXjagK524FhhTPcgADkLuDVI-iqxUUbfsGI5f5km7C5m6c6Cci26Q>
+    <xmx:hRXjatROszGHFL1ACou53I4TXasqZCUs4HoBdm4OqLcL7WDPMcuLpAOL>
 Feedback-ID: ice86485a:Fastmail
 Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 3D290F8008E; Thu, 29 Oct 2026 05:43:01 -0400 (EDT)
+	id 94067F8008E; Thu, 29 Oct 2026 05:44:36 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,54 +77,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Date: Thu, 29 Oct 2026 10:42:40 +0100
+Date: Thu, 29 Oct 2026 10:44:16 +0100
 From: "Ard Biesheuvel" <ardb@kernel.org>
 To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
 Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "Madhavan Srinivasan" <maddy@linux.ibm.com>,
- "Michael Ellerman" <mpe@ellerman.id.au>,
- "Nicholas Piggin" <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- "Ritesh Harjani" <ritesh.list@gmail.com>,
- "Shrikanth Hegde" <sshegde@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org
-Message-Id: <7c8500c2-4b59-40e2-a227-b488f1336fef@app.fastmail.com>
-In-Reply-To: <20261029063522.124421-1-ebiggers@kernel.org>
-References: <20261029063522.124421-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: powerpc/poly1305: Remove BROKEN implementation
+ "Herbert Xu" <herbert@gondor.apana.org.au>
+Message-Id: <5b340d9f-04c9-4ace-9983-be30c11ea75e@app.fastmail.com>
+In-Reply-To: <20261029054534.68481-1-ebiggers@kernel.org>
+References: <20261029054534.68481-1-ebiggers@kernel.org>
+Subject: Re: [PATCH 0/3] lib/crypto: mldsa: Address some minor nits
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
 
-On Thu, 29 Oct 2026, at 07:35, Eric Biggers wrote:
-> The PowerPC implementation of Poly1305 has been marked as BROKEN for
-> well over a year, since commit bc8169003b41 ("crypto: powerpc/poly1305 -
-> add depends on BROKEN for now").  So, it's not being built or used.
+On Thu, 29 Oct 2026, at 06:45, Eric Biggers wrote:
+> A few pedantic fixes for issues found by LLMs.
 >
-> The justification for marking it BROKEN was that it didn't work in
-> softirq context.  That still fully applies.
+> Eric Biggers (3):
+>   lib/crypto: mldsa: Check pk_len before doing pointer arithmetic
+>   lib/crypto: mldsa: Explicitly check that 'alg' is a valid value
+>   lib/crypto: mldsa: Add __must_check to mldsa_verify()
 >
-> However, it turns out the assembly file actually also contains logic
-> bugs that make it compute incorrect Poly1305 values in some cases.  This
-> is shown by it failing the test case test_poly1305_split_update_carry
-> (if "depends on BROKEN" is removed).  The cause of that appears to be a
-> lost carry bit in Carry_reduction.  However, there also appears to be a
-> bug in do_final_update where it incorrectly assumes v6 is fully reduced.
+>  include/crypto/mldsa.h         |  6 ++++--
+>  lib/crypto/mldsa.c             | 15 +++++++++++----
+>  lib/crypto/tests/mldsa_kunit.c |  9 +++++++++
+>  3 files changed, 24 insertions(+), 6 deletions(-)
 >
-> In addition, poly1305_emit_64 contains a secret-dependent branch.
->
-> Let's just drop this code.  A fixed version can be reconsidered later.
->
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  lib/crypto/Kconfig                     |    6 +-
->  lib/crypto/Makefile                    |    2 -
->  lib/crypto/powerpc/poly1305-p10le_64.S | 1076 ------------------------
->  lib/crypto/powerpc/poly1305.h          |   76 --
->  4 files changed, 1 insertion(+), 1159 deletions(-)
->  delete mode 100644 lib/crypto/powerpc/poly1305-p10le_64.S
->  delete mode 100644 lib/crypto/powerpc/poly1305.h
 >
 
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
