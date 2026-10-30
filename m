@@ -1,79 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793370628;
-	b=e2QAYd3tBs6GAxwOj8vsL9stOfITz02M2S/k+U94P/pGl0BMccXhA5gqUjQ3XabpAfv8
-	 lrVCcArVSbzgaQKyI6G96Z3OKbCD/VltGPyG4z8lX09OOoVkK1tQxtpAVFJLh3/m0U3/5
-	 fE4uUFSJt8XbMji104MgDDoEf3p+0Yh6YrT3AO6CqVZ9C2/jF3yIE0RETUHCd0H5zD4EH
-	 0FGhzNNO607+C+LHCIxZWEJx9rKyr+WecFjaonItSQhtvl37DGGNZih+MUBi5nO/ZeYGc
-	 Rs5ctfenjPISc/X5IBXa0lBbxeXa/6izfqaJJqZBilh2xAV6JypZf7b5rt8ds90BYRw==
+	t=1793371765;
+	b=X1QuBpZrFEUWUk4Flb5bImrGTfopLlZ3EJiWo+mPtayfHnlkcQNJJKAh1Igd3lcrhKpH
+	 oi2ekszLHQRoCzyhURv+4V7dXzXlabSUJIJnC2Ak0OuPe/PzNUVmhCfqOVpF8BpaSrTXf
+	 GXNllckU8Qdr3s6I5ajEUG2AjqN1gYnuLcQPhAHnjK8PyDoRSS/dV4Ao6DKbTc5AVd65r
+	 GjmAWNAPOh2AZsC7b/lrnIuP3gQU7vBUawbsRhJkkwyRKDIBSwswbutULGqME+UqUQ+p+
+	 4h4ezFVSdllisIt8RrDF89bGSwZKWKjUhUJrSthMAAsFy7eWkAW01sfS6rmyv0X0bSQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793370628;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Organization:Content-Transfer-Encoding;
-	bh=qHVaCrbZVV/aL8obwXxHOaq/3zcOfPB+i++209LsGG8=;
-	b=KC8vKnMQ202OVtKMnY4Vy6It5DrNMguzAfbJH0pBqa9xheMW2cBmyjvizL7EYSSgAQIH
-	 U5kFIKE3hRSOJcnjhgX3lYrtNAWEc9z2X2ZVTqfsb545lUSRU/ya5iVWHtsK1GI1VI0Lh
-	 hm/r7QqgYC3LTBjA2AHFFtwNlTFF1MxtHk8xrR8RJIHJcdWo8MTTGSVytCy3sa8E5lyfj
-	 Vo7kGc+a3tIUzrhnR35s8UoEbjbZcuEoyfbGbJZrCnIuUAHGciN95gUyks4nAYqTpIp80
-	 OS//YH1PBcSi3Zg7LrSbIWv1d/e8diYZDuUkCXNEKcmXMHMKBZOhLkvSuKj5Bpmr1xA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793371765;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=0TQjte6CqBgM+wFSxhT/bgRaDtwXwwSO4uSgCgPB3OY=;
+	b=N+LWdHEb81LvGmunpTvb8RFmn87X/EpCXePOUMPOOuhVdV7kE7dSg20NUc6AIWvBJOG7
+	 jycuckXnWDc9+SnBvecUJ65FGuBmzuIXBOx7EPj/yNHaWrVhG9ovBmw6LgCyzRnHeS8WP
+	 XCPFQ5OV4fwSSAImJTwKpDp3PHjVnmz9uGgjb8OAw4w4nm3gVMsaO7BjmPBEwRpRausYp
+	 cmxKy3bT6YSN+JDqfsOpu9eqy6DKmxFQZ76lfP4tNQL4pcxuAqddLJeiJK0OtmX+VViql
+	 oW6ylueTqr4OPSCe7K5eP1ti0WdP1LUUATFvN+guD2FFMUUEaCxAYEVrdApA5NPWNCQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=iAYZ92oZ;
-	arc=none smtp.remote-ip=192.198.163.14
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NA1m8gVY;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F68606A323
-	for <linux-crypto@vger.kernel.org>; Fri, 30 Oct 2026 14:30:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 84F68606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32CF1606A31A
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Oct 2026 14:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=iAYZ92oZ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793370627; x=1824906627;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hgamFFdtwFhF7P0xfkrYYUXesUQtJNAznKhQkw8jUU4=;
-  b=iAYZ92oZYmNwU1EnqxlyLMA9CbhBUAg2F9ikPAzfKLpzeRte5zVWactz
-   kbBs4maaaxIm/yAfh+v5TTGurjNFRDSPKm8ozoIzd9ibEwojR4QsRoww+
-   W6eQ8rMdQFD+b9e2xWqHeyzQh6vgjrwjcaLxxMdVtzClIiUYSSQg8dGjJ
-   LsmJeF2Owi8vrXzS4hz9BPIiboMoCtpGv/7tIvrUUzpbB3SPARba8JPo6
-   B0zL8+0bDFlrtLKh3nrKVOgwa/bTypl13f1lPxYz0YPx5CzT8eVLcygXW
-   AfyWW/V+MRFzwduq1NUedMMdwXVedD3e8b12tDp/21d7bJ6YhAN5Q0mnp
-   w==;
-X-CSE-ConnectionGUID: O5619iJpSAW+z4eW4mHTHQ==
-X-CSE-MsgGUID: FCv4q0wkTA2/cB/yu0NykA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11951"; a="2167051"
-X-IronPort-AV: E=Sophos;i="6.27,186,1787036400"; 
-   d="scan'208";a="2167051"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2026 07:30:27 -0700
-X-CSE-ConnectionGUID: 5zXA0MXlTkWULwqZvTEl9g==
-X-CSE-MsgGUID: f2KCP7NvQj+DYGrURyT/Vw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,186,1787036400"; 
-   d="scan'208";a="5417533"
-Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
-  by orviesa001.jf.intel.com with ESMTP; 30 Oct 2026 07:30:26 -0700
-From: Ahsan Atta <ahsan.atta@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Bairavi Alagappan <bairavix.alagappan@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 2/2] Documentation: qat: document three-service mode for QAT GEN5 devices
-Date: Fri, 30 Oct 2026 14:30:19 +0000
-Message-ID: <20261030143019.484280-3-ahsan.atta@intel.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20261030143019.484280-1-ahsan.atta@intel.com>
-References: <20261030143019.484280-1-ahsan.atta@intel.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NA1m8gVY
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3A8B1F00A1D
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Oct 2026 14:49:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793371764;
+	bh=0TQjte6CqBgM+wFSxhT/bgRaDtwXwwSO4uSgCgPB3OY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=NA1m8gVYHOCdqHGrZ4A/CsTsWNYOnrQL/kvNqYRh855w0eE48qkiEbOD/mUSAQJs8
+	 THi9A92uzFqXpL7REevNWMot+i0pxkE0Xz+q3vi9EvINUn3EcRXGZ67OxqbH52OCGj
+	 YEqxEc1/aQg9ETlfCD/kkezGO4FD1hN3Al4UcskSYIHPj9LFrLy7b99XqYU4NRSEHD
+	 lFunqd0Ki4rXYamLX95N8zKRGOHlg365oDaDLMoe35BHu3j9X+tvaNmY3o6zBj5ImX
+	 hTN8QnEdpiUj9nDiIhkAMojiIysBntHAy98ofps5LHCuIWmkrsK3dZP/jqUhOWqi32
+	 ofF2caZU1LBfg==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c43fbcb4393so119629266b.0
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Oct 2026 07:49:24 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzSjnMHDko4+883538HOR0mStCO9tkc0R9GLY2YUZKagbLuApD30KSRYkKmAxR2zb4pRRJc10FBMn24VCg=@vger.kernel.org
+X-Gm-Message-State: AFq9FYL41myuFOO1T6jPyChlnxb7EUV5ojY88XoGXB0RXhl/lL1a+MfJ
+	eVnXT13UFc6VVtFusCnya83Dn4AhKOMFCcRClLTDtCUBlh6NShjlkz5ErMtqNT4lv50xzb2ZjGT
+	2U4b2FJx8gOAfu3qYQpXUnovo6N+oJpk=
+X-Received: by 2002:a17:906:9f92:b0:c29:4915:83cb with SMTP id
+ a640c23a62f3a-c4ca7ab09dbmr235759666b.39.1793371763605; Fri, 30 Oct 2026
+ 07:49:23 -0700 (PDT)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -83,37 +59,46 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+References: <20261028030503.17923-1-kanchanapsridhar2026@gmail.com>
+ <20261028030503.17923-7-kanchanapsridhar2026@gmail.com> <sashiko-outbox-188658@kernel.org>
+ <auQhULh1VTh6lWoe@gondor.apana.org.au> <CACpmpodWMtmE0yNVN656K-8fPZgTj_DSZ0J7qxou+5Asoht+4A@mail.gmail.com>
+ <auQwWgMbBuo0YEBI@gondor.apana.org.au> <CACpmpodxvQCkQgXUU6pF8d7onxHvHF7sEYCbTkv81WXyyrFiEg@mail.gmail.com>
+In-Reply-To: <CACpmpodxvQCkQgXUU6pF8d7onxHvHF7sEYCbTkv81WXyyrFiEg@mail.gmail.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Fri, 30 Oct 2026 07:49:11 -0700
+X-Gmail-Original-Message-ID: <CAO9r8zNvy7ftXsmLnj4qbQYJ5nyQo=hrio4UQvNrpMbwj9YbMg@mail.gmail.com>
+X-Gm-Features: AclHuK_VMB6EZ1UVhDMh9oCJ1ZyT4EAf7VOhmffq_u4OhZNJTl7iN40sgLIywfU
+Message-ID: <CAO9r8zNvy7ftXsmLnj4qbQYJ5nyQo=hrio4UQvNrpMbwj9YbMg@mail.gmail.com>
+Subject: Re: [PATCH v2 6/8] mm: zswap: Store large folios in batches.
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, sashiko-reviews@lists.linux.dev, 
+	hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
+	akpm@linux-foundation.org, linux-mm@kvack.org, davem@davemloft.net, 
+	linux-crypto@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
+	senozhatsky@chromium.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Bairavi Alagappan <bairavix.alagappan@intel.com>
+On Thu, Oct 29, 2026 at 11:19=E2=80=AFPM Kanchana P. Sridhar
+<kanchanapsridhar2026@gmail.com> wrote:
+>
+> On Thu, Oct 29, 2026 at 10:51=E2=80=AFPM Herbert Xu <herbert@gondor.apana=
+.org.au> wrote:
+> >
+> > On Thu, Oct 29, 2026 at 10:15:15PM -0700, Kanchana P. Sridhar wrote:
+> > >
+> > > This is how it is in the current mainline, and has been for as long a=
+s
+> > > I can remember.. I assumed it was because we need a per-CPU acomp_req
+> > > to be allocated for the tfm. Can this be done with a single
+> > > crypto_acomp for a given algorithm?
+> >
+> > The request needs to be per-cpu, but the tfm does not.
+>
+> Great.. we can save a lot of memory this way.
+>
+> Yosry, should I go ahead and include this fix in this patch series? I
+> am Ok if you want to take this up.
 
-Update the cfg_services sysfs attribute documentation to describe
-support for concurrent symmetric crypto, asymmetric crypto, and
-compression services on QAT GEN5 devices.
-
-Signed-off-by: Bairavi Alagappan <bairavix.alagappan@intel.com>
-Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- Documentation/ABI/testing/sysfs-driver-qat | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
-index b0561b9fc4eb..48e17de3e0fd 100644
---- a/Documentation/ABI/testing/sysfs-driver-qat
-+++ b/Documentation/ABI/testing/sysfs-driver-qat
-@@ -41,8 +41,8 @@ Description:	(RW) Reports the current configuration of the QAT device.
- 
- 		Service combinations are permitted for all services except dcc.
- 		On QAT GEN4 devices (qat_4xxx driver) a maximum of two services can be
--		combined and on QAT GEN6 devices (qat_6xxx driver ) a maximum of three
--		services can be combined.
-+		combined. On QAT GEN5 devices (qat_420xx driver) and GEN6 devices
-+		(qat_6xxx driver) a maximum of three services can be combined.
- 		The order of services is not significant. For instance, sym;asym is
- 		functionally equivalent to asym;sym.
- 
--- 
-2.50.1
-
+Feel free to send a patch, but I think it doesn't have to be part of the se=
+ries.
