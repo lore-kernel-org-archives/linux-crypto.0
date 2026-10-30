@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793336015;
-	b=EXaU9q3jBE1ic9l6je7gxOJrn5rxLTxskvRCUi56Kff50L0jEC8KZYMmyzXA5t7kOgPN
-	 LOj1dIhauwGIwWdBako9PocFWJUqdz/qrrNEFab4t+bNjpW9fnxQCzJ3xNxn8fxNG/ei6
-	 re9YMdE0NP0MLIGGyR5mJiass0oeTDXZ2u11rbIt/9HsUx5gPP7zA/ba7OwzAJufLHa1U
-	 Cd2ofj9NYmyfvyrmM8VaWdcd9IrzNVGdaOVfbzsvF8NMVbL4x5W26RxSAjoU52w61xPaU
-	 TXl8Yn5GB6CMNSYDhbxF6oqvcimA1Zh9/sUnDe7PgQGH+inBJlRsza5kxaQJ80VKcjA==
+	t=1793336016;
+	b=Sev/voLDdlP06iIsWJ7+taCQpSQygdf7Bh40PEsJUjzpsyMAH58jbGSqQsnzhNPYKmzh
+	 2IznkpFe+1hxUqVgp/ovMELLylhLlfuPx+8SKqRt77EJ+FPb5WRL9AeaZ7oAjDzgBk5ZD
+	 0Hgx4rgDzjtrDdbSL0zxx38x+evNUrBz2crQJ4SLfaESbssoddxYGTUGqqoX7/Mwm90gR
+	 ZUWvNvIfQS0A3SHiLwvLoIn5kej/Ipdho8/niekiFMFo9PJ1/VYRLOcdk2Lq0KWvKuwwu
+	 XEr9AFrr7L7WdGg171Wroom2GmJ11LlQj1rxbphUl0jnbdFnA1fUUtta5nmoPCdJ5Tw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793336015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793336016;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=T/SnFkCayGx8K6l/oqZJSnqM0buBvXomcT1JYJ+sR6Y=;
-	b=r2X8d4y/eu3ZkR9eXJsnb9tBLYAjo/phEBhDySUuRnTFJ33lqppFn/bJaN7q4/rVwLMj
-	 g9ZCmbz1be0f6TN4HNNbGKf8vR/9q2dfkXU64kxH8uGkdvjlzwOip5LNFiNLbGhD6nyNp
-	 oRRyyvDqvXGGp5aQAka/4IvEHbv1rTJdshQU++q2l39TWsw+OnFQM+4+nxag8KcNZSfVn
-	 DBBYMHhdmEzJne69FsL9h4cox3XibylCmsy7kmzqhBY6GljZSkyB+XyluWhkwaimsdnoi
-	 9brMJbozIqFZl5DuB1IK2MMeSkLcTywoHuNL3vzRSzAzIZuLJM5ssuu3vXue1rFcFKg==
+	bh=G2iCRNYUffRl1zO0lOs9+mUZl/nKiKj1K4/YeJJQK+A=;
+	b=megrVu3v4rc92OhUlyU3oWw6mi1s0EgktH9c/XPhQAA3YJS8UsVvBJU7E4JStij6t9xd
+	 wADu1P/iWtSdhapesf4sxVK8VI9dSHL5ojYkxCD13dWEa/PqvfEECZMdsBNJP6dy2y/1s
+	 +0/yZFRCQQXunYmNPokBFhIM7eV2AiZWZ0n8tG+cloTCOx6jD6EcCfL4+e3XRmdy4St++
+	 IHMxpaXrpX/0/Sk+Q7VF3IycVTDNEEKC3VHhqY3CXYF0qrb9XNxeofmHuwmVyB5+Oq6CP
+	 DNGzTxepu+8GMI4eyO2olME2va2tSYfPJAPZr7esn6ID9GbMmbqMaSMitfIflT6V5bg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jnIwFl43;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oWEm1cSc;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E41D606A31A
-	for <linux-crypto@vger.kernel.org>; Fri, 30 Oct 2026 04:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254B4606A31F
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Oct 2026 04:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jnIwFl43
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8640C1F0093A;
-	Fri, 30 Oct 2026 04:53:34 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oWEm1cSc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 761FA1F000C1;
+	Fri, 30 Oct 2026 04:53:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1793336015;
-	bh=T/SnFkCayGx8K6l/oqZJSnqM0buBvXomcT1JYJ+sR6Y=;
+	bh=G2iCRNYUffRl1zO0lOs9+mUZl/nKiKj1K4/YeJJQK+A=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=jnIwFl43/jFf7BSsLrKRZZT8rfa/FIaMHcRsa1h/GaHnIE1H8z4u5iWSg48/ibiMJ
-	 ygKJ/GoRVevh6F6vRn0VHJ/XDPb/aHgfsNnd4h8U+mFxPbwfLONG5Wm/DWExNREi4B
-	 HHCeI5jZyFxE0dW//BiNLYkbaoSFkENzCU+ExUU4HdiejHx/ivtT3h3klKDWuOS4My
-	 DV+dMsGZ/QrTXC1u6B6JaNo0q0VSfG/uiSHNznWpT8q3EpFelqyORA1u2hn9XAd7TY
-	 Lpwm5TMfCWKXgxtGzsH8KV3fGD8PjmJXbG9SJXHZuY8lyyqDl74R519z2vngRV4rDx
-	 iQqsyr11ERZ0w==
-Message-ID: <sashiko-outbox-190323@kernel.org>
+	b=oWEm1cSciC9FeEKZvunuDp9B1lpd/mJkI9Rdk9sx2V7/FLfVjbhLitkociMlyrr0J
+	 gkC49JwwYBlkAtoMlsU/1k4iUq+9KlGD+XZ49IGTtRt9LHLjLUpzmp+TVFBYP9rdNY
+	 cjSRWEu2zkrz2VBrvWL23WkSnHz8ToqsqWr6CtKC57dmgRSJPudhN8+acPxpVzES3r
+	 PbO/or0D+s5Uz/LwUJ7Lz15fnx+qtQECzhqpRruRoDHUV3bugGoJYe3tYyqCET1Th/
+	 lrZ83XpaapVf2G65Q9H5YNLf8qTGGQMXYGiN4Wj/e0S+SivZOUjTV3B2RH4Maev4sU
+	 MBVoDAlevcllQ==
+Message-ID: <sashiko-outbox-190324@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH net-next 1/5] net/rxrpc: Add local FCrypt-PCBC
+Subject: Re: [PATCH net-next 2/5] net/rxrpc: Use local FCrypt-PCBC
  implementation
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Eric Biggers" <ebiggers@kernel.org>
@@ -49,11 +49,11 @@ Cc: "David Howells" <dhowells@redhat.com>, "Marc Dionne" <marc.dionne@auristor.c
  S . Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
  Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
  Horman" <horms@kernel.org>
-In-Reply-To: <20260428024400.123337-2-ebiggers@kernel.org>
-References: <20260428024400.123337-2-ebiggers@kernel.org>
+In-Reply-To: <20260428024400.123337-3-ebiggers@kernel.org>
+References: <20260428024400.123337-3-ebiggers@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Oct 2026 04:53:34 +0000
+Date: Fri, 30 Oct 2026 04:53:35 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,81 +65,87 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential issue(=
 s) to consider:
-- [Low] Missing export of `fcrypt_preparekey` causes a module build failure=
- for the KUnit test.
+- [Medium] Stack-allocated `struct fcrypt_key` is not zeroized before retur=
+ning in `rxkad_decrypt_response()`.
 --
 
-commit 987b9c773f38843aea47501d809de294b68d6aa0
+commit cab871c1c0eecff467a076e259b88fd1f8a50b0a
 Author: Eric Biggers <ebiggers@kernel.org>
 
-net/rxrpc: Add local FCrypt-PCBC implementation
+net/rxrpc: Use local FCrypt-PCBC implementation
 
-This commit adds a local implementation of FCrypt-PCBC encryption and
-decryption to replace the crypto API version. It also introduces a KUnit
-test suite for the net/rxrpc/ functions.
+This patch replaces the crypto API implementation of FCrypt-PCBC with a
+local implementation. This improves performance, allows removing the crypto
+API dependency, and simplifies the decryption code by linearizing the skb.
 
-> diff --git a/net/rxrpc/fcrypt.c b/net/rxrpc/fcrypt.c
-> new file mode 100644
-> index 000000000000..46038a02c0c0
-> --- /dev/null
-> +++ b/net/rxrpc/fcrypt.c
-
-[ ... ]
-
-> +void fcrypt_preparekey(struct fcrypt_key *key, const u8 raw_key[FCRYPT_B=
-SIZE])
-> +{
-> +	u64 k =3D 0;
-> +
-> +	/* Load the 56 non-parity bits of the key.  Discard the parity bits. */
-> +	for (int i =3D 0; i < 8; i++)
-> +		k =3D (k << 7) | (raw_key[i] >> 1);
-> +
-> +	/* Generate the key schedule word for each round. */
-> +	for (int i =3D 0; i < FCRYPT_ROUNDS; i++) {
-> +		key->sched[i] =3D cpu_to_be32(k);
-> +		/* Rotate the low 56 bits of 'k' right by 11 bits. */
-> +		k =3D (k >> 11) | ((k & ((1 << 11) - 1)) << (56 - 11));
-> +	}
-> +}
-
-Since the KUnit test is defined as a tristate in Kconfig and built as a
-separate module (rxrpc_kunit.ko) when CONFIG_AF_RXRPC_KUNIT_TEST=3Dm, does
-this function also need an EXPORT_SYMBOL_IF_KUNIT() to avoid a modpost
-undefined symbol error?
-
-> +
-> +/**
-> + * fcrypt_pcbc_encrypt - Encrypt data using FCrypt cipher in PCBC mode
-> + * @key: The key
-> + * @iv: The 8-byte initialization vector
-> + * @src: The source data
-> + * @dst: The destination data.  Both in-place and out-of-place are suppo=
-rted.
-> + * @nblocks: The number of 8-byte blocks to encrypt
-> + *
-> + * WARNING: This cipher is insecure.  Not only is the 56-bit key easily
-> + * brute-forced, the cipher itself is cryptographically weak and doesn't=
- even
-> + * provide the intended 56-bit security level.  It effectively just acts=
- as an
-> + * obfuscation algorithm.  It is supported only for backwards compatibil=
-ity.
-> + */
-> +void fcrypt_pcbc_encrypt(const struct fcrypt_key *key,
-> +			 const u8 iv[FCRYPT_BSIZE], const void *src, void *dst,
-> +			 size_t nblocks)
-> +{
+> diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+> index cba7935977f0..3c9e7f636b42 100644
+> --- a/net/rxrpc/rxkad.c
+> +++ b/net/rxrpc/rxkad.c
 
 [ ... ]
 
-> +}
-> +EXPORT_SYMBOL_IF_KUNIT(fcrypt_pcbc_encrypt);
+> @@ -1095,39 +916,22 @@ static int rxkad_decrypt_ticket(struct rxrpc_conne=
+ction *conn,
+>  /*
+>   * decrypt the response packet
+>   */
+> -static int rxkad_decrypt_response(struct rxrpc_connection *conn,
+> -				  struct rxkad_response *resp,
+> -				  const struct rxrpc_crypt *session_key)
+> +static void rxkad_decrypt_response(struct rxrpc_connection *conn,
+> +				   struct rxkad_response *resp,
+> +				   const struct rxrpc_crypt *session_key)
+>  {
+> -	struct skcipher_request *req =3D rxkad_ci_req;
+> -	struct scatterlist sg[1];
+> -	struct rxrpc_crypt iv;
+> -	int ret;
+> +	struct fcrypt_key cipher;
+> =20
+>  	_enter(",,%08x%08x",
+>  	       ntohl(session_key->n[0]), ntohl(session_key->n[1]));
+> =20
+> -	mutex_lock(&rxkad_ci_mutex);
+> -	ret =3D crypto_sync_skcipher_setkey(rxkad_ci, session_key->x,
+> -					  sizeof(*session_key));
+> -	if (ret < 0)
+> -		goto unlock;
+> -
+> -	memcpy(&iv, session_key, sizeof(iv));
+> -
+> -	sg_init_table(sg, 1);
+> -	sg_set_buf(sg, &resp->encrypted, sizeof(resp->encrypted));
+> -	skcipher_request_set_sync_tfm(req, rxkad_ci);
+> -	skcipher_request_set_callback(req, 0, NULL, NULL);
+> -	skcipher_request_set_crypt(req, sg, sg, sizeof(resp->encrypted), iv.x);
+> -	ret =3D crypto_skcipher_decrypt(req);
+> -	skcipher_request_zero(req);
+> -
+> -unlock:
+> -	mutex_unlock(&rxkad_ci_mutex);
+> +	fcrypt_preparekey(&cipher, session_key->x);
+> =20
+> +	static_assert(sizeof(resp->encrypted) % FCRYPT_BSIZE =3D=3D 0);
+> +	fcrypt_pcbc_decrypt(&cipher, session_key->x, &resp->encrypted,
+> +			    &resp->encrypted,
+> +			    sizeof(resp->encrypted) / FCRYPT_BSIZE);
+>  	_leave("");
+> -	return ret;
+>  }
 
-It looks like EXPORT_SYMBOL_IF_KUNIT() was included for
-fcrypt_pcbc_encrypt() and fcrypt_pcbc_decrypt(), but missed for
-fcrypt_preparekey(), which is also called by the new test suite.
+Does this code leave the cryptographic key material on the stack?
+
+The local struct fcrypt_key cipher is allocated on the stack and initialized
+with the session key schedule via fcrypt_preparekey(). After the decryption=
+ is
+complete, the function returns without securely erasing this key schedule f=
+rom
+the stack.
+
+Could we call memzero_explicit(&cipher, sizeof(cipher)) before returning to
+ensure the key material is cleared?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260428024400.1233=
-37-1-ebiggers@kernel.org?part=3D1
+37-1-ebiggers@kernel.org?part=3D2
