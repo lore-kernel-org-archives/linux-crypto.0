@@ -1,77 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793387476;
-	b=N4Ac/Iu95E1IRygbjYUSsgkCPhXmtCvoxfctORSPZrCfmp8pKPbyt4A/Fz9uL/4zAPc6
-	 6eYZVUm6OpALw4jmtxotTzmmDOm40ISCV02wSPzI9r7ZkeAEu2nsWziBLmrzGWJA2BqXr
-	 nvI/jQXUHtDB27/q4uVX+EN+K5YJiPURg11EvD4OzLMmFK9DzUdujytG9BU8zU4ge0WwP
-	 bCOPAHxJA14SVA2Au6tpiA4lQPke/0Oe5mUmQ8t5m8LwBFjZHcrKLg3JRY1Ovj4tZVcTk
-	 6KBYBhS+dyujapHyt0OatdwBtr4aSBilJm9osnxB1Flli4p7oB5jp4iRE/GGeIRqlJw==
+	t=1793393654;
+	b=XWAFNc/hAMv0CSUPJau42gBd2NjIPF/8NPTZLBMwx2sYT4fFkqvHkbQCcTrr3FY87GFF
+	 M3KAfnoW5+9gGQGWrkDT6fn2jo1hG5uoC/dEtSOohp0DV2j98UqmbvKst3IeWobodven7
+	 WYVBXxSkaX3edO3Msy3FyU5X+6FN5U8D7OowfxVsnavhjtQC+E0FHKWabsl4m0+GMRbr+
+	 qmVo5GPi5kSLHBFkeGadJxiuuqsrwyys4zFIbGneIZI/qVYAWzNEirEfVHfxf2aFnIM/8
+	 rhMPa6iRdJO3FmmJJpn2TJ8NTsaaMHDZGg1wApN+7Xska/wnGQqxPhd3qWdhzJBV/RA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793387476;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To;
-	bh=19Ak8N7iaTdP1KRs11X/V7bN5o/EP6FFYiTibflRDNY=;
-	b=MKj+cOa5PbnNsuTh59XcHIK59xpRGcBm78h22wvL7yCNng98T3RCK2akGxRJEUSNSsls
-	 F6dHgHdxTVQCWuFsFh4zQRnq2SHtOkgJFHWC0WX0QyUfIYix1VkcYzrXo/1X611CjfvnT
-	 xZ/3Ug7VLbH1hO0gFg+R+rlIytLa7VNF0rlCbJ8WBjPwIvWLqyR2UUgeXuBcgIEd3RNwU
-	 XFgNOforn5PsQqZenx9uMkh+NBq0N0tBUNrZHL08y+KcmTMnFqYTVb4qgBIQXePoSnNi2
-	 9Fd4qFDjQHD5ARbTF1HAp2YNeWId46Nqfl0khESDGuNItbflMS/wRx1k/kLGkP9XqFg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793393654;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=X0lYYe/wCl6huPOqebzWHZTcDSo/atNz2oair4XDCQs=;
+	b=N8UgFsArvKglcvdApGyiIMGDzMQxSw/IYqyqtKPmL1cq8zfOFqUo3FdhSx7XBWido3+h
+	 6RPonTGONm+zljbdPJkb7Ec6hO341YbjyMLi5AFArE5rU+t6dEiXtU0ST0ed9GtMI2Ebn
+	 TS8nNC231fC9hh/PpsqaHBfCnscwizZsOsKcB+SMmESOF8sGFJyGFQzAmCbRIsvkS/6iw
+	 tANgVDSlNEOskoFOkImSxsevzpgSOMn6CuSwGPEz2HLH0unkjHqgYok7KD4XcQaKI84LE
+	 IQS/CaOh0cvK5FZGoWaneEcKP8lyrfZ8ZfvKPy/HhqdNO29omrmoYdG9eeErd2O4iWw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Ruc6vxep;
-	arc=none smtp.remote-ip=90.155.50.34
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FJ30ZDQw;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC015606A31A;
-	Fri, 30 Oct 2026 19:11:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EC015606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2E7606A31C;
+	Fri, 30 Oct 2026 20:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=casper.20170209 header.b=Ruc6vxep
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=19Ak8N7iaTdP1KRs11X/V7bN5o/EP6FFYiTibflRDNY=; b=Ruc6vxepI0BvkM9nTI1PMx6lZm
-	EzQJ5W1MMjkIG9wl8uxR6Th2S+A7dJz5IpyMMZs5KQZcY7TdPCURl6Gfq3ziVCZ5kv1DFFwjb0Hwg
-	rFkFdZqHj/RhRXcq8lpfu+cHuqlXaA/jE1LV4vDJIcB9oajzT3GMSJrB0nMB64OpMfLZQ26n0xK3f
-	sWN0JQrmDwjUnx2+gJnIA1SMHmIE46r+aHxfwjFg8+MAlbAbu6elrzRyHm8wKmQcmpO6k/1nztfL/
-	fzWrgD9Q5QzQwWwse7xx4cJ+ckGn9+7mE3x8LMCGlu8Sn0/9ZBpcrbvyWTQcqm63WlodJExydZqLd
-	QXTHm8PQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xMs0M-0000000AIZp-2cp6;
-	Fri, 30 Oct 2026 19:11:10 +0000
-Date: Fri, 30 Oct 2026 19:11:10 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"Liam R. Howlett (Google)" <liam@infradead.org>,
-	Michal Hocko <mhocko@suse.com>, Baoquan He <bhe@redhat.com>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
-	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
-	"David Hildenbrand (Arm)" <david@kernel.org>
-Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
-Message-ID: <auTrzlSFCWNJYisW@casper.infradead.org>
-References: <20261028154218.1668182-1-liam@infradead.org>
- <20261028154218.1668182-5-liam@infradead.org>
- <auKshDXKQXt1kvjy@gondor.apana.org.au>
- <auMbCuecFeRmBFSK@pc636>
- <jfvq7vkx73vzp2ukq6nwnb3v3g2ezdcyppba4oa5lpzmz6ls6t@akc46gonndgy>
- <auQhkHG6XlgNTdRr@gondor.apana.org.au>
- <auRo5WBj2OlKlWGW@pc636>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FJ30ZDQw
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D9741F00A15;
+	Fri, 30 Oct 2026 20:54:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793393653;
+	bh=X0lYYe/wCl6huPOqebzWHZTcDSo/atNz2oair4XDCQs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=FJ30ZDQw0wH5T06kutDrnBN0YEFnyGDdfBuANz1vbB/xq0kzCM+VHopvcysZnGU08
+	 74QTr1gbUhTBjKlo/XdCCFKoBtqsGaHHAHjOxYxRyXaeS70qU8GYTx8NZbIv28WAdX
+	 tx3gFz2x2tiouBti7mqTVjDV/+o1xjDmf3sSxas8V167NJnUsO8eX07zukPMlhPNyB
+	 oX4Pii+l+MiFVlXd9aaGTZ6vdIWzOK4rWaUEg4drj+fvi2HI9mGrRD++dCxFIOXFre
+	 9nwNCwxE9AX0qqKm/ebjo3DHXCP0pNGMa3k1E/MqbEbxE1NArJ1rKdfhhfb3/1oIX0
+	 c3hSrLXwmFBkA==
+From: Sasha Levin <sashal@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Sasha Levin <sashal@kernel.org>,
+	stable@vger.kernel.org,
+	patches@lists.linux.dev,
+	Stephan Mueller <smueller@chronox.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH 6.1 1069/1887] crypto: jitter - replace LFSR with SHA3-256
+Date: Fri, 30 Oct 2026 16:54:04 -0400
+Message-ID: <2026-10-30-1-daily-reply-0001-jitter-sha3-6-1@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261029210038.GB49373@quark>
+References: <20261029210038.GB49373@quark>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -81,17 +63,16 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <auRo5WBj2OlKlWGW@pc636>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 30, 2026 at 10:52:37AM +0100, Uladzislau Rezki wrote:
-> The problem with spin_lock_irqsave() is that vmalloc() path can take
-> time to alloc and map pages. I am not sure this is worth to switch to
-> irq-save locking primitive. So this is the "heaviest" allocator in the
-> kernel. Callers have to be careful how the call vmalloc().
-> 
-> IMO, this caller has to be fixed.
+> But also this commit had known bugs that were fixed in follow-up commits
+> such as 735b72568c73, 908dffaf88a2, 9aa7e045f4af7, maybe others.
 
-Which caller, though?  Are you saying rhashtable_insert_rehash()
-needs to call kmalloc() instead of kvmalloc()?
+Queued the first one for 6.1. 908dffaf88a2 ("crypto: jitter - add oversampling
+of noise source") is already in 6.1. 9aa7e045f4af ("crypto: jitter - Mark
+intermediary memory as clean") only adds a KMSAN annotation and is not in 6.12
+or 6.6 either, so I left it out.
+
+-- 
+Thanks,
+Sasha
