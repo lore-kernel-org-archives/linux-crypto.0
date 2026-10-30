@@ -1,75 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793335712;
-	b=4gLRK7M/YTTKvxIXomyLycq7ibpj/SJVj300wTBCwlOjjmkr22NpkANgqG9dIrr/PzKa
-	 RtHfuSUK2JxDB9fBysZG4kK0ouYo1lbwQCMCVIs/c0fZ3POI9H9LvK6GW8GP0PsBWtNf8
-	 oCC0DPFKheODwNY1M0pttI3Z5noF9sJgLFuSmNsyzlIuGPwayA4kaIST4WpD9V46FcrKM
-	 UPvfC3LjF1uT7rzQuw66F5kndmJk9rp5UggzxJQcGfouFEWWdFM7xU80qOpeKgyn63R7Z
-	 GRKOPEIHrtw6ST1PX5hfWkaKuwAISagsB5Zs1OzGwE7MbkdOxPXgV2krDkmjpSMfd/w==
+	t=1793336015;
+	b=EXaU9q3jBE1ic9l6je7gxOJrn5rxLTxskvRCUi56Kff50L0jEC8KZYMmyzXA5t7kOgPN
+	 LOj1dIhauwGIwWdBako9PocFWJUqdz/qrrNEFab4t+bNjpW9fnxQCzJ3xNxn8fxNG/ei6
+	 re9YMdE0NP0MLIGGyR5mJiass0oeTDXZ2u11rbIt/9HsUx5gPP7zA/ba7OwzAJufLHa1U
+	 Cd2ofj9NYmyfvyrmM8VaWdcd9IrzNVGdaOVfbzsvF8NMVbL4x5W26RxSAjoU52w61xPaU
+	 TXl8Yn5GB6CMNSYDhbxF6oqvcimA1Zh9/sUnDe7PgQGH+inBJlRsza5kxaQJ80VKcjA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793335712;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=xCO2gpCBQE2FwzGxXtXJnVmZ+zGlw7S7nKOHMvP3QG0=;
-	b=vPTNIdCdmIWA+LBWVoZLIm+pbnbXlYV26Mhc1Z0w+X7kgn2Fjzr9LtTz+rmUHI1B6KUC
-	 O8dlAJ9nhGnyaEsYgg8vCV8hgTAb1Ut66fZl1N9dzCh/TCaIBgZNbZpjR3vh/ld/2gVWW
-	 jiWIHY+WVdUObKA9permuChzM/87r+l8TDSGS5g1hM3xRsf16n2rNwxu8SCIrwH1zOWXf
-	 eght5eqi2s8z0zIMWH2d6D1t9zY8BMDjcG7GSZ/8Jn0psW0Ip2ijVCM0Y/R526KBvb4hQ
-	 HYZkHkZIIdwQocdl7o0Bx6tZzdGmE9J7cYDOUm+jFBOZD+OxDRXI/bOWF5auQ/60F5Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793336015;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=T/SnFkCayGx8K6l/oqZJSnqM0buBvXomcT1JYJ+sR6Y=;
+	b=r2X8d4y/eu3ZkR9eXJsnb9tBLYAjo/phEBhDySUuRnTFJ33lqppFn/bJaN7q4/rVwLMj
+	 g9ZCmbz1be0f6TN4HNNbGKf8vR/9q2dfkXU64kxH8uGkdvjlzwOip5LNFiNLbGhD6nyNp
+	 oRRyyvDqvXGGp5aQAka/4IvEHbv1rTJdshQU++q2l39TWsw+OnFQM+4+nxag8KcNZSfVn
+	 DBBYMHhdmEzJne69FsL9h4cox3XibylCmsy7kmzqhBY6GljZSkyB+XyluWhkwaimsdnoi
+	 9brMJbozIqFZl5DuB1IK2MMeSkLcTywoHuNL3vzRSzAzIZuLJM5ssuu3vXue1rFcFKg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gondor.apana.org.au;
-	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=hKQDCwWc;
-	arc=none smtp.remote-ip=180.181.231.80
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jnIwFl43;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9103606A31A;
-	Fri, 30 Oct 2026 04:48:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9103606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E41D606A31A
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Oct 2026 04:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=hKQDCwWc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=xCO2gpCBQE2FwzGxXtXJnVmZ+zGlw7S7nKOHMvP3QG0=; 
-	b=hKQDCwWchBDZrqV2HNumPX2hRrvnfsyuREe+gEk1+dUcp8Ix5tYjEtSit3Ix1F6SCsLMbtLB63R
-	uZ4U+z5dDPcyVnSPDudr+gqN97h9YbEiQymk0YBvHWBreByFOtJgk2Xh6I+GPGa5r+A1nP7BPdYIP
-	vum6ASLLzYK0W339d7mFON4zuKKHSr7CpSgWU+18qIVY7dxeaT9Uuc/rwp+mjogVUayQrhMjXz5zD
-	n43lkbkGyO0OI0eY3jymvs6qA0TbpeZwPR2D2hn4qQklHAvB8BaoZQ3crAbmS47ueoqFaDPrt7W3m
-	RmJKWZjND5ofD7F2w9P0CzgYKXeCgqSSvxJg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xMeXI-00000008yjK-3ZRY;
-	Fri, 30 Oct 2026 12:48:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Oct 2026 12:48:16 +0800
-Date: Fri, 30 Oct 2026 12:48:16 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Liam R. Howlett (Google)" <liam@infradead.org>
-Cc: Uladzislau Rezki <urezki@gmail.com>, Michal Hocko <mhocko@suse.com>,
-	Baoquan He <bhe@redhat.com>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
-	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
-	"David Hildenbrand (Arm)" <david@kernel.org>
-Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
-Message-ID: <auQhkHG6XlgNTdRr@gondor.apana.org.au>
-References: <20261028154218.1668182-1-liam@infradead.org>
- <20261028154218.1668182-5-liam@infradead.org>
- <auKshDXKQXt1kvjy@gondor.apana.org.au>
- <auMbCuecFeRmBFSK@pc636>
- <jfvq7vkx73vzp2ukq6nwnb3v3g2ezdcyppba4oa5lpzmz6ls6t@akc46gonndgy>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jnIwFl43
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8640C1F0093A;
+	Fri, 30 Oct 2026 04:53:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793336015;
+	bh=T/SnFkCayGx8K6l/oqZJSnqM0buBvXomcT1JYJ+sR6Y=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=jnIwFl43/jFf7BSsLrKRZZT8rfa/FIaMHcRsa1h/GaHnIE1H8z4u5iWSg48/ibiMJ
+	 ygKJ/GoRVevh6F6vRn0VHJ/XDPb/aHgfsNnd4h8U+mFxPbwfLONG5Wm/DWExNREi4B
+	 HHCeI5jZyFxE0dW//BiNLYkbaoSFkENzCU+ExUU4HdiejHx/ivtT3h3klKDWuOS4My
+	 DV+dMsGZ/QrTXC1u6B6JaNo0q0VSfG/uiSHNznWpT8q3EpFelqyORA1u2hn9XAd7TY
+	 Lpwm5TMfCWKXgxtGzsH8KV3fGD8PjmJXbG9SJXHZuY8lyyqDl74R519z2vngRV4rDx
+	 iQqsyr11ERZ0w==
+Message-ID: <sashiko-outbox-190323@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH net-next 1/5] net/rxrpc: Add local FCrypt-PCBC
+ implementation
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Eric Biggers" <ebiggers@kernel.org>
+Cc: "David Howells" <dhowells@redhat.com>, "Marc Dionne" <marc.dionne@auristor.com>, linux-crypto@vger.kernel.org, "David
+ S . Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>
+In-Reply-To: <20260428024400.123337-2-ebiggers@kernel.org>
+References: <20260428024400.123337-2-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 30 Oct 2026 04:53:34 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -78,29 +62,84 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <jfvq7vkx73vzp2ukq6nwnb3v3g2ezdcyppba4oa5lpzmz6ls6t@akc46gonndgy>
 
-On Thu, Oct 29, 2026 at 10:53:56AM -0400, Liam R. Howlett (Google) wrote:
->
-> Given where we are in the release, this fixes a real issue that can
-> happen so maybe we take this now and settle the general handling later?
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Low] Missing export of `fcrypt_preparekey` causes a module build failure=
+ for the KUnit test.
+--
 
-There is no rush at all since the bug that you found has existed
-since 2025:
+commit 987b9c773f38843aea47501d809de294b68d6aa0
+Author: Eric Biggers <ebiggers@kernel.org>
 
-commit c6307674ed82c0c57d6e1e3408e84ac449ab8e94
-Author: Uladzislau Rezki (Sony) <urezki@gmail.com>
-Date:   Tue Oct 7 14:20:35 2025 +0200
+net/rxrpc: Add local FCrypt-PCBC implementation
 
-    mm: kvmalloc: add non-blocking support for vmalloc
+This commit adds a local implementation of FCrypt-PCBC encryption and
+decryption to replace the crypto API version. It also introduces a KUnit
+test suite for the net/rxrpc/ functions.
 
-Let's take the time to fix this properly.
+> diff --git a/net/rxrpc/fcrypt.c b/net/rxrpc/fcrypt.c
+> new file mode 100644
+> index 000000000000..46038a02c0c0
+> --- /dev/null
+> +++ b/net/rxrpc/fcrypt.c
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+[ ... ]
+
+> +void fcrypt_preparekey(struct fcrypt_key *key, const u8 raw_key[FCRYPT_B=
+SIZE])
+> +{
+> +	u64 k =3D 0;
+> +
+> +	/* Load the 56 non-parity bits of the key.  Discard the parity bits. */
+> +	for (int i =3D 0; i < 8; i++)
+> +		k =3D (k << 7) | (raw_key[i] >> 1);
+> +
+> +	/* Generate the key schedule word for each round. */
+> +	for (int i =3D 0; i < FCRYPT_ROUNDS; i++) {
+> +		key->sched[i] =3D cpu_to_be32(k);
+> +		/* Rotate the low 56 bits of 'k' right by 11 bits. */
+> +		k =3D (k >> 11) | ((k & ((1 << 11) - 1)) << (56 - 11));
+> +	}
+> +}
+
+Since the KUnit test is defined as a tristate in Kconfig and built as a
+separate module (rxrpc_kunit.ko) when CONFIG_AF_RXRPC_KUNIT_TEST=3Dm, does
+this function also need an EXPORT_SYMBOL_IF_KUNIT() to avoid a modpost
+undefined symbol error?
+
+> +
+> +/**
+> + * fcrypt_pcbc_encrypt - Encrypt data using FCrypt cipher in PCBC mode
+> + * @key: The key
+> + * @iv: The 8-byte initialization vector
+> + * @src: The source data
+> + * @dst: The destination data.  Both in-place and out-of-place are suppo=
+rted.
+> + * @nblocks: The number of 8-byte blocks to encrypt
+> + *
+> + * WARNING: This cipher is insecure.  Not only is the 56-bit key easily
+> + * brute-forced, the cipher itself is cryptographically weak and doesn't=
+ even
+> + * provide the intended 56-bit security level.  It effectively just acts=
+ as an
+> + * obfuscation algorithm.  It is supported only for backwards compatibil=
+ity.
+> + */
+> +void fcrypt_pcbc_encrypt(const struct fcrypt_key *key,
+> +			 const u8 iv[FCRYPT_BSIZE], const void *src, void *dst,
+> +			 size_t nblocks)
+> +{
+
+[ ... ]
+
+> +}
+> +EXPORT_SYMBOL_IF_KUNIT(fcrypt_pcbc_encrypt);
+
+It looks like EXPORT_SYMBOL_IF_KUNIT() was included for
+fcrypt_pcbc_encrypt() and fcrypt_pcbc_decrypt(), but missed for
+fcrypt_preparekey(), which is also called by the new test suite.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20260428024400.1233=
+37-1-ebiggers@kernel.org?part=3D1
