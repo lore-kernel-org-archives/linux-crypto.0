@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793424104;
-	b=3MhzelQvbHIeZIRpcglDDEX2SxkLlP5hI216A4MG38utmgd52rgo65CSX0Y+kTbzcjZK
-	 zNxoNUa33ZZGkBQI4Iy3jHUXOWO1//s6nrVmUz94Jilg3B6tBb0pyBe2OqhVm3zXW+pW9
-	 T0su7ViCpZp8FmxEn3M22GlTKUhiSRUVzptnqmI2YxGKnt7A+j+Jp5vSG7bnP1TWlnadf
-	 OQ5IOGAxgZ2guupsTovwYVY1OcgI9WtMyqwPSgTSZZ79I5AsZgb86TpRkDxokoKbrBi/X
-	 NOppm+MqywwhM2JAvOYwlQUdlbfQb7RzbJZwx9mHW5AUV8VUDXUkgsTq1HAXRxgrr/A==
+	t=1793424112;
+	b=p+++sjuBXmel2nPTfjGAX1DyV0ohN2jRTd4RqmRKRb7LqSTREV+XCNvftEu3N6+MatBt
+	 aMwCNXlmIBK/Of0yErnIlHqmty1QQWcXf08NSyFmx4TC2baZfYKVSWhcvGVSI1dcWQ1Ek
+	 fpz02I2O+LyKlAL+iwiiBnqe1843i0uz7W9H+rn7g/0/V77ZLPkUJx0BSgCGmM4K/DxUq
+	 e84fJ94do9ajGhm+dkQh6nDUiNRLnAbP2ycQNKNZAfk6dzjU4DpvjKgSFiJUbKbG4cxKj
+	 MaRSnu1qiQedkDs4vaYq/QYY514DLnWLzmMpm0b2QJnwqEQ2Aa2JTLe3QFXG9HTNHZw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793424104;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793424112;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=UVQLNKSJ0xoMcIh6PNK6CJrWvUDHEQR4CpLyeNGEsgQ=;
-	b=HGfWRdHCjVumx4uFoFCYynXCzXTbIxWJcAy0UFg3s4yhtSSoGwNtnVtKrdrjO5rrp447
-	 9oA8jVKVd3gTk6ihCi5ZWa/wqAPqHuq/UEkZ/nik+UtYcEAHrPYxWGvwmZCwwl8TXsxLk
-	 rGnoCqR5wbgxwQlbqCUj781wH4nJpuqH2QqG5mGAZNKkso4i43I6b/T26PYF1RvlGtJYc
-	 gALjUEwMNHqLilMJCP7tfKuGUn0XWvV4e2OQV5/6JM7SGJEeBL7kU52aamrwAK6+CubtE
-	 MFLnn0g6oCPkXciw6aHRVA5pH5xaUXYZt7KLjeu+GhdYnkJxt//RQcWm16ugJoyniqQ==
+	bh=nhGj4WC9tvZroxN/qiQX69HHKRPAZK+8FvNdfCptljc=;
+	b=f4O7EKUu5QtVsHx/6o4FoMPG6594ZtTRUUIM0mdnKLKcG/PHMFVfMbmS+0y47wa0LaX3
+	 2noIBIHvg1AlfzE1zKLN0vrMMkydCA9Q4QfLo/6IketCyNV0ZZaOsxO/FrocWseSkl+6Z
+	 gVY+wsqRcSTsrTgXvKDyYRdhIHeEMh5+OoVj/jA7oBC80QDqId/xQCHCSy79JwXcJWrWV
+	 d5OnymZjxvbFEOKf3DRZvOk5NdHhd9Gnv8F2wcDHWqzEmCE4AVpNKkHoPb5cAG8X5UGkO
+	 TFPphAW6QCkxOE+y3kza01uW5tVi5F8wqIkU8MP0fAWFleiaAVOsmUXCqsW5nFhJ04g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=l96ikhgm;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZwiaSdf8;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54443606A31D
-	for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2026 05:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C4A606A31F
+	for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2026 05:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=l96ikhgm
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B67A1F00A02;
-	Sat, 31 Oct 2026 05:21:44 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZwiaSdf8
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 959811F00919;
+	Sat, 31 Oct 2026 05:21:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793424104;
-	bh=UVQLNKSJ0xoMcIh6PNK6CJrWvUDHEQR4CpLyeNGEsgQ=;
+	s=k20260515; t=1793424111;
+	bh=nhGj4WC9tvZroxN/qiQX69HHKRPAZK+8FvNdfCptljc=;
 	h=From:To:Cc:Subject:Date;
-	b=l96ikhgmTYeAtdTjSDqAkvgg9yJmAoBDN1GNy6q+tFoUEOXmTGoB8GC3m4xsmkM7Y
-	 BX3bmD4V+nobdGldgiWBDgbra0b0cs9KxramSlmfyYpjMlsPQnpZ9DmjaoaTZHYeW9
-	 HrmAhVtHUlb/bdFnEnNzgUDYnxQj0qxJT1iDm4Y+N9caJ9pP52hJpkD4JeIGFwukDz
-	 CX+d1b3TPdLMp3yEw+e7F4CWgzqhS4dCDxcU49p02xJdcYOnRrm2zEp0ijJ6I9sN03
-	 mMP0TinrbKiFUgsawAV9qIA+ZhBIyjTfU/icLiyHH2/oAv+W5S0OkY/rVHIk+eB83r
-	 3AtBz0ODtcbQw==
+	b=ZwiaSdf85FRcHDgNOjjH7z4OkOMtWg4vQ9BtWrOXarOblA79SJ0cdn5ujzRmp/wwW
+	 TD4NFFDmVB+2opvolUKsPXCKmrb8HE9LGahv7yPsRVA+QZOee2rjIf9lQuRTS1SuUM
+	 FAf6na1FC3uskpKBbx1jTAaq/6+Ld8wH18e8pLuPGS0umPThM0dvazyyhOzBUHVEfN
+	 SLbNw7sVm3N4b/XCDh7b87S8G+sAV8vmFAam/tCpHEFfo5khHgspu3JzfEbSrbea+G
+	 OSQ24oVc8W5Ba/ZO7PST6it558wKJOFFACM4BnqrVTSGX1F07icp4mpWIV22a0ytjL
+	 iCaCGEzbhZdog==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: aes-cmac: Hide selection mask value from compilers
-Date: Fri, 30 Oct 2026 22:20:53 -0700
-Message-ID: <20261031052053.201779-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: gf128hash: Hide selection mask values from compilers
+Date: Fri, 30 Oct 2026 22:21:49 -0700
+Message-ID: <20261031052149.201983-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,42 +65,46 @@ they are used to select between two values and potentially generate a
 secret-dependent branch.  This is not known to be happening here, but we
 might as well be extra careful.
 
-Since the selected values are only 0x87 and 0 here, change the type of
-the mask to 'unsigned long' so that the compiler is not forced to
-materialize it in a register pair on 32-bit architectures.
-
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/aes.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ lib/crypto/gf128hash.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-index e1c191551736..1d26fd8be028 100644
---- a/lib/crypto/aes.c
-+++ b/lib/crypto/aes.c
-@@ -578,7 +578,7 @@ static void aes_cbcmac_blocks(u8 h[AES_BLOCK_SIZE],
- int aes_cmac_preparekey(struct aes_cmac_key *key, const u8 *in_key,
- 			size_t key_len)
- {
--	u64 hi, lo, mask;
-+	u64 hi, lo;
- 	int err;
+diff --git a/lib/crypto/gf128hash.c b/lib/crypto/gf128hash.c
+index 8dcdf5ec98be..5b8ae98cafed 100644
+--- a/lib/crypto/gf128hash.c
++++ b/lib/crypto/gf128hash.c
+@@ -88,10 +88,18 @@ static void clmul64(u64 a, u64 b, u64 *out_lo, u64 *out_hi)
+ 		  (a2 * (u128)b1) ^ (a3 * (u128)b0);
  
- 	/* Prepare the AES key. */
-@@ -596,9 +596,11 @@ int aes_cmac_preparekey(struct aes_cmac_key *key, const u8 *in_key,
- 	hi = be64_to_cpu(key->k_final[0].w[0]);
- 	lo = be64_to_cpu(key->k_final[0].w[1]);
- 	for (int i = 0; i < 2; i++) {
--		mask = ((s64)hi >> 63) & 0x87;
-+		unsigned long mask = (s64)hi >> 63;
-+
-+		OPTIMIZER_HIDE_VAR(mask);
- 		hi = (hi << 1) ^ (lo >> 63);
--		lo = (lo << 1) ^ mask;
-+		lo = (lo << 1) ^ (mask & 0x87);
- 		key->k_final[i].w[0] = cpu_to_be64(hi);
- 		key->k_final[i].w[1] = cpu_to_be64(lo);
- 	}
+ 	/* Multiply the low 4 bits of @a by @b. */
+-	u64 e0 = -(a & 1) & b;
+-	u64 e1 = -((a >> 1) & 1) & b;
+-	u64 e2 = -((a >> 2) & 1) & b;
+-	u64 e3 = -((a >> 3) & 1) & b;
++	u64 e0 = -(a & 1);
++	u64 e1 = -((a >> 1) & 1);
++	u64 e2 = -((a >> 2) & 1);
++	u64 e3 = -((a >> 3) & 1);
++	OPTIMIZER_HIDE_VAR(e0);
++	OPTIMIZER_HIDE_VAR(e1);
++	OPTIMIZER_HIDE_VAR(e2);
++	OPTIMIZER_HIDE_VAR(e3);
++	e0 &= b;
++	e1 &= b;
++	e2 &= b;
++	e3 &= b;
+ 	u64 extra_lo = e0 ^ (e1 << 1) ^ (e2 << 2) ^ (e3 << 3);
+ 	u64 extra_hi = (e1 >> 63) ^ (e2 >> 62) ^ (e3 >> 61);
+ 
+@@ -245,6 +253,7 @@ static void __maybe_unused ghash_key_to_polyval(const u8 in[GHASH_BLOCK_SIZE],
+ 	u64 lo = get_unaligned_be64(&in[8]);
+ 	u64 mask = (s64)hi >> 63;
+ 
++	OPTIMIZER_HIDE_VAR(mask);
+ 	hi = (hi << 1) ^ (lo >> 63) ^ (mask & ((u64)0xc2 << 56));
+ 	lo = (lo << 1) ^ (mask & 1);
+ 	out->lo = cpu_to_le64(lo);
 
 base-commit: 2a500a04d6f969318c05f46aedb6e73fc1963a00
 -- 
