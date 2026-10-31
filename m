@@ -1,52 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793444335;
-	b=4L0K5LutkN9ZY9/qZq89MQLv4h/OLqKVvKQXglaYB+BtMmzwkuqli0w9nXMYMt+rA31P
-	 ojv4i64SOG5BuNnbYW00IHwFR3BuKzQ7vuOvRuF8ns9g3jRuH1yvppUFboyWhH8FVacQl
-	 UXZcSCQuGgXEUVP6XKK0MSH6aPfOvc8mvvM70rWO5lPwzzdzmhZIKvFe4BBHUksu/2NIj
-	 hEGc1Cdv34s3mZQMD/cipoO6GHu63yVwHa7Uieaugi7j1hHoKO2iWE9kT3jcmVmic9z5t
-	 MBnE4U5jgAxXWu5Rmz65DU5pMAZqVFMFI87Vr2Rz6rF3BStZjzOB3sK9EHSxthgaPAw==
+	t=1793444481;
+	b=MQCcwr1TRNR4CCFyBaTtWY5ohEyxzhcIF0GGruVEyHnOA+FZaTxsU+fNqWqc21ENtjfb
+	 u2CeiDwIKSbTQFY60/dvGC8JycUqCIktNx5kiffhku0rm7vOoobRkVWHjtUUbzLZumVqH
+	 muD8uos4ZtDpj4RHfJAxnxSv3bS64bnV4UwgseKSmpBiM5RQuhcP7UU7n2io0MpHh6GfF
+	 Z8HHokHNUkxkKf/ooSzyknWCXymb7Zakg/twpZ7aozLDfQryWBF37y90v7Haty53TWJnW
+	 ZHKLXUAUC5TSXjVgsCvDj8maAOsKGz9pNT7Sr7mpvzv9d79gxOUhnz63ZzBMkgI9OmA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793444335;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793444481;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=cCGadwtToCorgflN9IipYjClmwBy5TcnQgY9awENpas=;
-	b=rAx1IHMlgg4aA7U9OrLocPlrBr3aQMb7uIBAHzKeJTc0EdjWtDS/yaq+7VBWF7XEKuaK
-	 gXIkpbRl1WDaPEPlBNfcpedGmu+3cwxfJLoFw2bOPoC1jBteEC4D/WD+tUje/bX6XzF/m
-	 yB6bFTIRevVuIpVSzv0ZalLytUP6pyp7cBLNPjmIcOzNCmAvIzoMwnfhbbNtdBaU1Vg/4
-	 z4e88BF2yxgF2hu6XSbt1O96ZswO/yTAtm/dlaXOj5NLJvOO7l00GdIdt4YFZDZ8vW74O
-	 ovvlsa0q9l/OOVQcJERyGqvawe99RaKw83tawiSfBhS9McEQQmnLFR+5W6eRtggYJKw==
+	bh=zFHP1wt2zbuyQ8JmVs2AALXpj9shBjg0MxdbpTuthyc=;
+	b=TPeuReOett0BVfZzw8EQZ93mI4tbqddddadogdeZS/yXjZfHW2O0Ym9xROKTnljxiG5N
+	 2EuZvQRYUx1iXuER8DHbkTTJSnIkqP9KO3+qbi+2EMN+nBpRQb3OlRBoWzwiMkXvSAlvk
+	 GhBTjm9Br59MmQL6zsKmNi4daE3OZE2X2pNmcrwmjbsXiO1DD8shOi34NqrjFnPeQgV2E
+	 4yWG4DRjmxUbLZvj3I1Xf/GyHKEy0jezy4EO/VBbC1loCMqSuqqpSub7xcnG3zyMoH2qU
+	 fooJIUiv2w9VNdej32Jz/nyiSvOCRwUpavHdG+ZkaMgYKC2Ht2+gpSk7tfFxsHFMkkw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=bfqJsfRk;
+	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=hJswqMkx;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B10606A31A;
-	Sat, 31 Oct 2026 10:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33179606A31A;
+	Sat, 31 Oct 2026 11:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=bfqJsfRk
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A2021F000C1;
-	Sat, 31 Oct 2026 10:58:52 +0000 (UTC)
+	dkim=pass (1024-bit key, unprotected) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=hJswqMkx
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C7F1F000C1;
+	Sat, 31 Oct 2026 11:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1793444333;
-	bh=cCGadwtToCorgflN9IipYjClmwBy5TcnQgY9awENpas=;
+	s=korg; t=1793444480;
+	bh=zFHP1wt2zbuyQ8JmVs2AALXpj9shBjg0MxdbpTuthyc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=bfqJsfRk5fAoPhQhuwBGpCLM+O0gvNvAKyTWknoAIRheMasf014RhAQl0jAmM2a2C
-	 pauGVZE+E0DCrSRj/gxggtAXBa265IeYMTdhTO/+JBHMyLn9tzZLrzSFH9UarsO+NA
-	 pOOyojO/0SXSkfWIivN54HLwhrx+pzTD+KHcJwVs=
-Date: Sat, 31 Oct 2026 11:58:47 +0100
+	b=hJswqMkx9Pywmx1XVCLQzKgBZbLn6VrwV9OaA5atPhGC/SN4MAfjjJMmTsKhBFvrD
+	 ABFiJvgdVpFJRRdD2K0h6NltWABUcpDPJBAA+c6wJC6LmxBdcKj0WCgebhXwjAN809
+	 DHhs0nIgCeUPsz6S50IHxE7XrpHChRHiLCd7GKZY=
+Date: Sat, 31 Oct 2026 12:01:12 +0100
 From: Greg KH <gregkh@linuxfoundation.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Jeremy.Jean@oss.cyber.gouv.fr, Jason@zx2c4.com, stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: FAILED: patch "[PATCH] lib/crypto: arm64: Fix lost Poly1305
- carry when resuming NEON" failed to apply to 6.12-stable tree
-Message-ID: <2026103132-crept-dormitory-2414@gregkh>
-References: <2026102137-contently-unshaven-7da4@gregkh>
- <20261021154806.GA1879@quark>
- <20261021164836.GB1879@quark>
+To: Roman Demidov <roman.demidov.nn@gmail.com>
+Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org, Joachim Vandersmissen <git@jvdsn.com>
+Subject: Re: [PATCH 5.10] crypto: ecdh - explicitly zeroize private_key
+Message-ID: <2026103104-wasabi-durably-9e01@gregkh>
+References: <20260911123140.137198-1-roman.demidov.nn@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -58,41 +57,54 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261021164836.GB1879@quark>
+In-Reply-To: <20260911123140.137198-1-roman.demidov.nn@gmail.com>
 
-On Wed, Oct 21, 2026 at 09:48:36AM -0700, Eric Biggers wrote:
-> On Wed, Oct 21, 2026 at 08:48:08AM -0700, Eric Biggers wrote:
-> > [+Cc linux-crypto@vger.kernel.org]
-> > 
-> > On Wed, Oct 21, 2026 at 04:40:37PM +0200, gregkh@linuxfoundation.org wrote:
-> > > 
-> > > The patch below does not apply to the 6.12-stable tree.
-> > > If someone wants it applied there, or to any other stable or longterm
-> > > tree, then please email the backport, including the original git commit
-> > > id to <stable@vger.kernel.org>.
-> > 
-> > It's a clean cherry-pick, as git detects the rename of
-> > poly1305-armv8.pl.  So there should be no need to require this to be
-> > resent.  Also, missing Cc to linux-crypto.
-> > 
-> > Same for 6.12, 6.6, 6.1, 5.15, and 5.10.
+On Fri, Sep 11, 2026 at 03:31:37PM +0300, Roman Demidov wrote:
+> From: Joachim Vandersmissen <git@jvdsn.com>
 > 
-> As I've said before, the reason this keeps happening is that Greg's
-> stable scripts perform a cherry-pick by first formatting the commit as a
-> patch file with the default 3 lines of context, then applying it with
-> 'patch' using the default fuzz of 2.
+> commit 73e5984e540a76a2ee1868b91590c922da8c24c9 upstream.
 > 
-> (The second step seems to occur in the 'apply_it' script, which isn't
-> public.  But based on the observed behavior, it must be what it does.)
+> private_key is overwritten with the key parameter passed in by the
+> caller (if present), or alternatively a newly generated private key.
+> However, it is possible that the caller provides a key (or the newly
+> generated key) which is shorter than the previous key. In that
+> scenario, some key material from the previous key would not be
+> overwritten. The easiest solution is to explicitly zeroize the entire
+> private_key array first.
+> 
+> Note that this patch slightly changes the behavior of this function:
+> previously, if the ecc_gen_privkey failed, the old private_key would
+> remain. Now, the private_key is always zeroized. This behavior is
+> consistent with the case where params.key is set and ecc_is_key_valid
+> fails.
+> 
+> Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> [ Roman: The zeroing is performed before ecdh_supported_curve() which is
+> not present in upstream but this does not change the fix's logic. ]
+> Signed-off-by: Roman Demidov <roman.demidov.nn@gmail.com>
+> ---
+> Backport fix for BDU:2025-00987
+> 
+>  crypto/ecdh.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/crypto/ecdh.c b/crypto/ecdh.c
+> index 96f80c8f8e30..2e7acfc42155 100644
+> --- a/crypto/ecdh.c
+> +++ b/crypto/ecdh.c
+> @@ -43,6 +43,8 @@ static int ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+>  	    params.key_size > sizeof(ctx->private_key))
+>  		return -EINVAL;
+>  
+> +	memset(ctx->private_key, 0, sizeof(ctx->private_key));
+> +
+>  	ndigits = ecdh_supported_curve(params.curve_id);
+>  	if (!ndigits)
+>  		return -EINVAL;
+> -- 
+> 2.53.0
+> 
+> 
 
-That script has been public for decades:
-	https://github.com/gregkh/gregkh-linux/blob/master/stable/apply_it
-
-> This process is buggy compared to simply using 'git cherry-pick':
-
-Agreed, see my previous message, we don't use git cherry-pick for this
-workflow, sorry.
-
-thanks,
-
-greg k-h
+Does not apply to 5.10.y :(
