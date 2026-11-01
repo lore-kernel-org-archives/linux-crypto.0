@@ -1,53 +1,77 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793481470;
-	b=moP0lOrOQS2hTHIVJjsSjhzEDsCaPeY23z4avRJ5mnfEZNSwrkF2w7KAeyhJ1c+WtCaY
-	 QH2L21ulxDJLsEuCHUzLudT0wP2KC6irisNIM09gJU3GPuoLV6mhjCNxxiDUkD+gxKSgp
-	 V4mpVBplNe2EzTTzoqG/n7oN1x3ngoNvKYOqc8R9f4bS0AXDiUaE5dnScGBjNPeLZ6lc2
-	 3eY5u1Ct9zmL2DF3Y1ItUqJKquIB3HXDV/yGnc6JuS+H4LJkfMcNMFf1EhhFbOzxzcT24
-	 Bnnd8SLu/uxkB2NP1bUPk3ZzbjY9Pe3liU5eSsIjBx4cBFGyM7sBtlZFKpX0JwUPGKQ==
+	t=1793492386;
+	b=P6ns8Z1ZN1engobT2nHy/2zgeLO56qOc8n6h1IW98gWQ2zBB1fiod8drvhfC3KjZ2Qk/
+	 26Jue/D7pZw1X6lfkH4FxX1wYSyDE7ofYA4IwFL99KSg+hlI5MwjDkfB6qCllfgQDBf9R
+	 WESWEUlOt/wi7OJqj9Fd0Q+T0ZA3IgiYPurZWfCDbD0JkWcD8KYEMalK9aihOS+GXuDOq
+	 u1PDjFVfH99Ngq88/vT32Pg7We0jE5pdSpEHdwKINjPGuIUxRf+ak04uD2VA+baO38s0L
+	 HBXOR/TBv82nMPg8dDxbB+6YOjvp3Yo4bpwdpMVZDmq4OovQF7s+c1LSHuWtmJbxgYA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793481470;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=uCnCfE3zPyraP8bjQ5AP1yuw1WQ4zpvbzWG4GvBwhfk=;
-	b=PKGga1P2sHoYFUANJNkoDxUcNZma3U2EAuQpeI9hWmdxHmRluCKJ783tcv4/eA7Qz4ui
-	 0KdWLCykW31rmQ4632R+U2JcjtRvVyhl3VzAcniu4lFxhfoJZfjByy5LtG45tL6/l8Sdu
-	 3zqkJIexyuUKrtJZQnypSmsyECiCg9tZ0CtKBbYOXOXhVyStikSolZhgpf2HKclbljRBp
-	 VNqnZqB7YNBvcC/bgsAjjy79ApJCLTWnIVxclIfvSO8ktZkeTtlFix2OsHQbEb9VGbb6V
-	 eiNS9qAPD8LI+9TcQujCkR1kJykDPEkGMdvbU01Ev9Q61V+RoZnl61N3ALknTe8PiOw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793492386;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=1C0upMKH+zbLi4SJoiKyMvaAF5IBekHbTFPSl9D526s=;
+	b=UHKou63FIgx5GMzs0bXAAtGFdwRBfjKY3VvLI/USraoogePmjDXcFYzqTbl24gzkayXt
+	 NYQT+F2j5H3YMotVqShAD6Bga670mSvhKxqSICc6+dSESX3ufRj4yo31K5TSV8eTYwdqh
+	 5Cjhz0KV/OGp81FXT/UIoNiakbPPRk7+mBmZuXU8wttbbKIgpk0UGl9eWYJ4p/A7sFvDd
+	 FHKihPhq8zeiqX4ZqUsOWp4fan8ojaSsHNcFM1d/78A5A4FN9pUwQIqjpIWLM+OG55do8
+	 rWDAmTwPNX+ldNmJ42ivE95wP+pPi796l/uE9qUuBlB3r/zNFTqn8CuMVMPmHFLA6Mg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WBuvvn+r;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=lkyQI4BJ;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D55606A31A
-	for <linux-crypto@vger.kernel.org>; Sat, 31 Oct 2026 21:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1E6606A32F;
+	Sun,  1 Nov 2026 00:19:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4F1E6606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WBuvvn+r
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 721591F000C1;
-	Sat, 31 Oct 2026 21:17:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793481469;
-	bh=uCnCfE3zPyraP8bjQ5AP1yuw1WQ4zpvbzWG4GvBwhfk=;
-	h=From:To:Cc:Subject:Date;
-	b=WBuvvn+rcG8S5FEvg3a+7oGBpza5+YnPZpEyGzMa+4wp/i3mU+T+tb57IPijNNtJS
-	 UGGUb+SGcujzVmxq1+hgSppF5njzIr4TSHmeLPp28J2Nz1AqTnccuPretkptSwZ1gF
-	 LmOaruc9p94pBnoGSgi4z+z0HXJr27BRb78b6Ed79HN7sRJj6hWZKfZcH//91KmXHh
-	 wIkv7UzU1zA6qj3Jb7jC4rHnC3/NB6IHhUHDmW/kpHnEoWS8QLmTElRe3cN26cXswu
-	 4ZDMSaI08hL2h6o0c06DS2bqD2zNih9Z+tZix62BgMG3knjXMNB39PGotZsOAvlaPL
-	 GgPkNKw/BmjfQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] crypto: arc4 - Remove obsolete crypto API support for ARC4
-Date: Sat, 31 Oct 2026 14:15:35 -0700
-Message-ID: <20261031211535.8793-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=lkyQI4BJ
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=1C0upMKH+zbLi4SJoiKyMvaAF5IBekHbTFPSl9D526s=; 
+	b=lkyQI4BJQJM4QlpFUo5SzXFSGLC4h9MwwD8oRQBAnobiz6XM2fsoCt2xrkyfzuBcm0pmLwYFv91
+	aDWf3RC5jq2sqrGwTNNz3RQHUAZKwhT21H9Py0aeaKI2FXP9EMMEdSJ5f5oiESJb9Dr5VUUHxunMR
+	Y0GYxx/whefT7APpF8NowSHqbdTueONn/SjoSwxrc6CRtjCSWHN6Hl1ht6e4YiVuw7y8HKzfVPbvC
+	mmp+V+pEu6a3Uf6KruAQgje0h/LYiBPYosOzXSAXfLodwgMVgzn65/IMpLQYwztCZDTA0QFwi51Zi
+	uYj4nGY51xJ1qmURuY5itLz0WmitqsUrkB9Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xNJI4-00000009U6S-0XzL;
+	Sun, 01 Nov 2026 08:19:17 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 01 Nov 2026 08:19:16 +0800
+Date: Sun, 1 Nov 2026 08:19:16 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Liam R. Howlett (Google)" <liam@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>
+Cc: Uladzislau Rezki <urezki@gmail.com>, Michal Hocko <mhocko@suse.com>,
+	Baoquan He <bhe@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
+	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
+	"David Hildenbrand (Arm)" <david@kernel.org>
+Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
+Message-ID: <auaFhOa5EBz4gJwK@gondor.apana.org.au>
+References: <20261028154218.1668182-1-liam@infradead.org>
+ <20261028154218.1668182-5-liam@infradead.org>
+ <auKshDXKQXt1kvjy@gondor.apana.org.au>
+ <auMbCuecFeRmBFSK@pc636>
+ <jfvq7vkx73vzp2ukq6nwnb3v3g2ezdcyppba4oa5lpzmz6ls6t@akc46gonndgy>
+ <urkgmijyytg3rrislm5fdzmfggqavzpiry23f6lpkqonvy2tqx@d56stj3eixfa>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -57,672 +81,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <urkgmijyytg3rrislm5fdzmfggqavzpiry23f6lpkqonvy2tqx@d56stj3eixfa>
 
-All in-kernel users of ARC4 use the ARC4 library (lib/crypto/arc4.c)
-directly, not the crypto API wrapper (crypto/arc4.c).
+On Fri, Oct 30, 2026 at 08:56:03PM -0400, Liam R. Howlett (Google) wrote:
+>
+> Hubert, I have another version of this patch set to send out, but this
+> particular patch remains the same.
+> 
+> Are you okay with keeping it the way it is for this release?
+> 
+> I don't want to force your hand but I also don't want to keep a valid
+> deadlock scenario in-tree.
 
-Removal of the crypto API wrapper was attempted in 2020
-(https://lore.kernel.org/linux-crypto/20200702101947.682-5-ardb@kernel.org/)
-but was delayed due to its use by iwd via AF_ALG.  This was, however,
-soon afterwards resolved by making iwd simply use userspace ARC4 code
-(https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/?id=1db8a85a60c645232eb5bba1ec0cd0a2927ccd16),
-which was released in iwd 1.9 in September 2020.
+Instead of your patch, please revert the original change that
+added kvmalloc to rhashtable:
 
-Also at the time, CONFIG_CRYPTO_ARC4 was placed under
-CONFIG_CRYPTO_USER_API_ENABLE_OBSOLETE, and the kernel started printing
-a warning whenever "ecb(arc4)" is used.  See commit 9ace67718310
-("crypto: arc4 - mark ecb(arc4) skcipher as obsolete").  So, any other
-hypothetical user would have had 6 years of deprecation warnings, even
-if somehow they were overlooking that ARC4 is insecure.
+commit 93f976b5190df32793908d49165f78e67fcb66cf
+Author: Davidlohr Bueso <dave@stgolabs.net>
+Date:   Tue Aug 21 22:01:45 2018 -0700
 
-Finally, "ecb(arc4)" isn't on the skcipher_allowlist introduced in v7.3,
-so it's no longer available in AF_ALG by default even if
-CONFIG_CRYPTO_ARC4 is enabled.
+    lib/rhashtable: simplify bucket_table_alloc()
 
-Given all this, it's clear that the crypto_skcipher / crypto_lskcipher
-API support for ARC4 is no longer used or needed.  Remove it.
+The newly added alloc_hooks_tag call should go after the if statement.
 
-The ARC4 library remains in place, as it's still used in the kernel to
-support certain legacy protocols.  (Note: since this removes the only
-ARC4 test, I'll also add a KUnit test to replace it in a later commit.)
+This patch should also be split out of your series and posted to
+linux-crypto.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- arch/arm/configs/am200epdkit_defconfig     |  1 -
- arch/arm/configs/spitz_defconfig           |  1 -
- arch/m68k/configs/amiga_defconfig          |  1 -
- arch/m68k/configs/apollo_defconfig         |  1 -
- arch/m68k/configs/atari_defconfig          |  1 -
- arch/m68k/configs/bvme6000_defconfig       |  1 -
- arch/m68k/configs/hp300_defconfig          |  1 -
- arch/m68k/configs/mac_defconfig            |  1 -
- arch/m68k/configs/multi_defconfig          |  1 -
- arch/m68k/configs/mvme147_defconfig        |  1 -
- arch/m68k/configs/mvme16x_defconfig        |  1 -
- arch/m68k/configs/q40_defconfig            |  1 -
- arch/m68k/configs/sun3_defconfig           |  1 -
- arch/m68k/configs/sun3x_defconfig          |  1 -
- arch/mips/configs/decstation_defconfig     |  1 -
- arch/mips/configs/decstation_r4k_defconfig |  1 -
- arch/mips/configs/ip32_defconfig           |  1 -
- arch/mips/configs/rt305x_defconfig         |  1 -
- arch/mips/configs/xway_defconfig           |  1 -
- arch/powerpc/configs/44x/eiger_defconfig   |  1 -
- arch/powerpc/configs/44x/redwood_defconfig |  1 -
- arch/s390/configs/debug_defconfig          |  1 -
- arch/s390/configs/defconfig                |  1 -
- arch/sh/configs/sh2007_defconfig           |  1 -
- arch/sh/configs/titan_defconfig            |  1 -
- arch/sparc/configs/sparc32_defconfig       |  1 -
- crypto/Kconfig                             | 13 ----
- crypto/Makefile                            |  1 -
- crypto/arc4.c                              | 82 ----------------------
- crypto/tcrypt.c                            | 19 -----
- crypto/testmgr.c                           |  7 --
- crypto/testmgr.h                           | 62 ----------------
- include/crypto/arc4.h                      |  3 +-
- 33 files changed, 1 insertion(+), 212 deletions(-)
- delete mode 100644 crypto/arc4.c
-
-diff --git a/arch/arm/configs/am200epdkit_defconfig b/arch/arm/configs/am200epdkit_defconfig
-index 61beac88e863..444091e601f2 100644
---- a/arch/arm/configs/am200epdkit_defconfig
-+++ b/arch/arm/configs/am200epdkit_defconfig
-@@ -85,7 +85,6 @@ CONFIG_DEBUG_KERNEL=y
- CONFIG_CRYPTO=y
- CONFIG_CRYPTO_CBC=m
- CONFIG_CRYPTO_ECB=m
--CONFIG_CRYPTO_ARC4=m
- # CONFIG_DEBUG_BUGVERBOSE is not set
- # CONFIG_DEBUG_PREEMPT is not set
- CONFIG_DEBUG_USER=y
-diff --git a/arch/arm/configs/spitz_defconfig b/arch/arm/configs/spitz_defconfig
-index c7cf089001bf..6b988283bc7d 100644
---- a/arch/arm/configs/spitz_defconfig
-+++ b/arch/arm/configs/spitz_defconfig
-@@ -217,7 +217,6 @@ CONFIG_CRYPTO_ECB=m
- CONFIG_CRYPTO_SHA256=m
- CONFIG_CRYPTO_AES=m
- CONFIG_CRYPTO_ANUBIS=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
-diff --git a/arch/m68k/configs/amiga_defconfig b/arch/m68k/configs/amiga_defconfig
-index e2d474e8cb8f..7a72436f7031 100644
---- a/arch/m68k/configs/amiga_defconfig
-+++ b/arch/m68k/configs/amiga_defconfig
-@@ -527,7 +527,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/apollo_defconfig b/arch/m68k/configs/apollo_defconfig
-index 77669e31bb5a..5e5a8b9a0019 100644
---- a/arch/m68k/configs/apollo_defconfig
-+++ b/arch/m68k/configs/apollo_defconfig
-@@ -481,7 +481,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/atari_defconfig b/arch/m68k/configs/atari_defconfig
-index 43ed1e317ae2..08cbb7e16847 100644
---- a/arch/m68k/configs/atari_defconfig
-+++ b/arch/m68k/configs/atari_defconfig
-@@ -506,7 +506,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/bvme6000_defconfig b/arch/m68k/configs/bvme6000_defconfig
-index 44c1a2228d5f..794973be69bf 100644
---- a/arch/m68k/configs/bvme6000_defconfig
-+++ b/arch/m68k/configs/bvme6000_defconfig
-@@ -473,7 +473,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/hp300_defconfig b/arch/m68k/configs/hp300_defconfig
-index 7ab25377bfe8..f79c221a6117 100644
---- a/arch/m68k/configs/hp300_defconfig
-+++ b/arch/m68k/configs/hp300_defconfig
-@@ -483,7 +483,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/mac_defconfig b/arch/m68k/configs/mac_defconfig
-index 13f642884a94..e08032056392 100644
---- a/arch/m68k/configs/mac_defconfig
-+++ b/arch/m68k/configs/mac_defconfig
-@@ -502,7 +502,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/multi_defconfig b/arch/m68k/configs/multi_defconfig
-index 1bbd2aa653c0..6aae07476a3f 100644
---- a/arch/m68k/configs/multi_defconfig
-+++ b/arch/m68k/configs/multi_defconfig
-@@ -592,7 +592,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/mvme147_defconfig b/arch/m68k/configs/mvme147_defconfig
-index 3bfc36faf8d5..ce0210ed83d8 100644
---- a/arch/m68k/configs/mvme147_defconfig
-+++ b/arch/m68k/configs/mvme147_defconfig
-@@ -473,7 +473,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/mvme16x_defconfig b/arch/m68k/configs/mvme16x_defconfig
-index 41ceed87c78a..2de3a5e2c95b 100644
---- a/arch/m68k/configs/mvme16x_defconfig
-+++ b/arch/m68k/configs/mvme16x_defconfig
-@@ -474,7 +474,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/q40_defconfig b/arch/m68k/configs/q40_defconfig
-index af4b5c6e4655..8c8ba10f183f 100644
---- a/arch/m68k/configs/q40_defconfig
-+++ b/arch/m68k/configs/q40_defconfig
-@@ -492,7 +492,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/sun3_defconfig b/arch/m68k/configs/sun3_defconfig
-index 1140951fefe7..e637063fec95 100644
---- a/arch/m68k/configs/sun3_defconfig
-+++ b/arch/m68k/configs/sun3_defconfig
-@@ -471,7 +471,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/m68k/configs/sun3x_defconfig b/arch/m68k/configs/sun3x_defconfig
-index bc9358e71ee0..ddc1bd7d0ac4 100644
---- a/arch/m68k/configs/sun3x_defconfig
-+++ b/arch/m68k/configs/sun3x_defconfig
-@@ -471,7 +471,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_XTS=m
-diff --git a/arch/mips/configs/decstation_defconfig b/arch/mips/configs/decstation_defconfig
-index 29915a002db1..e23784ae9636 100644
---- a/arch/mips/configs/decstation_defconfig
-+++ b/arch/mips/configs/decstation_defconfig
-@@ -178,7 +178,6 @@ CONFIG_CRYPTO_RMD160=m
- CONFIG_CRYPTO_SHA512=m
- CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_ANUBIS=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
-diff --git a/arch/mips/configs/decstation_r4k_defconfig b/arch/mips/configs/decstation_r4k_defconfig
-index 7eef7a1bdc30..0a81d57ca9c1 100644
---- a/arch/mips/configs/decstation_r4k_defconfig
-+++ b/arch/mips/configs/decstation_r4k_defconfig
-@@ -178,7 +178,6 @@ CONFIG_CRYPTO_RMD160=m
- CONFIG_CRYPTO_SHA512=m
- CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_ANUBIS=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
-diff --git a/arch/mips/configs/ip32_defconfig b/arch/mips/configs/ip32_defconfig
-index 5ddbaa0aafaf..0c3bae4a7bac 100644
---- a/arch/mips/configs/ip32_defconfig
-+++ b/arch/mips/configs/ip32_defconfig
-@@ -162,7 +162,6 @@ CONFIG_CRYPTO_SHA256=y
- CONFIG_CRYPTO_SHA512=y
- CONFIG_CRYPTO_WP512=y
- CONFIG_CRYPTO_ANUBIS=y
--CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_BLOWFISH=y
- CONFIG_CRYPTO_CAMELLIA=y
- CONFIG_CRYPTO_CAST5=y
-diff --git a/arch/mips/configs/rt305x_defconfig b/arch/mips/configs/rt305x_defconfig
-index c920976bedd0..86327df02681 100644
---- a/arch/mips/configs/rt305x_defconfig
-+++ b/arch/mips/configs/rt305x_defconfig
-@@ -126,7 +126,6 @@ CONFIG_JFFS2_COMPRESSION_OPTIONS=y
- CONFIG_SQUASHFS=y
- # CONFIG_SQUASHFS_ZLIB is not set
- CONFIG_SQUASHFS_XZ=y
--CONFIG_CRYPTO_ARC4=m
- # CONFIG_XZ_DEC_X86 is not set
- # CONFIG_XZ_DEC_POWERPC is not set
- # CONFIG_XZ_DEC_IA64 is not set
-diff --git a/arch/mips/configs/xway_defconfig b/arch/mips/configs/xway_defconfig
-index f1c53bbb72e9..74cc4c5cce4c 100644
---- a/arch/mips/configs/xway_defconfig
-+++ b/arch/mips/configs/xway_defconfig
-@@ -138,7 +138,6 @@ CONFIG_JFFS2_COMPRESSION_OPTIONS=y
- CONFIG_SQUASHFS=y
- # CONFIG_SQUASHFS_ZLIB is not set
- CONFIG_SQUASHFS_XZ=y
--CONFIG_CRYPTO_ARC4=m
- CONFIG_PRINTK_TIME=y
- CONFIG_STRIP_ASM_SYMS=y
- CONFIG_DEBUG_FS=y
-diff --git a/arch/powerpc/configs/44x/eiger_defconfig b/arch/powerpc/configs/44x/eiger_defconfig
-index 48ab405ab80b..240f3f453b5c 100644
---- a/arch/powerpc/configs/44x/eiger_defconfig
-+++ b/arch/powerpc/configs/44x/eiger_defconfig
-@@ -85,6 +85,5 @@ CONFIG_CRYPTO_MD4=y
- CONFIG_CRYPTO_MD5=y
- CONFIG_CRYPTO_SHA1=y
- CONFIG_CRYPTO_SHA512=y
--CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_BLOWFISH=y
- CONFIG_CRYPTO_DES=y
-diff --git a/arch/powerpc/configs/44x/redwood_defconfig b/arch/powerpc/configs/44x/redwood_defconfig
-index 1e883938ca11..a8b93d7a592d 100644
---- a/arch/powerpc/configs/44x/redwood_defconfig
-+++ b/arch/powerpc/configs/44x/redwood_defconfig
-@@ -84,6 +84,5 @@ CONFIG_CRYPTO_MD4=y
- CONFIG_CRYPTO_MD5=y
- CONFIG_CRYPTO_SHA1=y
- CONFIG_CRYPTO_SHA512=y
--CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_BLOWFISH=y
- CONFIG_CRYPTO_DES=y
-diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-index d44674b63715..e457b13057d2 100644
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@ -802,7 +802,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_AEGIS128=m
-diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-index e00e252d4694..9e10ac7b1c85 100644
---- a/arch/s390/configs/defconfig
-+++ b/arch/s390/configs/defconfig
-@@ -786,7 +786,6 @@ CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_ADIANTUM=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_HCTR2=m
- CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_AEGIS128=m
-diff --git a/arch/sh/configs/sh2007_defconfig b/arch/sh/configs/sh2007_defconfig
-index 3060bcd9cc5f..ce641ed3a147 100644
---- a/arch/sh/configs/sh2007_defconfig
-+++ b/arch/sh/configs/sh2007_defconfig
-@@ -176,7 +176,6 @@ CONFIG_CRYPTO_TGR192=y
- CONFIG_CRYPTO_WP512=y
- CONFIG_CRYPTO_AES=y
- CONFIG_CRYPTO_ANUBIS=y
--CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_BLOWFISH=y
- CONFIG_CRYPTO_CAMELLIA=y
- CONFIG_CRYPTO_CAST5=y
-diff --git a/arch/sh/configs/titan_defconfig b/arch/sh/configs/titan_defconfig
-index 00863ecb228e..6f690a0a26d7 100644
---- a/arch/sh/configs/titan_defconfig
-+++ b/arch/sh/configs/titan_defconfig
-@@ -252,7 +252,6 @@ CONFIG_CRYPTO_TGR192=m
- CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_AES=y
- CONFIG_CRYPTO_ANUBIS=m
--CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
-diff --git a/arch/sparc/configs/sparc32_defconfig b/arch/sparc/configs/sparc32_defconfig
-index d5579217fb4c..2f688b83e21b 100644
---- a/arch/sparc/configs/sparc32_defconfig
-+++ b/arch/sparc/configs/sparc32_defconfig
-@@ -84,7 +84,6 @@ CONFIG_CRYPTO_MD4=y
- CONFIG_CRYPTO_SHA256=m
- CONFIG_CRYPTO_SHA512=m
- CONFIG_CRYPTO_AES=m
--CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 981d5dc422d4..2d727f708d9a 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -613,19 +613,6 @@ config CRYPTO_ADIANTUM
- 
- 	  If unsure, say N.
- 
--config CRYPTO_ARC4
--	tristate "ARC4 (Alleged Rivest Cipher 4)"
--	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
--	select CRYPTO_SKCIPHER
--	select CRYPTO_LIB_ARC4
--	help
--	  ARC4 cipher algorithm
--
--	  ARC4 is a stream cipher using keys ranging from 8 bits to 2048
--	  bits in length.  This algorithm is required for driver-based
--	  WEP, but it should not be for other purposes because of the
--	  weakness of the algorithm.
--
- config CRYPTO_CHACHA20
- 	tristate "ChaCha"
- 	select CRYPTO_LIB_CHACHA
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 33bb5ad595e8..768a09b7162a 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -133,7 +133,6 @@ obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
- obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
- obj-$(CONFIG_CRYPTO_CAST5) += cast5_generic.o
- obj-$(CONFIG_CRYPTO_CAST6) += cast6_generic.o
--obj-$(CONFIG_CRYPTO_ARC4) += arc4.o
- obj-$(CONFIG_CRYPTO_TEA) += tea.o
- obj-$(CONFIG_CRYPTO_KHAZAD) += khazad.o
- obj-$(CONFIG_CRYPTO_ANUBIS) += anubis.o
-diff --git a/crypto/arc4.c b/crypto/arc4.c
-deleted file mode 100644
-index 1608018111d0..000000000000
---- a/crypto/arc4.c
-+++ /dev/null
-@@ -1,82 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- * Cryptographic API
-- *
-- * ARC4 Cipher Algorithm
-- *
-- * Jon Oberheide <jon@oberheide.org>
-- */
--
--#include <crypto/arc4.h>
--#include <crypto/internal/skcipher.h>
--#include <linux/init.h>
--#include <linux/kernel.h>
--#include <linux/module.h>
--#include <linux/sched.h>
--
--#define ARC4_ALIGN __alignof__(struct arc4_ctx)
--
--static int crypto_arc4_setkey(struct crypto_lskcipher *tfm, const u8 *in_key,
--			      unsigned int key_len)
--{
--	struct arc4_ctx *ctx = crypto_lskcipher_ctx(tfm);
--
--	return arc4_setkey(ctx, in_key, key_len);
--}
--
--static int crypto_arc4_crypt(struct crypto_lskcipher *tfm, const u8 *src,
--			     u8 *dst, unsigned nbytes, u8 *siv, u32 flags)
--{
--	struct arc4_ctx *ctx = crypto_lskcipher_ctx(tfm);
--
--	if (!(flags & CRYPTO_LSKCIPHER_FLAG_CONT))
--		memcpy(siv, ctx, sizeof(*ctx));
--
--	ctx = (struct arc4_ctx *)siv;
--
--	arc4_crypt(ctx, dst, src, nbytes);
--	return 0;
--}
--
--static int crypto_arc4_init(struct crypto_lskcipher *tfm)
--{
--	pr_warn_ratelimited("\"%s\" (%ld) uses obsolete ecb(arc4) skcipher\n",
--			    current->comm, (unsigned long)current->pid);
--
--	return 0;
--}
--
--static struct lskcipher_alg arc4_alg = {
--	.co.base.cra_name		=	"arc4",
--	.co.base.cra_driver_name	=	"arc4-generic",
--	.co.base.cra_priority		=	100,
--	.co.base.cra_blocksize		=	ARC4_BLOCK_SIZE,
--	.co.base.cra_ctxsize		=	sizeof(struct arc4_ctx),
--	.co.base.cra_alignmask		=	ARC4_ALIGN - 1,
--	.co.base.cra_module		=	THIS_MODULE,
--	.co.min_keysize			=	ARC4_MIN_KEY_SIZE,
--	.co.max_keysize			=	ARC4_MAX_KEY_SIZE,
--	.co.statesize			=	sizeof(struct arc4_ctx),
--	.setkey				=	crypto_arc4_setkey,
--	.encrypt			=	crypto_arc4_crypt,
--	.decrypt			=	crypto_arc4_crypt,
--	.init				=	crypto_arc4_init,
--};
--
--static int __init arc4_init(void)
--{
--	return crypto_register_lskcipher(&arc4_alg);
--}
--
--static void __exit arc4_exit(void)
--{
--	crypto_unregister_lskcipher(&arc4_alg);
--}
--
--module_init(arc4_init);
--module_exit(arc4_exit);
--
--MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("ARC4 Cipher Algorithm");
--MODULE_AUTHOR("Jon Oberheide <jon@oberheide.org>");
--MODULE_ALIAS_CRYPTO("ecb(arc4)");
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index e6834bdde9b9..579a05d39856 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1579,10 +1579,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		ret = min(ret, tcrypt_test("xts(cast6)"));
- 		break;
- 
--	case 16:
--		ret = min(ret, tcrypt_test("ecb(arc4)"));
--		break;
--
- 	case 18:
- 		ret = min(ret, tcrypt_test("crc32c"));
- 		break;
-@@ -1995,11 +1991,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				  speed_template_32_64);
- 		break;
- 
--	case 208:
--		test_cipher_speed("ecb(arc4)", ENCRYPT, sec, NULL, 0,
--				  speed_template_8);
--		break;
--
- 	case 209:
- 		test_cipher_speed("ecb(cast5)", ENCRYPT, sec, NULL, 0,
- 				  speed_template_8_16);
-@@ -2486,11 +2477,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				   speed_template_32_48_64);
- 		break;
- 
--	case 505:
--		test_acipher_speed("ecb(arc4)", ENCRYPT, sec, NULL, 0,
--				   speed_template_8);
--		break;
--
- 	case 506:
- 		test_acipher_speed("ecb(cast5)", ENCRYPT, sec, NULL, 0,
- 				   speed_template_8_16);
-@@ -2709,11 +2695,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				       speed_template_32_48_64, num_mb);
- 		break;
- 
--	case 605:
--		test_mb_skcipher_speed("ecb(arc4)", ENCRYPT, sec, NULL, 0,
--				       speed_template_8, num_mb);
--		break;
--
- 	case 606:
- 		test_mb_skcipher_speed("ecb(cast5)", ENCRYPT, sec, NULL, 0,
- 				       speed_template_8_16, num_mb);
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 9419d61d0602..094f8e0853f0 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4665,13 +4665,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.cipher = __VECS(anubis_tv_template)
- 		}
--	}, {
--		.alg = "ecb(arc4)",
--		.generic_driver = "arc4-generic",
--		.test = alg_test_skcipher,
--		.suite = {
--			.cipher = __VECS(arc4_tv_template)
--		}
- 	}, {
- 		.alg = "ecb(aria)",
- 		.test = alg_test_skcipher,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 0ee15a8fae27..a7f096b0830e 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -24388,68 +24388,6 @@ static const struct cipher_testvec cast5_ctr_tv_template[] = {
- 	},
- };
- 
--/*
-- * ARC4 test vectors from OpenSSL
-- */
--static const struct cipher_testvec arc4_tv_template[] = {
--	{
--		.key	= "\x01\x23\x45\x67\x89\xab\xcd\xef",
--		.klen	= 8,
--		.ptext	= "\x01\x23\x45\x67\x89\xab\xcd\xef",
--		.ctext	= "\x75\xb7\x87\x80\x99\xe0\xc5\x96",
--		.len	= 8,
--	}, {
--		.key	= "\x01\x23\x45\x67\x89\xab\xcd\xef",
--		.klen	= 8,
--		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.ctext	= "\x74\x94\xc2\xe7\x10\x4b\x08\x79",
--		.len	= 8,
--	}, {
--		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.klen	= 8,
--		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.ctext	= "\xde\x18\x89\x41\xa3\x37\x5d\x3a",
--		.len	= 8,
--	}, {
--		.key	= "\xef\x01\x23\x45",
--		.klen	= 4,
--		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00\x00\x00",
--		.ctext	= "\xd6\xa1\x41\xa7\xec\x3c\x38\xdf"
--			  "\xbd\x61\x5a\x11\x62\xe1\xc7\xba"
--			  "\x36\xb6\x78\x58",
--		.len	= 20,
--	}, {
--		.key	= "\x01\x23\x45\x67\x89\xab\xcd\xef",
--		.klen	= 8,
--		.ptext	= "\x12\x34\x56\x78\x9A\xBC\xDE\xF0"
--			  "\x12\x34\x56\x78\x9A\xBC\xDE\xF0"
--			  "\x12\x34\x56\x78\x9A\xBC\xDE\xF0"
--			  "\x12\x34\x56\x78",
--		.ctext	= "\x66\xa0\x94\x9f\x8a\xf7\xd6\x89"
--			  "\x1f\x7f\x83\x2b\xa8\x33\xc0\x0c"
--			  "\x89\x2e\xbe\x30\x14\x3c\xe2\x87"
--			  "\x40\x01\x1e\xcf",
--		.len	= 28,
--	}, {
--		.key	= "\xef\x01\x23\x45",
--		.klen	= 4,
--		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00"
--			  "\x00\x00",
--		.ctext	= "\xd6\xa1\x41\xa7\xec\x3c\x38\xdf"
--			  "\xbd\x61",
--		.len	= 10,
--	}, {
--		.key	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
--			"\x00\x00\x00\x00\x00\x00\x00\x00",
--		.klen	= 16,
--		.ptext	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF",
--		.ctext	= "\x69\x72\x36\x59\x1B\x52\x42\xB1",
--		.len	= 8,
--	},
--};
--
- /*
-  * TEA test vectors
-  */
-diff --git a/include/crypto/arc4.h b/include/crypto/arc4.h
-index f3c22fe01704..f88a5fb85c9a 100644
---- a/include/crypto/arc4.h
-+++ b/include/crypto/arc4.h
-@@ -1,6 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0+ */
- /*
-- * Common values for ARC4 Cipher Algorithm
-+ * ARC4 Cipher Algorithm
-  */
- 
- #ifndef _CRYPTO_ARC4_H
-@@ -10,7 +10,6 @@
- 
- #define ARC4_MIN_KEY_SIZE	1
- #define ARC4_MAX_KEY_SIZE	256
--#define ARC4_BLOCK_SIZE		1
- 
- struct arc4_ctx {
- 	u32 S[256];
-
-base-commit: e9954f3fbddd25e1a01b7e5a0b72fb8b564204e0
+Thanks,
 -- 
-2.56.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
