@@ -1,56 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=65.109.113.108
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793602174;
-	b=azK5Q7e+pp/ngqw7gJx1pH0Jm4QJx/gXKUkdG82v+VFfp6s9uGKJ40f5A8/2YNpyb2LZ
-	 wwBrGuHXpXLiqbPPnK4d58MOiuZ+WcUJk3ybJQs6S2TOY6lEPDT9+DhTlhNx4S6PpO4lI
-	 JxnLv9Wrt5NtzC+geU61eJEXRkz37kKwFTcbErsI+rABlT6Th3YfyYZYpqcsINBzCNkba
-	 BBUZ3Rzyg0qAJ/9Ewg8+XXZLMEVT5GdMevKd7cSTDAyvcPKsKvU4F8xlXbPnEEEwkLEZE
-	 ugKQfeD9Li4Nhb4WwhPgfAEHQCXEFOk7sZ0GjDm0iiYS5TfoQsz1LRFy7Ckv+ZdeJrA==
+	t=1793602918;
+	b=GXSeDBAwuZLCKzBAfOKtJEpbXMKgsSg5FCUIGr/8f6g0xuheEw9RMR0FzFLxtLUP5gy7
+	 9La0f0KI+uQua+PCS58wSCjnfAUuivEdCUAa7XWWC5Ur0+tG982/OiUdtcsZcQHD3sf9a
+	 bsSr6DhNTat8w8UbX56c/6XYn+wAJMKMETvYeCvC6Urpu+LnSmnuJn7MUgApnKT+DQzCg
+	 Wv8AW5iZFerUsQ965SlSHHbA69i+mfYOasIAqkV3YC5v5+r5sP32bGVqtbl1E2hXo14ib
+	 iTKtKqp8h1/ElkTDwIdTbzZkNsw010038beB+u+2in12mNYFA/h77HeIsqeCRP4g7Iw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793602174;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=RM3QVbG0XSlDtbJbaPbVELsay6LhWm18nju9jF437RM=;
-	b=HMFKiCLnsiFKLSMEozLCe8ekzKgwuIuapemInjVWwe/RWOsCtnBkWVYaJH8ejKNrDcJm
-	 UkeUMIKtx9vdSMgc0Gzv/RoIszd8jMJXpM+tSE+GbjO0iGaE63zJPcSYtWZDLoMaQ8Bok
-	 i8hqZUEsuh5X3fIyUs6Wd5bK6afiFPuHKDxH8sPphQGRPmLNj6/PvYwY1NF1cBgDvxPrn
-	 V8o0B0gaNcwMpqrvWNUyWiarTmPlgMhTaa9fjMKwxRjAmvDX+aD47cq6t9SYYFmuqFeFT
-	 ZQ4H92nJfri4yiX11SLyY/bgoAGkb8owxvwEfh0RLFB6b7b+v9uPhph+IdWud/SN4Iw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793602918;
+	h=DMARC-Filter:Received:X-Virus-Scanned:Received:DKIM-Signature:
+	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To;
+	bh=iAPIOenTPqHP2Ny+OdMrV89UeIqmPs8LpJjh/tMjUZM=;
+	b=so4Ap1Y+7tCEbKXMPyAzAO3j489H2feb3dS5TU+9/rVL5mrPx3EKLVypRh2zKPELahSd
+	 4OAPwEXAlM+FlPXrMmFAJwVF9GIpnDlA5UF1MRz+KRluhmpQ0I9LTGpN1x4Keo1MaW24J
+	 +44Hb6c+NN2GZzXTHa35QH9wNfwZZwChS0NqQk4XzgStFncwvIbKh9mMg6qtBR6e9QNK3
+	 QFY/10bD0rcKohU+TswP2yUN4txVYM+rDJhzyHyucmq7BK5+bcH/gYeUPuNAv7reNJMf3
+	 8AuPP2yVjtpE/SArYZWHHwetHrrUNavDtyEVLpNkgY8K4SsjNiEH/15kdX+GbaACYaQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jcs2Rkst;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=alien8.de;
+	spf=pass smtp.mailfrom=alien8.de;
+	dkim=pass header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=Wexv6Zcp;
+	arc=none smtp.remote-ip=65.109.113.108
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB45B606A326
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 06:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C058C606A324;
+	Mon,  2 Nov 2026 07:01:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C058C606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jcs2Rkst
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D0551F000C1;
-	Mon,  2 Nov 2026 06:49:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793602173;
-	bh=RM3QVbG0XSlDtbJbaPbVELsay6LhWm18nju9jF437RM=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=jcs2RkstBPOHbZyhcIMHjzvRNEY03p5ff3/7cZnWuzzAYo71jXCZG3xidBVMFvVfE
-	 YDPg9E68EAFCTsScFFqG/BluUu+h48OnGeASCwe8uxTFaiY4/WCQx5seSXVoyVuwJ/
-	 kgUZ9gFjA5OPcq+5YoApLJCABikHKsQRAD+7WL3ZYwxBWtO1u5b62yMIwUTu533Zo6
-	 QNEU5nbJjKgfybRlb2Qz3eglQsb8OoDPgZmqdq7WA1+YkwDIrvz/cxQkv2tzkoRv8k
-	 J6lCgp+le03leGxjKC1fXJgBrH/tgd4MwZJS+WQlg6itokO/UEetaQLf1tq95vcsTt
-	 voLUgYByNuuZw==
-Message-ID: <sashiko-outbox-192966@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] lib/crypto/mpi: Fix heap OOB write in mpi_powm() when
- res aliases input
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Maholi Tumanggor" <maholitumanggor@gmail.com>, linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net
-In-Reply-To: <20261102064225.2271-1-maholitumanggor@gmail.com>
-References: <20261102064225.2271-1-maholitumanggor@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Nov 2026 06:49:32 +0000
+	dkim=pass (4096-bit key, unprotected) header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=Wexv6Zcp
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 154E440E0184;
+	Mon,  2 Nov 2026 07:01:55 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id li8LNwrtJSLE; Mon,  2 Nov 2026 07:01:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1793602911; bh=iAPIOenTPqHP2Ny+OdMrV89UeIqmPs8LpJjh/tMjUZM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Wexv6ZcpPCkMgapkX25daR0HLzS4JjMaTW7WeUJHBqiV5ICvEI8g91SgoYrvua2Sr
+	 9pKYMHI6uZbaPI6iSjsx44gYHdBX77tMrVZ5W4Lr6wz5+SNzb8JJV5OkIQRcRGaxxC
+	 kqd0sDcKb9BiuQU6VYoZSS6WIzfSUOcShQQ1fHyHFHOAJy2LQW9tCZgvulrToHB3NI
+	 7npGOXZmhRr3OI/wmcoio5yRmX0ViNEscoexkVTt8NaPGuBP828U7D2yErHMOGl6eq
+	 0tDZHYxnEW0eaJ566Uc/LyNdLStyuJQBNbRC01TYnwSMFGbfAEDAxQhVHij2gK17I3
+	 c4xjc5KRsKejIgu+PD5gO0gr/8GlAJXWhCxdQfiFm03VkMvN3wQPybt+RrBrIemkfT
+	 /YtHah0kT9yJioZNPcUWFLpLkmwNuOcOgzZI6c5JUfeFOQR8s+gdvR2OXWoNX8vkKK
+	 RKHllfVnj2ohmITfTcH6TXylFhZyxkIaOqovstHy/x9oW/KukP5MWA3GNctvZOEfh+
+	 +R+PsTWZ5UWwy/rF1KyNzdkumT4zbDQA+gZsYGck5Gb9yOW6mq+e/QT4FDDANKZHGB
+	 GdeNrKVAOw4HGLPuVEUY357UvkcL8nvmRF8fEJ+BWPcpnwluX+kLnQc22jzt1o87az
+	 5Lbe4taVzs+H/RmTT7ecBYpw=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6358240E016C;
+	Mon,  2 Nov 2026 07:01:17 +0000 (UTC)
+Date: Sun, 1 Nov 2026 23:01:13 -0800
+From: Borislav Petkov <bp@alien8.de>
+To: K Prateek Nayak <kprateek.nayak@amd.com>
+Cc: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
+	ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
+	rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
+	pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+	dyoung@redhat.com, nikunj@amd.com, darwi@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v4 1/2] x86/sev: Clear RMPOPT when segmented RMP is
+ disabled by firmware
+Message-ID: <20261102070113.GEaug1OQN7oEYDk9aD@fat_crate.local>
+References: <cover.1793216372.git.ashish.kalra@amd.com>
+ <56da047d63b22f03a7e709fc172a5543da894d67.1793216372.git.ashish.kalra@amd.com>
+ <20261102052841.GBaugfibOXxGorZKgq@fat_crate.local>
+ <69ed0d93-f96d-4baa-a587-fade5a0a3262@amd.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -59,99 +92,27 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <69ed0d93-f96d-4baa-a587-fade5a0a3262@amd.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
-s) to consider:
-- [Critical] lib/crypto/mpi: use-after-free and leak in mpi_powm() when ass=
-ign_rp is set
---
+On Mon, Nov 02, 2026 at 11:42:05AM +0530, K Prateek Nayak wrote:
+> On 11/2/2026 10:58 AM, Borislav Petkov wrote:
+> > Segmented RMP support is advertised via X86_FEATURE_SEGMENTED_RMP, and the
+> > firmware enables it via MSR_AMD64_RMP_CFG[SEG_RMP_ENABLED]. The latter can be
+> > cleared in platform BIOS by the user, in which case the system runs in
+> > contiguous RMP setting.
+> 
+> nit. In the latter case, SNP is disabled entirely in bsp_determine_snp and
+> the system won't continue with contiguous RMP.
 
-commit 85051cb2fd0529447a03f7f3bbc383a2addcb07d
-Author: Maholi Tumanggor <maholitumanggor@gmail.com>
+Ah, true, good catch.
 
-lib/crypto/mpi: Fix heap OOB write in mpi_powm() when res aliases input
+Thx.
 
-This commit avoids writing the exponentiation result into an undersized
-res->d buffer in mpi_powm() when assign_rp is set due to res->d aliasing
-an input operand.
+-- 
+Regards/Gruss,
+    Boris.
 
-> diff --git a/lib/crypto/mpi/mpi-pow.c b/lib/crypto/mpi/mpi-pow.c
-> index 9e695a3bda3a0..06038ac8f92ac 100644
-> --- a/lib/crypto/mpi/mpi-pow.c
-> +++ b/lib/crypto/mpi/mpi-pow.c
-[ ... ]
-> @@ -256,14 +256,16 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
->  		 * might be, see above).
->  		 */
->  		if (mod_shift_cnt) {
-> -			carry_limb =3D
-> -			    mpihelp_lshift(res->d, rp, rsize, mod_shift_cnt);
-> +			mpi_ptr_t dst =3D assign_rp ? rp : res->d;
-> +
-> +			carry_limb =3D mpihelp_lshift(dst, rp, rsize, mod_shift_cnt);
-> +			if (!assign_rp)
->  			rp =3D res->d;
->  			if (carry_limb) {
-> -				rp[rsize] =3D carry_limb;
-> -				rsize++;
-> +			rp[rsize] =3D carry_limb;
-> +			rsize++;
->  			}
-> -		} else {
-> +		} else if (!assign_rp) {
->  			MPN_COPY(res->d, rp, rsize);
->  			rp =3D res->d;
->  		}
-
-[Severity: Critical]
-When assign_rp is set in lib/crypto/mpi/mpi-pow.c:mpi_powm() because
-res->alloced < size and rp aliases bp, ep, or mp, a new limb buffer is
-allocated directly into rp without saving a marker pointer:
-
-	if (res->alloced < size) {
-		if (rp =3D=3D ep || rp =3D=3D mp || rp =3D=3D bp) {
-			rp =3D mpi_alloc_limb_space(size);
-			if (!rp)
-				goto enomem;
-			assign_rp =3D 1;
-
-Later in the exponentiation loop, rp and xp are swapped after every
-squaring step and after every multiplication step:
-
-		xp =3D xp_marker =3D mpi_alloc_limb_space(2 * (msize + 1));
-		...
-		for (;;) {
-			while (c) {
-				...
-				swap(rp, xp);
-				rsize =3D xsize;
-
-				if ((mpi_limb_signed_t) e < 0) {
-					...
-					swap(rp, xp);
-					rsize =3D xsize;
-				}
-
-If the exponent causes an odd number of swap(rp, xp) operations (for
-example when exp has an odd number of zero bits after the most significant
-bit, such as exp =3D 2 or exp =3D 65537), the loop finishes with rp pointing
-to xp_marker and the block-local xp pointing to the buffer allocated for
-assign_rp.
-
-With this change, when assign_rp is 1, rp is left pointing to xp_marker
-while xp goes out of scope. At the end of mpi_powm():
-
-	if (assign_rp)
-		mpi_assign_limb_space(res, rp, size);
-	...
-	if (xp_marker)
-		mpi_free_limb_space(xp_marker);
-
-Wouldn't mpi_assign_limb_space() assign xp_marker to res->d and
-mpi_free_limb_space(xp_marker) immediately zero and free it, leaving
-res->d pointing to freed memory while leaking the limb buffer originally
-allocated for rp?
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102064225.2271=
--1-maholitumanggor@gmail.com?part=3D1
+https://people.kernel.org/tglx/notes-about-netiquette
