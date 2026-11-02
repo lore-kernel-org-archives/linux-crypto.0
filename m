@@ -1,72 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793610935;
-	b=UxcGzyPcbk2Mk7aSvfht/hay8wver21Nz1RhQ3Y4Pbrbvgqu02kHqivwBY8f0tRCc77W
-	 PnnYiEb/7HRc2lF38GGV7xuhyDi1IagJYbtZRDMR+rXwvx8rto70U6b8SGpwZGJ42MujR
-	 ni1Nl8rx6Nvpr4j18mDoLqy/jWjQaDIHrepgduMlchVE9XYM/bn9Bk/49MxRc9tRS59KL
-	 UR/AvJTTkrc11a5SrPNKJiDSwJlDcPsXDcCR98LTu2YcYwsM4P0tkq/UuUQgVaF1VGcJP
-	 R/yenqjsO1hOSylyDa2rluAlzXWgtTeR8n6oUoJiRIbjYoS4pov4hbm+rxv0Y6Hergw==
+	t=1793610957;
+	b=i1k3yqxiMmztdADzv7sIdhgaOahjkufOSbAS4C6STYEm2tmC69ghEeG7e0/M02G2Ur+d
+	 +g03MtB2U+mse1ANIJO7Voq/KqxlcPH6qloAFI6URXXrfpG3UQcu7T2m0EDB0PCcTOcQ4
+	 TpVnbeoaWICs4F4Itf79MuLiglFSC5IwMqEekmXRBri5dPINmjsneeLFE1JI6jS+mFe6a
+	 4TUp2R14aakhdP/+8L0lvcbD2wCHqhKpB1DMNJIT27SgsHW6nf6V1vUcgH5P7eYYDavO3
+	 sS5kw9eKFC2TfciAcTyrnIY6VAII2iJPCp56y6/Eazj5jj2/wrG9iof/1qxiUhtrn4A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793610935;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793610957;
 	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
 	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
 	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
 	 Subject:Content-Type:Content-Transfer-Encoding;
-	bh=yDfpqJH1Ftp3euH/05Eddb4f5u79S3Xza32h6C5hdQw=;
-	b=RFEObOgGg36U3yQWh5Dw9rYPudwpE26HlogcYAKbTCUcuIfM8fuJ3EXVvsMXgOdOjax7
-	 rehf4qNItyMNbvX7/BWayi1mIbgB74oOw9Qqxij/hNTsFe9YrP6Zyl4fbO0WGcwtfs4W2
-	 J7GqyU3H0iXfqi3GP9GkKNnU9nwt7GIK8zmd5sgSop1upBrhG1lHUa6PHRXVZg0YLC3Px
-	 aZz+eG8r9/c/MwvN4NsmSvLvdfB6ksHezLtGvyHXvezj07D/Tgjcdu7+gb5JRtftDe0qp
-	 2kYprSlWH787J0pG/kv2uQ3ECtlOprqfM9Bn5RgdhjSCGKjN7HeBsjSN/j6Y8+pCBDg==
+	bh=O08l4ELgs0AyAsYDBm6q/NWvRMOcCqrZ6eyVH6rwCZs=;
+	b=qY8Cv40UYuiAXlNDNgBB5Cxe+FxVOYZ7CKEJHZZk0etb5HHGlf7KkO/Fd5scHXOd1ygJ
+	 s7igN3HgdTvVuUSVCBNmPQoPITjjfEw6yvdByEShv0Mkxx7quvQ2BfW4irymmhP9SnU5u
+	 Ra//N3CrfXRmHJFWcD4FQ1BHu/Og4oI2FbuSW1cBFYEyO2IgURS3lOaFV549F+ZncaAr3
+	 Vfro51g8y17uBx97/07J6lzWamVQmOQPc+UpY4VBFcIguWJxR+r9Y+k4/SmUdN8fdBMZN
+	 YVU5/SghGr9M6yU5lm7XaV7FjaqqTrNei0Y2LUuLIImh10He4j8Tc3D2oNp8hObQ1wA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XrQYBV8S;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R8V+4BDZ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F90F606A327
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 09:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EDC606A327
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 09:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XrQYBV8S
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A89A1F00A02
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 09:15:34 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R8V+4BDZ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA4971F0093A;
+	Mon,  2 Nov 2026 09:15:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793610934;
-	bh=yDfpqJH1Ftp3euH/05Eddb4f5u79S3Xza32h6C5hdQw=;
+	s=k20260515; t=1793610956;
+	bh=O08l4ELgs0AyAsYDBm6q/NWvRMOcCqrZ6eyVH6rwCZs=;
 	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=XrQYBV8SCoS3X545wL36GF7tNCsmqYSoKUX7DXc3++4DQ6tuDmQHq2XK9QCwQNJsH
-	 joLaRjmj+YK1qxtvDnt1ORYXuEkG76hYB1qj2uPguaNrGmwX1Knz4/X2RAZghXc3mD
-	 6EBrth/Y1GuxRJUcBn35w385sp1MCffbwy08mFVYSRfO6ajyDYZ9Y67VUrbK06Pnx6
-	 tJlZTmJ3MB9buWQzPcg/UR5/r2joVEJl/f0YIYvGPCIkUR6BXP2LD7olz9jQ5XfSwF
-	 y54OsAljJR6OOKBT6V44/PQIYl+8h/PltZgKVXjytnnZpR3rSebohIHRwmHVs2ktxF
-	 4AEf27XBBBOHQ==
+	b=R8V+4BDZimhdx8DyOCpd7Ft6Ev5yEcOcYswRMk4r3soYnzKucor6bPRRwZ5so5v7z
+	 R3CCaDo9d+PMNmsdB/utSZjM2FtYDq6MzlgwOXjAEe/yv2mQO6X/NJ2Ma4fZWixvh5
+	 HznjSMp+YgZaODTGBGSZQgIid4qQ130KqQ75NluiaeoJYf0OsEYIgiIXNGDsfqx028
+	 dfHPyeborE0xQyTIjzAuBqo/oteJjQgdrGkX1wcWN5yObQBGvuIAOuFYnew5N3PRng
+	 PQbpY9iqylk4TKT3Q8iR0WX0ZqLhaG218wBn0AW3RYYVwhXC9PsI93wZj3dBzvM08G
+	 gpX8fXofx9Urg==
 Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id DE3CC198003A;
-	Mon,  2 Nov 2026 04:15:32 -0500 (EST)
+	by mailfauth.ams.internal (Postfix) with ESMTP id 58888198003A;
+	Mon,  2 Nov 2026 04:15:54 -0500 (EST)
 Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Mon, 02 Nov 2026 04:15:32 -0500
-X-ME-Sender: <xms:s1ToanM7MjZYOFVn1OnItPNdcA4uxdD4-Tgx6CCzyLWWdFSVk9BLeQ>
-    <xme:s1Toasx1X5iyTdZhyrIeCl4mKcLQoXOSbeqa5kCbM1sWAxqH3_OBbyu0z84KggTrR
-    qDnPfMNlkPIMdMUrVim8JSEssy7T01MhJI3wGlKrYrZwZrD3TTTUj_a>
-X-ME-Proxy-Cause: dmFkZTEaK45BE/0jQT3YYJxCaGH2Kfh2KXBSQcfiPkjruNj7ZUSQZaZi4hDPAYx/X3mDZj
-    C/5umqcnVngMExJqWX9NDsm3e+58IPkVaBnkYQAy5GdKd9u7Ky4w0/fy/P+cZBnBxBFR9s
-    JThW/vhDDTS45hrSCZPvCtWMV7K2LvpklieLeNfVYIwtOtnUEYA4anXLxxil4GFGd2WEDo
-    lVvN6uwnH6MYHH6mIrmGUXlkf++scYkVnZr3qHYG4h0El+aKufodt4LoMaG5IyA8GE8qmD
-    Z9Z/d9QCt0CxTyWcMo8gKzOhpdHdxCeybuzd2exU6iaVcByGgdSKP6auAeyUzPQxv3aeCz
-    dB1f/Q1XuPTHaWxadkoFLJCsAYtYdo1svOHQ6hpXAtuSqW+aAiCc2+hTWM56ov7TtogHv3
-    /oBx3Iry6YqGZJX27xp1wlFUBhwVasQouWDpdOG1TpbNOewkzo8qOM7F7gxqLZQagGPoVT
-    JJS3+AoRFwj1l1vVsVprqeCLg4CKmQTCUaMGkOqGYMLpCIQ54BWmOgJg+pLd714Xe+87wM
-    NnvNDNeX5z+R9bAkodHVtOqFpf6TbgdWxoUC6uclPLOBvmg/s7RZ42irQmU4blTJjR86bn
-    xFFthA8owUqT0hcEEBa2H0rYpQjLwy3ssP4bo3m/WOMiy/zOBGqz08ulJxjw
-X-ME-Proxy: <xmx:tFToagxmH88X9Nyoe9Hxg8By0kzTTdOVOcwcpLyEQv6d5Yy9MD00Kw>
-    <xmx:tFToavzNL4S05IdpjVVNihF1Wa9KZAR3osnW5I79F701iCsrE61Krw>
-    <xmx:tFToaoxGXC3n6yoQ35EdCXCeu2KRKJ_hbJwmUrWKCpLUcz5WA_K7RA>
-    <xmx:tFToapaO0d3mUb9ysogMd3A6ztyTGe-AbVEraq-vxeZqvCdi61J_Sg>
-    <xmx:tFToapXTmELo-jxkikLVJa8oVIiR64RMUIQ4ShVijzW4m2WVJz34ixCv>
+  by ams-compute-02.internal (MEProxy); Mon, 02 Nov 2026 04:15:54 -0500
+X-ME-Sender: <xms:yVToalmd1pNHw_N0rgQ5TEBcuzdG8wAEoZ1v_k-QkwYI4-05rz94sw>
+    <xme:yVToarrIWduXSHkArHdmL2_J8cOLRRF_awwuesWtMAwARp3U-c2vrA3F1HPRi85Hw
+    buWASN63bxJl54eegAOTiKCdOIdYRzzE6rIQHayWKcXSjYL4FDC9ZUM>
+X-ME-Proxy-Cause: dmFkZTFMI47ttLy+k0OQK3vUtEIYVuULnQr52PyFYw9FGe164xcBCCE05vl5x/7SjHfwMw
+    xMN0n95AsVDEB2xRkfUt2BjnL1sMKRTMGbG6zLszHUgzZB9hc7bTCypYPnYzxm68TB94an
+    KafAXTBctALDeNOLymrWtvdMz5V6fslFt8I6ayJ7IKtLgnvZBLzRrv26qiHgNtmCzmeOhz
+    UIO2LJedD7YOlxKO0pC7UL46O1Db23hvHu4wN04YaltC7v6/99l7O9ZO8h4QCvwxd438or
+    INwePNOm2nhuBFtR+BKLAVqjqdp9yNg36M1CWddm1BXr/gsXjXDsIwCk9CKjeCm1TbtPSS
+    5xhN7tmP0dRt02wNWkuEu3KOu+qND3ohtK9KZQWQqA4277QaU/aNiYGDMfHMnhJTv3798b
+    kOVv14BMCwgOX6D9DUiwbM4HsMNvW7FWsfGcKOXbWacWijfVY7ApiKn4oTwyl0HQOGFVa5
+    R1y2kZlkxkZmin6sjpZKm0f3qB2jgCmP+6LP4uYH7337M8BM716BcZQfCLMpmoHxUCEAxs
+    j2iBR4DEqxU84/fGglc14FSxpmHVlfJapqmi+00sdyiokZAJOQGVpp7duP7bXTUpfH9ITQ
+    vV0388JzM54CbghR1jNbmnSkfHj8ywury2maJWehew800xeOULzFlSEMxkIQ
+X-ME-Proxy: <xmx:ylToanRYHSi7Zk3Guqh4YmC3jZk8xEqy0S96gtiYSZqfZZdX90SjaA>
+    <xmx:ylToavrHE7DLT6-7VjgJPqQqcySWHjl4Wex1pzJE0-KvcAhKbhex4Q>
+    <xmx:ylToalJUoYe-bKx0ojDSkysbiDOa_0yPZ0zM555_-FwV3nCwgYrMVg>
+    <xmx:ylToaiq9qw5aljzg32tbWBN9K8YNquu_a10wqwCLUIMB0b7BlOWlVw>
+    <xmx:ylToatwD4Y5PNZY7QwOslAf9qUOUw6H3yfwRNH_A8qSEcOe45_CrBgok>
 Feedback-ID: ice86485a:Fastmail
 Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id ADBE2F8008E; Mon,  2 Nov 2026 04:15:31 -0500 (EST)
+	id 0E81CF8008E; Mon,  2 Nov 2026 04:15:53 -0500 (EST)
 X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,71 +77,66 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Date: Mon, 02 Nov 2026 10:15:11 +0100
+Date: Mon, 02 Nov 2026 10:15:32 +0100
 From: "Ard Biesheuvel" <ardb@kernel.org>
 To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
 Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
  "Herbert Xu" <herbert@gondor.apana.org.au>
-Message-Id: <2c122f4c-bd28-4617-90fd-ca73e95177f4@app.fastmail.com>
-In-Reply-To: <20261031052149.201983-1-ebiggers@kernel.org>
-References: <20261031052149.201983-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: gf128hash: Hide selection mask values from compilers
+Message-Id: <a112eb15-ecf7-4383-b022-f965592b676a@app.fastmail.com>
+In-Reply-To: <20261031052053.201779-1-ebiggers@kernel.org>
+References: <20261031052053.201779-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] lib/crypto: aes-cmac: Hide selection mask value from compilers
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
 
-On Sat, 31 Oct 2026, at 06:21, Eric Biggers wrote:
+On Sat, 31 Oct 2026, at 06:20, Eric Biggers wrote:
 > Hide selection mask values from compilers, so that they cannot see that
 > they are used to select between two values and potentially generate a
 > secret-dependent branch.  This is not known to be happening here, but we
 > might as well be extra careful.
 >
+> Since the selected values are only 0x87 and 0 here, change the type of
+> the mask to 'unsigned long' so that the compiler is not forced to
+> materialize it in a register pair on 32-bit architectures.
+>
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->  lib/crypto/gf128hash.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
+>  lib/crypto/aes.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >
 
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-
-> diff --git a/lib/crypto/gf128hash.c b/lib/crypto/gf128hash.c
-> index 8dcdf5ec98be..5b8ae98cafed 100644
-> --- a/lib/crypto/gf128hash.c
-> +++ b/lib/crypto/gf128hash.c
-> @@ -88,10 +88,18 @@ static void clmul64(u64 a, u64 b, u64 *out_lo, u64 *out_hi)
->  		  (a2 * (u128)b1) ^ (a3 * (u128)b0);
+> diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+> index e1c191551736..1d26fd8be028 100644
+> --- a/lib/crypto/aes.c
+> +++ b/lib/crypto/aes.c
+> @@ -578,7 +578,7 @@ static void aes_cbcmac_blocks(u8 h[AES_BLOCK_SIZE],
+>  int aes_cmac_preparekey(struct aes_cmac_key *key, const u8 *in_key,
+>  			size_t key_len)
+>  {
+> -	u64 hi, lo, mask;
+> +	u64 hi, lo;
+>  	int err;
 > 
->  	/* Multiply the low 4 bits of @a by @b. */
-> -	u64 e0 = -(a & 1) & b;
-> -	u64 e1 = -((a >> 1) & 1) & b;
-> -	u64 e2 = -((a >> 2) & 1) & b;
-> -	u64 e3 = -((a >> 3) & 1) & b;
-> +	u64 e0 = -(a & 1);
-> +	u64 e1 = -((a >> 1) & 1);
-> +	u64 e2 = -((a >> 2) & 1);
-> +	u64 e3 = -((a >> 3) & 1);
-> +	OPTIMIZER_HIDE_VAR(e0);
-> +	OPTIMIZER_HIDE_VAR(e1);
-> +	OPTIMIZER_HIDE_VAR(e2);
-> +	OPTIMIZER_HIDE_VAR(e3);
-> +	e0 &= b;
-> +	e1 &= b;
-> +	e2 &= b;
-> +	e3 &= b;
->  	u64 extra_lo = e0 ^ (e1 << 1) ^ (e2 << 2) ^ (e3 << 3);
->  	u64 extra_hi = (e1 >> 63) ^ (e2 >> 62) ^ (e3 >> 61);
-> 
-> @@ -245,6 +253,7 @@ static void __maybe_unused 
-> ghash_key_to_polyval(const u8 in[GHASH_BLOCK_SIZE],
->  	u64 lo = get_unaligned_be64(&in[8]);
->  	u64 mask = (s64)hi >> 63;
-> 
-> +	OPTIMIZER_HIDE_VAR(mask);
->  	hi = (hi << 1) ^ (lo >> 63) ^ (mask & ((u64)0xc2 << 56));
->  	lo = (lo << 1) ^ (mask & 1);
->  	out->lo = cpu_to_le64(lo);
+>  	/* Prepare the AES key. */
+> @@ -596,9 +596,11 @@ int aes_cmac_preparekey(struct aes_cmac_key *key, 
+> const u8 *in_key,
+>  	hi = be64_to_cpu(key->k_final[0].w[0]);
+>  	lo = be64_to_cpu(key->k_final[0].w[1]);
+>  	for (int i = 0; i < 2; i++) {
+> -		mask = ((s64)hi >> 63) & 0x87;
+> +		unsigned long mask = (s64)hi >> 63;
+> +
+> +		OPTIMIZER_HIDE_VAR(mask);
+>  		hi = (hi << 1) ^ (lo >> 63);
+> -		lo = (lo << 1) ^ mask;
+> +		lo = (lo << 1) ^ (mask & 0x87);
+>  		key->k_final[i].w[0] = cpu_to_be64(hi);
+>  		key->k_final[i].w[1] = cpu_to_be64(lo);
+>  	}
 >
 > base-commit: 2a500a04d6f969318c05f46aedb6e73fc1963a00
 > -- 
