@@ -1,72 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793610957;
-	b=i1k3yqxiMmztdADzv7sIdhgaOahjkufOSbAS4C6STYEm2tmC69ghEeG7e0/M02G2Ur+d
-	 +g03MtB2U+mse1ANIJO7Voq/KqxlcPH6qloAFI6URXXrfpG3UQcu7T2m0EDB0PCcTOcQ4
-	 TpVnbeoaWICs4F4Itf79MuLiglFSC5IwMqEekmXRBri5dPINmjsneeLFE1JI6jS+mFe6a
-	 4TUp2R14aakhdP/+8L0lvcbD2wCHqhKpB1DMNJIT27SgsHW6nf6V1vUcgH5P7eYYDavO3
-	 sS5kw9eKFC2TfciAcTyrnIY6VAII2iJPCp56y6/Eazj5jj2/wrG9iof/1qxiUhtrn4A==
+	t=1793611016;
+	b=Gi6oyaat7VKB/rV4XfjINTxUiQv7wBjbKuF6mujIXoOgT2jbwnwzekjfV/09jtt8Xd1u
+	 JB7cVFEpSFB/ycMiUdh9l+Obc3M/7PUaxuR2EWqPp8KJtsZpWLUUORtpwnMVAJ4qYcGBf
+	 G+C4xtfCUweuKzWdgesAxob/y/UGlr7dQeqcDRvn3YHypYQHHRUbUwp8QSkEkb3TzhgoR
+	 KtSqVqqDjtlt92oYyYrGIal9gJkYpwNGduQYMgyZkS/tC7OmDAbC/uBP0U8N13GVtQz5d
+	 RTorsP+3lYtlZvGO+4cj4lwHMRrlx4ecWYFraTqsb+iNXOU++rNCrJFL3YCWvZ/ncMA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793610957;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793611016;
 	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
 	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
 	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
 	 Subject:Content-Type:Content-Transfer-Encoding;
-	bh=O08l4ELgs0AyAsYDBm6q/NWvRMOcCqrZ6eyVH6rwCZs=;
-	b=qY8Cv40UYuiAXlNDNgBB5Cxe+FxVOYZ7CKEJHZZk0etb5HHGlf7KkO/Fd5scHXOd1ygJ
-	 s7igN3HgdTvVuUSVCBNmPQoPITjjfEw6yvdByEShv0Mkxx7quvQ2BfW4irymmhP9SnU5u
-	 Ra//N3CrfXRmHJFWcD4FQ1BHu/Og4oI2FbuSW1cBFYEyO2IgURS3lOaFV549F+ZncaAr3
-	 Vfro51g8y17uBx97/07J6lzWamVQmOQPc+UpY4VBFcIguWJxR+r9Y+k4/SmUdN8fdBMZN
-	 YVU5/SghGr9M6yU5lm7XaV7FjaqqTrNei0Y2LUuLIImh10He4j8Tc3D2oNp8hObQ1wA==
+	bh=fEH04FadFLQr70qSIXqkoae8wjtrp3fBYKrHpNz6edo=;
+	b=NGtoaS0x6jtJEG+fcM05nz0+BbrIp7/MKF8bvPtboGJPiLW55tEsFODKozt7MAFpzOAL
+	 8aBlbzhe5tdP4B48SnZluspr8RG9FQB0BEBKVC/w7N7xv0M9WUwkxqvo31UUF4bIGWv96
+	 YMMNh7o77n8it6EpTTyZz0nT9xlZm6qKFlh/l8WuKJzxRwedbF1HiYpV61oE/HQWg8Gvg
+	 ICGQXLLMbbwqXDWTE2i+6q/xqWdvzzHQaiqeEJor4yPUtE5R9duuc4eKmXjv0ZgjaSXCe
+	 JnF3MnhEkfsJ7Zs3u60C9KXtdwK3pFkEAdGR+wN2JtQCuNEXon5tTyxBqVWXSde5XnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R8V+4BDZ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CK48mHEu;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EDC606A327
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 09:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C057606A324
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 09:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R8V+4BDZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA4971F0093A;
-	Mon,  2 Nov 2026 09:15:55 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CK48mHEu
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FAD61F000C1;
+	Mon,  2 Nov 2026 09:16:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793610956;
-	bh=O08l4ELgs0AyAsYDBm6q/NWvRMOcCqrZ6eyVH6rwCZs=;
+	s=k20260515; t=1793611016;
+	bh=fEH04FadFLQr70qSIXqkoae8wjtrp3fBYKrHpNz6edo=;
 	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=R8V+4BDZimhdx8DyOCpd7Ft6Ev5yEcOcYswRMk4r3soYnzKucor6bPRRwZ5so5v7z
-	 R3CCaDo9d+PMNmsdB/utSZjM2FtYDq6MzlgwOXjAEe/yv2mQO6X/NJ2Ma4fZWixvh5
-	 HznjSMp+YgZaODTGBGSZQgIid4qQ130KqQ75NluiaeoJYf0OsEYIgiIXNGDsfqx028
-	 dfHPyeborE0xQyTIjzAuBqo/oteJjQgdrGkX1wcWN5yObQBGvuIAOuFYnew5N3PRng
-	 PQbpY9iqylk4TKT3Q8iR0WX0ZqLhaG218wBn0AW3RYYVwhXC9PsI93wZj3dBzvM08G
-	 gpX8fXofx9Urg==
+	b=CK48mHEuAw2z5AiPE195/y1wZdBnYnfifL1/2380Ahq0UzIj0reYpdTO2v1bj0MWY
+	 q5BafRGaFQRI/UhDkyb7J4pwIcXT+jsThwZByampTjKBY3UQV1GxS78bEZTEz/TJl9
+	 cHYLaodFY3iO/hDjt1ZILxDXTJQOQKQA9LpvYiO52Ypi/600JT3xGRTw/c6e9aSa7T
+	 ayBG4rMXFMIKb4DmejSoRhvH5dibMc8B10WCwKhSTlt4AxzEGDPv8aA/csteXGevuL
+	 f7fughsTKPn1KzMLBCTqmcVWbYhRNlvDDFZjUipiDnndIAfp7ooqK/MAnxhhAWgz6h
+	 LXBquBpWKodQg==
 Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 58888198003A;
-	Mon,  2 Nov 2026 04:15:54 -0500 (EST)
+	by mailfauth.ams.internal (Postfix) with ESMTP id DA40B198003A;
+	Mon,  2 Nov 2026 04:16:53 -0500 (EST)
 Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Mon, 02 Nov 2026 04:15:54 -0500
-X-ME-Sender: <xms:yVToalmd1pNHw_N0rgQ5TEBcuzdG8wAEoZ1v_k-QkwYI4-05rz94sw>
-    <xme:yVToarrIWduXSHkArHdmL2_J8cOLRRF_awwuesWtMAwARp3U-c2vrA3F1HPRi85Hw
-    buWASN63bxJl54eegAOTiKCdOIdYRzzE6rIQHayWKcXSjYL4FDC9ZUM>
-X-ME-Proxy-Cause: dmFkZTFMI47ttLy+k0OQK3vUtEIYVuULnQr52PyFYw9FGe164xcBCCE05vl5x/7SjHfwMw
-    xMN0n95AsVDEB2xRkfUt2BjnL1sMKRTMGbG6zLszHUgzZB9hc7bTCypYPnYzxm68TB94an
-    KafAXTBctALDeNOLymrWtvdMz5V6fslFt8I6ayJ7IKtLgnvZBLzRrv26qiHgNtmCzmeOhz
-    UIO2LJedD7YOlxKO0pC7UL46O1Db23hvHu4wN04YaltC7v6/99l7O9ZO8h4QCvwxd438or
-    INwePNOm2nhuBFtR+BKLAVqjqdp9yNg36M1CWddm1BXr/gsXjXDsIwCk9CKjeCm1TbtPSS
-    5xhN7tmP0dRt02wNWkuEu3KOu+qND3ohtK9KZQWQqA4277QaU/aNiYGDMfHMnhJTv3798b
-    kOVv14BMCwgOX6D9DUiwbM4HsMNvW7FWsfGcKOXbWacWijfVY7ApiKn4oTwyl0HQOGFVa5
-    R1y2kZlkxkZmin6sjpZKm0f3qB2jgCmP+6LP4uYH7337M8BM716BcZQfCLMpmoHxUCEAxs
-    j2iBR4DEqxU84/fGglc14FSxpmHVlfJapqmi+00sdyiokZAJOQGVpp7duP7bXTUpfH9ITQ
-    vV0388JzM54CbghR1jNbmnSkfHj8ywury2maJWehew800xeOULzFlSEMxkIQ
-X-ME-Proxy: <xmx:ylToanRYHSi7Zk3Guqh4YmC3jZk8xEqy0S96gtiYSZqfZZdX90SjaA>
-    <xmx:ylToavrHE7DLT6-7VjgJPqQqcySWHjl4Wex1pzJE0-KvcAhKbhex4Q>
-    <xmx:ylToalJUoYe-bKx0ojDSkysbiDOa_0yPZ0zM555_-FwV3nCwgYrMVg>
-    <xmx:ylToaiq9qw5aljzg32tbWBN9K8YNquu_a10wqwCLUIMB0b7BlOWlVw>
-    <xmx:ylToatwD4Y5PNZY7QwOslAf9qUOUw6H3yfwRNH_A8qSEcOe45_CrBgok>
+  by ams-compute-02.internal (MEProxy); Mon, 02 Nov 2026 04:16:53 -0500
+X-ME-Sender: <xms:BFXoamLnvbGyrU59mAcCHmqGQ7N9zoHX93Ag6I9XL2E3dSs-EOkNbg>
+    <xme:BFXoao9kpHGLBq78vGV_2okHthv-yVOg5k9bIrSKQUJSJDcjXHPrzkqkYl3PrjT6X
+    3I73wThezmk3m57oGChRIU-pMZ6nXHtdgrR_N87q_Mr678TeNjuOyG0>
+X-ME-Proxy-Cause: dmFkZTEGuTs347uE1l326fUoY9XVM2teM7miInQD8/2T3S2SZxx4Y4ZkIYo63FTkItv5dH
+    j9xwQxn1IeInhs0cUss0gbVSMJTA0wqsPtz9Q/rRmvEy+5Qip4zKDVL0WNZr5hECebULgB
+    rAuuHcdG/HzlrG9gHd7wK22CoYBSJAPdH1oUjuI7QQueY6KqXQ2MEZNfwWD9bRbUjZjPsX
+    v96y1tjwOU1PgCO4n4WvvYt2WuME8iNzTV9EqZmTr7vFnHuRMhGtrTeUFCuQvp/PcfVFho
+    zLlnLlAhqVVepagsF5jFQHE9Mgb3N40Uh6oH8jj9w9HbSQlTsDtgIf8yeXAx2eZuys8wp9
+    A02TwVv0CtJz5hQgA+zoa3dJMbFeTl+5Txu2+s1L8/ATEhT5jpRAQedXiOrGIbOw0JKPmt
+    l0u8YWhHq4SV3GRLHg5mULkSNRK+ojstWKyBjjcv0jL8nBMlgNCwSuqZ+8BeJYuGIswfe8
+    Mhc1FqPvRAZkpiLMA0iuOTdbHJFhdpvB14uLiVhaUjxUJLu39Y8x+FGZt0MPWiqsLFQWFH
+    IDiqpGigezlqTHxISFa44UnBBXaW5O8CXqFM1C/35b2dM38S8SlmMb5plRd45dt9UqeVjx
+    qZv2BsePBDIPC83JRUrqWTHpZHlfKnVz52x9/3ATu3IYY7d3aAGU+REbs5mg
+X-ME-Proxy: <xmx:BVXoav1ax-9TnN0UREBNr8_RO5SZiutHtOAoWQk6wajBqKnd40R3fw>
+    <xmx:BVXoak_yCZZNEyzJmy-clxFHfHGRDgeBbh4_4AmFOHXXNMY7Jma6dA>
+    <xmx:BVXoaoO41Vf3j36ovcO-fuPxe0aFsRqTlKyLTL5eTzWOX56OE4el0w>
+    <xmx:BVXoagdsKqJIzE1_GuG4kGCcPk0E1H6guWh0cMZCjL7SoqZS818NYg>
+    <xmx:BVXoavUFqAaYk3O7nLmdtkmzj9GUlfcpJGOlMzehhv9TzY_fwMH6K1M3>
 Feedback-ID: ice86485a:Fastmail
 Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 0E81CF8008E; Mon,  2 Nov 2026 04:15:53 -0500 (EST)
+	id 9DFF9F8008E; Mon,  2 Nov 2026 04:16:52 -0500 (EST)
 X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,66 +77,73 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Date: Mon, 02 Nov 2026 10:15:32 +0100
+Date: Mon, 02 Nov 2026 10:16:32 +0100
 From: "Ard Biesheuvel" <ardb@kernel.org>
 To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
 Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
  "Herbert Xu" <herbert@gondor.apana.org.au>
-Message-Id: <a112eb15-ecf7-4383-b022-f965592b676a@app.fastmail.com>
-In-Reply-To: <20261031052053.201779-1-ebiggers@kernel.org>
-References: <20261031052053.201779-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: aes-cmac: Hide selection mask value from compilers
+Message-Id: <bea12ae0-ac2d-40f9-b5a9-8836e3be4122@app.fastmail.com>
+In-Reply-To: <20261031042637.68815-1-ebiggers@kernel.org>
+References: <20261031042637.68815-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] lib/crypto: poly1305: Hide the mask value from compilers
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
 
-On Sat, 31 Oct 2026, at 06:20, Eric Biggers wrote:
-> Hide selection mask values from compilers, so that they cannot see that
-> they are used to select between two values and potentially generate a
-> secret-dependent branch.  This is not known to be happening here, but we
-> might as well be extra careful.
+On Sat, 31 Oct 2026, at 05:26, Eric Biggers wrote:
+> poly1305_core_emit() does a constant-time select between h and h - p,
+> where h is the accumulator and p is the Poly1305 prime of 2^130 - 5.
 >
-> Since the selected values are only 0x87 and 0 here, change the type of
-> the mask to 'unsigned long' so that the compiler is not forced to
-> materialize it in a register pair on 32-bit architectures.
+> The mask used in this select isn't hidden from the compiler, though, so
+> the compiler can infer that it's either all 0's or all 1's.
+>
+> In theory, the compiler could then use that to recognize the select, and
+> "optimize" it with a branch.
+>
+> Fortunately, in practice, I couldn't find any gcc or clang options that
+> made that happen.
+>
+> Regardless, add OPTIMIZER_HIDE_VAR() to "hide" the value of the mask for
+> safety against any future compiler optimizations.
 >
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->  lib/crypto/aes.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+>  lib/crypto/poly1305-donna32.c | 1 +
+>  lib/crypto/poly1305-donna64.c | 1 +
+>  2 files changed, 2 insertions(+)
 >
 
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-> diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-> index e1c191551736..1d26fd8be028 100644
-> --- a/lib/crypto/aes.c
-> +++ b/lib/crypto/aes.c
-> @@ -578,7 +578,7 @@ static void aes_cbcmac_blocks(u8 h[AES_BLOCK_SIZE],
->  int aes_cmac_preparekey(struct aes_cmac_key *key, const u8 *in_key,
->  			size_t key_len)
->  {
-> -	u64 hi, lo, mask;
-> +	u64 hi, lo;
->  	int err;
+> diff --git a/lib/crypto/poly1305-donna32.c 
+> b/lib/crypto/poly1305-donna32.c
+> index 5977785cd76e..73fe9181296c 100644
+> --- a/lib/crypto/poly1305-donna32.c
+> +++ b/lib/crypto/poly1305-donna32.c
+> @@ -167,6 +167,7 @@ void poly1305_core_emit(const struct poly1305_state 
+> *state, const u32 nonce[4],
 > 
->  	/* Prepare the AES key. */
-> @@ -596,9 +596,11 @@ int aes_cmac_preparekey(struct aes_cmac_key *key, 
-> const u8 *in_key,
->  	hi = be64_to_cpu(key->k_final[0].w[0]);
->  	lo = be64_to_cpu(key->k_final[0].w[1]);
->  	for (int i = 0; i < 2; i++) {
-> -		mask = ((s64)hi >> 63) & 0x87;
-> +		unsigned long mask = (s64)hi >> 63;
-> +
-> +		OPTIMIZER_HIDE_VAR(mask);
->  		hi = (hi << 1) ^ (lo >> 63);
-> -		lo = (lo << 1) ^ mask;
-> +		lo = (lo << 1) ^ (mask & 0x87);
->  		key->k_final[i].w[0] = cpu_to_be64(hi);
->  		key->k_final[i].w[1] = cpu_to_be64(lo);
->  	}
+>  	/* select h if h < p, or h + -p if h >= p */
+>  	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
+> +	OPTIMIZER_HIDE_VAR(mask);
+>  	g0 &= mask;
+>  	g1 &= mask;
+>  	g2 &= mask;
+> diff --git a/lib/crypto/poly1305-donna64.c 
+> b/lib/crypto/poly1305-donna64.c
+> index d0e4234c1c4c..402a3459ca49 100644
+> --- a/lib/crypto/poly1305-donna64.c
+> +++ b/lib/crypto/poly1305-donna64.c
+> @@ -152,6 +152,7 @@ void poly1305_core_emit(const struct poly1305_state 
+> *state, const u32 nonce[4],
+> 
+>  	/* select h if h < p, or h + -p if h >= p */
+>  	c = (g2 >> ((sizeof(u64) * 8) - 1)) - 1;
+> +	OPTIMIZER_HIDE_VAR(c);
+>  	g0 &= c;
+>  	g1 &= c;
+>  	g2 &= c;
 >
 > base-commit: 2a500a04d6f969318c05f46aedb6e73fc1963a00
 > -- 
