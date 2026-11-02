@@ -1,95 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793634837;
-	b=klOHzwob+omTDU+jYZlhMpM+765AKBnTwjIOxNaEY4ACtzJVTkAGJMuEMVmuoxdyEBoy
-	 XN0USRQrAR6uViD/AEV0axXjLY8G78SN6pSPQ8z2kC033OdToNwkPSKP2m+ABY1xKmQpj
-	 j74j193K3SQFDUncQKaJ/62pkduFcWxmsIKw+GqiJQ2LfRoOxOI7xBLb80oEmPhwX+ZmK
-	 0Fhk4YSuFimr1Z1WYxGUkBSsV1AD7SsyD7vn9xbKiaouIX9+0Aj+LJqsC71Ot7SNnWCF3
-	 oR3lIceT1sLLEQnXzrdwm+8vX+oauHvB6ZQB87wlWwWdhuCDi6sWDyfW1RV+ldQiUPA==
+	t=1793635257;
+	b=3WUjoPjN3bD6bs/P5K7OL3BbM3HhBc9SCmXrZHuIPZjGez/R71P67h+CteWzYhf0lVPq
+	 aNUBSR4YQJcjUw7ff4XK+ev4s2Tf7Jpf4eza5feh+sPDEwOLxXLQGgNI8t+9MSEgsk2dt
+	 3WCKjU41M1WQ/Hb7sDfQ+Q0plDB++mlUxOHXfDMSOnJ3tFg2dj1w6YIMM/udW1+f2CRgH
+	 /To/t1nGZ250nNzMD2Bem0TweZ1wt05qQbpY2Fo4+ECuELqQqz4jnnigv8svfZa6y8g7U
+	 3VLlp++NyhmbEZjf0MBEDxbsod/iEsZjiisSFPgdzs+qqxKeYpU3UeMrgVBjP20YuhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793634837;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:X-Google-Original-From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=73DR8o62Fs8K8T2lKj1AIW1Z0OeA4tbHKQ/fX8k3s30=;
-	b=bT/WfSp3s1XjUl+wnpCqPUvZAKzvn9Y22Loh6n6A7p0CjuJM5BOMrnTU5E56TmNrjb1v
-	 BkbAgQGzfECsZPU4vRruT7FF8GUqpXrgfu4wGP1Olx4j9OtpJSgDdWnqUVxjfuk7/phDd
-	 Xvtje4DoCl4am8/uq0hWwoaYWnvVVv0NWqSREcgWlINQpEzYl+vlB/wS/BysfmufINAuO
-	 X61EQpbYIfpRN5Z3m/efvFS3xQI6e7tLGjQz6T8uGP7CcO7daFKPluE0T84GWsp5P55il
-	 Tt6No/qh2Npja8L2aHFlGs4L501FnfEZRJ+xC+9NdFkF5Ty+RyYBGkX/xvCmnftviHw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793635257;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=Pt8TVBLj+aue5/olEE3IwKpFODSJf5c35bOqyoXE5JM=;
+	b=V9UI/QbLUwPvY5+midbVrCn6lW9dFnVVVgp7YXnKkIrmXnl4Tz90fRdN/0qKcRuqsT68
+	 K4C8A3FX5Jovo5QxOHs++RU0KloCP1X1TZukjPqpWyZiJBc1rd/aQxb5OCgaKZnnrmnpj
+	 T1vsYeyYh+6MJCuJXni7gRLr6v/s97TcbxSXXcrHp6XyoTHJXWv3d1cdSim1+UOidRu2U
+	 FSKSdTJgJ3Wmtu+8CMxhntTA12lW8bOcrhN0gpMTs5nUUDEI2aLi7bIJitWtuz0XHJtoB
+	 rZcAvc4aOL+MTKyirZw5D8WPfKfTM8V6cXjEnB3ms7OIpUh9CdpKim6e2ZiJJ4/QnSA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GSTzNnTp;
-	arc=none smtp.remote-ip=209.85.221.54
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SYAg2MlT;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8EC9607B78F
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 15:53:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8EC9607B78F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B12606A5A8
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 16:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GSTzNnTp
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-48afcfc4bf5so3259591f8f.1
-        for <linux-crypto@vger.kernel.org>; Mon, 02 Nov 2026 07:53:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793634835; x=1794239635; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=73DR8o62Fs8K8T2lKj1AIW1Z0OeA4tbHKQ/fX8k3s30=;
-        b=GSTzNnTpuWGoXoGwURiFUC+RcXlSjBM2byaI+KR0CSGw+H/KFBUlBesE+xenaYscIB
-         k9GXHRknAoBNiRKs+8i4IeB8dHdxSgdTDVPDk79Ktc17BWcLA99KuIOdGOF38WxFFpbZ
-         ZWqIiya+OOtDEjXCswiSRcmaJ3QgwmjDpfVA9bnJp+DjgnPuu/GbfpbbzuIlhMpXxBdG
-         rJc+cmAmHOTLh8h/sk35iHv2Ml5TB+sdYeDpBoV2NSTsXzSbHhz7WVGvpI6qiv0wsRwM
-         3xZauCPTaOBYo2/eXXNSxiQ1qDolSe78LZwAI8cqy7giQvyF9yCXt7pQVYmaF8Ct1Sn4
-         6kPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793634835; x=1794239635;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=73DR8o62Fs8K8T2lKj1AIW1Z0OeA4tbHKQ/fX8k3s30=;
-        b=vt072CSn/f3sQMMg1OPNZGkrP5SWvgd+xhmbnUJVVFw/VUOklYj2084IaNzXyjKfwC
-         w6IASOyQeKptFlrM1fjKrfTbjWyTeZzpzOAd6qJljUhwNFu93edh5s/gyF6CdUS1JvfO
-         oIDuhExojHVu7EADbPzjjRBS1Ad4VMEaUhU/FIp6i1UdPvhRxBryO9PIMURIDtLixoEm
-         osHjkx7S23YfYInBrKQH8fpJ84E2a+c5R9srvHa+seEsKmhLSyu7WoBJSnC1wMxv/8Um
-         70DKLa/i/NGDFVWeolDSRX4VfwGitwSM0SYCdP2rev/+9qv4lJHz2t8BsmpYWIX/RNvY
-         G7Xg==
-X-Forwarded-Encrypted: i=1; AKwUvBwiXguxEuKBMHODvH2YEp0KFvMoGYbZ7mhJAnpfnJfu2HV4Cdgchr/Pl3An3keilBjlOmXa+K8iNRHK2Zk=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9F5F9+cdyXTTNRfEdEIpBFCf1H6xHkh6WK5JzviPMLTTofkGly
-	FzFvkb1ry7dKXq89U5n7G9iX2rtCFdNdfOmGwPG+HZVeydsKpWQMpCM=
-X-Gm-Gg: AYBFou3xmFsmx9BoqW+5RN58OPK7RpFgnqPstUaJ6wSwYhJUQGWZXMC4hdWj1NDDp4m
-	Ms43KtQwZlu563mnIelcoMsTojFH0dMjKGnJ1E3izF0Tj5bEm8E2OvfdJlsjECcXrYrJ5BdnoFg
-	tt/u7u6NKVe8WCDJr8VCXWpn7qdU/PoplU/ESCcR023GArurfjW9lJAMnhh7M30MfPe/rzwwQbv
-	zGCIler48w/J3iI9F01O9BasG5m5c8N1CciM/qYW5G7GHjNEhv2KnHyA0AlvU0/hKIpUUJssaJF
-	sSfpmLwO0aAkYkNjxPniy8QNpwS8qWdyA58UephdrBYRkBzKdKGzH32+dl2wVYvQfe9Y5HLgSqY
-	tBCRpELe4N+gvKkGIC0LTszcB8XqUPDwz2YgEZQFCQFh29QEJ1YWfEdvHzlqehHHyg2uGC/JB/v
-	w3xYBxOaHyCCqIi9tr1pIVEp6o0/r1yCSkEWjdKfDNpDwwe3RN8mLJDA/rO1K3pi3jzRzNhlTSZ
-	oZnpCyHFKKqb6EVYNefJEdFkY4Ase07o87PmeW+eDivEs0nbnggZOoMATZigW8PoSaz63lHnLuc
-	a7HyTj4NbfE=
-X-Received: by 2002:a05:6000:26c1:b0:48e:870:7791 with SMTP id ffacd0b85a97d-48e6e30b824mr21941019f8f.26.1793634834903;
-        Mon, 02 Nov 2026 07:53:54 -0800 (PST)
-Received: from debian.. ([2001:41d0:303:db6b::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48e71b80eb1sm22010082f8f.34.2026.11.02.07.53.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 07:53:54 -0800 (PST)
-From: Tristan Madani <tristmd@gmail.com>
-X-Google-Original-From: Tristan Madani <tristan@talencesecurity.com>
-To: steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com
-Cc: herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Tristan Madani <tristan@talencesecurity.com>
-Subject: [PATCH] padata: fix lockdep warning in padata_find_next()
-Date: Mon,  2 Nov 2026 15:53:53 +0000
-Message-ID: <20261102155353.1268322-1-tristan@talencesecurity.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SYAg2MlT
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 086561F00A17;
+	Mon,  2 Nov 2026 16:00:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793635256;
+	bh=Pt8TVBLj+aue5/olEE3IwKpFODSJf5c35bOqyoXE5JM=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=SYAg2MlTtc1FLKdUflrImz5Exq9+eaYFYu1B31JTcElUSlv0gZeSTrP2pSCZbyotZ
+	 cdL8Thj0u5jeRKEjcNC7i28s9MZ03Z7Ld0h0Kad49fh3efQab2HAeQSYID4oa9yvrq
+	 uwCnrZNN04VkuZqs47wtuLr2Xxa0dljUErX2/caDnTt2cpdBiMRAsPeaR2AnVnYrEI
+	 3UzUIjEqJUOz2pjcsPF33KpG/cBsxN7lNceCHhdrM/v82UxA2hMNY/yeRse895argR
+	 AdVhhebHARNF/IjI50Q8HceDIdp2gqkvuuhn+iTw2nZ46CpzGwaHl1oTdfRpAaX0rR
+	 AYShCOCEZP6qA==
+Message-ID: <sashiko-outbox-193718@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] padata: fix lockdep warning in padata_find_next()
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Tristan Madani" <tristmd@gmail.com>, steffen.klassert@secunet.com, daniel.m.jordan@oracle.com
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, "Tristan
+ Madani" <tristan@talencesecurity.com>
+In-Reply-To: <20261102155353.1268322-1-tristan@talencesecurity.com>
+References: <20261102155353.1268322-1-tristan@talencesecurity.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Nov 2026 16:00:55 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -98,38 +59,81 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-padata_find_next() acquires reorder->lock while the caller
-padata_reorder() already holds squeue->serial.lock. Both locks are of
-type struct padata_list and thus share the same lockdep class, which
-triggers a false positive recursive locking warning even though the two
-instances always protect different data.
+Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+s) to consider:
+- [Medium] padata: redundant spin_lock_nested() in padata_find_next() split=
+s lock class
+--
 
-Annotate the inner lock with spin_lock_nested() to tell lockdep about
-the valid nesting.
+commit d8de136037d32da1b6bd4096b78d163c014e8d23
+Author: Tristan Madani <tristmd@gmail.com>
 
-Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
-Cc: stable@vger.kernel.org
-Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
----
- kernel/padata.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+padata: fix lockdep warning in padata_find_next()
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 0d3ea1b68b1f7..2f769ba7dfa99 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -253,7 +253,7 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd, int cpu,
- 
- 	reorder = per_cpu_ptr(pd->reorder_list, cpu);
- 
--	spin_lock(&reorder->lock);
-+	spin_lock_nested(&reorder->lock, SINGLE_DEPTH_NESTING);
- 	if (list_empty(&reorder->list))
- 		goto notfound;
- 
--- 
-2.47.3
+This commit replaces spin_lock() with spin_lock_nested() in
+padata_find_next() to annotate acquiring reorder->lock while
+padata_reorder() holds squeue->serial.lock.
 
+> diff --git a/kernel/padata.c b/kernel/padata.c
+> index 5a113c667d4cb..94d7880a001c4 100644
+> --- a/kernel/padata.c
+> +++ b/kernel/padata.c
+> @@ -253,7 +253,7 @@ static struct padata_priv *padata_find_next(struct pa=
+rallel_data *pd, int cpu,
+> =20
+>  	reorder =3D per_cpu_ptr(pd->reorder_list, cpu);
+> =20
+> -	spin_lock(&reorder->lock);
+> +	spin_lock_nested(&reorder->lock, SINGLE_DEPTH_NESTING);
+
+[Severity: Medium]
+Is this spin_lock_nested() annotation still needed here, and does it split
+reorder->lock across two lockdep subclasses?
+
+In Linux, spin_lock_init() assigns a lock_class_key per macro expansion site
+rather than per C struct type. Historically, squeue->serial.lock and
+reorder->lock shared a lockdep class because both were initialized via a
+common helper __padata_list_init() (and padata_find_next() was moved inside
+squeue->serial.lock in commit 71203f68c774 ("padata: Fix list-related race
+in padata_find_next"), rather than commit 16295bec6398).
+
+However, commit af3852cda347 ("padata: remove __padata_list_init()") removed
+that helper and initialized the two locks at separate spin_lock_init() call
+sites in kernel/padata.c:
+
+padata_init_squeues()
+	INIT_LIST_HEAD(&squeue->serial.list);
+	spin_lock_init(&squeue->serial.lock);
+
+padata_init_reorder_list()
+	INIT_LIST_HEAD(&list->list);
+	spin_lock_init(&list->lock);
+
+Because squeue->serial.lock and reorder->lock already have distinct lockdep
+classes, acquiring reorder->lock inside squeue->serial.lock does not trigger
+a recursive locking warning on current kernels.
+
+Meanwhile, padata_do_serial() acquires the same reorder->lock at the default
+subclass 0 before calling padata_reorder():
+
+padata_do_serial()
+	spin_lock(&reorder->lock);
+	...
+	spin_unlock(&reorder->lock);
+
+	if (gotit)
+		padata_reorder(padata);
+			spin_lock(&squeue->serial.lock);
+			padata_find_next()
+				spin_lock_nested(&reorder->lock, SINGLE_DEPTH_NESTING);
+
+Won't annotating reorder->lock with SINGLE_DEPTH_NESTING in
+padata_find_next() while padata_do_serial() acquires it at subclass 0 cause
+lockdep to track the same physical lock as two separate subclasses, hiding
+lock ordering dependencies between padata_do_serial() and
+padata_find_next()?
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261102155353.1268=
+322-1-tristan@talencesecurity.com?part=3D1
