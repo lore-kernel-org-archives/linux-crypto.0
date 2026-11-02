@@ -1,57 +1,113 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793613501;
-	b=Ra/NfTr9X7IwI5P1GnkHIZCzU14099ETOg4w6UQN1hk4Ii4HdNjVSIAED39245FBaLx1
-	 i9QK7LEv5LfBKll27DUJzw64MPwDNcKbwYIeZs14Fj1JaDt0Qhyp8mS3W84XVSwx60WVz
-	 dsxNqT0tuo8YK5U9E1EGhpIErb241I8FEXudcofWTYTx00A9IzNaDmhSWOlFN/j5NzXur
-	 3vGSn87mnTvJFesHwpaf7cQWdttHzm1WSPIPruzGXXiM6ULNEL4eyZagwDdMYfUA9XbR8
-	 y6rL43ZGAPQZiMQ6ShILXP05YLaMhXlY3Y9FSKUDxmxq+1QA9v94g9jKZcir1w5Ordw==
+	t=1793618296;
+	b=PLbuCfGq3cXeeTHvzDWlM+2dnfNoT9Eb2gwjsCZ/9whg7BQubeOTSjUGj4IaBITEbwOD
+	 165IjsSuntiftsmlhGTFTddDDsLiZAh4BwGuP4Keb6SKBteYWtzccXpdNMVK5sjG+BlH5
+	 GJ0k308rxXXL6yRJwYl9isjjiJKfatAhM0zocp2JZ1ohjjbeRW9BaamIL1Iq/1F2o2AS3
+	 cahQv7s5BgWpxKQl0bFOtAvigr2obIAsw35MCo8lM+1inbpy3wkIndyn0imi3XucVmD55
+	 vDf8tCeZCrFmesZmcIM7RCOXTcg3W8wxWvPxt9SUMtiWikPztmdXDTi+xATNGUPNlTg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793613501;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=0tR0C5wrSJK8oL3NG4NwgFXSd1VItIjr967cGvPECk8=;
-	b=kL2A5JFG/9ssqyvW60Og5//TzMN0vxA2e4Mfw2pWhVVrDHKvSXTH4g2zW3X/4oGhtIvC
-	 9Fw5Pj4joGXLEfEx/UjdPpd/rx/2HvKRXESlFeD8rvRa1CQq7ydTttccFbcN+15MaWVih
-	 SWyTKkFRbxfy4JcyipLGhoL9+nRXEQvw5Ohsq7XSv64T1dSoOOoFTrKT/DYtiEupJFGFd
-	 xSLFG12zp7P0LPRTfc1dh9xbB1j+1O6E/ajK7ceGmkkuWuhqZ+RPKU3Ato/a5aCyFpC7Q
-	 T94S59QzTsc97xTtp8oCU4NmDYAdmN8zMz9bo4oYcfXIbF0pIOf5d2st4Wz5AMRAJbQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793618296;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:X-Google-Original-From:Date:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=1yynEp54ZHg/bAl3tECuL99Dgvavr9fresZi3o0Y1io=;
+	b=B6mIXYglk13ngimBPnwcf81V7vtJ+RMS5XqMH68VXjsrcrLk9Z3EPD6ExMCPwKDop62y
+	 iRrv5NPdJIySP5nctEzeXZ0sDME9ma5f1EjsuuRDKwYTPsGcDFDSK9XTBEREva/tkOaIz
+	 CC54jjN2j8vVzdaIKDB/mu/hXqKZyRoM4KlIGGU786Ce/83bdVcom2V6sX83BWTYnxgS6
+	 lpG8Nh9+6UGhGuFFBDBHEe90oN574ao5A+tKCKezCx7EaHhwz6S/T81NqVtj/3G7yZrbH
+	 fp5iX1TWOq5gIBrLm01lI0kTrIcPU25RLnPo00j66PUduq0uTlJdoCALszIJFZk/h/A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PjVLe1A7;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HLXOpm8E;
+	arc=none smtp.remote-ip=209.85.167.51
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6A2606A327;
-	Mon,  2 Nov 2026 09:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9630960A262C
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 11:18:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9630960A262C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PjVLe1A7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 874D61F000C1;
-	Mon,  2 Nov 2026 09:58:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793613500;
-	bh=0tR0C5wrSJK8oL3NG4NwgFXSd1VItIjr967cGvPECk8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PjVLe1A72Lan9Thr7mP0/FCl3sMiK9qhVNV/5ZyXPaBKA0S3mNHvWtbpkh1eSr9kx
-	 FV+F3hTy4o8DKlrNBuKmLvpNdrR1YJqyNn8HKalTBmOYmUQqC38jZcvZzBFdW91m9N
-	 wa/nWJ2FXpK1Dz6tzQotCzl+qlWLCduThKGq6GGdZNp9Xx0LdCArYW/c9QxlBwxbuG
-	 zP+lFp9tYIV4nTwXUpPEzC8H/M8EMQxPfXbpLCW/cChxAbuaIPFO/WBlJg9dMn38zv
-	 8ynzj7A3f/mvzea8xe2bcCgva73+PRHjSr5qITJOrN4ZlAkPzy7WLFMGnSVgxYjA2W
-	 L+CuNQaMQC4KQ==
-Date: Mon, 2 Nov 2026 10:58:12 +0100
-From: Bartosz Golaszewski <brgl@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, 
-	Eric Biggers <ebiggers@kernel.org>, Demi Marie Obenour <demiobenour@gmail.com>, 
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, Pankaj Patil <pankaj.patil@oss.qualcomm.com>, 
-	Birk Skyum <birk.skyum@pm.me>, linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Subject: Re: [PATCH v11 0/2] crypto - qce: make algos optional and remove the
- BROKEN label
-Message-ID: <kh74or65txfcprntqqljabnszooj5ppuwizj35flv2r245zbvo@nfue4wdblicr>
-References: <20261022-qce-fixes-broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HLXOpm8E
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5ba3ec92031so3843365e87.2
+        for <linux-crypto@vger.kernel.org>; Mon, 02 Nov 2026 03:18:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793618294; x=1794223094; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:date:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=1yynEp54ZHg/bAl3tECuL99Dgvavr9fresZi3o0Y1io=;
+        b=HLXOpm8ENVpkY58LUtPdSmKtWAjb0kBQBWUI9OSY32i0qu+IF4ZGEGl8hOjOUqBPwJ
+         qucTFrRAybe/WdWOvtPbOiR3zr+8hSiRo0D2S5QK8cF5RWRjPBVF4R6T74uwLPlEsVVM
+         M3R0rOY5sP5zynRjiyNvFXxxqVyQAX8KbW2aEA4Kj6gSaWYc3cwmgu+Ve63x6rVk8Bx0
+         fzeSkGIMJDt7Nd06VPOygUrVFuxvgrwQ3y/iplClvGv4nNyisUI58oXnw8xPB4oEP5iL
+         oo+WmRiIVTNz7nx4soa4rvaeUAeBf+nZ1MxJEyN2xjM1jKuXKT7Su6H2jP65P+FaAfQM
+         xkiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793618294; x=1794223094;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:date:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=1yynEp54ZHg/bAl3tECuL99Dgvavr9fresZi3o0Y1io=;
+        b=XwN+azw0MnCz9YbHp20bTAGHdW8fjC0XtlnfICzMXuxVYcgBzL4Zer4WAHVbyy1Qky
+         hRm4hMk1Uj8GzwfNFUhRwrzMmOkHd3SM53Z9HMwUAtcW5Z7PwQ6eb6Zck35Zku9UUU5O
+         bUF+ANYLBmclJb8YCIcsd5DGcPR18wJxNH0xQwhRRmcW4yL9OBXLQiEsW8KZ2TIKPyYp
+         jMi6QU8jF3s3mQ1uVTeLwQovVFRc/i9TYU6iP5D5dWIOlv79YPOfUhB27luyLIhLk2h2
+         e6yETwkKDjncL/Xy47jRfQ7R5H39s5BSzTCVdwrVwwoUSL67mnsboajxzzLu0MjyNXI+
+         9EbQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxP2XtoMijlpB8MQ4NAXHuHX7/6pi41yUDkhfNJl9GlljWbPGkhB4B3Q7uqGRZoBC0x/rbyntYYxCQf+xU=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/ipT38uFAdIZP8ifgtGn0AIiDzdjGDBxRrdIoTSz3STexuIPR9
+	0DTUrzd/Tpjhe+rf7hsNZKQyX/dOenuWo74XURc/QPdTdL6rvl5F8S32
+X-Gm-Gg: AYBFou2B0x78m7L7RTs5gJoeTcgvg8GiGC2ZL1Gcsn0HSZJYLv0sZtiBr8jW/dM/AxW
+	xd7LKPK5YHcO/umpNGDuF2fK47xZifhBcZUeHZtz4Ha95cAapJUJppe1TNpsdfQ2XYqa0sxHl3L
+	Cfcmw029P98opUi38Qbz2KyFrTvTlCosIvOQgfK6e2cOSPsCduCdc6pEPSdZ6GKXxxJG6eZewNZ
+	WeDbN1R5b9wnGZGVyAPK+xmDj2fH7RDxKc4bGcTv3g16jIOLUIDpuwGPGVJMqnt9u+8YubeRL8K
+	oidu1jiJIjZ/I1GZ3wWCCiCil6cTPeXB6hpCdfJrCO45ZQOVBwqy5QRvgu2QiidEUoLxhglQkup
+	GIWmy98FqnCko2xK0hBYZ9IBvI5WXpaWyO6dEGqJU7hzaxP8vCj9O3/fW2RB/RTw+E8NZwBzeuK
+	28HosqG/eeROopY+tfnojrATuEfpFXFkoK09j/H49UKK2x5ICs9hOQ0NiodpvvyKcUpAn+cq5OY
+	pVUfoZrPAsiPWek9DcMXQpDoTl3BB6ceaqoNxgJtpDusAXubvMi3Os49dYOsr7p4DaEtVGdpquI
+	zLMh8REadbIhBOoD7mhvGGHQZgZ899n/A+DLO1t/UhcjHGDMuTpnBQ==
+X-Received: by 2002:a05:6512:1392:b0:5bf:c9c7:eae2 with SMTP id 2adb3069b0e04-5bfd9596876mr3227650e87.66.1793618293591;
+        Mon, 02 Nov 2026 03:18:13 -0800 (PST)
+Received: from pc636 (host-95-203-3-139.mobileonline.telia.com. [95.203.3.139])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5bfe074168bsm1622248e87.63.2026.11.02.03.18.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Nov 2026 03:18:12 -0800 (PST)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Mon, 2 Nov 2026 12:18:09 +0100
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"Liam R. Howlett (Google)" <liam@infradead.org>,
+	Michal Hocko <mhocko@suse.com>, Baoquan He <bhe@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
+	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
+	"David Hildenbrand (Arm)" <david@kernel.org>
+Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
+Message-ID: <auhxcS4rtrPG3tVF@pc636>
+References: <20261028154218.1668182-1-liam@infradead.org>
+ <20261028154218.1668182-5-liam@infradead.org>
+ <auKshDXKQXt1kvjy@gondor.apana.org.au>
+ <auMbCuecFeRmBFSK@pc636>
+ <jfvq7vkx73vzp2ukq6nwnb3v3g2ezdcyppba4oa5lpzmz6ls6t@akc46gonndgy>
+ <auQhkHG6XlgNTdRr@gondor.apana.org.au>
+ <auRo5WBj2OlKlWGW@pc636>
+ <auTrzlSFCWNJYisW@casper.infradead.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -63,28 +119,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261022-qce-fixes-broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com>
+In-Reply-To: <auTrzlSFCWNJYisW@casper.infradead.org>
 
-On Thu, Oct 22, 2026 at 10:57:58AM +0200, Bartosz Golaszewski wrote:
-> This is the follow-up to the three smaller series fixing crypto
-> self-tests in the QCE driver. It makes the crypto algorithms opt-in via
-> a module parameter and removes the BROKEN label so that the driver is
-> built by default.
+Hello, Matthew!
+
+> On Fri, Oct 30, 2026 at 10:52:37AM +0100, Uladzislau Rezki wrote:
+> > The problem with spin_lock_irqsave() is that vmalloc() path can take
+> > time to alloc and map pages. I am not sure this is worth to switch to
+> > irq-save locking primitive. So this is the "heaviest" allocator in the
+> > kernel. Callers have to be careful how the call vmalloc().
+> > 
+> > IMO, this caller has to be fixed.
 > 
-> The dependencies are:
-> - https://lore.kernel.org/all/20261016-qce-fixes-sha-v1-1-3ee5a30d84f3@oss.qualcomm.com/
-> - https://lore.kernel.org/all/20261019-qce-fixes-skcipher-v12-0-046e6be9bd83@oss.qualcomm.com/
-> - https://lore.kernel.org/all/20261020-qce-fixes-aead-v12-0-77a2e09abd0c@oss.qualcomm.com/
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
+> Which caller, though?  Are you saying rhashtable_insert_rehash()
+> needs to call kmalloc() instead of kvmalloc()?
+>
+The problem is that we used to BUG_ON() in vmalloc if soft-irq or BH
+is disabled, i.e. for vmalloc it is incorrect state.
 
-Hi Herbert!
+See https://lore.kernel.org/all/69ff8c7c.050a0220.1036b8.000b.GAE@google.com/
+Two patches to address this:
 
-Gentle ping, can these three series + this one now get queued for v7.4?
-The three dependencies have no more sashiko comments. The ones for this
-one are minor about missing module params docs so can probably be
-ignored or I can send a follow up.
+1. https://lore.kernel.org/all/20260515153009.2296191-1-urezki@gmail.com/
+2. https://lore.kernel.org/all/20261026102503.30860-1-urezki@gmail.com/
 
-Thanks,
-Bartosz
+second can be updated and resent as it checks if the context does soft
+irq processing whereas it allows:
+
+bh-disable;
+vmalloc();
+
+forbidding this will address the rhashtable deadlock(discussed here) but
+this will just fail allocation because it is incorrect state for vmalloc
+and calling kvmalloc() for rhashtable will not succeed.
+
+i.e. rhashtable context should be fixed also. This is what i meant by
+saying: this caller has to be fixed.
+
+--
+Uladzislau Rezki
