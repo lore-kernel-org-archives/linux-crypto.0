@@ -1,89 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.225
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793602918;
-	b=GXSeDBAwuZLCKzBAfOKtJEpbXMKgsSg5FCUIGr/8f6g0xuheEw9RMR0FzFLxtLUP5gy7
-	 9La0f0KI+uQua+PCS58wSCjnfAUuivEdCUAa7XWWC5Ur0+tG982/OiUdtcsZcQHD3sf9a
-	 bsSr6DhNTat8w8UbX56c/6XYn+wAJMKMETvYeCvC6Urpu+LnSmnuJn7MUgApnKT+DQzCg
-	 Wv8AW5iZFerUsQ965SlSHHbA69i+mfYOasIAqkV3YC5v5+r5sP32bGVqtbl1E2hXo14ib
-	 iTKtKqp8h1/ElkTDwIdTbzZkNsw010038beB+u+2in12mNYFA/h77HeIsqeCRP4g7Iw==
+	t=1793604776;
+	b=zy5hVkar71IUO6CiARjom6HU/Agz97u9+8MKEPKXA6fX26veyPKiPr7K5SljJZFSzotd
+	 7HkDfgTCKGhcYL9YTZ8O1ul+idFpK5AaFSi5oSfNOyD3kVPgg06hjKkz9dgRFyKRbXIVY
+	 rFXptyAOXPYJFnE6xP2+j/qZ06SYTdgP8rtE1+IXARussXEdlqhgdaw6mOdriMrBRGw5K
+	 8/bcGR852nLibVflk425AOlp9enyE+i21H9lNShCQAYb9LrRF/mh6M7WuyEnzvd7Ar+bb
+	 0UgX5Y/eHAepYgXsw3IKAiwf48z5U5gPVTae6+5apVsoJFulUro9hn9hIj+tOHiBmXw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793602918;
-	h=DMARC-Filter:Received:X-Virus-Scanned:Received:DKIM-Signature:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=iAPIOenTPqHP2Ny+OdMrV89UeIqmPs8LpJjh/tMjUZM=;
-	b=so4Ap1Y+7tCEbKXMPyAzAO3j489H2feb3dS5TU+9/rVL5mrPx3EKLVypRh2zKPELahSd
-	 4OAPwEXAlM+FlPXrMmFAJwVF9GIpnDlA5UF1MRz+KRluhmpQ0I9LTGpN1x4Keo1MaW24J
-	 +44Hb6c+NN2GZzXTHa35QH9wNfwZZwChS0NqQk4XzgStFncwvIbKh9mMg6qtBR6e9QNK3
-	 QFY/10bD0rcKohU+TswP2yUN4txVYM+rDJhzyHyucmq7BK5+bcH/gYeUPuNAv7reNJMf3
-	 8AuPP2yVjtpE/SArYZWHHwetHrrUNavDtyEVLpNkgY8K4SsjNiEH/15kdX+GbaACYaQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793604776;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=AK/SgB0NJhyyMo/+uhJJDQ0snfVmLXzbzA7HTWtNTBs=;
+	b=jXaHYAHAXWenM8oBcMR4DP9SafHtegMu67n1SNUqdHVTlwA5DOQ8uHmWySzcrcRgLV0/
+	 Wp8VoFqc8tIs1m2R59xSuHmQ53b8hYYDSaykvBFH9dDTi9M7N/Q5JgWsheK52OjYaQqjv
+	 7m9j263HpPQZLUMilbEseUg/ac1jYEoTifMwsmY9CVopyca6ZSFM5FrWAmnN2zayyos9q
+	 lkGHmpT+XqU4sbfl0EueKF0nfDYKS8iiStujCvnJ86DmTBXHGpzI3CYaKq0qKIuFVG255
+	 56icrl/qRuPz+rHtajVzfnaC9canTc970px/7R0I0GVeOJ2zj3rgSRf4lbx0c11wLqQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=alien8.de;
-	spf=pass smtp.mailfrom=alien8.de;
-	dkim=pass header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=Wexv6Zcp;
-	arc=none smtp.remote-ip=65.109.113.108
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b="z/pehWdh";
+	arc=none smtp.remote-ip=113.46.200.225
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C058C606A324;
-	Mon,  2 Nov 2026 07:01:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C058C606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A9E606A324;
+	Mon,  2 Nov 2026 07:32:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A0A9E606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key, unprotected) header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=Wexv6Zcp
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 154E440E0184;
-	Mon,  2 Nov 2026 07:01:55 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id li8LNwrtJSLE; Mon,  2 Nov 2026 07:01:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1793602911; bh=iAPIOenTPqHP2Ny+OdMrV89UeIqmPs8LpJjh/tMjUZM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Wexv6ZcpPCkMgapkX25daR0HLzS4JjMaTW7WeUJHBqiV5ICvEI8g91SgoYrvua2Sr
-	 9pKYMHI6uZbaPI6iSjsx44gYHdBX77tMrVZ5W4Lr6wz5+SNzb8JJV5OkIQRcRGaxxC
-	 kqd0sDcKb9BiuQU6VYoZSS6WIzfSUOcShQQ1fHyHFHOAJy2LQW9tCZgvulrToHB3NI
-	 7npGOXZmhRr3OI/wmcoio5yRmX0ViNEscoexkVTt8NaPGuBP828U7D2yErHMOGl6eq
-	 0tDZHYxnEW0eaJ566Uc/LyNdLStyuJQBNbRC01TYnwSMFGbfAEDAxQhVHij2gK17I3
-	 c4xjc5KRsKejIgu+PD5gO0gr/8GlAJXWhCxdQfiFm03VkMvN3wQPybt+RrBrIemkfT
-	 /YtHah0kT9yJioZNPcUWFLpLkmwNuOcOgzZI6c5JUfeFOQR8s+gdvR2OXWoNX8vkKK
-	 RKHllfVnj2ohmITfTcH6TXylFhZyxkIaOqovstHy/x9oW/KukP5MWA3GNctvZOEfh+
-	 +R+PsTWZ5UWwy/rF1KyNzdkumT4zbDQA+gZsYGck5Gb9yOW6mq+e/QT4FDDANKZHGB
-	 GdeNrKVAOw4HGLPuVEUY357UvkcL8nvmRF8fEJ+BWPcpnwluX+kLnQc22jzt1o87az
-	 5Lbe4taVzs+H/RmTT7ecBYpw=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6358240E016C;
-	Mon,  2 Nov 2026 07:01:17 +0000 (UTC)
-Date: Sun, 1 Nov 2026 23:01:13 -0800
-From: Borislav Petkov <bp@alien8.de>
-To: K Prateek Nayak <kprateek.nayak@amd.com>
-Cc: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
-	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
-	Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
-	ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
-	rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
-	pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
-	dyoung@redhat.com, nikunj@amd.com, darwi@linutronix.de,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH v4 1/2] x86/sev: Clear RMPOPT when segmented RMP is
- disabled by firmware
-Message-ID: <20261102070113.GEaug1OQN7oEYDk9aD@fat_crate.local>
-References: <cover.1793216372.git.ashish.kalra@amd.com>
- <56da047d63b22f03a7e709fc172a5543da894d67.1793216372.git.ashish.kalra@amd.com>
- <20261102052841.GBaugfibOXxGorZKgq@fat_crate.local>
- <69ed0d93-f96d-4baa-a587-fade5a0a3262@amd.com>
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=z/pehWdh
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=AK/SgB0NJhyyMo/+uhJJDQ0snfVmLXzbzA7HTWtNTBs=;
+	b=z/pehWdhVRd/ELfMH/gt5hqXy00rS0mSKpMJfKKpoUb95Kz3+hvKZOcvSGcXpUCFCOFyeTo6I
+	O44kGYOmFW4yb8HA+sfsJmWg8arK1dkAdareBWdQ3WJGeKw2j35GImzfqDptOFrUXROU/JdNmN3
+	XSi3f3715y4lEoE7y1XpwCk=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4jJ3MD3sbDz1K97l;
+	Mon,  2 Nov 2026 15:32:40 +0800 (CST)
+Received: from whupemk300004.china.huawei.com (unknown [7.152.185.168])
+	by mail.maildlp.com (Postfix) with ESMTPS id 25E554056C;
+	Mon,  2 Nov 2026 15:32:44 +0800 (CST)
+Received: from huawei.com (10.67.174.33) by whupemk300004.china.huawei.com
+ (7.152.185.168) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Mon, 2 Nov
+ 2026 15:32:42 +0800
+From: Gu Bowen <gubowen5@huawei.com>
+To: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, Ignat
+ Korchagin <ignat@linux.win>, Herbert Xu <herbert@gondor.apana.org.au>
+CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<kexec@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>, <lujialin4@huawei.com>
+Subject: [PATCH -next] crypto: asymmetric_keys: verify_pefile: fix integer underflow in pefile_strip_sig_wrapper
+Date: Mon, 2 Nov 2026 15:49:34 +0800
+Message-ID: <20261102074934.2925339-1-gubowen5@huawei.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -93,26 +70,83 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <69ed0d93-f96d-4baa-a587-fade5a0a3262@amd.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ whupemk300004.china.huawei.com (7.152.185.168)
 
-On Mon, Nov 02, 2026 at 11:42:05AM +0530, K Prateek Nayak wrote:
-> On 11/2/2026 10:58 AM, Borislav Petkov wrote:
-> > Segmented RMP support is advertised via X86_FEATURE_SEGMENTED_RMP, and the
-> > firmware enables it via MSR_AMD64_RMP_CFG[SEG_RMP_ENABLED]. The latter can be
-> > cleared in platform BIOS by the user, in which case the system runs in
-> > contiguous RMP setting.
-> 
-> nit. In the latter case, SNP is disabled entirely in bsp_determine_snp and
-> the system won't continue with contiguous RMP.
+The pefile_strip_sig_wrapper() function validates the win_certificate
+wrapper that precedes the PKCS#7 signature in a PE binary.  It checks
+that the wrapper length does not exceed the certificate table size
+(``wrapper.length > ctx->sig_len``) but fails to verify that the
+wrapper length is at least ``sizeof(struct win_certificate)`` (8 bytes).
 
-Ah, true, good catch.
+When a crafted PE image supplies a wrapper with ``length`` in the range
+[1, 7], the subsequent arithmetic::
 
-Thx.
+    ctx->sig_len = wrapper.length;      /* e.g. 1 */
+    ctx->sig_offset += sizeof(wrapper);
+    ctx->sig_len -= sizeof(wrapper);    /* 1 - 8 = 0xFFFFFFF9 (unsigned) */
 
+underflows the unsigned ``ctx->sig_len`` to a value near UINT_MAX.  The
+following ``sig_len < 4`` sanity check is bypassed because 0xFFFFFFF9 is
+greater than 4.
+
+The underflowed ``sig_len`` is then passed to verify_pkcs7_signature()
+and onwards to asn1_ber_decoder().  The ASN.1 decoder's own
+``datalen > 65535`` entry guard can be satisfied by constructing a
+PKCS#7 length field of exactly 65535 (e.g. ``30 82 ff fb``), allowing
+the decoder to proceed and attempt to read OID octets beyond the
+allocated vmalloc buffer, triggering a page fault in look_up_OID()::
+
+  BUG: unable to handle page fault for address: ffffd1e986cb2000
+  #PF: supervisor read access in kernel mode
+  RIP: 0010:look_up_OID+0x14/0x100
+  Call Trace:
+   pkcs7_note_OID+0x33/0xa0
+   asn1_ber_decoder+0x363/0xbd0
+   pkcs7_parse_message+0xd9/0x1b0
+   verify_pkcs7_signature+0x24/0x80
+   verify_pefile_signature+0x7b/0xf0
+   kexec_kernel_verify_pe_sig+0x1b/0x40
+   kimage_file_alloc_init+0x1d8/0x3f0
+   __se_sys_kexec_file_load+0xc6/0x270
+
+This is reachable through the kexec_file_load syscall on architectures
+that verify PE signatures (x86 bzImage with
+CONFIG_KEXEC_BZIMAGE_VERIFY_SIG, arm64 Image with
+CONFIG_KEXEC_IMAGE_VERIFY_SIG), requiring CAP_SYS_BOOT.
+
+The oops occurs while the caller holds kexec_lock; if the faulting task
+is killed, the lock is never released, leaving all subsequent kexec and
+kdump operations permanently returning -EBUSY until reboot.
+
+Add a lower-bound check on wrapper.length before the subtraction to
+prevent the underflow.
+
+Fixes: 09dacbbda935 ("pefile: Strip the wrapper off of the cert data block")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gu Bowen <gubowen5@huawei.com>
+---
+ crypto/asymmetric_keys/verify_pefile.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
+index cec99db14129..cfa85ccb1cf7 100644
+--- a/crypto/asymmetric_keys/verify_pefile.c
++++ b/crypto/asymmetric_keys/verify_pefile.c
+@@ -146,6 +146,11 @@ static int pefile_strip_sig_wrapper(const void *pebuf,
+ 			ctx->sig_len, wrapper.length);
+ 		return -ELIBBAD;
+ 	}
++	if (wrapper.length < sizeof(wrapper)) {
++		pr_warn("Signature wrapper too small (%x < %zx)\n",
++			wrapper.length, sizeof(wrapper));
++		return -ELIBBAD;
++	}
+ 	if (wrapper.revision != WIN_CERT_REVISION_2_0) {
+ 		pr_warn("Signature is not revision 2.0\n");
+ 		return -ENOTSUPP;
 -- 
-Regards/Gruss,
-    Boris.
+2.43.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
