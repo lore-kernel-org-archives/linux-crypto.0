@@ -1,64 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793581700;
-	b=pRa5QntsLsiQDWIc9cFshXY0ClgIPjQI1pomWM5PJdPnOViwtZ1KY+fTs7H3IOLl4g/T
-	 noryPDoVkGcW2mi37C44j3VOukHPoTup4Df8KCAy/nCEPxDUbATVnyLwHcYizgU95QGI1
-	 tNo4BDgX+qHx63GRz7Q4SzXacOUQ0Zqdnzw/xjjUHLtAgtWhLeFHJjt99OQmnK/Mfr6Ik
-	 ir3YAHRspBfQy4oLLg/eiM/KEWyFYreRD5YXZBQtWqyN/PhxeTRegpKsA4mJkwQo2JE0A
-	 IK0HSg3c8lq1kWNED4zmBTTeBhEMlNWZc8eP3QIpl4eUFSXLdH8quL+hk8dT1nrt5Nw==
+	t=1793582583;
+	b=GV/uXFxioa7xkLoT/G6dDc6nPMHRrut7ig7FD1atCLNcm0MBQy7GJ7cHwBEVrMjL9PCF
+	 X9Xmv1gZUAUer1iXKhoIFvBYtwCMry6EWjGKUjrcH7KhjM/tPlERdshB/GGq6qR5nSDMz
+	 9PYq9AtClzNBXDYOMznTsBykpKQNgUEg90omDU6xA6zee9KfALQTe9VfytFQOLDv03s0w
+	 LES0wmn9hEPjofttDO1mLndS0XWk5HQ5tT1HwPHu6tOt3z65UKajooLhZv+vrgn3JFiPF
+	 9wSUem9XMGKyNC8WHOte0K7j9iU8AaTec8nD4QMhE7eDdbNJdD7ioFmK/RsFlBNB4mA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793581700;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793582583;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=veR8q9v0OA1Q+QVhyvn39Itk2zf2DJACfdZv5+IibhY=;
-	b=G7znGgOebKscp47L6gUnjPM8lNpbfTUxJc5CbJJBWKLYKhmot+Uy94d1sIbt2o467pHA
-	 T5N7mJ7s5mPN8POkoV+7sug8T2GGd9qyVylx7H81m0Xsczb6BoOEaPZizJM1YrcFkvU3e
-	 4FIZ2sEglr7ncOfr47BVC0myqUcJn/DRBbcv4ZAhvVV5anWaC7j58FLtq9400DT1jDWzP
-	 aDaF5q8k11jzwb52GkK5ewhKyIlGouAcKlDL/B5Ti5MCMmDTx4arZwdCBHmQKR40zIOMM
-	 +5tW5ZvsfDC6E22ldc9peTuCPoaTLQ8dQBz8wd6q62+okPoUPBLDXvEQHf9LpWmPv3g==
+	bh=6vkcbO3vU90BX7fhYTtlK6Zz0qwp7+sMSXT/zTqq1BU=;
+	b=XqxuHkufHDLzdc2KYfRAP+2AkW4g6l/YpwQGDt6t7upLas5buljvWzsyfAUu9Wm5XhuO
+	 0fXQfe9dlD+/Vyzwd2HK/U2vR+oGEbP7r1R0fk0mqkM8cO0ld5wGwRnRHDBN85O2r/lq5
+	 EPuJgCLC8cE5cBj+7ZBYez3F4ofW0Y35DJHJgMfnIlvjmgBAhgtNK8U3NSupMbLSJ4Frp
+	 nHIm6NYCjdZ4MfXifq9USoWoM8AXD+UJZKpybBrTJ6n9R8hcq0DxnMwSvqdSZvkAQumrt
+	 779UYse74kBNLAZAfM76OjDTgqL+n/MQ29j72yBE01qHQN60aT1ZgBsCq9AqixifX7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TWhyC73b;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gbE2Puw4;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id D1655606A326;
-	Mon,  2 Nov 2026 01:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C4F606A326
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 01:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TWhyC73b
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id D748A1F000C1;
-	Mon,  2 Nov 2026 01:08:18 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gbE2Puw4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1196F1F000C1;
+	Mon,  2 Nov 2026 01:23:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793581699;
-	bh=veR8q9v0OA1Q+QVhyvn39Itk2zf2DJACfdZv5+IibhY=;
+	s=k20260515; t=1793582583;
+	bh=6vkcbO3vU90BX7fhYTtlK6Zz0qwp7+sMSXT/zTqq1BU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=TWhyC73bKY1y4jAAwZH9MuvbegRenyAHqF4o3GT0HjMTOU0rk8Z4hvYfxKctuMKjH
-	 BhZzekKFm5QUEhqXjH9qmLxWszWq3h+FHpG1l/J+F624Vp6VnZMrxNyetEwMc2sG72
-	 B8M8aMChgQEXFZeJET0ny182ZQIFxnjQCnOR/21Y17z1wm4QXvTXiWohgXB6/Nm5xJ
-	 oxuE+BY2R83st8jlMcNLag1m4C/MS3LvGAN/3iDVX9cXFKvCMrS3eqbJTNebKmby85
-	 nTC38KBE7XuDgFgO1w7zm36lWVKL78w5VHeSWTjv60UJCtAEBSuOM3hIciDGPrHzlV
-	 q3LHgzmc7WMNw==
-Date: Mon, 2 Nov 2026 03:08:15 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	"open list:ASYMMETRIC KEYS" <linux-crypto@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>
-Subject: Re: [PATCH v4 2/3] KEYS: Replace assoc_array with rhashtable
-Message-ID: <aufif6uG43-qMFM6@kernel.org>
-References: <20261029232437.2581640-1-jarkko@kernel.org>
- <20261029232437.2581640-3-jarkko@kernel.org>
- <20261101232149.GC2689@quark>
- <aufTcqW-DTB9Ofai@kernel.org>
- <aufheZ9mR0rWqicW@kernel.org>
+	b=gbE2Puw4nLZ4lmz0Sq7bLEk3hNB+dJG3oXYR1tm89wIhBrULa4mzE9Q8cDG+9powr
+	 4r183/34l8aVlGDUWLzfoLL4UiYnQMmfI2mDnprmdT24JakyxUM2FNMdJ7xsFD/obz
+	 C50unzgUyCyjYZ8vZC9wel/G/keK5jD1fypIKLzMDBpsOsEtPgPIPkB9UxkwxUwLMY
+	 hi2c8WQTQHrSMBcGZ8ePRqTSIbPRw3UNjHIzCZ1ugMtee7QyISYrehL2R14gXImgi1
+	 E+ieMh6n/I1GGwp+B499NyVMWpCewRr35v+8fugCsoymK13pjQKEzijpda68f1tAzl
+	 XJUVVvfoyEHag==
+Date: Sun, 1 Nov 2026 17:23:01 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH 00/14] crypto: Remove the unnecessary crypto_rng API
+Message-ID: <20261102012301.GA4764@sol>
+References: <20261018204618.104876-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -70,13 +57,12 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aufheZ9mR0rWqicW@kernel.org>
+In-Reply-To: <20261018204618.104876-1-ebiggers@kernel.org>
 
-On Mon, Nov 02, 2026 at 03:03:57AM +0200, Jarkko Sakkinen wrote:
-> Hmm... and rhashtable_insert_fast() can cause transient -EBUSY, which
-> is probably acceptable.
+On Sun, Oct 18, 2026 at 01:46:04PM -0700, Eric Biggers wrote:
+> This series applies to cryptodev/master commit 666d66df25253
 
-Or actually: is this acceptable or not? A small detail but I guess it
-makes sense to address this properly.
+Now that the merge window is over, it still applies to mainline
+(v7.4-rc1).  So I assume there's no need to resend this.
 
-Br, Jarkkko
+- Eric
