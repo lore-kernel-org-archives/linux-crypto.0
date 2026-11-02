@@ -1,73 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793611016;
-	b=Gi6oyaat7VKB/rV4XfjINTxUiQv7wBjbKuF6mujIXoOgT2jbwnwzekjfV/09jtt8Xd1u
-	 JB7cVFEpSFB/ycMiUdh9l+Obc3M/7PUaxuR2EWqPp8KJtsZpWLUUORtpwnMVAJ4qYcGBf
-	 G+C4xtfCUweuKzWdgesAxob/y/UGlr7dQeqcDRvn3YHypYQHHRUbUwp8QSkEkb3TzhgoR
-	 KtSqVqqDjtlt92oYyYrGIal9gJkYpwNGduQYMgyZkS/tC7OmDAbC/uBP0U8N13GVtQz5d
-	 RTorsP+3lYtlZvGO+4cj4lwHMRrlx4ecWYFraTqsb+iNXOU++rNCrJFL3YCWvZ/ncMA==
+	t=1793613501;
+	b=Ra/NfTr9X7IwI5P1GnkHIZCzU14099ETOg4w6UQN1hk4Ii4HdNjVSIAED39245FBaLx1
+	 i9QK7LEv5LfBKll27DUJzw64MPwDNcKbwYIeZs14Fj1JaDt0Qhyp8mS3W84XVSwx60WVz
+	 dsxNqT0tuo8YK5U9E1EGhpIErb241I8FEXudcofWTYTx00A9IzNaDmhSWOlFN/j5NzXur
+	 3vGSn87mnTvJFesHwpaf7cQWdttHzm1WSPIPruzGXXiM6ULNEL4eyZagwDdMYfUA9XbR8
+	 y6rL43ZGAPQZiMQ6ShILXP05YLaMhXlY3Y9FSKUDxmxq+1QA9v94g9jKZcir1w5Ordw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793611016;
-	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
-	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type:Content-Transfer-Encoding;
-	bh=fEH04FadFLQr70qSIXqkoae8wjtrp3fBYKrHpNz6edo=;
-	b=NGtoaS0x6jtJEG+fcM05nz0+BbrIp7/MKF8bvPtboGJPiLW55tEsFODKozt7MAFpzOAL
-	 8aBlbzhe5tdP4B48SnZluspr8RG9FQB0BEBKVC/w7N7xv0M9WUwkxqvo31UUF4bIGWv96
-	 YMMNh7o77n8it6EpTTyZz0nT9xlZm6qKFlh/l8WuKJzxRwedbF1HiYpV61oE/HQWg8Gvg
-	 ICGQXLLMbbwqXDWTE2i+6q/xqWdvzzHQaiqeEJor4yPUtE5R9duuc4eKmXjv0ZgjaSXCe
-	 JnF3MnhEkfsJ7Zs3u60C9KXtdwK3pFkEAdGR+wN2JtQCuNEXon5tTyxBqVWXSde5XnQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793613501;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=0tR0C5wrSJK8oL3NG4NwgFXSd1VItIjr967cGvPECk8=;
+	b=kL2A5JFG/9ssqyvW60Og5//TzMN0vxA2e4Mfw2pWhVVrDHKvSXTH4g2zW3X/4oGhtIvC
+	 9Fw5Pj4joGXLEfEx/UjdPpd/rx/2HvKRXESlFeD8rvRa1CQq7ydTttccFbcN+15MaWVih
+	 SWyTKkFRbxfy4JcyipLGhoL9+nRXEQvw5Ohsq7XSv64T1dSoOOoFTrKT/DYtiEupJFGFd
+	 xSLFG12zp7P0LPRTfc1dh9xbB1j+1O6E/ajK7ceGmkkuWuhqZ+RPKU3Ato/a5aCyFpC7Q
+	 T94S59QzTsc97xTtp8oCU4NmDYAdmN8zMz9bo4oYcfXIbF0pIOf5d2st4Wz5AMRAJbQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CK48mHEu;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PjVLe1A7;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C057606A324
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Nov 2026 09:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6A2606A327;
+	Mon,  2 Nov 2026 09:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CK48mHEu
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FAD61F000C1;
-	Mon,  2 Nov 2026 09:16:55 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PjVLe1A7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 874D61F000C1;
+	Mon,  2 Nov 2026 09:58:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793611016;
-	bh=fEH04FadFLQr70qSIXqkoae8wjtrp3fBYKrHpNz6edo=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=CK48mHEuAw2z5AiPE195/y1wZdBnYnfifL1/2380Ahq0UzIj0reYpdTO2v1bj0MWY
-	 q5BafRGaFQRI/UhDkyb7J4pwIcXT+jsThwZByampTjKBY3UQV1GxS78bEZTEz/TJl9
-	 cHYLaodFY3iO/hDjt1ZILxDXTJQOQKQA9LpvYiO52Ypi/600JT3xGRTw/c6e9aSa7T
-	 ayBG4rMXFMIKb4DmejSoRhvH5dibMc8B10WCwKhSTlt4AxzEGDPv8aA/csteXGevuL
-	 f7fughsTKPn1KzMLBCTqmcVWbYhRNlvDDFZjUipiDnndIAfp7ooqK/MAnxhhAWgz6h
-	 LXBquBpWKodQg==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id DA40B198003A;
-	Mon,  2 Nov 2026 04:16:53 -0500 (EST)
-Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Mon, 02 Nov 2026 04:16:53 -0500
-X-ME-Sender: <xms:BFXoamLnvbGyrU59mAcCHmqGQ7N9zoHX93Ag6I9XL2E3dSs-EOkNbg>
-    <xme:BFXoao9kpHGLBq78vGV_2okHthv-yVOg5k9bIrSKQUJSJDcjXHPrzkqkYl3PrjT6X
-    3I73wThezmk3m57oGChRIU-pMZ6nXHtdgrR_N87q_Mr678TeNjuOyG0>
-X-ME-Proxy-Cause: dmFkZTEGuTs347uE1l326fUoY9XVM2teM7miInQD8/2T3S2SZxx4Y4ZkIYo63FTkItv5dH
-    j9xwQxn1IeInhs0cUss0gbVSMJTA0wqsPtz9Q/rRmvEy+5Qip4zKDVL0WNZr5hECebULgB
-    rAuuHcdG/HzlrG9gHd7wK22CoYBSJAPdH1oUjuI7QQueY6KqXQ2MEZNfwWD9bRbUjZjPsX
-    v96y1tjwOU1PgCO4n4WvvYt2WuME8iNzTV9EqZmTr7vFnHuRMhGtrTeUFCuQvp/PcfVFho
-    zLlnLlAhqVVepagsF5jFQHE9Mgb3N40Uh6oH8jj9w9HbSQlTsDtgIf8yeXAx2eZuys8wp9
-    A02TwVv0CtJz5hQgA+zoa3dJMbFeTl+5Txu2+s1L8/ATEhT5jpRAQedXiOrGIbOw0JKPmt
-    l0u8YWhHq4SV3GRLHg5mULkSNRK+ojstWKyBjjcv0jL8nBMlgNCwSuqZ+8BeJYuGIswfe8
-    Mhc1FqPvRAZkpiLMA0iuOTdbHJFhdpvB14uLiVhaUjxUJLu39Y8x+FGZt0MPWiqsLFQWFH
-    IDiqpGigezlqTHxISFa44UnBBXaW5O8CXqFM1C/35b2dM38S8SlmMb5plRd45dt9UqeVjx
-    qZv2BsePBDIPC83JRUrqWTHpZHlfKnVz52x9/3ATu3IYY7d3aAGU+REbs5mg
-X-ME-Proxy: <xmx:BVXoav1ax-9TnN0UREBNr8_RO5SZiutHtOAoWQk6wajBqKnd40R3fw>
-    <xmx:BVXoak_yCZZNEyzJmy-clxFHfHGRDgeBbh4_4AmFOHXXNMY7Jma6dA>
-    <xmx:BVXoaoO41Vf3j36ovcO-fuPxe0aFsRqTlKyLTL5eTzWOX56OE4el0w>
-    <xmx:BVXoagdsKqJIzE1_GuG4kGCcPk0E1H6guWh0cMZCjL7SoqZS818NYg>
-    <xmx:BVXoavUFqAaYk3O7nLmdtkmzj9GUlfcpJGOlMzehhv9TzY_fwMH6K1M3>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 9DFF9F8008E; Mon,  2 Nov 2026 04:16:52 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=k20260515; t=1793613500;
+	bh=0tR0C5wrSJK8oL3NG4NwgFXSd1VItIjr967cGvPECk8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=PjVLe1A72Lan9Thr7mP0/FCl3sMiK9qhVNV/5ZyXPaBKA0S3mNHvWtbpkh1eSr9kx
+	 FV+F3hTy4o8DKlrNBuKmLvpNdrR1YJqyNn8HKalTBmOYmUQqC38jZcvZzBFdW91m9N
+	 wa/nWJ2FXpK1Dz6tzQotCzl+qlWLCduThKGq6GGdZNp9Xx0LdCArYW/c9QxlBwxbuG
+	 zP+lFp9tYIV4nTwXUpPEzC8H/M8EMQxPfXbpLCW/cChxAbuaIPFO/WBlJg9dMn38zv
+	 8ynzj7A3f/mvzea8xe2bcCgva73+PRHjSr5qITJOrN4ZlAkPzy7WLFMGnSVgxYjA2W
+	 L+CuNQaMQC4KQ==
+Date: Mon, 2 Nov 2026 10:58:12 +0100
+From: Bartosz Golaszewski <brgl@kernel.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, 
+	Eric Biggers <ebiggers@kernel.org>, Demi Marie Obenour <demiobenour@gmail.com>, 
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, Pankaj Patil <pankaj.patil@oss.qualcomm.com>, 
+	Birk Skyum <birk.skyum@pm.me>, linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
+Subject: Re: [PATCH v11 0/2] crypto - qce: make algos optional and remove the
+ BROKEN label
+Message-ID: <kh74or65txfcprntqqljabnszooj5ppuwizj35flv2r245zbvo@nfue4wdblicr>
+References: <20261022-qce-fixes-broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -77,74 +61,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Date: Mon, 02 Nov 2026 10:16:32 +0100
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>
-Message-Id: <bea12ae0-ac2d-40f9-b5a9-8836e3be4122@app.fastmail.com>
-In-Reply-To: <20261031042637.68815-1-ebiggers@kernel.org>
-References: <20261031042637.68815-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: poly1305: Hide the mask value from compilers
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261022-qce-fixes-broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com>
 
-
-
-On Sat, 31 Oct 2026, at 05:26, Eric Biggers wrote:
-> poly1305_core_emit() does a constant-time select between h and h - p,
-> where h is the accumulator and p is the Poly1305 prime of 2^130 - 5.
->
-> The mask used in this select isn't hidden from the compiler, though, so
-> the compiler can infer that it's either all 0's or all 1's.
->
-> In theory, the compiler could then use that to recognize the select, and
-> "optimize" it with a branch.
->
-> Fortunately, in practice, I couldn't find any gcc or clang options that
-> made that happen.
->
-> Regardless, add OPTIMIZER_HIDE_VAR() to "hide" the value of the mask for
-> safety against any future compiler optimizations.
->
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+On Thu, Oct 22, 2026 at 10:57:58AM +0200, Bartosz Golaszewski wrote:
+> This is the follow-up to the three smaller series fixing crypto
+> self-tests in the QCE driver. It makes the crypto algorithms opt-in via
+> a module parameter and removes the BROKEN label so that the driver is
+> built by default.
+> 
+> The dependencies are:
+> - https://lore.kernel.org/all/20261016-qce-fixes-sha-v1-1-3ee5a30d84f3@oss.qualcomm.com/
+> - https://lore.kernel.org/all/20261019-qce-fixes-skcipher-v12-0-046e6be9bd83@oss.qualcomm.com/
+> - https://lore.kernel.org/all/20261020-qce-fixes-aead-v12-0-77a2e09abd0c@oss.qualcomm.com/
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 > ---
->  lib/crypto/poly1305-donna32.c | 1 +
->  lib/crypto/poly1305-donna64.c | 1 +
->  2 files changed, 2 insertions(+)
->
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Hi Herbert!
 
-> diff --git a/lib/crypto/poly1305-donna32.c 
-> b/lib/crypto/poly1305-donna32.c
-> index 5977785cd76e..73fe9181296c 100644
-> --- a/lib/crypto/poly1305-donna32.c
-> +++ b/lib/crypto/poly1305-donna32.c
-> @@ -167,6 +167,7 @@ void poly1305_core_emit(const struct poly1305_state 
-> *state, const u32 nonce[4],
-> 
->  	/* select h if h < p, or h + -p if h >= p */
->  	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
-> +	OPTIMIZER_HIDE_VAR(mask);
->  	g0 &= mask;
->  	g1 &= mask;
->  	g2 &= mask;
-> diff --git a/lib/crypto/poly1305-donna64.c 
-> b/lib/crypto/poly1305-donna64.c
-> index d0e4234c1c4c..402a3459ca49 100644
-> --- a/lib/crypto/poly1305-donna64.c
-> +++ b/lib/crypto/poly1305-donna64.c
-> @@ -152,6 +152,7 @@ void poly1305_core_emit(const struct poly1305_state 
-> *state, const u32 nonce[4],
-> 
->  	/* select h if h < p, or h + -p if h >= p */
->  	c = (g2 >> ((sizeof(u64) * 8) - 1)) - 1;
-> +	OPTIMIZER_HIDE_VAR(c);
->  	g0 &= c;
->  	g1 &= c;
->  	g2 &= c;
->
-> base-commit: 2a500a04d6f969318c05f46aedb6e73fc1963a00
-> -- 
-> 2.56.0
+Gentle ping, can these three series + this one now get queued for v7.4?
+The three dependencies have no more sashiko comments. The ones for this
+one are minor about missing module params docs so can probably be
+ignored or I can send a follow up.
+
+Thanks,
+Bartosz
