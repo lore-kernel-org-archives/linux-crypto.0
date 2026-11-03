@@ -1,61 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=5.75.144.95
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793705837;
-	b=mb7qNnsnxXPKDFpsGqzV5cdUWuTOhEWVw+bxL6CDbFCNz1aw6Dp7el1rhFy45UCg716W
-	 ythgurzhsSvHcySkat6CQoVsGSAdI8KA160/YzA+iH60GUggmj+pXijH3Cs0eHm5JKoOg
-	 ypcQyGthPa5qXmC6AMXWXXWAsS/n+2xMepC2TvFy9eKeTGShkwmGS7R1vGp7HcsTREQej
-	 rifo5up20lZcY1nKZ1ypumYVpbqzC5DtWCKiGdRt/fkRVlgEfhvjqz+RmzSWPAeuWlmQL
-	 ApMqzYFF135Mlba9Hq8X6n1qRwefr26fmm4qlLSBgyGnj1/zgrmyOZ5vvKR5FUBBMMA==
+	t=1793708915;
+	b=BFEHJT17tRnjg/Nh/4YFArO53bXnB1COBO4IeyQkB12YVaJ2bCB2m5aKssX8AKY+w9oH
+	 AU/yvsFYsRA487/+FV2USbLHVVGwU4PK/lvSbntf8teh3A0e75Saq3BEQiBnpplJEdJ/F
+	 66NPJCKQOQ9Xiz5LebwRwKuN/SnZEyFEKskevgyJbA/l2qNCtJerCGcGq1qFZslaDziY2
+	 IKdoCKHwN/F6qSQaA8T1G9+Q/VL1oTQQO5QinBocjrHqNoz9pJSoUvb7ZyeADZoAs8phx
+	 T8Q1/O4h+2gidt6/0A9p0jdTgM3yut9cgsidgfQxRfQBmR9ChI3SrBoChjn3+jL/mXg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793705837;
-	h=DMARC-Filter:DKIM-Signature:DKIM-Signature:Date:From:To:CC:Subject:
-	 In-Reply-To:Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=pJdbATKNC3xFtCfDJQB9vkk9sNbtSPHMZ0TwFiWOJ7c=;
-	b=AwkUqgAqiKIahzJvmnsBYvg4hOuvnA9NcRhggH+w53e05GkCAB4TAu0G2jwv+Ss9U1L3
-	 /wZ9kHUcx7XyAhsvvNzU/Mv5OrsGaaVU9qG3trPwUDbpqKkXQT9WwLhXnwjDIVifMTOLu
-	 YCQNqFb9FFtWtG8vcYO22z9UFaVNlHJ2LTVeG4aEqu9hIFdHTn2L3ix0jk2kSCWGlYwyl
-	 zI7+00iVwUQo4djaG5cL8YFKUhyZOvy4e5SMcHkCOEUmTtHXaK9Cp9nOhK4o2Jvc+dKQ0
-	 0MIP6ryb9pbn/vE2InKJK71fyrKGLdL3cluh4QFS9XawRE/wBppj8i2jXymRu1z6M5A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793708915;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=tzXxdVEyLXVO2/FV72+l5Df+V+BelTThZGSFGoey7bI=;
+	b=EVwVCfdFGgmNQ/0mhAtpIzsDumo4wB6Pygn9IVumurmamAiLuOCvyB5ZbZojPXsRjdOn
+	 nzK7O/qSJQPM0CHFTLKIafBOsDXI1dBeP84AOEsz0R5N8wNjLf4QqbYKuBOFwjAzsAkyT
+	 DdgiPkDseGaAOLeMfNvpUd1hbIg9ULk3CEpr9/ulLKHgeapRCbV296KyKZCtDBeZX0IJd
+	 Lg9w09tPa2Kbn3b0rcfN9EO7ff7jV8cMRxqx4HvG/GaP1HwZlAEOX5PABNp3i2v9XmBSj
+	 fOU4x5UYXTZcyJsMRshlFncIvesGKINU77WTFjemHGaoZZ3uTn0mrmbjv42ABnHGt1w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=mainlining.org;
-	spf=pass smtp.mailfrom=mainlining.org;
-	dkim=pass header.d=mainlining.org header.i=@mainlining.org header.a=rsa-sha256 header.s=202507r header.b=lHiadR+T;
-	dkim=pass header.d=mainlining.org header.i=@mainlining.org header.a=ed25519-sha256 header.s=202507e header.b=wTGgPEtI;
-	arc=none smtp.remote-ip=5.75.144.95
-Received: from mail.mainlining.org (mail.mainlining.org [5.75.144.95])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gzz3Dc8e;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85840606D811;
-	Tue,  3 Nov 2026 11:37:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 85840606D811
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mainlining.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mainlining.org
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id AEB70606A324;
+	Tue,  3 Nov 2026 12:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=mainlining.org header.i=@mainlining.org header.a=rsa-sha256 header.s=202507r header.b=lHiadR+T;
-	dkim=pass header.d=mainlining.org header.i=@mainlining.org header.a=ed25519-sha256 header.s=202507e header.b=wTGgPEtI
-DKIM-Signature: v=1; a=rsa-sha256; s=202507r; d=mainlining.org; c=relaxed/relaxed;
-	h=Message-ID:Subject:To:From:Date; t=1793705783; bh=pJdbATKNC3xFtCfDJQB9vkk
-	9sNbtSPHMZ0TwFiWOJ7c=; b=lHiadR+TAxE9SrsaaXl3dXKVyUlNHidUFfr7QSKqajBmoPff6A
-	BytLHljGtOqVWwrTMJDVK2cb3CewfHu9gm4VDwtTeTs2amksQLofQV2rLrZnkmMEmudsxz9pjq1
-	c9zujwW5pQW+n1ULSkL70wO0zGunyK8xpHDRCsMRq/BWT3wv/Fd7rYsaPVDgfvzfBW/5MxV4GKX
-	K46AFJz5bo5c1hYsTbWlLXdD1b7ndiQbXqwFEcLHTwpcEvWqfXSoIPef8E2uPcE2ivaGT987AcI
-	wZaN5GoEuiY8uHl+eXmc9pRl3WztkWGdfxW3OC9BZ3T+ZNZEkMjrhLMtj8CJFzFL2Vg==;
-DKIM-Signature: v=1; a=ed25519-sha256; s=202507e; d=mainlining.org; c=relaxed/relaxed;
-	h=Message-ID:Subject:To:From:Date; t=1793705783; bh=pJdbATKNC3xFtCfDJQB9vkk
-	9sNbtSPHMZ0TwFiWOJ7c=; b=wTGgPEtIZQD0PD/uZORSMKWgmhRLAlKfldIhszVbev+oKnB4Dw
-	UhEeHcleZMraOr0kR72qxkq19tdMkGkAPBAw==;
-Date: Tue, 03 Nov 2026 11:36:24 +0000
-From: Bradley Morgan <brads@mainlining.org>
-To: tristmd@gmail.com
-CC: daniel.m.jordan@oracle.com, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, steffen.klassert@secunet.com,
- tristan@talencesecurity.com
-Subject: Re: [PATCH] padata: fix lockdep warning in padata_find_next()
-In-Reply-To: <20261102155353.1268322-1-tristan@talencesecurity.com>
-Message-ID: <9BC449D3-C881-406E-87AA-F023C1A864F8@mainlining.org>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gzz3Dc8e
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id C06101F000C1;
+	Tue,  3 Nov 2026 12:28:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793708914;
+	bh=tzXxdVEyLXVO2/FV72+l5Df+V+BelTThZGSFGoey7bI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=gzz3Dc8eQN7SGupVnRsWtaQfdhOfTHCRgsu8krzfPuhn70ZtBNbQy3vEPEPTvyeqk
+	 dHSSzy05TO4trP+bPXcvYWlP3Tom+tRRxh4tevtlcx10WNdE8wg61ka8obdu+MHXPD
+	 xHycSxCsVorPtyQErm0fAg2zqcEJ1/xZBupOqfBQ1khKizhTCpFsoBeU/Ol5uOVaEJ
+	 mEnui+LUdHKOgIDMrQ1QM8NJlcYfdUA9d97l4k3UVWK6duBjU70+41HPmRmN1RMtox
+	 jrAsM3Jm7Hj2YEX+cvHEaWEjxE+r/5Kw0/3IxXbVaTG3F3UosyklUFbKjgEubWLpIe
+	 eTraP5kbPULnQ==
+Date: Tue, 3 Nov 2026 13:28:31 +0100
+From: Bartosz Golaszewski <brgl@kernel.org>
+To: Frank.Li@oss.nxp.com
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Jia Jie Ho <jiajie.ho@starfivetech.com>, William Qiu <william.qiu@starfivetech.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	T Pratham <t-pratham@ti.com>, Thorsten Blum <blum@kernel.org>, Frank Li <Frank.Li@nxp.com>, 
+	Pan Chuang <panchuang@vivo.com>, Maxime =?utf-8?B?TcOpcsOp?= <maxime.mere@foss.st.com>, 
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>, 
+	"moderated list:ARM/Microchip (AT91) SoC support" <linux-arm-kernel@lists.infradead.org>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:QUALCOMM CRYPTO DRIVERS" <linux-arm-msm@vger.kernel.org>, 
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>, imx@lists.linux.dev, vkoul@kernel.org
+Subject: Re: [PATCH 1/1] crypto: use dmaengine_desc_set_callback()
+Message-ID: <7fhjiip7dupqjf4rgdhz4sh3hkjr6gibbxftnmkxq5ihq5orm4@wfalqdnrwkei>
+References: <20261102164538.3834039-1-Frank.Li@oss.nxp.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,46 +65,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261102164538.3834039-1-Frank.Li@oss.nxp.com>
 
-On 2 November 2026 15:53:53 GMT, Tristan Madani <tristmd@gmail.com> wrote:
->padata_find_next() acquires reorder->lock while the caller
->padata_reorder() already holds squeue->serial.lock. Both locks are of
->type struct padata_list and thus share the same lockdep class, which
->triggers a false positive recursive locking warning even though the two
->instances always protect different data.
->
->Annotate the inner lock with spin_lock_nested() to tell lockdep about
->the valid nesting.
->
->Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
->Cc: stable@vger.kernel.org
->Signed-off-by: Tristan Madani <tristan@talencesecurity.com>
->---
-> kernel/padata.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/kernel/padata.c b/kernel/padata.c
->index 0d3ea1b68b1f7..2f769ba7dfa99 100644
->--- a/kernel/padata.c
->+++ b/kernel/padata.c
->@@ -253,7 +253,7 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd, int cpu,
+On Mon, Nov 02, 2026 at 11:45:30AM -0500, Frank.Li@oss.nxp.com wrote:
+> From: Frank Li <Frank.Li@nxp.com>
 > 
-> 	reorder = per_cpu_ptr(pd->reorder_list, cpu);
+> Replace open-coded assignments to callback and callback_param fields
+> of struct dma_async_tx_descriptor with calls to the
+> dmaengine_desc_set_callback() helper across various crypto drivers.
 > 
->-	spin_lock(&reorder->lock);
->+	spin_lock_nested(&reorder->lock, SINGLE_DEPTH_NESTING);
-
-I'll bite.
-
-Reviewed-by: Bradley Morgan <brads@mainlining.org>
-
-
-> 	if (list_empty(&reorder->list))
-> 		goto notfound;
+> No functional change intended. Prepare make to struct
+> dma_async_tx_descriptor private to the DMA engine.
 > 
->
-
---- Thanks!
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> ---
+ 
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
