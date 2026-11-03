@@ -1,91 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=23.83.223.162
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793738942;
-	b=s5jipH3lc0kGLZeo4Gs1tvuyGPmyGHch/6fPhIDD9c33mFJvNQEp6maK9izSfJgHDEda
-	 B5kGAiP/jZ6G5FOJ5ePszsZZLQm5LbkozZBfYuWRlHgPBtjy233pK9oSCjqaOMqaqz70I
-	 mmjVzCVlCM4zbAQ/AH7OkXgp02CMHgfzgQk1mXcg2rpxn1/+ySyo1dt8UUlxHgLLXdv+d
-	 Sb0rKJFFgjVClBvR9xSc9KOBDHgILkEHiW0/5mrefTfvQigLsAWhtmH2hvJnE6ppjLp6Q
-	 vr8eG2KmLnWqhtSp23yjt9ZwLo8xaZSCdaJFbAGk5MzEwS5H3PsnSlVHaprIMKpzsuA==
+	t=1793741586;
+	b=14AOv9rQ6LSwYOTY54fKdCVooHFRPqRokKSf1tHz/CaM+uhSt/8kw2i1wPvP/ZecmC7y
+	 JrCGJNgsRO5CQMENWQdZD+smMP1nRe5HamUIlEachAmaL5UMVvUCBsay2oM0p8U/YUZty
+	 /LWI2mbduaNqg8qJOHV4Q3R3BlxwM5CutYonK/u2dZ5zWzDsQwRj6LJvzKZX6gyd12nHN
+	 DNDz5bbmeYD9jrcVbsHsRDSq305daqn0TKRzaLLU2s7s7aA6rYifq/XC6FpZxhLh6ZhU8
+	 PWp1plpDxWAHGHAfHarVyXKH3kepI6zgFA4JojszE7rY8XkrkoZRq3k+SaYPvoqhHPg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793738942;
-	h=DMARC-Filter:X-Sender-Id:Received:Received:X-Sender-Id:X-MC-Relay:
-	 X-MailChannels-SenderId:X-MailChannels-Auth-Id:X-Spill-Robust:
-	 X-MC-Loop-Signature:X-MC-Ingress-Time:Received:Received:
-	 DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:User-Agent;
-	bh=CixWyglPjJq+NuYBAuybNSUrDT7S8FVzUuoegqk0l5g=;
-	b=lGmvMb+roSk0YY40Y6+iub4GAmJw1X6g9bVB8J0PFzs0cG8BDHezdxKBEq66uCgiTnB2
-	 B7NS170vSfdH77aHXnZhGKqtK60Fe5c4ys+G4+16bRlYfHkW7Mtc46vUl5Lj3aC3kxdIK
-	 5j3vd4UxKrSkQoXiZjA086xfCGhDNhvlCTyuU/BfnSeCz1OMwvSw2aTUpfGKq2WxJclLw
-	 TZOtTyeUyQ+4m8JtHlGqhuvopaXzYrKLIXWE40ipPfc5dTbC7wh6nfm7RoytcX+tnCXwk
-	 +3P6ptsvXes+k9oMVTPfo3RzBylAJjiukiwKo2BlZk4/2LklJONMlTwbprKqbYxEJ/w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793741586;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:X-Developer-Signature:X-Developer-Key:
+	 Content-Transfer-Encoding;
+	bh=UITpgR/WG3sMmpBhiDEynfdsoVXjWJp4sNC8YILTOR4=;
+	b=eptdJfsZKIR7cKPA0ISy4xurd6p+GpPv2uSVPzJAjldOllbDAPw94IOR7FIsyy4FYnpt
+	 0SfoaK2GvyJYuckQb+KuNMlmiThD/m2fJOQ/QAgjT2S/U8NdPR4HFWgxxuPJbbj0okaVq
+	 UUeL00DMoPFQaEVaMqi1hN87cmdnSCRsx6iP0GYgqOiCX6PBMymGunzKRm420LicecqgV
+	 fiKTm48n5e56uBE+xPvfMvYZdlms4batKz0tAmEgOB/yu2/Wz08bM0+P9gRm7cavzmrJe
+	 gDomqbsFvICfJJaRrIhXyJ8qi1qseGIELrlWzPVnnIrRPOVuuQhggC5PFNwrPsetFFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=stgolabs.net;
-	spf=fail smtp.mailfrom=stgolabs.net;
-	dkim=pass header.d=stgolabs.net header.i=@stgolabs.net header.a=rsa-sha256 header.s=dreamhost header.b=b8zCEMv9;
-	arc=none smtp.remote-ip=23.83.223.162
-Received: from seashell.cherry.relay.mailchannels.net (seashell.cherry.relay.mailchannels.net [23.83.223.162])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kkjb1fTv;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD660606A324;
-	Tue,  3 Nov 2026 20:49:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BD660606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=stgolabs.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35998606A31B;
+	Tue,  3 Nov 2026 21:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=stgolabs.net header.i=@stgolabs.net header.a=rsa-sha256 header.s=dreamhost header.b=b8zCEMv9
-X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 885DE4C1392;
-	Tue, 03 Nov 2026 20:48:55 +0000 (UTC)
-Received: from pdx1-sub0-mail-a249.dreamhost.com (trex-green-2.trex.outbound.svc.cluster.local [100.99.192.246])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 2EA7C4C0C00;
-	Tue, 03 Nov 2026 20:48:55 +0000 (UTC)
-X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
-X-MailChannels-Auth-Id: dreamhost
-X-Spill-Robust: 300bfe26607bd16d_1793738935457_4122454896
-X-MC-Loop-Signature: 1793738935457:1005928785
-X-MC-Ingress-Time: 1793738935457
-Received: from pdx1-sub0-mail-a249.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.99.192.246 (trex/8.0.2);
-	Tue, 03 Nov 2026 20:48:55 +0000
-Received: from offworld (unknown [76.167.199.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dave@stgolabs.net)
-	by pdx1-sub0-mail-a249.dreamhost.com (Postfix) with ESMTPSA id 4jK0zV1BM8zymd;
-	Tue,  3 Nov 2026 12:48:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
-	s=dreamhost; t=1793738934;
-	bh=CixWyglPjJq+NuYBAuybNSUrDT7S8FVzUuoegqk0l5g=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=b8zCEMv9bhNCGM1tlmBK2EMLJBD1rcF1sm/u/EJTNNWWz3OG1iX9Mq2VL/ghE/4ch
-	 eqIGuBDuWjE/XvR9GDMpJYcW+YN4O6EOHwLc6oCxjxXAmxmm3my/Pm9mfPSUeqD+r8
-	 8LymCeE1FL+poryrkmBlBe40sOxdEo61oLWoduxYafry4p5ZKyL+1KoaggZy1x3tnR
-	 MPUBnvbI4fmY65BFuS1xCcROWODExD4KaFCSJLB4WxsmSTa0PRyDNOq0FHF38KFrY+
-	 wFO+5dUpyRyhr5qxbyRbWNgFPjJwznKh18a7eY4Ho1+qvk7sZ7M9bzfyY3Wq1JAdjw
-	 HwXsk1TKvFPOg==
-Date: Tue, 3 Nov 2026 12:48:51 -0800
-From: Davidlohr Bueso <dave@stgolabs.net>
-To: Dave Jiang <dave.jiang@intel.com>
-Cc: linux-cxl@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alison Schofield <alison.schofield@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-	Jonathan Cameron <jic23@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-	Frank Li <Frank.Li@kernel.org>
-Subject: Re: [PATCH] MAINTAINERS: Update CXL, NVDIMM, DAX, and others for djbw
-Message-ID: <20261103204851.v2blzpa25xopouc6@offworld>
-References: <20261103201547.4079847-1-dave.jiang@intel.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kkjb1fTv
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2C531F000C1;
+	Tue,  3 Nov 2026 21:33:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793741585;
+	bh=UITpgR/WG3sMmpBhiDEynfdsoVXjWJp4sNC8YILTOR4=;
+	h=From:To:Cc:Subject:Date;
+	b=kkjb1fTv9lriQEjrwVXX/F4iNglEKn+CJm2hGBiGb/ln1fg+TN/Veuc6iaR4EXGD0
+	 rsxV5xRvgmNllmjTAqqDLhrV+UqbdDksvfuyQUY6lx31E7tTrBAXCVdNGYl0Fm1WO9
+	 PspAsyet4yEnAv3neIbe0YQi+v8bSm7MPpXHpsOmFZ8wS2Nhh3RQoVfPwcQdnlVK1y
+	 7oAqCs/Y3OtdQVPSWtOisu4jQtRL1kPRHNKSr8k0w4SuvGKgIBNr6g1epj3Mqr/pAn
+	 ujS35DXvmTOE4eCua7KcmZhIl0sKcS69UUOkCKO2CPCjbmbL95E0YXmF3IP1A0GLG1
+	 MjgSqcoHBAeeA==
+From: Thorsten Blum <blum@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Keerthy <j-keerthy@ti.com>,
+	Tero Kristo <t-kristo@ti.com>
+Cc: Thorsten Blum <blum@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: sa2ul - remove redundant 0x prefixes
+Date: Tue,  3 Nov 2026 22:32:43 +0100
+Message-ID: <20261103213242.480649-2-blum@kernel.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -95,32 +61,78 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20261103201547.4079847-1-dave.jiang@intel.com>
-User-Agent: NeoMutt/20220429
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3106; i=blum@kernel.org; h=from:subject; bh=En9TdJx2JNSBwkxx3VVLAzIC9JU5hAIajtfLwpQpXrE=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmvgn5xzjy5aVfdivhJsqsuVM725HgkzWp8+9jcfXJGp 4RPy1l/7ihlYRDjYpAVU2R5MOvHDN/SmspNJhE7YeawMoEMYeDiFICJ8Fgz/E/59uKcwsPyiYmn Ys0X7Du3VJA1xokrrtZE9ueaefznG1MZ/vvc3Z7wWudNzvRttqtubl/Ny2F358Mj47npfdKTfTf szWAHAA==
+X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
 
-On Tue, 03 Nov 2026, Dave Jiang wrote:
+The %pad format specifier already includes the 0x prefix. Remove the
+redundant prefixes to avoid printing 0x0x.
 
->Dan is no longer with us. Removing entries in MAINTAINERS to prevent
->people from keep emailing his address.
->
->async_tx will be essentially orphaned. There has been discussion of
->deprecation for the feature on the dmaengine mailing list.
->
->fsdax will no longer have a maintainer. But there are reviewers still
->and Alison Schofield will continue to wrangle patches for DAX overall.
->
->Cc: Alison Schofield <alison.schofield@intel.com>
->Cc: Vishal Verma <vishal.l.verma@intel.com>
->Cc: Matthew Wilcox <willy@infradead.org>
->Cc: Jan Kara <jack@suse.cz>
->Cc: Davidlohr Bueso <dave@stgolabs.net>
->Cc: Jonathan Cameron <jic23@kernel.org>
->Cc: Vinod Koul <vkoul@kernel.org>
->Cc: Frank Li <Frank.Li@kernel.org>
->Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+Also remove the duplicate colon from the security context dump message.
 
-Thanks for sending this.
+Fixes: 7694b6ca649f ("crypto: sa2ul - Add crypto driver")
+Fixes: 2dc53d004745 ("crypto: sa2ul - add sha1/sha256/sha512 support")
+Fixes: d2c8ac187fc9 ("crypto: sa2ul - Add AEAD algorithm support")
+Signed-off-by: Thorsten Blum <blum@kernel.org>
+---
+ drivers/crypto/sa2ul.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Acked-by: Davidlohr Bueso <dave@stgolabs.net>
+diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+index 4557eae94164..e026fc14a411 100644
+--- a/drivers/crypto/sa2ul.c
++++ b/drivers/crypto/sa2ul.c
+@@ -652,7 +652,7 @@ void sa_set_swinfo(u8 eng_id, u16 sc_id, dma_addr_t sc_phys,
+ static void sa_dump_sc(u8 *buf, dma_addr_t dma_addr)
+ {
+ #ifdef DEBUG
+-	dev_info(sa_k3_dev, "Security context dump:: 0x%pad\n", &dma_addr);
++	dev_info(sa_k3_dev, "Security context dump: %pad\n", &dma_addr);
+ 	print_hex_dump(KERN_CONT, "", DUMP_PREFIX_OFFSET,
+ 		       16, 1, buf, SA_CTX_MAX_SZ, false);
+ #endif
+@@ -781,7 +781,7 @@ static void sa_cipher_cra_exit(struct crypto_skcipher *tfm)
+ 	struct sa_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct sa_crypto_data *data = dev_get_drvdata(sa_k3_dev);
+ 
+-	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
++	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(%pad), 0x%x(%pad))\n",
+ 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
+ 		ctx->dec.sc_id, &ctx->dec.sc_phys);
+ 
+@@ -822,7 +822,7 @@ static int sa_cipher_cra_init(struct crypto_skcipher *tfm)
+ 	crypto_skcipher_set_reqsize(tfm, crypto_skcipher_reqsize(child) +
+ 					 sizeof(struct skcipher_request));
+ 
+-	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
++	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(%pad), 0x%x(%pad))\n",
+ 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
+ 		ctx->dec.sc_id, &ctx->dec.sc_phys);
+ 	return 0;
+@@ -1447,7 +1447,7 @@ static int sa_sha_cra_init_alg(struct crypto_tfm *tfm, const char *alg_base)
+ 		}
+ 	}
+ 
+-	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
++	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(%pad), 0x%x(%pad))\n",
+ 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
+ 		ctx->dec.sc_id, &ctx->dec.sc_phys);
+ 
+@@ -1584,7 +1584,7 @@ static void sa_sha_cra_exit(struct crypto_tfm *tfm)
+ 	struct sa_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct sa_crypto_data *data = dev_get_drvdata(sa_k3_dev);
+ 
+-	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
++	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(%pad), 0x%x(%pad))\n",
+ 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
+ 		ctx->dec.sc_id, &ctx->dec.sc_phys);
+ 
+@@ -1664,7 +1664,7 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *fallback)
+ 		return ret;
+ 	}
+ 
+-	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
++	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(%pad), 0x%x(%pad))\n",
+ 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
+ 		ctx->dec.sc_id, &ctx->dec.sc_phys);
+ 
