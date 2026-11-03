@@ -1,98 +1,154 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.169
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793664206;
-	b=hQ9DgFvLkWzeD4ddBTh11fMdAWLyAF6b1RWAdP/UHW+GOmer9mKq43XFzhJhkz6cUN58
-	 ToBcPg68VsFS4jU9rc/9SZIaWearrihhgL0dMvv3fCfqFtdRnGlr/ZMoEVxmKyrbykJDc
-	 6e8bdquH+CY2xRfT+7NffLLpqUOagKBVfU5T1Uhke2001Ql2rokqIUg5pLMpdM6cqyY2y
-	 i/Q4XUfIDgKoHczK5Bjh+6Y3xam7jH+4X3YhhKyfWA575GkdgdBt7hJ8f9H1+3lVA/hyC
-	 bVWkwIcpGblG3ruBapxHZ+EAyNj0J9gAGK3CWAdgtyOM+8n43H9VuCa3xgLMe85kJnQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793664206;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Subject:Date:Message-Id:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=mwQ2z/age/B8OVHRkYCsNYXmBR1En6PKc33rR/ATxnM=;
-	b=c3NWrZcnyOaAZ+3aEjW8KYoZirwyEa1jLxrPw+TYMf+G3hH1AFM9t0QQj8qlM9JQGN+P
-	 J7MAh4QQlI7kd4udaK4buiE5VEJMs5bgOhc+zeE3ATl45bgolmfg8twD5km06Dt0tB9DM
-	 vENPs0hb/IrHLp8f082CPSgfUFGEKFnQ3RfZkQfoqKIy7HEz5GHOtZ501J55R1sn9z0zT
-	 /Jqvru8OrmFuED7Af7htdMUHsRjdJdRqzrQKVfgTQAvYV24cw/tn28GDJEimeafFdv9C0
-	 X3j9shU4dsMvrZfLoiJIECawPK2k42tLoB1+lR6juIIVnFWcmtTifVWvUEW+RSAj9Eg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gvvbvhit;
-	arc=none smtp.remote-ip=74.125.82.169
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=40.93.196.67
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
+	t=1793664464;
+	b=D7tjlfPTi+5I6ZQK1qnOWt3tbKxyM1rp0tRLjrDEkLLlDiEJtwfDsEbLRBfQxy6QgojM
+	 4stDjCAbDAB49Y8qwHmuDY3PnjI2g+jKCvd2kR9EjJo8yCCCuru77dkNyhHUh614a4Mw7
+	 p7pyYoNJ2sE5d3GwbubHZ5QtaIkYA8p9kWW4HS8Tfppny2Zbock3HDP+0AqmMr1iDQUzJ
+	 Z2SN0hnvSLi+1NPndc3df4FhbxT79Cun7oXprBX45x1TSpLnsTfrOxg4mdOABmYmJGluu
+	 DcMxgBmX02+5PbTr8jNxhbdvIcLapM+h8vOoXiMkejavB6qy7lZA21MpbBAlT9h5VoQ==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793664464;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Message-ID:Date:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:Autocrypt:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:X-ClientProxiedBy:
+	 MIME-Version:X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=qnx4f931yCHuVNIpF3TyJYIuJPwLd/bStE4QYZ0JF4M=;
+	b=jwxXBTUmhskedgaFk7Cum3vnBiMAk3ewkVPQ5wW3vBbBqTE+rJVrIC++cFte5ytb9klS
+	 iPOYWrduFU/J99aWj+4IEqt0tZhWlWm32yNfKHIiBlF4sO964taSo3JP0O/FQyMKB6IK7
+	 U+iGPyBq9smhVpn/YEL0BNIet2P0EjS6+Io2saLw1QCLyqB1tg9Qvie8Kiag6dR6m6ZqU
+	 Cj4+5nQV6YysLIQkQe2O4s310HKwjmuRo4zxF/HVMSVAYrXDsX705vaYebT37aDnA0HBy
+	 kcFslLrNMaCLmsj8I7E5R6iIJXTcWGJnuBYnt0H4xRc6t13ipvp/tgxiv/HTm/OgPQw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=amd.com;
+	spf=fail smtp.mailfrom=amd.com;
+	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=XuSMP7Kd;
+	arc=fail smtp.remote-ip=40.93.196.67
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013067.outbound.protection.outlook.com [40.93.196.67])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1CA606D807
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 00:03:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5C1CA606D807
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBA1606A32C;
+	Tue,  3 Nov 2026 00:07:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ECBA1606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gvvbvhit
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-36a18fc7a38so6660152eec.1
-        for <linux-crypto@vger.kernel.org>; Mon, 02 Nov 2026 16:03:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793664205; x=1794269005; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mwQ2z/age/B8OVHRkYCsNYXmBR1En6PKc33rR/ATxnM=;
-        b=gvvbvhit4nOAdNkRPqtYIUGcc6H/xG2s8hlp9IhhIq9jKPuQGFb29VyWC6t4fPgxEY
-         K1dCFrM3A1YvNsszCGWXiyTq0IBycUQbiUmPphnV0IzOKQ+Ma9EbpM7TZcBpHkynviJ1
-         r7yQ1nvl6FcMfxNksKst1MMkUWlit9ClXviYQB+ToKSPooKSIfqPX/CUxckfUgTQnK2C
-         bkzo8sJsdIrsrEMD1la9b0TtU9MpjHsYM45COJYCdMQcNUmGvGcBFc9kzOvFONyCw6BG
-         c+1kCsrND1aUi1SU2E/n8brTsX48fXDq2ioWdI0F3aJbkufqiXbSHZyrEU3ZkXciqkg/
-         zJ7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793664205; x=1794269005;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=mwQ2z/age/B8OVHRkYCsNYXmBR1En6PKc33rR/ATxnM=;
-        b=vCTIGcafIz7w8B/bnXjbOUrAoW1aVl+Z1hU16/EGDKdBjZcm0WVm4VeM5Cy9tydaaX
-         imRDCNBI2LqTuprRHNiBH5I2PvjJXa0hkba5CVjhe7mBY+XXCB3vZRQ9W/4YS1lD25Tw
-         K1QI5q9wyKBzlxVcK4N3zIcxTQaPlRBo3ODxB7px2k/KM5iHS/ZqjjwuAywcUhx1DLWw
-         ZkBiWolXzdN9cGWc/7N5Pod6qQFUWHnIE4VqsczvI72KolO6zij1MLVgmYvFKtVlF+y4
-         sGqeu6nTDDe0neFPETNSjqA8rk4AsBkhpxBV6ueedNKY+jPx27+04vOdB5ufTzLdULR0
-         2CXQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwunu0qYcYm0sVTM4veCE2VOvSq28u/OdWWHsLorTMHXQyyj0Z/aQwBpHhXhc0mTXErHcQxVgI0mKSweYQ=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9XWHU1Le1dvt9tNOVnnyEdjQfkWcsx02+ls+rKW8SeBFX4hUGr
-	32qAQBe5saLxGbOg080T62VQ+YY7LGvdS86oy16UnzR+EoWqIe0CyM9k
-X-Gm-Gg: AYBFou1fO55BygGOGWu0U/uInDjgVkF3DqEQAS/EwvLqAK2Lw/9epB1KRJUCkUmM6VY
-	u35EBgbTGNeYb6UbjIZ6TXD3VSBJTKje/45rFtww142WMT33hQowLEaIf2swbpkVNGEJx5gITov
-	7yvSov5z645f9kfumbSSa474qVq5z3IhaXy5llWxsVg6zvH4Ap5B47WShwyxQl+bLnfhnY/Dnhp
-	EEt7QXlZwH345M+9+u1sZetkMZpGMEBmxXGlshtuauTIkIxZez7SZgiYEZXU2kk6q7dLfRLIGGQ
-	HmdUdk6tHu5ey42c0fx8ElVv/MLJ0hcjvlkreAdChdmwYp+V5nF+DRZNaAMpEe6u+YV02q5yh62
-	0/MRhxVtIlDTFPi6lpAIK33SbjVYb++v16cIzQgw1eTO0DoIDDIftVefxNhJaVaDfdImmFpNSXo
-	+UtuSbVFKcHd+uYjMx7ZhilCBjjMmZAddkMHiZbLA1z3qtriABupC752L3EZQtLf7x+QVERRYhS
-	5LWknimdl7JAJzqL5lVe1Wb7PupFQCuT+9cIqDNR5T3TCIOZZiL/5fe4giiLWJBkbvAOyDluyPc
-	wBr6rVLYGv997HQEQ5FCoYkX1XLOfYZpd5vqxJuFrA==
-X-Received: by 2002:a05:693c:69d1:b0:358:3426:d601 with SMTP id 5a478bee46e88-36a4221b3c6mr19297627eec.2.1793664205205;
-        Mon, 02 Nov 2026 16:03:25 -0800 (PST)
-Received: from penguin.lxd ([12.187.136.98])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a429018casm36699729eec.14.2026.11.02.16.03.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Nov 2026 16:03:23 -0800 (PST)
-From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-To: hannes@cmpxchg.org,
-	yosry@kernel.org,
-	nphamcs@gmail.com,
-	chengming.zhou@linux.dev,
-	akpm@linux-foundation.org,
-	linux-mm@kvack.org,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	kanchanapsridhar2026@gmail.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 1/1] mm: zswap: Move the crypto_acomp to be per pool, instead of per-CPU.
-Date: Mon,  2 Nov 2026 16:03:13 -0800
-Message-Id: <20261103000313.13677-1-kanchanapsridhar2026@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=XuSMP7Kd
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ULXaD0faSCfsKvWAUHt5m88nTQNy9bspXnciS8X+/E8hx78vdM1a3gjISA74HNFTYK8ipLE1tQjAdzu4QP9B84mw8TMs9mPlkPn1hsoPoOzPzpw6lwb3Cu0wGiNyhz+5DfgDeNPiF88IN9MgkIgwJAcu34rgFNxN7ozrppvuXF82PX4t9DxeMfysPQYDKkbTYyC8hQ3o3gxXH+iJhNLDlj52gfsyLb4SAEqjq6BJOb3w5JwEz/D7/hzVDOB2QhBphQ3mpUlVo9bPIWpqqEha0S/6/NtmgwSMmrgOXVbIg0QINj7lldh9xH7BwKUSqKAtLxWJSXJiki7fGAJh3Dj29w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qnx4f931yCHuVNIpF3TyJYIuJPwLd/bStE4QYZ0JF4M=;
+ b=CUcmOBP3RSuBy7lWWliiM5mqnuDEkOIgRt8ho+mMDNjwxiHfAndWvJd68T6rLYoURWE61jFo584IQxc/MD1s5ZGJqnnyOH4dk+M6D3PLNN6vlg59vrBxFpZg7wulLKeIrRmUeItUANGkb9yN5q/onh/EhC0lwMQ/IN7I1+YyzCblJkNg0L+mpuL+P+awxxgSP7hXN9z+/7x+aoVq0KvwCXgHKRYREBGdmNRXb7QtRNIYMSKqD/E7t8cKimTSPbW4W8NJoJwclwGGnXxOzXwpeypXBxeGIEFftoAHWb98miLE+vB/tkP7kG65I2vgS2cPe7G3HZVVoQn/Auk1Vil3ZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qnx4f931yCHuVNIpF3TyJYIuJPwLd/bStE4QYZ0JF4M=;
+ b=XuSMP7Kd0SWpuyMrF0D4ch+0bEbz+6RgzPqVHAhc0RV1Ey/0E1rjg6q41ay3UE0aQpR4ZgsY154QPhgxbxA0Rg6GSSGUl/1EhLZMqmx4EFblajlPYBKFAoHKvSXt5CvwWgVjJbqloGtYuXKCt/xpzXXIJrI5/1d6DZoLZFee02Y=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by DM4PR12MB7622.namprd12.prod.outlook.com (2603:10b6:8:109::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.569.11; Tue, 3 Nov
+ 2026 00:07:40 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad%4]) with mapi id 15.21.0569.011; Tue, 3 Nov 2026
+ 00:07:40 +0000
+Message-ID: <30947e17-bffc-4c70-b19c-56504771c9fa@amd.com>
+Date: Mon, 2 Nov 2026 18:07:35 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] x86/sev: Clear RMPOPT when segmented RMP is
+ disabled by firmware
+To: Borislav Petkov <bp@alien8.de>, Tom Lendacky <thomas.lendacky@amd.com>
+Cc: K Prateek Nayak <kprateek.nayak@amd.com>, tglx@kernel.org,
+ mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
+ herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+ pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+ Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com, ackerleytng@google.com,
+ jackyli@google.com, pgonda@google.com, rientjes@google.com,
+ jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+ babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, darwi@linutronix.de,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1793216372.git.ashish.kalra@amd.com>
+ <56da047d63b22f03a7e709fc172a5543da894d67.1793216372.git.ashish.kalra@amd.com>
+ <20261102052841.GBaugfibOXxGorZKgq@fat_crate.local>
+ <69ed0d93-f96d-4baa-a587-fade5a0a3262@amd.com>
+ <414b2fc2-a55a-4b2d-ac70-4def101c4aee@amd.com>
+ <20261102144805.GCauiipTaEXcg6Lr59@fat_crate.local>
+ <d81f6807-26ac-49b9-a205-c89c394ec1d4@amd.com>
+ <20261102193116.GDaujlBJc3XjG3xzLj@fat_crate.local>
+ <9ebcb83a-1c0e-423a-8730-eff6b710634b@amd.com>
+ <20261102214343.GFaukED8ep3EMmQxfx@fat_crate.local>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+Autocrypt: addr=ashish.kalra@amd.com; keydata=
+ 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
+In-Reply-To: <20261102214343.GFaukED8ep3EMmQxfx@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA1P222CA0178.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c4::26) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -102,162 +158,111 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DM4PR12MB7622:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6ef221f2-f07e-4679-40bb-08df393e7973
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|23010399003|1800799024|366016|376014|56012099006|11063799006|4143699003|261028144727099003|261009223027099003|261026121527099003|261026140227099003|261022105027099003|10067099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	tUEx8n2zo/rNCFBXfsonsvJskQxo0rNZKABbRg0vnG3knUjgWb9aQotEjLjMWvXd+3IrMfbHU7nNse1MnwZrgQ+avuuap/9nLo7arKlPWwwXfu6iVFeLHj2BWbuL+9svSP8NOz08YqkktjBXgc8HrZ2MY1xp8yuf2msxI/FP9a1cJhUoh4/K1xdT8swZSVJmyL5HuM7yJADoPkQ6RWGbpZWw9U1IBlPnekW3URclpalOMS8zyNIKtQgZ8CAgeaL98f/S53JLR3lZnqQGRKq8dMzRORv/BXj/399NPyK+MuBhcIue/ok5xaslCPuG+AJQvP7kQ5n67W8gydxmfao6fvlZs4KI3rQ8itCiLgGbc/U0eerpS2PNAz8Ah4gYBb1+STjsb8x+qXSbzybhkimQHuKZ5ft7EwQX41H+9CswSTgon8AiP0volQVrolTqakvxQLFFqcBfkwxOXicMVTKd5B3jwfjHUpwmrGVuFMzWAsHfASalenB0oQudU7l/vkPaiFPgUO/itxI4AxUvfthV8yAzS3biOhFXZV+fyYHmMPmUf1hQAaZv+UkvvrTUX/mTu8ZgalZovEun0NM0ukfWGwWqzRipr9AHnVZl3lx5oS1pV/446XfVag/uRGvJot+koGtp1uyhc6QHtEpAycxuCBuSkTHpvW+uI8PRTSDK0UA=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(23010399003)(1800799024)(366016)(376014)(56012099006)(11063799006)(4143699003)(261028144727099003)(261009223027099003)(261026121527099003)(261026140227099003)(261022105027099003)(10067099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TDE1U2dVbEt1bis2dENVcGdNbHNKMHpCOTN6a2Z0TFJ6WUw0TEJveTRSYS9n?=
+ =?utf-8?B?bkoyY3JXTEJZb1JRNi9qOUYrUkZ2NnVIUW1kU05FZDA2UTd1MHJXdE10WUdT?=
+ =?utf-8?B?M0xvRzNTdG0vVnFJelgxYVdEOFZoU3pCMUpUVHREOURlb2xzTTYrM21oZndt?=
+ =?utf-8?B?amtGKzNUVSsrMnpTSlY5V0dmb01YeVRCL091SEhzZDVORzhIWVM2REI3bjU0?=
+ =?utf-8?B?RHNXME9hQjk2OGE4UlpoTHVQT3c2T2V6OUExMnBUQ0FSLy85ODJJQ0RQZzNU?=
+ =?utf-8?B?Y1k5UVZianVJSjFmcEt4TWY0Wnd3QzZLRDFId0RjdE1QdEVJOEd4VmU4L3JN?=
+ =?utf-8?B?VHVUNllRcG9SYXlXR0ZkZHIxMlNUREExRVBReDk5KzBYUEkxK2RJMjB2QVZF?=
+ =?utf-8?B?cDdCOHFyUzdzMUdKbVBtRkFIN3F4U1lhaHlWS1UvRUpCYTRmaFNBU0xqWEZW?=
+ =?utf-8?B?UEN5VmM2QkJRVEh2ZXMrU1dQaTV6WlJYamdtaDhGOHdMS1BhTkJNQVV6K1Yv?=
+ =?utf-8?B?SGZ3OUMrWno2YVR5NDI2QmpBOGx3NW90UGFtZ09zYmVxdlpBOUdqc01kOUVP?=
+ =?utf-8?B?WHptckhwa3BnUzdQdUhGQS9nYU9wQzNlZERVSEFXN3RRL1Q2Z05SOXNoZjQ4?=
+ =?utf-8?B?VHIwZnkyTjU5K1F4NFROSGtXY29pVmFsUmJ2NFdRczA2RDlVdmRrb0FMZksr?=
+ =?utf-8?B?YXBLTWU5QUg3eDlnbTduUi9FVzJwYjZQU0c4UzM5QkV6WGN4L2tDL0R5ZHpr?=
+ =?utf-8?B?ckVxdGJBeUFqWlZlRGd2Ykw0Q1ZZVXRvZFllY1hhUVFiRFVRTDVZcmU2N0xI?=
+ =?utf-8?B?eVpmK1d4c2xFWldVa0IxWEdLcE94YktNM1FKbzUvbHZiUFcwNEw1MUh5ZjNR?=
+ =?utf-8?B?bUNnWjIzSGhLQm9PTDIzeXB5YVlMUnUzbEtGZWRQczBNd1h4VzEydy8wTDdu?=
+ =?utf-8?B?MkFVUlM4bktPbEFUY08vbzNZaGhUS0tSMjd6VDhDKzlFTnE3RlYzUEhaV2pP?=
+ =?utf-8?B?NFEzakVNbzJjelUrbC80YUV4dHdKU2lDRkl3K1ZzTkVFNVgwNlFLaUdJdTd0?=
+ =?utf-8?B?eVFiWEJWYkJvaVlJbUhSclRiODE0Ymg2dzJ6VWFqSkJRU1QzT29iS05Yand6?=
+ =?utf-8?B?Uk9FK1pxK1BxbHc1OGwwRFEzOHl1M3VuQnR4cy9ldndJaHdZak5IQVFlU0JU?=
+ =?utf-8?B?STVzZW03ZFVRb1RTVWhDSng3TEc2UEpGc1huRUFnNnR5QVFCYnA4c0RsQlVx?=
+ =?utf-8?B?UHRGVHpOdUoyaVkycjZ5dkNId1B0T29DZzdxcTAwYTBLWU54V25kcXlzRndy?=
+ =?utf-8?B?bVdXV1h2blBFLzM5bmFYOWpnVHZkSWYzV2JrS05NL3czd3BSSkYrTnZtZDNL?=
+ =?utf-8?B?MEJJcERMQ2xZbGhFL2hyK3EwZ1JMOG1iVGplK2tiRkpwaWV0Q0NNNVAzNTRE?=
+ =?utf-8?B?eUNFSmFwY3RTY244dFphWEtuRFZVQmhpNitGcmNnM1ZjQjk3V0h4U25qczNn?=
+ =?utf-8?B?Ym9adFA3WlZvc1QrZWNlbFBIb0ZXNHIzcnpRWENGSjlsNy9aVDczRjNXblhF?=
+ =?utf-8?B?eCsrNmRRUE1uZ0FuNTZUQnJWbWFMM1R1anBrTDIycHdaMGs4Y0NlNDdUVnVv?=
+ =?utf-8?B?VWF5S292dldzWU16Y3RDZjdHNGVuNGFPM1RqZUdDKzI2Q2dlY2FmU0lnKzRK?=
+ =?utf-8?B?azBUSHphQVhPVU9qMHY4cVJPaU92WUc1VTgzRjA1WkFzbjBqTTFoOVhkTkY0?=
+ =?utf-8?B?RU9kN3ZhTUVDMGVyRFE5Q21md1h4RUhzeXdxcC9kcndtTEhxL0pwblhYQ0hr?=
+ =?utf-8?B?cVVXSjRVSmcvSTdOTDZldkJiTnZPUm45TXVxUTlkUXFNMTVmeHlINUE3eGFL?=
+ =?utf-8?B?b3F2NzFaREt0SEZBVVcxUndWZHhhWWJpc2JZZVMvTDZkOUdOaVJORzFzcy80?=
+ =?utf-8?B?bmJubnlnZVdESmMxR3RRTS95QXNQUjNSbXZvSGtnUlpLOFN4N3lBaVdFeXpy?=
+ =?utf-8?B?R0NKVEplWjBuNzdpRDJ1TVlIRmdlSHNTZHEwLzVkSTNUeFdkWlBKNG9zWUdX?=
+ =?utf-8?B?OUh6aGpSVXNNOEpPYkt0RUZHNW9YTlRMOTBUVkFONWRzazFOMDhzVCtZUlJL?=
+ =?utf-8?B?UTNDT2ZGNE1vODdwdEVOeUhUcFRhTzk3eC9ZU0V1bHl5bWxaczc5NlZxUmQ1?=
+ =?utf-8?B?eTJMSkE1QmNzYWJsajUrSjBuVEN3alU5VXppL1JxZ2xBZGp5R1RmWjhFR3Bo?=
+ =?utf-8?B?TTNqdkE2Vmk4Q2FNVXpZcldlQnBTU2VjZUt2d2h5ZXc4WlBJSFJnS2w4QW1I?=
+ =?utf-8?B?VmtjdDZNcUpPUzFtWmZYbkk0R0xjNkt4eFF1OGljVE12cVVJNWhhZz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ef221f2-f07e-4679-40bb-08df393e7973
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2026 00:07:39.9759
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OLLE20TMilKQ+i7l3eQszrHJadVDftqKkDUKPFazqlZtM2tVvaQbpacq7JPOgOZ9fxTMUG46Hec4erpipbREVQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7622
 
-The "struct crypto_acomp" member of the per-CPU "struct
-crypto_acomp_ctx" has been moved to "struct zswap_pool" since this is a
-global entity representing the crypto algorithm.
 
-We save 56 bytes per-CPU by not allocating per-CPU memory for the
-crypto_acomp. The size of the global "struct zswap_pool" increases from
-240 to 248 bytes as a result of this change.
+On 11/2/2026 3:43 PM, Borislav Petkov wrote:
+> On Mon, Nov 02, 2026 at 03:25:52PM -0600, Tom Lendacky wrote:
+>> The current code clears X86_FEATURE_RMPOPT when
+>> probe_segmented_rmptable_info() fails. The above code doesn't.
+> 
+> See the hunk in cpuid-deps.c
+> 
+>> But since SNP will be disabled on failure of snp_probe_rmptable_info(),
+>> I guess it doesn't matter. In which case you can eliminate the goto by
+>> doing:
+> 
+>>
+>> 	if (cpu_feature_enabled(X86_FEATURE_SEGMENTED_RMP)) {
+>> 		rdmsrq(MSR_AMD64_RMP_CFG, rmp_cfg);
+>> 		if (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED)
+>> 			return probe_segmented_rmptable_info();
+>> 	}
+>>
+>> 	setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
+>> 	return probe_contiguous_rmptable_info();
+>>
+>> Which looks pretty clean.
+> 
+> Yap.
 
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
----
- mm/zswap.c | 63 +++++++++++++++++++++++++++---------------------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+LGTM, tested on HW.
 
-diff --git a/mm/zswap.c b/mm/zswap.c
-index ad01c691a263..68825a6c0b68 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -151,7 +151,6 @@ struct zswap_comp_ctx {
- 
- /* Separate requests, so that decompression does not wait for compression. */
- struct crypto_acomp_ctx {
--	struct crypto_acomp *acomp;
- 	struct zswap_comp_ctx comp;
- 	struct zswap_acomp_req decomp;	/* unused with on-stack requests */
- };
-@@ -167,6 +166,7 @@ struct zswap_pool {
- 	struct crypto_acomp_ctx __percpu *acomp_ctx;
- 	struct percpu_ref ref;
- 	struct rcu_work release_rwork;
-+	struct crypto_acomp *acomp;
- 	struct hlist_node node;
- 	u8 idx;
- 	char tfm_name[CRYPTO_MAX_ALG_NAME];
-@@ -286,16 +286,6 @@ static void acomp_ctx_free(struct crypto_acomp_ctx *acomp_ctx)
- 	acomp_request_free(acomp_ctx->decomp.req);
- 	acomp_ctx->decomp.req = NULL;
- 
--	/*
--	 * We have to handle both cases here: an error pointer return from
--	 * crypto_alloc_acomp_node(); and a) NULL initialization by zswap, or
--	 * b) NULL assignment done in a previous call to acomp_ctx_free().
--	 */
--	if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
--		crypto_free_acomp(acomp_ctx->acomp);
--
--	acomp_ctx->acomp = NULL;
--
- 	kfree(acomp_ctx->comp.buffer);
- 	acomp_ctx->comp.buffer = NULL;
- }
-@@ -322,6 +312,17 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
- 
- 	strscpy(pool->tfm_name, compressor, sizeof(pool->tfm_name));
- 
-+	/*
-+	 * In case of an error, crypto_alloc_acomp() returns an
-+	 * error pointer, never NULL.
-+	 */
-+	pool->acomp = crypto_alloc_acomp(pool->tfm_name, 0, 0);
-+	if (IS_ERR(pool->acomp)) {
-+		pr_err("could not alloc crypto acomp %s : %pe\n",
-+			pool->tfm_name, pool->acomp);
-+		goto error;
-+	}
-+
- 	/* Many things rely on the zero-initialization. */
- 	pool->acomp_ctx = alloc_percpu_gfp(*pool->acomp_ctx,
- 					   GFP_KERNEL | __GFP_ZERO);
-@@ -385,6 +386,14 @@ static struct zswap_pool *zswap_pool_create(char *compressor)
- error:
- 	if (pool->acomp_ctx)
- 		free_percpu(pool->acomp_ctx);
-+
-+	/*
-+	 * We have to handle both cases here: an error pointer return from
-+	 * crypto_alloc_acomp(); and NULL initialization by kzalloc_obj().
-+	 */
-+	if (!IS_ERR_OR_NULL(pool->acomp))
-+		crypto_free_acomp(pool->acomp);
-+
- 	if (pool->zs_pool)
- 		zs_destroy_pool(pool->zs_pool);
- 	kfree(pool);
-@@ -423,6 +432,13 @@ static void zswap_pool_destroy(struct zswap_pool *pool)
- 
- 	free_percpu(pool->acomp_ctx);
- 
-+	/*
-+	 * We have to handle both cases here: an error pointer return from
-+	 * crypto_alloc_acomp(); and NULL initialization by kzalloc_obj().
-+	 */
-+	if (!IS_ERR_OR_NULL(pool->acomp))
-+		crypto_free_acomp(pool->acomp);
-+
- 	zs_destroy_pool(pool->zs_pool);
- 	kfree(pool);
- }
-@@ -840,34 +856,20 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
- 	 * To handle cases where the CPU goes through online-offline-online
- 	 * transitions, we return if the acomp_ctx has already been initialized.
- 	 */
--	if (acomp_ctx->acomp) {
--		WARN_ON_ONCE(IS_ERR(acomp_ctx->acomp));
-+	if (acomp_ctx->comp.areq.req)
- 		return 0;
--	}
- 
- 	acomp_ctx->comp.buffer = kmalloc_node(PAGE_SIZE, GFP_KERNEL, cpu_to_node(cpu));
- 	if (!acomp_ctx->comp.buffer)
- 		return ret;
- 
--	/*
--	 * In case of an error, crypto_alloc_acomp_node() returns an
--	 * error pointer, never NULL.
--	 */
--	acomp_ctx->acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
--	if (IS_ERR(acomp_ctx->acomp)) {
--		pr_err("could not alloc crypto acomp %s : %pe\n",
--				pool->tfm_name, acomp_ctx->acomp);
--		ret = PTR_ERR(acomp_ctx->acomp);
--		goto fail;
--	}
--
--	ret = zswap_acomp_req_init(&acomp_ctx->comp.areq, acomp_ctx->acomp);
-+	ret = zswap_acomp_req_init(&acomp_ctx->comp.areq, pool->acomp);
- 	if (ret)
- 		goto req_fail;
- 
- 	/* Skip the per-CPU request when decompression can use the stack. */
--	if (acomp_is_async(acomp_ctx->acomp)) {
--		ret = zswap_acomp_req_init(&acomp_ctx->decomp, acomp_ctx->acomp);
-+	if (acomp_is_async(pool->acomp)) {
-+		ret = zswap_acomp_req_init(&acomp_ctx->decomp, pool->acomp);
- 		if (ret)
- 			goto req_fail;
- 	}
-@@ -876,7 +878,6 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
- 
- req_fail:
- 	pr_err("could not alloc crypto acomp_request %s\n", pool->tfm_name);
--fail:
- 	acomp_ctx_free(acomp_ctx);
- 	return ret;
- }
-@@ -1031,7 +1032,7 @@ static bool zswap_decompress(struct zswap_entry *entry, struct folio *folio)
- 	 * Otherwise serialize decompression on the shared per-CPU request.
- 	 */
- 	if (!acomp_ctx->decomp.req) {
--		ACOMP_REQUEST_ON_STACK(req, acomp_ctx->acomp);
-+		ACOMP_REQUEST_ON_STACK(req, pool->acomp);
- 		DECLARE_CRYPTO_WAIT(wait);
- 
- 		zswap_set_acomp_req_callback(req, &wait);
--- 
-2.39.5
+Thanks,
+Ashish
 
+> 
+>>> diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
+>>> index 99801e844b30..acbcec394ef1 100644
+>>> --- a/arch/x86/kernel/cpu/cpuid-deps.c
+>>> +++ b/arch/x86/kernel/cpu/cpuid-deps.c
+>>> @@ -93,6 +93,7 @@ static const struct cpuid_dep cpuid_deps[] = {
+>>>  	{ X86_FEATURE_SPEC_CTRL_SSBD,		X86_FEATURE_SPEC_CTRL },
+>>>  	{ X86_FEATURE_LASS,			X86_FEATURE_SMAP      },
+>>>  	{ X86_FEATURE_INVLPGB,			X86_FEATURE_PCID      },
+>>> +	{ X86_FEATURE_RMPOPT,			X86_FEATURE_SEV_SNP   },
+> 
+> This hunk.
+> 
