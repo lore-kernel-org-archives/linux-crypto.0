@@ -1,89 +1,201 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.179
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793722440;
-	b=mJv0rcHD3Cr93Yjz9q/hyfwQYL3+fqYMd0bojrJjF6Pgb8hKl8ZziOPXMfwrCyv/o75d
-	 pFVDS08L45tC4oQH/y/xyUSuY/pMJbgMIT9bWHrYptp5HGR4Tp0klsA2wOItyl5ZDZDF9
-	 ymJn8c6+/ozln98QtIwB041kFepTvKNvzZGhWxJV9O80IbnlZDQ+Th51XVZYsmW8+RQXc
-	 EQyM78qoeI5l3jqHfKbc+qaZCDqh9+6XMDFWhqm5vCx9r+LL9e7nTePngE3QzefwgQrfh
-	 lYDFM7gKi34L4TPloiiLg10txPbYyvySYNAfY7kC2prCuvw5OsWWO2L4pA5YzJ/DZEA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793722440;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key;
-	bh=RwcH6l6SUH5YEaW+wO0x6nlaiZGCJh24bNQeXxROXqI=;
-	b=z3OzwKTkVsfw75WQf/hP8TPG+DME/nSARmCRb9yF+k9RjtP/Mg2eCAJRT8BjzimAQgMg
-	 /zG8O7+viSGJMsp5I+JY5XkyZHEnPY1oLejmVVAq+OecYW5cLGh/vfoWzBIV8r/giNV6T
-	 tpkvDF5j0VxX4BB6puSD3+q7zyuADbgSo5ACYrtSiA1KOyOKnygjGuUkfSg4vnmwQdCfu
-	 Vp//dbCNnCv2YVFa8zffjLV0K+y3qhV/N1O3sAOEmvDhIjnd1enbHt1tw3fgIYLrGaECX
-	 JdOrNbGAyqI+e7midiylFbj9wSa1+yE6HCNYoU8bz8ew63QUVdsd+h6D6yv2Hp05dbw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=beagleboard.org;
-	spf=fail smtp.mailfrom=beagleboard.org;
-	dkim=pass header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b=ifRO9CzZ;
-	arc=none smtp.remote-ip=74.125.82.179
-Received: from mail-dy1-f179.google.com (mail-dy1-f179.google.com [74.125.82.179])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.150.75
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793723070;
+	b=aDSnn2b8TlGlNIMA5/XGT0vPwJzCIRCeRzBoU8qaG9m5KIOITSWWtcGfxjJfee+A0dmL
+	 IxE1IRREU76mDvn/3+nJOXDUvwq9HofQtwMIGmGM1RCugOCkZvYSdaBXwnILAlxn3v9wj
+	 /hPT+VbOht2gwSNK9LcNSboNLJVloWNvwzG0AP3g9+GNXUuBJLlos+pE3kVYxfuh1cc45
+	 uxFTSoxSsr5MMSlAVOLuvuR6T0mqbjDs9S8iiykdwNjfct5aY0zBpmBjxA3uo/lh5TM5i
+	 DyBApSWYlR8GkXoz3QcMnkffE1TfAhtIalvNyLCa64UjOLhnNBpbD9KKm1ji9o3HOgw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793723070;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:DKIM-Signature:
+	 Received:Received:From:To:CC:Subject:Thread-Topic:Thread-Index:Date:
+	 Message-ID:References:In-Reply-To:Accept-Language:Content-Language:
+	 X-MS-Has-Attach:X-MS-TNEF-Correlator:x-ms-publictraffictype:
+	 x-ms-traffictypediagnostic:x-ms-office365-filtering-correlation-id:
+	 x-ms-exchange-senderadcheck:x-ms-exchange-antispam-relay:
+	 x-microsoft-antispam:x-microsoft-antispam-message-info:
+	 x-forefront-antispam-report:
+	 x-ms-exchange-antispam-messagedata-chunkcount:
+	 x-ms-exchange-antispam-messagedata-0:Content-Type:Content-ID:
+	 Content-Transfer-Encoding:MIME-Version:
+	 X-Exchange-RoutingPolicyChecked:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-AuthAs:X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-originalarrivaltime:
+	 X-MS-Exchange-CrossTenant-fromentityheader:
+	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
+	 X-MS-Exchange-CrossTenant-userprincipalname:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:
+	 X-Proofpoint-ORIG-GUID:X-Authority-Analysis:X-Proofpoint-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=us2Z18GiPGwHJOIixZDUrHXWZaU++0cbRZKDA50yxE8=;
+	b=g0e66VELp0YFSo0rLS42CEoY9LoXYTE0Xj6M+J/odF1K/pP6HyYjGt05RGwd2xP3B4SC
+	 Aep9TQAt3AlDqKiubLA+EaSTyM4ynO8/dvXNn3Y6p5UKGhCl1Zywl6X0dfki9FmCElyZX
+	 iBXcraFGLJ468c1rIWlgf3c3qwMrgZYkulcnPTXwtD+fTGErKU4eWAO90KRznuBV/YLDk
+	 8vtsA+e30f3UW6E32wXWWl9+TlEoB8nWAflcSOZvOvpuPnOR0MK2A2wcjPZ4HfUzl4Uu2
+	 kglalBL4OMuSKm06RdEDzyVfU2ZJZ3WX1+iCQbsLYizTz5Xl7Oya5LV/NUjqltM+y8Q==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=ti.com;
+	spf=pass smtp.mailfrom=ti.com;
+	dkim=pass header.d=ti.com header.i=@ti.com header.a=rsa-sha256 header.s=proofpoint-05-2026 header.b=f+17jHoO;
+	dkim=pass header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-ticloud-onmicrosoft-com header.b=Y3pTUw35;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.150.75
+Received: from mx0a-0002e601.pphosted.com (mx0a-0002e601.pphosted.com [148.163.150.75])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FA5606A331
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 16:13:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 15FA5606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7F2606D81F;
+	Tue,  3 Nov 2026 16:24:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6E7F2606D81F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b=ifRO9CzZ
-Received: by mail-dy1-f179.google.com with SMTP id 5a478bee46e88-353804b591eso7506823eec.0
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Nov 2026 08:13:59 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=ti.com header.i=@ti.com header.a=rsa-sha256 header.s=proofpoint-05-2026 header.b=f+17jHoO;
+	dkim=pass (1024-bit key, unprotected) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-ticloud-onmicrosoft-com header.b=Y3pTUw35
+Received: from pps.filterd (m0380145.ppops.net [127.0.0.1])
+	by m0380145.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 6A3E7p413735208;
+	Tue, 3 Nov 2026 10:22:51 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
+	:content-id:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	proofpoint-05-2026; bh=us2Z18GiPGwHJOIixZDUrHXWZaU++0cbRZKDA50yx
+	E8=; b=f+17jHoOEwLCDNDITDJ1bRQaCLAmhgEmndX7N1sWWyQkSZGqgImL/cumz
+	AUyq2erhqgsk4FJa8jZnzBulB9TBb07wvXv9uJnqdxnUHGe3AfcCGLIEb5HEzDix
+	utP/z1l626f7dndOlBqZotHdMK41AtJxEx8xx1GwZfufDvgs2Y7u1eM+BaWBIShD
+	zox+llwsWvTQDzxsW/sLFzneV6UdKHavnmBO6v0cCn2U/3AYwYrjF1zp8XhgsVnp
+	i6OQTH4nChNsN1iJ5GK73p9wCq/TfdNB+MP+dhpvzRJNC4cgK2zXiwMydy44onwQ
+	aVb5v4b0oe6uGHWD90H8xaWIqUN2g==
+Received: from sn4pr0501cu005.outbound.protection.outlook.com (mail-southcentralusazon11011000.outbound.protection.outlook.com [40.93.194.0])
+	by m0380145.ppops.net (PPS) with ESMTPS id 4hqbaejwmb-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 03 Nov 2026 10:22:48 -0600 (CST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RA0i3nxWdZ8OMMbf4e0lnvc0Ih5ZjZTTeXe2EdkO72l7PBb3iNge3JQganaKU4BiHdjaSUzcL/T0N7Hl69veqHpz23FS8BnUKeMeRZ6L+RQm72rrc92Z0m1OmIx9sSNxGxJ1OM/n7kyzh9TThQKp/a77DFtCUPZluhA8rcq4nVyLJztBLLUkDP5WO6IEMAbj4XRz7p8H8cT+mLGqfT9nDFMguVASQI/bkxuH62H55iK1b+8MfR8mPZEbvS06EbnunLH0IS0ARjn3mO/HbupVUOfu5gY1LmXxw+mZmTXiVtpHINkL+d/LdNjqdukr7k1kTsQyPdXJyW1GfydZJSFwmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=us2Z18GiPGwHJOIixZDUrHXWZaU++0cbRZKDA50yxE8=;
+ b=hsVgMY4b0TNUA7e2fBZjIKmyBd5wNV/u5NC8e7hfMfZVxuceo9e1AKbfUIjbIOF6JCPxwWhm1aerUtayPPr9JLfRi+cw5S7+pf1Hs3yCZ8D7ou0uOp735yNEKKzp5dvEt3X5mwTzjWpIOCc6kJ8H+7oOOeDkg8t9o2OSJ55jm6msKkt2J9D5oCRe1sSB3RKKtP1GippYTzsXwY1iB/rtz6yk0HdNBwpw6rBsXDLSQUU6f6vRP0phwL5+IdGOs+/jOI1XzZQNBE5h77rcg/+NjKgsvo+FzajXpO3vpvUYJDOD3c+nMpA60gTYD3RgCoDdMJCfjq80IzJZN2MvIp/z+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=ti.com; dmarc=pass action=none header.from=ti.com; dkim=pass
+ header.d=ti.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=beagleboard.org; s=google; t=1793722439; x=1794327239; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=RwcH6l6SUH5YEaW+wO0x6nlaiZGCJh24bNQeXxROXqI=;
-        b=ifRO9CzZXOkXaYlanvPiLctzrmcde3AwiSd8EspD/AQPPHtpT+Trce12wQlpwZaXfJ
-         xrPlIgzKj2lJgtUnDqsGK5jee2Dyp3fHfP44iUunnfbrhmgo4elPHJPlzxca382HR/SV
-         y43cyBlixekBhC/ehAWh933h6lgDw7+N6eGYr0m6DfuWVw1uLhu5G+KKXaapaPhSShZQ
-         f6OKaB6Hp5hv+pkbpO7/QU2HNRlJyc0nzvW1HHhtkvFb7wYwCb0s1ZnbKW9ELXDArw7c
-         7ZOBBbZh/Y6TEUV7bIMt/vEI9GvpDMiZM2d9aPrNVl6PjlYplVEtYQqvjlMeinDw2A+Y
-         OnQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793722439; x=1794327239;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=RwcH6l6SUH5YEaW+wO0x6nlaiZGCJh24bNQeXxROXqI=;
-        b=f5QdTM6GYSXXFvhSbJdXyqfMCK2L5RPl7V8B3EuhvsZMf1UrFPUZNFqeyRFk2uUP6d
-         OvQIKyMYgg3veUtj6pHzWWImqV29MKD9SEvidxc3OJR20AVfgRyR86Nf4RSV+xP5dTb/
-         9ZV8LWsp8FCmzwuWdjXjzLUzrcGWft6gWdAhrJ5oLGJ6zM0q/DfrOH/4OorM4NHOqyHH
-         9LDtuazqnMCE4q19nvxYuewC/0Hn7dTTNpILiAFnKXHhCSLqYaarpBEsL4lX/Q5wuaFy
-         qCv6utHrkU8NdTg0sJeSISIKd+2xSVYjHCJ0xYcEwJgDMZqz4K53GFWNp0RlAaxSrtlx
-         uJMA==
-X-Forwarded-Encrypted: i=1; AKwUvBwnVuWKEQ6Bp6r7scQJoNZJcc/1q8UEQqYEW/alNvaF6lJ4FgADlzYUv2b4A0MYXa0hW+ChpHdZ5+XpTJA=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/MFjeyjHN/RongFPS3D+yAM3AP0OelwqVLVtkXDtWaDixc7B5R
-	VnuTxdpGWSGucu2T8rjHaVzYOfToCMw7oYmkq2Hy+vzPO7RH1gGFRNAzeOo5Pd2+5xCE0mbaB3g
-	mahg=
-X-Gm-Gg: AYBFou3vmNLL5CBip6ONDVbr9EoGwaglDOUtQkkXXg0dBZEk1vE54myJCGxpRyK9tnJ
-	6lFXFHEBJRrxAdxKjkkfoEnFhtFD7FQceHj76mtc9KBSUo4SOvfDp2uKBxFJTPz60WioP4O9GIo
-	S3uGnwNxzpWvw3u/z9INGi+Dsuj+855bJmKm33yLKMOS+nDbG7FNQ0NCOOPK/qInFxsDNuI99uk
-	ilnxdo6h/JsT9HMOvPG5GxjT83zIYld1iBXGKhXTNbwvrnZps10J1juqoDvFt6PZwbM4u3qsTJh
-	2df0bobNg7gDMEGO3ws4rcLiy3KWl7z9JPVFasRzTnQzW9ljb0YPYsHIOADAzugeUDgeQavA5BN
-	noZgJRbogmSgiqVgIHb95C02XYbD2oGQu7+zPQwH1KGKDNYJnTcWGM8829V2t7Ptf3NnIy7IZiJ
-	D7mq/bvj5ZwsQ5ws3QUM53hXi4DZjPJXVICBGcnstNHVCzzXPHMdqrI+2d9vS7wlskuRUROTVu8
-	mUcHVY+wFTq+loOOBZjVJaOHqhqAXvN1indIw/GiS+t+HJuU/CJ16ic3KMN/GtsOGJ7ewJ4HR2e
-	Lr79wvlIdqGtkcBI0zPpvoRUxspEQeOjlwAxscGd
-X-Received: by 2002:a05:693c:69cf:b0:369:daea:812a with SMTP id 5a478bee46e88-36a423fae73mr18470988eec.30.1793722439073;
-        Tue, 03 Nov 2026 08:13:59 -0800 (PST)
-Received: from [192.168.29.54] ([2405:201:4019:32fc:3c55:6b24:5147:322b])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428c17bdsm47214021eec.6.2026.11.03.08.13.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 08:13:58 -0800 (PST)
-From: Ayush Singh <ayush@beagleboard.org>
-Date: Tue, 03 Nov 2026 21:41:56 +0530
-Subject: [PATCH v5 9/9] greybus: Add Rust UART node driver
+ d=ticloud.onmicrosoft.com; s=selector1-ticloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=us2Z18GiPGwHJOIixZDUrHXWZaU++0cbRZKDA50yxE8=;
+ b=Y3pTUw35K+HD+H0+35qMYTrOC/abuZJDvaNLm3HEhyMIVnumIF0BwuITpA6pxEs2WgHa7XhZUNlZ5xN/s1h+pQmUeoo/vRTCEw+/hIgrwDo6+KLezVgz+RD8Bi9f6upNVmtCbCLkgWilGnaZNTXYmrXfKMH2cXzJDaCpq6O/JME=
+Received: from IA1PR10MB6122.namprd10.prod.outlook.com (2603:10b6:208:3aa::16)
+ by CH4PR10MB8098.namprd10.prod.outlook.com (2603:10b6:610:238::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.569.10; Tue, 3 Nov
+ 2026 16:21:09 +0000
+Received: from IA1PR10MB6122.namprd10.prod.outlook.com
+ ([fe80::adbc:118f:b10d:46fb]) by IA1PR10MB6122.namprd10.prod.outlook.com
+ ([fe80::adbc:118f:b10d:46fb%6]) with mapi id 15.21.0569.011; Tue, 3 Nov 2026
+ 16:21:08 +0000
+From: "T, Pratham" <t-pratham@ti.com>
+To: "Frank.Li@oss.nxp.com" <Frank.Li@oss.nxp.com>
+CC: "imx@lists.linux.dev" <imx@lists.linux.dev>,
+        "vkoul@kernel.org"
+	<vkoul@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea
+	<claudiu.beznea@tuxon.dev>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Jia Jie Ho
+	<jiajie.ho@starfivetech.com>,
+        William Qiu <william.qiu@starfivetech.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Thorsten Blum <blum@kernel.org>, Frank Li
+	<Frank.Li@nxp.com>,
+        Pan Chuang <panchuang@vivo.com>,
+        =?utf-8?B?TWF4aW1lIE3DqXLDqQ==?= <maxime.mere@foss.st.com>,
+        "open list:CRYPTO
+ API" <linux-crypto@vger.kernel.org>,
+        "moderated list:ARM/Microchip (AT91) SoC
+ support" <linux-arm-kernel@lists.infradead.org>,
+        open list
+	<linux-kernel@vger.kernel.org>,
+        "open list:QUALCOMM CRYPTO DRIVERS"
+	<linux-arm-msm@vger.kernel.org>,
+        "moderated list:ARM/STM32 ARCHITECTURE"
+	<linux-stm32@st-md-mailman.stormreply.com>
+Subject: Re: [PATCH 1/1] crypto: use dmaengine_desc_set_callback()
+Thread-Topic: [PATCH 1/1] crypto: use dmaengine_desc_set_callback()
+Thread-Index: AQHdaumubW5inhTdSk6/yrACY/bYEbcciNQA
+Date: Tue, 3 Nov 2026 16:21:08 +0000
+Message-ID: <1d412546-5119-416c-b948-523adff01a41@ti.com>
+References: <20261102164538.3834039-1-Frank.Li@oss.nxp.com>
+In-Reply-To: <20261102164538.3834039-1-Frank.Li@oss.nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=ti.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR10MB6122:EE_|CH4PR10MB8098:EE_
+x-ms-office365-filtering-correlation-id: 0edf9679-e961-4a7b-e82c-08df39c677e6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|23010399003|1800799024|10067099003|18002099003|22082099003|261102123227099003|261021123027099003|261009223027099003|261021121427099003|56012099006|38070700021;
+x-microsoft-antispam-message-info:
+ u8E8ujM28jrNn67C0NaH9VhL/v2B+it8sKIssyxZT1Fd4NbWo1GDnWHH9npuwoEw7VopGAFqoyQWcyDIlhoMfo7ueneZocOoYAqQi5xugH/Do3hfyfHKhTY4wQm21jyYC5Sn2uQX/fff6gjHeFU5Ehaxs7z8AoNP3h1yaS774On+6xG0N+a3uHL+dLuzuPuVGggfuIh78FOmJVE2TdC2ICY6f6hs5UtFpJ4HlsXSFJ4rgQk/JT+mdStcpzakncBipZ4UBSBxb4OeU4u4cb56wosNKOXHslGkvFp65O0rLBXmVYAWRW/SK6HXuuxYRAC7CNpJLNcAUcz+TlywVyP/P6yCgYGXIBNbPwAnRXEBPo/n9w+1dq700BkobwUu4gNkGNvgGFPsmhOCnNXBDUjJKtWx82BgHbQ5RTqcgIsLTtingA9rAHbMIX67stkimsLtomo4j9PTuV22ALWChG4tu3IBAlSrRj8M8+GJB+twwikLMFYvBCBtfjXjmK3g60jpmkbWsS/7506Bw9MTJPSldKluiaO2KKTfhAHxwXptqEsePLq0O5AEeYcPhfOeSLSQtjMYVTrNxoav/fXvrSY21eJU1qc+Wh9eeiPilPGoC96PaynRFzUPXmwsm+lOt7bcUKl/R8n+s1uSd7Ez2/+/96V7lBerq6rrljRfzpEPZ1+dHlBDPqKFjcF+PVQ6CIteS1J3lj4lHOsPDJ2l6nVxON6MdkD/XI/lnIlVxs0MPkU=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR10MB6122.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(23010399003)(1800799024)(10067099003)(18002099003)(22082099003)(261102123227099003)(261021123027099003)(261009223027099003)(261021121427099003)(56012099006)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?OXQ5L0M0bERyamZqekRBc1EycDJzNGFQd1F3VkdZRXFmbmFnUHlYdTZxc2g1?=
+ =?utf-8?B?ZGx0RVJoTzlOa0sxZmtQZUMwSU9UVXpvWGFMZ2ZxUEhJNHdITUhFc0o4Z1lx?=
+ =?utf-8?B?T0YyTjZZYWpHZlJ0QTU1SlZGVkY4L1VoQzVUNHV1K3VpSUh1VSt6bnFCbU1n?=
+ =?utf-8?B?K2wzUEJHTEZNQTZwVFRQQzFOSWI3eHpOZ2xNOHplMlFCcm9UN05SQnhLSUhm?=
+ =?utf-8?B?TzhIZi9XQ3BBdzBpNkVVb1BINEJOTEgzZGk2SHVWNldROEF2djkxTlpxNXZD?=
+ =?utf-8?B?Snp2SWdEZlIrSzlyRHJSQ0JDZFFKdGJTcnVtRjVrRkt5clZ6S1d0eWYrMklv?=
+ =?utf-8?B?dE1ycWZNZXZLczlZZDgwMVc3TzNMQ0RuaVJuNE1idWdTREU1UUQxZk1PaWdu?=
+ =?utf-8?B?N1hGSUJPU0c0c3kvWmo5TkQ2dDRNVGFmbmJqVkpHbGo2UldxQTJLVzNIUTFR?=
+ =?utf-8?B?Qkx0Z1NGM3FPQnlqT1g5UzRLK3ZVUEpEUERuOTM0eXdZd2ZRMnNRSHdPYUl6?=
+ =?utf-8?B?SDRDYTg3SlhzeEJtR2RENzNVS0JXNHFEZEhoQTNwUi9XNW5VM1d0NmF1WjV2?=
+ =?utf-8?B?ekNFNXdnVjZsTk1MeUJFamwyVFAyVyswMnJLOTJxZUNncGJ0UE1YU1ZKbzdJ?=
+ =?utf-8?B?NTNNOGJJd0tGbDJ5Z0RMSWZHYVNGei9tZkxUZ3pDQ2ZWQXF4TVU1RndlVEtk?=
+ =?utf-8?B?NEhPU0RGQlhEeWtQTmtWcGZ2MXdZUXF1eHhLd0xLQ1l6dklZRWMwSU9YcXU4?=
+ =?utf-8?B?UTlSQUYzTzMrTG5lQ2RrR2gxZWdnRnkybXMvdVY0a0psQ3JETzMyTmFMbUJa?=
+ =?utf-8?B?bmtSb2JxS1pGRUUyS042T3FOMWg3WmhrK08reXlNeU1GamVMUDU3U21YRndF?=
+ =?utf-8?B?K1pDQjRiNGNMTHNTTUtmUXZkQ2tzMGZKeERMMEo4UFUvOHlBU3VHdGF2cVNX?=
+ =?utf-8?B?ZkxyVE1mTGN4RXdkOWRoUWxQN0k0U3g2djFyWlQ4MlZIemdFeWdNcndlY2o3?=
+ =?utf-8?B?WXk4OVRRemRYL3hRcjFDbUEyT0tVWC9uZ1kvVW1xUSs5YzVPRUlPZ1BvMlBw?=
+ =?utf-8?B?Rm5vazQwM2xrbCsvMjA3eDlZMld3K1ZFTGliUUZqMzdPN3VCdWZveGpCdHIz?=
+ =?utf-8?B?dEtNcWRMYytuY3hoc1Z5ZjNhR0FaSm9peDU4Z1A4Zy92eGY0M2NENmRaT0Y3?=
+ =?utf-8?B?dkM2aWE2UTlLSEZpRG9rWVNnLzcwV0x2b0xFcDBWb3hGbG9KbmFaSkttWjFD?=
+ =?utf-8?B?ZzhTTDFzYWtGTmVaeDFYQWR0VzhJY29oQU1QWk4rUUIrNVJla05CRkJRMHZX?=
+ =?utf-8?B?UTFOa092NUZMeDlvVGxJdzdsY1R3d1NISXFMRzM2TXhGblJhOEh2cFVsUHJs?=
+ =?utf-8?B?dHQxK1B4ckpxZGVhV2RVQVV5VEFlS1czV3lWSFhiUFpZaU4xeEhTek5QZFhM?=
+ =?utf-8?B?TVZPbHk2NXZ4TU5wdGQ4WHl6NWR4TkRyQm94REwrYXpkZkg1ODYxY05UeVM1?=
+ =?utf-8?B?TWJhNjZFcTlMRFIzZGViRUkyc2dYMGRtaWRDMi9lekovSUF6cWVEaEQ5NGo4?=
+ =?utf-8?B?YUtvWkxWTzlBN2dVY0NYTURJZExjemR3Y3VOZGgxb0RhYWFoWUxLMXlSUFds?=
+ =?utf-8?B?RGp0VlQrdGNCQitWdjg0M2swWjFHTTFxK2hwUGFXSXl2UlJXQlBUVHl3Mjhu?=
+ =?utf-8?B?SlozSnA2eUdlaExFTHlZMGFnbnhVSHhwbktCUzY1MXAxQ2cwbEVsQzdNeW0y?=
+ =?utf-8?B?bkhBMUtBS3FLTG03Um83V1ViKzA2NW9xZHlGalZnNGRFMVI2eXNBUkNiMnNE?=
+ =?utf-8?B?OXBWbkg5eDVtbjY4ZWQ0eWJSSmg5c2s3SHdFbmxMMHRMK29MMTU4S3JXMmp0?=
+ =?utf-8?B?M1p6U2JGNlQvUzdEbVN1TGRCUHY5ZW9GMTA5MEFiYks5YXdUdks3OVhsbmF1?=
+ =?utf-8?B?RExzdjFKc09nMTBpUm9MK2t0UUJZWVpKRDN0T01nUTVOTy9EakhtdjdZTS8w?=
+ =?utf-8?B?WjJrcXAvU3VHdGxpdjBONTNpWTlySzFldk5VUG52VnQwMDBiUmk4TUZ1OVNM?=
+ =?utf-8?B?SHEzc3hHUDlKTVllVTA4TW4xVk1MU2FTMnVNb0o2YmErUHBaQ2Z4M2FUOFd6?=
+ =?utf-8?B?c2JvS2U2Y2orR0J1YnBYdzQ3L1RHdnFWbFYrMEhJcGV6bVNrUGkxc3ZUcmtw?=
+ =?utf-8?B?N1JMRitTNVpEMG84WnBnT1VCb0lHZWpQbnZOZ1hrWHNBc1BpeDBZbDVaVGRw?=
+ =?utf-8?B?d2xqdDZSaXRhSDYveWNXSTV1SG1rZXF6emlHV3lRRzMxNDlENitOUndXajZv?=
+ =?utf-8?Q?88qisQSlhnfOsW7rPk?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0E9384CC49862043A28FA5EBA2B8323B@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: base64
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -93,425 +205,70 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261103-gb-uart-transport-v5-9-f8e326d6561f@beagleboard.org>
-References: <20261103-gb-uart-transport-v5-0-f8e326d6561f@beagleboard.org>
-In-Reply-To: <20261103-gb-uart-transport-v5-0-f8e326d6561f@beagleboard.org>
-To: Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com, 
- Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
- Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
- Danilo Krummrich <dakr@kernel.org>, 
- Daniel Almeida <daniel.almeida@collabora.com>, 
- Tamir Duberstein <tamird@kernel.org>, 
- Alexandre Courbot <acourbot@nvidia.com>, 
- =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
- Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, 
- Ayush Singh <ayush@beagleboard.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
- Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett" <liam@infradead.org>, 
- Uladzislau Rezki <urezki@gmail.com>, 
- Markus Probst <markus.probst@posteo.de>
-Cc: greybus-dev@lists.linaro.org, linux-kernel@vger.kernel.org, 
- rust-for-linux@vger.kernel.org, linux-crypto@vger.kernel.org, 
- devicetree@vger.kernel.org, Ayush Singh <ayush@beagleboard.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=12433;
- i=ayush@beagleboard.org; h=from:subject:message-id;
- bh=tFOTmp9/1kr1wLjqm5OZDK94tW5bhoEDsqAOswVr9nk=;
- b=owEBbQKS/ZANAwAKAQXO9ceJ5Vp0AcsmYgBq6gfggs88rwtBtmZ2JBoJ5fYPPwVS01v3xrJNt
- hQ7Y4NSgUeJAjMEAAEKAB0WIQTfzBMe8k8tZW+lBNYFzvXHieVadAUCauoH4AAKCRAFzvXHieVa
- dFxbD/wKP5M8hF66MmLIphKFKU5qY46GvB6LQyi48hnH5tq/7og4IxBgGNb+U44spMP1GD1hdqx
- c2/3dammxiwOdPK9y6ZlP8TNpuW7n2xxdcuwXFDgRhC5Cva6t8gdSPmNgbtWP5FMvZhfX+jeK/3
- Ce4/txt8Z3I/CQ4MQFWrMIoo+8nK+2KCRDDaWYE2ZkhcrNhkZRx3PQ+ZULL+h10aZ2ZEOZaRwiR
- UzrzDJ4dws0Daimexg1s6P9z8hScSe42XKgIid12+AzJYiHmB4mq0yPQ9eJhGyrtn9hVpKitj6I
- 07D21Er589g4tPWqQz0er05usuQNDmuaASQR9KFUyzW3yDPgHaqlCTN0dVBfBngR/AR/H7CZKkN
- FNKhDB9FxIAj2nT4GelRc/093W6JEXKQHZIM+clRs8A3m66vQE1+iBV5v4GWRZZySWQQ8lyTLIX
- wbKHkjYqnNeSDrck7ZM/oSSm+VgKSmih/zzHlNm43msUkc5YiHGErqV/JigjveuPypw8pus96Ml
- F8V44/AWTNoi6lZJTrUsAwpX+CJMdwrMiS+VlWqmHEuqHqI3FL+UA1VgxL269wZCsqQJ1CtV+zk
- WGX8wBBGu5+uly3vQ03AdWyM8RTweAldUz8sSXyUWa/UJXrSveP26O0fMsiOQFlQ8IxgKO12F40
- zRS9Be6KHnNrnPg==
-X-Developer-Key: i=ayush@beagleboard.org; a=openpgp;
- fpr=DFCC131EF24F2D656FA504D605CEF5C789E55A74
+X-Exchange-RoutingPolicyChecked:
+	yU3uiCWKKYg63k+WqNWcygNx/tHURKCOL7rns/gE1xz7JFwXkvQ8Y6olV+uWJj6SB6excl7dAfG5JGiHVZ0ItoZEr64eZ39G5ZnA43OJESA2uP8Rpg/pnK9HMlerSO3uRiG15xlNi2cu5BkS1rAXQMk63r4EJBi6URUKbVopHDug8exkBzn8pfC2iOCokPALgkTIE2kTrDa96WI1h8g7iZyjopStLQWw3J7om3DzkoKlauELPATtP+VziYhZFTjJZHM5iqxbPaStLuBunNERYjoLAmjqNZ0pTJDI4ie6DPtSibcMtBVfmRt/d+8VzYxdUdIF2dXy1MY0YMdb+K18iA==
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR10MB6122.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0edf9679-e961-4a7b-e82c-08df39c677e6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Nov 2026 16:21:08.7536
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: m/Hjeo6DRj2n9zrKeLlnpCrgT4d3tmfiGQpbuSEufMpVWUERDLx1P+M+Z2Z73aqwd94vbiG6MnUbBFuJnPesBw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH4PR10MB8098
+X-Proofpoint-ORIG-GUID: wG_I1e05Qk7NhBrDFYy3gzHBXTcpOdyq
+X-Authority-Analysis: v=2.4 cv=eYGo7LEH c=1 sm=1 tr=0 ts=6aea0a58 cx=c_pps
+ a=QnZ2uEdZlRAtgHxfLCbJPw==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=zJRp6_cAMcgA:10 a=AlMIdn_sM9wA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Z8NIEmU8O1QQgoT56wFK:22 a=gO1vWkAQAl3rybz1DQOp:22 a=8AirrxEcAAAA:8
+ a=sozttTNsAAAA:8 a=yugM23XqmQLCJm96DuAA:9 a=QEXdDO2ut3YA:10
+ a=ST-jHhOKWsTCqRlWije3:22
+X-Proofpoint-GUID: wG_I1e05Qk7NhBrDFYy3gzHBXTcpOdyq
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTAzMDA2NSBTYWx0ZWRfX1wJ3sg+Gu2j5
+ Ar58OzACzeIVGdiN9uXNg7KUgs0ycsR0NVIHb6icROdkInjWK0UWJRdJvGlih5Uc5JX+A0ivcK9
+ OKN/OKsz7k1aefT6yAVU6RRXvcNt092StJceaV5xLYYNDBdXFndzzpr0y2loH8/eICnwluRDkuJ
+ xzjzSh+iiCSz4kPliQHvrvB7OhwxMODcpFsv1o+jELQu+qDDNG9ZBlPqVt4yEXEjMeLcJhgTDaB
+ /ZDBlwcaFghOFrLYTY0SS/FAk1cZ9qbZIMCQ3+cYdnQDfGxhlJzqYxm2ISklGtYf86hHb+SqNoP
+ Y7NKCUS+sc2aviu8dLXvnt+owADl63s1y/zSWo5QDkOA3oj2z+cEO1w+9GMXRlMwY529j3aA3Jo
+ RPUGmEeRfsOGI/nt9qk/YQ6PVh2kSoj+UsC86I49WgB9exiVQ1mSFrEAk0ybNMruRP2C1t5fkA5
+ PNaRv8qmRoeQ9Sn/L2g==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTAzMDA2NSBTYWx0ZWRfX/ARxtcp1bNT2
+ mixfGfKCy6YPufFFJpO8GJGLKdZdXAYGr8wbwmqPqMeTGr/RVi7R6yBWkwdmj5Zm9HIgzL3qm42
+ wL7B7Y2HoAlS2SYA3gPp07+le2Tj87U=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-03_03,2026-11-03_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 clxscore=1011 priorityscore=1501 malwarescore=0
+ suspectscore=0 adultscore=0 bulkscore=0 phishscore=0 spamscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2610300000
+ definitions=main-2611030065
 
-Add a driver for Greybus nodes attached over a plain serial port. The
-node is registered with the software SVC (gb-softsvc), which handles the
-SVC protocol on behalf of the AP, so no dedicated coprocessor running
-SVC firmware is needed.
-
-Greybus messages are carried over HDLC framing on the wire. Each frame
-carries a one-byte address (0x01 for Greybus) and control byte, followed
-by the 16-bit CPort ID and the Greybus message itself.
-
-Port parameters are taken from the firmware node: "current-speed" if
-present, otherwise 115200, with flow control and parity disabled.
-
-Since gb-uart-node imports types from gb-softsvc, Rust to Rust calling
-setup from nova-core [0] is being used.
-
-[0]: https://lore.kernel.org/all/20260622-nova-exports-v5-0-6191773fc977@nvidia.com/
-
-Signed-off-by: Ayush Singh <ayush@beagleboard.org>
----
- MAINTAINERS                     |   1 +
- drivers/greybus/.gitignore      |   1 +
- drivers/greybus/Kconfig         |  15 +++
- drivers/greybus/Makefile        |  10 ++
- drivers/greybus/gb_uart_node.rs | 270 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 297 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 521bc6c67979..5bdd500ef63e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11527,6 +11527,7 @@ M:	Ayush Singh <ayush@beagleboard.org>
- L:	greybus-dev@lists.linaro.org (moderated for non-subscribers)
- S:	Maintained
- F:	Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml
-+F:	drivers/greybus/gb_uart_node.rs
- 
- GREYBUS SUBSYSTEM
- M:	Johan Hovold <johan@kernel.org>
-diff --git a/drivers/greybus/.gitignore b/drivers/greybus/.gitignore
-new file mode 100644
-index 000000000000..ff9c4a3539b4
---- /dev/null
-+++ b/drivers/greybus/.gitignore
-@@ -0,0 +1 @@
-+exports_gb_softsvc_generated.h
-diff --git a/drivers/greybus/Kconfig b/drivers/greybus/Kconfig
-index 709563f8c0ad..ce2030161f30 100644
---- a/drivers/greybus/Kconfig
-+++ b/drivers/greybus/Kconfig
-@@ -61,5 +61,20 @@ config GREYBUS_SOFTSVC
- 	  To compile this code as a module, choose M here: the module
- 	  will be called gb-softsvc.ko
- 
-+config GREYBUS_UART_NODE
-+	tristate "Greybus UART node transport"
-+	depends on GREYBUS_SOFTSVC
-+	depends on RUST_SERIAL_DEV_BUS_ABSTRACTIONS
-+	depends on RUST_GREYBUS_ABSTRACTIONS
-+	select RUST_CRC_CCITT_ABSTRACTIONS
-+	help
-+	  Select this option if you have a Greybus node connected over a
-+	  serial port. The node is registered with the software SVC, which
-+	  handles the SVC protocol on behalf of the AP, so no dedicated
-+	  coprocessor running SVC firmware is required.
-+
-+	  To compile this code as a module, choose M here: the module
-+	  will be called gb-uart-node.ko
-+
- endif	# GREYBUS
- 
-diff --git a/drivers/greybus/Makefile b/drivers/greybus/Makefile
-index 0fa802fdf6ca..023f59c11e65 100644
---- a/drivers/greybus/Makefile
-+++ b/drivers/greybus/Makefile
-@@ -28,6 +28,12 @@ obj-$(CONFIG_GREYBUS_ES2)	+= gb-es2.o
- obj-$(CONFIG_GREYBUS_SOFTSVC)	+= gb-softsvc.o
- gb-softsvc-y			+= gb_softsvc.o gb_softsvc_exports.o
- 
-+obj-$(CONFIG_GREYBUS_UART_NODE)	+= gb-uart-node.o
-+gb-uart-node-y			+= gb_uart_node.o
-+
-+# Export Rust symbols from gb-softsvc only if gb-uart-node actually references them.
-+gb-softsvc-export-deps := $(if $(CONFIG_GREYBUS_UART_NODE),$(obj)/gb_uart_node.o)
-+
- rust_needed_exports = \
- 	{ $(if $(strip $(2)),$(NM) -u $(2);,) echo "__DEFINED_RUST_SYMBOLS__"; \
- 	  $(NM) -p --defined-only $(1); } | \
-@@ -66,3 +72,7 @@ endif
- # Output gb_softsvc's crate metadata for use by gb_uart_node at compile time.
- RUSTFLAGS_gb_softsvc.o += \
- 	--emit=metadata=$(objtree)/$(obj)/libgb_softsvc.rmeta
-+
-+# Allow gb_uart_node to import gb_softsvc's types.
-+$(obj)/gb_uart_node.o: $(obj)/gb_softsvc.o
-+RUSTFLAGS_gb_uart_node.o := -L $(objtree)/$(obj) --extern gb_softsvc
-diff --git a/drivers/greybus/gb_uart_node.rs b/drivers/greybus/gb_uart_node.rs
-new file mode 100644
-index 000000000000..b38e776c3e85
---- /dev/null
-+++ b/drivers/greybus/gb_uart_node.rs
-@@ -0,0 +1,270 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Greybus UART Node driver
-+
-+use kernel::{
-+    alloc::Flags,
-+    crc_ccitt::crc_ccitt,
-+    device::{
-+        AsBusDevice,
-+        Bound,
-+        Core, //
-+    },
-+    error::code,
-+    new_spinlock,
-+    of, //
-+    prelude::*,
-+    serdev,
-+    sync::{
-+        aref::ARef,
-+        Arc,
-+        SpinLock, //
-+    },
-+};
-+
-+use zerocopy::little_endian;
-+use zerocopy_derive::{
-+    FromBytes,
-+    Immutable,
-+    KnownLayout, //
-+};
-+
-+/// Most greybus implementations will have a limit on greybus message length. The theoretical limit
-+/// is [`u16::MAX`], but the real limits are much more modest. 256 seems to be the limit I use on
-+/// most of my peers, but let's use 512 to be on safe side in kernel. The only real big request that
-+/// I frequently encounter is manifest_get. However, if camera protocol ends up being supported at
-+/// some point, this might need to be increased.
-+const HDLC_MAX_FRAME_LEN: usize = 512;
-+const HDLC_FRAME_HEADER_LEN: usize =
-+    2 * size_of_val(&HDLC_FRAME) + 2 * size_of::<u16>() + 2 * size_of::<u8>();
-+const HDLC_MAX_MSG_LEN: usize = HDLC_MAX_FRAME_LEN - HDLC_FRAME_HEADER_LEN;
-+
-+const HDLC_FRAME: u8 = 0x7E;
-+const HDLC_ESC: u8 = 0x7D;
-+const HDLC_XOR: u8 = 0x20;
-+const HDLC_EXPECTED_CRC: u16 = 0xf0b8;
-+
-+const ADDRESS_GREYBUS: u8 = 0x01;
-+
-+#[repr(C, packed)]
-+#[derive(FromBytes, Immutable, KnownLayout)]
-+struct GreybusFrame {
-+    cport: little_endian::U16,
-+    msg: [u8],
-+}
-+
-+struct HdlcRx {
-+    rx_buf: KVec<u8>,
-+    rx_in_esc: bool,
-+    rx_overflow: bool,
-+    sdev: ARef<serdev::Device>,
-+    node: gb_softsvc::Module,
-+}
-+
-+impl HdlcRx {
-+    fn new(sdev: ARef<serdev::Device>, node: gb_softsvc::Module) -> Result<Self> {
-+        Ok(Self {
-+            node,
-+            sdev,
-+            rx_buf: KVec::with_capacity(HDLC_MAX_FRAME_LEN, GFP_KERNEL)?,
-+            rx_in_esc: false,
-+            rx_overflow: false,
-+        })
-+    }
-+
-+    fn frame_finish(&self) -> Result<()> {
-+        if self.rx_buf.len() < 4 {
-+            return Err(code::EFAULT);
-+        }
-+
-+        let crc = crc_ccitt(0xffff, &self.rx_buf);
-+        if crc != HDLC_EXPECTED_CRC {
-+            dev_warn!(self.sdev.as_ref(), "CRC failed {}", crc);
-+            return Ok(());
-+        }
-+
-+        let addr = self.rx_buf[0];
-+        let _ctrl = self.rx_buf[1];
-+        let payload = &self.rx_buf[2..self.rx_buf.len() - size_of::<u16>()];
-+
-+        match addr {
-+            ADDRESS_GREYBUS => {
-+                let frame = GreybusFrame::ref_from_bytes(payload).map_err(|_| code::EINVAL)?;
-+                self.node.submit_message(0, frame.cport.into(), &frame.msg)
-+            }
-+            _ => Err(code::EINVAL),
-+        }
-+    }
-+
-+    fn rx(&mut self, data: &[u8]) -> usize {
-+        for i in data.iter() {
-+            match *i {
-+                HDLC_FRAME => {
-+                    if !self.rx_buf.is_empty() {
-+                        if let Err(e) = self.frame_finish() {
-+                            dev_warn!(self.sdev.as_ref(), "bad frame: {e:?}\n");
-+                        }
-+                    }
-+
-+                    self.rx_buf.clear();
-+                    self.rx_in_esc = false;
-+                    self.rx_overflow = false;
-+                }
-+                HDLC_ESC => self.rx_in_esc = true,
-+                // Skip data if buffer has overflown.
-+                _ if self.rx_overflow => {}
-+                _ => {
-+                    let c = if self.rx_in_esc { *i ^ HDLC_XOR } else { *i };
-+                    self.rx_in_esc = false;
-+
-+                    if self.rx_buf.push_within_capacity(c).is_err() {
-+                        dev_warn!(self.sdev.as_ref(), "buffer overflow. Dropping frame");
-+
-+                        self.rx_overflow = true;
-+                        self.rx_buf.clear();
-+                    }
-+                }
-+            }
-+        }
-+
-+        data.len()
-+    }
-+}
-+
-+struct GbNode {
-+    sdev: ARef<serdev::Device>,
-+}
-+
-+impl GbNode {
-+    const fn new(sdev: ARef<serdev::Device>) -> Self {
-+        Self { sdev }
-+    }
-+
-+    fn fill_buf(mut crc: u16, data: &[u8], buf: &mut KVec<u8>) -> Result<u16> {
-+        for i in data {
-+            crc = crc_ccitt(crc, &[*i]);
-+            if *i == HDLC_ESC || *i == HDLC_FRAME {
-+                buf.push_within_capacity(HDLC_ESC)
-+                    .map_err(|_| code::E2BIG)?;
-+                buf.push_within_capacity(i ^ HDLC_XOR)
-+                    .map_err(|_| code::E2BIG)?;
-+            } else {
-+                buf.push_within_capacity(*i).map_err(|_| code::E2BIG)?;
-+            }
-+        }
-+
-+        Ok(crc)
-+    }
-+}
-+
-+impl gb_softsvc::InterfaceOps for GbNode {
-+    fn write(&self, data: &[u8], cport: u16, gfp_mask: Flags) -> Result<()> {
-+        // SAFETY: `GbNode` only exists while its serdev driver is bound, so the device is in the
-+        // `Bound` state for the duration of this call.
-+        let bound: &serdev::Device<Bound> =
-+            unsafe { serdev::Device::from_device(self.sdev.as_ref().as_bound()) };
-+
-+        // Drop messages which are bigger than what is supported.
-+        if data.len() > HDLC_MAX_MSG_LEN {
-+            return Err(code::E2BIG);
-+        }
-+
-+        let mut buf = KVec::with_capacity(HDLC_MAX_FRAME_LEN, gfp_mask)?;
-+
-+        let mut crc = 0xffff;
-+
-+        buf.push_within_capacity(HDLC_FRAME)
-+            .map_err(|_| code::E2BIG)?;
-+
-+        crc = Self::fill_buf(crc, &[ADDRESS_GREYBUS, 0x03], &mut buf)?;
-+        crc = Self::fill_buf(crc, &cport.to_le_bytes(), &mut buf)?;
-+        crc = Self::fill_buf(crc, data, &mut buf)?;
-+
-+        crc ^= 0xffff;
-+        Self::fill_buf(crc, &crc.to_le_bytes(), &mut buf)?;
-+
-+        buf.push_within_capacity(HDLC_FRAME)
-+            .map_err(|_| code::E2BIG)?;
-+
-+        // A short count means the wait was interrupted by a signal after part of the frame was
-+        // accepted. The rest is never sent; the receiver drops the truncated frame on the next
-+        // flag, but the message itself was not sent.
-+        if bound.write_all(&buf, 0)? != buf.len() {
-+            return Err(code::EINTR);
-+        }
-+
-+        Ok(())
-+    }
-+}
-+
-+#[pin_data]
-+struct GbUartNode {
-+    #[pin]
-+    rx: SpinLock<HdlcRx>,
-+}
-+
-+impl GbUartNode {
-+    fn init(sdev: &serdev::Device<Core<'_>>) -> Result<HdlcRx> {
-+        if sdev
-+            .set_baudrate(
-+                sdev.as_ref()
-+                    .fwnode()
-+                    .and_then(|fwnode| fwnode.property_read(c"current-speed").optional())
-+                    .unwrap_or(115200),
-+            )
-+            .is_err()
-+        {
-+            return Err(EINVAL);
-+        }
-+        sdev.set_flow_control(false);
-+        sdev.set_parity(serdev::Parity::None)?;
-+
-+        let node = gb_softsvc::Module::new(&[Arc::new(GbNode::new(sdev.into()), GFP_KERNEL)?])?;
-+
-+        HdlcRx::new(sdev.into(), node)
-+    }
-+}
-+
-+kernel::of_device_table!(
-+    OF_TABLE,
-+    <GbUartNode as serdev::Driver>::IdInfo,
-+    [(of::DeviceId::new(c"beagle,beagleconnect-freedom"), ())]
-+);
-+
-+#[vtable]
-+impl serdev::Driver for GbUartNode {
-+    type IdInfo = ();
-+    type Data<'bound> = Self;
-+    const OF_ID_TABLE: Option<of::IdTable<Self::IdInfo>> = Some(&OF_TABLE);
-+
-+    fn probe<'bound>(
-+        sdev: &'bound serdev::Device<Core<'_>>,
-+        _info: Option<&'bound Self::IdInfo>,
-+    ) -> impl PinInit<Self, Error> + 'bound {
-+        dev_dbg!(sdev.as_ref(), "Probe gb_uart_node.\n");
-+
-+        try_pin_init!(Self {
-+            rx <- new_spinlock!(Self::init(sdev)?, "gb_uart_node::rx"),
-+        }? Error)
-+    }
-+
-+    fn receive<'bound>(
-+        _sdev: &'bound serdev::Device<Bound>,
-+        this: Pin<&Self>,
-+        data: &[u8],
-+    ) -> usize {
-+        if let Some(mut guard) = this.rx.try_lock() {
-+            return guard.rx(data);
-+        }
-+
-+        0
-+    }
-+}
-+
-+kernel::module_serdev_device_driver! {
-+    type: GbUartNode,
-+    name: "gb_uart_node",
-+    authors: ["Ayush Singh <ayush@beagleboard.org>"],
-+    description: "Greybus node connected over UART",
-+    license: "GPL v2",
-+}
-
--- 
-2.56.0
-
+T24gMDItMTEtMjAyNiAyMjoxNSwgRnJhbmsuTGlAb3NzLm54cC5jb20gd3JvdGU6DQo+IEZyb206
+IEZyYW5rIExpIDxGcmFuay5MaUBueHAuY29tPg0KPiANCj4gUmVwbGFjZSBvcGVuLWNvZGVkIGFz
+c2lnbm1lbnRzIHRvIGNhbGxiYWNrIGFuZCBjYWxsYmFja19wYXJhbSBmaWVsZHMNCj4gb2Ygc3Ry
+dWN0IGRtYV9hc3luY190eF9kZXNjcmlwdG9yIHdpdGggY2FsbHMgdG8gdGhlDQo+IGRtYWVuZ2lu
+ZV9kZXNjX3NldF9jYWxsYmFjaygpIGhlbHBlciBhY3Jvc3MgdmFyaW91cyBjcnlwdG8gZHJpdmVy
+cy4NCj4gDQo+IE5vIGZ1bmN0aW9uYWwgY2hhbmdlIGludGVuZGVkLiBQcmVwYXJlIG1ha2UgdG8g
+c3RydWN0DQo+IGRtYV9hc3luY190eF9kZXNjcmlwdG9yIHByaXZhdGUgdG8gdGhlIERNQSBlbmdp
+bmUuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBGcmFuayBMaSA8RnJhbmsuTGlAbnhwLmNvbT4NCj4g
+LS0tDQo+ICBkcml2ZXJzL2NyeXB0by9hdG1lbC1hZXMuYyAgICAgICAgICAgIHwgMyArLS0NCj4g
+IGRyaXZlcnMvY3J5cHRvL2F0bWVsLXNoYS5jICAgICAgICAgICAgfCA2ICsrLS0tLQ0KPiAgZHJp
+dmVycy9jcnlwdG8vYXRtZWwtdGRlcy5jICAgICAgICAgICB8IDMgKy0tDQo+ICBkcml2ZXJzL2Ny
+eXB0by9pbWctaGFzaC5jICAgICAgICAgICAgIHwgMyArLS0NCj4gIGRyaXZlcnMvY3J5cHRvL29t
+YXAtYWVzLmMgICAgICAgICAgICAgfCA4ICsrKy0tLS0tDQo+ICBkcml2ZXJzL2NyeXB0by9vbWFw
+LWRlcy5jICAgICAgICAgICAgIHwgNSArKy0tLQ0KPiAgZHJpdmVycy9jcnlwdG8vb21hcC1zaGFt
+LmMgICAgICAgICAgICB8IDMgKy0tDQo+ICBkcml2ZXJzL2NyeXB0by9xY2UvZG1hLmMgICAgICAg
+ICAgICAgIHwgMyArLS0NCj4gIGRyaXZlcnMvY3J5cHRvL3NhMnVsLmMgICAgICAgICAgICAgICAg
+fCAzICstLQ0KPiAgZHJpdmVycy9jcnlwdG8vc3RhcmZpdmUvamg3MTEwLWFlcy5jICB8IDMgKy0t
+DQo+ICBkcml2ZXJzL2NyeXB0by9zdGFyZml2ZS9qaDcxMTAtaGFzaC5jIHwgMyArLS0NCj4gIGRy
+aXZlcnMvY3J5cHRvL3N0bTMyL3N0bTMyLWNyeXAuYyAgICAgfCA5ICsrKy0tLS0tLQ0KPiAgZHJp
+dmVycy9jcnlwdG8vc3RtMzIvc3RtMzItaGFzaC5jICAgICB8IDMgKy0tDQo+ICBkcml2ZXJzL2Ny
+eXB0by90aS9kdGhldjItYWVzLmMgICAgICAgIHwgOSArKystLS0tLS0NCj4gIDE0IGZpbGVzIGNo
+YW5nZWQsIDIyIGluc2VydGlvbnMoKyksIDQyIGRlbGV0aW9ucygtKQ0KTEdUTS4NCg0KUmV2aWV3
+ZWQtYnk6IFQgUHJhdGhhbSA8dC1wcmF0aGFtQHRpLmNvbT4NCg0KLS0gDQpSZWdhcmRzDQpUIFBy
+YXRoYW0gPHQtcHJhdGhhbUB0aS5jb20+DQo=
