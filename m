@@ -1,62 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.10.208.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.112
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793713810;
-	b=mmQYPo4vk6k9XNuIwA5i+Rg4p1pNoGp67QaQYgCQ+hgq2s9NZzfmyBtJTY+eIu9Bj4sw
-	 25sqhp2j9flRlJ/Ds9FIWijo7ywGIxKHDk41z6qd4IdZJS8Q2bhXgcwxsZxxzntBcXSE5
-	 xOY0a9Y6Zou3v1TvoX9jF9CJincKyLdg5XGHCTJ6GTkT9aM9ThOU6fHn7TuRVOFPyjrr3
-	 KxRd6MIxf4XCzkxi2d0GycSIEuH1Lhyw4ecNPD7R5qkEUnlZlN3q36FWUk34GtfvOfJGK
-	 Ylj7ceg8JJUPcY+BTk4VFNGJ8Wu8wRvJpHsMCxhES3YIfhMEVF2AzdCEuerFY2YWvOA==
+	t=1793715970;
+	b=5UXI6bR7nLTI/5PBh0n1kdhFTZbulO1mcNroQs/hwl1u8hW7Zaxms+uOgf/zEZ7n7pTR
+	 CVrjMg1g+dOegTSLjWAMbfKAaOAgEKq2wcYXr3k1z+a0JKkaa0kcM5rhG4a+C6wrAotww
+	 ln5+WMbtULN4OutFmynl6syA0MMDD0pnBQ/KdqJH6B1x+dTE6HMfyBjnGeFgV1eNG10cm
+	 5rRPDW4y3TuOR1QISQk+X0LJvCuhhESw3PogE4TNCjI3rdzx0QBdyQ8UYOFsFW/AEVmlx
+	 LR7aYVzv3kOrEWFiTHUSCAiXeHTOvhq75OIFc6gbVhXtivnzVCdLkzMA/yUd48MyXRw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793713810;
-	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:
-	 Organization:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 X-Rspamd-Queue-Id;
-	bh=D9Bh52UpfAm+qb3j8t6IEKEI/Dr/0E/0m1u5bOYdNYk=;
-	b=J5Byokru4EUPqk2/lIMyhzo6A4g/s02+Wu4IkG81SQaOCLSEmsR2WoOc45n7Usi39IKQ
-	 vw2id6RKMRhLmLyalJcseNXJUXaexu7lBY9D8iZ7UeHH99wd/aAec97Gv403k6mAGlvY3
-	 rmOMqCOF3eiOG65tRF20yQZQRiUBdMSj8P/2tTBBNqk1hRSGHXBhUNYSDwMJIptzN7Jbo
-	 /oQpuOPiREuc75X3dtZTca5gumlRQa2mm6v1gNRxvdT8UbaW5KvBhehN4WsvXUbhPi4Ol
-	 btKGuzj3l1XCy4S+55dSgBY7Feo/2/5qLER8gITMJn78znd8R8dNJeTQV7cLrNsp14A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793715970;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=SP+PsE8Ru4U+3pCKdB8/8ut6hXzWlTRuTLeApszTcIU=;
+	b=F2ZQP506esc4OL70mxeNpQBSoX5Hp2ewdO1rwXRHEuukaF/MQQr5fkzcHLIKbzeqkgFy
+	 FhQOHyEbT02OlmtSxBgafQsav1V1krP55HsFiIcOnped1vXAc6uhRIgV+3drqBjLAZ6vo
+	 woLNqXLCjRx/3+ja2UGhlKaK5kn12HTYtvERSV41+dLiWbDTqhN7GL6s8ZkncTJl9g91r
+	 exr1gJCojNwcCtRbNmT6uunC52JyERrU25bni27O8+Q/6OH+HMx7iEBsHn2DUDL7s9Q0x
+	 X+qwGhuosiF+GGEJFoTiCHjkTXD/Z42Cu9ixOnK19pKeVFtbNlzqyhalCw3D1AgFEdA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=mandelbit.com;
-	spf=pass smtp.mailfrom=mandelbit.com;
-	dkim=pass header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=WPSWNBuJ;
-	arc=none smtp.remote-ip=195.10.208.46
-Received: from mout-b-106.mailbox.org (mout-b-106.mailbox.org [195.10.208.46])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=YaHi5cR7;
+	arc=none smtp.remote-ip=91.218.175.112
+Received: from mta0.migadu.com (out-112.mta0.migadu.com [91.218.175.112])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33AAA606A327
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 13:50:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 33AAA606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BE4606A324
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 14:26:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 96BE4606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=WPSWNBuJ
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-106.mailbox.org (Postfix) with ESMTPS id 4jJqh617Y3zNll3;
-	Tue, 03 Nov 2026 14:49:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1793713798;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D9Bh52UpfAm+qb3j8t6IEKEI/Dr/0E/0m1u5bOYdNYk=;
-	b=WPSWNBuJ8wN+mFXYt/pSqZyJ49NXGsYeLZmbiWG9GSAiocOJJaDCSTM0h7Rmz2DGeGKcKS
-	/rz/t2V3KjO/puDRZ3N46XPx23hQi0r7f536w8YtMtrAMIyp7Jzw/bNJfJVHtYrDG4g+Ft
-	bsv8VGasT0g4jSdTQUMS3FXGK7PuwurmR5R5OB7+4tCdJmnieGUVpcdZKJWHE5wcjNxN9L
-	IIlw0glMca3GJ1s3UpfkSNmMZ2U4Y/PjPCrvF6Ftx8dUmKtyWuxay7O5r+3041nUwvAUBD
-	d4uRcgqSSa7t4jmcT79YgnxoNZjKC3SxgMu1xAxkrkzN59fg88HMxyUN+W+qOQ==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of antonio@mandelbit.com designates 2001:67c:2050:b231:465::202 as permitted sender) smtp.mailfrom=antonio@mandelbit.com
-Message-ID: <0f5fa2f9-84a1-403a-b279-afed3c939a01@mandelbit.com>
-Date: Tue, 3 Nov 2026 14:49:56 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=YaHi5cR7
+X-Envelope-To: linux-crypto@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=e4dRfO2AklgdwU7Ax1baawDTLW3B5X1MgsMszdfEn0w=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793715967; v=1; x=1794320767;
+ b=YaHi5cR7BLL3kSm9QyMD6IvLgxrXUGjQG7/SqJWzCm2WzFzZhyONHi8FPdjtOJk4qBGtFzGG
+ kUjC4kf2hI0RoP7sX43XiNI3hrc3E6tOctdbNbZyDbre2NqoFVOkam2lJx6loXVKlDQ2DE0i8lm
+ Q9I7zUhYUe25GVDd/+Ls1CWo=
+X-Envelope-To: linux-crypto@vger.kernel.org
+Received: by mta10.migadu.com with ESMTPS id 313b1a0531fdd4a8;
+	Tue, 03 Nov 2026 14:26:07 +0000
+X-Mizu-Trace-ID: 313b1a0531fdd4a8
+X-Migadu-Flow: FLOW_OUT
+From: Usama Arif <usama.arif@linux.dev>
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Cc: Usama Arif <usama.arif@linux.dev>,
+	akpm@linux-foundation.org,
+	chengming.zhou@linux.dev,
+	dsterba@suse.com,
+	hannes@cmpxchg.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	nphamcs@gmail.com,
+	terrelln@fb.com,
+	yosry@kernel.org,
+	riel@surriel.com,
+	shakeel.butt@linux.dev,
+	alex@ghiti.fr,
+	senozhatsky@chromium.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
+	kernel-team@meta.com
+Subject: Re: [PATCH v2 1/2] mm: zswap: use separate compression and decompression requests
+Date: Tue,  3 Nov 2026 06:25:58 -0800
+Message-ID: <20261103142600.279899-1-usama.arif@linux.dev>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261013002140.28880-1-kanchanapsridhar2026@gmail.com>
+References: 
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -66,81 +82,92 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] lib/crypto: x86/chacha: Add a 16-block AVX-512
- function
-To: Martin Willi <martin@strongswan.org>, Eric Biggers <ebiggers@kernel.org>,
- linux-crypto@vger.kernel.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>
-References: <20261102113926.2765176-1-martin@strongswan.org>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@mandelbit.com>
-Organization: Mandelbit SRL
-In-Reply-To: <20261102113926.2765176-1-martin@strongswan.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 4jJqh617Y3zNll3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On Mon, 12 Oct 2026 17:21:40 -0700 "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com> wrote:
 
-On 02/11/2026 12:39, Martin Willi wrote:
-> Here is v2 of the 16-block ChaCha function for 512-bit zmm registers.
-> Patch 1 renames the assembly file, patch 2 wraps the 8-block code in
-> a macro, and patch 3 adds the 16-block function on top.
+> On Fri, Oct 9, 2026 at 6:31 PM Usama Arif <usama.arif@linux.dev> wrote:
+> >
+> > Stores and loads serialize on the same per-CPU acomp request and mutex.
+> > A low-priority store can be preempted as soon as the compressor drops
+> > its stream lock, while it still holds the mutex. A higher-priority load
+> > on that CPU then waits until the store runs again, which can take a
+> > long time when other tasks are runnable.
+> >
+> > Give compression and decompression their own request, completion wait
+> > and mutex. Since commit e2c3b6b21c77f ("mm: zswap: use SG list
+> > decompression APIs from zsmalloc"), the per-CPU buffer is only used for
+> > compression, so group it with the compression request. Independent
+> > requests can share the per-CPU transform; the codecs and drivers
+> > synchronize their shared state internally. Loads can still wait for
+> > each other on the decompression mutex, and stores still serialize on
+> > the compression mutex.
+> >
+> > acomp_request_free() ignores NULL requests, so drop the check in
+> > acomp_ctx_free().
+> >
+> > This follows the proposal from Sergey Senozhatsky for the same split
+> > for zram [1].
+> >
+> > [1] https://lore.kernel.org/all/20261005122036.718976-10-senozhatsky@chromium.org/
+> >
+> > Signed-off-by: Usama Arif <usama.arif@linux.dev>
 > 
-> I previously mentioned a larger series with more AVX refactorings to
-> shared macros along with a 4-block zmm variant. That needs some
-> more work, so here is just the 16-block variant.
+> I have a question with regards to this patch. Is the intent to allow a
+> decompress thread to run concurrently with a store thread for a given process?
+
+The request is shared by tasks using the same CPU and zswap pool.
+These may be different processes or threads of the same process.
+Each operation still runs synchronously in its caller.
+
+The motivating case can happen entirely on one CPU:
+1. Task A compresses page X and releases the codec's stream lock.
+2. A is preempted while still holding the zswap request mutex.
+3. Task B runs and faults in an already stored page Y.
+
+With the shared request, B blocks until A runs again and releases the
+mutex. Separate requests let B load Y while A's store is unfinished.
+The codec/driver still synchronizes its own shared state.
+
+> If so, I wonder if incurring context switch/PTE/TLB shootdowns performance
+> penalty is worth it?
+
+The switch to B already occurs with the existing code. This patch adds
+no worker threads, forced migration, PTE changes or TLB shootdowns.
+It avoids B's subsequent wait on A's request mutex. The 1-vCPU
+benchmark in the cover letter exercises this without CPU migration.
+
 > 
-> v1 used embedded broadcasts for the final ChaCha state add. This comes
-> with a minor regression on older Intel chips when used in the 8-block
-> variant. Therefore I kept the state words in registers in the macro
-> version used by both 8/16-block variants, see patch 3.
+> With the proposed change, will zswap_store() continue to run on the "old" CPU
+> (i.e. the one to which the process got migrated), or is it a requirement that
+> the "old" process is in sleep state? If so, should we codify/document this
+> requirement?
 > 
-> I don't have a Zen 4, which splits zmm instructions into two 256-bit
-> halves, so I can't tell how the 16-block function performs there.
-> If anybody has access to one, numbers from there would be great.
+
+There is no requirement for A to sleep. A can remain runnable while
+preempted. Its zswap_store() invocation resumes in the same task, on
+whichever CPU the scheduler selects. If it migrates after selecting
+the context, it retains that pointer and the corresponding mutex,
+as the existing code does. The same task cannot execute on two CPUs
+at once.
+
+> On the new CPU, is the same process "runnable", and if so, how do we ensure that
+> the "higher priority" decompress is handled while the zswap_store() prior to
+> preemption is still not done?
+
+Normal scheduler policy decides when B runs. Once it runs, the split
+removes its dependency on A releasing the shared request mutex.
+A load starting on another CPU already selects a different context
+today; migration is unnecessary for the benefit described here.
+
+Existing folio/swap-cache locking still orders accesses to the same
+page. The example above concerns two independent pages.
+
+Thanks for the review!
+Usama
+
 > 
-> Changes in v2:
->   - Rename chacha-avx512vl-x86_64.S to chacha-avx512-x86_64.S
->   - Generate the 8- and 16-block functions from a shared macro
->   - Drop the cpu_has_xfeatures() and X86_FEATURE_AVX512F checks
->   - Keep the state words in registers for the final add
->   - Benchmark with the ChaCha KUnit suite instead of tcrypt
+> Thanks,
+> Kanchana
 > 
-> v1: https://lore.kernel.org/linux-crypto/20260722153247.630519-1-martin@strongswan.org/
-> 
-> Martin Willi (3):
->    lib/crypto: x86/chacha: Rename the AVX-512VL assembly file
->    lib/crypto: x86/chacha: Wrap the 8-block AVX-512 code in a macro
->    lib/crypto: x86/chacha: Add a 16-block AVX-512 function
-> 
->   lib/crypto/Makefile                           |   2 +-
->   ...x512vl-x86_64.S => chacha-avx512-x86_64.S} | 730 +++++++++++-------
->   lib/crypto/x86/chacha.h                       |  28 +-
->   3 files changed, 477 insertions(+), 283 deletions(-)
->   rename lib/crypto/x86/{chacha-avx512vl-x86_64.S => chacha-avx512-x86_64.S} (55%)
-> 
-> 
-> base-commit: c90bb21618db40f1f30a1c0ed58d4f46b27dba26
-
-Thanks for this v2!
-
-Unfortunately no Zen 4 here to test with.
-
-This said, I gave the code a go on my Ryzen 9 3950X and I matched the 
-results without encountering any issue.
-
-For the whole series:
-
-Tested-by: Antonio Quartulli <antonio@mandelbit.com>
-
-Regards,
-
--- 
-Antonio Quartulli
-
-CEO and Co-Founder
-Mandelbit Srl
-https://www.mandelbit.com
-
