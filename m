@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793723406;
-	b=ia97ftczXAveBuh21PVqygfqP6LadlEZqOlSHMZXg3CiGc8vtCn4A/FBcuHNNyN51fHP
-	 iK7Zwd3/WJXkZYamsZWjV1Aaj1vdgT5VMlExyiQNfOZw6SBqMYfrsV/CZd05KF/SCQOgO
-	 Rwu9pBv9dPV9ALbyjOriWJJGnB38WixLGm278MJsU0+acOKHVOIyUMyjn9zQOyfyowTOI
-	 5LiXOA4gvqvyRMoMWC4l8vUycbLQxlCIVkQwtnYGd5FW7UeK5KkXceNV9r35ISHktAlJp
-	 7NHJpwRqrqKHaMU88yE1jfOnuuHR57o1D+3PnSDlhZLaom65XQLaKMVyZwQMULUTBhQ==
+	t=1793723569;
+	b=Moh/hMqRzXPOhHmRiu6m5N5dpKDRtkPxIozwNYn8rEaokUxBx+nf2cm3S6kCTrZz0AWy
+	 IrJfEkHrtPlEBEvVCRUhRtaCAvrTpVMi561e5Z40VarEThukOc3eb61wAl64ceBSMqDlh
+	 dZTglesM1PMLsdzJFHv8fD15g8PSInvt/2Kv4nwna/532/UDAK2vL2MApw8KhmnzefMXh
+	 6OK3COYVjTqWY2ploRamY3YtDgbrqUA+TpVZCT7mIIZiH/d+pHLuP86gb0tKgpyZaYAT7
+	 WaWOtWX1B409YM2y/Ztlg45enwC9wxRv8QjGKcgo1m/QhNn6vnnyif7vxjuZlKANlNA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793723406;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793723569;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Hd9PQQ8ozOYSKti/kNoYNT++gNKLWkbtNoIAA4opdCA=;
-	b=HungH1gcpS//WoXhKUCYGQgm4ppEjwmZYUHDD9buUjW8iULN9ud6L3TTFHNDSwSPXziC
-	 ozgnzqRPkIndCnWbPAfvmh6EwWExT/4x173NBpdMJDN8t29DRC+dmAmP7NiUffkDYXyEJ
-	 uWqi7lP+5X1nJkkgMRPFsf7kJFYnwX+OE5aDFkbWnzRDKZN1WhgkrCiZip5Pt1sK+QYAd
-	 AcQmuyewqx+xAFG5YJ8bR/MgkxZotE5fbMTrIvY26jeYmauaICQ2LX5dDiQbcVAwsV33r
-	 G850vY2xWw6u6fjH4tdYQQG4kgs4sVmzEpZ9ZtxIeuUJeHz8rrc+B6qPsKF7WNEb4ZQ==
+	bh=PVzXQ2RYaauL4WOwQ31wWF0ak8azJBeYTb0/1fqEAaE=;
+	b=PNM+Itmmy7M4mayV++vtJNjJjoVsnkFBAT/eugWJ9kPZEwt0YKoYYfIGfvACg1I0b2BA
+	 zd1CQyhi/tsMKuMoWk7PW7Yf9WsKvB4+oFh1xFIxPi96Rd4vc0NBKyEhFewcYpd7b0q/C
+	 PgK0/pBlZ8Z99nC3Z1VYaiXJQQ1xf4Bx7J2ZJbYF/5usgnWaiI+XIMZlQpMc7wsLzWTth
+	 m41m0JCoO48BEIj93JchI6y3Bfp4z7TWxWYgEPbAWpubSC+noKdQLOgVF7/g9wDYVNNAz
+	 YtWL83lRTIl2NIY6l9+wSTxqLpin0PfJ0IGeYeym1Z9QhoTsfNqJV+oNdbgwM/nCyDw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BUDG7NQ0;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UVhJ1DD9;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A27E606D803;
-	Tue,  3 Nov 2026 16:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BBB606A324;
+	Tue,  3 Nov 2026 16:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BUDG7NQ0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F95D1F00A18;
-	Tue,  3 Nov 2026 16:30:04 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UVhJ1DD9
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEDA11F0093A;
+	Tue,  3 Nov 2026 16:32:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793723405;
-	bh=Hd9PQQ8ozOYSKti/kNoYNT++gNKLWkbtNoIAA4opdCA=;
+	s=k20260515; t=1793723569;
+	bh=PVzXQ2RYaauL4WOwQ31wWF0ak8azJBeYTb0/1fqEAaE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=BUDG7NQ0/lHzpiPu+jwuqlL3hP4gXpULtNXG71tbvKd7XNAbKnAEOb7mM5tAOKBmp
-	 V4zFYcVXK6yxmaFiSNoyTxVUxRCZaD0vyn74BoNYq5yzDEwwUAe/aarppwewp5MTi+
-	 YJDja6RS7HEB3jsDZnWrMG/LXQn/b0oNiQASY89GENa7kUD+co788voxYh1D7fAcod
-	 rtJnif45tnei/4F/3SF+RYK+SHMP3OduGweo3THRK3LuigIAQS5wktAvdz3Mzv6tgh
-	 PrIcll1od/N+ENujX8eeBW6VTgxGF84TK5A4HsraJ3YjWhN+LYqr95ZHJGj42Q3k46
-	 PAdtk+zkT10MA==
-Message-ID: <sashiko-outbox-195727@kernel.org>
+	b=UVhJ1DD92jYPTwpzTriuTDtiTfy2CiWCj00e/WHxiFzK5SizkQoQjACjofZdEkRZP
+	 /h2VEIm+kUygQOqtLpjpVDBcFIgGczNemozZGLHLWZ98gtL11/DJeue0LAmAV80oqK
+	 Gkp88uLQ1Zbnp3VQcebet61Eru0PVl+qmXpApM+w907bFe4Pn5cLBEGMMIt4G5r9wc
+	 kMNT4uSHU3pniH2hFAbBkz3HFcS0NBxiJt6AF49IkRhv7BweULY7xTOWzhxjapxStV
+	 13T5XX7epziOk9f3l0ipHmwn7AmS34/p/S95flIIpp7FDOU0Oub1D+wQ2uA2MCMCGR
+	 VUE+rGcnTuZ4g==
+Message-ID: <sashiko-outbox-195729@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 1/9] greybus: operation: keep request active across
- message_send
+Subject: Re: [PATCH v5 7/9] drivers: greybus: Add software SVC
+ implementation
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Ayush Singh" <ayush@beagleboard.org>, "Jason Kridner" <jkridner@beagleboard.org>, robertcnelson@gmail.com, "Johan
  Hovold" <johan@kernel.org>, "Alex Elder" <elder@kernel.org>, "Greg
@@ -60,12 +60,12 @@ To: "Ayush Singh" <ayush@beagleboard.org>, "Jason Kridner" <jkridner@beagleboard
  Howlett" <liam@infradead.org>, "Uladzislau Rezki" <urezki@gmail.com>, "Markus
  Probst" <markus.probst@posteo.de>
 Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-In-Reply-To: <20261103-gb-uart-transport-v5-1-f8e326d6561f@beagleboard.org>
+In-Reply-To: <20261103-gb-uart-transport-v5-7-f8e326d6561f@beagleboard.org>
 References: <20261103-gb-uart-transport-v5-0-f8e326d6561f@beagleboard.org>
- <20261103-gb-uart-transport-v5-1-f8e326d6561f@beagleboard.org>
+ <20261103-gb-uart-transport-v5-7-f8e326d6561f@beagleboard.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Nov 2026 16:30:04 +0000
+Date: Tue, 03 Nov 2026 16:32:47 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -75,166 +75,209 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 2 potential issue(=
+Thank you for your contribution! Sashiko AI review found 3 potential issue(=
 s) to consider:
-- [Critical] greybus: operation: double put in gb_operation_request_send() =
-on send error
-- [Critical] greybus: operation: race between gb_operation_get_active() cal=
-ls on send
+- [High] greybus: gb_softsvc: unsynchronized async SVC handshake in init() =
+and drop()
+- [Medium] greybus: gb_softsvc: unchecked response result in GbHdDriver::sv=
+c_handler()
+- [Low] greybus: gb_softsvc: commit message describes outdated NodeOps API
 --
 
-commit 1f5c8fb4470157e5c81c1041163bd49efb2ea63b
+commit ee105f38d9a9f65cae00900a000f4081ef4dbafb
 Author: Ayush Singh <ayush@beagleboard.org>
 
-greybus: operation: keep request active across message_send
+drivers: greybus: Add software SVC implementation
 
-This commit takes an extra reference and active count on the Greybus
-operation across gb_message_send() in gb_operation_request_send() so that
-operation cancellation waits for the host driver's send path to return.
+This commit adds gb-softsvc, an in-kernel software implementation of a
+Greybus Supervisory Controller (SVC) in Rust for transports that do not
+have a hardware SVC on the bus.
 
-> diff --git a/drivers/greybus/operation.c b/drivers/greybus/operation.c
-> index 7e12ffb2dd60d..a63bc2eb164e9 100644
-> --- a/drivers/greybus/operation.c
-> +++ b/drivers/greybus/operation.c
-> @@ -766,7 +766,25 @@ int gb_operation_request_send(struct gb_operation *o=
-peration,
->  	if (ret)
->  		goto err_put;
-> =20
-> +	/*
-> +	 * Completion can drop the reference and active count above while the
-> +	 * host driver is still sending. Hold another of each across the send, =
-so
-> +	 * that cancelling the operation waits for the host driver to return.
-> +	 */
-> +	gb_operation_get(operation);
-> +	ret =3D gb_operation_get_active(operation);
-> +	if (ret) {
-> +		/*
-> +		 * The connection is being torn down, and the operation, which is
-> +		 * already on its list, will be cancelled and completed.
-> +		 */
-> +		gb_operation_put(operation);
-> +		return 0;
-> +	}
-
-[Severity: Critical]
-Because the first gb_operation_get_active(operation) call adds operation->l=
-inks
-to connection->operations with operation->active =3D=3D 1 and then drops
-connection->lock before the second reference and active count are acquired,
-can a concurrent teardown race in the window between the two
-gb_operation_get_active() calls?
-
-1. If gb_connection_disable() or gb_connection_disable_forced() runs right
-after the first gb_operation_get_active() unlocks connection->lock,
-gb_connection_cancel_operations() -> gb_operation_cancel() queues
-gb_operation_work(). If gb_operation_work() runs before this thread reaches
-the second gb_operation_get(operation), it invokes operation->callback(),
-decrements operation->active to 0 (waking gb_operation_cancel() before
-gb_message_send() has even started), and drops the completion reference. For
-asynchronous callers whose callback drops the caller's own reference (such =
+>     drivers: greybus: Add software SVC implementation
+>    =20
+>     A Greybus network requires an SVC (Supervisory Controller) to bring
+>     interfaces up, assign device IDs and connect CPorts to the AP. On a
+>     UniPro network the SVC is a real entity on the bus, but transports th=
+at
+>     merely carry Greybus messages - a UART, an I2C bus, a network link -
+>     have no such entity, so every host driver for those transports ends up
+>     open-coding an SVC emulation of its own.
+>    =20
+>     Add gb-softsvc, a Rust implementation of the SVC that lives in the
+>     kernel and registers itself as a Greybus host device. It answers the
+>     SVC-side operations the core expects during interface bring-up and
+>     teardown.
+>    =20
+>     Host drivers use it through a small in-kernel interface. A driver
+>     implements the NodeOps trait to send data towards its node and then
+>     calls module_insert() to announce a new node, submit_message() to hand
+>     incoming Greybus messages back to the core, and module_remove() on
+>     disconnect. Interface IDs are allocated by the SVC and returned from
+>     module_insert().
+>    =20
+>     Connection create/destroy and interface activate/resume currently just
+>     acknowledge the request; callbacks into NodeOps can be added later if
+>     transports need to act on them.
+>    =20
+>     gb_softsvc_exports.c exports the Rust symbols for dependent modules, =
 as
-gb_loopback_async_operation_callback() in drivers/staging/greybus/loopback.=
-c),
-operation->kref can reach 0 and free operation before the second
-gb_operation_get() and gb_operation_get_active() touch it.
+>     the build system does not yet support Rust cross-module dependencies
+>     natively. This hack is taken from nova-core [0].
+>    =20
+>     [0]: https://lore.kernel.org/all/20260622-nova-exports-v5-0-6191773fc=
+977@nvidia.com/
+>    =20
+>     Signed-off-by: Ayush Singh <ayush@beagleboard.org>
 
-2. For GB_OPERATION_FLAG_CORE operations, gb_operation_get_active() permits
-operations when connection->state is GB_CONNECTION_STATE_DISCONNECTING:
+[Severity: Low]
+As reported by Sashiko on v4 [1], does the commit message still describe an
+older version of the public API?
 
-drivers/greybus/operation.c:gb_operation_get_active() {
-	...
-	case GB_CONNECTION_STATE_DISCONNECTING:
-		if (!gb_operation_is_core(operation))
-			goto err_unlock;
-		break;
-	...
+The changelog states that host drivers implement NodeOps and call
+module_insert() (to obtain allocated interface IDs) and module_remove(). In
+drivers/greybus/gb_softsvc.rs, the public trait is InterfaceOps,
+module_insert() and module_remove() are private methods on Svc, and drivers
+use Module::new(), Module::submit_message() with a module-relative interface
+index, and Drop for Module.
+
+> diff --git a/drivers/greybus/gb_softsvc.rs b/drivers/greybus/gb_softsvc.rs
+> new file mode 100644
+> index 0000000000000..c9bff6a5fa658
+> --- /dev/null
+> +++ b/drivers/greybus/gb_softsvc.rs
+
+[ ... ]
+
+> @@ -0,0 +1,533 @@
+> +            (
+> +                false,
+> +                protocols::GB_SVC_TYPE_INTF_UNIPRO_ENABLE
+> +                | protocols::GB_SVC_TYPE_INTF_UNIPRO_DISABLE,
+> +            ) =3D> self.0.intf_unipro_enable_disable(hd, hdr),
+> +            (false, protocols::GB_SVC_TYPE_INTF_ACTIVATE) =3D> self.0.in=
+tf_activate(hd, msg),
+> +            (false, protocols::GB_SVC_TYPE_INTF_RESUME) =3D> self.0.intf=
+_resume(hd, msg),
+> +            (true, protocols::GB_SVC_TYPE_PROTOCOL_VERSION) =3D> self.0.=
+send_svc_hello(hd)?,
+> +            (true, protocols::GB_SVC_TYPE_SVC_HELLO) =3D> {
+> +                let global_state =3D GlobalState::new(self.0.clone(), hd=
+.into());
+> +                let _ =3D GLOBAL_STATE.lock().replace(global_state);
+> +            }
+
+[Severity: Medium]
+Should GbHdDriver::svc_handler() verify that the response header result is
+GB_OP_SUCCESS before advancing the handshake and populating GLOBAL_STATE?
+
+In drivers/greybus/operation.c, gb_operation_request_handle() always calls
+gb_operation_response_send(operation, status) for non-unidirectional reques=
+ts:
+
+drivers/greybus/operation.c:gb_operation_response_send() {
+    ...
+    /* Fill in the response header and send it */
+    operation->response->header->result =3D gb_operation_errno_map(errno);
+
+    ret =3D gb_message_send(operation->response, GFP_KERNEL);
+    ...
 }
 
-If a core operation passes the first gb_operation_get_active() in
-GB_CONNECTION_STATE_ENABLED, and gb_connection_disable() transitions to
-GB_CONNECTION_STATE_DISCONNECTING and cancels/completes the operation in the
-window before the second gb_operation_get_active(), won't the second
-gb_operation_get_active() still succeed in DISCONNECTING, re-add the already
-completed operation to connection->operations, and send it?
+If gb_svc_version_request() or gb_svc_hello() fails in drivers/greybus/svc.=
+c,
+the core still sends a response over GB_SVC_CPORT_ID with a non-zero error
+code in header->result and leaves svc->state uninitialized. Because
+GbHdDriver::svc_handler() only matches on (hdr.is_response(),
+hdr.request_type()), it will treat the failed response as a success and
+publish an uninitialized SVC in GLOBAL_STATE.
 
-Conversely, in drivers/greybus/connection.c, gb_connection_disable() and
-_gb_connection_enable() call gb_connection_cancel_operations() when entering
-GB_CONNECTION_STATE_DISCONNECTING, but not when subsequently setting
-connection->state =3D GB_CONNECTION_STATE_DISABLED:
-
-drivers/greybus/connection.c:gb_connection_disable() {
-	...
-	spin_lock_irq(&connection->lock);
-	connection->state =3D GB_CONNECTION_STATE_DISCONNECTING;
-	gb_connection_cancel_operations(connection, -ESHUTDOWN);
-	spin_unlock_irq(&connection->lock);
-	...
-	connection->state =3D GB_CONNECTION_STATE_DISABLED;
-}
-
-If a core operation passes the first gb_operation_get_active() while in
-GB_CONNECTION_STATE_DISCONNECTING and connection->state transitions to
-GB_CONNECTION_STATE_DISABLED before the second gb_operation_get_active(), t=
-he
-second call returns -ENOTCONN and this path returns 0 without dropping the
-first active count or reference and without anyone cancelling the operation,
-leaking operation and hanging synchronous callers waiting on
-operation->completion.
-
+> +            (
+> +                true,
+> +                protocols::GB_SVC_TYPE_MODULE_INSERTED | protocols::GB_S=
+VC_TYPE_MODULE_REMOVED,
+> +            ) =3D> {}
+> +            (false, ty) =3D> {
+> +                dev_warn!(hd.as_ref(), "unsupported request 0x{:02x}\n",=
+ ty);
+> +                let rsp =3D Msg::response(hdr, protocols::GB_OP_PROTOCOL=
+_BAD, ());
+> +                hd.data_rcvd(protocols::GB_SVC_CPORT_ID, rsp.as_bytes());
+> +            }
+> +            (true, ty) =3D> dev_warn!(hd.as_ref(), "unexpected response =
+0x{:02x}\n", ty),
+> +        };
 > +
->  	ret =3D gb_message_send(operation->request, gfp);
-> +	gb_operation_put_active(operation);
-> +	gb_operation_put(operation);
->  	if (ret)
->  		goto err_put_active;
+> +        Ok(())
+> +    }
+> +}
 
-[Severity: Critical]
-What happens if gb_operation_cancel() cancels the operation while
-gb_message_send() is in progress, and gb_message_send() then returns a
-non-zero error code?
+[ ... ]
 
-While gb_message_send() is running, operation is on connection->operations
-with operation->errno set to -EINPROGRESS. If a concurrent teardown calls
-gb_connection_cancel_operations() -> gb_operation_cancel(operation, -ESHUTD=
-OWN):
+> +impl kernel::Module for GreybusSoftSvc {
+> +    fn init(_module: &'static ThisModule) -> Result<Self> {
+> +        pr_info!("gb_softsvc (init)\n");
+> +
+> +        // SAFETY: This runs once at module init, before anything else c=
+an reach `GLOBAL_STATE`.
+> +        unsafe { GLOBAL_STATE.init() };
+> +
+> +        let faux =3D faux::Registration::new(c_str!("gb-softsvc"), None)=
+?;
+> +        let svc =3D Arc::pin_init(Svc::new(), GFP_KERNEL)?;
+> +        let data =3D GbHdDriver(svc.clone());
+> +
+> +        let dev =3D faux.as_ref().as_ref();
+> +        let hd =3D hd::Registration::new(dev, GB_OPERATION_SIZE_MAX, CPO=
+RT_ID_MAX + 1, Ok(data))?;
+> +
+> +        svc.send_version(hd.as_ref())?;
+> +
+> +        Ok(GreybusSoftSvc {
+> +            _hd: hd,
+> +            _faux: faux,
+> +        })
+> +    }
+> +}
+> +
+> +impl Drop for GreybusSoftSvc {
+> +    fn drop(&mut self) {
+> +        let _ =3D GLOBAL_STATE.lock().take();
+> +        pr_info!("gb_softsvc (exit)\n");
+> +    }
+> +}
 
-drivers/greybus/operation.c:gb_operation_cancel() {
-	...
-	if (gb_operation_result_set(operation, errno)) {
-		gb_message_cancel(operation->request);
-		queue_work(gb_operation_completion_wq, &operation->work);
-	}
-	...
-}
+[Severity: High]
+Because the SVC handshake runs asynchronously on svc->connection->wq, can
+GreybusSoftSvc::init() and GreybusSoftSvc::drop() race with the handshake w=
+ork
+items?
 
-gb_operation_work() will run operation->callback(operation) and call
-gb_operation_put_active(operation) and gb_operation_put(operation), consumi=
-ng
-the initial completion active count and reference.
+In GreybusSoftSvc::init(), svc.send_version() calls hd.data_rcvd() ->
+greybus_data_rcvd() -> gb_connection_recv_request(), which only queues the
+incoming GB_SVC_TYPE_PROTOCOL_VERSION request onto svc->connection->wq.
+GreybusSoftSvc::init() returns before that work item and the subsequent
+GB_SVC_TYPE_SVC_HELLO request complete and populate GLOBAL_STATE in
+GbHdDriver::svc_handler(), so a consumer calling Module::new() right after
+module init will see GLOBAL_STATE as None and fail with EAGAIN:
 
-If gb_message_send() also returns an error (for example, on disconnect or TX
-failure), gb_operation_request_send() drops the send active count and
-reference here, and then jumps to err_put_active:
+    pub fn new(intfs: &[Arc<dyn InterfaceOps>]) -> Result<Self> {
+        ...
+        let guard =3D GLOBAL_STATE.lock();
+        let state =3D guard.as_ref().ok_or(code::EAGAIN)?;
 
-	ret =3D gb_message_send(operation->request, gfp);
-	gb_operation_put_active(operation);
-	gb_operation_put(operation);
-	if (ret)
-		goto err_put_active;
-	...
-err_put_active:
-	gb_operation_put_active(operation);
-err_put:
-	gb_operation_put(operation);
+In addition, when GreybusSoftSvc is dropped, GreybusSoftSvc::drop() runs
+GLOBAL_STATE.lock().take() before its _hd field is dropped via
+Registration::drop() -> gb_hd_del() -> gb_svc_del() ->
+gb_connection_disable_rx(). If the asynchronous GB_SVC_TYPE_SVC_HELLO respo=
+nse
+is processed on svc->connection->wq after GreybusSoftSvc::drop() clears
+GLOBAL_STATE but before _hd is unregistered, GbHdDriver::svc_handler() will
+reinstall GlobalState into GLOBAL_STATE and leak the Arc<Svc> and
+ARef<hd::Device> references.
 
-Wouldn't jumping to err_put_active drop the completion active count and
-operation->kref a second time (three puts for two gets), underflowing
-operation->active to -1, underflowing operation->kref into a use-after-free,
-and running both the asynchronous completion callback and the synchronous
-error return path?
+[1] https://lore.kernel.org/r/20261021-gb-uart-transport-v4-4-c308ce821d45@=
+beagleboard.org
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261103-gb-uart-tr=
-ansport-v5-0-f8e326d6561f@beagleboard.org?part=3D1
+ansport-v5-0-f8e326d6561f@beagleboard.org?part=3D7
