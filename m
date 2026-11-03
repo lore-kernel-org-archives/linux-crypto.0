@@ -1,47 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793723291;
-	b=1kPBye5GDjMIsIGjglX987fnghYKdFLZo+PdltART7vLK5O40G16seGf9YX2p+hKWqjK
-	 l4V2IXvv0QivHuQIZF378JMvybZHV6rVZ0wZIWF6aG6tPlybCZ+6HmVQoJAj7OED4nN81
-	 GrPNn7hTcBWOrLKlKZ/0DcuOTqpNy6u3/rs4mhXhHhd7oBBqI6vjF/0qhfpqC7Vd2TLLN
-	 uAmU4W0mFvOCPyMoWayfEaGX3obO6kt4d8dRH3Sb2RojlNPEue2fLnGJBXYBkPhCzIE8l
-	 VxhHKds2WyZqwfS0o/IFhhZV4rGTB/L7thKe7qcdczLQzC781BAmV9lzB8HyeENvtEQ==
+	t=1793723406;
+	b=ia97ftczXAveBuh21PVqygfqP6LadlEZqOlSHMZXg3CiGc8vtCn4A/FBcuHNNyN51fHP
+	 iK7Zwd3/WJXkZYamsZWjV1Aaj1vdgT5VMlExyiQNfOZw6SBqMYfrsV/CZd05KF/SCQOgO
+	 Rwu9pBv9dPV9ALbyjOriWJJGnB38WixLGm278MJsU0+acOKHVOIyUMyjn9zQOyfyowTOI
+	 5LiXOA4gvqvyRMoMWC4l8vUycbLQxlCIVkQwtnYGd5FW7UeK5KkXceNV9r35ISHktAlJp
+	 7NHJpwRqrqKHaMU88yE1jfOnuuHR57o1D+3PnSDlhZLaom65XQLaKMVyZwQMULUTBhQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793723291;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793723406;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=kFjGSTadJ6qoktnpYz+dD2REm71grJ6UoHE4PWQ/UmU=;
-	b=LV7OR/25MfmJ87zyXqhtV56dnPDiY+QhbmIjumdvYeiPE34+LCMjUILBt6YKDi/meX3/
-	 6Bk468WKQwutrLVHcNf87rk6jxI144/5dfex08R1j6bOhh6nS6rk1RqTUqBV5dnBX+vho
-	 cVkhfRxreZoibGqEmWHSvC1rsGDvnOxLDOj4MlNQBml8+GFYbvWdPx/GMNkpZcEps1ymf
-	 ycHCiHXKGN1VnA9v9PZMDQsywRfG6C9hRo7koJibCueUhXG2rY4gFoNv3C94vv3BVGXqe
-	 H+uFBGaM3l0PMjsuGmOXGFJOrBNMMjbZEspE9mcUsHZJxqL9r0YoWBuKcME9PGPE9qA==
+	bh=Hd9PQQ8ozOYSKti/kNoYNT++gNKLWkbtNoIAA4opdCA=;
+	b=HungH1gcpS//WoXhKUCYGQgm4ppEjwmZYUHDD9buUjW8iULN9ud6L3TTFHNDSwSPXziC
+	 ozgnzqRPkIndCnWbPAfvmh6EwWExT/4x173NBpdMJDN8t29DRC+dmAmP7NiUffkDYXyEJ
+	 uWqi7lP+5X1nJkkgMRPFsf7kJFYnwX+OE5aDFkbWnzRDKZN1WhgkrCiZip5Pt1sK+QYAd
+	 AcQmuyewqx+xAFG5YJ8bR/MgkxZotE5fbMTrIvY26jeYmauaICQ2LX5dDiQbcVAwsV33r
+	 G850vY2xWw6u6fjH4tdYQQG4kgs4sVmzEpZ9ZtxIeuUJeHz8rrc+B6qPsKF7WNEb4ZQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FJryDVI+;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BUDG7NQ0;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BCA606A324;
-	Tue,  3 Nov 2026 16:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A27E606D803;
+	Tue,  3 Nov 2026 16:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FJryDVI+
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97DCF1F000C1;
-	Tue,  3 Nov 2026 16:28:09 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BUDG7NQ0
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F95D1F00A18;
+	Tue,  3 Nov 2026 16:30:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793723291;
-	bh=kFjGSTadJ6qoktnpYz+dD2REm71grJ6UoHE4PWQ/UmU=;
+	s=k20260515; t=1793723405;
+	bh=Hd9PQQ8ozOYSKti/kNoYNT++gNKLWkbtNoIAA4opdCA=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=FJryDVI+RTtFOJZpdf9qlki724l0mIzud1wID2ZFGSsOEVpWf5DvwDvXB5pGnjk8q
-	 VI6JajuHnseOqOMbMvimsiWyk2rKegsjVJrWPyiFCNzdRRaSgc/NRDIH2sysBDoaAO
-	 g4KW0M1J3XspwXIfjvvMFRWOPn1vg6QmKP1QxlIW7G7LffkrWreXJgrX8SdUCciIdJ
-	 Gh26Fu6Su9GncWtnVdXbdUlgYsAswFNJd5K2CKU+95M1HgogAS5O5aBXv0nkE5ltLg
-	 9F6wORaUaksyxbVKHwuf2BjfKBYmkofjmoHjAHUPqHMiUJknjLBoRA2v73jg3qI9vr
-	 AKP6mDRb7do/w==
-Message-ID: <sashiko-outbox-195724@kernel.org>
+	b=BUDG7NQ0/lHzpiPu+jwuqlL3hP4gXpULtNXG71tbvKd7XNAbKnAEOb7mM5tAOKBmp
+	 V4zFYcVXK6yxmaFiSNoyTxVUxRCZaD0vyn74BoNYq5yzDEwwUAe/aarppwewp5MTi+
+	 YJDja6RS7HEB3jsDZnWrMG/LXQn/b0oNiQASY89GENa7kUD+co788voxYh1D7fAcod
+	 rtJnif45tnei/4F/3SF+RYK+SHMP3OduGweo3THRK3LuigIAQS5wktAvdz3Mzv6tgh
+	 PrIcll1od/N+ENujX8eeBW6VTgxGF84TK5A4HsraJ3YjWhN+LYqr95ZHJGj42Q3k46
+	 PAdtk+zkT10MA==
+Message-ID: <sashiko-outbox-195727@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v5 6/9] rust: kernel: Add greybus abstractions
+Subject: Re: [PATCH v5 1/9] greybus: operation: keep request active across
+ message_send
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Ayush Singh" <ayush@beagleboard.org>, "Jason Kridner" <jkridner@beagleboard.org>, robertcnelson@gmail.com, "Johan
  Hovold" <johan@kernel.org>, "Alex Elder" <elder@kernel.org>, "Greg
@@ -59,12 +60,12 @@ To: "Ayush Singh" <ayush@beagleboard.org>, "Jason Kridner" <jkridner@beagleboard
  Howlett" <liam@infradead.org>, "Uladzislau Rezki" <urezki@gmail.com>, "Markus
  Probst" <markus.probst@posteo.de>
 Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-In-Reply-To: <20261103-gb-uart-transport-v5-6-f8e326d6561f@beagleboard.org>
+In-Reply-To: <20261103-gb-uart-transport-v5-1-f8e326d6561f@beagleboard.org>
 References: <20261103-gb-uart-transport-v5-0-f8e326d6561f@beagleboard.org>
- <20261103-gb-uart-transport-v5-6-f8e326d6561f@beagleboard.org>
+ <20261103-gb-uart-transport-v5-1-f8e326d6561f@beagleboard.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 03 Nov 2026 16:28:09 +0000
+Date: Tue, 03 Nov 2026 16:30:04 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -74,74 +75,166 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Low] rust: greybus: blanket Send and Sync impls on hd::Device<Ctx>
+- [Critical] greybus: operation: double put in gb_operation_request_send() =
+on send error
+- [Critical] greybus: operation: race between gb_operation_get_active() cal=
+ls on send
 --
 
-commit d45a0cafbb6b7cfe1ad47516461c24f42e8c8a34
+commit 1f5c8fb4470157e5c81c1041163bd49efb2ea63b
 Author: Ayush Singh <ayush@beagleboard.org>
 
-rust: kernel: Add greybus abstractions
+greybus: operation: keep request active across message_send
 
-This commit adds Rust abstractions for the Greybus core, including host
-device registration, driver callbacks, and wire protocol definitions.
+This commit takes an extra reference and active count on the Greybus
+operation across gb_message_send() in gb_operation_request_send() so that
+operation cancellation waits for the host driver's send path to return.
 
-> diff --git a/rust/kernel/greybus/hd.rs b/rust/kernel/greybus/hd.rs
-> new file mode 100644
-> index 0000000000000..9e1a5fc645cd7
-> --- /dev/null
-> +++ b/rust/kernel/greybus/hd.rs
-[ ... ]
-> +/// A Greybus host device.
-> +///
-> +/// # Invariants
-> +///
-> +/// The wrapped value is a valid `struct gb_host_device` created by `gb_=
-hd_create()`, and every
-> +/// [`ARef<Device>`](crate::sync::aref::ARef) owns an increment on its r=
-eference count.
-> +#[repr(transparent)]
-> +pub struct Device<Ctx =3D device::Normal>(Opaque<bindings::gb_host_devic=
-e>, PhantomData<Ctx>);
+> diff --git a/drivers/greybus/operation.c b/drivers/greybus/operation.c
+> index 7e12ffb2dd60d..a63bc2eb164e9 100644
+> --- a/drivers/greybus/operation.c
+> +++ b/drivers/greybus/operation.c
+> @@ -766,7 +766,25 @@ int gb_operation_request_send(struct gb_operation *o=
+peration,
+>  	if (ret)
+>  		goto err_put;
+> =20
+> +	/*
+> +	 * Completion can drop the reference and active count above while the
+> +	 * host driver is still sending. Hold another of each across the send, =
+so
+> +	 * that cancelling the operation waits for the host driver to return.
+> +	 */
+> +	gb_operation_get(operation);
+> +	ret =3D gb_operation_get_active(operation);
+> +	if (ret) {
+> +		/*
+> +		 * The connection is being torn down, and the operation, which is
+> +		 * already on its list, will be cancelled and completed.
+> +		 */
+> +		gb_operation_put(operation);
+> +		return 0;
+> +	}
+
+[Severity: Critical]
+Because the first gb_operation_get_active(operation) call adds operation->l=
+inks
+to connection->operations with operation->active =3D=3D 1 and then drops
+connection->lock before the second reference and active count are acquired,
+can a concurrent teardown race in the window between the two
+gb_operation_get_active() calls?
+
+1. If gb_connection_disable() or gb_connection_disable_forced() runs right
+after the first gb_operation_get_active() unlocks connection->lock,
+gb_connection_cancel_operations() -> gb_operation_cancel() queues
+gb_operation_work(). If gb_operation_work() runs before this thread reaches
+the second gb_operation_get(operation), it invokes operation->callback(),
+decrements operation->active to 0 (waking gb_operation_cancel() before
+gb_message_send() has even started), and drops the completion reference. For
+asynchronous callers whose callback drops the caller's own reference (such =
+as
+gb_loopback_async_operation_callback() in drivers/staging/greybus/loopback.=
+c),
+operation->kref can reach 0 and free operation before the second
+gb_operation_get() and gb_operation_get_active() touch it.
+
+2. For GB_OPERATION_FLAG_CORE operations, gb_operation_get_active() permits
+operations when connection->state is GB_CONNECTION_STATE_DISCONNECTING:
+
+drivers/greybus/operation.c:gb_operation_get_active() {
+	...
+	case GB_CONNECTION_STATE_DISCONNECTING:
+		if (!gb_operation_is_core(operation))
+			goto err_unlock;
+		break;
+	...
+}
+
+If a core operation passes the first gb_operation_get_active() in
+GB_CONNECTION_STATE_ENABLED, and gb_connection_disable() transitions to
+GB_CONNECTION_STATE_DISCONNECTING and cancels/completes the operation in the
+window before the second gb_operation_get_active(), won't the second
+gb_operation_get_active() still succeed in DISCONNECTING, re-add the already
+completed operation to connection->operations, and send it?
+
+Conversely, in drivers/greybus/connection.c, gb_connection_disable() and
+_gb_connection_enable() call gb_connection_cancel_operations() when entering
+GB_CONNECTION_STATE_DISCONNECTING, but not when subsequently setting
+connection->state =3D GB_CONNECTION_STATE_DISABLED:
+
+drivers/greybus/connection.c:gb_connection_disable() {
+	...
+	spin_lock_irq(&connection->lock);
+	connection->state =3D GB_CONNECTION_STATE_DISCONNECTING;
+	gb_connection_cancel_operations(connection, -ESHUTDOWN);
+	spin_unlock_irq(&connection->lock);
+	...
+	connection->state =3D GB_CONNECTION_STATE_DISABLED;
+}
+
+If a core operation passes the first gb_operation_get_active() while in
+GB_CONNECTION_STATE_DISCONNECTING and connection->state transitions to
+GB_CONNECTION_STATE_DISABLED before the second gb_operation_get_active(), t=
+he
+second call returns -ENOTCONN and this path returns 0 without dropping the
+first active count or reference and without anyone cancelling the operation,
+leaking operation and hanging synchronous callers waiting on
+operation->completion.
+
 > +
-> +// SAFETY: `gb_host_device` is reference counted through its embedded `s=
-truct device`, which may be
-> +// used from any thread.
-> +unsafe impl<Ctx> Send for Device<Ctx> {}
-> +
-> +// SAFETY: `gb_host_device` has its own internal locking, so it is safe =
-to share references to it
-> +// across threads.
-> +unsafe impl<Ctx> Sync for Device<Ctx> {}
+>  	ret =3D gb_message_send(operation->request, gfp);
+> +	gb_operation_put_active(operation);
+> +	gb_operation_put(operation);
+>  	if (ret)
+>  		goto err_put_active;
 
-[Severity: Low]
-As reported by Sashiko on v4 [1], in rust/kernel/greybus/hd.rs, Device<Ctx>
-provides blanket Send and Sync implementations for all Ctx and omits the
-Ctx: device::DeviceContext bound on the struct definition.
+[Severity: Critical]
+What happens if gb_operation_cancel() cancels the operation while
+gb_message_send() is in progress, and gb_message_send() then returns a
+non-zero error code?
 
-Because Device<Ctx> also implements AsRef<device::Device<Ctx>>, marking
-Device<device::CoreInternal> as Sync would allow sharing a
-&Device<device::CoreInternal> reference across threads and obtaining
-concurrent &device::Device<device::CoreInternal> references, even though
-device::Device<device::CoreInternal> is intentionally !Sync because
-set_drvdata() and drvdata_obtain() mutate dev->driver_data without
-synchronization.
+While gb_message_send() is running, operation is on connection->operations
+with operation->errno set to -EINPROGRESS. If a concurrent teardown calls
+gb_connection_cancel_operations() -> gb_operation_cancel(operation, -ESHUTD=
+OWN):
 
-Other bus device wrappers in the kernel crate (such as device::Device,
-serdev::Device, platform::Device, pci::Device, auxiliary::Device, and
-usb::Device) bound Ctx: device::DeviceContext on the struct definition and
-only implement Send and Sync for Device (Device<device::Normal>) and Sync
-for Device<device::Bound>, keeping Core and CoreInternal contexts !Send and
-!Sync.
+drivers/greybus/operation.c:gb_operation_cancel() {
+	...
+	if (gb_operation_result_set(operation, errno)) {
+		gb_message_cancel(operation->request);
+		queue_work(gb_operation_completion_wq, &operation->work);
+	}
+	...
+}
 
-Should Device<Ctx> in rust/kernel/greybus/hd.rs constrain
-Ctx: device::DeviceContext and restrict its Send and Sync implementations to
-match the other device wrappers?
+gb_operation_work() will run operation->callback(operation) and call
+gb_operation_put_active(operation) and gb_operation_put(operation), consumi=
+ng
+the initial completion active count and reference.
 
-[1] https://lore.kernel.org/r/20261021-gb-uart-transport-v4-3-c308ce821d45@=
-beagleboard.org
+If gb_message_send() also returns an error (for example, on disconnect or TX
+failure), gb_operation_request_send() drops the send active count and
+reference here, and then jumps to err_put_active:
+
+	ret =3D gb_message_send(operation->request, gfp);
+	gb_operation_put_active(operation);
+	gb_operation_put(operation);
+	if (ret)
+		goto err_put_active;
+	...
+err_put_active:
+	gb_operation_put_active(operation);
+err_put:
+	gb_operation_put(operation);
+
+Wouldn't jumping to err_put_active drop the completion active count and
+operation->kref a second time (three puts for two gets), underflowing
+operation->active to -1, underflowing operation->kref into a use-after-free,
+and running both the asynchronous completion callback and the synchronous
+error return path?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261103-gb-uart-tr=
-ansport-v5-0-f8e326d6561f@beagleboard.org?part=3D6
+ansport-v5-0-f8e326d6561f@beagleboard.org?part=3D1
