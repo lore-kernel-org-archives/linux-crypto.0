@@ -1,59 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793724656;
-	b=fBVUBdMYQ/tvzV8GGpQbqvMomcwvTsWZTO7+42jrerGbUI8ZCU3pIl9B0U/IZ5BN8OEg
-	 7+Et/VVyoDej0ZXmezGxFUS3ntpLmO4uMibvDTRQ6f4Aa/CGsjy4DeoeebMuZgJGUJJyC
-	 4oiyDOQYQHpwPOjFtbJa3uPWamNnMFihQIf+HvNOgOrpovFx2T9/5Z62KK6qC5GqE+H+C
-	 G8tzDs2NYYrGcTuWbqLxjwVdxp78kDwAMUr3PiMptl8LvP2m3T3M++KSFXjx+MPUd02Xa
-	 0898Xo6umpK+SEdR1iVvpP0vFr80c91G/XPY/Gn0Px5UEXeGSDZYu3BEpSqXsohRd/A==
+	t=1793724757;
+	b=gcY1+YLGLjxORBQjnHdGjKCQ5fT4bByT5RLBbiW0Xyxy21QJfj98pk580hNrfs+47fzx
+	 im64xPiW8Gp8y7aytiCu2SnYkuqGB1g6YeI8YxT037z8+arXU+g8SXfvTgawH+6chv6pM
+	 pmwlGM4kNkikx53FPZC6BNsGQ0uIumfDpd9tEDymE3KulbY63bvA6j9moSe4gP0emz9o5
+	 sXkHFPQc5hz6wBJ65BaGQ7QZ0gIEfzq1FgTqd06KM4RwDjaEE6mcRqSerwNUVeDgEAESj
+	 XGwbfPK0Jiw1tOSZaGOaWFrScjnLHaffg1pUtzD1RkNoiW767K4jjrULwmpFRd9RQvQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793724656;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:X-Developer-Signature:
-	 X-Developer-Key:Content-Transfer-Encoding;
-	bh=HvepMD3bA5aDGNIpfaaW63plOSdqKDU2bYIKQSrUk80=;
-	b=VD52NBf585a1GWw01BRSulWqFFvVZTUL9K2Ae9l9sOsNgJmgrEXfvWrHJjarpmb4ethZ
-	 fnNh20qv4tAszcyVd7XhoM/vH6TkVzgYiHf2J3HJjhoV4aLIVPJYvEbOmEo25t/R/NM/y
-	 tfZ7u/wD3+KcDxfuzh7q05fdDEPAyghsxPNi56me2vTmFUMh6iwZR8/mpqzMit9Rip/UL
-	 7TfM57l2pkV/0oKWCXylbLL01m7/cENZDtdkpVD8HWDGDLMInUYAsDEwyMyEw33IR61v4
-	 gV5GnyoAcJ5deW9nQmFD3V8d8yaK2uH4SlQGMvbR1n43pndRKMqNUlAePPxew4F7J/w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793724757;
+	h=Received:DKIM-Signature:Received:Subject:From:In-Reply-To:References:
+	 X-PR-Tracked-List-Id:X-PR-Tracked-Message-Id:X-PR-Tracked-Remote:
+	 X-PR-Tracked-Commit-Id:X-PR-Merge-Tree:X-PR-Merge-Refname:
+	 X-PR-Merge-Commit-Id:Message-Id:Date:To:Cc;
+	bh=lNlcpPLo7FBrO/QJvjnMbL90+K6TUMGiPf3gYVpjyjI=;
+	b=cOQvVDJkFAsKifNqeiehGpOQkMsVEHPTiAN4hm8Y/qRDA4olUCLjtkHUMOJwljdqvJJZ
+	 3zZ638Xod+zqhtPtgQlknondx2R3VQH3vJa2TIVodmbw5eoJejrKFKcYO8bjproCLaj++
+	 nC7Ws9Yzgpv/Q9KV/yxC+p01J4wBMuq5JBY0tZ7wEvM2ZMX6kKh5lr9xFe/+TApL1+2hb
+	 KOEb1RomF23N/CsDWzPdO5ixxg75VsRoBoGquTmv63s+voO1Id0y1krNNcdzkkHmuShA+
+	 PF5atOUNNi0lxE5r3QEysy99nOBI3fOrttP4vESmgLiGTeZXgGPXUTogoccW9vG/Vag==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jpA5uBAm;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EupygsBD;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9F9606A336;
-	Tue,  3 Nov 2026 16:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BEE606A326;
+	Tue,  3 Nov 2026 16:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jpA5uBAm
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 953981F000C1;
-	Tue,  3 Nov 2026 16:50:53 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EupygsBD
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 878361F000C1;
+	Tue,  3 Nov 2026 16:52:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793724655;
-	bh=HvepMD3bA5aDGNIpfaaW63plOSdqKDU2bYIKQSrUk80=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=jpA5uBAm0M8lavM0Yy9jEvsCvpODwogzY029ZQQx02unY8o9Ng3vAi3wrAMpQaSmc
-	 IsgFkgEOAoNLVz6giG052wF/QTcjrog10kF1oMaehPi2euvGgv63M07ma/qVKfWlnb
-	 gfi+rNwmcb2F6KyTVLB0xQ8CUDe+cuQwbFj40CRrdaiv8T41J7jJgIhreCbYVBL8GN
-	 A2uG1vzN+gGC1jvaTMKXvB4YGP/NRFJGiMpde30xaRNKsWtAN7r9ktWjRZ2OeCOnxG
-	 SWTYwR3GaKLSuT8AcqY2ra2oe9Nmrmh4tNr2IeNjMRxRxwBPGpnc1fpAh6x+ZP8wHI
-	 Tscg02HMqee8w==
-From: Thorsten Blum <blum@kernel.org>
-To: Laurent Vivier <lvivier@redhat.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Thorsten Blum <blum@kernel.org>,
-	virtualization@lists.linux.dev,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] hwrng: virtio - simplify virtrng_restore()
-Date: Tue,  3 Nov 2026 17:50:28 +0100
-Message-ID: <20261103165026.454333-4-blum@kernel.org>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261103165026.454333-3-blum@kernel.org>
-References: <20261103165026.454333-3-blum@kernel.org>
+	s=k20260515; t=1793724756;
+	bh=lNlcpPLo7FBrO/QJvjnMbL90+K6TUMGiPf3gYVpjyjI=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=EupygsBD3uzXVUovJisqhgzt+LGoP/Rpk+flj07K63weXGyyPWRChJxAJhJeH2LG0
+	 0siQzFJGtwXDHa5+9zIcY6Gh/vC4NOYw3n1OBwHBozIqlSHAbTZ+4XkgmKSd+zSqxG
+	 UX96tkXQoHElBiI17QAIKIfNa3m1alT7qQB37WMva/U2q6xBAYfsSHIVT4et6+ymko
+	 uAsx+pno2MOOCpopFvigrq3vkaoaPDoFzHwqxsrtOxZnrGKZJkW/zTcZxHK5RIDuAX
+	 2GGoJwU63nzuloquRD2j0WgDIPAFLQaer1MiqPb3CDAAAuW7xKQx3bcEZOry9m6xdr
+	 VpaaY8V92GWBw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D37E391AFFF;
+	Tue,  3 Nov 2026 16:52:36 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto library fixes for v7.4-rc2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20261102174428.GA1935@sol>
+References: <20261102174428.GA1935@sol>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20261102174428.GA1935@sol>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+X-PR-Tracked-Commit-Id: 01ad209f122b7c173477bd60c7997564f9c65961
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b2e7a7bbc127534b73936a505237f08758552252
+Message-Id: <179372475516.1755341.2580594496121383266.pr-tracker-bot@kernel.org>
+Date: Tue, 03 Nov 2026 16:52:35 +0000
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -62,62 +67,16 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1486; i=blum@kernel.org; h=from:subject; bh=FVIFUZ5ihpdfeiOOZxwZ1iGDyjPpbrvySLprWVV+LNc=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmvBO6aHzBe/+dAw3Oz01Nd1a//CLs4U1n8wcE9i1XF5 +yrYtrH1VHKwiDGxSArpsjyYNaPGb6lNZWbTCJ2wsxhZQIZwsDFKQATmfeb4X+OiZ9p+26Xt4sm nIvj+6abK+BTv09h3RG+b6r8R0Pnlrxj+MPFaWKttr99m1o/a/aeOdsvK9crng9a/ifNYtmz/5f SbzEBAA==
-X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
-Content-Transfer-Encoding: 8bit
 
-Return errors directly to simplify the control flow.
+The pull request you sent on Mon, 2 Nov 2026 09:44:28 -0800:
 
-Signed-off-by: Thorsten Blum <blum@kernel.org>
----
- drivers/char/hw_random/virtio-rng.c | 31 +++++++++++++++--------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
 
-diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
-index f5e8e6093e27..de1d0113ce6c 100644
---- a/drivers/char/hw_random/virtio-rng.c
-+++ b/drivers/char/hw_random/virtio-rng.c
-@@ -244,26 +244,27 @@ static int virtrng_freeze(struct virtio_device *vdev)
- 
- static int virtrng_restore(struct virtio_device *vdev)
- {
-+	struct virtrng_info *vi;
- 	int err;
- 
- 	err = probe_common(vdev);
--	if (!err) {
--		struct virtrng_info *vi = vdev->priv;
-+	if (err)
-+		return err;
-+	vi = vdev->priv;
- 
--		/*
--		 * Set hwrng_removed to ensure that virtio_read()
--		 * does not block waiting for data before the
--		 * registration is complete.
--		 */
--		vi->hwrng_removed = true;
--		err = hwrng_register(&vi->hwrng);
--		if (!err) {
--			vi->hwrng_register_done = true;
--			vi->hwrng_removed = false;
--		}
--	}
-+	/*
-+	 * Set hwrng_removed to ensure that virtio_read()
-+	 * does not block waiting for data before the
-+	 * registration is complete.
-+	 */
-+	vi->hwrng_removed = true;
-+	err = hwrng_register(&vi->hwrng);
-+	if (err)
-+		return err;
- 
--	return err;
-+	vi->hwrng_register_done = true;
-+	vi->hwrng_removed = false;
-+	return 0;
- }
- 
- static const struct virtio_device_id id_table[] = {
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b2e7a7bbc127534b73936a505237f08758552252
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
