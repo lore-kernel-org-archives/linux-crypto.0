@@ -1,61 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.51
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793675750;
-	b=lGoJP/TTfyCs0lcWWjNIt12VEaKtqTMOmrmgtgCWGLCdreVCE8+pOg/BquhKPjPpgya4
-	 7pFkHkv/2TTIv67taPMjj7CcCO/pNORFfSKR+UDtUGFfUgVga9MVjI9Eneu1teVLiIWqj
-	 vFRkkICt5Sa2lM2Ck4Qz87tl3xtdHQyqYUi+fsHR4b3gOu0rSfep+JbP5SZIlgEfYUEpk
-	 40WNhsDJF6XZCvHavvKq35ElDsERNGc6spWgRIlot7anICs5sIIhN2hUPH5FI6pwx6ogz
-	 4H5th9CCeelWFu2pIy3r6xKTWI1crIrX6ICIlJ+cM0Hl/nZVDFlmo1XxRv6+CdkVeWQ==
+	t=1793679262;
+	b=R4fgJv/LLmUL/1cBXsR0C1sM19yGPZs+D3c0sGJ9wwuNuT5nKRyrdIwAaGSBfu0BZJNL
+	 LexrJmDLTX9lqOgbwL07aa9S8OwsG9dvmC54El7nfKwV9N326eG1y8opoWTFlYV5IhnyH
+	 AOXVlJxS5l1Sgdl/vr/VNHvU7N+tBs0rDL08qiSI6vzAPc//iQmz23aN6TgM7Lyamt7QY
+	 d82TstvGN4wXc100aXT94cRJoDksuCgBIMFfMZ3z20C2zE3mr7WdhYqber00waf+PoVSU
+	 ygGOehRuogEiJvWd2UVNmgGK2gVfAXoEfBGDKEoCrV9hE9A9EH6QZMawAjcfvrTll9A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793675750;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=MEkfduRuxEwqk5nLpLbvUlTtIBBaXB2Udv/zTBYNtus=;
-	b=5H4FAbwNexMIsLdHjfCZ5c8dBJD6o8hsnDtnltu012m6SLeah1UonyD0uuYP1rpC91Fw
-	 Q7zYeitnAwmqCxFCC4486RhfTIuvpkfPLoRgE0a3XjgfSz/vZsLbpX61OaWjFrzzoKbSW
-	 N3jOg//uE5TItVqRHshA0YHXHtjGqsRdb6qfa+1pYxjM7ZVYbj5dOn7hegiDYQtEnpU9H
-	 3TK+fCqSqCXdVwn2YGeGf3yew6t9zcDvbbkA86sfra/IM3HKlW6adG2fbDw5TNOz5R+0o
-	 EfYN55opWPBX24OalpKHyr4/dZF6owKeyF/8vSKxFN3UFketpk6p5ZJ6sVakQ2iyjgQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793679262;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=Nj3McratJJ6pEFP0XBRtJ0WdPjrftXOJFNhSnJCxiPU=;
+	b=rQgTDQAK3wqdpR+IhvFwVvC2tsrzHj9oqnLhuyBowpc7slfV05UgenY6+ZLrAGD6h7wN
+	 R/vvSpcHwBuPxNFwcaqFRndRFJvjy+CfMgjr2OHM7OnG+l3mp9ukrCs6suNT9J/QG1ECo
+	 YX+AOqweV19CuNGeRVa25Y6cuvWnSlRX4H3+2TTdQ0VSaHJZNByEGkaWseaLKmcl4lBJu
+	 VGzALnyhd9Rl0pQQg7R21SI2CmiHdyWWL/0Aq/7qDwzJkGE0YM9C2i+zybYzaEkNYp72D
+	 YWhletjXlwkk+EiRr/QL/v3vXMxl9IjtHk8wEyDpgtwHYEX6vxkZvUmpkQPAty0Utog==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=infradead.org;
-	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=sRR+9dZH;
-	arc=none smtp.remote-ip=198.137.202.133
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bZ7P+a3D;
+	arc=none smtp.remote-ip=209.85.216.51
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9983C606A324;
-	Tue,  3 Nov 2026 03:15:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9983C606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53060606A335
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 04:14:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 53060606A335
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=sRR+9dZH
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=MEkfduRuxEwqk5nLpLbvUlTtIBBaXB2Udv/zTBYNtus=; b=sRR+9dZHtcHS9adHo3SLSc8wDg
-	21sYYXhRYjwR6NhshG4rt0L2MjyLOcIzpbUJ/FMquzKmr+9yK3Bt+F4mCULSjxWc2BxI/73fY1O/x
-	Pqy1uOe7HEXN2ZVIl9K1QNMrtNjhHGhxTlJ1xjP+AwSmUmWbL+GFH+dgzvEuStIBmehTMLs3aEiku
-	eFwpl2xK9tnVC1Izch0cu9dW4vWRHB460VkItv8NE9J0WX6/XwsyEVn00MBaAoflamthvDLLPKEr0
-	Q8vkw+YYXUISGkCoPNVtwbmjedqKtIn2L67FRWdJj6leAxKx6Rn7smO3sveOlHkEFMM/uWWQ2hXnu
-	teemDDGQ==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xO500-00000000vdF-3hB2;
-	Tue, 03 Nov 2026 03:15:48 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Thomas Graf <tgraf@suug.ch>,
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bZ7P+a3D
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3ac451e128cso2327546a91.1
+        for <linux-crypto@vger.kernel.org>; Mon, 02 Nov 2026 20:14:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793679262; x=1794284062; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Nj3McratJJ6pEFP0XBRtJ0WdPjrftXOJFNhSnJCxiPU=;
+        b=bZ7P+a3DvUJiqy8nxjwt2b63ar5U7DIrlY+60Bo8e+2Lt0UzQ++1cgZoZT0ViU2koy
+         FHJzdh8J03Lq/HhHfcmqqKtHGbdzID90L57Ov6xBspr1/t3F4a3EC17m8i4kWwjS5242
+         7XcKyewoB5pfq+roI9pQqZMELNPx7AWQvopLgHegGPRJTo9xxNbfAk5jHFqKSgNq45Ov
+         au+wgqOlVTGRHLuTCVXOMxZMcll3A1lkYPlhT/L89cMwTD79glZDWvtLsdSbJS9bukHS
+         xq4pRd5OUHXRCwJIBsXmgfidfXifYMJWSfNDKtj/BodqoPvTt0hOuSRz6UE4c+nKL/aY
+         yiNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793679262; x=1794284062;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Nj3McratJJ6pEFP0XBRtJ0WdPjrftXOJFNhSnJCxiPU=;
+        b=h9Qcd/Tf02dxmSuMXAX4rfYFHoAC2UmMujgszPjkNxGB+0pwx9M7CV4HPiigaAXsFC
+         ZO5V9ewe1Qh6KDcmAF6HTz7nzhaYZzPWyiZfD2ncuufeiBQEvJe7McfnAMSE7frNjBSO
+         1mFu0/665vcqPSxjYvg1Zg81YRTLSicy3mWFmg1pZ2NRzsMTM5o1PoXANppQjGPnLbUY
+         WK4h4B4C3BGbHEZDRu4fL6NGCuRQLuHNGcnAm5H8BYjiVNBpJM6zTKAnANMICoMtVsPA
+         7EwzYr2UlY3suhNANOOv/bShB0a92cd2lQs1lFpBFZ/31JTKO1zrve73QxtqpHaRSiAu
+         aiUw==
+X-Gm-Message-State: APuU4Z8KpcmhJ8js/U3IzyQF163pyIMnN/FY3M65ASQAPx56a+oSDUAl
+	blhQAA7DIBc26DdASRAad5+W17ghOYmkBdtUm8M8pG3B0zN55dlRuHmtNNoBEw==
+X-Gm-Gg: AYBFou00oR+RxczpTQA2YJqg4oIwuxSSSMEQjGZ0kOxz2B/7sZW53QpuFJ3ZUcUJrz+
+	vLkpeAOboXtnWEQkvTwYSDC7/SCTYxFOqNBS3+uN8h1bDAFD9bRyZAKVYFLeBNZ/LNVe7osTVAE
+	F5xwTw097ocTlcuVYR3exnu36Lgut4Iwz8nlQ6nuxS2dWF/q5jHArl6GmyPYu59CnM6Zlzo9AAr
+	sc+aKZmo7ZEqq0sY58b5ZFcUMcsCymCKbu7ooJN359NcWwG4lLp+HB71KzS6lAABjSbvfPFNvha
+	21r07j2CQMWWqiNDbe9y6WIErdfcKJplXln2RLD4HLujzbIEtx0WVNnZBfJfTxcR1rkFcM7zCc0
+	ksv9bO8SKPf5V1UZei8ncABqJ7lDX8DGVkU/cCRxbv3Ptmkl+UMa/4eqtrFWAAd+vscfcEoLyzf
+	PJ3zpri2UgHD/C7y5N3I+BfSFn+s+xsAOqZ82kB/7Vu1RNflVCTWXLw9d1Q/4hXowrHjf4/DhJi
+	nnkcIbuiBu7XoWyiP6VS6ambhZYJ84JhezU/3L/QKHjRK+OSN83bWyTD9cLc4pY4EwEo1UP7J51
+	rBMtdUbLXK19TcJhAWjr3884unX6rT9tA3yaz9cnbMHS7kV9mZgM
+X-Received: by 2002:a17:90b:4e8f:b0:3ac:4e18:238c with SMTP id 98e67ed59e1d1-3ae89806287mr9145855a91.49.1793679261420;
+        Mon, 02 Nov 2026 20:14:21 -0800 (PST)
+Received: from d.home.yangfl.dn42 ([2a09:bac1:7680:28::4:396])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b07c6740a1sm1989659a91.10.2026.11.02.20.14.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Nov 2026 20:14:21 -0800 (PST)
+From: David Yang <mmyangfl@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH] rhashtable: headers: add missing members, remove excess ones
-Date: Mon,  2 Nov 2026 19:15:47 -0800
-Message-ID: <20261103031547.2662864-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.56.0
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Danilo Krummrich <dakr@kernel.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] hwrng: histb: fix the FIFO batch timeout
+Date: Tue,  3 Nov 2026 12:13:58 +0800
+Message-ID: <20261103041403.4071708-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,85 +100,17 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add or remove kernel-doc comments for missing or excess struct members
-and function (or macro) parameters to prevent these kernel-doc warnings:
+The poll timeout in histb_rng_wait() was derived for a single word, while
+the device feeds the FIFO in batches. Fix the timeout, and print with
+dev_*() so that the messages name the device.
 
-Warning: include/linux/rhashtable-types.h:108 struct member 'alloc_tag' not described in 'rhashtable'
-Warning: include/linux/rhashtable-types.h:108 struct member 'lockdep_key' not described in 'rhashtable'
-Warning: include/linux/rhashtable-types.h:145 struct member 'end_of_table' not described in 'rhashtable_iter'
-Warning: include/linux/rhashtable-types.h:199 Excess function parameter 'ht' description in 'rhashtable_init'
-Warning: include/linux/rhashtable-types.h:199 Excess function parameter 'params' description in 'rhashtable_init'
-Warning: include/linux/rhashtable-types.h:220 Excess function parameter 'hlt' description in 'rhltable_init'
-Warning: include/linux/rhashtable-types.h:220 Excess function parameter 'params' description in 'rhltable_init'
+David Yang (2):
+  hwrng: histb: wait for a batch of words
+  hwrng: histb: use device messages
 
-Warning: include/linux/rhashtable.h:87 struct member 'dep_map' not described in 'bucket_table'
-Warning: include/linux/rhashtable.h:87 Excess struct member 'rehash' description in 'bucket_table'
-Warning: include/linux/rhashtable.h:87 Excess struct member 'ntbl' description in 'bucket_table'
+ drivers/char/hw_random/histb-rng.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-Cc: Thomas Graf <tgraf@suug.ch>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
+-- 
+2.53.0
 
- include/linux/rhashtable-types.h |   11 +++++++----
- include/linux/rhashtable.h       |    3 +--
- 2 files changed, 8 insertions(+), 6 deletions(-)
-
---- linux-next-20261102.orig/include/linux/rhashtable.h
-+++ linux-next-20261102/include/linux/rhashtable.h
-@@ -65,12 +65,11 @@ struct rhash_lock_head {};
-  * struct bucket_table - Table of hash buckets
-  * @size: Number of hash buckets
-  * @nest: Number of bits of first-level nested table.
-- * @rehash: Current bucket being rehashed
-  * @hash_rnd: Random seed to fold into hash
-  * @walkers: List of active walkers
-  * @rcu: RCU structure for freeing the table
-  * @future_tbl: Table under construction during rehashing
-- * @ntbl: Nested table used when out of memory.
-+ * @dep_map: Lockdep tracking map
-  * @buckets: size * hash buckets
-  */
- struct bucket_table {
---- linux-next-20261102.orig/include/linux/rhashtable-types.h
-+++ linux-next-20261102/include/linux/rhashtable-types.h
-@@ -88,6 +88,8 @@ struct rhashtable_lockdep_keys {
-  * @mutex: Mutex to protect current/future table swapping
-  * @lock: Spin lock to protect walker list
-  * @nelems: Number of elements in table
-+ * @alloc_tag: Allocation codetag and percpu counters
-+ * @lockdep_key: Lockdep keys for each lock
-  */
- struct rhashtable {
- 	struct bucket_table __rcu	*tbl;
-@@ -134,6 +136,7 @@ struct rhashtable_walker {
-  * @walker: Associated rhashtable walker
-  * @slot: Current slot
-  * @skip: Number of entries to skip in slot
-+ * @end_of_table: End of table walk has been reached
-  */
- struct rhashtable_iter {
- 	struct rhashtable *ht;
-@@ -157,8 +160,8 @@ int __rhashtable_init_noprof(struct rhas
- 
- /**
-  * rhashtable_init - initialize a new hash table
-- * @ht:		hash table to be initialized
-- * @params:	configuration parameters
-+ * @...:	variable args list: hash table to be initialized and
-+ *              configuration parameters
-  *
-  * Initializes a new hash table based on the provided configuration
-  * parameters. A table can be configured either with a variable or
-@@ -211,8 +214,8 @@ int __rhltable_init_noprof(struct rhltab
- 
- /**
-  * rhltable_init - initialize a new hash list table
-- * @hlt:	hash list table to be initialized
-- * @params:	configuration parameters
-+ * @...:	variable args list: hash list table to be initialized and
-+ *              configuration parameters
-  *
-  * Initializes a new hash list table.
-  *
