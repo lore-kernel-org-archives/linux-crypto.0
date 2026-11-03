@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793689822;
-	b=a7JusUmtCfrMJRYxcVRe58AYItYxj1EFtbGFOM+Sr8FEec21HcRIJEhg018Klh8m+NM8
-	 9jUhIZVgrthxKnLoBIeMiwUBKIM9lpLqrJDesw+nN26m8bCQ3ZOdaK4vVegUDisnGmcHy
-	 XpzXRaj/FIgtgX19yeB7qvb7glyUQlHiaXVZo9vnBnyiqeNqK8BgCH6dDQTpfNQXfqam5
-	 iOjeav92iqRw7VMB5cgiNLY8EN38qSB1Ug03yAhYqJSwD/GIRRZqjUhE0+DrIyh6yq9yp
-	 Z/EvYFteQGvmeIjKGu8n5CODclTPDIGqbJM4lh1KeWEBqLxiJZ+IB6BtKHDDVEo9AoA==
+	t=1793689840;
+	b=JfJ14qLNYFRP68RM2J+XYbgjShHEGqdt5iK3U1pPF0Dsfwzh0E1f5OguGzPI+4VP5kBj
+	 2F/Grs9FUA/agiYVg9UvAPooPG8TQ0xpvVZ2pgknaHIO6wxPip/wtjcL72P2mNOTChUEX
+	 mY3FgL2msGpJPMxNVOpICYItW5qJ6/0a7+coOqVA6maTni2EHpcYxAwjcHj4UbkWeMz9c
+	 WGmJYZzKtknnS4dBWePGvFC+aKmgvzW7oV96vt+qskbYKpG1VhbBevDT0b/aZVjsQFMWd
+	 ayIoRVoanSpc73M8EIj4X/Du+xOsGOJJi2OJiqoO54y1rR7rvCkHG/7+nBdgToRPHOw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793689822;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793689840;
 	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
 	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=lhekMbxihbNT10QqQYBHsUxGrrg/edudFTnsSxoMiNU=;
-	b=YasrJiNzs2KDwvn41qVfm9oYL45gWNYSIOsiwMTtDsdnRJnNwb2CsGQuvPrmteg3DXoE
-	 Y0Ykxs+kxJ95+GmtAFXC8nmNQo32A9AKsfygPtnqJJVf9KnrWyP9dUMVKPwxVvYQgLd5Q
-	 cO7NW2KgnGUsLjaXHzTp2yUbaNgfbDqcBkeK+ezFgx8svu+A5heiTVSkt9CJJkEm98qoc
-	 3VUUSzkn9wCTUTH2x4TLDzwNjiy+9ScvHCCAVOpTzGr1+rxXusaQlzjLYqkCcgsoICf2C
-	 lswvDHN2QxCZ+YqrrYW3zSmzzuSYvuv3INPCGws3Bkhau9s5iPg5WLTsiWjynZQQAoA==
+	bh=pOsDwi+mve7hdfNgeVrwdGKRg0GB1YS8Vlvx7tVwWkE=;
+	b=j2h/vo1ZT1yPB1PCm0YZxxn2KZkbuVPduCgW68GHU9zeoCBBzDvLXfLNbMD9OYBqh/7b
+	 o1zJ6//2AdI8UbutqYqNA5H4yvV9sntYtAJXuW+kbqSgZo/0Xl6D0ABdDU7/mfnXo0Wwc
+	 YSYmPpwv3PUiUF8nVsgelXu9V40sm+MVFOPl9Q4hi8h+S+0fD4maxVs40JJm3zH7lINiE
+	 ZCiBnt3xXMXbyFCqg2wOIHUrrpOei3NN3N7fRiVWxsHu3/7AHueA39nIuKeHF5E6d5xJ0
+	 +qSTbohDPHFIupf6utwgz4u1hhaSkC9QwNdr/9uXE1NZfLMJQOfPrki60HW5pgdQNGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cko3MwKc;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Bjomng5/";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F350606A32C;
-	Tue,  3 Nov 2026 07:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBD3606A338;
+	Tue,  3 Nov 2026 07:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cko3MwKc
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19AB1F0093A;
-	Tue,  3 Nov 2026 07:10:19 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Bjomng5/
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71D8B1F00919;
+	Tue,  3 Nov 2026 07:10:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793689821;
-	bh=lhekMbxihbNT10QqQYBHsUxGrrg/edudFTnsSxoMiNU=;
+	s=k20260515; t=1793689839;
+	bh=pOsDwi+mve7hdfNgeVrwdGKRg0GB1YS8Vlvx7tVwWkE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=cko3MwKcBQOuRl8lP0yhkcP2yiWsxST+VMSEZ2OVgtdwKWeP02A6k8ezqdERumT1v
-	 dEb2nFC+ZNjRe7ll4E+tOqYa1AvbmPnRIfh1dkFSpCna6vgiE57f87sDjj3NKI09E+
-	 3DqGgLZbaxPwpx9n/cOTsd/Qinw/uCz26+jcxk7PgJ46Gcqzbn6K7Z+0rIUrehFRhk
-	 FChI+5oWA70AskDcdKVLvBWpz9REg1vr5A9XJEhLaFJ0YZIsXFTncjMcB3hvb7i+bz
-	 YRekryNJ0jTQQAnfHTyAlee8o622fNIMm7SZSExGTp+sD863gDz3HKQVEDiJBsdk9G
-	 RCfnLybxpXxrw==
-Message-ID: <2bc3c884-00ce-4104-b019-893c22c36436@kernel.org>
-Date: Tue, 3 Nov 2026 08:10:17 +0100
+	b=Bjomng5/i5efj7glBHMJhmYhFPw+GA69QlYyzoFsW7B03jkfTqs/aOXVDYYEi9KPx
+	 1qvUFOaFHakowGFydiJ1q/+aqQ3WD3AvGWGHShPY/80RoDI6DZygetoTjcogOmDP5A
+	 et+ma/FxeqmJgw/YO7xE2wxBkkFKdBPeLW/FxTHp7B3oZc1j9kKVv+AWGBMX0R+M4l
+	 2HAcnJ7g0wKI9lshomgVpOQ9P9whOSBl5uuSJeV5377i2fOHb4YEirTbKUrAggFpBy
+	 OTL5+XSzSPWSeDmZvKbMlBIYeSsEikdHGVspfrYIlEpn/STRtFXIl97R+eAP51nXVc
+	 vrA48exlI23dQ==
+Message-ID: <dc21de34-6dad-40b4-8965-6c0b8cf03375@kernel.org>
+Date: Tue, 3 Nov 2026 08:10:35 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -52,13 +52,13 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: octeontx2 - Unwind allocations when AEAD
- initialization fails
-To: Wentao Liang <vulab@iscas.ac.cn>, schalla@marvell.com,
- bbhushan2@marvell.com, herbert@gondor.apana.org.au
+Subject: Re: [PATCH] crypto: safexcel - Unwind SHA3 initialization if HMAC
+ setup fails
+To: Wentao Liang <vulab@iscas.ac.cn>, atenart@kernel.org,
+ herbert@gondor.apana.org.au
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
  linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20261103064248.1054181-1-vulab@iscas.ac.cn>
+References: <20261103064030.1034291-1-vulab@iscas.ac.cn>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -104,25 +104,25 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261103064248.1054181-1-vulab@iscas.ac.cn>
+In-Reply-To: <20261103064030.1034291-1-vulab@iscas.ac.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 03/11/2026 07:42, Wentao Liang wrote:
-> cpt_aead_init() allocates a hash transform, descriptor and pads before
-> looking up a CPT device and initializing the hardware context. Failures
-> in those later steps return without freeing the earlier allocations.
-> If fallback allocation fails, the hardware context is also left mapped
-> and allocated. The algorithm exit callback does not run after a failed
-> initialization.
+On 03/11/2026 07:40, Wentao Liang wrote:
+> safexcel_hmac_sha3_cra_init() first initializes the SHA3 context, which
+> allocates an ahash fallback. If allocating the shash transform or its
+> descriptor fails afterwards, that fallback is not released. The crypto
+> core does not invoke cra_exit after cra_init returns an error.
 > 
-> Release the hardware context when fallback initialization fails and free
-> the hash resources on all three failure paths.
+> Call safexcel_sha3_cra_exit() on these failure paths to release the
+> resources acquired by safexcel_sha3_cra_init().
 > 
-> Fixes: 6f03f0e8b6c8 ("crypto: octeontx2 - register with linux crypto framework")
-> Fixes: e92971117c2c ("crypto: octeontx2 - add ctx_val workaround")
+> Fixes: 6c1c09b3dd0c ("crypto: inside-secure - Add HMAC-SHA3 family of authentication algorithms")
 > Cc: stable@vger.kernel.org
 > Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
+
+Not even bothering to run checkpatch.
+
 > Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 
 Another fake identity of "vulab" doing exactly the same as other cases,
