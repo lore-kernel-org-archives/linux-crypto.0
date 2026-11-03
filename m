@@ -1,88 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793722368;
-	b=CGeWMUXcQGAmWjU/sZPTnFUlZLtD61luDuMYxY4C6MGBBMyscFvQX0CPQ8p2wTk3yb89
-	 MjOcO0EUu9VJJK2SPmUjSDPrKmaDzcJdOBHktaMftDlP2Df9h4rJOwRRuL+rsdbD9qCe5
-	 PbtrrlaZsvmT0kJlHFmjoDxjhgaqcxoPZ/SHBFQOychCRPm65bH+bXoNgzNryUGKcFvbu
-	 976wfjxFFflk9yLindi3vqzhb3dUIvp9B8K5ae6dzU3C48VZk9BShFQhC14nY9QKrBaAV
-	 gBx3qRj9kVgSppOCJ06UDacVA+SY8GLK8SohlKjP4X/QqOZJIBv5XBmsCcIw8qE7iGw==
+	t=1793722379;
+	b=d4Tt6JV625mw93oy1lfPeI+pd7MWzFYCojhUfLiMzFbhlhCfOVsKX6oP778oDtC54KqT
+	 wh7rxzJ/MbfmYaGw5XGscLOK2F5RNEJwCX+fxyII+G+N7BjIEnZ6ZL/bN/9i5jA61F+6p
+	 izxhDLPvMwrKUlKepn1JN8CVOKxwC4loMtDfaAumqXfnMEJ6viaZgCZVmt0++BgZRCHxs
+	 TwBC2Bvnqrh1tqAjE/QzAEnZeTo9GVwHGwgTI+TqaWnVpzI4JI9HGzqD36OzJVOVPMTfa
+	 5pCQFzTp3ylqWr+6LvWN840sr8g7qI4RMc4mk1CrT9ZV5i17xlE4MEOxIyce+RdM+VQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793722368;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793722379;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key;
-	bh=7ioXeNGoQl9lc7Y570BlNDeQal84QvGenHazRImLOrE=;
-	b=X6dJgTAiQyW1IyGxviA3rRPZmal8cLsZlJ4Dt4SGP7c/GYzuk0dKVvS76pDy8lEpARZy
-	 uayVRAutzpZwZ7mKUZtJNlQ1ncj/8HDLLf2MUxiks39VdUFt3koK6Z0txvsh3/zjOyM2T
-	 oqthqTRXniZL9mf0vm8WtGhJfYJFPgxwG/cV1NJXm2aTBbWEnvyPHqIXFMCdvpsgcCcOz
-	 SZEnBplI/GqKL/Cc+GhzRWFsOSkHk8tmwM34DhonZcyf44J+zhn0/pJ2RKFO35ovJilnC
-	 Xf3ZBFLJdgZg44CXN/RQl/AzU6wUyo283ZQNq+ucgCcrgudoaqg+KErAEDA0tzcjGBA==
+	bh=hSMTNzWMANqWlYxsoyKc+GU1Gc89Y6rRwgx6/XfOORc=;
+	b=5R78m5PyJBMY2dGC1yio9kvMgvG3+3FQpgkQwmW4iTsGBLLV3cQGcir3rdFc3basWCwd
+	 /+siqwo3GWJTRbUccGDv8wHHLiQ3eSAYN3K8C1p/UOFZQH36346fxxE6exx3vAmEtmopQ
+	 2IxPIdYLGii6yiJzkKgTxrhKXMN2dtpGWKlKDrMDEEUzWULR36PyE21IGFtJHxqqtGNeY
+	 1fqzMTFci+zS5F/JOUOfdvGTxqjkwc65q2NMrfZWyUoY8Kw0SqHB98tpjw3bhDBxw4VDv
+	 jLsHmDfXMobxpuWv3J/f2HrW7YUEqZEPf0w6EHl38117UGpNJD9UUqKMIugL3D5JcTg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=beagleboard.org;
 	spf=fail smtp.mailfrom=beagleboard.org;
-	dkim=pass header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b="IV1W//k0";
-	arc=none smtp.remote-ip=74.125.82.172
-Received: from mail-dy1-f172.google.com (mail-dy1-f172.google.com [74.125.82.172])
+	dkim=pass header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b=TCYWmWZa;
+	arc=none smtp.remote-ip=74.125.82.47
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BC2606A32C
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 16:12:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 86BC2606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B4E606D825
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 16:12:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7B4E606D825
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b=IV1W//k0
-Received: by mail-dy1-f172.google.com with SMTP id 5a478bee46e88-36661f953e4so6565914eec.1
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Nov 2026 08:12:48 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=beagleboard.org header.i=@beagleboard.org header.a=rsa-sha256 header.s=google header.b=TCYWmWZa
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-15ea896ddc8so7356283c88.0
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Nov 2026 08:12:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=beagleboard.org; s=google; t=1793722368; x=1794327168; darn=vger.kernel.org;
+        d=beagleboard.org; s=google; t=1793722378; x=1794327178; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=7ioXeNGoQl9lc7Y570BlNDeQal84QvGenHazRImLOrE=;
-        b=IV1W//k0LPH9DUOAnz2D5JRScaD44LuAFIbXFdJN6DaiHIvmVSyDo+GAfCks9XWCX/
-         VlPmztLmmH6ErKGS/Xu7hsViJBPOA6v20MMt5n9/gN0blS4EKrY/w+SVlCd38LbMRWQP
-         Sk3BUwm8fk69T/wwEZuEbYiTZiqgDmWhaEFW1XkVNLL34l1TmncQA7vE7qEmgmFJFBQf
-         JiOoBDTqWFFIjlFT0eDAV6Cftdwfi/MiSyWzYcjqCcIFX8aDig5mucRBwv/+PkQm3Ga9
-         vhHv3cVAZC+v87lCU1gYJHP2OP9An8rAymI+7R/Z31PrY3Ng7Dl6EVO9JGvGSeWeH78I
-         kJ6g==
+        bh=hSMTNzWMANqWlYxsoyKc+GU1Gc89Y6rRwgx6/XfOORc=;
+        b=TCYWmWZaCqFgI85/TpfZ98KMVon3DiDgKRYugDv45+Q8LmWrfKTWHmkQVREtB1tiRx
+         HQaCVwM2bFCOsFjmHDsVfvukyXkLHpeHkz8L6tzGFmp4Oy7hTXPOgDSK4F+bz9ZM1nWn
+         ZyybP4J0HhQdmsKH+71+tD5JoXFNwrR7dXp+ONXXGxcXQm+sGr3EmsChLgMSeLCvTYB6
+         lglkvAXOHOuUbxWhreMXGQ+nJXAk/p3SQTCaBhJxEumAxdM6p1QY1sPEAFaZPIDIki6v
+         rRfxKuigPTgOvEQuuUZZ8BD4LNbeIy/kgQYu82lGi1BCREYdM2Tn468Am15+Z/b54pcy
+         aN0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793722368; x=1794327168;
+        d=1e100.net; s=20260707; t=1793722378; x=1794327178;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :content-type:mime-version:subject:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=7ioXeNGoQl9lc7Y570BlNDeQal84QvGenHazRImLOrE=;
-        b=VoJ64xuz37WGtO5eed8RkmzPDMgjf6rbAlD6xxZDyhRUOlrW6Xfb2TfDt4r4maNG7J
-         2+VLzeAZW1UBLj9nc+OtDL5vyD44eHJ6r7VGrhGYcs8W3eZjUkWKYzniedwPaJulpSUK
-         RzBCojFpgS5JPptDjTZozZEqx5KDPOksJmBoIklACEKdN3ghyaACuyfZZ1zHcLTRlUkb
-         QrtEjxmKAddQX5hY93Lu3ad2o1hI2lncJuRBA6CkzIJheidpwhkdp80p+yCxUkH7iwVy
-         EhA7HgTxBZSycvDC2lCj+/GVKoGFqXbSN85W2KZn0ouwQxgQxuJzBeYPovkHw5Gz8VHn
-         PMxg==
-X-Forwarded-Encrypted: i=1; AKwUvBzobdkPiTD2AK2vbRQEVjDoydBZHf7nzm60SEXfKpdpHMTLGixrGP4lLPgK0ATBuz9kIMVDtFrhdlglDl4=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9fOwZH1494ht3Gy9SX7O/yzdB4HGq85q24n33uSozEct1JXeGN
-	joFEu1vbxdvfJDfeYf7G0IEso6uK6esoMkn+j+cXCvjn/3QXc+BZvKrCzn14nVItCg==
-X-Gm-Gg: AYBFou3wa/zJU0OiAX4nRKH+enn1JnQzLQgN0YxwH8UmXwm3gBld30NwmbLzY5BczSl
-	ljF+b9H4f/K1DhpJjEu+s1bBuXmPXt+TeTHMI9Ih+feALqJdb5r1Z5frT/jAxMtxUw5+XHZWa/r
-	/etFFEff6ZPwTYgrAXfVeE6im25txx4u7jNh4Psf7/Keo8Tq8gfFltltDaNNFEGPP1fJ9wymfFG
-	/DitSIzkbh/HBWROXAM+2D/Aqk/BwDE1gUTppmHr2W+SdfZGpVss4/sNtIDYyjQe0cAxVYyLxvK
-	Vn9gimOTJxqEl3UPjAaNekbxkPxxNALLtE1ymuN/3rlUEBTa56mHSiWrh9pko6OZ7DIAKIgAOiN
-	EE6rh6oEDlhQyu3FmzrTDVYIgsBaabmpZPTyZmY0sj+NQnJbbAPwfUuh+etqeZwCVDH9cr7R0td
-	rduWfY9s3hZmfOKe1RgKDkHY5cKbMTznGnufh0H+vk+VGoBiYXgYeoNlDuQVwbIkZ1k7LQvokN2
-	W5XWie5TnLGjA2jwOhSaCyma5/MYahfPT5gP8EtWVvev9Vjc0EmjUuK4jd/V55hBAGUHs8jZmYe
-	Z6FAXQZRiodAA1O9ZOK0d4tu4ottLE7Tg1JVyp63
-X-Received: by 2002:a05:693c:414f:20b0:369:e930:6bc4 with SMTP id 5a478bee46e88-36a423f6f4amr20779058eec.30.1793722367527;
-        Tue, 03 Nov 2026 08:12:47 -0800 (PST)
+        bh=hSMTNzWMANqWlYxsoyKc+GU1Gc89Y6rRwgx6/XfOORc=;
+        b=n212l1uEkLMx+4hStuCri0W/9aRWuRKfePEJRywQrpqelQCHse60xSZdsODbelcK3c
+         WorOp8GV9t9eah3no0x4C2VSZCHtyEaqrol+R4lJd+uZhc7SLYmC5RR/vGSrTD6uiAX/
+         9WAYZ4uvPwG57ouE1Ohf7vwU0FUsFCtj8ZmatFWZLy4cp525Wv/inh4DWcG1cA/Ueokc
+         thaZYHxgAoCFxykAUoE3ayQvkHv5L4ndH8iIUPYTGlHflQvX/j61dNmh5vQPLcvoaZqv
+         UstQe9irjdJZamCRLLNh5s5ogmxrKS5+vHKDun5YEhKHTNVG4qH7Clcx93Px7FOWqT96
+         PB0w==
+X-Forwarded-Encrypted: i=1; AKwUvBzCFt9W4QVjN5vFaiyjizHk/6J2ri3MtCdVtKl7OW8RWVT3Jir2ovKLrUOk9jGBFFmDtywHei71ybrtRUY=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8Z8ju75ysuSdndc/hCeaI/RAbNdEamf9bPRw44fyp+VLZVW4eD
+	n8GmNIAo8ofiL2zCymBo+ER4LOrzhPCOhOJmWUXu2zg9XGi6ZnqmBmXp2IiyvfmoVw==
+X-Gm-Gg: AYBFou3GT7eKKx9RBxeg/Jrt4XWXbyePEwnKkwh/m1ztIoZ0S2i9Y7OXZoHcT388Foy
+	bkyD5IZoOnYg89PyA8vEJWavMDyqYLjNkKojLtEu2St8mMPU4Fq3wL6PuatoXiGbeCuF49rqraL
+	7vEeX25dFxtUPv/b75028PePoK6m5NE39fXLz3Yx7dn5x8GMtVyST0cebGqmGbPjRUh6H/ukNKj
+	5dD2P3pTnrTLvrbolBPNUBAiTRJ1KoNWf60HsTM6n0rOTM2ykK+ZStFd3aeOK+6hvJlTbAHzIu4
+	Ft1sb9ityYXd9//eOHQmEiYBBs02Vvh0r2NWGXPRwnHo2hKv3pFSTjO0Cs2MHBtJbdg77+jhpbN
+	7aOzQJJqbvFFxGYxTFZwY3NOzNwAeyFqqtUHTRLoaSiI4bSr29o5ctS5++Zr4C5EXgLC63LOA6g
+	Dw1zWvcLPY9K133WMnZLjHDoqZrvka0SgJWVVzAAFIAFRcVOQeBzjmMSsQJ0StpGqydALprnKFx
+	YyY0uMvvVvT/g6bQ8GIsn3rqCKRETJ9/ZFun9e4FZwjeC2xKhniyYtsUI+Nk9aU+7ab4XIFrbRx
+	H0wHfu+RsSL11M2crDM0WqOyi+c+a0DZb92/TYjg
+X-Received: by 2002:a05:701b:4241:20b0:143:2968:564c with SMTP id a92af1059eb24-1ac5b9cb040mr21210378c88.26.1793722377822;
+        Tue, 03 Nov 2026 08:12:57 -0800 (PST)
 Received: from [192.168.29.54] ([2405:201:4019:32fc:3c55:6b24:5147:322b])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428c17bdsm47214021eec.6.2026.11.03.08.12.37
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36a428c17bdsm47214021eec.6.2026.11.03.08.12.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Nov 2026 08:12:47 -0800 (PST)
+        Tue, 03 Nov 2026 08:12:57 -0800 (PST)
 From: Ayush Singh <ayush@beagleboard.org>
-Date: Tue, 03 Nov 2026 21:41:49 +0530
-Subject: [PATCH v5 2/9] greybus: svc: add gb_svc_flush()
+Date: Tue, 03 Nov 2026 21:41:50 +0530
+Subject: [PATCH v5 3/9] greybus: operation: arm request timeout before
+ sending
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -94,7 +95,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261103-gb-uart-transport-v5-2-f8e326d6561f@beagleboard.org>
+Message-Id: <20261103-gb-uart-transport-v5-3-f8e326d6561f@beagleboard.org>
 References: <20261103-gb-uart-transport-v5-0-f8e326d6561f@beagleboard.org>
 In-Reply-To: <20261103-gb-uart-transport-v5-0-f8e326d6561f@beagleboard.org>
 To: Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com, 
@@ -121,76 +122,71 @@ Cc: greybus-dev@lists.linaro.org, linux-kernel@vger.kernel.org,
  rust-for-linux@vger.kernel.org, linux-crypto@vger.kernel.org, 
  devicetree@vger.kernel.org, Ayush Singh <ayush@beagleboard.org>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1952; i=ayush@beagleboard.org;
- h=from:subject:message-id; bh=leFklJHqSM2Agexfq76WAyMkgy+VatMb+l4RrmRvEVc=;
- b=owEBbQKS/ZANAwAKAQXO9ceJ5Vp0AcsmYgBq6gffxreQRs7TJaFm5zqIwRX5Xi5Jltc++k1bo
- aG5dJ7zHjmJAjMEAAEKAB0WIQTfzBMe8k8tZW+lBNYFzvXHieVadAUCauoH3wAKCRAFzvXHieVa
- dCprD/9rMZgkex0abhAVOa9YiUlwHr1P2aW2cUH0d6ZwazDnZdvYtYd83Q0OTESCns5ujf2EQ6t
- s0NScLrfHPhMZH1sQ31fEfsENABtei6FOdDWE1ME+Ygw3e8ilifdL83ydvU2kt75J/i33k+Ldtq
- 4olwZV8Ppqji7pM3+oFTyXp2BedRbuIGnH4cInm6urkQWbDLG7QLjoM6lhVcyBJDksVIQZ/YP5H
- 1mnOOO6dkY8v367yfTWsOsqNYxzvF7+IQpvGDsKR/OEB2kTU9gJC2TQxdb/Y96DzCiCLkwiOYpu
- XcOd1O3pZMSKM3hL8rkLSKTr1/b6FcFHeQkr61SJx/QIn4TScC6pD3DrRrBLjDekpJp+vLx/s/a
- 6bHKaaeKmqbUG2wFsD7gtz4vIB76raBLtU8C2MU90YcKk1vapTEFIRCEvUf94NvjTCFvblZFAjv
- IFTQ6wpKA3u4VtBN8anLe8uCsuTO0lrSTU4dwdU0tsAQrscUnj0FfmGEjUnnFkeiVQhY2JOU26N
- OZD7m5NAMjbmfN5MnN2HsxgnseoMOy9SD9n7f43QrJLckgV5tKsqMTKmV3AYUP+56d6mYK01LWD
- 9B3oX3i4t5yGlM2cO6GrT02s4W0TNJdgWMZYIuDcj1Pa2w5Oi2pyngaIrzz15bPprvvBYQTOAYS
- EoPcaGoJSn89XKA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1558; i=ayush@beagleboard.org;
+ h=from:subject:message-id; bh=zpOdmfpBKhgDMSZ3lQslDxw8tphqN8m/HcEZLtVnRY0=;
+ b=owEBbQKS/ZANAwAKAQXO9ceJ5Vp0AcsmYgBq6gffPq0afsUXss+TmBdVdcpnwmES8qvVoLoO8
+ fS7Dc+JsBaJAjMEAAEKAB0WIQTfzBMe8k8tZW+lBNYFzvXHieVadAUCauoH3wAKCRAFzvXHieVa
+ dFAUEADCzZFb4PmN4Rj+2VqSKvaqBBqV1/9MMgt1W+ePRdZqR2RiTnya+lDjXg76JvCKC7OaJJh
+ tPF4igoaNIvSeMnln1nUF/c5JmeqXUOvtr8iZNVddhaKHTBjhu8RO9QW5vRmymDn9VHi5y5Zc57
+ jdRvwIzTBspkV+aeZw3jha9H1VQxRQZ28Elj0GMYRzcV7hbyuEerljz0mC+sLJ7DQH7K0HF4URR
+ mqBQP/viA7KP8jwZyxzha2TVxp7/6qQ7uvlPgOF4ev2q58pH5QgGE0aY0IzdsxEJ9TLEkoE5SVe
+ KcKjQI6fj8rpb2dOOIHS/NwNhpcyOFBeBzi2ehtKW0hyb00CZU00Qm/tf9gMnZ19tFLblr0vL9Z
+ eN7B3nD4r2RsiYt/JYM1Es4ZjPVhxgWwtupkOf+7Y5ss9qcHGukalGPJSg6dmINyw2kySgXqonR
+ EMnhdNMDXQVKCitMDg+GvvO24uGQWvLjlVWmmMnzIRJhNcBN6KZEfk8drCV+YSSehwa7Lk9ShkE
+ CIAS2oed/ThFJR9r4Ekh8CENJXPhTKo1FRO3AlMkm3j9PmEtKoiatAbrgnX1jbvFUcRQq3YKyoq
+ wWB5Pz8+FmmOUy9k21LGNWhqUeoT9xxDMmTwot0WDvYbxUfr89m00XeYfWozvgbn/GNGrwldMtg
+ Z+TSFS87f4yWb0A==
 X-Developer-Key: i=ayush@beagleboard.org; a=openpgp;
  fpr=DFCC131EF24F2D656FA504D605CEF5C789E55A74
 
-A host driver that is its own SVC, such as a software SVC, injects
-requests like MODULE_REMOVED through greybus_data_rcvd(). The core acts
-on them asynchronously: the request handler runs on the connection
-workqueue and queues the actual work on svc->wq. The response is sent
-before that work runs, so it cannot tell the driver that the module is
-gone.
+The host driver can complete a request before add_timer is called. The
+main case for this is softsvc, although, depending on which transport
+is used, there is a possibility that response arrives much faster than
+expected.
 
-Add gb_svc_flush() to wait until every request received so far has been
-fully processed. It flushes the connection workqueue, then svc->wq.
+By populating timer earilier, we prevent the starting a timer on
+already completed request (which would then leak an active timer on cleanup).
 
 Signed-off-by: Ayush Singh <ayush@beagleboard.org>
 ---
- drivers/greybus/svc.c       | 14 ++++++++++++++
- include/linux/greybus/svc.h |  1 +
- 2 files changed, 15 insertions(+)
+ drivers/greybus/operation.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/greybus/svc.c b/drivers/greybus/svc.c
-index 490577731a19..788d95b4b87b 100644
---- a/drivers/greybus/svc.c
-+++ b/drivers/greybus/svc.c
-@@ -1381,6 +1381,20 @@ static void gb_svc_remove_modules(struct gb_svc *svc)
+diff --git a/drivers/greybus/operation.c b/drivers/greybus/operation.c
+index a63bc2eb164e..2d37acedf36f 100644
+--- a/drivers/greybus/operation.c
++++ b/drivers/greybus/operation.c
+@@ -782,20 +782,25 @@ int gb_operation_request_send(struct gb_operation *operation,
+ 		return 0;
  	}
- }
  
-+/**
-+ * gb_svc_flush - wait for received SVC requests to be processed
-+ * @svc: the SVC
-+ *
-+ * Requests pass through the connection workqueue on their way to svc->wq, so
-+ * both have to be flushed, in this order.
-+ */
-+void gb_svc_flush(struct gb_svc *svc)
-+{
-+	flush_workqueue(svc->connection->wq);
-+	flush_workqueue(svc->wq);
-+}
-+EXPORT_SYMBOL_GPL(gb_svc_flush);
++	/*
++	 * Arm the timeout before sending: the response can arrive, and the
++	 * operation complete, before the host driver returns.
++	 */
++	if (timeout) {
++		operation->timer.expires = jiffies + msecs_to_jiffies(timeout);
++		add_timer(&operation->timer);
++	}
 +
- void gb_svc_del(struct gb_svc *svc)
- {
- 	gb_connection_disable_rx(svc->connection);
-diff --git a/include/linux/greybus/svc.h b/include/linux/greybus/svc.h
-index da547fb9071b..ced5fc3a9c6b 100644
---- a/include/linux/greybus/svc.h
-+++ b/include/linux/greybus/svc.h
-@@ -63,6 +63,7 @@ struct gb_svc *gb_svc_create(struct gb_host_device *hd);
- int gb_svc_add(struct gb_svc *svc);
- void gb_svc_del(struct gb_svc *svc);
- void gb_svc_put(struct gb_svc *svc);
-+void gb_svc_flush(struct gb_svc *svc);
+ 	ret = gb_message_send(operation->request, gfp);
+ 	gb_operation_put_active(operation);
+ 	gb_operation_put(operation);
+ 	if (ret)
+ 		goto err_put_active;
  
- int gb_svc_pwrmon_intf_sample_get(struct gb_svc *svc, u8 intf_id,
- 				  u8 measurement_type, u32 *value);
+-	if (timeout) {
+-		operation->timer.expires = jiffies + msecs_to_jiffies(timeout);
+-		add_timer(&operation->timer);
+-	}
+-
+ 	return 0;
+ 
+ err_put_active:
++	timer_delete_sync(&operation->timer);
+ 	gb_operation_put_active(operation);
+ err_put:
+ 	gb_operation_put(operation);
 
 -- 
 2.56.0
