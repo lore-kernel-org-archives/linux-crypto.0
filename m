@@ -1,54 +1,61 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793747311;
-	b=ZHQ0ipvfOpVW+mhl3QC83G4uduvFtSUuPOOPpqR5J0DVv+b7Xc69UdBqxTRr2rWeUUGu
-	 +E7LOIekqVclncgs5IudbqhSJl5KnwCgRr6LR9f+Q84pjQG8leF0p40mCs9dvXdioOD2C
-	 3crPgqXsL5mYJUqmoWAN9Zkq+s6Ki4f4aI0g9zN9Rc/QS366mZRa6bgIgUJhDFevJIfZe
-	 oJNZxyfvukfLlVBUQSPbRxsKKNATyL2HwNZrc1GY00dj8p9ACCG4xeErkdeTepLNZ+8Kv
-	 zvMejHzGJuW3NTHLR25sEItSJzbSNNSskTyhcwLX56DBrUw4DiknTUEOEEfBVDrYiKw==
+	t=1793748294;
+	b=p+yarn5MMErhJ56ROlPcmHELeVPZhqDWQLLZbrYKgQQK0Vajyie07ALO0Af1M3Gvu53w
+	 dTuRZBow1tOjbXFaUDbhtUB3FXi7RzUIFoy8FTasdr9fROyEwhSLyeCguREY5jGeDkEz0
+	 4ETnsEg2rv5c3MCw1BcONaYaCtTsdU6RFfYmwlNpiE23ERlsW+xd/b3LPIOhzAgSPRD1q
+	 gnb9iORkjPxpyj8qolop95b6zukiJ0sEhvNgeMF0InYilaG/aDOFcRfJ1GIh3UYkUDUSl
+	 tzSLHDnVWNO0/NJo7/0v0NklJ5qlV2dTlqoSf1OF06m1d3J2Zz8lyr0z5UO6C+VD/aQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793747311;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793748294;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=IGTNflkPv/YNika7vMFmtkUnf7pEAhzj99fogLnfVKI=;
-	b=fuJrz3GQPLknUzKuDyEvtfBHK6mRuIP9V/QJfPt1FSCA0E8Tkj0eQW+DkMMbV4B1pq5o
-	 tjmOGTyCN5rygISHTkjFBvH72kFJGrpNTfHB2aCRZoMwNKhc2H+REpHxlw4r00P5j/jJa
-	 /RqrGIHj903663SN3NewpWjUYAA+HssGj+mrW+EOdSZnYgXPNSeAnnQZXWky+jg3macuV
-	 jBt11+abTYS+bOtv1LdFJJNJ7bOrYeaRtn75MbuRsnd+31rkkMjYIgC53wm3cqHESRvcD
-	 eCMiFNuz/+dqARVMOs7kRKAmZ48QD8F9C2IB9T+xcHFDw07mcwdDc9rrv9aqQ4pdpdw==
+	bh=Ub33AwiTbl5j5ejD0YdroRfi93xSlsqCkCfErBeCvDQ=;
+	b=yZ3v+atglVsIVo7hmdyue884Hw3nYQxvcDo9xvPWwOKSh/gg9ZSgGZdcn6AlAxniT/kU
+	 5MREXsxIF1k1N2kQiS3NBZ6qQ9t8M7x3Y3sNsNgaPI1JOCfW/0aEsvga44U5KerOAAvN9
+	 CPuMTy5aavCHb7qShxwDULpdYDYFkd6i6WW+rnTC0P+5tzhR3bPn+cDkz9sU1iu/46PYk
+	 ro4eLNuaYl2Ya7LTkOcqcqFDYeLgpS09jv/I0BH1sCMVJWRfG8Rl7KabHWRFYykbBgqpQ
+	 rDuSSZq/BfSMxxuNqAsmbfA8KTGQak152ByWetoWBfsJ9hYTfj6dRTpCw888Kdd8Azw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHRwydEs;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=as5bvSmr;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BE0606A324
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 23:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1349606A31B;
+	Tue,  3 Nov 2026 23:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHRwydEs
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24A801F000C1;
-	Tue,  3 Nov 2026 23:08:31 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=as5bvSmr
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF941F0093A;
+	Tue,  3 Nov 2026 23:24:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793747311;
-	bh=IGTNflkPv/YNika7vMFmtkUnf7pEAhzj99fogLnfVKI=;
+	s=k20260515; t=1793748293;
+	bh=Ub33AwiTbl5j5ejD0YdroRfi93xSlsqCkCfErBeCvDQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=NHRwydEsM15zNU/VYaENAjZ/lyLTj0LrXuAmDuwGh416t34RD1bTqAzk/96VahA8x
-	 SPQimadbVTwtyd+6+7D44i9rSZpT3nPgt+ML1a3Hdd0NBm7beI0ybVWvZE/Pd8Dk1s
-	 tzuJUDaEm3MGrNpHtDAjP0G4WlhiJDN6Kp5PpUvvqqUrfXHBBv+q8CtBJuO/VZWNg4
-	 ijs1Y36lh12C62v4L5fWEnGLabECHQEMYa3iXmFMST/s9xWF08yZcAyURSKKrpfcIA
-	 VKZcuF6eXhiFd7Wpo18+QgdQq1OeT1GZ4wc36uENV+dFVIxpdJv0/8Lrj/EE6k++/M
-	 y3PZZ+BA6y4zg==
-Date: Tue, 3 Nov 2026 15:08:29 -0800
+	b=as5bvSmr4tCB0xxH1/aFLd2ZB398jBjfJ9zs6u5RRa950j9pkoKghrGGJYG/PHIVb
+	 eifE8dGAjfgdDFThQFHcrH/I5XS1Vo4gvrICxIxL0giwMRm6Ez7EAIVBkbAKUpPWDl
+	 WZHRkvv22/2h0p4gEFk00mBvUt28JQ6JELZEC6tXHkBBHOVGkrGfxhOJA89Jf7uXEk
+	 +4NH5NZ+z/EfgPp9UnnatW7C1m1ZVC9J9u8yTmna47hVGeX9IYzOKHQKH0lNFGTEaR
+	 ZV2JGQAugs+Qmbj1x/LhHAAVVx8Yisvqsv3G+Cdxz2WAn6Hu4XKtVkvKNUNbRpOWd6
+	 G7m49I+QfpneQ==
+Date: Tue, 3 Nov 2026 15:24:51 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Martin Willi <martin@strongswan.org>
-Cc: linux-crypto@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+To: Tzu-Ching Yang <shingekinocore@gmail.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
-	Antonio Quartulli <antonio@mandelbit.com>
-Subject: Re: [PATCH v2 0/3] lib/crypto: x86/chacha: Add a 16-block AVX-512
- function
-Message-ID: <20261103230829.GD2281@quark>
-References: <20261102113926.2765176-1-martin@strongswan.org>
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"Jose E. Marchesi" <jose.marchesi@oracle.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Simon Horman <horms@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] unroll: Drop the unused unrolled and unrolled_none
+ macros
+Message-ID: <20261103232451.GE2281@quark>
+References: <20261023163108.2042675-1-shingekinocore@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,41 +67,40 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261102113926.2765176-1-martin@strongswan.org>
+In-Reply-To: <20261023163108.2042675-1-shingekinocore@gmail.com>
 
-On Mon, Nov 02, 2026 at 12:39:23PM +0100, Martin Willi wrote:
-> I don't have a Zen 4, which splits zmm instructions into two 256-bit
-> halves, so I can't tell how the 16-block function performs there.
-> If anybody has access to one, numbers from there would be great.
+On Sat, Oct 24, 2026 at 12:31:08AM +0800, Tzu-Ching Yang wrote:
+> unrolled and unrolled_none are object-like macros with lower-case
+> names, and neither has had a user since commit c6594d642717 ("unroll:
+> add generic loop unroll helpers") added them in February 2025.
+> 
+> The name unrolled also breaks code that uses it for something else. On
+> GCC the macro expands to an empty _Pragma(), so a function parameter
+> named unrolled compiles with only -Wunknown-pragmas warnings (errors
+> only with CONFIG_WERROR) and silently loses its name:
+> 
+> 	int add(int unrolled, int x) { return unrolled + x; }
+> 
+> builds as "return x;" with GCC 11 to 16 (GCC 8 to 10 and Clang reject
+> it).
+> 
+> Drop both macros, and retitle the kernel-doc comment from unrolled to
+> unrolled_count(), the macro its usage example shows. unrolled_full and
+> unrolled_count() stay; any clash with their names fails to build
+> instead of compiling silently.
+> 
+> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Link: https://lore.kernel.org/all/3c25921c-7bdf-4edd-ba06-838dd1765db6@intel.com/
+> Signed-off-by: Tzu-Ching Yang <shingekinocore@gmail.com>
+> ---
+> v2: drop the two unused macros instead of making all three
+> function-like (Alexander Lobakin).
+> v1: https://lore.kernel.org/all/20261016025613.2690485-1-shingekinocore@gmail.com/
+> 
+> Eric, this version no longer touches lib/crypto/. Would you still
+> take it through libcrypto-next, or should it go through Andrew's -mm
+> tree (unroll.h has no MAINTAINERS entry)?
 
-chacha_kunit benchmark results from AMD Genoa (Zen 4 server processor):
-
-(I added some extra lengths as well:)
-
-     | Len   | Before    | After     | Improvement |
-     +-------+-----------+-----------+-------------+
-     | 1     | 6 MB/s    | 6 MB/s    |   0.00%     |
-     | 16    | 106 MB/s  | 106 MB/s  |   0.00%     |
-     | 64    | 437 MB/s  | 437 MB/s  |   0.00%     |
-     | 127   | 1078 MB/s | 1072 MB/s |  -0.56%     |
-     | 128   | 1106 MB/s | 1101 MB/s |  -0.45%     |
-     | 200   | 1361 MB/s | 1316 MB/s |  -3.31%     |
-     | 256   | 1674 MB/s | 1612 MB/s |  -3.70%     |
-     | 511   | 2950 MB/s | 2970 MB/s |  +0.68%     |
-     | 512   | 3052 MB/s | 2976 MB/s |  -2.49%     |
-     | 768   | 2674 MB/s | 3417 MB/s | +27.79%     |
-     | 1024  | 3241 MB/s | 4514 MB/s | +39.28%     |
-     | 1420  | 3242 MB/s | 3845 MB/s | +18.60%     |
-     | 2048  | 3587 MB/s | 4829 MB/s | +34.63%     |
-     | 3173  | 3088 MB/s | 4439 MB/s | +43.75%     |
-     | 4096  | 3743 MB/s | 5040 MB/s | +34.65%     |
-     | 8920  | 3606 MB/s | 4846 MB/s | +34.39%     |
-     | 16384 | 3739 MB/s | 5105 MB/s | +36.53%     |
-
-Note that mobile Zen 5 processors have only 256-bit ALUs as well.  There
-the results are similar.
-
-It's still worth enabling AVX-512 code like this on these processors.
-It's just not quite as helpful as it is on processors with 512-bit ALUs.
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
 - Eric
