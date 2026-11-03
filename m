@@ -1,96 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793666778;
-	b=nWVh+xOu3XnwG0C2tT49eR6b8fopBPCv63qL+1nuHnwa1wly/U9ONr1DRrgn88ldzPJi
-	 atH2GJUL1fXXtpQG9B0QlHdFwUnFfPxE6J30xEsSEpthYiy9lkhbDGbQM//4xMInmujFt
-	 BOoeiqoCgc09PJfPKCiujvb/jXVBwHnWbraFeG8uYR1sdUaZFwgHqKuc0r2ks45zC6gVp
-	 G4hQIwc2v9pmkoRmfyc02MdsYSdChylWsrhcgOd4Rgo5+MQN0Gki0NxxVshUL8APm1D34
-	 tcm4UrmCM/nBIvDgoMEU6sKldEzokLEGG46DxiiQ+511pvR7fFs6j+sGVBwK6VzPePg==
+	t=1793670574;
+	b=g7rC3xiJHBW639ejn9tNr+xdmEiSPTnNIip5kg44dHzRh5EhIoNAuP9o34lgIzyI/CZq
+	 fymZZr8imAfSyA5e1KZG8PJpz8h9bPzbjOirhNJS5syZulV5XJlshbR+FSLeD/mcHcP1f
+	 zD+f0a+Zhy3DpH3NTNxmcxBDVdWAz3t6iOS5U+bBPQysX1htUrPixHqxi8UsfNSFz1/Ok
+	 3S4xKJqQcZZ8GcoKQsc6TurPJFdPfsCMsbqE5sZNn2+y6K+pw6wGg3pbrFuR/wVH75OwT
+	 aRqNqOAICf+4nNUlw0bgZ37OziKWG/UxMRjHYcwiixatYM3R3gCj6ohPF8mBnq/aMmA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793666778;
-	h=DMARC-Filter:Received:X-Virus-Scanned:Received:DKIM-Signature:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=P6zdhMrVQdSbUCSy9T5hCPdt8mnqgszANMMXRfbHvQA=;
-	b=aODpd8nr2P00jTMkPvUyjGlfv7At2a9CuS2cpCGFRdl7c2m5f1r8go+z5wpfdrSCLUwj
-	 vyy6XHNFk34WTOYxKMUotxBTkp1QGTlCF/XzwX8Xps6G01gUjgoRCp9v0IFMK6PKJePxw
-	 ra4wuYTNZRf/zbatYU0KTz5onKGvtK0CGMxS20zpdG2CrHEQyJnuw+EWKvOQW/zFYssn1
-	 pDjmVmwbCcNqhlpoOUECpVCECHl9gQOW7VbECbvwhFX/rbDm49gQZTfcaFeiBUvt8J7Ik
-	 WTWNE/a879jdugmic7T2vIc5jndijxCBiYWnq/3XtZLJtuidS2CipoFXk5S0+lhxURA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793670574;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To;
+	bh=oqD5KjVEUEOf5ZVgC/hbD2wTa3fhBUi4PPSMQExmXq4=;
+	b=GHd3H63kRvNZ47wTvtdzRkJXgInSSgdNZY75Vn5f6vw97V1RFasH6QFA7ysnq3S5vDVR
+	 5taiHI/72K5aE7IqHgwCEDS04Z0Pm2SFPhGuJky1Gw90qOeVI0mP0BPuPe5isVLUn8Sx8
+	 iv2A+pMF5VBznT2NSfzLsL7dzaALFGNOzRCUuT5k/r9NanpURe/uNhlpZo6popG29x7rt
+	 pQCL2C9HmawaI4k3dLeLQGiuMZ5ApgHXuULzn5cndhdDlZ2P8oqxqJ4u6VC1CqLFtw1/x
+	 rgo+vXDwBs3+v+oVco0umZOXJYk5MBSbTAJJNDsu0H9tgu4PmVHyicHXkhDbqcb2nQw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=alien8.de;
-	spf=pass smtp.mailfrom=alien8.de;
-	dkim=pass header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=YEJ91bHe;
-	arc=none smtp.remote-ip=65.109.113.108
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	dmarc=pass header.from=infradead.org;
+	spf=pass smtp.mailfrom=infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=HMnnSs23;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488A2606A324;
-	Tue,  3 Nov 2026 00:46:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 488A2606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D06B606A326;
+	Tue,  3 Nov 2026 01:49:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6D06B606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key, unprotected) header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=YEJ91bHe
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E63A540E016C;
-	Tue,  3 Nov 2026 00:46:14 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id ugQTfxD5SsTq; Tue,  3 Nov 2026 00:46:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1793666768; bh=P6zdhMrVQdSbUCSy9T5hCPdt8mnqgszANMMXRfbHvQA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YEJ91bHecdj53GxAo6rc9mKOeHJzKr4cxQ/09btqC8Pv69LWCP//4j7WgIZOmn3K5
-	 VuibwijhSdxkNT4FsCPpJZUBr3OVrcIgy4s3C5j3SajV0S65J+GTXjT7Z+rZgv3h4d
-	 6SJKg1+GOc7qAdYnQVAX8bJzUPFRWVweKU5MV1pMjmow5DEEFXZ/o4a+KKVvWF4AZQ
-	 Lu6z1KTLP/SG+pnZu1np2Ygabrla7JoSxZcfNivK+q7HUoBgs1rMdtl4wIiit1GgCW
-	 +MuyKdoZawSr1KPSfxC4OcPMEyFrp5nyc61N+MUgYi66q+gies9M+9Xt/IXQBEiPh+
-	 ep7W9jxmSaEJA7ZfLsHklQHYZ777Pnh/jy/Pp4VO9+qq2aiBCTXktaoNJMjGeRT9VC
-	 LE/LnHVx93Uo8IRD/9Q5gTLzqhYXbMsZMj1J+iiS+yw/omF8AMjmh6bJ/r7KZmPNYq
-	 UCBjPTvRpAMIl9YnNLSYx4xKXYoH3OfCgvs9NP8VJ+dwlA+ZKJi6kXzOUFOz8t3yp2
-	 kON4ympmSoJYojttVZiiuoYS6d2v+wSPsHIsi/XWEnWLB0YnZZ0PnBBrj6LgqELFRo
-	 6iVFDv8IJG/lPvFLscRfSJY9pyOSoG/2jRQd5t936hQ6sAK5dfyI6D3n9hFoFIntzO
-	 HMEL5UFf4veh4Vnki+VDNPXw=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CE2B540E029C;
-	Tue,  3 Nov 2026 00:45:34 +0000 (UTC)
-Date: Mon, 2 Nov 2026 16:45:31 -0800
-From: Borislav Petkov <bp@alien8.de>
-To: "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-	K Prateek Nayak <kprateek.nayak@amd.com>, tglx@kernel.org,
-	mingo@redhat.com, dave.hansen@linux.intel.com, x86@kernel.org,
-	hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
-	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
-	Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
-	ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
-	rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
-	pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
-	dyoung@redhat.com, nikunj@amd.com, darwi@linutronix.de,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH v4 1/2] x86/sev: Clear RMPOPT when segmented RMP is
- disabled by firmware
-Message-ID: <20261103004531.GEaukuq9sXbCs_PjfL@fat_crate.local>
-References: <56da047d63b22f03a7e709fc172a5543da894d67.1793216372.git.ashish.kalra@amd.com>
- <20261102052841.GBaugfibOXxGorZKgq@fat_crate.local>
- <69ed0d93-f96d-4baa-a587-fade5a0a3262@amd.com>
- <414b2fc2-a55a-4b2d-ac70-4def101c4aee@amd.com>
- <20261102144805.GCauiipTaEXcg6Lr59@fat_crate.local>
- <d81f6807-26ac-49b9-a205-c89c394ec1d4@amd.com>
- <20261102193116.GDaujlBJc3XjG3xzLj@fat_crate.local>
- <9ebcb83a-1c0e-423a-8730-eff6b710634b@amd.com>
- <20261102214343.GFaukED8ep3EMmQxfx@fat_crate.local>
- <30947e17-bffc-4c70-b19c-56504771c9fa@amd.com>
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=HMnnSs23
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=oqD5KjVEUEOf5ZVgC/hbD2wTa3fhBUi4PPSMQExmXq4=; b=HMnnSs23htRHeD+t1FXWi56qQU
+	kPaJq1I5j/zgCvQGnhWnpQywJkuRkZqvwjGZsMKrWXHfl2qdKOx1DObFxKsDHRH1vFhhs7CgyiJ1z
+	h6tspKBuh2NCHFUFtlbdZ1NDITMe8KcbwrD8rBm3MQfa2hC3aRsM2cDf1kDW8HK6HoJaFNBZxLeI8
+	FPr8ahYhpC59zyt4ZozA+Z38N+HYlvdIaFUWJGkWVOP9XYNc1xgHtjKQFZ98Zr1lnwu3eEQnSFoPZ
+	TJmLSL/MyBwVtYi84PRuIDAxZ4T2ehO+femW09MTceV3Iztu3PxigLwucGnoDjDotL1sTmlr5JJ2g
+	Ni7SNwNg==;
+Received: from [38.23.173.23] (helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xO3eT-00000000p01-3FoP;
+	Tue, 03 Nov 2026 01:49:29 +0000
+Date: Mon, 2 Nov 2026 20:49:23 -0500
+From: "Liam R. Howlett (Google)" <liam@infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Davidlohr Bueso <dave@stgolabs.net>, 
+	Uladzislau Rezki <urezki@gmail.com>, Michal Hocko <mhocko@suse.com>, Baoquan He <bhe@redhat.com>, 
+	Alexander Potapenko <glider@google.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
+	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	maple-tree@lists.infradead.org, Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Andrew Ballance <andrewjballance@gmail.com>, 
+	stable@vger.kernel.org, "David Hildenbrand (Arm)" <david@kernel.org>
+Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
+Message-ID: <xdzcyoou73blpfdlgy47i2ktrcsffnclerzojpgrxphid54gjc@nicdcvzqx447>
+References: <20261028154218.1668182-1-liam@infradead.org>
+ <20261028154218.1668182-5-liam@infradead.org>
+ <auKshDXKQXt1kvjy@gondor.apana.org.au>
+ <auMbCuecFeRmBFSK@pc636>
+ <jfvq7vkx73vzp2ukq6nwnb3v3g2ezdcyppba4oa5lpzmz6ls6t@akc46gonndgy>
+ <urkgmijyytg3rrislm5fdzmfggqavzpiry23f6lpkqonvy2tqx@d56stj3eixfa>
+ <auaFhOa5EBz4gJwK@gondor.apana.org.au>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -100,112 +77,60 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <30947e17-bffc-4c70-b19c-56504771c9fa@amd.com>
+In-Reply-To: <auaFhOa5EBz4gJwK@gondor.apana.org.au>
 
-On Mon, Nov 02, 2026 at 06:07:35PM -0600, Kalra, Ashish wrote:
-> LGTM, tested on HW.
+On 26/11/01 08:19AM, Herbert Xu wrote:
+> On Fri, Oct 30, 2026 at 08:56:03PM -0400, Liam R. Howlett (Google) wrote:
+> >
+> > Hubert, I have another version of this patch set to send out, but this
+> > particular patch remains the same.
+> > 
+> > Are you okay with keeping it the way it is for this release?
+> > 
+> > I don't want to force your hand but I also don't want to keep a valid
+> > deadlock scenario in-tree.
+> 
+> Instead of your patch, please revert the original change that
+> added kvmalloc to rhashtable:
+> 
+> commit 93f976b5190df32793908d49165f78e67fcb66cf
+> Author: Davidlohr Bueso <dave@stgolabs.net>
+> Date:   Tue Aug 21 22:01:45 2018 -0700
+> 
+>     lib/rhashtable: simplify bucket_table_alloc()
+> 
 
-Ok, thanks.
+I don't follow.  Reverting that patch gives the same functional flow as
+the patch I already sent; kzalloc() for one branch and kvzalloc() for
+the other. 
 
-This below is what I have now, and the code looks a lot better. If there are
-no more complaints and it looks like what you tested, you can wait for me to
-push out the two patches and then you can test tip:x86/urgent again.
+We will, however, restore the useless __GFP_NORETRY flag to one branch,
+and a broken check.
 
-Thx.
+-       if (gfp != GFP_KERNEL)
+-               tbl = kzalloc(size, gfp | __GFP_NOWARN | __GFP_NORETRY);
 
----
-From: Ashish Kalra <ashish.kalra@amd.com>
-Date: Wed, 28 Oct 2026 19:49:22 +0000
-Subject: [PATCH] x86/sev: Clear RMPOPT when segmented RMP is disabled by
- firmware
+gfp != GFP_KERNEL is supposed to just send GFP_ATOMIC in here, but
+instead you are sending GFP_KERNEL | __GFP_NOFAIL as well.
+gfpflags_allow_blocking() should be used here, right?
 
-Segmented RMP support is advertised via X86_FEATURE_SEGMENTED_RMP, and the
-firmware enables it via MSR_AMD64_RMP_CFG[SEG_RMP_ENABLED]. The latter can be
-cleared in platform BIOS by the user, in which case the system runs in
-contiguous RMP setting.
+The patch you are saying to revert was correct when it went in.
 
-snp_probe_rmptable_info() does not clear X86_FEATURE_RMPOPT in the
-advertised-but-firmware-disabled case.
+> The newly added alloc_hooks_tag call should go after the if statement.
 
-As a result, this does not prevent snp_enable_rmpopt() from trying to program
-MSR_AMD64_RMPOPT_BASE, which raises a #GP on the MSR access.
+You are saying to add it to both branches of the if statement, right?
 
-Make sure X86_FEATURE_RMPOPT is cleared in all cases where segmented RMP is
-not enabled.
+> 
+> This patch should also be split out of your series and posted to
+> linux-crypto.
 
-  [ bp:
-   - Put the commit message on Ozempic
-   - Simplify snp_probe_rmptable_info()
-   - Fix feature check order in snp_enable_rmpopt()
-   - Add RMPOPT feature dependency on SEV_SNP ]
+Sounds good.
 
-Fixes: 15d974be0a3b ("x86/sev: Initialize RMPOPT configuration MSRs")
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-Link: https://patch.msgid.link/56da047d63b22f03a7e709fc172a5543da894d67.1793216372.git.ashish.kalra@amd.com
----
- arch/x86/kernel/cpu/cpuid-deps.c |  1 +
- arch/x86/virt/svm/sev.c          | 17 +++++------------
- 2 files changed, 6 insertions(+), 12 deletions(-)
+The fixes tag should still point to c6307674ed82, since that's when the
+issue became visible.
 
-diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
-index 99801e844b30..acbcec394ef1 100644
---- a/arch/x86/kernel/cpu/cpuid-deps.c
-+++ b/arch/x86/kernel/cpu/cpuid-deps.c
-@@ -93,6 +93,7 @@ static const struct cpuid_dep cpuid_deps[] = {
- 	{ X86_FEATURE_SPEC_CTRL_SSBD,		X86_FEATURE_SPEC_CTRL },
- 	{ X86_FEATURE_LASS,			X86_FEATURE_SMAP      },
- 	{ X86_FEATURE_INVLPGB,			X86_FEATURE_PCID      },
-+	{ X86_FEATURE_RMPOPT,			X86_FEATURE_SEV_SNP   },
- 	{}
- };
- 
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index bd70c4d0b774..417e6a41ac60 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -669,10 +669,10 @@ void snp_enable_rmpopt(void)
- 	u64 base;
- 	int cpu;
- 
--	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
- 		return;
- 
--	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
-+	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
- 		return;
- 
- 	if (!rmpopt_soft_init)
-@@ -819,18 +819,11 @@ bool snp_probe_rmptable_info(void)
- {
- 	if (cpu_feature_enabled(X86_FEATURE_SEGMENTED_RMP)) {
- 		rdmsrq(MSR_AMD64_RMP_CFG, rmp_cfg);
--
--		if (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED) {
--			if (probe_segmented_rmptable_info())
--				return true;
--
--			setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
--			return false;
--		}
--	} else {
--		setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
-+		if (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED)
-+			return probe_segmented_rmptable_info();
- 	}
- 
-+	setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
- 	return probe_contiguous_rmptable_info();
- }
- 
--- 
-2.53.0
+Thanks,
+Liam
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
