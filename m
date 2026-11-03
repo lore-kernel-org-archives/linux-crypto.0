@@ -1,22 +1,22 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=159.226.251.81
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793687385;
-	b=alMj4qNMB0aVwQPkQl2X1f15qEzfIeIF1/t3OERQAcFjc8u4cyh98b/9lMosL2ygPpoK
-	 yjDM0uJPSrvMBTm5jAytrGDRRWi+hBf+1NtR5qHFsK5tFF4Dn0174QmoariBuOvOm1xBu
-	 Co6ggQKXuzH/WlroouRQBolf/64+7itnQ6LOmMF7KqT8kNh9IQ0xwowiNjlnLyCtx5nvJ
-	 j1ogbmvEawD+n0nOWYgBmS8/QxOsusnNCp/QImmts3CYTTFn9BZmzynZu4Yxtszp3S24h
-	 TQmu6s4M6O4M6qOb0x+v4lBn8EsNSgOjN1OKxxpWLbvE/6oxTq0W3UbpEAcNtJRVyew==
+	t=1793687928;
+	b=InG9aZqHu8oB4zAnEerIKXfS8dznw6JAFZgIAvPdcv1+mFjt7rmroesdckZ56cC8+I69
+	 qeCxcYqwkfqCBDPtnA0drO6lvLkEt/IS3Q5p85qM8o2+8zx5afQUd5ZWuKnf1yz1JaVDQ
+	 wE7nC1i1rwvse1m+Tp1preUX5sh6KdS9oPdx+sK77Q0Wwv8IkcAwQWQ42R3KNCtzqUIuM
+	 PBE6xNVY/rQgKaBvMfWGC0ul8lfK/kvZCVrllRrC96L+d1r0Lm3uQrqNvUzptW9OjrAQ3
+	 KqoJGqJEw89XT6j+GjewcJU3lEIEMbO7kJtnhtwpovDEEF4ZMUymOc6vCod0FK+ic3A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793687385;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793687928;
 	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
 	 MIME-Version:Content-Transfer-Encoding:X-CM-TRANSID:
 	 X-Coremail-Antispam:X-Originating-IP:X-CM-SenderInfo;
-	bh=6/6xUUOjwtL1FwuXpKSTtDVBiayCB2HCPjgP1T7L0+g=;
-	b=lp0hRafTEgWZQ3FRvjy7kegcpPPUoYo3w9Nn1ncewKRm0VZvxxxMc9VnBSRcHxL3A3Pv
-	 9wWYdy+h2t0+NFrmJX0B5NevRWIOs9pVeIww+QkZwjpdt9eoS+sRI1BbI2hVKsZ7L/IrF
-	 p0QcLdxLX+W2I/xiZKDqp3LMs8nkDRbrpiw8Yvwt7tO1tAJiOh9hBT0RBiEFve09JqO5J
-	 pd2IYjZ6fttWUwKPmYMwo/hTQiM+WvVTLl2fH2G9cGgYJNkavhjFfOd+BBuWpPpzPxjps
-	 SSCEWDw0FIuAg4Hh6QsX94sZ7VmES7ZYTf3mN/zrm0lUELMVGz39wrQEsBCP6WVkp+w==
+	bh=sTSdkkz2vrjceniKIFMADF9L4UGSrsp9KNEr/A42Nmc=;
+	b=4a3C5uhvPy6faFfL/siJytWaiE2PtTtsAR6OWRWTdOnypMVsqDRJg4hpp+BiN++hQyl9
+	 ZkeUwgDVKblerfBlEbYvZeGhjGkD66eY53oRzrMMEZHtvpsW+F3ddMbBWzYYpto3Imz+p
+	 dWKi9iHWDWxdt473TUM8rcJ4jqNlhXh/lEdiM17Wrz8tpY9EbH1pXmKC1yIz2oAEZOWjO
+	 I5SFeuPc7A+FEEYLLrvdX5eQ8ceb/jMjoKbI7QOtDQ7V+B7En4bpgv6At52snVKe8d+l7
+	 bZ90hCpzss7bbwanX9ZAKo84kpc8wvGLspTO3exuYE/NSfPOZRbi9FRJNaf39KUZmOw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=iscas.ac.cn;
 	spf=pass smtp.mailfrom=iscas.ac.cn;
@@ -25,28 +25,25 @@ Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51CB606A32C;
-	Tue,  3 Nov 2026 06:29:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E51CB606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30ED606A324;
+	Tue,  3 Nov 2026 06:38:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C30ED606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-03 (Coremail) with SMTP id rQCowACXoZJNf+lqD145AA--.419S2;
-	Tue, 03 Nov 2026 14:29:33 +0800 (CST)
+	by APP-03 (Coremail) with SMTP id rQCowAAHGJlxgelqZHE5AA--.148S2;
+	Tue, 03 Nov 2026 14:38:41 +0800 (CST)
 From: Wentao Liang <vulab@iscas.ac.cn>
-To: clabbe@baylibre.com,
+To: ayush.sawal@chelsio.com,
 	herbert@gondor.apana.org.au
 Cc: davem@davemloft.net,
-	linusw@kernel.org,
-	kaloz@kernel.org,
 	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Wentao Liang <vulab@iscas.ac.cn>,
 	stable@vger.kernel.org
-Subject: [PATCH] crypto: ixp4xx - Free the fallback cipher if context initialization fails
-Date: Tue,  3 Nov 2026 06:29:42 +0000
-Message-Id: <20261103062942.1021598-1-vulab@iscas.ac.cn>
+Subject: [PATCH] crypto: chcr - Free fallback transforms when device assignment fails
+Date: Tue,  3 Nov 2026 06:38:50 +0000
+Message-Id: <20261103063850.1033008-1-vulab@iscas.ac.cn>
 X-Mailer: git-send-email 2.34.1
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,67 +55,110 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACXoZJNf+lqD145AA--.419S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw17Gw43Wr43tw1kAFW7CFg_yoW8CF4rpF
-	WrCrWkKrWDJF17Ca4xJFWrCFyfJ3yrAayakw48G340kFn3urZ5GFW2yr4jkrZ5JFyrGFyx
-	AF4vvryUJwnrXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:rQCowAAHGJlxgelqZHE5AA--.148S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJw48WrW7Jr18KFWkJFy3twb_yoW5tr4DpF
+	4Yk3yvyrWrJFn7KayxJrs5G3s8Ga9ayay7KrWFkw1FkwnIvrWkWF9rX3yjvF15tFW8JFW5
+	Zr4vyas8Wr1DJaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1q6rW5McIj6I8E87Iv67AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUogAwDUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRUAA2rpWfV5NwAAs+
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUtVWrXwAv7VC2z280aVAFwI0_Gr1j6F4UJwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v2
+	6r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
+	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCI
+	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+	AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbkhL5
+	UUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwQAA2rpWtl+-AAAsC
 
-init_tfm_ablk() allocates a fallback skcipher before calling init_tfm().
-If allocating either security association context fails, init_tfm()
-returns an error and the fallback is left allocated. The crypto core
-does not call the algorithm exit callback after a failed initialization,
-so exit_tfm_ablk() cannot release it.
+The skcipher, RFC3686 and AEAD initialization callbacks allocate their
+fallback transforms before calling chcr_device_init(). If no active
+device can be assigned, chcr_device_init() returns -ENXIO and the
+fallback is leaked. The crypto core does not invoke the algorithm's
+exit callback after its initialization callback fails.
 
-Free the fallback cipher when init_tfm() fails. The security association
-contexts are already unwound by init_tfm().
+Free the fallback transform before returning the device assignment
+error in each of these initialization callbacks.
 
-Fixes: dfb098d692ea ("crypto: ixp4xx - fallback when having more than one SG")
+Fixes: b8fd1f4170e7 ("crypto: chcr - Add ctr mode and process large sg entries for cipher")
+Fixes: 0e93708dabc0 ("crypto: chcr - Add fallback for AEAD algos")
 Cc: stable@vger.kernel.org
 Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
 Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 ---
- drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/crypto/chelsio/chcr_algo.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-index 33e8e887a415..6af50a01c96f 100644
---- a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-+++ b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-@@ -635,6 +635,7 @@ static int init_tfm_ablk(struct crypto_skcipher *tfm)
- 	struct crypto_tfm *ctfm = crypto_skcipher_tfm(tfm);
- 	struct ixp_ctx *ctx = crypto_tfm_ctx(ctfm);
- 	const char *name = crypto_tfm_alg_name(ctfm);
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index e2f2b2a6200e..fd4720fa50a9 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -1439,6 +1439,7 @@ static int chcr_init_tfm(struct crypto_skcipher *tfm)
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+ 	struct chcr_context *ctx = crypto_skcipher_ctx(tfm);
+ 	struct ablk_ctx *ablkctx = ABLK_CTX(ctx);
 +	int ret;
  
- 	ctx->fallback_tfm = crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(ctx->fallback_tfm)) {
-@@ -649,7 +650,11 @@ static int init_tfm_ablk(struct crypto_skcipher *tfm)
- 		 );
+ 	ablkctx->sw_cipher = crypto_alloc_skcipher(alg->base.cra_name, 0,
+ 				CRYPTO_ALG_NEED_FALLBACK);
+@@ -1450,7 +1451,11 @@ static int chcr_init_tfm(struct crypto_skcipher *tfm)
+ 	crypto_skcipher_set_reqsize(tfm, sizeof(struct chcr_skcipher_req_ctx) +
+ 					 crypto_skcipher_reqsize(ablkctx->sw_cipher));
  
- 	crypto_skcipher_set_reqsize(tfm, sizeof(struct ablk_ctx) + crypto_skcipher_reqsize(ctx->fallback_tfm));
--	return init_tfm(crypto_skcipher_tfm(tfm));
-+	ret = init_tfm(crypto_skcipher_tfm(tfm));
+-	return chcr_device_init(ctx);
++	ret = chcr_device_init(ctx);
 +	if (ret)
-+		crypto_free_skcipher(ctx->fallback_tfm);
++		crypto_free_skcipher(ablkctx->sw_cipher);
 +
 +	return ret;
  }
  
- static int init_tfm_aead(struct crypto_aead *tfm)
+ static int chcr_rfc3686_init(struct crypto_skcipher *tfm)
+@@ -1458,6 +1463,7 @@ static int chcr_rfc3686_init(struct crypto_skcipher *tfm)
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+ 	struct chcr_context *ctx = crypto_skcipher_ctx(tfm);
+ 	struct ablk_ctx *ablkctx = ABLK_CTX(ctx);
++	int ret;
+ 
+ 	/*RFC3686 initialises IV counter value to 1, rfc3686(ctr(aes))
+ 	 * cannot be used as fallback in chcr_handle_cipher_response
+@@ -1470,7 +1476,11 @@ static int chcr_rfc3686_init(struct crypto_skcipher *tfm)
+ 	}
+ 	crypto_skcipher_set_reqsize(tfm, sizeof(struct chcr_skcipher_req_ctx) +
+ 				    crypto_skcipher_reqsize(ablkctx->sw_cipher));
+-	return chcr_device_init(ctx);
++	ret = chcr_device_init(ctx);
++	if (ret)
++		crypto_free_skcipher(ablkctx->sw_cipher);
++
++	return ret;
+ }
+ 
+ 
+@@ -3164,6 +3174,7 @@ static int chcr_aead_cra_init(struct crypto_aead *tfm)
+ {
+ 	struct chcr_aead_ctx *aeadctx = AEAD_CTX(a_ctx(tfm));
+ 	struct aead_alg *alg = crypto_aead_alg(tfm);
++	int ret;
+ 
+ 	aeadctx->sw_cipher = crypto_alloc_aead(alg->base.cra_name, 0,
+ 					       CRYPTO_ALG_NEED_FALLBACK |
+@@ -3174,7 +3185,11 @@ static int chcr_aead_cra_init(struct crypto_aead *tfm)
+ 		tfm, max(sizeof(struct chcr_aead_reqctx),
+ 			 sizeof(struct aead_request) +
+ 			 crypto_aead_reqsize(aeadctx->sw_cipher)));
+-	return chcr_device_init(a_ctx(tfm));
++	ret = chcr_device_init(a_ctx(tfm));
++	if (ret)
++		crypto_free_aead(aeadctx->sw_cipher);
++
++	return ret;
+ }
+ 
+ static void chcr_aead_cra_exit(struct crypto_aead *tfm)
 -- 
 2.34.1
 
