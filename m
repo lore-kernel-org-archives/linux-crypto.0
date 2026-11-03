@@ -1,81 +1,96 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.8
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793701708;
-	b=Ie8qn1OrNtToaIN3jt2hRbbrzY74Ra99/ED/yuquEAae/wg0qgiW4heJY4LwEjn5DL7s
-	 adcdfV8i6ofdfTeBtjP0Uy2Hn3cC9KoMX5Gq6zoTqTvvQ2hVQSjgKfaTBFrM2B8qjMF+o
-	 dOocs0+LqNdYsYmIflOGFWSJVwrLRM742oc3/jsP1M6zGPygFIcSrqqWiquj7DkQ2utQo
-	 5hp54dPcK5ucDgfvu6/kxogG6M4FsSXx/pVpHiOdTz7Fhu8AIswS5ErhK30vf5+5/dtmh
-	 255Bw/uysoBglw8+ozc+GSq4xSpBoYyVTY1V5eNZrbyn9DNnb3lp/o9muZNUZiPiGLA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793701708;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:Organization;
-	bh=brI27/R3evN0ktEK8A0I0W9UNIMPS/xp4y6+g+aCaBo=;
-	b=hwgRZn0MjZPjWZib1pXmbbR6wNYwBny8wtL/BHgHyhiQbIJ1pgMpDxZVQiKdGKKgNb6u
-	 9vGeQhXNqBG4c6MdJI4W/k7IpXU5wW6An9OY9ZlmP2/0okJtqgs1LJCL3CWUMenk919gC
-	 x5ngl0JJE57VNQVRCUFLGEIv2lBzIzsyJqSbf26miBC/VuvY33x0j0bHlcYOmS4H/vmGM
-	 sMsBC6W9A2OWXka2rGfse55oDJwTZlo5z06Rl9p792AOJ0u9MZHar6IpZUkAJJ1G3A8+j
-	 LAPmB+azru28Sl4dbZSCq+m+5YrIrnzeXkhnszHQsyzWOPhxSV6tic42sjg51f9tTWA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.intel.com;
-	spf=pass smtp.mailfrom=linux.intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=I+7E1g4J;
-	arc=none smtp.remote-ip=192.198.163.8
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.175
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793703674;
+	b=tI0td+crB3/uY7az9wlnJVeKXpZDpbvi6k8Kk0Y39Cjb5xbT/1ITXG+iAXx7chIMbbmt
+	 KtZ9y8VmZ2Dt937ym5ShV/LHUkapzXO7ZqfJATf6yR0Pct5WKNFujjSZ10l/5d++jn28w
+	 8KadaDwXJMLfE42btARtae+fpSLiJFMb8yJzWFNPBmMxXVsnFEpce9uf7cb/YAVzt0VkW
+	 xC+Gl6GBHycjf5giXlKTdgblI+tWbCnOm8GXyDNHbv7+gy+Y0LNC4V21S/dDL7rF3b2pn
+	 LXNTPRnbwnyCmYH3rPHFsf3pQgb8jbA4Hi0EHiz4ezcUCJzYWca0e0Ql3/csIw9X48w==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793703674;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type;
+	bh=sn9Od1d1g96GmgUVpWI8H/bAOkp0jHvgb53RStXQYfQ=;
+	b=lOk303onfA0AUxpKos+6nRQ0vWtkK4AXrqIQPRtaQp4+y4vg46DFtIg2fslvoi0X5/mK
+	 wwV8+liToj0RZWa8+i/JlhbXfUkGshdTiP2gwCu6P4n4lqSn0lwb9AjDTfEhINw79dx/6
+	 kbZ7nA5Ej3WNgkSoaaNJJUCkdjOPDLiZJYA8nfnT79paTRkTK3dovaJ8otCQL18sd71rj
+	 x1pU0xaIUpEW/xV3ewdsvcUN85kQmUSO5xeEUJAMFDfIEXLr5zeSUtamavrl96Dlggmbn
+	 2Ka+CZ7Khy46P+FXrdnNKgni9zQYV9fMbrI/HGY46HFTZYyxPsCv+ipae6TG4IbS65w==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=none header.from=thegoodpenguin.co.uk;
+	spf=pass smtp.mailfrom=thegoodpenguin.co.uk;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.175
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EC4606FAF5;
-	Tue,  3 Nov 2026 10:28:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B6EC4606FAF5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=I+7E1g4J
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793701707; x=1825237707;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/azmaKzOQApHWRANZvyKMDE5eR/p+FiNIyfzDv8GWBc=;
-  b=I+7E1g4JHJecLkpIciu5oeD36dnuzruzJCqWeQVAwUzwY0RTZB6go0fJ
-   ewYkGD2V03kW5UvP57iXn6MyQ9GKKrt0O7tteHHRgOdW+R5hoOnLaUh/M
-   AWb1o1Mg5tKQh2BlQ9GVZFTgzCADCzV+kg5fV201ZKYQfeZU5nAjDCWhK
-   85nEEUON+8s7lWbW2+/WxQoeovXatOckRV/UT3r5I/3pDcQE06qmxyqhe
-   /41C9gXhqWXZMfyvkWOzh5uQcXy1R8E9q6VktKDjTtCQrX2gtzOYZeJ88
-   1NFCm9Q7NNQuxWyYjjVSzwS09qPBO6BDtHp//gHhixfNy/ukFQ7atP/PL
-   w==;
-X-CSE-ConnectionGUID: KD/mWuJATtGw+9yWx+CIFQ==
-X-CSE-MsgGUID: bcIageVgQu67I/XKkuriJQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11954"; a="2310418"
-X-IronPort-AV: E=Sophos;i="6.27,193,1787036400"; 
-   d="scan'208";a="2310418"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2026 02:28:26 -0800
-X-CSE-ConnectionGUID: 1bIC71+GRU+9xXUc9Jx1pA==
-X-CSE-MsgGUID: V2qjLPU4SH2zD8mLISaVAQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,193,1787036400"; 
-   d="scan'208";a="6387021"
-Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.108])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2026 02:28:22 -0800
-Date: Tue, 3 Nov 2026 12:28:20 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
-Cc: Lee Jones <lee@kernel.org>, Chen-Yu Tsai <wens@kernel.org>,
-	David Rhodes <david.rhodes@cirrus.com>,
-	Richard Fitzgerald <rf@opensource.cirrus.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Zha Qipeng <qipeng.zha@intel.com>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Thomas Richard <thomas.richard@bootlin.com>, mfd@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-sound@vger.kernel.org,
-	patches@opensource.cirrus.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] mfd: Use named initializers for acpi_device_id
-Message-ID: <aum3RLDLDa1gllge@ashevche-desk.local>
-References: <20261102-acpi-mfd-v1-1-d61029971be8@thegoodpenguin.co.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DA9606B107
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Nov 2026 11:01:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 69DA9606B107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thegoodpenguin.co.uk
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-53644b28706so62800671cf.3
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Nov 2026 03:01:13 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1793703672; cv=none;
+        d=google.com; s=arc-20260327;
+        b=exaO3k3DAfSc75SiCBecR96O2iCnlINttD9ynL6G4MxlYQYVMtep014XngvYfO2qm6
+         HgncmI5hWJOz+t9nlRV2nXii3WVYfabKLy6fYs3fdNLFy+lfXRl20BoQtLiEUlmkWKCN
+         aicEJDgdRDWSbfBqXoMJuJRdyNpXzJcZQp7XBcL2S3BG+wDzXNVMbT6Rf9kQCNo0pjzp
+         vXojd0on4CCJd1IK9GdHpWi1M2SA/Qajmx2CpYsn8VWcqtuGOXMy9cEAZnWweIrKl3GN
+         99esGkhRXTjPJUoymLekeNCzECqx6pvM+eh73IK1eK4G3XzupztEA6Odp5AAC2C458af
+         7+Jw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=sn9Od1d1g96GmgUVpWI8H/bAOkp0jHvgb53RStXQYfQ=;
+        fh=ACOkJ9ahw9IKn+XKrbzteFDHHmtBp6d7HWBQBG1F0PA=;
+        b=mnNkeVqZ+0M4FasCxFfV/r4IKM3ZvAbwnA80LC/roSdzsrZeeCpA6MJK61N64IMqXr
+         u73PP33omkakhyvMSNYxZCseiCb3qAUfrBgGVAbwOE7yCkJQsRoSpHXAkyKMYZxTHWBU
+         c03gQkiPF95y7Z4rp1lZpvsvlAUMeoVqrtJst67aOks3oeP35mp8FQVLY6mnIynSzMHK
+         QOJEpIos5PY4gG8nBN/awv4Ipgy3bMmGno6RtT47EarRM4z7QTGBlFCidWrkfKZxoRi5
+         YpG2Cxe0Xd3GBW476UgOE6m09MEFMoqxpwKjtPXBn0Q9w5SvzXLhjGvsPrxR7al7JW58
+         l/Pg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=thegoodpenguin-co-uk.20260707.gappssmtp.com; s=20260707; t=1793703672; x=1794308472; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=sn9Od1d1g96GmgUVpWI8H/bAOkp0jHvgb53RStXQYfQ=;
+        b=Pz3Y4KMeK2eY7RaHYtlKu1J7sH+3HT1AN9Y1jhkU1u1BzolllJGseg6l0Oh+TO8WmZ
+         I787+KldE1OJsVNQ2eZ1lqF2kjDacSGnXeu/o+LOEpxQXmQVkfUFpS/62LO1lxz56G9f
+         RkPsCCf8TfPczShU7BO/ULwQqV6l2XIQ/vMOl0YzKXnRMgfI74WdLvnUjgSHxJUWWSok
+         iUAV/T1HLxAGh1up7gSomvRNV76+6VaXaQTUcMC5ZBRjgjs71nHOZ27jLrBWjrnoqx7k
+         oQDdoOjRZnn9TbtLI3DhY2XCnZ8HBCxPVNA6+eJIfEUPR5CAJ3UmuUeWgkypprr3KVHN
+         xFGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793703672; x=1794308472;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=sn9Od1d1g96GmgUVpWI8H/bAOkp0jHvgb53RStXQYfQ=;
+        b=u+2hpIMjBJf/JwlI88W5BrHQAnOyXkIFSaogr/pVfQAhRP6Xzg/Ndj3kMJ5jN52UdG
+         Y2Xk7MMGbUxnJGsiKfCHM9eONxdAWW6s5c3kZx/creyHxElckc/CKgEY2q/xunOB2gjU
+         OZnoWSfeEzRquCvV7pvhSgIjNQ5tUg6wwF9DTDuwl1/Xec5Tw4150bxdQQi7wCMXNyBk
+         kOCpzR3EfGV11LgWbSl8g8Rhu2z1p59Hbx2iV7RX7UN7V2oDgQVACSvU+GZQi4jEPwnQ
+         9squx7cf1PHdyGT8n1ALXkn4xbePha5dK8COzS5w7cCdt3Ln0oRof7qYQSm7T9l28FIW
+         V0WQ==
+X-Forwarded-Encrypted: i=1; AKwUvByBchBWMFOLu5t6xqYcNwNRz9JF86mC8g1cZlZ4uQuoCtSD4CjUj4HlDTIaPCXR9D/4SYHpCTe0/GMY8Fk=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/DbDy6UI/BDIcqOkUjfGEk8TA1lFuSCyvkBnZmGPClW1xQ+Ohn
+	Qz5NkYTYEw/DuJNuccWguYdDF/zu8Bfmb2/lPGGVXlUziaAnIHxcB+/IVwx5umb+EVMDv/piN2O
+	zbDgHHbapCSYBwLNmHMT31/Ru7G7vj4Q2vJbFakSAjw==
+X-Gm-Gg: AYBFou2/+ndChgzM/UZxtwJtKKt16dpXc5XfWOq2LxnpA8odSS+yvH3CfwQ830B03nW
+	N1Wext51Uen0bJcln4woSsJX4OkaCR6XgYuLHqyRIrNBzLUl4BephymM8RaMM+0upoSHuBmwKLW
+	PdcJugrd5r8S6BekD+t1LpgTJBXYbXP6eavNDu8gfWVVn5Rno+wQqfMqau9cgylniBaQEmdfyv8
+	j1LxzIomAAKf+3fAgGXMpHQHChV/gJJ0wPAVgicAboLZ4dCyf8gfDUqLSBVp9fq5XT2b4qQwVgR
+	cjt8cAsLaKNu64vg9jF98NBTVJ2omn2JtskgJPZulnlxKrUcq5BXQe/rxroR/swHa90iVsn/5hO
+	UfPm0huA0iJg3LTO6Inu4Gy3xCpIDhsWRJe3O52ZOL8X6OcP+GHNydveeBpsLMBvLW4yscp0=
+X-Received: by 2002:a05:622a:1386:b0:537:f05d:6ae9 with SMTP id
+ d75a77b69052e-542b62a5744mr204134421cf.13.1793703672263; Tue, 03 Nov 2026
+ 03:01:12 -0800 (PST)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -85,25 +100,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261102-acpi-mfd-v1-1-d61029971be8@thegoodpenguin.co.uk>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+References: <20261102-acpi-mfd-v1-1-d61029971be8@thegoodpenguin.co.uk> <aum3RLDLDa1gllge@ashevche-desk.local>
+In-Reply-To: <aum3RLDLDa1gllge@ashevche-desk.local>
+From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
+Date: Tue, 3 Nov 2026 11:01:01 +0000
+X-Gm-Features: AclHuK-r_cJD1goYWPornsINa7shzhekDP8lLl1_99QVlK0QEb0lwrUHquiGssM
+Message-ID: <CAA6zWZKqCpD8GLjnTwAOnBq+Uhq0fA=eCRm4tkX9YDeiC=h2mQ@mail.gmail.com>
+Subject: Re: [PATCH] mfd: Use named initializers for acpi_device_id
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Lee Jones <lee@kernel.org>, Chen-Yu Tsai <wens@kernel.org>, 
+	David Rhodes <david.rhodes@cirrus.com>, Richard Fitzgerald <rf@opensource.cirrus.com>, 
+	Mika Westerberg <mika.westerberg@linux.intel.com>, Zha Qipeng <qipeng.zha@intel.com>, 
+	Qunqin Zhao <zhaoqunqin@loongson.cn>, Thomas Richard <thomas.richard@bootlin.com>, mfd@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linux-sound@vger.kernel.org, 
+	patches@opensource.cirrus.com, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Nov 02, 2026 at 12:25:14PM +0000, Pawel Zalewski wrote:
-> Use a designated initializer for the acpi_device_id fields which makes the
-> code more readable and consistent with how lists are initialized in the
-> rest of the kernel code base. Also drop explicitly setting fields to 0
-> where it is redundant.
-> 
-> Unify the list terminator to have a single space between the brackets and
-> no trailing comma.
+> Can you split Intel LPSS to a separate patch? It will help reviewing both parts.
 
-Can you split Intel LPSS to a separate patch? It will help reviewing both parts.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Sure I can - will do in v2.
