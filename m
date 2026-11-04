@@ -1,77 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793787835;
-	b=3hbqYcm0JQPzjyfYTh/prG7rs++/MGZFUFedvU+U4EZS+r74alz1fPxm7nP55QGPAdBB
-	 29qodpi8txgaprwyQ4ZkdIevy/d0IOWeuhdhCcVo+/M3m4MsNZyi/FN8pgG+7I25HoxD2
-	 QwXR92aM09J2ECyfRZYNeoYu0rwoGi+XY2m94XsA0dTL39rfOPvpVYOpNk+zyIhBPMIZv
-	 TvSb8ADrtucE6t/YVJfKB6L5uAnWQ01qTow+rHNEYydreZhZKP7+P8vTRfX47heHwz5DN
-	 DS04ELlc9150IvCk1lYXkYxUXqBgua2e833X6jfzeHP9fYGabFLiJCSVlbbzyO7JV5A==
+	t=1793789642;
+	b=fmpzAM0mUZ9rl/PVFLJbgoqTYMHv1QIi2cH8QmD+xQqS8eqG7MZwuTPWL/FgmbiPBaml
+	 VjDLgB25w/HdinmBPEanOxRUP7Za1FAbrPIKz8IaacbVZypDQtEgXnqnAXtFuIOCOFzzf
+	 c4j/nfdeXyu2aKehDkQ2EjZmJWiQ4ksUhwgIKixaFOISP3kkyhRq9jAUo1Km75shfVHiw
+	 RsPHXthZCxdmqU11mCJ31AiuE+1caC4+JXMoCxz4ddkVGdROsE8W+7awluryxDAQ8wsPL
+	 MIiX+t4CvkentBArhZl5IFB5emNXzWhVpcJDtnBmh+g2QLtexmbKQ2lXzQrxokIP5xg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793787835;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Organization:
-	 Content-Transfer-Encoding;
-	bh=n8dFcRs7N96xz4NwwyTPTMPJ8QLXU7zrTYpusF9ZuWc=;
-	b=FEgFlPH8b33+9KKjkpr+voUqWma4kc3VM/CnRkTfCG7yvHVElbm5/kxd0Er39TVItkqb
-	 Br99J1onHRLhZG8pHVHTEQ24U+b3on7v7dLfdnbANhXYCIAY2CZL9TAuvuKizBwn0Azsz
-	 BhBfttBCEcmlQ76myd5LzFDGXW1JuYbAMKD/lEOKukD5pD4Ww4mUApmX0ybLY5gPoa4yR
-	 KKQvJTIiGhB2TbUGPQ0GV0dvlcXrUCdqh2ZqDk6zwAiIp0sTqfbcafa0WtQNvkkju99ki
-	 5xj61tLfNEstPo/3PRm8HOoggBv83rD1HWYDygagqwpcKOjXnO96GFhkUQyjjBZnNtQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793789642;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:MIME-Version:Content-Transfer-Encoding:X-Scanned-By;
+	bh=mr6TqXgtbsRpH7YcJhsJ3zQQdGBC5zTXONlOxYcraG8=;
+	b=KeKUiwa4uAekeTiUGeknc+m8LvWZV8u6FQLKyUxbGCdDoa3QmVcuXykFiIY+z+Z2COnz
+	 0RFkhfqREKv49/CKQ9MQK+k6XOG3TgYyF2WAyqKPAMkaUrvVBNRTQMGqHKsdC7pfF7Bwa
+	 P0dzyR9kSYb52DOc4wmpI81p3bo6IwYAvqCaJoR8BfJtVKc46jo7KHbwtwvBaEAeeZuPO
+	 4Dcc7Mh/VWrrm7Y/694dLH8KnAW0c5dDN62n3KmNK0LsnhTB4kWMPfIrjJXyJjYp2hdsW
+	 yqvLpReel2qFP8tBAzYxSnVejgYmigUo8nlfifEm3m+m3HnZY3c9lTjpAOfRhu2TL4Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b="bcnZ/ZHm";
-	arc=none smtp.remote-ip=192.198.163.9
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ZnTzeAfv;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCDD606D838
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Nov 2026 10:23:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7CCDD606D838
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DDFF606A32C
+	for <linux-crypto@vger.kernel.org>; Wed,  4 Nov 2026 10:54:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2DDFF606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=bcnZ/ZHm
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793787834; x=1825323834;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=rXMYiDLKye9gu1XcAqd4hTkqS2ouzL3J5p66xyBj7Xs=;
-  b=bcnZ/ZHm8/bA03IEixXdOETqXIJRNuHHN7tR0Yui/nJ54cEMuw9sCNWL
-   0IJ6unh8lyEWqnOXAiVe/hKPhW0pytmjfEs9piHaoF8s3y3QvGzGVM9oJ
-   cD5hQoyE+OIniKeIqI0AxxCxYzNkGbu7s+9UdJe3UEX2C6v883BGIt1M/
-   mFI+j/ZN+bMYtJKfY3gcOdmaPIk8+WDkQDWpCmDgUi8JFG8BOCuexSf6t
-   PTay1JsumhizvZNCCDhiKit33lEMfTnqAszxElIEr9pMHcupCZs0skk75
-   VIyoHBZSbwJco51ac/+EgxaZ4rulmhro1rgvMmCed06XoMLooqsXVTlKx
-   Q==;
-X-CSE-ConnectionGUID: 4DuPf6LiSQ+Mb6Dp9Tv4rg==
-X-CSE-MsgGUID: HHDg7Nw6RSmlJtYtg/LMIA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11955"; a="2411937"
-X-IronPort-AV: E=Sophos;i="6.27,195,1787036400"; 
-   d="scan'208";a="2411937"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2026 02:23:54 -0800
-X-CSE-ConnectionGUID: qUCoLS7VSiy5ufWOafdXUg==
-X-CSE-MsgGUID: X/06Gz10QSeWJ0Rt2ie1kg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,195,1787036400"; 
-   d="scan'208";a="6540325"
-Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
-  by orviesa005.jf.intel.com with ESMTP; 04 Nov 2026 02:23:52 -0800
-From: Ahsan Atta <ahsan.atta@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - avoid double free of authentication descriptor
-Date: Wed,  4 Nov 2026 10:23:45 +0000
-Message-ID: <20261104102345.543725-1-ahsan.atta@intel.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ZnTzeAfv
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1793789641;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mr6TqXgtbsRpH7YcJhsJ3zQQdGBC5zTXONlOxYcraG8=;
+	b=ZnTzeAfvUVAXm02rUoIqD7rEnylwenx/FctWvJBItC/dO5sGLnbDSrzeigScuAHwqHCGzx
+	fKe4lZIe8/u/L55agJa9m/6OuDrId8TYqlVcOZ1VLVbb68AQ1DxvQDMKzGmbKIcbH5Tsqa
+	jhxNkZNz+Edo3kH3sUq+R+OVonOjqtE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-679-6F5HHHkzOV2WTNhpUocNng-1; Wed,
+ 04 Nov 2026 05:53:58 -0500
+X-MC-Unique: 6F5HHHkzOV2WTNhpUocNng-1
+X-Mimecast-MFC-AGG-ID: 6F5HHHkzOV2WTNhpUocNng_1793789636
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8FB7819560B1;
+	Wed,  4 Nov 2026 10:53:56 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.44.48.42])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6005930000E8;
+	Wed,  4 Nov 2026 10:53:54 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] lib/crypto: Add a sentence about zeroizing raw key structures
+Date: Wed,  4 Nov 2026 11:53:52 +0100
+Message-ID: <20261104105352.135540-1-thuth@redhat.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -81,47 +77,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
+Let's make it clear that raw key material has to be zeroized, too.
 
-qat_uclo_wr_suof_img() reuses a single struct icp_qat_fw_auth_desc
-pointer across all signed images. At the end of every loop iteration
-qat_uclo_ummap_auth_fw() releases the DMA buffer backing the
-descriptor, but leaves the caller's pointer untouched.
-
-If qat_uclo_map_auth_fw() then fails for a subsequent image before it
-assigns a new descriptor, for example when qat_uclo_simg_alloc()
-cannot allocate the DMA region, the error path jumps to wr_err and
-calls qat_uclo_ummap_auth_fw() again on the stale pointer. This reads
-chunk_bus_addr and chunk_size from already freed coherent memory and
-passes them to dma_free_coherent(), resulting in a use-after-free and
-a double free.
-
-Clear the descriptor pointer in qat_uclo_ummap_auth_fw() after the
-buffer is released so that it is unmapped at most once.
-
-Fixes: b0272276d903 ("crypto: qat - add support for new devices to FW loader")
-Signed-off-by: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
-Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Suggested-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- drivers/crypto/intel/qat/qat_common/qat_uclo.c | 1 +
- 1 file changed, 1 insertion(+)
+ Suggested here:
+ https://lore.kernel.org/linux-crypto/20260930201434.GA61218@google.com/
 
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_uclo.c b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-index a00ca2a0900f..e0ff6b232e91 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-@@ -1398,6 +1398,7 @@ static void qat_uclo_ummap_auth_fw(struct icp_qat_fw_loader_handle *handle,
- 		dram_desc.dram_size = ((struct icp_qat_auth_chunk *)
- 				       (*desc))->chunk_size;
- 		qat_uclo_simg_free(handle, &dram_desc);
-+		*desc = NULL;
- 	}
- }
+ Documentation/crypto/libcrypto-zeroization.rst | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/crypto/libcrypto-zeroization.rst b/Documentation/crypto/libcrypto-zeroization.rst
+index 76b6506711634..fe9f94413d1f2 100644
+--- a/Documentation/crypto/libcrypto-zeroization.rst
++++ b/Documentation/crypto/libcrypto-zeroization.rst
+@@ -47,7 +47,9 @@ The following types of structures hold sensitive material and should be
+ zeroized after use:
  
+ - **Key structures** (e.g. ``struct aes_key``, ``struct hmac_sha256_key``):
+-  contain expanded round keys or prepared key material.
++  contain expanded round keys or prepared key material. Note: Arrays and
++  structures that contain raw key material (e.g. raw AES keys) of course
++  need to be zeroized as well as soon as the data is not required anymore.
+ 
+ - **HMAC/MAC context structures** (e.g. ``struct hmac_sha256_ctx``,
+   ``struct aes_cmac_ctx``): contain inner and outer hash states derived from
 -- 
-2.50.1
+2.56.0
 
