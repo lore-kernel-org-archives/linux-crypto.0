@@ -1,82 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793792483;
-	b=zo0Ytcqi7T0e9Nu5HxQfv07to7gZjlS09w6nE08vRoKrmaUx3PN9HGn1pefYPbzYrG+w
-	 f4cI/laNZIgjgspOFe7h1UprrmyvHDp3P2IYq+CjfE9ZayfUeU7WAEK64qqlucFk3wvAE
-	 f9Q4oLcRNnqEZvB67bVliL0a7J491Ig0nBlqAPRI1s6uNxbvoO2BR/2xAE1lKXlP4/lxd
-	 mlUSNhOQqovrA7ZorMyPH2Q0uryfMZxHKtC+OAseTV48p+KVuOOzDYX/GJuqmd/sN8w/o
-	 x0XKuq0TJyBVMNQLfgiDemRHeFMVA3B4tKLudiZp0GYR9pfWSI20aagyQRsVGG3QgXg==
+	t=1793792487;
+	b=IN5WyiqLx3oxZcAEbpSYq8/CRIoxS5r5/1G5w1v0cGcF9XDckDxEVaG9KHGAGBn4BS4l
+	 +hZ9xEgokHQ+bANlRSfr8RT+l9TA2c8aCNqDiFVpcSvccplNESZUTdEXKhCvfnSBjMN0e
+	 i6JyfvTLkc4DsFT2dDfh+lA1oKlRiQ7RoGWAq9mWlb+Jm/NEdEO1K3vy+W/nAj9ANzHfo
+	 J1sdCz54JST4t2lK1tqRJZhXJHbJLyuVyyOt+VHQ9o9m6a5wFHrz++EDEQEHr6HHYrcFi
+	 iD0sYgUzjYO0l+6zg4EC3S8fbJ18kfP2A7uEEWxIpyWrgndT5/iAadylWf2kQLxIsUw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793792483;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793792487;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=izYKdqoeoSdawHeFj/YzAtZebFxT9JtTIALU4NjHjR4=;
-	b=CB2eOjQiM/bRzY01N0mntCQO5NfobK3f/dZcdlmpAgP3dFVpKZwOMlYai+GVd8lgRIRo
-	 EFxlU44umZmKQ2O5EJcF6Dz4d8tvePgh4xUJhlrhXsltW5Y6SQ3dI7rkBHEzr5d51lEek
-	 sHcRSj6yZjxixSZ+a7l08X5xFjWOiSyJFtFt7qy5LlBv8t21sKhs7bSnyhDUfNjq14dXD
-	 W2pC29+4vMjslEnO/jQ6OSA97cuOObr5K42cJ03Npniyizo4loenB/1G/9DSPT0TyuWoE
-	 iFibai1t/Pw3O89UV6qvIN/k0O5fjSwkmVtY9Kqd29ebJcfftCqN2qWY6DrXtOykIBQ==
+	bh=8kizTq969MMG4ZmGsWzf/eUqjfpKRrKiIja6oeumpC0=;
+	b=CBNCcuu0Ukl5xDl5Qs6Drf0msKkKNSV/Mk3shGGz9M+8bxqw6Hn3eYRNUl9E9gjILfQt
+	 n0k9bGu05ul8TLo4rd/Csyn/gwuAvEdAjE9FSsgQ06t6Nn+/O+KEil1Spl5aOFJVVEJEB
+	 N1SDlxme9YyHvivde2ZHlge9jEHsfbhoUO0kPbJwgC11q2n8rB+xPqSvutb5rooq9PkJq
+	 3b4d7dFWApjApxNdn2sUlxB3l6Q85AcMgQZL2iT0HqNxHULkXuC57Men67wdOI9BIguB/
+	 GU+gBteAOkByiy26ZBWIP2fApUm8nemOKQiHAIcqZPrYBv8mzz0rH4HZu7fXm5JWpPQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=FUpSFZ91;
-	arc=none smtp.remote-ip=209.85.216.50
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p11Jkqj4;
+	arc=none smtp.remote-ip=209.85.214.172
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54878606A330
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Nov 2026 11:41:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 54878606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B56606A329
+	for <linux-crypto@vger.kernel.org>; Wed,  4 Nov 2026 11:41:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B5B56606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=FUpSFZ91
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3ac6794fe45so501305a91.0
-        for <linux-crypto@vger.kernel.org>; Wed, 04 Nov 2026 03:41:23 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p11Jkqj4
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2e987b4a710so9376775ad.1
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Nov 2026 03:41:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793792483; x=1794397283; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1793792486; x=1794397286; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=izYKdqoeoSdawHeFj/YzAtZebFxT9JtTIALU4NjHjR4=;
-        b=FUpSFZ91rkWfLqLAFhZVbsjzNMSUObbfpIwwxnxRFhycxnlfSNv3QRqzXs3Yw2Ub4D
-         pF7Bm+EEkpxWFMage9B1J9QUdD7J0QxtSh2kBak7AmuqagHq4TRhsJwnQ8vKE1kc+kEY
-         h/sTj/mggLP2S4OUpe+q3uNGrr5LlDagL1oqE38xM0aLfiJDEMk93Y3A8vp/fHkyLnp0
-         ZydBne6Wo3QNWm7mfjIDvM0a/FdhsVHdvUSKprpW2qeHUvkAQS4aOTZtzf6AHk3zo8Uw
-         EpZk3FZHUKWp/osTNB/h1NFIlgv3nYg0NMKTItEHkYsOS/+DH1YxtVOWCsJtgi+uY02Q
-         5vEA==
+        bh=8kizTq969MMG4ZmGsWzf/eUqjfpKRrKiIja6oeumpC0=;
+        b=p11Jkqj4WY8LyHttPdwO37K2LXKgvg6/RHTsJHDKF7/dp4c2eDnOYhQCb0cnfV/L3T
+         z1ytXlQopIrHnAW5tc7tCduqoW3Ul5NS9xQAl4+xfDb/DVsj9rTTzPVRQlX/mOFMFWcT
+         /p3KxWmz+b0BwdIXW3Z36OKlkail1/p+RXXsqQryQQ1a6pFG5743ZD8YL12xQZ1p+OEj
+         IgjS9H82I3ijNVQF7nLRzTRqxh5DJpwllM+emkL3rr1BC4hZdA3DToKsjv/4rJA1iyIp
+         B6UsxhgF6S7xEsjW7fnEwLUihFAN2mtouySLsavF3hn9rCMbtRDqMo4vU0K6wtLXIpB0
+         Ba5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793792483; x=1794397283;
+        d=1e100.net; s=20260707; t=1793792486; x=1794397286;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=izYKdqoeoSdawHeFj/YzAtZebFxT9JtTIALU4NjHjR4=;
-        b=0YattmW1NnyjzAfqvYELvsWauiX931gwbdpjaIgDq2ByXQjhQDUZJu3Qtl/4sTVSU3
-         b0ifMI+zFHYj4WMtZE+ST/QLgw1aYfklqZ0dsl9vuVM7suQf5yaQC39bkuKOyec6DeMO
-         WNoQzP1ekwoNwqsKPjeVYaOgwr9Wh916GB80kca8EMZ18JSXOVPYHCH9nem3guQg5lwT
-         iXIWlxuyhruUkihuYoQGH/PwKVtyWagvfDdAcascW2JSBKC/OL+eObTPGMuwrLqIj+0v
-         UHKtxjngCyzDWjBC/2I5CGuo4FlVXikpABo0f6coDqLReqEhdkF6B9lkEuL288T9Wcc2
-         vj3Q==
-X-Gm-Message-State: APuU4Z9i+fX8S6wA44pCwR/TkC/I3WSK+bcMyQq/ysgpTgzeWIhYWT++
-	FiF1xGG0Dd9GmJS7+ZVlEei3EguCzcLamidgMKcsdbCtWEyg0UnLTPVxAApoWw==
-X-Gm-Gg: AYBFou2tHTJI9LzjO403PS+7wrPFDW3fffDcBDWfLZ9O0bjWg5rhrqTXMLorBVhmA8M
-	G68J2+iAI62u2st4njak36GVL7b08wTP3sRSe3DrvIckroSl0YvL0RxXAHtGDitu/W9tRU9e1Gv
-	T/BWJXGguDDZClVuyvUwX5QpOWnGDVODNtNwH095tATDEu+bFM9hTQsWOSo4zAeFx9Grr1nILND
-	4s/ao+Ffc5luBvtAOlR4i4mE8lG/MZWJ3k4bq6ttGkOU0AIzgAaWDK3Q8WhAYh6z9VBRvAHkTKS
-	uuLeB+pLI+mUMkNMpxsuXZBqLFuvOG+XlGfRzLWKQ+kqsYegs68ukz46htXmP9xBH0gHb0cstci
-	iGI+74H/ht38kjJCFcXM4OAvtvDZ8O5ru6HHbOVz0/Q5cM3WEBGmaizFzLnHZjbBfCOpidPsmgD
-	ANewoqVI6uSfQTSn1EHYOHPubxfaKYbULtDbHfDwUgtlk6Nk2drJUL1NPvCxS39NWvwabDJmjR/
-	PTfBhDxjkJ/6yMXi4zDby/COGkKrhY0oOnYJijmoJLx1fwZRrDjXfc/hyedg+ZkYcB3T4QYX78+
-	wngAVVGBPF9lqVDDG9ui7ICC9hOLYMnHZU9UjJXsHu2fpRnsOa0O
-X-Received: by 2002:a17:90b:562d:b0:3ad:a462:f07f with SMTP id 98e67ed59e1d1-3ae8982c1ffmr14269962a91.45.1793792482472;
-        Wed, 04 Nov 2026 03:41:22 -0800 (PST)
+        bh=8kizTq969MMG4ZmGsWzf/eUqjfpKRrKiIja6oeumpC0=;
+        b=rwR0WRDSgU4+jGxrLmK2jKDQlkyzQdsDj/wWvwZ4lKx4NhenW1S8mZ3nGiNBUQkJ4h
+         Tojqw+tfM4bh+Qn2FIqz6Apqd2eo6sBoT68DTK2s51NMoVXwFuBSmE655+szTRVW3QfA
+         w4zY6GsNhpa4EN6Lv/WNyVIMGMLmhwQVQb7gv4S5Pd6SXtntfRN8AjwyESV2hZAyu2CS
+         fq22vfVemxd4sKsmNRpZ+Kp6Ed76olRTQagtnNA5Jh4csNP10cMm2yLu6vau9mlqfHux
+         L5tDE94SJHq7GxnHS2MJy/S1SFLlWo6WViBgL00S8T/OuufCuS7nqsOMOLP2tUtyun1U
+         60Rg==
+X-Gm-Message-State: APuU4Z8cpbWoa/VHuS2TRZeK400ovt8UCrF/GA2Mv09pvONuBqEvuS0x
+	fsFTsuiumN7MD754Gdr9JumcRXrBXNdwjn4hvUWyEaCFx24RawuKKgMdYCTLFw==
+X-Gm-Gg: AYBFou2oPF2k9sldMurQyLaVp1E5QszU++Uvi+dObCTHYDhMa8MzG9TUDapxm/EU6MI
+	NfM17ku1CNWc+iD7czLDaFh/wZs3iKFKSpB7ORt1zXDgoHsqmeBq2ZvyJGYhlT6WbpWq7+0ZW8u
+	p3JFmPIR3EQi3mY3cyyPV3kcXSG1+xDr2I9LVdnRgT3rtmVijv4J2lF1cJiFH0g06amCuQnFUa7
+	WfNC/45sqDJOJM2nbOTTIb8bw2f9qmQCtggBtpSy3CAiuyVDcwd+dJUovrBxkZeHWOQxiscepCJ
+	TUsNeLjMXdtrzANpPSXmlxvrtmZQlzvpiuYeeyKR2cYN1wAjykmfdxyWVtGznGRUJEH8Yq2j1Ss
+	V06YCRaQ1dkLs6hVlwHR7WEJdLRqTWcyTHYAAM4UwRc7svjy0P8r2MwOsutGIjXdTAVCrxjwIXW
+	2vKIqyD42FgMGQ/fEH4Q1gtj6oHMYVlS/YcZZbP87MSi3v8P7eURM+TTWcFekZ3JaY5pogXxBeD
+	zt5lpRUHdzWQITZ4AluzDH1NdSZe6sWQXNkRq/0soOJN8cM/ZLltDeZbTHXR6ilsueLBNqpsY1r
+	723Z3k7IUeKn0JZkaulami0eraSv1yQOoRz3EoHz66eSfBq6jOGw
+X-Received: by 2002:a17:90a:d610:b0:3a0:cca0:4a8c with SMTP id 98e67ed59e1d1-3ae896d7b4fmr8102111a91.7.1793792485919;
+        Wed, 04 Nov 2026 03:41:25 -0800 (PST)
 Received: from d.home.yangfl.dn42 ([2a09:bac1:7680:28::4:396])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b093d481a3sm3770036a91.1.2026.11.04.03.41.19
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b093d481a3sm3770036a91.1.2026.11.04.03.41.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2026 03:41:22 -0800 (PST)
+        Wed, 04 Nov 2026 03:41:25 -0800 (PST)
 From: David Yang <mmyangfl@gmail.com>
 To: linux-crypto@vger.kernel.org
 Cc: David Yang <mmyangfl@gmail.com>,
@@ -87,9 +87,9 @@ Cc: David Yang <mmyangfl@gmail.com>,
 	Danilo Krummrich <dakr@kernel.org>,
 	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/2] hwrng: histb - fix read timeout
-Date: Wed,  4 Nov 2026 19:41:04 +0800
-Message-ID: <20261104114108.2378751-2-mmyangfl@gmail.com>
+Subject: [PATCH v2 2/2] hwrng: histb - use device messages
+Date: Wed,  4 Nov 2026 19:41:05 +0800
+Message-ID: <20261104114108.2378751-3-mmyangfl@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261104114108.2378751-1-mmyangfl@gmail.com>
 References: <20261104114108.2378751-1-mmyangfl@gmail.com>
@@ -104,52 +104,46 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The old figures were per-word averages, but the device produces 4
-words in one go, with each unit of post-process depth taking ~200us.
+pr_*() prints without saying which device the message came from. Print
+with dev_*() instead and adjust error messages.
 
-The old 30ms timeout was chosen on that per-word basis. At a depth
-of 144, a 4-word batch may take as long as ~30ms, causing random
-read timeouts.
-
-Also, a restart after rewriting the control word may take ~300ms, so
-use a 500ms timeout instead to cover all of the above.
-
-Fixes: a2216e187471 ("crypto: hisilicon/trng - add support for HiSTB TRNG")
 Signed-off-by: David Yang <mmyangfl@gmail.com>
 ---
- drivers/char/hw_random/histb-rng.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ drivers/char/hw_random/histb-rng.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/hw_random/histb-rng.c b/drivers/char/hw_random/histb-rng.c
-index 445b80beed62..d435d4ab9aa7 100644
+index d435d4ab9aa7..d28cc84e8367 100644
 --- a/drivers/char/hw_random/histb-rng.c
 +++ b/drivers/char/hw_random/histb-rng.c
-@@ -26,16 +26,21 @@ struct histb_rng_priv {
+@@ -22,6 +22,7 @@
+ 
+ struct histb_rng_priv {
+ 	struct hwrng rng;
++	struct device *dev;
+ 	void __iomem *base;
  };
  
- /*
-- * Observed:
-- * depth = 1 -> ~1ms
-- * depth = 255 -> ~16ms
-+ * Observed: the FIFO fills with 4 words at a time, roughly every 200us per
-+ * unit of post-process depth, i.e. one batch per:
-+ * depth = 144 -> ~30ms
-+ * depth = 255 -> ~52ms
-+ * Rewriting the control word delays the first batch by up to 300ms.
-  */
-+#define BATCH_TIMEOUT_US	(500 * USEC_PER_MSEC)
-+
- static int histb_rng_wait(void __iomem *base)
- {
- 	u32 val;
+@@ -71,8 +72,9 @@ static int histb_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 			if (!wait)
+ 				return i;
+ 			if (histb_rng_wait(base)) {
+-				pr_err("failed to generate random number, generated %d\n",
+-				       i);
++				dev_err(priv->dev,
++					"RNG timeout, generated %d of %zu bytes\n",
++					i, max);
+ 				return i ? i : -ETIMEDOUT;
+ 			}
+ 		}
+@@ -142,6 +144,7 @@ static int histb_rng_probe(struct platform_device *pdev)
+ 	}
  
- 	return readl_relaxed_poll_timeout(base + RNG_STAT, val,
--					  val & DATA_COUNT, 1000, 30 * 1000);
-+					  val & DATA_COUNT, 1000,
-+					  BATCH_TIMEOUT_US);
- }
- 
- static void histb_rng_init(void __iomem *base, unsigned int depth)
+ 	priv->base = base;
++	priv->dev = dev;
+ 	priv->rng.name = pdev->name;
+ 	priv->rng.read = histb_rng_read;
+ 	ret = devm_hwrng_register(dev, &priv->rng);
 -- 
 2.53.0
 
