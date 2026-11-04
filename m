@@ -1,82 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793769689;
-	b=kq+8OKnj/Dx2dJ2Bpr9XSJV3X7YOKkhoDjZBGe3/tBOXx2yr+/aRJf01yPDco8VyOizD
-	 8H5LVkv6ND9cChJUkVPmBXGpKVsPsOLCSwlklHDQ3aaIKtvFWdTmJFb+99XEhRXcRidkx
-	 gxZHJZjnC5vOwC7TepmCDl1iXpDdmtwUJrQQAKlRny2p5keKjIqIf5U39ILsCeZaeLD/2
-	 7K9cvsEwMNfIMhaDcLIu9P7wqX8JIxLMPELxek1RGp3IUsVOHmQLWp1eNF4myLA0WBkNS
-	 CG/mSmuEX7RKqD2x+iXTafCfW/rxvbZQ2V7US4iScKrqK7fzg/9SU4KNAR0iVIcdBLw==
+	t=1793770035;
+	b=YA58ynUbHK+1wj5avzV2cA1o6lkQiFinucOmUGxhYxegtr1T30mM6yNDXbpgO+Af7III
+	 0To02nLCt1pApnKzyWyQ65KTUVlK6xDFvgvRv2vOO8sOi1ZtD1w09CB248ev8Q43nJSBP
+	 UXQB2dnsjqldSzmM1+1x8WFSRObTU6p8x1IZJbH8teRRaUT/2Ld0hkpLMHjW8rlfVrRx5
+	 jhohsMZLUBfVRZZLCs1mN6Nu/N4Uxt1RBxUdv3SWtAdBevMQ8bbMU3MnPZvU116CHChmj
+	 ZXtQrizLtzAY5RP0SuUD6SdjbumrV1GrWB/xC/Hs859dZhMRuYAdHtnm8jx70w5l/6Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793769689;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793770035;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=S3sZXHpAcPchFFTmYmyd75A+OImYl038QKcmLNpDQcM=;
-	b=jdl1uq1a2z2JrUle2T9OC9Oyc9Wn8m/5mj70eWFYazixGGbxCztf3prBdUM2J/B6iQai
-	 cBsBYBFuiuMTVkMqtMr/K1cLG6j2cGcBvqOjC0U5JGESY4LOLsLWxe/uVrURb0bRbIRe3
-	 w8UGVlXe39hDTc2aRllARZ/Nf/msjbx1v5l/tA3Ck70PPrMEX+ALoSvYgFzx/wiyy6r14
-	 wQwv4Qp2t87gEUfTyFZuwbk9mjItb6mzGHLYqj9VBcBxRlCXO1yu/HuwKnnYyXkXY4adK
-	 yeKCkOIO+Mrdtc8qDTtbTRxvmMiUtCL0eNGDG52FlhCNtFUrUcpZ7jBa8dsB4QmueuQ==
+	bh=m0lCmt30EUiatLfsbnSZVC7crDyhMJWqluU/myeillI=;
+	b=p2uGPcxlV1XaVllTFKkCEjcd8S+j861irkYpMmbDHB9XzqBMn6KN0skM98eI8+4ST16+
+	 q+1fY9u+7yZ+VuQr/vmkyfMsGh1tmakxBs2p0MXazEeU8iMGvlJ95U1BMhsKMOtjXqQL0
+	 0XEVyHKj3OYkjvbBqXTGur5vhGW0kdUwhRt0p5B1S5RiJQL0XoOsOadAviYfFHf16Z0yn
+	 xAf/DHjNCl0WtmfLFolNN/6eCu5t+IgFwGnCv6kEkncBv8TS9zHK5eYqYlK0EXmU8I/Wa
+	 MlJw6bNmY4e67Rv7SCRBM/hV4mVkfsmtVbmWmT4hYpBgQwkw8PqIXNT1x+5VHAaWzYQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=YzLPmqXY;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=QK0n3R8T;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDEE4606A31B;
-	Wed,  4 Nov 2026 05:21:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DDEE4606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1808E606A31B;
+	Wed,  4 Nov 2026 05:27:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1808E606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=YzLPmqXY
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=QK0n3R8T
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=S3sZXHpAcPchFFTmYmyd75A+OImYl038QKcmLNpDQcM=; 
-	b=YzLPmqXY0MxXcC9TMOXwtUj7onQ5u6uagUGMGvdjIpVkTP0Dv23rLhmSumxfZZn9cA6gKZRTLLB
-	zUUP6RRaHjDRbnuMAMqEcuo7nQHB9PsSZBPM0FnxE9Q98mO389RY3/dWKz1C958KgOmh16HLIOKtc
-	x8cUnVMgGtq+BggapJkv2Bn36/SFC076gxdVbV5Jq6XjHbUfxzsEdgrOXRaPt+v+zCSF5MuA7lv1C
-	rmHeiyTOMCaynQwEazXm1jotf54Q72+cISoQelnRNRnE5jqXHmklBVLsl7GiCJ8J9VmVwxH5IB5KO
-	iBPhK7SfwtoU/iY7fhPYXRvyuSnkjDLm697A==;
+	from:content-type:reply-to; bh=m0lCmt30EUiatLfsbnSZVC7crDyhMJWqluU/myeillI=; 
+	b=QK0n3R8TKCA3wbnmyk3Dfxurzbf8yHdlTX+2PI62NNo+nne+umG/Fjw9XcSeafMgOHqU6nzLpa8
+	f4G6+VDk6xERljfPHijnAzPCzOebtrFS9kqR7sl1hWFlyqm1u7xAoiNS6ja3donyQfWbQzmOEMSG2
+	Ew+6nJGCE3+zJ2A9qXepeTLV8mF+/EYl5ezefzv3fvBLhLMDXnSw14KRqsjdC90jezJntIOyaURfO
+	CxI3QjWmZAUYjKC3Kc/bYe/ZmoV/g5WdyDDbmKytotJp8YSJ2kEQchRC45gh4Q609NHWAQcrM6NWA
+	4UdGGA7QMn1+5ivCebizL+fe6foVjlPqXuSQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xOTQr-0000000Ajf4-0KeO;
-	Wed, 04 Nov 2026 13:21:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 04 Nov 2026 13:21:09 +0800
-Date: Wed, 4 Nov 2026 13:21:09 +0800
+	id 1xOTWZ-0000000Ajjv-3GDG;
+	Wed, 04 Nov 2026 13:27:04 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 04 Nov 2026 13:27:03 +0800
+Date: Wed, 4 Nov 2026 13:27:03 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "Liam R. Howlett (Google)" <liam@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Uladzislau Rezki <urezki@gmail.com>, Michal Hocko <mhocko@suse.com>,
-	Baoquan He <bhe@redhat.com>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
-	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
-	"David Hildenbrand (Arm)" <david@kernel.org>
-Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
-Message-ID: <aurAxRpCwzeyXeVj@gondor.apana.org.au>
-References: <20261028154218.1668182-1-liam@infradead.org>
- <20261028154218.1668182-5-liam@infradead.org>
- <auKshDXKQXt1kvjy@gondor.apana.org.au>
- <auMbCuecFeRmBFSK@pc636>
- <jfvq7vkx73vzp2ukq6nwnb3v3g2ezdcyppba4oa5lpzmz6ls6t@akc46gonndgy>
- <urkgmijyytg3rrislm5fdzmfggqavzpiry23f6lpkqonvy2tqx@d56stj3eixfa>
- <auaFhOa5EBz4gJwK@gondor.apana.org.au>
- <xdzcyoou73blpfdlgy47i2ktrcsffnclerzojpgrxphid54gjc@nicdcvzqx447>
- <auqtTjXhD8is-y9f@gondor.apana.org.au>
- <CAHk-=wiE0KG+jkhmJWifXuAVivtB63WCWtdEpGAex7-T0SHd2g@mail.gmail.com>
+To: sashiko-reviews@lists.linux.dev
+Cc: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>,
+	hannes@cmpxchg.org, yosry@kernel.org, nphamcs@gmail.com,
+	chengming.zhou@linux.dev, akpm@linux-foundation.org,
+	linux-mm@kvack.org, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] mm: zswap: Move the crypto_acomp to be per pool,
+ instead of per-CPU.
+Message-ID: <aurCJ8wl6EYiXS2J@gondor.apana.org.au>
+References: <20261103000313.13677-1-kanchanapsridhar2026@gmail.com>
+ <sashiko-outbox-194595@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -88,21 +71,18 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wiE0KG+jkhmJWifXuAVivtB63WCWtdEpGAex7-T0SHd2g@mail.gmail.com>
+In-Reply-To: <sashiko-outbox-194595@kernel.org>
 
-On Tue, Nov 03, 2026 at 08:28:36PM -0800, Linus Torvalds wrote:
+On Tue, Nov 03, 2026 at 05:42:27AM +0000, sashiko-bot@kernel.org wrote:
 >
-> Sadly, the commit you point to doesn't talk about *why* that
-> braindamage was done. Looking at the original thread it seems like it
-> was for kmsan.
+> For example, in drivers/crypto/hisilicon/zip/zip_crypto.c,
+> hisi_zip_acomp_init() allocates one compression queue pair, one
+> decompression queue pair, and a per-transform request queue and spinlock on
+> tfm->base.node:
 
-Here is the link to the whole series that was applied (v4):
-
-https://lore.kernel.org/all/20251007122035.56347-11-urezki@gmail.com/T/#m50cf87c3f12015a56abe5a6359525019851f1b97
-
-This is the original RFC:
-
-https://lore.kernel.org/all/20250704152537.55724-1-urezki@gmail.com/
+That's just a bug in hisilicon.  The tfm is meant to be a globally
+shared data structure.  All per-CPU/node optimisations should be
+implemented in the reqeust object.
 
 Thanks,
 -- 
