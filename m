@@ -1,80 +1,92 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1793817505;
-	b=vT5ORKHVaQfhKl51iKXnIiw9vryMtBX10BG1UdzTvhEF1v9VXexx7UhCQX8A9ZEE5cdx
-	 W2RM7avPquhlb9cjmjdVo1+OKZg01cczkEQhTckAIBkRku9obd6oeLqmM6vKUtNoOQ1JD
-	 PANyHwwCmqywNQwVWZh0yVci39KQGDqTrAreCbMxhaq1Q0tfo8VBFt/nFobQ5dQgB/D3A
-	 GKx86fwD41fqjCxbStKbDELUFPaVsj8Yhi6mm2siixPA4zAHqx/f1kr+uyiPkdSKrAqXi
-	 dnEBqc644Xo8jkozaeykAlQXDrE9un07VSlyjRN/StqouStrIlDms4EwiCMpCyVzcVQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793817505;
-	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
-	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=kjCSLYkElyGJvKYAsH4sNDGhqXKOLz26uY3GRFmiYE8=;
-	b=KsXhL8om4aU53P9HqhNfdiwT34rrQEXOof3BHGcU+VMTLXWvmkRoNUJXXTzsN9xPVPph
-	 xDHgibwRE2MTxsaRNdGiHwDMIUlY/BJVAwwZ1EUeeQrZPU7vC56PYI1Se5+noACEyApzI
-	 1cXN9v+IlbUrSqa7P10U/vrqFoMmUi49ICVIlNhEBZS5Vxl5sSw01wA7+nnqbjG45hN/j
-	 F+dwnQypVsEfAxBX8m3f9Cbtj1zeJXRn2LjFniRU+cZNhX8KB6FIQJyPckzVJdSMrbG6X
-	 qm50Sk+cUm2cJvVl+3y22IJVl92G4EyK1lVeCilEkIaZze78dxj6qZDP61d/ZVhSLEw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FEgFp+s7;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.16
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1793824475;
+	b=i83aI4gIfWzud97AfEDLo2au77JyC741eVqRO4XcpDgxG2qUcItKlFocWvzaO2Iqh+Bq
+	 lW0o4krMN50EIhpGhpk1/HGYJET6umMgAWsmOiLeIvVuoyMDefcMk3qy3gDEAuFqwlTCr
+	 a89sp71ol7fLzgeDvD+Wth1IvOb5o6tTKd8SDCeU38vzIfgx9U0ZF7gOYt9CqoaM8eqBe
+	 2D/RlD3BnZVJxSn83SbAnyQzj9Hn6Gp0P/SN67wXzADGLw5TPBj8qZ7uSKTlDuzBkfRx6
+	 escT0R0qLJYBIPm/CqkXBKbv+gcZXQ4ol57+uvzwYLJQNGluOafyBrbtLQ3wbh/mgeQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793824475;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:Organization;
+	bh=qRsZY3xueLsYo81EeFYIjiC4t2ZfkCtOq22VvO5dYxA=;
+	b=ME/3YUjsUo230CRlCJvUDoP9n9qTSRYpl4fmsZXsijW4vL+mMh+rJNnv4IF1IQGs7utn
+	 S6wcHE9hVDk9eK9ZieXF7yx66lG6Q3aTm6gvgsm+06t9xr5zLEh/BosgxxqQNPZrYKDRw
+	 1w63pvFu1c1r74woSz+SocaP+sInk8iWzP7mTgzNfggaGkXxLclLe9z4Y75KCguWoogPQ
+	 kuuDZOjZeYTI9THR+/VnaVk8C2tDY0NM+3XOJcUmhm27GDR1f+rM9ZnxoCZfGf3OD2vWb
+	 BSwk4pzGM4FYT5tBxPR3z8sPOiz9DjEAUc+IKctVyUcyRI1jtx9QijheW5wER1KiQqg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=linux.intel.com;
+	spf=pass smtp.mailfrom=linux.intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=flLLQg46;
+	arc=none smtp.remote-ip=192.198.163.16
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5CB606A326;
-	Wed,  4 Nov 2026 18:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B918606AB31;
+	Wed,  4 Nov 2026 20:34:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6B918606AB31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FEgFp+s7
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1793817505;
-	b=CG/+JxbI/nuWrahg96M6HyLck/HMymXhG4NgllYxM/Vy0HmvqLMdDeTZqSXKDG9u9d/I
-	 mKejYD6BO/TD0bB6C3U+I0pfSRj8s3DQrbem2WX5FbGvQfYtu5MQkkYkMoA3FzRxkuBMQ
-	 URizgJwboF2bXJXQp/0sRIyM0bClLTemOFpjcVSJ1tuLJ7JcHGkVPlDV7gBbZsW0YonUn
-	 izlrFW2hpuUoO/670HQ2e2j1S9aZjlSGFCUXnjjjX0i0X/S2NlO286vG6Jk8836WP4BJ9
-	 dXyc+eGxNPyTn2oElzTwtU+PzkYSq1YFQD7w1dEpUghAulnoy2Q4nVqh6sKliOtjffg==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1793817505;
-	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To;
-	bh=kjCSLYkElyGJvKYAsH4sNDGhqXKOLz26uY3GRFmiYE8=;
-	b=U5TSmZJNiBfowOgVpo3dPHOBXPe8ZMqzpSzjqzwoqIRijFWlcyFyOBHuVwiYYrPYr7o1
-	 VL2d6lsotKIXpa/C6Qm5Dir1dJ6TzYFZqKh4Voz0YZQ499ccZjSNLfIfgMpS4yH6WOb75
-	 tatVsN4ggACjn7Ea8IcoTabjxTT7oq2EezkGcH3ZNYhQfPMUVfhao5nGOODQjZdXIhwTn
-	 YiVLv/X2dbAs13KlSZATIp/YVNpqMfCFACMKROIvNElDqE7A9LIMRJDnskHx48kTKr7SE
-	 TreOsTspNPVFQsoBoIm6b71hZ4eDMPOucObf3klzj4tEO6+ObTKf4a0hnUh7Yn3I/1w==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 619F01F00A16;
-	Wed,  4 Nov 2026 18:38:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793817504;
-	bh=kjCSLYkElyGJvKYAsH4sNDGhqXKOLz26uY3GRFmiYE8=;
-	h=From:Subject:Date:To:Cc:Reply-To;
-	b=FEgFp+s7JLYTSaQRbnYafNYot9KInDcdTK7w/TyuZalwutknx+ALu+oERTbQLHDYE
-	 OIn9mj09VXw1QVP2ZG5meffudgvKNLKG3GYHk2eqQwdpsQ9jP41+K4WtvmevoTY2Xq
-	 tzVK+118sQJAHmHfJnflRV3SSCUpyg4gJ6rQMOw0KE6/T0Zt9mx+hmCW551Fz3GKcL
-	 7PAOKffLyF/nhdigDVntD3BzHVgNQYPPHoBT+L8oFi+LCWgN6e6HcqQZp9jc6Z7Tb6
-	 gTFUlP+8MK38M+0Lzi8znL4qMBuxyFjICI4F/abinK60ok7BKBCM60Po7N9X7A10F5
-	 POrWHvN6RRQyg==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id B742946F34;
-	Wed,  4 Nov 2026 18:38:23 +0000 (UTC)
-From: Andrew Gigena via B4 Relay <devnull+mail.andrewgigena.dev@kernel.org>
-Subject: [PATCH v2 0/2] arm64: dts: qcom: sm8150: Add standalone ICE node
- for UFS
-Date: Wed, 04 Nov 2026 18:38:11 +0000
-Message-Id: <20261104-sm8150-ice-rfc-v2-0-d697bbce0278@andrewgigena.dev>
+	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=flLLQg46
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1793824475; x=1825360475;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=StSSW5/xpW0MGVJqCQ72E4YsaavMQP4nt5umVauhYso=;
+  b=flLLQg46O2M6J+ogWtr7H/PhnqpoImgqcs/izKeta51h0tYW8OYbtEg1
+   w/vaj6rYDYoiaq7f7Jf8/+SawRJmBGjwOQiurRaKoIm6Et22V6bR7cqBK
+   gPn7a5DvdCavOJ17ijfCvAZIqY7i14ORggAtOApCbo0krNLQo8hfA0RyL
+   dDJCIDA/92Du1TY8czZhnyVBTPTCEG8CB7OpalKnSp+TPCDqHOzCnqyLU
+   SGVux3/s/ghcmwUeVv8xV5Z3guv7k6YUzcdIIvmCzagkd2jHxYNeueI5D
+   PlJz1ELxyATHZMRNuFGkUCJRp5HaduC0YMkrD2l1jhv0ShY1aJuJsk8ZN
+   w==;
+X-CSE-ConnectionGUID: sLDKA66fQ/u7ChElgOMcOA==
+X-CSE-MsgGUID: XfM4BTJyQTeHE7sODUF/Sg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11956"; a="2613577"
+X-IronPort-AV: E=Sophos;i="6.27,195,1787036400"; 
+   d="scan'208";a="2613577"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2026 12:34:34 -0800
+X-CSE-ConnectionGUID: rXnAXH6STZCbtlf11xATow==
+X-CSE-MsgGUID: nn0XOPIDS0qODXMv7b+VxA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,195,1787036400"; 
+   d="scan'208";a="7138628"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.24])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2026 12:34:29 -0800
+Date: Wed, 4 Nov 2026 22:34:26 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Frank.Li@oss.nxp.com, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Jia Jie Ho <jiajie.ho@starfivetech.com>,
+	William Qiu <william.qiu@starfivetech.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	T Pratham <t-pratham@ti.com>, Thorsten Blum <blum@kernel.org>,
+	Frank Li <Frank.Li@nxp.com>, Pan Chuang <panchuang@vivo.com>,
+	Maxime =?iso-8859-1?Q?M=E9r=E9?= <maxime.mere@foss.st.com>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+	"moderated list:ARM/Microchip (AT91) SoC support" <linux-arm-kernel@lists.infradead.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:QUALCOMM CRYPTO DRIVERS" <linux-arm-msm@vger.kernel.org>,
+	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>,
+	imx@lists.linux.dev, vkoul@kernel.org
+Subject: Re: [PATCH 1/1] crypto: use dmaengine_desc_set_callback()
+Message-ID: <auuW0safpswDmp13@ashevche-desk.local>
+References: <20261102164538.3834039-1-Frank.Li@oss.nxp.com>
+ <7b476c24-3185-49ff-9a72-fbd865dc0d65@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -84,79 +96,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNyw6CMBBFf4XM2pppecaV/2FY0GGAMbGQFquG8
- O8Crl2e5NxzFwjshQNckgU8Rwkyug3MKQEaGtezknZjMGgKrTFT4VHpHJUQK9+RQptZQ5jmXCF
- so8lzJ+8jeKt/HJ72zjTvld0YJMyj/xyPUe/e33jUClVepqUtyDARXhvXen710rNrzi1HqNd1/
- QKM9s3yxQAAAA==
-X-Change-ID: 20261104-sm8150-ice-rfc-0b4b2c035e80
-To: Abel Vesa <abelvesa@kernel.org>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
- Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, 
- Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>, 
- Bjorn Andersson <andersson@kernel.org>, Andy Gross <agross@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-scsi@vger.kernel.org, Andrew Gigena <mail@andrewgigena.dev>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1793817503; l=1778;
- i=mail@andrewgigena.dev; s=20261104; h=from:subject:message-id;
- bh=EYYDw/tfOLuPl22DSLCCU8f7CgFbqXXJ5pXhEipb5G4=;
- b=kp8or87NIVZSizcmjfJxMsBDmwAMDFADyUHX9ZpCifKsu+M7gWCsUUg5i0rRWaJA7hvSsYkTO
- z3gr7fGK/u5B0+6JLErzPTeCyQeCPRJ4PtjayE0fw+pZ4f5Cl1xrNX2
-X-Developer-Key: i=mail@andrewgigena.dev; a=ed25519;
- pk=OMhlYIBaOEC8g4mJ4JCKy7kbg+lrwRxuujieZF8Ne6U=
-X-Endpoint-Received: by B4 Relay for mail@andrewgigena.dev/20261104 with
- auth_id=1402
-X-Original-From: Andrew Gigena <mail@andrewgigena.dev>
-Reply-To: mail@andrewgigena.dev
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7b476c24-3185-49ff-9a72-fbd865dc0d65@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-Hi everyone,
+On Wed, Nov 04, 2026 at 06:51:10PM +0100, Krzysztof Kozlowski wrote:
+> On 02/11/2026 17:45, Frank.Li@oss.nxp.com wrote:
 
-This small series brings the Qualcomm Inline Crypto Engine (ICE) to the
-SM8150 (Snapdragon 855) platform, following the same standalone-node style
-already used on SM8250 and newer SoCs.
+> > diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+> > index 84392411b98d8..49f1bf19747d8 100644
+> > --- a/drivers/crypto/atmel-aes.c
+> > +++ b/drivers/crypto/atmel-aes.c
+> > @@ -824,8 +824,7 @@ static int atmel_aes_dma_transfer_start(struct atmel_aes_dev *dd,
+> >  	if (!desc)
+> >  		return -ENOMEM;
+> >  
+> > -	desc->callback = callback;
+> > -	desc->callback_param = dd;
+> > +	dmaengine_desc_set_callback(desc, callback, NULL, dd);
+> >  	dmaengine_submit(desc);
+> >  	dma_async_issue_pending(dma->chan);
+> >  
+> 
+> Apparently reviewing only a few lines of entire patch is still reviewing:
+> https://lore.kernel.org/all/9e39502a-dd17-4fa2-98a3-9019523cb5e8@kernel.org/
+> 
+> Therefore:
+> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
 
-The first patch documents the new qcom,sm8150-inline-crypto-engine
-compatible and moves qcom,sm8150-ufshc to the standalone-ICE UFS binding.
-The second patch converts the UFS node to reference a dedicated ICE node
-instead of embedding the registers directly.
+Yep, in a form of
 
-I've tested this on a Google Pixel 4 (google-flame) and everything works:
-/sys/block/sda/queue/crypto now advertises AES-256-XTS and ext4 reports
-encryption as "supported". The ICE self-test completes cleanly during boot.
+  Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org> # atmel-aes
 
-Happy to adjust anything or add more details if needed. Thanks for reviewing!
+or something that makes it clear what has been reviewed.
 
-Signed-off-by: Andrew Gigena <mail@andrewgigena.dev>
-
-Changes in v2:
-- Move qcom,sm8150-ufshc from the legacy embedded-ICE UFS binding to
-  the standalone-ICE UFS binding.
-- Keep the SM8150 ICE compatible sorted in the existing list.
-- Link to v1: https://patch.msgid.link/20261104-sm8150-ice-rfc-v1-0-5737b6c2ecc0@andrewgigena.dev
-
----
-Andrew Gigena (2):
-      dt-bindings: crypto: ice: Document sm8150 inline crypto engine
-      arm64: dts: qcom: sm8150: Use standalone ICE node for UFS
-
- .../bindings/crypto/qcom,inline-crypto-engine.yaml |  1 +
- .../devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml |  2 ++
- .../devicetree/bindings/ufs/qcom,ufs.yaml          | 11 ++++------
- arch/arm64/boot/dts/qcom/sm8150.dtsi               | 25 ++++++++++++++--------
- 4 files changed, 23 insertions(+), 16 deletions(-)
----
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
-change-id: 20261104-sm8150-ice-rfc-0b4b2c035e80
-
-Best regards,
---  
-Andrew Gigena <mail@andrewgigena.dev>
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
