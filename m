@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793779869;
-	b=Kg0lnuS1IMacSi/T35p+XisQ7JvC5OVtOqDOUXOAmdMvsJ0E1BJhN9lBnEk/TCwcFhsC
-	 /5E5im0eCdrSkaEYOr+EQyajFRXnKcazAWOP0JuhfB5ADnoQbR6UNMZ1miOeEBvbAkWf4
-	 +yPBTwsEbdzFnyUTt4VLXn0bTmhjV44zvCUysusEAeItiruzBtwxtTyAPr6fXU+wM52Jf
-	 bEGTiM5dg0WxU4qOhmHVOwDp+FH+UWwmyeUZYyQg1YNuRWbodkwaVKx/nB+EK/fsRRQmq
-	 22Nv7H28DQ/lcNykHXDMK7/WUOk1k0pEqrsUvef4irXZ4eMsChYLS0CdipkAwoabYRQ==
+	t=1793779997;
+	b=2ASBT4ujYW6/N/2Uyo3+bf2CtKdM3ZtqhdYdZlnWXJhR28cZgdL1/78c273CHU7WrGDD
+	 6KtT9T5DAKS0tvS/D094pTgoYG5qveakxActCYYtpmGgvGXYBZjsf8ISO4WVAyYrXKK48
+	 4WKArkqfkNHNTR+Lgh/yIvfBc4zdMFl4cWsJhSf3Ho30WbgFkhUgEEvDkp9PLvVry6KLq
+	 S6vWNeHx4o7BVl8ziMcmBpboGNLX2pgYmy5DsZ3Tf5Jlsu80fwwCnGPHHMbzLCTrcInEQ
+	 twkxmSLyFOk5Es1+Twhxm9ixcwklrJUUfItUECvudBZex3HlcuibM+ZapKorfitq+Xw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793779869;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793779997;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=4KY+Fuiq+GYQrb6V/VfCQHGb8q0rg+tzhRKKwIWQwGw=;
-	b=aU3TDWeHcoCzmEkXCllx9Yq2A+vQDqIxNScAQgC15k33jP/JBDX5yOo8YsKA550pw5dm
-	 tLBp2toq+pOfgEb9SGRQt53TdpMwvEDly/b9bORoyFV6u4DatoOGjqNHuynzpoUxd4IoN
-	 1tL7C0kd+PseHbJEiVJX+HGhx6nJEUo3G1SsI8o1yV2qGVPe1i1wmGST14kwZDlfo1MnS
-	 m3Uw6cbo7VTRw7dXZXq9adg4JPyEgeQLeGZagqUq/4hDxE5i8SZKWce/nxnZWZGKEyyXm
-	 04g+J5LuW2LiqNu4X/A1nTJqAxnOjRZMsdC1K/MY7gO+7BJ6IqvCFrscrUxm8sr0qOA==
+	bh=bdJaCuRrck5XURNeDJ9hK44eiu7EkOclUMzEmjR9gPg=;
+	b=ak+DfyKFKiHUm1UxS1avMZ6rzcwFBukjUhqD1aTXMq8viZ+/4Wu3bteq08qiuE4OVBd+
+	 NPV1aNI5yGrbYPOAK5DiBl5pnzdT0mIjnkVlAKge9vOo1n3TqsvtYq0HVtDF+9xtSWrqB
+	 JJ9zYdNn6dB5mG1H0sxwkki7G9Cs/so/jU1W7jxe8bDghPKhQ66EvJ2UFdiKKEKx8jmu7
+	 ZwAg6DwFboAeCf6QvkB9jYWKQ2Eus+c1vH3vJELXtHqtBw3VX1Zh47vXm968c2H2gU3A8
+	 Lin9s9znhZHwG+0n7/XRUhWw2erv8zie7cXu6sLISmr24r2vcdb3dCajjIPi9o7umdg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eMS9HsRB;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=esasq0kU;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1A6606A329;
-	Wed,  4 Nov 2026 08:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A44B606A32C;
+	Wed,  4 Nov 2026 08:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eMS9HsRB
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDAC61F000C1;
-	Wed,  4 Nov 2026 08:11:03 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=esasq0kU
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 345441F00A02;
+	Wed,  4 Nov 2026 08:13:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793779868;
-	bh=4KY+Fuiq+GYQrb6V/VfCQHGb8q0rg+tzhRKKwIWQwGw=;
+	s=k20260515; t=1793779996;
+	bh=bdJaCuRrck5XURNeDJ9hK44eiu7EkOclUMzEmjR9gPg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=eMS9HsRBy7rj+CCF/fKwXB6sfgwftmuo/rgpmp7bene/SfCsS4+CgB4PStBt07G/v
-	 zLBLgfz8rzIRtv5EdSTh9ydr9xiRNJCpKMNKMXrauKNef/hbHPbo3XAa4aZ1NVFXzK
-	 Iofg2X7CxRZqQwK+3of/eC/MbfP4hc2foMOu0w6pxo6aVDsJ9V3vcTj1RvkiI2+tD0
-	 5AMsKa/Hmt7IsLX1XB9ypxc98vsccE4/wg3GTWON6SgDS+jEBpMJ6ZPjBbvHzEZU/n
-	 EZdKBudg+axXUnoq9/7Xq9w7zS6KI8y+BJ1+qoIPhJN2xnsH4SjNMZNP0UwAbl1LIN
-	 3ZCcqo89Va8Ow==
-Message-ID: <sashiko-outbox-196860@kernel.org>
+	b=esasq0kUdJ8TBKGIsocSdW9hgp35/Sz3SfYoG18RFZUS+dbK328U20UdVz9VTOM2S
+	 97hF+FUycDdnSIPmeFIkTvAJkjC8fLpwh4/zheDSzMb+MFkPCjqqVfs3wgWPsx4xts
+	 VOHUSRJwXz0SoWS5DkFQw8GYxyHd5lGqiJ0BGmAhXmB78zv8R/DjJCe3xZCO+lVWDQ
+	 Y07CT5XTaRz+q2P75uPqCaQXv30mjvzYBADlzOUhJpFw/VVtJRBAskJzE0VvY0TrjR
+	 QxlynUCF7MYcY9y7jqvB7Ma+AESEAiW75ClD35ysQ9k51cNQphQxhAVxqxV93TO7LZ
+	 SCwEf+ZdG5U4A==
+Message-ID: <sashiko-outbox-196863@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: sm8150: Use standalone ICE node
- for UFS
+Subject: Re: [PATCH 1/2] dt-bindings: crypto: ice: Document sm8150 inline
+ crypto engine
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Andrew Gigena" <mail@andrewgigena.dev>, "Abel Vesa" <abelvesa@kernel.org>, "Herbert
  Xu" <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Rob
@@ -50,12 +50,12 @@ To: "Andrew Gigena" <mail@andrewgigena.dev>, "Abel Vesa" <abelvesa@kernel.org>, 
  Dooley" <conor+dt@kernel.org>, "Bjorn Andersson" <andersson@kernel.org>, "Konrad
  Dybcio" <konradybcio@kernel.org>
 Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-In-Reply-To: <20261104-sm8150-ice-rfc-v1-2-5737b6c2ecc0@andrewgigena.dev>
+In-Reply-To: <20261104-sm8150-ice-rfc-v1-1-5737b6c2ecc0@andrewgigena.dev>
 References: <20261104-sm8150-ice-rfc-v1-0-5737b6c2ecc0@andrewgigena.dev>
- <20261104-sm8150-ice-rfc-v1-2-5737b6c2ecc0@andrewgigena.dev>
+ <20261104-sm8150-ice-rfc-v1-1-5737b6c2ecc0@andrewgigena.dev>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Nov 2026 08:11:02 +0000
+Date: Wed, 04 Nov 2026 08:13:15 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,78 +65,55 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 1 potential issue(=
+Thank you for your contribution! Sashiko AI review found 2 potential issue(=
 s) to consider:
-- [Low] arm64: dts: qcom: sm8150: ufs_mem_hc violates qcom,ufs.yaml schema
+- [Medium] dt-bindings: crypto: ice: sm8150 standalone ICE conflicts with q=
+com,ufs.yaml
+- [Low] dt-bindings: crypto: ice: qcom,sm8150-inline-crypto-engine out of s=
+ort order
 --
 
-commit 44282b2e2d420ebb8b4be7b6dd11cd5ecade575e
+commit 8ecc5836840659392f33486ed20f5aa5057a1a4c
 Author: Andrew Gigena <mail@andrewgigena.dev>
 
-arm64: dts: qcom: sm8150: Use standalone ICE node for UFS
+dt-bindings: crypto: ice: Document sm8150 inline crypto engine
 
-This commit converts the SM8150 UFS controller node to use a standalone
-Inline Crypto Engine (ICE) node referenced via the qcom,ice property,
-moving the ICE register region and clock out of ufs_mem_hc.
+This commit documents the qcom,sm8150-inline-crypto-engine compatible string
+in Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml.
 
-> diff --git a/arch/arm64/boot/dts/qcom/sm8150.dtsi b/arch/arm64/boot/dts/q=
-com/sm8150.dtsi
-> index 293fcbacff346..b3d6f3d923950 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8150.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8150.dtsi
-> @@ -2071,9 +2071,7 @@ pcie1_phy: phy@1c0e000 {
->  		ufs_mem_hc: ufshc@1d84000 {
->  			compatible =3D "qcom,sm8150-ufshc", "qcom,ufshc",
->  				     "jedec,ufs-2.0";
-> -			reg =3D <0 0x01d84000 0 0x2500>,
-> -			      <0 0x01d90000 0 0x8000>;
-> -			reg-names =3D "std", "ice";
-> +			reg =3D <0 0x01d84000 0 0x2500>;
->  			interrupts =3D <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
->  			phys =3D <&ufs_mem_phy>;
->  			phy-names =3D "ufsphy";
-> @@ -2092,8 +2090,7 @@ ufs_mem_hc: ufshc@1d84000 {
->  				"ref_clk",
->  				"tx_lane0_sync_clk",
->  				"rx_lane0_sync_clk",
-> -				"rx_lane1_sync_clk",
-> -				"ice_core_clk";
-> +				"rx_lane1_sync_clk";
->  			clocks =3D
->  				<&gcc GCC_UFS_PHY_AXI_CLK>,
->  				<&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
-> @@ -2102,8 +2099,7 @@ ufs_mem_hc: ufshc@1d84000 {
->  				<&rpmhcc RPMH_CXO_CLK>,
->  				<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
->  				<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
-> -				<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>,
-> -				<&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-> +				<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
->  			freq-table-hz =3D
->  				<37500000 300000000>,
->  				<0 0>,
-> @@ -2112,8 +2108,8 @@ ufs_mem_hc: ufshc@1d84000 {
->  				<0 0>,
->  				<0 0>,
->  				<0 0>,
-> -				<0 0>,
-> -				<0 300000000>;
-> +				<0 0>;
-> +			qcom,ice =3D <&ice>;
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-=
+engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-e=
+ngine.yaml
+> index 23bf98c2b9fa0..1918f18fe8b10 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.=
+yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.=
+yaml
+> @@ -23,6 +23,7 @@ properties:
+>            - qcom,sa8775p-inline-crypto-engine
+>            - qcom,sc7180-inline-crypto-engine
+>            - qcom,sc7280-inline-crypto-engine
+> +          - qcom,sm8150-inline-crypto-engine
 
-[Severity: Low]
-Does converting ufs_mem_hc here without updating the devicetree binding
-cause dtbs_check failures on SM8150 and SA8155P boards?
+[Severity: Medium]
+Does adding a standalone ICE compatible for SM8150 conflict with the existi=
+ng
+qcom,sm8150-ufshc binding in Documentation/devicetree/bindings/ufs/qcom,ufs=
+.yaml?
 
-In Documentation/devicetree/bindings/ufs/qcom,ufs.yaml, the allOf entry
-matching qcom,sm8150-ufshc still requires 9 clocks (including
-ice_core_clk), 2 reg entries, and reg-names:
+On SM8150, the inline crypto engine is associated with the UFS controller
+(GCC only provides GCC_UFS_PHY_ICE_CORE_CLK, with no SDCC ICE clock in
+include/dt-bindings/clock/qcom,gcc-sm8150.h).
 
-  - if:
+In Documentation/devicetree/bindings/ufs/qcom,ufs.yaml, qcom,sm8150-ufshc is
+defined as using the legacy embedded ICE representation:
+
+    if:
       properties:
         compatible:
           contains:
             enum:
+              - qcom,msm8996-ufshc
               - qcom,sdm845-ufshc
               - qcom,sm6350-ufshc
               - qcom,sm8150-ufshc
@@ -147,24 +124,50 @@ ice_core_clk), 2 reg entries, and reg-names:
           maxItems: 9
         clock-names:
           items:
+            - const: core_clk
             ...
             - const: ice_core_clk
         reg:
           minItems: 2
         reg-names:
-          minItems: 2
+          items:
+            - const: std
+            - const: ice
+
+In the same qcom,ufs.yaml schema, the conditional rule for nodes using the
+standalone ICE binding via qcom,ice requires at most 1 reg entry and 8
+clocks, which is mutually exclusive with the qcom,sm8150-ufshc constraints:
+
+    if:
       required:
-        - reg-names
+        - qcom,ice
+    then:
+      properties:
+        clocks:
+          maxItems: 8
+        clock-names:
+          maxItems: 8
+        reg:
+          maxItems: 1
+        reg-names:
+          maxItems: 1
 
-Meanwhile, the rule for qcom,ice in the same binding requires maxItems: 1
-for reg and maxItems: 8 for clocks, which conflicts with the
-qcom,sm8150-ufshc constraints above.
+When ufshc@1d84000 in arch/arm64/boot/dts/qcom/sm8150.dtsi is converted to a
+standalone qcom,sm8150-inline-crypto-engine node referenced via qcom,ice and
+the embedded ice register range and ice_core_clk are removed from the UFS
+node, won't this fail dtbs_check against qcom,ufs.yaml and break Device Tree
+ABI compatibility with existing kernels expecting the embedded ICE registers
+and clock on qcom,sm8150-ufshc?
 
-Should qcom,sm8150-ufshc be updated in the UFS binding schema (for example,
-moved to Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
-alongside qcom,sm8250-ufshc and qcom,sm8450-ufshc) before or along with
-this change?
+>            - qcom,shikra-inline-crypto-engine
+
+[Severity: Low]
+This isn't a bug, but the compatible enum in properties:compatible in
+Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml is
+sorted alphabetically. Should qcom,sm8150-inline-crypto-engine be placed
+after qcom,shikra-inline-crypto-engine and before
+qcom,sm8450-inline-crypto-engine?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261104-sm8150-ice=
--rfc-v1-0-5737b6c2ecc0@andrewgigena.dev?part=3D2
+-rfc-v1-0-5737b6c2ecc0@andrewgigena.dev?part=3D1
