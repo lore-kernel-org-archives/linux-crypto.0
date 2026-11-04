@@ -1,98 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.138
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793792487;
-	b=IN5WyiqLx3oxZcAEbpSYq8/CRIoxS5r5/1G5w1v0cGcF9XDckDxEVaG9KHGAGBn4BS4l
-	 +hZ9xEgokHQ+bANlRSfr8RT+l9TA2c8aCNqDiFVpcSvccplNESZUTdEXKhCvfnSBjMN0e
-	 i6JyfvTLkc4DsFT2dDfh+lA1oKlRiQ7RoGWAq9mWlb+Jm/NEdEO1K3vy+W/nAj9ANzHfo
-	 J1sdCz54JST4t2lK1tqRJZhXJHbJLyuVyyOt+VHQ9o9m6a5wFHrz++EDEQEHr6HHYrcFi
-	 iD0sYgUzjYO0l+6zg4EC3S8fbJ18kfP2A7uEEWxIpyWrgndT5/iAadylWf2kQLxIsUw==
+	t=1793793216;
+	b=FQ21hQz57OYSB59DkxiotaADWQz8f8hbe/tSWate5D7Uu3StgxgimHfkQnP0zwRV9Ydg
+	 cve4I2Xq9+HvrDV1KLEhjQlkXdG1eHX57pghX8Frts5V+YYx8TdVjodx1LcjoPUysf1Ff
+	 VsfWA0G5WtUMtfkw8RK5G/p2YljTytUlZKMbZ79EbVBqLAuyYq7v0z9j6te9+2p9pHYa/
+	 qzl0VubK2ZG7a1npAI1NB+iy3QZ+JSjTdYquBhpEFeFhNvgzOJ+8vdlPBLc/sDWLxNKz4
+	 FHjjji0h6/pjluFp+5a5QeLFPKH3eLeivwRGkEfqcadgcQH1pD5122AE6oaF7ed7dUA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793792487;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=8kizTq969MMG4ZmGsWzf/eUqjfpKRrKiIja6oeumpC0=;
-	b=CBNCcuu0Ukl5xDl5Qs6Drf0msKkKNSV/Mk3shGGz9M+8bxqw6Hn3eYRNUl9E9gjILfQt
-	 n0k9bGu05ul8TLo4rd/Csyn/gwuAvEdAjE9FSsgQ06t6Nn+/O+KEil1Spl5aOFJVVEJEB
-	 N1SDlxme9YyHvivde2ZHlge9jEHsfbhoUO0kPbJwgC11q2n8rB+xPqSvutb5rooq9PkJq
-	 3b4d7dFWApjApxNdn2sUlxB3l6Q85AcMgQZL2iT0HqNxHULkXuC57Men67wdOI9BIguB/
-	 GU+gBteAOkByiy26ZBWIP2fApUm8nemOKQiHAIcqZPrYBv8mzz0rH4HZu7fXm5JWpPQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793793216;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=I7g8O9XnBkOnRo4UInvEGJ58/pb8j1Hf4MI5iyCwU3U=;
+	b=KN4SU7v5qJDhTIt5KMj50q+tKP0F/p1z0K0CsXE9VnOUr00uK1dIVwhfoJx83bw4n9Xh
+	 oFcmTBKsEHsk0P+qKkyRfF5JHR5M2bADTYI3mavDTWu1QK3u6UEMIwGGaVsPpP0cyzTV+
+	 qZYe3NHLkBpJYgKGtiKcF6DUxTIuThJ+d+U+FRfiaBoXU2Hhm3ByDiZFyWLk+PihDGdxl
+	 x746NfVF/lfCpMxE0M+CaC8FjBI0FnLcCe4oYY3eeNQHXgihCW6JAGZ3tO/lcotvMRDiT
+	 VBpME6yWR3J0M5RT1u17K1PhH3tQtsnn/N8CKmhlf/EUTUMeKbnnYZPyStaSQke38FA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p11Jkqj4;
-	arc=none smtp.remote-ip=209.85.214.172
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=STWBsNjy;
+	arc=none smtp.remote-ip=91.218.175.138
+Received: from mta0.migadu.com (out-138.mta0.migadu.com [91.218.175.138])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B56606A329
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Nov 2026 11:41:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B5B56606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472D8606A331
+	for <linux-crypto@vger.kernel.org>; Wed,  4 Nov 2026 11:53:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 472D8606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p11Jkqj4
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2e987b4a710so9376775ad.1
-        for <linux-crypto@vger.kernel.org>; Wed, 04 Nov 2026 03:41:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793792486; x=1794397286; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=8kizTq969MMG4ZmGsWzf/eUqjfpKRrKiIja6oeumpC0=;
-        b=p11Jkqj4WY8LyHttPdwO37K2LXKgvg6/RHTsJHDKF7/dp4c2eDnOYhQCb0cnfV/L3T
-         z1ytXlQopIrHnAW5tc7tCduqoW3Ul5NS9xQAl4+xfDb/DVsj9rTTzPVRQlX/mOFMFWcT
-         /p3KxWmz+b0BwdIXW3Z36OKlkail1/p+RXXsqQryQQ1a6pFG5743ZD8YL12xQZ1p+OEj
-         IgjS9H82I3ijNVQF7nLRzTRqxh5DJpwllM+emkL3rr1BC4hZdA3DToKsjv/4rJA1iyIp
-         B6UsxhgF6S7xEsjW7fnEwLUihFAN2mtouySLsavF3hn9rCMbtRDqMo4vU0K6wtLXIpB0
-         Ba5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793792486; x=1794397286;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8kizTq969MMG4ZmGsWzf/eUqjfpKRrKiIja6oeumpC0=;
-        b=rwR0WRDSgU4+jGxrLmK2jKDQlkyzQdsDj/wWvwZ4lKx4NhenW1S8mZ3nGiNBUQkJ4h
-         Tojqw+tfM4bh+Qn2FIqz6Apqd2eo6sBoT68DTK2s51NMoVXwFuBSmE655+szTRVW3QfA
-         w4zY6GsNhpa4EN6Lv/WNyVIMGMLmhwQVQb7gv4S5Pd6SXtntfRN8AjwyESV2hZAyu2CS
-         fq22vfVemxd4sKsmNRpZ+Kp6Ed76olRTQagtnNA5Jh4csNP10cMm2yLu6vau9mlqfHux
-         L5tDE94SJHq7GxnHS2MJy/S1SFLlWo6WViBgL00S8T/OuufCuS7nqsOMOLP2tUtyun1U
-         60Rg==
-X-Gm-Message-State: APuU4Z8cpbWoa/VHuS2TRZeK400ovt8UCrF/GA2Mv09pvONuBqEvuS0x
-	fsFTsuiumN7MD754Gdr9JumcRXrBXNdwjn4hvUWyEaCFx24RawuKKgMdYCTLFw==
-X-Gm-Gg: AYBFou2oPF2k9sldMurQyLaVp1E5QszU++Uvi+dObCTHYDhMa8MzG9TUDapxm/EU6MI
-	NfM17ku1CNWc+iD7czLDaFh/wZs3iKFKSpB7ORt1zXDgoHsqmeBq2ZvyJGYhlT6WbpWq7+0ZW8u
-	p3JFmPIR3EQi3mY3cyyPV3kcXSG1+xDr2I9LVdnRgT3rtmVijv4J2lF1cJiFH0g06amCuQnFUa7
-	WfNC/45sqDJOJM2nbOTTIb8bw2f9qmQCtggBtpSy3CAiuyVDcwd+dJUovrBxkZeHWOQxiscepCJ
-	TUsNeLjMXdtrzANpPSXmlxvrtmZQlzvpiuYeeyKR2cYN1wAjykmfdxyWVtGznGRUJEH8Yq2j1Ss
-	V06YCRaQ1dkLs6hVlwHR7WEJdLRqTWcyTHYAAM4UwRc7svjy0P8r2MwOsutGIjXdTAVCrxjwIXW
-	2vKIqyD42FgMGQ/fEH4Q1gtj6oHMYVlS/YcZZbP87MSi3v8P7eURM+TTWcFekZ3JaY5pogXxBeD
-	zt5lpRUHdzWQITZ4AluzDH1NdSZe6sWQXNkRq/0soOJN8cM/ZLltDeZbTHXR6ilsueLBNqpsY1r
-	723Z3k7IUeKn0JZkaulami0eraSv1yQOoRz3EoHz66eSfBq6jOGw
-X-Received: by 2002:a17:90a:d610:b0:3a0:cca0:4a8c with SMTP id 98e67ed59e1d1-3ae896d7b4fmr8102111a91.7.1793792485919;
-        Wed, 04 Nov 2026 03:41:25 -0800 (PST)
-Received: from d.home.yangfl.dn42 ([2a09:bac1:7680:28::4:396])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b093d481a3sm3770036a91.1.2026.11.04.03.41.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Nov 2026 03:41:25 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] hwrng: histb - use device messages
-Date: Wed,  4 Nov 2026 19:41:05 +0800
-Message-ID: <20261104114108.2378751-3-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261104114108.2378751-1-mmyangfl@gmail.com>
-References: <20261104114108.2378751-1-mmyangfl@gmail.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=STWBsNjy
+X-Envelope-To: linux-crypto@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=Ci2Pt7fChn/3//APtQJ06s/FAY3b1ZNy/PHgjeitdbk=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793793214; v=1; x=1794398014;
+ b=STWBsNjy3OEtxWmyE5iaSLwm8DvkGZrHmsrFyq66NcpMmt2CgrDej3GNo9bb9XpKcUwddJn5
+ TY1G23S7w4JmV6Adwmp02sV6HWQs3XoYGMIK9JkKINLq8K5r9E9IksdnvIKyK+g/LCUkocIsmYs
+ iR8pic90BS8Z4GNlRrpQphpw=
+X-Envelope-To: linux-crypto@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id faccf47d409c8a15;
+	Wed, 04 Nov 2026 11:53:34 +0000
+X-Mizu-Trace-ID: faccf47d409c8a15
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <9a335f59-79ef-4c32-b6f6-1e66dc03cc2e@linux.dev>
+Date: Wed, 4 Nov 2026 11:53:29 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -102,48 +58,136 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] mm: zswap: use separate compression and
+ decompression requests
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Cc: akpm@linux-foundation.org, chengming.zhou@linux.dev, dsterba@suse.com,
+ hannes@cmpxchg.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ nphamcs@gmail.com, terrelln@fb.com, yosry@kernel.org, riel@surriel.com,
+ shakeel.butt@linux.dev, alex@ghiti.fr, senozhatsky@chromium.org,
+ herbert@gondor.apana.org.au, davem@davemloft.net,
+ linux-crypto@vger.kernel.org, kernel-team@meta.com
+References: <20261013002140.28880-1-kanchanapsridhar2026@gmail.com>
+ <20261103142600.279899-1-usama.arif@linux.dev>
+ <CACpmpodmeJB5FssJdfFxF+A2PkrC+=hnWGn=F_fTbbEtDfRF_A@mail.gmail.com>
+Content-Language: en-US
+From: Usama Arif <usama.arif@linux.dev>
+In-Reply-To: <CACpmpodmeJB5FssJdfFxF+A2PkrC+=hnWGn=F_fTbbEtDfRF_A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-pr_*() prints without saying which device the message came from. Print
-with dev_*() instead and adjust error messages.
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/char/hw_random/histb-rng.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/histb-rng.c b/drivers/char/hw_random/histb-rng.c
-index d435d4ab9aa7..d28cc84e8367 100644
---- a/drivers/char/hw_random/histb-rng.c
-+++ b/drivers/char/hw_random/histb-rng.c
-@@ -22,6 +22,7 @@
- 
- struct histb_rng_priv {
- 	struct hwrng rng;
-+	struct device *dev;
- 	void __iomem *base;
- };
- 
-@@ -71,8 +72,9 @@ static int histb_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- 			if (!wait)
- 				return i;
- 			if (histb_rng_wait(base)) {
--				pr_err("failed to generate random number, generated %d\n",
--				       i);
-+				dev_err(priv->dev,
-+					"RNG timeout, generated %d of %zu bytes\n",
-+					i, max);
- 				return i ? i : -ETIMEDOUT;
- 			}
- 		}
-@@ -142,6 +144,7 @@ static int histb_rng_probe(struct platform_device *pdev)
- 	}
- 
- 	priv->base = base;
-+	priv->dev = dev;
- 	priv->rng.name = pdev->name;
- 	priv->rng.read = histb_rng_read;
- 	ret = devm_hwrng_register(dev, &priv->rng);
--- 
-2.53.0
+On 03/11/2026 22:05, Kanchana P. Sridhar wrote:
+> On Tue, Nov 3, 2026 at 6:26 AM Usama Arif <usama.arif@linux.dev> wrote:
+>>
+>> On Mon, 12 Oct 2026 17:21:40 -0700 "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com> wrote:
+>>
+>>> On Fri, Oct 9, 2026 at 6:31 PM Usama Arif <usama.arif@linux.dev> wrote:
+>>>>
+>>>> Stores and loads serialize on the same per-CPU acomp request and mutex.
+>>>> A low-priority store can be preempted as soon as the compressor drops
+>>>> its stream lock, while it still holds the mutex. A higher-priority load
+>>>> on that CPU then waits until the store runs again, which can take a
+>>>> long time when other tasks are runnable.
+>>>>
+>>>> Give compression and decompression their own request, completion wait
+>>>> and mutex. Since commit e2c3b6b21c77f ("mm: zswap: use SG list
+>>>> decompression APIs from zsmalloc"), the per-CPU buffer is only used for
+>>>> compression, so group it with the compression request. Independent
+>>>> requests can share the per-CPU transform; the codecs and drivers
+>>>> synchronize their shared state internally. Loads can still wait for
+>>>> each other on the decompression mutex, and stores still serialize on
+>>>> the compression mutex.
+>>>>
+>>>> acomp_request_free() ignores NULL requests, so drop the check in
+>>>> acomp_ctx_free().
+>>>>
+>>>> This follows the proposal from Sergey Senozhatsky for the same split
+>>>> for zram [1].
+>>>>
+>>>> [1] https://lore.kernel.org/all/20261005122036.718976-10-senozhatsky@chromium.org/
+>>>>
+>>>> Signed-off-by: Usama Arif <usama.arif@linux.dev>
+>>>
+>>> I have a question with regards to this patch. Is the intent to allow a
+>>> decompress thread to run concurrently with a store thread for a given process?
+>>
+>> The request is shared by tasks using the same CPU and zswap pool.
+>> These may be different processes or threads of the same process.
+>> Each operation still runs synchronously in its caller.
+>>
+>> The motivating case can happen entirely on one CPU:
+>> 1. Task A compresses page X and releases the codec's stream lock.
+>> 2. A is preempted while still holding the zswap request mutex.
+>> 3. Task B runs and faults in an already stored page Y.
+>>
+>> With the shared request, B blocks until A runs again and releases the
+>> mutex. Separate requests let B load Y while A's store is unfinished.
+>> The codec/driver still synchronizes its own shared state.
+>>
+>>> If so, I wonder if incurring context switch/PTE/TLB shootdowns performance
+>>> penalty is worth it?
+>>
+>> The switch to B already occurs with the existing code. This patch adds
+>> no worker threads, forced migration, PTE changes or TLB shootdowns.
+>> It avoids B's subsequent wait on A's request mutex. The 1-vCPU
+>> benchmark in the cover letter exercises this without CPU migration.
+>>
+>>>
+>>> With the proposed change, will zswap_store() continue to run on the "old" CPU
+>>> (i.e. the one to which the process got migrated), or is it a requirement that
+>>> the "old" process is in sleep state? If so, should we codify/document this
+>>> requirement?
+>>>
+>>
+>> There is no requirement for A to sleep. A can remain runnable while
+>> preempted. Its zswap_store() invocation resumes in the same task, on
+>> whichever CPU the scheduler selects. If it migrates after selecting
+>> the context, it retains that pointer and the corresponding mutex,
+>> as the existing code does. The same task cannot execute on two CPUs
+>> at once.
+>>
+>>> On the new CPU, is the same process "runnable", and if so, how do we ensure that
+>>> the "higher priority" decompress is handled while the zswap_store() prior to
+>>> preemption is still not done?
+>>
+>> Normal scheduler policy decides when B runs. Once it runs, the split
+>> removes its dependency on A releasing the shared request mutex.
+>> A load starting on another CPU already selects a different context
+>> today; migration is unnecessary for the benefit described here.
+>>
+>> Existing folio/swap-cache locking still orders accesses to the same
+>> page. The example above concerns two independent pages.
+> 
+> Thanks for explaining the motivation for this change, and the detailed
+> analysis! Is it possible that this could cause compression contexts to
+> be starved of compute resources under memory pressure, potentially
+> causing deadlocks with page-faults in the worst-case scenario? 
+
+The split removes an unnecessary dependency between unrelated pages.
+Under fair scheduling, runnable reclaimers still get CPU time, and a
+fault needing memory can perform direct reclaim itself. Faults on a page
+being stored still wait for its folio lock, so I don't see a new deadlock
+cycle here.
+
+> Since
+> compression is inherently slower than decompression, could this be
+> making it easier for swap page-faults to preempt compression.
+
+On non-PREEMPT_RT kernels, software compression already runs under the
+codec's stream spinlock with preemption disabled. The delay addressed
+here is after that lock is released; the split does not make active
+compression newly preemptible.
+
+
+> On a
+> related note, should direct reclaim (only) be allowed to use a
+> non-preemptible context via a spinlock?
+> 
+I would keep the current split. The codec already protects its stream,
+while the outer context must remain sleepable for asynchronous
+completion waits. A spinlock cannot safely cover those waits.
+
 
