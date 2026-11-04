@@ -1,65 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793770035;
-	b=YA58ynUbHK+1wj5avzV2cA1o6lkQiFinucOmUGxhYxegtr1T30mM6yNDXbpgO+Af7III
-	 0To02nLCt1pApnKzyWyQ65KTUVlK6xDFvgvRv2vOO8sOi1ZtD1w09CB248ev8Q43nJSBP
-	 UXQB2dnsjqldSzmM1+1x8WFSRObTU6p8x1IZJbH8teRRaUT/2Ld0hkpLMHjW8rlfVrRx5
-	 jhohsMZLUBfVRZZLCs1mN6Nu/N4Uxt1RBxUdv3SWtAdBevMQ8bbMU3MnPZvU116CHChmj
-	 ZXtQrizLtzAY5RP0SuUD6SdjbumrV1GrWB/xC/Hs859dZhMRuYAdHtnm8jx70w5l/6Q==
+	t=1793770735;
+	b=NTdBzG1wWDo0yoTzsBeRBIDujICtpmivw6DMeGCNWSvuenTvgN0e/l6+dmGlpAXjJhf2
+	 zEUjV+j5d9SczW8xXnOtdGJ760fR11nH1EgDXC3o492AALoQdk9NXzPIG/5nSrkLdE6tu
+	 j02uoTg0mEotH+1prGFlAwzDQ0FwT9lN06RS8QCvQ5pvr/3eurmkHkXwZQ7jFch6NthF2
+	 dJWv/tcrsRrLTido1Us1KrJVmuzvWggO4CEldUrIySU+vQtnLMgPm/Toi9nqXHetzGKsV
+	 y9b/hYPhvRZ9MJndNPS/Y1HBoqR7bgbFKfZ2QsIe+r0Y9h/DuAPxFJxnJH0NO5sFrSg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793770035;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=m0lCmt30EUiatLfsbnSZVC7crDyhMJWqluU/myeillI=;
-	b=p2uGPcxlV1XaVllTFKkCEjcd8S+j861irkYpMmbDHB9XzqBMn6KN0skM98eI8+4ST16+
-	 q+1fY9u+7yZ+VuQr/vmkyfMsGh1tmakxBs2p0MXazEeU8iMGvlJ95U1BMhsKMOtjXqQL0
-	 0XEVyHKj3OYkjvbBqXTGur5vhGW0kdUwhRt0p5B1S5RiJQL0XoOsOadAviYfFHf16Z0yn
-	 xAf/DHjNCl0WtmfLFolNN/6eCu5t+IgFwGnCv6kEkncBv8TS9zHK5eYqYlK0EXmU8I/Wa
-	 MlJw6bNmY4e67Rv7SCRBM/hV4mVkfsmtVbmWmT4hYpBgQwkw8PqIXNT1x+5VHAaWzYQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793770735;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=xQLzKzl6PB5o9Q+gWyP4dEufl7NGFTpQelnBQNFTonI=;
+	b=rm8vzXPi3sVe4PUsACLYLqQQRnCOWQMUEZvlve25GJLxQwRgUB3FOL83+LWbBOZ6QNFo
+	 3oQM/ZGmxFW03niHwjOA9RQGUxSzS7F/+nrrjlzKs409Ei4O09sw8/qF4nKcUrBYM+be1
+	 rJFCkZpP1GLrvdaAoqE/5PwMFNhN6kr4huwj/LTWHSxYxlFSZmqN3M7ZIQuRgdRK/hamw
+	 7SSLkJDJqp5H9Xmb67XRtdLduDbhArleVKOq+16EwMg2TxXvvx+P3jz9eZpyXyfeTpoXS
+	 ge2UIcGcQR/ZmflfbWPXnZ8iZrR5CzEx4I5gcjrke6Ic8D72znVzZao8iKgMVoBxwXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gondor.apana.org.au;
-	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=QK0n3R8T;
-	arc=none smtp.remote-ip=180.181.231.80
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hcujtlWc;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1808E606A31B;
-	Wed,  4 Nov 2026 05:27:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1808E606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29841606A31B
+	for <linux-crypto@vger.kernel.org>; Wed,  4 Nov 2026 05:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=QK0n3R8T
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=m0lCmt30EUiatLfsbnSZVC7crDyhMJWqluU/myeillI=; 
-	b=QK0n3R8TKCA3wbnmyk3Dfxurzbf8yHdlTX+2PI62NNo+nne+umG/Fjw9XcSeafMgOHqU6nzLpa8
-	f4G6+VDk6xERljfPHijnAzPCzOebtrFS9kqR7sl1hWFlyqm1u7xAoiNS6ja3donyQfWbQzmOEMSG2
-	Ew+6nJGCE3+zJ2A9qXepeTLV8mF+/EYl5ezefzv3fvBLhLMDXnSw14KRqsjdC90jezJntIOyaURfO
-	CxI3QjWmZAUYjKC3Kc/bYe/ZmoV/g5WdyDDbmKytotJp8YSJ2kEQchRC45gh4Q609NHWAQcrM6NWA
-	4UdGGA7QMn1+5ivCebizL+fe6foVjlPqXuSQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xOTWZ-0000000Ajjv-3GDG;
-	Wed, 04 Nov 2026 13:27:04 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 04 Nov 2026 13:27:03 +0800
-Date: Wed, 4 Nov 2026 13:27:03 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: sashiko-reviews@lists.linux.dev
-Cc: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>,
-	hannes@cmpxchg.org, yosry@kernel.org, nphamcs@gmail.com,
-	chengming.zhou@linux.dev, akpm@linux-foundation.org,
-	linux-mm@kvack.org, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] mm: zswap: Move the crypto_acomp to be per pool,
- instead of per-CPU.
-Message-ID: <aurCJ8wl6EYiXS2J@gondor.apana.org.au>
-References: <20261103000313.13677-1-kanchanapsridhar2026@gmail.com>
- <sashiko-outbox-194595@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hcujtlWc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9501B1F000C1;
+	Wed,  4 Nov 2026 05:38:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793770734;
+	bh=xQLzKzl6PB5o9Q+gWyP4dEufl7NGFTpQelnBQNFTonI=;
+	h=From:To:Cc:Subject:Date;
+	b=hcujtlWcge5NqolCnpgAz2K0sUVt23oPkGvhryeN2ID6HPPSbjqM7RKVWxYnShohU
+	 a9Ld9tyqfvGuJ8xG6JprfluTBqdQwp4Kecy8KR2yTqFiYjwMzlA7Us1qfYQvPbRqdm
+	 3D8ufd0pZUOqBtAbKUebq51uYnMs2frylPNn4WpeSwhAfoAxVznlfuehfywASS3KhQ
+	 r3/oMxJxnWxtoA1Y8leUWnbDO9JP6UCb/buWpoyd0q3I24IqKnPeNeKszd9GtCUuAb
+	 DFd2RYUyzN2B21Ex6mmN/zvXZOlvsTERiHihezUSvsvDxCGB2kS+IOzOfTZiBBGLgd
+	 DGRzE7nvbubXg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Martin Willi <martin@strongswan.org>,
+	Antonio Quartulli <antonio@mandelbit.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: x86/chacha: Remove vzeroupper at beginning of functions
+Date: Tue,  3 Nov 2026 21:38:30 -0800
+Message-ID: <20261104053830.82604-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -69,23 +60,82 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <sashiko-outbox-194595@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 03, 2026 at 05:42:27AM +0000, sashiko-bot@kernel.org wrote:
->
-> For example, in drivers/crypto/hisilicon/zip/zip_crypto.c,
-> hisi_zip_acomp_init() allocates one compression queue pair, one
-> decompression queue pair, and a per-transform request queue and spinlock on
-> tfm->base.node:
+There's no point in executing vzeroupper at the beginning of the AVX2
+and AVX-512 optimized functions.  Remove it, leaving the vzeroupper at
+the end (where it is needed) only.
 
-That's just a bug in hisilicon.  The tfm is meant to be a globally
-shared data structure.  All per-CPU/node optimisations should be
-implemented in the reqeust object.
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/x86/chacha-avx2-x86_64.S   | 5 -----
+ lib/crypto/x86/chacha-avx512-x86_64.S | 6 ------
+ 2 files changed, 11 deletions(-)
 
-Thanks,
+diff --git a/lib/crypto/x86/chacha-avx2-x86_64.S b/lib/crypto/x86/chacha-avx2-x86_64.S
+index f3d8fc018249..0b0cf92a022c 100644
+--- a/lib/crypto/x86/chacha-avx2-x86_64.S
++++ b/lib/crypto/x86/chacha-avx2-x86_64.S
+@@ -46,8 +46,6 @@ SYM_FUNC_START(chacha_2block_xor_avx2)
+ 	# on four words in each matrix in parallel, but requires shuffling to
+ 	# rearrange the words after each round.
+ 
+-	vzeroupper
+-
+ 	# x0..3[0-2] = s0..3
+ 	vbroadcasti128	0x00(%rdi),%ymm0
+ 	vbroadcasti128	0x10(%rdi),%ymm1
+@@ -240,8 +238,6 @@ SYM_FUNC_START(chacha_4block_xor_avx2)
+ 	# required word shuffling has a rather high latency, we can do the
+ 	# arithmetic on two matrix-pairs without much slowdown.
+ 
+-	vzeroupper
+-
+ 	# x0..3[0-4] = s0..3
+ 	vbroadcasti128	0x00(%rdi),%ymm0
+ 	vbroadcasti128	0x10(%rdi),%ymm1
+@@ -548,7 +544,6 @@ SYM_FUNC_START(chacha_8block_xor_avx2)
+ 	# rotation is done with the slightly better performing byte shuffling,
+ 	# 7/12-bit word rotation uses traditional shift+OR.
+ 
+-	vzeroupper
+ 	# 4 * 32 byte stack, 32-byte aligned
+ 	lea		8(%rsp),%r10
+ 	and		$~31, %rsp
+diff --git a/lib/crypto/x86/chacha-avx512-x86_64.S b/lib/crypto/x86/chacha-avx512-x86_64.S
+index 422479631d5b..ffdfe005cba6 100644
+--- a/lib/crypto/x86/chacha-avx512-x86_64.S
++++ b/lib/crypto/x86/chacha-avx512-x86_64.S
+@@ -55,8 +55,6 @@ SYM_FUNC_START(chacha_2block_xor_avx512vl)
+ 	# on four words in each matrix in parallel, but requires shuffling to
+ 	# rearrange the words after each round.
+ 
+-	vzeroupper
+-
+ 	# x0..3[0-2] = s0..3
+ 	vbroadcasti128	0x00(%rdi),%ymm0
+ 	vbroadcasti128	0x10(%rdi),%ymm1
+@@ -220,8 +218,6 @@ SYM_FUNC_START(chacha_4block_xor_avx512vl)
+ 	# required word shuffling has a rather high latency, we can do the
+ 	# arithmetic on two matrix-pairs without much slowdown.
+ 
+-	vzeroupper
+-
+ 	# x0..3[0-4] = s0..3
+ 	vbroadcasti128	0x00(%rdi),%ymm0
+ 	vbroadcasti128	0x10(%rdi),%ymm1
+@@ -489,8 +485,6 @@ SYM_FUNC_END(chacha_4block_xor_avx512vl)
+ 	# VL=32 encrypts eight blocks in 256-bit ymm registers.
+ 	# VL=64 encrypts sixteen blocks in 512-bit zmm registers.
+ 
+-	vzeroupper
+-
+ 	# x0..15[0-VL/4] = s[0..15]
+ 	vpbroadcastd	0x00(%rdi),V0
+ 	vpbroadcastd	0x04(%rdi),V1
+
+base-commit: 9fbbbaefd5f95551da18426c200cf41e1b4255a1
+prerequisite-patch-id: 890b33260038bff2e3adfe7867af5919666677fc
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.56.0
+
