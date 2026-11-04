@@ -1,55 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793798639;
-	b=5hIPm3J9WPO1kQKM0oEffmMqSxZCFiiK+I/kP6BqUBNKoxrN3ir6A9O3EROg040IwvtX
-	 5W1qXcvBt2Vjlj1K3rtwul85k/pUVbn9qHgX+ObpzkfzYJkDZNvAoQsNAaTqk6ZM/Ehnd
-	 zgWNV2evD1Fylq9cp3KtOz39orLm3ZYCaXuEZ2sdDKjaBToft+1B7PKyPP3KjWA/whAmJ
-	 a0rZFICMXlxjorVvQoUhgEn/bmME6t9jVjn4ngfMqHT2kT9RAn6tS2ajbpiiWw6hB+PsH
-	 eABTRKwseqDD1gtpReH7E1CBxMSmJc+GzNq1HKzcvTxF9RfMEvxo9mpdQl6P4uubjpQ==
+	t=1793799103;
+	b=K5a1pc6cNG86Vwh9CrE7Go/NlCk8RhR0l7kfqJAPrsy3891VhKpzOrcgkoruMf7HtbA2
+	 O48Lxvrn76qVdm1FTgq0GAcqKVqyhNFXKicQ94tqIt0n2SnxPJ0emUI3CC364soyHP9aw
+	 4kF2CsuUDogDuVPMcAxpL68JI+fh1yF+NR7Hab3BEllQBNLj9fA8a0vWBMLou8oppdRtN
+	 6JBEf/COMRSkqgcL/OFH96v72EInmTesshkNB5pZHU+WAnx39zU0BVehqdCoWajw9sDmH
+	 O3ONgeauFhdffWHLV9lfiudMNqaiJnwcZP6IYLjMJyfOH96xjZkt0jF+3D5si6eRM0w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793798639;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793799103;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=koGhw/zQkpB3+l8oGWVfjInvNvaPcvPO52t7yk4yfHM=;
-	b=MkseGyVwPRG58Frnmc9AtQ/8JyPgFeQqSLh+efUx9X7y/jZQqSIqm9/Q+Xvv8JFMltVR
-	 4sD7f4CZVz/mt2n+uir9TTS+XVanQK4DZg+FUH6BlZXhNH5sK7Q/11UuWuhvwKuKYBuGq
-	 xeuhi3MwcT9jJZzpWJ7ftvjVggHgl0qqqAP3PVlAXGsWLLLPapbiDUh0F2I9OzE+lpv1J
-	 J1BNs7o5qblPk9qlw12Domemm4FUVRWRaEbuiAgoCOl6gy2EQtL4Gk4alp+9MJNhCqQkK
-	 GP1A5lRNdYFBjStdsxbmjoPBszkm2zYIEH8UQDoxsqZkulr2rJlHyQgQ7xJQiB8QnlQ==
+	bh=ZFpULgh/2Py9g9R1tDcInwYAR5BepHxp04BQ0WGbqvY=;
+	b=Z91DaO1qVXJoax2oOPaPdmu0681sEPWKWJjQqJ3bUqNGbCQ3KaH+vHnfZlPgkEzhDfz3
+	 3vvUubZlStM3wLR8hks9tWu5BiooKYSNpY2EvxSuOisU6NBK5mYIbBxwyGS3Gp+fhXTGW
+	 jYtq//82zrDic2mAiCTW0Lv1jwsyQ+z4ckkP7687Ud17RyLnGWBKLUmIAz9TmJ8bEM6t8
+	 uSdWmWb3q5Dtko+sdrWW3UmfVquEUE7w1e/VWsBsfSw9Lp5eIGfe9OTR6KEhqGsLbKHco
+	 4SM8ma8+T2IihX+Dz7jVLbVPOhNZrLQYvKF6Q/iSN7NyK002I/csZ3lTBRRR14XlVtg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fHj+ep8x;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Rj7+x9S0;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92ECD606A32E;
-	Wed,  4 Nov 2026 13:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E786606A31B;
+	Wed,  4 Nov 2026 13:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fHj+ep8x
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D42441F000C1;
-	Wed,  4 Nov 2026 13:23:57 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Rj7+x9S0
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7851A1F000C1;
+	Wed,  4 Nov 2026 13:31:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793798639;
-	bh=koGhw/zQkpB3+l8oGWVfjInvNvaPcvPO52t7yk4yfHM=;
+	s=k20260515; t=1793799102;
+	bh=ZFpULgh/2Py9g9R1tDcInwYAR5BepHxp04BQ0WGbqvY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=fHj+ep8x3yly6WmyIDK2JcRVgHVPEfVW9dXsFN8/Z0zmMyMquAKVVLEt5r4Zbaz4o
-	 uRgjDJimqS+NN2BNXzMVtwauA6MqR0inhTnNHfDU3VMQwSnP5AlvLp6EVgB4ADGcyw
-	 oxzWDr7H4cd6AHmRRYrlKrsJNliogCy1eZy9APbtbHmkkfmURuJRbtxcCmPSOeLGdB
-	 aM7wpa+ZPrSH1Men7SSQvVyTiQuVtYXBrwYM986yfTyo/AMpVWC7zmtHaERVKT7zH/
-	 8Y5nkLwdC47edx9o5vs3HAYjsPR8qNeAblD1SonFEz3Gbai7248COv0ZdmoVZJphwU
-	 0sCrXBzHz3pXA==
-Date: Wed, 4 Nov 2026 14:23:54 +0100
+	b=Rj7+x9S0abM0/dp+PucNKWJyGLObTVn+lErpoqoyfCMFXU1zLBfI8BDWPMad2LLJa
+	 e0Yc6vmrblq/0yMnc5+e2K3ha1jyU3h7nyiCkuU4D+JzmeTakH+3SPDAQYnB/QwFS7
+	 zHb5+Jou3DZeQD6opKxuxw7bUpalozNM7w/rcWk4djPT8mCmn2kPojiEOf9dYMLGW0
+	 XgXTBsfYtlKjpdsQ4d9cJYn+y8v1ypauk1pEeOHQX4QLEHwaVZiOlvxupy4eGvX1d8
+	 OrqqwsWO1VNAhzhqwYvQiHlu7HXjTGkmEWF4OVYok0G30Vkm7Vqzvsmm7AsV72ohIs
+	 U6tDhZ6rnuD1g==
+Date: Wed, 4 Nov 2026 14:31:37 +0100
 From: Thorsten Blum <blum@kernel.org>
-To: "Chawdhry, Manorit" <m-chawdhry@ti.com>
+To: Manorit Chawdhry <m-chawdhry@ti.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: sa2ul - avoid rollback in sa_init_ctx_info()
-Message-ID: <ausx6tcVMminhyQ7@kernel.org>
-References: <20261104082056.47165-2-blum@kernel.org>
- <727fd6fb-844b-4229-86e5-f34a8b518413@ti.com>
+	"David S. Miller" <davem@davemloft.net>, Keerthy <j-keerthy@ti.com>,
+	Colin Ian King <colin.i.king@gmail.com>, Andrew Davis <afd@ti.com>,
+	Pratham T <t-pratham@ti.com>, Kamlesh Gurudasani <kamlesh@ti.com>,
+	Udit Kumar <u-kumar1@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 21/30] crypto: sa2ul - reject exhausted context IDs
+Message-ID: <auszufOgf4FyKOu0@kernel.org>
+References: <20261104-b4-upstream-sa2ul-cleanup-v2-0-15ab90b3f9c2@ti.com>
+ <20261104-b4-upstream-sa2ul-cleanup-v2-21-15ab90b3f9c2@ti.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,53 +63,34 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <727fd6fb-844b-4229-86e5-f34a8b518413@ti.com>
+In-Reply-To: <20261104-b4-upstream-sa2ul-cleanup-v2-21-15ab90b3f9c2@ti.com>
 
-Hi Manorit,
-
-On Wed, Nov 04, 2026 at 01:06:15PM +0000, Chawdhry, Manorit wrote:
-> Hi Thorsten,
+On Wed, Nov 04, 2026 at 11:14:31AM +0530, Manorit Chawdhry wrote:
+> When every security-context ID is allocated, the bitmap search returns
+> SA_MAX_NUM_CTX. Setting that out-of-range bit can corrupt adjacent state
+> in the device structure. Reject allocation while still holding the lock
+> so no bitmap or context count is changed.
 > 
-> On 11/4/2026 1:50 PM, Thorsten Blum wrote:
-> > Allocate the security context before reserving a security context ID to
-> > avoid the rollback on allocation failure. Remove the now-unused local
-> > error variable.
-> >
-> > Signed-off-by: Thorsten Blum <blum@kernel.org>
-> > ---
-> >   drivers/crypto/sa2ul.c | 22 ++++++----------------
-> >   1 file changed, 6 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-> > index e026fc14a411..964ddadaa211 100644
-> > --- a/drivers/crypto/sa2ul.c
-> > +++ b/drivers/crypto/sa2ul.c
-> > @@ -748,7 +748,12 @@ static int sa_init_ctx_info(struct sa_ctx_info *ctx,
-> >   			    struct sa_crypto_data *data)
-> >   {
-> >   	unsigned long bn;
-> > -	int err;
-> > +
-> > +	ctx->sc = dma_pool_alloc(data->sc_pool, GFP_KERNEL, &ctx->sc_phys);
-> > +	if (!ctx->sc) {
-> > +		dev_err(&data->pdev->dev, "Failed to allocate SC memory\n");
-> > +		return -ENOMEM;
-> > +	}
+> Fixes: 7694b6ca649f ("crypto: sa2ul - Add crypto driver")
+> Signed-off-by: Manorit Chawdhry <m-chawdhry@ti.com>
+> ---
+>  drivers/crypto/sa2ul.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> I have been working on a cleanup and the following patch [0] would 
-> actually defeat
-> the purpose of the patch you've posted, with the addition of the check, 
-> we'd have to
-> rollback this dma alloc'ed pool instead which just reverses the order of 
-> rollback and
-> nothing else.
-> 
-> Are you okay if we drop this patch ( given am not seeing any criticality 
-> ) or do you see
-> it still helping after the context of the patch I shared?
+> diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+> index ead12f77ff67..2964aa44d50e 100644
+> --- a/drivers/crypto/sa2ul.c
+> +++ b/drivers/crypto/sa2ul.c
+> @@ -717,6 +717,10 @@ static int sa_init_ctx_info(struct sa_ctx_info *ctx,
+>  
+>  	spin_lock(&data->scid_lock);
+>  	bn = find_first_zero_bit(data->ctx_bm, SA_MAX_NUM_CTX);
+> +	if (bn >= SA_MAX_NUM_CTX) {
+> +		spin_unlock(&data->scid_lock);
+> +		return -ENOSPC;
+> +	}
+>  	__set_bit(bn, data->ctx_bm);
+>  	data->sc_id++;
+>  	spin_unlock(&data->scid_lock);
 
-You would need to call dma_pool_free() with my patch, but it's probably
-better to not allocate any memory at all. So yes, feel free to drop it.
-
-Thanks,
-Thorsten
+Reviewed-by: Thorsten Blum <blum@kernel.org>
