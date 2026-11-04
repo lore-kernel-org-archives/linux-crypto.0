@@ -1,56 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793775449;
-	b=tI7yx07+V1BC2nUB4QRbnQvrxVIcCKjdsh9ClGaPtAwLBYFp/a41j66PPFQjlb1RrRMv
-	 MZhayXE6Zj4o/D8hoer+sCpcqfSJoyFIzJHUtwyUvTRjBOMnwDqd6JqCAmuIK+cUiyuHF
-	 eGxdizTAaEcx8/h981Xkm2+8CbkdYCx1X1eTKcE+b+C5Td5aa1AN4Vq4P7YUJbk/KLqlu
-	 o9uzv8VhPlZVIdq5u6zOIh2nOWlhqUywGuJPNjVv5gqu40kRa+M8FWciQn1kkm8nDdvZ6
-	 OT3K63PVKQ8eATwhzd8iWau6s9xYH8zuVe6zt6Osdj70/ohvx5NaZW7RWGCWgPLUuzQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793775449;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=iRrCyzj/0UT7qDL+X/Hk0Ju/p9T3I7JV8tBIQMN/fBg=;
-	b=ZPYwxwawwP47dByz7bopmbQZxgB9VjQl/eLVsdoi0cCDNatDu1hFAPd/TxlAuP+XfnvL
-	 LUdzllTSqnopnrsej8V18Im7AsSO5UvEHz/eQ8QqPZSwxDTWXeSp/LcrFg41x3RznCdKd
-	 H+ZP2afQA/gH1nz50XdlroXzqYuON7Aj5DtarXUzQHK9blj1NNyxPG9Lsk9kN+e544LrE
-	 yPFrCUnmFJBFRKq7V0UdYOQ1OVKFl6CbFgANrpYR2B1my3YJMWpxfncil4/B0wWSEOOQC
-	 seS5MZoYGU+WPw8GrPpGMZgz42liGTIWuCs1sr0jdhHgPZOzEim0qJF0+PUk9hI/wGg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IrdiT27n;
-	arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793779281;
+	b=lvwUZCaR75Vu6ltDx941mz4wB6bFE+ZIHlp2TlqX5RH7OwtRG0rFtP6nrNThsDSyRjeB
+	 tABsP1PK2wjld2qJIJQXnMDYQb/TzQDEw7tTCHSVtgD91jrtvf4LWlZqiHKnWzeyDFoUh
+	 jM5E2leR5VICAmWJ7+i2Kcwe1LuavT+9GAZK3eXfsd88pm/QfRCgsMueg3ep87JkaA1k/
+	 9l++/YB7EU2GlMfXrTMLtV+X66wYnb6BvTUse6eHHrTCsJ8iUXaodF2V3E8WdYiF2dkLQ
+	 Ci9l8P2eyVBuk0j886WLayxklAp2owqvKpdep9k6Xxy/nxjIZscpk0LHWpYwZlFEG3A==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793779281;
+	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=CFW4UEZq8C8dcoEJ8gp9Mlet5nVWqNMu2HwlLBIoyp4=;
+	b=bwNhj5F6agJNMS+5MLzgOeJDEwqypBRaZY39wXaLbP31PVGiNr2xOmkwy7PnJV/FzR3h
+	 pJFX5VnUFTh6ThDGjfhoa2TTe8kRpgRZvcikpRJdFY9dmNMIs1m7eYBa3wy4PhxputOSY
+	 Xtwsydk6oNI9i3iTckJfSLqtrZEkWhCScQFEwbacYz8LW1kJOG7acXtjGiiYGNtDlvnFw
+	 TgALRoI7rt7mpCwzmNmIPddY4h/tFjRFVSwe6pJ9zyJNs2HC1h3iwukzyYOGYKr7R73Yr
+	 ICy1BNsAOQpMasearkcdpspOb2+DeOxpuVYa1C71KSnM+a+s/Zx5ZGII2i2sYsu6ARg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EhEhcDnN;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FF0606A31B
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Nov 2026 06:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18ED606A326;
+	Wed,  4 Nov 2026 08:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IrdiT27n
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EE8B1F000C1;
-	Wed,  4 Nov 2026 06:57:28 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EhEhcDnN
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1793779280;
+	b=fuSzYbSvkZGQYRUauovwyvPidlxA/6oPf647Reabthak+xyajrXTTJSCq/JdeBEzsgGm
+	 1spQO3TfsfqAVwNK+hM2XU4lk28cb1ETFlpzLFjR5HSsRndFnztIJ6vxq2p+Cvcji77WQ
+	 YugPW/ycNrZlYKuaRdYiR5XonjErxBPowFLRs5Le4odSPkHjHwKqTgqW+KkIvY9f/E+Zc
+	 YofOFuShlLEiYcVlBmYjRGvtfkRUZL7xF/QPkaqxAMPgCQoqb3a4EteeLPH33YBcFQyOG
+	 XGev2po4IRG0EsLvCu4MzHpqSfQ4JvcSNnU+m6KFNXfRfYhwY1uW88+ZyS+dnHHEHtg==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1793779280;
+	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=CFW4UEZq8C8dcoEJ8gp9Mlet5nVWqNMu2HwlLBIoyp4=;
+	b=Vs4f8bQzrpl0EC0+XiC3yCzZSLNFkgDV9Ngd4xfIY5jk690b9FkoRO2gvplMjGDb22mi
+	 up9ZEEmYpT3QaSwQ/9MwT7rJPVClH+XWB/4zKtzB1caVeTttLsx4ykCL7l6CT5JpZ5qSp
+	 B3OxYFF0dZsD8xdbZJ9cul30hXniH20j8Pa9zQqacfMWe53ez1Ht6mCz8zhCi60yhFUlo
+	 afwo+/SFikz/mVqwKxZO1DHx68qwcn2lMnN0IWXdcyHgVFHJPEAVsYWwKNQ4wDLgNMnLQ
+	 lpTAN9NR0EP5Ir2gBPG855UKuH7FNpnzxPype5K//xubUwBy72uuXHXoo0A+aawAdlQ==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id BF57A1F0093A;
+	Wed,  4 Nov 2026 08:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793775448;
-	bh=iRrCyzj/0UT7qDL+X/Hk0Ju/p9T3I7JV8tBIQMN/fBg=;
-	h=From:To:Cc:Subject:Date;
-	b=IrdiT27n914agNlTdCzSEJWG9l8yyNrOOgar/X+LvL+LaW+wNNAhWcD2BimA5gUog
-	 uA0M4OFZVCQOkfBUo8eo/dDR5Tr/xPd8YIkqTrPNWnpmTSykdnoEMM106FkpUflEOH
-	 jQd8Drq3qlOb07APXTrwrrbpMgJSkMFQZWIowYmsV7HHD3YNdiDzspiTAFM56Pl+kb
-	 lpbkUt9n5R6BxsfqHL9rIY5rEet1lxU5LRnYCsdWmuxWdcl7NqOcZ8PzxZ8UXQhG2c
-	 JyFGL66krmM43exa52k8eZMtCL5QIsdNy4LBvjzLB7y+/Gsfu9KlUF7P+teGAWGpzG
-	 dGerS8MCBu1Lg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Martin Willi <martin@strongswan.org>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: x86/chacha: Avoid overly-narrow keystream XORs
-Date: Tue,  3 Nov 2026 22:57:03 -0800
-Message-ID: <20261104065703.247316-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.0
+	s=k20260515; t=1793779280;
+	bh=CFW4UEZq8C8dcoEJ8gp9Mlet5nVWqNMu2HwlLBIoyp4=;
+	h=From:Subject:Date:To:Cc:Reply-To;
+	b=EhEhcDnN4zY9yHfi6PKLHdp8REmFYKAY0S3lRcFETDOIVvk9w5eWEngOpkmM0YVib
+	 DgCS2slqdzK2ZTqnK7qX3SDvA0xVFXilNZDdHT3Usk4S9yLoplbzqILDQf/MCW3vVo
+	 b/Hot6Vi7dB8XbvYAjf/mJzVADlr3OZnLef3xlYCKseKAoS94X/iGtLy/EMUjmyGWR
+	 wa3BbBw8E2qj3lWGgKvwNyGMKlpIJbBTNesjvwZ8Kp207qahSo4p0HjRUIWjUpNqRo
+	 3ZwPxMdA0F+AiHVxx9ntiZgvyNQ3itGF6SVsbT+7gQgrAvWSua6VvRZfEpm6SCscmS
+	 Y3OXCL55oWNXw==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 1C5A946D45;
+	Wed,  4 Nov 2026 08:01:19 +0000 (UTC)
+From: Andrew Gigena via B4 Relay <devnull+mail.andrewgigena.dev@kernel.org>
+Subject: [PATCH 0/2] arm64: dts: qcom: sm8150: Add standalone ICE node for
+ UFS
+Date: Wed, 04 Nov 2026 08:00:35 +0000
+Message-Id: <20261104-sm8150-ice-rfc-v1-0-5737b6c2ecc0@andrewgigena.dev>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,615 +84,87 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMTQqDQAxA4atI1gYyoxbxKuKik0ZNwR8mWgTx7
+ h3b5bd47wSTqGLQZCdE+ajpMie4PAMen/MgqK9k8OQfzlGJNtWuIlQWjD0jhTJ4pqKSmiBFa5R
+ ej9+w7f62PbyFt/sC1/UFAWPPRHIAAAA=
+X-Change-ID: 20261104-sm8150-ice-rfc-0b4b2c035e80
+To: Abel Vesa <abelvesa@kernel.org>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Andrew Gigena <mail@andrewgigena.dev>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1793779278; l=2116;
+ i=mail@andrewgigena.dev; s=20261104; h=from:subject:message-id;
+ bh=CG4hBCZDt6NMDb6T/GIIXkxNx2nWNouLk8UK8MwH370=;
+ b=8JRR2i0YPt0NbVNbojLUBVDdePC4/V5tgYtK9H/b/gTU6h9PLJFsf69/uXGhsHfkxBT5GGrhc
+ fsiviVuRAKnD8B43S4aqE6KQ7f5KX1z7Xh8IoETU8zxmeJ87Eb2Ub+c
+X-Developer-Key: i=mail@andrewgigena.dev; a=ed25519;
+ pk=OMhlYIBaOEC8g4mJ4JCKy7kbg+lrwRxuujieZF8Ne6U=
+X-Endpoint-Received: by B4 Relay for mail@andrewgigena.dev/20261104 with
+ auth_id=1402
+X-Original-From: Andrew Gigena <mail@andrewgigena.dev>
+Reply-To: mail@andrewgigena.dev
 
-chacha_2block_xor_avx2(), chacha_4block_xor_avx2(),
-chacha_2block_xor_avx512vl(), and chacha_4block_xor_avx512vl() currently
-XOR the data with the keystream 128 bits at a time.  This is
-unnecessarily narrow; the same functions already use 256-bit vectors
-elsewhere.  Do it 256 bits at a time instead, which is more efficient.
+Hi everyone,
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+This small series brings the Qualcomm Inline Crypto Engine (ICE) to the
+SM8150 (Snapdragon 855) platform, following the same standalone-node style
+already used on SM8250 and newer SoCs.
+
+The first patch documents the new compatible in the binding, and the second
+converts the UFS node to reference a dedicated ICE node instead of embedding
+the registers directly.
+
+I've tested this on a Google Pixel 4 (google-flame) and everything works:
+/sys/block/sda/queue/crypto now advertises AES-256-XTS and ext4 reports
+encryption as "supported". The ICE self-test completes cleanly during boot.
+
+Happy to adjust anything or add more details if needed. Thanks for reviewing!
+
+Andrew Gigena (2):
+
+dt-bindings: crypto: ice: Document sm8150 inline crypto engine
+arm64: dts: qcom: sm8150: Use standalone ICE node for UFS
 ---
- lib/crypto/x86/chacha-avx2-x86_64.S   | 220 +++++++++-----------------
- lib/crypto/x86/chacha-avx512-x86_64.S | 220 +++++++++-----------------
- 2 files changed, 150 insertions(+), 290 deletions(-)
+ .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml |  1 +
+ arch/arm64/boot/dts/qcom/sm8150.dtsi                         | 21 ++++++++++++---------
+ 2 files changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/lib/crypto/x86/chacha-avx2-x86_64.S b/lib/crypto/x86/chacha-avx2-x86_64.S
-index 0b0cf92a022c..8179a04a3027 100644
---- a/lib/crypto/x86/chacha-avx2-x86_64.S
-+++ b/lib/crypto/x86/chacha-avx2-x86_64.S
-@@ -135,59 +135,37 @@ SYM_FUNC_START(chacha_2block_xor_avx2)
- 	sub		$2,%r8d
- 	jnz		.Ldoubleround
- 
--	# o0 = i0 ^ (x0 + s0)
--	vpaddd		%ymm8,%ymm0,%ymm7
--	cmp		$0x10,%rax
--	jl		.Lxorpart2
--	vpxor		0x00(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x00(%rsi)
--	vextracti128	$1,%ymm7,%xmm0
--	# o1 = i1 ^ (x1 + s1)
--	vpaddd		%ymm9,%ymm1,%ymm7
--	cmp		$0x20,%rax
--	jl		.Lxorpart2
--	vpxor		0x10(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x10(%rsi)
--	vextracti128	$1,%ymm7,%xmm1
--	# o2 = i2 ^ (x2 + s2)
--	vpaddd		%ymm10,%ymm2,%ymm7
--	cmp		$0x30,%rax
--	jl		.Lxorpart2
--	vpxor		0x20(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x20(%rsi)
--	vextracti128	$1,%ymm7,%xmm2
--	# o3 = i3 ^ (x3 + s3)
--	vpaddd		%ymm11,%ymm3,%ymm7
--	cmp		$0x40,%rax
--	jl		.Lxorpart2
--	vpxor		0x30(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x30(%rsi)
--	vextracti128	$1,%ymm7,%xmm3
-+	# x0 += s0, x1 += s1, x2 += s2, x3 += s3
-+	vpaddd		%ymm8,%ymm0,%ymm0
-+	vpaddd		%ymm9,%ymm1,%ymm1
-+	vpaddd		%ymm10,%ymm2,%ymm2
-+	vpaddd		%ymm11,%ymm3,%ymm3
- 
--	# xor and write second block
--	vmovdqa		%xmm0,%xmm7
--	cmp		$0x50,%rax
-+	# xor the data with the keystream
-+
-+	vperm2i128	$0x20, %ymm1, %ymm0, %ymm4
-+	cmp		$1*32,%rax
- 	jl		.Lxorpart2
--	vpxor		0x40(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x40(%rsi)
-+	vpxor		0*32(%rdx),%ymm4,%ymm4
-+	vmovdqu		%ymm4,0*32(%rsi)
- 
--	vmovdqa		%xmm1,%xmm7
--	cmp		$0x60,%rax
-+	vperm2i128	$0x20, %ymm3, %ymm2, %ymm4
-+	cmp		$2*32,%rax
- 	jl		.Lxorpart2
--	vpxor		0x50(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x50(%rsi)
-+	vpxor		1*32(%rdx),%ymm4,%ymm4
-+	vmovdqu		%ymm4,1*32(%rsi)
- 
--	vmovdqa		%xmm2,%xmm7
--	cmp		$0x70,%rax
-+	vperm2i128	$0x31, %ymm1, %ymm0, %ymm4
-+	cmp		$3*32,%rax
- 	jl		.Lxorpart2
--	vpxor		0x60(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x60(%rsi)
-+	vpxor		2*32(%rdx),%ymm4,%ymm4
-+	vmovdqu		%ymm4,2*32(%rsi)
- 
--	vmovdqa		%xmm3,%xmm7
--	cmp		$0x80,%rax
-+	vperm2i128	$0x31, %ymm3, %ymm2, %ymm4
-+	cmp		$4*32,%rax
- 	jl		.Lxorpart2
--	vpxor		0x70(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x70(%rsi)
-+	vpxor		3*32(%rdx),%ymm4,%ymm4
-+	vmovdqu		%ymm4,3*32(%rsi)
- 
- .Ldone2:
- 	vzeroupper
-@@ -196,14 +174,14 @@ SYM_FUNC_START(chacha_2block_xor_avx2)
- .Lxorpart2:
- 	# xor remaining bytes from partial register into output
- 	mov		%rax,%r9
--	and		$0x0f,%r9
-+	and		$31,%r9
- 	jz		.Ldone2
--	and		$~0x0f,%rax
-+	and		$~31,%rax
- 
- 	mov		%rsi,%r11
- 
- 	lea		8(%rsp),%r10
--	sub		$0x10,%rsp
-+	sub		$32,%rsp
- 	and		$~31,%rsp
- 
- 	lea		(%rdx,%rax),%rsi
-@@ -211,8 +189,8 @@ SYM_FUNC_START(chacha_2block_xor_avx2)
- 	mov		%r9,%rcx
- 	rep movsb
- 
--	vpxor		0x00(%rsp),%xmm7,%xmm7
--	vmovdqa		%xmm7,0x00(%rsp)
-+	vpxor		0x00(%rsp),%ymm4,%ymm4
-+	vmovdqa		%ymm4,0x00(%rsp)
- 
- 	mov		%rsp,%rsi
- 	lea		(%r11,%rax),%rdi
-@@ -384,113 +362,65 @@ SYM_FUNC_START(chacha_4block_xor_avx2)
- 	sub		$2,%r8d
- 	jnz		.Ldoubleround4
- 
--	# o0 = i0 ^ (x0 + s0), first block
--	vpaddd		%ymm11,%ymm0,%ymm10
--	cmp		$0x10,%rax
--	jl		.Lxorpart4
--	vpxor		0x00(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x00(%rsi)
--	vextracti128	$1,%ymm10,%xmm0
--	# o1 = i1 ^ (x1 + s1), first block
--	vpaddd		%ymm12,%ymm1,%ymm10
--	cmp		$0x20,%rax
--	jl		.Lxorpart4
--	vpxor		0x10(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x10(%rsi)
--	vextracti128	$1,%ymm10,%xmm1
--	# o2 = i2 ^ (x2 + s2), first block
--	vpaddd		%ymm13,%ymm2,%ymm10
--	cmp		$0x30,%rax
--	jl		.Lxorpart4
--	vpxor		0x20(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x20(%rsi)
--	vextracti128	$1,%ymm10,%xmm2
--	# o3 = i3 ^ (x3 + s3), first block
--	vpaddd		%ymm14,%ymm3,%ymm10
--	cmp		$0x40,%rax
--	jl		.Lxorpart4
--	vpxor		0x30(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x30(%rsi)
--	vextracti128	$1,%ymm10,%xmm3
-+	# x0 += s0, x1 += s1, x2 += s2, x3 += s3
-+	vpaddd		%ymm11,%ymm0,%ymm0
-+	vpaddd		%ymm12,%ymm1,%ymm1
-+	vpaddd		%ymm13,%ymm2,%ymm2
-+	vpaddd		%ymm14,%ymm3,%ymm3
-+	vpaddd		%ymm11,%ymm4,%ymm4
-+	vpaddd		%ymm12,%ymm5,%ymm5
-+	vpaddd		%ymm13,%ymm6,%ymm6
-+	vpaddd		%ymm15,%ymm7,%ymm7
- 
--	# xor and write second block
--	vmovdqa		%xmm0,%xmm10
--	cmp		$0x50,%rax
--	jl		.Lxorpart4
--	vpxor		0x40(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x40(%rsi)
-+	# xor the data with the keystream
- 
--	vmovdqa		%xmm1,%xmm10
--	cmp		$0x60,%rax
-+	vperm2i128	$0x20, %ymm1, %ymm0, %ymm8
-+	cmp		$1*32,%rax
- 	jl		.Lxorpart4
--	vpxor		0x50(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x50(%rsi)
-+	vpxor		0*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,0*32(%rsi)
- 
--	vmovdqa		%xmm2,%xmm10
--	cmp		$0x70,%rax
-+	vperm2i128	$0x20, %ymm3, %ymm2, %ymm8
-+	cmp		$2*32,%rax
- 	jl		.Lxorpart4
--	vpxor		0x60(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x60(%rsi)
-+	vpxor		1*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,1*32(%rsi)
- 
--	vmovdqa		%xmm3,%xmm10
--	cmp		$0x80,%rax
-+	vperm2i128	$0x31, %ymm1, %ymm0, %ymm8
-+	cmp		$3*32,%rax
- 	jl		.Lxorpart4
--	vpxor		0x70(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x70(%rsi)
-+	vpxor		2*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,2*32(%rsi)
- 
--	# o0 = i0 ^ (x0 + s0), third block
--	vpaddd		%ymm11,%ymm4,%ymm10
--	cmp		$0x90,%rax
--	jl		.Lxorpart4
--	vpxor		0x80(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x80(%rsi)
--	vextracti128	$1,%ymm10,%xmm4
--	# o1 = i1 ^ (x1 + s1), third block
--	vpaddd		%ymm12,%ymm5,%ymm10
--	cmp		$0xa0,%rax
--	jl		.Lxorpart4
--	vpxor		0x90(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x90(%rsi)
--	vextracti128	$1,%ymm10,%xmm5
--	# o2 = i2 ^ (x2 + s2), third block
--	vpaddd		%ymm13,%ymm6,%ymm10
--	cmp		$0xb0,%rax
--	jl		.Lxorpart4
--	vpxor		0xa0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xa0(%rsi)
--	vextracti128	$1,%ymm10,%xmm6
--	# o3 = i3 ^ (x3 + s3), third block
--	vpaddd		%ymm15,%ymm7,%ymm10
--	cmp		$0xc0,%rax
-+	vperm2i128	$0x31, %ymm3, %ymm2, %ymm8
-+	cmp		$4*32,%rax
- 	jl		.Lxorpart4
--	vpxor		0xb0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xb0(%rsi)
--	vextracti128	$1,%ymm10,%xmm7
-+	vpxor		3*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,3*32(%rsi)
- 
--	# xor and write fourth block
--	vmovdqa		%xmm4,%xmm10
--	cmp		$0xd0,%rax
-+	vperm2i128	$0x20, %ymm5, %ymm4, %ymm8
-+	cmp		$5*32,%rax
- 	jl		.Lxorpart4
--	vpxor		0xc0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xc0(%rsi)
-+	vpxor		4*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,4*32(%rsi)
- 
--	vmovdqa		%xmm5,%xmm10
--	cmp		$0xe0,%rax
-+	vperm2i128	$0x20, %ymm7, %ymm6, %ymm8
-+	cmp		$6*32,%rax
- 	jl		.Lxorpart4
--	vpxor		0xd0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xd0(%rsi)
-+	vpxor		5*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,5*32(%rsi)
- 
--	vmovdqa		%xmm6,%xmm10
--	cmp		$0xf0,%rax
-+	vperm2i128	$0x31, %ymm5, %ymm4, %ymm8
-+	cmp		$7*32,%rax
- 	jl		.Lxorpart4
--	vpxor		0xe0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xe0(%rsi)
-+	vpxor		6*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,6*32(%rsi)
- 
--	vmovdqa		%xmm7,%xmm10
--	cmp		$0x100,%rax
-+	vperm2i128	$0x31, %ymm7, %ymm6, %ymm8
-+	cmp		$8*32,%rax
- 	jl		.Lxorpart4
--	vpxor		0xf0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xf0(%rsi)
-+	vpxor		7*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,7*32(%rsi)
- 
- .Ldone4:
- 	vzeroupper
-@@ -499,14 +429,14 @@ SYM_FUNC_START(chacha_4block_xor_avx2)
- .Lxorpart4:
- 	# xor remaining bytes from partial register into output
- 	mov		%rax,%r9
--	and		$0x0f,%r9
-+	and		$31,%r9
- 	jz		.Ldone4
--	and		$~0x0f,%rax
-+	and		$~31,%rax
- 
- 	mov		%rsi,%r11
- 
- 	lea		8(%rsp),%r10
--	sub		$0x10,%rsp
-+	sub		$32,%rsp
- 	and		$~31,%rsp
- 
- 	lea		(%rdx,%rax),%rsi
-@@ -514,8 +444,8 @@ SYM_FUNC_START(chacha_4block_xor_avx2)
- 	mov		%r9,%rcx
- 	rep movsb
- 
--	vpxor		0x00(%rsp),%xmm10,%xmm10
--	vmovdqa		%xmm10,0x00(%rsp)
-+	vpxor		0x00(%rsp),%ymm8,%ymm8
-+	vmovdqa		%ymm8,0x00(%rsp)
- 
- 	mov		%rsp,%rsi
- 	lea		(%r11,%rax),%rdi
-diff --git a/lib/crypto/x86/chacha-avx512-x86_64.S b/lib/crypto/x86/chacha-avx512-x86_64.S
-index bfa708c5e3ee..a0553decd9c5 100644
---- a/lib/crypto/x86/chacha-avx512-x86_64.S
-+++ b/lib/crypto/x86/chacha-avx512-x86_64.S
-@@ -127,59 +127,37 @@ SYM_FUNC_START(chacha_2block_xor_avx512vl)
- 	sub		$2,%r8d
- 	jnz		.Ldoubleround
- 
--	# o0 = i0 ^ (x0 + s0)
--	vpaddd		%ymm8,%ymm0,%ymm7
--	cmp		$0x10,%rcx
--	jl		.Lxorpart2
--	vpxord		0x00(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x00(%rsi)
--	vextracti128	$1,%ymm7,%xmm0
--	# o1 = i1 ^ (x1 + s1)
--	vpaddd		%ymm9,%ymm1,%ymm7
--	cmp		$0x20,%rcx
--	jl		.Lxorpart2
--	vpxord		0x10(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x10(%rsi)
--	vextracti128	$1,%ymm7,%xmm1
--	# o2 = i2 ^ (x2 + s2)
--	vpaddd		%ymm10,%ymm2,%ymm7
--	cmp		$0x30,%rcx
--	jl		.Lxorpart2
--	vpxord		0x20(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x20(%rsi)
--	vextracti128	$1,%ymm7,%xmm2
--	# o3 = i3 ^ (x3 + s3)
--	vpaddd		%ymm11,%ymm3,%ymm7
--	cmp		$0x40,%rcx
--	jl		.Lxorpart2
--	vpxord		0x30(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x30(%rsi)
--	vextracti128	$1,%ymm7,%xmm3
-+	# x0 += s0, x1 += s1, x2 += s2, x3 += s3
-+	vpaddd		%ymm8,%ymm0,%ymm0
-+	vpaddd		%ymm9,%ymm1,%ymm1
-+	vpaddd		%ymm10,%ymm2,%ymm2
-+	vpaddd		%ymm11,%ymm3,%ymm3
- 
--	# xor and write second block
--	vmovdqa		%xmm0,%xmm7
--	cmp		$0x50,%rcx
-+	# xor the data with the keystream
-+
-+	vperm2i128	$0x20, %ymm1, %ymm0, %ymm4
-+	cmp		$1*32,%rcx
- 	jl		.Lxorpart2
--	vpxord		0x40(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x40(%rsi)
-+	vpxor		0*32(%rdx),%ymm4,%ymm4
-+	vmovdqu		%ymm4,0*32(%rsi)
- 
--	vmovdqa		%xmm1,%xmm7
--	cmp		$0x60,%rcx
-+	vperm2i128	$0x20, %ymm3, %ymm2, %ymm4
-+	cmp		$2*32,%rcx
- 	jl		.Lxorpart2
--	vpxord		0x50(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x50(%rsi)
-+	vpxor		1*32(%rdx),%ymm4,%ymm4
-+	vmovdqu		%ymm4,1*32(%rsi)
- 
--	vmovdqa		%xmm2,%xmm7
--	cmp		$0x70,%rcx
-+	vperm2i128	$0x31, %ymm1, %ymm0, %ymm4
-+	cmp		$3*32,%rcx
- 	jl		.Lxorpart2
--	vpxord		0x60(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x60(%rsi)
-+	vpxor		2*32(%rdx),%ymm4,%ymm4
-+	vmovdqu		%ymm4,2*32(%rsi)
- 
--	vmovdqa		%xmm3,%xmm7
--	cmp		$0x80,%rcx
-+	vperm2i128	$0x31, %ymm3, %ymm2, %ymm4
-+	cmp		$4*32,%rcx
- 	jl		.Lxorpart2
--	vpxord		0x70(%rdx),%xmm7,%xmm6
--	vmovdqu		%xmm6,0x70(%rsi)
-+	vpxor		3*32(%rdx),%ymm4,%ymm4
-+	vmovdqu		%ymm4,3*32(%rsi)
- 
- .Ldone2:
- 	vzeroupper
-@@ -188,17 +166,17 @@ SYM_FUNC_START(chacha_2block_xor_avx512vl)
- .Lxorpart2:
- 	# xor remaining bytes from partial register into output
- 	mov		%rcx,%r9
--	and		$~0xf,%r9
--	and		$0xf,%rcx
-+	and		$~31,%r9
-+	and		$31,%rcx
- 	jz		.Ldone2
- 
- 	mov		$-1,%rax
- 	bzhi		%rcx,%rax,%rax
- 	kmovq		%rax,%k1
- 
--	vmovdqu8	(%rdx,%r9),%xmm1{%k1}{z}
--	vpxord		%xmm7,%xmm1,%xmm1
--	vmovdqu8	%xmm1,(%rsi,%r9){%k1}
-+	vmovdqu8	(%rdx,%r9),%ymm0{%k1}{z}
-+	vpxor		%ymm4,%ymm0,%ymm0
-+	vmovdqu8	%ymm0,(%rsi,%r9){%k1}
- 
- 	jmp		.Ldone2
- 
-@@ -335,113 +313,65 @@ SYM_FUNC_START(chacha_4block_xor_avx512vl)
- 	sub		$2,%r8d
- 	jnz		.Ldoubleround4
- 
--	# o0 = i0 ^ (x0 + s0), first block
--	vpaddd		%ymm11,%ymm0,%ymm10
--	cmp		$0x10,%rcx
--	jl		.Lxorpart4
--	vpxord		0x00(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x00(%rsi)
--	vextracti128	$1,%ymm10,%xmm0
--	# o1 = i1 ^ (x1 + s1), first block
--	vpaddd		%ymm12,%ymm1,%ymm10
--	cmp		$0x20,%rcx
--	jl		.Lxorpart4
--	vpxord		0x10(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x10(%rsi)
--	vextracti128	$1,%ymm10,%xmm1
--	# o2 = i2 ^ (x2 + s2), first block
--	vpaddd		%ymm13,%ymm2,%ymm10
--	cmp		$0x30,%rcx
--	jl		.Lxorpart4
--	vpxord		0x20(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x20(%rsi)
--	vextracti128	$1,%ymm10,%xmm2
--	# o3 = i3 ^ (x3 + s3), first block
--	vpaddd		%ymm14,%ymm3,%ymm10
--	cmp		$0x40,%rcx
--	jl		.Lxorpart4
--	vpxord		0x30(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x30(%rsi)
--	vextracti128	$1,%ymm10,%xmm3
-+	# x0 += s0, x1 += s1, x2 += s2, x3 += s3
-+	vpaddd		%ymm11,%ymm0,%ymm0
-+	vpaddd		%ymm12,%ymm1,%ymm1
-+	vpaddd		%ymm13,%ymm2,%ymm2
-+	vpaddd		%ymm14,%ymm3,%ymm3
-+	vpaddd		%ymm11,%ymm4,%ymm4
-+	vpaddd		%ymm12,%ymm5,%ymm5
-+	vpaddd		%ymm13,%ymm6,%ymm6
-+	vpaddd		%ymm15,%ymm7,%ymm7
- 
--	# xor and write second block
--	vmovdqa		%xmm0,%xmm10
--	cmp		$0x50,%rcx
--	jl		.Lxorpart4
--	vpxord		0x40(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x40(%rsi)
-+	# xor the data with the keystream
- 
--	vmovdqa		%xmm1,%xmm10
--	cmp		$0x60,%rcx
-+	vperm2i128	$0x20, %ymm1, %ymm0, %ymm8
-+	cmp		$1*32,%rcx
- 	jl		.Lxorpart4
--	vpxord		0x50(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x50(%rsi)
-+	vpxor		0*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,0*32(%rsi)
- 
--	vmovdqa		%xmm2,%xmm10
--	cmp		$0x70,%rcx
-+	vperm2i128	$0x20, %ymm3, %ymm2, %ymm8
-+	cmp		$2*32,%rcx
- 	jl		.Lxorpart4
--	vpxord		0x60(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x60(%rsi)
-+	vpxor		1*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,1*32(%rsi)
- 
--	vmovdqa		%xmm3,%xmm10
--	cmp		$0x80,%rcx
-+	vperm2i128	$0x31, %ymm1, %ymm0, %ymm8
-+	cmp		$3*32,%rcx
- 	jl		.Lxorpart4
--	vpxord		0x70(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x70(%rsi)
-+	vpxor		2*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,2*32(%rsi)
- 
--	# o0 = i0 ^ (x0 + s0), third block
--	vpaddd		%ymm11,%ymm4,%ymm10
--	cmp		$0x90,%rcx
--	jl		.Lxorpart4
--	vpxord		0x80(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x80(%rsi)
--	vextracti128	$1,%ymm10,%xmm4
--	# o1 = i1 ^ (x1 + s1), third block
--	vpaddd		%ymm12,%ymm5,%ymm10
--	cmp		$0xa0,%rcx
--	jl		.Lxorpart4
--	vpxord		0x90(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0x90(%rsi)
--	vextracti128	$1,%ymm10,%xmm5
--	# o2 = i2 ^ (x2 + s2), third block
--	vpaddd		%ymm13,%ymm6,%ymm10
--	cmp		$0xb0,%rcx
--	jl		.Lxorpart4
--	vpxord		0xa0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xa0(%rsi)
--	vextracti128	$1,%ymm10,%xmm6
--	# o3 = i3 ^ (x3 + s3), third block
--	vpaddd		%ymm15,%ymm7,%ymm10
--	cmp		$0xc0,%rcx
-+	vperm2i128	$0x31, %ymm3, %ymm2, %ymm8
-+	cmp		$4*32,%rcx
- 	jl		.Lxorpart4
--	vpxord		0xb0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xb0(%rsi)
--	vextracti128	$1,%ymm10,%xmm7
-+	vpxor		3*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,3*32(%rsi)
- 
--	# xor and write fourth block
--	vmovdqa		%xmm4,%xmm10
--	cmp		$0xd0,%rcx
-+	vperm2i128	$0x20, %ymm5, %ymm4, %ymm8
-+	cmp		$5*32,%rcx
- 	jl		.Lxorpart4
--	vpxord		0xc0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xc0(%rsi)
-+	vpxor		4*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,4*32(%rsi)
- 
--	vmovdqa		%xmm5,%xmm10
--	cmp		$0xe0,%rcx
-+	vperm2i128	$0x20, %ymm7, %ymm6, %ymm8
-+	cmp		$6*32,%rcx
- 	jl		.Lxorpart4
--	vpxord		0xd0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xd0(%rsi)
-+	vpxor		5*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,5*32(%rsi)
- 
--	vmovdqa		%xmm6,%xmm10
--	cmp		$0xf0,%rcx
-+	vperm2i128	$0x31, %ymm5, %ymm4, %ymm8
-+	cmp		$7*32,%rcx
- 	jl		.Lxorpart4
--	vpxord		0xe0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xe0(%rsi)
-+	vpxor		6*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,6*32(%rsi)
- 
--	vmovdqa		%xmm7,%xmm10
--	cmp		$0x100,%rcx
-+	vperm2i128	$0x31, %ymm7, %ymm6, %ymm8
-+	cmp		$8*32,%rcx
- 	jl		.Lxorpart4
--	vpxord		0xf0(%rdx),%xmm10,%xmm9
--	vmovdqu		%xmm9,0xf0(%rsi)
-+	vpxor		7*32(%rdx),%ymm8,%ymm8
-+	vmovdqu		%ymm8,7*32(%rsi)
- 
- .Ldone4:
- 	vzeroupper
-@@ -450,17 +380,17 @@ SYM_FUNC_START(chacha_4block_xor_avx512vl)
- .Lxorpart4:
- 	# xor remaining bytes from partial register into output
- 	mov		%rcx,%r9
--	and		$~0xf,%r9
--	and		$0xf,%rcx
-+	and		$~31,%r9
-+	and		$31,%rcx
- 	jz		.Ldone4
- 
- 	mov		$-1,%rax
- 	bzhi		%rcx,%rax,%rax
- 	kmovq		%rax,%k1
- 
--	vmovdqu8	(%rdx,%r9),%xmm1{%k1}{z}
--	vpxord		%xmm10,%xmm1,%xmm1
--	vmovdqu8	%xmm1,(%rsi,%r9){%k1}
-+	vmovdqu8	(%rdx,%r9),%ymm0{%k1}{z}
-+	vpxor		%ymm8,%ymm0,%ymm0
-+	vmovdqu8	%ymm0,(%rsi,%r9){%k1}
- 
- 	jmp		.Ldone4
- 
+To: Abel Vesa <abelvesa@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "David S. Miller" <davem@davemloft.net>
+To: Rob Herring <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>
+To: Conor Dooley <conor+dt@kernel.org>
+To: Bjorn Andersson <andersson@kernel.org>
+To: Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: devicetree@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Andrew Gigena <mail@andrewgigena.dev>
 
-base-commit: 9fbbbaefd5f95551da18426c200cf41e1b4255a1
-prerequisite-patch-id: 890b33260038bff2e3adfe7867af5919666677fc
-prerequisite-patch-id: 36cadf8c358a9778d745637c00368df82a93ce0d
-prerequisite-patch-id: b9ef92f4abcdfe8946d645db12187f6293a46381
--- 
-2.56.0
+---
+Andrew Gigena (2):
+      dt-bindings: crypto: ice: Document sm8150 inline crypto engine
+      arm64: dts: qcom: sm8150: Use standalone ICE node for UFS
+
+ .../bindings/crypto/qcom,inline-crypto-engine.yaml |  1 +
+ arch/arm64/boot/dts/qcom/sm8150.dtsi               | 25 ++++++++++++++--------
+ 2 files changed, 17 insertions(+), 9 deletions(-)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20261104-sm8150-ice-rfc-0b4b2c035e80
+
+Best regards,
+--  
+Andrew Gigena <mail@andrewgigena.dev>
+
 
