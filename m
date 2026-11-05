@@ -1,58 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793867651;
-	b=ug1hqo0LX5y7CVjetgVZaji4iGObr6KQwXYjLa82tm0tGbn0OqKhYO6vXje1n68R7V74
-	 wgfJGTJukF40QRDTehNQVeECWVbhLs3n3tY5EdKFIcNV+pyevkq14wg1q3yiXkjMJ504w
-	 kIGfZD+9t/RVw0Sw/JpeuABg/gU13eYPCmM86/3zTTGlPTFMOXrsMcIHxvD0m3a6cEwCt
-	 Cgm/EY+GBdJpBzdJeMMk62HEYC6wpavvOCwY+miS/8wCKXJ8UfoiSjDWLOP3P9jPN/AVb
-	 pt7ENBa8ywu93Asi+nV3/4176+zr3ffR3zR9Xv73td2rI3k0OxxsI1UGEBBhInDsYTg==
+	t=1793868728;
+	b=sxSMb9Qsv8CLb1LtpSh5GyEd23OT5H2/lrHbkNXV8I2sUMNDkF8wvO8lZu+kNF6XFnoW
+	 y77U8LBvjZpUv4RuKRnGCKZ3/bxcUzNO+SkVuP3VQyQ7+9gbq6fYK8w2EjeDoYEMUDbhG
+	 ef394Sv1xrs30iloC2ojAtczf0s/0a83XsCPLVnIE5WsWXymnVOqUQp87525qw6GpNaBL
+	 HIPNpSR9f+rZZYONXkmM1k3kNBBWGWyye1PpcwXH++tCw0CiWnoxC7z6qWqaKngXxwDdJ
+	 zIumAuRxJz/Gk8e78uOzOawV7AfYGGGkQqLaD2rVuYoK0Wgnj7rZKP9jYrMV3khMovg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793867651;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=P6zJzHowc63hNrslPmkjJoluc08V1uJth2yk4JtAx/Q=;
-	b=r29lKKYrFl46Jj2gEnOURQQRvvI/TIal1Njt3k2YSn8syknx8lgTETpc973UzPEtjwag
-	 v0yjhGC8CRnvuvv7dA5RIDiL1I2gXjpBLpoSHNhMuUNZkK6fWC6XbwYB7NXZ0UlX0M2Pz
-	 R0rmLOR90d6ktz9CRt9nsnOOoxbhAsM49CbXh04x2S14CRe+168t2yxwrxfEu0Y9bu5lP
-	 czcOLNWAb8MrmQfS4FAUMGURimA2x7LQhCY669avxwKrKtN+BhvNOyEQP+BVKwoT1Xz1J
-	 kpKd7SrP/Hsk5Q3+IcA8XE78q9jl5M9MvMobE9W191O+3MFDAQhSqbR3AfFakvoXwPQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793868728;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=Y4soA1wbGGkJusNMsltnTjlcCbzxXwWGOb9aK3q0azE=;
+	b=MUFCKj4N3OFcis85yHv/HeG5uNj/hZPPr44rjE6vu6TOGJ0xPSVcctqfvA8c2VwqLq2t
+	 su3UZIvHxQMGBguSvvBRt0wE/ym16yoZrMNGJ1XaZdd0xJHL89/1DuRXqW0jQM+rC5Omg
+	 O3ErqgQRw7eNV9/6FMfHZ/OqS8GA+daV5BTDnMAupiu7gI2oseFfQiEzxCMORG/f3knCa
+	 pRaiz0Vq/4iUxFtzPBDdlPNwxbwLTDUEL59MQCKwX+NidJ1qCj88t9N+cIzCdRuZFKRq9
+	 SwZI0sVBGmB/xdfiKO0kkvgjHG1Z5gqlJY52P+Qu26xv7z+TO46496UkycGt58mRSTA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PgsB4KG+;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=hQiyX4SZ;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 1D0B5606A326;
-	Thu,  5 Nov 2026 08:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC2D606A31B;
+	Thu,  5 Nov 2026 08:52:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5AC2D606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PgsB4KG+
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 18C8F1F000C1;
-	Thu,  5 Nov 2026 08:34:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793867651;
-	bh=P6zJzHowc63hNrslPmkjJoluc08V1uJth2yk4JtAx/Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=PgsB4KG+YAoQ79kF8S5BnWq41I3LxQihafA1LQ2Q1GYDgrfSetMiFusaqGsfYRoyv
-	 v4uLUxCL9SEAlH3BQOLrOCFJlIeEawjUVVlO+GVJp9cNCEVwV0wrYlhYIOHOELRXhx
-	 bnjHxsWG7GarO8D02mXITbOdTBrokZPEim8ynEP6g2m+i8HtcskAYfnQfhn78ZVt/O
-	 nO9Cj4b2DezjsYwhySxnymrrKfutZFtGtk5Vbf3AG6SjgzmGuNCbK8mMctQkO03+30
-	 SUtyhFnIuMdGYo0YiG5AI+Qht4S4WdNZn4IBi+5O9ZzOoMKSGeN9OP8OBHg3IohoI5
-	 n+XP28Ae2nY8g==
-Date: Thu, 5 Nov 2026 09:34:07 +0100
-From: Bartosz Golaszewski <brgl@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, 
-	Eric Biggers <ebiggers@kernel.org>, Demi Marie Obenour <demiobenour@gmail.com>, 
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, Pankaj Patil <pankaj.patil@oss.qualcomm.com>, 
-	Birk Skyum <birk.skyum@pm.me>, linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org
-Subject: Re: [PATCH v11 0/2] crypto - qce: make algos optional and remove the
- BROKEN label
-Message-ID: <fbcaiobhykgsgd3zyayvrkuk5lnrjtmwelxkxvbijukdbcw4i5@7e2qyfekariq>
-References: <20261022-qce-fixes-broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com>
- <kh74or65txfcprntqqljabnszooj5ppuwizj35flv2r245zbvo@nfue4wdblicr>
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=hQiyX4SZ
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=Y4soA1wbGGkJusNMsltnTjlcCbzxXwWGOb9aK3q0azE=; 
+	b=hQiyX4SZA2tS4OXtKu5IuvLWAXyaLoxbQnJcqusLNlkaedE6ATQ+A26fMjA+DYRDUg87uGUyiou
+	lRoULOF943cIw6tI3K5Gc22hTeG/Ng9v6UlF2mFw11tbJk30wbOJrfqNpzIDiRCPr/CITaVGpo2mu
+	poZo3XOSqfuhiG1btoJU0qjEBRk56rx7Asf3gHcsABOhPh1m1gKk3R9k5NGYbHUEvCMMHcL69Q2+B
+	W3GWTdl/jvFmVLDSrI0uBXfF6h1TC0alZsj+uGooCwXHrg5dbLH2huVft4OF2ZZd/GOlnzvExmkns
+	T6iqHL02WTG56M/nMw7sLkSlzw6ZKMYHcyoQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xOtC7-0000000BJbr-3JtE;
+	Thu, 05 Nov 2026 16:51:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 05 Nov 2026 16:51:39 +0800
+Date: Thu, 5 Nov 2026 16:51:39 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	"Liam R. Howlett (Google)" <liam@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>, Michal Hocko <mhocko@suse.com>,
+	Baoquan He <bhe@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
+	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
+	"David Hildenbrand (Arm)" <david@kernel.org>
+Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
+Message-ID: <auxDm_YO4oACA_d2@gondor.apana.org.au>
+References: <jfvq7vkx73vzp2ukq6nwnb3v3g2ezdcyppba4oa5lpzmz6ls6t@akc46gonndgy>
+ <urkgmijyytg3rrislm5fdzmfggqavzpiry23f6lpkqonvy2tqx@d56stj3eixfa>
+ <auaFhOa5EBz4gJwK@gondor.apana.org.au>
+ <xdzcyoou73blpfdlgy47i2ktrcsffnclerzojpgrxphid54gjc@nicdcvzqx447>
+ <auqtTjXhD8is-y9f@gondor.apana.org.au>
+ <CAHk-=wiE0KG+jkhmJWifXuAVivtB63WCWtdEpGAex7-T0SHd2g@mail.gmail.com>
+ <aurAxRpCwzeyXeVj@gondor.apana.org.au>
+ <CAHk-=wgPvbYRcKpQ8WTH-EYZRgMG0KSH+cZxY5-Hyf+X7JjWsw@mail.gmail.com>
+ <aurJZ81qnbiHH_P1@gondor.apana.org.au>
+ <ausS3LQNkdc6lBy3@milan>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,33 +88,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <kh74or65txfcprntqqljabnszooj5ppuwizj35flv2r245zbvo@nfue4wdblicr>
+In-Reply-To: <ausS3LQNkdc6lBy3@milan>
 
-On Mon, Nov 02, 2026 at 10:58:20AM +0100, Bartosz Golaszewski wrote:
-> On Thu, Oct 22, 2026 at 10:57:58AM +0200, Bartosz Golaszewski wrote:
-> > This is the follow-up to the three smaller series fixing crypto
-> > self-tests in the QCE driver. It makes the crypto algorithms opt-in via
-> > a module parameter and removes the BROKEN label so that the driver is
-> > built by default.
-> > 
-> > The dependencies are:
-> > - https://lore.kernel.org/all/20261016-qce-fixes-sha-v1-1-3ee5a30d84f3@oss.qualcomm.com/
-> > - https://lore.kernel.org/all/20261019-qce-fixes-skcipher-v12-0-046e6be9bd83@oss.qualcomm.com/
-> > - https://lore.kernel.org/all/20261020-qce-fixes-aead-v12-0-77a2e09abd0c@oss.qualcomm.com/
-> > 
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> > ---
-> 
-> Hi Herbert!
-> 
-> Gentle ping, can these three series + this one now get queued for v7.4?
-> The three dependencies have no more sashiko comments. The ones for this
-> one are minor about missing module params docs so can probably be
-> ignored or I can send a follow up.
+On Wed, Nov 04, 2026 at 12:11:24PM +0100, Uladzislau Rezki wrote:
 >
+> There are users in kernel. For example:
 
-Hi, another gentle ping since v7.4-rc1 is tagged. Is there anything I
-can do to move this forward?
+Thanks for the list.
+
+> drivers/GPU
+>     /* Allocate the file in vmalloc memory, it's likely to be big */
+>     iter.start = __vmalloc(file_size, GFP_NOWAIT);
+> 
+> AMD-GPU:
+>     kvzalloc(size, GFP_NOWAIT);
+>     kvzalloc_objs(struct amdgpu_coredump_ring, GFP_NOWAIT);
+>     kvzalloc(ring->ring_size, GFP_NOWAIT);
+
+These appear to be executing out of process context without spin
+locks so they're not really GFP_ATOMIC.
+
+> Virtio ring-testing:
+>     (alloc_ring(0)), gfpflags_allow_blocking(0) does not allow blocking.
+
+I didn't really look into this as it's just test code.
+
+> net/ipv4/udp.c:
+>     err = bpf_iter_udp_realloc_batch(iter, batch_sks, GFP_NOWAIT);
+
+This looks buggy in exactly the same way as rhashtable.  It's
+called under spin_lock_bh, and the same lock can be taken on
+the softirq path on another CPU.
+
+So are there any safe users of kvmalloc with GFP_ATOMIC? If not
+I suggest that we change kvmalloc to disallow vmalloc when called
+with GFP_ATOMIC.
 
 Thanks,
-Bartosz
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
