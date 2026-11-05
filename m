@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793840180;
-	b=pktFxPximIymgffIuzKqdU8BaAn+htnsKyK3Ytrk8faPIC5l9rEjx2nrdI1hOJiNJEkA
-	 d3UdzwBICXmn28pt0PxKdfs9hcbFONm10FtUiuhGJk+Krc4o6NeEnIUcTKIxKZ+79Yq5/
-	 6KcmyFIuLY/1D7FlaLQR/PAJFsg8UPt1qRle3IweGBZERmJuc8oj89las5WRWw7r1Jaks
-	 C7reDTnFTqiDC9ixZim890mg/33y90V7AqvEilUmjhFlxQXo1kFQTRJ9yIRZVH3D56UlK
-	 bIlba6iVavDGbBvrarsVg/lcK7yTykUxiU0ix7Y/d5gmX8d5mniZyWh6MFBdKnDTqkg==
+	t=1793840181;
+	b=hfHJxYTVmFyWO6ZKooMxgMOudlZZFqliHmwAQ3nLIpO80e3E9ifjDvFMULM2MkcSrr+t
+	 cp1ezvHanWK0MB36Gmj6OfEQ+Nmrf1ZTjNNIMF94loUqq0DxLu2gBboYqV8WfBPCtFC7I
+	 zkMg7m3pO5f1w2raI3qqDl5dVYBwAeQIG3D/+aoh/dXjYI7nO8cgYNbVbb/C/niMUFZrY
+	 UHD+xs+wInJxREWoE3Av+08eFs7Mm3wwAunype7lsUPzLBe0zPbgIGXQ8U/Ur8vcIbv+G
+	 Ez94rqzGtCy/DG/MnlOikmR6xpKTK/krgIHnbQnxkIZjKufN0La4/RBFQAbVdSPhNHg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793840180;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793840181;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=ZGcQ3yAQo2lh3KDOjkq5y231LznUfwRWHoArGG8ApFA=;
-	b=PeoDXAN9FDl+1LLquXGRJ2XnrRmg0jKsqdDz8YJH6/pV54CO1idN6KN8uHI/aSNjJG/p
-	 pBhv0CFngo7SZshUIhiMl/bdjUp7o6HK2avobAvrchvUP8muBNzgbGLT23uWiXiA4pc31
-	 Ow6ZJ34lgX2rbTa6DcBU1G+twQXgZUIjrtKrLQMgdVMBhO+Y920fxvIBzZGmAvcEDg/sV
-	 WOdBjTlNQpc6VXFt59mayc9OU8FwQ1Hag+ZiB+13E2hgEbJrJZzYNhdOELH+giSIU/Oti
-	 n1jq606iDiTuRXex4Fe9T5dAoaujAG9l4QMqgvSVSwz4OTFXhnnGzzUfgTz4leTnigg==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=/UJOjkqaqO8MFJch1nfSqvPWF4/U5P/hg/MRikiB+Ro=;
+	b=KTixFK+lOZOeLbON22o0s1CCLaAqwysEFXJRhrFnD28FJ+tlRj/XN3fCBle6jxIITh88
+	 wfWbUP92rlcnKYdhBZ/Zw+uaUVtrKxKQ2pl5gcEXi/HGkVCAEOa9DaUx8PO+o5jXIeTjR
+	 LWmD+1LUyqW9p3C/iUZ2X0z7NAVpP0kpxvvUxtsp4FcFL8RfrzlibdJjq8pJWLuMP1dKh
+	 M24AxVr/qizyFkYzA8E4PWe0KlL6F7x5dF5pNbjowjQCDr1wWIcDMHsrOwQhgkHWcvsGt
+	 qIARpAWYKnOnoyUHha4CqzG/vJVU0R4pd/3+o25FNzI/YAYyWbBsGsZHFZftTavXD/g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mi3NLqps;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IbNoiSOb;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF89606D801
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F35606D80A
 	for <linux-crypto@vger.kernel.org>; Thu,  5 Nov 2026 00:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mi3NLqps
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26D5E1F00A02;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IbNoiSOb
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 770BA1F00A1C;
 	Thu,  5 Nov 2026 00:56:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1793840180;
-	bh=ZGcQ3yAQo2lh3KDOjkq5y231LznUfwRWHoArGG8ApFA=;
-	h=From:To:Cc:Subject:Date;
-	b=Mi3NLqpsULVxmBEguIl+beT6AxYah0g8IIYXWYqKPmCBBVmQyRK20Qsk9KhuAluSR
-	 YuAsvWUcum1orZ8RT/sViU/V5rCXf5Pgb9ihHz1knQFsCXEQdI1N2gfZMr8cQEMfx0
-	 rY3L4UH7VO9eHXX59VkqCaLKyOgyapOqW7ITSe+hP7DP6sTZnY87UEBXO4RH0e9maA
-	 UTrf+/Ur4FyJ//VoNWhhhvwhmDVl1a4dYVHXxcolZUjtn8BMdndorKSsLFQ5MHrrva
-	 3+eQ1wXl4+yKld8wS6CFOCVs+YWKyM3FxqBU5+Gc2mkQrSjFQ6QOadi7C/JUDrMBOz
-	 kfoiRUD5MAtwg==
+	bh=/UJOjkqaqO8MFJch1nfSqvPWF4/U5P/hg/MRikiB+Ro=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=IbNoiSObT284GNW71GfuttXSMG1s9XQmE6NK6Km9DxO6YiCZVZoVCxQLNiicLoUGI
+	 ZHfsPdhSFFUDdNYjGXRZmXLTZbtWANsL28DNS5DXG2RephMna895TIdZiXl0GKgFv3
+	 Mtmw8gquRPLsVJNE/a4wflsxnEMBj/BlE7lM/FEYx9loD4yPUVCe4lzn0vsf+vTABv
+	 l/QvUYQ+p6r0oRxl4Qe77X0204eQOqNZJjsw5xRVzYXjMrTj8x9C0mfw/P24K6arfZ
+	 phOFIz3M9Bp0JKwzBKiVrSlxIXUsh3bTbUnLPuc2I9Ws5yqEWE1VbH8DwgUU5WOqI9
+	 xx+L0Pf1SRZ3Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
@@ -46,10 +46,12 @@ Cc: Ard Biesheuvel <ardb@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 0/3] crc, crypto: Opt out of initializing MXCSR and 387 state
-Date: Wed,  4 Nov 2026 16:55:20 -0800
-Message-ID: <20261105005523.84925-1-ebiggers@kernel.org>
+Subject: [PATCH 1/3] lib/crc: x86: Opt out of initializing MXCSR and 387 state
+Date: Wed,  4 Nov 2026 16:55:21 -0800
+Message-ID: <20261105005523.84925-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261105005523.84925-1-ebiggers@kernel.org>
+References: <20261105005523.84925-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,13 +63,10 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series is targeting libcrypto-next.
-
-The crypto and CRC code using "kernel-mode FPU" is integer code that
-does not use any MMX or x87 instructions.  To the extent that
-float-domain instructions are used at all, they are only moves and
-shuffles, neither of which raises SIMD floating-point exceptions or
-depends on MXCSR.
+The CRC code using "kernel-mode FPU" is integer code that does not use
+any MMX or x87 instructions.  To the extent that float-domain
+instructions are used at all, they are only moves and shuffles, neither
+of which raises SIMD floating-point exceptions or depends on MXCSR.
 
 Therefore, there's no need to initialize MXCSR or the 387 FPU state.
 
@@ -80,34 +79,61 @@ A precedent for this optimization can be found in
 commit a58db7ad80e8 ("netfilter: nft_set_pipapo_avx2: Skip LDMXCSR, we
 don't need a valid MXCSR state").
 
-Eric Biggers (3):
-  lib/crc: x86: Opt out of initializing MXCSR and 387 state
-  lib/crypto: x86: Opt out of initializing MXCSR and 387 state
-  crypto: x86 - Opt out of initializing MXCSR and 387 state
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crc/x86/crc-pclmul-template.h | 18 +++++++++---------
+ lib/crc/x86/crc32.h               |  2 +-
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
- arch/x86/crypto/aegis128-aesni-glue.c   |  6 +++---
- arch/x86/crypto/aesni-intel_glue.c      | 10 +++++-----
- arch/x86/crypto/aria_aesni_avx2_glue.c  |  4 ++--
- arch/x86/crypto/aria_aesni_avx_glue.c   |  2 +-
- arch/x86/crypto/aria_gfni_avx512_glue.c |  6 +++---
- arch/x86/crypto/ecb_cbc_helpers.h       |  2 +-
- arch/x86/crypto/sm4_aesni_avx_glue.c    |  6 +++---
- lib/crc/x86/crc-pclmul-template.h       | 18 +++++++++---------
- lib/crc/x86/crc32.h                     |  2 +-
- lib/crypto/x86/aes.h                    | 24 ++++++++++++------------
- lib/crypto/x86/blake2s.h                |  2 +-
- lib/crypto/x86/chacha.h                 |  4 ++--
- lib/crypto/x86/gf128hash.h              |  8 ++++----
- lib/crypto/x86/nh.h                     |  2 +-
- lib/crypto/x86/poly1305.h               |  2 +-
- lib/crypto/x86/sha1.h                   |  4 ++--
- lib/crypto/x86/sha256.h                 |  4 ++--
- lib/crypto/x86/sha512.h                 |  2 +-
- lib/crypto/x86/sm3.h                    |  2 +-
- 19 files changed, 55 insertions(+), 55 deletions(-)
-
-
-base-commit: 9fbbbaefd5f95551da18426c200cf41e1b4255a1
+diff --git a/lib/crc/x86/crc-pclmul-template.h b/lib/crc/x86/crc-pclmul-template.h
+index 893119bb7c07..124946f441a9 100644
+--- a/lib/crc/x86/crc-pclmul-template.h
++++ b/lib/crc/x86/crc-pclmul-template.h
+@@ -42,14 +42,14 @@ static inline bool have_avx512(void)
+  * bytes, the CPU has PCLMULQDQ support, and the current context may use SIMD.
+  *
+  * 16 bytes is the minimum length supported by the [V]PCLMULQDQ functions.
+- * There is overhead associated with kernel_fpu_begin() and kernel_fpu_end(),
+- * varying by CPU and factors such as which parts of the "FPU" state userspace
+- * has touched, which could result in a larger cutoff being better.  Indeed, a
+- * larger cutoff is usually better for a *single* message.  However, the
+- * overhead of the FPU section gets amortized if multiple FPU sections get
+- * executed before returning to userspace, since the XSAVE and XRSTOR occur only
+- * once.  Considering that and the fact that the [V]PCLMULQDQ code is lighter on
+- * the dcache than the table-based code is, a 16-byte cutoff seems to work well.
++ * There is overhead associated with the kernel-mode "FPU" section, varying by
++ * CPU and factors such as which parts of the "FPU" state userspace has touched,
++ * which could result in a larger cutoff being better.  Indeed, a larger cutoff
++ * is usually better for a *single* message.  However, the overhead of the FPU
++ * section gets amortized if multiple FPU sections get executed before returning
++ * to userspace, since the XSAVE and XRSTOR occur only once.  Considering that
++ * and the fact that the [V]PCLMULQDQ code is lighter on the dcache than the
++ * table-based code is, a 16-byte cutoff seems to work well.
+  */
+ #define CRC_PCLMUL(crc, p, len, prefix, consts, have_pclmulqdq)		\
+ do {									\
+@@ -58,7 +58,7 @@ do {									\
+ 		const void *consts_ptr;					\
+ 									\
+ 		consts_ptr = (consts).fold_across_128_bits_consts;	\
+-		kernel_fpu_begin();					\
++		kernel_fpu_begin_mask(0);				\
+ 		crc = static_call(prefix##_pclmul)((crc), (p), (len),	\
+ 						   consts_ptr);		\
+ 		kernel_fpu_end();					\
+diff --git a/lib/crc/x86/crc32.h b/lib/crc/x86/crc32.h
+index 19a5e3c6c73b..fb07ed449ae4 100644
+--- a/lib/crc/x86/crc32.h
++++ b/lib/crc/x86/crc32.h
+@@ -67,7 +67,7 @@ static inline u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
+ 		 * crc32c_x86_3way() and crc32_lsb_vpclmul_avx512().  The latter
+ 		 * is needed anyway for crc32_le(), so we just reuse it here.
+ 		 */
+-		kernel_fpu_begin();
++		kernel_fpu_begin_mask(0);
+ 		if (static_branch_likely(&have_vpclmul_avx512))
+ 			crc = crc32_lsb_vpclmul_avx512(crc, p, len,
+ 				       crc32_lsb_0x82f63b78_consts.fold_across_128_bits_consts);
 -- 
 2.56.0
 
