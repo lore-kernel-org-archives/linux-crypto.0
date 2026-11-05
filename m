@@ -1,61 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793866584;
-	b=G877EUFJWXsT/sWXysSdhl0SVHkbmc8ap9YMbIUFXzjsBSZ8D6UFGhNQZgrbI+H6tWKh
-	 Nf5/NB18Q/ex87r7uoCsfd2n7o9T9ZpGrZ+iidhT34VhuqxczcClrLjFn+meQvOn64+Oy
-	 B9q3PzdpfOW5b+3zO50NKvmYtxrdYeBC1XKSyuGo52PYzyfJtizT4VoxvaC13LCBiDgof
-	 9ktvjSwLdiWGU76C5Os2tfd8VXfkKHY8bY+8iLGDlFRX0v5fToeuT3Lz9zFINTREJ2YF0
-	 BpgJ3V6bsoSBlWYMuL0qIqrWaDGXkMPw/LBHh1D+oZg5FO/Lbn4MUQjd78QsX6/cj1w==
+	t=1793867354;
+	b=FDz/U2auwU5aji5z5FMsa+eCCMkgQPNjLxaz6MhXbj7boWZWc0jNLOPG79ndmx0+Fq6z
+	 m17VIYK+ZCTuE+uSLB9m8yOmX75m9Oj3TY3jXXrCUrFjqpfFte3vADkD7gIy7wX0auI48
+	 zYACD9vvn7H/iYT6k8QhPHupPtRt5eeIxpzSEdqO9Hwmrb6SlOoCze9Dbs5PsLPmyGmgd
+	 Q5jFDO+7PACcaiFfpLCRWLRD920vdFBfyXVyrLgaMKBR35kUk2kIcQz0jb1UjnK5OhPpK
+	 igejrkuDofyE2V6qQzKmtVgH9YO6Pxc7AhruvCbdC0OZ+1eGN01jxy198XD7BPBd0Qg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793866584;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=aCqimnZwAFGyowHxGlAlEMRT7cLaOWAjaF+PQzroRbY=;
-	b=KMq4lWrNSOrIBt5NW5PElkrS9WsbCO7Z0ed7K0nneewt7jFfQAShaFVKQ3fYlemUIs+K
-	 l/ayFruQu5TWnTsQ148/Qw4r4SiotJZzK2xDgjk9oEBmf/SYnPFIaNXdcPzXewgSYaEe6
-	 H7gy8zTVsxpWldNBDlXir7uyogxCi45nvUIdbPbDZ45+XkqVJXEbICUk+N5dohrsJWhry
-	 YvSzdJKO8ZG3FkM3wHTWHh7YgTnl7wYWRMhaJF866ZF8WYcOK5JLFyjTuVO6vNuY2QWDX
-	 NRg3rhMgfdF46XTecWYvaewBdBsxWMk+4ZtWG++G/yYzpfXHORsNOOn0N2QeBUvlw2g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793867354;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:MIME-Version:Content-Transfer-Encoding:X-Scanned-By;
+	bh=+rrAtFHqeMqdCjqPxg36A60/bzAo4VX4pdxWOCoyrs8=;
+	b=UDmTUImCDmYQ0rPBYg+inf3Fp4IUeAnGDfT2TBcUzVAtOg1TBdOZeWMES0tw1mgnGMXe
+	 d5+sck9I3WPufJbxN25uQ51VXOT/TYs01Rn6/T76Lagg2AmBfpPqFrBtJK64+YRBarDWr
+	 Se9UrvdVsgz70le2wFptJB2DQ9iEZjFomPmfE1tUPNTEcJIVe42CbM5pTZguFQ5I/doua
+	 r+d0WRZzVCw2sdHUz3ifZR5d6lBhKLjE/45+3t9dy7uyHuCnqSVZnQJ97qwk69RXEjZyZ
+	 6PdTsZdpKp5eYF/n8f2tuKIvSnQIN+LyNb9S/DQh518eaiwys9+myfEbPRKdJ9uem6A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P4HEJQmN;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=g141u7p8;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 64AA6606A31B;
-	Thu,  5 Nov 2026 08:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2675D606A333
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Nov 2026 08:29:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2675D606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P4HEJQmN
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 2CC5D1F000C1;
-	Thu,  5 Nov 2026 08:16:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793866584;
-	bh=aCqimnZwAFGyowHxGlAlEMRT7cLaOWAjaF+PQzroRbY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=P4HEJQmNW8JflOOJimMB1ufM60UtpVCT7i2H/JZMGolOesBwaicWwAoP+7XGeRUx5
-	 n4pPm2NgpYFgl8xhRPdq+GZqMLRk74kHgespXBg6iXwzQb/OovDkVOjTiLOT5dKzCW
-	 5e4JBWrs+16xt47L/Yx1qP16aZzUmeK2tyMet7MZUXIu9Kqxo1BNokGAgfkW+j2Fb6
-	 aOdOYy7K5Gsr30p32CUrIqdzpn+4AkzBT8527s1M2AwcbIIXYNNNSVqAooQ0yb92MA
-	 zJubGfq3ZRff9+jBPiN9WAJSSv0PJ2vk42DibQp6jsKIZq4E7ba0K1e/fB/1DHAii9
-	 abufRnmE2Ff0Q==
-Date: Thu, 5 Nov 2026 09:16:16 +0100
-From: Bartosz Golaszewski <brgl@kernel.org>
-To: Frank.Li@oss.nxp.com
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Jia Jie Ho <jiajie.ho@starfivetech.com>, William Qiu <william.qiu@starfivetech.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	T Pratham <t-pratham@ti.com>, Thorsten Blum <blum@kernel.org>, Frank Li <Frank.Li@nxp.com>, 
-	Pan Chuang <panchuang@vivo.com>, Maxime =?utf-8?B?TcOpcsOp?= <maxime.mere@foss.st.com>, 
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>, 
-	"moderated list:ARM/Microchip (AT91) SoC support" <linux-arm-kernel@lists.infradead.org>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:QUALCOMM CRYPTO DRIVERS" <linux-arm-msm@vger.kernel.org>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>, imx@lists.linux.dev, vkoul@kernel.org
-Subject: Re: [PATCH 1/1] crypto: use dmaengine_desc_set_callback()
-Message-ID: <rbrhsoidlozxq3fjrnoeqf6ehb75fmbs7tv7de6dehocc4thxi@5sfhcuwuda3o>
-References: <20261102164538.3834039-1-Frank.Li@oss.nxp.com>
+	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=g141u7p8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1793867353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+rrAtFHqeMqdCjqPxg36A60/bzAo4VX4pdxWOCoyrs8=;
+	b=g141u7p87nJuV/sIpxF/YpVZAEVQFHyOtF+pCDsf8TKm7wIH9neE8MUjAn5chfr6TJuVHy
+	hN0ifwSva2FdouuP9HeKKzWpkN/39qBO4cHFMq5s7egbsEFuNtoDfPQTiYJo6YFm9MUYZR
+	cFj2gayFpL8Jmmc3DPBUauJv5epLxag=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-355-dAP-xzHIOrWZ4hyhPfNwKw-1; Thu,
+ 05 Nov 2026 03:29:08 -0500
+X-MC-Unique: dAP-xzHIOrWZ4hyhPfNwKw-1
+X-Mimecast-MFC-AGG-ID: dAP-xzHIOrWZ4hyhPfNwKw_1793867346
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8674A19560B8;
+	Thu,  5 Nov 2026 08:29:06 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.44.48.66])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 46F3D188458A;
+	Thu,  5 Nov 2026 08:29:03 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH v2] lib/crypto: Add a sentence about zeroizing raw key structures
+Date: Thu,  5 Nov 2026 09:29:02 +0100
+Message-ID: <20261105082902.327526-1-thuth@redhat.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,29 +76,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261102164538.3834039-1-Frank.Li@oss.nxp.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Mon, Nov 02, 2026 at 11:45:30AM -0500, Frank.Li@oss.nxp.com wrote:
-> From: Frank Li <Frank.Li@nxp.com>
-> 
-> Replace open-coded assignments to callback and callback_param fields
-> of struct dma_async_tx_descriptor with calls to the
-> dmaengine_desc_set_callback() helper across various crypto drivers.
-> 
-> No functional change intended. Prepare make to struct
-> dma_async_tx_descriptor private to the DMA engine.
-> 
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> ---
->  drivers/crypto/atmel-aes.c            | 3 +--
->  drivers/crypto/atmel-sha.c            | 6 ++----
->  drivers/crypto/atmel-tdes.c           | 3 +--
->  drivers/crypto/img-hash.c             | 3 +--
->  drivers/crypto/omap-aes.c             | 8 +++-----
->  drivers/crypto/omap-des.c             | 5 ++---
->  drivers/crypto/omap-sham.c            | 3 +--
->  drivers/crypto/qce/dma.c              | 3 +--
+Let's make it clear that raw key material has to be zeroized, too.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com> # QCE
+Suggested-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Move the information into a separate paragraph
+
+ Documentation/crypto/libcrypto-zeroization.rst | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/Documentation/crypto/libcrypto-zeroization.rst b/Documentation/crypto/libcrypto-zeroization.rst
+index 76b6506711634..af3a4559b4963 100644
+--- a/Documentation/crypto/libcrypto-zeroization.rst
++++ b/Documentation/crypto/libcrypto-zeroization.rst
+@@ -43,6 +43,11 @@ two purposes:
+ What to zeroize
+ ---------------
+ 
++Raw key material (e.g. a plain AES key stored in an array or a caller-
++defined struct) must also be zeroized as soon as it is no longer needed,
++for example right after it has been used to populate one of the key
++structures below.
++
+ The following types of structures hold sensitive material and should be
+ zeroized after use:
+ 
+-- 
+2.56.0
+
