@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793852679;
-	b=2Gq/u1MGrgGPSHmCiFFjtSEtKrKWPvNkh8aGXbKThoUdk32ZgqvB/irp8/wcU/3bPz6A
-	 mYaqhQV1f79XVE5dFZDUKmLjj4BR6EPwzfS3fuwckQ1ROAe5l3NDbwUoYrDonZwuDjW29
-	 8XIfFQWy2ID58KVRFzPrVv9U2w1p0XyOFJdxZ6O36dGk0O9kRTgrK07obURSqc6iwMMoE
-	 sSncQiES3odUFhGNmIGH1LUEDXrvDeMXLi1uW3FZ/NikL/e1SpsQZ4B8IkfksWQ+iRFLZ
-	 FCqH2BmT+BH6Plce1f6yYdN22fOEuB85kj/c88ya99uYcXrKb+JQUiEpn1VbAfFocGg==
+	t=1793852686;
+	b=ApaA1fPKIGhX4sGlXAhWzL4iJz8f88n/mdT6NhgABy8X4lZ9YoZ71P6SFpV3j+47mcFm
+	 +cRUz3pQNyOl/Ocko4GzUuBrop6AFfq1FCr4rSiNH0VaeiHoctmUGMn82HU1OhAAzfmnR
+	 9+FLLytQhIctyZLJgJKQtYZZhcAYyOCd+XwDh7qxLNXN6T9snCT2M8d7B+3pQQNSjNmd9
+	 rraBPu4AM2Xi7CtyMLeQ3+DrhgEGNlBQ3yPCv9nl2GCkExvt13Izy/HUKSB5lItdfrBsR
+	 XKRxSuT9I2upGbnrmpaHo5uQNKU0XvapQKQ+jvGOUOvJWo+VSIhBELUJDX0/KjK2MGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793852679;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793852686;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=/TR8Xwdq1PpFrakKIMDSNlwwkCAg8XLQg7oJ1W7ubTo=;
-	b=oU8QxUQOSCKUlKitgWbiIoii9aJWWMXr8WDu+mCqsSwSyABjh8rPFV1vh2snRWvDHkBy
-	 UsgxXXq1xgluyfqWnDVr/wSa6BqP2ftfqByOWsgUQih3XZ6mejJpXtJ9EWIdHKTqDn2pe
-	 JKjb2+5mkcZ9bi09FHNhaGami32tkzo2chVeHbwSXaJ3vT6yxJesiCf1xe6r6VT4IMZe3
-	 4mQCpOnV0YyiVIwTYv6SHu6ojHjlVuLaHG9eyaGL9+3/n7oLh6URzZwdnJrjk6qgXncnK
-	 RYiPUgoqX9FfQR8Nx8LY0WEWuP9GfHfHIL57tyl9LL5g26LKLgE91JYx3OhYBU+ltDg==
+	bh=KULSM/ptFA2jiWLBpbkBTOSrXDoTQx0lLvinntyec8Y=;
+	b=y0JEuLZTlMuue3mfrlOzioVu45R9fBb6SrxAswd7Ca1/3CGiIoH4lzEFTdOyWu146bRv
+	 cAfnv7x/mtewh2HzflGhe8xo0g/zfqIwga+UGwK8hpEtHjGv9itE5hWrW3FcUGQ2YCDcr
+	 4Cb+i6fXdJCR8cfsxQ0SKL9p7oz/AL9iTGAJOn+qx0V3/H+l+9vtyGD7H1nHm5Jr4CXgM
+	 ii6YFSCCMzzkL1SHpGJajgMESuddUyWP2/OOfbz4Z9frAJATgHhDhIkxj5UBuRmOqry9K
+	 Eny1uh0p7jtd55gD3z+3+8yd/co6gCgX9sLqQM50pZ0XvEMK42r32ZE91MwSWU2JSWQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BFXjvs1r;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZtdbzFVR;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26B6606A31B
-	for <linux-crypto@vger.kernel.org>; Thu,  5 Nov 2026 04:24:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E456E606A328
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Nov 2026 04:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BFXjvs1r
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 375561F000C1;
-	Thu,  5 Nov 2026 04:24:38 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZtdbzFVR
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 657CB1F000C1;
+	Thu,  5 Nov 2026 04:24:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793852678;
-	bh=/TR8Xwdq1PpFrakKIMDSNlwwkCAg8XLQg7oJ1W7ubTo=;
+	s=k20260515; t=1793852685;
+	bh=KULSM/ptFA2jiWLBpbkBTOSrXDoTQx0lLvinntyec8Y=;
 	h=From:To:Cc:Subject:Date;
-	b=BFXjvs1r9WAqlZ53TuHFDr0NE3u9yTD2mWD1alT6C8wNG9MgMxq/f8+LxNThSEWEM
-	 QcRXo5tmWSUQN737d6aKOdy9GoixHbsWG432doE3GiKtNYg3WeoT495s7pHL/QdYHl
-	 bT/PQqoFXZWORPjQPAtb9jKtBN5gf/vomxtWB5NP0gQ683utS4oBGtYR4fc+wV700t
-	 XTW6YdUA7mSgODNX9uKi0sL+DyObsjf/TuRW9Ajqgu2fEdJKao4FmZwyLVLhjLC7JE
-	 oU9G+m+ubjEktoDmFT6iAVqd7u/dxUhx3/pBwsTFAK4FdoK+dwh9uDbsheI85r0HTF
-	 cM+iRQDa5K8uA==
+	b=ZtdbzFVRBBD/5MRMpIOydFx2qcaG85db7CLTYv5rI4YsP/AXk0HhFRNf9aAAg+X3f
+	 c8iSveN9BpPudq0bwhwa7U1vx3lhf0NVmBAN59eXmAGyuNtsq7vscNr5HZrIWgU7WC
+	 JDfdhJkMLvHzwf1vedJSxbSS6AbNd1Fvb5VYXIoOf8gAJncapy7h6pY56vd9n1GMvJ
+	 zt0dPR9xBCI5EVWCnJbfLI0+KG2lqrmnEnh4/C1Zcjw9fcLWe9bWGHLpUX3ZYDBGw+
+	 jFjYTt4WLRIPuiiPWlvBABxINP2wnOF5mPh+dqTPiTWMm/fJaSfUFMMRgMN9F8NhkW
+	 uJJMQ4xFGnjWg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: x86/nh: Optimize nh_sse2()
-Date: Wed,  4 Nov 2026 20:24:27 -0800
-Message-ID: <20261105042427.307868-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: x86/nh: Optimize nh_avx2()
+Date: Wed,  4 Nov 2026 20:24:42 -0800
+Message-ID: <20261105042442.308062-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -60,126 +60,213 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Various microoptimizations for nh_sse2().  Nothing too exciting:
+Various microoptimizations for nh_avx2().  Nothing too exciting:
 
 - Instead of adding the message words to the key words and then
   permuting both, do the following: permute both when loading, add the
-  permuted words, and multiply together adjacent pairs.  This saves two
-  pshufd instructions per 16 bytes processed, and the ones that remain
+  permuted words, and multiply together adjacent pairs.  This saves one
+  vpshufd instruction per 32 bytes processed, and the ones that remain
   are now better separated in the flow.
 
 - Reassign register aliases to put the most frequently used variables in
-  %xmm0-%xmm7, which take fewer bytes to encode in many instructions.
+  %ymm0-%ymm7, which take fewer bytes to encode in many instructions.
 
-- Replace the unnecessary T7 with T0.
+- Update the registers used in _nh_2xstride() to match nh_sse2() and
+  eliminate the need for T7.
 
-- Replace the 'add $0x30, KEY' with base+displacement addressing, which
-  was already being used anyway in most cases.
+- Replace the initial 'add $0x20, KEY' with base+displacement
+  addressing, which was already being used anyway in most cases.
 
-nh_sse2() shrinks from 1038 bytes to 913 bytes, and a quick benchmark
-(with AVX2 support disabled) shows 3% faster Adiantum encryption.
+- Update the horizontal sum algorithm at the end of the function to save
+  a couple instructions.
+
+nh_avx2() shrinks from 664 bytes to 518 bytes, and a quick benchmark
+shows 1% faster Adiantum encryption on x86_64.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/x86/nh-sse2.S | 60 +++++++++++++++++++++-------------------
- 1 file changed, 31 insertions(+), 29 deletions(-)
+ lib/crypto/x86/nh-avx2.S | 116 +++++++++++++++++++--------------------
+ 1 file changed, 57 insertions(+), 59 deletions(-)
 
-diff --git a/lib/crypto/x86/nh-sse2.S b/lib/crypto/x86/nh-sse2.S
-index d36c0e6d5556..b3f17e1dfbdb 100644
---- a/lib/crypto/x86/nh-sse2.S
-+++ b/lib/crypto/x86/nh-sse2.S
-@@ -9,22 +9,21 @@
+diff --git a/lib/crypto/x86/nh-avx2.S b/lib/crypto/x86/nh-avx2.S
+index 9c085a31b137..a2e9ed68dcd4 100644
+--- a/lib/crypto/x86/nh-avx2.S
++++ b/lib/crypto/x86/nh-avx2.S
+@@ -9,55 +9,55 @@
  
  #include <linux/linkage.h>
  
--#define		PASS0_SUMS	%xmm0
--#define		PASS1_SUMS	%xmm1
--#define		PASS2_SUMS	%xmm2
--#define		PASS3_SUMS	%xmm3
--#define		K0		%xmm4
--#define		K1		%xmm5
--#define		K2		%xmm6
--#define		K3		%xmm7
--#define		T0		%xmm8
--#define		T1		%xmm9
--#define		T2		%xmm10
--#define		T3		%xmm11
--#define		T4		%xmm12
--#define		T5		%xmm13
--#define		T6		%xmm14
--#define		T7		%xmm15
-+#define		K0		%xmm0
-+#define		K1		%xmm1
-+#define		K2		%xmm2
-+#define		K3		%xmm3
-+#define		T0		%xmm4
-+#define		T1		%xmm5
-+#define		T2		%xmm6
-+#define		T3		%xmm7
-+#define		T4		%xmm8
-+#define		T5		%xmm9
-+#define		T6		%xmm10
-+#define		PASS0_SUMS	%xmm11
-+#define		PASS1_SUMS	%xmm12
-+#define		PASS2_SUMS	%xmm13
-+#define		PASS3_SUMS	%xmm14
+-#define		PASS0_SUMS	%ymm0
+-#define		PASS1_SUMS	%ymm1
+-#define		PASS2_SUMS	%ymm2
+-#define		PASS3_SUMS	%ymm3
+-#define		K0		%ymm4
+-#define		K0_XMM		%xmm4
+-#define		K1		%ymm5
+-#define		K1_XMM		%xmm5
+-#define		K2		%ymm6
+-#define		K2_XMM		%xmm6
+-#define		K3		%ymm7
+-#define		K3_XMM		%xmm7
+-#define		T0		%ymm8
+-#define		T1		%ymm9
+-#define		T2		%ymm10
+-#define		T2_XMM		%xmm10
+-#define		T3		%ymm11
+-#define		T3_XMM		%xmm11
+-#define		T4		%ymm12
+-#define		T5		%ymm13
+-#define		T6		%ymm14
+-#define		T7		%ymm15
++#define		K0		%ymm0
++#define		K0_XMM		%xmm0
++#define		K1		%ymm1
++#define		K1_XMM		%xmm1
++#define		K2		%ymm2
++#define		K2_XMM		%xmm2
++#define		K3		%ymm3
++#define		K3_XMM		%xmm3
++#define		T0		%ymm4
++#define		T1		%ymm5
++#define		T2		%ymm6
++#define		T2_XMM		%xmm6
++#define		T3		%ymm7
++#define		T3_XMM		%xmm7
++#define		T4		%ymm8
++#define		T5		%ymm9
++#define		T6		%ymm10
++#define		PASS0_SUMS	%ymm11
++#define		PASS1_SUMS	%ymm12
++#define		PASS2_SUMS	%ymm13
++#define		PASS3_SUMS	%ymm14
  #define		KEY		%rdi
  #define		MESSAGE		%rsi
  #define		MESSAGE_LEN	%rdx
-@@ -36,9 +35,14 @@
- 	movdqu		\offset(MESSAGE), T1
+ #define		HASH		%rcx
  
- 	// Load next key stride
--	movdqu		\offset(KEY), \k3
-+	movdqu		\offset+0x30(KEY), \k3
++// Process 32 message bytes and accumulate the NH sums in PASS[0-3]_SUMS.  The
++// message words are expected in T3 and the key words in \k0-\k3.  Each group of
++// four message and key words must be in the order (0, 2, 1, 3), so that the
++// words multiplied by NH are next to each other.  This clobbers \k0 and T0-T6.
++// It leaves \k1-\k3 alone, since they're needed for the next 32 bytes.
+ .macro _nh_2xstride	k0, k1, k2, k3
  
 -	// Add message words to key words
-+	// Permute message and key words from (0, 1, 2, 3) to (0, 2, 1, 3).
-+	// This puts the words that NH multiplies together next to each other.
-+	pshufd		$0xd8, T1, T1
-+	pshufd		$0xd8, \k3, \k3
-+
+-	vpaddd		\k0, T3, T0
 +	// Add permuted message words to permuted key words
- 	movdqa		T1, T2
- 	movdqa		T1, T3
- 	paddd		T1, \k0    // reuse k0 to avoid a move
-@@ -46,19 +50,15 @@
- 	paddd		\k2, T2
- 	paddd		\k3, T3
++	vpaddd		\k0, T3, \k0
+ 	vpaddd		\k1, T3, T1
+ 	vpaddd		\k2, T3, T2
+ 	vpaddd		\k3, T3, T3
  
 -	// Multiply 32x32 => 64 and accumulate
--	pshufd		$0x10, \k0, T4
--	pshufd		$0x32, \k0, \k0
--	pshufd		$0x10, T1, T5
--	pshufd		$0x32, T1, T1
--	pshufd		$0x10, T2, T6
--	pshufd		$0x32, T2, T2
--	pshufd		$0x10, T3, T7
--	pshufd		$0x32, T3, T3
+-	vpshufd		$0x10, T0, T4
+-	vpshufd		$0x32, T0, T0
+-	vpshufd		$0x10, T1, T5
+-	vpshufd		$0x32, T1, T1
+-	vpshufd		$0x10, T2, T6
+-	vpshufd		$0x32, T2, T2
+-	vpshufd		$0x10, T3, T7
+-	vpshufd		$0x32, T3, T3
+-	vpmuludq	T4, T0, T0
+-	vpmuludq	T5, T1, T1
+-	vpmuludq	T6, T2, T2
+-	vpmuludq	T7, T3, T3
+-	vpaddq		T0, PASS0_SUMS, PASS0_SUMS
 +	// Multiply 32x32 (adjacent pairs) => 64 and accumulate
-+	pshufd		$0x31, \k0, T4
-+	pshufd		$0x31, T1, T5
-+	pshufd		$0x31, T2, T6
-+	pshufd		$0x31, T3, T0
- 	pmuludq		T4, \k0
- 	pmuludq		T5, T1
- 	pmuludq		T6, T2
--	pmuludq		T7, T3
-+	pmuludq		T0, T3
- 	paddq		\k0, PASS0_SUMS
- 	paddq		T1, PASS1_SUMS
- 	paddq		T2, PASS2_SUMS
-@@ -76,7 +76,9 @@ SYM_FUNC_START(nh_sse2)
- 	movdqu		0x00(KEY), K0
- 	movdqu		0x10(KEY), K1
- 	movdqu		0x20(KEY), K2
--	add		$0x30, KEY
-+	pshufd		$0xd8, K0, K0
-+	pshufd		$0xd8, K1, K1
-+	pshufd		$0xd8, K2, K2
- 	pxor		PASS0_SUMS, PASS0_SUMS
- 	pxor		PASS1_SUMS, PASS1_SUMS
- 	pxor		PASS2_SUMS, PASS2_SUMS
++	vpshufd		$0x31, \k0, T4
++	vpshufd		$0x31, T1, T5
++	vpshufd		$0x31, T2, T6
++	vpshufd		$0x31, T3, T0
++	vpmuludq	\k0, T4, \k0
++	vpmuludq	T1, T5, T1
++	vpmuludq	T2, T6, T2
++	vpmuludq	T3, T0, T3
++	vpaddq		\k0, PASS0_SUMS, PASS0_SUMS
+ 	vpaddq		T1, PASS1_SUMS, PASS1_SUMS
+ 	vpaddq		T2, PASS2_SUMS, PASS2_SUMS
+ 	vpaddq		T3, PASS3_SUMS, PASS3_SUMS
+@@ -71,9 +71,8 @@
+  */
+ SYM_FUNC_START(nh_avx2)
+ 
+-	vmovdqu		0x00(KEY), K0
+-	vmovdqu		0x10(KEY), K1
+-	add		$0x20, KEY
++	vpshufd		$0xd8, 0x00(KEY), K0
++	vpshufd		$0xd8, 0x10(KEY), K1
+ 	vpxor		PASS0_SUMS, PASS0_SUMS, PASS0_SUMS
+ 	vpxor		PASS1_SUMS, PASS1_SUMS, PASS1_SUMS
+ 	vpxor		PASS2_SUMS, PASS2_SUMS, PASS2_SUMS
+@@ -82,14 +81,14 @@ SYM_FUNC_START(nh_avx2)
+ 	sub		$0x40, MESSAGE_LEN
+ 	jl		.Lloop4_done
+ .Lloop4:
+-	vmovdqu		(MESSAGE), T3
+-	vmovdqu		0x00(KEY), K2
+-	vmovdqu		0x10(KEY), K3
++	vpshufd		$0xd8, (MESSAGE), T3
++	vpshufd		$0xd8, 0x20(KEY), K2
++	vpshufd		$0xd8, 0x30(KEY), K3
+ 	_nh_2xstride	K0, K1, K2, K3
+ 
+-	vmovdqu		0x20(MESSAGE), T3
+-	vmovdqu		0x20(KEY), K0
+-	vmovdqu		0x30(KEY), K1
++	vpshufd		$0xd8, 0x20(MESSAGE), T3
++	vpshufd		$0xd8, 0x40(KEY), K0
++	vpshufd		$0xd8, 0x50(KEY), K1
+ 	_nh_2xstride	K2, K3, K0, K1
+ 
+ 	add		$0x40, MESSAGE
+@@ -105,9 +104,9 @@ SYM_FUNC_START(nh_avx2)
+ 	jl		.Llast
+ 
+ 	// 2 or 3 strides remain; do 2 more.
+-	vmovdqu		(MESSAGE), T3
+-	vmovdqu		0x00(KEY), K2
+-	vmovdqu		0x10(KEY), K3
++	vpshufd		$0xd8, (MESSAGE), T3
++	vpshufd		$0xd8, 0x20(KEY), K2
++	vpshufd		$0xd8, 0x30(KEY), K3
+ 	_nh_2xstride	K0, K1, K2, K3
+ 	add		$0x20, MESSAGE
+ 	add		$0x20, KEY
+@@ -118,11 +117,11 @@ SYM_FUNC_START(nh_avx2)
+ .Llast:
+ 	// Last stride.  Zero the high 128 bits of the message and keys so they
+ 	// don't affect the result when processing them like 2 strides.
+-	vmovdqu		(MESSAGE), T3_XMM
++	vpshufd		$0xd8, (MESSAGE), T3_XMM
+ 	vmovdqa		K0_XMM, K0_XMM
+ 	vmovdqa		K1_XMM, K1_XMM
+-	vmovdqu		0x00(KEY), K2_XMM
+-	vmovdqu		0x10(KEY), K3_XMM
++	vpshufd		$0xd8, 0x20(KEY), K2_XMM
++	vpshufd		$0xd8, 0x30(KEY), K3_XMM
+ 	_nh_2xstride	K0, K1, K2, K3
+ 
+ .Ldone:
+@@ -144,14 +143,13 @@ SYM_FUNC_START(nh_avx2)
+ 	vpunpcklqdq	PASS3_SUMS, PASS2_SUMS, T2	// T2 = (2A 3A 2C 3C)
+ 	vpunpckhqdq	PASS3_SUMS, PASS2_SUMS, T3	// T3 = (2B 3B 2D 3D)
+ 
+-	vinserti128	$0x1, T2_XMM, T0, T4		// T4 = (0A 1A 2A 3A)
+-	vinserti128	$0x1, T3_XMM, T1, T5		// T5 = (0B 1B 2B 3B)
+-	vperm2i128	$0x31, T2, T0, T0		// T0 = (0C 1C 2C 3C)
+-	vperm2i128	$0x31, T3, T1, T1		// T1 = (0D 1D 2D 3D)
++	vpaddq		T1, T0, T0			// T0 = (0A+0B 1A+1B 0C+0D 1C+1D)
++	vpaddq		T3, T2, T2			// T2 = (2A+2B 3A+3B 2C+2D 3C+3D)
++
++	vinserti128	$0x1, T2_XMM, T0, T1		// T1 = (0A+0B 1A+1B 2A+2B 3A+3B)
++	vperm2i128	$0x31, T2, T0, T0		// T0 = (0C+0D 1C+1D 2C+2D 3C+3D)
+ 
+-	vpaddq		T5, T4, T4
+ 	vpaddq		T1, T0, T0
+-	vpaddq		T4, T0, T0
+ 	vmovdqu		T0, (HASH)
+ 	vzeroupper
+ 	RET
 
 base-commit: 9fbbbaefd5f95551da18426c200cf41e1b4255a1
 -- 
