@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793840181;
-	b=YMpIyflQofneseH1eP6pr17y7tJBx9MN7y6ExLiZgjxI1xPrQefmRj0lWsQdEgd+wW6k
-	 EMPcLXNmLztJbobfMvVwFfRK20ilwpGm2+bzM6GdjcE9iTMX/R+M48s6i4tCow9qPwhhP
-	 AR3sX18ccnAZckiYQjjMbQIo/fKP/ywUqbRcq0TQ1L04E/vu0RNCEC/6MyJBH+2z/FdTf
-	 dxccGcvgZl18Kc4OGyOBX9Z/JVf1OexYEyKzkRxaIj0ALNsHPoYfcC4CBB9DRB8R38jpn
-	 2JYnYCXPwe/Ooxvo+ohFawd/fko1Nf8qfNE6BMhxU5u+lwzNJVHW/ZeEtPjrj+YPtMQ==
+	b=Qrsl0NGSYrGEv9VF3C611P8lh2PFNURSWCJ9HS6Ig95N9sN1SqLhiVsK4M4tWU8zbs9b
+	 ztNFyUUwYVNSeOryB51mtp1bmCInwaBVx6aF9ZHWBj/juWrdxRC/2Zf13fyTOPT1W49T5
+	 63wIDXXqKz88EDWE55h7BQQ6pcvsMA3LKb45N2oU1gtxcKP/aKX+G7oh5+B52mc1Mt3ZQ
+	 ioRh5up4pk8klAjyPi6OFS7ULQ80P9cFrw3bV6RJ5drvmf8kLZByzeXM+CEZceVX4YTaU
+	 r5kglSN0qRkmh+KUQYTGjQ6VxEX8aIsN1niZLkfQ7GMn9uCjd7V5j4INMHmBMmliFSQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793840181;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=bW9Y/zHyUVjeX+w7bt0c4GRvVcqBbUI3Gf+3V3zBKYk=;
-	b=L2eGTfINXySWJ8RHNVYm16347xFqhRGfe0Slzt15LespjXXRdoQ2iWUTukB+yWYLGHIA
-	 w/nY6QPnFzeoyfl/bnsIf+8NDRwAAhzlHUHGaueV5oTKd6O35ZoYu/egYBaFFJ76HDOBC
-	 n0XLZPfGrl0Yi8hpWIq4G1lEIw3AoOcQ12p8xwrMzXOuloADyIDGoa2niWm6CsYLRAtDT
-	 J7dE0ik+z3L7JwQiN0taZW08SS+ZV71+M2Ude74r7ZsWuIdCDSQcYE5hHjYPJRNiIBRcJ
-	 6EpGGo1iZjVUcjiwXnB8WnXQOlacBgGv4136uDVPn/cCn71fHheG2TH9ID/GblPBNqA==
+	bh=a7HqO70vIfLrmyRfsQppVgIXn+/RpSONQV4rOvrkfms=;
+	b=MDvomsELByAqB/2oE0chOs8Z1CMI7El2iffmO2cHwdh/PBSAay479+f52KYniF2IaAYK
+	 2Wl/cQum9XzCgkOElqu8DRM1Oj2zpXxBW/LrEfnQCjLg64hqoDWWtYsGoA1UNNf03tZqF
+	 Zi1aXAXR7nZih+PQdAqJF+cYAvkAUEEJ30IBcj7BcjnRT2DsieerFOSuvAFKckOovRYWw
+	 RUZ+SD9f4TUl9z+I0vu0Kl2SCcFCL65BrhBqXyj0hVb0w9onpbP2sIPkmk6cvxjN/kEdC
+	 iUr6+4iBStCuniF9Tz+SUbMmvyvBE4iLJWu8V6kG05rPuFQu5ArSboXG1DLv2GnKtUQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PW6zzK8M;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cZlfRbAs;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535E6606D814
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF70606D818
 	for <linux-crypto@vger.kernel.org>; Thu,  5 Nov 2026 00:56:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PW6zzK8M
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C71BB1F00919;
-	Thu,  5 Nov 2026 00:56:20 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cZlfRbAs
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2172E1F000C1;
+	Thu,  5 Nov 2026 00:56:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1793840181;
-	bh=bW9Y/zHyUVjeX+w7bt0c4GRvVcqBbUI3Gf+3V3zBKYk=;
+	bh=a7HqO70vIfLrmyRfsQppVgIXn+/RpSONQV4rOvrkfms=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PW6zzK8MNItbeKgPXwP9WlqcoAnEhmJB0XWVfI16eISTeSoD4ubJrkCtCol3K0qK5
-	 qULzwEQUrrpr5mzS2uocFoIml8zWYzpNVIgE6OfO1CJmcu2Z3bhorAEXzXOGkwhuIb
-	 b+plxsnUxUjoKAEBnf89EOBgxvn0WJgGoupklG2ki70gw5X1L98Z9u/0rfrwEv5hGa
-	 33ko29kcEZP0Ohl1vz1Bmi9s/A2lkdK7llZ4CKYuVNck9st2aSx5Olvg0Anqyh7UEd
-	 azNnQvZJExRuYpa3xBf9K1s72ddcMx8C9iWLR/klIkkdzjhWTr6VksvMhV1/WT0l3d
-	 jBhU/UbMdhe3w==
+	b=cZlfRbAsEn1gkCltB7OLJQaX/zPYtwpyBVX+Yi0egoXkPQMNM9BvrpDEDV6r0LFis
+	 imdEaelji3Ez6sgH8M45ajX4Q8RL7uMIerDKVbJRyFBEl1Eu/VD6+MK9zwrXR9RGe8
+	 O+XZI4RZzLTyGlrjGqMj40VtQI8huMukohdM08Wyv1uPPsJlWrVEJBboorxHpyjWyh
+	 IAYBrJ4Y7KsS4oO9b49vz718AAqsY6wSA6OnTOuU3cwCzpq7EpV9O6xg9SR7aP7dgu
+	 V9qvOBAQMMSeL8LbnkRI2g7ZyeUL2sKauvDVRiaHXumLmYrnSufhfet/cNOCtF8Gdl
+	 mUAEIqer5dBcg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
@@ -46,9 +46,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 2/3] lib/crypto: x86: Opt out of initializing MXCSR and 387 state
-Date: Wed,  4 Nov 2026 16:55:22 -0800
-Message-ID: <20261105005523.84925-3-ebiggers@kernel.org>
+Subject: [PATCH 3/3] crypto: x86 - Opt out of initializing MXCSR and 387 state
+Date: Wed,  4 Nov 2026 16:55:23 -0800
+Message-ID: <20261105005523.84925-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261105005523.84925-1-ebiggers@kernel.org>
 References: <20261105005523.84925-1-ebiggers@kernel.org>
@@ -81,301 +81,205 @@ don't need a valid MXCSR state").
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/x86/aes.h       | 24 ++++++++++++------------
- lib/crypto/x86/blake2s.h   |  2 +-
- lib/crypto/x86/chacha.h    |  4 ++--
- lib/crypto/x86/gf128hash.h |  8 ++++----
- lib/crypto/x86/nh.h        |  2 +-
- lib/crypto/x86/poly1305.h  |  2 +-
- lib/crypto/x86/sha1.h      |  4 ++--
- lib/crypto/x86/sha256.h    |  4 ++--
- lib/crypto/x86/sha512.h    |  2 +-
- lib/crypto/x86/sm3.h       |  2 +-
- 10 files changed, 27 insertions(+), 27 deletions(-)
+ arch/x86/crypto/aegis128-aesni-glue.c   |  6 +++---
+ arch/x86/crypto/aesni-intel_glue.c      | 10 +++++-----
+ arch/x86/crypto/aria_aesni_avx2_glue.c  |  4 ++--
+ arch/x86/crypto/aria_aesni_avx_glue.c   |  2 +-
+ arch/x86/crypto/aria_gfni_avx512_glue.c |  6 +++---
+ arch/x86/crypto/ecb_cbc_helpers.h       |  2 +-
+ arch/x86/crypto/sm4_aesni_avx_glue.c    |  6 +++---
+ 7 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/lib/crypto/x86/aes.h b/lib/crypto/x86/aes.h
-index b555290ab075..01af1a522b42 100644
---- a/lib/crypto/x86/aes.h
-+++ b/lib/crypto/x86/aes.h
-@@ -50,7 +50,7 @@ static void aes_preparekey_arch(union aes_enckey_arch *k,
- 
- 	if (static_branch_likely(&have_aesni) && key_len != AES_KEYSIZE_192 &&
- 	    irq_fpu_usable()) {
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		if (key_len == AES_KEYSIZE_128)
- 			aes128_expandkey_aesni(rndkeys, inv_rndkeys, in_key);
- 		else
-@@ -66,7 +66,7 @@ static void aes_encrypt_arch(const struct aes_enckey *key,
- 			     const u8 in[AES_BLOCK_SIZE])
- {
- 	if (static_branch_likely(&have_aesni) && irq_fpu_usable()) {
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		aes_encrypt_aesni(out, in, key);
+diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
+index 09fc0b15b0e9..5aa0adf9b285 100644
+--- a/arch/x86/crypto/aegis128-aesni-glue.c
++++ b/arch/x86/crypto/aegis128-aesni-glue.c
+@@ -124,7 +124,7 @@ crypto_aegis128_aesni_process_crypt(struct aegis_state *state,
  		kernel_fpu_end();
- 	} else {
-@@ -79,7 +79,7 @@ static void aes_decrypt_arch(const struct aes_key *key,
- 			     const u8 in[AES_BLOCK_SIZE])
- {
- 	if (static_branch_likely(&have_aesni) && irq_fpu_usable()) {
+ 		err = skcipher_walk_done(walk,
+ 					 walk->nbytes % AEGIS128_BLOCK_SIZE);
 -		kernel_fpu_begin();
 +		kernel_fpu_begin_mask(0);
- 		aes_decrypt_aesni(out, in, key);
- 		kernel_fpu_end();
- 	} else {
-@@ -101,7 +101,7 @@ static bool aes_ecb_encrypt_arch(u8 *dst, const u8 *src, size_t len,
- {
- 	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
- 		return false;
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 	aes_ecb_encrypt_aesni(dst, src, len / AES_BLOCK_SIZE, key);
- 	kernel_fpu_end();
- 	return true;
-@@ -114,7 +114,7 @@ static bool aes_ecb_decrypt_arch(u8 *dst, const u8 *src, size_t len,
- {
- 	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
- 		return false;
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 	aes_ecb_decrypt_aesni(dst, src, len / AES_BLOCK_SIZE, key);
- 	kernel_fpu_end();
- 	return true;
-@@ -141,7 +141,7 @@ static bool aes_cbc_encrypt_arch(u8 *dst, const u8 *src, size_t len,
- {
- 	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
- 		return false;
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 	aes_cbc_encrypt_aesni(dst, src, len / AES_BLOCK_SIZE, iv, key);
- 	kernel_fpu_end();
- 	return true;
-@@ -155,7 +155,7 @@ static bool aes_cbc_decrypt_arch(u8 *dst, const u8 *src, size_t len,
- {
- 	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
- 		return false;
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 	aes_cbc_decrypt_aesni(dst, src, len / AES_BLOCK_SIZE, iv, key);
- 	kernel_fpu_end();
- 	return true;
-@@ -173,7 +173,7 @@ static bool aes_cbc_cts_encrypt_arch(u8 *dst, const u8 *src, size_t len,
- 	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
- 		return false;
- 
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 	if (cbc_blocks) {
- 		aes_cbc_encrypt_aesni(dst, src, cbc_blocks, iv, key);
- 		dst += cbc_blocks * AES_BLOCK_SIZE;
-@@ -197,7 +197,7 @@ static bool aes_cbc_cts_decrypt_arch(u8 *dst, const u8 *src, size_t len,
- 	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
- 		return false;
- 
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 	if (cbc_blocks) {
- 		aes_cbc_decrypt_aesni(dst, src, cbc_blocks, iv, key);
- 		dst += cbc_blocks * AES_BLOCK_SIZE;
-@@ -260,7 +260,7 @@ static bool aes_ctr_arch(u8 *dst, const u8 *src, size_t len,
- 	ctr64 = le_ctr[0] = get_unaligned_be64(&ctr[8]);
- 	le_ctr[1] = get_unaligned_be64(&ctr[0]);
- 
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 
- 	nblocks = DIV_ROUND_UP(len, AES_BLOCK_SIZE);
- 	ctr64 += nblocks;
-@@ -296,7 +296,7 @@ static bool aes_xctr_arch(u8 *dst, const u8 *src, size_t len, u64 ctr,
- 	if (!static_branch_likely(&have_aesni_avx) ||
- 	    unlikely(!irq_fpu_usable()))
- 		return false;
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 	if (static_branch_likely(&have_vaes_avx512))
- 		aes_xctr_crypt_vaes_avx512(dst, src, len, ctr, iv, key);
- 	else if (static_branch_likely(&have_vaes_avx2))
-@@ -344,7 +344,7 @@ aes_xts_crypt_x86(u8 *dst, const u8 *src, size_t len, u8 tweak[AES_BLOCK_SIZE],
- 	if (!static_branch_likely(&have_aesni) || unlikely(!irq_fpu_usable()))
- 		return false;
- 
--	kernel_fpu_begin();
-+	kernel_fpu_begin_mask(0);
- 	if (IS_ENABLED(CONFIG_X86_64) &&
- 	    static_branch_likely(&have_vaes_avx512)) {
- 		if (!cont)
-diff --git a/lib/crypto/x86/blake2s.h b/lib/crypto/x86/blake2s.h
-index 0f7c51f055c8..952db559eed3 100644
---- a/lib/crypto/x86/blake2s.h
-+++ b/lib/crypto/x86/blake2s.h
-@@ -34,7 +34,7 @@ static void blake2s_compress(struct blake2s_ctx *ctx,
- 		const size_t blocks = min_t(size_t, nblocks,
- 					    SZ_4K / BLAKE2S_BLOCK_SIZE);
- 
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		if (static_branch_likely(&blake2s_use_avx512))
- 			blake2s_compress_avx512(ctx, data, blocks, inc);
- 		else
-diff --git a/lib/crypto/x86/chacha.h b/lib/crypto/x86/chacha.h
-index fdf01b07742e..3bbfd21255de 100644
---- a/lib/crypto/x86/chacha.h
-+++ b/lib/crypto/x86/chacha.h
-@@ -152,7 +152,7 @@ static void hchacha_block_arch(const struct chacha_state *state,
- 	if (!static_branch_likely(&chacha_use_simd)) {
- 		hchacha_block_generic(state, out, nrounds);
- 	} else {
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		hchacha_block_ssse3(state, out, nrounds);
- 		kernel_fpu_end();
  	}
-@@ -168,7 +168,7 @@ static void chacha_crypt_arch(struct chacha_state *state, u8 *dst,
- 	do {
- 		size_t todo = min(bytes, SZ_4K);
  
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		chacha_dosimd(state, dst, src, todo, nrounds);
+ 	if (walk->nbytes) {
+@@ -138,7 +138,7 @@ crypto_aegis128_aesni_process_crypt(struct aegis_state *state,
+ 						walk->nbytes);
  		kernel_fpu_end();
+ 		err = skcipher_walk_done(walk, 0);
+-		kernel_fpu_begin();
++		kernel_fpu_begin_mask(0);
+ 	}
+ 	return err;
+ }
+@@ -191,7 +191,7 @@ crypto_aegis128_aesni_crypt(struct aead_request *req,
+ 	if (err)
+ 		return err;
  
-diff --git a/lib/crypto/x86/gf128hash.h b/lib/crypto/x86/gf128hash.h
-index 6b79b06caab0..5ef8f2f7b6f3 100644
---- a/lib/crypto/x86/gf128hash.h
-+++ b/lib/crypto/x86/gf128hash.h
-@@ -31,7 +31,7 @@ static void polyval_preparekey_arch(struct polyval_key *key,
- 	static_assert(ARRAY_SIZE(key->h_powers) == NUM_H_POWERS);
- 	memcpy(&key->h_powers[NUM_H_POWERS - 1], raw_key, POLYVAL_BLOCK_SIZE);
- 	if (static_branch_likely(&have_pclmul_avx) && irq_fpu_usable()) {
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		for (int i = NUM_H_POWERS - 2; i >= 0; i--) {
- 			key->h_powers[i] = key->h_powers[i + 1];
- 			polyval_mul_pclmul_avx(
-@@ -52,7 +52,7 @@ static void polyval_mul_x86(struct polyval_elem *a,
- 			    const struct polyval_elem *b)
- {
- 	if (static_branch_likely(&have_pclmul) && irq_fpu_usable()) {
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		if (static_branch_likely(&have_pclmul_avx))
- 			polyval_mul_pclmul_avx(a, b);
- 		else
-@@ -88,7 +88,7 @@ static void ghash_blocks_arch(struct polyval_elem *acc,
- 			size_t n = min_t(size_t, nblocks,
- 					 4096 / GHASH_BLOCK_SIZE);
+-	kernel_fpu_begin();
++	kernel_fpu_begin_mask(0);
  
--			kernel_fpu_begin();
-+			kernel_fpu_begin_mask(0);
- 			ghash_blocks_pclmul(acc, &key->h, data, n);
- 			kernel_fpu_end();
- 			data += n * GHASH_BLOCK_SIZE;
-@@ -110,7 +110,7 @@ static void polyval_blocks_arch(struct polyval_elem *acc,
- 			size_t n = min_t(size_t, nblocks,
- 					 4096 / POLYVAL_BLOCK_SIZE);
+ 	aegis128_aesni_init(&state, &ctx->key, req->iv);
+ 	crypto_aegis128_aesni_process_ad(&state, req->src, req->assoclen);
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index d2fb53e23eda..3b58d77d2f5d 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -458,7 +458,7 @@ static int gcm_setkey(struct crypto_aead *tfm, const u8 *raw_key,
+ 		return err;
  
--			kernel_fpu_begin();
-+			kernel_fpu_begin_mask(0);
- 			polyval_blocks_pclmul_avx(acc, key, data, n);
- 			kernel_fpu_end();
- 			data += n * POLYVAL_BLOCK_SIZE;
-diff --git a/lib/crypto/x86/nh.h b/lib/crypto/x86/nh.h
-index 342636dcb750..e41512e5b4bb 100644
---- a/lib/crypto/x86/nh.h
-+++ b/lib/crypto/x86/nh.h
-@@ -21,7 +21,7 @@ static bool nh_arch(const u32 *key, const u8 *message, size_t message_len,
- {
- 	if (message_len >= 64 && static_branch_likely(&have_sse2) &&
- 	    irq_fpu_usable()) {
+ 	if (likely(crypto_simd_usable())) {
 -		kernel_fpu_begin();
 +		kernel_fpu_begin_mask(0);
- 		if (static_branch_likely(&have_avx2))
- 			nh_avx2(key, message, message_len, hash);
- 		else
-diff --git a/lib/crypto/x86/poly1305.h b/lib/crypto/x86/poly1305.h
-index a2034809b97b..3b92e20f4f9b 100644
---- a/lib/crypto/x86/poly1305.h
-+++ b/lib/crypto/x86/poly1305.h
-@@ -117,7 +117,7 @@ static void poly1305_blocks(struct poly1305_block_state *state, const u8 *inp,
- 	do {
- 		const size_t bytes = min(len, SZ_4K);
- 
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		if (static_branch_likely(&poly1305_use_avx512))
- 			poly1305_blocks_avx512(ctx, inp, bytes, padbit);
- 		else if (static_branch_likely(&poly1305_use_avx2))
-diff --git a/lib/crypto/x86/sha1.h b/lib/crypto/x86/sha1.h
-index 6aff433466e7..9de5f388055e 100644
---- a/lib/crypto/x86/sha1.h
-+++ b/lib/crypto/x86/sha1.h
-@@ -16,7 +16,7 @@ DEFINE_STATIC_CALL(sha1_blocks_x86, sha1_blocks_generic);
- 			 const u8 *data, size_t nblocks)           \
- 	{                                                          \
- 		if (likely(irq_fpu_usable())) {                    \
--			kernel_fpu_begin();                        \
-+			kernel_fpu_begin_mask(0);                  \
- 			asm_fn(state, data, nblocks);              \
- 			kernel_fpu_end();                          \
- 		} else {                                           \
-@@ -36,7 +36,7 @@ static void sha1_blocks_avx2(struct sha1_block_state *state,
- 			     const u8 *data, size_t nblocks)
- {
- 	if (likely(irq_fpu_usable())) {
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		/* Select the optimal transform based on the number of blocks */
- 		if (nblocks >= SHA1_AVX2_BLOCK_OPTSIZE)
- 			sha1_transform_avx2(state, data, nblocks);
-diff --git a/lib/crypto/x86/sha256.h b/lib/crypto/x86/sha256.h
-index e98ffdaf4b14..72bce769aa92 100644
---- a/lib/crypto/x86/sha256.h
-+++ b/lib/crypto/x86/sha256.h
-@@ -18,7 +18,7 @@ DEFINE_STATIC_CALL(sha256_blocks_x86, sha256_blocks_generic);
- 			 size_t nblocks)                                   \
- 	{                                                                  \
- 		if (likely(irq_fpu_usable())) {                            \
--			kernel_fpu_begin();                                \
-+			kernel_fpu_begin_mask(0);                          \
- 			asm_fn(state, data, nblocks);                      \
- 			kernel_fpu_end();                                  \
- 		} else {                                                   \
-@@ -79,7 +79,7 @@ static bool sha256_finup_2x_arch(const struct __sha256_ctx *ctx,
- 	 */
- 	if (static_branch_likely(&have_sha_ni) && len >= SHA256_BLOCK_SIZE &&
- 	    len <= 65536 && likely(irq_fpu_usable())) {
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		sha256_ni_finup2x(ctx, data1, data2, len, out1, out2);
- 		kernel_fpu_end();
- 		kmsan_unpoison_memory(out1, SHA256_DIGEST_SIZE);
-diff --git a/lib/crypto/x86/sha512.h b/lib/crypto/x86/sha512.h
-index 4e177b4606bd..d16be7c03a41 100644
---- a/lib/crypto/x86/sha512.h
-+++ b/lib/crypto/x86/sha512.h
-@@ -16,7 +16,7 @@ DEFINE_STATIC_CALL(sha512_blocks_x86, sha512_blocks_generic);
- 			 size_t nblocks)                                   \
- 	{                                                                  \
- 		if (likely(irq_fpu_usable())) {                            \
--			kernel_fpu_begin();                                \
-+			kernel_fpu_begin_mask(0);                          \
- 			asm_fn(state, data, nblocks);                      \
- 			kernel_fpu_end();                                  \
- 		} else {                                                   \
-diff --git a/lib/crypto/x86/sm3.h b/lib/crypto/x86/sm3.h
-index e06d4a22e4fa..493887838888 100644
---- a/lib/crypto/x86/sm3.h
-+++ b/lib/crypto/x86/sm3.h
-@@ -14,7 +14,7 @@ static void sm3_blocks_avx(struct sm3_block_state *state,
- 			   const u8 *data, size_t nblocks)
- {
- 	if (likely(irq_fpu_usable())) {
--		kernel_fpu_begin();
-+		kernel_fpu_begin_mask(0);
- 		sm3_transform_avx(state, data, nblocks);
+ 		aes_gcm_precompute(key, flags);
  		kernel_fpu_end();
  	} else {
+@@ -527,7 +527,7 @@ static int gcm_setkey(struct crypto_aead *tfm, const u8 *raw_key,
+ /*
+  * Initialize @ghash_acc, then pass all @assoclen bytes of associated data
+  * (a.k.a. additional authenticated data) from @sg_src through the GHASH update
+- * assembly function.  kernel_fpu_begin() must have already been called.
++ * assembly function.  The caller must be in a kernel-mode FPU section.
+  */
+ static void gcm_process_assoc(const struct aes_gcm_key *key, u8 ghash_acc[16],
+ 			      struct scatterlist *sg_src, unsigned int assoclen,
+@@ -578,7 +578,7 @@ static void gcm_process_assoc(const struct aes_gcm_key *key, u8 ghash_acc[16],
+ 		scatterwalk_done_src(&walk, orig_len_this_step);
+ 		if (need_resched()) {
+ 			kernel_fpu_end();
+-			kernel_fpu_begin();
++			kernel_fpu_begin_mask(0);
+ 		}
+ 	}
+ 	if (unlikely(pos))
+@@ -631,7 +631,7 @@ gcm_crypt(struct aead_request *req, int flags)
+ 	 * section and start a new one if there are multiple data segments or if
+ 	 * rescheduling is needed while processing the associated data.
+ 	 */
+-	kernel_fpu_begin();
++	kernel_fpu_begin_mask(0);
+ 
+ 	/* Pass the associated data through GHASH. */
+ 	gcm_process_assoc(key, ghash_acc, req->src, assoclen, flags);
+@@ -653,7 +653,7 @@ gcm_crypt(struct aead_request *req, int flags)
+ 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+ 		if (err)
+ 			return err;
+-		kernel_fpu_begin();
++		kernel_fpu_begin_mask(0);
+ 	}
+ 	/* Last segment: process all remaining data. */
+ 	aes_gcm_update(key, le_ctr, ghash_acc, walk.src.virt.addr,
+diff --git a/arch/x86/crypto/aria_aesni_avx2_glue.c b/arch/x86/crypto/aria_aesni_avx2_glue.c
+index 371be2fb6469..7eece77fde91 100644
+--- a/arch/x86/crypto/aria_aesni_avx2_glue.c
++++ b/arch/x86/crypto/aria_aesni_avx2_glue.c
+@@ -99,7 +99,7 @@ static int aria_avx2_ctr_encrypt(struct skcipher_request *req)
+ 		u8 *dst = walk.dst.virt.addr;
+ 
+ 		while (nbytes >= ARIA_AESNI_AVX2_PARALLEL_BLOCK_SIZE) {
+-			kernel_fpu_begin();
++			kernel_fpu_begin_mask(0);
+ 			aria_ops.aria_ctr_crypt_32way(ctx, dst, src,
+ 						      &req_ctx->keystream[0],
+ 						      walk.iv);
+@@ -110,7 +110,7 @@ static int aria_avx2_ctr_encrypt(struct skcipher_request *req)
+ 		}
+ 
+ 		while (nbytes >= ARIA_AESNI_PARALLEL_BLOCK_SIZE) {
+-			kernel_fpu_begin();
++			kernel_fpu_begin_mask(0);
+ 			aria_ops.aria_ctr_crypt_16way(ctx, dst, src,
+ 						      &req_ctx->keystream[0],
+ 						      walk.iv);
+diff --git a/arch/x86/crypto/aria_aesni_avx_glue.c b/arch/x86/crypto/aria_aesni_avx_glue.c
+index d23fc91c0ebd..29f0aa96d8dc 100644
+--- a/arch/x86/crypto/aria_aesni_avx_glue.c
++++ b/arch/x86/crypto/aria_aesni_avx_glue.c
+@@ -97,7 +97,7 @@ static int aria_avx_ctr_encrypt(struct skcipher_request *req)
+ 		u8 *dst = walk.dst.virt.addr;
+ 
+ 		while (nbytes >= ARIA_AESNI_PARALLEL_BLOCK_SIZE) {
+-			kernel_fpu_begin();
++			kernel_fpu_begin_mask(0);
+ 			aria_ops.aria_ctr_crypt_16way(ctx, dst, src,
+ 						      &req_ctx->keystream[0],
+ 						      walk.iv);
+diff --git a/arch/x86/crypto/aria_gfni_avx512_glue.c b/arch/x86/crypto/aria_gfni_avx512_glue.c
+index e05bbeb22d4a..d58a26cc2646 100644
+--- a/arch/x86/crypto/aria_gfni_avx512_glue.c
++++ b/arch/x86/crypto/aria_gfni_avx512_glue.c
+@@ -87,7 +87,7 @@ static int aria_avx512_ctr_encrypt(struct skcipher_request *req)
+ 		u8 *dst = walk.dst.virt.addr;
+ 
+ 		while (nbytes >= ARIA_GFNI_AVX512_PARALLEL_BLOCK_SIZE) {
+-			kernel_fpu_begin();
++			kernel_fpu_begin_mask(0);
+ 			aria_ops.aria_ctr_crypt_64way(ctx, dst, src,
+ 						      &req_ctx->keystream[0],
+ 						      walk.iv);
+@@ -98,7 +98,7 @@ static int aria_avx512_ctr_encrypt(struct skcipher_request *req)
+ 		}
+ 
+ 		while (nbytes >= ARIA_AESNI_AVX2_PARALLEL_BLOCK_SIZE) {
+-			kernel_fpu_begin();
++			kernel_fpu_begin_mask(0);
+ 			aria_ops.aria_ctr_crypt_32way(ctx, dst, src,
+ 						      &req_ctx->keystream[0],
+ 						      walk.iv);
+@@ -109,7 +109,7 @@ static int aria_avx512_ctr_encrypt(struct skcipher_request *req)
+ 		}
+ 
+ 		while (nbytes >= ARIA_AESNI_PARALLEL_BLOCK_SIZE) {
+-			kernel_fpu_begin();
++			kernel_fpu_begin_mask(0);
+ 			aria_ops.aria_ctr_crypt_16way(ctx, dst, src,
+ 						      &req_ctx->keystream[0],
+ 						      walk.iv);
+diff --git a/arch/x86/crypto/ecb_cbc_helpers.h b/arch/x86/crypto/ecb_cbc_helpers.h
+index 11955bd01af1..ef0bb85a2ce0 100644
+--- a/arch/x86/crypto/ecb_cbc_helpers.h
++++ b/arch/x86/crypto/ecb_cbc_helpers.h
+@@ -24,7 +24,7 @@
+ 		const u8 *src = walk.src.virt.addr;			\
+ 		u8 *dst = walk.dst.virt.addr;				\
+ 		u8 __maybe_unused buf[(bsize)];				\
+-		if (do_fpu) kernel_fpu_begin()
++		if (do_fpu) kernel_fpu_begin_mask(0)
+ 
+ #define CBC_WALK_START(req, bsize, fpu_blocks)				\
+ 	ECB_WALK_START(req, bsize, fpu_blocks)
+diff --git a/arch/x86/crypto/sm4_aesni_avx_glue.c b/arch/x86/crypto/sm4_aesni_avx_glue.c
+index ed383da5ff46..1521587665e5 100644
+--- a/arch/x86/crypto/sm4_aesni_avx_glue.c
++++ b/arch/x86/crypto/sm4_aesni_avx_glue.c
+@@ -48,7 +48,7 @@ static int ecb_do_crypt(struct skcipher_request *req, const u32 *rkey)
+ 		const u8 *src = walk.src.virt.addr;
+ 		u8 *dst = walk.dst.virt.addr;
+ 
+-		kernel_fpu_begin();
++		kernel_fpu_begin_mask(0);
+ 		while (nbytes >= SM4_CRYPT8_BLOCK_SIZE) {
+ 			sm4_aesni_avx_crypt8(rkey, dst, src, 8);
+ 			dst += SM4_CRYPT8_BLOCK_SIZE;
+@@ -136,7 +136,7 @@ int sm4_avx_cbc_decrypt(struct skcipher_request *req,
+ 		const u8 *src = walk.src.virt.addr;
+ 		u8 *dst = walk.dst.virt.addr;
+ 
+-		kernel_fpu_begin();
++		kernel_fpu_begin_mask(0);
+ 
+ 		while (nbytes >= bsize) {
+ 			func(ctx->rkey_dec, dst, src, walk.iv);
+@@ -201,7 +201,7 @@ int sm4_avx_ctr_crypt(struct skcipher_request *req,
+ 		const u8 *src = walk.src.virt.addr;
+ 		u8 *dst = walk.dst.virt.addr;
+ 
+-		kernel_fpu_begin();
++		kernel_fpu_begin_mask(0);
+ 
+ 		while (nbytes >= bsize) {
+ 			func(ctx->rkey_enc, dst, src, walk.iv);
 -- 
 2.56.0
 
