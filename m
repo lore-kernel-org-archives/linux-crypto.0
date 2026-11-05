@@ -1,85 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.126.103.232
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793863099;
-	b=t6fiAe8pjBv8jIcb+aW1hjw5X7uJAasuqXonKdlqFaFe0PqtDmbI1oiGaLUgmCJFEx3w
-	 UxFI+xA8T1QISTHJ7UKEaVZisgOTg4kp8hdqTNjb/9clQLxRjoiIy9+P+i4H8vwa6jfd4
-	 x56jmhZ5CBMkjVikzSfU7fN8f77lJmlc/UJiFjWW4S3ZRM2N8+ozJZvtboeEUAZZG6nGk
-	 id/948PiKqcMT9wg2VDYOnEifuF/PkbXbKLsI3XaxSBkouPZU8CvSe31shRsKatQrhZsP
-	 Npl+WOXSAr+efeDX6VcMiqdukjiforSyFyzv3yXyaE/Mdb8A0JfC18tEAk13gZIB8Eg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793863099;
-	h=DMARC-Filter:X-UUID:X-CTIC-Tags:X-CID-P-RULE:X-CID-O-INFO:X-CID-INFO:
-	 X-CID-META:X-CID-BVR:X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:X-User:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=GJfuccBsESyaMktbIQtsSYOwxg6JTp+e/MYBrXLWAPI=;
-	b=1GcmRO1ksNrHUlbRpaVjcTU/1kLLNgBGc4113UlkRklRWM75rcDgrPaxClPePTEHiwJj
-	 SVUAoeQhK+Rhfw4g3/xqEb5GxYyExHlhO2briYq3CidwSXQ08fSHbS7stosqLJaNrinbD
-	 3stcHZSQNZrNUoe5LHMWQ/Sxfwqq5pGaKZzce4twXmza4LDPxc9orcdW+hzp4g0I4+9Ny
-	 glILhcxpg9lovt3VENg9zvJr+j9ka9uHhHv/IZTNPw1ZO3GqqEXd/Wfn8E1CBN+u5Z/Ss
-	 dqsh0WBmMAeuiXYq4l/S2jT7y4nBEqzGc18T314ACZoOc1k7ZbkvoMIg8vLrS98wzlA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kylinos.cn;
-	spf=pass smtp.mailfrom=kylinos.cn;
-	arc=none smtp.remote-ip=124.126.103.232
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.170
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1793865159;
+	b=v9MzO+pMuomBtSkvcQp6zQaW22oUhB6K2ki5eEVVrP3Qw1l/AAy8YdRIhF4AZqM/89Bb
+	 Y7d00DA3YEyh05GnrS079lHYS98NThjOFBLO+nM6Us8ixg2E8oVqbTTtUNyPHx3Ghr8NG
+	 xblj8jFKeq3a2IRz4mndKAYsh2izdPPX1QOm1xdo8cbqHiLBUJqyv0YKKoTMcXPmxMbMn
+	 HiMVpltGGI5slgx/49Oab+NUPmNy8Z8fUTkcRYQxbL7aI5vpfeiRbWHLl8S1D0kX2j3Cc
+	 s9wPoddRkyH18ygs0uViDN0nelyefGhnIU4XqVpHNz7iTIXUkjLAdflHY1cA0qe6JNg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793865159;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type;
+	bh=UJ312eBsn1Ygh4FvbElLwVY+HLtQNYmxjBGI04ZaxcU=;
+	b=ZVLk5lM8TXCBK8O+D/MlQSaBqncsVOyKuE/toyd7W2IODnjomoE7KfaBSAqKZ5oRqQXv
+	 1EaTYAAm7UXjW3F93J11KLISfqBzfCkEwB1/05+YhGTMijcEnFPcZdSRyQgaFAuZeTocu
+	 EFDr2plubPgj/CRCBItcn88WW2yYTqfy7RpJfth5yJ+zgHFskV/k7Ngxn7j4gcuJ9QMes
+	 EXUp6+FAttoOOtqPlxl82C+yxiNzwGBOMTOX/OboAUt2txap2V62NU6vb0eOOk2R6dZ5P
+	 M3eXcVVlyyM9xFN0/A53CRvhDDusFYpTja0qDOjqcRLl0mlwOd6LjWfhOIbUlkcs32A==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=none header.from=thegoodpenguin.co.uk;
+	spf=pass smtp.mailfrom=thegoodpenguin.co.uk;
+	dkim=pass header.d=thegoodpenguin-co-uk.20260707.gappssmtp.com header.i=@thegoodpenguin-co-uk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b="fj/Utz0+";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.160.170
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F26606A329;
-	Thu,  5 Nov 2026 07:18:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A8F26606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 09ea3350d8e911f19a56ed5b684f684d-20261105
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_ADR_NAME, HR_TO_COUNT, HR_TO_NO_NAME
-	IP_TRUSTED, SRC_TRUSTED, SA_EXISTED, SN_UNTRUSTED, SN_UNFAMILIAR
-	SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD
-	CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
-	ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:1a3d4cd5-2fb7-469d-848b-876edd21e248,IP:10,
-	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:35
-X-CID-INFO: VERSION:1.3.19,REQID:1a3d4cd5-2fb7-469d-848b-876edd21e248,IP:10,UR
-	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:35
-X-CID-META: VersionHash:7db8b62,CLOUDID:b678190c7abd29f5c4e550106320e6c8,BulkI
-	D:261105151805TSDO90KJ,BulkQuantity:0,SF:10|40|66|78|102|127|153|865|898,T
-	C:nil,Content:0|15|50|99,EDM:5,IP:-2|1,URL:0,File:nil,RT:nil,Bulk:nil,QS:n
-	il,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC
-	:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_IBB,TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 09ea3350d8e911f19a56ed5b684f684d-20261105
-X-User: leixiang@kylinos.cn
-Received: from ninol [(116.128.244.169)] by mailgw.kylinos.cn
-	(envelope-from <leixiang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 635666650; Thu, 05 Nov 2026 15:18:03 +0800
-From: Xiang Lei <leixiang@kylinos.cn>
-To: 
-Cc: Xiang Lei <leixiang@kylinos.cn>,
-	Wei Liu <liuwei@kylinos.cn>,
-	stable@vger.kernel.org,
-	Laurent Vivier <lvivier@redhat.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Michael Bommarito <michael.bommarito@gmail.com>,
-	virtualization@lists.linux.dev,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] hwrng: virtio - fix copy_data() handling of partial reads
-Date: Thu,  5 Nov 2026 15:17:33 +0800
-Message-ID: <20261105071736.65932-1-leixiang@kylinos.cn>
-X-Mailer: git-send-email 2.53.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026B6606A337
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Nov 2026 07:52:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 026B6606A337
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thegoodpenguin.co.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=thegoodpenguin-co-uk.20260707.gappssmtp.com header.i=@thegoodpenguin-co-uk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=fj/Utz0+
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-535179e995bso15807361cf.0
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Nov 2026 23:52:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1793865153; cv=none;
+        d=google.com; s=arc-20260327;
+        b=Ta3SqmsEQ0BStlcKOSQ1PAeBIpoCwW9lhRKrApynkI1WJG3AEG+mkBLEWA0n///wK7
+         RWZyzXQdg0ny85uUJBR08700p+kOThx9uL0uUF3zss2MOMk42EjxhjROd71YGU4uzBdn
+         cvP81JxagYzofyLFEHndYHTZvxqgWCUl3SbFtWHpa3QV1CnV9YIt7DaeuYbN9py87AFH
+         VmiNIut/OVfYWi55OFDhtQMiqXTizIQOH5skjRKB88uDtNemLREzgzDXaGAtZLp7os4e
+         wbWTx6uX2JT13w6UQ51jrY+DqONPCHbdPurGIczoJcjTACIR3hjYRbaEqLb31WjA0HMk
+         fTqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=UJ312eBsn1Ygh4FvbElLwVY+HLtQNYmxjBGI04ZaxcU=;
+        fh=5uOkUWVqFIA7Ft2uOtqkwaec+PN4XeCX6PD+j0hxJvM=;
+        b=LklY33KfLtYiD+XL4/H/iTq/iX6REON/Z96tDL3ozL1cqLDnbvt0HKB9uAlFdcf+ze
+         vwHN4U4Nb+AmYVb0s1RiVEZJbDp4O78j2K909z4RJdJ6M4CRgAbrQ+sXfrLQyFAlNPrL
+         6w+2L56b+hGhe8h3yJlxKLieBf2FOKY5uLHHMqPBlCckd+gOeY0SsvHIsxIXix+ROkm3
+         F0SOAHkr1n3KdMmEYLlgcjMkwho3yP0GjYeKxtRjG3TnW54DvCqGIGG//BSlfBZOUM6l
+         4ZdMFtSJ9+Nak76iOS6hRNfRVTLMp9etanhE13rYym1Zz/oqFu7hPgdWB/i63ZhkSdFS
+         WLdw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=thegoodpenguin-co-uk.20260707.gappssmtp.com; s=20260707; t=1793865153; x=1794469953; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=UJ312eBsn1Ygh4FvbElLwVY+HLtQNYmxjBGI04ZaxcU=;
+        b=fj/Utz0+Y60yxuICoU+fCjL6rWSodnNW6GiJHpZFeQ+K2c9r1QwILznm9v34n66don
+         oJmzfyvtULO2tr6wY+lSqq6zbRaU/rDDqXMmthU+VRX3LXLjyEd+frpxnTny+Zi6Bl40
+         5aZFwvUXnt+aJD703LqQYGi16cJJa/n+KXmo6ZTgZv0HO08YeC/iQQlgbb6ehBs74UJC
+         MqOimmMyxrchQL+wAPHSdoYvcUvNohjaX/Wfa4A3hfbTpbjwXam50XCSlFCHfrdVIki0
+         zQQ45uBjHZUMzFHITfSuog9dfvY/WAx1yFsc7j/TyUIyCNISIizr7gkGXBMA7YHDjJzJ
+         AWaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793865153; x=1794469953;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=UJ312eBsn1Ygh4FvbElLwVY+HLtQNYmxjBGI04ZaxcU=;
+        b=BC4sV5JJpV43S+AwkcVlKVyD8w7KfsPwe87uto99Czd9CmqVAwLBGmmq2+npZAHGMj
+         g23SS5oz0QpBNhZtVXvOMltuneLMa7TpPNDuodpLkK2C4227PmnPDTEGC4pK2wi+ZU3d
+         7qrDMFsZWYhq9epxtGoRLeXUX7/iWJS6Qxj4sKW4JgDalUvZQenrOE2blMvjkvRnJ4Cw
+         3/57Sfye8KnrSJ8gDy3Swm22/lsoQJ773RAGoh1qahirvgPXttgtKRdWM5Eal/w2dG55
+         ROTckwQBulkXnYQVvjzUxlVb8dPBGc2H00AV6g0sCWL4xKRVmikEFyN9xJHmccxrYvKq
+         cqgw==
+X-Forwarded-Encrypted: i=1; AKwUvBzxeB8w+Nk5C2vI4IHrxb37qwzheDh76KR6B2so/0OWf87lE0PlbSW3JpnIkRilfqMPOyTu96hnxv+yAjc=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/R0exdd4VlZ6iFaAhCF/b1eIaDLenhtrkgh/Pv4pHJJqwfghmw
+	9cUniWE/mUFDI5f6aWP9z1+9kPCArM/INC69vwBZ1urzJ01MxqVjuaSuH1Rpvwcvxf6WaLpC6Le
+	KYi0ZJ5DYZIunXVpF1VeLg09zn+Tz2LDozab6Zx3m5w==
+X-Gm-Gg: AYBFou1rkYrPckHmuY7owbYuQno/GXCvKhUrLryyQ7Y3crEF5CUClkaaA/1B6RSk0v1
+	n78BK85409UMy6+o/r4fpUTFHclIDST/I/DnaZgyzEs6u2Hj/sVuJBhDiX/NrjZF8XtIqU/bLng
+	bEhZTzL6oy+gdtTvA8F5YCNCWjG6jMXEqq9sLN1nSQ/rzXhkFGTlW2LbGx7NY5oQPS+Lg6IlZ2n
+	yMDhQTLn4ZZQ0VMPvLezYX1/rN+EDj3qMaq5aRSrhUi7FG9Ag2wh2ksb39gxuBqNduNYCoS6v87
+	vvELXV4QVmQjMAhO/espG7G8emHlyNdsIN+tQv+4LnMsaF7L0jIHDaZjB3Dg7W7Wq0/Lm26lkZX
+	Vzri6AgH4rlLBOt6T6RIXbY5IoAEaaGdYvrtiN99Smkw1PtwPR7Mop3eza4dvfoF30xhofC5MmF
+	+cixaCiD5VmKG3Od7T
+X-Received: by 2002:ac8:5e14:0:b0:536:79aa:de06 with SMTP id
+ d75a77b69052e-542b781c097mr305348781cf.52.1793865152881; Wed, 04 Nov 2026
+ 23:52:32 -0800 (PST)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -89,55 +104,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261104-acpi-mfd-v2-0-64b9dee3baaf@thegoodpenguin.co.uk>
+ <20261104-acpi-mfd-v2-2-64b9dee3baaf@thegoodpenguin.co.uk> <auulmL-HXdzcdM2V@ashevche-desk.local>
+In-Reply-To: <auulmL-HXdzcdM2V@ashevche-desk.local>
+From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
+Date: Thu, 5 Nov 2026 07:52:21 +0000
+X-Gm-Features: AclHuK8oxaHoF3EiK88-RObp0nE6JLTdIkoUzrIpdnanDmHfkYi6XSLOF6A9rt8
+Message-ID: <CAA6zWZKk9C_PnZKZueYYCT=XHcQA7r4SPM4MK8zWHLyYuxS=Uw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] mfd: Use named initializers for acpi_device_id
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Lee Jones <lee@kernel.org>, Chen-Yu Tsai <wens@kernel.org>, 
+	David Rhodes <david.rhodes@cirrus.com>, Richard Fitzgerald <rf@opensource.cirrus.com>, 
+	Mika Westerberg <mika.westerberg@linux.intel.com>, Zha Qipeng <qipeng.zha@intel.com>, 
+	Qunqin Zhao <zhaoqunqin@loongson.cn>, Thomas Richard <thomas.richard@bootlin.com>, 
+	Andy Shevchenko <andy@kernel.org>, mfd@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-sound@vger.kernel.org, patches@opensource.cirrus.com, 
+	linux-crypto@vger.kernel.org, Charles Keepax <ckeepax@opensource.cirrus.com>
+Content-Type: text/plain; charset="UTF-8"
 
-vi->data_avail is decremented on each read, so it holds the remaining
-bytes rather than the total length. Subtracting vi->data_idx from it
-again in commit e3046eeada29 ("hwrng: virtio: clamp device-reported
-used.len at copy_data()") undercounts the bytes left after a partial
-read. This can leave vi->data_avail nonzero without queuing a new
-request, causing virtio_read() to hang on have_data.
-
-Clamp vi->data_avail to sizeof(vi->data) - vi->data_idx instead.
-
-Fixes: e3046eeada29 ("hwrng: virtio: clamp device-reported used.len at copy_data()")
-Tested-by: Wei Liu <liuwei@kylinos.cn>
-Cc: stable@vger.kernel.org
-Signed-off-by: Xiang Lei <leixiang@kylinos.cn>
----
- drivers/char/hw_random/virtio-rng.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
-index f9982217247d..a3392f7e2d8c 100644
---- a/drivers/char/hw_random/virtio-rng.c
-+++ b/drivers/char/hw_random/virtio-rng.c
-@@ -70,7 +70,7 @@ static void request_entropy(struct virtrng_info *vi)
- static unsigned int copy_data(struct virtrng_info *vi, void *buf,
- 			      unsigned int size)
- {
--	unsigned int idx, avail;
-+	unsigned int idx;
- 
- 	/*
- 	 * vi->data_avail was set from the device-reported used.len and
-@@ -81,13 +81,13 @@ static unsigned int copy_data(struct virtrng_info *vi, void *buf,
- 	 * steered into adjacent slab memory, including under
- 	 * speculation.
- 	 */
--	avail = min(vi->data_avail, sizeof(vi->data));
--	if (vi->data_idx >= avail) {
-+	if (vi->data_idx >= sizeof(vi->data)) {
- 		vi->data_avail = 0;
- 		request_entropy(vi);
- 		return 0;
- 	}
--	size = min(size, avail - vi->data_idx);
-+	vi->data_avail = min(vi->data_avail, sizeof(vi->data) - vi->data_idx);
-+	size = min(size, vi->data_avail);
- 	idx = array_index_nospec(vi->data_idx, sizeof(vi->data));
- 	memcpy(buf, vi->data + idx, size);
- 	vi->data_idx += size;
--- 
-2.53.0
-
+> Haven't I given the tag for Intel PMIC drivers?
+No I do not see it, the only reply on lore and in my inbox from you on
+V1 is re splitting the Intel LPSS.
