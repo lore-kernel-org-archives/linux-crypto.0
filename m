@@ -1,96 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793995474;
-	b=xxx06Fe1OCgiY9V8IlcQQxhMv5RX/Iu1+ayQRXOeFJKhnHX9ChVL347pVdzY6RrQS2QX
-	 wdV5kzJQMLq3I4ZL6ZUKOvuE8W6kt8JAezD1pjEZZFsRmLqH4nbF9jsEJEJQi9tqRpOuU
-	 8zW/jMKAJBUu3WuGo2Pg1e4ThmzViXdL4AdQO36ZIJ3UFnOSrHFpKVl9MHKpxJo54NLia
-	 DB2UiW1vRRQ8NpZ0oAZqE/7wmHNuMiUqQtupSnuDh1uNCj798hgqrp05zv1v3vEHP5gJU
-	 ZxrL1IcLJqjeKMO1ZGvsq7426Vq4rhpsmTpN5+vuKKNReBJksYK8IeUzjjQ3RcXRi8Q==
+	t=1794009592;
+	b=2Hb2rGZWQO0QHMwMVAOIrK1fom/g/Jlf8c+O0EbKrttwqwk0fQJNG/hYbhf+KOtZHcS7
+	 n1Lh0ZrkYc1+/tWybD/Ct9SUxlGsM7+z8fxwzJAVl5IKqTnt0JlGaS/mxN+3X9AkzevCK
+	 VOCTQ12ZO3oTH24ru8LcysN+6okQWg/vNWxdS/+cYKohVcvWskXgB273AQ8KqnZ9BrtX/
+	 LxjHBZVn6wQU7e048T9tYEyC+o59bkRel+XcpCOKi4j/mom03fWH6z9N62vsuEkkVRZgl
+	 LTccecNg541WA+sFiZ2t8Ktli9SQDZ3I3yj8vw7DDPK8Ds3OzT1O1zkLbn9FJKLnhnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793995474;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=qdzzuDHKyfn9MEDqIa+4Jje9jOJuwPCdKzFPnU5vUZU=;
-	b=TJ8axmXislN0w/Fi7AvHFfyjBPyZ8A8LCBCigRpMYtuE8Zx5HcUgmvinoDx3n4mDo3+c
-	 epd9vCWM24ikOqo/O3ciLlwkS+z4zXuy/eruRTjHOR7AyDHfYJwcVHZvGVxVmspNcf9SY
-	 dfFiy7luxOLNO1fdVRtKBBRld8slysrKRivhumT+k+cQPEH0dw+s08If7QqIs4aLbHp51
-	 i9cNV4bTbyyiFBYECfwjdEqAaIx6D5bwz78PjimTnSMpsM4IZ4Nu7YdgkV38lQObkQG1D
-	 Mz0clcLlJ+8SjzNeZJY171YW8v4WSKtRcBlLi/ffLhGrfGijyw8ed+MUAN0AwIiy6KA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794009592;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=kSvS5npMsYGUescqYNHuwns+vY8BLGHpBcdfwZNgI9Y=;
+	b=ky63OViHFRmwwq9wwlT8c9CmPgrd3xoe1Qca+TO125zSJPlwX78CRaUBAvaGR9OlPu/F
+	 IvDYHgOohebdbp8pOKj0TmCtsG9aA86MAQMesqTqG56bYkf9FzMCJupUgLyPoyzwKzfO5
+	 4v98afW1l9wFojkC09Qv3cvg0jA7k26oMFhcJfDhgrFPYjoWzyqCsbTZJ/BwGXItM5Id0
+	 hHvB8vz9nRBHtXy3ONjD2vb4RAgjxuIBINBvBsdDxL7VaxZTxqOJumlqBuqt+tWB0tbqk
+	 A8DFr7Mn68887i+PIWnhXr1Fq1O8zT/sqNeRbHA5aAN89e3EhuKWHfibtSFSh0GdOQg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0EaSKAHq;
-	arc=none smtp.remote-ip=209.85.128.44
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O+UuiM0f;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98463606A329
-	for <linux-crypto@vger.kernel.org>; Fri,  6 Nov 2026 20:04:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 98463606A329
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3C8606A326;
+	Fri,  6 Nov 2026 23:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0EaSKAHq
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4a4d7ae1ae9so10441595e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Nov 2026 12:04:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793995473; x=1794600273; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=qdzzuDHKyfn9MEDqIa+4Jje9jOJuwPCdKzFPnU5vUZU=;
-        b=0EaSKAHqfT6MH8ZkinKIWE9zvrSc79drozCAYUhfgwN1m4IXV5z8n7RslTiGPtjbks
-         8vK9vNKjmpB2vCiu82GrSYnB7PriyUI9woE+kdH/u1SeQ6RDamBgmFLd3Q3y6RWgAYpL
-         gmxNBdiPLUIC9Iq9auW8I24skXfVqMt1s8SVEl5yAEoY0A/eN2BAwW7kWLtmS4SMKYau
-         6RTbon4zvOqZi9yMA+4XmSKUmzQReJL1OAEaiOteb/X1HYQoOIwIMqUPcm1S8w/mM2SU
-         tMZhlgkHK0CHkJKjkLF+F+7KNVaEUCCaTOShURJCGPeygCU6Z11sKRGrVyg+Xz7e3+Ob
-         yz6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793995473; x=1794600273;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=qdzzuDHKyfn9MEDqIa+4Jje9jOJuwPCdKzFPnU5vUZU=;
-        b=MhNJEGar2ClUE6aRitN2DWRLNmM6lhjLOl9r7X90h1pIBCRZNL0PEGoYIyFvRYD0ty
-         TrnQ+FhQAjaQyT9aVwP3I+V6/ajs5Se/SxpWuEdYzpDbuDuTyr9RNjgLVtvIE2LhEQ8j
-         h7a8VTa8SZv3RFPkxLu1yuk4dIINDZUHCSMNQv/vXAWB0wgfeslDZO6OU28RJQE/c+Q+
-         XMoOvYbp2PZiPodiHkUH9ZkQxjlqyJ5+q3Y5jHpw7jz26j8TKLpdZQWs/ZtPYR9qqOZF
-         GzVgRlTGc+GSo3tHuMROl4JMvJUXcHOHGJwVF6qYHgKK7sCuBVACdPbVkcivJuz7e0QG
-         UX7g==
-X-Forwarded-Encrypted: i=1; AKwUvBx2OmemBkanMf8ncEr4PmKYpqmmKdEYH67ID7ZA5yRhGRqGbfKWKqU/a/HPrisDQGkJNL5yo6+AaXpJr4w=@vger.kernel.org
-X-Gm-Message-State: APuU4Z98gr24tfLh5Ly/0kP8sf3r7qj/z9fB1V0AnVvWQwj0NHE5VIU1
-	uUJUnfBNg0GKRx0F1x4cXMVmP4Ki+iStmteRrEueEVYO+6PL8XdWMAmY
-X-Gm-Gg: AYBFou3w+L9S+WoZLzky+m0uGvpXyvxe+jQ7eHF2Uu3rTNIif3d3WSqdnhrMhgZH3EY
-	C4BKfUtWya+vvaYbN3T9Nxsiqr/njRLl1e684IdI3m20NefsnMCx7PXPKt37eBa7a4UHPrtIHvZ
-	Y5IgArazlcrezcifVa1HXouafGEOrK6sQ5FjFbBaivmP/Mg23+b58djYxuHP3XF/7bcFp5KG1IJ
-	VbN+rb4tgKGXiKAiVmKQ4IbbkTYBn53hNMw9thOz5mf+ofTb3V5BIGNWEnwV2YIyzXwwQFRqa12
-	oL7vcpTtizZgTuHkH/QjUdYMeBLypqe4LlUc7Rsqw0k68Iz74CvhiCSR95Zd8Kq/x9ynokoxqhr
-	ycOSn/bSE1eVveHxS2yhkQnGs1aJYBQ9sby4h3BybJ8nD7cu4FS8vkdfDxv7QmiYvs4aSrF19AD
-	qUnWEe/bBraP0bbmKsuwOFJaJdFHyKu8sUCz0plKlD1fIivHtmOwzhOjLNoJUT5l7azkV6b7WZS
-	N90KHO/i+nDfLBKiARu4/yLyzmXdv1NkTp2xpgPtfUrboGauhFAoju4H91A4WzUEAgR67ahJZzy
-	zeotp1JrPVPyfn4fz0Zhg1f8s0uCUIWrwLloSA==
-X-Received: by 2002:a05:600c:3ba0:b0:4a7:a5db:a93e with SMTP id 5b1f17b1804b1-4b6db1c5f48mr71249715e9.4.1793995472786;
-        Fri, 06 Nov 2026 12:04:32 -0800 (PST)
-Received: from fedora.domain.name ([217.218.152.94])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4b76cbdb9cdsm16959195e9.1.2026.11.06.12.04.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2026 12:04:32 -0800 (PST)
-From: Muhammad Mahdi Amirpour <ampr.mhd@gmail.com>
-To: ampr.mhd@gmail.com
-Cc: dhowells@redhat.com,
-	lukas@wunner.de,
-	ignat@cloudflare.com,
-	herbert@gondor.apana.org.au,
-	keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v2] pkcs7: Return -EOPNOTSUPP for data-taking algorithms in pkcs7_get_digest()
-Date: Fri,  6 Nov 2026 23:33:56 +0330
-Message-ID: <20261106200423.37769-1-ampr.mhd@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O+UuiM0f
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01B601F0089F;
+	Fri,  6 Nov 2026 23:59:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794009591;
+	bh=kSvS5npMsYGUescqYNHuwns+vY8BLGHpBcdfwZNgI9Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=O+UuiM0fK4oR8EZ2meSl5yH/TC+kEPKIlSb/W1Vwccx2Z1x/oaRBC0rUxhzH3Q1FI
+	 wRyLE3mJycmci5fqln5NuoRHSLuj6uxKspkUt30qVSe6ZMLC2t0HcSDa1QCk6rmUKv
+	 5/lxEFfmz9oieM+b0kn/ggjdQzHdPIreM/pACSH1F7tXbDeuJH50ISgWKKLkxqOgN5
+	 DVti3roP66ChIWz4VIi8l2vpKFLkTPWljvM1kRxcKDPLo7BRWmAUjYmgKQi8KzBLX/
+	 9JTm2A0Xd7dQPFJbfWN/sa7XazXvjBwFWbXK2Yf5UM55JxgnYaFUmLkHKXzbUi8eSy
+	 MAbKibWYgvpeQ==
+Date: Fri, 6 Nov 2026 23:59:49 +0000
+From: Yosry Ahmed <yosry@kernel.org>
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
+	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	rientjes@google.com, willy@infradead.org, senozhatsky@chromium.org
+Subject: Re: [PATCH v3 0/8] Batched zswap_store() framework with compression
+ batching.
+Message-ID: <au5l3KEjG_mri-br@google.com>
+References: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -100,68 +59,67 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
 
-pkcs7_get_digest() is documented to return a digest for IMA to use
-when verifying a modsig.  For signature algorithms where the public
-key algorithm consumes the raw data rather than a precomputed hash
-(algo_takes_data, currently ML-DSA), pkcs7_digest() does not produce
-an intermediate digest.
+On Thu, Nov 05, 2026 at 11:24:04PM -0800, Kanchana P. Sridhar wrote:
+>  =============================================================================
+>    usemem PMD THP BPFTRACE
+>  =============================================================================
+>            Baseline           zswap           zswap          Change    Change
+>         mm-unstable           store        compress            with      with
+>          10-25-2026        batching        batching        compress  compress
+>                         (patch 6-7)       (patch 8)        batching  batching
+>                                                                (ns)       %
+>  =============================================================================
+>   zswap_store_order0_folio (ns):
+>  =============================================================================
+>   p50        39,631          37,538          37,765          -1,866    -4.71% 
+>   p95        53,088          49,690          49,349          -3,739    -7.04% 
+>   p99        65,065          63,529          57,404          -7,661   -11.77%
+>  =============================================================================
+>   zswap_store_higher_order_folio (ns):
+>  =============================================================================
+>   p50    21,460,366      21,201,411      20,383,233      -1,077,133    -5.02%
+>   p95    25,975,341      27,558,253      25,045,350        -929,991    -3.58%
+>   p99    29,538,493      61,926,648      27,184,835      -2,353,658    -7.97%
+>  =============================================================================
+>   zswap_single_compress_per_page (ns):
+>  =============================================================================
+>   p50        37,545          39,320          37,218            -327    -0.87%
+>   p95        51,549          66,503          51,481             -68    -0.13%
+>   p99        89,866         134,854          87,091          -2,775    -3.09%
+>  =============================================================================
+>   zswap_batch_compress_per_page (ns):            
+>  =============================================================================
+>   p50                                        40,493           2,948     7.85%
+>   p95                                        56,944           5,395    10.47%
+>   p99                                        76,242         -13,624   -15.16%
+>  =============================================================================
 
-When such a signature has no authenticated attributes, sig->m points
-at the raw data and m_free is false, so the existing check rejects it.
-But when the signature does have authenticated attributes, sig->m is
-an allocated buffer containing a modified copy of the AuthAttrs and
-m_free is true.  The existing check therefore returns that buffer to
-the caller as if it were a digest.
+As with previous versions, I cannot reproduce these results. I tried
+with a QEMU VM on a Cascade Lake host. I saw marginal improvements with
+patch 6 and no significant gain with patches 7-8.
 
-Test for algo_takes_data directly and report that no digest is
-available, before attempting to call pkcs7_digest().  This covers
-both ML-DSA cases consistently and removes the now-dead m_free check.
+I noticed that you omitted high-level metrics (e.g. throughput), I
+didn't see significant changes in throughput, and I also ran a kernel
+build and saw a small regression in some cases (probably with order-0
+folios) and no significant improvement otherwise. Even if latency for
+some functions does improve slightly, it doesn't matter if it doesn't
+show up on higher-level metrics.
 
-The only in-tree caller, ima_collect_modsig(), does not check the
-return value of pkcs7_get_digest(); for a data-taking algorithm it
-will now leave the digest fields unset and fall through with no
-digest, which is the correct outcome for an algorithm that does not
-produce an intermediate digest.  Callers that do care can detect the
-new -EOPNOTSUPP return.
+It could be the difference in setups, or the overhead of bpftrace hooks
+for zswap_compress() might affect measured zswap_store() latencies, as
+you will have fewer zswap_compress() calls with patch 8.
 
-Fixes: f3eccecd782d ("pkcs7: Allow the signing algo to do whatever digestion it wants itself")
-Cc: stable@vger.kernel.org # v7.0+
-Signed-off-by: Muhammad Mahdi Amirpour <ampr.mhd@gmail.com>
----
-v2:
- - Add algorithm name to the pr_notice_once() message (Ignat)
- - Add Fixes: and Cc: stable tags (Ignat)
+As advised previously, I would trim down patch 6 to the bare minimum
+(without all the scaffolding and prep work for patches 7-8), and send it
+separately (with patch 5), and we can check if it's worth adding, I am
+still concerned it might be adding overhead for order-0 to be honest.
 
- crypto/asymmetric_keys/pkcs7_verify.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index 474e2c1ae21b..c2e0eda502e2 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -147,14 +147,15 @@ int pkcs7_get_digest(struct pkcs7_message *pkcs7, const u8 **buf, u32 *len,
- 	if (sinfo == NULL || sinfo->next != NULL)
- 		return -EBADMSG;
- 
-+	if (sinfo->sig->algo_takes_data) {
-+		pr_notice_once("%s: No digest for data-taking algorithm (%s)\n",
-+			       __func__, sinfo->sig->pkey_algo);
-+		return -EOPNOTSUPP;
-+	}
-+
- 	ret = pkcs7_digest(pkcs7, sinfo);
- 	if (ret)
- 		return ret;
--	if (!sinfo->sig->m_free) {
--		pr_notice_once("%s: No digest available\n", __func__);
--		return -EINVAL; /* TODO: MLDSA doesn't necessarily calculate an
--				 * intermediate digest. */
--	}
- 
- 	*buf = sinfo->sig->m;
- 	*len = sinfo->sig->m_size;
--- 
-2.55.0
-
+I am questioning the benefit of batching here without HW batching, so
+far the results are more concerning than encouraging. I already spent
+too much time trying to reproduce the performance gains. Also, sending
+new versions without resolving discussions on previous ones is not
+really productive.
