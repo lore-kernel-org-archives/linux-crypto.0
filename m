@@ -1,115 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=210.118.77.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793976208;
-	b=Iy+LMvh/NYk/7ULarJpQSSCM3zh6QviVWQJbQBtms02sfuLNMbJyOMpvfCjWpEwc78YW
-	 mqb+Sz4gBlCADyyALiFhDjl37YBIJs8VfQEaLm2U7Cr1eUhEINAmPDwwRcJpd68s70Ghf
-	 3pBv1N+rGU6+7kEY6UakXBehxG6WRic98GOoR4D1c6NJ7C8RE0sA4MUs+EAieCTQKdlXn
-	 AhoZB/qPzWPGIsQpuFlCQvxLlTOkABCdI+OY93SlYpLriVWW2nnQt7pBmuzwXPO2EZ1VL
-	 IifoPqzQM3UaU2Fd6xUqlHV51IDcyzZdCpGWeLc9EppgGoGfYBc8ePmHKVzrf8LPZGQ==
+	t=1793976196;
+	b=25BGW0zOb8LzWPLs0VwIWxq9E0CeqF6VSsFasT63WhtXfxXldpQveZrdgfbFcEYizM1+
+	 ssUciloTqUkDc2wLINDmzmWa4FjAVLMuIrbOEg5UlDZmG02byh+Pr9LmTdw3k6h6d/slH
+	 ryFVUmTMsz8UpgMCY0tyIH5vfMa3z71+0tAsu+n16y8Q8ZkTv2O+PpX2gTcRjgw9Q19lX
+	 hFHnewSsDtDbH0TEmvJpQ/qwrux6ZKY9urpyQ0RbEiwtHeEBeUK/gHE0IUD8XovmkTZnY
+	 iI78TNaCH9k2wWjUxjwIMdAJ4vSrXj6rOk2zwZCw/8+UdkVvgCLMx2iU4NMoodJT8lA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793976208;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:X-Google-Original-From:Date:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=1coO61O9o20KGfWhe+U/6TV0ZY/FeV096v+PDZIBmoM=;
-	b=n7HFgJbxawi3kL0QGx814wtYuOM4m9Dt/Pk+GC0UZXWwpnGCQCPjH9t34Ev1NV7N2YDe
-	 DRKJSlsRoOAF2Gnstb0w0UEiDlVw28a9DvzrreXiSBKgL2jLdu4w/SYGYjuzgDoHbE0mq
-	 ZQ+v/L2ConZjB65cODyJt3tQZVk0cfEWfc3vOPfCZw66kods8aQJ05BYVLh3V3jwdh33w
-	 5UO3GMr/WmyHLN+Footzwu3N7SzCRvOw5/b+9hRvLSR1wSZ+ZZOWBJC3+m66MuIUY5sZ0
-	 /wHqxsc0HpKiRqTUndcpCOztfopSRNn8uQLQE4asCenuMmNTZ490JWjUsCOAQp+5L5g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793976196;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
+	 From:Date:Subject:MIME-Version:Content-Transfer-Encoding:Message-Id:
+	 In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-CMS-MailID:X-Msg-Generator:Content-Type:X-RootMTR:X-EPHeader:
+	 X-CMS-RootMailID:References;
+	bh=up0bypD0w4MbuxMJmbcYp1qKVPmLDXcUCmPyh+TIxbU=;
+	b=Ag7LHQv4ZNVTbjspj8co09gw4TMYLLbkjJBVp7Sf7s+PYGe9no9lZuflKF2+gFhgQmdN
+	 BfgBhmDBUAeeG+g9G6qSCoNLlak55/eKlxeulWeshNges2C3aJYGcYo+EJuPOjIKvv5NG
+	 35KXLSzxp0YEd9mVTaf6MNZLK0HD/YcvCf7MHqHcXbSYkNMQXI3I2Ov8vHJ1CC2C6ENQz
+	 D3VSL47twhqqi0Sv8UXffxt4OAIfdsrTp5TjmcgLswDLW+zWwDimHptzRgVCchMvzkR+G
+	 GLAITpBkCRKwzPkdScwKQJymkf9d9cOzqckOlOfWKtJqp+P4h/9UCuMnqwq8NO+AT2A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dQ8Kjz3P;
-	arc=none smtp.remote-ip=209.85.208.50
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=samsung.com;
+	spf=pass smtp.mailfrom=samsung.com;
+	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b="n13D/HUQ";
+	arc=none smtp.remote-ip=210.118.77.11
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8243E606EEBB
-	for <linux-crypto@vger.kernel.org>; Fri,  6 Nov 2026 14:43:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8243E606EEBB
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364AB6083620;
+	Fri,  6 Nov 2026 14:43:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 364AB6083620
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=dQ8Kjz3P
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6b58cb69927so2170934a12.0
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Nov 2026 06:43:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793976206; x=1794581006; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:date:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1coO61O9o20KGfWhe+U/6TV0ZY/FeV096v+PDZIBmoM=;
-        b=dQ8Kjz3Pm/40Y6QK+wnykiNHDgz7dKP607sj6/+hqieIq1ZmyilklclOYXjWaBJyZQ
-         wigV9r8VouxbEKE9QgPdw1VpSrB3xLnotHYSSNbzuz878AnRPuvoVHRTNcqgEq7hLDnq
-         EBy4H5xYRegGJoTvMOlxOYRVq93ULaPKtOQBRtm4a5TxD5b5qxrLBPFkjRnIHAg/fRo8
-         SPdaU35rkr0LfaG3/AS4/PMkK2BSbubxBavooY3Ygux0TcvwzrklGLkuYTCBblRoq/9Q
-         wGBWvVpbu/YmDkyrFWrcQ9+Xr/vMo02AxG7ipmZa006A9g2kUtdIwncG4kcQ9DAOguTO
-         Q3Kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793976206; x=1794581006;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=1coO61O9o20KGfWhe+U/6TV0ZY/FeV096v+PDZIBmoM=;
-        b=hvxLS9lwvLzM2ObKseEj1dy686GEi9K7HWzrHKMMIUtsM2IbhDf0RhJg4I0BPS4j8X
-         Ae9bxxIxvBzPbBmAg4/LeRZOhkjTaZMvPQtNJpADKaRzHQViEGSDxL0AzEWpTQy5Bgbu
-         W+/VLe0jGSK1I42VL52v6oWLssccuH5jEa34yV8DXVNs8JrbTrsD2KtYYPYkuLi7lUMj
-         0RC7N+JDnI/yGRylScHY2uDArObVE6oWZr7YX+cVT1eMtowptxq4NeL6WjBj9+OfWlyK
-         lxaLXmg3AF7W9awQbwbpEhSz8RcjypU+WvH7EEGlX8ObPe/mR4U+2/hN3cD9xJ4gvhlI
-         gZ+g==
-X-Forwarded-Encrypted: i=1; AKwUvBxHSG8Wgu2Xf5Tlibqu9sNbUvWgG0GdL5kKCL4op3PZ6G+46Uzp5ucybEB75vGi3uSYqOwEoTh6k6KQnEY=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9FNXDyR6KYEV/XjyCP74gN+k5aRJOYaBx5fIj4yY0AdsepoUIO
-	SvMFoALdT+3UFXiswIJgnoOqRdPmxm7Nj7xGi7uGqsmZusFR3baX9Knm
-X-Gm-Gg: AYBFou2ZTnuNO71yll0OmBJ0FPpFGB9RaiNDXt+GUWmFLx8/Kl6EcMA0RoWZbKSRkKk
-	YEjuapZwJ2PbTHypqBwrK84uNYoUPfjkPdzkEmwefp/+m+/DHeZPD1jR+CjfxCyDfncieFeuGyn
-	a2qBWxRbN3AJuW88EzFmER2nZ/j8vn5DEQ8sqh3hJ48QaQuRTI8P9MnjEx4wxRMjfdGoqscTr5I
-	Nhmuy4hkvxks7p7cI1CiougRDxEfF2eJLTnqLium0W39Xlpde5brPx3U/TqiwOyelXMTLochr92
-	XEtrJIGv/HD2zTPBlOTdOyh9gGMMI/irSz9BZwmnRyNAzSTu6RxwB17O77r6rBfOBpgM9BZrCy+
-	3405FaGq+A70Vzrhx1hZ6oA/sF6y5XdM0lrOmnMBjBXxLEsiMx6PTCLtmuKsFT3R2OrkmTg0JxH
-	XsiflrQ/SXgvrlXbmvTv5B/nMejWsdeH7Fg5G6bDijNe5Ky9j8efLyqhMxoLPR78zaU2BRR1yBs
-	fENISX76ty4eI2GIgCgZpWPL9mjMMDSERzN42f2ZGlvZdKW+osB4hvUf0IwSSXx6e6+
-X-Received: by 2002:a17:907:fdcb:b0:c2e:616b:6763 with SMTP id a640c23a62f3a-c4d3525a3f4mr249438666b.3.1793976205728;
-        Fri, 06 Nov 2026 06:43:25 -0800 (PST)
-Received: from milan ([2001:9b1:d5a0:a500::24b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4d35631eb2sm86304166b.27.2026.11.06.06.43.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2026 06:43:24 -0800 (PST)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@milan>
-Date: Fri, 6 Nov 2026 15:43:21 +0100
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"Liam R. Howlett (Google)" <liam@infradead.org>,
-	Davidlohr Bueso <dave@stgolabs.net>, Michal Hocko <mhocko@suse.com>,
-	Baoquan He <bhe@redhat.com>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
-	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
-	"David Hildenbrand (Arm)" <david@kernel.org>
-Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
-Message-ID: <au3nidyyEWsNkL9D@milan>
-References: <xdzcyoou73blpfdlgy47i2ktrcsffnclerzojpgrxphid54gjc@nicdcvzqx447>
- <auqtTjXhD8is-y9f@gondor.apana.org.au>
- <CAHk-=wiE0KG+jkhmJWifXuAVivtB63WCWtdEpGAex7-T0SHd2g@mail.gmail.com>
- <aurAxRpCwzeyXeVj@gondor.apana.org.au>
- <CAHk-=wgPvbYRcKpQ8WTH-EYZRgMG0KSH+cZxY5-Hyf+X7JjWsw@mail.gmail.com>
- <aurJZ81qnbiHH_P1@gondor.apana.org.au>
- <ausS3LQNkdc6lBy3@milan>
- <auxDm_YO4oACA_d2@gondor.apana.org.au>
- <auzOjphJ8DWpXwUy@milan>
- <CAHk-=wjcKOC7O30L8_8PMniT71aqy_3ZEYK2xyoR8zW9ZCvO7g@mail.gmail.com>
+	dkim=pass (1024-bit key, unprotected) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=n13D/HUQ
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20261106144313euoutp01609be1926bb6af1c0e08a55213877a47~le9fWhqkE2134921349euoutp01I;
+	Fri,  6 Nov 2026 14:43:13 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20261106144313euoutp01609be1926bb6af1c0e08a55213877a47~le9fWhqkE2134921349euoutp01I
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1793976193;
+	bh=up0bypD0w4MbuxMJmbcYp1qKVPmLDXcUCmPyh+TIxbU=;
+	h=From:Date:Subject:In-Reply-To:To:Cc:References:From;
+	b=n13D/HUQT4qG8TsybwN9p3MSA3PMoh7Jn7AHMiqfgv3mw6zDye1isI8+PO+xE6nRP
+	 FeswtF6L761fRPLwwChHR9wM7agGc74cXBC8kujH7talPGggPwwtE3u0XTghLfMNQf
+	 b6BBhHfA5SAmlqpsglXuUoN53JI9/Rd6CbWTS9kw=
+Received: from eusmtip1.samsung.com (unknown [203.254.199.221]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20261106144312eucas1p26109d26cecef034bf7734283cb04b211~le9eXhZVO3079930799eucas1p2r;
+	Fri,  6 Nov 2026 14:43:12 +0000 (GMT)
+Received: from AMDC4942.eu.corp.samsungelectronics.net (unknown
+	[106.210.136.40]) by eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20261106144310eusmtip1ef57e68a1a7cd88e3cc55dc4c661e6bc~le9cgyZ493253232532eusmtip1W;
+	Fri,  6 Nov 2026 14:43:10 +0000 (GMT)
+From: Michal Wilczynski <m.wilczynski@samsung.com>
+Date: Fri, 06 Nov 2026 15:42:54 +0100
+Subject: [PATCH v2 14/15] lib/lz4: replace lz4_kernel_api.h's prototypes
+ with <linux/lz4.h>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -119,32 +66,211 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjcKOC7O30L8_8PMniT71aqy_3ZEYK2xyoR8zW9ZCvO7g@mail.gmail.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261106-lz4-vendor-upstream-v2-14-ee04c3f0d7dc@samsung.com>
+In-Reply-To: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
+To: Michal Wilczynski <m.wilczynski@samsung.com>,  Nathan Chancellor
+	<nathan@kernel.org>,  Nick Desaulniers <ndesaulniers@google.com>,  Bill
+	Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,  Russell
+	King <linux@armlinux.org.uk>,  Thomas Bogendoerfer
+	<tsbogend@alpha.franken.de>,  "James E.J. Bottomley"
+	<James.Bottomley@HansenPartnership.com>,  Helge Deller <deller@gmx.de>,
+	Heiko Carstens <hca@linux.ibm.com>,  Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>,  Christian Borntraeger
+	<borntraeger@linux.ibm.com>,  Sven Schnelle <svens@linux.ibm.com>, Thomas
+	Gleixner <tglx@kernel.org>,  Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>,  Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>,  Sergey
+	Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, 
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>,  Nick
+	Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>,  Chao Yu
+	<chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,  Eric Biggers
+	<ebiggers@kernel.org>,  Herbert Xu <herbert@gondor.apana.org.au>,  David
+	Laight <david.laight.linux@gmail.com>,  Sungguk <sungguk.na@samsung.com>,
+	Jaehoon Chung <jh80.chung@samsung.com>,  Marek Szyprowski
+	<m.szyprowski@samsung.com>, linux-erofs@lists.ozlabs.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7312;
+	i=m.wilczynski@samsung.com; h=from:subject:message-id;
+	bh=evukEav2ZpAAeGL576jqRy7FW4GV2dVQQnisPOQ1yNI=;
+	b=owGbwMvMwCGWumv6zndzRCIZT6slMWS9fZ6q3DhvMZ9VdZyu9bGM93wym+KneB2qvXpu/4595
+	xjmOP8/21HKwiDGwSArpshydmO0keQ/hqflxx//gpnDygQyhIGLUwAmwqbCyLC5dJJdpvSZGU1X
+	5BM1NwZmKOgaJW66N7Hk5FZusdeBa5UZ/sc6s8suuljt8Yb1b/zPor1HU+6a3ZmaL/PBcIbSW8F
+	vd9gA
+X-Developer-Key: i=m.wilczynski@samsung.com; a=openpgp;
+	fpr=CDB15B3219FE00E577C7E3FA65BA97B9EE9C1459
+X-CMS-MailID: 20261106144312eucas1p26109d26cecef034bf7734283cb04b211
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20261106144312eucas1p26109d26cecef034bf7734283cb04b211
+X-EPHeader: CA
+X-CMS-RootMailID: 20261106144312eucas1p26109d26cecef034bf7734283cb04b211
+References: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
+	<CGME20261106144312eucas1p26109d26cecef034bf7734283cb04b211@eucas1p2.samsung.com>
 
-On Thu, Nov 05, 2026 at 01:02:35PM -0800, Linus Torvalds wrote:
-> On Thu, 5 Nov 2026 at 10:44, Uladzislau Rezki <urezki@gmail.com> wrote:
-> >
-> > @@ -1025,7 +1025,13 @@ void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source,
-> >                         }
-> >                 }
-> >         } else {
-> > -               spin_lock(&br->hash_lock);
-> > +               if (in_serving_softirq()) {
-> > +                       if (!spin_trylock(&br->hash_lock))
-> 
-> I don't think that in_serving_softirq() makes any sense.
-> 
-> If I read this code correctly - and it's possible I didn't - this is
-> always called under local_bh_disable().
-> 
-> And local_bh_disable() will have increased the preempt-count exactly
-> so that it looks like it's in_serving_softirq().
->
-Sorry, probably i am missing something here. My understanding
-is that local_bh_disable() adds SOFTIRQ_DISABLE_OFFSET and
-in_serving_softirq() checks another SOFTIRQ_OFFSET bit.
+lz4_kernel_api.h carried its own copy of the twenty public prototypes
+because it could not include <linux/lz4.h>, which defined the stream
+types that upstream's headers also define.
 
---
-Uladzislau Rezki
+The types are incomplete now, so it can. Two prototype lists for one
+ABI is a drift hazard: the entry points were built against one and their
+callers against the other, so no compiler ever saw both, and MODVERSIONS
+would not catch a mismatch either, since it hashes the exporter's view
+only. Now there is one list.
+
+It also puts the public constants in scope of the entry points, so the
+size assertions can name them, and the HC level clamp can use
+LZ4HC_CLAMP_CLEVEL, static_asserted equal to upstream's
+LZ4HC_CLEVEL_OPT_MIN.
+
+Signed-off-by: Michal Wilczynski <m.wilczynski@samsung.com>
+---
+ lib/lz4/lz4_compress.c   |  2 +-
+ lib/lz4/lz4_decompress.c |  2 +-
+ lib/lz4/lz4_kernel_api.h | 64 +++---------------------------------------------
+ lib/lz4/lz4hc_compress.c |  8 +++---
+ 4 files changed, 11 insertions(+), 65 deletions(-)
+
+diff --git a/lib/lz4/lz4_compress.c b/lib/lz4/lz4_compress.c
+index 941e32a19ac972aef543c9a03b447a8a98bf5215..3e272584ea0c905b48b6bf0b7e77acfbad131bd1 100644
+--- a/lib/lz4/lz4_compress.c
++++ b/lib/lz4/lz4_compress.c
+@@ -30,7 +30,7 @@
+ 
+ /* Catch any divergence from upstream's layout at build time. */
+ static_assert(sizeof(LZ4_stream_t) == LZ4_STREAM_MINSIZE);
+-static_assert(LZ4_STREAM_MINSIZE == 16416); /* LZ4_MEM_COMPRESS */
++static_assert(LZ4_STREAM_MINSIZE == LZ4_MEM_COMPRESS);
+ 
+ /* LZ4_initStream() returns NULL for a misaligned state, which
+  * LZ4_compress_fast_extState() dereferences and
+diff --git a/lib/lz4/lz4_decompress.c b/lib/lz4/lz4_decompress.c
+index 60b57862a2e387aa89fa26f6f8e2b5485b5d9995..5d68a6f59a62ddb3701dd3531cf606c05ef4e607 100644
+--- a/lib/lz4/lz4_decompress.c
++++ b/lib/lz4/lz4_decompress.c
+@@ -31,7 +31,7 @@
+ #endif
+ 
+ static_assert(sizeof(LZ4_streamDecode_t) == LZ4_STREAMDECODE_MINSIZE);
+-static_assert(LZ4_STREAMDECODE_MINSIZE == 32); /* LZ4_MEM_DECOMPRESS */
++static_assert(LZ4_STREAMDECODE_MINSIZE == LZ4_MEM_DECOMPRESS);
+ 
+ int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
+ 			int maxDecompressedSize)
+diff --git a/lib/lz4/lz4_kernel_api.h b/lib/lz4/lz4_kernel_api.h
+index de75e5d976eb9dd318da5318a26b91d7aed81042..43605a0e4d7f543662af83251184968f0d1b70dd 100644
+--- a/lib/lz4/lz4_kernel_api.h
++++ b/lib/lz4/lz4_kernel_api.h
+@@ -3,19 +3,10 @@
+  * Copyright (c) 2026 Samsung Electronics Co., Ltd.
+  * Author: Michal Wilczynski <m.wilczynski@samsung.com>
+  *
+- * lz4_kernel_api.h -- the LZ4 API this directory exports
++ * lz4_kernel_api.h -- hand the LZ4 names back to the kernel
+  *
+- * lz4_deps.h renames upstream's entry points to __lz4_* so that the kernel's
+- * own definitions can use the real names; this header undoes that renaming
+- * and the optimize() override, and declares what lib/lz4 exports.
+- *
+- * The same functions are declared to callers in <linux/lz4.h>, in terms of
+- * opaque stream types.  We cannot include that header here -- it and
+- * upstream's lz4.h describe the same library and collide -- so the
+- * declarations are repeated, expressed in upstream's own types.  Keep the two
+- * in step; <linux/lz4.h> is the one callers compile against.
+- *
+- * Include after upstream/lz4.c or upstream/lz4hc.c.
++ * Undo lz4_deps.h's renaming and its optimize() override, and pull in
++ * <linux/lz4.h>.  Include after upstream/lz4.c or upstream/lz4hc.c.
+  */
+ 
+ #undef LZ4_compress_fast
+@@ -40,51 +31,4 @@
+ 
+ #undef optimize
+ 
+-/*
+- * The objects that do not build lz4hc.c never see this type, and it is only
+- * ever used through a pointer here.  Upstream declares it the same way.
+- */
+-typedef union LZ4_streamHC_u LZ4_streamHC_t;
+-
+-/* Compression.  wrkmem is LZ4_MEM_COMPRESS bytes, supplied by the caller. */
+-int LZ4_compress_default(const char *source, char *dest, int inputSize,
+-			 int maxOutputSize, void *wrkmem);
+-int LZ4_compress_fast(const char *source, char *dest, int inputSize,
+-		      int maxOutputSize, int acceleration, void *wrkmem);
+-int LZ4_compress_destSize(const char *source, char *dest, int *sourceSizePtr,
+-			  int targetDestSize, void *wrkmem);
+-
+-/* Streaming compression. */
+-void LZ4_resetStream(LZ4_stream_t *LZ4_stream);
+-int LZ4_loadDict(LZ4_stream_t *streamPtr, const char *dictionary,
+-		 int dictSize);
+-int LZ4_saveDict(LZ4_stream_t *streamPtr, char *safeBuffer, int dictSize);
+-int LZ4_compress_fast_continue(LZ4_stream_t *streamPtr, const char *src,
+-			       char *dst, int srcSize, int maxDstSize,
+-			       int acceleration);
+-
+-/* Decompression. */
+-int LZ4_decompress_safe(const char *source, char *dest, int compressedSize,
+-			int maxDecompressedSize);
+-int LZ4_decompress_safe_partial(const char *source, char *dest,
+-				int compressedSize, int targetOutputSize,
+-				int maxDecompressedSize);
+-int LZ4_setStreamDecode(LZ4_streamDecode_t *LZ4_streamDecode,
+-			const char *dictionary, int dictSize);
+-int LZ4_decompress_safe_continue(LZ4_streamDecode_t *LZ4_streamDecode,
+-				 const char *source, char *dest,
+-				 int compressedSize, int maxDecompressedSize);
+-int LZ4_decompress_safe_usingDict(const char *source, char *dest,
+-				  int compressedSize, int maxDecompressedSize,
+-				  const char *dictStart, int dictSize);
+-
+-/* HC compression.  wrkmem is LZ4HC_MEM_COMPRESS bytes. */
+-int LZ4_compress_HC(const char *src, char *dst, int srcSize, int dstCapacity,
+-		    int compressionLevel, void *wrkmem);
+-void LZ4_resetStreamHC(LZ4_streamHC_t *streamHCPtr, int compressionLevel);
+-int LZ4_loadDictHC(LZ4_streamHC_t *streamHCPtr, const char *dictionary,
+-		   int dictSize);
+-int LZ4_compress_HC_continue(LZ4_streamHC_t *streamHCPtr, const char *src,
+-			     char *dst, int srcSize, int maxDstSize);
+-int LZ4_saveDictHC(LZ4_streamHC_t *streamHCPtr, char *safeBuffer,
+-		   int maxDictSize);
++#include <linux/lz4.h>
+diff --git a/lib/lz4/lz4hc_compress.c b/lib/lz4/lz4hc_compress.c
+index 4d56d45028110805628be766b2758a8dffd56f0c..4f40a12df17cfed2bab7f5d87ac087b4d423cef7 100644
+--- a/lib/lz4/lz4hc_compress.c
++++ b/lib/lz4/lz4hc_compress.c
+@@ -39,7 +39,7 @@ static int LZ4_compressBound(int isize)
+ 
+ /* Catch any divergence from upstream's layout at build time. */
+ static_assert(sizeof(LZ4_streamHC_t) == LZ4_STREAMHC_MINSIZE);
+-static_assert(LZ4_STREAMHC_MINSIZE == 262200); /* LZ4HC_MEM_COMPRESS */
++static_assert(LZ4_STREAMHC_MINSIZE == LZ4HC_MEM_COMPRESS);
+ 
+ /* Levels >= LZ4HC_CLEVEL_OPT_MIN (10) reach the optimal parser, which needs
+  * a ~64K opt[]: too big for a kernel stack, and in the heap mode lz4_deps.h
+@@ -48,10 +48,12 @@ static_assert(LZ4_STREAMHC_MINSIZE == 262200); /* LZ4HC_MEM_COMPRESS */
+  * working.  Levels 3..9 keep their meaning; 1 and 2 are upstream's lz4mid,
+  * faster and weaker than the shallow hash chain the fork used for them.
+  */
++static_assert(LZ4HC_CLAMP_CLEVEL == LZ4HC_CLEVEL_OPT_MIN);
++
+ static int lz4hc_clamp_level(int compressionLevel)
+ {
+-	if (compressionLevel >= LZ4HC_CLEVEL_OPT_MIN)
+-		return LZ4HC_CLEVEL_OPT_MIN - 1;
++	if (compressionLevel >= LZ4HC_CLAMP_CLEVEL)
++		return LZ4HC_CLAMP_CLEVEL - 1;
+ 
+ 	return compressionLevel;
+ }
+
+-- 
+2.34.1
+
