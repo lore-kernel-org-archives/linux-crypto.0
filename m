@@ -1,65 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793964560;
-	b=HT6Bntwzek9EHjrFCHrB+jTVCU6tIpNDI90EVCbXoraiDrnf+iIsXtCHdn8bFIFBZXgH
-	 EVdDR6N7ZtdYMGJx3vETiUv5kY60J4mdzZS4r6bHz0X4Z9rMnJxJFvJEWu3V7E0fAZl4O
-	 MNlXyF/IXTgdj0Vnt+1AdNuyQl7lzEh6v3Xxfd18OS+IILc/ZRtkpBbOqJnrzBdeS7SvS
-	 wCBIEo+8To+ZesAETr7smbhHsiYHqlSlDsSKE/2PkjdWXqBvcrkSVch/+Kjl6MDZlT6N2
-	 6n1z3FQkwm1A6O8NWOdFOUhCTzXWkq2cCLc/JwnsNCbh/pGmds5aRkMVHROMyOEYSeg==
+	t=1793964629;
+	b=hf8fSn1ML4uVpYyFfOLPhiXie5WhC0Og3HzMSRQlrhXT34gy5cNQmb3xRxshevBFPjil
+	 qgZAferKPm/LKBCI51Ho2SgTptV5QkcoW7MLg+CJSVTTL+5NQYY/+i5Tg6Fz0ozownW8V
+	 +dWmuuUqVz7ISUZcYsXdOtDFZnQA8AsmsNCvWVOBC3B0KKgBzTBA+I4swtSsprCeC8QUz
+	 SOtPII4HIwMbEouZ9M5Fy4LTNm8TSr8kxK24ZslxnfuvZf8P/+TCuoIZnsYjmhSwLC1rK
+	 buz9A+qi07Ag+Nbq7iMqSHiplyo6i6tH+joUnOwZQocdM4EiXuU5ItyzdTN808CfVCg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793964560;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=iM+SfBejBmbmga6UyfeGy4tcXe+ACgtNFM+WMKjMw2k=;
-	b=lnVI3BiCxHMDwQnhCeVGesNrHjQMdwIfCceA2muF5GLzw16R8DuX3S8vyuB/1IjInE7X
-	 cXYWFb7qeR3u/HQ2W209DqxzT2tiiYesHfCeFg0I9vZqNXRGh+jdWHd0/CCHx3CPpFLzj
-	 E2ecvpxfIM6fKDEVYJ0jMbBdu5n+0xfxXMg2905Im9tGg/zwA43IlWqMi7uO35g8goywL
-	 FG+dGKcTdZBNBkE4AfDw9KfI3QNro9WxbHAQbG8q3bNCvBEMxgO6V+1Uc3x9e2cMrWJCO
-	 IF9J7w56LcosgJUzOUe9Ct8YGMKuU49gn1ZroXvjNA/LOD4nGZUw3T6QNITFfPh64aQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793964629;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=m9WRGg7uv4AersWeud7SoY+SXQFUs0fujKXYHljLyqQ=;
+	b=En5LXkxI0/IEX6evjO/EitABfb4GKNB6phk3+OwRRsTStIPBV7qr22Is+YKPAnS5D7Y0
+	 fTBw6xQJ+vMu7Qb8333xC+EdOvFSp1AKAhnbHeRBRc6McaACEOIO4zn0IlLr7FG6vR/x/
+	 ppjUOAwuJUPVh6IaahATWfvfQZuM5ZB1DaEdBAc1NTjj9SA8ClUjR+kSD7nZL4dmjgfm8
+	 m0bFdqKiB1urAjTjPWmiB99PJG7t3NeVxb2/UkPmFvRGKrkM03IkpqbEV7ZfKoE9tMpb7
+	 LFQQxev2LOIZagaFjV00A812JZQ8Xj5v4WA8GEuMV9XGNRW1VXF9mgaHBdVGryleMdA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gondor.apana.org.au;
-	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=Kr2TdItY;
-	arc=none smtp.remote-ip=180.181.231.80
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GdDZQn8Y;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11AC606D835;
-	Fri,  6 Nov 2026 11:29:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D11AC606D835
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E685E606EEBA;
+	Fri,  6 Nov 2026 11:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=Kr2TdItY
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=iM+SfBejBmbmga6UyfeGy4tcXe+ACgtNFM+WMKjMw2k=; 
-	b=Kr2TdItY9CYe1scElzL+I/RzNP3Gn+yn4X2emxWeNXDGBTLtIHso/MwGIoWdzlypgwmshXFJf0z
-	9sBuPsFkkfNX3KpFgC/iH1iNdtWmMMo0yq7Xf45yOdzWEsQox2aiKz7DZ+f1CZ8HLa7HEiD7sUJvw
-	wX5qFov1hcT2xayiTwRVJHqRqNCJJDkACXeuKslCB1EMPQPsgTvzTZZKKQRoWGCUk7VRnGc0yvHrO
-	sZiHsHTzaE5dG02S/70BvAjCaz5C/9aa0a26/bAzhseBYHAK6k93tRmPZ37YF5TGmMvFvc+m17kal
-	d82dasUSBCmtct1ne+7Kue3UWMtTbJMNC2MQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xPI89-0000000Br7q-21aL;
-	Fri, 06 Nov 2026 19:29:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Nov 2026 19:29:13 +0800
-Date: Fri, 6 Nov 2026 19:29:13 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: ZhaoJinming <zhaojinming@uniontech.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	linux-kernel@vger.kernel.org,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
-	Laurent M Coquerel <laurent.m.coquerel@intel.com>,
-	Thorsten Blum <blum@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - free dc_data with kfree() in the error path
-Message-ID: <au26CQgxIh74UlJ2@gondor.apana.org.au>
-References: <20261019-qat-dc-data-kfree-v1-1-b294cb951a77@uniontech.com>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GdDZQn8Y
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93FC21F008A1;
+	Fri,  6 Nov 2026 11:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793964628;
+	bh=m9WRGg7uv4AersWeud7SoY+SXQFUs0fujKXYHljLyqQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=GdDZQn8Ykl1TppbRA05wdf6ZG/Ay/vL6GEnVHghCS/Q6PkjbeEMIitnGBO0FUf7UJ
+	 2YGNjIsoO+8yZ4AWUlW0s7PkwwmxAYARTnbBTLHMzIZ4c9UB4cO+N2TNOTqM8hv18C
+	 bGX4bYh7Ei1SqX7F5yqGynVZOQRNNpIS4IqjYL9M0AexBeHSIHxn7w1oahQF2qOWW0
+	 FCTL9hiJzKFfLqMjhe6ggejEp+KusZSdAeJdANwZcRayWf7eIIgPi87ihVCkePGI/L
+	 S/Yr0DmWk3gK7ojk3i+UrWaBTgMIkaOeYk2NiKbtmtbP7eWQO9HxfkyltASCLG95T4
+	 UaMuVHGSFemHA==
+Date: Fri, 6 Nov 2026 12:30:23 +0100
+From: Thorsten Blum <blum@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Rusty Russell <rusty@rustcorp.com.au>, Amos Kong <akong@redhat.com>,
+	virtualization@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hwrng: virtio - prevent use-after-free after a failed
+ restore
+Message-ID: <au26T4dmLXWFkxPv@kernel.org>
+References: <20261016103640.4989-2-blum@kernel.org>
+ <au219vQfcYE0maYw@gondor.apana.org.au>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -71,44 +63,35 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261019-qat-dc-data-kfree-v1-1-b294cb951a77@uniontech.com>
+In-Reply-To: <au219vQfcYE0maYw@gondor.apana.org.au>
 
-On Mon, Oct 19, 2026 at 01:51:32PM +0800, ZhaoJinming wrote:
-> qat_compression_alloc_dc_data() allocates dc_data with kzalloc_node(), but
-> its error path releases it with devm_kfree():
-> 
-> 	dc_data = kzalloc_node(sizeof(*dc_data), GFP_KERNEL,
-> 			       dev_to_node(dev));
-> 	...
-> err:
-> 	accel_dev->dc_data = NULL;
-> 	kfree(obuff);
-> 	devm_kfree(dev, dc_data);
-> 
-> devm_kfree() only frees memory that was allocated with devm_kmalloc() and
-> registered with the device resource manager.  dc_data is a plain kmalloc
-> allocation that was never registered, so devres_destroy() does not find it,
-> returns -ENOENT and devm_kfree() ends up in WARN_ON() without freeing
-> anything.  The dc_data structure is leaked.
-> 
-> Commit 4cc871ad0173 ("crypto: qat - use unmanaged allocation for dc_data")
-> switched dc_data to unmanaged allocation and replaced the devm_kfree() in
-> qat_free_dc_data(), but missed the identical call in the error path of
-> qat_compression_alloc_dc_data().  That path is taken when the overflow
-> buffer allocation or its DMA mapping fails.
-> 
-> Free dc_data with kfree() here as well, matching the allocation and the
-> other release path.
-> 
-> Fixes: 4cc871ad0173 ("crypto: qat - use unmanaged allocation for dc_data")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
-> ---
->  drivers/crypto/intel/qat/qat_common/qat_compression.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Herbert,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Fri, Nov 06, 2026 at 07:11:50PM +0800, Herbert Xu wrote:
+> On Fri, Oct 16, 2026 at 12:36:40PM +0200, Thorsten Blum wrote:
+> > remove_common() frees the driver data during freeze, but does not clear
+> > vdev->priv, which points to freed memory. If probe_common() then fails
+> > during restore, a later remove or freeze can dereference the dangling
+> > pointer.
+> > 
+> > Clear vdev->priv on the probe_common() error cleanup path and before
+> > freeing the driver data in remove_common(). Also reset the device and
+> > return early from remove_common() if vdev->priv is already NULL for a
+> > safe teardown after a failed restore.
+> > 
+> > Fixes: 08e53fbdb85c ("virtio-rng: support multiple virtio-rng devices")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Thorsten Blum <blum@kernel.org>
+> > ---
+> >  drivers/char/hw_random/virtio-rng.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> 
+> Please respond to this comment:
+> 
+> https://sashiko.dev/#/patchset/20261016103640.4989-2-blum%40kernel.org
+
+I think the issue raised by Sashiko is valid, but also pre-existing and
+could therefore be fixed in a separate follow-up patch.
+
+Thanks,
+Thorsten
