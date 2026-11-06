@@ -1,57 +1,61 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793964629;
-	b=hf8fSn1ML4uVpYyFfOLPhiXie5WhC0Og3HzMSRQlrhXT34gy5cNQmb3xRxshevBFPjil
-	 qgZAferKPm/LKBCI51Ho2SgTptV5QkcoW7MLg+CJSVTTL+5NQYY/+i5Tg6Fz0ozownW8V
-	 +dWmuuUqVz7ISUZcYsXdOtDFZnQA8AsmsNCvWVOBC3B0KKgBzTBA+I4swtSsprCeC8QUz
-	 SOtPII4HIwMbEouZ9M5Fy4LTNm8TSr8kxK24ZslxnfuvZf8P/+TCuoIZnsYjmhSwLC1rK
-	 buz9A+qi07Ag+Nbq7iMqSHiplyo6i6tH+joUnOwZQocdM4EiXuU5ItyzdTN808CfVCg==
+	t=1793969426;
+	b=TZakNZpUge3JXkAuS8OLlDR4Di5m6/IzNj5NdtsBK6duSKtiyuLPMVaGg+ahIRHXIhzH
+	 xaL7Flj0GHKwJckdheIIxR8rKCV4IFpq09PUvFPSK08h/Fw2AUTniMvkGMHb/gllDEPg/
+	 biYEG/+r9nR8zryAEtZ7Wer6gP/MrwAFw3gCDpDTkgvs3fKtlTjJF/i6s+cl7ZtuHMz42
+	 Kh274m9DyXWQJA/DeAdWMcr2Otmw+2PxM5nFYLbnOKCpuLdWoKIeQd2pDmfYYqk+SD4Hd
+	 uXm4ZeLb0Vti9UE87/FpVJ2ojphWboaijVkQ9h/qCBsiSSmC/jasWPFETDBZ6+Lk1fw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793964629;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793969426;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=m9WRGg7uv4AersWeud7SoY+SXQFUs0fujKXYHljLyqQ=;
-	b=En5LXkxI0/IEX6evjO/EitABfb4GKNB6phk3+OwRRsTStIPBV7qr22Is+YKPAnS5D7Y0
-	 fTBw6xQJ+vMu7Qb8333xC+EdOvFSp1AKAhnbHeRBRc6McaACEOIO4zn0IlLr7FG6vR/x/
-	 ppjUOAwuJUPVh6IaahATWfvfQZuM5ZB1DaEdBAc1NTjj9SA8ClUjR+kSD7nZL4dmjgfm8
-	 m0bFdqKiB1urAjTjPWmiB99PJG7t3NeVxb2/UkPmFvRGKrkM03IkpqbEV7ZfKoE9tMpb7
-	 LFQQxev2LOIZagaFjV00A812JZQ8Xj5v4WA8GEuMV9XGNRW1VXF9mgaHBdVGryleMdA==
+	bh=u7TzN7UjxwjzBe9DUJ1+ST6+Za71fgRUknBs8rBYbuI=;
+	b=wFNPNbgY6eck6IlOtMCzLtaCm6KW8PGhG3GKfhE5uGSuFExQynf+6ZJEB/q9h7nx/XKm
+	 hFp7ARXbLSTfespi+jV+GyeEpMAm6Xz7UZiR2QqfbuXC4keGGi0Xt8/qGq0XUlrDc+A0X
+	 EQUXcF5jq7nPYz5Xz5YxG1W3xFgTC4CtfmNNNmybDZdV1AsUwXhSFvRD2Zf/+srqcVOFK
+	 3HUmdCIMq7SaSyZ38aHRY8eC1H1WN5BJ3/VrdWTFFxb+paQjVk+n/iY+OgPIA70CYNq7V
+	 iKp28FHkJ/AR+X0F1EEOUoY1A7KYKVwR9EkwAMRxHIpSgJtCFoHC38jJOq2PIC/eSbQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GdDZQn8Y;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UUU+zab7;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E685E606EEBA;
-	Fri,  6 Nov 2026 11:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D57606A329;
+	Fri,  6 Nov 2026 12:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GdDZQn8Y
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93FC21F008A1;
-	Fri,  6 Nov 2026 11:30:26 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UUU+zab7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE721F0089F;
+	Fri,  6 Nov 2026 12:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793964628;
-	bh=m9WRGg7uv4AersWeud7SoY+SXQFUs0fujKXYHljLyqQ=;
+	s=k20260515; t=1793969426;
+	bh=u7TzN7UjxwjzBe9DUJ1+ST6+Za71fgRUknBs8rBYbuI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=GdDZQn8Ykl1TppbRA05wdf6ZG/Ay/vL6GEnVHghCS/Q6PkjbeEMIitnGBO0FUf7UJ
-	 2YGNjIsoO+8yZ4AWUlW0s7PkwwmxAYARTnbBTLHMzIZ4c9UB4cO+N2TNOTqM8hv18C
-	 bGX4bYh7Ei1SqX7F5yqGynVZOQRNNpIS4IqjYL9M0AexBeHSIHxn7w1oahQF2qOWW0
-	 FCTL9hiJzKFfLqMjhe6ggejEp+KusZSdAeJdANwZcRayWf7eIIgPi87ihVCkePGI/L
-	 S/Yr0DmWk3gK7ojk3i+UrWaBTgMIkaOeYk2NiKbtmtbP7eWQO9HxfkyltASCLG95T4
-	 UaMuVHGSFemHA==
-Date: Fri, 6 Nov 2026 12:30:23 +0100
-From: Thorsten Blum <blum@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Laurent Vivier <lvivier@redhat.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Rusty Russell <rusty@rustcorp.com.au>, Amos Kong <akong@redhat.com>,
-	virtualization@lists.linux.dev, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hwrng: virtio - prevent use-after-free after a failed
- restore
-Message-ID: <au26T4dmLXWFkxPv@kernel.org>
-References: <20261016103640.4989-2-blum@kernel.org>
- <au219vQfcYE0maYw@gondor.apana.org.au>
+	b=UUU+zab7ko1b/IuvOLLJMhGYnAobEwxjsYAPCJBRYo8BWBJVVDKSMQaYBpMfYYZ8Z
+	 ngUcCddpyyFNYBBjMUB3/5kOdmjEaloZ16DcS9Lqt4CoSAWrjpW5O+G9vE13u2bTw3
+	 s4/xSmYst1uhMTz9XLYAzLGgV7P3KXZkgXdJDawigpbgUCjjAAdoUanvrYVQcVDQ/V
+	 dN7RPerNuKOLwr9MaMqMX2jykXgsQd0BZ/LKE4M+2uvJgUnANc3ElVQZzUHr9vRgZu
+	 IvQKPCr671kPsG9JpAQTBcwEaRZnN9WO/4oh/ZKaycyTLrRw9rDR3TaCuAAfsQaNwE
+	 dnHkin62gu60Q==
+Date: Fri, 6 Nov 2026 13:50:22 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Andrew Gigena <mail@andrewgigena.dev>
+Cc: Abel Vesa <abelvesa@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
+	Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, 
+	Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Andy Gross <agross@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] dt-bindings: crypto: ice: Document sm8150 inline
+ crypto engine
+Message-ID: <20261106-offbeat-hawk-of-purring-50a8aa@quoll>
+References: <20261104-sm8150-ice-rfc-v2-0-d697bbce0278@andrewgigena.dev>
+ <20261104-sm8150-ice-rfc-v2-1-d697bbce0278@andrewgigena.dev>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,37 +65,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <au219vQfcYE0maYw@gondor.apana.org.au>
+In-Reply-To: <20261104-sm8150-ice-rfc-v2-1-d697bbce0278@andrewgigena.dev>
 
-Hi Herbert,
-
-On Fri, Nov 06, 2026 at 07:11:50PM +0800, Herbert Xu wrote:
-> On Fri, Oct 16, 2026 at 12:36:40PM +0200, Thorsten Blum wrote:
-> > remove_common() frees the driver data during freeze, but does not clear
-> > vdev->priv, which points to freed memory. If probe_common() then fails
-> > during restore, a later remove or freeze can dereference the dangling
-> > pointer.
-> > 
-> > Clear vdev->priv on the probe_common() error cleanup path and before
-> > freeing the driver data in remove_common(). Also reset the device and
-> > return early from remove_common() if vdev->priv is already NULL for a
-> > safe teardown after a failed restore.
-> > 
-> > Fixes: 08e53fbdb85c ("virtio-rng: support multiple virtio-rng devices")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Thorsten Blum <blum@kernel.org>
-> > ---
-> >  drivers/char/hw_random/virtio-rng.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
+On Wed, Nov 04, 2026 at 06:38:12PM +0000, Andrew Gigena wrote:
+> Document the compatible used for the inline crypto engine found on
+> SM8150.
 > 
-> Please respond to this comment:
+> SM8150 UFS uses a standalone ICE node referenced via qcom,ice, so move
+> qcom,sm8150-ufshc from the legacy embedded-ICE UFS binding to the
+> standalone-ICE UFS binding. Update the legacy binding example to use
+> qcom,sdm845-ufshc, which still uses the embedded ICE representation.
 > 
-> https://sashiko.dev/#/patchset/20261016103640.4989-2-blum%40kernel.org
 
-I think the issue raised by Sashiko is valid, but also pre-existing and
-could therefore be fixed in a separate follow-up patch.
+This part should be a separate commit.
 
-Thanks,
-Thorsten
+> Signed-off-by: Andrew Gigena <mail@andrewgigena.dev>
+> ---
+>  .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml |  1 +
+>  Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml  |  2 ++
+>  Documentation/devicetree/bindings/ufs/qcom,ufs.yaml           | 11 ++++-------
+>  3 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> index 23bf98c2b9fa..0d73e4581e6e 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> @@ -24,6 +24,7 @@ properties:
+>            - qcom,sc7180-inline-crypto-engine
+>            - qcom,sc7280-inline-crypto-engine
+>            - qcom,shikra-inline-crypto-engine
+> +          - qcom,sm8150-inline-crypto-engine
+>            - qcom,sm8450-inline-crypto-engine
+>            - qcom,sm8550-inline-crypto-engine
+>            - qcom,sm8650-inline-crypto-engine
+> diff --git a/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml b/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
+> index 3c407426d697..572eec814a60 100644
+> --- a/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
+> +++ b/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
+> @@ -23,6 +23,7 @@ select:
+>            - qcom,sc7280-ufshc
+>            - qcom,sc8180x-ufshc
+>            - qcom,sc8280xp-ufshc
+> +          - qcom,sm8150-ufshc
+>            - qcom,sm8250-ufshc
+>            - qcom,sm8350-ufshc
+>            - qcom,sm8450-ufshc
+> @@ -48,6 +49,7 @@ properties:
+>                - qcom,sc7280-ufshc
+>                - qcom,sc8180x-ufshc
+>                - qcom,sc8280xp-ufshc
+
+And what about eight clock? All existing DTS will report warning? I
+don't quite get the need of this move.
+
+Best regards,
+Krzysztof
+
+
