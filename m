@@ -1,54 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793939949;
-	b=sDSrsFpGLnY5mxionXdh3eqljAp/mJCgWDfaaAU+qUVWziHv2ZfIf29rDSyfk8fVIf/3
-	 KXz1w3iW9ar8bc4DjE8cWt/WKAIe0/jLq3fxpJTeSLlhwGuttyCiYA2HFLtR/RuwWQiTf
-	 iC0WJAdxdz1H49CWBTbjm6DQVjiPgUndNq1crR2NAl9twNa1ZA9GLWPH/ALZvQr0LvB3J
-	 LiDAyeHansT/As/MQhXvQxcZ3dCFv+4v3a/r3VoX4hymh7ISKTpJoWL2p/F2B3fZkDrXP
-	 x2/DFBwxBwVgLjfV7DxEvYYpA32z0APso+nEcjZ4VnGHkYHjaszZzd3O5Dg2YIixWdQ==
+	t=1793944204;
+	b=LU1KAQYBJ63tBwlD4kl8eoRUWUuiICJqCvauAC8LFkQyevlAdgHeE1PEP8l11YR63MmG
+	 BWhgAvhO26GSHb/Xvy0qqlS7OYaDKgnYItuYAWEKO2BFcZjCwxVTPDMKreCtQxCn8RtKd
+	 NBmFjEXV0/6y30ooqSnEg6Rp9neLonWrRUiX1M3JSfvRegIw8xdH/briBdbnetPweXIf3
+	 CCo1C8QG4U6RrIX7FMozVzppid9nH3wOh1BfU2fXI3AP3JMiS0qYtSZVl4XFBgJcKaMub
+	 IHrjGiA2bf1GKxt7DQ2H4z8f1OYVh8BqMdahxMghV5zY0cero/0xpZhCRam8IxHNslA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793939949;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=WJYakVHTUhSimLuhetEiFN6YjNSgw5A9ogbMFTPYB+M=;
-	b=uZXCJdkZeNHCkt/aLAlYiJg2qhVTrCUsUbnXcXjknG7hUnHPJL5bm8879XlmQgGOourv
-	 loZSJ+aQw23IvVK9VPDHWYqDzF+8Ovx8IGUcgu7GiUtOG20+BiXgmGIdZML9Hwe7tTF1s
-	 jUrGtmUvNLWco1IDXx0gIp98f1RN+2ha7YPRBlhouz7CTMzMn2TjYGMWnxbZN+H3V5eIe
-	 L03RoVsVtqaARQAVyNBi3VGZ3fSNjquj/jL+J8YU/IJkeGqlFjQb3F1oTl0V/Cx5u5gTU
-	 m3aBv0Spzh8mSPGP8SpSTXmtk48TXs9sB9jEoiS/tN4v0ADMs6UxmzmOYr2iNt2mDZg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793944204;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=4x8jyjVTceVaevPhTybBNOQ2fqMlLZ3JJbNWyZ1lHVs=;
+	b=0hJmwktbuMW2GE5BFbh1xsBGzWa/x0sTYMD/kDC5nQgVrt1wVllsdP2SpwQ+8zBYIMJl
+	 +I856XijeKT66EQ8UnEVlABN4dYOiv7arIsbZHcqUhn0O2qRBiLALlKoDqboq7+aW6hDq
+	 YrH9UO0nKMI/Omb+aIngR3cZKkBcN4wSLZL1UsLXg1yQ5LhcvIKOQyqHSg5UHpfkO0a6c
+	 J+7VWrw60D4jTzNQcril4SWDEYvFdb29fgq+ihUiz7A9LYobPyNIvVYR9p2VMxnzmxD52
+	 9WtY7c5iiibTpc+//j1McWD0SzTRTNkcaBDxyZ1NO6QBUlC1iWdZ0KxD5aLmTyZUfbw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DcbK63p+;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=r6qbavq7;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13582606A31B;
-	Fri,  6 Nov 2026 04:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA95606A326;
+	Fri,  6 Nov 2026 05:50:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EDA95606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DcbK63p+
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B881F0089F;
-	Fri,  6 Nov 2026 04:39:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793939948;
-	bh=WJYakVHTUhSimLuhetEiFN6YjNSgw5A9ogbMFTPYB+M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=DcbK63p+2ga0ES8PIR7j9TglbcWVb6xd6xGaohOG85yUqo/tsyI2RWIgmhv6Mku/w
-	 7JoXLz29DqtfFoeD/Ze0b7TX3WZGBq5MG/J9Tx6UOztWcHTtjICk5tbwshrKwYQlY3
-	 8Pm2MK7kSo2SM5/srTaWbM6S23GEpUlC2MjNKvYDyqJW6TkqOX2z/GKlbLOci3pEbS
-	 OY7fmXoSHBswPUrBSY3kCCQwMz5DHzp6RVdKuza+h5O4rKnbMGDkyDBXYJoM36m/pu
-	 S63JhCr+349Q6ZByR+sVTEoV52uDhLEM43DAvonQdd92Q5O3YqQDEydXwE3qfMZ2iK
-	 L6qqDxqxxYp+A==
-Date: Thu, 5 Nov 2026 20:39:07 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Walter McKelvie <walt@mckelvie.org>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: algif_aead - Allow gcm(aes) for privileged
- users
-Message-ID: <20261106043907.GC3877@sol>
-References: <2e4c2648-72b2-4249-89d3-8dd111b84395@app.fastmail.com>
- <20261106043459.1169202-1-walt@mckelvie.org>
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=r6qbavq7
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=4x8jyjVTceVaevPhTybBNOQ2fqMlLZ3JJbNWyZ1lHVs=; 
+	b=r6qbavq7bbjaRfZ1zcjNUKa7kKJAsjgQKDVs+7mPQ9rpcEeoS+iElNldE1WZZxi66uDJtrvc36C
+	g0e3mI85wZt74LDRBOTTuOkvDvdRX69A3qThoEoL6ihS8jtA6ftYKK/VDCxcK2glMgsjOqCAbU5n+
+	H61TkvPZ7tmELi1hGsg3Ogg7X3hC9Y1Y79Q2pd360JSSvsSLr1uiSsbSWcoQ9fbRRdb+vkI9uf8h1
+	CzSP2fXQMSzY51nS/8hSzZRPDbAcR6A5tKYVzJZpYHMmTemDG/etwVeQmC5seesi8gqsEJeXUfnWm
+	9y0A0JCbHKNAq+c+iQUoVIggs4LQCxJKF5EQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xPCpb-0000000BjvR-3kvB;
+	Fri, 06 Nov 2026 13:49:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Nov 2026 13:49:43 +0800
+Date: Fri, 6 Nov 2026 13:49:43 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Liam R. Howlett (Google)" <liam@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>, Michal Hocko <mhocko@suse.com>,
+	Baoquan He <bhe@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Marco Elver <elver@google.com>, Michal Hocko <mhocko@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, maple-tree@lists.infradead.org,
+	Lorenzo Stoakes <ljs@kernel.org>, Chris Mason <mason@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Andrew Ballance <andrewjballance@gmail.com>, stable@vger.kernel.org,
+	"David Hildenbrand (Arm)" <david@kernel.org>
+Subject: Re: [PATCH 4/4] rhashtable: fix vmalloc() deadlock in atomic rehash
+Message-ID: <au1qd5i4UiyNyS8S@gondor.apana.org.au>
+References: <xdzcyoou73blpfdlgy47i2ktrcsffnclerzojpgrxphid54gjc@nicdcvzqx447>
+ <auqtTjXhD8is-y9f@gondor.apana.org.au>
+ <CAHk-=wiE0KG+jkhmJWifXuAVivtB63WCWtdEpGAex7-T0SHd2g@mail.gmail.com>
+ <aurAxRpCwzeyXeVj@gondor.apana.org.au>
+ <CAHk-=wgPvbYRcKpQ8WTH-EYZRgMG0KSH+cZxY5-Hyf+X7JjWsw@mail.gmail.com>
+ <aurJZ81qnbiHH_P1@gondor.apana.org.au>
+ <ausS3LQNkdc6lBy3@milan>
+ <auxDm_YO4oACA_d2@gondor.apana.org.au>
+ <auzOjphJ8DWpXwUy@milan>
+ <CAHk-=wjcKOC7O30L8_8PMniT71aqy_3ZEYK2xyoR8zW9ZCvO7g@mail.gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,44 +88,35 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261106043459.1169202-1-walt@mckelvie.org>
+In-Reply-To: <CAHk-=wjcKOC7O30L8_8PMniT71aqy_3ZEYK2xyoR8zW9ZCvO7g@mail.gmail.com>
 
-On Thu, Nov 05, 2026 at 11:34:59PM -0500, Walter McKelvie wrote:
-> iwd depends on the AF_ALG algorithm "gcm(aes)", although iwd's own
-> source never mentions "gcm(aes)" or L_AEAD_CIPHER_AES_GCM.  The
-> dependency is indirect, through the TLS implementation in libell (ell)
-> that iwd uses for EAP-TLS, EAP-TTLS and EAP-PEAP: iwd's
-> src/eap-tls-common.c hands the EAP tunnel to l_tls_new().  In ell, the
-> TLS 1.2 cipher suite table in ell/tls-suites.c uses
-> L_AEAD_CIPHER_AES_GCM for the eight *_WITH_AES_{128,256}_GCM_* suites,
-> ell/cipher.c maps that to the AF_ALG name "gcm(aes)", and
-> tls_change_cipher_spec() in ell/tls.c instantiates it with
-> l_aead_cipher_new().  Before offering a suite, ell checks that its AEAD
-> could be bound on an AF_ALG socket (l_aead_cipher_is_supported()) and
-> drops the suites whose bind() failed.
+On Thu, Nov 05, 2026 at 01:02:35PM -0800, Linus Torvalds wrote:
 > 
-> With af_alg_restrict=1 the bind of "gcm(aes)" fails even for iwd, which
-> holds CAP_NET_ADMIN, so the AES-GCM suites silently disappear from
-> iwd's ClientHello and EAP authentication fails against RADIUS servers
-> that only accept GCM suites (common for eduroam deployments).  This
-> contradicts the intent of commit 2f204fe718f5 ("crypto: af_alg - Add
-> af_alg_restrict sysctl, defaulting to 1"), which was to keep iwd
-> working under the default restriction level; the iwd algorithm list it
-> was based on evidently did not account for the algorithms used by
-> ell's TLS code.
+> I don't think that in_serving_softirq() makes any sense.
 > 
-> Add "gcm(aes)" to the privileged part of the AEAD allowlist.  It is
-> the only AEAD that iwd actually uses: ell's TLS code has no CCM or
-> ChaCha20-Poly1305 suites, and no other ell or iwd code creates an AEAD
-> cipher.  (ell does bind "ccm(aes)" once at startup, in
-> init_supported() in ell/cipher.c, to probe which AEADs are available,
-> but nothing uses it, so its allowlist comment is left as is.)
+> If I read this code correctly - and it's possible I didn't - this is
+> always called under local_bh_disable().
 > 
-> Fixes: 2f204fe718f5 ("crypto: af_alg - Add af_alg_restrict sysctl, defaulting to 1")
-> Link: https://github.com/NixOS/nixpkgs/issues/583203
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Walter McKelvie <walt@mckelvie.org>
+> And local_bh_disable() will have increased the preempt-count exactly
+> so that it looks like it's in_serving_softirq().
+> 
+> Maybe I got lost somewhere, but it basically looks like that test will
+> always be true and is pointless (and misleading).
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+You're absolutely right.
 
-- Eric
+Even if there was a way to tell whether you're in a real softirq
+context, it's crazy to change how locking is done in br_fdb when
+the real issue is caused by a kvmalloc call that is made through
+rhashtables.
+
+Now if we did the same test within kvmalloc and simply fell back to
+kmalloc it might work.  But then again, why are we trying to support
+GFP_ATOMIC vmalloc when there appears to be zero users of it, a
+whole year after it was introduced?
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
