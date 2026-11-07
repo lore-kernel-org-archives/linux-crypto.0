@@ -1,57 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794036308;
-	b=5IVNizmjYMUFqizFS599lgxxkTw9aRbyZSnJ6W8b/EZts9Xx6cUrijJwnsAWEhUAXOI4
-	 vfPjccwCGOge5DhtLDfzOS57EYdh+3ERWZu9elF3fh6ckZUtOEGodPxGNAtI73ISWNKta
-	 OaNRngxOMCafmuwzMfrDgLQ5jF27UpfIAYdIFTNdKaG09ja9peSuUb0UGVHUklJLFjbwv
-	 2I7nO3Nlboy/4BX97wtx4rLbG51tC6/p67UtLDOe2yyji0HHxa3Ow5+dDPiiwoZ275Bwn
-	 AprH1+ZLuTNVJqFiRVej0bx7R0DN2h5b4Q9RKZtQs+KqCSv/2abJ+iqxrQYpCVPvLZA==
+	t=1794036309;
+	b=u9RF9DDFix/9Fp622CwOootv5dgolCE52G2GfAZCmrTzLOQ8AI+GOG2D+RH8ZSko/Qib
+	 3BdBPWT7CWbIFF3VMdPm9TB1fCiLMTFCPy9S7zwZUHqD6UGs56SVrvWBY5iTPGq0eitwR
+	 L2bPjkwTc+zmt+yh8fdqz2ujNpeTCntRFFGjSryqjZODF5M2xDaPAqEmCTrekj1HxvJbI
+	 d7iJIClCkRVQx/7tTZumggwZcCwnahT++aU6EH90nc2Qj8m/iMVSBDMCIkrgsPFJ51H8O
+	 7AZWVbF4AkEiKlxfyHVuikAR4RBmS0Kqc2BV6VxSeDs54lNUDq3YNt2sQ8NFiT36+Lw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794036308;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794036309;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=TgN9ogDRRfRK2oexKDdbAOVIB3kCwunMAnWHxeIq0w0=;
-	b=QAiZ06Q/X1hf1e0v4aB03KGlqO/jrA8N7KLX1fRFLnYWGEpntIdgODa1y3ItPWytvK7k
-	 Uv1MWvNSnUvNWfSl9+IxmcKdC3CQcRKRF7n73yPZ/RS5blgYSctAinJ3e35Ianyvmwk6j
-	 l9J9hOBeyLOY9C3sQnArjX5LIfy5AU441dYFLYsUg0owgT0vDBD5p/+diIyPHzlY2V/Hn
-	 7H/mSJcXqqDWMmp9FS6eo1QJsVK4veEAN7r2laqKfqkCQh/NO43l+PpmDSM4Q3lGmat/d
-	 R7p+sjXjsyV7qpaPljZJeilwSs5vIU0ftTtLhqoUnweJ15L7m4/mDAnkd2N8X+1guFw==
+	bh=4uPbxxqopJMnZ7ErMwn2urmrgG+FVEzHE8ZgEba/UMo=;
+	b=3xVUSUPDqj0g0gkx3sPcqOw55GrnjCaOKjKrPjCK0wu+IzyBuKPwQRBG4ulN4stvYhry
+	 LQx2vMoAo/ne+DUgCjqD4DvJNY5c+q+ra+EFINhgln257efaA2kLfcCrTV7RzAA+qWy3B
+	 jKKEn9xUklygBZQZTqN2M55gRvVNVLiSyBGPhfqejePcUmCcYxJsl5iJe04/xvKEj+qSY
+	 hcg1LNKTuOjbFuh5UCmrOoHE4ll6vDLRb8VtrUtPtp1SKmm2P8/EJWooeAiaOrNcsCwZk
+	 HugZm+BrASqxORCAeOEXyF35Y3mIHoj4VXQukaJ/cmjcvQeAJwo6DafoH4y1C9mCyPw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DJVUYjQk;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fGWSR5Wr;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3CD606A330
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 07:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B2B606A32C
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 07:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DJVUYjQk
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF62A1F008A1;
-	Sat,  7 Nov 2026 07:25:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fGWSR5Wr
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D6921F0089F;
+	Sat,  7 Nov 2026 07:25:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794036307;
-	bh=TgN9ogDRRfRK2oexKDdbAOVIB3kCwunMAnWHxeIq0w0=;
+	s=k20260515; t=1794036308;
+	bh=4uPbxxqopJMnZ7ErMwn2urmrgG+FVEzHE8ZgEba/UMo=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=DJVUYjQkXVy8QrSbj0lQ/02xBLylp9eHAUe4LuTBjg94FTrisAs7fomyvtqGz2m/B
-	 5yUTsmXO7uO+imVJN35EnBt1mlexyH1oMHf0S2Mzyn1FWUol0daV63rup2cACFVTo2
-	 MmnXEEpwN65LTKg8BrvyC5wFsr485uXyt79SaPYVlIlXqulm3DdQIMhBHg8tYNeL2N
-	 whR8e0pudEp6C54X6dGAcc6aINtFA6WI1D1zyF9mrmPRRyvk2o2BFcm2go1aLbIGnf
-	 YEk0ZzuF6rDt1fflPiiSVyBBQO/ZHfrU9HgCeMfP2b3Oy02AAdkpT+Y2jVwpb+HBr2
-	 x/cuso6kfG8Rw==
-Message-ID: <sashiko-outbox-202710@kernel.org>
+	b=fGWSR5WrTTNeAhup2qqC/jsN9AWbf3vIClbIxqBpcJZ8WheZynSa+RnAX8g3fzRxS
+	 /kYZy7BQMhq5gyGVOXBjZSCRaGNG+6qmkXaySZhUxBYO6xjB8kuCSsHoPx6BWRmZfY
+	 d2Ij8C985C5YwV/Mle23/SFWqR4+HSGI/7t5t92NXWaEvxIS8SeNEvWX87Ui+gCQ8H
+	 8HiQDbiz8x/fkZiXVqeJbdut61xdVdZis1eUz4nAf+4ciBGgfdsNhm7uLoLYbcDX7A
+	 dA9v4RRGqXc+1z0JDYtRCEUjPeudzFN30DM4PdhTISckZStCq4WGJpLYf/xmHQEYxb
+	 MqcmxokqaOahQ==
+Message-ID: <sashiko-outbox-202711@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 4/8] crypto: acomp - Add API to get a compression
- algorithm's batch-size.
+Subject: Re: [PATCH v3 5/8] mm: zswap: Store the folio's node id in the
+ zswap_entry.
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>, hannes@cmpxchg.org, yosry@kernel.org, nphamcs@gmail.com, chengming.zhou@linux.dev, akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, davem@davemloft.net, linux-crypto@vger.kernel.org
 Cc: rientjes@google.com, willy@infradead.org, senozhatsky@chromium.org
-In-Reply-To: <20261106072412.7909-5-kanchanapsridhar2026@gmail.com>
+In-Reply-To: <20261106072412.7909-6-kanchanapsridhar2026@gmail.com>
 References: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
- <20261106072412.7909-5-kanchanapsridhar2026@gmail.com>
+ <20261106072412.7909-6-kanchanapsridhar2026@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Nov 2026 07:25:06 +0000
+Date: Sat, 07 Nov 2026 07:25:07 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -63,69 +63,97 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential
 issue to consider:
-- [Medium] crypto: acomp: batch_size gated on acomp_is_async() instead
-  of REQ_SEG
+- [Medium] mm: zswap: shrink_memcg() skips entries on nodes outside
+  N_NORMAL_MEMORY
 --
 
-commit 2fa95d403dcc5d6c7b702698b0e306a5d643d3b3
+commit f6e1c6117279d2be409376eb57c05492fc654dea
 Author: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
 
-crypto: acomp - Add API to get a compression algorithm's batch-size.
+mm: zswap: Store the folio's node id in the zswap_entry.
 
-This commit adds a batch_size field to struct acomp_alg and introduces
-crypto_acomp_batch_size() to query the maximum batch size supported by an
-acomp transform.
+This commit stores the swapped-out folio's NUMA node ID in struct
+zswap_entry for list_lru tracking and switches zswap_entry slab allocations
+to be node-agnostic.
 
-> diff --git a/crypto/acompress.c b/crypto/acompress.c
-> index ac4dc52668b89..df9e42f519c35 100644
-> --- a/crypto/acompress.c
-> +++ b/crypto/acompress.c
-> @@ -327,6 +327,20 @@ int crypto_acomp_decompress(struct acomp_req *req)
->  }
->  EXPORT_SYMBOL_GPL(crypto_acomp_decompress);
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index 78cf3d16b97b0..95997172db6f6 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+[ ... ]
+> @@ -680,14 +685,8 @@ static int zswap_enabled_param_set(const char *val,
+>  * lru functions
+>  **********************************/
 > =20
-> +unsigned int crypto_acomp_batch_size(struct crypto_acomp *tfm)
-> +{
-> +	if (acomp_is_async(tfm) &&
-> +	    (crypto_comp_alg_common(tfm)->base.cra_type =3D=3D &crypto_acomp_ty=
-pe)) {
-> +		struct acomp_alg *alg =3D crypto_acomp_alg(tfm);
-> +
-> +		if (alg && alg->batch_size > 1)
-> +			return alg->batch_size;
-> +	}
-> +
-> +	return 1;
-> +}
-> +EXPORT_SYMBOL_GPL(crypto_acomp_batch_size);
+> -static inline int entry_to_nid(struct zswap_entry *entry)
+> -{
+> -	return page_to_nid(virt_to_page(entry));
+> -}
+> -
+>  static void zswap_lru_add(struct zswap_entry *entry)
+>  {
+> -	int nid =3D entry_to_nid(entry);
+>  	struct mem_cgroup *memcg;
+> =20
+>  	/*
+> @@ -704,19 +703,18 @@ static void zswap_lru_add(struct zswap_entry *entry)
+>  	rcu_read_lock();
+>  	memcg =3D obj_cgroup_memcg(entry->objcg);
+>  	/* will always succeed */
+> -	list_lru_add(&zswap_list_lru, &entry->lru, nid, memcg);
+> +	list_lru_add(&zswap_list_lru, &entry->lru, entry->nid, memcg);
+>  	rcu_read_unlock();
+>  }
+[ ... ]
+> @@ -1539,9 +1538,10 @@ static bool zswap_store_page(struct folio *folio, =
+long index,
+>  {
+>  	swp_entry_t page_swpentry =3D folio_swap_entry(folio, index);
+>  	struct zswap_entry *entry, *old;
+> +	int nid =3D folio_nid(folio);
+> =20
+>  	/* allocate entry */
+> -	entry =3D zswap_entry_cache_alloc(GFP_KERNEL, folio_nid(folio));
+> +	entry =3D zswap_entry_cache_alloc(GFP_KERNEL);
+>  	if (!entry) {
+>  		zswap_reject_kmemcache_fail++;
+>  		return false;
+> @@ -1556,6 +1556,7 @@ static bool zswap_store_page(struct folio *folio, l=
+ong index,
+>  	 * to an unrelated live pool.
+>  	 */
+>  	entry->pool_idx =3D pool->idx;
+> +	entry->nid =3D nid;
 
 [Severity: Medium]
-Should crypto_acomp_batch_size() check crypto_acomp_req_seg(tfm) (or
-have crypto_register_acomp() enforce CRYPTO_ALG_REQ_SEG when batch_size
-> 1) instead of gating on acomp_is_async(tfm)?
+Can shrink_memcg() miss zswap_list_lru entries when a folio comes from a
+node outside N_NORMAL_MEMORY?
 
-crypto_acomp_compress() dispatches segmented requests based on
-crypto_acomp_req_seg(tfm):
+Previously, entry_to_nid() derived the list_lru node ID from the GFP_KERNEL
+slab page backing struct zswap_entry, which was guaranteed to be on a node
+in N_NORMAL_MEMORY.  Now entry->nid is set to folio_nid(folio), and movable
+swap-backed folios can reside on ZONE_MOVABLE-only or ZONE_HIGHMEM-only
+nodes that are in N_MEMORY but not in N_NORMAL_MEMORY.  Because
+shrink_memcg() only walks N_NORMAL_MEMORY nodes:
 
-crypto/acompress.c:crypto_acomp_compress() {
+mm/zswap.c:shrink_memcg() {
     ...
-	if (req->unit_size && acomp_request_issg(req)) {
-		if (!crypto_acomp_req_seg(tfm))
-			return acomp_do_req_chain(req, true);
+	for_each_node_state(nid, N_NORMAL_MEMORY) {
+		unsigned long nr_to_walk =3D SWAP_CLUSTER_MAX;
 
-		return tfm->compress(req);
+		shrunk +=3D list_lru_walk_one(&zswap_list_lru, nid, memcg,
+					    &shrink_memcg_cb, &ctl, &nr_to_walk);
+		scanned +=3D SWAP_CLUSTER_MAX - nr_to_walk;
 	}
     ...
 }
 
-If an asynchronous acomp_alg sets batch_size > 1 without setting
-CRYPTO_ALG_REQ_SEG in cra_flags, crypto_acomp_batch_size() returns
-alg->batch_size, but crypto_acomp_compress() routes batched requests
-(req->slen > req->unit_size) to acomp_do_req_chain(), which fails with
--ENOSYS.  Conversely, requiring acomp_is_async(tfm) forces
-crypto_acomp_batch_size() to return 1 for synchronous acomp_alg
-transforms even when they set batch_size > 1 and CRYPTO_ALG_REQ_SEG.
+entries added under entry->nid for nodes outside N_NORMAL_MEMORY are
+skipped by both per-cgroup and global pool limit reclaim, leaving them
+unreclaimable by shrink_memcg() and causing premature zswap_store()
+rejections once limits are reached.  Should shrink_memcg() iterate over
+N_MEMORY instead?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106072412.7909=
--1-kanchanapsridhar2026@gmail.com?part=3D4
+-1-kanchanapsridhar2026@gmail.com?part=3D5
