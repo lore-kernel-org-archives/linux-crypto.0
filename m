@@ -1,55 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794087260;
-	b=mXxIMGa7KEn7fPGXMnWQ/OP0q8XHS1eBJsBj3ikw/F7wn/dRggXu+6l+gHLur2SRFmew
-	 pdpk9sbNqNcu2SnCwOuryKLroYN0hq2VgfaUTzgFVogDRXi4FmEm6b1NqCEYYTqKbLqM8
-	 jWz2N9ETbbvFPRZk3JCcAOtmnHxpOPMuYKPdR+e1kO/723+166VCeHqInZQAXWL/3QQDc
-	 0WLg36DEqJqrZnOYC2RexNpJlPQ6NMCmfW1jdva/ftCEt5RiON8J6SklFi3rsfSFdkFp2
-	 S4DmbWdUIGPL8dxyuddyosi/b3BzKH/9COq6tjZnvIQakSZFO83FDDr0cm7dgo/puZg==
+	t=1794087438;
+	b=fgSWPi5dGTrCJIKMa+s/RucHF9N4WjU+hD3rwf3hNwbOirb19OlsH6ndyBhNrE/bFp48
+	 YKV95oXw0JcIxKqqgvvFhN5AovHm/+51C2AL641uk8kWD5bL/7CU83LAAzprj6s3Zpjw1
+	 gC7/tEA+manDK3LS59O5GTA2Yp7PlagP3bviPvan2BmQ3pICrahdVWAttI375FjCupXjf
+	 GUYwkWlO9Zj0Stxcph8VU07iXW8ggkDaZJedMxaxztmLzwK0CQmp3dp4nXzQ0rBmfYIlR
+	 y/oSRrFxXX0Rq0QHhpt8WLbBiZyl00u8DnJr4wNHxKWVf5u6mfAHMtMZiPEGs8rlG1Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794087260;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794087438;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=1rUq8wd3X80C8mXGrrALT29sY2dlIbvmN+EvfEtmNyA=;
-	b=mlufKFP+MM8IJHZzIglt9fs1QkUEgFEubn9279lL5tYxJ8EjTU+ZQTbk7sz09kDm4AiK
-	 lhb+PyD+/SVVTcF7LEGDseNP43d+Ec0DfPJJgE0I2j+qWurWmWADRsDuEFqqXmyOk1uUm
-	 BEjAlWJP7ake1An6fuF1Aanyoxqvo6wyOjTqUC7UqnVa+vGc8j+mS90SnApEEcViDMTUJ
-	 mkUw859Wdj7g0agGd6mXP0gpmZ5aYJdOWkFyGqz3ZsVHk7HHKje6E9ROwyep0i1qGrQut
-	 UpX7aVWPnu9eemmmP1sKjSGGpKyBnb+J79+ZyoDChvpaPTog0I/Z0g+O5DB+9/Grnxw==
+	bh=RZICYlEwCNSQrTvDVmUOLS6u4KZIZYM8/Ot1Wf7WUvc=;
+	b=3767NWhavo4qY9TYBgKw22KomZSfn7EsJ3U2lwX6e1CobAJWJxPyll3AQFaszDzxqsyg
+	 VDmMDG9qg66tJ3hNoU04IS5wdDxWH8H2MzWBLJoocdyrfCNWa/zv4/yQ2UifkNJBZo9+Q
+	 7GKWyPNby8gbDCAxUHqHpCxUsWBviP+MbbBU4wCwa7TenrTYbeSSqRKULwGLiVCYI/18p
+	 8eSIodEcp1jY8TlyLlC5L64582QrcvBdgpDhWFuPqsOmt1eDVxhLxUNirV4YBk0M4QsGj
+	 aWJR9tG/zqEqCkcWU/mL7v4slLDBKXgOHtnSvIed8uCLHoIWCoFr7LTH7m7vBiqeXRg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=S8vpX5A7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gzSZd4xq;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F6E606A326
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 21:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BD8606A326;
+	Sat,  7 Nov 2026 21:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=S8vpX5A7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE44C1F0089F;
-	Sat,  7 Nov 2026 21:34:19 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gzSZd4xq
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D62311F0089F;
+	Sat,  7 Nov 2026 21:37:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794087260;
-	bh=1rUq8wd3X80C8mXGrrALT29sY2dlIbvmN+EvfEtmNyA=;
+	s=k20260515; t=1794087438;
+	bh=RZICYlEwCNSQrTvDVmUOLS6u4KZIZYM8/Ot1Wf7WUvc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=S8vpX5A72hyO7pb4JPv7TMsccxRmobQVMM+PwHPjcRDe3VJm0IXTdLF1TwjI0tWmI
-	 w3OSQi3G1ZtbOyxbDlI8X0qFda3PRnHemk8fr2J701JvzEXzHdBG013np/QbUdGNd4
-	 WZ29WkhUd6GP7BNyX6CZb91mQOWeTDm1HltmAWGagpcLge5cWbNGuS2BxzlfO4AFA9
-	 bMpZVuFxtbzyqt0ey5R/AcmDjr7VT4ATcA8w2ZgrJN+mMJT4cI68sqaY0IGISacFuO
-	 +RWoIlT2FdvBOyMXv4jrJ4tSqG5GzYxWZEE+N3/Qn+rFWasQ2Oma6lb5tsXkTbC93Q
-	 MmTe9kYiKtFsw==
-Date: Sat, 7 Nov 2026 13:34:18 -0800
+	b=gzSZd4xqZKO7PvkKljWyy95ermHBQf9W4ylW0o8zV4fyMnS3nr1/g46MmRYgIg7Gy
+	 7X1k//hkzfdGie5glazqrbad2VfQwRq5oE/B9FJphlYz2h7zP2bI4mbis6z6zuUQp/
+	 rZD3wvL/H5Uyr7o8mZhHj7e7UmnY1DcqI9DihdGasDtTp4pVPzp4IAFzhSZ7woNQrj
+	 r9OAWDOJKhoZcMlD1mHFAVKyh/+ktvgy2n6wjTL/WdbRzgNWRHzHa61R2TO28XVeby
+	 RK/ho6cJfitCUoYPiWetjNwaeqViA/UZT+irbosL1QgFnWGgZbgLfpAjKbUXZA5d1t
+	 edyD0+mDl9d7g==
+Date: Sat, 7 Nov 2026 13:37:16 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org
-Subject: Re: [PATCH 1/3] lib/crc: x86: Opt out of initializing MXCSR and 387
- state
-Message-ID: <20261107213418.GB137269@quark>
-References: <20261105005523.84925-1-ebiggers@kernel.org>
- <20261105005523.84925-2-ebiggers@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Emanuele Rocca <emanuele.rocca@arm.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/crc: arm64: use .arch_extension to enable CRC and
+ crypto
+Message-ID: <20261107213716.GC137269@quark>
+References: <20261105154145.557042-1-emanuele.rocca@arm.com>
+ <68e24de8-0c94-473b-b2a1-47b9b79eb974@app.fastmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,33 +60,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261105005523.84925-2-ebiggers@kernel.org>
+In-Reply-To: <68e24de8-0c94-473b-b2a1-47b9b79eb974@app.fastmail.com>
 
-On Wed, Nov 04, 2026 at 04:55:21PM -0800, Eric Biggers wrote:
-> The CRC code using "kernel-mode FPU" is integer code that does not use
-> any MMX or x87 instructions.  To the extent that float-domain
-> instructions are used at all, they are only moves and shuffles, neither
-> of which raises SIMD floating-point exceptions or depends on MXCSR.
+On Fri, Nov 06, 2026 at 09:57:01AM +0100, Ard Biesheuvel wrote:
+> Hello Emanuele,
 > 
-> Therefore, there's no need to initialize MXCSR or the 387 FPU state.
+> On Thu, 5 Nov 2026, at 16:41, Emanuele Rocca wrote:
+> > Instead of using ".cpu generic+crc+crypto", use ".arch_extension crc" and
+> > ".arch_extension crypto" to enable the required instructions.
+> >
+> > The ".cpu generic+crc+crypto" directive replaces the assembler's current
+> > feature set with generic+crc+crypto, dropping any other features that were
+> > previously enabled, for example by -march or by a toolchain configured with
+> > --with-arch=armv9-a. In contrast, ".arch_extension" enables the requested
+> > extensions while preserving the current feature set.
+> >
+> > This is not a functional change: crc32-core.S only uses base A64
+> > instructions plus CRC32 and PMULL, which remain available, and BTI landing
+> > pads are emitted as HINT instructions. However, using .arch_extension
+> > avoids the pitfall of silently disabling features. See commit 9142c2f8f84b
+> > ("octeontx2: use arch_extension to enable LSE").
+> >
 > 
-> Opt out of this initialization by using kernel_fpu_begin_mask(0) instead
-> of kernel_fpu_begin().  This eliminates an 'ldmxcsr' instruction in
-> every kernel-mode FPU section, reducing overhead, which matters most for
-> short input lengths.  On 32-bit kernels it also eliminates 'fninit'.
+> I don't mind the patch, but I will point out that issues such as these can
+> never occur in .S sources. The emitted instructions are always the same, and
+> the only reason we need the .arch is so that the assembler permits the use
+> of the special ones.
 > 
-> A precedent for this optimization can be found in
-> commit a58db7ad80e8 ("netfilter: nft_set_pipapo_avx2: Skip LDMXCSR, we
-> don't need a valid MXCSR state").
+> Commit 9142c2f8f84b is different because it uses .arch in inline asm, where
+> it switches the assembler into a different mode behind the back of the
+> compiler, leading it to reject instructions generated by the compiler.
 > 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  lib/crc/x86/crc-pclmul-template.h | 18 +++++++++---------
->  lib/crc/x86/crc32.h               |  2 +-
->  2 files changed, 10 insertions(+), 10 deletions(-)
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
+Thanks.  Emanuele, could you maybe note that in the commit message?
 
-Reviews and acks appreciated!
+Also, this patch is not complete even for lib/crc/arm64/, since
+lib/crc/arm64/crc-t10dif-core.S still uses "armv8-a+crypto".  If we're
+bothering with this, I would suggest just taking care of both
+crc32-core.S and crc-t10dif-core.S in one patch.  (The crypto files I
+mentioned before should be a different patch.)
 
 - Eric
