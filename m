@@ -1,13 +1,13 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.154.28
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.150.75
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794067647;
-	b=zQY1bZR2K9cKN++iWc6sgkkjz+obCZ5yiQZXmMS7Sg0kEjvtkySqHVN8xOqmll9QuavZ
-	 nhsAFrLJpFZjq+7zImoSHFY6inStBXa6QNZPMQaYhWrMnjItI24zRSRIByl2RL5uqFEkh
-	 PcZQ+gSd3yz39/BBkV9yagGVDnWX+LL4Nw61DYMEAxLiUCJ3WUwmp/Blp1c/7L/KzvEW1
-	 07nPh9XXITWiHl6gAObeLOAuUDgBvqtELTbrQqqxmQBTDgwM4VvJXvB2nn8qBhrwsFV7m
-	 xb+7ctY9BiSY21kmXiAHRyFesMpaPQkoqFdeLe86P0y8hfPbXE5Se0h2MvwRznWwkhA==
+	t=1794067648;
+	b=gYtDyykEkzaAVImLZ8/ThZ35h/1mf4oQV7mOd6cokxoG+KwiRtXjBCgIYYs/XRyLx3i7
+	 0EIwvCVT1t2xgHz6RwuDub4LbZXi4oyfbQOJv63+Fe+c1SVrcY3/mCe98xuq06WAdAq6v
+	 1sBweXFKPWpHyFSwjoxcORpBTTQP4r5o7fcH2q9MmVyqmM+qgXbiIaNDEzV/XsMcEH2hj
+	 6bFBCyGXX6bCuUP/DTiM92TDpC0Mel1VUnd4sMt+vT3aJLY/VsqZe9UkfOqriAQl2l07R
+	 K6ZAP+2i6VBgQUGXNW/dN+x6SjguDtcDItTDTcLSu5I8oLS50WoofdD91cmeB+zvN7w==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794067647;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794067648;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:DKIM-Signature:
 	 Received:Received:X-MS-Exchange-Authentication-Results:Received-SPF:
 	 Received:Received:Received:Received:Received:From:To:CC:Subject:Date:
@@ -26,113 +26,114 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
 	 X-MS-Exchange-CrossTenant-FromEntityHeader:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:X-Proofpoint-Spam-Info:
 	 X-Authority-Analysis:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
 	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=hc5rQFmgZIu2nYYv+qmWT4ckMpFthoMdaBzcgTssWY8=;
-	b=jZWeim0uSiZ10tnmHiycDEcajCmNxwCx076fphXzY/QP3YYrRntKDSPykX7Sqz4Wqhvr
-	 mno3SYIBqHSLKFQJqAgveGNPoMeO9++4f/KRwOXJCs9M/qrJj6Ycf4WZTv4GHlZ9OyXum
-	 d55WVG8zyEoLHFo3xODwWYeE8zCiRr10qy4pkGDu8c6GMrkKWubY5ntJru29nc/gZw46f
-	 5vliiYYiOl3nq1M3xStuVQNe0mozNrIOfYnD/jvY4QvDd6wNOUTpNzvZw74nnV60dxQzv
-	 HRhZzyHoS1vR9nJESyep1jDelTHENyXzMU9TYQ8SWoa5WI3zBFczaTWKNlEXnp7qg4g==
+	bh=n9IAh6Ha3M5DllqXZRkXT45vI4T5UBS/I3stI4IGUnA=;
+	b=EfJhYXsKjp+cW5aWQmBnDKBdS9z46LecPg/sf2RVcwSIXXCluNlE1fiyYAlhaKRATz8h
+	 4xv07ZrgLPRSUqApnZ2yXx6oQTQjJjh0IWz6pPYinnKQ0lb46M1Up5pUCpAnlYt8rekqD
+	 q7aQRu8me+/yrdI/hfcDKQGile67LM0jDtHHAGUbURItzPTdAv9cCFYfNrCE8hO8/QWTA
+	 XxPBjU18FAoeQp8ut2F9VxdzCR71V9Kpk+5iZYB954AlXD8akSHYGZLT5wb2jsp213sOy
+	 uOjvQ17wPPEAeZJmUu7Ailn90RZmDFxXGbhK0r1X2h+N44owrNP66L6TpTCtupsI/yQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=ti.com;
 	spf=pass smtp.mailfrom=ti.com;
-	dkim=pass header.d=ti.com header.i=@ti.com header.a=rsa-sha256 header.s=proofpoint-05-2026 header.b=OtImdsn6;
-	dkim=pass header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-ticloud-onmicrosoft-com header.b=YjCou7Wl;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.154.28
-Received: from mx0b-0002e601.pphosted.com (mx0b-0002e601.pphosted.com [148.163.154.28])
+	dkim=pass header.d=ti.com header.i=@ti.com header.a=rsa-sha256 header.s=proofpoint-05-2026 header.b=aMkKvzhL;
+	dkim=pass header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-ticloud-onmicrosoft-com header.b=hQi0gE1Q;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=148.163.150.75
+Received: from mx0a-0002e601.pphosted.com (mx0a-0002e601.pphosted.com [148.163.150.75])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E473C606A334;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79A3606A32C;
 	Sat,  7 Nov 2026 16:07:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E473C606A334
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D79A3606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.a=rsa-sha256 header.s=proofpoint-05-2026 header.b=OtImdsn6;
-	dkim=pass (1024-bit key) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-ticloud-onmicrosoft-com header.b=YjCou7Wl
-Received: from pps.filterd (m0374955.ppops.net [127.0.0.1])
-	by mx0b-0002e601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6A7ExxKR2608381;
-	Sat, 7 Nov 2026 10:07:23 -0600
+	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.a=rsa-sha256 header.s=proofpoint-05-2026 header.b=aMkKvzhL;
+	dkim=pass (1024-bit key) header.d=ticloud.onmicrosoft.com header.i=@ticloud.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-ticloud-onmicrosoft-com header.b=hQi0gE1Q
+Received: from pps.filterd (m0384305.ppops.net [127.0.0.1])
+	by m0384305.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 6A7ExnW43866358;
+	Sat, 7 Nov 2026 10:07:21 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	proofpoint-05-2026; bh=hc5rQFmgZIu2nYYv+qmWT4ckMpFthoMdaBzcgTssW
-	Y8=; b=OtImdsn6Uh2yex8PkLNeB+thgwRNfhwlHh1V+wETb9e4q7VKME9Rzox7g
-	jYYlf7d1ZmaDfGBRhIkWu2YgOvjcQ0sn4k+4Zj6jDNVW2vnZDGc2biyZq99QXi/9
-	K5h+n7htCuSgBe6eTdDo6YWbtuxWmUpOjGA1PKmZUUaOy3sFQlbHqHkpcbIXvPnS
-	Ck4iv6UVDXQ1beQlwA3XHVK/y6lXmpkqW4UpWImZyaUiv7GTIGC1wHLG5ZBVL88l
-	Dc/qwFVwoEMqNNMDSfVWsdR7a73Mzilml5fOV2vDxOr94nOLjS7VBaf3fryf0v/0
-	3tMUbLtXDE6XWk/1wveRrOl+/xKvg==
-Received: from ph7pr06cu001.outbound.protection.outlook.com (mail-westus3azon11010053.outbound.protection.outlook.com [52.101.201.53])
-	by mx0b-0002e601.pphosted.com (PPS) with ESMTPS id 4ht0vrha23-1
+	proofpoint-05-2026; bh=n9IAh6Ha3M5DllqXZRkXT45vI4T5UBS/I3stI4IGU
+	nA=; b=aMkKvzhLkWNUQEkNHDyFE+uOQAiTPCH+AuuMCxL2ObeZ/EWIjkyGstT4c
+	ad+5626LLPgJ3d3vrDtXKJKxRq53M00oYrAcwCDqmPVK2YjgduMJni10WUzJtVtF
+	TkFz/jKKVsnpDu+AuuBvdMSp1SRGNxnB6A4HPX3LutZhONrj/lhAmhtKib2Ev7Ym
+	5EItDInNCNMODNDpn8ip0+YH/WGcfln+MvqTVFORxFqMzFXgQle9TRVEoe1+qVBe
+	SlPm3OnZe2wlbPcho6n+wyzq6Tfd7D0G5K/MMbBpnxQKglYWyg04inna+NE+96vm
+	hsbXitfG1bc9PWHs5tnpLvljCZrZA==
+Received: from cy3pr05cu001.outbound.protection.outlook.com (mail-westcentralusazon11013051.outbound.protection.outlook.com [40.93.201.51])
+	by m0384305.ppops.net (PPS) with ESMTPS id 4hs3qmj06h-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sat, 07 Nov 2026 10:07:23 -0600 (CST)
+	Sat, 07 Nov 2026 10:07:21 -0600 (CST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nzHhhOcxR+Om+F3uxLlvwI44KpFtZqa1Hl+yH6hl75FY+Cpfkn6XlNyGxgoHtpwnY5wAm6KbVKN3CcvMgD3AnRkvQj4B4o0o1oBChfDGDiYaEBib206fvJSooCNfWcPs0Ni9zTY1iav7YXemZKZVUC3pbJHybq2iNZVIkVNXAiv8KOjFsIaoSyJ+UAD3T+o89CSvWnSSQKl8Vw7nW922LuCC+l5E5HKHIcp5adwRT/Y9geXNKjVxSO7w7X+BLmimJeKF3g9NGhw1H/3OwM0mppbHwkL7R2e7CbV05kiBaUbVnRGpp6wASgZ+OB6jq18az5JsxyWDas0UdwgLPHR9Pg==
+ b=fyEEVo+OUsdKQ1WzyCYNWjZC65LIsJUz5f1F6N5fbb5fvJeDSHEY4No/DPZ3Sj1aOeBY6L/ipQAxTvZjQVQ5j5lD3/lepNZ864DlvkuKR7tgOWKQPjwdzpI1RCRAOGJ6ItBPiQlL4wlaqS6HTnT9WuM0PKxOo2CFEI4OK0NQYrTR+ztY1LfvXBdymEzrE+r2+OMDLL1/3rtIFFUPKpVgUddsJnNQXwuOiEO2/iUO+24orVywb7mITfxEiFbI0w/krzUEI/s46YSQBS1FGaZiQMpLPkCTOaan3n5ulreNTBRGRbbJlsg5lrZieaRrfTbwqH0Rxb1wONdlHvA3cWcRYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hc5rQFmgZIu2nYYv+qmWT4ckMpFthoMdaBzcgTssWY8=;
- b=FyBOHfUjHRPFrXXDbhqUJTS9VGiBim9RtXiZ6nzDA0eSSQZKYdlF0r/I+8mcGs8hA89uy0eALtglZb3BzxobfAHvNusI+sHhUiYZvZvj7JVOIb0T9yiyMeMAytSI4hSGSFqkC6MRX+OtwImyhXcC5BAtWjoVTRhS+pRec+oG5c6cZ97NSheLkgQG2aNXOArWSytC2rH0L/9qzQayjSVXg4qpYKC77FBM6mJfIcQCoJkrDaNaOHkhsqtTV8RDB1S8wtLMsZRmELaFaEL4Urp/91mzpOBkcOMoRXCU3vARqB6RE7ixDr+vzXcSeTRUV9XsiuSi1p3+J/+LR3w/E1mXQA==
+ bh=n9IAh6Ha3M5DllqXZRkXT45vI4T5UBS/I3stI4IGUnA=;
+ b=KzLDQansvOhUCzJaPj0JarPMevlJPGIu+TegmQNeZ241VmsV26nme1feq6L9MfSqCx7M+hG/UL0/PzhKEZKDI3m8cjLELUmcibp6ZQX1TcpZrhEJGwp3BDD4lUC7ZhLj2Pt6zFuA6K5styE7eRgAw+axlwOPGAh0ACz0AezA5OFiJYNqZB8iFDfn20VYUww1EyDQbR4jCTbsXtbvqgq0GAJAOzw2K2YRXIr8VVzJYms30m2YZBz06/xHy1taBVfuzU6OZj0OltW/KwvMLKphJPYPjpO9IAM/VbTJumUASUVc9QhKcXezVsWgW6ffeyunjMACcO7ufjXuYn/gA14NGQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.195) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=ti.com;
+ 198.47.21.194) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=ti.com;
  dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ticloud.onmicrosoft.com; s=selector1-ticloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hc5rQFmgZIu2nYYv+qmWT4ckMpFthoMdaBzcgTssWY8=;
- b=YjCou7WlvWXY2/9dd0Jc5k4ja2OYquK85Ws6Oze4nDIV1Y5zvxVabbfUAC/d39Qhqor+w6szBj5VNEBdUrZIXeGTU4H7XKBCcUdWrxcKZCJZoKIm6hkQ33u4U+BbCnWSpTqTPV8vFMWV3vRBmBpPn0lEwiKjMy8AhdZPFGQoLzQ=
-Received: from MN0P220CA0006.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:52e::30)
- by SJ5PPFD020A49E6.namprd10.prod.outlook.com (2603:10b6:a0f:fc02::7d0) with
+ bh=n9IAh6Ha3M5DllqXZRkXT45vI4T5UBS/I3stI4IGUnA=;
+ b=hQi0gE1Q7nl5xIYTQP8GmPR/VWOT4VkdptV8m5Tddv31hHv8VWqx+6HoSsTn7eqT0mHa327sKztM2XOHKYVX2zzoHxICzCsKLYYCoV7ovCr0JnqR5yHg3laC6v9cCkyfiU7ci0Pbd38wlbG2lLrTfM48gDRp+B6cpdqSqohXdqI=
+Received: from CH0PR04CA0117.namprd04.prod.outlook.com (2603:10b6:610:75::32)
+ by IA1PR10MB5897.namprd10.prod.outlook.com (2603:10b6:208:3d7::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.10; Sat, 7 Nov
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.592.11; Sat, 7 Nov
  2026 16:07:19 +0000
-Received: from MN7PEPF0000014F.namprd04.prod.outlook.com
- (2603:10b6:208:52e:cafe::9a) by MN0P220CA0006.outlook.office365.com
- (2603:10b6:208:52e::30) with Microsoft SMTP Server (version=TLS1_3,
+Received: from BL2PEPF000352CA.namprd02.prod.outlook.com
+ (2603:10b6:610:75:cafe::3b) by CH0PR04CA0117.outlook.office365.com
+ (2603:10b6:610:75::32) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.592.11 via Frontend Transport; Sat, 7
- Nov 2026 16:07:19 +0000
+ Nov 2026 16:07:18 +0000
 X-MS-Exchange-Authentication-Results: mx.microsoft.com 1; spf=pass (sender IP
- is 198.47.23.195) smtp.mailfrom=ti.com; dkim=none (message not signed)
+ is 198.47.21.194) smtp.mailfrom=ti.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=ti.com;
 Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
-Received: from lewvzet201.ext.ti.com (198.47.23.195) by
- MN7PEPF0000014F.mail.protection.outlook.com (10.167.254.41) with Microsoft
+ 198.47.21.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.21.194; helo=flwvzet200.ext.ti.com; pr=C
+Received: from flwvzet200.ext.ti.com (198.47.21.194) by
+ BL2PEPF000352CA.mail.protection.outlook.com (10.167.249.132) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.615.4 via Frontend Transport; Sat, 7 Nov 2026 16:07:18 +0000
-Received: from DLEE209.ent.ti.com (157.170.170.98) by lewvzet201.ext.ti.com
- (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ 15.21.615.4 via Frontend Transport; Sat, 7 Nov 2026 16:07:17 +0000
+Received: from DFLE205.ent.ti.com (10.64.6.63) by flwvzet200.ext.ti.com
+ (10.248.192.31) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Sat, 7 Nov
- 2026 10:07:11 -0600
-Received: from DLEE200.ent.ti.com (157.170.170.75) by DLEE209.ent.ti.com
- (157.170.170.98) with Microsoft SMTP Server (version=TLS1_2,
+ 2026 10:06:50 -0600
+Received: from DFLE214.ent.ti.com (10.64.6.72) by DFLE205.ent.ti.com
+ (10.64.6.63) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Sat, 7 Nov
- 2026 10:07:11 -0600
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE200.ent.ti.com
- (157.170.170.75) with Microsoft SMTP Server (version=TLS1_2,
+ 2026 10:06:49 -0600
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DFLE214.ent.ti.com
+ (10.64.6.72) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45 via Frontend
- Transport; Sat, 7 Nov 2026 10:07:11 -0600
+ Transport; Sat, 7 Nov 2026 10:06:49 -0600
 Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.53.205])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 6A7G79VR3459964;
-	Sat, 7 Nov 2026 10:07:10 -0600
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 6A7G6mMk3459484;
+	Sat, 7 Nov 2026 10:06:49 -0600
 From: T Pratham <t-pratham@ti.com>
 To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-CC: Sebin Francis <sebin.francis@ti.com>,
-        Manorit Chawdhry
-	<m-chawdhry@ti.com>,
-        Praneeth Bajjuri <praneeth@ti.com>, Vishal Mahaveer
-	<vishalm@ti.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v12 09/15] crypto: ti - Validate sg_nents_for_len() return value in DTHEv2 AEAD
-Date: Sat, 7 Nov 2026 21:36:24 +0530
-Message-ID: <20261107160631.2592763-10-t-pratham@ti.com>
+CC: Mert Seftali <mertsftl@gmail.com>, Sebin Francis <sebin.francis@ti.com>,
+        Manorit Chawdhry <m-chawdhry@ti.com>,
+        Praneeth Bajjuri <praneeth@ti.com>, Vishal Mahaveer <vishalm@ti.com>,
+        kernel test robot <lkp@intel.com>,
+        "Dan
+ Carpenter" <error27@gmail.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v12 01/15] crypto: ti - Use list_first_entry_or_null() in dthe_get_dev()
+Date: Sat, 7 Nov 2026 21:36:16 +0530
+Message-ID: <20261107160631.2592763-2-t-pratham@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20261107160631.2592763-1-t-pratham@ti.com>
 References: <20261107160631.2592763-1-t-pratham@ti.com>
@@ -149,147 +150,139 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN7PEPF0000014F:EE_|SJ5PPFD020A49E6:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc599b99-cc06-44aa-55c3-08df3ce9328f
+X-MS-TrafficTypeDiagnostic: BL2PEPF000352CA:EE_|IA1PR10MB5897:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f6b2b53-f1e8-4d4c-8b74-08df3ce9324f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|376014|1800799024|82310400026|36860700016|56012099006|261022105027099003|261021121427099003|261102123227099003|261028144727099003|261009223027099003|261026140227099003|22082099003|18002099003|10067099003;
+	BCL:0;ARA:13230040|23010399003|36860700016|376014|1800799024|82310400026|56012099006|261026140227099003|261021123027099003|261009223027099003|261102123227099003|261021121427099003|261022105027099003|261028144727099003|10067099003|18002099003|22082099003|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	9Jj+Cxpb22m/U3P55pOgLMNbdou5XmpQk9NORgx9hIgtAHuOKUj+vQpyM8E8nSA8xAmmBdACg4xfgaL39rh19Ka8HGunn/fo6m2+7fAWaEMR/Br6V8E+8H9tPHvR3UdE+WJ/xjbINA/+xnqU1N4CEyAkgWGkfxET9uXPlpFFvhQSVErMLO+oDrsxKr17KNwmxvE99rnPEz/oezRjrmTcODZe6Hzb6r6q2M2JYv+vGlprGgS7Sy9eR28RX3xIP63Tw6hacAI5Dq8gRJuP3mevhhjaQqJj+EBmLxmjlRZ1KXDMl3x1CCUw1a1ABnuX3F2r49KlNJm6w0E0B5Vmzqr7G5oe6gR/FbriZK6X5xKQvXVWYeMoZVESNR0QWE3jaKxfYEonocDvRjgC48ttmxsRy6NCG9nqMW6Wmy6s8Ib6fbGS/CYhU8emxxWS7qad/sJUF92JZmKVJgKv3XwboVy3Uan+t/MzNyX4BCZW8BU2W+owczlum7hyGqY8HYcpz9Gao33CXvlJeyK83GFw6gOByfVQn0mqn7207nwdht8jRQPI68gng4dmDyYAYSDLnEo6vCagLuuHHg4E6Lcco7pfnWGQTND7Abd17EQIEbxIOv8Rx+izkkmgdYft4qNytRKXM9x9WFYJ/vSYNSatVFsrwf4lEJiD3AWgYszOg+4HLpWTZfdU1yAZFrydfjg3xs7CsK6fG3/bn0oz0cy/cmlpcw==
+	cx9TQlHBkvUmUW9YauRxGvvWC1kaVfWT7ExjzlbcRMiKdv+D71UkSG3QNOGcL0mZDxYyVRA2bUTDxLTQ9h2j6v+71t3OkUJlQjKmj+98vwckyXEQUopoVJQsFdFItYqPTxdIRUJu3SnN0YmY9rGZilEmriBvqfxzE6bmk0g5f4ojd2/OmCyquzlmXWZyuPpaF+6AiVyX0xqKCFLkuccSTp6SF/dOh45lccRWDmsQa8X20eu90KIZcJSso/INXdsB0ZrEF7MyVgGz93rH1QQmLP7nyQda4/fPN3Cm4yyjhvFLCkbQd19yWOverjEx/kpci/JAfoRGPXX56uUSRmoNfg52BjQe01ai+XpOtCGPBFSk1Nwky6brEBoMvRwLHY3az+jCzvolO+pteetIkxLSB32LJCQGE/z/9lvIJ26dS3yqC57O/eUPHwaTcQG9NVME2whF/UyDVY91ZxitDXgJdjnXIdb2QGQzGL7mrxv2e6TcqP2N0w7qfsUbIxhCHSP1Webpt1a5WDgjiEwkPoxbYHM0GU7IrFltPgwSHmnk248NAJIJCfjaPRMElrfkolBAF3rQXNjcuvAkOajwQakbXpushlz9caS+/JckG0cjR1L/a6nZJ1seDmhIJHHmYS8c4VPLxCVakux00Zj+JtS/Ypq3cqc+MKl6MwfHCpuFRfY=
 X-Forefront-Antispam-Report:
-	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(376014)(1800799024)(82310400026)(36860700016)(56012099006)(261022105027099003)(261021121427099003)(261102123227099003)(261028144727099003)(261009223027099003)(261026140227099003)(22082099003)(18002099003)(10067099003);DIR:OUT;SFP:1101;
+	CIP:198.47.21.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:flwvzet200.ext.ti.com;PTR:ErrorRetry;CAT:NONE;SFS:(13230040)(23010399003)(36860700016)(376014)(1800799024)(82310400026)(56012099006)(261026140227099003)(261021123027099003)(261009223027099003)(261102123227099003)(261021121427099003)(261022105027099003)(261028144727099003)(10067099003)(18002099003)(22082099003)(13003099007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	zTU9KqOeUrSoE0wUgEl0IHbebDOmqbVQFgJt1uGb0fkdUHb8jCQZ1I2f0vOCA446KkvefNJe1NLScQ4V8mPkG3r01NdxMPFl/bk4XELXmWkrrJYDukB1hExb6PJ+eZLlO7u25rUP8mwOwInCrFfxYGy1+0eR049rhloLl3bMgeWWuu/Hdzqs64rBySdIrECoEcu4bP9Ht16AgpWwFWaReCDZtu5qT68PDMKXNNbUpN8J9lMnRJd04yK9Oyzs4Ay7ZU5dzS17yHbyOHkU+qQ9eB09tJCoDHLhkCu16ukEHCDVU8OOCfQwndEBdBbpNcv9lz8QYrUOKJQCN3QRyzmJhff/Y2f0VT0lXQfG1A46Q8ja1TjG0RZRUVW6k5sZ0ir1B9NoNfnnIzQsU/8u+jW4p03YWddQxf/3dlA22wbyerXOu0QFpCWobIpSCdKckPdf
+	vRdbnkuzijxIKpOC8xjxti+1etqKGff+khWqhOtuonzKBP5GTocZXJgYKvgyB+9uhM5GznyyWBAmBHcUtJlCL2DOTwTU7qbWmnScPOgXzLe7dQkU2zpI+DpPpzsa84yMHfVy1qsxiKFRehnvxdLMa88necOlDNrNafRlHCJbBScPA3daAS1U0G9EmyMIi+RjjG/WYgxaAdnWwA+cxzmaTbrppp6WJWGkUzQvL6hfZZsEXvt+VvUh8HQIGwTaaDoMjp+jyMgBtLQ/FkOIU2eOUbwaEGKk7KDUqULhZ2BchpHRPzHsB+OudasvIqL5MoUbppQm+YJYkMvYhl6pizUdyz3dASqWzBAD82cbDe15UCWw4t+QKLoTSOumxi27WZzEGUZyPXGAa2f51nXT9dbK+GhaLMS7VTUEoK+ObocQVIB4/vw94cGwubpMlStzPz/3
 X-Exchange-RoutingPolicyChecked:
-	MrruNwLyLcoN9sCpe1jRI7Uo7XLgETCivkwYNJMrV97XYisUqMbl2tF2W3WEVoBzFKO6ahEYb7hzl8Kjx+YIWxae1SddwPaVnjLkOSx28kQyUw3iWFFfSBNBjgvQLUcXmUgO0qwFdW1Dd4WYlm96kOTdLuzcageic54LElasO+v5UQGMongQviOZVmrNpazn2hL30jBegOg8EXeRH6d+fQapFI9N7g4dX+dBgMYypMcSiYVN77bQGljVXAYkr2SgQFQ2Ltw09gEgqMYOAY3dyxduYxssyUhKzECmCW2iuKKrdqdL2tHrfHnc7XmI0JNPryGaes9NcVDZHcHw6lK1tg==
+	E2nYKLe5k7WYqpQTv9Jj5F9v8pew+bISh//GkKE5aSp90zNQYJgczAlKMCjYv13Pi4Pu6gSAG7bap37FMNsBXT0NR3EXISv1hJ9IkNHgWO02NnTDlAfxs/hd+4/ZW18wQEWb5a6FxQVi4+rVDjzZ80gNolfpWHQ0g00V6gQ2d09p9Xi7zTHXv0Za1vAzf8bkeyW+cdBxfk5hs9sMHuOeH0T2ea8rqHC9yyobQfDAZSYoIWVhyXBUGBpIa4A4tePK9/PlT00imm93942LO3f7XZ6xQkxMdZAjb+6HdRnv/IdDHUpAo8LtayygPcI3/BOEIKzrYPc3GvqSMKFoy2mxcw==
 X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2026 16:07:18.2041
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2026 16:07:17.8273
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc599b99-cc06-44aa-55c3-08df3ce9328f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f6b2b53-f1e8-4d4c-8b74-08df3ce9324f
 X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.21.194];Helo=[flwvzet200.ext.ti.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MN7PEPF0000014F.namprd04.prod.outlook.com
+	BL2PEPF000352CA.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFD020A49E6
-X-Proofpoint-ORIG-GUID: Kogp2gwt26jPjGJdAZ_JoaEj8l3UgfO5
-X-Proofpoint-GUID: Kogp2gwt26jPjGJdAZ_JoaEj8l3UgfO5
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA3MDA2MyBTYWx0ZWRfX3GXngzaCQaFz
- f5Qkd3cnrry67sXwHIJf1XWRKXte9bw54ANvR2Blzk0uNZX6sApYruD5Hj60NA+s/AJ1zycTvei
- xh7dJG+uqSfbtXhGLYOXTzcD37MTCDE=
-X-Authority-Analysis: v=2.4 cv=aaf0Dhot c=1 sm=1 tr=0 ts=6aef4cbb cx=c_pps
- a=0vJwjWeN+wUybMchBBml3A==:117 a=f+v6EHfkeJbVwR46tk4DMg==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=zJRp6_cAMcgA:10 a=s63m1ICgrNkA:10
- a=AlMIdn_sM9wA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Z8NIEmU8O1QQgoT56wFK:22
- a=fPAWb5peG099m5CrUpKH:22 a=sozttTNsAAAA:8 a=iMD6g9N4YQ2QoEUmFGwA:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA3MDA2MyBTYWx0ZWRfXwuCdgZLn5QZJ
- n5JHE4Uu/TlrSc9LmNtuVsgG5GxPiyfoBgl974YbNBk3Cf3SS2dmiVGSssWN2bh3+kFFF3mW+2Q
- hMm9eK+nf8pxN9Jme1TjmnvRyM3eVDqnkAdf7uiUtNkqQKfYqFD5xGQgbCDGH+zyqmnqC9UVmjT
- X7cFlGHK3WMBv3njg1g/oitPXZHJoQOfQpUbVGciUswwLfTtbeLbyplsiRpwy1t3TtGh1RMbJ8o
- Zngg0yVKp+xu1PwKsAriNPBMwi8fpRUYqXxP525dbMxpiwvjFNBbAppdA7mLHb1UUpW62M4m1WC
- Zh/Pnc8Nojej+dC4Z1D0EwUrXz/j590mgihln0waKe3zu4kOs1tqoCyO1ncVnubirL5B6KDhdoE
- 6IS+B80uRhkh62v2PjMw4aYtlvppANiUHDE5i9lcC7T3dIbNTIyjfMIo7W9pu4udPuZDdsDqPNG
- 59SNKGdSTUN7LXTUL1g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB5897
+X-Authority-Analysis: v=2.4 cv=F63C5ahN c=1 sm=1 tr=0 ts=6aef4cb9 cx=c_pps
+ a=xsj2MuQvL1s4LVRwU0hgyg==:117 a=iwqwCZQqcuTv3JOpYdM7/Q==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=zJRp6_cAMcgA:10 a=AlMIdn_sM9wA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=Z8NIEmU8O1QQgoT56wFK:22 a=taLDd7a_hP9WKsMzeGRc:22
+ a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=pGLkceISAAAA:8 a=sozttTNsAAAA:8
+ a=HYHyqeARaHjSmq2Pe6sA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTA3MDA2MyBTYWx0ZWRfX/V1RvM11hASA
+ gc4GjcbkyXw7mQYQMP05Wuklm/0PjLRN/3n0mpbtCZL+Q1qUTWgM+W3XQw+nIBFfLiYwzSjZ2/K
+ rwZXGvJh9kjK8FvJIQERrIp0kwikmxa+E6+IWOlCxCZGbFNx27e7i5W1tISxZjWMiMYBqxnBjKU
+ m54yBzEgolDfiSgTg7P8iw2wLKB2w/luOzGxNeLZuhzdUBVkKqwXu0GNjF3rYCQRtE4yJ+SdOT9
+ FmEl7gdCl4jE66LYeCynx6gt2wTL0475lnkB2yzwyUlJwOWahGuIgvLHYmqlYL92SJkO+Irfqzb
+ +227WEbtw4pRGqLdCO8GQNXKhNvhc29iT+MfCmRHSxCGp1UVVDgZmBIdDouSvk9X9ijRUgkxuoW
+ mb23kETx6M5H3+sGmYr60uc77ExzgIftn4RpkEGRzXbiBR/b/cD+O/A71M8ZpFVtHlS5IGYM4cM
+ ckUYCMc9eKqBj5hs0Ww==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTA3MDA2MyBTYWx0ZWRfX03vuE96f6KfK
+ 087eWkduvguspGz2go2+EdloT5FSGFbvfvYpA+m7MS+ivaviLs/uK0vjHyLQHLN71OI5VanoIEY
+ Ro/YhOQkfqG+XtWM2oOE4SOO2i3toyE=
+X-Proofpoint-ORIG-GUID: vHXe9PNoMZXeHRiXx4IupaTkqWYZENps
+X-Proofpoint-GUID: vHXe9PNoMZXeHRiXx4IupaTkqWYZENps
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
  definitions=2026-11-07_05,2026-11-06_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
- phishscore=0 adultscore=0 bulkscore=0 spamscore=0 clxscore=1015
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
- definitions=main-2611070063
+ impostorscore=0 priorityscore=1501 adultscore=0 clxscore=1015 malwarescore=0
+ spamscore=0 lowpriorityscore=0 suspectscore=0 bulkscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611070063
 
-sg_nents_for_len() returns -EINVAL if the supplied scatterlist is
-shorter than the requested length.
+From: Mert Seftali <mertsftl@gmail.com>
 
-Add explicit checks after each sg_nents_for_len() call in DTHEv2 AEAD
-driver.
+dthe_get_dev() fetches a device from the global device list with
+list_first_entry() and then checks the result for NULL. However,
+list_first_entry() never returns NULL: on an empty list it returns a
+bogus pointer computed from the list head. The NULL check is therefore
+dead code, and an empty list would be treated as a valid entry and
+moved around as if it were a real device.
 
-Fixes: 37b902c603042 ("crypto: ti - Add support for AES-GCM in DTHEv2 driver")
+Use list_first_entry_or_null() so the existing NULL check works as
+intended and an empty list is handled gracefully.
+
+[pratham:]
+Add null checks on dev_data in callers of dthe_get_dev().
+
+Fixes: 52f641bc63a4 ("crypto: ti - Add driver for DTHE V2 AES Engine (ECB, CBC)")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <error27@gmail.com>
+Closes: https://lore.kernel.org/r/202606111933.69GGTKxr-lkp@intel.com/
+Signed-off-by: Mert Seftali <mertsftl@gmail.com>
+Co-developed-by: T Pratham <t-pratham@ti.com>
 Signed-off-by: T Pratham <t-pratham@ti.com>
 ---
- drivers/crypto/ti/dthev2-aes.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ drivers/crypto/ti/dthev2-aes.c    | 12 ++++++++++--
+ drivers/crypto/ti/dthev2-common.c |  2 +-
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/ti/dthev2-aes.c b/drivers/crypto/ti/dthev2-aes.c
-index beaaca862f39d..38278ad42f904 100644
+index a3c069ca2baf2..dfb26be6d20ac 100644
 --- a/drivers/crypto/ti/dthev2-aes.c
 +++ b/drivers/crypto/ti/dthev2-aes.c
-@@ -643,6 +643,8 @@ static struct scatterlist *dthe_aead_prep_aad(struct scatterlist *sg,
- 		return NULL;
+@@ -112,6 +112,9 @@ static int dthe_cipher_init_tfm(struct crypto_skcipher *tfm)
+ 	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct dthe_data *dev_data = dthe_get_dev(ctx);
  
- 	aad_nents = sg_nents_for_len(sg, assoclen);
-+	if (aad_nents < 0)
-+		return ERR_PTR(aad_nents);
- 	if (assoclen % AES_BLOCK_SIZE)
- 		aad_nents++;
++	if (!dev_data)
++		return -ENODEV;
++
+ 	ctx->dev_data = dev_data;
+ 	ctx->keylen = 0;
  
-@@ -699,6 +701,10 @@ static struct scatterlist *dthe_aead_prep_crypt(struct scatterlist *sg,
- 		goto dthe_aead_prep_crypt_split_err;
+@@ -124,6 +127,9 @@ static int dthe_cipher_init_tfm_fallback(struct crypto_skcipher *tfm)
+ 	struct dthe_data *dev_data = dthe_get_dev(ctx);
+ 	const char *alg_name = crypto_tfm_alg_name(crypto_skcipher_tfm(tfm));
  
- 	crypt_nents = sg_nents_for_len(out_sg[0], cryptlen);
-+	if (crypt_nents < 0) {
-+		err = crypt_nents;
-+		goto dthe_aead_prep_crypt_mem_err;
-+	}
- 	if (cryptlen % AES_BLOCK_SIZE)
- 		crypt_nents++;
++	if (!dev_data)
++		return -ENODEV;
++
+ 	ctx->dev_data = dev_data;
+ 	ctx->keylen = 0;
  
-@@ -758,6 +764,8 @@ static int dthe_aead_enc_get_tag(struct aead_request *req)
- 		return ret;
+@@ -571,10 +577,12 @@ static int dthe_aead_init_tfm(struct crypto_aead *tfm)
+ {
+ 	struct dthe_tfm_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct dthe_data *dev_data = dthe_get_dev(ctx);
++	const char *alg_name = crypto_tfm_alg_name(crypto_aead_tfm(tfm));
  
- 	nents = sg_nents_for_len(req->dst, req->cryptlen + req->assoclen + ctx->authsize);
-+	if (nents < 0)
-+		return nents;
+-	ctx->dev_data = dev_data;
++	if (!dev_data)
++		return -ENODEV;
  
- 	sg_pcopy_from_buffer(req->dst, nents, tag, ctx->authsize,
- 			     req->assoclen + req->cryptlen);
-@@ -779,6 +787,8 @@ static int dthe_aead_dec_verify_tag(struct aead_request *req)
- 		return ret;
+-	const char *alg_name = crypto_tfm_alg_name(crypto_aead_tfm(tfm));
++	ctx->dev_data = dev_data;
  
- 	nents = sg_nents_for_len(req->src, req->assoclen + req->cryptlen);
-+	if (nents < 0)
-+		return nents;
+ 	ctx->aead_fb = crypto_alloc_sync_aead(alg_name, 0,
+ 					      CRYPTO_ALG_NEED_FALLBACK);
+diff --git a/drivers/crypto/ti/dthev2-common.c b/drivers/crypto/ti/dthev2-common.c
+index ba6cde75d3611..cb4b8b38a5ec8 100644
+--- a/drivers/crypto/ti/dthev2-common.c
++++ b/drivers/crypto/ti/dthev2-common.c
+@@ -39,7 +39,7 @@ struct dthe_data *dthe_get_dev(struct dthe_tfm_ctx *ctx)
+ 		return ctx->dev_data;
  
- 	sg_pcopy_to_buffer(req->src, nents, tag_in, ctx->authsize,
- 			   req->assoclen + req->cryptlen - ctx->authsize);
-@@ -975,6 +985,10 @@ static int dthe_aead_run(struct crypto_engine *engine, void *areq)
- 	if (assoclen != 0) {
- 		/* Map AAD for TX only */
- 		aad_nents = sg_nents_for_len(aad_sg, assoclen);
-+		if (aad_nents < 0) {
-+			ret = aad_nents;
-+			goto aead_dma_map_aad_err;
-+		}
- 		aad_mapped_nents = dma_map_sg(tx_dev, aad_sg, aad_nents, aad_dir);
- 		if (aad_mapped_nents == 0) {
- 			dev_err(dev_data->dev, "Failed to map AAD for TX\n");
-@@ -996,6 +1010,10 @@ static int dthe_aead_run(struct crypto_engine *engine, void *areq)
- 	if (cryptlen != 0) {
- 		/* Map ciphertext src for TX (BIDIRECTIONAL if in-place) */
- 		src_nents = sg_nents_for_len(src, cryptlen);
-+		if (src_nents < 0) {
-+			ret = src_nents;
-+			goto aead_dma_prep_aad_err;
-+		}
- 		src_mapped_nents = dma_map_sg(tx_dev, src, src_nents, src_dir);
- 		if (src_mapped_nents == 0) {
- 			dev_err(dev_data->dev, "Failed to map ciphertext src for TX\n");
-@@ -1016,6 +1034,10 @@ static int dthe_aead_run(struct crypto_engine *engine, void *areq)
- 		/* Map ciphertext dst for RX (only if separate dst) */
- 		if (diff_dst) {
- 			dst_nents = sg_nents_for_len(dst, cryptlen);
-+			if (dst_nents < 0) {
-+				ret = dst_nents;
-+				goto aead_dma_prep_src_err;
-+			}
- 			dst_mapped_nents = dma_map_sg(rx_dev, dst, dst_nents, dst_dir);
- 			if (dst_mapped_nents == 0) {
- 				dev_err(dev_data->dev, "Failed to map ciphertext dst for RX\n");
+ 	spin_lock_bh(&dthe_dev_list.lock);
+-	dev_data = list_first_entry(&dthe_dev_list.dev_list, struct dthe_data, list);
++	dev_data = list_first_entry_or_null(&dthe_dev_list.dev_list, struct dthe_data, list);
+ 	if (dev_data)
+ 		list_move_tail(&dev_data->list, &dthe_dev_list.dev_list);
+ 	spin_unlock_bh(&dthe_dev_list.lock);
 -- 
 2.34.1
 
