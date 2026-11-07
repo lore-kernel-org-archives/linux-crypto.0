@@ -1,49 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794055187;
-	b=u0IKsa8ifC+0z2uFnV3Qi32S34raRX7PgYLN3CELrt6Z4wpileDgGvg6m/MZZGIi395B
-	 hubTQZdx75a4cp+eAeQQFyVmv8dgE45rCCauDxX0NrxfWSfEypaWPk/6VuxxHI1fEM5op
-	 fBFq76mJO2iVT2ACZxu0Zpe7ozUdiZb/23XjR/paoRPvVi50FKSm1HBrgkxN5o9hcmASG
-	 bN+QDvTMEUPlUaeNrC4cTcrtFAgcNjvouvPOc8ANuDr6sYfgznAA5WFI/CnpMfJfWxUdH
-	 XGzFiBbWGb4wHODcjEmfAiOhUMslWt1601q8fuRercq2jNdroYIIIvdSIjEIJqb50fw==
+	t=1794056192;
+	b=KsCNWodMfCek5ZkC59L6yv7FAA4NupkYLJc/mwFrtQYTBqoXx8vdC7F51Ap4pulRL6FB
+	 lxJ4hZKVgpL/yGd24cHyDpjyhfzM78OY9JI86Z3N+45dgaL41fhu1RQK0wRS7c6BBZKL9
+	 61QFUSxe/CzEPzmyySeJTtgNVpXShvQSF6Y0Ah1zC/HLNpoEzNm582ZiMTc7CrgBKX+aH
+	 n98dsoypUO86a8DqTghLf1Yl8IxGcgGefhIbXdgZPKFghUurCnzy13UVKFHPj1zKksWXN
+	 AeaoCIQcbJ+U38x8/LcTYQp79H4u+VqvwWy62ezyybtXKVRQbzwlK0UfBiu12amRsAg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794055187;
-	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=MtZkoKUjowTG2Upsi1vq8iBJI9ISeGB6pNGvPLOId3M=;
-	b=i+L9m9nNTdsGpi2RQktLs5saAjGCzN73q/rrCIsQmQFZ3wYAp9Q017WHY94UBIE05tDV
-	 +dsVMizPfhpe/QKG6Iz0iATxGc3KEIKUyPhNvf9EIZzDGdX2rVcktW3VVz7bMyCCg0lA1
-	 zUIdZT7eoliOWsUodQJJiUoycP9xy5Mloa5pfi2UQrG81CHLJmnTJTELO4dmDgR0y0cOv
-	 gzSHwnTZeetIlXVqS7xb1ppsW8LSZYZQQR4QdKm6olH6TlNykAFojulvSjolzZ2rTeh+/
-	 TH6DhZ0z1NntFjkoyCrbRf/ESUHQg3G9RZIxOPPit28kpmZKTPhCMisPaxl2ZRpIhQw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794056192;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=QqdYyo+1t3zSvcXUH6Yd+SMswjfuLmpYrfNH0rpYBcw=;
+	b=SnNPPI0zjjd4pXIaf/A6+76vgvfZCO9v37sceDFiaBNkanssSlNYPxfisVWzYO9+/9sa
+	 8XWmn2dR6t0QMxzLr5cf5l93i5E5jFjep38h/JMHVQeRrImiwlV5mnndjI2kpmajTySn6
+	 qLfwh6fCESI81kJAb5qULl9p47fD7UIy4w/XmriGWY6AmB2JAx5dmtLMbZrZueEQ9BuJp
+	 gK0eXbmQoZB8MyFqxFy4TcajD+i4FloEy1Ivbl067itxSYsLjGMORfcACMhEorjvpvf8g
+	 woIw0dP15GI3nr0L5FrWN11qJau7hPb1xwk4JA4yUBlbUSndiowMcxagUsSw5VumiBQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CjhW8Wmb;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Yc3unTgf;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BD0606A32C;
-	Sat,  7 Nov 2026 12:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8896606A326
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 12:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CjhW8Wmb
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DC0D1F0089F;
-	Sat,  7 Nov 2026 12:39:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Yc3unTgf
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 065001F0089F;
+	Sat,  7 Nov 2026 12:56:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794055186;
-	bh=MtZkoKUjowTG2Upsi1vq8iBJI9ISeGB6pNGvPLOId3M=;
-	h=From:Date:Subject:To:Cc;
-	b=CjhW8Wmb0boCh1WJST1slzCVLToBYih13WYsAgLLCpeNLO+FUvuQBNYRAAggVPISu
-	 7sS/gM+JIsfasPuXGvBQcrRMgGFR//ayTrGbSrKUeL1s3AYTNV651QD40DECNpu3gU
-	 GJjSMd6R3QjlqBboryxcJS8p95wyM7Cd7jGH7wkhtrfc6g44nM/jUyE/AHoyJTnEn4
-	 2wDhJwORRWuSq6mxzsLHgxC9emWOoYewJ4G/KHFE5sQ+eLb1oq10dd45CCp14BqWiK
-	 S4HPeKRRYo0C+Jq7BoInQ2BnLdX9+r1vbCmDuwE8nMedPu6zvLUP3bH/637kc9tErK
-	 o1d+BffcdDHYQ==
-From: Joshua Crofts <crofts@kernel.org>
-Date: Sat, 07 Nov 2026 13:39:43 +0100
-Subject: [PATCH] crypto: omap-sham: remove redundant
+	s=k20260515; t=1794056191;
+	bh=QqdYyo+1t3zSvcXUH6Yd+SMswjfuLmpYrfNH0rpYBcw=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=Yc3unTgfO4Tthr8WP2jmMq79s4r20ao4EfEMqr7P/r+UDqHBEX4bhUqdCkRpHX70b
+	 EcZ8ZWTcpVCc+OTGMYhIF4842lF3fofT2T+FvImMr/tXHWclxCFrgRUHoAjGSFvq8Z
+	 xEby8sU6vNaov7HPx0JZp3R1DR1XAV/usTkYSZIarP72LplODq4+ixiVvpH0fTUSW1
+	 0Yz+L1EFhmnOff9sFfxzGoi/hw30CKMik+qMdBy2UGnY+VOHv/ca6ZXoHNoyjmudrs
+	 1to91N884whbPqUobo9NxGjH7BpqMKSdBteA0/coTWB5aBYKEkYIlUSFaV9tosuoXO
+	 DrPTE8uZLX0qA==
+Message-ID: <sashiko-outbox-202899@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH] crypto: omap-sham: remove redundant
  pm_runtime_dont_use_autosuspend() calls
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Joshua Crofts" <crofts@kernel.org>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
+ S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+In-Reply-To: <20261107-crypto-dont-use-autosuspend-removal-v1-1-62696ad3ff0e@kernel.org>
+References: <20261107-crypto-dont-use-autosuspend-removal-v1-1-62696ad3ff0e@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 07 Nov 2026 12:56:30 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -52,64 +60,65 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261107-crypto-dont-use-autosuspend-removal-v1-1-62696ad3ff0e@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NQQ6CMBBA0auQWTsJLQrqVYiLQgdtop1mpiUSw
- t1tXL7N/zsoSSCFe7OD0Bo0cKwwpwbml4tPwuCrwba2N6YdcJYtZUbPMWNRQlcya9FE0aPQh1f
- 3xs4uV385d7dh6qGWktASvv/L+DiOHzCy6ht1AAAA
-X-Change-ID: 20261107-crypto-dont-use-autosuspend-removal-32f8d54397b6
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Joshua Crofts <crofts@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1794055185; l=1297;
- i=crofts@kernel.org; s=20261015; h=from:subject:message-id;
- bh=DZSdqhiD5oCGCq66lcad98q7o8oDJxYQC9Z6fM9UOfw=;
- b=CBN8az44Z0BR6sKeQ1S2sZLSTtJOwDrLIsN8gaWeor6BtJhNgmFcGtO7ZChG9fotcYUFchz2c
- 7hb9tChgs6CA+iu1hEjt3tYOw/0tO8sHJ7ELkBle7Sgzkzx/bHHqlHu
-X-Developer-Key: i=crofts@kernel.org; a=ed25519;
- pk=RTDOoVwgeL4oFdASj9U+cxJuIjXuXk73zkjnGOJKbEo=
 
-Since commit d1706f9da9f4 ("PM: runtime: call pm_runtime_dont_use_autosuspend() on reinit()"),
-driver core is now responsible for undoing any
-pm_runtime_use_autosuspend() calls on driver exit.
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [High] crypto: omap-sham: missing runtime suspend before
+  pm_runtime_disable()
+--
 
-Remove the redundant function calls.
+commit 3e6145ea4d9da519423f99c72ef5ab8b8512ee57
+Author: Joshua Crofts <crofts@kernel.org>
 
-Signed-off-by: Joshua Crofts <crofts@kernel.org>
----
- drivers/crypto/omap-sham.c | 2 --
- 1 file changed, 2 deletions(-)
+crypto: omap-sham: remove redundant pm_runtime_dont_use_autosuspend() calls
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 5e739415a010..72182f190084 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -2109,7 +2109,6 @@ static int omap_sham_probe(struct platform_device *pdev)
- 	list_del(&dd->list);
- 	spin_unlock_bh(&sham.lock);
- err_pm:
--	pm_runtime_dont_use_autosuspend(dev);
- 	pm_runtime_disable(dev);
- 	if (!dd->polling_mode)
- 		dma_release_channel(dd->dma_lch);
-@@ -2131,7 +2130,6 @@ static void omap_sham_remove(struct platform_device *pdev)
- 	omap_sham_unregister_algs(dd->pdata);
- 	crypto_engine_exit(dd->engine);
- 	cancel_work_sync(&dd->done_task);
--	pm_runtime_dont_use_autosuspend(&pdev->dev);
- 	pm_runtime_disable(&pdev->dev);
- 
- 	if (!dd->polling_mode)
+This commit removes the pm_runtime_dont_use_autosuspend() calls from the
+probe error path and driver remove callback in omap-sham.
 
----
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
-change-id: 20261107-crypto-dont-use-autosuspend-removal-32f8d54397b6
+> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+> index 5e739415a0102..72182f1900849 100644
+> --- a/drivers/crypto/omap-sham.c
+> +++ b/drivers/crypto/omap-sham.c
+> @@ -2109,7 +2109,6 @@ static int omap_sham_probe(struct platform_device *=
+pdev)
+>  	list_del(&dd->list);
+>  	spin_unlock_bh(&sham.lock);
+>  err_pm:
+> -	pm_runtime_dont_use_autosuspend(dev);
+>  	pm_runtime_disable(dev);
+>  	if (!dd->polling_mode)
+>  		dma_release_channel(dd->dma_lch);
+> @@ -2131,7 +2130,6 @@ static void omap_sham_remove(struct platform_device=
+ *pdev)
+>  	omap_sham_unregister_algs(dd->pdata);
+>  	crypto_engine_exit(dd->engine);
+>  	cancel_work_sync(&dd->done_task);
+> -	pm_runtime_dont_use_autosuspend(&pdev->dev);
+>  	pm_runtime_disable(&pdev->dev);
+> =20
+>  	if (!dd->polling_mode)
 
-Best regards,
--- 
-Joshua Crofts
+[Severity: High]
+Does removing pm_runtime_dont_use_autosuspend() before pm_runtime_disable()
+prevent .runtime_suspend from running on probe failure and driver removal?
 
+Because autosuspend is enabled with a 1000 ms delay, pm_runtime_put_sync()
+in omap_sham_probe() and in __device_release_driver() before
+omap_sham_remove() only arms the autosuspend timer and leaves the device in
+RPM_ACTIVE.  Previously, calling pm_runtime_dont_use_autosuspend() while
+runtime PM was still enabled triggered a synchronous rpm_idle() ->
+rpm_suspend() transition before pm_runtime_disable().
+
+Without it, pm_runtime_disable() cancels the pending autosuspend timer and
+disables runtime PM while the device is still active.  When
+pm_runtime_reinit() later runs in device_unbind_cleanup(), runtime PM is
+already disabled, so it only resets the software status to RPM_SUSPENDED via
+pm_runtime_set_suspended() without invoking .runtime_suspend.  This leaves
+hardware clocks and the power domain enabled, and on OMAP2/OMAP3 platforms
+using omap_device_pm_domain, probe failure leaves od->_state at
+OMAP_DEVICE_STATE_ENABLED while runtime_status is RPM_SUSPENDED, causing any
+subsequent probe to fail with -EINVAL in omap_device_enable().
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261107-crypto-don=
+t-use-autosuspend-removal-v1-1-62696ad3ff0e@kernel.org?part=3D1
