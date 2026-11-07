@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794088564;
-	b=nDHyHPeiARDhGO1Czham3n+v6uPzKyauG2yN6ah90AqNKTKBm/ARsUgUshpwx5R3qS7v
-	 YPR1p67gTVVcFur4CKOmuYX8EewZKeAID3/F6Jouln9DM8HvJ/qIr710piO2yflAwRjps
-	 /4HJNVJ85+1hg6I4zRXmBdbBA32GR888Zgs7QLr11yfHBT2yasHKOv4ffTl2EUVLl5Rh0
-	 4hiftOVv/K9HWDfZoYkvOtwltodb2jFFQ2XHy9THs936dC/Zc4TwV5W3jwK4hHwyy7eVs
-	 hMtTZjxmP0n58AWsi52vEGaVZnGzZsYJOH9xyQq7ik4iU2dregILsoySihk9d6nlefg==
+	t=1794088664;
+	b=ndnPIB8cm6w9uMq7d/e4Q8VRvCcogRkxDwuxrkPA5+0HvxbQFJkzo4xaESoIEo9omot3
+	 MVUWeCIlvtwOdRNLm+Q1vNEGNzX2M4kNQPENSkk6fpmYaIcyKtAaj7mNZVmY6cxWqNmtN
+	 EH3YNPLbvDfoA53VWI0UruLgIZgtoSV8eR/S/earGdNcK7WVGkG+4yZZR0KZWrxisZpHo
+	 7YC2FV3QcJIFTbPTq2Dnsl+9sWJ4ub6fUN/x4QTR5JtWXHQ77pmhc4Ec1eNF6IbKt1Gcv
+	 VpJJ1FudKb0U3hPOyp0ymxsKb5jG6HoCQpA/f73Pq55sTsTLuqhvNaeT8r6dCr0OUhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794088564;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794088664;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=GAXt+gB49McI0nwQHHJW1Y2EfO3QNGnxsgrwkzL5pHU=;
-	b=i7MfDiD6hfdNURAfcmqkAXVmVUIQeQ+q0ex1DirIZ1PnHsoUp5jRQXpl90inZYt/5KXX
-	 nWCDXqihmie1h06OLzuLsW8CdXl5TVx4Ivr+96ffisndzgHnFN4XNZJt2oeG8zZXkce1Z
-	 s9ZBdXs9JhdmI52UnYpcIWhonP1z88v2o+4/SL2ywWcqbM0i06ApotvB01MQHXgvvOmgm
-	 DSwN3+PNZJ8qKUdzIU7SEF4JzRhjbP5w6xsqZwIZyP5o7xJYxJAWRdT+0eVCYX+8Le9WD
-	 /hnIPFvSIUC8/QoCR/2XlfVKtvw37Hq/FgVQTFol6MiQHFTV912vvyPI3aNwq/OudNQ==
+	bh=LzoLcyC2Y8RmWj72XVRho2AtJAKsnaGUGYCLrR4Z3n0=;
+	b=IFMksG+aaaj16SLafLGzXbodVIwiqMc5hITCZw5ZuUW7xGVqinEvL4rRxI7m4uYuqwow
+	 YgE8JL8VSsfFAaopX70llcYjvT0aZ74s37SgmhyhgmpoxRY2jFaf7aZN3DMIqxEMLRMus
+	 kbcIGHnPVI8FopAEZpKt9u4yaxj8VUIWfS3TTfolvF5kuHFweDFR4ZhwGGrF91W3t4TNe
+	 /eUXIKA1mtoWe3mxtFJBIL5YZm3IXWUdBF93q9d4TTlGFZVGySqXWHzVLtZJzu6N4vxpx
+	 5drch9U61fFJHcB7Pgzza1HUMOsaJKU8SRdz9DvrRywS84HfzEWVUefSwTh8ytYltew==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=C3gQeTGQ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y3oj9txi;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C0C606A326
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 21:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE85A606A326
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 21:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=C3gQeTGQ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 930901F0089F;
-	Sat,  7 Nov 2026 21:56:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y3oj9txi
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7012F1F0089F;
+	Sat,  7 Nov 2026 21:57:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794088564;
-	bh=GAXt+gB49McI0nwQHHJW1Y2EfO3QNGnxsgrwkzL5pHU=;
+	s=k20260515; t=1794088663;
+	bh=LzoLcyC2Y8RmWj72XVRho2AtJAKsnaGUGYCLrR4Z3n0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=C3gQeTGQmKhTRlrxYh8mCqOy41Gb5th4byfvnkEA4tNnS/580WA4Dp5psr8Fi80dA
-	 Goa0YUDIx6nMquuDu91b1HKB189NQXrOPPhIQd67iN7YaCF5mxWqyvZzKBaiysO9bX
-	 oR9E9NZcJDLZNHIGAqI72FSwOj/ADqURJybgQacZfbSQX56SlZtmK9XEubTqtF0gkg
-	 yfn5nqMYtiHTyV+mTmmBlPofixktq9V5XmMXIXSbu4ntdDPOcLSBAKVhLiPtNzIFbK
-	 uuqxhE7Ot5Aa661MZon4x+OzVq2OgQRohmMbh/8JOhsNe0Q2p0LyM1BOfL3UAkrQeY
-	 fcua0xBqrTRvg==
-Date: Sat, 7 Nov 2026 13:56:02 -0800
+	b=Y3oj9txinZHt1LEEKIW0XJnp6Wgdan2xQH2FFdORgPbRTDyOExoU6ROyNafFjddiX
+	 VVu1bl8u9BqE4rzx/ueDdyHk/akS5Aiax5mLwSmTkoxEV59Ioot5F8YBzGYjP5VbiU
+	 bACLZsTOJ3jjWdUX+S/4yzky55v1NeP6JtEbzNhrjehpwxihvmCLSOv8RIof/gTeps
+	 nmVaCmIWbI59upD4qJ5tzcIOTeam6guGORDTS7hPdMmydblZ7BCIJ5mxGTIjMoaQpI
+	 0sE5nJZITlaxJVuMZIjxlaObFYCXy6xC1gUeYa+2nD5H67R4YMHXtsoqs10IgybnrZ
+	 S9dKjnQeEX0Ig==
+Date: Sat, 7 Nov 2026 13:57:42 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org
-Subject: Re: [PATCH 2/3] lib/crypto: x86: Opt out of initializing MXCSR and
- 387 state
-Message-ID: <20261107215602.GJ137269@quark>
+Subject: Re: [PATCH 3/3] crypto: x86 - Opt out of initializing MXCSR and 387
+ state
+Message-ID: <20261107215742.GK137269@quark>
 References: <20261105005523.84925-1-ebiggers@kernel.org>
- <20261105005523.84925-3-ebiggers@kernel.org>
+ <20261105005523.84925-4-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,9 +61,9 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261105005523.84925-3-ebiggers@kernel.org>
+In-Reply-To: <20261105005523.84925-4-ebiggers@kernel.org>
 
-On Wed, Nov 04, 2026 at 04:55:22PM -0800, Eric Biggers wrote:
+On Wed, Nov 04, 2026 at 04:55:23PM -0800, Eric Biggers wrote:
 > The crypto code using "kernel-mode FPU" is integer code that does not
 > use any MMX or x87 instructions.  To the extent that float-domain
 > instructions are used at all, they are only moves and shuffles, neither
@@ -82,17 +82,14 @@ On Wed, Nov 04, 2026 at 04:55:22PM -0800, Eric Biggers wrote:
 > 
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->  lib/crypto/x86/aes.h       | 24 ++++++++++++------------
->  lib/crypto/x86/blake2s.h   |  2 +-
->  lib/crypto/x86/chacha.h    |  4 ++--
->  lib/crypto/x86/gf128hash.h |  8 ++++----
->  lib/crypto/x86/nh.h        |  2 +-
->  lib/crypto/x86/poly1305.h  |  2 +-
->  lib/crypto/x86/sha1.h      |  4 ++--
->  lib/crypto/x86/sha256.h    |  4 ++--
->  lib/crypto/x86/sha512.h    |  2 +-
->  lib/crypto/x86/sm3.h       |  2 +-
->  10 files changed, 27 insertions(+), 27 deletions(-)
+>  arch/x86/crypto/aegis128-aesni-glue.c   |  6 +++---
+>  arch/x86/crypto/aesni-intel_glue.c      | 10 +++++-----
+>  arch/x86/crypto/aria_aesni_avx2_glue.c  |  4 ++--
+>  arch/x86/crypto/aria_aesni_avx_glue.c   |  2 +-
+>  arch/x86/crypto/aria_gfni_avx512_glue.c |  6 +++---
+>  arch/x86/crypto/ecb_cbc_helpers.h       |  2 +-
+>  arch/x86/crypto/sm4_aesni_avx_glue.c    |  6 +++---
+>  7 files changed, 18 insertions(+), 18 deletions(-)
 
 Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
