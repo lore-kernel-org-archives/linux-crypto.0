@@ -1,55 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794080096;
-	b=Q6u6/nIwRWy34gIfNWvSKMxfBA0+A1Cw60uXh+n5l5WHnD+6uMJhzQDMCTwFllBnY32F
-	 2yeSVeg0lQiUZqay24xBpdcIEicmHl2MD5NuXquCMYW7PcHjmtLHGmTgHFcJtTuoKPb6S
-	 jkaj4+OMTm5I7iQfmmomgtk7wU2ta0ygn+IAHv5ZIzmIgYXVT4BA4fYANpyeHPpOe/N/r
-	 D9sLHNSIKMRxtEcMbrH8fvLh0qOJefjOGgLNrCUJpObfFJdE0hMSncvvcUGs0V0e78TIF
-	 7oXjJps5lYdaHHbtsTa8wp7g7E19nU4rUR4B6I0MQqvfCElYMZokm3RCnHEYrfFH3ZA==
+	t=1794080254;
+	b=aCTZSPMPIVKIqIM4lX6H6lf8ExjoV5eHWik0cZgOaIuMmd2NgeFZpYIbQEr0eJRFjJ7B
+	 tpRysIfPXxx9nh7sKSPJXLhzZfFFEEyV7pD7S1pFlWq/MgDL69J9Z7/H1cyVsPtlzHdDr
+	 Cj7ZU1OKq5JkQC8DrRdCjbIP/OneITvk8ATq9KyYtamgjjuXWB5yXHrfUmjxGWaBjXR6W
+	 cWyGlwLzQsSrHvdDHA176NOPJhkrc21bKCHzP/0tI7a8U0p9byek8oimHh0Lctsd/O9QS
+	 DqgWiDgfA755H3UzocJgIxQoj47TrQEuYasT0H9ZunJFcfkEINWjubosmPps74GIKfQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794080096;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=xGm+aEPkCG2mHxOhWyC2m5RAgLXTk8CznK8+AvtCYXc=;
-	b=xbXaV4o8GZadeqHk3wR6KrvM/YbLP6WFRT7vFL0hNgupP0j3UuX9bGheIqsjfnZ9CR/m
-	 ZSaMCYj1tVocsoaFp9zHi2EBfYHcFlJCb+aaDuxw8KbZKm98vW6cE/RP/VEpBMiv3TxK0
-	 HUBeF8CRlLg16A9MIP+4fA1sYz9gEgPGZPUMB2lvlyn/QigJ2h7f1QMp+ZdM2tV+fc067
-	 zqB4ZBU01wkx3wi8ugC0mCZU0+h5XSkIjhmjNFRrLhUDqab77KmlEIQSRQ6fZDZ4GDUR9
-	 kTxL9woc1fmAgTOcGSfEK8ZGhcdj19Q9FZWz12YmKNq0AorWnU8dG63R0nNXRPomc9g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794080254;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=J28D76vigY1x0q3PndZXdhZsdxLHUeQhHl/TW06na0k=;
+	b=fSfW1oMxyUWma+wte8sNxcfwdyaNuFK2e16nD16M+mpZKJxQ0fdUaGaFRSL6fy1Ku2Js
+	 D0aIFezUvkH18JiZ8uXgCgnHLqK0p72Hcm4cSpzk4LfCuRXzgsDU9x/3u5X2kURe+2zJ6
+	 0TaCO8Q8BnLQditI+aQjYJ14IdVCHUi/z3KfQPcF5rIx35jjM3v2emkMHTiNqQxk6D/p/
+	 T63IFGxwpzYz6pv+ENtCn4yadLVKVcryiyQaiaS4sf0IIMrqI/EYcZdhJ2RkCm1XKYK6O
+	 l23UKQJnuXR0anx580Jmmr0nQQ56y12rlSNW1w3LTQWZq0N8mOZCvYq4Z7nyGyR7BlQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZGgd+GY4;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CwsG3UsV;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84058606A326
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 19:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A09E606A326;
+	Sat,  7 Nov 2026 19:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZGgd+GY4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 302511F0089F;
-	Sat,  7 Nov 2026 19:34:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CwsG3UsV
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84B8F1F0089F;
+	Sat,  7 Nov 2026 19:37:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794080096;
-	bh=xGm+aEPkCG2mHxOhWyC2m5RAgLXTk8CznK8+AvtCYXc=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ZGgd+GY4Kq/PpJE90h0rIPoWHUOZspvg11zl8Wrv/hHFmHpw+vKz42hJIYdu1g+Oe
-	 i79YZMCbdZJ0HdQOIXVOYPvxeQ3L+d7TTJN1ou8ljZOkTCBYMG1VQNdfgKahURFobD
-	 wj8aeIQPTxD2paBigsUehU9DvnQC1zFkYa8TNqsBwDv6zqdFYC4dJEeLb5d2Gw1yI4
-	 efFDLfgLBvrwxUdKfO8nw+PdVl2WKeL+eZltrRX/HTSVhp93vUZmNbhwuIng/Kmusn
-	 6jU1isceRZbOk/keFMxTSLVvqpqoIQdwq4BaHPxhbhqdNnyIHBSAOmI0mKdE/NPGzS
-	 CJ7UcyoR1TSRQ==
-Message-ID: <sashiko-outbox-203214@kernel.org>
-From: sashiko-bot@kernel.org
+	s=k20260515; t=1794080253;
+	bh=J28D76vigY1x0q3PndZXdhZsdxLHUeQhHl/TW06na0k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=CwsG3UsVdufq6iv7NioeMVsalbu8uf8VUvmfGUBXnWfEEPbY3ExsnVN8Pb18+iqMV
+	 7gBH4E/mk+X3Y8iZe7m1as0lE01oK9d49Z9kHt3N3v6HQAILprPNwUCA/ngWhnFqii
+	 Hwj6Tgyi2mn9+ESkUn6KOss/vaqh6ak93pFtjVVF+H270dG4EMd/+GvdhPNhhtFQN8
+	 SJq258UEGPFglGng2oCF5zj8MOUAFXN8mqX7QnRByDpYAH1V5N9yCDt0hle23M8XQC
+	 ZlpeSoshHLnm991mfqvemMJtpMLGusjl0lvVIRMbq2hAxsbJTgCWRoKrmqudGcI1p5
+	 CBfk/+/X6ZimQ==
+Date: Sat, 7 Nov 2026 11:37:32 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 6.18] crypto: sa2ul - Fix HMAC key preparation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Eric Biggers" <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, "Herbert Xu" <herbert@gondor.apana.org.au>
-In-Reply-To: <20261107192358.47287-1-ebiggers@kernel.org>
+Message-ID: <20261107193732.GD6049@quark>
 References: <20261107192358.47287-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Nov 2026 19:34:55 +0000
+ <sashiko-outbox-203214@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -58,70 +55,18 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <sashiko-outbox-203214@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found no new issues
-in this patch, but noticed 1 related pre-existing issue it does not
-introduce:
-- [Critical] crypto: sa2ul: negative index out-of-bounds read in
-  sa_aead_setkey() [1]
---
+On Sat, Nov 07, 2026 at 07:34:55PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found no new issues
+> in this patch, but noticed 1 related pre-existing issue it does not
+> introduce:
+> - [Critical] crypto: sa2ul: negative index out-of-bounds read in
+>   sa_aead_setkey() [1]
 
-commit 44d71286f88be3b8e50cd6afb3ed5b5d01ae3f54
-Author: Eric Biggers <ebiggers@kernel.org>
+drivers/crypto/ is buggy.  No surprise there.
 
-crypto: sa2ul - Fix HMAC key preparation
-
-This commit replaces the manual shash-based HMAC ipad/opad derivation in
-sa_prepare_iopads() with the crypto library helpers hmac_sha1_preparekey()
-and hmac_sha256_preparekey(), and removes the unused shash allocation and
-indirect call.
-
-> diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-> index 4a766e4351970..563e0f0d574ad 100644
-> --- a/drivers/crypto/sa2ul.c
-> +++ b/drivers/crypto/sa2ul.c
-
-[ ... ]
-
-> @@ -1785,7 +1720,6 @@ static int sa_aead_setkey(struct crypto_aead *authe=
-nc,
->  	if (key_idx >=3D 3)
->  		return -EINVAL;
-> =20
-> -	ad->ctx =3D ctx;
->  	ad->enc_eng.eng_id =3D SA_ENG_ID_EM1;
->  	ad->enc_eng.sc_size =3D SA_CTX_ENC_TYPE1_SZ;
->  	ad->auth_eng.eng_id =3D SA_ENG_ID_AM1;
-
-[Severity: Critical]
-This problem wasn't introduced by this patch, but can a negative key_idx
-cause an out-of-bounds read on mci_cbc_enc_no_iv_array[] and
-mci_cbc_dec_no_iv_array[] [1]?
-
-Unlike skcipher, the AEAD framework does not enforce a minimum encryption
-key size before calling ->setkey().  When crypto_authenc_extractkeys()
-extracts an encryption key with keys.enckeylen < 16, key_idx =3D
-(keys.enckeylen >> 3) - 2 is negative, bypassing the signed key_idx >=3D 3
-check:
-
-drivers/crypto/sa2ul.c:sa_aead_setkey() {
-    ...
-	key_idx =3D (keys.enckeylen >> 3) - 2;
-	if (key_idx >=3D 3)
-		return -EINVAL;
-    ...
-	ad->mci_enc =3D mci_cbc_enc_no_iv_array[key_idx];
-	ad->mci_dec =3D mci_cbc_dec_no_iv_array[key_idx];
-    ...
-}
-
-This loads out-of-bounds memory into the hardware mode control instruction
-pointers mci_enc and mci_dec.  Note that non-multiples of 8 (such as
-enckeylen =3D=3D 17) also pass this check, so validating keys.enckeylen with
-aes_check_keylen() before computing key_idx would catch both.
-
-[1] https://sashiko.dev/#/bug/linux-3f578a84-38a7-46fe-bc7b-117d71d9d394
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261107192358.4728=
-7-1-ebiggers@kernel.org?part=3D1
+- Eric
