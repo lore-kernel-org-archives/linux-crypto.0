@@ -1,54 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794087438;
-	b=fgSWPi5dGTrCJIKMa+s/RucHF9N4WjU+hD3rwf3hNwbOirb19OlsH6ndyBhNrE/bFp48
-	 YKV95oXw0JcIxKqqgvvFhN5AovHm/+51C2AL641uk8kWD5bL/7CU83LAAzprj6s3Zpjw1
-	 gC7/tEA+manDK3LS59O5GTA2Yp7PlagP3bviPvan2BmQ3pICrahdVWAttI375FjCupXjf
-	 GUYwkWlO9Zj0Stxcph8VU07iXW8ggkDaZJedMxaxztmLzwK0CQmp3dp4nXzQ0rBmfYIlR
-	 y/oSRrFxXX0Rq0QHhpt8WLbBiZyl00u8DnJr4wNHxKWVf5u6mfAHMtMZiPEGs8rlG1Q==
+	t=1794087591;
+	b=0fPItc3jphU8agqEvOTxtYkYvPTaG31r5er0iQZanE6v9Vs8jCFAqy7LooVK59/uuk5A
+	 QPr0OGdmGZaUbx41S2ZH65l4jzeANaVaH9CUUe5ab/AmKhODpv5BXWdS1+HiK3ed9J9OT
+	 uST/gL0PYdm9RAQLlyDGkRukIi547A6wuXeVl3msrj1R7jw7UAPi0TKsXfukHHWxxSrT0
+	 eTDpV5yDFXIAbcIQWPhI1ASUBaziL8goCfa5wGJ7TXoxEJ4eHlV4wc22jhMP80un3JeAM
+	 SxmFK/h7DL9RH6finn7sotcr4sounKuxkyg+uLX0HQScEMs5k/pcFdJaYuMM9hfJvOA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794087438;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794087591;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=RZICYlEwCNSQrTvDVmUOLS6u4KZIZYM8/Ot1Wf7WUvc=;
-	b=3767NWhavo4qY9TYBgKw22KomZSfn7EsJ3U2lwX6e1CobAJWJxPyll3AQFaszDzxqsyg
-	 VDmMDG9qg66tJ3hNoU04IS5wdDxWH8H2MzWBLJoocdyrfCNWa/zv4/yQ2UifkNJBZo9+Q
-	 7GKWyPNby8gbDCAxUHqHpCxUsWBviP+MbbBU4wCwa7TenrTYbeSSqRKULwGLiVCYI/18p
-	 8eSIodEcp1jY8TlyLlC5L64582QrcvBdgpDhWFuPqsOmt1eDVxhLxUNirV4YBk0M4QsGj
-	 aWJR9tG/zqEqCkcWU/mL7v4slLDBKXgOHtnSvIed8uCLHoIWCoFr7LTH7m7vBiqeXRg==
+	bh=N6BX7jy9UP524WlkQd/sKHQmxwNRGsDuHmwgftesxwc=;
+	b=bdSU3c63uhPfuWUJoK3UfczU9yn1iGTopurtRaWRUOkHjDKcC4ccXuOHGBzwl+sT8Kjt
+	 5C5hoSzPDhtnFQjA+T4BI7t2EJ+3vQ68YNthYVdIr7qAah5lK0vifSs9L7346EOrO4GhE
+	 hhJaEBDr7+UORaTZb3fGVbBZehp7JKNap4RtBTuqsplwre40G3JeMmu9+OFdG1zDtQs1R
+	 QxLO73+oBrtarwHbl52MRAzSJPKzorML7ipF+M4HFqIxUL8Nu9YmdQuVUj/pPwipryaXq
+	 y386YAAfp7GGyHfHJDGjjQQB8MlrSGpM0cljw0zW4VdzisnORHuwxmw7TS449l2eElA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gzSZd4xq;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FZ6y7H25;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BD8606A326;
-	Sat,  7 Nov 2026 21:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99330606A32D
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 21:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gzSZd4xq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D62311F0089F;
-	Sat,  7 Nov 2026 21:37:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FZ6y7H25
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7FE81F0089F;
+	Sat,  7 Nov 2026 21:39:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794087438;
-	bh=RZICYlEwCNSQrTvDVmUOLS6u4KZIZYM8/Ot1Wf7WUvc=;
+	s=k20260515; t=1794087591;
+	bh=N6BX7jy9UP524WlkQd/sKHQmxwNRGsDuHmwgftesxwc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gzSZd4xqZKO7PvkKljWyy95ermHBQf9W4ylW0o8zV4fyMnS3nr1/g46MmRYgIg7Gy
-	 7X1k//hkzfdGie5glazqrbad2VfQwRq5oE/B9FJphlYz2h7zP2bI4mbis6z6zuUQp/
-	 rZD3wvL/H5Uyr7o8mZhHj7e7UmnY1DcqI9DihdGasDtTp4pVPzp4IAFzhSZ7woNQrj
-	 r9OAWDOJKhoZcMlD1mHFAVKyh/+ktvgy2n6wjTL/WdbRzgNWRHzHa61R2TO28XVeby
-	 RK/ho6cJfitCUoYPiWetjNwaeqViA/UZT+irbosL1QgFnWGgZbgLfpAjKbUXZA5d1t
-	 edyD0+mDl9d7g==
-Date: Sat, 7 Nov 2026 13:37:16 -0800
+	b=FZ6y7H25zRt2Fu64hKiew23g2fWY5v1ZsZdPnOBESTUMuWZllvyK0ikoTUSg5ei6Y
+	 oOCUesb3uP5QBVT2qYma37FVoVCK+Bt9yIN8yrpmZOkKTUSreFnCFjvGAHs1SUkRdt
+	 P6TmJb9M42Fb+9kZ1GE91MqiG4KSIsmLsoY3q5+72+abU235Mv8Wbbq0P/lzLUJ24M
+	 CsyVanFSryurr7Q0flQlAwEKqyHLbg7t12ajzza/7k/k8oDRz3J1cM9dpu+oYfISK3
+	 bCN2gns7b9KzpdDVXreDK6kqtEHOGeeccsHVaqzEjVCQG4/V63fY6dvZh3+BLHajNL
+	 gHxxKwvUglY7g==
+Date: Sat, 7 Nov 2026 13:39:49 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Emanuele Rocca <emanuele.rocca@arm.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crc: arm64: use .arch_extension to enable CRC and
- crypto
-Message-ID: <20261107213716.GC137269@quark>
-References: <20261105154145.557042-1-emanuele.rocca@arm.com>
- <68e24de8-0c94-473b-b2a1-47b9b79eb974@app.fastmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Martin Willi <martin@strongswan.org>,
+	Antonio Quartulli <antonio@mandelbit.com>
+Subject: Re: [PATCH] lib/crypto: x86/chacha: Use bzhi to simplify mask
+ generation
+Message-ID: <20261107213949.GD137269@quark>
+References: <20261103235027.63382-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,44 +62,21 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <68e24de8-0c94-473b-b2a1-47b9b79eb974@app.fastmail.com>
+In-Reply-To: <20261103235027.63382-1-ebiggers@kernel.org>
 
-On Fri, Nov 06, 2026 at 09:57:01AM +0100, Ard Biesheuvel wrote:
-> Hello Emanuele,
+On Tue, Nov 03, 2026 at 03:50:27PM -0800, Eric Biggers wrote:
+> When XOR'ing the bytes from a partial register at the end, use the bzhi
+> instruction (from BMI2) to generate the needed mask a bit more
+> efficiently.  All real processors with AVX-512 also have BMI2, so we
+> might as well make use of it.  This follows the example of the AVX-512
+> optimized AES-GCM code which already does this.
 > 
-> On Thu, 5 Nov 2026, at 16:41, Emanuele Rocca wrote:
-> > Instead of using ".cpu generic+crc+crypto", use ".arch_extension crc" and
-> > ".arch_extension crypto" to enable the required instructions.
-> >
-> > The ".cpu generic+crc+crypto" directive replaces the assembler's current
-> > feature set with generic+crc+crypto, dropping any other features that were
-> > previously enabled, for example by -march or by a toolchain configured with
-> > --with-arch=armv9-a. In contrast, ".arch_extension" enables the requested
-> > extensions while preserving the current feature set.
-> >
-> > This is not a functional change: crc32-core.S only uses base A64
-> > instructions plus CRC32 and PMULL, which remain available, and BTI landing
-> > pads are emitted as HINT instructions. However, using .arch_extension
-> > avoids the pitfall of silently disabling features. See commit 9142c2f8f84b
-> > ("octeontx2: use arch_extension to enable LSE").
-> >
-> 
-> I don't mind the patch, but I will point out that issues such as these can
-> never occur in .S sources. The emitted instructions are always the same, and
-> the only reason we need the .arch is so that the assembler permits the use
-> of the special ones.
-> 
-> Commit 9142c2f8f84b is different because it uses .arch in inline asm, where
-> it switches the assembler into a different mode behind the back of the
-> compiler, leading it to reject instructions generated by the compiler.
-> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  lib/crypto/x86/chacha-avx512-x86_64.S | 30 +++++++++++----------------
+>  lib/crypto/x86/chacha.h               |  3 ++-
+>  2 files changed, 14 insertions(+), 19 deletions(-)
 
-Thanks.  Emanuele, could you maybe note that in the commit message?
-
-Also, this patch is not complete even for lib/crc/arm64/, since
-lib/crc/arm64/crc-t10dif-core.S still uses "armv8-a+crypto".  If we're
-bothering with this, I would suggest just taking care of both
-crc32-core.S and crc-t10dif-core.S in one patch.  (The crypto files I
-mentioned before should be a different patch.)
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
 - Eric
