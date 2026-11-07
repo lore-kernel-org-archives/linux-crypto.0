@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794088121;
-	b=UhxLJ2hiLzt4fWsPgH6bOvFeDUXaZiukFcoTlkioYmjAzbJuNALPt3Z2ZxKYx96YUALU
-	 S9baYhJ5uBUJNGFMpdrRnkPbAmHonAnplhhGz6gUC4NuTlxo24Sdj7r8+sdhcERkt0ROv
-	 YNAlrbJipyK2Tne8bh1UwRMpbgRvltWqH9awFmtaTQ08wHC/CwRzF+tVXw6wrsZlH8eF2
-	 lyjNsNr64D0v24ISKfd+gk5GjD3O50afThtOPJwX+kDnu65KY4FDOF55YlPPihqU8/azN
-	 Lm0fPKci7BDQDfx0VNCX5upRE/V1FzqEV6jCWTieBFBQ/rKvkTUfstVPCdzVD0jmrsQ==
+	t=1794088331;
+	b=UHIJ7R60qShrbnYgt3HJ3zJkqsE7KRL8Kw/3q5l7ZgDGgPAmR/4lRqSB61wgOrz5gp86
+	 d9ssGvOfieGWPoaUMvczC2mVYAwKrQJSa5kd0XVhHuo0cWOhAHoXd5/K8kMjt2zpPLlsh
+	 7U5cjEXXxcedlUr4obBxGL3E0oWUwXfTDTxF2zz7mB2nYi9fmchfR5Ms+W/SJvMLBk6k2
+	 dy1D0UUAnodpl3p95dyNYXjT7AnHeuS6L+6K/VrZ9hPlb0+Zk+/dH7RszMdGeLaQFqowT
+	 cJD84M71iZ1wMiHhIjatfYYgfYI3V3Ha6slyeYVhTaz2zUTi7gvjgCC81NNz5DSbBJA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794088121;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794088331;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=wwYvm2bDM8aSjVqV04xi/hd2ryIALcISEFIbJN3M/0E=;
-	b=dm2Cb8BwUooFw8ySx/s732o4YSD3E/ELe3HMWP1OnpolF5UGx/0PQpT+H7DSBtWQuAX1
-	 QmngO6d+niLc4znoIyk1OOsLca8W+amA6gkMzYLI1w7Dgbqt7LpxEunf/3g11MQQHcDyt
-	 vGMFSXXI+ZfLiNhMpdmA6Yfsh55yd/cGJjdmSv5n3/5ynMYXNIy9xGIoq9GKNvNvrieXy
-	 BErnCqFlxijVh7nQNg01LR1QgFXK9+Q+76UopQRJSxO01vrWT78RdBzBfQvUwhfcigMaA
-	 q94hPIWztJ4jR1+dCO1nsZL9U2XjwngFCO5lwCN7KsmDuYtKGTXpW5BDiC8fJW1nI5Q==
+	bh=j7XdAKJDOSBKiyAhBkN6T2HEwB+kHm1R+cJ4qfzJvsM=;
+	b=xczQIwz29By8qFZ7t65AitaEO1VxjxDDvq7zKqITfh1aIvSBy3DLmp9InloP8n3hiXpB
+	 9HAIZAz+0B3dfgP3JS+QDMAR2d9gAUFxqRwmpOh0UoDYw/fQEizX8p02HLIW616rRB27E
+	 KHJouiG1rYbyde9Vj5oGpiGbRJ+8vtY1MK5e+pRtYkN7MEGkn+wduLWi0xuRi3T/nbPNJ
+	 2r1RkMYu2ckdolnAp19ngw28KqA5aUQEoXfCFpae7VJVb6KCpkULTBik0r6Lfu6/1mO8w
+	 f2Wo4H0osKAU1pnC8sNALi/nFJzdqDiFfwp+m+h4OX6ruEWtKH92uaj0m9PoTRylvCg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=idCqqtOD;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lEI0VtMD;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A2D606A326
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 21:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A81606A326
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 21:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=idCqqtOD
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA0541F0089F;
-	Sat,  7 Nov 2026 21:48:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lEI0VtMD
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C76981F0089F;
+	Sat,  7 Nov 2026 21:52:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794088120;
-	bh=wwYvm2bDM8aSjVqV04xi/hd2ryIALcISEFIbJN3M/0E=;
+	s=k20260515; t=1794088331;
+	bh=j7XdAKJDOSBKiyAhBkN6T2HEwB+kHm1R+cJ4qfzJvsM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=idCqqtODRLQg+cM4UQ9WyuRq2UT1fRpsAqgF+Y3+sI/0Vu0noF0OuoVKopWuvk5Ki
-	 1QuEyMMv3BfeBTHs3PVYNp1bBW0BiPUNo0VlohzI4gfJfmLZbuWl05r0lDBujBzChs
-	 Kg4hK5SF42ecLr5KE5amQ5GUuW3/wbqw1jK8cN6LSrvdjLyWvLyJYAfzNYxEnCec3p
-	 AHEXLoYTCgfqkiQb9StIGEJC9QIRsza6hxQ+3DDlha3jkZuiS3+QS0azq3+cuhImVs
-	 l28bbZ0/8jG0Oi3pmB8aKm799msyhjbCzZ33rK5wz4IflUIrbmDYWT4+Gf1f+qky6M
-	 d9osuMjIbNPww==
-Date: Sat, 7 Nov 2026 13:48:39 -0800
+	b=lEI0VtMD3mtRsoKGFn/7Tbz3nboLf6HoVWVk/U0NH3SeyL800QxMaLgSLhtlAbGvH
+	 7EZ3K+qEWpIwz8Rs8eqYk8U1MVZEUVzsuFvtaxqgg++wT0/PNepae/ydh1bjRAIfLv
+	 CIC2AcarR7ZbcUF8OPz+aZK/znIJKSvA28M/ZFgJEJmls7Fpq9dQerkOrFunOdNNMW
+	 Ry4CoYt6tX0unoIKyV2yXyTNBPfCSIIFD0GmZayRMGiR6wzlKEAGglNj7js5O6X01a
+	 DKCEalK/d8M5SMyFz1vRx9kNOqUu5zXl6AEUeMI8KttzGjkju8pCALuj1AfzFWQYBm
+	 bfFgI7iSuawUg==
+Date: Sat, 7 Nov 2026 13:52:09 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
@@ -47,9 +47,10 @@ Cc: Ard Biesheuvel <ardb@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Martin Willi <martin@strongswan.org>,
 	Antonio Quartulli <antonio@mandelbit.com>
-Subject: Re: [PATCH] lib/crypto: x86/chacha: Simplify chacha_dosimd()
-Message-ID: <20261107214839.GH137269@quark>
-References: <20261104081604.302414-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] lib/crypto: x86/chacha: Eliminate more never-taken
+ branches
+Message-ID: <20261107215209.GI137269@quark>
+References: <20261104225526.68557-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,27 +62,38 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261104081604.302414-1-ebiggers@kernel.org>
+In-Reply-To: <20261104225526.68557-1-ebiggers@kernel.org>
 
-On Wed, Nov 04, 2026 at 12:16:04AM -0800, Eric Biggers wrote:
-> - Use if-else statements to make the logic clearer, eliminate excessive
->   not-taken branches for certain lengths (e.g., 16-block aligned
->   lengths), and consolidate a lot of the counter increments.
+On Wed, Nov 04, 2026 at 02:55:26PM -0800, Eric Biggers wrote:
+> The x86_64 optimized ChaCha code has assembly functions that generate 1,
+> 2, 4, 8, or 16 keystream blocks and XOR them with up to that number of
+> data blocks.
 > 
-> - Eliminate the unnecessary chacha_advance() function.
->   DIV_ROUND_UP(bytes, CHACHA_BLOCK_SIZE) is just as good.
->   The min() clamp did nothing.
+> However, to avoid unnecessary overhead, the 4, 8, and 16-block
+> functions, and the AVX2 2-block function, are never called with a length
+> that is supported by the next-smaller function (that is, <= N/2 blocks,
+> or <= 1 block for the SSSE3 4-block function), since a smaller function
+> is called to handle such cases instead.
 > 
-> - Don't pass a length greater than N blocks to the assembly functions
->   that process N blocks.  They all accepted it and just processed the
->   first N blocks anyway, but there's no need to rely on that.
+> As a result, all the branches in those assembly functions that handle
+> XOR'ing fewer than that minimum number of data blocks are dead code.
 > 
-> The behavior is unchanged for every length.
+> Remove these branches to eliminate dead code and overhead.  Also rename
+> the assembly functions to make it clear which cases they handle.
+> 
+> Some register moves in chacha_1to4blocks_ssse3() are also eliminated, as
+> they were needed only because of the support for less than 1 block.
+> 
+> Note: many of the functions could use exclusive rather than inclusive
+> lower bounds.  Inclusive is used for simplicity.
 > 
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->  lib/crypto/x86/chacha.h | 128 +++++++++++++++++-----------------------
->  1 file changed, 54 insertions(+), 74 deletions(-)
+>  lib/crypto/x86/chacha-avx2-x86_64.S   | 73 +++++++--------------
+>  lib/crypto/x86/chacha-avx512-x86_64.S | 94 +++++++++------------------
+>  lib/crypto/x86/chacha-ssse3-x86_64.S  | 51 ++++++---------
+>  lib/crypto/x86/chacha.h               | 72 +++++++++++++-------
+>  4 files changed, 119 insertions(+), 171 deletions(-)
 
 Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
