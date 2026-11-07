@@ -1,56 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794046878;
-	b=XvW/WtgAOeaDrIhU7Go/04fQntvbsOcky5qPp7LPZJ0Kw7k/mF57ij6JZhibCIO+g8Mv
-	 jpiHLXK+HAUAHhzC25+aJiIccNOHETB2sHCRalmF5qI36d7Ka1yK6u3VYTBLapp+6RELL
-	 pQENX+PjPH933Vhde7ncpwnHitIRB/MboeNZp/sQQ7gNZ0TUjDCWqEqWQNSSw6peNNomr
-	 30Q6GYdCzWrYFxb0Z203CEy53Yzv3LnZJpX1dEG3qM8f2Zu3F5Z3eTP1YIcGlIR2yBR1o
-	 Sg4dcOgnabmwgMExWMxWX7XKjDOZ9Dw+WBgXRY4BTsMvWs1z3war6JNJNmefREJ+XPA==
+	t=1794055187;
+	b=u0IKsa8ifC+0z2uFnV3Qi32S34raRX7PgYLN3CELrt6Z4wpileDgGvg6m/MZZGIi395B
+	 hubTQZdx75a4cp+eAeQQFyVmv8dgE45rCCauDxX0NrxfWSfEypaWPk/6VuxxHI1fEM5op
+	 fBFq76mJO2iVT2ACZxu0Zpe7ozUdiZb/23XjR/paoRPvVi50FKSm1HBrgkxN5o9hcmASG
+	 bN+QDvTMEUPlUaeNrC4cTcrtFAgcNjvouvPOc8ANuDr6sYfgznAA5WFI/CnpMfJfWxUdH
+	 XGzFiBbWGb4wHODcjEmfAiOhUMslWt1601q8fuRercq2jNdroYIIIvdSIjEIJqb50fw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794046878;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=1Hte/mrif48x+MfoOWMojIHIFcNzBDtLRjD6dpkNF4M=;
-	b=UqsYh6V4csvBPjVhZ791y/aNfO5gPI3dteRo9qSNPsoV7x7w5KIl6xeo2888stwAgdI1
-	 xHaUvQhT0oZXXt0TEzRGaG2CLw/yIbTLUAw8WEUTdOR0zOjwn0OZSKGpCZc67Fl79UVhc
-	 qSipFSkgktn6xjN1iZT/O0WJxMdFANpb44x+gymBtBUJ8paumDCz9cySGck3TSSwgDUsO
-	 z4zokgXiMMa5P82qb5jXe+CvAWR4Uxttl7+UU4LclSPaRhcIiJZnZy01ofvj0JRcrztsd
-	 re3nVHjRxYJedJ8dMOGYxLRDRBBqmKS2MvbT4ecFzJFcx97hbB+df1Pca7SmMlqxLlA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794055187;
+	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=MtZkoKUjowTG2Upsi1vq8iBJI9ISeGB6pNGvPLOId3M=;
+	b=i+L9m9nNTdsGpi2RQktLs5saAjGCzN73q/rrCIsQmQFZ3wYAp9Q017WHY94UBIE05tDV
+	 +dsVMizPfhpe/QKG6Iz0iATxGc3KEIKUyPhNvf9EIZzDGdX2rVcktW3VVz7bMyCCg0lA1
+	 zUIdZT7eoliOWsUodQJJiUoycP9xy5Mloa5pfi2UQrG81CHLJmnTJTELO4dmDgR0y0cOv
+	 gzSHwnTZeetIlXVqS7xb1ppsW8LSZYZQQR4QdKm6olH6TlNykAFojulvSjolzZ2rTeh+/
+	 TH6DhZ0z1NntFjkoyCrbRf/ESUHQg3G9RZIxOPPit28kpmZKTPhCMisPaxl2ZRpIhQw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aaAFwMzS;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CjhW8Wmb;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFD1606D815
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 10:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BD0606A32C;
+	Sat,  7 Nov 2026 12:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aaAFwMzS
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B77241F008A1;
-	Sat,  7 Nov 2026 10:21:17 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CjhW8Wmb
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DC0D1F0089F;
+	Sat,  7 Nov 2026 12:39:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794046878;
-	bh=1Hte/mrif48x+MfoOWMojIHIFcNzBDtLRjD6dpkNF4M=;
-	h=From:Subject:Reply-To:To:In-Reply-To:References:Date;
-	b=aaAFwMzSPChEBA+HIupiW/aWb5Uq3ApFw+PGpZvIry4RyW6PqfgY4Yk4ZtmiTbq24
-	 yQwTagVsQrcgGlwJfyBarWXN+GmYRtXS39eUH+bu8NDD/itTLAPX4rPxEV/+LF5Rye
-	 opNlvNJWIAiex9LS+yKU2X99P4t3W1WL/FWEpVQ1HWOCOPwYK1fDKgT+LqhZoeJvOj
-	 jS6T9uP1dmPef37S23kCAtpJ970zOJc9UYt+znbz/n+RpTnP94QUv4U4klhWfL6skj
-	 Pp1JP9UUIXrMU7/6kxCkoQh4AlFVm03JO57VB749Z7Q3ZMXB4getzPxaSGrsmQ6XnJ
-	 uMHUkpzVbA9Gg==
-Message-ID: <sashiko-outbox-202815@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] hwrng: cctrng - cancel deferred works on unbind to
- avoid use-after-free
-Reply-To: sashiko-reviews@lists.linux.dev
-To: hyunjungg <hj351016@gmail.com>, "Olivia Mackall" <olivia@selenic.com>, "Herbert
- Xu" <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org
-In-Reply-To: <20261107100238.3542588-1-hj351016@gmail.com>
-References: <20261107100238.3542588-1-hj351016@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Nov 2026 10:21:17 +0000
+	s=k20260515; t=1794055186;
+	bh=MtZkoKUjowTG2Upsi1vq8iBJI9ISeGB6pNGvPLOId3M=;
+	h=From:Date:Subject:To:Cc;
+	b=CjhW8Wmb0boCh1WJST1slzCVLToBYih13WYsAgLLCpeNLO+FUvuQBNYRAAggVPISu
+	 7sS/gM+JIsfasPuXGvBQcrRMgGFR//ayTrGbSrKUeL1s3AYTNV651QD40DECNpu3gU
+	 GJjSMd6R3QjlqBboryxcJS8p95wyM7Cd7jGH7wkhtrfc6g44nM/jUyE/AHoyJTnEn4
+	 2wDhJwORRWuSq6mxzsLHgxC9emWOoYewJ4G/KHFE5sQ+eLb1oq10dd45CCp14BqWiK
+	 S4HPeKRRYo0C+Jq7BoInQ2BnLdX9+r1vbCmDuwE8nMedPu6zvLUP3bH/637kc9tErK
+	 o1d+BffcdDHYQ==
+From: Joshua Crofts <crofts@kernel.org>
+Date: Sat, 07 Nov 2026 13:39:43 +0100
+Subject: [PATCH] crypto: omap-sham: remove redundant
+ pm_runtime_dont_use_autosuspend() calls
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -59,78 +52,64 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261107-crypto-dont-use-autosuspend-removal-v1-1-62696ad3ff0e@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NQQ6CMBBA0auQWTsJLQrqVYiLQgdtop1mpiUSw
+ t1tXL7N/zsoSSCFe7OD0Bo0cKwwpwbml4tPwuCrwba2N6YdcJYtZUbPMWNRQlcya9FE0aPQh1f
+ 3xs4uV385d7dh6qGWktASvv/L+DiOHzCy6ht1AAAA
+X-Change-ID: 20261107-crypto-dont-use-autosuspend-removal-32f8d54397b6
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Joshua Crofts <crofts@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794055185; l=1297;
+ i=crofts@kernel.org; s=20261015; h=from:subject:message-id;
+ bh=DZSdqhiD5oCGCq66lcad98q7o8oDJxYQC9Z6fM9UOfw=;
+ b=CBN8az44Z0BR6sKeQ1S2sZLSTtJOwDrLIsN8gaWeor6BtJhNgmFcGtO7ZChG9fotcYUFchz2c
+ 7hb9tChgs6CA+iu1hEjt3tYOw/0tO8sHJ7ELkBle7Sgzkzx/bHHqlHu
+X-Developer-Key: i=crofts@kernel.org; a=ed25519;
+ pk=RTDOoVwgeL4oFdASj9U+cxJuIjXuXk73zkjnGOJKbEo=
 
-Thank you for your contribution! Sashiko AI review found no new issues
-in this patch, but noticed 1 related pre-existing issue it does not
-introduce:
-- [High] hwrng: cctrng - runtime resume before enabling runtime PM in
-  cctrng_probe() [1]
---
+Since commit d1706f9da9f4 ("PM: runtime: call pm_runtime_dont_use_autosuspend() on reinit()"),
+driver core is now responsible for undoing any
+pm_runtime_use_autosuspend() calls on driver exit.
 
-commit 8e1ce791cb06b2432af8b8abe4b88073b7383901
-Author: Hyunjung Ko <hj351016@gmail.com>
+Remove the redundant function calls.
 
-hwrng: cctrng - cancel deferred works on unbind to avoid use-after-free
+Signed-off-by: Joshua Crofts <crofts@kernel.org>
+---
+ drivers/crypto/omap-sham.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-This commit replaces INIT_WORK() with devm_work_autocancel() for
-compwork and startwork in cctrng_probe() so that pending work items are
-canceled on driver unbind before drvdata is freed.
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 5e739415a010..72182f190084 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -2109,7 +2109,6 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	list_del(&dd->list);
+ 	spin_unlock_bh(&sham.lock);
+ err_pm:
+-	pm_runtime_dont_use_autosuspend(dev);
+ 	pm_runtime_disable(dev);
+ 	if (!dd->polling_mode)
+ 		dma_release_channel(dd->dma_lch);
+@@ -2131,7 +2130,6 @@ static void omap_sham_remove(struct platform_device *pdev)
+ 	omap_sham_unregister_algs(dd->pdata);
+ 	crypto_engine_exit(dd->engine);
+ 	cancel_work_sync(&dd->done_task);
+-	pm_runtime_dont_use_autosuspend(&pdev->dev);
+ 	pm_runtime_disable(&pdev->dev);
+ 
+ 	if (!dd->polling_mode)
 
-> diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cct=
-rng.c
-> index 03401ee59a8e8..138cc7072b023 100644
-> --- a/drivers/char/hw_random/cctrng.c
-> +++ b/drivers/char/hw_random/cctrng.c
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20261107-crypto-dont-use-autosuspend-removal-32f8d54397b6
 
-[ ... ]
+Best regards,
+-- 
+Joshua Crofts
 
-> @@ -497,8 +498,14 @@ static int cctrng_probe(struct platform_device *pdev)
->  		return dev_err_probe(dev, PTR_ERR(drvdata->clk),
->  				     "Failed to get or enable the clock\n");
-> =20
-> -	INIT_WORK(&drvdata->compwork, cc_trng_compwork_handler);
-> -	INIT_WORK(&drvdata->startwork, cc_trng_startwork_handler);
-> +	rc =3D devm_work_autocancel(dev, &drvdata->compwork,
-> +				  cc_trng_compwork_handler);
-> +	if (rc)
-> +		return rc;
-> +	rc =3D devm_work_autocancel(dev, &drvdata->startwork,
-> +				  cc_trng_startwork_handler);
-> +	if (rc)
-> +		return rc;
->  	spin_lock_init(&drvdata->read_lock);
-> =20
->  	/* register the driver isr function */
-
-[Severity: High]
-This problem wasn't introduced by this patch, but later in cctrng_probe(),
-does cc_trng_pm_get() fail with -EACCES when CONFIG_PM is enabled [1]?
-
-drivers/char/hw_random/cctrng.c:cctrng_probe() {
-	...
-	/* init PM */
-	rc =3D cc_trng_pm_init(drvdata);
-	if (rc)
-		return dev_err_probe(dev, rc, "cc_trng_pm_init failed\n");
-
-	/* increment device's usage counter */
-	rc =3D cc_trng_pm_get(dev);
-	if (rc)
-		return dev_err_probe(dev, rc, "cc_trng_pm_get returned %x\n", rc);
-	...
-	/* All set, we can allow auto-suspend */
-	cc_trng_pm_go(drvdata);
-	...
-}
-
-cc_trng_pm_init() calls pm_runtime_set_active(), while pm_runtime_enable()
-is deferred until cc_trng_pm_go() at the end of probe.  When
-cc_trng_pm_get() calls pm_runtime_resume_and_get(), runtime PM is still
-disabled and dev->power.last_status is RPM_INVALID, so rpm_resume()
-returns -EACCES and cctrng_probe() aborts.
-
-[1] https://sashiko.dev/#/bug/linux-6da7f352-ac7d-4b81-8569-a1008cfc3400
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261107100238.3542=
-588-1-hj351016@gmail.com?part=3D1
