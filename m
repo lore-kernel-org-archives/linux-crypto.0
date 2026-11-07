@@ -1,57 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794036310;
-	b=DziZmMhSIFsdNwvkgiRUYWuwsnjs6D3qUlHoTnJs14lT952bI91z+Cnk/gRjOlklepuR
-	 +XVTADTLoOAo0UMp1/hUlwTcQES8RHzuDIh7SDAUpSyWYPZFpOq2HLSVSfPEGZP45MQrX
-	 GfJWAHxDX7Rsh82jxVAkwrWfbOfZLGHagRbTYBBADgDtvfF7UD6/knSCGo13BUHYESqCs
-	 LJ65igZeqgPeJUIfPpACZKx1a0UtPrdyMXUsEJcytBRHgj9im32Y9yaJ4O3aXKwHtLsp4
-	 Bpb1DViAlKBT53WempZtHJdjqU98mx1WaHdMd9wE66y0U+MP0PeY0WyVO31HCTWyyqA==
+	t=1794036312;
+	b=ccaMre6Wp3RumgKFb6Ts2qyFKxulgIzyHY0RjsZeT9omHPPrzqVbo3IKMByOGsWq3cXI
+	 Jf7F850Qn3cdmh0Yuv8FyB344OE96mlQO8trOt8K6PO6N+nMH7NellW1T0rp3+ziKnZ4s
+	 vijNc20fuAWM4NPhtKBJML893EUkzVEjyENzAylftBb73KgU7ijpibp9moguhmFt+0o3A
+	 4Qbl3DPD8iXrOH0dQ8ZsVUw9Qoy2klbof6pwpTCv4o8iaB/OKuKA815VX41JkoJzvGz4X
+	 czE5Sk7q8ChQFhQVs6S0XWYaboRDTbfjGoD0Xbrh8WGIzrT6nZOk0G54q1P21sth3XQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794036310;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794036312;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=gCWQ9qkOFfgvFaYqP71kdGivRiPvl6C6TAal7j1jCxY=;
-	b=mp+S3d8Wz6paNfWshJEMSnljRVgujl6oSgLC1ltpGRMNbknizp5pFuG9NSSU6Do18fIQ
-	 cAY0r0OLsaZsvYTNlSSJVV8wf5cDxcIFwfPdgTFvneX3BUu25mE4MTLVKbQf1yqD2F8ok
-	 dM4YFmrmJsCiqZgaUv2kGX1b52xOHEYj4tRnWIn7NhkZCDg1tgPmUawdNfknXPeUnP46+
-	 2XVjNK1OE3QrPxfaUgd2CFdsJOGUIXbM1Vlqs0qbgIO58bC7II6ofY9vO7kIulVVqs5U6
-	 o3nrKj+UqfsvNuq61kONpnFjK/N0FmW7YhotIXCdGceosX56LT3xnNU2WTvNjKoYjQQ==
+	bh=Q/BnVNvWJBWN8gIYT+KV/HWUVqg2WBwCQRGFUzyrbeE=;
+	b=gNbwz7cfL++a65B6j7/PtiFt6cv6eCarWqWmK3vAP1O8uJeNlRT94D4Fi3YrbuVuHKAc
+	 uQJWKjA3TNaYBRVvC/7rh62nD1B/n0nN7NcYf06AUM7UA2K9YCM8X8hSVKkKiDmO3916D
+	 xrs/DBk9LJ98ITvp/BaR9LXW69CSChYyXFiBjBK2c6lx/FDdyRRaDs59NLMsE3IJ4/E4a
+	 SkTB6dCUqzgGJXZ29G9c/S3o4b/Fm9VmOEjQezTb8TlINXfqjYp5VZr6hix38mol16t7T
+	 Nu65DTx4lfTk9If5ACX183AGerpLWrCaIzZM/qZA/e3oiYdekpyKR2FWtbHfylxgmMg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ghu6+rk9;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jmvCllkf;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A122606A32C
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 07:25:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F80606A32F
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Nov 2026 07:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ghu6+rk9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 154191F008A1;
-	Sat,  7 Nov 2026 07:25:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jmvCllkf
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 266BB1F0089F;
+	Sat,  7 Nov 2026 07:25:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794036309;
-	bh=gCWQ9qkOFfgvFaYqP71kdGivRiPvl6C6TAal7j1jCxY=;
+	s=k20260515; t=1794036312;
+	bh=Q/BnVNvWJBWN8gIYT+KV/HWUVqg2WBwCQRGFUzyrbeE=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=ghu6+rk9zvmZZeSobEbSSFgk+jAhNIIOk9bFNo1gTqTIp/UnTSag42Qp/zyd3ihcK
-	 AZpDymTpKHuTWu/jSjwvMpptttU06vOhysWyskWYa9dka6E5XTmkuMXPmwQloA967K
-	 q8WmaoWbpouBqXrfZpq0y9baC7yHASyvLCNQKtJKRF1ISKsZR9sgrZC6d9uxWJYwH0
-	 2TDuq94q56wEbPwGzYaqHJj2xvzozpAiibjdNM6BKIq36n0nyxFlQ1B9R3QXCvXgzw
-	 PsdC6eohfA/XkbgEDGzv2VxVLipRn1QRYWWRT+DiuSdDZsRg0houLoh5BYkMar38K0
-	 9Hen3RIvxjmbw==
-Message-ID: <sashiko-outbox-202713@kernel.org>
+	b=jmvCllkfdsrF2NhWVBiWXaxoCk12Mfad/LDdzOWbzSYahK1g4CONW6WJzTO+fPnvg
+	 Q4zPLbpII9E8Mn6IPnkrVgbHgeDBksLsi3HGoNJ5Qiu3RTckVC39LyIuZVbPMIv1DR
+	 VFVBYgItdtP48DkfYFhl9TZ4RYWZq0PjQJ+ITFM9cNRVc4AtPtrhqkV6Vh97DJBO7d
+	 6XMLYyaMNf0OU4eLgfOnZq1nn1Ip0hzieNf3MzDUoDOfzKrs0eQ2iw+/V7vpVCSBzc
+	 uj7tthUR44Jk1LLCQ/dtYz4aAGdfvn+EBRm59/S9DsHp9yGIcb5LMxDe8ph5BT9wt9
+	 7koHoQeoIVWuw==
+Message-ID: <sashiko-outbox-202714@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 7/8] mm: zswap: Refactor and optimize
- zswap_store_pages() batch operations.
+Subject: Re: [PATCH v3 8/8] mm: zswap: Batched zswap_compress() for storing
+ large folios in batches.
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>, hannes@cmpxchg.org, yosry@kernel.org, nphamcs@gmail.com, chengming.zhou@linux.dev, akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, davem@davemloft.net, linux-crypto@vger.kernel.org
 Cc: rientjes@google.com, willy@infradead.org, senozhatsky@chromium.org
-In-Reply-To: <20261106072412.7909-8-kanchanapsridhar2026@gmail.com>
+In-Reply-To: <20261106072412.7909-9-kanchanapsridhar2026@gmail.com>
 References: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
- <20261106072412.7909-8-kanchanapsridhar2026@gmail.com>
+ <20261106072412.7909-9-kanchanapsridhar2026@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Nov 2026 07:25:08 +0000
+Date: Sat, 07 Nov 2026 07:25:09 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -63,124 +63,224 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 3 potential
 issues to consider:
-- [High] mm: zswap: missing !CONFIG_MEMCG stub for obj_cgroup_get_many()
-- [Low] mm: zswap: unconditional incompressible page stat updates on
-  zero delta
-- [Low] mm: memcontrol: unused and duplicated obj_cgroup_charge_zswap()
+- [High] mm: zswap: corrupted and unterminated dst scatterlist in
+  zswap_compress()
+- [Medium] mm: zswap: unclamped nr_batch_pages on remainder batch in
+  zswap_compress()
+- [Medium] mm: zswap: unsigned sg->length check mishandles negative
+  errors in zswap_compress()
 --
 
-commit 55351c710f10c5fbb79d9201d80496dc658bbc19
+commit 212f5740068394b4c82b7b1e5452b1ac6625322f
 Author: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
 
-mm: zswap: Refactor and optimize zswap_store_pages() batch operations.
+mm: zswap: Batched zswap_compress() for storing large folios in batches.
 
-This commit factors zswap_store_pages() into batch helpers
-zswap_init_entries() and zswap_tree_stores(), and introduces
-obj_cgroup_charge_zswap_many() to charge and account zswap batches at
-once.
-
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index ac6c43ea8c5a6..ab280a448e8c4 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -6368,6 +6368,42 @@ void obj_cgroup_charge_zswap(struct obj_cgroup *ob=
-jcg, size_t size)
->  	rcu_read_unlock();
->  }
-> =20
-> +/**
-> + * obj_cgroup_charge_zswap_many - bulk charge compression backend memory
-> + *                                from compressing a batch of pages.
-> + * @objcg: the object cgroup
-> + * @size: total compressed length of a batch of compressed objects
-> + * @nr_pages: # of pages that were compressed to store in zswap
-> + * @nr_incomp_pages: # of incompressible pages to store in zswap
-> + *
-> + * This forces the charge after obj_cgroup_may_zswap() allowed
-> + * compression and storage in zswap for this cgroup to go ahead.
-> + */
-> +void obj_cgroup_charge_zswap_many(struct obj_cgroup *objcg, size_t size,
-> +				  u8 nr_pages, u8 nr_incomp_pages)
-> +{
-> +	struct mem_cgroup *memcg;
-> +
-> +	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys))
-> +		return;
-> +
-> +	if (obj_cgroup_is_root(objcg))
-> +		return;
-> +
-> +	VM_WARN_ON_ONCE(!(current->flags & PF_MEMALLOC));
-> +
-> +	/* PF_MEMALLOC context, charging must succeed */
-> +	if (obj_cgroup_charge(objcg, GFP_KERNEL, size))
-> +		VM_WARN_ON_ONCE(1);
-> +
-> +	rcu_read_lock();
-> +	memcg =3D obj_cgroup_memcg(objcg);
-> +	mod_memcg_state(memcg, MEMCG_ZSWAP_B, size);
-> +	mod_memcg_state(memcg, MEMCG_ZSWAPPED, nr_pages);
-> +	mod_memcg_state(memcg, MEMCG_ZSWAP_INCOMP, nr_incomp_pages);
-> +	rcu_read_unlock();
-> +}
-
-[Severity: Low]
-Could obj_cgroup_charge_zswap() be removed now that its only caller in
-mm/zswap.c has switched to obj_cgroup_charge_zswap_many(), just as
-zswap_pool_get() was replaced by zswap_pool_get_many()?  Leaving
-obj_cgroup_charge_zswap() in mm/memcontrol.c and include/linux/memcontrol.h
-duplicates the charging logic with no remaining callers.
+This commit replaces per-page zswap_compress() calls with a batched
+implementation that compresses up to ZSWAP_MAX_BATCH_SIZE pages using a
+per-CPU scatterlist table and updates the batch entries in
+zswap_update_entries().
 
 > diff --git a/mm/zswap.c b/mm/zswap.c
-> index 8c36344000f51..5ef1ae67e67a9 100644
+> index 5ef1ae67e67a9..45fd8dfaf916d 100644
 > --- a/mm/zswap.c
 > +++ b/mm/zswap.c
 
 [ ... ]
 
-> @@ -1711,17 +1702,86 @@ static bool zswap_store_pages(struct zswap_store_=
-context *zc,
->  			zswap_lru_add(entry);
->  	}
-> =20
+> @@ -898,6 +914,7 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, s=
+truct hlist_node *node)
+
+[ ... ]
+
+> +	acomp_ctx->comp.sg_table =3D kmalloc(sizeof(*acomp_ctx->comp.sg_table),
+> +					   GFP_KERNEL);
+> +	if (!acomp_ctx->comp.sg_table) {
+> +		ret =3D -ENOMEM;
+> +		goto req_fail;
+> +	}
+> +
+> +	if (sg_alloc_table(acomp_ctx->comp.sg_table, ZSWAP_MAX_BATCH_SIZE,
+> +			   GFP_KERNEL)) {
+> +		ret =3D -ENOMEM;
+> +		goto req_fail;
+> +	}
+> +
 > +	/*
-> +	 * Each batch entry is successfully compressed and stored in the tree,
-> +	 * and further failures will be cleaned up in zswap_store().
-> +	 * Next, we do bulk accounting for the batch: grab refs to the pool and
-> +	 * objcg, charge zswap memory, increment zswap_stored_pages and
-> +	 * zswap_stored_incompressible_pages. The opposite actions will be
-> +	 * performed by zswap_entry_free() when the entry is removed from the
-> +	 * tree.
+> +	 * Statically map the per-CPU destination buffers to the per-CPU
+> +	 * SG lists; crucial for performance.
 > +	 */
-> +	zswap_pool_get_many(pool, zc->nr_pages);
-> +	if (objcg) {
-> +		obj_cgroup_get_many(objcg, zc->nr_pages);
+> +	for_each_sg(acomp_ctx->comp.sg_table->sgl, sg, ZSWAP_MAX_BATCH_SIZE, i)
+> +		sg_set_buf(sg, acomp_ctx->comp.buffers[i], PAGE_SIZE);
+
+[ ... ]
+
+> +static bool zswap_compress(struct zswap_store_context *zc)
+> +{
+> +	u8 batch_start, comp_batch_iter;
+> +	struct scatterlist *sg, *dst_sg;
+> +	int err;
+> =20
+>  	/*
+> -	 * it maybe looks a little bit silly that we send an asynchronous reque=
+st,
+> -	 * then wait for its completion synchronously. This makes the process l=
+ook
+> -	 * synchronous in fact.
+> -	 * Theoretically, acomp supports users send multiple acomp requests in =
+one
+> -	 * acomp instance, then get those requests done simultaneously. but in =
+this
+> -	 * case, zswap actually does store and load page by page, there is no
+> -	 * existing method to send the second page before the first page is done
+> -	 * in one thread doing zswap.
+> -	 * but in different threads running on different cpu, we have different
+> -	 * acomp instance, and compression and decompression use separate
+> -	 * requests, so multiple threads can do (de)compression in parallel.
+> +	 * @nr_batch_pages is constrained by the per-CPU comp_ctx's compressor
+> +	 * batch size and the @zc->nr_pages in this store batch. @slen indicates
+> +	 * the total source length bytes for @nr_batch_pages.
+>  	 */
+> +	zc->nr_batch_pages =3D min(zc->comp_ctx->compr_batch_size, zc->nr_pages=
+);
+> +	zc->slen =3D zc->nr_batch_pages * PAGE_SIZE;
+> =20
+>  	/*
+> +	 * Compress the @nr_pages in @folio starting at index @folio_start
+> +	 * in batches of @nr_batch_pages.
+>  	 */
+> +	for (batch_start =3D 0; batch_start < zc->nr_pages;
+> +	     batch_start +=3D zc->nr_batch_pages) {
+
+[Severity: Medium]
+Can zc->nr_batch_pages exceed the remaining pages in the store batch on the
+final loop iteration?
+
+zc->nr_batch_pages and zc->slen are computed once before the loop instead
+of being clamped to zc->nr_pages - batch_start on each iteration.  If a
+compressor has a compr_batch_size that does not evenly divide zc->nr_pages
+(for example, compr_batch_size =3D=3D 3 with zc->nr_pages =3D=3D 4), the fi=
+nal
+iteration reads past the end of the folio batch and walks past the SG_END
+terminator of zc->comp_ctx->sg_table->sgl in for_each_sg(), causing a NULL
+pointer dereference when sg_next() returns NULL.
+
+> +		/*
+> +		 * Send @nr_batch_pages to crypto_acomp for compression:
+> +		 *
+> +		 * These pages are in @folio's range of indices in the interval
+> +		 *     [@folio_start + @batch_start,
+> +		 *      @folio_start + @batch_start + @nr_batch_pages).
+> +		 *
+> +		 * The source folio pages in the batch are directly submitted to
+> +		 * crypto_acomp via acomp_request_set_src_folio().
+> +		 */
+> +		acomp_request_set_src_folio(zc->comp_ctx->areq.req, zc->folio,
+> +				(zc->folio_start + batch_start) * PAGE_SIZE,
+> +				zc->slen);
+> +
+> +		dst_sg =3D zc->comp_ctx->sg_table->sgl + batch_start;
+> +		dst_sg->length =3D zc->slen;
+> +
+> +		/*
+> +		 * The per-CPU @zc->comp_ctx->sg_table scatterlists are statically
+> +		 * mapped to the per-CPU dst @buffers at pool creation time.
+> +		 * There are ZSWAP_MAX_BATCH_SIZE per-CPU SG lists and dst
+> +		 * buffers allocated for all compressors.
+> +		 */
+> +		acomp_request_set_dst_sg(zc->comp_ctx->areq.req,
+> +					 dst_sg, zc->slen);
 
 [Severity: High]
-Does calling obj_cgroup_get_many() here break the build when CONFIG_ZSWAP=
-=3Dy
-and CONFIG_MEMCG=3Dn?
+Does setting dst_sg->length =3D zc->slen corrupt the per-CPU scatterlist ta=
+ble
+in zc->comp_ctx->sg_table?
 
-include/linux/memcontrol.h only defines obj_cgroup_get_many() inside the
-#ifdef CONFIG_MEMCG block, while the #else section only provides stubs for
-obj_cgroup_get() and obj_cgroup_put().
+In zswap_cpu_comp_prepare(), each entry in sg_table->sgl is mapped to a
+separate PAGE_SIZE buffer and only sgl[ZSWAP_MAX_BATCH_SIZE - 1] has SG_END
+set.  During compression, each entry's sg->length is overwritten with the
+compressed size or a negative error code.
 
-> +		obj_cgroup_charge_zswap_many(objcg, total_batch_comp_length,
-> +					     zc->nr_pages, nr_incomp);
+When zc->nr_batch_pages > 1, setting dst_sg->length =3D zc->slen tells the
+compressor that dst_sg[0]'s single PAGE_SIZE buffer is nr_batch_pages *
+PAGE_SIZE bytes long, while dst_sg[1 .. nr_batch_pages - 1].length are never
+reset to PAGE_SIZE and retain stale lengths or negative error codes from the
+previous batch.  If crypto_acomp_compress() fails while zc->wb_enabled is
+true without updating every entry's sg->length, any entry still holding a
+stale length in (0, PAGE_SIZE) bypasses the sg->length >=3D PAGE_SIZE check
+and causes zswap_update_entries() to store stale data from the previous
+folio.
+
+In addition, because SG_END is only set on sgl[3], passing dst_sg =3D sgl +
+batch_start leaves 4 - batch_start entries linked in req->dst.  Hardware
+acomp drivers that check sg_nents(req->dst) or DMA-map every entry in the
+scatterlist walk past the current batch into trailing entries whose
+sg->length may still hold PAGE_SIZE or (unsigned int)-ENOSPC (0xffffffe4)
+from an earlier failed compression.
+
+> +
+> +		err =3D crypto_wait_req(crypto_acomp_compress(zc->comp_ctx->areq.req),
+> +				      &zc->comp_ctx->areq.wait);
+> +
+> +		/*
+> +		 * If a page cannot be compressed into a size smaller than
+> +		 * PAGE_SIZE, save the content as is without a compression, to
+> +		 * keep the LRU order of writebacks.  If writeback is disabled,
+> +		 * reject the page since it only adds metadata overhead.
+> +		 * swap_writeout() will put the page back to the active LRU list
+> +		 * in the case.
+> +		 */
+> +		if (err && !zc->wb_enabled)
+> +			goto compress_error;
+> =20
+> +		/*
+> +		 * For each output SG list in @acomp_ctx->req->sg_table->sgl,
+> +		 * the @sg->length should be set to either the page's compressed
+> +		 * length (success), or it's negative value compression error.
+> +		 */
+> +		for_each_sg(dst_sg, sg, zc->nr_batch_pages, comp_batch_iter) {
+> +
+> +			if (sg->length <=3D 0 || sg->length >=3D PAGE_SIZE) {
+> +				if (!zc->wb_enabled) {
+> +					if (sg->length =3D=3D PAGE_SIZE)
+> +						sg->length =3D -ENOSPC;
+> +					else if (WARN_ON_ONCE(!sg->length || sg->length > PAGE_SIZE))
+> +						sg->length =3D -EINVAL;
+> +					goto compress_error;
+> +				}
+> +
+> +				sg->length =3D PAGE_SIZE;
+> +			}
+> +		}
+>  	}
+> =20
+> +	return zswap_update_entries(zc);
+> =20
+> +compress_error:
+> +	for_each_sg(dst_sg, sg, zc->nr_batch_pages, comp_batch_iter) {
+> +		if ((int)sg->length < 0) {
+> +			if ((int)sg->length =3D=3D -ENOSPC)
+> +				zswap_reject_compress_poor++;
+> +			else
+> +				zswap_reject_compress_fail++;
+> +		}
 > +	}
-> +	atomic_long_add(zc->nr_pages, &zswap_stored_pages);
-> +	atomic_long_add(nr_incomp, &zswap_stored_incompressible_pages);
+> +
+> +	return false;
+>  }
 
-[Severity: Low]
-Should the incompressible page updates here and in
-obj_cgroup_charge_zswap_many() be skipped when nr_incomp is 0?
+[Severity: Medium]
+Does checking sg->length without casting to int mishandle negative
+compression error codes when !zc->wb_enabled?
 
-In the common case where all pages in the batch are compressible,
-atomic_long_add(0, &zswap_stored_incompressible_pages) still performs an
-atomic read-modify-write on the shared global counter, and
-mod_memcg_state(memcg, MEMCG_ZSWAP_INCOMP, 0) still runs get_cpu(), updates
-per-CPU stats by 0, and fires trace_mod_memcg_state() with val =3D=3D 0.
+scatterlist.length is an unsigned int, so a negative error code stored in
+sg->length (such as -ENOSPC) is never <=3D 0 and instead triggers
+WARN_ON_ONCE(!sg->length || sg->length > PAGE_SIZE) and overwrites
+sg->length with -EINVAL before compress_error: checks for -ENOSPC.
+Conversely, if crypto_acomp_compress() returns an error before setting
+negative values in sg->length, jumping directly to compress_error: finds no
+entries with (int)sg->length < 0 and increments neither rejection counter.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106072412.7909=
--1-kanchanapsridhar2026@gmail.com?part=3D7
+-1-kanchanapsridhar2026@gmail.com?part=3D8
