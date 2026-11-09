@@ -1,57 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794211256;
-	b=NOBhkKtTnNjdUv0PuYL4tV8jKyr4hbY4QNI3bdqFuXQvDT5+BQMUJ21IobYHQ2XfNj8K
-	 8OBi9SQ3odhdq5PFcdxmOm1Y21n4aBxUesnk4oKS00VUpkcpe2rdX8AlCHsSVXjmI0ygR
-	 QKV9yHJsKFLcSjOJlA2F1193vl96UaxoJ06Ljgh1kx2isxSPOgJwqC80Hcx2wS1C6+Etd
-	 8CAzNgvL2C/eaIg04e5d6HaKbp34xl9V9ZLSKolrALa5dGQ2CxIa+B9WSYPxzih3BgpL0
-	 8KnlxQURTVxoBlnwtfwI+VuSWBkL0fz5HnNSyi9cjCkNKHxKv9HkQH6ZSx0Q8y1qaKQ==
+	t=1794211534;
+	b=UAnzvgKi56g4uTwW39cCW7/L6SwaVvKGpCniFegt7mYwGbbP0xgVnqrtMIim6CUWz45E
+	 av+qnYWf2CjNRWVPAhB+dab0pfo26gXuFEwxAO7n+n1WLYcwtOtQh+f5r9loM3xxV6f5f
+	 4DGrB98eJmazHsbzQadT7YrSW+9yKuWiW8/12G1pFoS4ormojBEwoOTth4lqr90ItBvve
+	 QUsLgBNVRZtsslvkvyndcezO0Cc0TZY31qxrfRtZccNeFqJhtjw/PREbcIB5BuTkEdaRN
+	 M3gQNT+4BAR47zvGO+89pY7ePb/GTe56aIIHtPxwlGCjsWBOKQNADFK7/BZNWZOMv3w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794211256;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794211534;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=gjmtswv9VcZKkxlAxk/CoVqUw3+8B5/47myQS0vj5vw=;
-	b=KPdxWDB0TIVDnqErDKu9khsE9gXqipu5WpJ0GavOtV0XIFH5hTwsFrULoe2uSJgzMgKb
-	 TGBGkKq9fzqYwc9h80kLO8MDZ+J4tytuMuFdX8g4B3xBtJLt2rfoqRGo+uAbj0rbuPfh4
-	 gacWlUpGU7+H70W8s7guwfigakbSiMXbXQqRUwKvBfaksAP2Y5DOtMVxCPjhLwXKYVGho
-	 cln6TAvoQ5DZGeY+HMcbYZUPeefoFEiLSvepJXYMpdABPutGFsaLP69cyLYzLh+Dpduwc
-	 /eAFQrg/S/99EC6LE/aqS4jDW2As87vfmYQHcA2dqK148S2NLUP4xxp5ZddWhWBd2DQ==
+	bh=J65fHlMIodQdJrFvp6Eb4f0lyEr7o6Uh1vYDTmprIg8=;
+	b=upfwcu8kWiC4spx+/N7SGI9XWhlyECNhijWSKg7nPlFhpevA4uE/nUkqp6RYfV2LJSCh
+	 GvGvBYbTwDCkSoq7+S1jAk7HT7eDLsPqmHC5dgS1B/Jh22vj4vbFwwx+HY6y5oUXBScaI
+	 ge5rgTMv+JYi6fQM3P/zlFbQJ+McLgpvwy1JUtt3pHcUGEO6hpIWS67ubOBoYfyMPZeiW
+	 1Yo9SMdOU6Nl9kZ8aVJ0NA7oxzWrVKaEfjRiiSRkuxE66+a02VX79J53b+AJKUXBu13oi
+	 nhjNjNuCkVG9ZvKyhabMRI3yZUSwobA3lkT/YK7+EgV6BrUCkAA6iw9BD9m0IStp19g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="l/vJVyiL";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FhAlFBCj;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A83606A31C
-	for <linux-crypto@vger.kernel.org>; Mon,  9 Nov 2026 08:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD46606A321
+	for <linux-crypto@vger.kernel.org>; Mon,  9 Nov 2026 08:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=l/vJVyiL
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ED081F0089F;
-	Mon,  9 Nov 2026 08:00:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FhAlFBCj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052491F0089F;
+	Mon,  9 Nov 2026 08:05:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794211255;
-	bh=gjmtswv9VcZKkxlAxk/CoVqUw3+8B5/47myQS0vj5vw=;
+	s=k20260515; t=1794211533;
+	bh=J65fHlMIodQdJrFvp6Eb4f0lyEr7o6Uh1vYDTmprIg8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=l/vJVyiLA+IKIW8CqRKrFXpMgiLN/39uYjSiMnmVvBQQoQuQ8oTP2WUFK4QpXiWpH
-	 2hOg2KWpVMtlpIWfz1XFFzb+/mH7UlBT0q867eWDQUqaYWN4kX9u5XjvVBUaBp7Zw5
-	 5GY0GAOPNCbEHmUqIYvTv/tAz+hzJr7VDWQVqOo7JPmGBmkVKD4fVvTBqI0QlW1/T/
-	 UfndYq2FZSIu6xop24TtbhjKR/VS3ifzTpXj+hrLodsfu0IgHUJbwrjauXLCovNvKq
-	 VuZ7PpTd/C+Gp5JFat0Y0cjjNTjsKen/bwkDxvgG531WwtteBLvJOkMWszUF5mtv83
-	 MtNQ8RJbe4IRw==
-Message-ID: <sashiko-outbox-204559@kernel.org>
+	b=FhAlFBCj+SJ6rnZT7ousddDGpx4leWAXnIn2QX7rDOwl0c1FqKG5aChNoPvT9J5BP
+	 6eYCZxwfGHSSAM7KAUihui9wCP7gw+m6UxSFT+joBjkqkW2sJo68ul3aDA3npgkPP9
+	 ExgQn/ON4RXbz/dR8E+TOQ3buQK1I4idV5hm9F/94AuzPCRZ/tMfBWEfKZRhbYDADM
+	 Pvb0l9lk/P6ruMd+Ktr7jn/x/7HuORhNrdLFowyQNPTTYqpwVXEG62a2l4O9pWLCqm
+	 ZX4CJk6+I+UM5syo7GpgAEljPJPFspH2V5J8E6Q3UGg1YBAgi0/KnxMsu6ibq3eBI9
+	 vujPYPrholKvA==
+Message-ID: <sashiko-outbox-204560@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 3/4] crypto: hisilicon/hpre - use crypto engine
- framework
+Subject: Re: [PATCH 4/4] crypto: hisilicon/zip - adapt to use crypto engine
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Chenghai Huang" <huangchenghai2@huawei.com>, herbert@gondor.apana.org.au, davem@davemloft.net
 Cc: linux-crypto@vger.kernel.org, liulongfang@huawei.com, qianweili@huawei.com, wangzhou1@hisilicon.com, linwenkai6@hisilicon.com
-In-Reply-To: <20261109073556.2517351-4-huangchenghai2@huawei.com>
+In-Reply-To: <20261109073556.2517351-5-huangchenghai2@huawei.com>
 References: <20261109073556.2517351-1-huangchenghai2@huawei.com>
- <20261109073556.2517351-4-huangchenghai2@huawei.com>
+ <20261109073556.2517351-5-huangchenghai2@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Nov 2026 08:00:54 +0000
+Date: Mon, 09 Nov 2026 08:05:32 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,156 +60,158 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] crypto: hisilicon/hpre: race in hpre_ctx_init() with engine
-  init and exit
-It also noticed 2 related pre-existing issues this patch does not
-introduce:
-- [Critical] crypto: hisilicon/hpre - null pointer dereference in
-  hpre_ecdh_cb() [1]
-- [Critical] crypto: hisilicon/hpre: destination scatterlist overwrite
-  in hpre_hw_data_clr_all() [2]
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [High] crypto: hisilicon/zip - req_id exhaustion deadlock in
+  hisi_zip_do_comp()
+- [Medium] crypto: hisilicon/zip: hisi_zip_do_acomp() clobbers -EBUSY on
+  backlog
 --
 
-commit fd11798f0428979de89ed11bd547ffce95a2a817
-Author: Weili Qian <qianweili@huawei.com>
+commit e6135edb946689a8be0edb23655def633c6b3f9a
+Author: Chenghai Huang <huangchenghai2@huawei.com>
 
-crypto: hisilicon/hpre - use crypto engine framework
+crypto: hisilicon/zip - adapt to use crypto engine
 
-This commit migrates the HiSilicon HPRE DH, RSA, and ECDH algorithms to
-the crypto engine framework so that CRYPTO_TFM_REQ_MAY_BACKLOG requests
-are queued and retried when the hardware queue is full.
+This commit migrates the HiSilicon ZIP acomp driver to the crypto_engine
+framework so requests that hit a full hardware queue are queued and retried
+instead of failing immediately.
 
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto=
-/hisilicon/hpre/hpre_crypto.c
-> index 66a276786a7d0..c02c33ba04d4a 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-> +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-[ ... ]
-> @@ -386,10 +398,20 @@ static int hpre_ctx_init(struct hpre_ctx *ctx, u8 t=
-ype)
->  		return -ENODEV;
->  	}
-> =20
-> +	hpre =3D container_of(qp->qm, struct hpre, qm);
-> +	if (!hpre->engine_num) {
-> +		hisi_qm_free_qps(&qp, 1);
-> +		return -ENODEV;
-> +	}
-> +	ctx->engine =3D hpre->engine[qp->qp_id % hpre->engine_num];
-> +	if (!ctx->engine) {
-> +		hisi_qm_free_qps(&qp, 1);
-> +		return -ENODEV;
-> +	}
-
-[Severity: Medium]
-Can hpre_ctx_init() race with hpre_alloc_crypto_engine() and
-hpre_free_crypto_engine() when multiple HPRE devices are present?
-
-In hpre_probe(), hisi_qm_add_list() adds the QM to hpre_devices before
-hisi_qm_alg_register() calls hpre_algs_register(), and error rollback or
-hpre_remove() calls hpre_algs_unregister() before hisi_qm_del_list().
-When a first device has already registered the algorithms, a transform
-allocated on another CPU can grab a QP from a second device while its
-engines are being set up or torn down:
-
-CPU0                                  CPU1
-hpre_remove()
-  hisi_qm_alg_unregister()
-    hpre_algs_unregister()
-      hpre_free_crypto_engine()
-        crypto_engine_exit(engine[0])
-                                      hpre_ctx_init()
-                                        hpre_create_qp()
-                                        ctx->engine =3D hpre->engine[0];
-        hpre->engine_num =3D 0;
-                                      hpre_rsa_enc()
-                                        crypto_transfer_..._to_engine()
-                                          <-- use-after-free on kworker
-
-Similarly, during hpre_probe() of a second device, hpre_create_qp() can
-select the new QM before hpre_alloc_crypto_engine() sets hpre->engine_num,
-causing hpre_ctx_init() to fail with -ENODEV and forcing the transform to
-software fallback even though other HPRE devices are ready.
+> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/h=
+isilicon/zip/zip_crypto.c
+> index 70adde049b535..84951bc74a96e 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
 
 [ ... ]
 
-> @@ -1433,8 +1475,12 @@ static void hpre_ecdh_cb(struct hpre_ctx *ctx, voi=
-d *resp)
->  	p =3D sg_virt(areq->dst);
->  	memmove(p, p + ctx->key_sz - curve_sz, curve_sz);
->  	memmove(p + curve_sz, p + areq->dst_len - curve_sz, curve_sz);
-> -
-> -	kpp_request_complete(areq, ret);
-> +	local_bh_disable();
-> +	if (areq->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
-> +		crypto_finalize_kpp_request(ctx->engine, areq, ret);
-> +	else
-> +		kpp_request_complete(areq, ret);
-> +	local_bh_enable();
-> =20
->  	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
->  }
-
-[Severity: Critical]
-This problem wasn't introduced by this patch, but can sg_virt(areq->dst)
-cause a NULL pointer dereference [1] when a request scatterlist is
-backed by highmem pages?
-
-Because the algorithms are registered without CRYPTO_ALG_KERN_DRIVER_ONLY,
-requests submitted via AF_ALG can carry highmem pages where sg_virt()
-returns NULL.  Passing that result to dma_map_single() in
-hpre_get_data_dma_addr() performs an invalid DMA mapping, and passing p to
-memmove() here in hpre_ecdh_cb() dereferences NULL.
+> @@ -333,68 +345,111 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, =
+void *data)
 
 [ ... ]
 
-> @@ -1679,86 +1732,176 @@ static void hpre_ecdh_exit_tfm(struct crypto_kpp=
- *tfm)
-[ ... ]
-> +static int hpre_rsa_do_one_request(struct crypto_engine *engine, void *a=
-req)
+> +static int hisi_zip_do_comp(struct hisi_zip_req *req)
 > +{
-> +	struct akcipher_request *akreq =3D
-> +	    container_of(areq, struct akcipher_request, base);
-> +	void *tmp =3D akcipher_request_ctx(akreq);
-> +	struct hpre_asym_request *hpre_req =3D PTR_ALIGN(tmp, hpre_align_sz());
+> +	struct hisi_qp *qp =3D req->qp_ctx->qp;
+> +	struct device *dev =3D &qp->qm->pdev->dev;
 > +	int ret;
 > +
-> +	ret =3D hpre_alg_send_message(hpre_req);
-> +	if (ret && ret !=3D -ENOSPC)
-> +		hpre_hw_data_clr_all(hpre_req->ctx, hpre_req, akreq->dst, akreq->src);
+> +	if (!req->buf_ready) {
+> +		ret =3D hisi_zip_create_req(req);
+> +		if (unlikely(ret))
+> +			return -ENOSPC;
 > +
-> +	return ret;
+> +		ret =3D hisi_zip_map_req_buffers(req);
+> +		if (unlikely(ret))
+> +			goto remove_req;
+> +	}
+> +
+> +	ret =3D hisi_zip_do_work(req);
+> +	if (ret =3D=3D -EINPROGRESS)
+> +		return -EINPROGRESS;
+> +
+> +	if (ret =3D=3D -EBUSY)
+> +		return -ENOSPC;
+
+[Severity: High]
+Can hisi_zip_do_comp() deadlock qp_ctx->engine when a request with
+req->buf_ready =3D=3D false sits at the head of engine->queue while all
+req_q->size bits in req_q->req_bitmap are held by req->buf_ready =3D=3D true
+requests queued behind it?
+
+req_q->req_bitmap has sq_depth bits, while qm_get_avail_sqe() caps the
+hardware SQ at sq_depth - 1 in-flight requests.  When hisi_qp_send() returns
+-EBUSY, hisi_zip_do_comp() returns -ENOSPC with req->buf_ready =3D=3D true =
+and
+keeps req->req_id allocated while the request is parked in engine->queue.
+Because hisi_zip_do_acomp() runs hisi_zip_do_comp() before
+crypto_transfer_acomp_request_to_engine(), and qm_poll_req_cb() runs
+hisi_zip_acomp_cb() (freeing req_id) before atomic_dec(&qp->qp_status.used),
+new submissions can claim freed req_bitmap bits and queue behind an unmapped
+request:
+
+CPU0                              CPU1 (QM completion / new submitters)
+hisi_zip_do_acomp(req_b)
+  /* sq_depth - 1 in flight,
+   * 1 parked with req_id held:
+   * req_bitmap is full
+   */
+  hisi_zip_do_comp(req_b)
+    hisi_zip_create_req(req_b)
+      -> -EBUSY (-ENOSPC,
+         buf_ready =3D=3D false)
+  crypto_transfer_acomp_request_to_engine(req_b)
+    /* req_b at head of engine->queue */
+                                  qm_poll_req_cb()
+                                    hisi_zip_acomp_cb()
+                                      hisi_zip_remove_req()
+                                    /* before atomic_dec(&qp_status.used),
+                                     * new hisi_zip_do_acomp() calls
+                                     * allocate the freed req_ids, get
+                                     * -EBUSY from hisi_qp_send(), and
+                                     * queue behind req_b with
+                                     * buf_ready =3D=3D true
+                                     */
+kworker:
+crypto_pump_requests()
+  hisi_zip_do_one_request(req_b)
+    hisi_zip_create_req(req_b)
+      -> -ENOSPC
+  crypto_enqueue_request_head(req_b)
+  kthread_queue_work(pump_requests)  <-- spins forever
+
+Once all sq_depth bits in req_bitmap are held by requests queued behind
+req_b and the hardware SQ drains, req_b can never allocate a req_id and the
+requests behind it can never be dequeued to release theirs, wedging the
+queue and spinning engine->kworker at 100% CPU.
+
+[ ... ]
+
+> +static int hisi_zip_do_acomp(struct acomp_req *acomp_req, u8 alg_type)
+> +{
+> +	struct hisi_zip_ctx *ctx =3D crypto_tfm_ctx(acomp_req->base.tfm);
+> +	struct hisi_zip_qp_ctx *qp_ctx =3D &ctx->qp_ctx[alg_type];
+> +	struct hisi_zip_req *req =3D acomp_request_ctx(acomp_req);
+> +	int ret;
+> +
+> +	if (unlikely(!acomp_req->src || !acomp_req->slen ||
+> +		     !acomp_req->dst || !acomp_req->dlen))
+> +		return -EINVAL;
+> +
+> +	req->req =3D acomp_req;
+> +	req->alg_type =3D alg_type;
+> +	req->qp_ctx =3D qp_ctx;
+> +	req->buf_ready =3D false;
+> +
+> +	if (ctx->fallback)
+> +		return hisi_zip_fallback_do_work(acomp_req,
+> +						 req->alg_type =3D=3D HZIP_ALG_TYPE_DECOMP);
+> +
+> +	ret =3D hisi_zip_do_comp(req);
+> +	if (ret !=3D -ENOSPC)
+> +		return ret;
+> +
+> +	ret =3D crypto_transfer_acomp_request_to_engine(qp_ctx->engine, acomp_r=
+eq);
+> +	if (ret !=3D -EINPROGRESS && ret !=3D -EBUSY) {
+> +		hisi_zip_release_req_resource(req);
+> +		return ret;
+> +	}
+> +
+> +	return -EINPROGRESS;
 > +}
 
-[Severity: Critical]
-This problem wasn't introduced by this patch, but does calling
-hpre_hw_data_clr_all() with a non-NULL dst scatterlist on send failure
-overwrite the caller's destination buffer [2] with zeroes?
+[Severity: Medium]
+Should hisi_zip_do_acomp() return ret instead of -EINPROGRESS at the end of
+the function?
 
-drivers/crypto/hisilicon/hpre/hpre_crypto.c:hpre_hw_data_clr_all() {
-	...
-	if (req->dst) {
-		if (dst)
-			scatterwalk_map_and_copy(req->dst, dst, 0,
-						 ctx->key_sz, 1);
-		dma_free_coherent(dev, ctx->key_sz, req->dst, tmp);
-	}
-}
-
-When hpre_hw_data_init() allocates a zeroed coherent bounce buffer in
-req->dst and sending the request later fails in hpre_dh_compute_value(),
-hpre_rsa_enc(), hpre_rsa_dec(), hpre_dh_do_one_request(), or
-hpre_rsa_do_one_request(), the hardware never runs, so passing dst to
-hpre_hw_data_clr_all() copies those unpopulated zeroes into the caller's
-scatterlist.  Passing NULL for dst on error cleanup paths would free the
-bounce buffer without modifying the caller's destination memory.
-
-[1] https://sashiko.dev/#/bug/linux-2e7b66d8-14a8-417d-adb9-4989357e46d7
-[2] https://sashiko.dev/#/bug/linux-547b9bb7-6119-42c4-b3f0-fda7348ea883
+When engine->queue is full and CRYPTO_TFM_REQ_MAY_BACKLOG is set,
+crypto_transfer_acomp_request_to_engine() records the request on
+engine->queue.backlog and returns -EBUSY.  Returning -EINPROGRESS hides the
+backlog signal from callers and still triggers the extra
+crypto_request_complete(backlog, -EINPROGRESS) notification from
+crypto_pump_requests() that callers only expect after receiving -EBUSY.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261109073556.2517=
-351-1-huangchenghai2@huawei.com?part=3D3
+351-1-huangchenghai2@huawei.com?part=3D4
