@@ -1,97 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794240666;
-	b=S7sq5WrO6eSs7/6VQalwXJFdxiEo4qip49TNZussycDBq7KVDSt36a+KNeZ+OWyKRRC8
-	 2v4v9Gl6X1MizlI22Gjupn8zoTxN+COgncNt24TtytKsejaly8Zw5YfXB8eO81UvsRLmL
-	 KWCvAnzOAjvseKxwGl9VbmxCgR94ZVZVnPtED7ktT/ZcE3PfeOVlWgP2iewL61SVT/M+F
-	 12c5OEuxm9Sayzx/DlQ8aKv3i4CfojHjjB1aPLixftzxkXmBSEvewTpAcpIhLKboakn0e
-	 yTvjNvy3PlbJX5KZJyAAQrB3bEFkcEMmEvVoUj41z2wiytdWUPGypFofTmED4tnM/HQ==
+	t=1794241427;
+	b=vfUIoa8ykjB6oOHmVrXOWrXOSzRAXw3dQCEHQynM5pWY8QwvRjoxStNMaBLN6b0UAhkX
+	 xApOMcBgNjmYmHZcv6JdZ2OLrdxKaHp9jH9p0dG6F4pMKGm9xd4oTfUEh3Qk0SvBv/J3j
+	 hAMc7/Y88Zd4LnTzPazo6XxACYjUJ3hMhXpza2MIxgaBZcW1XlMl2wfPYc0IB42jq3Udi
+	 DHVQekRhoDYIZbsDh0dKnox4EgA6sOcczOVD5utWD6NfS5Zj1W7Hg6RHUXDf4gejXsHkQ
+	 7X3JecF3/fYp5JJJv5s0ThS92CqWltU8XxRZMiaAnMJcDDv15v4z9oZj6lP46+cxQHw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794240666;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
-	 X-Developer-Signature:X-Developer-Key:Content-Transfer-Encoding;
-	bh=iYkTywuCbwXoYuRkafCkrkQZYRRKfQoT9USNJ2YT4e8=;
-	b=vMWSUWhmCrYHmVEu5BwMUgAwbNdWoqAQlCVbTwkiRjBmA32s+HhFJ2Mky328u5H9scxu
-	 Z4T6OABkVzp1hTsLBnfMT5AOrTs+8LoKY6P+KwF1AAc9uKBAUNF3cAKC7Y0MesIh39PXN
-	 q5Bv6GAieZqr5yftfN84LmYpD2g8YLDZ0EtZ+WfK15JBaQP9CVMNTfm0gZKlPG01o6Ati
-	 QwGpxdzcFrz1XQTXghcBZFfLUowqgiP26blFkBPCfwhHsl3nrJUZ5GrCT9GxOyN0C5cT0
-	 nvQn23FeivZfPDfhFWJfg3pRnpoaqUDeJnKomUCNLrTxkYRB+QIDf0pd7LEMF5EZo8g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794241427;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=jHf22tsdPPfDKAeOIiu4WmAuLGDaW8+V7RxrZhx4qXg=;
+	b=rNpkmw2ikMwtNeZrOXZVUubAnUnTdH4OfnwHF+ZK0B4ItIlsu25zGVpbKjNG/8rU6uuO
+	 +CFM8T9P0ChCNDnTuC3d2LDUzQeidTqp4VACFDbMds4V7AwyzxSwLBFRTh2h/PGeIK5+l
+	 NE7a+o2Y1wM0gi/YsI5XLGHcvrVrXdyU2DD8VDjGxh9pqGW5ejYbee2qGgjsdTZVYSx16
+	 UK870HrpcFVHIt5eUkfNbm9tPZw7sL+V4T+swqTt6yHJJKqL7HwavvW2ojIW7KcopNgud
+	 Ol7XePOVz8PmGdJtQNCgjPIYUFjQWybUIGyFU0FQz+iW/L8IJCbgPkLptUCTY61jWqQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=baylibre.com;
-	spf=pass smtp.mailfrom=baylibre.com;
-	dkim=pass header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=MghQ1KLv;
-	arc=none smtp.remote-ip=209.85.221.52
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OSyx9BAa;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1840C606A325
-	for <linux-crypto@vger.kernel.org>; Mon,  9 Nov 2026 16:11:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1840C606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8A0606A32A
+	for <linux-crypto@vger.kernel.org>; Mon,  9 Nov 2026 16:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=MghQ1KLv
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-490f38e9688so866374f8f.0
-        for <linux-crypto@vger.kernel.org>; Mon, 09 Nov 2026 08:11:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1794240663; x=1794845463; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=iYkTywuCbwXoYuRkafCkrkQZYRRKfQoT9USNJ2YT4e8=;
-        b=MghQ1KLv54EedTri4JNw32laFYDjS/SwI2FRTNNTRws/j4eakEwad8k0qhrVABlUNm
-         0LKToQE891jWDm71V2elF27KZb7b5Qo5Hf8LOVqwn3PTih0JeZvqu4wXWGJbSM1P/0zj
-         65a2Iuejjkg80rWP5RPUf6tIj5S0TkPuFL/qvfdUy1CRuphqooyl8Q3J+eGpYwMtL5Sh
-         fB09lpzEDraNyUQomW2naTTrabD/ioSykLeTiPKt0jUzq/uh6trp5YsLxCZDPWP1d40v
-         RSso0MK5xl6Rr8xe7wdi5iD0U+wIRB5GyQ5oG7GiXPVLCWyu+vCwhvANo+MBqSEQXpSO
-         2YYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794240663; x=1794845463;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=iYkTywuCbwXoYuRkafCkrkQZYRRKfQoT9USNJ2YT4e8=;
-        b=l+7ZnHdR799W53p3J8w1Y9p0bNhPob6UXyz2AA6t1/tCf2tP4W3K37CJc899CSuZrc
-         EJe5VOf7VriCSMFxZVXXnGg+YwFfvq5xRA6Gw7CTc2i3JhGYirr4C82WhtyS/PFYL8kZ
-         d14yJZq4ecBLoF/Kva9cHF/yPDFcQ4Yirh3ftWFt8pbRP3oZfT62U+HZyUYISu6LBtUC
-         x8boYYhO1usM8GJfngDpCSPSUvdoMS99ZBNbkhsaRXscRttZBVXuB9hDIXLxIHTH5GaZ
-         eFjGjihR3iIuaHO5XlRl1wv48TWanZ037knGkPMvq7vz5mBSKMKaFMivV8BYrzsyNs9G
-         CAFA==
-X-Forwarded-Encrypted: i=1; AL+hErHcbSF79tWR2GLf3SRxWVQ9MKZQ7RLL1i7JFM1iCm1RfvKBKNvCPMrG4CzhQ4uSVQnR4c1KI1QXLxcH4J8=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+saGo4NqbXeMkIDS5FVsHP/UqzZICDIukyalMWw3Fhz6CEGY37
-	vlD2ygwswPlcL4tbTLviJYv7Om54/AU00OzJRJMpgfQzkuDG6I7WBQrmJJArNfcLIWA=
-X-Gm-Gg: AYBFou22sutzMlVH/zY74thcoqKrzWXpQed/vyNEy0duFEJbmBwzJ65vAP9bbgqTANw
-	tl69M9IPFlPpCmshaxlzGYCS4VB4eLSHaVm3BHe/zO+lx24YK2yKdeg/WjHv6AMU8HZka9KEsaA
-	H/NwAw81df+RyNaJP8C9Ue5H0FM+iNVYUjLzawb5UG4pkoR9TiW2j1V14q0fcDbSTe4El520LC5
-	twVJL/72u7J2yKT+tgZJ1uoFCmmRRv7PM/pREcqOsDlCZtZxbmAufhQUWbcQA+UH3oWvvaOXjms
-	drZTLaCfUQ/wpSxElsE2lsK7E2BogbrvP+2+sGZqc21AlZYEQRf1eqtQryIm34c4Ajw4jYxkBnJ
-	o+cys/YTqs57QxL6vLNUCs3+b2VmkmARfgxckIlnmw9mDfmRF+dIWO0bCPNPlxdM4KUSIxTd+xQ
-	0PSzBHqgNIHPuU3HYQaGzPgRfrQowlinImtLw1O/qLt/oNuZjxdRheQEfYBMB52dih/4j5XhM0M
-	2d/IWCt7QhOrtCP8bI8dh9ETA7fuvietjfU745MDUi2qJeB6OAvzUAlRdYDetKduZYMWrT1Wml5
-	NzUaivprs1tJbspmuV5wdWp+UdxieJGpIKTEZvjQatzAp4a6W8eR5mCiUwdSruKqI1Snat8nFeD
-	0YcB4virvkP2uqeYqUdnHUH2Ji3gM8i5iuM6A
-X-Received: by 2002:a5d:6f0f:0:b0:488:8347:a110 with SMTP id ffacd0b85a97d-4958852d7camr9206350f8f.7.1794240663350;
-        Mon, 09 Nov 2026 08:11:03 -0800 (PST)
-Received: from localhost (p200300f65f19a90407b2ef73b14b6bb2.dip0.t-ipconnect.de. [2003:f6:5f19:a904:7b2:ef73:b14b:6bb2])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-49592f38e2bsm11333582f8f.8.2026.11.09.08.11.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 08:11:02 -0800 (PST)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto/arm64: sm4 - Drop cpu feature table for PMULL
-Date: Mon,  9 Nov 2026 17:10:52 +0100
-Message-ID: <20261109161052.890682-2-u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OSyx9BAa
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00FC71F008A2
+	for <linux-crypto@vger.kernel.org>; Mon,  9 Nov 2026 16:23:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794241427;
+	bh=jHf22tsdPPfDKAeOIiu4WmAuLGDaW8+V7RxrZhx4qXg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=OSyx9BAa9gS4PwuytH0sMUh2QyzhT6ozk6cj07WytrOmwfGLoC3KN8+wL4IsPkOuq
+	 wgVG4zxb4RwB9DVXmyHCHLSeoSIKvTTlZ76dxEOgcxdgh5ZVMrJn8kDrYEAtmPICgj
+	 HcIX0pl3w2Da+iZvLrqGiSOmus+BORZjtThdpKZxcWwrVxHQ3tcpSVyFpPj3394gtE
+	 W/u9WJffOZKTRUz/cmPGbuIut3k0lBJh4Lr4fpD0eyNtl0EUMyMqtkOJKeWLayU18J
+	 7bZqP5NO02E3HFuQ9seJ2dkgfPCb0vq+tUoiRTiANl8ZRgEB5+Iv1d7viNOQxetQoE
+	 D1SEz81YkI70g==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c4d5cb1b181so143654666b.3
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Nov 2026 08:23:46 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErGJLhIQsobfznRBqKE/ZupejX3LtVupCgsG4qUEq1tW3wHT4JUEXZo3qdXzk92x0PmeeAdkX1QaFM8t+Ko=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8blRjv0Ub0TUsjwlxxMafxlphfscKcj8dULR8fpdgI6uRWIsSB
+	fw2oUxm6UVGG06oehXyOYDIKahL4q9kcZSM6fIkTjMZaCmRGsoPQVdc3rLDYzFqdnf93eBC4HMt
+	Xq27QaJ9vnlRXtVU/82fesqXxYGL8JVc=
+X-Received: by 2002:a17:907:ea89:b0:c3f:7270:10ab with SMTP id
+ a640c23a62f3a-c4d6d491847mr331944966b.14.1794241425829; Mon, 09 Nov 2026
+ 08:23:45 -0800 (PST)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -101,56 +59,168 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1632; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=ZENMDpTv1RAuYxRP4uIpom+hTDPJIPTBuLnJMesEc/w=; b=owGbwMvMwMXY3/A7olbonx/jabUkhqyPH3raN9femBcj1ypSsHWevt2/r3ta3Ba+ElrePbFr9 ZfH0+t+dTIaszAwcjHIiimy2DeuybSqkovsXPvvMswgViaQKQxcnAIwkZnG7P/M1Wauzlf5nie7 6gL/tADeqtlPhFQ8Hz2psdyrLPSr6YTa9wWeCX5VCrV/suftmv4/4UtYkOrV1GwpL+v8Rj/2Bsn SY3dkwubrJ1/RP/A/P/5FeH6B673185nbdP43z0+7uefc24lXzyZsL+L9f8Zx/XQZL0+/ePWwu9 krlLZN8+dmUBNYHHqquL3Ha83GbtNoH4UlK27JlJnxJMXJym809JjOzaAT09rVNSXryunF6U7XC la7XOMoO9i3e1cHv/ixt2V/PuT33lrhWloRIWe6wX25zVTncw2PfyikRUvss2q/FCffqvlIoCHd 8aB3kLSi3Z8XbtHO0zKMGSTmLIiUaXBcNX/eBOa9ItvjAQ==
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+References: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
+ <au5l3KEjG_mri-br@google.com> <CACpmpoc3R8gwkMouwyFLw9PEqyDN1i6OcmPxsvZ1d0QOPSS_fQ@mail.gmail.com>
+In-Reply-To: <CACpmpoc3R8gwkMouwyFLw9PEqyDN1i6OcmPxsvZ1d0QOPSS_fQ@mail.gmail.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Mon, 9 Nov 2026 08:23:34 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zOVf+gN0nbKkMGraTGhnCOG+5mpNBJvsZ=C5jDOssBf+A@mail.gmail.com>
+X-Gm-Features: AclHuK8wGQGw5PDN9FVkkzijzlP7nY0X41Q1fjXtSpx5oni4CF9QZzjxFkOpA7k
+Message-ID: <CAO9r8zOVf+gN0nbKkMGraTGhnCOG+5mpNBJvsZ=C5jDOssBf+A@mail.gmail.com>
+Subject: Re: [PATCH v3 0/8] Batched zswap_store() framework with compression batching.
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Cc: hannes@cmpxchg.org, nphamcs@gmail.com, chengming.zhou@linux.dev, 
+	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
+	senozhatsky@chromium.org
+Content-Type: text/plain; charset="UTF-8"
 
-The result of having that table is that the sm4-ce-gcm module is
-autoloaded if the CPU supports the PMULL cpu feature. However that
-module is only usefull if there are both SM4 and PMULL. The module is
-already auto-loaded if the CPU has SM4 and calls sm4_ce_gcm_init() then
-which fails without PMULL.
+> > As with previous versions, I cannot reproduce these results. I tried
+> > with a QEMU VM on a Cascade Lake host. I saw marginal improvements with
+> > patch 6 and no significant gain with patches 7-8.
+> >
+> > I noticed that you omitted high-level metrics (e.g. throughput), I
+> > didn't see significant changes in throughput, and I also ran a kernel
+> > build and saw a small regression in some cases (probably with order-0
+> > folios) and no significant improvement otherwise. Even if latency for
+> > some functions does improve slightly, it doesn't matter if it doesn't
+> > show up on higher-level metrics.
+> >
+> > It could be the difference in setups, or the overhead of bpftrace hooks
+> > for zswap_compress() might affect measured zswap_store() latencies, as
+> > you will have fewer zswap_compress() calls with patch 8.
+> >
+> > As advised previously, I would trim down patch 6 to the bare minimum
+> > (without all the scaffolding and prep work for patches 7-8), and send it
+> > separately (with patch 5), and we can check if it's worth adding, I am
+> > still concerned it might be adding overhead for order-0 to be honest.
+> >
+> > I am questioning the benefit of batching here without HW batching, so
+> > far the results are more concerning than encouraging. I already spent
+> > too much time trying to reproduce the performance gains. Also, sending
+> > new versions without resolving discussions on previous ones is not
+> > really productive.
+>
+> Thanks for taking the time to test and provide feedback, Yosry.
+>
+> I omitted high-level metrics like throughput since you raised a
+> concern about variation. Hence, I decided to go with the "ultimate
+> truth" which is bpftrace latency measurements.
 
-So dropping the PMULL cpu feature table has the only affect that on
-machines with PMULL but without SM4 the useless module isn't loaded any
-more.
+I didn't mean that we shouldn't look at high-level metrics, it's just
+that the test setup had too much variance for the high-level metrics
+to be useful so I checked the low-level latency. Ideally we'd test
+performance with benchmarks that should have stable high-level
+metrics.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
----
-Hello,
+> For performance validation, I only have access to a 16G Chromebook
+> with a Crostini VM to which 13G is allocated. I am setting aside 3G
+> for swap and 7G for QEMU. Within the QEMU VM, I am selecting 2 E-cores
+> to run the 2 usemem processes to minimize variation due to frequency
+> fluctuations. This setup has its own limitations such as being unable
+> to fix the frequency.
+>
+> Despite all this, I have been able to consistently replicate the
+> bpftrace latency improvements with patch 8. My results show regression
+> with patch 6-7, and improvement only with patch 8. As noted in the
+> cover-letter, patch 8 adds significant latency improvement for order-0
+> folios. This is with ZSTD. FWIW, these are bpftrace latency
+> improvements in a significantly memory constrained environment and
+> this ought to be a useful data point. I have been posting general
+> vmstat "system health" metrics to prove that nothing unexpected is
+> going on.
+>
+> My data shows that order-0 zswap_store() tail latency improves by 11%
+> over mm-unstable with patch 8, although p50 is roughly similar between
+> patches 6-7 and 8. PMD store latency is significantly better at p50
+> and p99 with patch 8.
+>
+> Likewise, p99 latency of zswap_compress() alone improves by 3% with
+> patch 8, while it degrades with patch 6-7. p50 is almost the same with
+> patch 8, although patch 6-7 regresses. The page-normalized
+> batch_compress() p99 latency is better by 15%. All comparisons are wrt
+> mm-unstable.
+>
+> Hence, I believe even in a memory-constrained setup such as mine,
+> batching significantly (7-15%) improves p99 in all cases, with 4-5%
+> gains in p50: for order-0 and PMD folios.
+>
+> In addition to the latency benefits shown through my validation, I
+> would like to also emphasize the strategic benefit of moving zswap to
+> use batching, as noted under "Conclusions" in my cover letter. IOW,
+> batching within large folios to improve workload metrics can only do
+> so much (in proportion to the # of large folios reclaimed and
+> contribution of zswap_store() to the overall allocation-reclaim path).
+> What this patch series attempts to provide is a zswap batching
+> framework upon which additional improvements can be built, such as
+> reclaiming multiple folios as a batch. I believe that compress
+> batching is essential to support these next steps, which improve
+> workload throughput/latency metrics even more than simply batching
+> within folios. This is with ZSTD.
 
-PSA: I don't know what these cpu features are and what the sm4-ce-gcm
-module does. I just stumbled over that MODULE_DEVICE_TABLE(cpu, ...) and
-convinced myself by looking at the code about the above analysis. It
-wouldn't be a big surprise to me if I missed something relevant. So
-please apply some distrust before the patch.
+Without a direct line of sight for such features and consensus from
+the community, landing the framework in zswap is not very useful, it
+actually increases maintenance burden.
 
-Best regards
-Uwe
+> Due to the environmental constraints, I haven't been able to reliably
+> use kernel compilation for validation.
+>
+> I have been doing my best to resolve previous discussions by
+> incorporating the calculate_high_delay() hack that you suggested to
+> reduce variation. The data posted in v3 comprehends this suggestion.
 
- arch/arm64/crypto/sm4-ce-gcm-glue.c | 6 ------
- 1 file changed, 6 deletions(-)
+Oh I wasn't suggesting you generally test with this hack, I just
+noticed that the variance was resulting from memory.high throttling
+and nullified it to see what the numbers look like without it. As I
+mentioned above, ideally we see stable improvement in high-level
+metrics. usemem is already a microbenchmark, if we can't demonstrate
+stable improvements in its metrics and have to measure latency of
+specific functions, the significance of the optimizations is
+questionable.
 
-diff --git a/arch/arm64/crypto/sm4-ce-gcm-glue.c b/arch/arm64/crypto/sm4-ce-gcm-glue.c
-index ef06f4f768a1..ffed81b40220 100644
---- a/arch/arm64/crypto/sm4-ce-gcm-glue.c
-+++ b/arch/arm64/crypto/sm4-ce-gcm-glue.c
-@@ -247,12 +247,6 @@ static void __exit sm4_ce_gcm_exit(void)
- 	crypto_unregister_aead(&sm4_gcm_alg);
- }
- 
--static const struct cpu_feature __maybe_unused sm4_ce_gcm_cpu_feature[] = {
--	{ cpu_feature(PMULL) },
--	{}
--};
--MODULE_DEVICE_TABLE(cpu, sm4_ce_gcm_cpu_feature);
--
- module_cpu_feature_match(SM4, sm4_ce_gcm_init);
- module_exit(sm4_ce_gcm_exit);
- 
+It's a tradeoff between maintainability and performance. It doesn't
+really make sense to add complexity for marginal performance benefits
+on a small subset of setups.
 
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
--- 
-2.56.0.rc1
+>
+> I would like to suggest/request the following, as next steps:
+>
+> 1) Can we reconcile our methodologies for usemem bpftrace
+> measurements: # of vCPU, usemem command line, reading Silesia, etc.
+> Also swap space and QEMU memory allocation, using linear lhists() in
+> bpftrace, etc. If you can share these details, it would be very
+> helpful. Thanks again for your time!
 
+I ran a VM with 2 vCPUs, 8G of memory, and a 25G swapfile (although
+the size of the swapfile doesn't matter much).
+
+I used zstd with the default pool limit (20%) and the shrinker off,
+with 2M THP enabled. I set memory.high to 3G for usemem like you.
+
+I used this usemem command with the diff you posted in the last version:
+$ usemem -w --read-silesia -O -b 1 -s 10 -n 2 2400M
+
+For kernel build, I used:
+$ kcbench --llvm -s 6.8 --nodownload -j 8 -i 1 -o <PATH>--detailed-results
+
+I don't have the bpftrace commands but it should be pretty standard (I
+think I used hist() not lhist() tho).
+
+All that being said, I don't think I have more time to spend on this tbh.
+
+>
+> 2) Does the kernel community offer servers for contributors to test
+> their optimizations at scale?
+
+I don't believe so, but I am not sure.
+
+> 3) Can I please request the help of other zswap maintainers/reviewers
+> to validate this series with ZSTD on a server setup with usemem
+> running on 30+ cores, under high over-commit ratios; through bpftrace
+> and/or throughput metrics.
+
+I can't ask people to spend time testing this, I already spent more
+time than I have and I am sure other people are also busy. If someone
+is interested in testing this and collecting performance numbers, that
+would be up to them.
