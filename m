@@ -1,153 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.217
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794206210;
-	b=cAg8Dqec6k0C7abQ3njS6IT1rMQba6RzdMjJO1GDiDTQ/egXrJmNNFXH0SGjRWTygPY0
-	 x5YukVR+PPXd/G8HQhTKpyM31/86grWR2LmSUYNohqU0buSw9+2aESCtOkwfuV/yOpWVP
-	 E9ZGjZl29FaPxEPMSClHvMcv97BC7fpy8f6Kv/bvUIla6+j4BuJaPA+7Ok1jLNNEOWY22
-	 7T6bFPhXWHyHnuyrEF5Eco8qWzS2R3csBnkFY3T8lwKnxwoqwZYroMSirQelBprwKfe57
-	 yAiZfmQHfwlJoK3KnYb5E+aySgF/WODRNvwvsLF+LXPnLgx/UNhHRqWkS2lDQsew0jw==
+	t=1794209774;
+	b=I58IiwMqndKfZKSBNi2IqNMNKILQIu0M6KHcKVCSmQ+RkgzJNXtp/+zpsJLuon07ziqc
+	 uX+eas15GL4dZhhHaGkhlOkV46awIvybnSBEX08bay3DgURsJu7cfnqC5p9jkZXPhb6RJ
+	 UY9zc/cw6pPd48srp6hXczXjyIKGCedWE581HUj/uhmUJvpQ8O3SHT3c4ma1csNjb9+1g
+	 Y5O6zZiQy9vnxFEuXsRDA1OYpskxrJBa8x9nQ0EJVq3GWa7RMd8aVti1i/c3rPxNigRWW
+	 2hoH4enOQcmD9+JnkJbvW5ZEcX1Q+NZfpuMwVG16CwXCHxG/eRDA37rJkzje3YQFffw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794206210;
-	h=DMARC-Filter:Received:X-Virus-Scanned:Received:DKIM-Signature:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=AtsfehftEhocEg2I5bmWwp2ROneUNtV4068+F7Hlw8w=;
-	b=spizSneDKGXHMomI/uMVyXQpL+nVFXeKycUYGq0sYBKGN0nuwky1Wamcbcnf1OsVCS3i
-	 J2Sm9iefRYz3368PANTUwGcGII1AMUMwtrSM94gIdaeiPkuxdH1EU35W14Aar6LGBn4XD
-	 +KkPZ6G4WoXqkGOJG7p1U9nubCAA9E14Lf9twCDjK6krE0kg63uAjZ3Hcd9tYNj6jPjbi
-	 XvafkxsLKLoFbIgD+0FVKQG0mUlInriNr2wmwMrrsJTT3zFjcdOk+jc3rOPZQ4vvEZKsc
-	 aG9o275oAuA1NSB//UrD4VI5IF/mtOQwMYUaeL2jtzhL4bMYVGI7VsGXAaPccMCUuBQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794209774;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
+	 X-ClientProxiedBy;
+	bh=4PSBgBKPMTFaPBbhIHGgOgP5gYmCkxw9n9vkogmf9Ac=;
+	b=eIJMtwEIv3FPybAaDT/1sDkBBbVIW1eJ0ryrmVgfggKyr4TNi+8wWXD2N4EZvRs3Sglk
+	 M6ftCXp6RWdyTurElZk+zhQKcOrGOE2DEPC81uMHb3IBwGn32COMpWC7zmSOw9Lb1x7dl
+	 jfPnvQrVsfjklk6vbaMqxaG36Ddk7DW2CzlNaTdKRQscy3u0uFqgKrqjZVMr81Zz73SM3
+	 k/eblY/JQqRkeZNNwVChshf5Nj7bvWlcDIc2xkUSH0zcO5Uzw/kjKrlgSjKvsUj0uSdFT
+	 YGNDDr5OWFszS+/na4hamzrAAZjPXnHeTajUbVT7YNCxGc5Br43KGd75hwx1Lk88ZAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=alien8.de;
-	spf=pass smtp.mailfrom=alien8.de;
-	dkim=pass header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b="JHF72/UU";
-	arc=none smtp.remote-ip=65.109.113.108
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=JXYJv7Jl;
+	arc=none smtp.remote-ip=113.46.200.217
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32DD606A321;
-	Mon,  9 Nov 2026 06:36:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F32DD606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22A2606A32A;
+	Mon,  9 Nov 2026 07:36:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C22A2606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.a=rsa-sha256 header.s=alien8 header.b=JHF72/UU
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 56B0A40E04CD;
-	Mon,  9 Nov 2026 06:36:46 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id aOVENPtaFWK7; Mon,  9 Nov 2026 06:36:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1794206204; bh=AtsfehftEhocEg2I5bmWwp2ROneUNtV4068+F7Hlw8w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JHF72/UUi4yUT9aqIf+1NnxYf6RBnkvYAj3W0oNSoARYb9dCH6USJz/XwRB3zKAzN
-	 MWJW9xd/ygniOGVsaaW7GBZaf+qXYyhu3aJBhi2D/f1MdqaPIPAWinTyaFBOA9gM35
-	 5nUywwgnc62cQv4bfa4eoHQf48x0D4FJFNgLCt83+USeUOLy7Qh+2lSpB7trl1wz/p
-	 kEpq/vJ6nrjXE/KAhASp6qorwpWq2HXjCxbam8Cyo1Z2sIRXrUNhsh6zZ/KoYZL2i4
-	 1lmr105l2rgJ8qXntBB7PKSVPBF2/Z8bSDrAGXjT8NRQY6og6HlqYUIe5alwo9BgNF
-	 dx1kkKAsqjQxtJJM1XRbbhZFSRsQTaoRpIN6D9Rt0nTL0lKCj+axgl9IxZagHCy091
-	 r8Ki+ygh/0tcNG4AUVe5LTp4ch5qnCP4xKJ3OLYrbSXIXoab9f+zgIaxkW4jibdP8X
-	 3s6MuKTd4JCyKlo7AF17HWOnrGSmGTMzu5kqiIdy8sdRXtaPhqcCV+NSL9gv2T7SAZ
-	 ofaUI4PE6zr8T9OByuN3e8vf5AXpiMuzD+cRw/CoXMu517BCsSSS6nnJ+9Y0mm0MV/
-	 h2mAq7Jr8pQs6CouL4r0WevxUISKIjEtmSGk88S8UwKCzTVapUK5ItYrpXUIxXDEx2
-	 sCCf9g3g76KyyYwpg9RRhxLk=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B1AD640E01E1;
-	Mon,  9 Nov 2026 06:35:12 +0000 (UTC)
-Date: Sun, 8 Nov 2026 22:35:09 -0800
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@kernel.org>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	"Liam R. Howlett" <liam@infradead.org>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jini Susan George <jinisusan.george@amd.com>,
-	Kees Cook <kees@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Kim Phillips <kim.phillips@amd.com>, Joerg Roedel <jroedel@suse.de>,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	"Tycho Andersen (AMD)" <tycho@kernel.org>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Michael Kerrisk <mtk.manpages@gmail.com>,
-	Suresh Siddha <suresh.b.siddha@intel.com>,
-	Xiaotian Feng <dfeng@redhat.com>,
-	Venkatesh Pallipadi <venkatesh.pallipadi@intel.com>,
-	Andi Kleen <ak@linux.intel.com>, Kiryl Shutsemau <kas@kernel.org>,
-	Tony Luck <tony.luck@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Carlos =?utf-8?B?TMOzcGV6?= <clopez@suse.de>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Jori Koolstra <jkoolstra@xs4all.nl>,
-	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
-	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	Ian Campbell <ian.campbell@citrix.com>,
-	Jeremy Fitzhardinge <jeremy.fitzhardinge@citrix.com>,
-	Petr Tesarik <ptesarik@suse.com>,
-	David Howells <dhowells@redhat.com>,
-	Haavard Skinnemoen <hskinnemoen@atmel.com>,
-	Kenji Kaneshige <kaneshige.kenji@jp.fujitsu.com>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Michael Kelley <mhklinux@outlook.com>,
-	Ilias Stamatis <ilstam@amazon.com>,
-	Sumanth Korikkar <sumanthk@linux.ibm.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	Toshi Kani <toshi.kani@hp.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Jiang Liu <jiang.liu@linux.intel.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>,
-	Palmer Dabbelt <palmerdabbelt@google.com>,
-	linux-coco@lists.linux.dev, xen-devel@lists.xenproject.org,
-	iommu@lists.linux.dev, linux-mm@kvack.org, aik@ozlabs.ru,
-	Santosh Shukla <santosh.shukla@amd.com>,
-	"Pratik R . Sampat" <prsampat@amd.com>,
-	Scott Soule Cheloha <scott.cheloha@amd.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [RFC PATCH kernel 01/17] pci/dma/tsm: Call disable DMA bus hook
- on cleanup
-Message-ID: <20261109063509.GFavFpnZ-OM-rGcjdp@fat_crate.local>
-References: <20260916115159.1938195-1-aik@amd.com>
- <20260916115159.1938195-2-aik@amd.com>
- <20260916174929.GCaqrWqZ1fIhi4Rgbn@fat_crate.local>
- <9c83efe9-9367-472f-bf39-e07252e70c3c@amd.com>
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=JXYJv7Jl
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=4PSBgBKPMTFaPBbhIHGgOgP5gYmCkxw9n9vkogmf9Ac=;
+	b=JXYJv7JlcNeKagLb7/Y/RdeVGp4+JD8PlQlMUqoowTPP/MGsSHz6WFLxOZXJOmuDCrtIJZnuC
+	lc9IBrFhPDbFVkxrU6rEl1E6whqUmR0z8GSIP+pHEITPQ60UaqA2P0BlWaSK/JiQHCLTEVI/VeX
+	wre2AqQKpPV0pP0MbtzXKuc=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4jNM5J6q91zcbMY;
+	Mon,  9 Nov 2026 15:35:32 +0800 (CST)
+Received: from whupemk200001.china.huawei.com (unknown [7.152.184.93])
+	by mail.maildlp.com (Postfix) with ESMTPS id BC60340561;
+	Mon,  9 Nov 2026 15:36:08 +0800 (CST)
+Received: from localhost.localdomain (10.50.163.32) by
+ whupemk200001.china.huawei.com (7.152.184.93) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Mon, 9 Nov 2026 15:36:07 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<liulongfang@huawei.com>, <qianweili@huawei.com>, <wangzhou1@hisilicon.com>,
+	<linwenkai6@hisilicon.com>
+Subject: [PATCH 0/4] crypto: engine - add acomp support and adapt Hisilicon HPRE and ZIP drivers
+Date: Mon, 9 Nov 2026 15:35:52 +0800
+Message-ID: <20261109073556.2517351-1-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -157,22 +69,56 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9c83efe9-9367-472f-bf39-e07252e70c3c@amd.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ whupemk200001.china.huawei.com (7.152.184.93)
 
-On Thu, Sep 17, 2026 at 12:28:50PM +1000, Alexey Kardashevskiy wrote:
-> Correct, the patches between v7.3-rc2 and 01/17 (can drop samples and tools,
-> obviously) are enough. It is basically recent tagged upstream + rebased
-> Dan's https://lore.kernel.org/r/20260705220819.2472765-1-djbw@kernel.org
+This series adds asynchronous compression (acomp) support to the crypto
+engine framework, then converts the Hisilicon HPRE and ZIP drivers to
+use it instead of their hand-rolled backlog / queue-retry mechanisms.
 
-You probably should rebase that branch on 7.4 because it has caught a bunch of
-conflicts since the last time...
+Patch 1 fixes the retry pump loop in the engine core: it skips the
+idle check that clears engine->busy and rechecks engine->running, so
+after the queue drains a later request can be enqueued without a pump
+and stall the engine, and crypto_engine_stop() can spin on the stale
+busy flag up to -EBUSY.
 
-Thx.
+Patch 2 adds struct acomp_engine_alg with transfer/finalize helpers and
+a register/unregister interface, mirroring the existing akcipher and
+kpp support. struct acomp_alg moves to <crypto/acompress.h> so that
+engine.h can embed it.
+
+Patch 3 gives each HPRE QP (DH/RSA/ECDH) its own crypto engine.
+MAY_BACKLOG requests are routed through the engine, which provides the
+backlog queue and retries on -ENOSPC; other requests are sent directly
+with bounded retries, and in-flight requests are cleaned up by the
+completion callback.
+
+Patch 4 gives ZIP a per-device engine pool, with each QP context
+borrowing an engine by its QP id so compression and decompression
+queue independently. Requests are sent to the hardware when it has
+room; on a full queue they are parked in the engine queue and retried,
+with the DMA mappings kept across retries.
+
+Chenghai Huang (3):
+  crypto: engine - clear busy and recheck running in the retry pump loop
+  crypto: engine - add acomp support
+  crypto: hisilicon/zip - adapt to use crypto engine
+
+Weili Qian (1):
+  crypto: hisilicon/hpre - use crypto engine framework
+
+ crypto/crypto_engine.c                      |  46 ++-
+ drivers/crypto/hisilicon/Kconfig            |   2 +
+ drivers/crypto/hisilicon/hpre/hpre.h        |   4 +
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 414 +++++++++++++++-----
+ drivers/crypto/hisilicon/zip/zip.h          |   5 +
+ drivers/crypto/hisilicon/zip/zip_crypto.c   | 358 +++++++++++------
+ include/crypto/acompress.h                  |  33 ++
+ include/crypto/engine.h                     |  13 +
+ include/crypto/internal/acompress.h         |  33 --
+ 9 files changed, 649 insertions(+), 259 deletions(-)
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+2.43.0
