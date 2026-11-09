@@ -1,51 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.14
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794252056;
-	b=FS1WODdbPl2Ud14ns6YNqTK+DZaDNxpSsXALGRp1SddcTNaF9rFwqH60mPLuHFMg3UY8
-	 SuN73NUK3MhznrGPmSbh1O3yR73UK6qsfvVD2xr2Rth9nCXAnRMmP7VucqSmSF/9OCU5l
-	 UkV4lzIIE0eFQDGu5Tyo266CdRLgzwVsmJy18dWZVTTFYGXCYWwB2EjwUL60xsz2DgeQF
-	 43+iiysFKOKkQEL5PYB/ly/XrSB0KHs8v2LfC1ddF3o0PuMaaRkEA2XLZ7JY68wnk6GFl
-	 HQC6qdtJa+exIOrIPlgOW/vjClh6wD2r0tGrxnfYZmITjmaDo+z2mV5DoOmN1ZqmqtA==
+	t=1794262701;
+	b=Rxa8nrfLVZKMPi4O4bALBqSx4TbBC+9biTFllh8N8mz9GV1DVrM7QU3Y13aXQ/c0adQe
+	 ZMkuAJYjgwwRHLsRDtBrgQqYl/S0vNLWC4c+UYuVBROKaLG8VcjrVDmp9kRwVhPBD400v
+	 WTD79BJd9jlhNU7GfQ1mIyKWgb3IuxD+cJGW0HqPrt0K+OHCy9FbdaJ8z4udngwfJDZqd
+	 ImaCJy+bbYMt5Ly+y88DFcyz4XX/2bZhXPU7hwk35cWqOwfp3p7HeuJOfzd6cGosNn1Rk
+	 R77/FU6F2Qwx7H61EqxfJRvABDt3CqjWekUGL7aW/wvGhqBEv7h2eomwA4kfuw4HdhQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794252056;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=sYZrTSymVbGr+J5tx9WqmyGxsTySgpEc5GVqzxAxWWE=;
-	b=JUL0f3TE/5EA5I4ZPft0eBvoRzeS71kO/YiN7Xiq/qKn4HoqDvreaWECHxG9moXUpntF
-	 PupAAE+9ppLN0vLcEx/oD7tN24Hbufv2w3PmIZ5mAiumtyJoQCRJ1xP1t1E64ZMh4EZzN
-	 PKXTYY8ORXeeDMTpNQ+IdpSZ+VWO7UZ0Ieh/8ygr8j8jbBxG6eNqD0uPfSO6HYn11ENyd
-	 GBNn4LzjsN5BdPyDiSgYSDYp1MkzGfS27XXfFaecmOhr5PuedVs78QFq0YlPAHAu7qn74
-	 aN5xPe4cIANWe9pzUWPSYsISRDmcm8umm2GPy24zu7A197WCRbmXB+xdnBprCbv8h2w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794262701;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=c9eJFkB1A2V/YM9JwIyEGfv/PGOIESHseQrXfeJUqyE=;
+	b=HD1Wa2OGitCLNk1wx14yUOeO/985aova7romkNJXk0NgF5jMpZxHhKKySmKyJEcj5JJ3
+	 Iz0ES+qAa66rk5+k8EGBpU8UMNQNgJ92aRdB0aISiLXju1vJcSOP0acOLC9KIPpJxj9Re
+	 rmMbuHIgH64C5AhJQtkt+9YR0aUgSHgziuAzdk8jVbnDA/OzuIKf6dGtW2/U4G6mO9pt2
+	 GSM1lDwLKhupsABpjgX9LVGoM5lvEyseQPF6w4CB5auwXe8IY8FIcVRW/akFTK2iohRWN
+	 miEGAGTAlXwePlepesGfaKHIye5cKcJU9vnyj735vx3bKXkbc6BMEJCXrl01I3XMfJg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gtS20Lwe;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fqs0Wigu;
+	arc=none smtp.remote-ip=198.175.65.14
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F0E606A33C
-	for <linux-crypto@vger.kernel.org>; Mon,  9 Nov 2026 19:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB7F606A325;
+	Mon,  9 Nov 2026 22:18:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2AB7F606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gtS20Lwe
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BD731F008A4;
-	Mon,  9 Nov 2026 19:20:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794252055;
-	bh=sYZrTSymVbGr+J5tx9WqmyGxsTySgpEc5GVqzxAxWWE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gtS20LweN0QSN1Ihxss/vJRFWtxuhebLjzeu5/79URneQ1I6YK3Sl+hqz3EBjJ/uH
-	 3YHoVAdvk4y4TLPWHi/fCW6KuNiRqrFhDITyfMn4VHUCnMFzHc9nj1TNqIL32Ef1ig
-	 q6FgAUlntqjfEptahf+L+YW+WpB7B/1y5Rx29ZThMELaZdCEQRtEhIDVUg0a+oaLBH
-	 1bD+NRbyQU+VCQZV9KHBmkksDlJ5Pn86MAVr0Q4pmz80aCg97vx/Y8hTUtqk4MT74W
-	 TOaqg6c0lhn9SWWM3WUnMZsy30S2HjwcZtLwmbcXZVIZDoq2DcluFoQMzg7ErJJdXA
-	 E0G03M90J94Rw==
-Date: Mon, 9 Nov 2026 19:20:53 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Antonio Quartulli <antonio@mandelbit.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: lib/crypto: AES-GCM x86 arch hooks: any plan?
-Message-ID: <20261109192053.GA57100@google.com>
-References: <6ce2344c-f6b5-4051-87b0-88a1c258a6d3@mandelbit.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fqs0Wigu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1794262701; x=1825798701;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aK30euBbuDTMMaEp6ls7Vv/1SJLD5Mq+6g69iv5YITc=;
+  b=fqs0Wiguve1RNqiD28X1sK8POY3mt/rL89mAUGJTZk37AC6koc1xT4pb
+   +Hx7p1S1X5PrfrGe/bUjUGXCxXiILBHtP6JiCDZR8N6nL5Yjp7Ex1l6EH
+   27D5XCXWWCOO/kUKnC2TfklY8TA6HrScKX+C1bovXjvyYTu02wZSYh4zs
+   IJuFBFk+hIrBffrx/9muz7lYw1tscOR8+DsiYVYKbstODssVJp13zCIKA
+   7qLsKg6w7OLYzxetp25G1tKhXxP/D2NqhlTJDZZ/JtcDYHgB0eddInqTo
+   EheFYf3mGutaLw8WyVXAjOJ0BRA5SB864SCdbB0WJZYnvtw+QlSz5Np2f
+   g==;
+X-CSE-ConnectionGUID: g3WeQ/92Tq+gT6s3KG2qFw==
+X-CSE-MsgGUID: yOF/G8iXTDOps3QRhog+7A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11961"; a="2891784"
+X-IronPort-AV: E=Sophos;i="6.27,204,1787036400"; 
+   d="scan'208";a="2891784"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2026 14:18:20 -0800
+X-CSE-ConnectionGUID: uRWsm7i9QwiwhY7dhOj8yA==
+X-CSE-MsgGUID: sRE96BBBQGe1ftnOsgoHNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,204,1787036400"; 
+   d="scan'208";a="7851116"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 09 Nov 2026 14:18:18 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xQXgs-00000000vQl-3fQU;
+	Mon, 09 Nov 2026 22:18:14 +0000
+Date: Tue, 10 Nov 2026 06:17:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chenghai Huang <huangchenghai2@huawei.com>, herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	liulongfang@huawei.com, qianweili@huawei.com,
+	wangzhou1@hisilicon.com, linwenkai6@hisilicon.com
+Subject: Re: [PATCH 2/4] crypto: engine - add acomp support
+Message-ID: <202611100606.eXBh5Nlt-lkp@intel.com>
+References: <20261109073556.2517351-3-huangchenghai2@huawei.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -57,36 +87,36 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6ce2344c-f6b5-4051-87b0-88a1c258a6d3@mandelbit.com>
+In-Reply-To: <20261109073556.2517351-3-huangchenghai2@huawei.com>
 
-On Mon, Nov 09, 2026 at 04:47:05PM +0100, Antonio Quartulli wrote:
-> Since the commit adding GCM to the library says the arch-optimized code
-> will be migrated into it, do you already have work in progress for x86?
-> 
-> If not, we'd be happy to help there, or to test yours on Zen 5 with ovpn
-> as a user.
-> 
-> One design question I have though: the VAES code needs the hash key
-> powers H^16..H^1 (and H^8..H^1 for VAES-AVX2 / AES-NI), while the x86
-> ghash_key only holds the PCLMUL state.
-> 
-> Would you rather extend struct ghash_key on x86, or have an
-> arch-specific part in struct aes_gcm_key that aes_gcm_preparekey()
-> fills when the arch code is usable?
+Hi Chenghai,
 
-I'm planning it.  I've just been trying to get other things out of the
-way first.  If you're interested you can try to do it; just keep in mind
-it will be quite a bit of work to do properly.
+kernel test robot noticed the following build errors:
 
-The tentative plan is to implement the GHASH and AES-GCM arch hooks that
-lib/crypto/aes.c already has in place.  And yes, that would mean that
-the x86 AES-GCM code would have to be reorganized to operate on struct
-ghash_key (expanded to hold up to 16 key powers) and struct aes_enckey
-rather than a combined struct.
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on linus/master v7.4-rc2 next-20261109]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-That by itself may result in performance regressions on short messages,
-though, as each AES-GCM operation would be broken up into multiple calls
-to the arch code.  There likely will also need to be new hooks for
-one-shot AES-GCM operations to handle them efficiently.
+url:    https://github.com/intel-lab-lkp/linux/commits/Chenghai-Huang/crypto-engine-clear-busy-and-recheck-running-in-the-retry-pump-loop/20261109-153553
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20261109073556.2517351-3-huangchenghai2%40huawei.com
+patch subject: [PATCH 2/4] crypto: engine - add acomp support
+config: riscv-defconfig (https://download.01.org/0day-ci/archive/20261110/202611100606.eXBh5Nlt-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project fc9576e3b179738d99c5babe5cd9d6c1f883e0db)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261110/202611100606.eXBh5Nlt-lkp@intel.com/reproduce)
 
-- Eric
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611100606.eXBh5Nlt-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+>> ERROR: modpost: crypto/crypto_engine.ko: symbol 'crypto_register_acomp' undefined!
+>> ERROR: modpost: crypto/crypto_engine.ko: symbol 'crypto_unregister_acomp' undefined!
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
