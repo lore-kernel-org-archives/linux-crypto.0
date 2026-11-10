@@ -1,109 +1,110 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.171
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794288727;
-	b=0B6O0AK4TMUm6VtltXSq7fz5PaWtN7E1hFlP7FSwKgqYLogPhtZFBw9D0TdbImr0Kz/0
-	 kIinuyWZlGZJcNqLotFecl9E+jQ0qdLG/cbfJUUPt5omWperw6FY18DtJSwMJ2gM5OG/Z
-	 fZUdSBOxeiNyB2OVXXLurai6Qsuj2LyyqEgk1j4wG+G8uR9DOlD2amnO6S5vcB8I44yy1
-	 OgMdvXpoaEXFGqk3DDAavTLsPeOiRD89V4jLgqkO7DOql506KYAig2MyISARmu9R7xsZj
-	 pDGSdiXoiHjvNvfNg1wtIkTHtrYR/d1jOt4MAphwqJ0Pc8EX22DP5TPzpeQbJupAGtQ==
+	t=1794289020;
+	b=kJsmVtVxfuQNicoVJ5vsDTbB5Q8AOkHki5GTqQEgBYu3MVLGPqy+BtmrDdChcwf2UY1t
+	 R7hJg7FkTkRJsjKBvZqv9cTflGvesD9W4x0GR+c2m6vXWYu7YmV+zGi0aZ7IIde7doqMc
+	 yAqJwmhBbogf92GT/Ha1PLpbhDsaohyuymI/5IMjXSZnmYDmrTwVqXL+O0yANfE+FFdRp
+	 8dq56l4QsuezwJqSxvJn+AKLMN8GiqL/I2V5atarlW1dR03fPMlkwmRWriomvXw4GvnoT
+	 L7UkJWQx4PW+UGlnGgLXstfwJK1cTfnaA2lB/SUkjaWZnaFrmOvadW41cz2t+xusNkg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794288727;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794289020;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
 	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=xnocq1WZWdoAPVGSUgOgkKPWt/rTa6IdAGYk7ooAxeo=;
-	b=eLcuZZtGNw9dEgQyPG6661x/m1s3+BCeq2XN8qNvRqnRmYxK5eyYaNTJq3iOj1Kr7+v7
-	 kqT6ADribYy27bbWCYh3nkzMpWjUQg87uFE2dGmT8ugnRd92TqqlSyxqbffj+rNjiu8wS
-	 Yjz9YuBJlzfIzjAvSrZIe9iiMl4cDVxdvUwJnSnI6nkeRE+aH7HzqJX9a4RvrI+sx6PyM
-	 pR22NFf0yTmiifXT+zlcjwDn0tYQ8yPwIMNYFRTWjuD9IWJbdOQS431XKjR5sH7xsg6BP
-	 2ekHg6cixj+W5Pd7qIXJlIoLWXdZSKCSIIobh/5VuaWYdl0x+ZhJ934QgLEXlJyglug==
+	bh=upBQHvhIXS9jA4rn/T2U6OyiZNi8Uwc76Ij6dQGz7TA=;
+	b=bcMHC8n9EIoR4XojSGYKqGnf4PB+3RJ/YXmwSklebV/lXGnbEDBxVTPlHvz92IyFzi3g
+	 bn/ubOrJ1dsafDTEs6JZPgtygGVfZY6GLjxH8QfNVN7mcVNvsICuiVU3GmJUVO8FB8Djc
+	 zu3U+zvv66Mzp2jSgY1jJHtEMX7HlE9AgHOBoAHRNop01Z6oWAKwZLLYoEi1n+QHRvVRd
+	 THkZJTOMcGwLPdTspdKC6FVOtoQtD4/HuHLT7neLRjuE1NB2Ay0/b+YC+lwJN+DN14Z6D
+	 cdyXeC1CPWKQ+OpnJn+nWpLyMAF/piFrP6Ja0/TyGZp5neeVpd2t4oirUgC32/1gdfw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=chromium.org;
 	spf=pass smtp.mailfrom=chromium.org;
-	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=NKD7nBqu;
-	arc=none smtp.remote-ip=209.85.210.182
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	dkim=pass header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=a20xVX7N;
+	arc=none smtp.remote-ip=209.85.210.171
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A188606A326
-	for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2026 05:32:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A188606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57B660A2621
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2026 05:36:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E57B660A2621
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=NKD7nBqu
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8a05b210703so806359b3a.0
-        for <linux-crypto@vger.kernel.org>; Mon, 09 Nov 2026 21:32:06 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.a=rsa-sha256 header.s=google header.b=a20xVX7N
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-8b29b83fdf1so684596b3a.2
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Nov 2026 21:36:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1794288726; x=1794893526; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1794289019; x=1794893819; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=xnocq1WZWdoAPVGSUgOgkKPWt/rTa6IdAGYk7ooAxeo=;
-        b=NKD7nBquVIBNB4qaaYR2zKW+bAMipyhfH6k5oIss7pvhTr5H9DNDivmA6LyFBlYTaI
-         4uw1kRx4aPbJe3bz/4M6KlZJDaZ3OEIvYm9wlTKWLh2MiMoqB2GfrySxaqYj3Idv/ftJ
-         aGTK7fjoiU34fH/KaVYzyLEfPizBt75JslG4k=
+        bh=upBQHvhIXS9jA4rn/T2U6OyiZNi8Uwc76Ij6dQGz7TA=;
+        b=a20xVX7NeZjvXNyM41dYWvLkg80id1Mtm74DkyBWYfM0GGXgLb8i1+nApuqtrL8uLo
+         zE4qrJ3gNwkeUVWkpUNiFHGrdIzZeRo9Bur+lQwMh5IboV/ahqD2hnLAdr9gSwVdEq52
+         47ewJ4dnUp54hAJDfsvJlQHVaRbFtqFrQtWkI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794288726; x=1794893526;
+        d=1e100.net; s=20260707; t=1794289019; x=1794893819;
         h=in-reply-to:content-disposition:content-type:mime-version
          :references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=xnocq1WZWdoAPVGSUgOgkKPWt/rTa6IdAGYk7ooAxeo=;
-        b=wMvNEkPZvYt1ipmS+S2zO9BOXtXISvWrDI3okbCBRcNhrUzlP/eNQ17Ol9qPijYk68
-         baq+acTSswOaepbZbpl7bAu8/KY3KbhofgbQtkEXjKQfVxYn0sC0X6ziL2fcs4HPccJ1
-         R1Chs8UOqEhwrQWHSiTKiJ8+xSnzY4UykYwuDXc0eIOLcZlClzZWaZ7KbXkMKciV0/ce
-         tpavwaXo5JPhNI7qw/pEbpqVOXk7XSqruqra/+9ei7f3kHopszUEXRzMZkSL7RrNCOsr
-         kIjcdxVCjY0IT3l9QPvweQMxvNf2bLg1UObkCc7I/Sxns3WqW4wqzi8s1uPLI4w5qjid
-         g+8g==
-X-Forwarded-Encrypted: i=1; AL+hErELGay4zjk0J+qJs3NPt+HoDL/k0HgJD5UH2IZ73oNBHvQY0JacFqmn6GR8Xlpef5yBCNdQOwVJSaGrsB8=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8ovI6mivx65lukJMI6wdZnLAlPuL4kLzxL3pVH/DUB/A/1oB3c
-	jy2IVwi3EOos002Ado+f5oC+DrmDNHh8s/qWjhTFHnk2SHrB2BcQ0fosAS03BXb/k5jw0PATQEz
-	sSm0=
-X-Gm-Gg: AYBFou1qwF9vJBp2LAnkMPdLsbx4OUNTHHW2J1rh4S5ejnXp+lpeyKHfgvYu6lwNUM+
-	IVMcPriHMqoeJoQp0klJbKJY74CxTDk8dbyb+zmNPVUVkiFvLTDAy8to/vlq5W0Rabt563DJyAv
-	+QkJwvKxk0jERa2DjuSB/IdWdH43cKotBWwBRFOlEfDDPAFzmmdCDOz+p3469pq5S9Mi/vLTTcg
-	5cWv3cH5Xkqg6VYdHa6124Zi0PNx0qc1H4nJobq4TkGMophDu6kpRUxBKLdAWFp34MnvsO0Ylot
-	NY/8b0NqOUkjQG4d6BscoSQ1j0Ue+rJ5WLVjcn2eORzVhTvvwVlxnw4GP6hxK2lVOxMvYvjbQH2
-	zTbUKmo3X5MuEl0zfdB+10IxfbQs43HaA9C673AayqpshXpFgyyy211SKfgHQuv8hK7UkbNjEmG
-	pHRRPxgjWex+dl2Peq+5OvNZeIdBOjXKvCYmL700X88aLOWZ9z5O6J94hPp1EnDjvthvpzll2cU
-	fHij9t0zRAfB9A1u1SLHKfCF1ZjB1fOUs8j/QPOSw1ZHSA/Nn6tXqzvoOtgr9Y5WXM5x2l05PHD
-	ydGNCuz2aLXMbcfej8e1DnSvJXCK4CpjVo0PYtA3UlPcCTtCngfS9jFEOLocOufVxn78sg==
-X-Received: by 2002:a05:6a00:408b:b0:8b5:f9b1:a8cf with SMTP id d2e1a72fcca58-8ba87550f4fmr1854484b3a.51.1794288726218;
-        Mon, 09 Nov 2026 21:32:06 -0800 (PST)
+        bh=upBQHvhIXS9jA4rn/T2U6OyiZNi8Uwc76Ij6dQGz7TA=;
+        b=RJe4CqDGjNWMp4SIiRwe7XNMMuLqRLaY2S3JJ+GAZbghMSNk7iqFN6Uu0DCDFHuEx0
+         JyIrT6FpD5GRSFo1i5En9e3YOx3jO+xmp3APPIJfYqPQCXJ1/8WUSZsTGuiw5XwOowQn
+         IV7mVTI1B8Pvv6O3dRDUsSGJScuNLEqY94lwB1FxwGGFaNps+5O8RgpsdUyYfi2Y1oI+
+         3h+xLkK2zY7caCsvhPSBC5wkdGRRDBHrtorn9tqLxy15mM/XoExPLRJyp75YVjit3FnT
+         Oim2a3Kw6k6dtzn/Gnt8NHQvS9kWSmP80dunlF2VO4oRAcTZOnclVxxzxWQqwSAu2b6B
+         /X9w==
+X-Forwarded-Encrypted: i=1; AL+hErHZDwdXUrV7KrM0jeOYLDH9MnCtNfJAuaYDfAHUVNtjb49j/uXgH39QVtq2HJ+hwKLAXYxMdOi8fCgtugE=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/xx7DesmGhr5ATwMul/nShZo8Q9ZHG+IvgRYDPqsuQ2MCs4uHg
+	0mYaz61eZKPqnMugu/TmhPADDMG2NKQSUP5o86n/I60oCF4n6axT3zr1OfpYRx/4aw==
+X-Gm-Gg: AYBFou17pg6j+Au12j+1aNuwCnH7IDQUpgnovnST7j/SFeX9Cmm+bgol9QQkqEew8+M
+	ch7/VnQDDg56c9pZBvTUBdskIAtNRSznoaVC4INm84fnh+8Q1xqaeTwTIQlKgSb5fXmutnl5NY3
+	wS9HOX6Uxd1z1YCV3rcfFKUKtPdAZ4o80ZWX45NOQoezQ0WPN7k4bsk0o2cYy7fASw3U71BmsoJ
+	kL/T13BgdDvzZkf4wkwWQFyIJwkP8QiKz1bQULI/Wmvtg009U3BFdlRBThqWqqj5zEZSDgPO0PJ
+	BL0NsCrusdINkVBjAQar/aXHQP77X+f4CaiogGfkvngMgZE8DXhkHiAC5MWYN/Kw2WVQa17073T
+	WoCR4CcQbfn4HPuxuQfdujdodNhmhnksH3J3ZX6Es0WWKrXjQYH8v7EKU9iEkO8nOhgqB+IJduC
+	Eocwf0cNlI0Vi6u+tSS50Zb0G+OGA5oEGyvelBwd8APnGf8JhYgzngHkcrp+t4NeqHgxaVjixwo
+	GYEPNU5YudwOmI+SYMN1B3fZGQ84scHcPGTiiV8ctVNS4bsIACuw4UxG9P+yBbyk2L/HIuDZGWU
+	dUj17HLnSqc+Oi7/aiatZpafz2vaKOd3HoYo/nJwx+Op+XzcxCnrbjNv3wRv5sPHWFeTDg==
+X-Received: by 2002:a05:6a00:1492:b0:89f:5c84:46ec with SMTP id d2e1a72fcca58-8ba89661da0mr1558178b3a.40.1794289019108;
+        Mon, 09 Nov 2026 21:36:59 -0800 (PST)
 Received: from google.com ([2a00:79e0:2031:6:e137:9384:7cd8:6e40])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8baab8dccc7sm400979b3a.52.2026.11.09.21.31.52
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8baab8dccc7sm405355b3a.52.2026.11.09.21.36.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Nov 2026 21:32:00 -0800 (PST)
-Date: Tue, 10 Nov 2026 14:31:51 +0900
+        Mon, 09 Nov 2026 21:36:58 -0800 (PST)
+Date: Tue, 10 Nov 2026 14:36:48 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: Michal Wilczynski <m.wilczynski@samsung.com>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Russell King <linux@armlinux.org.uk>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>, 
+To: Michal Wilczynski <m.wilczynski@samsung.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>, 
 	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
 	Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, 
 	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
 	Minchan Kim <minchan@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
 	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-s390@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>, 
 	Nick Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>, 
 	Jaegeuk Kim <jaegeuk@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
 	Herbert Xu <herbert@gondor.apana.org.au>, David Laight <david.laight.linux@gmail.com>, 
 	Sungguk <sungguk.na@samsung.com>, Jaehoon Chung <jh80.chung@samsung.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 03/15] zram: lz4hc: reset the dictionary stream once,
- not per page
-Message-ID: <avKrj0h8fBNSrfCi@google.com>
+	Marek Szyprowski <m.szyprowski@samsung.com>, linux-erofs@lists.ozlabs.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 10/15] lib/lz4: switch the compressor to the vendored
+ sources
+Message-ID: <avKs4_S7r6EiUVgC@google.com>
 References: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
- <CGME20261106144252eucas1p272c9e37d66ad385db070f941879aecb1@eucas1p2.samsung.com>
- <20261106-lz4-vendor-upstream-v2-3-ee04c3f0d7dc@samsung.com>
- <sashiko-outbox-201613@kernel.org>
+ <CGME20261106144305eucas1p17b3b27d403dc7d13b85cdd9a4bea83b9@eucas1p1.samsung.com>
+ <20261106-lz4-vendor-upstream-v2-10-ee04c3f0d7dc@samsung.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -115,43 +116,41 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <sashiko-outbox-201613@kernel.org>
+In-Reply-To: <20261106-lz4-vendor-upstream-v2-10-ee04c3f0d7dc@samsung.com>
 
-On (26/11/06 14:49), sashiko-bot@kernel.org wrote:
-> Thank you for your contribution! Sashiko AI review found no new issues
-> in this patch, but noticed 1 related pre-existing issue it does not
-> introduce:
-> - [Medium] zram: high-order memory allocation using kzalloc in
->   lz4hc_create() [1]
-> --
-> 
-> commit 2f51683dc7418bdcd0730283cb7003d8754fcd5f
-> Author: Michal Wilczynski <m.wilczynski@samsung.com>
-> 
-> zram: lz4hc: reset the dictionary stream once, not per page
-> 
-> This commit moves the LZ4_resetStreamHC() call for dictionary-backed
-> streams from lz4hc_compress() to lz4hc_create() so that the stream state is
-> only reset once at creation time rather than on every compressed page.
-> 
-> > diff --git a/drivers/block/zram/backend_lz4hc.c b/drivers/block/zram/backend_lz4hc.c
-> > index d8aa01bb258fe..06286c805cf7c 100644
-> > --- a/drivers/block/zram/backend_lz4hc.c
-> > +++ b/drivers/block/zram/backend_lz4hc.c
-> > @@ -72,6 +72,7 @@ static int lz4hc_create(struct zcomp_params *params, struct zcomp_ctx *ctx)
-> >  		zctx->cstrm = kzalloc_obj(*zctx->cstrm);
-> >  		if (!zctx->cstrm)
-> >  			goto error;
-> > +		LZ4_resetStreamHC(zctx->cstrm, params->level);
-> >  	}
-> 
-> [Severity: Medium]
-> This problem wasn't introduced by this patch, but should zctx->cstrm be
-> allocated with vmalloc() or kvzalloc() instead of kzalloc_obj() [1]?
+On (26/11/06 15:42), Michal Wilczynski wrote:
+[..]
+> diff --git a/drivers/block/zram/backend_lz4.c b/drivers/block/zram/backend_lz4.c
+> index 1e4ad31d39a63f45b3bddd3d8a467d8d7d095beb..50265e3ce256490994cb6dae32a45da376e408e0 100644
+> --- a/drivers/block/zram/backend_lz4.c
+> +++ b/drivers/block/zram/backend_lz4.c
+> @@ -42,7 +42,7 @@ static int lz4_setup_params(struct zcomp_params *params)
+>  	if (!params->dict || !params->dict_sz)
+>  		return 0;
+>  
+> -	dict_stream = kzalloc_obj(*dict_stream);
+> +	dict_stream = kzalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
+>  	if (!dict_stream)
+>  		return -ENOMEM;
+>  
+> @@ -88,7 +88,7 @@ static int lz4_create(struct zcomp_params *params, struct zcomp_ctx *ctx)
+>  		if (!zctx->dstrm)
+>  			goto error;
+>  
+> -		zctx->cstrm = kzalloc_obj(*zctx->cstrm);
+> +		zctx->cstrm = kzalloc(LZ4_MEM_COMPRESS, GFP_KERNEL);
+>  		if (!zctx->cstrm)
+>  			goto error;
+>  	}
+> @@ -112,7 +112,7 @@ static int lz4_compress(struct zcomp_params *params, struct zcomp_ctx *ctx,
+>  					zctx->mem);
+>  	} else {
+>  		/* Cstrm needs to be reset */
+> -		memcpy(zctx->cstrm, params->drv_data, sizeof(*zctx->cstrm));
+> +		memcpy(zctx->cstrm, params->drv_data, LZ4_MEM_COMPRESS);
+>  		ret = LZ4_compress_fast_continue(zctx->cstrm, req->src,
+>  						 req->dst, req->src_len,
+>  						 req->dst_len, params->level);
 
-That's how I have it in my local tree - vmalloc(LZ4HC_MEM_COMPRESS).
-Michal, I suppose you don't base the series on top of linux-next or
-Andrew's tree?
-
-We reset the stream when we setup params, so I don't think we need
-to do anything in lz4hc_create().
+The zram code here is outdated, it has been reworked quite a bit
+(patches are in linux-next and Andrew's trees).
