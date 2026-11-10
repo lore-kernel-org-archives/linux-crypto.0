@@ -1,107 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794347775;
-	b=yDsiaQr85CD9CcgJ55S9BJjr3mBo+kfv3wJgXk9ts1kQ6IVxz3tE7gX7FUzPXKt+kKyf
-	 LK/x9vneT7fXwd00EwfLiM2AHM0yDPdD3bcWDXZ+DirTXJxUzwNWVrUanrbjkSzvYRNH5
-	 V1zqAACVL/wRA7Ex+5+SZYm6ewOKKdLkcvrlCKYNHlgYmXBbTnNQ48+WJYTkLENLn+Xof
-	 cGF3hfbZZHzcq6l5dHBv4gd7r572uOrKbbeM2B5bqxKGIQxT303i17gO105o1bGy1Xj48
-	 AKscBfMXtznmSswQp2Zgk9gH3Yi3D2NSu6/mwtnS6RGHxNaEDGHnuKxi9QXpCmDiQ/w==
+	t=1794348005;
+	b=AUXqhzvqUkTlf6aRLxGCY+wvfg4JZPbXcpuEYTa3lj4UEIn2U5qLqm3f3GPf2vfAJ56q
+	 WHnFkkiwsA1TQ7BEIbVQLrVibjN4ECG1GZvVhjmeStvCAX3B3XyviHuX2HKVvMWLgdrGj
+	 XQP/I/cAenhg8dsmLCKNG4Bq/dNtnsNyGm/WOC3+Td/LHLhR/IGreYgx0CTAHzfkCSBUe
+	 2I8vbwkET6sZaAmERvG36F0pqi49st2M03TQKCePirvx+bhA355UR66ocLWgdGzO+25H1
+	 mZxRWFpU2+QEunS7cdYNEkIvtps9nwSqAIBnCbOJ6Ubptu8el+VWkUxIsOO+EasSAFw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794347775;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Type:X-Developer-Signature:X-Developer-Key:
-	 Content-Transfer-Encoding;
-	bh=J2ssMX9HHR58GQtXhKxK47mc9PFmk9t4SfWyslJHnl8=;
-	b=v8NDrfGfyvV+gZGjRiB4dhURjYAXny4HEj8Hk24t2wcCcEUdGzZ47ZsXNPc69oDTZ7lj
-	 kuQMK5rxl50nlqf6wwmW1p3+sKLvXvdOZiu4WANpDC80357RP40aPW5/oOG3BtAi8qVKm
-	 8kJe+Yt8G52cWylDpSo9emp2UFY6JB4S5C+Kis3av/QS4Y/pFWdyZeY/MOpv58dIKX8D7
-	 UWayP88xsySioWuNcUoYDVwYlLK7uw3QMD9ij6MxLUxYwnqfuB9Q/NMbZ2yETVQTPO1Zp
-	 UBOHxp7WCa6762QwG/h1s5leY3bX+JBcY57UuLGEoIOenRGz0p2H/+xA0hDrI+sW6Dw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794348005;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=bP0PYjy5UHIUcYCgsHgni8Lrx9/nduv1+ncg/+mUhcY=;
+	b=uFDUDLyRsLUwBC23JIH+ka7S0OlZxzenJBxNPw1GySAQy544UNI5UpcULUfbPnMIYTOo
+	 Ewp8zGAAqm7Ef2XN5/42OPtLrPMMgb5nPdbnxEHK2ZDch5nhhtUoJP6pZk83aCki/6m3a
+	 Gw2vPSyvQFfUpm51eqzDO51Ji9CrqDzQ6S992pUJAKqWsI+ckte/QABFw5YWrFSYrtQoQ
+	 upfiMvhfIW9/tjo4U1PIsKHiVcep5iPX2LPLtRC7kmS13SDbslkpz6hLJP3i4hq8HNk2j
+	 QZfkDp4zU9A2sqd3Ptdc7wl0aqfYHmReLQ/nDjoTHqUyFKr0ldSKVEap6pPNAO/LQxQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=baylibre.com;
-	spf=pass smtp.mailfrom=baylibre.com;
-	dkim=pass header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=YTRWsWWX;
-	arc=none smtp.remote-ip=209.85.128.41
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fG1m79DG;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C1560A3829
-	for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2026 21:56:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11C1560A3829
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A443606A327;
+	Tue, 10 Nov 2026 22:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=YTRWsWWX
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4a2167bd087so26074765e9.3
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2026 13:56:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1794347773; x=1794952573; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=J2ssMX9HHR58GQtXhKxK47mc9PFmk9t4SfWyslJHnl8=;
-        b=YTRWsWWXc+D74qGfCCjaRmGCbKpU+EPmjvAj2uxhXrXIYQ2s2Y9CirCXQnmOashz0r
-         D1+iuxx6zwkV4ylOirv54xKJGT4UtpSkuQzKxOkLINHcaziEmbRi9U0YgoPMaUE9PEDd
-         u4aiNbA0EgK+rQA4++CDkD6egbJdU1M8wT1EpgTWgbQ7+acx+nRgkXI2crdjrqjJ/TUT
-         tb9/pxePl9PaQy7BX1yNCljTPynCn2iYqkLsKJYTfoGuy2fdHdwxCt45B5DleM7aVm2E
-         f5QPs4Jf2uvpeC/axcwnT7Y3lW8vP6DSoJqqdwlkrQTXnTUMKTYK58i+/e43GAMgAJzx
-         ylRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794347773; x=1794952573;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=J2ssMX9HHR58GQtXhKxK47mc9PFmk9t4SfWyslJHnl8=;
-        b=Ap9C10Ikao88FFXH7hQN+5mcG/89wOpio9EUK3YxeoMI9tkzxcfNtzTCf8fXoPIaYx
-         A9TJi1YH3EGikzWIRBOceokDF+ggkjzWNCU9DaKeFhIU+FtHRZ7klIcSeP+F4e4c9MV7
-         Z9Na5EtEqvAgNWauvSv2pZYz6Gg64wQJ9b9xMIbPFgDpCyvxDyI2bM62mN0ivPTpSbKx
-         0qsZbqo/wgMs9ILzC5/dfWI0F8Uu4YAdtnLzFXfJUU2gdk9yqsCVy0LnJRaz3IOkYGhM
-         OiDpSCJ3Rep0+pTJObL45z6+/Q2TX/0xqfo3X9zhHZwsrrSMdIsoawncVtfJP0VeX4Gp
-         2h+g==
-X-Forwarded-Encrypted: i=1; AL+hErFjErrmZeE+w2S0nz/nHrgyrLLRolZtXRETFWYooDUEQy3uzVdvaHURnzbPOu3lvoLdBevQnmeuYet/IZY=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+uBGBKRmv8tCNorwL2BtruDRBfEMcEGxZW4d3guP72nJE/3KlD
-	bjb2ISPa8Jyk8kD4zd/l4IbU6qVvKjLeveNW8djsTmcGEf6ipj6rlqbbkdMQPJQJmJM=
-X-Gm-Gg: AYBFou0FtVJpyYKCkkjza92FNwahkg8879S5x3X34pjHwg2QsuClAxyaBpLm1dPCqVI
-	8cXSCzV3fB2MpD7XFWDhIW1p9emDoSm5ROHJsav29HXUwI0dJsRrIoa/eErettJZUBMr+a+kAJf
-	fqcXBvfmYb/FdOmDoMbHOf42pEz2ejUXI/cv3985X7ae+R1D/a1zxt+yC7Iv2t3iMZZpCQPWwdn
-	Wt1w5PfmG7DSViUDe2acowrASHu281NdZbgCcl/NOGF3tSz1wq6uBHnNd0q1108F+/KhD3kZnfM
-	SlHgu8gUtxvQJht6oaWJA6Q4LviTln6DE2A+XihJlgxG1JIcHXbx3lyDpwrOpzxPZEnrQJCNGwf
-	cm66qpjZXAGRTBY4DGMkoIWymhcTIcIqUGxigbpsyOMn3yuhOXYpdfPE1aycfBfK+eNtu5a1aBF
-	L6h8BGyGos+GYAlC2YXeLrBLOsH0G/v8vGNG1FauelX5zEMjSDpcibAllQ8FFQQw/SDNu4Oqgo6
-	Nobo7nRdfXFZ38wHOI8cFntVYzOG8G21gkM7RX9AGMes5tbCeXcARAe6MsQuW3/xcs+P5Lb8noE
-	FKCVkYFpFM87KAEFm3IdQfV8S3+QKrZt+n4ZUtlyIsRnxfKk0aha/CwI
-X-Received: by 2002:a05:600c:c167:b0:4a5:dc5d:20f7 with SMTP id 5b1f17b1804b1-4ba09382f6fmr6035325e9.14.1794347773486;
-        Tue, 10 Nov 2026 13:56:13 -0800 (PST)
-Received: from localhost ([2a02:8071:56d1:2de0:1d24:d58d:2b65:c291])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4ba01fef675sm88296925e9.14.2026.11.10.13.56.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Nov 2026 13:56:12 -0800 (PST)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Lee Jones <lee@kernel.org>
-Cc: David Rhodes <david.rhodes@cirrus.com>,
-	Richard Fitzgerald <rf@opensource.cirrus.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Zha Qipeng <qipeng.zha@intel.com>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Thomas Richard <thomas.richard@bootlin.com>,
-	linux-sound@vger.kernel.org,
-	patches@opensource.cirrus.com,
-	mfd@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Charles Keepax <ckeepax@opensource.cirrus.com>,
-	Linus Walleij <linusw@kernel.org>
-Subject: [PATCH v4 10/20] mfd: Use named initializers for acpi_device_id arrays
-Date: Tue, 10 Nov 2026 22:54:35 +0100
-Message-ID:  <39fc883cf1c7077bce8f16719cca59060a395b02.1794347059.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.56.0.rc1
-In-Reply-To: <cover.1794347059.git.u.kleine-koenig@baylibre.com>
-References: <cover.1794347059.git.u.kleine-koenig@baylibre.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fG1m79DG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28BEE1F008A1;
+	Tue, 10 Nov 2026 22:00:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794348005;
+	bh=bP0PYjy5UHIUcYCgsHgni8Lrx9/nduv1+ncg/+mUhcY=;
+	h=From:To:Cc:Subject:Date;
+	b=fG1m79DGOncedhneDGG4/mIKZpB1vH8YoqM2wKZEtFujwabLrkQExfUSorlad+WCA
+	 xlTjMdH9Ebndq/Ia1/f94RrciuAcydhFbs0iSuR9IERaif5IDvNzkLITOq2Z9HdJqg
+	 AvE8uffRQnE3tmyJJOiZgJcEIYN2IgoeLzu2O/GxliwZ33p9C7OeYnnpCy8Ligr65i
+	 kx0EZOud+LJSMVCpzKeLKnzRVvhAjp9+I31ERzQUr9nnWoE2BPFOxjJciFxUyyJj1c
+	 yA9dWN3sysDDhfLQiL5XIQ+gG21/GM73aoR1jUFWvV08mEtvQvd+8f3t+Z3LZrxOjY
+	 YrNxjBuTa3pPQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: stable@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 5.15,5.10] lib/crypto: mips: Disable Octeon SHA code on little-endian kernels
+Date: Tue, 10 Nov 2026 13:59:45 -0800
+Message-ID: <20261110215945.38544-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -111,249 +58,96 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10352; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=fM1Juxh4IFY92UDh+eqsOdQrCJyZjYHdJp4ObozJMlM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBq85K4QzkGZW7fkRlPgsa2PeAjSnzPW1/xyvP1k 4ByXl76m0qJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCavOSuAAKCRCPgPtYfRL+ TtODB/9mLTyWMW4ZEO8F0sFYKUrqNx/OOS6Bg+vSsYLv8O+WdwNRxqCi7SVGmHgigQmUHYCeHF8 Pj5Xs/FretDYGVu2LyIjwphJN68fLvTYIa2lk4q9nZH9W99hbo/EDO/i5lhQS07JkUv66+gyaeG cjf4wmQTNTjM5fK9tWHzokUmVKUhzqfCJThb484255lJTLZomqbSKQz7W1nJkshtCz4QaBgaB4O k+S4mmip6Y1CACRoZgRbmTJQi9i+d71WCdOH267Cflh4AwE6rA1e5TpvKCkZE24SP5IiTQ2t83T QUV2FFbzA+zpTweCpC+j7WlSuj4oOkGFJQYC9XuMrBslZL4B
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 
-While being less compact, using named initializers allows to more easily
-see which members of the structs are assigned which value without having
-to lookup the declaration of the struct. And it's also more robust
-against changes to the struct definition.
+commit dd2a4edb26e1c78823c50ba10c42f2d3de2e5ec4 upstream.
 
-The mentioned robustness is relevant for a planned change to struct
-acpi_device_id that replaces .driver_data by an anonymous union.
+Kernels built for the MIPS64-based Cavium Octeon SoCs are normally
+big-endian, but little-endian builds are also supported.  Currently, the
+SHA-1, SHA-256, and SHA-512 code using the Octeon crypto co-processor is
+enabled in both builds.
 
-This patch doesn't modify the compiled arrays, only their representation
-in source form benefits.
+This code is untestable without the hardware.  However, based on the
+code itself, it is implausible that it computes hash values correctly in
+little-endian builds.  Such builds write many incorrect values to COP2:
 
-Reviewed-by: Charles Keepax <ckeepax@opensource.cirrus.com>
-Reviewed-by: Linus Walleij <linusw@kernel.org>
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
+  - SHA-1 and SHA-256: The 64-bit integer that contains the last two
+    32-bit message words of each block is written to COP2 entirely
+    byte-reflected, due to missing endianness conversion in
+    octeon_sha1_start() and octeon_sha256_start() to compensate for
+    using native 64-bit loads from the message bytes.  This differs from
+    all the earlier message words which are written correctly.
+
+    Furthermore, the state is written to COP2 with each 32-bit word
+    byte-reflected within each 64-bit integer, due to incorrect use of
+    64-bit endianness conversion in write_octeon_64bit_hash_dword() when
+    the state is kept in memory in native-endian 32-bit words.
+
+  - SHA-512: All the 64-bit message words are written to COP2
+    byte-reflected, due to missing endianness conversion in
+    write_octeon_64bit_block_sha512() and octeon_sha512_start().  The
+    SHA-512 state words seem to be written correctly.
+
+Big-endian kernels aren't affected by these bugs.  These bugs also
+aren't new; this code has been broken on little-endian ever since it and
+Octeon little-endian support were first added in v4.1.
+
+Commit d2a948d2db68 ("MIPS: Octeon: Make octeon-md5 driver
+endian-agnostic") made the MD5 code work on little-endian kernels by
+adding 64-bit endianness conversions to the COP2 macros used by MD5
+(some of which are shared by SHA-1 and SHA-256, despite those algorithms
+keeping the state words in native-endian instead of MD5's little-endian,
+causing some of the strange behavior described above).  However, SHA-1,
+SHA-256, and SHA-512 were never fixed to work on little-endian kernels.
+
+Therefore, disable the Octeon SHA-1, SHA-256, and SHA-512 code in
+little-endian kernels.  This causes the generic code that actually
+computes hash values correctly to be used instead.
+
+Fixes: 82be2dcfa6a1 ("crypto: octeon - add SHA1 module")
+Fixes: c3d0def62001 ("crypto: octeon - add SHA256 module")
+Fixes: fbaa4dfd51a0 ("crypto: octeon - add SHA512 module")
+Cc: stable@vger.kernel.org
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Link: https://patch.msgid.link/20261022054450.20746-1-ebiggers@kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/mfd/cs42l43-i2c.c             |  6 +--
- drivers/mfd/intel-lpss-acpi.c         | 58 +++++++++++++--------------
- drivers/mfd/intel_pmc_bxt.c           |  2 +-
- drivers/mfd/intel_soc_pmic_bxtwc.c    |  2 +-
- drivers/mfd/intel_soc_pmic_chtdc_ti.c |  2 +-
- drivers/mfd/intel_soc_pmic_chtwc.c    |  2 +-
- drivers/mfd/intel_soc_pmic_crc.c      |  2 +-
- drivers/mfd/intel_soc_pmic_mrfld.c    |  2 +-
- drivers/mfd/kempld-core.c             |  4 +-
- drivers/mfd/loongson-se.c             |  2 +-
- drivers/mfd/upboard-fpga.c            |  4 +-
- 11 files changed, 43 insertions(+), 43 deletions(-)
+ crypto/Kconfig | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/mfd/cs42l43-i2c.c b/drivers/mfd/cs42l43-i2c.c
-index 2f1862199618..faf4fc6b3d73 100644
---- a/drivers/mfd/cs42l43-i2c.c
-+++ b/drivers/mfd/cs42l43-i2c.c
-@@ -73,9 +73,9 @@ MODULE_DEVICE_TABLE(of, cs42l43_of_match);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 126d4699f06f7..6cfd33de36c15 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -868,7 +868,7 @@ config CRYPTO_SHA512_SSSE3
  
- #if IS_ENABLED(CONFIG_ACPI)
- static const struct acpi_device_id cs42l43_acpi_match[] = {
--	{ "CSC4243", CS42L43_DEVID_VAL },
--	{ "CSC2A3B", CS42L43B_DEVID_VAL },
--	{ "CSC4244", CS42L43B_DEVID_VAL },
-+	{ .id = "CSC4243", .driver_data = CS42L43_DEVID_VAL },
-+	{ .id = "CSC2A3B", .driver_data = CS42L43B_DEVID_VAL },
-+	{ .id = "CSC4244", .driver_data = CS42L43B_DEVID_VAL },
- 	{}
- };
- MODULE_DEVICE_TABLE(acpi, cs42l43_acpi_match);
-diff --git a/drivers/mfd/intel-lpss-acpi.c b/drivers/mfd/intel-lpss-acpi.c
-index 720adb0ee21f..2f46a85066bd 100644
---- a/drivers/mfd/intel-lpss-acpi.c
-+++ b/drivers/mfd/intel-lpss-acpi.c
-@@ -137,38 +137,38 @@ static const struct intel_lpss_platform_info cnl_i2c_info = {
+ config CRYPTO_SHA1_OCTEON
+ 	tristate "SHA1 digest algorithm (OCTEON)"
+-	depends on CPU_CAVIUM_OCTEON
++	depends on CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_HASH
+ 	help
+@@ -922,7 +922,7 @@ config CRYPTO_SHA256_PPC_SPE
  
- static const struct acpi_device_id intel_lpss_acpi_ids[] = {
- 	/* SPT */
--	{ "INT3440", (kernel_ulong_t)&spt_info },
--	{ "INT3441", (kernel_ulong_t)&spt_info },
--	{ "INT3442", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3443", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3444", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3445", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3446", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3447", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3448", (kernel_ulong_t)&spt_uart_info },
--	{ "INT3449", (kernel_ulong_t)&spt_uart_info },
--	{ "INT344A", (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT3440", .driver_data = (kernel_ulong_t)&spt_info },
-+	{ .id = "INT3441", .driver_data = (kernel_ulong_t)&spt_info },
-+	{ .id = "INT3442", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3443", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3444", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3445", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3446", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3447", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3448", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT3449", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT344A", .driver_data = (kernel_ulong_t)&spt_uart_info },
- 	/* CNL */
--	{ "INT34B0", (kernel_ulong_t)&cnl_info },
--	{ "INT34B1", (kernel_ulong_t)&cnl_info },
--	{ "INT34B2", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B3", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B4", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B5", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B6", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B7", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B8", (kernel_ulong_t)&spt_uart_info },
--	{ "INT34B9", (kernel_ulong_t)&spt_uart_info },
--	{ "INT34BA", (kernel_ulong_t)&spt_uart_info },
--	{ "INT34BC", (kernel_ulong_t)&cnl_info },
-+	{ .id = "INT34B0", .driver_data = (kernel_ulong_t)&cnl_info },
-+	{ .id = "INT34B1", .driver_data = (kernel_ulong_t)&cnl_info },
-+	{ .id = "INT34B2", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B3", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B4", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B5", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B6", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B7", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B8", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT34B9", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT34BA", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT34BC", .driver_data = (kernel_ulong_t)&cnl_info },
- 	/* BXT */
--	{ "80860AAC", (kernel_ulong_t)&bxt_i2c_info },
--	{ "80860ABC", (kernel_ulong_t)&bxt_info },
--	{ "80860AC2", (kernel_ulong_t)&bxt_info },
-+	{ .id = "80860AAC", .driver_data = (kernel_ulong_t)&bxt_i2c_info },
-+	{ .id = "80860ABC", .driver_data = (kernel_ulong_t)&bxt_info },
-+	{ .id = "80860AC2", .driver_data = (kernel_ulong_t)&bxt_info },
- 	/* APL */
--	{ "80865AAC", (kernel_ulong_t)&apl_i2c_info },
--	{ "80865ABC", (kernel_ulong_t)&bxt_info },
--	{ "80865AC2", (kernel_ulong_t)&bxt_info },
-+	{ .id = "80865AAC", .driver_data = (kernel_ulong_t)&apl_i2c_info },
-+	{ .id = "80865ABC", .driver_data = (kernel_ulong_t)&bxt_info },
-+	{ .id = "80865AC2", .driver_data = (kernel_ulong_t)&bxt_info },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, intel_lpss_acpi_ids);
-diff --git a/drivers/mfd/intel_pmc_bxt.c b/drivers/mfd/intel_pmc_bxt.c
-index e405d7513ca1..6a9ad1f135c7 100644
---- a/drivers/mfd/intel_pmc_bxt.c
-+++ b/drivers/mfd/intel_pmc_bxt.c
-@@ -414,7 +414,7 @@ static int intel_pmc_create_devices(struct intel_pmc_dev *pmc)
- }
+ config CRYPTO_SHA256_OCTEON
+ 	tristate "SHA224 and SHA256 digest algorithm (OCTEON)"
+-	depends on CPU_CAVIUM_OCTEON
++	depends on CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
+ 	select CRYPTO_SHA256
+ 	select CRYPTO_HASH
+ 	help
+@@ -952,7 +952,7 @@ config CRYPTO_SHA512
  
- static const struct acpi_device_id intel_pmc_acpi_ids[] = {
--	{ "INT34D2" },
-+	{ .id = "INT34D2" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, intel_pmc_acpi_ids);
-diff --git a/drivers/mfd/intel_soc_pmic_bxtwc.c b/drivers/mfd/intel_soc_pmic_bxtwc.c
-index 117517c171b5..08fedf3d3fee 100644
---- a/drivers/mfd/intel_soc_pmic_bxtwc.c
-+++ b/drivers/mfd/intel_soc_pmic_bxtwc.c
-@@ -606,7 +606,7 @@ static int bxtwc_resume(struct device *dev)
- static DEFINE_SIMPLE_DEV_PM_OPS(bxtwc_pm_ops, bxtwc_suspend, bxtwc_resume);
- 
- static const struct acpi_device_id bxtwc_acpi_ids[] = {
--	{ "INT34D3", },
-+	{ .id = "INT34D3" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, bxtwc_acpi_ids);
-diff --git a/drivers/mfd/intel_soc_pmic_chtdc_ti.c b/drivers/mfd/intel_soc_pmic_chtdc_ti.c
-index 6daf33e07ea0..ff6223d6f54b 100644
---- a/drivers/mfd/intel_soc_pmic_chtdc_ti.c
-+++ b/drivers/mfd/intel_soc_pmic_chtdc_ti.c
-@@ -162,7 +162,7 @@ static int chtdc_ti_resume(struct device *dev)
- static DEFINE_SIMPLE_DEV_PM_OPS(chtdc_ti_pm_ops, chtdc_ti_suspend, chtdc_ti_resume);
- 
- static const struct acpi_device_id chtdc_ti_acpi_ids[] = {
--	{ "INT33F5" },
-+	{ .id = "INT33F5" },
- 	{ },
- };
- MODULE_DEVICE_TABLE(acpi, chtdc_ti_acpi_ids);
-diff --git a/drivers/mfd/intel_soc_pmic_chtwc.c b/drivers/mfd/intel_soc_pmic_chtwc.c
-index aa71a7d83fcd..413d2fd4f86a 100644
---- a/drivers/mfd/intel_soc_pmic_chtwc.c
-+++ b/drivers/mfd/intel_soc_pmic_chtwc.c
-@@ -261,7 +261,7 @@ static const struct i2c_device_id cht_wc_i2c_id[] = {
- };
- 
- static const struct acpi_device_id cht_wc_acpi_ids[] = {
--	{ "INT34D3", },
-+	{ .id = "INT34D3" },
- 	{ }
- };
- 
-diff --git a/drivers/mfd/intel_soc_pmic_crc.c b/drivers/mfd/intel_soc_pmic_crc.c
-index 627a89334908..d3db727c08de 100644
---- a/drivers/mfd/intel_soc_pmic_crc.c
-+++ b/drivers/mfd/intel_soc_pmic_crc.c
-@@ -252,7 +252,7 @@ static int crystal_cove_resume(struct device *dev)
- static DEFINE_SIMPLE_DEV_PM_OPS(crystal_cove_pm_ops, crystal_cove_suspend, crystal_cove_resume);
- 
- static const struct acpi_device_id crystal_cove_acpi_match[] = {
--	{ "INT33FD" },
-+	{ .id = "INT33FD" },
- 	{ },
- };
- MODULE_DEVICE_TABLE(acpi, crystal_cove_acpi_match);
-diff --git a/drivers/mfd/intel_soc_pmic_mrfld.c b/drivers/mfd/intel_soc_pmic_mrfld.c
-index 77121775c1a3..9d7e1881d693 100644
---- a/drivers/mfd/intel_soc_pmic_mrfld.c
-+++ b/drivers/mfd/intel_soc_pmic_mrfld.c
-@@ -139,7 +139,7 @@ static int bcove_probe(struct platform_device *pdev)
- }
- 
- static const struct acpi_device_id bcove_acpi_ids[] = {
--	{ "INTC100E" },
-+	{ .id = "INTC100E" },
- 	{}
- };
- MODULE_DEVICE_TABLE(acpi, bcove_acpi_ids);
-diff --git a/drivers/mfd/kempld-core.c b/drivers/mfd/kempld-core.c
-index fbbff3eac500..71b226a57204 100644
---- a/drivers/mfd/kempld-core.c
-+++ b/drivers/mfd/kempld-core.c
-@@ -438,8 +438,8 @@ static void kempld_remove(struct platform_device *pdev)
- }
- 
- static const struct acpi_device_id kempld_acpi_table[] = {
--	{ "KEM0000" },
--	{ "KEM0001" },
-+	{ .id = "KEM0000" },
-+	{ .id = "KEM0001" },
- 	{}
- };
- MODULE_DEVICE_TABLE(acpi, kempld_acpi_table);
-diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-index 4c668e2d2241..49a95b8e4ca3 100644
---- a/drivers/mfd/loongson-se.c
-+++ b/drivers/mfd/loongson-se.c
-@@ -233,7 +233,7 @@ static int loongson_se_probe(struct platform_device *pdev)
- }
- 
- static const struct acpi_device_id loongson_se_acpi_match[] = {
--	{ "LOON0011" },
-+	{ .id = "LOON0011" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, loongson_se_acpi_match);
-diff --git a/drivers/mfd/upboard-fpga.c b/drivers/mfd/upboard-fpga.c
-index 9a9599dcb0a1..6674f4a1d2fe 100644
---- a/drivers/mfd/upboard-fpga.c
-+++ b/drivers/mfd/upboard-fpga.c
-@@ -300,8 +300,8 @@ static int upboard_fpga_probe(struct platform_device *pdev)
- }
- 
- static const struct acpi_device_id upboard_fpga_acpi_match[] = {
--	{ "AANT0F01", (kernel_ulong_t)&upboard_up2_fpga_data },
--	{ "AANT0F04", (kernel_ulong_t)&upboard_up_fpga_data },
-+	{ .id = "AANT0F01", .driver_data = (kernel_ulong_t)&upboard_up2_fpga_data },
-+	{ .id = "AANT0F04", .driver_data = (kernel_ulong_t)&upboard_up_fpga_data },
- 	{}
- };
- MODULE_DEVICE_TABLE(acpi, upboard_fpga_acpi_match);
+ config CRYPTO_SHA512_OCTEON
+ 	tristate "SHA384 and SHA512 digest algorithms (OCTEON)"
+-	depends on CPU_CAVIUM_OCTEON
++	depends on CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
+ 	select CRYPTO_SHA512
+ 	select CRYPTO_HASH
+ 	help
+
+base-commit: 29c6cdaac04a6989a7ed4ae4275ce4244e617f58
 -- 
-2.56.0.rc1
+2.56.0
 
