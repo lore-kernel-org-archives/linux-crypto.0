@@ -1,51 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794344528;
-	b=Y0KH3MtN7EKN7G7Nhw4NyWKHJ71le6gReIjNPrJ2/9gTNbYd6FUC6gbRSXeGjOj3D6Bx
-	 ZfjMvFUGaO39yU+5WoXtxkk0ZJbEzizpoWZJRE0jR7Dgc0IUA0VZSc7Ist5IVA/U3FiXg
-	 qJtKRECB4xqhW8VjOvJ9rCnfhm5qw+SdSgi0057XYeLzvqY7PEcUUUd/cbl0Oj3/qNqXY
-	 2FzzNUbT4YqisDwaPgj6656lIGeUGV6kJxf9dNLmSsPw7szcOLQfdo7qs6V2EdZI47Bkp
-	 64QAnDvhcnmbJAjTEpQEJJoPl3jhI/H6QcLadkxiDNJ7BbDGJfVlDfwYYwodGo6bUfA==
+	t=1794344793;
+	b=hIVTnU2mG4iYXGM1zJ1ve07sq2qr2+raEDgsPooAViEMeiUim8t9Z4YPnS/D1WkEIKES
+	 nETcG/d6JiUY2DZOgt0woCNkAa31BXJvGTXH1xScAo7Tphq2l0foWBNLLwfK4sTBzCZwS
+	 8w+UJivujriZBSesaYz3LItJ1kDf3SxqHxnIApSgHhiHegyPCmr6IWT9lbjQcpH/YOnrq
+	 B/fFjvkgwM9kPUvRvCm78GCw2zhtXpL7MGiq8uggLUDwENeUlI5I8tVy3LNvl+gd6qDh7
+	 VIZCX37vQOsoAy/34VJn52HXaIe9aw7LyXhf6Os9CDUJ3+DuKBczJrbGg0LSI0AMXEg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794344528;
-	h=Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=TYw+lTDw9uZUPVqkSCGZ4s7jhz0x5pD5eMZjD1rHixE=;
-	b=ryviXmyibKtB3Hh4TfypNislBJgzglgt+0VJmUdfggqyyl4oB0JLABOtEDPdvSJFdH37
-	 kUGIe/TdyQHw4Urj/FGcsGodc4TDIn8G0T0czWwuPfJRvAw2yh3pDepIanCFACNuT0la6
-	 W5bORA8nSr3w7ctQhFH4cMWj83hl0IAOWU8u0R6zmlgfvM7rTOxiMxTH+M5umeJXRGRJh
-	 mu8mvddcjVg6AoNOURbSzxReIT13aRox8WPCOatVGrBxX5Qmk8CsTQbMucqNHmtvr+5Is
-	 kdhviFKb45gdIQ8OPEMTD36ghHO1nopq3uKP8geO/1ZlWtZulCwgH4eu5N+QOXxFqmA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794344793;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To;
+	bh=gvFWqio/V9hzEqiVCMxAfOwWWqkCgy+VVi7hZNerAjc=;
+	b=TnUC/m+ojJeqAmi66pFOywkrZsUAcV4gOmmK+B/WJnQRjbQAeoTqmwKs8QFiEAv079m1
+	 kkz6MEdGYuT3W/x2osbEorC0LA7dA8vDMC3O1Cs+MUN1ImULIwTd9Mmo89I5/ILbGegPI
+	 k/in9Gf/32hx9Tafuf4cD2/xZglRc7xEaQ2SdpncuozKLycb/zkvb4maaiiXhvbdOu6t/
+	 MAM+wOB726qKjd8XyZIl+p6c6tSlHaKXU+YU9C+Wxc9oLe7T/4aq4EWF/d5oWloWed8gF
+	 zZcYctjMxjdZb/FPQvfvDsJmN8L1D3pSAJYXpa+B6GzenfA6Wk3d9LjISX/auS52upw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Usp3eWU6;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9E7606A320;
-	Tue, 10 Nov 2026 21:02:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38C901F008A4;
-	Tue, 10 Nov 2026 21:02:08 +0000 (UTC)
-From: Dave Jiang <dave.jiang@intel.com>
-To: linux-cxl@vger.kernel.org,
-	nvdimm@lists.linux.dev,
-	linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Alison Schofield <alison.schofield@intel.com>,
-	Vishal Verma <vishal.l.verma@intel.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jan Kara <jack@suse.cz>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Frank Li <Frank.Li@kernel.org>,
-	Alistair Popple <apopple@nvidia.com>,
-	Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Subject: [PATCH v2] MAINTAINERS: Update CXL, NVDIMM, DAX, and others for djbw
-Date: Tue, 10 Nov 2026 14:01:52 -0700
-Message-ID: <20261110210152.3494345-1-dave.jiang@intel.com>
-X-Mailer: git-send-email 2.54.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266F8606A320
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Nov 2026 21:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Usp3eWU6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F8371F0089F;
+	Tue, 10 Nov 2026 21:06:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794344792;
+	bh=gvFWqio/V9hzEqiVCMxAfOwWWqkCgy+VVi7hZNerAjc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Usp3eWU6UCaumbGlTP32QlBGf+GrRTldOtRig70TjugpHeY9nDlP3haBpHeOAAeKc
+	 N8bs87ku0ttil+ciVrMW6dzJY8GZ2xMlDdr0DAE0BJ3Ebk/w3m2Bh34WttA0eVu2Dv
+	 1kDL1v1q2vtjfO189PwUm5jHY2xa1j7woDTftdsDwKqp1Kjf0MrS0kCoxrhmN2v59P
+	 hMKuBec4p9xsmdBT/F0gPHu1aeGl4jkHJuT4M8CQkDRrFf1l80cKEnDjGqCwDtKKS3
+	 WRE16CH4Tx5ckDc38CWDaFLDugl12jRnVP+/zAgwNMbi0IKs/CWlpgEWsNzHbdfCh5
+	 FStqbYEV7nwng==
+Date: Tue, 10 Nov 2026 13:06:30 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] crypto: arm64/ghash - Reduce boilerplate
+Message-ID: <20261110210630.GA1907@quark>
+References: <20261109164502.905237-2-u.kleine-koenig@baylibre.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -55,118 +60,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261109164502.905237-2-u.kleine-koenig@baylibre.com>
 
-Dan is no longer with us. Removing entries in MAINTAINERS to prevent
-people from keep emailing his address.
+On Mon, Nov 09, 2026 at 05:45:02PM +0100, Uwe Kleine-König wrote:
+> Make use of module_cpu_feature_match() which expands to nearly the code
+> that is typed out.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+> ---
+>  arch/arm64/crypto/ghash-ce-glue.c | 10 +++-------
+>  1 file changed, 3 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+> index eaf2932ceaf5..0884f812a315 100644
+> --- a/arch/arm64/crypto/ghash-ce-glue.c
+> +++ b/arch/arm64/crypto/ghash-ce-glue.c
+> @@ -384,7 +384,8 @@ static struct aead_alg gcm_aes_algs[] = {{
+>  
+>  static int __init ghash_ce_mod_init(void)
+>  {
+> -	if (!cpu_have_named_feature(ASIMD) || !cpu_have_named_feature(PMULL))
+> +	/* ASIMD is implied by PMULL, but better be safe than sorry */
+> +	if (!cpu_have_named_feature(ASIMD))
+>  		return -ENODEV;
 
-Frank will take over for async_tx until the feature is removed.
+The ASIMD check can be dropped too.  There's already other code that
+assumes PMULL implies ASIMD.
 
-Alistair will take over on fsdax with Alison continue to wrangle patches
-for DAX overall patches.
-
-Cc: Alison Schofield <alison.schofield@intel.com>
-Cc: Vishal Verma <vishal.l.verma@intel.com>
-Cc: Matthew Wilcox <willy@infradead.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Davidlohr Bueso <dave@stgolabs.net>
-Cc: Jonathan Cameron <jic23@kernel.org>
-Cc: Vinod Koul <vkoul@kernel.org>
-Cc: Frank Li <Frank.Li@kernel.org>
-Cc: Alistair Popple <apopple@nvidia.com>
-Acked-by: Davidlohr Bueso <dave@stgolabs.net>
-Acked-by: Vishal Verma <vishal.l.verma@intel.com>
-Acked-by: Alison Schofield <alison.schofield@intel.com>
-Acked-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
-Signed-off-by: Dave Jiang <dave.jiang@intel.com>
-
----
-
-v2:
-- Add Frank as reviewer for async_tx.
-- Alistair has been working on fsdax and agreed to be maintainer.
----
- MAINTAINERS | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 93abbb315065..58bdd5eff5c2 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4294,7 +4294,7 @@ S:	Maintained
- F:	crypto/rsa*
- 
- ASYNCHRONOUS TRANSFERS/TRANSFORMS (IOAT) API
--R:	Dan Williams <djbw@kernel.org>
-+R:	Frank Li <Frank.li@oss.nxp.com>
- S:	Odd fixes
- W:	http://sourceforge.net/projects/xscaleiop
- F:	Documentation/crypto/async-tx-api.rst
-@@ -6726,7 +6726,6 @@ M:	Jonathan Cameron <jic23@kernel.org>
- M:	Dave Jiang <dave.jiang@intel.com>
- M:	Alison Schofield <alison.schofield@intel.com>
- M:	Vishal Verma <vishal.l.verma@intel.com>
--M:	Dan Williams <djbw@kernel.org>
- R:	Ira Weiny <iweiny@kernel.org>
- R:	Li Ming <ming.li@zohomail.com>
- R:	Richard Cheng <icheng@nvidia.com>
-@@ -7621,7 +7620,6 @@ S:	Maintained
- F:	scripts/dev-needs.sh
- 
- DEVICE DIRECT ACCESS (DAX)
--M:	Dan Williams <djbw@kernel.org>
- M:	Vishal Verma <vishal.l.verma@intel.com>
- M:	Dave Jiang <dave.jiang@intel.com>
- M:	Alison Schofield <alison.schofield@intel.com>
-@@ -10315,12 +10313,12 @@ F:	include/linux/fcntl.h
- F:	include/uapi/linux/fcntl.h
- 
- FILESYSTEM DIRECT ACCESS (DAX)
--M:	Dan Williams <djbw@kernel.org>
-+M:	Alistair Popple <apopple@nvidia.com>
- R:	Matthew Wilcox <willy@infradead.org>
- R:	Jan Kara <jack@suse.cz>
- L:	linux-fsdevel@vger.kernel.org
- L:	nvdimm@lists.linux.dev
--S:	Supported
-+S:	Maintained
- F:	fs/dax.c
- F:	include/linux/dax.h
- F:	include/trace/events/fs_dax.h
-@@ -13455,7 +13453,6 @@ F:	drivers/platform/x86/intel/hid.c
- 
- INTEL I/OAT DMA DRIVER
- M:	Dave Jiang <dave.jiang@intel.com>
--R:	Dan Williams <djbw@kernel.org>
- L:	dmaengine@vger.kernel.org
- S:	Supported
- Q:	https://patchwork.kernel.org/project/linux-dmaengine/list/
-@@ -15278,7 +15275,6 @@ K:	libie
- 
- LIBNVDIMM BTT: BLOCK TRANSLATION TABLE
- M:	Vishal Verma <vishal.l.verma@intel.com>
--M:	Dan Williams <djbw@kernel.org>
- M:	Dave Jiang <dave.jiang@intel.com>
- M:	Alison Schofield <alison.schofield@intel.com>
- L:	nvdimm@lists.linux.dev
-@@ -15288,7 +15284,6 @@ P:	Documentation/nvdimm/maintainer-entry-profile.rst
- F:	drivers/nvdimm/btt*
- 
- LIBNVDIMM PMEM: PERSISTENT MEMORY DRIVER
--M:	Dan Williams <djbw@kernel.org>
- M:	Vishal Verma <vishal.l.verma@intel.com>
- M:	Dave Jiang <dave.jiang@intel.com>
- M:	Alison Schofield <alison.schofield@intel.com>
-@@ -15307,7 +15302,6 @@ F:	Documentation/devicetree/bindings/pmem/pmem-region.yaml
- F:	drivers/nvdimm/of_pmem.c
- 
- LIBNVDIMM: NON-VOLATILE MEMORY DEVICE SUBSYSTEM
--M:	Dan Williams <djbw@kernel.org>
- M:	Vishal Verma <vishal.l.verma@intel.com>
- M:	Dave Jiang <dave.jiang@intel.com>
- M:	Alison Schofield <alison.schofield@intel.com>
-
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
--- 
-2.54.0
-
+- Eric
