@@ -1,66 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.19
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794274810;
-	b=K+ZowGSK9/Hvgh04tFfKzXFVCN1b1Lfv+eSsbuIRk8LYZELTojeDzvJ1X7Y1CG+XlspE
-	 +vkTatxWqAC/Ddtvbt/FtlTb+tGOP81x67YO5cGqQxL3OMtPKrJ8iT9vzSZ2oiQ32opEj
-	 9kKGWRD+5OuLWmwHEQyBxTO6ALHsR9iY3mAyugC6Q9ji/DCoe/CewvOYexGcipk5q+AjP
-	 oSe6DfhjPj+dfaBKNRZl/oh/m7x7p0YztNdauJIaIBPyxi0izle6zS1Dmu3gBERCP556J
-	 CKtIhq7nFKhUPyphSl3943inwpQ+f4q8tTrreR/R1Tw23HjUQ3XFM22RRYLzF6E9K9w==
+	t=1794276320;
+	b=p/lbSKudYwsEw9n4IrC92coq/3O8QFoWAgQnjSiCEpbriMgsvRHGEl2hsarBbIqP+3go
+	 Bzejfkve48jNbZJad+YcjjqrJ3egn59jc6LHdPeEw6sT6YRbxucWTuSCPzkWmmdV7lk/d
+	 90dpppg2TQSL2K7yx3HXMpfPcDqjG+fcgktcTiXN4C5FMwwPIMqcIkFPubey1ZOhIbDaz
+	 Pa/NbwdjBhsxJvGVbkN9UZTWfV4E6l0GdQLi64dBmr+ULpzAseiAxD1a7X2OdtOhZfgdO
+	 4/sbWB8zBO2I/74FxLRd3BpcwxJ7zoNpF6gnk2AcQaDMPNu59ISLSW2iwCk5eOnpWEA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794274810;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
-	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=AK/SgB0NJhyyMo/+uhJJDQ0snfVmLXzbzA7HTWtNTBs=;
-	b=B0K89GrFWo6kCoraBYMNbUpYNa5HfuQpDJoITZXJtizT+BXdxs9HD7YNmciC1zy9DTg1
-	 X0NqFSDRbm19FXSprbA2Zu+aEeM2nvvcm91xJKoPb7IFA2TfXm7jt0o3PnRfWCbL+CYHY
-	 4yZ2qN4h01sCIPMcEk4HIPZerQYrJX2SUD8FHVFihm+DzcGHbEV6v0GxIpvadprZekSqv
-	 GgCeb4q3muvC136ZJu/+rPhIQGNn4wEQH770NQO87HJtHu6T19kycRHuxb6PXArBzs0m9
-	 MzvehsX7+kBwg+UIZ1/ihshsaqHrQ3OqaNKSP7vz2bVQOqCUyq9vW4RJe2rTaeOmhkQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794276320;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
+	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=PHi2s2f16mLfxcR4BhP+bBJMxU0LcZFpYGFigSfV9Kc=;
+	b=PczFDfLQ9NsViZOdW2Yp33lpoecyQxxpS1u1Z8iW8wYP7s334DLcxv39vV7ZCqCL7paW
+	 6ZmLr+mMFzGOczlwW7q6oocbdFwGegg6nHDvSDkDyVt2a9J837k8hULF+v+sH5rhHYDYi
+	 FSIj5IdMo8TNJppC2/LA5WLgtFyjJDWig9JllNX+9K0kDFKfLycTND/EOufzAlz4b+I5l
+	 7ZJiQiluxXJ/mV3gkp0CwSn5GFUcbBBNCgt1ZN1D1SogTGzn00op9SVo51ePYGTiiZRaD
+	 0tAK2ehBDy41dqC125o4/t8eeUbrzX6aT7JFyhHAN3H3Y4umzPtkcdZv5MXA8NW7GOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b="z/pehWdh";
-	arc=none smtp.remote-ip=113.46.200.222
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=PNExLYqp;
+	arc=none smtp.remote-ip=198.175.65.19
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30718606A325;
-	Tue, 10 Nov 2026 01:40:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30718606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2784606A321;
+	Tue, 10 Nov 2026 02:05:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D2784606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=z/pehWdh
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=AK/SgB0NJhyyMo/+uhJJDQ0snfVmLXzbzA7HTWtNTBs=;
-	b=z/pehWdhVRd/ELfMH/gt5hqXy00rS0mSKpMJfKKpoUb95Kz3+hvKZOcvSGcXpUCFCOFyeTo6I
-	O44kGYOmFW4yb8HA+sfsJmWg8arK1dkAdareBWdQ3WJGeKw2j35GImzfqDptOFrUXROU/JdNmN3
-	XSi3f3715y4lEoE7y1XpwCk=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4jNq8P4HRgzLlvw;
-	Tue, 10 Nov 2026 09:39:49 +0800 (CST)
-Received: from whupemk300004.china.huawei.com (unknown [7.152.185.168])
-	by mail.maildlp.com (Postfix) with ESMTPS id EFD2940586;
-	Tue, 10 Nov 2026 09:40:03 +0800 (CST)
-Received: from huawei.com (10.67.174.33) by whupemk300004.china.huawei.com
- (7.152.185.168) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Tue, 10 Nov
- 2026 09:40:02 +0800
-From: Gu Bowen <gubowen5@huawei.com>
-To: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, Ignat
- Korchagin <ignat@linux.win>, Herbert Xu <herbert@gondor.apana.org.au>
-CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<kexec@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<stable@vger.kernel.org>, <lujialin4@huawei.com>
-Subject: [PATCH] crypto: asymmetric_keys: verify_pefile: fix integer underflow in pefile_strip_sig_wrapper
-Date: Tue, 10 Nov 2026 09:56:57 +0800
-Message-ID: <20261110015657.528337-1-gubowen5@huawei.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=PNExLYqp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1794276319; x=1825812319;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JH5OURTQMWE/CgnqxOwW+e2/FmEhQm7dl5QFh/wnna0=;
+  b=PNExLYqphRkAGY4JS7CQaWowBvdEenHF93a0U941BZlFEs2yaa8nTi/P
+   kRsVCbA5y3qMh030z5hY4clmALEdhVYBfWmLywnQbDg8O3RmqlcFqsA/C
+   r7B4jlWgg/Ro1bovqDCY/yBes9WOvG7cpsHmxdK8YUZDmo7+tBtI5SN8f
+   90dU3z9S8SMf+eZRja3aKWudIzZICjj/NWu8cPiaoADQwaVOtQXZkuYZ7
+   B2yvRAZC5niCpUuMNDVQHbda1gyrNHBpm5FOWIbDDD9zPtlU0RX31u79H
+   tvU3hHbRpNoYocvMmtDsofCneLJOeAxM1RMyhFYEljHOiy+fX6tcnLuTz
+   g==;
+X-CSE-ConnectionGUID: Q35Vtw33StCXQuM6CEfKYg==
+X-CSE-MsgGUID: i8pDznOuSmulP9+tMjBkPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11961"; a="3049264"
+X-IronPort-AV: E=Sophos;i="6.27,204,1787036400"; 
+   d="scan'208";a="3049264"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2026 18:05:18 -0800
+X-CSE-ConnectionGUID: /OxRHji+Q2y9+mcZM02zYQ==
+X-CSE-MsgGUID: oGV6OJz6TbGQxzY2j+rwaw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,204,1787036400"; 
+   d="scan'208";a="8332004"
+Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 09 Nov 2026 18:05:15 -0800
+Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1xQbEW-00000000vkN-2Vje;
+	Tue, 10 Nov 2026 02:05:12 +0000
+Date: Tue, 10 Nov 2026 10:05:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chenghai Huang <huangchenghai2@huawei.com>, herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	liulongfang@huawei.com, qianweili@huawei.com,
+	wangzhou1@hisilicon.com, linwenkai6@hisilicon.com
+Subject: Re: [PATCH 2/4] crypto: engine - add acomp support
+Message-ID: <202611100938.hePDEbMz-lkp@intel.com>
+References: <20261109073556.2517351-3-huangchenghai2@huawei.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -70,83 +85,43 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- whupemk300004.china.huawei.com (7.152.185.168)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261109073556.2517351-3-huangchenghai2@huawei.com>
 
-The pefile_strip_sig_wrapper() function validates the win_certificate
-wrapper that precedes the PKCS#7 signature in a PE binary.  It checks
-that the wrapper length does not exceed the certificate table size
-(``wrapper.length > ctx->sig_len``) but fails to verify that the
-wrapper length is at least ``sizeof(struct win_certificate)`` (8 bytes).
+Hi Chenghai,
 
-When a crafted PE image supplies a wrapper with ``length`` in the range
-[1, 7], the subsequent arithmetic::
+kernel test robot noticed the following build errors:
 
-    ctx->sig_len = wrapper.length;      /* e.g. 1 */
-    ctx->sig_offset += sizeof(wrapper);
-    ctx->sig_len -= sizeof(wrapper);    /* 1 - 8 = 0xFFFFFFF9 (unsigned) */
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v7.4-rc2 next-20261109]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-underflows the unsigned ``ctx->sig_len`` to a value near UINT_MAX.  The
-following ``sig_len < 4`` sanity check is bypassed because 0xFFFFFFF9 is
-greater than 4.
+url:    https://github.com/intel-lab-lkp/linux/commits/Chenghai-Huang/crypto-engine-clear-busy-and-recheck-running-in-the-retry-pump-loop/20261109-153553
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20261109073556.2517351-3-huangchenghai2%40huawei.com
+patch subject: [PATCH 2/4] crypto: engine - add acomp support
+config: arm-gemini_defconfig (https://download.01.org/0day-ci/archive/20261110/202611100938.hePDEbMz-lkp@intel.com/config)
+compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project b3e2466a7ef2bbc97d31230c3bf39a6fa50a608a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261110/202611100938.hePDEbMz-lkp@intel.com/reproduce)
 
-The underflowed ``sig_len`` is then passed to verify_pkcs7_signature()
-and onwards to asn1_ber_decoder().  The ASN.1 decoder's own
-``datalen > 65535`` entry guard can be satisfied by constructing a
-PKCS#7 length field of exactly 65535 (e.g. ``30 82 ff fb``), allowing
-the decoder to proceed and attempt to read OID octets beyond the
-allocated vmalloc buffer, triggering a page fault in look_up_OID()::
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202611100938.hePDEbMz-lkp@intel.com/
 
-  BUG: unable to handle page fault for address: ffffd1e986cb2000
-  #PF: supervisor read access in kernel mode
-  RIP: 0010:look_up_OID+0x14/0x100
-  Call Trace:
-   pkcs7_note_OID+0x33/0xa0
-   asn1_ber_decoder+0x363/0xbd0
-   pkcs7_parse_message+0xd9/0x1b0
-   verify_pkcs7_signature+0x24/0x80
-   verify_pefile_signature+0x7b/0xf0
-   kexec_kernel_verify_pe_sig+0x1b/0x40
-   kimage_file_alloc_init+0x1d8/0x3f0
-   __se_sys_kexec_file_load+0xc6/0x270
+All errors (new ones prefixed by >>):
 
-This is reachable through the kexec_file_load syscall on architectures
-that verify PE signatures (x86 bzImage with
-CONFIG_KEXEC_BZIMAGE_VERIFY_SIG, arm64 Image with
-CONFIG_KEXEC_IMAGE_VERIFY_SIG), requiring CAP_SYS_BOOT.
+>> ld.lld: error: undefined symbol: crypto_register_acomp
+   >>> referenced by crypto_engine.c
+   >>>               crypto/crypto_engine.o:(crypto_engine_register_acomp) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: crypto_unregister_acomp
+   >>> referenced by crypto_engine.c
+   >>>               crypto/crypto_engine.o:(crypto_engine_unregister_acomp) in archive vmlinux.a
 
-The oops occurs while the caller holds kexec_lock; if the faulting task
-is killed, the lock is never released, leaving all subsequent kexec and
-kdump operations permanently returning -EBUSY until reboot.
-
-Add a lower-bound check on wrapper.length before the subtraction to
-prevent the underflow.
-
-Fixes: 09dacbbda935 ("pefile: Strip the wrapper off of the cert data block")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gu Bowen <gubowen5@huawei.com>
----
- crypto/asymmetric_keys/verify_pefile.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
-index cec99db14129..cfa85ccb1cf7 100644
---- a/crypto/asymmetric_keys/verify_pefile.c
-+++ b/crypto/asymmetric_keys/verify_pefile.c
-@@ -146,6 +146,11 @@ static int pefile_strip_sig_wrapper(const void *pebuf,
- 			ctx->sig_len, wrapper.length);
- 		return -ELIBBAD;
- 	}
-+	if (wrapper.length < sizeof(wrapper)) {
-+		pr_warn("Signature wrapper too small (%x < %zx)\n",
-+			wrapper.length, sizeof(wrapper));
-+		return -ELIBBAD;
-+	}
- 	if (wrapper.revision != WIN_CERT_REVISION_2_0) {
- 		pr_warn("Signature is not revision 2.0\n");
- 		return -ENOTSUPP;
--- 
-2.43.0
-
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
