@@ -1,57 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794344923;
-	b=XDbICQdqo6bDycE2sxAo/J4bFFwPMwxVot/7wMxupTTcZ+SAPbqP2uETZnoEw7l7wUPv
-	 WkDq6gzC6eqnkFoZWCxt+HnvHMdbLn1NExSCVqulSAsGcnXiVj37TXMhtyhGsGzZJEt33
-	 UScFlucaFBblT0MjGrbyUYaNYrJRmZFbS4vWxITwmTYFTSzF1NX0/mlzeBCGmxH71Mgjz
-	 anbOM4gUaJmZi4j+cFV0DqRTXt6grGFZvSlDwzNggrTnX3bHj6ahVFkDhdo8UhSCxIfcW
-	 rmRrPM/+iETERBZcpnmq5Bmz36en4SDq2GLPO17786UskMCvFQimyLohWNwIy7LcYUQ==
+	t=1794346002;
+	b=wqonFvqXZZ7QcmMi5bRU/Sv3grTWF8+ksNBnlHkrCQV4TAJNrLkj/ZwX7ETEX1eJUvHn
+	 dW1MQ4YO1Ew+9UbS90FupWmySHOgWhwoiEp2RGV3heQWsftnACLm01yz9d4WAVN5800aI
+	 D/X3RKjYZhuaAsNDRtvL1qm0DY5JrZLJbrpwvkxwdib4ztC3ME89smw2SRFgqMx1De5wz
+	 iBzt7KzGiNIoiWVOh+B/Nsba67kxyTZWllb0a7tZSyTywAbPCd8jUZ4xgYminkknTIMji
+	 v69pGPGhoEV64bl7E/D5dtDfmDMPMJzm2HhL+IEnUTnwRXbppSjQVVHcVPwo17J0YhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794344923;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To;
-	bh=Wihr2MrF2FO793dTKH7ddHpRfNQ9adLzPWYI0Gv/j84=;
-	b=V5oUhhcV43KuLX3R/Ia2/Ktq3k5C6UXQYyi8nAvIwNHh3KGfKtMsP+hO6Ov143AUAjWQ
-	 1ZdzHLzP4HajSPaSDA3tRturzm96j31BO80/GMEv8gjk4axjgjC3vMT95eDRxf95oIE+H
-	 3zEvRpMTcItRKUrsC1bpzrzrYYWbAiSeR8G6qMxIZFKrYLJL/gNjeu7toUECAx8YVaiy2
-	 wpImnjza3xSVlyo6kCcwjgSMIjVdCiwC5MpCdLYTvFd9jEEzbxg/TTEFlin3hS4D+GhWF
-	 gK8YqeW1LtK+O+oT08/fkMNYOLUQMnyIz0Ojl7lPjR0+a8rLMJ5PmCyTuoaBl+bH50A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794346002;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=Q9ZzFflVO7mgT/5vT9SxQ6PvIks03h4y+p5OjTXEzxM=;
+	b=rhl8QEYeTxnbHPA3HQfe86uXJB0gudd4jKUf7U9NnpAs4RjfkH00a0HbFmXot6UtNoND
+	 Twq2APAbcoKN9H1BHFuMOWw3gVlX38ThJqO0jIJQRpWvQ+qd+RIPpHHllW0loeBurY/+F
+	 CBYO/T8+KyDd6K3lsMrZB4+unQfEYs4POw4+BElMFkGdk2r5ye7/YyoQXq2SYUWZydNdB
+	 5DVvC4WriZ3QptuGfNyCab/Q1P/tDtdgzSI0Na6hVaort8PgJ9doccAKcZWaegIuTTJo8
+	 L9+O5mT3dScZOW6vIt6wfMPwafWupcn56hFbznlQ+awKyi4hYgxc573k1lV8Y/g2Fyg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YMVAf3zz;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X0JSVBew;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D46606A321;
-	Tue, 10 Nov 2026 21:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D347A606A325;
+	Tue, 10 Nov 2026 21:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YMVAf3zz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE4EB1F0089F;
-	Tue, 10 Nov 2026 21:08:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X0JSVBew
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 490371F0089F;
+	Tue, 10 Nov 2026 21:26:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794344922;
-	bh=Wihr2MrF2FO793dTKH7ddHpRfNQ9adLzPWYI0Gv/j84=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YMVAf3zzQ0uqmVL+VbTBt+1JwkrNK+Qw1g08kq63UdwgwteUdVwp20F+rr1emd7Vt
-	 IvMeVGLIbRV9oE6BEbzcDenCSC3DirWr9GhZJLjENk4g51cUp/DpJzRwygXyzFX6VW
-	 1HNSZQaAbAU7dSw9W5Di8cYnz712D2Ae5jk0XTeOguq4TUxW6KnWHGSALSsypJEICZ
-	 wtBaRKiKo1RI3Hmk4D8OXQDpRgdrOc9HJwOr+czsitqPSshhWE8TX0MWO5nVrl4RP1
-	 SRy2vqLTkcGVCqwTjXDhahGcBbe9vg2BW03u2PtMbhRdo5N50kZW1Spftp6CcNWQbM
-	 2gg5qJFmHgYqQ==
-Date: Tue, 10 Nov 2026 13:08:40 -0800
+	s=k20260515; t=1794346001;
+	bh=Q9ZzFflVO7mgT/5vT9SxQ6PvIks03h4y+p5OjTXEzxM=;
+	h=From:To:Cc:Subject:Date;
+	b=X0JSVBewuufDvujfur89ffpeQiEPqUJfkO4ZJBR4LVARjd1Py/yrUp9xLfryC3yGT
+	 2gnytcemgFmiJ8vGKYulzXL3x/Ndv3NSuyhOtFSjuCvgKje60aEYyuTLkCt78v6rPN
+	 nW9iy1Pt5GZp3n4FOd5RGRlUlwShoRTzlalBmB4IroBvGM1+MYiChM4jhRYz4+wAYP
+	 eUPh1JpB4LqhQWb+JlTrbxaRDLU/IgctVFZ9siV3upABhLRf38e9JlfVWZjUdmQbky
+	 qC5vy/DnOjMCzGrtnAvYSWxoOJrQXyIRoRFqyIC43Q4EzJ0gqIx7YFBwXSdGwDWkIY
+	 LPSdjqkUPkUTA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto/arm64: sm4 - Drop cpu feature table for PMULL
-Message-ID: <20261110210840.GB1907@quark>
-References: <20261109161052.890682-2-u.kleine-koenig@baylibre.com>
+To: stable@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 6.18] lib/crypto: mips: Disable Octeon SHA code on little-endian kernels
+Date: Tue, 10 Nov 2026 13:26:31 -0800
+Message-ID: <20261110212631.36307-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,35 +58,96 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261109161052.890682-2-u.kleine-koenig@baylibre.com>
 
-On Mon, Nov 09, 2026 at 05:10:52PM +0100, Uwe Kleine-König wrote:
-> The result of having that table is that the sm4-ce-gcm module is
-> autoloaded if the CPU supports the PMULL cpu feature. However that
-> module is only usefull if there are both SM4 and PMULL. The module is
-> already auto-loaded if the CPU has SM4 and calls sm4_ce_gcm_init() then
-> which fails without PMULL.
-> 
-> So dropping the PMULL cpu feature table has the only affect that on
-> machines with PMULL but without SM4 the useless module isn't loaded any
-> more.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
-> ---
-> Hello,
-> 
-> PSA: I don't know what these cpu features are and what the sm4-ce-gcm
-> module does. I just stumbled over that MODULE_DEVICE_TABLE(cpu, ...) and
-> convinced myself by looking at the code about the above analysis. It
-> wouldn't be a big surprise to me if I missed something relevant. So
-> please apply some distrust before the patch.
+commit dd2a4edb26e1c78823c50ba10c42f2d3de2e5ec4 upstream.
 
-I guess this and your other patch look fine, if Herbert wants to apply
-them.  Note that we've actually been moving away from having separate
-modules for the architecture-optimized crypto code, and when that
-happens to this code the MODULE_DEVICE_TABLE will go away anyway.
+Kernels built for the MIPS64-based Cavium Octeon SoCs are normally
+big-endian, but little-endian builds are also supported.  Currently, the
+SHA-1, SHA-256, and SHA-512 code using the Octeon crypto co-processor is
+enabled in both builds.
 
-- Eric
+This code is untestable without the hardware.  However, based on the
+code itself, it is implausible that it computes hash values correctly in
+little-endian builds.  Such builds write many incorrect values to COP2:
+
+  - SHA-1 and SHA-256: The 64-bit integer that contains the last two
+    32-bit message words of each block is written to COP2 entirely
+    byte-reflected, due to missing endianness conversion in
+    octeon_sha1_start() and octeon_sha256_start() to compensate for
+    using native 64-bit loads from the message bytes.  This differs from
+    all the earlier message words which are written correctly.
+
+    Furthermore, the state is written to COP2 with each 32-bit word
+    byte-reflected within each 64-bit integer, due to incorrect use of
+    64-bit endianness conversion in write_octeon_64bit_hash_dword() when
+    the state is kept in memory in native-endian 32-bit words.
+
+  - SHA-512: All the 64-bit message words are written to COP2
+    byte-reflected, due to missing endianness conversion in
+    write_octeon_64bit_block_sha512() and octeon_sha512_start().  The
+    SHA-512 state words seem to be written correctly.
+
+Big-endian kernels aren't affected by these bugs.  These bugs also
+aren't new; this code has been broken on little-endian ever since it and
+Octeon little-endian support were first added in v4.1.
+
+Commit d2a948d2db68 ("MIPS: Octeon: Make octeon-md5 driver
+endian-agnostic") made the MD5 code work on little-endian kernels by
+adding 64-bit endianness conversions to the COP2 macros used by MD5
+(some of which are shared by SHA-1 and SHA-256, despite those algorithms
+keeping the state words in native-endian instead of MD5's little-endian,
+causing some of the strange behavior described above).  However, SHA-1,
+SHA-256, and SHA-512 were never fixed to work on little-endian kernels.
+
+Therefore, disable the Octeon SHA-1, SHA-256, and SHA-512 code in
+little-endian kernels.  This causes the generic code that actually
+computes hash values correctly to be used instead.
+
+Fixes: 82be2dcfa6a1 ("crypto: octeon - add SHA1 module")
+Fixes: c3d0def62001 ("crypto: octeon - add SHA256 module")
+Fixes: fbaa4dfd51a0 ("crypto: octeon - add SHA512 module")
+Cc: stable@vger.kernel.org
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Link: https://patch.msgid.link/20261022054450.20746-1-ebiggers@kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/Kconfig | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index fa882108ba62c..2f2edeaf9de3e 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -142,7 +142,7 @@ config CRYPTO_LIB_SHA1_ARCH
+ 	depends on CRYPTO_LIB_SHA1 && !UML
+ 	default y if ARM
+ 	default y if ARM64 && KERNEL_MODE_NEON
+-	default y if MIPS && CPU_CAVIUM_OCTEON
++	default y if MIPS && CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
+ 	default y if PPC
+ 	default y if S390
+ 	default y if SPARC64
+@@ -160,7 +160,7 @@ config CRYPTO_LIB_SHA256_ARCH
+ 	depends on CRYPTO_LIB_SHA256 && !UML
+ 	default y if ARM && !CPU_V7M
+ 	default y if ARM64
+-	default y if MIPS && CPU_CAVIUM_OCTEON
++	default y if MIPS && CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
+ 	default y if PPC && SPE
+ 	default y if RISCV && 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
+ 		     RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
+@@ -180,7 +180,7 @@ config CRYPTO_LIB_SHA512_ARCH
+ 	depends on CRYPTO_LIB_SHA512 && !UML
+ 	default y if ARM && !CPU_V7M
+ 	default y if ARM64
+-	default y if MIPS && CPU_CAVIUM_OCTEON
++	default y if MIPS && CPU_CAVIUM_OCTEON && CPU_BIG_ENDIAN
+ 	default y if RISCV && 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
+ 		     RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
+ 	default y if S390
+
+base-commit: 1cdda838e8475edf89b73ff0cc952005dd0b1fa7
+-- 
+2.56.0
+
