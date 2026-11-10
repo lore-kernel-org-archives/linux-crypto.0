@@ -1,62 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794334735;
-	b=zDqvsP2DzLYwsNqrUeet8b6Sr8AhconUl1TiN1EGeD1Qti7hJmbfPumCASuWbIijtFGV
-	 Brviia1/cdOeXsWfIVFiEAv1KWhKYRnsbGaxMJNDEXWMheZOZ0GMsB2/nXzRFajTMTq0I
-	 Bin1XsKA70r3afvl/tJCeppsNuyhZem6kaHKjhVJ65ExcQW7nVC1sVFF2YcZqabNC3COU
-	 YSXwEXGDUbdD0mhbYJC3AtvkcU0VH9cXiDApvDIHQRqH6u4OBCpxLclG2RZzh/pGq5jxO
-	 I4ZCJXZlWyt0q5fzcHpgKr7Ux05Qyvx4b/MxWeVCQrMvXp+TlqiZjm3LCeU7QHqZAQg==
+	t=1794344528;
+	b=Y0KH3MtN7EKN7G7Nhw4NyWKHJ71le6gReIjNPrJ2/9gTNbYd6FUC6gbRSXeGjOj3D6Bx
+	 ZfjMvFUGaO39yU+5WoXtxkk0ZJbEzizpoWZJRE0jR7Dgc0IUA0VZSc7Ist5IVA/U3FiXg
+	 qJtKRECB4xqhW8VjOvJ9rCnfhm5qw+SdSgi0057XYeLzvqY7PEcUUUd/cbl0Oj3/qNqXY
+	 2FzzNUbT4YqisDwaPgj6656lIGeUGV6kJxf9dNLmSsPw7szcOLQfdo7qs6V2EdZI47Bkp
+	 64QAnDvhcnmbJAjTEpQEJJoPl3jhI/H6QcLadkxiDNJ7BbDGJfVlDfwYYwodGo6bUfA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794334735;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=ti0FFiAc19qMbwUdWnG2Fegu5iHFKeoAF69fwct6oz4=;
-	b=ztKS6dQvoyB/jeRiQkOteJCwebjTAW4QN1ExoJe7Cec7ekAz2eZC0GmGVikWCO7Tl2Pl
-	 cP3k51oqHqrCL3RzLjiWBwYGNrWW9MLe/hxiRbXnxooAa4UCqg7PE3eSPV8DSyXzdW5Fl
-	 cOkFNTcT/IR+RxNeCFu6P4dXbbPuYhvkNnbmr26WiQZm4UX56tpr4QEyv2N9gGD/ITh0k
-	 5dU/g+YnzEOQpGFERwpY+zCYF0l9JV44uFvfWfSnhj1AMKtHrWHuZHCY6wokiKB3VRsVb
-	 O6QZSQicrzB8zy6cmbTVRR8+ieXzOPDCcLl/PvLVoytAoVPrsgeKpNb01UeZDAbKwCQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794344528;
+	h=Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=TYw+lTDw9uZUPVqkSCGZ4s7jhz0x5pD5eMZjD1rHixE=;
+	b=ryviXmyibKtB3Hh4TfypNislBJgzglgt+0VJmUdfggqyyl4oB0JLABOtEDPdvSJFdH37
+	 kUGIe/TdyQHw4Urj/FGcsGodc4TDIn8G0T0czWwuPfJRvAw2yh3pDepIanCFACNuT0la6
+	 W5bORA8nSr3w7ctQhFH4cMWj83hl0IAOWU8u0R6zmlgfvM7rTOxiMxTH+M5umeJXRGRJh
+	 mu8mvddcjVg6AoNOURbSzxReIT13aRox8WPCOatVGrBxX5Qmk8CsTQbMucqNHmtvr+5Is
+	 kdhviFKb45gdIQ8OPEMTD36ghHO1nopq3uKP8geO/1ZlWtZulCwgH4eu5N+QOXxFqmA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JeruiO8w;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEBF606A320;
-	Tue, 10 Nov 2026 18:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JeruiO8w
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 565FC1F0089F;
-	Tue, 10 Nov 2026 18:18:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794334735;
-	bh=ti0FFiAc19qMbwUdWnG2Fegu5iHFKeoAF69fwct6oz4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=JeruiO8wDEvUtzVDB/HytMdFLSTbVBjy7bsq/3OG7qCNYx+byR+PCDntTHGMzTaY5
-	 Y3281yxPfX5y7wm0SNdnYs1QN+syDXWaurpxXcHWYXKgsoifNq2AObISC+moEYRoH2
-	 scuzGwHyaeudfKcp8oX8ZXf6KqxJcitl2EmKwc/1yFIuBoXAoNY3rsIEBC9qjxfgEH
-	 vtx8xfV0fmquxBXqSq4hrIqk01hHqxtJ1BZxoLKHRLTUi52Nqla6iOcEBY0613BkmM
-	 HPajy513ZLd71RiT5fm0DbSJBYwW7C6m/2kagSqkE9Kmndj6BmH8ihs0ZgBX+wPxWY
-	 bPqoX78/RpE/w==
-Message-ID: <sashiko-outbox-207570@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v8 4/5] crypto: cmh - add AES skcipher/aead/cmac
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Alex Ousherovitch" <aousherovitch@rambus.com>, "Saravanakrishnan
- Krishnamoorthy" <skrishnamoorthy@rambus.com>, "Joel Wittenauer" <Joel.Wittenauer@cryptography.com>, "Thi
- Nguyen" <thin@rambus.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
- S. Miller" <davem@davemloft.net>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Jonathan
- Corbet" <corbet@lwn.net>, "Shuah Khan" <skhan@linuxfoundation.org>, "Randy
- Dunlap" <rdunlap@infradead.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-In-Reply-To: <20261110-cmh-b4-a-v8-v8-4-4cea8ebc1d40@rambus.com>
-References: <20261110-cmh-b4-a-v8-v8-0-4cea8ebc1d40@rambus.com>
- <20261110-cmh-b4-a-v8-v8-4-4cea8ebc1d40@rambus.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Nov 2026 18:18:53 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9E7606A320;
+	Tue, 10 Nov 2026 21:02:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38C901F008A4;
+	Tue, 10 Nov 2026 21:02:08 +0000 (UTC)
+From: Dave Jiang <dave.jiang@intel.com>
+To: linux-cxl@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Alison Schofield <alison.schofield@intel.com>,
+	Vishal Verma <vishal.l.verma@intel.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jan Kara <jack@suse.cz>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Frank Li <Frank.Li@kernel.org>,
+	Alistair Popple <apopple@nvidia.com>,
+	Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Subject: [PATCH v2] MAINTAINERS: Update CXL, NVDIMM, DAX, and others for djbw
+Date: Tue, 10 Nov 2026 14:01:52 -0700
+Message-ID: <20261110210152.3494345-1-dave.jiang@intel.com>
+X-Mailer: git-send-email 2.54.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,133 +54,119 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential
-issues to consider:
-- [Critical] crypto: cmh: stack overflow in ahash_request_zero() via
-  missing tfm->fb
-- [Medium] crypto: cmh: missing CRYPTO_ALG_ASYNC mask in
-  cmh_aes_aead_init_tfm()
---
+Dan is no longer with us. Removing entries in MAINTAINERS to prevent
+people from keep emailing his address.
 
-commit 89559a30a0ea6b4fc4382fe41b13de31385e0958
-Author: Alex Ousherovitch <aousherovitch@rambus.com>
+Frank will take over for async_tx until the feature is removed.
 
-crypto: cmh - add AES skcipher/aead/cmac
+Alistair will take over on fsdax with Alison continue to wrangle patches
+for DAX overall patches.
 
-This commit registers AES skcipher (ECB, CBC, CTR, XTS), AEAD (GCM, CCM),
-and ahash (CMAC) algorithms on the CMH AES core, along with the AES core
-ABI definitions.
+Cc: Alison Schofield <alison.schofield@intel.com>
+Cc: Vishal Verma <vishal.l.verma@intel.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Davidlohr Bueso <dave@stgolabs.net>
+Cc: Jonathan Cameron <jic23@kernel.org>
+Cc: Vinod Koul <vkoul@kernel.org>
+Cc: Frank Li <Frank.Li@kernel.org>
+Cc: Alistair Popple <apopple@nvidia.com>
+Acked-by: Davidlohr Bueso <dave@stgolabs.net>
+Acked-by: Vishal Verma <vishal.l.verma@intel.com>
+Acked-by: Alison Schofield <alison.schofield@intel.com>
+Acked-by: Jonathan Cameron <jonathan.cameron@oss.qualcomm.com>
+Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 
-> diff --git a/drivers/crypto/cmh/cmh_aes_aead.c b/drivers/crypto/cmh/cmh_a=
-es_aead.c
-> new file mode 100644
-> index 0000000000000..7edacf38198bf
-> --- /dev/null
-> +++ b/drivers/crypto/cmh/cmh_aes_aead.c
+---
 
-[ ... ]
+v2:
+- Add Frank as reviewer for async_tx.
+- Alistair has been working on fsdax and agreed to be maintainer.
+---
+ MAINTAINERS | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-> +static int cmh_aes_aead_init_tfm(struct crypto_aead *tfm)
-> +{
-> +	struct cmh_aes_aead_tfm_ctx *tctx =3D crypto_aead_ctx(tfm);
-> +	const struct cmh_aes_aead_info *info =3D cmh_aes_aead_get_info(tfm);
-> +
-> +	memset(tctx, 0, sizeof(*tctx));
-> +	tctx->authsize =3D info->maxauthsize;
-> +
-> +	if (info->type =3D=3D CMH_AES_AEAD_CCM) {
-> +		struct crypto_aead *fb;
-> +
-> +		tctx->ccm =3D true;
-> +		fb =3D crypto_alloc_aead("ccm(aes)", 0,
-> +				       CRYPTO_ALG_NEED_FALLBACK);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 93abbb315065..58bdd5eff5c2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4294,7 +4294,7 @@ S:	Maintained
+ F:	crypto/rsa*
+ 
+ ASYNCHRONOUS TRANSFERS/TRANSFORMS (IOAT) API
+-R:	Dan Williams <djbw@kernel.org>
++R:	Frank Li <Frank.li@oss.nxp.com>
+ S:	Odd fixes
+ W:	http://sourceforge.net/projects/xscaleiop
+ F:	Documentation/crypto/async-tx-api.rst
+@@ -6726,7 +6726,6 @@ M:	Jonathan Cameron <jic23@kernel.org>
+ M:	Dave Jiang <dave.jiang@intel.com>
+ M:	Alison Schofield <alison.schofield@intel.com>
+ M:	Vishal Verma <vishal.l.verma@intel.com>
+-M:	Dan Williams <djbw@kernel.org>
+ R:	Ira Weiny <iweiny@kernel.org>
+ R:	Li Ming <ming.li@zohomail.com>
+ R:	Richard Cheng <icheng@nvidia.com>
+@@ -7621,7 +7620,6 @@ S:	Maintained
+ F:	scripts/dev-needs.sh
+ 
+ DEVICE DIRECT ACCESS (DAX)
+-M:	Dan Williams <djbw@kernel.org>
+ M:	Vishal Verma <vishal.l.verma@intel.com>
+ M:	Dave Jiang <dave.jiang@intel.com>
+ M:	Alison Schofield <alison.schofield@intel.com>
+@@ -10315,12 +10313,12 @@ F:	include/linux/fcntl.h
+ F:	include/uapi/linux/fcntl.h
+ 
+ FILESYSTEM DIRECT ACCESS (DAX)
+-M:	Dan Williams <djbw@kernel.org>
++M:	Alistair Popple <apopple@nvidia.com>
+ R:	Matthew Wilcox <willy@infradead.org>
+ R:	Jan Kara <jack@suse.cz>
+ L:	linux-fsdevel@vger.kernel.org
+ L:	nvdimm@lists.linux.dev
+-S:	Supported
++S:	Maintained
+ F:	fs/dax.c
+ F:	include/linux/dax.h
+ F:	include/trace/events/fs_dax.h
+@@ -13455,7 +13453,6 @@ F:	drivers/platform/x86/intel/hid.c
+ 
+ INTEL I/OAT DMA DRIVER
+ M:	Dave Jiang <dave.jiang@intel.com>
+-R:	Dan Williams <djbw@kernel.org>
+ L:	dmaengine@vger.kernel.org
+ S:	Supported
+ Q:	https://patchwork.kernel.org/project/linux-dmaengine/list/
+@@ -15278,7 +15275,6 @@ K:	libie
+ 
+ LIBNVDIMM BTT: BLOCK TRANSLATION TABLE
+ M:	Vishal Verma <vishal.l.verma@intel.com>
+-M:	Dan Williams <djbw@kernel.org>
+ M:	Dave Jiang <dave.jiang@intel.com>
+ M:	Alison Schofield <alison.schofield@intel.com>
+ L:	nvdimm@lists.linux.dev
+@@ -15288,7 +15284,6 @@ P:	Documentation/nvdimm/maintainer-entry-profile.rst
+ F:	drivers/nvdimm/btt*
+ 
+ LIBNVDIMM PMEM: PERSISTENT MEMORY DRIVER
+-M:	Dan Williams <djbw@kernel.org>
+ M:	Vishal Verma <vishal.l.verma@intel.com>
+ M:	Dave Jiang <dave.jiang@intel.com>
+ M:	Alison Schofield <alison.schofield@intel.com>
+@@ -15307,7 +15302,6 @@ F:	Documentation/devicetree/bindings/pmem/pmem-region.yaml
+ F:	drivers/nvdimm/of_pmem.c
+ 
+ LIBNVDIMM: NON-VOLATILE MEMORY DEVICE SUBSYSTEM
+-M:	Dan Williams <djbw@kernel.org>
+ M:	Vishal Verma <vishal.l.verma@intel.com>
+ M:	Dave Jiang <dave.jiang@intel.com>
+ M:	Alison Schofield <alison.schofield@intel.com>
 
-[Severity: Medium]
-Does this fallback allocation need CRYPTO_ALG_ASYNC in the mask so that
-ccm(aes) does not wrap rambus-cmh-ctr-aes?
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.54.0
 
-On architectures where ccm-aes-lib is not registered (such as arm64 and
-arm), allocating ccm(aes) instantiates the ccm template via
-crypto_ccm_create_common(), which grabs ctr(aes) using the passed mask.
-Because cmh_aes_register() has already registered rambus-cmh-ctr-aes at
-priority 300, the fallback ends up running CTR on the CMH hardware via
-bounce buffers and rejecting requests over 32 MiB with -EINVAL, rather
-than using a software implementation with no size limit as documented.
-
-> diff --git a/drivers/crypto/cmh/cmh_aes_cmac.c b/drivers/crypto/cmh/cmh_a=
-es_cmac.c
-> new file mode 100644
-> index 0000000000000..34a7a5ba07baf
-> --- /dev/null
-> +++ b/drivers/crypto/cmh/cmh_aes_cmac.c
-
-[ ... ]
-
-> +static int cmh_aes_cmac_init_tfm(struct crypto_ahash *tfm)
-> +{
-> +	struct cmh_aes_cmac_tfm_ctx *tctx =3D crypto_ahash_ctx(tfm);
-> +	struct crypto_ahash *fb;
-> +
-> +	tctx->key.mode =3D CMH_KEY_NONE;
-> +
-> +	/*
-> +	 * The generic cmac(aes) shash has no export_core, so the crypto
-> +	 * core cannot wrap it as crypto_ahash_fb().  Allocate it here
-> +	 * instead; masking out CRYPTO_ALG_ASYNC excludes this (async)
-> +	 * driver so the allocator picks the generic, synchronous transform,
-> +	 * and its request is embedded after the reqctx.
-> +	 */
-> +	fb =3D crypto_alloc_ahash(crypto_ahash_alg_name(tfm), 0,
-> +				CRYPTO_ALG_ASYNC);
-> +	if (IS_ERR(fb))
-> +		return PTR_ERR(fb);
-> +	tctx->fb =3D fb;
-> +
-> +	crypto_ahash_set_reqsize(tfm,
-> +				 sizeof(struct cmh_aes_cmac_reqctx) +
-> +				 crypto_tfm_ctx_alignment() +
-> +				 sizeof(struct ahash_request) +
-> +				 crypto_ahash_reqsize(fb));
-> +	crypto_ahash_set_statesize(tfm, crypto_ahash_statesize(fb));
-> +	return 0;
-> +}
-
-[Severity: Critical]
-Can leaving crypto_ahash_tfm(tfm)->fb pointing to the async CMH transform
-overflow the kernel stack when a caller uses crypto_hash_digest() or
-HASH_FBREQ_ON_STACK()?
-
-Because cmh_aes_cmac_alg sets CRYPTO_ALG_NO_FALLBACK,
-crypto_create_tfm_node() leaves tfm->fb pointing to tfm itself, while
-cmh_aes_cmac_init_tfm() sets tfm's reqsize to over 800 bytes above
-MAX_SYNC_HASH_REQSIZE:
-
-crypto/ahash.c:crypto_hash_digest() {
-	HASH_REQUEST_ON_STACK(req, crypto_ahash_fb(tfm));
-	int err;
-
-	ahash_request_set_callback(req, 0, NULL, NULL);
-	ahash_request_set_virt(req, data, out, len);
-	err =3D crypto_ahash_digest(req);
-
-	ahash_request_zero(req);
-
-	return err;
-}
-
-HASH_REQUEST_ON_STACK() reserves only sizeof(struct ahash_request) +
-MAX_SYNC_HASH_REQSIZE bytes on the stack and binds req to
-crypto_ahash_fb(tfm) (still the CMH tfm).  crypto_ahash_digest() then
-returns -EAGAIN because an on-stack request is used with an async
-transform, and ahash_request_zero() zeroes sizeof(*req) +
-crypto_ahash_reqsize(tfm) bytes, writing over 800 bytes past the stack
-buffer.
-
-Pointing crypto_ahash_tfm(tfm)->fb at crypto_ahash_tfm(fb) (and restoring
-it before freeing fb in cmh_aes_cmac_exit_tfm()) would direct stack
-requests to the synchronous fallback transform.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261110-cmh-b4-a-v=
-8-v8-0-4cea8ebc1d40@rambus.com?part=3D4
