@@ -1,47 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794409681;
-	b=iYDGa5DmQYSS5HGmei3tb13h/fhPoqXHiEcq/AmynK4D7sVJSFEuHE1ML1n4tQJrVFZA
-	 4WO6QEw90FUjgmBiZuLeOZ6RisyF+eQsHvZWRWn4UmYRkYhKaS4g632tFETZ7ssC1zQxk
-	 yiSccE9Bajcm9OBadgNxLOCp0Q++KQrpMCbA7+oTZC7/ExlnF9XgXe/I2X5hWl+2jwyGx
-	 Zc0H7RSM7K3z2RMdVE67+1P+k4SZELPHBeML1rZnv1p7XXZzDS1OlXQiOYxVphNOL5oBq
-	 05GnVV6KKEqLgoeWJBTP7Szoqlorhi1Ruk5lQEy2AUZAJDEZc4MJcDoaT4n5E6lyVeg==
+	t=1794411019;
+	b=WdqoVBLkPc0R+r8tB4Lua/MIPDZ5U8TnZE9iTk6m6f60OX31bDR/voVnKsyd+ttHq9Qz
+	 0pxmOlb8qFK2ok12wh7dBexLe/SOMoh+0kkqy2UCYPwAd1hALUDbAcu1TSw1/xAI+XX+5
+	 vbLFqFG6CDKbZx5YtnGbpIAzXbTT36geCHIl+80I/T1wl5B4UeUeBIOIuS+HNGIHwMWFY
+	 xf116sh652VvMrwtshjFqmcFophJhjnTxJ1ZbI0wmZlcShpy/+bPhhdxTD6gSTEv/rSDZ
+	 li6f8cKrNeJnKQ1wINMFJvhgo8urzGZHlDENo3q+WjS4cfSnl0Vt4XQDML8HdYJ1F4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794409681;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794411019;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=ih2B8blwTc3USqx6VcHYBPSXPYFyGlrDkk2IWGJJ8RY=;
-	b=kLPGXxdeeXTAaYn+sNyC5xtIIOVxETGBElwpGE0Ya96zYzMW/wMPnGkoUL66Ae37GIrh
-	 +SlPi32vyfvbY6WFhyytBhNHb4cE48fDxBtTNuSulq6VFUZj/F4Ey+Grx40hEiB8jNB5F
-	 ssd4/F7wz6kk6M0ec3ISe98HAfwsOiJc4rDJLXn/BznMGyVlUAj7NOYdciZOcFj0UMko3
-	 jJBK9pJuw18DnS4+vWoMmQ9U2jpINr33Y80ZvIVtOAI0d3Kf+qbIU0YJWJdAPC+KFAumt
-	 KPKVTFOSVqvB5lD+J9S19QQ/x92+Q5oA47fFPdg+W7cRN2rCyDJWEk+YHNSKZVLTM8A==
+	bh=VPS+rF73zyfS5/2LmPCI0S8FRw/sGRxV3qcg3vrPAH8=;
+	b=yPSL8vTuhtljJfA6Y8Fzq++zEEVZotqmzZ/suIeAqN9TGukNMJEjtchiS0fYsQFk5hIa
+	 2jhPicxqcmUQY7nJhvxBCoQ9mfZAo1BVszpsSCq6i6bvKttvmLT/gS+TRmoYMbJ4Z1qDr
+	 ZZBo5nK6AediHkF5WXFWD86Gxouw+7HwepdgQSwwopLu/QvVeFPgSWoqNv4g5xD7VMMvn
+	 2fGSvgIsKbmwSLZMEYPrmKyTFw7FWrkphWaTCI+Q79j6fB12Wcc9cnQknKaSSd/LyKC1b
+	 LDZW1HcmR5eM3aWTkYQ0eubxwJcM6+OWcs9FrWx/dD+/GyqKoRhtxEL042QS2hQMi7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oiW8jtYi;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=U9jkSN4G;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36625606A33A
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 15:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C64D606A32A
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 15:30:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oiW8jtYi
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB62C1F00A05;
-	Wed, 11 Nov 2026 15:07:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=U9jkSN4G
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C8AE1F00A05;
+	Wed, 11 Nov 2026 15:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794409680;
-	bh=ih2B8blwTc3USqx6VcHYBPSXPYFyGlrDkk2IWGJJ8RY=;
+	s=k20260515; t=1794411019;
+	bh=VPS+rF73zyfS5/2LmPCI0S8FRw/sGRxV3qcg3vrPAH8=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=oiW8jtYibBCfW8SldCv6W6KmObhplE+P0sQneiQ9e7RAgGX28wz0bZ7ANq0U969IU
-	 77VnXsdHJqWbl7dbU7YP6Z5he54LKEorjEytS9a6eZ3xhx7JfeqilESIAr7zaO5ggO
-	 eaHlX5Wq5bsRxhstXPZDpvWqZaOOWtSBG5hy/p2uny4/VGRXUh24LmEgAZQvJkt4TK
-	 GGH6o08mohq8/7mEu9SqDv92h53odJaI44YEPjUcVtL9X9eBTy0Dk51NZ6o7PklT75
-	 9P94b3cyEhnz1ici2XRbJuUqb0Xqar4aL98mm8zs1VzWaxHVbSh+bVtweYwJtPpwr8
-	 qyQcVqXz6XIow==
-Message-ID: <sashiko-outbox-209215@kernel.org>
+	b=U9jkSN4GD8V0oF9v+gGD5aLQf+N4wzQGg7UJKE7yil+YoySJ3ZOvEoFfsYPkSJ2gB
+	 7GZy3siyu0JqkBk1CtOrIi+kP8IcA6JHOlx2t5ILwiTbRltTH8wJk4SvyNldzbdGI3
+	 B76DrDHVQWEOn+bG6+ZqeK3AOzyG79FsUaObsqwQO12UvaksTNBWcD83p2x1zlXvn7
+	 lSazSWa4RTN+2EgzdfTExy6UWi7q8QSHZoORk3wIrYxVyTlRwZY3U0V1x/drwfECOC
+	 N/FUp904lYWlCS9PRJHx8EHdGAAioj+7PJgJaOQsR5nRAGjo0IUNo44dQtwoDpp+bW
+	 yQ6D5H37M7QNQ==
+Message-ID: <sashiko-outbox-209224@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 3/6] firmware: qcom: Add a TEE bus based ICE back-end
+Subject: Re: [PATCH v2 4/6] tee: optee: Register TEE devices on the platform
+ bus
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Harshal Dev" <harshal.dev@oss.qualcomm.com>, "Eric Biggers" <ebiggers@kernel.org>, "Bjorn
  Andersson" <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Abel
@@ -49,12 +50,12 @@ To: "Harshal Dev" <harshal.dev@oss.qualcomm.com>, "Eric Biggers" <ebiggers@kerne
  Soni" <neeraj.soni@oss.qualcomm.com>, "Manivannan Sadhasivam" <manivannan.sadhasivam@oss.qualcomm.com>, "Sumit
  Garg" <sumit.garg@oss.qualcomm.com>, "Selvam Sathappan Periakaruppan" <selvam.periakaruppan@oss.qualcomm.com>
 Cc: "Basant Kumar" <basantk@qti.qualcomm.com>, linux-crypto@vger.kernel.org
-In-Reply-To: <20261111-ice-migrate-tee-svc-v2-3-29d19f6c92ab@oss.qualcomm.com>
+In-Reply-To: <20261111-ice-migrate-tee-svc-v2-4-29d19f6c92ab@oss.qualcomm.com>
 References: <20261111-ice-migrate-tee-svc-v2-0-29d19f6c92ab@oss.qualcomm.com>
- <20261111-ice-migrate-tee-svc-v2-3-29d19f6c92ab@oss.qualcomm.com>
+ <20261111-ice-migrate-tee-svc-v2-4-29d19f6c92ab@oss.qualcomm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Nov 2026 15:07:58 +0000
+Date: Wed, 11 Nov 2026 15:30:17 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,140 +65,248 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 2 potential
+Thank you for your contribution! Sashiko AI review found 7 potential
 issues to consider:
-- [High] firmware: qcom: missing qcom_ice_tee.h breaks build in
+- [High] firmware: qcom: duplicate module_init() and module_exit() in
   qcom_ice_tee.c
-- [High] firmware: qcom: broken stub guard and Kconfig deps for
-  qcom_ice_tee_probe()
+- [High] tee: missing EXPORT_SYMBOL_GPL() for
+  tee_platform_device_register()
+- [High] soc: qcom: Kconfig dependency and module cycle selecting
+  QCOM_ICE_TEE
+- [High] tee: optee: platform device name collision with optee_driver
+- [High] soc: qcom: ice: qcom_ice_tz_is_available() requires both SCM
+  and OP-TEE
+- [Medium] tee: unchecked devm_add_action_or_reset() in
+  tee_platform_device_register()
+- [Medium] firmware: qcom: missing remove callback in
+  qcom_ice_plat_driver
 --
 
-commit dca5daf641df3494a0c5504854d7604efeca0f27
+commit c9fd96220ba8e5c6eeef8806d3112f1e39c17581
 Author: Harshal Dev <harshal.dev@oss.qualcomm.com>
 
-firmware: qcom: Add a TEE bus based ICE back-end
+tee: optee: Register TEE devices on the platform bus
 
-This commit adds an OP-TEE client driver that registers TrustZone operations
-for the Qualcomm Inline Crypto Engine (ICE) driver.
+This commit adds tee_platform_device_register() to register OP-TEE devices =
+on
+the platform bus and updates the Qualcomm ICE driver and its TEE backend to
+check whether OP-TEE has probed.
 
-> diff --git a/drivers/firmware/qcom/Kconfig b/drivers/firmware/qcom/Kconfig
-> index 3ad22f8fc3e5f..189ada7fdcd67 100644
-> --- a/drivers/firmware/qcom/Kconfig
-> +++ b/drivers/firmware/qcom/Kconfig
-> @@ -25,6 +25,15 @@ config QCOM_PAS_TEE
->  	  Enable the generic Peripheral Authentication Service (PAS) provided
->  	  by the firmware TEE implementation as the backend.
-> =20
-> +config QCOM_ICE_TEE
-> +	tristate
-> +	depends on TEE
-> +	depends on !CPU_BIG_ENDIAN
-> +	default m if ARCH_QCOM
-> +	help
-> +	  Enable the generic Inline Crypto Engine (ICE) firmware service TEE
-> +	  implementation as a backend.
-> +
->  config QCOM_SCM
->  	tristate "Qualcomm PAS SCM interface driver" if ARCH_QCOM || COMPILE_TE=
-ST
->  	select QCOM_PAS
-> diff --git a/drivers/firmware/qcom/Makefile b/drivers/firmware/qcom/Makef=
-ile
-> index 88ce74d74c3e2..5ef64f17e6e59 100644
-> --- a/drivers/firmware/qcom/Makefile
-> +++ b/drivers/firmware/qcom/Makefile
-> @@ -11,3 +11,4 @@ obj-$(CONFIG_QCOM_QSEECOM)	+=3D qcom_qseecom.o
->  obj-$(CONFIG_QCOM_QSEECOM_UEFISECAPP) +=3D qcom_qseecom_uefisecapp.o
->  obj-$(CONFIG_QCOM_PAS)		+=3D qcom_pas.o
->  obj-$(CONFIG_QCOM_PAS_TEE)	+=3D qcom_pas_tee.o
-> +obj-$(CONFIG_QCOM_ICE_TEE)     +=3D qcom_ice_tee.o
 > diff --git a/drivers/firmware/qcom/qcom_ice_tee.c b/drivers/firmware/qcom=
 /qcom_ice_tee.c
-> new file mode 100644
-> index 0000000000000..694aa05847f0e
-> --- /dev/null
+> index 694aa05847f0e..39f7094439d99 100644
+> --- a/drivers/firmware/qcom/qcom_ice_tee.c
 > +++ b/drivers/firmware/qcom/qcom_ice_tee.c
-> @@ -0,0 +1,402 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/slab.h>
-> +#include <linux/tee_drv.h>
-> +#include <linux/uuid.h>
-> +#include <linux/firmware/qcom/qcom_ice_tee.h>
-
-[Severity: High]
-Does including <linux/firmware/qcom/qcom_ice_tee.h> here break compilation =
-at
-this commit?
-
-include/linux/firmware/qcom/qcom_ice_tee.h is not created until a later pat=
-ch
-in the series, commit "tee: optee: Register TEE devices on the platform bus=
-",
-and nothing in qcom_ice_tee.c uses it.  Moving this #include to that commit
-would keep this patch compilable and bisectable.
 
 [ ... ]
 
-> +	qcom_ice_tee_ops.dev =3D dev;
-> +	ret =3D qcom_ice_tz_ops_register(&qcom_ice_tee_ops);
-> +	if (ret)
-> +		goto err_ops;
-> +
+> @@ -398,5 +414,30 @@ static struct tee_client_driver qcom_ice_tee_driver =
+=3D {
+> =20
+>  module_tee_client_driver(qcom_ice_tee_driver);
+> =20
+> +static int qcom_ice_plat_probe(struct platform_device *pdev)
+> +{
+> +	/* Paired with smp_load_acquire() in qcom_ice_tee_is_available() */
+> +	smp_store_release(&__teedev, &pdev->dev);
 > +	return 0;
-> +err_ops:
-> +	tee_client_close_session(data->ctx, data->session_id);
-> +err_sess:
-> +	tee_client_close_context(data->ctx);
-> +	return ret;
 > +}
 > +
-> +static void qcom_ice_tee_remove(struct tee_client_device *ice_dev)
-> +{
-> +	struct device *dev =3D &ice_dev->dev;
-> +	struct qcom_ice_tee_private *data =3D dev_get_drvdata(dev);
+> +static const struct platform_device_id qcom_ice_plat_id_table[] =3D {
+> +	{
+> +		.name =3D "optee",
+> +	},
+> +	{ }
+> +};
+> +MODULE_DEVICE_TABLE(platform, qcom_ice_plat_id_table);
 > +
-> +	qcom_ice_tz_ops_unregister(&qcom_ice_tee_ops);
+> +static struct platform_driver qcom_ice_plat_driver =3D {
+> +	.probe =3D qcom_ice_plat_probe,
+> +	.id_table =3D qcom_ice_plat_id_table,
+> +	.driver =3D {
+> +		.name =3D "qcom-ice-plat",
+> +	},
+> +};
+
+[Severity: Medium]
+Should qcom_ice_plat_driver also provide a .remove callback to clear
+__teedev?  When the parent tee_device is unregistered or qcom-ice-plat is
+unbound, plat_tee_free() unregisters and frees pdev, leaving __teedev as a
+dangling pointer and causing qcom_ice_tee_is_available() to keep returning
+true.
+
+> +
+> +module_platform_driver(qcom_ice_plat_driver);
 
 [Severity: High]
-When the ICE driver is built as a module, do qcom_ice_tz_ops_register() and
-qcom_ice_tz_ops_unregister() here resolve to the no-op stubs in
-include/soc/qcom/ice.h?
+Does adding module_platform_driver(qcom_ice_plat_driver) in the same file as
+module_tee_client_driver(qcom_ice_tee_driver) break modular builds?  Both
+macros expand to module_driver(), which defines __inittest(), init_module(),
+__exittest(), and cleanup_module(), causing duplicate symbol definitions wh=
+en
+built as a module.
 
-In commit "soc: qcom: ice: Add TZ agnostic re-direction functions", the
-declarations in include/soc/qcom/ice.h are guarded with #ifdef rather than
-IS_ENABLED():
+A single module_init() and module_exit() pair is needed to register
+qcom_ice_tee_driver before qcom_ice_plat_driver, unwind on registration
+failure, and unregister both in reverse order.
 
-include/soc/qcom/ice.h:
-    #ifdef CONFIG_QCOM_INLINE_CRYPTO_ENGINE
-    int qcom_ice_tz_ops_register(struct qcom_ice_tz_ops *ops);
-    void qcom_ice_tz_ops_unregister(struct qcom_ice_tz_ops *ops);
-    #else
-    static inline int qcom_ice_tz_ops_register(struct qcom_ice_tz_ops *__un=
-used)
-    {
-    	return 0;
-    }
+> diff --git a/drivers/soc/qcom/Kconfig b/drivers/soc/qcom/Kconfig
+> index 535c8619197b3..8dc75c252f52b 100644
+> --- a/drivers/soc/qcom/Kconfig
+> +++ b/drivers/soc/qcom/Kconfig
+> @@ -296,6 +296,7 @@ endif
+>  config QCOM_INLINE_CRYPTO_ENGINE
+>  	tristate
+>  	select QCOM_SCM
+> +	select QCOM_ICE_TEE
 
-Because qcom_inline_crypto_engine is a tristate symbol (defaulting to m in
-arm64 defconfig), modular builds define CONFIG_QCOM_INLINE_CRYPTO_ENGINE_MO=
-DULE
-instead of CONFIG_QCOM_INLINE_CRYPTO_ENGINE, so qcom_ice_tee_probe() silent=
-ly
-calls the stub and never registers qcom_ice_tee_ops with the ICE driver.
+[Severity: High]
+Can QCOM_INLINE_CRYPTO_ENGINE unconditionally select QCOM_ICE_TEE here?
 
-Also, in drivers/firmware/qcom/Kconfig, the new qcom_ice_tee entry has no
-dependency on qcom_inline_crypto_engine (allowing qcom_ice_tee to be built-=
-in
-while qcom_inline_crypto_engine is a module, or built when it is disabled) =
-and
-defines help text on a promptless tristate symbol.
+QCOM_ICE_TEE depends on TEE and !CPU_BIG_ENDIAN in
+drivers/firmware/qcom/Kconfig, whereas QCOM_INLINE_CRYPTO_ENGINE is selected
+by MMC_SDHCI_MSM and SCSI_UFS_QCOM without those dependencies.  Selecting
+QCOM_ICE_TEE when TEE is disabled (or when QCOM_INLINE_CRYPTO_ENGINE is
+built-in and TEE is modular) causes unmet direct dependency warnings and li=
+nk
+failures for tee_client_* symbols, and include/linux/firmware/qcom/qcom_ice=
+_tee.h
+has no fallback stub for qcom_ice_tee_is_available() (nor an include of
+linux/types.h for bool).
+
+In addition, qcom_ice.c now calls qcom_ice_tee_is_available() from
+qcom_ice_tee.c while qcom_ice_tee.c calls qcom_ice_tz_ops_register() and
+qcom_ice_tz_ops_unregister() from qcom_ice.c, creating a circular dependency
+between the two modules.
+
+> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
+> index 452896b1858f1..4844621b74970 100644
+> --- a/drivers/soc/qcom/ice.c
+> +++ b/drivers/soc/qcom/ice.c
+> @@ -18,6 +18,7 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/xarray.h>
+> =20
+> +#include <linux/firmware/qcom/qcom_ice_tee.h>
+>  #include <linux/firmware/qcom/qcom_scm.h>
+> =20
+>  #include <soc/qcom/ice.h>
+> @@ -132,7 +133,13 @@ static bool qcom_ice_tz_ops_registered(void)
+> =20
+>  static bool qcom_ice_tz_is_available(void)
+>  {
+> -	return qcom_scm_is_available();
+> +	/*
+> +	 * Both back-ends should be available before we check for
+> +	 * qcom_ice_tz_ops_registered(), otherwise we could pre-maturely
+> +	 * assume that TZ does not provide any ICE secure interface.
+> +	 */
+> +	return (qcom_scm_is_available() & qcom_ice_tee_is_available());
+> +
+>  }
+
+[Severity: High]
+Does requiring both qcom_scm_is_available() and qcom_ice_tee_is_available()
+break all QTEE-based platforms where OP-TEE is not present?
+
+__teedev is only set when OP-TEE probes and registers its platform device.
+On platforms using QTEE via SCM (or when OP-TEE is not enabled),
+qcom_ice_tee_is_available() remains false forever, so once qcom_ice_create()
+checks qcom_ice_tz_is_available() in the next patch it will defer probe
+indefinitely and prevent UFS/SDHC storage from coming online.
+
+Also, this uses bitwise & on booleans instead of &&, and at this commit
+qcom_ice_tz_is_available() is an unused static function, triggering a
+-Wunused-function warning during bisection.
+
+> diff --git a/drivers/tee/optee/smc_abi.c b/drivers/tee/optee/smc_abi.c
+> index 51624443359bf..85ee761739826 100644
+> --- a/drivers/tee/optee/smc_abi.c
+> +++ b/drivers/tee/optee/smc_abi.c
+> @@ -1920,6 +1920,14 @@ static int optee_probe(struct platform_device *pde=
+v)
+>  	if (rc)
+>  		goto err_disable_shm_cache;
+> =20
+> +	/*
+> +	 * Device should only be visible on the platform bus once the
+> +	 * child devices have already been enumerated on the TEE bus.
+> +	 */
+> +	rc =3D tee_platform_device_register(optee->teedev, "optee");
+> +	if (rc)
+> +		goto err_disable_shm_cache;
+
+[Severity: High]
+Does registering a platform device named "optee" here (and in
+optee_ffa_probe()) collide with optee_driver on the platform bus?
+
+drivers/tee/optee/smc_abi.c defines optee_driver with:
+
+drivers/tee/optee/smc_abi.c:
+	static struct platform_driver optee_driver =3D {
+		.probe  =3D optee_probe,
+		.remove =3D optee_smc_remove,
+		.shutdown =3D optee_shutdown,
+		.driver =3D {
+			.name =3D "optee",
+			.of_match_table =3D optee_dt_match,
+		},
+	};
+
+Because optee_driver has .driver.name =3D "optee" and no .id_table,
+platform_match() falls back to strcmp(pdev->name, drv->name) =3D=3D 0 and m=
+atches
+this new child platform device against optee_driver, recursively calling
+optee_probe() (which logs errors and fails with -ENXIO).  On non-DT systems
+that already have a platform device named "optee" with PLATFORM_DEVID_NONE,
+registering a second one also fails with -EEXIST, and only a single platform
+driver can bind to the device at a time.
+
+> diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
+> index 1aac50c7c1de7..0d3c266b29c7b 100644
+> --- a/drivers/tee/tee_core.c
+> +++ b/drivers/tee/tee_core.c
+
+[ ... ]
+
+> @@ -1225,6 +1226,26 @@ int tee_device_register(struct tee_device *teedev)
+>  }
+>  EXPORT_SYMBOL_GPL(tee_device_register);
+> =20
+> +static void plat_tee_free(void *data)
+> +{
+> +	struct platform_device *plat_dev =3D data;
+> +
+> +	platform_device_unregister(plat_dev);
+> +}
+> +
+> +int tee_platform_device_register(struct tee_device *teedev, const char *=
+teename)
+> +{
+> +	struct platform_device *plat_dev;
+> +
+> +	plat_dev =3D platform_device_register_data(&teedev->dev, teename,
+> +						 PLATFORM_DEVID_NONE, NULL, 0);
+> +	if (IS_ERR(plat_dev))
+> +		return PTR_ERR(plat_dev);
+> +
+> +	devm_add_action_or_reset(&teedev->dev, plat_tee_free, plat_dev);
+> +	return 0;
+
+[Severity: Medium]
+Should tee_platform_device_register() return the result of
+devm_add_action_or_reset()?  __devm_add_action_or_reset() is marked
+__must_check and on allocation failure it runs plat_tee_free() to unregister
+plat_dev, while this function still returns 0 to the caller.
+
+> +}
+
+[Severity: High]
+Does tee_platform_device_register() need EXPORT_SYMBOL_GPL()?  It is defined
+in tee.ko and called from optee_probe() and optee_ffa_probe() in optee.ko, =
+so
+building OP-TEE as a module fails at modpost with an undefined symbol.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111-ice-migrat=
-e-tee-svc-v2-0-29d19f6c92ab@oss.qualcomm.com?part=3D3
+e-tee-svc-v2-0-29d19f6c92ab@oss.qualcomm.com?part=3D4
