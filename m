@@ -1,123 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794434587;
-	b=m0rJNXonjjzzwcTDcwTO4H1ldWx2S483c/CamjyQxS7tHfthY19pXuJ5mWXKXZgrmn9/
-	 zCyem5ACf1s8qYMaBl+RTOvNQRX4E7Siq5VCwrj0N3aFsJA/+JtSpg8wBP4VxEJuFMyxc
-	 2daXbJMRdBow7664nIwUmXNtHWAfVyTBNDdgdgSYhkWsD7DrBuqjE1J/D6yNcQCrSREpw
-	 lFw0SXr/a6Fp//aNF1HX7Ucud6e/iJRWSemd4gTWmSZN+XweB4RLrS9ukaWzvzYJJfhGz
-	 9fml/LOt8SWAtlhWgRMMGL7YyzrP/LUpaRYumD1GgEI9v6okCbNVAXFASPd3LyeP5gg==
+	t=1794436521;
+	b=N6gKP+2V2Mefzm3d6Fofi94kVwhkWgxMwSEU+68tr28rr7xIR+CCNIZtBmQDAw2iv18p
+	 gZn1DFbBTEnkKxXud2wJSnKl53bLQ1QM7swE8PrDBWOWNwpihX8P6ZP/Gq0Spu8LEEY+/
+	 l63/GN0/7WhtGECuqkwGGkDOUnMbfbaCzF0oy1En5pZyPQjMG2kYnZweMnV1L6fx2rTmi
+	 Yqtps9VjduG+Xkr8AJi97UBJpaAtRFTrTAbroSPh3a/0dhxlSbL9km+tPvjJubRBPlbu4
+	 52AlAODJz5remp12R2w/ZggoP/qkUZHQLyF3O+fAgB+ge8qF7jvHKxNUvRCc5EfH7zw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794434587;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 Mail-Followup-To:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=/29Fh1u2FOm5/5k1pmwlztbcmx561O6eu158ApMSsyU=;
-	b=oDLLqt2wZocMgWJg+j0Xz9D0Ncm7u4C7fyJizRS281dwA7RhjGR90esX195TmYd9taxq
-	 DwZw2WoEcxZ7dK7WtSk8N8ClxxsmuJ3j7XUuvlvGJwBx5d4i/pXO17rNfWNgL0UttUjSW
-	 el/a6J3GinaCMJgsmuQB1VZZEdgNn9AAygnKMp+QgKrYUO6dHN3hfprNfIfueoRJLQcD2
-	 jaY3J2mzyRMzUTIW8wp3L1caGOEiM8UOagT4m1PHCU/vt3aYVQk/xPGX69ABXpu1c275i
-	 +bIcDBqpTo/EVqtt8gknlNJkm9kqDQSJcPhVsTzS3Ftg5ndS1zVEsSlZyWJI7gt3dDg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794436521;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=POAeLGBJ2SCPjA/XHSnzvUyIJWWz8yLoqSCEHHqdbTo=;
+	b=urgPBshJhYrjl2HwfNsxFK8U1MsHRHWPL/5HiHVqsJbqcew7L7ZHUXMHhE4PHijumX8/
+	 H+zLY2/l84GYm0AlG8pjqUe5KYVsXW7Vn+Fombi1dmPRc0rI9Lds2hMxYqTclpoJA3RtC
+	 Nksx/xsdsZmi3oO4n1fCrw/NQNw/AidoRtxZ46/6CWIozlFmEZ3QLTneodN4VTOqLwMAu
+	 1jpQetRK0u6UWorF0VmK2Pgi2Usu+oKtYBOQV/HL+gm38ImVMHuf711RQyiauaC6KIPrd
+	 WTnVIpEHkbmuwE6DXugIU597hTaSpBC+jgbwYSjSJo3jEdQOUM8Mtlh1Zf09nTex5Bg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H2HTk8rO;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lVR7L8YQ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B77606A32D;
-	Wed, 11 Nov 2026 22:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6503606A89B
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 22:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H2HTk8rO
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2E751F00A05;
-	Wed, 11 Nov 2026 22:02:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lVR7L8YQ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 246631F00A05;
+	Wed, 11 Nov 2026 22:35:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794434586;
-	bh=/29Fh1u2FOm5/5k1pmwlztbcmx561O6eu158ApMSsyU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=H2HTk8rOLZgWw9Lm2uB8it44XJGQ1VP252zKM3Vsl27YeQT3fQC/oPf+9dR1GGuPe
-	 fTrdVHJg83sazuCLRwsK7FMBmZ65BjYmx/5l1Fr9V4zrWbVX2E4c/EGrAZHOJ23iP5
-	 K6oVJy3Ue6XdepxFi87RWoq3TdzVK9qDLL8BM8XMCz9n7H3pjJ8s2COHz+NjnFIDwg
-	 2eGJ+4dbOKk2dBpxqBDuRpXAU1slNtJxbA2Dkar3W/730CiqV+uxXwdTMmafxIRXoH
-	 hanK6KHxVmWrohkzaChiP47GtgTq+nQUar+jL+4xWJclsB1e8afff/e4uoWiQs4JB9
-	 jrQrJYXOzTbWA==
-Date: Wed, 11 Nov 2026 23:02:51 +0100
-From: Gao Xiang <xiang@kernel.org>
-To: Michal Wilczynski <m.wilczynski@samsung.com>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>,
-	Nick Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
+	s=k20260515; t=1794436521;
+	bh=POAeLGBJ2SCPjA/XHSnzvUyIJWWz8yLoqSCEHHqdbTo=;
+	h=From:To:Cc:Subject:Date;
+	b=lVR7L8YQhC+9ua5FYdgQFCLAsUtOCXPYwayg36zVkhNbNedCk6Vope/BJe9QtouH9
+	 9PZFKAItHoGWx3X9+CpBaPyJQoifL64RqKbPd9a5ucmJZjAesRvDAcpkCXN5Z0CXLP
+	 gZTVNYHLl/LaLOUapr0CbbZkJWAyBSOuFBLSyzhTDjaA6UM9KxUVGRn2mrnnBbeN+Q
+	 MXGBYGdWXUyJxJlY1FjmNdaKJdn6eHW7zBaqfH6WVdP4Pkq+v68zfkjksf/91tw5Tx
+	 PAnzsLM0P/ms6YVRjtfUrRyxjC1vL5XzGRlTuUAh/xYC9V+qIFDPRbSc/nWZUFQfyn
+	 /9PLrnxIyQPbg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Laight <david.laight.linux@gmail.com>,
-	Sungguk <sungguk.na@samsung.com>,
-	Jaehoon Chung <jh80.chung@samsung.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	linux-erofs@lists.ozlabs.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 12/15] lib/lz4: widen LZ4_DECOMPRESS_INPLACE_MARGIN
- for the fast decode loop
-Message-ID: <avTmC_1I59FKA1FN@MacBookPro.fritz.box>
-Mail-Followup-To: Michal Wilczynski <m.wilczynski@samsung.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	Helge Deller <deller@gmx.de>, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>,
-	Nick Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Laight <david.laight.linux@gmail.com>,
-	Sungguk <sungguk.na@samsung.com>,
-	Jaehoon Chung <jh80.chung@samsung.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	linux-erofs@lists.ozlabs.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-crypto@vger.kernel.org
-References: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
- <CGME20261106144309eucas1p2a9bfcc1cf81779d473fb073e7d9139b7@eucas1p2.samsung.com>
- <20261106-lz4-vendor-upstream-v2-12-ee04c3f0d7dc@samsung.com>
+	Martin Willi <martin@strongswan.org>,
+	Antonio Quartulli <antonio@mandelbit.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: x86/chacha: Drop redundant moves from AVX2 code
+Date: Wed, 11 Nov 2026 14:34:55 -0800
+Message-ID: <20261111223455.89467-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -127,42 +60,137 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20261106-lz4-vendor-upstream-v2-12-ee04c3f0d7dc@samsung.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Michal,
+The AVX2 optimized ChaCha code has many instances of moving one register
+to another, then left-shifting the destination register with 'vpslld'.
+This pattern likely was copied from the SSSE3 code, which uses 'pslld'.
+However, like all the other AVX instructions, 'vpslld' has separate
+source and destination registers.  Just utilize that instead.
 
-On Fri, Nov 06, 2026 at 03:42:52PM +0100, Michal Wilczynski wrote:
-> erofs decompresses a pcluster in place when the slack after the output
-> is at least LZ4_DECOMPRESS_INPLACE_MARGIN(compressed size), upstream's
-> (compressedSize >> 8) + 32.
-> 
-> That holds for the fork, which overshoots its output by at most 8
-> bytes. Upstream's LZ4_FAST_DEC_LOOP, which the next patch brings in for
-> x86 and arm64, copies in 32-byte steps and can overwrite input it has
-> not read yet: of 172410 valid streams laid out as erofs does at exactly
-> that margin, 3660 fail to decode, none with the fork. The worst needs
-> (compressedSize >> 8) + 33. Images mkfs.erofs built did not hit this,
-> but nothing in the format rules it out.
-> 
-> Use (compressedSize >> 8) + (compressedSize >> 15) + 36, which takes a
-> 4K pcluster's margin from 48 to 52 bytes. Upstream's lz4.h defines the
-> macro too, so undefine it first.
-> 
-> Signed-off-by: Michal Wilczynski <m.wilczynski@samsung.com>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/x86/chacha-avx2-x86_64.S | 36 ++++++++++-------------------
+ 1 file changed, 12 insertions(+), 24 deletions(-)
 
-First, I really think kernel LZ4 should be updated for many years, so
-thanks for this!
+diff --git a/lib/crypto/x86/chacha-avx2-x86_64.S b/lib/crypto/x86/chacha-avx2-x86_64.S
+index 18ae03e05074f..8aa3227f7302b 100644
+--- a/lib/crypto/x86/chacha-avx2-x86_64.S
++++ b/lib/crypto/x86/chacha-avx2-x86_64.S
+@@ -74,8 +74,7 @@ SYM_FUNC_START(chacha_1to2blocks_avx2)
+ 	# x2 += x3, x1 = rotl32(x1 ^ x2, 12)
+ 	vpaddd		%ymm3,%ymm2,%ymm2
+ 	vpxor		%ymm2,%ymm1,%ymm1
+-	vmovdqa		%ymm1,%ymm6
+-	vpslld		$12,%ymm6,%ymm6
++	vpslld		$12,%ymm1,%ymm6
+ 	vpsrld		$20,%ymm1,%ymm1
+ 	vpor		%ymm6,%ymm1,%ymm1
+ 
+@@ -87,8 +86,7 @@ SYM_FUNC_START(chacha_1to2blocks_avx2)
+ 	# x2 += x3, x1 = rotl32(x1 ^ x2, 7)
+ 	vpaddd		%ymm3,%ymm2,%ymm2
+ 	vpxor		%ymm2,%ymm1,%ymm1
+-	vmovdqa		%ymm1,%ymm7
+-	vpslld		$7,%ymm7,%ymm7
++	vpslld		$7,%ymm1,%ymm7
+ 	vpsrld		$25,%ymm1,%ymm1
+ 	vpor		%ymm7,%ymm1,%ymm1
+ 
+@@ -107,8 +105,7 @@ SYM_FUNC_START(chacha_1to2blocks_avx2)
+ 	# x2 += x3, x1 = rotl32(x1 ^ x2, 12)
+ 	vpaddd		%ymm3,%ymm2,%ymm2
+ 	vpxor		%ymm2,%ymm1,%ymm1
+-	vmovdqa		%ymm1,%ymm6
+-	vpslld		$12,%ymm6,%ymm6
++	vpslld		$12,%ymm1,%ymm6
+ 	vpsrld		$20,%ymm1,%ymm1
+ 	vpor		%ymm6,%ymm1,%ymm1
+ 
+@@ -120,8 +117,7 @@ SYM_FUNC_START(chacha_1to2blocks_avx2)
+ 	# x2 += x3, x1 = rotl32(x1 ^ x2, 7)
+ 	vpaddd		%ymm3,%ymm2,%ymm2
+ 	vpxor		%ymm2,%ymm1,%ymm1
+-	vmovdqa		%ymm1,%ymm7
+-	vpslld		$7,%ymm7,%ymm7
++	vpslld		$7,%ymm1,%ymm7
+ 	vpsrld		$25,%ymm1,%ymm1
+ 	vpor		%ymm7,%ymm1,%ymm1
+ 
+@@ -251,15 +247,13 @@ SYM_FUNC_START(chacha_2to4blocks_avx2)
+ 	# x2 += x3, x1 = rotl32(x1 ^ x2, 12)
+ 	vpaddd		%ymm3,%ymm2,%ymm2
+ 	vpxor		%ymm2,%ymm1,%ymm1
+-	vmovdqa		%ymm1,%ymm10
+-	vpslld		$12,%ymm10,%ymm10
++	vpslld		$12,%ymm1,%ymm10
+ 	vpsrld		$20,%ymm1,%ymm1
+ 	vpor		%ymm10,%ymm1,%ymm1
+ 
+ 	vpaddd		%ymm7,%ymm6,%ymm6
+ 	vpxor		%ymm6,%ymm5,%ymm5
+-	vmovdqa		%ymm5,%ymm10
+-	vpslld		$12,%ymm10,%ymm10
++	vpslld		$12,%ymm5,%ymm10
+ 	vpsrld		$20,%ymm5,%ymm5
+ 	vpor		%ymm10,%ymm5,%ymm5
+ 
+@@ -275,15 +269,13 @@ SYM_FUNC_START(chacha_2to4blocks_avx2)
+ 	# x2 += x3, x1 = rotl32(x1 ^ x2, 7)
+ 	vpaddd		%ymm3,%ymm2,%ymm2
+ 	vpxor		%ymm2,%ymm1,%ymm1
+-	vmovdqa		%ymm1,%ymm10
+-	vpslld		$7,%ymm10,%ymm10
++	vpslld		$7,%ymm1,%ymm10
+ 	vpsrld		$25,%ymm1,%ymm1
+ 	vpor		%ymm10,%ymm1,%ymm1
+ 
+ 	vpaddd		%ymm7,%ymm6,%ymm6
+ 	vpxor		%ymm6,%ymm5,%ymm5
+-	vmovdqa		%ymm5,%ymm10
+-	vpslld		$7,%ymm10,%ymm10
++	vpslld		$7,%ymm5,%ymm10
+ 	vpsrld		$25,%ymm5,%ymm5
+ 	vpor		%ymm10,%ymm5,%ymm5
+ 
+@@ -309,15 +301,13 @@ SYM_FUNC_START(chacha_2to4blocks_avx2)
+ 	# x2 += x3, x1 = rotl32(x1 ^ x2, 12)
+ 	vpaddd		%ymm3,%ymm2,%ymm2
+ 	vpxor		%ymm2,%ymm1,%ymm1
+-	vmovdqa		%ymm1,%ymm10
+-	vpslld		$12,%ymm10,%ymm10
++	vpslld		$12,%ymm1,%ymm10
+ 	vpsrld		$20,%ymm1,%ymm1
+ 	vpor		%ymm10,%ymm1,%ymm1
+ 
+ 	vpaddd		%ymm7,%ymm6,%ymm6
+ 	vpxor		%ymm6,%ymm5,%ymm5
+-	vmovdqa		%ymm5,%ymm10
+-	vpslld		$12,%ymm10,%ymm10
++	vpslld		$12,%ymm5,%ymm10
+ 	vpsrld		$20,%ymm5,%ymm5
+ 	vpor		%ymm10,%ymm5,%ymm5
+ 
+@@ -333,15 +323,13 @@ SYM_FUNC_START(chacha_2to4blocks_avx2)
+ 	# x2 += x3, x1 = rotl32(x1 ^ x2, 7)
+ 	vpaddd		%ymm3,%ymm2,%ymm2
+ 	vpxor		%ymm2,%ymm1,%ymm1
+-	vmovdqa		%ymm1,%ymm10
+-	vpslld		$7,%ymm10,%ymm10
++	vpslld		$7,%ymm1,%ymm10
+ 	vpsrld		$25,%ymm1,%ymm1
+ 	vpor		%ymm10,%ymm1,%ymm1
+ 
+ 	vpaddd		%ymm7,%ymm6,%ymm6
+ 	vpxor		%ymm6,%ymm5,%ymm5
+-	vmovdqa		%ymm5,%ymm10
+-	vpslld		$7,%ymm10,%ymm10
++	vpslld		$7,%ymm5,%ymm10
+ 	vpsrld		$25,%ymm5,%ymm5
+ 	vpor		%ymm10,%ymm5,%ymm5
+ 
 
-But my personal thought is that could you just fold this patch into
-the next one ("lib/lz4: switch the decompressor to the vendored sources")?
-Because this one should be part of the fast loop update.
+base-commit: 33b4f31b1aea3f62b61c892daefc0e6a77859032
+-- 
+2.56.1
 
-Although the current patch order is also fine, but my potential concern
-is that people don't know the details maybe pick the random ones for
-backporting, which is what I'd like to avoid so I hope this patch could
-be just part of it, otherwise the inplace decompression could be broken.
-
-Thanks,
-Gao Xiang
