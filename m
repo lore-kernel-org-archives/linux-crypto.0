@@ -1,56 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794383042;
-	b=1wFZqd8jaLysrL1OM+VLrQkWa5tPHki2e+Mi8gP1a3dyqAATwQVB8IBNcYpCWoZk3DMW
-	 15ymTNJyqiPYySt0CGvL9UsCWlxTqdVvu9xSGoOZieeKbB2k+riPy4qc3n8L3KyCg2qds
-	 Ywnhv8EC65JEdUCq03hTlxc9pgsULW0kp/fIS32ydUgQGR2VLkIJ98y2zd79Kq28iSBgq
-	 NYwfmzTLigGNnDtfM9oI6lXX+2KJIHZQ6BHbvHzSghGLlzYi7c+IXUfmTmUpIyncSMJEE
-	 9hjj+Jz780Wgsi8jqAsmm5hzXY5s60yaJdeTeGQKlmrwH1igfOTKfraQzZ8zed6mobQ==
+	t=1794383425;
+	b=NQXqHiNCmdz95QjsacBewGtYrFZPyNqwIxeXq3I2RsN0lmIYP4mAv22686CJEb6kbC2S
+	 CokwMyX+0WlYxqOA97OkeG5vYgMnSfijub1ekPfq03wcaBS3fCSDqSyJP/w5yhRifpJ/g
+	 uphWVbO7xNh3hWtdXr5N3FKiP/FF7qh4j696eDmGcZp5vGhmuYCMmxbXAUuQSYmXwleW5
+	 ak9ItDbL0g1AvwC+Biak8karruDEL22iJ3ybZ0aJuCCkdvwC3WwjLERflVfCAhY5oBMtC
+	 0XAD7XS/rNk1AgfzTcgMZVtU/iPNqiQnLd46SawFDsCVsYS5aPBA7evhDxse46H8fvA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794383042;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=45FhZV3cK1G+TR2s+hAlpex0xsCMjuBlN5+yKT3scms=;
-	b=0JJojGkKIAA7W9l3qFTeCdLeeURj5icivEgUuho2JUwVzfXvh/KBi/RgXSk5naBnJI5B
-	 boWZNO8tdJxi/oGL1H2tfNJ6ZH8IF4GIi36SjLllg8BTOOXOjHm3dSgRsH+mRhHRjQQ83
-	 0UOQNF+dXFtNZwpzBzR0QaasKM57b+TI5qsiiM6WWdHeYwvsYZPOXy0p9h40TSKQl1xvs
-	 JEQI2+EUAsqgPNrJVcIiH+YSgyMrVAaIQ8BgnwTDf9Kpi/hRftq9miNyvZ5nQO5IhbLWC
-	 jlLABNqyFc+4lpox36yWqhA+rIYw7TAqpCBEFx93pAfWbvSr1O/2+FdDk1ezHiffEhA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794383425;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=uq+L6cPLS8Wa01hR151F3a5DAKKg4V5vijaXWb/aJ1k=;
+	b=svPU3C00oQSIk+xiDIG0pcCwH9BumybWTOjJ7TZYhsly3LY0Z3cBVC3zL5sHNB9RZVXM
+	 YdAbEBq13Z2SMsbE6rU0z9PoClO1s+JRk6QBjGacB/iew4JZsXVP9LT2m3qTiQpBFkwgr
+	 UnouzJYw0ahzIrRQj+DO97ATBwtLYHMrplZXiqEzxGInFvBnco0WqHaWw9XhauB0sD8g4
+	 0ViEACTIHS771I9PakjgoOKiqFHl7C1ElSxnP53xMbtd2LXamdmnxAlXrmLenp8D4Hd5M
+	 1NMrZGqPV1U4AU5PBxzw4vgZ8Z2wfaK2KD3OLhVGryWD9zDCCJBhvHdQEBulENSNJnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aipMd4e7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="F/rCe1Q8";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE75606A320
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 07:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E564606A31C;
+	Wed, 11 Nov 2026 07:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aipMd4e7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F8901F00A05;
-	Wed, 11 Nov 2026 07:44:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=F/rCe1Q8
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B8821F00A05;
+	Wed, 11 Nov 2026 07:50:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794383041;
-	bh=45FhZV3cK1G+TR2s+hAlpex0xsCMjuBlN5+yKT3scms=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=aipMd4e76FJLjbE+/3gNlUNND1zjX/MEpsz+pbXzoVt3zn8pgKvUjoBetkAmdWPuU
-	 qr60y810aU40irtG3a1fOF5N238wBW8G5TuVhlwnQCFd4iVi1WbxCJSDO8XlUjQdOf
-	 0OmIQi5QJrVPf45BijOSKxtN4NQSw2grkYmgIc8AIIBvtWT5yfmkHl0wdfLvZKCjPf
-	 iFq16HoFNJTHm/EvEYItkFTlEc6yLfdUvyAb7dLLGBin7V2skEDVrzvMTph3U4twlW
-	 w4tH3kO6bggSbR3ndSmx8infIGL8I2OnwS+WSNHLYehM73RmRbiAoGMB2kqQCt1/b9
-	 grkClUqMcXv/g==
-Message-ID: <sashiko-outbox-208540@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] hwrng: mtk - use pm_runtime_resume_and_get() in
- mtk_rng_read()
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Gu Bin" <gubin@cmss.chinamobile.com>, sean.wang@mediatek.com, olivia@selenic.com, herbert@gondor.apana.org.au
-Cc: matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com, linux-crypto@vger.kernel.org
-In-Reply-To: <20261111073237.1647-1-gubin@cmss.chinamobile.com>
-References: <20261111073237.1647-1-gubin@cmss.chinamobile.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Nov 2026 07:44:00 +0000
+	s=k20260515; t=1794383425;
+	bh=uq+L6cPLS8Wa01hR151F3a5DAKKg4V5vijaXWb/aJ1k=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=F/rCe1Q8/Z1SPdFpdpBTaG7s0720UBBSMpuVV/Yc400nPp+MT5MidrNAZqtoeSDeI
+	 FufHNaxvWqihCkZqqLkqNDEYOl/ftFdjOm8+RhKGLLn7PwKlyWcS7IS4vXww+efTjM
+	 w4NVEElC8AQQ5+hg7f96cryHiRLSqEui2DIgx155u8v21fhnGwF1OGj+ycGgYVagSO
+	 9f/HPcQZ5hGyQvPL12UzkZ0CUezLPJChWkKhXQSf1fmYmsW5570qB0oY3g8Vz9Mm4o
+	 YC7rADKquBZOpACW3GA/btlG0WgVJLFQ33ezA7pnJGkB6GCkNEJnHv9+6Qwh98/Qjk
+	 zwgnyqhkmL7Sw==
+Message-ID: <537d8cc2-7740-4e51-a4aa-8adf03322480@kernel.org>
+Date: Wed, 11 Nov 2026 08:50:19 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -59,75 +50,96 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] dt-bindings: crypto: ice: Document sm8150 inline
+ crypto engine
+To: Andrew Gigena <mail@andrewgigena.dev>
+Cc: Abel Vesa <abelvesa@kernel.org>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>,
+ Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>,
+ Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>,
+ Bjorn Andersson <andersson@kernel.org>, Andy Gross <agross@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20261104-sm8150-ice-rfc-v2-0-d697bbce0278@andrewgigena.dev>
+ <20261104-sm8150-ice-rfc-v2-1-d697bbce0278@andrewgigena.dev>
+ <20261106-offbeat-hawk-of-purring-50a8aa@quoll>
+ <fb4d03b3-eb35-4aeb-baa1-f4df54653192@andrewgigena.dev>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <fb4d03b3-eb35-4aeb-baa1-f4df54653192@andrewgigena.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found no new issues
-in this patch, but noticed 1 related pre-existing issue it does not
-introduce:
-- [High] hwrng: mtk - premature hwrng registration and unchecked runtime
-  PM in mtk_rng_read() [1]
---
+On 11/11/2026 05:23, Andrew Gigena wrote:
+>> This part should be a separate commit.
+> 
+> I splitted it into two commits in v3:
+> 1. Add qcom,sm8150-inline-crypto-engine compatible.
+> 2. Move qcom,sm8150-ufshc to the standalone-ICE UFS binding.
+> 
 
-commit dfb825399ed095d750b85ef745a6c83b7ac41f98
-Author: Gu Bin <gubin@cmss.chinamobile.com>
+No clue what's this about, you completely cut context.
 
-hwrng: mtk - use pm_runtime_resume_and_get() in mtk_rng_read()
+>> And what about eight clock? All existing DTS will report warning? I
+>> don't quite get the need of this move.
+> 
+> After the move, SM8150 UFS no longer provides the ICE register region or
+> ice_core_clk; those live in the standalone ICE node. The only in-tree
+> user of qcom,sm8150-ufshc is arch/arm64/boot/dts/qcom/sm8150.dtsi, which
 
-This commit replaces pm_runtime_get_sync() with pm_runtime_resume_and_get()
-in mtk_rng_read() and returns early if resuming the device fails.
+So you introduce the warning at this point?
 
-> diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mt=
-k-rng.c
-> index 127b82d979e8e..1e8e458dab25c 100644
-> --- a/drivers/char/hw_random/mtk-rng.c
-> +++ b/drivers/char/hw_random/mtk-rng.c
-> @@ -95,7 +95,9 @@ static int mtk_rng_read(struct hwrng *rng, void *buf, s=
-ize_t max, bool wait)
->  	struct mtk_rng *priv =3D to_mtk_rng(rng);
->  	int retval =3D 0;
-> =20
-> -	pm_runtime_get_sync(priv->dev);
-> +	retval =3D pm_runtime_resume_and_get(priv->dev);
-> +	if (retval < 0)
-> +		return retval;
-> =20
->  	while (max >=3D sizeof(u32)) {
->  		if (!mtk_rng_wait_ready(rng, wait))
+> is converted in the DTS patch, so there are no leftover users of the
+> embedded-ICE binding for this compatible and no schema warnings.
 
-[Severity: High]
-This problem wasn't introduced by this patch, but can mtk_rng_read() be
-called while runtime PM is disabled [1]?
 
-In mtk_rng_probe(), devm_hwrng_register() is called before dev_set_drvdata()
-and devm_pm_runtime_enable():
-
-drivers/char/hw_random/mtk-rng.c:mtk_rng_probe() {
-	...
-	ret =3D devm_hwrng_register(&pdev->dev, &priv->rng);
-	if (ret) {
-		dev_err(&pdev->dev, "failed to register rng device: %d\n",
-			ret);
-		return ret;
-	}
-
-	if (!(priv->flags & MTK_RNG_SMC)) {
-		dev_set_drvdata(&pdev->dev, priv);
-		pm_runtime_set_autosuspend_delay(&pdev->dev,
-						 RNG_AUTOSUSPEND_TIMEOUT);
-		pm_runtime_use_autosuspend(&pdev->dev);
-		ret =3D devm_pm_runtime_enable(&pdev->dev);
-	...
-}
-
-Because devm_hwrng_register() immediately exposes the RNG and starts
-hwrng_fillfn(), and because reverse-order devres teardown on unbind disables
-runtime PM before unregistering the RNG, mtk_rng_read() can run while
-runtime PM is disabled, causing pm_runtime_resume_and_get() to fail with
--EACCES (or previously causing unclocked MMIO reads when CONFIG_PM is
-enabled).  Enabling runtime PM and setting drvdata before calling
-devm_hwrng_register() would avoid this window during both probe and unbind.
-
-[1] https://sashiko.dev/#/bug/linux-371c6254-7dda-4dcc-bf98-1919a85f9f5b
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111073237.1647=
--1-gubin@cmss.chinamobile.com?part=3D1
+Best regards,
+Krzysztof
