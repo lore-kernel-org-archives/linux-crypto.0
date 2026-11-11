@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794428121;
-	b=leimKAQXFpPzMA400XFwhOEbWtRP2Bkq+oqEOVsY2O3gy/IfKlAeI0RM+LiCY1r1bCrM
-	 hKoX10fQyq3pH5iC62k7zctQXFTAOtTDGm3nAnuvefnDygyhh9+hpflzwuy/lmDjmc/sh
-	 u/vHQ6JXvgnFiQhZNioAiD4gmFqvlDKBiytAMT8BbrMmyEvQgKg9eqhiS54rl4099y25A
-	 UWIWepVeJsxFa7XP/EBWndYa3FXQv+RkdbfyaBNvR70Fj+DclFsv3O5wd+DzLOrvDFUxv
-	 rLXVPumT+q5XnDRcPbYZLtuwz+T98DQjruiUu07VH1bmWXMlSloLTd3Pi1DrSBpruhQ==
+	t=1794428130;
+	b=XSLaFLhIXD6lgb9iBkmbdI96D9LXq+zzlpcym7Mo/gpUeNP8lHIo9MZmO2aDXffziUiK
+	 u6hqJKDh5gR6J23OwMkcyzb2+sGhBgXK3wtSvAClV5M1BA/MleK1F5LsrrrwiDaSk5HvZ
+	 4tkY/fm5GPxxoIM1e20N13hdtacrBfBI4NZXwZ1MnGadGtpC5HDjps7ysq4o4i0hFyMG+
+	 rrjH5/w52sws8ZFz3jyla3EITYnRbrMdsx+TM8cMey4SuAbVA5WI6KaDoSvN683/PY++W
+	 hL7Zt617QQS4emHyqf2JsH8KUtkK5U6KmvBUdhjBJL7z4+eN2yLFGu+gm3t/0JTfUjQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794428121;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794428130;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=s6V0RNyXyZYrQMxuFEP3/ICRTep3TpJ9KGiBuY2dqZw=;
-	b=UHa1BjI2t2mgKaWALav74eyPTav6vh1A8f6Z/sHZ+Vm7xgqTVN+7hDuX6btEqhmkG3Sz
-	 N6MbMSyppuL9+SrbRRMdo8I4fuytW+IETTBNMED6HLQ3qbBhRgvr2OPsKmjfu5gTj/VXS
-	 u/lpY4kCns+3M94cKeF90mUIhOf2UYKyIGS9O7lLXjjhRMWe21UoLbHRGXQo6oyZK1Bun
-	 FD19LAyh36+fuCLaGIooWmXlHyYEP+JIDO7/n5WrXluy0eVgXbakwUkVlqmW+PuuPQHFr
-	 +AtsxPFRJf+5qmJWWPDHRKy/D4/1Fioe4PH/geRcMpnlMRSI7cOgy2zdF4JvZMmEoNw==
+	bh=6SZ5Morm1pTObyS9kphBk2li/F2B7RmkHpLEFosG0as=;
+	b=QBOFsCtS4UdWwl5NVB7up88xbAMAvLBJiDCIAjcZ1tYB1z3NB1qG3o4S0xgOIjStvaeX
+	 V1T4/xAA5w7ztfPWSzYJwwMWp+3qUKMqgYzLdPFno/6/keTqNKF5I0pYnW3aYHbEYdl7L
+	 1cSFR67GPJ7DpULxZ1qirAZoKSKyN57rHSZj7xIl2aosccjYlFg0FQaPU8M+hhB3gqgTC
+	 qDrvnb1PBUVWVVs1tmQujwQ/msOpZBInEwtJI0J7kNxDweAYX3Rtuyu6ZzRC0Sg0vqkik
+	 TR7oj8W7CC4QOoDhPsui6ZUUr2cwWruuci5MiDGC7Yc09Ot5s6sYz/NNhlyiXgmKMdg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DS0EuSoA;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="G/5IRctE";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0BC606A334
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 20:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE37E606A32A
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 20:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DS0EuSoA
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A1791F00A07;
-	Wed, 11 Nov 2026 20:15:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G/5IRctE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5798F1F00A05;
+	Wed, 11 Nov 2026 20:15:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794428121;
-	bh=s6V0RNyXyZYrQMxuFEP3/ICRTep3TpJ9KGiBuY2dqZw=;
+	s=k20260515; t=1794428130;
+	bh=6SZ5Morm1pTObyS9kphBk2li/F2B7RmkHpLEFosG0as=;
 	h=From:To:Cc:Subject:Date;
-	b=DS0EuSoAeu2EJ606SJ2+UyhrH+N6gY5cDk5WQyaoIY/rZarptOA3RN+EKVXUZa9f8
-	 tcA/PTBH/TBzUGNtYD+FSslmbya2qNmPTJqLXSSNMlxayM0nk1eD+opb/Hb1sK3KP2
-	 iskrzOYEpLY4nDxTwJvdyHQ7vzI06hbXxuFhp5RpcH3n69ChYhVL8xIZfgDkOa17Oi
-	 L2/loGO/YNL3HgNI+f4dfEl5m6tDSJQuZA4YLSjGmFOr781Wr9h2lsCwy+K/Yo4pb5
-	 MEVBZPdXqbzbFIBXkPDqP+XQI6F1MzHhZFd+U2pRLBvyz04FekCJzCzKJ1Rs/YN2f7
-	 SLPGgguUOBRuA==
+	b=G/5IRctEp4uRoNVkakvHlmbHIvCofXGypdV1uk1xweEyP9geV3nnGNNBV/iWlpQd3
+	 mBvygckFASs9vVOGVdo7tJNu7eBNgChtmczlRfcP/gN4H+4Kj4BS5xnCUXzxPPHds5
+	 Yott0xbjd9885Vbf1Lc6YjoBBxRHn8H58PukbjgKMtC3n7eHwi46SEj/ybP9BY66ll
+	 +S6ztO38eueavUS/jgdppIqKLDhiWpp2mRrQqR69LCPgr126jgSBqHB6IYpKeQNXW3
+	 mEACLrl5kUPtq4ZKVT/x32ZlEQor8uwxGWBa+ULva6OjEWOpeFOBxiLjuprJgPWAGf
+	 kEfRASZQNbvBw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
@@ -46,9 +46,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: x86/chacha: Drop redundant check for AVX
-Date: Wed, 11 Nov 2026 12:15:17 -0800
-Message-ID: <20261111201517.39989-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: x86/poly1305: Drop redundant checks for AVX and AVX2
+Date: Wed, 11 Nov 2026 12:15:25 -0800
+Message-ID: <20261111201525.40031-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,32 +61,46 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-X86_FEATURE_AVX2 implies X86_FEATURE_AVX.  Simplify
-chacha_mod_init_arch() accordingly.
-
-(Note: as usual, arch/x86/kernel/cpu/cpuid-deps.c is non-enforcing: if a
-dependency isn't met, it warns and doesn't prevent booting.  However,
-that case doesn't occur in real CPUs and is unsupported.)
+Reorganize the code in poly1305_mod_init_arch() to use nesting.  This
+eliminates redundant boot_cpu_has() calls.  It also makes the code
+structure more closely match poly1305_blocks(), which has an early
+return if poly1305_use_avx isn't set.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/x86/chacha.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ lib/crypto/x86/poly1305.h | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/lib/crypto/x86/chacha.h b/lib/crypto/x86/chacha.h
-index 76cddc522fa04..3e465184ca87b 100644
---- a/lib/crypto/x86/chacha.h
-+++ b/lib/crypto/x86/chacha.h
-@@ -188,8 +188,7 @@ static void chacha_mod_init_arch(void)
- 
- 	static_branch_enable(&chacha_use_simd);
- 
--	if (boot_cpu_has(X86_FEATURE_AVX) &&
--	    boot_cpu_has(X86_FEATURE_AVX2)) {
-+	if (boot_cpu_has(X86_FEATURE_AVX2)) {
- 		static_branch_enable(&chacha_use_avx2);
- 
- 		if (boot_cpu_has(X86_FEATURE_AVX512VL) &&
+diff --git a/lib/crypto/x86/poly1305.h b/lib/crypto/x86/poly1305.h
+index 3b92e20f4f9b3..89d3b6add442a 100644
+--- a/lib/crypto/x86/poly1305.h
++++ b/lib/crypto/x86/poly1305.h
+@@ -143,13 +143,17 @@ static void poly1305_emit(const struct poly1305_state *ctx,
+ #define poly1305_mod_init_arch poly1305_mod_init_arch
+ static void poly1305_mod_init_arch(void)
+ {
+-	if (boot_cpu_has(X86_FEATURE_AVX))
++	if (boot_cpu_has(X86_FEATURE_AVX)) {
+ 		static_branch_enable(&poly1305_use_avx);
+-	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_AVX2))
+-		static_branch_enable(&poly1305_use_avx2);
+-	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_AVX2) &&
+-	    boot_cpu_has(X86_FEATURE_AVX512F) &&
+-	    /* Skylake downclocks unacceptably much when using zmm, but later generations are fast. */
+-	    boot_cpu_data.x86_vfm != INTEL_SKYLAKE_X)
+-		static_branch_enable(&poly1305_use_avx512);
++		if (boot_cpu_has(X86_FEATURE_AVX2)) {
++			static_branch_enable(&poly1305_use_avx2);
++			/*
++			 * Skylake downclocks unacceptably much when using zmm,
++			 * but later generations are fast.
++			 */
++			if (boot_cpu_has(X86_FEATURE_AVX512F) &&
++			    boot_cpu_data.x86_vfm != INTEL_SKYLAKE_X)
++				static_branch_enable(&poly1305_use_avx512);
++		}
++	}
+ }
 
 base-commit: 33b4f31b1aea3f62b61c892daefc0e6a77859032
 -- 
