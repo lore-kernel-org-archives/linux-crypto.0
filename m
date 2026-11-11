@@ -1,100 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.222.178
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794397862;
-	b=EtDCs+P0Hfl9TebwFD8yqxeXNvs7QO2RMYrlSpghKOEh+bHlr8S0CByOwpPqIhqh9dyT
-	 mO/UVERjM7RZ3xLNJaCKLbHF7RaSG5DrsK7cEuRfMke8OtQsODlQ02GVpXlC857+v3shO
-	 clAKycPehQkdtdYd5ZWEpuJbhUYuH/IDbBmlACGt9UjF4ioPjBHnEXM/EXh2gs0ch4oXu
-	 bbB7gCLx+qxtyf6PM2gTiojvih+QsiH14shhKftk/x++8WtgosV/rhkJSuelULu2guhE6
-	 8jAfN8KoQQqZA/mHBm434hkg3wa5kTt9CbfCLqVdDJC/flDLZZ2Z0BhCHZLbbL05f4Q==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794397862;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type;
-	bh=SvJ/yakFDduNn4r/1BAeP9p8qTqGeWwQTRNwHFqESl4=;
-	b=Bruo0j7lIrbXOVBSZT743jfhE6Z9f2X4+waPW5K25GZHKNAttAKqvaVNaU0EX5bI/W6g
-	 qGf5qDYF9qsR3zl8Xm9kS2aJoSnbV38QINl4uZG2AXnRvwaNpHxkvYKA+uUXCmc4bMJZD
-	 0cZFKlTV8TrjlO+c6YmYPmSjnxr+GgCvPymap8Vb8geQM+PfpYdmHcpOpNeq5qPVtxlUT
-	 Tv7C/OGV4VqQJAAwTsX0+51zOxRVTGhABMIPrtaEH9WkRzkui3s8PKn4NCq8FdfwiZkhB
-	 4YRqkGpNdlv9ATKkRMMvxtAgWLwLgTnMKM/R81bCGzN9gDVeQ9AA5COL20CnTIYjGJw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=thegoodpenguin.co.uk;
-	spf=pass smtp.mailfrom=thegoodpenguin.co.uk;
-	dkim=pass header.d=thegoodpenguin-co-uk.20260707.gappssmtp.com header.i=@thegoodpenguin-co-uk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=V5b2CttP;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.222.178
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794398131;
+	b=DfQlpyEEwTAcAVx0UeMc2PAXxk2ersEaHr5iscZqueYBYkFaNFXEdnc3Mf/NS2WQrz+J
+	 LpC+rQ0gYA+AX8NYpZlc+Edwax1Bz/KlndmJlOZ4JwDM68ToAVN86AIf3fRxLsXVUZ8to
+	 BQh3HGD2lZ7VUauLnCt6XE2JBfPPakOGB0xLxAwYcIq+epiSwOgnoTZjdA2SL6w7tyy9p
+	 wNZXuzv2c27tPm0Laytg3oxoNRtQQlQy95x80awDGZGjf4+PZLK0cleXbC3v9jcogCABu
+	 RzBkh7z/HALky6jP48G8SeJLl+kRpPwRlejb9cd8vxUIV5rjv773g3bYj/U4LK0nmEg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794398131;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=PGvsu9/JZQ+N/QI6/3pmeeJRuhLul8XtmywqRM3J3ew=;
+	b=b07+nzpzfoEmQ09WJqyYYjENASAqlVNYqXfs4dMYTlQUkV6TADtRNb7K/mcdAZqPBkmx
+	 78OiEtPtt9ngPtXaotORXmK7c1r+aKrt9XK3TjiPS7dXtlQVJak3lv5eFdqk/iZt6yiVU
+	 nBOuCq8ZWGZSnjmNNWigB7Ff8WodTsei+cig/Olj8nrfOB7wCQsVuVc0J2H3oXVQnugZf
+	 Y2+3c5J5CMAjF3L6kJBsm80+veP7W70aXtApbtSmpfsjny1B6le9F6zdCryqwnqBOj2td
+	 odpnJVUIHpbnxTfkbtoQedGrXigkZkPjWfAxvZJeZdKGO+/JXniV/EGZMNOywYQReIQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ClQVkByF;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC10C606A33B
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 11:51:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DC10C606A33B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thegoodpenguin.co.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9406606A31C;
+	Wed, 11 Nov 2026 11:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thegoodpenguin-co-uk.20260707.gappssmtp.com header.i=@thegoodpenguin-co-uk.20260707.gappssmtp.com header.a=rsa-sha256 header.s=20260707 header.b=V5b2CttP
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-93efc0452b5so203816685a.0
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 03:51:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794397861; cv=none;
-        d=google.com; s=arc-20260327;
-        b=GTWFAzA9FPArpOXO00kVw8q/0J53HKbiqTWuwLbBLlPwGRayeVX2nxaPDqqJz9qVcT
-         O8RxtsJOA1da31Vk/Ajxx1PRhddId9vaCCTFbFPXvm+EXUI+PVapolVelUx4er8ZgC1H
-         Q/Hc4xOQy1dhtEMtMEQFxKSPcjTYYIjLNuC5/+FcUK+kSm1mIAdhVXJToekKTiUSSjnn
-         Ii5O0J13zV1Hb4vbwI3TDWqDPAUblYlzygJDDdVDnTSuUbTjnB7qaACxLbfowkBN3O/s
-         uViGE4x6cTZZDLXZSTK8YuCQyVl+ocGNCVYWfCZxDMJWe91tm3XDLuHtFVi+DpBHYrNg
-         28kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=SvJ/yakFDduNn4r/1BAeP9p8qTqGeWwQTRNwHFqESl4=;
-        fh=BPw6W1nolRx/nWux81Ss3k3gVgPb2HnaimOz9ZR4DVI=;
-        b=WaP0EfvZ8u3CyP4KLYPDbBpAY91DQUwALDTyDF4A398zvDnFR0FfWM/h9wGz1TGpFy
-         UWFmmYOE4GqbYvNX3saMk7UIzaXNajNlm9/rZBv2IoNTBwNvh7/rjoTNL7CMkSxd+Ph+
-         pGAczZLHyWp/0Duo1HZUZZc34CEYwIwv7rGm5QWjVnFfsAUpMYWsjdFb2SAHqJsiDBsc
-         3902iuUTslPJwpQHnkPyfi1IoOxcZGbJaAAGPDo/LBIwaXTTgExcKIRjs8g05Gi/OE23
-         vqSZqmeJXZo3zs6VSxj0D7UPHA/kXtlIvgDPKZ0cZ7FtyB1LVFgQx50sqsSyIbRYpHeQ
-         TboA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=thegoodpenguin-co-uk.20260707.gappssmtp.com; s=20260707; t=1794397861; x=1795002661; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=SvJ/yakFDduNn4r/1BAeP9p8qTqGeWwQTRNwHFqESl4=;
-        b=V5b2CttPgbaVLOVj6ShAbHXi4p9RJT87mHYSQ2huFLF0TIid3B0OYYsH+S43C8BZV9
-         9D+7K5VTtq4qrX6bb+aRmpJWX4OF3zJh324PqWGT1mn5sCmaEY/mlYE8QO/HSeLnzz+S
-         Lp5LcjvplpXXuqRUqb9o/5LhjixxkPgMhPUxWDdl19PZhejlNgF6B0vLWL7IRsNblZRL
-         BQF+ayRBoIUIE0r+npXYv2+V5xhmi6ou+bwi8JU7E72bKUJFC8OLdfnbRUYt/bpm8v/P
-         EDD6hi9UaGnRnghqrhZhKUn1jl9/ZIH1mZCsmv3gyaT7BSi3sRQsQ+sbLT+M9LY+qzqb
-         qpvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794397861; x=1795002661;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=SvJ/yakFDduNn4r/1BAeP9p8qTqGeWwQTRNwHFqESl4=;
-        b=IvLIAZLuxkTKZl5zmmKS/C3vt+28sYRyHgxZPPmi0dPKnzwG95czJeRyJ62xSi4Aq5
-         HSFlZpcgaj2+Y7MOguhOvhR4RYGcQycPyFhmWsUzRT6M/60X9srRRVvJnVsQvWqq8YuJ
-         5JDxkawB/KvGKtBSWYW/qS9mWMqeUIOFPyBu9gdxdqLgI0n9pSsKH0BskZI/Y57zBGpL
-         ahlkOkrTk0wNbNeHezt9lXsodkYSTcKyht3LhzU2bwSKjNv9nS9KExrIvqIjMhaWbTTb
-         dy3Zu9aKW/RTupyVVuZ1RxjnhrixQcwopyNcsP5frQGAlarYsgXpwyR/gLJkJZCGB+aw
-         4flw==
-X-Forwarded-Encrypted: i=1; AL+hErG7tVnDIem8URPkBO1OioUs3YAyhOv0VgmbVvIlQco95bX7d3wSBB0QPCrIZ6rTpKKxD+BPAJFN2cTTR7U=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+D3+U4+CuoCtMoqClD10AGqrJaG36EDWZ1bHGzDCmLkQiJMIRD
-	kU5yB5IwZOJFXrZwOked2irqqLbH0+G4kFL5rftrBBtnJ61usSN4OXwFihjHBVipaDHiKRVZUsy
-	lsNgwkkMGILmT91YKsB+HTrSx69sqG4beets81CTPRw==
-X-Gm-Gg: AYBFou1xwYbeC0hfwLR33jGmjOgIt4AW27o1mPcwx8uZkoVN2SBBq2cyJ5SkHaR+pDw
-	QfyzuksewvQRT5/UhzcR+IpdgyPNjrRPetlAmFjxune89IpufzJruZHnWHpKI5FE9p73QfxPWAF
-	O5Gxhoi1uUZSa0yNB/38t3inzoYukEIxNoKh4va1s14ZiibshsH+uK0XbF5hOrfIbGVBM07c9Xh
-	XjENp/JvCA+nJYgKu41CAMrf1lYSzP6601triJDsdblUD1iFL72KAYgYFKnn68yZWwsc1eem6Lx
-	UKyf+gjAgsLSPX6mwWs7UtL2VREaRQqjCnD0pl8f/PVmctXw/487aa2c1AQgFetu4vLCN7CCie4
-	KsS1+BVDUMLriEcy2LluJidaKmFi8sIQ0dFe+9L6g7wXAxQ8g56afSzcQkS5wRXpimILE2RU5Gf
-	Zxi1ayiOkPJQlNXbbl
-X-Received: by 2002:a05:620a:8908:b0:93f:34c9:9259 with SMTP id
- af79cd13be357-947affef9aamr308328285a.50.1794397860820; Wed, 11 Nov 2026
- 03:51:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ClQVkByF
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 671581F00A05;
+	Wed, 11 Nov 2026 11:55:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794398131;
+	bh=PGvsu9/JZQ+N/QI6/3pmeeJRuhLul8XtmywqRM3J3ew=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ClQVkByFnAQxI3or7r/1Y1iRok8udc9O8ftg6U6iSV7IiA4SNGG5pF7v7RWDt3YBT
+	 yH8w3XspXdBTHltg3x3yt5qRf8cJSo83a60FFQ/EXOfUggwoYw6/HBXEZpIiUzCLoH
+	 E9MFZe0PTyLsKQMKaPkK7PacASg6ah5lSrc84ba0Hh3kq0fuVo0hdCp4RKSnOA0Lga
+	 Rf7GDQ8TMQCw9tOsBL2R8tbsbSJC18qQKr002cuYty843vd8AMxp+WUzIFMFqKiPp3
+	 Tpd/0cCB7so+2QP0oD1tAflANGGoOZWSO4Jgq71EAP+WjtX05koa7cC5BXvtEZSucu
+	 0MlQ4SRKE/X9A==
+Date: Wed, 11 Nov 2026 12:55:27 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Andrew Gigena <mail@andrewgigena.dev>
+Cc: Abel Vesa <abelvesa@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
+	Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, 
+	Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Andy Gross <agross@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] dt-bindings: ufs: qcom: classify sm8150-ufshc as
+ standalone ICE
+Message-ID: <20261111-capable-violet-degu-e764f8@quoll>
+References: <20261111-sm8150-ice-rfc-v3-0-f9d5a806fc95@andrewgigena.dev>
+ <20261111-sm8150-ice-rfc-v3-2-f9d5a806fc95@andrewgigena.dev>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -104,33 +65,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <cover.1794347059.git.u.kleine-koenig@baylibre.com>
- <39fc883cf1c7077bce8f16719cca59060a395b02.1794347059.git.u.kleine-koenig@baylibre.com>
- <avQrO4etMgpOhvwF@ashevche-desk.local> <avQ19KBnQ2mnhZa-@monoceros>
-In-Reply-To: <avQ19KBnQ2mnhZa-@monoceros>
-From: Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
-Date: Wed, 11 Nov 2026 11:50:48 +0000
-X-Gm-Features: AclHuK9yXImPSOD4H34XxYmcqqFrOLj5GBNrtIWsMZD69B4vZ4xDk3_xNWS8s7s
-Message-ID: <CAA6zWZJd7Leaytnf-BfHu5ujAnEhTwSB2007KXnV=eE=pvpz4g@mail.gmail.com>
-Subject: Re: [PATCH v4 10/20] mfd: Use named initializers for acpi_device_id arrays
-To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Lee Jones <lee@kernel.org>, 
-	David Rhodes <david.rhodes@cirrus.com>, Richard Fitzgerald <rf@opensource.cirrus.com>, 
-	Mika Westerberg <mika.westerberg@linux.intel.com>, Zha Qipeng <qipeng.zha@intel.com>, 
-	Qunqin Zhao <zhaoqunqin@loongson.cn>, Thomas Richard <thomas.richard@bootlin.com>, 
-	linux-sound@vger.kernel.org, patches@opensource.cirrus.com, 
-	mfd@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, Charles Keepax <ckeepax@opensource.cirrus.com>, 
-	Linus Walleij <linusw@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20261111-sm8150-ice-rfc-v3-2-f9d5a806fc95@andrewgigena.dev>
 
-> Oh, I wasn't aware that Pawel is still on that. Initially we had a list
-> where Pawel indeed was assigned for acpi_device_id. Since then I went on
-> to do these changes per subsystem for several *_device_id at once
-> (instead of per *_device_id and subsystem) and stopped looking after the
-> initial list. I might have mentioned that in our internal chat, but I
-> take the blame on the lack of coordination.
+On Wed, Nov 11, 2026 at 04:17:50AM +0000, Andrew Gigena wrote:
+> SM8150 UFS uses a standalone ICE node, so its compatible belongs to the
+> standalone-ICE binding rather than the embedded-ICE one.
+> 
+> Signed-off-by: Andrew Gigena <mail@andrewgigena.dev>
+> ---
+>  Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml |  2 ++
+>  Documentation/devicetree/bindings/ufs/qcom,ufs.yaml          | 11 ++++-------
+>  2 files changed, 6 insertions(+), 7 deletions(-)
+> 
 
-Hi Uwe! My bad as well! We just had a chat and now agreed to proceed
-in a coordinated way and do all *device_id changes per subsystem in
-one sweep to reduce the amount of churn.
+This introduces new dtbs_check warning, which is fine but should be
+explained that it has no practical impact.
+
+Best regards,
+Krzysztof
+
