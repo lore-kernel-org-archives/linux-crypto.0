@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794395416;
-	b=BfxsKPBSF/GpUDlrKym13cWWX3aoeX1HaNRlPNFcbOA0rbB+TFwzuw/BCEFm9Mn4xoaG
-	 5dHr/AuB+VVsSjuSq564mq9558YXXgF7HhMD6RHdIPdqlLl6GZp5JN1l1reVPeeGxw/Ke
-	 s5IfjqSMCCl9bvUJVBh6es9XHyAXDNm6lpCrx/+nSMOARLShRA1jpCHQ12tbePcQw7vSX
-	 rnFTKOEdhwU/S+RMWXSTLID8oDtePccck4TJYa9mNmsv4k3fi9Jk6eZ9vi+kv9jHgKxfW
-	 w4NzGwt2MTb01C9uWgC3ttfGQuME6ZjMKR0dD1BdY+YFZfs4kOrYCDBHqGFKc1VNfyA==
+	t=1794395470;
+	b=Ak28A59ZY293JNBdo/RVqnSCPMitqOOkrImleOivf+iFr3Ev8o/3g7zc6xCYpcavZp3+
+	 ggHvNzmY4etcbukhU7foSGikVChjjYuWXt2qB+1uqS55YW2y0x1PEh7Hz9mRJTqnPH2vA
+	 Rpii1kjYKTGpz6aezneQijzRQpbQWkv3fGI0lXfA5iPYmtcxWqjqHoLTO4xARf5t/QvGP
+	 3stNS3DFecS51/s8PfB9KTFGFf9VJPln3R73A/G+an0GYfEBZYTV2Q2CharCUxfku5VhM
+	 UxexNyICFqW6tL7UHqFy+p7NhIIriWLA22v8Kx305QQ+uHi2fW/OSw8t1D9CIac2cbw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794395416;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794395470;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=W4Zd/TWVFnT//vb4/FFMwAQIXVyfGZrnD6iu7ob72UI=;
-	b=hMNfgwYdV/syULWug1rshRpXIQg7b5GKe8i8Q8p+9wEy7bvvREDRp8UMS80wpgb6P4dL
-	 K9HA7Xc9x5N6IHhdd0ZRwL9EZyh1S6zKhjL114LLvkxrswFGrlxNofE2OogNwNl2iurOd
-	 avNViRabyVSn8sv+e2sm53+m4vt/HVPlt7AOgjlvERdsbnmaDqTG03D54qHD+SUXidh/G
-	 uaFlmWVR+dFdcecLpzrWeIo28t22/kobrkEoydr3Sfg7nikp/NKNQCVvd/0oaOYFx16Wp
-	 +i2LB094u6avYiB7uuyhjdvO7qPXsUGk/Sn14AEk4SdsBku+c8dTgVudRETjI4LL4og==
+	bh=Wqf670lVRIqkSlXkc/j0Hs3DDZypkVmJhCP0wEC28B8=;
+	b=QQEbblUfkc8XGp4olvO7V3seu/TllyeamQzP7CUrVjYuoDX24tSrZAzfsSAryNU0mPdu
+	 uun7T18hKRNidsgYEEXx0o4biCVJm/jRzmNwx7hvvl1ChgulrHKKpVWV8/4FkTHFD5Jt4
+	 A+5d2kq2ITNX4FWTrGJ5YbIq6fVYYZSlqducihv8H2HQ7qCnnaG0qowtv8ErHY2qGYZYZ
+	 BoTvb7pQdiOUnwIoF4R7y8b94qoe2CUifFEHE1Y04PEk+mSEnEiURc4QF8SqoC/1DqeKZ
+	 qe27c8lEGTWANu9so/D07IEdXuq/TTXIxpNzX1wuQ9wwNnwS8/gJsF54kc2vxzCWK7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=DHMlKQv2;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=OEHFVsDd;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF484606A895;
-	Wed, 11 Nov 2026 11:10:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF484606A895
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67525606A32E;
+	Wed, 11 Nov 2026 11:11:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 67525606A32E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=DHMlKQv2
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=OEHFVsDd
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=W4Zd/TWVFnT//vb4/FFMwAQIXVyfGZrnD6iu7ob72UI=; 
-	b=DHMlKQv2B02Hb+AoRBrod1bVe2mTBfhVxzmEX+pAngretmvXktRfmCHXjVGAuo8n8DHCLLOJf9s
-	I5GIgyY0+9EMX0S57Ho32uBuQEtqgUcMZmTlRqwJEM7kCCMbAFp9xDcygSw/pVgOinuf9cx85RWxh
-	rNqs63P9P6tFB4ur/rkr5mUjnP0vYiGOS17UK0DX1i6b/BzS3Pb1FQLMYpVDLF7DZnkAVC03lrgYi
-	guGKtUkyt5PRNt7+7IK/Y0xTO/hT/EF5fCL4d53ORsEsV/ieoswqDmQIHEM7YVPyCcsaXbCI4VWFJ
-	MbUortb9+5QZD4lvZYOD+E6Pza3MuohhGamw==;
+	from:content-type:reply-to; bh=Wqf670lVRIqkSlXkc/j0Hs3DDZypkVmJhCP0wEC28B8=; 
+	b=OEHFVsDdXtsM4pU2FvmQHtHOH51IpmoKSRBy1vWyxbsZMT3R4KbiFcEzULHteifp3rB35e2F7/H
+	qQJfhosuWbVI51TWDfsflOrn/c9wBanTDe0ipURHOK+Y4epyY2l5pcpJ3Wi2SAJbuqi96cKEVS5of
+	YjTOBeZLf7UAh9xKlvC8F/qAsOU2eq/rsJvJlnaURTcAQLUwi7L9YBbkl7lurLKCofj7K3xXgiIib
+	e0RKiiFQJhjPYkN2y03VGAu6FCk+zcajXQ+8KhLpt/8p6+DpOwUxUJ2KtJTHk4AXaAT9mXEg/Y3d/
+	7/0YKCOLJgdZdDD321Fnv/CNk3gxjVKdQ6xw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xR6DT-0000000DmPX-467m;
-	Wed, 11 Nov 2026 19:10:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Nov 2026 19:10:11 +0800
-Date: Wed, 11 Nov 2026 19:10:11 +0800
+	id 1xR6EM-0000000DmQ4-297H;
+	Wed, 11 Nov 2026 19:11:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Nov 2026 19:11:06 +0800
+Date: Wed, 11 Nov 2026 19:11:06 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 Cc: Bartosz Golaszewski <brgl@kernel.org>,
@@ -63,9 +63,9 @@ Cc: Bartosz Golaszewski <brgl@kernel.org>,
 	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org,
 	Pankaj Patil <pankaj.patil@oss.qualcomm.com>
-Subject: Re: [PATCH v12 0/4] crypto: qce - fix self-test issues in skcipher
-Message-ID: <avRNE-rPQDTNWvMh@gondor.apana.org.au>
-References: <20261019-qce-fixes-skcipher-v12-0-046e6be9bd83@oss.qualcomm.com>
+Subject: Re: [PATCH v12 0/3] crypto - qce: fix self-test issues in aead
+Message-ID: <avRNSjAu-KDqJHSw@gondor.apana.org.au>
+References: <20261020-qce-fixes-aead-v12-0-77a2e09abd0c@oss.qualcomm.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -77,23 +77,23 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261019-qce-fixes-skcipher-v12-0-046e6be9bd83@oss.qualcomm.com>
+In-Reply-To: <20261020-qce-fixes-aead-v12-0-77a2e09abd0c@oss.qualcomm.com>
 
-On Mon, Oct 19, 2026 at 04:46:04PM +0200, Bartosz Golaszewski wrote:
-> This iteration will hopefully fix the final remaining comment from
-> sashiko.
+On Tue, Oct 20, 2026 at 02:47:00PM +0200, Bartosz Golaszewski wrote:
+> As requested by Herbert: this is the aead part of the QCE fixes sent
+> separately for easier review.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 > ---
 > Changes in v12:
-> - Also reject messages shorter than a full block for AES-XTS
-> - Link to v11: https://patch.msgid.link/20261016-qce-fixes-skcipher-v11-0-d13ddfe609a4@oss.qualcomm.com
+> - clear the ctx->need_fallback flag for key sizes other than AES-192
+>   (sashiko)
+> - Link to v11: https://patch.msgid.link/20261019-qce-fixes-aead-v11-0-11c55cc7a695@oss.qualcomm.com
 > 
 > Changes in v11:
-> - Split out the skcipher patches into a smaller series for easier review
-> - Drop patch "crypto: qce - Fix CTR-AES for partial block requests" as a
->   subsequent commit makes this adjustment effectively dead code
-> - Fix a mid-series build failure due to an earlier bad rebase
+> - Split out the aead patches into a smaller series for easier review
+> - add a patch fixing a race condition resulting from sharing
+>   ctx->eed_fallback by concurrent requests
 > - Link to v10: https://patch.msgid.link/20261013-qce-fix-self-tests-v10-0-57162a38a554@oss.qualcomm.com
 > 
 > Changes in v10:
@@ -157,19 +157,15 @@ On Mon, Oct 19, 2026 at 04:46:04PM +0200, Bartosz Golaszewski wrote:
 > 
 > ---
 > Bartosz Golaszewski (3):
->       crypto: qce - Reject messages shorter than a block for AES-XTS
->       crypto: qce - Use a fallback for AES-CTR with a partial final block
->       crypto: qce - Use fallback for fragmented skcipher payloads
+>       crypto: qce - Don't modify the TFM context for per-request fallback
+>       crypto: qce - Use a fallback for CCM with a partial final block
+>       crypto: qce - Use fallback for CCM with a fragmented payload
 > 
-> Kuldeep Singh (1):
->       crypto: qce - Fix xts-aes-qce for weak keys
-> 
->  drivers/crypto/qce/cipher.h   |  1 +
->  drivers/crypto/qce/skcipher.c | 41 +++++++++++++++++++++++++++++++++--------
->  2 files changed, 34 insertions(+), 8 deletions(-)
+>  drivers/crypto/qce/aead.c | 46 ++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 36 insertions(+), 10 deletions(-)
 > ---
-> base-commit: f0f20b900bbb8bdcfaf6cb282787854067d8eec8
-> change-id: 20261016-qce-fixes-skcipher-e0384a650e25
+> base-commit: 0aac16003b01b9282491ea3d454697c2dc7e8c78
+> change-id: 20261019-qce-fixes-aead-e229fa2015e3
 > 
 > Best regards,
 > -- 
