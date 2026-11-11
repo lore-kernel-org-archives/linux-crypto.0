@@ -1,123 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794392026;
-	b=GxkCIPSa/6D1EJIBZgA1TuolAv78PsA145fo1rZHReT4SepeH8BBydpdM4pR+7bHY25T
-	 7rL4u2xwesvQVFB1NwgyrPSXsMgeujKtDrq3LX+HIHfD6tlURWB2u4Qh6UjzGlNgD4NQj
-	 Z7omNRW7VSZduJLPifDPkizw6u1fQzj3bkaXgQoSyY0vTQ7AXCscI2v7PJYOmPmKNvfhk
-	 2NfXhU1k32ZLPg7wO9g7zr4ka37k7lmY53B7REYMv8qA1dl0RohHKSd9iuHNCAOi4zzbX
-	 irLiTKB3mcaoVX/eFg1IgBq8+Z2famGxQf8yWutn9pcpKscYgjtbuOojSI2aOoxFGUA==
+	t=1794393896;
+	b=XrF9lzznfVCKPMqX47zbYIb+a/OThEHGLKsFKHwlsipvtpf0ib7HAwdZzHJM8zjsjmOT
+	 T6IIhZDMKRYpLnova5FfXSGc+6vht2d5YTiXvyM0UIKA6SwWPX6+3AOpQ63/dAXjsH7uE
+	 nDm6egqME2J4QLfUQB5TyVXBJWvOIWO7l5JpisZ6I+HL3iC111gRpg2ngFK2VXGn2J3aA
+	 go1qFt6bwvy7Q1KF/JXg8ZUKu7FGWmnL93zPhLHl0NBE7c36if/yiC3YTTkOnSNrtTJyv
+	 qDmfiZQtpRtV/xGq+WLgX6IBxv6f4Jx1184XU6s0Bf+TJlcNLR6+cK4GMmyhOOyHX5w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794392026;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Date:From:
-	 To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:X-Proofpoint-Spam-Info:
-	 X-Authority-Analysis:X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=5McJnxb83WQY6Kyk4BRcLwQ/t8a2Otwl41DlY+4EO5Q=;
-	b=km4QBfjTnmalQrLrMxdKnfqsD2oqeDEcjgbYx45LAH+aCJjAsTjq7FVJg9yX4NdKD+Xh
-	 Atd7STZBkTpsgXtxStfCn0VwXG22Fsizdv00s+VUmiZjiQlv5NLGQNjF5tTeoW+MdcBQg
-	 +fQ9JGdZWphvR8crHcfAh2TrBZzhxM8ltQQA6giSL/G4z2avhPBSsF2ReSy/wElp8IKQv
-	 pMSyR9B25n2b/fUV1oH97em04T+MwwxEhD/yOdKSVEGUlvBUAU3BN1dueTO1TECmX/3QZ
-	 xyepDYjPg84qCB7fpDb//bWcckmiMiT15/KnNd86ATqjn9iVWY+xoX1ujyfzpATB/Tw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794393896;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=QXEhi4g+1QbPElhmNqyuHB6NGR5M3lkugk5YWNvi+aM=;
+	b=htHgf5as9f8LVXKCP9//yysTQWFJ9GhppRCkL2x3q53KNqNKMOMT93MtCrFzulAYm5/E
+	 I2+dqJHYd9Mmz5QYqvwWiviVj4n9KmjFkY5GV6UNfqRR9mtXZvmV+S1/0D4iRSpOgoLEz
+	 9WkKoEXFndEn0WElMWw2kh195C567Prkpdwoc60jHIJngN3krjiLHCy12QNiUREfsESAF
+	 ehabSrneUIHDhmwYAY1eL6EuN2IyzngdohHFkSMA8FPIxwx8bc5a5ocj9f16ZcTQTSOsU
+	 3FebeSFDlJdq4ap2KdyrtN4a9TT8IkarznnXohxA+BzPjK1SQIWvVgep5Z8efoHzi/A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Hx7qaaDr;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=UOpiTRlG;
-	arc=none smtp.remote-ip=205.220.180.131
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=KbRa+Eee;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A86B606A324
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 10:13:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3A86B606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D20B606A31C;
+	Wed, 11 Nov 2026 10:44:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5D20B606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Hx7qaaDr;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=UOpiTRlG
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AB5LBWW1052930
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 10:13:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=5McJnxb83WQY6Kyk4BRcLwQ/
-	t8a2Otwl41DlY+4EO5Q=; b=Hx7qaaDrgNyaX1pYAxVX9pZF39S6QKy9m7Q6v7yt
-	24I+xxtIM5XoHs0dBHptK1Ir+wxRh3oYHIggv9PTq/A9/odrPASt58sspaYYd8RQ
-	tlqxxE6rx/EPDv/meyxv5bqJou2dAN3R62caSMqA3Xp48qRWYdko0vd7/LhGqUeq
-	9skyEkcpkzHdKMJ9zNuXortCeomCpHxj+e/9bbI7PxTUY8V2yGLS20iOh4cgCHmx
-	Q4LOKAS4es4o90jpYemRpDA4rrFFvaMclm3swKwUhJ/0ufbSShXuLxh5KlgkNJRc
-	hvtZ5Hi3UR/OJYIvaE3UCnzIzlczMLST59CgeloZYQml2A==
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hvdrh22hq-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 10:13:45 +0000 (GMT)
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-93f6f4fe531so542768885a.0
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 02:13:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1794392024; x=1794996824; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=5McJnxb83WQY6Kyk4BRcLwQ/t8a2Otwl41DlY+4EO5Q=;
-        b=UOpiTRlGeZym+Yl/c1KdTpZpSLEXAyKj/EVyc36g13N9he8c7CltOzE+QlGG8+O3ps
-         gDmUWOI4h6D1RSJ4oHC0MdSs2Y4tF7w9f+ZzDc3tYFCHlWYy6L0QD7400ohEOVyUQjbu
-         x9ZXbtnfc7Y/KfixdVXUl275vn1ac/qO7ulD8HvawppDw8ff/VbazlzaNwquiZQhBsZP
-         NRBloS/CBZbLy2wCch4ZTj8uVcSg3Ez/G+872Eaftj4+ui/x3DEUHIwIAi0SzSHi06zu
-         Bn8+oOQBm/GXHrKAJTrWhQaxxAs6Gr2eZwJI66Yx0v+ldKb6XHMZHjiHGcdrAlTs0tPD
-         s+tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794392024; x=1794996824;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=5McJnxb83WQY6Kyk4BRcLwQ/t8a2Otwl41DlY+4EO5Q=;
-        b=vguQ9VzskvB4F6hpg9WAoj4PJAxIbbSR9NnFdpigGQCWMFUejYdsa9CSWV0B5eBBcq
-         36AfGkSYKztXGvZrbgtKmNde/Gpfs1NHlO6eLb7Kv8TZ1vDv0EsUFtQgyOaDX0OlAA7U
-         89iK+8i+qSSmelvnMdeL3pG52MT6dpXTwN0sZ05wKKPQ8IP2lGguIzDduea9bTfgeIfa
-         Liar3GtOds7w5XY/HuzS1PoIke+fJW/4+I5UUSzF1MmezIhR9tNRc8ELQEyjs6hxUMJ7
-         W7YpzBknIVDiN2o8mat38za4ar8OQBWdeTmjNB1m8tZS8kxKRiqn0hzOsQLmwNo128uO
-         Mf8g==
-X-Forwarded-Encrypted: i=1; AL+hErF5EqY3AvzQWuFghuYbdITrbfFLGrYHCZVD7VcHkVmaXpBBrC0cxR3ElPwJZnx5ZrhEX9cCDafASD6umnY=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9o0RKtTzmNVoMKSxCutEMZWixYtuFV2/+6bkYPV4rQp3mg/je3
-	DFcRmwMhO3SbE0YWY2eUb2QUn0KcWO9btZyGRucsL7hiJgaVulMXNRuEdurdeFw7fb38PeRNVIZ
-	WIxzDh8CVqDBdpPXanh6cXbuDbdjQEhbzti1BRgQ/L2iYZlMTcw3kK6gn8qq7oZEwEWrpYms7dn
-	U=
-X-Gm-Gg: AYBFou0gaustNp/pIxl701N7bmHr9PbYsYf84FxlO1WbLL6QX7u7czCChsr3R/vK9Z1
-	NWn+NJ6K1bOAHGk9jmQIS5/9qm3ww1Ibrc7RYw46aU7+k37YH7LZ4ZHc+71L2SF70sfnyou38n6
-	4rHPlLf6aqnz82DgVIbEjmRsnEcesx+pDEMiljkMDAJ/Wz15xnoHbsCs1vRw8THjgWelVLliHhG
-	YzY4HbVPdO88+96c0cj1OwMp94jCNHv2+WyT3c/PzhEoxPCEHoUnezFiTqdZBj7O/rlIhaZnmGW
-	hNAnfA8vg2Ap9c0VMsCwbMX0cX4nPiaSd72zcHv45yR+I1fK22Q6HB2gGMoPS+/KbI0eHJzCCwJ
-	LN8Q7OWIYUwIkhgkNFIrthHHmaNJXtzscodW3XCD1Vv8wa4jcjvzMnoqbzE9Ga6Ex
-X-Received: by 2002:a05:620a:6c11:b0:93f:19fe:e6ca with SMTP id af79cd13be357-947aff8efecmr302492485a.43.1794392024344;
-        Wed, 11 Nov 2026 02:13:44 -0800 (PST)
-X-Received: by 2002:a05:620a:6c11:b0:93f:19fe:e6ca with SMTP id af79cd13be357-947aff8efecmr302489085a.43.1794392023805;
-        Wed, 11 Nov 2026 02:13:43 -0800 (PST)
-Received: from oss.qualcomm.com ([188.27.161.77])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4983600bd6esm10339577f8f.28.2026.11.11.02.13.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Nov 2026 02:13:43 -0800 (PST)
-Date: Wed, 11 Nov 2026 12:13:41 +0200
-From: Abel Vesa <abel.vesa@oss.qualcomm.com>
-To: Demeter Barna <me@fromdisposition.org>
-Cc: Abel Vesa <abelvesa@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: sm8350: Add the inline crypto
- engine
-Message-ID: <m54copzsq6jovs7miluvkwwczxiquq67n5vgddy34vd4otycxw@ezowb2pkeesp>
-References: <20261109-b4-sm8350-ice-v2-0-fd5e84985e90@fromdisposition.org>
- <20261109-b4-sm8350-ice-v2-2-fd5e84985e90@fromdisposition.org>
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=KbRa+Eee
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=QXEhi4g+1QbPElhmNqyuHB6NGR5M3lkugk5YWNvi+aM=; 
+	b=KbRa+Eeeo1zU2vH++8/Ff0bpzI3/EAl29l+JDm56IiwP+sbf+AyrN9hmgX7ebEDbokJssqeBRMK
+	AwVF4ZC3vGKCA4acaZLkip6jgFicG3/iYntf2SG6hkmwz2TJ7WHkLo+HI9JXmJT1q+eF8DJMow4Ue
+	q7JPE8CTLRB1n84gjPFGEy5rQKYEwD2OyqFeyw4eLlhiKUj71NNeCiabT/Qhi5gf9vwgNkCbC6vFH
+	9bLFdkD85vOUn88QaJraTS7qcsjn1W+s0gDbw7sEvOrFWEjAGzcVT8ieLKKCd9Etki8uRqXw70qAn
+	E8u5IdNSo+4VPChLefApzzoZJjQxw/vOmb7Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xR5ow-0000000Dlpg-19Rw;
+	Wed, 11 Nov 2026 18:44:51 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Nov 2026 18:44:50 +0800
+Date: Wed, 11 Nov 2026 18:44:50 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Kristen Accardi <kristen.c.accardi@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] crypto: iaa - use RCU per-package WQ tables
+Message-ID: <avRHIuISSNUxfAU4@gondor.apana.org.au>
+References: <20261019-iaa-crypto-wq-tables-v1-0-fab67b2a1538@intel.com>
+ <20261019-iaa-crypto-wq-tables-v1-3-fab67b2a1538@intel.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -129,44 +68,43 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261109-b4-sm8350-ice-v2-2-fd5e84985e90@fromdisposition.org>
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTExMDA0MCBTYWx0ZWRfX8IEpoAGygg7e
- 0iAJhrSBrrJtlD5C/vurZoiHrN9I9jjYPU2XlC4loEfTRFOLouq8MzKlYMZwBlm13VLzhxL7oBd
- 50REJc5tG6UnffR9RWVHBTNBuJt5Kck=
-X-Authority-Analysis: v=2.4 cv=PoQG/AM3 c=1 sm=1 tr=0 ts=6af43fd9 cx=c_pps
- a=50t2pK5VMbmlHzFWWp8p/g==:117 a=asF+/XNaGoxFafzDDLC1GQ==:17
- a=kj9zAlcOel0A:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
- a=Tt5JBQAfAAAA:8 a=EUspDBNiAAAA:8 a=z9-AyCJIoEr-Zpo9GLwA:9 a=CjuIK1q_8ugA:10
- a=IoWCM6iH3mJn3m4BftBB:22 a=kpHMOrJS8sLNr5ru0mYA:22
-X-Proofpoint-GUID: R2yGwUDsNcAQhKUBLPBv-Z__Yk5Z06S3
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTExMDA0MCBTYWx0ZWRfX0D6qkDxdhH+U
- FdVa7jSQoArcW6OMECPFFEAbjsDhaiYjov5RGFgL7W9WwM2W7D0Eb4kMZEQoO5eTCNdcHC5KVJs
- zI9q8sW/Y154NjOaGM7G9MACWeaSjiFKSvvgvK5ILSSk8FbSm7v7kFARM9pURypeTpfew/BnnNl
- vdO25SHYWapIK5TGkOODLnaEaWm9enfr1FafDoIJEdfzTmkKDSSIFQk4dF4BVFyRFkOIOV12ySa
- Nkf6rOQi8ZOTiyreWMU2CMNR2YAoSRA881MKC0FV92AOd2SLn1KoWXcD2gxcqQzb/0ezgi6CJua
- nzmAy4VLmCvje/p5o1X7t3cJ+GJiLRhM/vvrUpZ3B3ApuTh2SXhRFIP2icYUk51zADr0E003u9B
- Wi+WQIl4GoUa0YF69oqlvODfGrj89PPMi2XFwRAcxw+zqtODmRbpFgfqvIVCl2rAqKwtfk09KBz
- Od3ZQFimw/v5Uf8DBuQ==
-X-Proofpoint-ORIG-GUID: R2yGwUDsNcAQhKUBLPBv-Z__Yk5Z06S3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-11_02,2026-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 suspectscore=0 clxscore=1015 priorityscore=1501
- malwarescore=0 bulkscore=0 adultscore=0 impostorscore=0 spamscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
- definitions=main-2611110040
+In-Reply-To: <20261019-iaa-crypto-wq-tables-v1-3-fab67b2a1538@intel.com>
 
-On 26-11-09 13:55:30, Demeter Barna wrote:
-> Describe the UFS inline crypto engine at 0x1d88000 and hand it to the
-> UFS host controller with qcom,ice. The region covers the engine and its
-> hardware key manager (0x8000 + 0x9000), as in Qualcomm's SM8350 device
-> tree; it is clocked by the UFS ICE core and AHB clocks and powered by
-> the UFS PHY GDSC, as on SM8450. Without it the UFS driver logs
-> "Disabling inline encryption support" and fscrypt has no hardware path.
+On Mon, Oct 19, 2026 at 04:06:22PM -0700, Vinicius Costa Gomes wrote:
+> rebalance_wq_table() gives CPU n all the WQs of IAA device
+> n / cpus_per_iaa. The flat index ignores package boundaries, so a CPU
+> can be paired with a device on another package, and each CPU sends all
+> its requests to one device while the other devices of its package stay
+> idle. The table is also rebuilt in place, so a request issued during a
+> probe or remove can read a NULL WQ and fail with -ENODEV.
 > 
-> Signed-off-by: Demeter Barna <me@fromdisposition.org>
+> Replace it with one table per package, holding the WQs of every IAA
+> device on that package, and have each CPU round-robin over its package's
+> table. Rebalance builds the whole set of tables and publishes it with
+> rcu_replace_pointer(). The submit paths look the WQ up, and take their
+> reference on it, inside an RCU read-side section.
+> 
+> - A package without IAA devices gets a copy of another package's table,
+>   so the lookup needs no fallback.
+> - Every table has room for all the WQs, a few pointers more than it
+>   needs, so they can be sized without counting per package.
+> - If a rebalance fails, the current tables are kept. On removal they
+>   are cleared instead, because they still hold the removed WQ. Removal
+>   then waits for a grace period before returning, because the idxd_wq
+>   can be freed after that.
+> 
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> ---
+>  drivers/crypto/intel/iaa/iaa_crypto.h      |   7 -
+>  drivers/crypto/intel/iaa/iaa_crypto_main.c | 346 ++++++++++-------------------
+>  2 files changed, 117 insertions(+), 236 deletions(-)
 
-Reviewed-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
+Please respond to this comment:
+
+https://sashiko.dev/#/patchset/20261019-iaa-crypto-wq-tables-v1-0-fab67b2a1538%40intel.com
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
