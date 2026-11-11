@@ -1,56 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=96.67.55.147
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794411823;
-	b=upaDMY+s1zOukxP/7HYWIIV6penxO8U8PuDicdkWwXfemTR+I9tXcGnPKGw5hQ13kagh
-	 wZHXL3LsKJBd3Z93+bBosi6rTWAI2YQMXK9zubYG207McZBN909uCp+zZinH4TZft3UIw
-	 hyTq+ueM2tMeOhKLrZan0YEgZd5TI0iKcKdODWeMyWi+m66UulGEYq++bSvZfmAt1KoM6
-	 03aRZ+bRyoBsK+Oim8Nx8WW1b2XPEDyTLB+iTB5f03WuIGdV4eae6AX71eBZ2YdjqQdU2
-	 RFD62iIREiifYwGzgEoRu8G2QrDyycZHzG7112s9vH9ySYhP5Xh5fFFFdIX1M0bStUA==
+	t=1794411873;
+	b=RzAd/LH1+Hgfq6uEtOVMTq3APP8fXxpSq+kNHjfgPXwQ91NOIlPn9SPh0ZLnPxWnvBMH
+	 TJ1uzBvryV6rPfabayG/1fbpyxxhNBP6gnuGOZz38fLzsHh79jMmZKdDxLyVWWl+sOsZW
+	 A9onfBaQxqO7a1/zJSxGNKqi6etTIqgTdfCt9nSzlWoXqY39frPwksVcPUZcZYU1spW7A
+	 i6mIoXpri4Kc90/FgSEtU8DZ2i/KFMVLt+nd8HoLsVs3s6g7Xv6D0fvRdzKP1ucrJVpIE
+	 sml1kKDfpd9Li1ZnTZuY7YsH5PeYlzT/bm8iqGD6qSz1phu24wGhQ945kY+0bXHvIMg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794411823;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794411873;
 	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:Subject:From:To:Date:
 	 In-Reply-To:References:Autocrypt:Content-Type:
 	 Content-Transfer-Encoding:User-Agent:MIME-Version;
-	bh=/9VREGS4F/KCTU6r3pJe44nJmA9BMguSSiJq5/NaFng=;
-	b=KiM8pyVvXTHLGf/tAO0TEi4YxCPIPxdaZZdwKfJTlw24ZX60Fe6pltb3//G4jpGBjcaO
-	 FCwxT9E9MgidjUwCZlRRB+7RHS/3vvBHZwEH1lXmBE6Nlh06nycxGJ3pkP/weW8cjp55o
-	 cPT3Bl969BJfKGzuUVTOQLjzmU6A9Dro9hBkhhHOt82Z4MQBi9hHyq7ibAHVAcQrwHDnF
-	 fFQdYXnumo2nNSduo30ii+4DUORXSTCyyKcwBXuMuATprOxPxAh/miyZgIgPMcCVTqiMu
-	 9VoSs9rGDwr0Bj7tY0vDeh8kuvZy6KUu6qJld2Vn3v4N+ouUzfonTwR598ko6oQInUA==
+	bh=0fjVRx5vsZkDMKGmhuNd7Yjfbs2A2AKB7RRC040th0Y=;
+	b=aNB7QB6wk0RYD482TjthxSUILVbv3+HAR9CrLDhY3numisgewxfPhYGN60DYDlLa42OP
+	 wL9kXAFKt6XLCYLo+7GFAsURFUaFcsQ6NaZuYFxsCAe30bSL+7t0UPwMXRhsW+jKxpPiZ
+	 fQJZMGWd0UADmXG8RVSZTQF8XhM+zar9vFOpNPLq/COXPkvA4tgUaEAkuA7eSA8B6XAjb
+	 DXJN2DXBW0MyGMIz6X+qFZbgbSjnYGAQnq1FWahDYA/Hs1aLVzxJvgADFsA1Sh8EdBbDS
+	 HghEsC5AG3C3xmxJ7kHF9k11y+xQRMsJqVVi+Skn2EvjgZCS1M03voPZQxEkfWh2ziw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=surriel.com;
 	spf=pass smtp.mailfrom=surriel.com;
-	dkim=pass header.d=surriel.com header.i=@surriel.com header.a=rsa-sha256 header.s=mail header.b=nOH3v0Bg;
+	dkim=pass header.d=surriel.com header.i=@surriel.com header.a=rsa-sha256 header.s=mail header.b=EoVBFv6o;
 	arc=none smtp.remote-ip=96.67.55.147
 Received: from shelob.surriel.com (shelob.surriel.com [96.67.55.147])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CB2606A326;
-	Wed, 11 Nov 2026 15:43:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 60CB2606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A06606A339;
+	Wed, 11 Nov 2026 15:44:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19A06606A339
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=surriel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=surriel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=surriel.com header.i=@surriel.com header.a=rsa-sha256 header.s=mail header.b=nOH3v0Bg
+	dkim=pass (2048-bit key) header.d=surriel.com header.i=@surriel.com header.a=rsa-sha256 header.s=mail header.b=EoVBFv6o
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=surriel.com
 	; s=mail; h=MIME-Version:Content-Transfer-Encoding:Content-Type:References:
 	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID; bh=/9VREGS4F/KCTU6r3pJe44nJmA9BMguSSiJq5/NaFng=; b=nOH3v0
-	BgviyORkrv/kYgza8bS7DBqp+z6vvdhaL6MxCQAWNfCtloYDKLKiTixQodcP0Sv5jlvMdnsha054W
-	U/qYAGfbfN9SwVkEb5vulZ1Qz9Foi1t5GZSl4aVD4TFGijBzZu0Nd0QJIhP6aCyTl4e0cbfYMogcM
-	7qGghq1U7cyU4tQUSXmWgDwgOfmPU4LJhFTZi5tSwNPCwygqVsBby4hSMH3zGwzfVGzqWL6Nxv9ly
-	WIwJsxy+52HXAyLJo1bkBtLeiqhbQ8jn1ZWAue8+vxVWlpKu/iYnu6bBfMrefDAHpIRedWi/fwloW
-	ULCpubfTY4uMAZjRaxN7az8CXoCA==;
+	:Resent-Message-ID; bh=0fjVRx5vsZkDMKGmhuNd7Yjfbs2A2AKB7RRC040th0Y=; b=EoVBFv
+	6oY8+IOL8Tyrj2uliK/+jDzxNnmJgURLiHpTSqGjVydHO/Ny7XVuOvp3vas+3W6+iABLVZMX9aMXt
+	DDyJix35YA0TeyTJqMQgcVABnpmPL5yBSdnAI8j7at/Ax0Se3nS1Ufe8Zae+echT/5bsrF/Uce0iY
+	hY4QkORTL6PDyXjWxwMU4LDNROEp2C3OPaDHupepWY5jNMq1oTujdKu2CjXzruuhYUxBJairvppjc
+	uUeWrjpyQaFlQUX0dFpfIeg0h8SUsk0Zdqad+arogguxMf/qalnOKOscTdwzs7aSw0n/lYJf17iMg
+	nJ4HjW2Mpg6FX6rObqinZdrp06PQ==;
 Received: from [2601:18c:8100:a0e0:5a47:caff:fe78:8708]
 	by shelob.surriel.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.99.5)
 	(envelope-from <riel@surriel.com>)
-	id 1xRATp-00000003v0H-3ThD;
-	Wed, 11 Nov 2026 15:43:21 +0000
-Message-ID: <5cf37868cde9f220b5b6b60871864d8679454ac0.camel@surriel.com>
-Subject: Re: [PATCH 1/2] crypto: zstd - use vmalloc() for stream workspaces
+	id 1xRAUh-00000003v17-3enR;
+	Wed, 11 Nov 2026 15:44:15 +0000
+Message-ID: <6e62d5b36362a5dd174de68b5090794877ce499c.camel@surriel.com>
+Subject: Re: [PATCH 2/2] crypto: deflate - use vmalloc() for stream
+ workspaces
 From: Rik van Riel <riel@surriel.com>
 To: Usama Arif <usama.arif@linux.dev>, Herbert Xu
  <herbert@gondor.apana.org.au>, 	davem@davemloft.net, terrelln@fb.com,
@@ -58,10 +59,10 @@ To: Usama Arif <usama.arif@linux.dev>, Herbert Xu
  chengming.zhou@linux.dev, Andrew Morton	 <akpm@linux-foundation.org>,
  linux-crypto@vger.kernel.org, linux-mm@kvack.org, 
 	linux-kernel@vger.kernel.org, shakeel.butt@linux.dev, kernel-team@meta.com
-Date: Wed, 11 Nov 2026 10:43:21 -0500
-In-Reply-To: <20261111153532.1036709-2-usama.arif@linux.dev>
+Date: Wed, 11 Nov 2026 10:44:15 -0500
+In-Reply-To: <20261111153532.1036709-3-usama.arif@linux.dev>
 References: <20261111153532.1036709-1-usama.arif@linux.dev>
-	 <20261111153532.1036709-2-usama.arif@linux.dev>
+	 <20261111153532.1036709-3-usama.arif@linux.dev>
 Autocrypt: addr=riel@surriel.com; prefer-encrypt=mutual;
  keydata=mQENBFIt3aUBCADCK0LicyCYyMa0E1lodCDUBf6G+6C5UXKG1jEYwQu49cc/gUBTTk33A
  eo2hjn4JinVaPF3zfZprnKMEGGv4dHvEOCPWiNhlz5RtqH3SKJllq2dpeMS9RqbMvDA36rlJIIo47
@@ -100,22 +101,24 @@ Precedence: list
 MIME-Version: 1.0
 
 On Wed, 2026-11-11 at 07:07 -0800, Usama Arif wrote:
-> The zstd acomp streams retain their workspaces after the last
-> transform
-> has been freed. The first is allocated during transform
-> initialization;
-> additional per-CPU streams are allocated on demand. They are released
-> when the algorithm is unregistered.
+> The deflate acomp streams outlive the transforms that use them. One
+> stream is allocated during transform initialization; additional
+> per-CPU streams are allocated on demand. They are freed only when
+> the algorithm is unregistered.
 >=20
-> In a 4 KiB-page x86-64 build, each stream requests 1,566,281 bytes.
-> If kvmalloc() succeeds via kmalloc(), it occupies an order-9 block
-> (2 MiB). vmalloc() needs 383 backing pages (1,532 KiB), 516 KiB fewer
-> per stream. Across 384 populated streams, that is 193.5 MiB less
+> In a 4 KiB-page x86-64 build, each stream requests 145,320 bytes.
+> If kvmalloc() succeeds via kmalloc(), it occupies an order-6 block
+> (256 KiB). vmalloc() needs 36 backing pages (144 KiB), 112 KiB fewer
+> per stream. Across 384 populated streams, that is 42 MiB less
+> workspace backing if all would have used kmalloc(). There is no such
+> gain when kvmalloc() already falls back to vmalloc().
 >=20
-Woah. Nice catch
-
+> Use vmalloc() and vfree() directly, as the crypto lz4 implementations
+> already do. This uses vmalloc address space, page tables and
+> bookkeeping; the figures above compare workspace backing only.
+>=20
 > Signed-off-by: Usama Arif <usama.arif@linux.dev>
->=20
+
 Reviewed-by: Rik van Riel <riel@surriel.com>
 
 --=20
