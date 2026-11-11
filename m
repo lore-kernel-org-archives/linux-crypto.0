@@ -1,79 +1,80 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
 	t=1794419698;
-	b=rnsj2WsQafPolUVgh+tPHG7NgjczTnm5NenL5EveQlurEEHqr4Jk2pp08TDC3OEyuSF3
-	 QDgatqTuOQ0WvM6e4avX9rmD7GQpr3ogUw1ERML5KXlbXjoPBnkFFOcc8sy5sKxAGuAmr
-	 Lj0dk4CweOq2OEotz9ibSQVg74oZF1WTwHlRgK2c965n5ClfNilBkeFM4px/Xtsz9NQ2G
-	 XJtmjFwsV+qQVdjlqTRJXYKXvdt0/65UPGB0+ExDVETsGRcn6Kh40z20BhWGR5A1x1fGb
-	 z8P5gMNvAohmXC4bxdH0gZe15DPV65e7oSVPJAy5SRXWtNV8ymAERsbF2z+lRaQcNcg==
+	b=Px6ciBOhVIxxP0+vM1+ZwXqJmFK9/SVIlcym5cnY7wPyyLEWcfP37k7HQN4pNFWqQ4T7
+	 3h+N22PYJED7FMiPrxNQ9+ucwAxL66rEBFLyMZH/8K23wfM3LjE2vkc5P+GZi9RveFH/5
+	 hbnQl2hO1WDdhkyqg69+BsNKW6GrwbMIUt/pqpLN+h/+kq7BgejntiPPRG+/qRI+AM4lt
+	 Sb5E6eEQ6nNbYYuwi/wuYWhtwEoaO6o+F/15vdkaWIO3Qj6JFhVhKwQvR6IzNdMmVx3Lc
+	 Pp3E6E84tG2wlnW1x8OPLT8Lv+7GxLX1foGs95X8upU5qZY+QPVWrF/K76yEarEgTYg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794419698;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=NuefdyGrdEGI4G6kB8HaGwrhpuI/tyFukRQfwK0mqeE=;
-	b=LfHxhuFOT/ApLDYkMCuOIZbliqbbj8H4xVIjFaS5JH2M0NrCsTbjwoylSTiONytJqvht
-	 dPQfXO+Q6BJHDoehmKaeSKQ/1K1gn9au26XqAymb5/pM8qBnVfaZfKJotXx1kxl8cAd/u
-	 hxHlNz5a7VGAFLYzA5hPwQPHVLWZd6Tsv9IVaGjfqiozRrQD7iy1YWwC0GWt9In8VhyYv
-	 2NPfF9QeLxP6L4ys5KVIPUB1x0NAA+H4+6XwOUx9EdhxRX3ThOKEtIVhueaGYkEZMFECT
-	 Aei1oj06etJETOz/gM/+WwXhLc/3c4N4DTzJDc1RBVjezeqbxNmmWMDdlNWNdNUPPUw==
+	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=2/e0Lvd7Sqz3iHPXMWwA53veJ/X35GUDoRLhWv/Rf1o=;
+	b=u1R0MmErNsCZIAdpnN9eCF7atBMNgD34GSQk2nvaKkSyrydYRm5rQIvBRFbXjqAbTAa+
+	 EioiBueJiIFAVAi+u7zO6/XnAU2ZJLgn0P8WcuKppwhJV2eDAovkLn8/Agyno9lerN641
+	 jYnqr2R5qNInfoQTmQBdPlsnoxYCNDOcc3ZtpOKXE18g6AtHUJN3ie1nMfkhMz4Zn1hbY
+	 N3ZuWI3RrStf4L8iLw9lf9nolSPisnsVQbFA9nXJzuCKAv/O1duhNJYRaxB3XaoF8ub9C
+	 YDZXgbH3GbF5K6xfq+iOIBBTHONPoPwgOV709kWFcLEv+bH1amZnhdWOcH3gw+EKmwA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gpbhYaYC;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XVYcTEyV;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A5C606A33D;
-	Wed, 11 Nov 2026 17:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECCD3606A31C;
+	Wed, 11 Nov 2026 17:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gpbhYaYC
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XVYcTEyV
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1794419698;
-	b=sRKJwe23YYFWmTkwqZbnd3sCWDfJbC2jwa8owLYpIrNYjKx2bbrCxvqIe9ZCVuwqX/EZ
-	 YkaEDyMLwjsUWpZFw9KDhAOnM98hFOX3a1Iz1u5nWBEwsM/EJi27uQPe6LAiNft05pdUZ
-	 ugjH0/hvBqQbuUOhapv3gpVjjLD+CqJiAzAeW1rIJQfejsWPFbgIsO8jUrAl5Q/bgTXDi
-	 C7JwdCcWpCUg9iC5M/b+CAahG+PBYIFQYMO5QuEGLHs8HiZyj5GMNv0owiv9fJcTjOpox
-	 HpkaNZjQARr/nB3yd78TJ1GQKLej7cdQfdD0UYpybe7nmX6q8djnssdeM6FdpfUqwKQ==
+	t=1794419697;
+	b=RlFLmbCUi2GT3o1c/j140nniBQSfKc1SB2bJcVDYGyOCPUR3SyQNa4VhFphd37rYMMy9
+	 NGiIEWclB9sjWBwouOjh5PRwXHStKlpvHo8rYXFOg5IViVytFXtCnXmPuLijUEKM9gw+S
+	 P2cyGmm6E4/S0c5FEVEbDBYnIfkJLco04ywbU0d6IvGyi44zl9O5i5f0oKCxfTYIjk5rE
+	 razNbjZlRlBks5RQinxCsgzRLH4siBr1K0/AUWsGk1TX8+bZYGeelT1geUUMqnFc3siy4
+	 czxu8j0ar/T+FvvEXQgKO5+IsdQe9ZRlcdirOJAs6lHPq2GSF53ehxLl4QsD6mqbCXg==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1794419698;
-	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=NuefdyGrdEGI4G6kB8HaGwrhpuI/tyFukRQfwK0mqeE=;
-	b=ax+hzk3JEtaprB/Pm7wd7fxxnklDcutHKbcsWO/u0pdmaJOB2tSBfyVj20weC/DEYvHA
-	 BcLdLgwwJiP86FcW/d7q3jw1vNju+F+Q4mxVGwIgITzclK5lN2DoHyR9dwYiBIm9vX+Wk
-	 nxIzxfE/4QxGW33OTGyMWtbLSiXELQBX7WkTphSU7kfxU9t8XzaS6wcqSvRQxYT9fV5tv
-	 5Uk3vHZoqxq+MzFd5+Z3a+5+FyRH39Wo7a5pBP9nMac7e2h4DAgRM711nzIICrokwZJaZ
-	 9I8UIQbtsG7LOfRD+mcwjf9tJpXwW0nZ8vbpoM1Jxyc1uzFClMJEPt3apHf1q9G5hkA==
+	c=relaxed/relaxed; t=1794419697;
+	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=2/e0Lvd7Sqz3iHPXMWwA53veJ/X35GUDoRLhWv/Rf1o=;
+	b=t1ngS1c40tAmd7yAKy/EMhEoAR9mB1pblb1URTwWa/8s81Ux0C75UAq4Rmn0+VFxHFnL
+	 7Bl79rRu6m3XaZI0dtAB3l7FG/aHugsQL9Qv/pkA086SbgjQRmek3k1DZV1uDYRtVDC6n
+	 s3tKkZ0CR+/R8+i2FD0s30AQQWA27qGRDwKkuSQsGSAEAoapi8GXkYgO54eajENR4jTiI
+	 VwhLhfiw/mE91NffuBx+PTjG8A7TvnyAXxnm2K8KEMfFQ/7q0YFA7GAb2YPMeGujULScQ
+	 89qzy3VEcPc1Xz1jyMVMgHGk9IZ8p0bIzU8bbSFtDZSlYK5BOoyPa4jsmuizVaZaiRA==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id BCC9E1F00A08;
+	by smtp.kernel.org (Postfix) with ESMTPS id 4CABA1F00A05;
 	Wed, 11 Nov 2026 17:54:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794419698;
-	bh=NuefdyGrdEGI4G6kB8HaGwrhpuI/tyFukRQfwK0mqeE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=gpbhYaYClxRXSjZRv5FnFgevcMc4SxnhtxHRgi02h9THAqKzLyt5uxNYhUH7uAhLe
-	 qxe+fp5oaG0hrX7zSMQd1Ff39ta74bEpyvHV1GRVjNm7OossufRhH3uDQktLoPFWCY
-	 zGV4ZuQoboG3r4cU+HsRWauE80Xg9sAraineYF7nqsEUGmHlEr1CthyyIh/eWUKCSN
-	 SMnCPq6OsyOXTxSfp9Cm1G5TZDwt44cxy0I5U4hyFRwHg/h6AnnFOyM75CffwRcb5a
-	 iTWeOmHwqY8k2AovjemxcDl+c7TY1odQRog0G9MGR/jXQYXAocco6c+vUlVrHTAqJt
-	 3cVlAFkynCJDg==
+	s=k20260515; t=1794419697;
+	bh=2/e0Lvd7Sqz3iHPXMWwA53veJ/X35GUDoRLhWv/Rf1o=;
+	h=From:Subject:Date:To:Cc:Reply-To;
+	b=XVYcTEyV00BY14+qs++vccbk07bfewEa/mBTOu/Z07zyTlEewUymdpr7Y/HNIGrDy
+	 tgJlYNLuQJ9YPUXvhUUALjP+UBGfgT6k6+FgU/k2/BOH+UhUuV1oeuEORSM7lp+5Se
+	 r3wMgWIV2lM/BhSIRjdeTODsxuENdi8RL6YK60bJurxBYRlgJozOLwK7FXLrlbFxnp
+	 FpZUWPvNctIFJwk11SQRQ6trII+XwtjbPrReqynzHcHjEH/W4K00zYuehyYssvj9Wr
+	 GGv9eq8Eaeb3cFxziTsgQVdZUaQM7F4EA+cfIlzMpLC7jUiujL/I8z/eRvMgkFtnY6
+	 oCqyDa04Zcphg==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 416554907E;
-	Wed, 11 Nov 2026 17:54:57 +0000 (UTC)
+	by lkml.kernel.org (Postfix) with ESMTP id CB8B84906D;
+	Wed, 11 Nov 2026 17:54:56 +0000 (UTC)
 From: Andrew Gigena via B4 Relay <devnull+mail.andrewgigena.dev@kernel.org>
-Date: Wed, 11 Nov 2026 17:53:23 +0000
-Subject: [PATCH v4 3/3] arm64: dts: qcom: sm8150: use standalone ICE for
- UFS
+Subject: [PATCH v4 0/3] arm64: dts: qcom: sm8150: Add standalone ICE node
+ for UFS
+Date: Wed, 11 Nov 2026 17:53:20 +0000
+Message-Id: <20261111-sm8150-ice-rfc-v4-0-0311eac35609@andrewgigena.dev>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -84,9 +85,12 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261111-sm8150-ice-rfc-v4-3-0311eac35609@andrewgigena.dev>
-References: <20261111-sm8150-ice-rfc-v4-0-0311eac35609@andrewgigena.dev>
-In-Reply-To: <20261111-sm8150-ice-rfc-v4-0-0311eac35609@andrewgigena.dev>
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33NzQ6CMBAE4FcxPVuzLZQfT76H8UC3C9REMC1WD
+ eHdLXgxUTxOMvPNyDw5S57tNyNzFKy3fRdDut0wbKuuIW5NzEyCzISAlPtLIRRwi8RdjRx0qiV
+ CoqgAFkdXR7V9LODx9M7+ps+Ew6zMjdb6oXfP5TGIubeKB8GBqzzJdYaSEOFQdcbRvbENddXOU
+ GDzR5D/FRkVk5W51kgg82JFST4UIb6UJCp1aVRVQFZjqX4o0zS9AJRozkJRAQAA
+X-Change-ID: 20261104-sm8150-ice-rfc-0b4b2c035e80
 To: Abel Vesa <abelvesa@kernel.org>, 
  Herbert Xu <herbert@gondor.apana.org.au>, 
  "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
@@ -98,97 +102,68 @@ To: Abel Vesa <abelvesa@kernel.org>,
  Konrad Dybcio <konradybcio@kernel.org>
 Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-scsi@vger.kernel.org, Andrew Gigena <mail@andrewgigena.dev>
+ linux-scsi@vger.kernel.org, Andrew Gigena <mail@andrewgigena.dev>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1794419696; l=2347;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794419696; l=1891;
  i=mail@andrewgigena.dev; s=20261104; h=from:subject:message-id;
- bh=5ojOLo8hWLDK0hV2yglUJhrUv/sb3CLr9di70RGzFCA=;
- b=bAwBBdu9JMvmNabnEDVyXMeyhN7JwGVt3GX5ECEqowubBcL6QLE6oqUfVaLsbk2VfFDZEo76W
- CEersWwrsTuD9hMcEqClkKWlmLDY11pdCteuW+1EgrdTaxZJmSPrQMX
+ bh=ToMZN0TBCRPcQcR7ja+7EuF65OVoNHPNyts1YrPHW3E=;
+ b=xdt1PgjbVpCJks9hfSRRbhxiZnBh2Ei4/7a75ITpnTDZzb2Ts2bJ/VHHmDyqoCR1pFF8MjdCE
+ PvyQdHlDBFBCiRg8wcnEPRR7c4dZznU90qrNZhUIEpOmrsyv9wRWanL
 X-Developer-Key: i=mail@andrewgigena.dev; a=ed25519;
  pk=OMhlYIBaOEC8g4mJ4JCKy7kbg+lrwRxuujieZF8Ne6U=
 X-Endpoint-Received: by B4 Relay for mail@andrewgigena.dev/20261104 with
  auth_id=1402
 X-Original-From: Andrew Gigena <mail@andrewgigena.dev>
 Reply-To: mail@andrewgigena.dev
-Content-Transfer-Encoding: 7bit
 
-From: Andrew Gigena <mail@andrewgigena.dev>
+Hi everyone,
 
-Align SM8150 with the standalone ICE representation used on newer
-platforms instead of embedding ICE registers in the UFS node.
+This series adds standalone ICE support to SM8150 (Snapdragon 855),
+matching newer Qualcomm platforms.
+
+Patch 1 documents the sm8150 ICE compatible.
+Patch 2 moves sm8150-ufshc to the standalone-ICE UFS binding.
+Patch 3 converts the UFS node to use a dedicated ICE node.
+
+Tested on a Google Pixel 4 (google-flame): AES-256-XTS advertised,
+ext4 encryption supported, ICE self-test passes.
 
 Signed-off-by: Andrew Gigena <mail@andrewgigena.dev>
+
+Changes in v4:
+- Add Krzysztof's Reviewed-by to patch 1.
+- Document the transient dtbs_check warning for embedded-ICE DTs and why
+  it has no practical impact (patch 2).
+- Link to v3: https://patch.msgid.link/20261111-sm8150-ice-rfc-v3-0-f9d5a806fc95@andrewgigena.dev
+
+Changes in v3:
+- Split bindings into two commits (compatible + standalone-ICE move).
+- Drop author Tested-by from DTS patch.
+- Link to v2: https://patch.msgid.link/20261104-sm8150-ice-rfc-v2-0-d697bbce0278@andrewgigena.dev
+
+Changes in v2:
+- Move sm8150-ufshc to the standalone-ICE binding.
+- Keep the ICE compatible sorted.
+- Link to v1: https://patch.msgid.link/20261104-sm8150-ice-rfc-v1-0-5737b6c2ecc0@andrewgigena.dev
+
 ---
- arch/arm64/boot/dts/qcom/sm8150.dtsi | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+Andrew Gigena (3):
+      dt-bindings: crypto: ice: document sm8150 compatible
+      dt-bindings: ufs: qcom: classify sm8150-ufshc as standalone ICE
+      arm64: dts: qcom: sm8150: use standalone ICE for UFS
 
-diff --git a/arch/arm64/boot/dts/qcom/sm8150.dtsi b/arch/arm64/boot/dts/qcom/sm8150.dtsi
-index 293fcbacff34..b3d6f3d92395 100644
---- a/arch/arm64/boot/dts/qcom/sm8150.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8150.dtsi
-@@ -2071,9 +2071,7 @@ pcie1_phy: phy@1c0e000 {
- 		ufs_mem_hc: ufshc@1d84000 {
- 			compatible = "qcom,sm8150-ufshc", "qcom,ufshc",
- 				     "jedec,ufs-2.0";
--			reg = <0 0x01d84000 0 0x2500>,
--			      <0 0x01d90000 0 0x8000>;
--			reg-names = "std", "ice";
-+			reg = <0 0x01d84000 0 0x2500>;
- 			interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
- 			phys = <&ufs_mem_phy>;
- 			phy-names = "ufsphy";
-@@ -2092,8 +2090,7 @@ ufs_mem_hc: ufshc@1d84000 {
- 				"ref_clk",
- 				"tx_lane0_sync_clk",
- 				"rx_lane0_sync_clk",
--				"rx_lane1_sync_clk",
--				"ice_core_clk";
-+				"rx_lane1_sync_clk";
- 			clocks =
- 				<&gcc GCC_UFS_PHY_AXI_CLK>,
- 				<&gcc GCC_AGGRE_UFS_PHY_AXI_CLK>,
-@@ -2102,8 +2099,7 @@ ufs_mem_hc: ufshc@1d84000 {
- 				<&rpmhcc RPMH_CXO_CLK>,
- 				<&gcc GCC_UFS_PHY_TX_SYMBOL_0_CLK>,
- 				<&gcc GCC_UFS_PHY_RX_SYMBOL_0_CLK>,
--				<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>,
--				<&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-+				<&gcc GCC_UFS_PHY_RX_SYMBOL_1_CLK>;
- 			freq-table-hz =
- 				<37500000 300000000>,
- 				<0 0>,
-@@ -2112,8 +2108,8 @@ ufs_mem_hc: ufshc@1d84000 {
- 				<0 0>,
- 				<0 0>,
- 				<0 0>,
--				<0 0>,
--				<0 300000000>;
-+				<0 0>;
-+			qcom,ice = <&ice>;
- 
- 			status = "disabled";
- 		};
-@@ -2139,6 +2135,17 @@ ufs_mem_phy: phy@1d87000 {
- 			status = "disabled";
- 		};
- 
-+		ice: crypto@1d90000 {
-+			compatible = "qcom,sm8150-inline-crypto-engine",
-+				     "qcom,inline-crypto-engine";
-+			reg = <0 0x01d90000 0 0x8000>;
-+			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>,
-+				 <&gcc GCC_UFS_PHY_AHB_CLK>;
-+			clock-names = "core",
-+				      "iface";
-+			power-domains = <&gcc UFS_PHY_GDSC>;
-+		};
-+
- 		cryptobam: dma-controller@1dc4000 {
- 			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
- 			reg = <0 0x01dc4000 0 0x24000>;
+ .../bindings/crypto/qcom,inline-crypto-engine.yaml |  1 +
+ .../devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml |  2 ++
+ .../devicetree/bindings/ufs/qcom,ufs.yaml          | 11 ++++------
+ arch/arm64/boot/dts/qcom/sm8150.dtsi               | 25 ++++++++++++++--------
+ 4 files changed, 23 insertions(+), 16 deletions(-)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20261104-sm8150-ice-rfc-0b4b2c035e80
 
--- 
-2.56.0
+Best regards,
+--  
+Andrew Gigena <mail@andrewgigena.dev>
 
 
