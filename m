@@ -1,61 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794412492;
-	b=FE861MZ1mMqF+bbM4m6RaFlelHUWSHyUovDp2/wKXnb0Fih78e2NI+dGVHV2dLZeRfQx
-	 nMHs9hL9wNFcDFxHadPGNNhI24sdZd6o7LMoEzE8jcta+0E06j0xFHJGlMeCq9tbcOkJn
-	 yioDYQsIV4knMWVWKz6qM2DBbWqAqemIczxBJGizlSce/CGcSUwSoMAZAGUHkpfGUn/Aq
-	 eHEzYfllHRnRqntUMZ6MAU06YblvbXa9xHSu+yjnk0VFAxw+2EjD0AV6qaQqz5+eCO+vv
-	 7j5JD3Ou7YcU0i5gZVq15mpxtWaPpNPT8CjMldbmHhNYGEhv4MBQi5Dv3ZRziHbHvdQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794412492;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=nSe4OW8xhUxzc1SihiNGaIeSrpjr0BWrfZIJ2KCa3CA=;
-	b=eKIUrv1WZCvDm60gmPI3zt6dWEXjxpIKPz1RcCvhlyACTqcTNxYdWkSL4ohrWMADDMwQ
-	 tGW09kg+NytOkgpt9Hxm1nuYI1KtfS9Uy5usNg5Ino4ZOb4c9R0FYlBV/RkEHNYQHeAWJ
-	 1J2MEExPxjNp9KdbyNqBYjdbupWKvGph3yZnI6DvCIFbpFrsfPBI5YXzBr9aP8sTG6bme
-	 A5J8UiyS4kVAO1WCtjw+eS1nySs/E4mq6A+N8MoyG8Ibvm2VJEoAkUYTslEHzsftPNL+O
-	 RG/1J5YJQxtYb8zN+X3VnSxm866tJu3BbNp8YNe93q2l83mAvCqULiCwYCgcG6HTguw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="oy/WLyph";
-	arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794412623;
+	b=1zzGAYYMKR+O3sSWvMZjCtgAw5+wNQ77e9jV2+SRHejxAIr4PaZ4Dg49C6Cu/4PO1rXm
+	 2TGLyA23VwQlT+37WKQt54vlXCbhbvFumi/0189JHjeC6DUg7lttN4+LqUqMSpjJuEN5B
+	 PIwz/PhGcwSSIfCa6JklFdmKq/67BAjPa/ef7w7rME4fj2/TRf9ISFO215OXUX/1wosIs
+	 oEy23rkMyWsB3uKKOEiGTTjqoJaj7w5MvaNtK3sr99J1aufYEE1MG64OdW1NI+Bqy6fkg
+	 rCvV6wa3DniSwdpuyaOn2FvzEMXlhnuXiqXUsjnWK4l6Cd0UCUMABCU7bKCLNo7Untg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794412623;
+	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=hB3qr0XijsciFSTqEKSx+8DjTeDGtKWKa/wAKflq8fY=;
+	b=k/w1ueTCOEsuIglipdkP45rsVoRGfzShEX7PCQHSf4BeH033YG/DCCvaGYOn75rEQLRW
+	 QaFwAjMlQV62ag8GnqfQMfjYDFCO4SIPG0xcaDgt8U9DU7OdEMrzixNXNxZWTGA9uLy/Y
+	 t5Y89Oeow6hhZwbo8rhlykn6fDU7R/fnjgglVoT4SUNmmouDyrj46CelcPMuYMxMqtxAq
+	 Vo+tWhJtKjY3yfxtKICiljYIQvmho8dpcTC/UZKJGgPS+nPQ0mVbqAUZ/3HoHsI6N8SCI
+	 Jrz1bvjoig1mQM3EkQf+wLNrdnxKcl2AG8XNCNhhqyhl+ewQTP4AIjMOye/uUcPkLqw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mkz4FcqF;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18342606A32E
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 15:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECADE606A32D;
+	Wed, 11 Nov 2026 15:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oy/WLyph
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A22C1F00A09;
-	Wed, 11 Nov 2026 15:54:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mkz4FcqF
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1794412622;
+	b=fUqQUrQA7hB3EdmLYXkbEUjqHSMIvCaV3nHgzgjuhFJWjUAomgHQgifzLchrZaYaU3wJ
+	 BqN6KQ7uIKv5bI9RGo2ywbMJG5H+WDaNSaOCosMaNWLI3UBrb2EKCwJRTjOYnYKKw9PC8
+	 o5NoCeO5hjDfyw8oaE9PpE9A2SUigDX5dIWe46z1v7yXh8eCglqgDHp3vMpE3jKchwkkm
+	 2Re0nqdu3OYj7a3jQ/4Y7ag2a+7PoifKZppEB92Wd5nP26xdO372EXp4c+D+bg2gg7y2c
+	 aMAhzk7IcoVYxE37lQz9rmZPui+aeXjCn08Pvc5162kr+Jo04iRUwuAni20KGadjazQ==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1794412622;
+	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=hB3qr0XijsciFSTqEKSx+8DjTeDGtKWKa/wAKflq8fY=;
+	b=FQsfeBuVSmZEPuEhU9i8eglrvKEfq+HKQXPCJqfyTaVlmcSmBBEg3Po0mIip0K5XJD47
+	 PPL2LbKIz55IX1OWcax6DllxL7wgm/joOSEzX7F+/LZUJ6Z6f4vMrGqb6GVjHNSYuXzYx
+	 Dc6rwXyAVeHi237GP2+tcxJQ11Yf7h2MT05SHZDv8gTCNNvENVkF72fvQFZW9OOnhRvoo
+	 8Xws4QYtrDxAFnBeEHKCjPqmwp3G/MjdhAuDYGHfsQVqFd+zFJWZJt4DN6vQYaLcmJjqh
+	 Ct71dH0/iYbFT6OQ3peM0orNScjn8KUclXCsvdQTHq++o1VpspfF5DZNFYbK9d3XpLA==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id DBC211F00A05;
+	Wed, 11 Nov 2026 15:57:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794412491;
-	bh=nSe4OW8xhUxzc1SihiNGaIeSrpjr0BWrfZIJ2KCa3CA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=oy/WLyph0h8j216TKYDpgqhQf7PO0I9w6+mmUFHnpckoJfGMOZps3GLQhs2FDMJfB
-	 v5sSd0RyLYugEkZsbkC6gK5iLy2RhrAi2sIacxSpCFdA9jALt59HK5Nby4MB0ozy4L
-	 XnZSZtEOf+a628v3O1mu5U9W3hcP7x8/vAz/uN2kxonElpogLx0dqn0x9DW+RfAlTt
-	 qx+Km/8Xus9dKL7Mufz9A0a1D34KCLGK2+VPDOKRN1+8m9CI9pQuuWCAQrJMBk5zEk
-	 4ouhgY/KMvT/Hrmf7GfaR0vo79AyXjKAMPRfBHLmBWwPN7K2AKYMA3vC8ek7kHvuvh
-	 Sst41ugyWxKPg==
-Message-ID: <sashiko-outbox-209233@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 6/6] firmware: qcom: scm: Drop exported ICE wrapper
- functions
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Harshal Dev" <harshal.dev@oss.qualcomm.com>, "Eric Biggers" <ebiggers@kernel.org>, "Bjorn
- Andersson" <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Abel
- Vesa" <abelvesa@kernel.org>, "Kuldeep Singh" <kuldeep.singh@oss.qualcomm.com>, "Neeraj
- Soni" <neeraj.soni@oss.qualcomm.com>, "Manivannan Sadhasivam" <manivannan.sadhasivam@oss.qualcomm.com>, "Sumit
- Garg" <sumit.garg@oss.qualcomm.com>, "Selvam Sathappan Periakaruppan" <selvam.periakaruppan@oss.qualcomm.com>
-Cc: "Basant Kumar" <basantk@qti.qualcomm.com>, linux-crypto@vger.kernel.org
-In-Reply-To: <20261111-ice-migrate-tee-svc-v2-6-29d19f6c92ab@oss.qualcomm.com>
-References: <20261111-ice-migrate-tee-svc-v2-0-29d19f6c92ab@oss.qualcomm.com>
- <20261111-ice-migrate-tee-svc-v2-6-29d19f6c92ab@oss.qualcomm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Nov 2026 15:54:50 +0000
+	s=k20260515; t=1794412622;
+	bh=hB3qr0XijsciFSTqEKSx+8DjTeDGtKWKa/wAKflq8fY=;
+	h=From:Subject:Date:To:Cc:Reply-To;
+	b=mkz4FcqFfpaNw9TRp2Sal4Nhd6pwXiiuNOHTyhIVf8qIc8lHZSjZoEQHbsS6Oy0SL
+	 7krBZQI+qkM0GiBlbuG1ff2NWyvFYD7B2hL1eSSVAC50zESQTJcNsLIWNNFw3l7KT9
+	 Y2Dkcu8Cp18ky8LQqAbN31JAjr30XaXpNI4C3aHLK/7rhWfFPvrvUt40PtnacZALff
+	 o+OxKa/IHkL6Bcbtq7kP+dLIqjFszZnAnQR5XtHMeLYyAIIEja6EfVxdL6pk2zvUd5
+	 RLu+hbALuOjIYBghRKeBbqsOSAOa3JAHWCZeBx0X0SyTcB1UBPEBAb5pV5AQgAb7tT
+	 b25difc71pTiw==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 32F8548F87;
+	Wed, 11 Nov 2026 15:57:01 +0000 (UTC)
+From: Florian Bauckholt via B4 Relay <devnull+florian.bauckholt.cispa.de@kernel.org>
+Subject: [PATCH 0/2] KEYS: two fixes for the asymmetric keyctl operations
+Date: Wed, 11 Nov 2026 16:56:06 +0100
+Message-Id: <20261111-keyctl-pkey-fixes-v1-0-934ebaa267a7@cispa.de>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,77 +82,73 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzNDINDNTq1MLsnRLQDSummZFanFukZmxqYWiRbmBuZJZkpAfQVFqWAJoLb
+ oWAi/uDQpKzW5BGSQUm0tAM4iKAB1AAAA
+X-Change-ID: 20261111-keyctl-pkey-fixes-26358a8707b6
+To: David Howells <dhowells@redhat.com>, 
+ Jarkko Sakkinen <jarkko@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
+ Ignat Korchagin <ignat@linux.win>, Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+ "Serge E. Hallyn" <serge@hallyn.com>, Hui Peng <benquike@gmail.com>, 
+ keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, Florian Bauckholt <florian.bauckholt@cispa.de>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794412620; l=1414;
+ i=florian.bauckholt@cispa.de; s=20261105; h=from:subject:message-id;
+ bh=GOMrVRBSeE8hLfYs6YtkMRfH5HXSdleUYoeN7mchAzM=;
+ b=ttCpoRZ+CbmvpkYf413TemwqzcVJRwcmDQFBw0RzMU4Y567p7HmCNsBTbuz39K5A+kzj5pEPC
+ UY6g6KZOvd/CwiN08BuJKpNjqRuza+FpOi7QwafT0wnivIQ2G0SvzMu
+X-Developer-Key: i=florian.bauckholt@cispa.de; a=ed25519;
+ pk=n9klXQ+dI45FWy0qWLrGpQfXU5ylIA0SN+uWSmOx3ok=
+X-Endpoint-Received: by B4 Relay for florian.bauckholt@cispa.de/20261105
+ with auth_id=1420
+X-Original-From: Florian Bauckholt <florian.bauckholt@cispa.de>
+Reply-To: florian.bauckholt@cispa.de
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] firmware: qcom: scm: missing @dev in ICE helper kernel-doc
-  comments
---
+Hi,
 
-commit 7bfa90e5e53a6765c06df911105e2ee2369b3560
-Author: Harshal Dev <harshal.dev@oss.qualcomm.com>
+two small fixes for KEYCTL_PKEY_VERIFY and KEYCTL_PKEY_DECRYPT that I
+ran into while doing differential testing of crypto implementations
+with the kernel hooked up via UML:
 
-firmware: qcom: scm: Drop exported ICE wrapper functions
+Patch 1 fixes a regression from commit cb481e59ea6c ("KEYS: fix overflow
+in keyctl_pkey_params_get_2()"), which was tagged for stable:
+KEYCTL_PKEY_VERIFY ignores the signature length passed by the caller.
+It also is a prerequisite for making the x962 ECDSA template reject
+signatures that are not DER-encoded, which I'm posting separately to
+linux-crypto.
 
-This commit removes the exported ICE wrapper functions from the SCM driver
-and renames the internal static helpers now that the ICE driver uses the TZ
-agnostic ICE APIs.
+Patch 2 fixes PKCS#1 decryption of an empty message returning the
+ciphertext.
 
-> diff --git a/drivers/firmware/qcom/qcom_scm.c b/drivers/firmware/qcom/qco=
-m_scm.c
-> index 6b66bcedc84fd..277334f71178d 100644
-> --- a/drivers/firmware/qcom/qcom_scm.c
-> +++ b/drivers/firmware/qcom/qcom_scm.c
-> @@ -1399,25 +1399,20 @@ int qcom_scm_ocmem_unlock(enum qcom_scm_ocmem_cli=
-ent id, u32 offset, u32 size)
->  }
->  EXPORT_SYMBOL_GPL(qcom_scm_ocmem_unlock);
-> =20
-> -bool __qcom_scm_ice_available(struct device *dev)
-> -{
-> -	return __qcom_scm_is_call_available(dev, QCOM_SCM_SVC_ES,
-> -					    QCOM_SCM_ES_INVALIDATE_ICE_KEY) &&
-> -		__qcom_scm_is_call_available(dev, QCOM_SCM_SVC_ES,
-> -					     QCOM_SCM_ES_CONFIG_SET_ICE_KEY);
-> -}
-> -
->  /**
->   * qcom_scm_ice_available() - Is the ICE key programming interface avail=
-able?
-> + * @dev: The SCM device
->   *
->   * Return: true iff the SCM calls wrapped by qcom_scm_ice_invalidate_key=
-() and
->   *	   qcom_scm_ice_set_key() are available.
->   */
-> -bool qcom_scm_ice_available(void)
-> +static bool qcom_scm_ice_available(struct device *dev)
->  {
-> -	return __qcom_scm_ice_available(__scm->dev);
-> +	return __qcom_scm_is_call_available(dev, QCOM_SCM_SVC_ES,
-> +					    QCOM_SCM_ES_INVALIDATE_ICE_KEY) &&
-> +		__qcom_scm_is_call_available(dev, QCOM_SCM_SVC_ES,
-> +					     QCOM_SCM_ES_CONFIG_SET_ICE_KEY);
->  }
-> -EXPORT_SYMBOL_GPL(qcom_scm_ice_available);
-> =20
->  /**
->   * qcom_scm_ice_invalidate_key() - Invalidate an inline encryption key
-> @@ -1431,7 +1426,7 @@ EXPORT_SYMBOL_GPL(qcom_scm_ice_available);
->   *
->   * Return: 0 on success; -errno on failure.
->   */
-> -static int __qcom_scm_ice_invalidate_key(struct device *dev, u32 index)
-> +static int qcom_scm_ice_invalidate_key(struct device *dev, u32 index)
+Both changes were part of a patch posted by Hui Peng in September that
+did not get a reply [1]. That patch also changed the out_len checks in
+keyctl_pkey_params_get_2(), which is not included here.
 
-[Severity: Low]
-Should the kernel-doc comments for qcom_scm_ice_invalidate_key(),
-qcom_scm_ice_set_key(), qcom_scm_derive_sw_secret(),
-qcom_scm_generate_ice_key(), qcom_scm_prepare_ice_key(), and
-qcom_scm_import_ice_key() also document @dev like qcom_scm_ice_available()
-above?  Renaming these static helpers to match the preceding kernel-doc
-blocks without documenting @dev causes W=3D1 kernel-doc warnings.
+Thanks!
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111-ice-migrat=
-e-tee-svc-v2-0-29d19f6c92ab@oss.qualcomm.com?part=3D6
+[1] https://lore.kernel.org/all/20260919221742.3709658-1-benquike@gmail.com/
+
+---
+Florian Bauckholt (2):
+      KEYS: fix signature length passed to KEYCTL_PKEY_VERIFY
+      KEYS: asymmetric: Fix PKCS#1 decryption of an empty message
+
+ crypto/asymmetric_keys/public_key.c | 6 +++---
+ security/keys/keyctl_pkey.c         | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+---
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+change-id: 20261111-keyctl-pkey-fixes-26358a8707b6
+
+Best regards,
+--  
+Florian Bauckholt <florian.bauckholt@cispa.de>
+
+
