@@ -1,95 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=96.67.55.147
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794411873;
-	b=RzAd/LH1+Hgfq6uEtOVMTq3APP8fXxpSq+kNHjfgPXwQ91NOIlPn9SPh0ZLnPxWnvBMH
-	 TJ1uzBvryV6rPfabayG/1fbpyxxhNBP6gnuGOZz38fLzsHh79jMmZKdDxLyVWWl+sOsZW
-	 A9onfBaQxqO7a1/zJSxGNKqi6etTIqgTdfCt9nSzlWoXqY39frPwksVcPUZcZYU1spW7A
-	 i6mIoXpri4Kc90/FgSEtU8DZ2i/KFMVLt+nd8HoLsVs3s6g7Xv6D0fvRdzKP1ucrJVpIE
-	 sml1kKDfpd9Li1ZnTZuY7YsH5PeYlzT/bm8iqGD6qSz1phu24wGhQ945kY+0bXHvIMg==
+	t=1794412055;
+	b=tn2hSFShjuB0fJIUIGX8b80IvPu92BemnYgy95MvN0bjONXdHUh0cXx3n70PJpa+eiHB
+	 gd5CrxrOigWQoHKv18WgRnR0Cv6mG8wINZQQor3lEmKe+Nnz6t/xLVWMEAkZz9RjSPjoQ
+	 tqm2FLFFGeWBMWZn1c/fG47R4ZxUp+iqzECFROly9sAnWK3B0qZHL683KeCu73VZdYjzR
+	 mufdUPbONSTwfW4HsFRoCt4+vW9iKsraM+jzhxqISuJTUNs1GzSL2TSFH3YXrWy1YlThH
+	 8QSFWEshOWC9PRoWP37A8qF9ZMEEwMHo70k79UhjD6MCYgkN4nREFgcvni4wzxnonyQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794411873;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:Subject:From:To:Date:
-	 In-Reply-To:References:Autocrypt:Content-Type:
-	 Content-Transfer-Encoding:User-Agent:MIME-Version;
-	bh=0fjVRx5vsZkDMKGmhuNd7Yjfbs2A2AKB7RRC040th0Y=;
-	b=aNB7QB6wk0RYD482TjthxSUILVbv3+HAR9CrLDhY3numisgewxfPhYGN60DYDlLa42OP
-	 wL9kXAFKt6XLCYLo+7GFAsURFUaFcsQ6NaZuYFxsCAe30bSL+7t0UPwMXRhsW+jKxpPiZ
-	 fQJZMGWd0UADmXG8RVSZTQF8XhM+zar9vFOpNPLq/COXPkvA4tgUaEAkuA7eSA8B6XAjb
-	 DXJN2DXBW0MyGMIz6X+qFZbgbSjnYGAQnq1FWahDYA/Hs1aLVzxJvgADFsA1Sh8EdBbDS
-	 HghEsC5AG3C3xmxJ7kHF9k11y+xQRMsJqVVi+Skn2EvjgZCS1M03voPZQxEkfWh2ziw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794412055;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=xIZHJyQOhdBp8HxU5684aVF32yUv2tOaBYVhKjjuZgs=;
+	b=vme49tb/Q/6lLUauXiaC/mQdAou16kNHOQCk3JlOxn28gO5Eq+VhCsDJ3+zeqHpapQq7
+	 LDNPWN3FjWf5TuTl+q9Hp3+ZUFNL0uO00PlNwFY6Sg1oXpLzeNvPESFM5vJua8H/N1Fg4
+	 2WaN7mpvz5M33qSb1Y7Tbaiznw/PUPApwiOiwlud1cwsE/dzIFfyLsX/hBbIEWuVmX1w1
+	 qhnXFz4wZBpGBxt4MqJQpyrEnwDh82Eo0+TyZBNnFcZOWQ1h9sLCOa3ROIXaw3hgOLQBL
+	 xs8Kzl7Z9ubtNoozL3bMp24gveEHmVljWAoRIVaE8+JAmn8LB/CjHzos3gTbEsZNouQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=surriel.com;
-	spf=pass smtp.mailfrom=surriel.com;
-	dkim=pass header.d=surriel.com header.i=@surriel.com header.a=rsa-sha256 header.s=mail header.b=EoVBFv6o;
-	arc=none smtp.remote-ip=96.67.55.147
-Received: from shelob.surriel.com (shelob.surriel.com [96.67.55.147])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GMmEb7Eh;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A06606A339;
-	Wed, 11 Nov 2026 15:44:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19A06606A339
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=surriel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=surriel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDBB606A326
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 15:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=surriel.com header.i=@surriel.com header.a=rsa-sha256 header.s=mail header.b=EoVBFv6o
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=surriel.com
-	; s=mail; h=MIME-Version:Content-Transfer-Encoding:Content-Type:References:
-	In-Reply-To:Date:To:From:Subject:Message-ID:Sender:Reply-To:Cc:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID; bh=0fjVRx5vsZkDMKGmhuNd7Yjfbs2A2AKB7RRC040th0Y=; b=EoVBFv
-	6oY8+IOL8Tyrj2uliK/+jDzxNnmJgURLiHpTSqGjVydHO/Ny7XVuOvp3vas+3W6+iABLVZMX9aMXt
-	DDyJix35YA0TeyTJqMQgcVABnpmPL5yBSdnAI8j7at/Ax0Se3nS1Ufe8Zae+echT/5bsrF/Uce0iY
-	hY4QkORTL6PDyXjWxwMU4LDNROEp2C3OPaDHupepWY5jNMq1oTujdKu2CjXzruuhYUxBJairvppjc
-	uUeWrjpyQaFlQUX0dFpfIeg0h8SUsk0Zdqad+arogguxMf/qalnOKOscTdwzs7aSw0n/lYJf17iMg
-	nJ4HjW2Mpg6FX6rObqinZdrp06PQ==;
-Received: from [2601:18c:8100:a0e0:5a47:caff:fe78:8708]
-	by shelob.surriel.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99.5)
-	(envelope-from <riel@surriel.com>)
-	id 1xRAUh-00000003v17-3enR;
-	Wed, 11 Nov 2026 15:44:15 +0000
-Message-ID: <6e62d5b36362a5dd174de68b5090794877ce499c.camel@surriel.com>
-Subject: Re: [PATCH 2/2] crypto: deflate - use vmalloc() for stream
- workspaces
-From: Rik van Riel <riel@surriel.com>
-To: Usama Arif <usama.arif@linux.dev>, Herbert Xu
- <herbert@gondor.apana.org.au>, 	davem@davemloft.net, terrelln@fb.com,
- dsterba@suse.com, hannes@cmpxchg.org, 	yosry@kernel.org, nphamcs@gmail.com,
- chengming.zhou@linux.dev, Andrew Morton	 <akpm@linux-foundation.org>,
- linux-crypto@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, shakeel.butt@linux.dev, kernel-team@meta.com
-Date: Wed, 11 Nov 2026 10:44:15 -0500
-In-Reply-To: <20261111153532.1036709-3-usama.arif@linux.dev>
-References: <20261111153532.1036709-1-usama.arif@linux.dev>
-	 <20261111153532.1036709-3-usama.arif@linux.dev>
-Autocrypt: addr=riel@surriel.com; prefer-encrypt=mutual;
- keydata=mQENBFIt3aUBCADCK0LicyCYyMa0E1lodCDUBf6G+6C5UXKG1jEYwQu49cc/gUBTTk33A
- eo2hjn4JinVaPF3zfZprnKMEGGv4dHvEOCPWiNhlz5RtqH3SKJllq2dpeMS9RqbMvDA36rlJIIo47
- Z/nl6IA8MDhSqyqdnTY8z7LnQHqq16jAqwo7Ll9qALXz4yG1ZdSCmo80VPetBZZPw7WMjo+1hByv/
- lvdFnLfiQ52tayuuC1r9x2qZ/SYWd2M4p/f5CLmvG9UcnkbYFsKWz8bwOBWKg1PQcaYHLx06sHGdY
- dIDaeVvkIfMFwAprSo5EFU+aes2VB2ZjugOTbkkW2aPSWTRsBhPHhV6dABEBAAG0HlJpayB2YW4gU
- mllbCA8cmllbEByZWRoYXQuY29tPokBHwQwAQIACQUCW5LcVgIdIAAKCRDOed6ShMTeg05SB/986o
- gEgdq4byrtaBQKFg5LWfd8e+h+QzLOg/T8mSS3dJzFXe5JBOfvYg7Bj47xXi9I5sM+I9Lu9+1XVb/
- r2rGJrU1DwA09TnmyFtK76bgMF0sBEh1ECILYNQTEIemzNFwOWLZZlEhZFRJsZyX+mtEp/WQIygHV
- WjwuP69VJw+fPQvLOGn4j8W9QXuvhha7u1QJ7mYx4dLGHrZlHdwDsqpvWsW+3rsIqs1BBe5/Itz9o
- 6y9gLNtQzwmSDioV8KhF85VmYInslhv5tUtMEppfdTLyX4SUKh8ftNIVmH9mXyRCZclSoa6IMd635
- Jq1Pj2/Lp64tOzSvN5Y9zaiCc5FucXtB9SaWsgdmFuIFJpZWwgPHJpZWxAc3VycmllbC5jb20+iQE
- +BBMBAgAoBQJSLd2lAhsjBQkSzAMABgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRDOed6ShMTe
- g4PpB/0ZivKYFt0LaB22ssWUrBoeNWCP1NY/lkq2QbPhR3agLB7ZXI97PF2z/5QD9Fuy/FD/jddPx
- KRTvFCtHcEzTOcFjBmf52uqgt3U40H9GM++0IM0yHusd9EzlaWsbp09vsAV2DwdqS69x9RPbvE/Ne
- fO5subhocH76okcF/aQiQ+oj2j6LJZGBJBVigOHg+4zyzdDgKM+jp0bvDI51KQ4XfxV593OhvkS3z
- 3FPx0CE7l62WhWrieHyBblqvkTYgJ6dq4bsYpqxxGJOkQ47WpEUx6onH+rImWmPJbSYGhwBzTo0Mm
- G1Nb1qGPG+mTrSmJjDRxrwf1zjmYqQreWVSFEt26tBpSaWsgdmFuIFJpZWwgPHJpZWxAZmIuY29tP
- okBPgQTAQIAKAUCW5LbiAIbIwUJEswDAAYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQznneko
- TE3oOUEQgAsrGxjTC1bGtZyuvyQPcXclap11Ogib6rQywGYu6/Mnkbd6hbyY3wpdyQii/cas2S44N
- cQj8HkGv91JLVE24/Wt0gITPCH3rLVJJDGQxprHTVDs1t1RAbsbp0XTksZPCNWDGYIBo2aHDwErhI
- omYQ0Xluo1WBtH/UmHgirHvclsou1Ks9jyTxiPyUKRfae7GNOFiX99+ZlB27P3t8CjtSO831Ij0Ip
- QrfooZ21YVlUKw0Wy6Ll8EyefyrEYSh8KTm8dQj4O7xxvdg865TLeLpho5PwDRF+/mR3qi8CdGbkE
- c4pYZQO8UDXUN4S+pe0aTeTqlYw8rRHWF9TnvtpcNzZw==
-Content-Type: text/plain; charset="UTF-8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GMmEb7Eh
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE2E91F00A08;
+	Wed, 11 Nov 2026 15:47:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794412055;
+	bh=xIZHJyQOhdBp8HxU5684aVF32yUv2tOaBYVhKjjuZgs=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=GMmEb7EhuycQBA8Lrgnj0VsowFCWZKFXM3H1uwTpwD5EXXrO48kyQe5itKPPbVNsY
+	 SaQHpx1qsKXDoAj7mwIYOyQiGBBRAHYwFp9re7fhjP5BVtnUIvyU9yHs2evl01SdH4
+	 GAZ+wnO8qyTLZzBRKYBBW8x+DGYtHA01US8ws8+5js/W5FUMqJ7xzZFMN8nF86LBBg
+	 JTPYr9Qplt90BFmmiDM2j91F0LV8YaFC40Fb6Kc4bDRL4dZ/dWfg1fsXSP+wZtyj/V
+	 5WPfQFoCOmIsqBrIiNh+3WsdblyL0SCCPXjJbEjuKJQ6Jr+wefk/RA/vKpeUTo/nrg
+	 FmteVk12uawRg==
+Message-ID: <sashiko-outbox-209231@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v2 5/6] soc: qcom: ice: Migrate to the TZ agnostic ICE
+ APIs
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Harshal Dev" <harshal.dev@oss.qualcomm.com>, "Eric Biggers" <ebiggers@kernel.org>, "Bjorn
+ Andersson" <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Abel
+ Vesa" <abelvesa@kernel.org>, "Kuldeep Singh" <kuldeep.singh@oss.qualcomm.com>, "Neeraj
+ Soni" <neeraj.soni@oss.qualcomm.com>, "Manivannan Sadhasivam" <manivannan.sadhasivam@oss.qualcomm.com>, "Sumit
+ Garg" <sumit.garg@oss.qualcomm.com>, "Selvam Sathappan Periakaruppan" <selvam.periakaruppan@oss.qualcomm.com>
+Cc: "Basant Kumar" <basantk@qti.qualcomm.com>, linux-crypto@vger.kernel.org
+In-Reply-To: <20261111-ice-migrate-tee-svc-v2-5-29d19f6c92ab@oss.qualcomm.com>
+References: <20261111-ice-migrate-tee-svc-v2-0-29d19f6c92ab@oss.qualcomm.com>
+ <20261111-ice-migrate-tee-svc-v2-5-29d19f6c92ab@oss.qualcomm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.2 (3.60.2-3.fc44) 
+Date: Wed, 11 Nov 2026 15:47:34 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -98,28 +64,168 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
 
-On Wed, 2026-11-11 at 07:07 -0800, Usama Arif wrote:
-> The deflate acomp streams outlive the transforms that use them. One
-> stream is allocated during transform initialization; additional
-> per-CPU streams are allocated on demand. They are freed only when
-> the algorithm is unregistered.
->=20
-> In a 4 KiB-page x86-64 build, each stream requests 145,320 bytes.
-> If kvmalloc() succeeds via kmalloc(), it occupies an order-6 block
-> (256 KiB). vmalloc() needs 36 backing pages (144 KiB), 112 KiB fewer
-> per stream. Across 384 populated streams, that is 42 MiB less
-> workspace backing if all would have used kmalloc(). There is no such
-> gain when kvmalloc() already falls back to vmalloc().
->=20
-> Use vmalloc() and vfree() directly, as the crypto lz4 implementations
-> already do. This uses vmalloc address space, page tables and
-> bookkeeping; the figures above compare workspace backing only.
->=20
-> Signed-off-by: Usama Arif <usama.arif@linux.dev>
+Thank you for your contribution! Sashiko AI review found 4 potential
+issues to consider:
+- [High] soc: qcom: ice: infinite probe deferral in qcom_ice_create()
+  without OP-TEE
+- [High] soc: qcom: ice: circular module dependency and build failure in
+  qcom_ice_create()
+- [Medium] soc: qcom: ice: -ENODEV converts to true in
+  qcom_ice_tz_has_wrapped_key_support()
+- [Medium] soc: qcom: ice: unsynchronized ice_tz_ops access races with
+  backend teardown
+--
 
-Reviewed-by: Rik van Riel <riel@surriel.com>
+commit 6c35fbb5f17a57538422d90392b9a647da09687a
+Author: Harshal Dev <harshal.dev@oss.qualcomm.com>
+
+soc: qcom: ice: Migrate to the TZ agnostic ICE APIs
+
+This commit switches the Qualcomm Inline Crypto Engine driver from calling
+qcom_scm_*() directly to using the qcom_ice_tz_*() wrapper functions.
+
+> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
+> index 4844621b74970..9bab177f7ce55 100644
+> --- a/drivers/soc/qcom/ice.c
+> +++ b/drivers/soc/qcom/ice.c
+> @@ -307,7 +307,7 @@ static bool qcom_ice_check_supported(struct qcom_ice =
+*ice)
+>  	 * advertise support for raw keys or wrapped keys, HWKM cannot be used
+>  	 * unconditionally.  A module parameter is used to opt into using it.
+>  	 */
+> -	if (ice->hwkm_version && qcom_scm_has_wrapped_key_support()) {
+> +	if (ice->hwkm_version && qcom_ice_tz_has_wrapped_key_support()) {
+
+[Severity: Medium]
+Does qcom_ice_tz_has_wrapped_key_support() evaluate to true when ice_tz_ops
+is NULL?
+
+drivers/soc/qcom/ice.c:qcom_ice_tz_has_wrapped_key_support() {
+	struct qcom_ice_tz_ops *ops;
+
+	ops =3D ice_tz_ops;
+	if (!ops)
+		return -ENODEV;
+
+	return ops->ice_has_wrapped_key_support(ops->dev);
+}
+
+Because the return type is bool, returning -ENODEV converts to true,
+causing qcom_ice_check_supported() to falsely enable ice->use_hwkm when
+ice_tz_ops is NULL.
+
+[ ... ]
+
+> @@ -553,9 +553,9 @@ int qcom_ice_program_key(struct qcom_ice *ice, unsign=
+ed int slot,
+>  	for (i =3D 0; i < ARRAY_SIZE(key.words); i++)
+>  		__cpu_to_be32s(&key.words[i]);
+> =20
+> -	err =3D qcom_scm_ice_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
+> -				   QCOM_SCM_ICE_CIPHER_AES_256_XTS,
+> -				   blk_key->crypto_cfg.data_unit_size / 512);
+> +	err =3D qcom_ice_tz_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
+> +				  QCOM_ICE_CIPHER_AES_256_XTS,
+> +				  blk_key->crypto_cfg.data_unit_size / 512);
+
+[Severity: Medium]
+Can qcom_ice_tz_set_key() and the other qcom_ice_tz_*() wrappers race with
+qcom_ice_tz_ops_unregister() during backend teardown?
+
+CPU0                              CPU1
+qcom_ice_program_key()
+  qcom_ice_tz_set_key()
+    ops =3D ice_tz_ops;
+    if (!ops)
+                                  qcom_ice_tee_remove()
+                                    qcom_ice_tz_ops_unregister(...)
+                                      smp_store_release(&ice_tz_ops, NULL)
+                                    tee_client_close_session(...)
+                                    tee_client_close_context(...)
+                                    /* devm frees qcom_ice_tee_private */
+    ops->ice_set_key(ops->dev, ...)
+      ...                         <-- use-after-free on ops->dev data
+
+Each qcom_ice_tz_*() wrapper reads ice_tz_ops without holding a lock or
+reference, and qcom_ice_tz_ops_unregister() clears ice_tz_ops without
+waiting for in-flight calls to complete before qcom_ice_tee_remove() tears
+down the TEE session and frees its devm-managed driver data.
+
+[ ... ]
+
+> @@ -696,11 +696,11 @@ static struct qcom_ice *qcom_ice_create(struct devi=
+ce *dev,
+>  {
+>  	struct qcom_ice *engine;
+> =20
+> -	if (!qcom_scm_is_available())
+> +	if (!qcom_ice_tz_is_available())
+>  		return ERR_PTR(-EPROBE_DEFER);
+
+[Severity: High]
+Does checking qcom_ice_tz_is_available() here cause qcom_ice_create() to
+return -EPROBE_DEFER forever on platforms that do not have both QTEE SCM
+and OP-TEE available at the same time?
+
+drivers/soc/qcom/ice.c:qcom_ice_tz_is_available() {
+	...
+	return (qcom_scm_is_available() & qcom_ice_tee_is_available());
+}
+
+qcom_ice_tee_is_available() only becomes true when an OP-TEE platform
+device binds to qcom_ice_plat_probe().  On any QTEE/SCM platform without
+OP-TEE (or on an OP-TEE platform without qcom_scm),
+qcom_ice_tz_is_available() never becomes true even after ice_tz_ops is
+registered, so UFS and SDHCI controllers calling devm_of_qcom_ice_get()
+defer probe indefinitely and cannot mount the root filesystem.
+
+Conversely, on OP-TEE platforms, qcom_ice_plat_probe() and
+qcom_ice_tee_probe() bind on different buses; if qcom_ice_plat_probe() sets
+__teedev before qcom_ice_tee_probe() registers qcom_ice_tee_ops,
+qcom_ice_tz_is_available() returns true while qcom_ice_tz_ops_registered()
+is still false, causing qcom_ice_create() to fail permanently with
+-EOPNOTSUPP instead of deferring probe.
+
+> =20
+> -	if (!qcom_scm_ice_available()) {
+> -		dev_warn(dev, "ICE SCM interface not found\n");
+> +	if (!qcom_ice_tz_ops_registered()) {
+> +		dev_warn(dev, "ICE firmware service interface not found\n");
+>  		return ERR_PTR(-EOPNOTSUPP);
+>  	}
+
+[Severity: High]
+Does calling qcom_ice_tz_is_available() and qcom_ice_tz_ops_registered() in
+qcom_ice_create() introduce a circular module dependency and break modular
+builds?
+
+Making qcom_ice_tz_is_available() live causes qcom_ice to reference
+qcom_ice_tee_is_available() from qcom_ice_tee and qcom_scm_is_available()
+from qcom_scm, while both of those modules call qcom_ice_tz_ops_register()
+and qcom_ice_tz_ops_unregister() exported by qcom_ice.  This also fails to
+link when CONFIG_QCOM_INLINE_CRYPTO_ENGINE=3Dy and CONFIG_QCOM_ICE_TEE is
+modular or disabled.
+
+In addition, include/soc/qcom/ice.h guards qcom_ice_tz_ops_register() and
+qcom_ice_tz_ops_unregister() with #ifdef CONFIG_QCOM_INLINE_CRYPTO_ENGINE
+instead of IS_ENABLED(CONFIG_QCOM_INLINE_CRYPTO_ENGINE):
+
+include/soc/qcom/ice.h:
+#ifdef CONFIG_QCOM_INLINE_CRYPTO_ENGINE
+int qcom_ice_tz_ops_register(struct qcom_ice_tz_ops *ops);
+void qcom_ice_tz_ops_unregister(struct qcom_ice_tz_ops *ops);
+#else
+static inline int qcom_ice_tz_ops_register(struct qcom_ice_tz_ops *__unused)
+{
+	return 0;
+}
+
+When CONFIG_QCOM_INLINE_CRYPTO_ENGINE=3Dm (such as in arm64 defconfig), the
+static inline stubs in include/soc/qcom/ice.h conflict with the definitions
+in drivers/soc/qcom/ice.c and turn registration in the backends into a
+no-op, leaving qcom_ice_tz_ops_registered() permanently false.
 
 --=20
-All Rights Reversed.
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111-ice-migrat=
+e-tee-svc-v2-0-29d19f6c92ab@oss.qualcomm.com?part=3D5
