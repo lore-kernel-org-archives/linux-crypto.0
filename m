@@ -1,66 +1,66 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.15
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794440912;
-	b=wb8i3bxdvDD7usw7eSOZ+bvf+F24V8j1hOUkyi5zr+S14S25QoDIyvO9kaU8dVzBziEL
-	 M9qRx3WCNyvivtpxG8+TJvzKmOhetRxXBpCVA1m2zJeLGkJjun+WHmg7ZSP40pfu5rncr
-	 9KBBqBUOiojxUEpm2hl15E3kn2opiXFC4jhP6P9xXjyWrCK9b5fUWuSopVVHy9BPl50BV
-	 t0tpqqlTrw7DZwIQYnmiUDD9Wta796fwg865RngR3X3UpLMtfkGtWrNwUknDfLZQKJe4G
-	 1GgoTcbrq3xihL4aYoyGb9NB0DOGiY37iMC/YOL2dCdDuSbpqHg8yToxsBNRwSTZsjw==
+	t=1794440918;
+	b=VTj3FwD3Jt5uxiEu8Z/D4Pl6k1P38EixCRmS/FcZu3NHIsDM8qKPhH3jOXApXVTakP5u
+	 LPnbQ7uzpASB05X5R+YIQqzM7bceIbdVrUkdoWZDQvalODwSRaxCHG3Wy3JaDqq+iDOkv
+	 iPOiitMGUy2N8gQOdsbgWK1fusHLCE1qlpT4uvjz8jl/KiFVbHP0CzlQ3zRzIUnd3wqOm
+	 2KaPe0bB6bQYHQAyZxWdQAS7tCUtEH/VqzeX+SRbCGjoldEMFOVSaZgYioMPxQqs+Hvx6
+	 7QuNN1514scFP2oAwoFtsWBhnRqV7E2a1s4FeABbSR5icCGoFbD93GweZ7NPlON8Ygg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794440912;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794440918;
 	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
 	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
 	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Iaxxel5eQmGQTudIuvxMVFkeCpIWN6hgvbXS3j/ddMY=;
-	b=qQsUdcJylFZ3kB+y4wOnQLS2UApIfE1v1tRGUNt+WPz0HFNZlVpS8/PCy1kfj6XvSnVg
-	 P3pumpYxWXNKmQQ8K4AEk7OJ+AXOYwOeoyMK7vW+hT7ZG8yCD/3U0/ARaGosKJBkF8ksT
-	 oxnenOjdAIedL2gYNv+/9qh4vRB/Dk3T/k7GwbqhDRe+lF+BuKqREu/1Lw6s6ldhof0uN
-	 WewBccnG7njDQmUqlSqODm//EKYAi6ico+2Vz0twM5UefoSBBSsvD1QDnANoBfykGj8AO
-	 FSiELaerkFCu8II6MoRm7fs0QhfBhTBb1I3YxQQ3msuf8exU5OqAWKvq3/K4A5zRcFQ==
+	bh=RTEzT24mGfCmMXNTDbKofHgfVLGW6QdVWlksf5weadY=;
+	b=spGrhYzkISjRVo0YRn2KuG/AOUKRcnHTr2IEMtemzhzQqBkLMvMup4xE73WgoRG2+sLh
+	 mwMvvTVvfghwElfaKoBgjJI9FgudgZ+wyvrnhxWKmqa23/GOYSEzoIeNRQjDIBsAL+oNp
+	 9L8D0yJqxE47p4/2756TsVeFtIPgPLHe5MX1zpW581T0VQOMfl4nfYEcvnEPiDm7Zeqa4
+	 7s8dDqWVwi4SSZAzBW+wJ0eO6zdh6XVLpjv46m9p76RCbRcxStCZsCz9nJPaWy06CSfll
+	 JuKQ+U0f83ovZ0SifRYDgCrCuEJ4Vll2vctH1l2m4Q4/RK2q12bPwRvlthNSq9vgH+A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=intel.com;
 	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b="YK/w9e5I";
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=gyAGYXu0;
 	arc=none smtp.remote-ip=192.198.163.15
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73EC7606C0B0;
-	Wed, 11 Nov 2026 23:48:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 73EC7606C0B0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A2C60A2622;
+	Wed, 11 Nov 2026 23:48:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E1A2C60A2622
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=YK/w9e5I
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=gyAGYXu0
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1794440911; x=1825976911;
+  t=1794440918; x=1825976918;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=F2WuUYmuXTPXL+P5748IfGeMmC4KPLynQ6+J0uAEp+0=;
-  b=YK/w9e5IWHuHOGZCpyrIiUoz0lAFiaLXtm0kYASpfId+l4gbZDextDvN
-   4jK8UuJ65ggGldkyBBHxkLRGMlRrq4ODK1fOGT3l2iRR3J6EnsWkzwudK
-   EYDcUK3z776OVqqQJJ4WtFsw6F1Xa6i/dty4AZe96fBTgnFGqf4N3qOC8
-   g9GvxlO2jcQ4WVnettuz8ZQpFxqacfcTe7taY/3kKa5Os0nK+Ys/+19xg
-   Dw/hrAD4lfLx/wTqSf4yAE+GKBsAIb+3Kfl9Wigd6bkQ88Tv766WgkPLQ
-   x+zgM+4xl0n6DvoRWaeNDX2ORGtb62M81rhn4Zm83Y5vl5PfMpPRAJc6R
+  bh=qiTprQcvixtyWKG6YcvfO8nQP3PU4VUrniMboE6NSkI=;
+  b=gyAGYXu0++GouxpOqlvz4AE0UESwZiHddy1GtCYInd4ZlrehbkYhRlUS
+   6e8Hz+pLp5W/fJ0NWTiK65HE6GIAwM+0my0QS1OF8JzK44J4ot8aBYyb7
+   i+9SWp2KFqMCwzNFDgR5HpO8wntHWySXxhDftp7AFRBzXi4JzSmu0FFyS
+   oHsM8lPMo4g81t6nzOB3Pmg8mJIrPwn0LnJ1oHHp+2HDWskrfoGr9dm5y
+   0+0jdhqTvxnTEyLyEssOJ7pa7dcljB2d1gqYbY8TR/aXHxfWzgrRFowpQ
+   RcqorQm77jx+WDNuJsF1sesslbNczN3ECI+rn+Il94jv94TGlZZua77fi
    A==;
-X-CSE-ConnectionGUID: AFHQjuDlTiq5kbiHN6Yy+Q==
-X-CSE-MsgGUID: 72OqXOYOQyCXo7ACfUMtdA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11963"; a="3226584"
+X-CSE-ConnectionGUID: KCyVcGU2TjSmtUi5mP2wkg==
+X-CSE-MsgGUID: 5YR98Z95TNGWExXLbwV9Pw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11963"; a="3226618"
 X-IronPort-AV: E=Sophos;i="6.27,208,1787036400"; 
-   d="scan'208";a="3226584"
+   d="scan'208";a="3226618"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2026 15:48:31 -0800
-X-CSE-ConnectionGUID: L4ZeofTETcawVOXtCfTrDg==
-X-CSE-MsgGUID: WFO6/awMR/Gk2uILNvf7Cg==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2026 15:48:37 -0800
+X-CSE-ConnectionGUID: VLtbyyzhTuu5gT0SuDLr3w==
+X-CSE-MsgGUID: LreG1qb0TWiBf5byqg7Q0g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.27,208,1787036400"; 
-   d="scan'208";a="8512363"
+   d="scan'208";a="8512387"
 Received: from pavel-dev.sc.intel.com (HELO pepopov-mobl2.intel.com) ([10.3.206.11])
-  by orviesa002.jf.intel.com with ESMTP; 11 Nov 2026 15:48:28 -0800
+  by orviesa002.jf.intel.com with ESMTP; 11 Nov 2026 15:48:34 -0800
 From: Pavel Popov <pavel.e.popov@intel.com>
 To: "Rafael J. Wysocki" <rafael@kernel.org>,
 	Viresh Kumar <viresh.kumar@linaro.org>,
@@ -99,9 +99,9 @@ Cc: Pavel Popov <pavel.e.popov@intel.com>,
 	linux-arch@vger.kernel.org,
 	linux-pci@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/7] drm/i915: Include <asm/cpu_device_id.h> unconditionally
-Date: Wed, 11 Nov 2026 16:48:15 -0700
-Message-ID: <20261111234821.4814-3-pavel.e.popov@intel.com>
+Subject: [PATCH 4/7] cpufreq: ondemand: Include <asm/cpu_device_id.h> unconditionally
+Date: Wed, 11 Nov 2026 16:48:17 -0700
+Message-ID: <20261111234821.4814-5-pavel.e.popov@intel.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20261111234821.4814-1-pavel.e.popov@intel.com>
 References: <20261111234821.4814-1-pavel.e.popov@intel.com>
@@ -119,8 +119,7 @@ Content-Transfer-Encoding: 8bit
 <asm/cpu_device_id.h> now has a generic version, so the #ifdef
 CONFIG_X86 around the include is no longer needed.
 
-<asm/intel-family.h> is included by <asm/cpu_device_id.h>. The CPU
-match table still needs CONFIG_X86 for the INTEL_* model defines.
+od_should_io_be_busy() still needs CONFIG_X86 for boot_cpu_data.
 
 Signed-off-by: Pavel Popov <pavel.e.popov@intel.com>
 ---
@@ -129,28 +128,31 @@ it is in mainline.
 
 [1] https://lore.kernel.org/r/20261111234439.4098-1-pavel.e.popov@intel.com
 
- drivers/gpu/drm/i915/intel_cpu_info.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/cpufreq/cpufreq_ondemand.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/gpu/drm/i915/intel_cpu_info.c b/drivers/gpu/drm/i915/intel_cpu_info.c
-index e52d0ac713a..a6b46cc841a 100644
---- a/drivers/gpu/drm/i915/intel_cpu_info.c
-+++ b/drivers/gpu/drm/i915/intel_cpu_info.c
-@@ -6,12 +6,11 @@
-  * intel_device_info.h by having a separate file.
+diff --git a/drivers/cpufreq/cpufreq_ondemand.h b/drivers/cpufreq/cpufreq_ondemand.h
+index 2ca8f1aaf2e..0e33865f9d3 100644
+--- a/drivers/cpufreq/cpufreq_ondemand.h
++++ b/drivers/cpufreq/cpufreq_ondemand.h
+@@ -6,6 +6,8 @@
+  * Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
   */
  
 +#include <asm/cpu_device_id.h>
 +
- #include "intel_cpu_info.h"
+ #include "cpufreq_governor.h"
+ 
+ struct od_policy_dbs_info {
+@@ -26,8 +28,6 @@ struct od_dbs_tuners {
+ };
  
  #ifdef CONFIG_X86
 -#include <asm/cpu_device_id.h>
--#include <asm/intel-family.h>
 -
- static const struct x86_cpu_id g8_cpu_ids[] = {
- 	X86_MATCH_VFM(INTEL_ALDERLAKE,		NULL),
- 	X86_MATCH_VFM(INTEL_ALDERLAKE_L,	NULL),
+ /*
+  * Not all CPUs want IO time to be accounted as busy; this depends on
+  * how efficient idling at a higher frequency/voltage is.
 -- 
 2.54.0
 
