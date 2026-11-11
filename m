@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.139
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794388035;
-	b=FjBKFe6iA5mhM8IzwMwAtmfdoyFxoEMxBC0rHyl8S4aMVKj++ls7W1Shfs4Yu+VG43W2
-	 +9KAUQbDNBuMv7+09Wlxf3kgSunZ8OFOwXOQ6FATQ0nEBBWMQkZ5Zv1c6akuiwGzJnDAY
-	 r6f3wYWbg9sOhsGHqsxI2TP33RzY/XpCOiiAVUjTDXxDcWIIy0uT6lCDQVEz77XsKjUX0
-	 uEZw8TyWYRK4/1Zx6ZaUVfx261sXSOz/U097/St8GoJfaTNQH3FgpETAepb9WcXNusXEu
-	 3xftwOY04Oks7anlpTwxn5cNagK4/se8LNLIi5hywN/W/klgs2S2nyX1e2MsxlNxX5Q==
+	b=1ub1/slktKukoaOpqY+F5xYtfjbnsrXk1CkkjQ1zNM5jNz8uoaljQ8okIN01jtAtjoC+
+	 3oUBRHWd3S00fJSdGTsCRBcyUsKjWpaRGV05Vqp0e/Fq+yxbWnVBVA7hMx77bkt2j2Tas
+	 1v30Tonh6Mu+W8X/VZ+il1sm+RXmC8/2pIYV7SSi6sv+3dGDdnhY8NsrQlcJkX9x4592Q
+	 npVfbNHAPZYJqNIzHRsAJGu49EkFOo/t+DtDp15UJ8Kq3fI2qsRbAETZypHt6dEHDEiUo
+	 4SxnC7bqcGd6E0DyDT8+hOOBylBW38rVMyCh0QwhLMNIgUCjw0D57mBTo3th0/YEIDw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794388035;
 	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
 	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
 	 To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=7bWqdfYQDOOZNT4u6upFk/9Ul12VxKdb2Ez+LjvVceE=;
-	b=tOGi1PhS2UZOIUt9Ctg8QLr93fwdFiiuf6cwI2DglMa2Xa3dnXTOP28wcKmpXpTKWn0V
-	 q2rWKCcQzUuo2TNp7wIEuuAwmmAn1Nm1EZ1/XNDvUeuVIUHfIXohHy4eBr6oGysk+5YkL
-	 B/Zan1A107noKOTfI7WvkLs9JlHhOpJt+J03XMM8gZyo+0OB5rcf1nTTCAghPCa6MwXcN
-	 +DZg/Jf4+pY7JeRnNPp0SRaHTFV9CmG7/X/lN+s0ra5xyzNORjuysYgRIVvet9GPUoBRA
-	 v29JO/Zbc7jLDtb4DKHurFh9YQ/On21AXALRxmZPPVoYahklCvJYxkX8xN+z4YMH3iA==
+	bh=zY5dQkELre1GS4SkxRkb95S2IVHHtMfAcsv7zPuOtlk=;
+	b=OYThXobf/P3rJrkyZ5e6JSs+of5zcS72RxrjBh0TuaHGam0MTZNLciYshZyG0He/oHh8
+	 Ws+r5YTvYa1vtvz8N6x9vlD4gEy37EzCP5phAqc1UzrUJ1IZTQxscg2Z+eIZn7Wmld7xG
+	 X+pb7H3zKBLRwXj/qGWd6N82+Lh2ThJo3c223LhYW0lHO7g0/JVOkPa+C4l4OlgsZC44f
+	 TnmGny8rMUBlZ2pfYlTXAEeJtopNCxiBvz7rG8NGryZGmsUa4kHEjIJvkOFPWfvkVUhC4
+	 SfdNUM2+lgOWNTmPWx8iQ+DzuPVz/Klfz19+vq3qowCxk4S4ux3IuVvrukrX0HbLWyg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=cmss.chinamobile.com;
 	spf=pass smtp.mailfrom=cmss.chinamobile.com;
-	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=bAvFYd75;
+	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=FNgNCbsz;
 	arc=none smtp.remote-ip=111.22.67.139
 Received: from cmccmta6.chinamobile.com (cmccmta6.chinamobile.com [111.22.67.139])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25562606A323;
-	Wed, 11 Nov 2026 09:07:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 25562606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FAD606A32A;
+	Wed, 11 Nov 2026 09:07:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88FAD606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=bAvFYd75
+	dkim=pass (1024-bit key) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=FNgNCbsz
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=cmss.chinamobile.com; s=default; l=0;
 	h=from:subject:message-id:to:cc:mime-version;
 	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=bAvFYd754U4txyH4Tl7Ug4uuL2zC8imMiyUeAukcKMwtwIPOoTHizs1IN+uSyh1EKTbW/2UXQXmY7
-	 9xMfi3HgTjabL7Z1Iw5sFyikNgWk+kj292R3szKEQXGSQZDNjb41HvhFx3lwUwZjX0PBvEAF3Kt6Ta
-	 QrgiaHM0rcAU/JeU=
+	b=FNgNCbsz7HLqW9Vb87BoZ/1KcMEMA4K3vSd4gxtBpKKLH+K4Z/1V26y1/EBOjfdYtFToJaHwfCGcx
+	 l+evLcvfIaIIQdFrP9V/R3MlSk+2LfvNec7u2baoNuDqgySH3wiE10+IVTWLf8NdFLiZdcF1dh0Gg4
+	 ysQXlR20399Mg9zw=
 X-RM-TagInfo: emlType=0                                       
 X-RM-SPAM-FLAG:00000000
 Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
-	by rmmx-syy-dmz-app01-12001 (RichMail) with SMTP id 2ee16af43040d39-b320e;
+	by rmmx-syy-dmz-app09-12009 (RichMail) with SMTP id 2ee96af430416b2-dca56;
 	Wed, 11 Nov 2026 17:07:13 +0800 (CST)
-X-RM-TRANSID:2ee16af43040d39-b320e
+X-RM-TRANSID:2ee96af430416b2-dca56
 X-RM-TagInfo: emlType=0                                       
 X-RM-SPAM-FLAG:00000000
-Received:from FHB-W5100250 (unknown[36.137.216.21])
-	by rmsmtp-syy-appsvr06-12006 (RichMail) with SMTP id 2ee66af4303a7e7-d683f;
+Received:from  (unknown[36.137.216.21])
+	by rmsmtp-syy-appsvr06-12006 (RichMail) with SMTP id 2ee66af4303a7e7-d684d;
 	Wed, 11 Nov 2026 17:07:13 +0800 (CST)
-X-RM-TRANSID:2ee66af4303a7e7-d683f
+X-RM-TRANSID:2ee66af4303a7e7-d684d
 From: Gu Bin <gubin@cmss.chinamobile.com>
 To: sean.wang@mediatek.com,
 	olivia@selenic.com,
@@ -58,12 +58,13 @@ Cc: matthias.bgg@gmail.com,
 	angelogioacchino.delregno@collabora.com,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/2] hwrng: mtk - runtime PM fixes
-Date: Wed, 11 Nov 2026 17:06:57 +0800
-Message-ID: <20261111090704.1699-1-gubin@cmss.chinamobile.com>
+Subject: [PATCH v2 1/2] hwrng: mtk - use pm_runtime_resume_and_get() in mtk_rng_read()
+Date: Wed, 11 Nov 2026 17:06:58 +0800
+Message-ID: <20261111090704.1699-2-gubin@cmss.chinamobile.com>
 X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20261111073237.1647-1-gubin@cmss.chinamobile.com>
+In-Reply-To: <20261111090704.1699-1-gubin@cmss.chinamobile.com>
 References: <20261111073237.1647-1-gubin@cmss.chinamobile.com>
+ <20261111090704.1699-1-gubin@cmss.chinamobile.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -75,23 +76,46 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The sashiko review of v1 pointed out a pre-existing ordering problem:
-mtk_rng_probe() registers the RNG before enabling runtime PM, so
-mtk_rng_read() can run while runtime PM is disabled - both in the
-probe window (hwrng_register() starts the fillfn kthread right away)
-and on unbind (the devres teardown disables runtime PM before the RNG
-is unregistered). Patch 2 moves the drvdata assignment and the
-runtime PM setup above the registration, which closes both windows.
-Patch 1 is unchanged.
+mtk_rng_read() calls pm_runtime_get_sync() without checking the return
+value and immediately starts polling and reading the RNG registers:
+when resuming the device fails (negative return), the reads hit a
+device that never resumed, and the failure is only surfaced indirectly
+(if at all) through the -EIO fallback of the final return.
 
-Gu Bin (2):
-  hwrng: mtk - use pm_runtime_resume_and_get() in mtk_rng_read()
-  hwrng: mtk - enable runtime PM before registering the RNG
+Use pm_runtime_resume_and_get() instead and bail out on the error: the
+helper reports the resume failure and drops the usage counter reference
+it took, which a failed pm_runtime_get_sync() leaves behind (the usage
+counter is incremented before the resume attempt, so returning
+directly after a failed get_sync() would leak the reference and the
+device could never autosuspend again). The tail
+pm_runtime_put_sync_autosuspend() must not be used for this bailout:
+the device never resumed, so balancing the counter is all that is
+needed. On success the helper returns 0, which is exactly what the
+read counter expects at that point.
 
- drivers/char/hw_random/mtk-rng.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+Fixes: 81d2b34508c6 ("hwrng: mtk - add runtime PM support")
+Signed-off-by: Gu Bin <gubin@cmss.chinamobile.com>
+---
+ drivers/char/hw_random/mtk-rng.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
+index 127b82d979e8..1e8e458dab25 100644
+--- a/drivers/char/hw_random/mtk-rng.c
++++ b/drivers/char/hw_random/mtk-rng.c
+@@ -95,7 +95,9 @@ static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ 	struct mtk_rng *priv = to_mtk_rng(rng);
+ 	int retval = 0;
+ 
+-	pm_runtime_get_sync(priv->dev);
++	retval = pm_runtime_resume_and_get(priv->dev);
++	if (retval < 0)
++		return retval;
+ 
+ 	while (max >= sizeof(u32)) {
+ 		if (!mtk_rng_wait_ready(rng, wait))
 -- 
 2.55.0.windows.3
+
 
 
