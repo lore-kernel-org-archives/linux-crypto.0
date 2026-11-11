@@ -1,62 +1,66 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794393896;
-	b=XrF9lzznfVCKPMqX47zbYIb+a/OThEHGLKsFKHwlsipvtpf0ib7HAwdZzHJM8zjsjmOT
-	 T6IIhZDMKRYpLnova5FfXSGc+6vht2d5YTiXvyM0UIKA6SwWPX6+3AOpQ63/dAXjsH7uE
-	 nDm6egqME2J4QLfUQB5TyVXBJWvOIWO7l5JpisZ6I+HL3iC111gRpg2ngFK2VXGn2J3aA
-	 go1qFt6bwvy7Q1KF/JXg8ZUKu7FGWmnL93zPhLHl0NBE7c36if/yiC3YTTkOnSNrtTJyv
-	 qDmfiZQtpRtV/xGq+WLgX6IBxv6f4Jx1184XU6s0Bf+TJlcNLR6+cK4GMmyhOOyHX5w==
+	t=1794394229;
+	b=oxMoYJOO90kYzEcZ087AiGgk7ljZVjIY/m6rAbxEv/sQDZZEYT0N5a8pVV0tuwJD/907
+	 c4rLHw7qSYkm03UDjUZElH3PntUEpFoHIf+x7NOnYxfTUEt8n9eB0tI+XETpLhTnlEcrX
+	 q2MLxb7hi4JKhbkWubGyi/69mvwLggvtfORlkr4aHXBoOyvQvOryBe8yN/uaZgKLoltX8
+	 JmNqNh8gNtB4XWABH2YRrypi2kaJfR6pwmD2c1VaofpVo7utTv0F8GzYoQu4R8tkd9d/F
+	 y4qWLQxF53fERwONY6DBMAVSo5uHIg2iqlM93puwMAWNEht0vxrvV5Z7/zTYmI6nEYQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794393896;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794394229;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=QXEhi4g+1QbPElhmNqyuHB6NGR5M3lkugk5YWNvi+aM=;
-	b=htHgf5as9f8LVXKCP9//yysTQWFJ9GhppRCkL2x3q53KNqNKMOMT93MtCrFzulAYm5/E
-	 I2+dqJHYd9Mmz5QYqvwWiviVj4n9KmjFkY5GV6UNfqRR9mtXZvmV+S1/0D4iRSpOgoLEz
-	 9WkKoEXFndEn0WElMWw2kh195C567Prkpdwoc60jHIJngN3krjiLHCy12QNiUREfsESAF
-	 ehabSrneUIHDhmwYAY1eL6EuN2IyzngdohHFkSMA8FPIxwx8bc5a5ocj9f16ZcTQTSOsU
-	 3FebeSFDlJdq4ap2KdyrtN4a9TT8IkarznnXohxA+BzPjK1SQIWvVgep5Z8efoHzi/A==
+	bh=AvcBgrPzTkerP4XT6zd7gDQi0L+d93ktdb5ouA+0y+0=;
+	b=w9Yp2dJBG8HfgWjg2dSmhHof16q/TFVoh65qowaCu8oQSKO0CIWVf6dZbQ5wGAFOp7Y5
+	 s0bdmQZSJNYEcBUP11i6ZWuBx4Xa00ngzWlo+pm55HtQ8pKfcjq+qZyiHvst3P7nsYuGi
+	 LpkcBDngdOVfDEOwGtH9Vx9h4o9IXuSs6zXDRH8fMgiPfM8VpXQ++41WKdiiTyb6teJml
+	 OFhQOPVwpVFTQCl7nANO2VcL0BfldXcxIh1kkM4MIC7vSpRnYZB7/0cTpAeNMgP9fZoMi
+	 fX10ftl4Aa2+2T5n9yAPY2ldjndFFttg0nKRGVr6gCz6ml/wJoKWX8c7jL9C8HLgvig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=KbRa+Eee;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=hXyb69Uk;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D20B606A31C;
-	Wed, 11 Nov 2026 10:44:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5D20B606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B4F606A31C;
+	Wed, 11 Nov 2026 10:50:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 81B4F606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=KbRa+Eee
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=hXyb69Uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=QXEhi4g+1QbPElhmNqyuHB6NGR5M3lkugk5YWNvi+aM=; 
-	b=KbRa+Eeeo1zU2vH++8/Ff0bpzI3/EAl29l+JDm56IiwP+sbf+AyrN9hmgX7ebEDbokJssqeBRMK
-	AwVF4ZC3vGKCA4acaZLkip6jgFicG3/iYntf2SG6hkmwz2TJ7WHkLo+HI9JXmJT1q+eF8DJMow4Ue
-	q7JPE8CTLRB1n84gjPFGEy5rQKYEwD2OyqFeyw4eLlhiKUj71NNeCiabT/Qhi5gf9vwgNkCbC6vFH
-	9bLFdkD85vOUn88QaJraTS7qcsjn1W+s0gDbw7sEvOrFWEjAGzcVT8ieLKKCd9Etki8uRqXw70qAn
-	E8u5IdNSo+4VPChLefApzzoZJjQxw/vOmb7Q==;
+	from:content-type:reply-to; bh=AvcBgrPzTkerP4XT6zd7gDQi0L+d93ktdb5ouA+0y+0=; 
+	b=hXyb69UkKGHtHfUMegNRZjUDd8HJ5ZsS8vLHvqR6Z8sgsl6Ae91HiIYVHMq8AVk6IJRKRVET2Wp
+	hy2ypgFRqQtS49xWcrqDu50yjlM8tbFt9sgX+hZgCa0FIWpRuSejwz4Jv5og2a9+4GXiJJcwYUsjS
+	xox4DyqCBV7wvOBgPBrQf9MW9sVzKvC7esqCqrtLEA1RX7Tei6tIaf8w1fE9Qg2ZJ5tkyjXvnwWTA
+	QnPTVeTaPgdRSPDI3cXJ667uWHnW0Vsu5mEiKQoBmqWcZ9CMLRmRia1omdX0mhQihCigywWsryJW+
+	Ba4M4tpo3PnsrYMPv2WR2acZxm3DqEqVWR1w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xR5ow-0000000Dlpg-19Rw;
-	Wed, 11 Nov 2026 18:44:51 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Nov 2026 18:44:50 +0800
-Date: Wed, 11 Nov 2026 18:44:50 +0800
+	id 1xR5u6-0000000Dlyt-1IvG;
+	Wed, 11 Nov 2026 18:50:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Nov 2026 18:50:10 +0800
+Date: Wed, 11 Nov 2026 18:50:10 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Kristen Accardi <kristen.c.accardi@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Changwei Zou <changwei.zou@canonical.com>
+Cc: sahil.malhotra@nxp.com, davem@davemloft.net, horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+	jeffbarnes@linux.microsoft.com, stephane.debusne@cynove.com,
+	iuliana.prodan@nxp.com, martin.kepplinger-novakovic@ginzinger.com,
+	lukas@wunner.de, sahil.malhotra@oss.nxp.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/4] crypto: iaa - use RCU per-package WQ tables
-Message-ID: <avRHIuISSNUxfAU4@gondor.apana.org.au>
-References: <20261019-iaa-crypto-wq-tables-v1-0-fab67b2a1538@intel.com>
- <20261019-iaa-crypto-wq-tables-v1-3-fab67b2a1538@intel.com>
+Subject: Re: [PATCH v3 2/2] crypto: caam - Use bounce buffer for unaligned
+ RSA destination buffers
+Message-ID: <avRIYjWB6AUbeLUS@gondor.apana.org.au>
+References: <20261020025426.955531-1-changwei.zou@canonical.com>
+ <20261020025426.955531-3-changwei.zou@canonical.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -68,40 +72,58 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261019-iaa-crypto-wq-tables-v1-3-fab67b2a1538@intel.com>
+In-Reply-To: <20261020025426.955531-3-changwei.zou@canonical.com>
 
-On Mon, Oct 19, 2026 at 04:06:22PM -0700, Vinicius Costa Gomes wrote:
-> rebalance_wq_table() gives CPU n all the WQs of IAA device
-> n / cpus_per_iaa. The flat index ignores package boundaries, so a CPU
-> can be paired with a device on another package, and each CPU sends all
-> its requests to one device while the other devices of its package stay
-> idle. The table is also rebuilt in place, so a request issued during a
-> probe or remove can read a NULL WQ and fail with -ENODEV.
+On Tue, Oct 20, 2026 at 01:54:26PM +1100, Changwei Zou wrote:
+> The rsa-caam driver directly DMA-maps the destination buffer supplied by
+> the caller via req->dst without checking whether it meets the cacheline
+> alignment requirements of DMA-incoherent hardware such as i.MX8.
 > 
-> Replace it with one table per package, holding the WQs of every IAA
-> device on that package, and have each CPU round-robin over its package's
-> table. Rebalance builds the whole set of tables and publishes it with
-> rcu_replace_pointer(). The submit paths look the WQ up, and take their
-> reference on it, inside an RCU read-side section.
+> On CPUs with non-coherent DMA caches, if the destination buffer shares a
+> cacheline with other data (i.e. it is not cacheline-aligned), cache
+> writeback/invalidation during DMA can corrupt adjacent memory or cause
+> stale data to be read back. This manifests as intermittent -EKEYREJECTED
+> errors when loading signed kernel modules.
 > 
-> - A package without IAA devices gets a copy of another package's table,
->   so the lookup needs no fallback.
-> - Every table has room for all the WQs, a few pointers more than it
->   needs, so they can be sized without counting per package.
-> - If a rebalance fails, the current tables are kept. On removal they
->   are cleared instead, because they still hold the removed WQ. Removal
->   then waits for a grace period before returning, because the idxd_wq
->   can be freed after that.
+> When any segment of req->dst is not cacheline-aligned in either its
+> start offset or length, allocate a single contiguous aligned bounce
+> buffer covering the full dst_len rounded up to a cacheline multiple,
+> redirect the operation to it, and copy the result back to the original
+> destination once the hardware has completed successfully.
 > 
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Introduce a helper sg_is_dma_aligned() that checks both sg->offset and
+> sg->length for cacheline alignment. Checking sg->offset suffices for
+> the start address since physical pages are always page-aligned and
+> PAGE_SIZE is a multiple of dma_get_cache_alignment(). sg->length is
+> also checked to ensure the buffer end does not share a cacheline with
+> adjacent memory.
+> 
+> The intermittent error 'Key was rejected by service' on i.MX8 with CAAM
+> can be triggered when loading signed kernel modules:
+> 
+>     for i in $(seq 1 100); do
+>         sudo modprobe xfs 2>&1 && echo "SUCCESS on attempt $i" \
+>         && sudo rmmod xfs || echo "FAILED on attempt $i"
+>     done
+> 
+> Reported-by: Martin Kepplinger-Novakovic <Martin.Kepplinger-Novakovic@ginzinger.com>
+> Closes: https://lore.kernel.org/r/6029acc0f0ddfe25e2537c2866d54fd7f54bc182.camel@ginzinger.com
+> Signed-off-by: Changwei Zou <changwei.zou@canonical.com>
+> Assisted-by: OpenCode:claude-sonnet-4.6
+> Tested-by: Martin Kepplinger-Novakovic <martin.kepplinger-novakovic@ginzinger.com>
+> Tested-by: Stephane Debusne <stephane.debusne@cynove.com>
 > ---
->  drivers/crypto/intel/iaa/iaa_crypto.h      |   7 -
->  drivers/crypto/intel/iaa/iaa_crypto_main.c | 346 ++++++++++-------------------
->  2 files changed, 117 insertions(+), 236 deletions(-)
+>  drivers/crypto/caam/caampkc.c | 87 ++++++++++++++++++++++++++++++++++-
+>  drivers/crypto/caam/caampkc.h |  6 +++
+>  2 files changed, 92 insertions(+), 1 deletion(-)
 
-Please respond to this comment:
+Please respond to the Sashiko comments:
 
-https://sashiko.dev/#/patchset/20261019-iaa-crypto-wq-tables-v1-0-fab67b2a1538%40intel.com
+https://sashiko.dev/#/patchset/20261020025426.955531-1-changwei.zou%40canonical.com
+
+I'm also disappointed with the lack of response from the caam
+maintainers.  Unless active maintainence can be demonstrated
+for this driver, I'm going to have it removed again.
 
 Thanks,
 -- 
