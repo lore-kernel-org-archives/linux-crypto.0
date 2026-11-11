@@ -1,80 +1,117 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794419698;
-	b=Px6ciBOhVIxxP0+vM1+ZwXqJmFK9/SVIlcym5cnY7wPyyLEWcfP37k7HQN4pNFWqQ4T7
-	 3h+N22PYJED7FMiPrxNQ9+ucwAxL66rEBFLyMZH/8K23wfM3LjE2vkc5P+GZi9RveFH/5
-	 hbnQl2hO1WDdhkyqg69+BsNKW6GrwbMIUt/pqpLN+h/+kq7BgejntiPPRG+/qRI+AM4lt
-	 Sb5E6eEQ6nNbYYuwi/wuYWhtwEoaO6o+F/15vdkaWIO3Qj6JFhVhKwQvR6IzNdMmVx3Lc
-	 Pp3E6E84tG2wlnW1x8OPLT8Lv+7GxLX1foGs95X8upU5qZY+QPVWrF/K76yEarEgTYg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794419698;
-	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
-	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=2/e0Lvd7Sqz3iHPXMWwA53veJ/X35GUDoRLhWv/Rf1o=;
-	b=u1R0MmErNsCZIAdpnN9eCF7atBMNgD34GSQk2nvaKkSyrydYRm5rQIvBRFbXjqAbTAa+
-	 EioiBueJiIFAVAi+u7zO6/XnAU2ZJLgn0P8WcuKppwhJV2eDAovkLn8/Agyno9lerN641
-	 jYnqr2R5qNInfoQTmQBdPlsnoxYCNDOcc3ZtpOKXE18g6AtHUJN3ie1nMfkhMz4Zn1hbY
-	 N3ZuWI3RrStf4L8iLw9lf9nolSPisnsVQbFA9nXJzuCKAv/O1duhNJYRaxB3XaoF8ub9C
-	 YDZXgbH3GbF5K6xfq+iOIBBTHONPoPwgOV709kWFcLEv+bH1amZnhdWOcH3gw+EKmwA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XVYcTEyV;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECCD3606A31C;
-	Wed, 11 Nov 2026 17:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XVYcTEyV
-Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
-ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1794419697;
-	b=RlFLmbCUi2GT3o1c/j140nniBQSfKc1SB2bJcVDYGyOCPUR3SyQNa4VhFphd37rYMMy9
-	 NGiIEWclB9sjWBwouOjh5PRwXHStKlpvHo8rYXFOg5IViVytFXtCnXmPuLijUEKM9gw+S
-	 P2cyGmm6E4/S0c5FEVEbDBYnIfkJLco04ywbU0d6IvGyi44zl9O5i5f0oKCxfTYIjk5rE
-	 razNbjZlRlBks5RQinxCsgzRLH4siBr1K0/AUWsGk1TX8+bZYGeelT1geUUMqnFc3siy4
-	 czxu8j0ar/T+FvvEXQgKO5+IsdQe9ZRlcdirOJAs6lHPq2GSF53ehxLl4QsD6mqbCXg==
-ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1794419697;
-	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To;
-	bh=2/e0Lvd7Sqz3iHPXMWwA53veJ/X35GUDoRLhWv/Rf1o=;
-	b=t1ngS1c40tAmd7yAKy/EMhEoAR9mB1pblb1URTwWa/8s81Ux0C75UAq4Rmn0+VFxHFnL
-	 7Bl79rRu6m3XaZI0dtAB3l7FG/aHugsQL9Qv/pkA086SbgjQRmek3k1DZV1uDYRtVDC6n
-	 s3tKkZ0CR+/R8+i2FD0s30AQQWA27qGRDwKkuSQsGSAEAoapi8GXkYgO54eajENR4jTiI
-	 VwhLhfiw/mE91NffuBx+PTjG8A7TvnyAXxnm2K8KEMfFQ/7q0YFA7GAb2YPMeGujULScQ
-	 89qzy3VEcPc1Xz1jyMVMgHGk9IZ8p0bIzU8bbSFtDZSlYK5BOoyPa4jsmuizVaZaiRA==
-ARC-Authentication-Results: i=1; smtp.kernel.org; 
-	arc=none smtp.remote-ip=100.80.115.77
-Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.122
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794421903;
+	b=ix5mOG51VPmR7LNRxiAXVLO9VYvvS7O6u6h+R0ZGtbKzsDnPOn7J2PPiFSDocznoYN4i
+	 fKOMcEkcUNgSgC5pLC+ljstehnmN1qH6+G04eQahjsIm+PO0gM/nEN1FHb08Fbey1Dm3j
+	 XNol+6lqAQDkyhzNskuPb2G5P/VVj08xShNc18NSp+xqGp/jq7cqbMkRvDTvf5T0aChDN
+	 qUtPolbjtOuh29lDR32x02RGFRUWTVE1uv+hdT4EXGHB8/BH/3bydhlTaE6GOxqznJGis
+	 Vl+km4PPjdXmAofjZRJ0GtdChGHi/8p+R0GtaG8t+8S8lVHEKhrSiBjqbiW1/T/2zdw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794421903;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:
+	 X-Google-DKIM-Signature:X-Forwarded-Encrypted:X-Gm-Message-State:
+	 X-Gm-Gg:X-Received:X-Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=4AU6yrqWvCc/nyHqN3PU3r1GIThqckGTo09wAzMWOLA=;
+	b=ectqffGPtraMpgYBuznK48VKXES0GAqbNmTdbVVdti+y7cKlxQAUYXNVwS8wm/SqY4ts
+	 R1MKZxZfJX1DN5HIY8QDL2723kTPJ9ZPu11zU5KgQinY/3ZaJAy8G6QZP9hUIiT/fD6a6
+	 5tKzPIRe9+sQG3XRz11eSxsRo2smHzQ3O7MEqoCEkE8hoEVBakMq0BqPh2JAFKJm7/uMy
+	 DgVoi0g0WK0fdv0c0Mp020tgKcweSKqyARAuSclT7FLeTST2bAwbpQNNTq7QRIZEMgFLS
+	 ppxwM1lK8gBcENiGQn7SgxVHDCeiPipNc5nmJVvZBdyHJW4FtlCQuVrNHxT7MDMLTsQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=canonical.com;
+	spf=pass smtp.mailfrom=canonical.com;
+	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=hAQTx9YA;
+	arc=none smtp.remote-ip=185.125.188.122
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 4CABA1F00A05;
-	Wed, 11 Nov 2026 17:54:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794419697;
-	bh=2/e0Lvd7Sqz3iHPXMWwA53veJ/X35GUDoRLhWv/Rf1o=;
-	h=From:Subject:Date:To:Cc:Reply-To;
-	b=XVYcTEyV00BY14+qs++vccbk07bfewEa/mBTOu/Z07zyTlEewUymdpr7Y/HNIGrDy
-	 tgJlYNLuQJ9YPUXvhUUALjP+UBGfgT6k6+FgU/k2/BOH+UhUuV1oeuEORSM7lp+5Se
-	 r3wMgWIV2lM/BhSIRjdeTODsxuENdi8RL6YK60bJurxBYRlgJozOLwK7FXLrlbFxnp
-	 FpZUWPvNctIFJwk11SQRQ6trII+XwtjbPrReqynzHcHjEH/W4K00zYuehyYssvj9Wr
-	 GGv9eq8Eaeb3cFxziTsgQVdZUaQM7F4EA+cfIlzMpLC7jUiujL/I8z/eRvMgkFtnY6
-	 oCqyDa04Zcphg==
-Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id CB8B84906D;
-	Wed, 11 Nov 2026 17:54:56 +0000 (UTC)
-From: Andrew Gigena via B4 Relay <devnull+mail.andrewgigena.dev@kernel.org>
-Subject: [PATCH v4 0/3] arm64: dts: qcom: sm8150: Add standalone ICE node
- for UFS
-Date: Wed, 11 Nov 2026 17:53:20 +0000
-Message-Id: <20261111-sm8150-ice-rfc-v4-0-0311eac35609@andrewgigena.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F68B606A31C
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 18:31:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7F68B606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key, unprotected) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=hAQTx9YA
+Received: from mail-yx1-f70.google.com (mail-yx1-f70.google.com [74.125.224.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id EA4863F288
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 18:31:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1794421893;
+	bh=4AU6yrqWvCc/nyHqN3PU3r1GIThqckGTo09wAzMWOLA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=hAQTx9YAaCki+ZEz3l+BuQFoV4KaH7ZYP8A8aNJNibzZXl8br1TloPw2oTzR85jCT
+	 U0PZjcp4a6x2b34V57O8NYevQTiMDkBE3nb7mh5nZzQsX0q8IRu/ZZd4n/ft1TJ3/v
+	 pzX6letQgq0Nw+P+mH7Zf8RWh2dv8i8GVbAtJcgZNCzWsq9TttK9RqTV539JspSacB
+	 rnfD0U8YkIlepxcw5z1YSZ7Y8Nhf6Y7JmvPC8Bw53GjjOYH+FR/R66uKUYTL8H3Wdf
+	 CQD7HrbHEEaHhhhTia4zxi9z61Ea6OLyi4GPwTIA1K61SdrJUSkC0xlOrDk6tBrJjj
+	 0lWOcWQX4FzDvmjbCmPPS7NtZ5AD5NBKXySxGzElKA/teoMKsoJtpHP2jLyZxqEdx5
+	 sgcXDI4tfwOkxauz6YlsxAlFaVNqYUzq3/S4FrQjO4smYvD+X/9r0XDClqvMQDqlI4
+	 ZqtSZQjBDy16pOXvtfVhpRmqiZ8bIibKW4ZH92ppMubFt6XrMKuTWoVuyMBLqUrEtg
+	 GtIQ82bDc5e+UECHOYQ02+zQg2+JW/NYUIj/vnn/bGpM+pflT+dzkPKvB5tqMKtAGr
+	 Q6VwUTe0v5KwzMWA8tKRvGoNBYHPaoI5HZYN5siGrJNn2iGd/susLS089o8KASaMXG
+	 EMYGU2/DkayH3STLYLiRJWfg=
+Received: by mail-yx1-f70.google.com with SMTP id 956f58d0204a3-67a6eb09b1eso4639353d50.1
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Nov 2026 10:31:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794421893; x=1795026693;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=4AU6yrqWvCc/nyHqN3PU3r1GIThqckGTo09wAzMWOLA=;
+        b=rYgEhsfR5O3rZb4LY0fmvr+3hY5gnkAqwVtA7sedC6mAjyEPsbF9XpagzZWh0RqSZr
+         G9bJmoF8qcRPtJfJ2SN3htjoV4lHTv02/o43daFCQWAwAK174TcWODcje82GzXA0Ed8K
+         2Qyum+hXyduDj13vGMB3mIYRgUofy3LO72DKhUNyLgRWKEZypQGfg0wOdHW+DAYaySfO
+         9MF917hO7vCA0/VuRa1FWx7nKHg6N8dYMuq880B1EdLwJMbo7Y0Af605OFo9IyCRTPCS
+         NmPD+ch0ZJMp+WOI43I3ZYBtLpEcvxJAG50UmDbzCqIun8Aji+73VLVWfdWNxe8hVAJZ
+         FVdQ==
+X-Forwarded-Encrypted: i=1; AL+hErEOuGHN5NsZtIKIaBijadM3iF3UtL5it7bc+48ojl8dcrFLo3Ztmyrn26wYzNrlQEOM9duHw6AL+237R1Q=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/Ru6GZBKbkv813cUeJhl3l6L+trxGlrEN88MnGioj/63C0Uofb
+	2VeL9FVKMNt84AY/KWvopqtqPfQmhVquoQydURMWcgZX+TaYguZYAhQzpdhAtm5AI7RA62AfVfZ
+	YO948BezH5VFOwdMPxrf0HK0CQJwde3v186EdfiaQA8KgZNncFdLGcTGkTYWjTS/6RuLb8RscWR
+	PS0RrIUg==
+X-Gm-Gg: AYBFou26B8plB1Fo6gzxE2U4uz5CM+5w/FjMTImLJMr/3FhvI6mqhefL0UQcvU5+Ira
+	f+6RHwJ+7E5WKc39PVOs6+ulYbHMfpQDzxs1SzjMy8yobTe2q8RyHBDMx2ND9ZQwenwVx32kOe4
+	jFLEFtc/7tGOEFVVCNVFTuo5Op1+Lzhp+h2C+YPmja9d6ThijI0JS6b+ghc7hI73rMkURSh10aU
+	JGwxEoqMG5LBEwCWAQ/TlFMDqkqrr44+15afTM7WVmykV4v+1vfz3vu8URg2Fv4Pl/8r0sK9URX
+	XeKZp67gNqDJAKZck6NKdxbgC9UCqIck4Lji2/79ZGKchTE62l/zhGtjGkApQHqyuw5coMeh5DT
+	FNzNuqWLYE6nnwdqh8zndClw95sPxjXMcpQUTEe6G3LE50n1uptfVEgyqBSE=
+X-Received: by 2002:a17:903:f83:b0:2cc:6018:f030 with SMTP id d9443c01a7336-2edd76d1b91mr27420575ad.14.1794400871218;
+        Wed, 11 Nov 2026 04:41:11 -0800 (PST)
+X-Received: by 2002:a17:903:f83:b0:2cc:6018:f030 with SMTP id d9443c01a7336-2edd76d1b91mr27420345ad.14.1794400870858;
+        Wed, 11 Nov 2026 04:41:10 -0800 (PST)
+Received: from ZBook.gateway ([123.208.39.53])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2edb6d4d79bsm20660295ad.16.2026.11.11.04.41.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2026 04:41:09 -0800 (PST)
+From: Changwei Zou <changwei.zou@canonical.com>
+To: herbert@gondor.apana.org.au
+Cc: changwei.zou@canonical.com,
+	davem@davemloft.net,
+	gaurav.jain@nxp.com,
+	horia.geanta@nxp.com,
+	iuliana.prodan@nxp.com,
+	jeffbarnes@linux.microsoft.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lukas@wunner.de,
+	martin.kepplinger-novakovic@ginzinger.com,
+	pankaj.gupta@nxp.com,
+	sahil.malhotra@nxp.com,
+	sahil.malhotra@oss.nxp.com,
+	stephane.debusne@cynove.com
+Subject: Re: [PATCH v3 2/2] crypto: caam - Use bounce buffer for unaligned RSA destination buffers
+Date: Wed, 11 Nov 2026 23:40:59 +1100
+Message-ID: <20261111124059.789629-1-changwei.zou@canonical.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <avRIYjWB6AUbeLUS@gondor.apana.org.au>
+References: <avRIYjWB6AUbeLUS@gondor.apana.org.au>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -84,86 +121,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33NzQ6CMBAE4FcxPVuzLZQfT76H8UC3C9REMC1WD
- eHdLXgxUTxOMvPNyDw5S57tNyNzFKy3fRdDut0wbKuuIW5NzEyCzISAlPtLIRRwi8RdjRx0qiV
- CoqgAFkdXR7V9LODx9M7+ps+Ew6zMjdb6oXfP5TGIubeKB8GBqzzJdYaSEOFQdcbRvbENddXOU
- GDzR5D/FRkVk5W51kgg82JFST4UIb6UJCp1aVRVQFZjqX4o0zS9AJRozkJRAQAA
-X-Change-ID: 20261104-sm8150-ice-rfc-0b4b2c035e80
-To: Abel Vesa <abelvesa@kernel.org>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
- Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, 
- Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>, 
- Bjorn Andersson <andersson@kernel.org>, Andy Gross <agross@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-scsi@vger.kernel.org, Andrew Gigena <mail@andrewgigena.dev>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1794419696; l=1891;
- i=mail@andrewgigena.dev; s=20261104; h=from:subject:message-id;
- bh=ToMZN0TBCRPcQcR7ja+7EuF65OVoNHPNyts1YrPHW3E=;
- b=xdt1PgjbVpCJks9hfSRRbhxiZnBh2Ei4/7a75ITpnTDZzb2Ts2bJ/VHHmDyqoCR1pFF8MjdCE
- PvyQdHlDBFBCiRg8wcnEPRR7c4dZznU90qrNZhUIEpOmrsyv9wRWanL
-X-Developer-Key: i=mail@andrewgigena.dev; a=ed25519;
- pk=OMhlYIBaOEC8g4mJ4JCKy7kbg+lrwRxuujieZF8Ne6U=
-X-Endpoint-Received: by B4 Relay for mail@andrewgigena.dev/20261104 with
- auth_id=1402
-X-Original-From: Andrew Gigena <mail@andrewgigena.dev>
-Reply-To: mail@andrewgigena.dev
+Content-Transfer-Encoding: 8bit
 
-Hi everyone,
+Hi Herbert,
 
-This series adds standalone ICE support to SM8150 (Snapdragon 855),
-matching newer Qualcomm platforms.
+Thanks a lot.
+This is a valid finding, I'll fix it in v4.
 
-Patch 1 documents the sm8150 ICE compatible.
-Patch 2 moves sm8150-ufshc to the standalone-ICE UFS binding.
-Patch 3 converts the UFS node to use a dedicated ICE node.
+> rsa_edesc_alloc() allocates req_ctx->bounce_buf with size
+> ALIGN(req->dst_len, dma_get_cache_alignment()), but initializes the
+> bounce scatterlist entry via sg_init_one(&req_ctx->dst,
+> req_ctx->bounce_buf, req->dst_len) with the unaligned req->dst_len.
 
-Tested on a Google Pixel 4 (google-flame): AES-256-XTS advertised,
-ext4 encryption supported, ICE self-test passes.
+Correct. The bounce buffer is allocated with the aligned size, but the SG
+is described with the possibly-unaligned req->dst_len.
 
-Signed-off-by: Andrew Gigena <mail@andrewgigena.dev>
+So the fix is to describe the SG with the aligned allocation size:
 
-Changes in v4:
-- Add Krzysztof's Reviewed-by to patch 1.
-- Document the transient dtbs_check warning for embedded-ICE DTs and why
-  it has no practical impact (patch 2).
-- Link to v3: https://patch.msgid.link/20261111-sm8150-ice-rfc-v3-0-f9d5a806fc95@andrewgigena.dev
+	unsigned int bounce_len =
+		ALIGN(req->dst_len, dma_get_cache_alignment());
 
-Changes in v3:
-- Split bindings into two commits (compatible + standalone-ICE move).
-- Drop author Tested-by from DTS patch.
-- Link to v2: https://patch.msgid.link/20261104-sm8150-ice-rfc-v2-0-d697bbce0278@andrewgigena.dev
+	req_ctx->bounce_buf = kzalloc(bounce_len, flags);
+	if (!req_ctx->bounce_buf)
+		return ERR_PTR(-ENOMEM);
+	sg_init_one(&req_ctx->dst, req_ctx->bounce_buf, bounce_len);
 
-Changes in v2:
-- Move sm8150-ufshc to the standalone-ICE binding.
-- Keep the ICE compatible sorted.
-- Link to v1: https://patch.msgid.link/20261104-sm8150-ice-rfc-v1-0-5737b6c2ecc0@andrewgigena.dev
+My own test case (loading signed kernel modules) used req->dst_len = 512
+bytes, which is already cacheline-aligned, so this unaligned-length path
+was not exercised and the issue was missed.
 
----
-Andrew Gigena (3):
-      dt-bindings: crypto: ice: document sm8150 compatible
-      dt-bindings: ufs: qcom: classify sm8150-ufshc as standalone ICE
-      arm64: dts: qcom: sm8150: use standalone ICE for UFS
-
- .../bindings/crypto/qcom,inline-crypto-engine.yaml |  1 +
- .../devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml |  2 ++
- .../devicetree/bindings/ufs/qcom,ufs.yaml          | 11 ++++------
- arch/arm64/boot/dts/qcom/sm8150.dtsi               | 25 ++++++++++++++--------
- 4 files changed, 23 insertions(+), 16 deletions(-)
----
-base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
-change-id: 20261104-sm8150-ice-rfc-0b4b2c035e80
-
-Best regards,
---  
-Andrew Gigena <mail@andrewgigena.dev>
-
-
+Kind regards,
+Changwei
