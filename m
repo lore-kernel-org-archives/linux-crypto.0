@@ -1,64 +1,67 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.137
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794371724;
-	b=bjyBNtC1UknCshrob84PevOwpghWMjYJ9ZgZedIKFbzh1lACn9S5+BbHLvuEhvGkk4XI
-	 fjFNs4RPyJ6dcTc7hTX00c6eavprnjOwKKDksycbwlg+PxGrUSTOPwSxFRK5bV83Uavxg
-	 Nt8/HPkhdamVJO6H6Xv2CZlxGsDCyBqU/XYk8UBXZBaO90lw3X6zikW5DJEF2ay01ntx7
-	 LsFQfdx+wkzXnC8IY/WINbjCInYTJAMLEmw3Rf6+lhSwFPL5TQbyKaO0K3Ep3SrctVut4
-	 oX85scQXFmTwseM6WsKnEVjCICrCBlqORDVEboW/0X7jo+ksFf4N6MJyaDoPW4jjN7g==
+	t=1794382372;
+	b=OwP5UUj4IrG2wES2llm4EG8v3pOvo95wwui4zT9xDgwkXz4ruCIjuh46S2GK5WjYZa3d
+	 LHBigldYIaVINhebnMNH4LcN+992TFTJqv9SLyEQsNV67NTmynVYzwN7r5PsJeccM2gNN
+	 hHzz7G5kbDTcufDRmjtlNNTvOmIBdKM8GJHRVrJW1KG519Sq2R788LhR/ZIoDcAQ7lPXa
+	 /KfQOsWzTeN2LwqCgTC2PJLHLcljkGmhFFjGVP2Vqu1rYrQkrg9VpPfiwsMos++rsBKoe
+	 KE98dVJ58z9bofPF87pvDR+vG3XjJtMYgx5zhA4Y9gakMfEPXMYGPj6EnYrXxEyQuMg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794371724;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=aqhm8xM2X96PqIZ9tqXE+P+Q89EVeGW8jdqalCMQXBo=;
-	b=w2MPa3t3y6wNDsvY5ipjpJ6wXvT4SVpe8gOjXH2AAxxqNgfl9NeHDOPZFQ/BWrLI/x8l
-	 5RQBN6qa1QvcSHzHKubfiuh6wm0i7Lr0M5Bfo7ErNldGSPiW1tBvWAH1uuRtUWCTQu4y6
-	 LKFpcP/Th+VLlcmOqAjLEoeWVRzw4NsT/dO/h5bYGLTvIRW0B0REJU6uZxkEXWOmUn7WV
-	 8nQyoPFSgVMIj9aXFi+mjRMQpSGA/awJePFs0+tCJUSro2c9nWtadMj3BsoYaNkZQlSAv
-	 rck1usnMNuYDVBZDljMrekppRmgXFDpCo226hA46JdM7ywsuY8ngwtf7BZi88oN3hxA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794382372;
+	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
+	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=jhQtOuk8zHkM7reWLtWObyZkmP6dpOPJpNjyxPj5gEA=;
+	b=o3GndzrOuGt2a+isLM+sIoDl1fr5U2UNDG0wHQLjLHywOpoz3Og20xhR00lxlHHC5qFD
+	 ULjIVxeAAJ3dbhJsW3ASaa9Al5uuAKK9G1ypYvRQbojkfHR1knA1byB/h6U0Qr9DCMRli
+	 gHeyth8VUCDcQlDD1Z7FGysLWrLpc05rsotkJtQkWbhatyyeVQZOhSHkQ/+EC7IgFfBhH
+	 9P06u1LLSaX9/BfcEKJnValsvyi3lYP/MxwdA2LdxMEg+y7RDcep5Zqc5VpbbpcPdW0Q9
+	 ds4HDOFylA/Z8HmdYsz6XD19AGgqGax2ybDPRDzU95JMka+we24WMz3ZVP9ltv0vjXg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B1jQgEio;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D40F606A31C;
-	Wed, 11 Nov 2026 04:35:23 +0000 (UTC)
+	dmarc=pass header.from=cmss.chinamobile.com;
+	spf=pass smtp.mailfrom=cmss.chinamobile.com;
+	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b="f/lN//iC";
+	arc=none smtp.remote-ip=111.22.67.137
+Received: from cmccmta4.chinamobile.com (cmccmta4.chinamobile.com [111.22.67.137])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFEB606A327;
+	Wed, 11 Nov 2026 07:32:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CDFEB606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B1jQgEio
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C60021F0089F;
-	Wed, 11 Nov 2026 04:35:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794371723;
-	bh=aqhm8xM2X96PqIZ9tqXE+P+Q89EVeGW8jdqalCMQXBo=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=B1jQgEioZO6F0Zq8tMe/+Sax/zKz9Msn6hHOez2aNiPqsj9FIGmmSkVHv3/+yC6t0
-	 j2C8A6gsmx48q20hqGLau+6Tj4qGPTBQqKCiXYDiR2ES4mDYukpV3v2aEBmxpvsRT3
-	 8+2XYzSu86hgHGUJGA701VYhQCcpM4nBubhRtuFrzA8zLUjJbu/K5kI72ysUlBqy3b
-	 EC7JzmQSXxqUeGWWFiLYJ4WowCnw/oAQXq+5BfNvocRps/pFbm9ngHGyxTqsQVIaNq
-	 0yHolvsdjij0FHD+Z4STOOL1PoZ1f4jHsFbxOKY9381ChnDM/t07Ulcs1KTncEywes
-	 p/nLLa+mQWF/w==
-Message-ID: <sashiko-outbox-208298@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 2/3] dt-bindings: ufs: qcom: classify sm8150-ufshc as
- standalone ICE
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Andrew Gigena" <mail@andrewgigena.dev>, "Abel Vesa" <abelvesa@kernel.org>, "Herbert
- Xu" <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Rob
- Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>, "Conor
- Dooley" <conor+dt@kernel.org>, "Manivannan Sadhasivam" <mani@kernel.org>, "Alim
- Akhtar" <alim.akhtar@samsung.com>, "Bart Van Assche" <bvanassche@acm.org>, "Bean
- Huo" <beanhuo@micron.com>, "Stanley Jhu" <stanleyjhu@google.com>, "Bjorn
- Andersson" <andersson@kernel.org>, "Andy Gross" <agross@kernel.org>, "Konrad
- Dybcio" <konradybcio@kernel.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-scsi@vger.kernel.org
-In-Reply-To: <20261111-sm8150-ice-rfc-v3-2-f9d5a806fc95@andrewgigena.dev>
-References: <20261111-sm8150-ice-rfc-v3-0-f9d5a806fc95@andrewgigena.dev>
- <20261111-sm8150-ice-rfc-v3-2-f9d5a806fc95@andrewgigena.dev>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Nov 2026 04:35:22 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=f/lN//iC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=cmss.chinamobile.com; s=default; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=f/lN//iCEJ0y4+w8q87XPCCZ+yqt1GpSzx+RMOz/BUIYVsud2SOxI3NOAMSKcfxO2WoFrTApIJ4kO
+	 BcVJoWBIwAY5hDpPNKucjD+f3Uhj9Yfp0wMedmF99tsyEnNO0LzoXEngjftbdbPGMueR6mbRAAFFuo
+	 yKBn3uX6rriQRVAM=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app08-12008 (RichMail) with SMTP id 2ee86af41a1fae6-75c62;
+	Wed, 11 Nov 2026 15:32:47 +0800 (CST)
+X-RM-TRANSID:2ee86af41a1fae6-75c62
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from FHB-W5100250 (unknown[36.137.216.21])
+	by rmsmtp-syy-appsvr08-12008 (RichMail) with SMTP id 2ee86af41a18137-d31a3;
+	Wed, 11 Nov 2026 15:32:47 +0800 (CST)
+X-RM-TRANSID:2ee86af41a18137-d31a3
+From: Gu Bin <gubin@cmss.chinamobile.com>
+To: sean.wang@mediatek.com,
+	olivia@selenic.com,
+	herbert@gondor.apana.org.au
+Cc: matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: mtk - use pm_runtime_resume_and_get() in mtk_rng_read()
+Date: Wed, 11 Nov 2026 15:32:35 +0800
+Message-ID: <20261111073237.1647-1-gubin@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.50.1.windows.1
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,62 +70,49 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] dt-bindings: ufs: qcom: moving sm8150-ufshc breaks existing
-  2-reg/9-clock DTs
---
+mtk_rng_read() calls pm_runtime_get_sync() without checking the return
+value and immediately starts polling and reading the RNG registers:
+when resuming the device fails (negative return), the reads hit a
+device that never resumed, and the failure is only surfaced indirectly
+(if at all) through the -EIO fallback of the final return.
 
-commit 830241ce50cfd60c40fb1ab69965eff9ecfda73c
-Author: Andrew Gigena <mail@andrewgigena.dev>
+Use pm_runtime_resume_and_get() instead and bail out on the error: the
+helper reports the resume failure and drops the usage counter reference
+it took, which a failed pm_runtime_get_sync() leaves behind (the usage
+counter is incremented before the resume attempt, so returning
+directly after a failed get_sync() would leak the reference and the
+device could never autosuspend again). The tail
+pm_runtime_put_sync_autosuspend() must not be used for this bailout:
+the device never resumed, so balancing the counter is all that is
+needed. On success the helper returns 0, which is exactly what the
+read counter expects at that point.
 
-dt-bindings: ufs: qcom: classify sm8150-ufshc as standalone ICE
+Fixes: 81d2b34508c6 ("hwrng: mtk - add runtime PM support")
+Signed-off-by: Gu Bin <gubin@cmss.chinamobile.com>
+---
+ drivers/char/hw_random/mtk-rng.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-This commit moves the qcom,sm8150-ufshc compatible from
-Documentation/devicetree/bindings/ufs/qcom,ufs.yaml to
-Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml and updates
-the example in qcom,ufs.yaml to use qcom,sdm845-ufshc.
+diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
+index 127b82d979e8..1e8e458dab25 100644
+--- a/drivers/char/hw_random/mtk-rng.c
++++ b/drivers/char/hw_random/mtk-rng.c
+@@ -95,7 +95,9 @@ static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ 	struct mtk_rng *priv = to_mtk_rng(rng);
+ 	int retval = 0;
+ 
+-	pm_runtime_get_sync(priv->dev);
++	retval = pm_runtime_resume_and_get(priv->dev);
++	if (retval < 0)
++		return retval;
+ 
+ 	while (max >= sizeof(u32)) {
+ 		if (!mtk_rng_wait_ready(rng, wait))
+-- 
+2.50.1.windows.1
 
-> diff --git a/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml=
- b/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
-> index 3c407426d6972..572eec814a604 100644
-> --- a/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
-> +++ b/Documentation/devicetree/bindings/ufs/qcom,sc7180-ufshc.yaml
-> @@ -23,6 +23,7 @@ select:
->            - qcom,sc7280-ufshc
->            - qcom,sc8180x-ufshc
->            - qcom,sc8280xp-ufshc
-> +          - qcom,sm8150-ufshc
->            - qcom,sm8250-ufshc
->            - qcom,sm8350-ufshc
->            - qcom,sm8450-ufshc
-> @@ -48,6 +49,7 @@ properties:
->                - qcom,sc7280-ufshc
->                - qcom,sc8180x-ufshc
->                - qcom,sc8280xp-ufshc
-> +              - qcom,sm8150-ufshc
->                - qcom,sm8250-ufshc
->                - qcom,sm8350-ufshc
->                - qcom,sm8450-ufshc
 
-[Severity: Medium]
-As reported by Krzysztof Kozlowski on v2 [1], does moving
-qcom,sm8150-ufshc to qcom,sc7180-ufshc.yaml break dtbs_check for existing
-SM8150 and SA8155P device trees?
 
-qcom,sc7180-ufshc.yaml restricts reg to maxItems: 1 and clocks to
-maxItems: 8, rejecting the second ice register region and the ninth
-ice_core_clk clock used by the embedded-ICE representation (supported
-since 462c5c0aa798 ("dt-bindings: ufs: qcom,ufs: convert to dtschema")).
-Later commit "arm64: dts: qcom: sm8150: use standalone ICE for UFS" in
-this series converts the in-tree sm8150.dtsi to use a standalone ICE node,
-but dtbs_check fails at this commit (and across subsystem trees if UFS
-bindings and QCOM DTS changes are merged separately) and schema backwards
-compatibility with existing 2-reg/9-clock DTBs is broken.
-
-[1] https://lore.kernel.org/r/20261106-offbeat-hawk-of-purring-50a8aa@quoll
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261111-sm8150-ice=
--rfc-v3-0-f9d5a806fc95@andrewgigena.dev?part=3D2
