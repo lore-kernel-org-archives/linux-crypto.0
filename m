@@ -1,86 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=111.22.67.139
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794386758;
-	b=QLpdENWaNtV0Ye7x1EzdfCNA67bf7AK5rk9UV7fS83RqGVjpmGDDxeRqHBUAsiAew06e
-	 StUnb0azKyzBRLELP+kfcTXdrxPXdy2lpF1kxLjVcV16KMlIORrPBpx0Q0RkwsMRCSfxc
-	 Mdd/29Oz03UkuqFnHuWKCaZgEZ7koOFFuqcqwD24apP+BYXOO4UG692lDlO2aE9jK8Z73
-	 JUNTDKC7wMXB14lPWZV70dDm2QnaAuR/LcCsVPJLUp/xZLMsv+XxtAMNk4BBC996dV8ML
-	 lI4dF6vQ4DIEoS+2LILho9Gd990XSEhZlpnf5SPbOMSo6IgJS+Jp3ZniA9E1zP6Donw==
+	t=1794388035;
+	b=FjBKFe6iA5mhM8IzwMwAtmfdoyFxoEMxBC0rHyl8S4aMVKj++ls7W1Shfs4Yu+VG43W2
+	 +9KAUQbDNBuMv7+09Wlxf3kgSunZ8OFOwXOQ6FATQ0nEBBWMQkZ5Zv1c6akuiwGzJnDAY
+	 r6f3wYWbg9sOhsGHqsxI2TP33RzY/XpCOiiAVUjTDXxDcWIIy0uT6lCDQVEz77XsKjUX0
+	 uEZw8TyWYRK4/1Zx6ZaUVfx261sXSOz/U097/St8GoJfaTNQH3FgpETAepb9WcXNusXEu
+	 3xftwOY04Oks7anlpTwxn5cNagK4/se8LNLIi5hywN/W/klgs2S2nyX1e2MsxlNxX5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794386758;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
-	 Organization;
-	bh=kncqX4lw1YZwjRHTnWDSvhtRyCgunphnrbNs5+1f+kU=;
-	b=V/FHB2QVD1jAi5xumiRRcsJqe4+M8epgzOMcgFRJjilZEW2yFMe8bIJMGza7SKFGq1pO
-	 c1jywUqbCL1AIM3/cLYuXhrtSqauU6pXjhafQMbWljTIDWQKFhsjq0H6OcxOM8UUjsSJW
-	 5DPsGBejxKOhtsJ4qLCmFwDhfcd527ZgvDyELZnI+8KBkmzcm9u0bqRa4I2tKeSdZqYOx
-	 i9dIW4FiytMvs3QIDVcm+36jAytf9d7k2ZcSxJKn7jnl+Dnt6W1aNL5DNrVnDEJUgnloA
-	 okEE6IEMuas/lkgQ7zZ86GwQjXECNYmU86riHngWnxkpPHrdGY/5kPcDJfOhx0I6ocw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794388035;
+	h=DMARC-Filter:DKIM-Signature:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:
+	 X-RM-TRANSID:X-RM-TagInfo:X-RM-SPAM-FLAG:Received:X-RM-TRANSID:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=7bWqdfYQDOOZNT4u6upFk/9Ul12VxKdb2Ez+LjvVceE=;
+	b=tOGi1PhS2UZOIUt9Ctg8QLr93fwdFiiuf6cwI2DglMa2Xa3dnXTOP28wcKmpXpTKWn0V
+	 q2rWKCcQzUuo2TNp7wIEuuAwmmAn1Nm1EZ1/XNDvUeuVIUHfIXohHy4eBr6oGysk+5YkL
+	 B/Zan1A107noKOTfI7WvkLs9JlHhOpJt+J03XMM8gZyo+0OB5rcf1nTTCAghPCa6MwXcN
+	 +DZg/Jf4+pY7JeRnNPp0SRaHTFV9CmG7/X/lN+s0ra5xyzNORjuysYgRIVvet9GPUoBRA
+	 v29JO/Zbc7jLDtb4DKHurFh9YQ/On21AXALRxmZPPVoYahklCvJYxkX8xN+z4YMH3iA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.intel.com;
-	spf=pass smtp.mailfrom=linux.intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=APXoZQdi;
-	arc=none smtp.remote-ip=192.198.163.19
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4068F606A321;
-	Wed, 11 Nov 2026 08:45:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4068F606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	dmarc=pass header.from=cmss.chinamobile.com;
+	spf=pass smtp.mailfrom=cmss.chinamobile.com;
+	dkim=pass header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=bAvFYd75;
+	arc=none smtp.remote-ip=111.22.67.139
+Received: from cmccmta6.chinamobile.com (cmccmta6.chinamobile.com [111.22.67.139])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25562606A323;
+	Wed, 11 Nov 2026 09:07:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 25562606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=APXoZQdi
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1794386758; x=1825922758;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=WNu/MWKjEWQu9WGprrc9CixlEoX3UeLS/7xFqiNwO6Q=;
-  b=APXoZQdicxD+Y1huqUvh58RugUL88W7af38kAg5rFALSscIQ1p0HZdbH
-   vqwRVuBat3sjyU2RV60nMGFLp5lXIADtdY65IlY/keCrfoJn11UawRo9b
-   xxIgWQEiI3ulHZcG+zefZ1hamVoJ9egPqijCWMnwZki43QT8p7ZF2kU84
-   CtdhT0Sd087MKmAQweEFeEJBHOZYz6ReWg3PeMyJy2jh8ev5KPnCAfvAg
-   fEBvkjl6zq60tzEP5FNVLNCykcc9X0QuVBLD2wfXdgn1Sdk9WuVZ/2br+
-   3iRWBf5zy74JobsU7vLD3RyjgOwrBaAcKX8pqImoDT0rNBM2/wKPkG23m
-   A==;
-X-CSE-ConnectionGUID: RbN81DBGRXSWCHmY7itjAg==
-X-CSE-MsgGUID: ZbDRzIbeR7i3XgryVATRBQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11962"; a="3253972"
-X-IronPort-AV: E=Sophos;i="6.27,207,1787036400"; 
-   d="scan'208";a="3253972"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2026 00:45:57 -0800
-X-CSE-ConnectionGUID: bUxqKsr9T7u440+wBy8DEQ==
-X-CSE-MsgGUID: jZDWUL46SBCKWU1u1b0onA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,207,1787036400"; 
-   d="scan'208";a="8702945"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.142])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2026 00:45:50 -0800
-Date: Wed, 11 Nov 2026 10:45:47 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-Cc: Lee Jones <lee@kernel.org>, David Rhodes <david.rhodes@cirrus.com>,
-	Richard Fitzgerald <rf@opensource.cirrus.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Zha Qipeng <qipeng.zha@intel.com>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Thomas Richard <thomas.richard@bootlin.com>,
-	linux-sound@vger.kernel.org, patches@opensource.cirrus.com,
-	mfd@lists.linux.dev, linux-kernel@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=cmss.chinamobile.com header.i=@cmss.chinamobile.com header.a=rsa-sha256 header.s=default header.b=bAvFYd75
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=cmss.chinamobile.com; s=default; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=bAvFYd754U4txyH4Tl7Ug4uuL2zC8imMiyUeAukcKMwtwIPOoTHizs1IN+uSyh1EKTbW/2UXQXmY7
+	 9xMfi3HgTjabL7Z1Iw5sFyikNgWk+kj292R3szKEQXGSQZDNjb41HvhFx3lwUwZjX0PBvEAF3Kt6Ta
+	 QrgiaHM0rcAU/JeU=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app01-12001 (RichMail) with SMTP id 2ee16af43040d39-b320e;
+	Wed, 11 Nov 2026 17:07:13 +0800 (CST)
+X-RM-TRANSID:2ee16af43040d39-b320e
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from FHB-W5100250 (unknown[36.137.216.21])
+	by rmsmtp-syy-appsvr06-12006 (RichMail) with SMTP id 2ee66af4303a7e7-d683f;
+	Wed, 11 Nov 2026 17:07:13 +0800 (CST)
+X-RM-TRANSID:2ee66af4303a7e7-d683f
+From: Gu Bin <gubin@cmss.chinamobile.com>
+To: sean.wang@mediatek.com,
+	olivia@selenic.com,
+	herbert@gondor.apana.org.au
+Cc: matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
 	linux-crypto@vger.kernel.org,
-	Charles Keepax <ckeepax@opensource.cirrus.com>,
-	Linus Walleij <linusw@kernel.org>
-Subject: Re: [PATCH v4 10/20] mfd: Use named initializers for acpi_device_id
- arrays
-Message-ID: <avQrO4etMgpOhvwF@ashevche-desk.local>
-References: <cover.1794347059.git.u.kleine-koenig@baylibre.com>
- <39fc883cf1c7077bce8f16719cca59060a395b02.1794347059.git.u.kleine-koenig@baylibre.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] hwrng: mtk - runtime PM fixes
+Date: Wed, 11 Nov 2026 17:06:57 +0800
+Message-ID: <20261111090704.1699-1-gubin@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.50.1.windows.1
+In-Reply-To: <20261111073237.1647-1-gubin@cmss.chinamobile.com>
+References: <20261111073237.1647-1-gubin@cmss.chinamobile.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -90,31 +73,25 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <39fc883cf1c7077bce8f16719cca59060a395b02.1794347059.git.u.kleine-koenig@baylibre.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Tue, Nov 10, 2026 at 10:54:35PM +0100, Uwe Kleine-König (The Capable Hub) wrote:
-> While being less compact, using named initializers allows to more easily
-> see which members of the structs are assigned which value without having
-> to lookup the declaration of the struct. And it's also more robust
-> against changes to the struct definition.
-> 
-> The mentioned robustness is relevant for a planned change to struct
-> acpi_device_id that replaces .driver_data by an anonymous union.
-> 
-> This patch doesn't modify the compiled arrays, only their representation
-> in source form benefits.
+The sashiko review of v1 pointed out a pre-existing ordering problem:
+mtk_rng_probe() registers the RNG before enabling runtime PM, so
+mtk_rng_read() can run while runtime PM is disabled - both in the
+probe window (hwrng_register() starts the fillfn kthread right away)
+and on unbind (the devres teardown disables runtime PM before the RNG
+is unregistered). Patch 2 moves the drvdata assignment and the
+runtime PM setup above the registration, which closes both windows.
+Patch 1 is unchanged.
 
-I don't know who is the first, you, guys, collaborate together and come up with
-a solution, but I have reviewed already this
-https://lore.kernel.org/lkml/20261104-acpi-mfd-v2-0-64b9dee3baaf@thegoodpenguin.co.uk/
+Gu Bin (2):
+  hwrng: mtk - use pm_runtime_resume_and_get() in mtk_rng_read()
+  hwrng: mtk - enable runtime PM before registering the RNG
+
+ drivers/char/hw_random/mtk-rng.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
 -- 
-With Best Regards,
-Andy Shevchenko
+2.55.0.windows.3
 
 
