@@ -1,48 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794493289;
-	b=upBJKo6TzUrXC9AwtWGYP+PUB+7m2rnrUxP/cdrpKMyzSQmq+OVbOfWTAawj9eSAeJmP
-	 K7INFLPxvAoOoLeIxMXHw3OuOh1iMnGMkStE+XQf7uevH/QaDE3DNKnLaabeXMNN3LwZk
-	 5W9oRVI17l4Apt3bnsu8BFkoMynlsJCepK8K5aHCLFI6AimEnDt4uAHTJUP4y1ez+Icym
-	 q5iUcVo/Mp3tsP/RHOkJbkTMxSbDw5zCt2ddLMySjGQwoxT5/ubSGIE0JFQjNfGyNnW5N
-	 DEvPjwg3p5IAT+tJ7nwxg0XX+QUOux3Iq4AG3xBZI30Qr/3AhvOuGI2lOKhNgBvYZsQ==
+	t=1794494083;
+	b=GcMFCDJjCm8JLRUnJNXzcqOfntF3YzuO0wRnBiHC0AcxGyH8rDiEGnPyhCfKNUjnemUd
+	 1ENuGEukpRmbRe/E/AYz1m+oNzotsVQxHGzKnBXTs4TuW1rw/BukCdHg1UAUBu6/W7BAH
+	 qxH8iKIT0y/LhtxZJ9w3SE08uFRtrvduSpjwVgx4PptxjU+eF9YxMuhJOtwuFsTZPqcZS
+	 o9FkGWMKE244PtR6u3SCmwNrNrCJS1ofGawSb0ROhrX5D39yKEIW6DYcPKhr6YYrxs+l/
+	 LrgBpmIFYDbNvKs4xjtTDN/McaVwdQ2QKBp6f6Hf3CrL7ociB/9f+1YYP1WBPiQZOtQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794493289;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794494083;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=JeiXReGFIigsnxp+EjXluL4rh7Bp6LV85L/Z5vjT+B0=;
-	b=ePyb6AEScNrcHddMno7oyWuRkJxEgIiBmBkTwOybAUOxRXgjzMrmfJr1kCr5DFV/WUqy
-	 EH7KAmNQ4gVfMB4CdIfZypg9Zh6sCPV5GzlseCfjdBdkY4K+uboicFuyeUFJjmdQaesAM
-	 zovSjH7n9xW48Arr/GFTPrRBtdIr7QyJuF/CHay2vxgjMYR5HhP6Y6XsZvMtat5lo73Zh
-	 jTkwZk6cGWzirJ/DAWKaTLfA//e1wLuCH7WjoPKKkUeNP7VHFQb6C3zdyJE+/ix27y11y
-	 DfVXrRSx+SSS+Sf64in0Oc/o8fScQPmdgzb3rhp5DohB2mFDhx25MJ/94IZ7ka9n/kg==
+	bh=oKGOE90JjtF1ivf+YIrpKLut8WiEBtXXB8vgIF1ajQg=;
+	b=DJggbUVUldFvGZPWa2hqyFWrscNOL/7sQo5FROcQNr2qzxhch8hSVGSQLL5vHVOqJnUJ
+	 VlYyIhF/ax+njYu2GZJQoYD2DiPavvti/ZaAn2F/pT4ZCWoD2kJgFblFREQbShHyZ5hep
+	 EdBohVWnCd0N+Uwdtxu4ds8wtd3y/rhborVpsVENjNoG+7tnWUHNLzEKbQZZ4b79I5Eqj
+	 JpoJkvTuso+U17XiliizMglTr9EuEab9kYkZ6yy+cZ1r9d6Xr3a8ahsq+uetvWL10Ab1N
+	 wCrM4lOh4YiYOtnUB9Jx20A53LxPr+LOQkErNeB3slEEGfXAzCHzOFCqf6QHHc8eZ4w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H7Rdwark;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LMwUUDv0;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BCD606B804
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 14:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64B1606A881
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 14:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H7Rdwark
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61FF71F00A05;
-	Thu, 12 Nov 2026 14:21:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LMwUUDv0
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B77AA1F00A05;
+	Thu, 12 Nov 2026 14:34:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794493289;
-	bh=JeiXReGFIigsnxp+EjXluL4rh7Bp6LV85L/Z5vjT+B0=;
+	s=k20260515; t=1794494082;
+	bh=oKGOE90JjtF1ivf+YIrpKLut8WiEBtXXB8vgIF1ajQg=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=H7RdwarktzvSvHJjJ9Zwd8VzHWkbryFy9aegvLAoGdxAo48r4ZcuB5UnKfqbgn7hN
-	 0Prfi8Lq11x6LO9rwfi7+gvI6nd0VDF3iV2+sKCVIGBPnzt02hpFLEXbWvTDYRCB+k
-	 DPt2H3kfidCDoJu6PgmND3luG3XAWKOCSdlLD9XjoP/hqiH8nGWAgXnhWO8T7EiUCC
-	 3WiHuEtemQHCpqT5aNB06rDtiYeYR40CEKwWiNOUhtBA2t5+ujeIj+kspjyiFKROWC
-	 vaMQGqAGCJRyfGn1Nm0eR+weHkV0bGNvaWDykPi3X3jB6Shc2tDWKyK/A7Md5JiZbK
-	 mwhsMlgO4RCIQ==
-Message-ID: <sashiko-outbox-211301@kernel.org>
+	b=LMwUUDv0xQNn6f3uc5y+JrEwPQLm4+zQnHOEyGNJAPWJy0LaYuMwWdKFD+aG3DZ5i
+	 D+HHCUI4oTFGmq+30g3w6jB0G3Cy+EFaz0GcEb2XsJNoi102wYl4teXMTrd7I4vkrY
+	 r9Zazfws7W0VADbVCQEQM6jOjCtM4/ruUg4UHOFxWYnWvwVM8YLMIziZ9/6c4og22V
+	 K0qchBcG5jHQz5KGqLmSMn0/hKMsonTs5KS0GzVChN21yYYtfdnvy4HbeEnGoSbUvu
+	 gB7f6QTreyvGEf0ilEtwRwHIIY3weRSlLwihesgrYowQTZnGHAJrXssRqgBCap4qIf
+	 Gao7SetoPvr8A==
+Message-ID: <sashiko-outbox-211343@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v11 2/4] soc: qcom: add core driver for the Qualcomm
- Crypto Engine
+Subject: Re: [PATCH v11 1/4] crypto: qce - convert to auxiliary bus
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Bartosz Golaszewski" <bartosz.golaszewski@oss.qualcomm.com>, "Thara
  Gopinath" <thara.gopinath@gmail.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
@@ -51,14 +50,13 @@ To: "Bartosz Golaszewski" <bartosz.golaszewski@oss.qualcomm.com>, "Thara
  Biggers" <ebiggers@kernel.org>, "Demi Marie Obenour" <demiobenour@gmail.com>, "Bjorn
  Andersson" <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Russell
  King" <linux@armlinux.org.uk>, "Abel Vesa" <abelvesa@kernel.org>
-Cc: linux-crypto@vger.kernel.org, brgl@kernel.org, "Pankaj Patil" <pankaj.patil@oss.qualcomm.com>, "Abel
- Vesa" <abel.vesa@oss.qualcomm.com>
-In-Reply-To: <20261112-qce-fix-self-tests-v11-2-b86a65ee7107@oss.qualcomm.com>
+Cc: linux-crypto@vger.kernel.org, brgl@kernel.org, "Pankaj Patil" <pankaj.patil@oss.qualcomm.com>
+In-Reply-To: <20261112-qce-fix-self-tests-v11-1-b86a65ee7107@oss.qualcomm.com>
 References: <20261112-qce-fix-self-tests-v11-0-b86a65ee7107@oss.qualcomm.com>
- <20261112-qce-fix-self-tests-v11-2-b86a65ee7107@oss.qualcomm.com>
+ <20261112-qce-fix-self-tests-v11-1-b86a65ee7107@oss.qualcomm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Nov 2026 14:21:28 +0000
+Date: Thu, 12 Nov 2026 14:34:41 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -68,64 +66,95 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] soc: qcom: qce-core: wrong error check in qce_core_probe()
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [Low] crypto: qce: ignored .driver.name initializer in
+  qce_crypto_driver
+- [Low] crypto: qce - stale ICC comment in qce_crypto_probe()
 --
 
-commit 3e3675a3a324f53defb90d980deda844f4366b5a
+commit 29e94f7689b20cef79914c127c10bb58d32472f1
 Author: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
-soc: qcom: add core driver for the Qualcomm Crypto Engine
+crypto: qce - convert to auxiliary bus
 
-This commit adds the core platform driver for the Qualcomm Crypto Engine to
-manage runtime PM interconnect scaling and register child auxiliary devices.
+This commit converts the Qualcomm crypto engine driver from a platform
+driver to an auxiliary bus driver, removes interconnect bandwidth scaling,
+updates runtime PM handling, and uses the parent device for DMA mappings.
 
-> diff --git a/drivers/soc/qcom/qce-core.c b/drivers/soc/qcom/qce-core.c
-> new file mode 100644
-> index 0000000000000..d51a791bb1a36
-> --- /dev/null
-> +++ b/drivers/soc/qcom/qce-core.c
-> @@ -0,0 +1,92 @@
+> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+> index ddb4df3d227f8..346e9ea0fe0f0 100644
+> --- a/drivers/crypto/qce/core.c
+> +++ b/drivers/crypto/qce/core.c
 
 [ ... ]
 
-> +static int qce_core_probe(struct platform_device *pdev)
-> +{
-> +	struct auxiliary_device *auxdev;
-> +	struct device *dev =3D &pdev->dev;
-> +	struct icc_path *mem_path;
-> +	const char *const *subdev;
-> +	int ret;
-> +
-> +	mem_path =3D devm_of_icc_get(&pdev->dev, "memory");
-> +	if (IS_ERR(mem_path))
-> +		return PTR_ERR(mem_path);
-> +
-> +	dev_set_drvdata(dev, mem_path);
-> +
-> +	ret =3D devm_pm_runtime_enable(dev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	PM_RUNTIME_ACQUIRE(dev, pm);
-> +	ret =3D PM_RUNTIME_ACQUIRE_ERR(&pm);
-> +	if (ret)
-> +		return ret;
-> +
-> +	for (subdev =3D qce_core_aux_devs; *subdev; subdev++) {
-> +		auxdev =3D __devm_auxiliary_device_create(dev, "qce", *subdev, NULL, 0=
-);
-> +		if (IS_ERR(auxdev))
-> +			return PTR_ERR(auxdev);
-> +	}
+> @@ -228,10 +243,6 @@ static int qce_crypto_probe(struct platform_device *=
+pdev)
+>  	if (IS_ERR(qce->bus))
+>  		return PTR_ERR(qce->bus);
+> =20
+> -	qce->mem_path =3D devm_of_icc_get(dev, "memory");
+> -	if (IS_ERR(qce->mem_path))
+> -		return PTR_ERR(qce->mem_path);
+> -
+>  	/*
+>  	 * Enable runtime PM after clocks and ICC path are acquired so that
+>  	 * the resume callback can enable clocks and apply the ICC bandwidth
 
-[Severity: Medium]
-Should this check for !auxdev instead of IS_ERR(auxdev)?
-__devm_auxiliary_device_create() returns NULL on failure, so a failed
-allocation or registration will be ignored and qce_core_probe() will return
-0 without creating the child device.
+[Severity: Low]
+This isn't a bug, but this comment in qce_crypto_probe() still mentions
+acquiring the ICC path and applying the ICC bandwidth vote, which this
+commit removes from the driver.
+
+[ ... ]
+
+> @@ -336,25 +330,22 @@ static const struct dev_pm_ops qce_crypto_pm_ops =
+=3D {
+>  	SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
+>  };
+> =20
+> -static const struct of_device_id qce_crypto_of_match[] =3D {
+> -	{ .compatible =3D "qcom,crypto-v5.1", },
+> -	{ .compatible =3D "qcom,crypto-v5.4", },
+> -	{ .compatible =3D "qcom,qce", },
+> +static const struct auxiliary_device_id qce_crypto_ids[] =3D {
+> +	{ .name =3D "qce.crypto", },
+>  	{}
+>  };
+> -MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
+> +MODULE_DEVICE_TABLE(auxiliary, qce_crypto_ids);
+> =20
+> -static struct platform_driver qce_crypto_driver =3D {
+> +static struct auxiliary_driver qce_crypto_driver =3D {
+>  	.probe =3D qce_crypto_probe,
+> +	.id_table =3D qce_crypto_ids,
+>  	.driver =3D {
+> -		.name =3D KBUILD_MODNAME,
+> -		.of_match_table =3D qce_crypto_of_match,
+> +		.name =3D "qce-crypto",
+>  		.pm =3D pm_ptr(&qce_crypto_pm_ops),
+>  	},
+>  };
+
+[Severity: Low]
+Should qce_crypto_driver set .name instead of .driver.name, or drop
+.driver.name?  __auxiliary_driver_register() unconditionally overwrites
+auxdrv->driver.name based on auxdrv->name and the module name:
+
+drivers/base/auxiliary.c:__auxiliary_driver_register() {
+	...
+	if (auxdrv->name)
+		auxdrv->driver.name =3D kasprintf(GFP_KERNEL, "%s.%s", modname,
+						auxdrv->name);
+	else
+		auxdrv->driver.name =3D kasprintf(GFP_KERNEL, "%s", modname);
+	...
+}
+
+Because qce_crypto_driver.name is NULL, the "qce-crypto" initializer is
+ignored and overwritten with KBUILD_MODNAME ("qcrypto").
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261112-qce-fix-se=
-lf-tests-v11-0-b86a65ee7107@oss.qualcomm.com?part=3D2
+lf-tests-v11-0-b86a65ee7107@oss.qualcomm.com?part=3D1
