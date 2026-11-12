@@ -1,101 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.41
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794501902;
-	b=bwQt853k72mAyQkcEz5/Lk9WOYNpLHpTPGa2IEm9KAEjnA3AA71QvNxjdWqYYOv6cBxO
-	 30aC+t555eGauWwcm3ECCxeq3OGRl+mT7tyzm1b6zi2lf7Bc0iVzVo2Ku3u8XVIa4Sdr4
-	 oKA9YfOj7blSFtZ6EW0Qdf2Nbj0bujrwB9yBIjAwic2m5RIcCGC91op38k3iaP1LkCxq8
-	 vuHVMUKqH2bfjQcWu/hOQB79A62deoonrSaCHXp8PD0np/sv3GE1iejTWlzzJEibpXL+B
-	 PVhwFe3tkvP3DPzzJYeSpUqC67WLQTg5kA8Q0/R/+7VrVVD4JSe+l2MHeX+qNnvO34Q==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794501902;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.69
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794502066;
+	b=kAPjWydT4V0Z43zPj2lCCOdjKZyPmzyB1qw3506xWZpP5adTsi0BixsfI8/WO1D2c3fT
+	 FKLgwC0rBupZl6LiRBs2dn0GZMDsaz+k8FQCpTCGVhzcBRKcwHisjD6ICxq8vhJhQAR2I
+	 thkBVTIp2oe7lIHVLPJL5kPxsFhuR5ijdcqVB7H97YZm+MCi8ajGWdJLOkM/eyrddZZhh
+	 Zn8VDUBcYGoV16emnkrr+1lMxTgB6mw04dhfOBFs8M9y3DSm6SVypr6dMSxnckYtkVos/
+	 Ope8cTE7HBSLrXxK1xURZXlcF6XOne4W6xSRB9MzAnKkbOcUgbpoHqwSMPlkjzXaSxQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794502066;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=8aQvohkJadEw6IMbc6hGb2fWlHEzcIWW9oqIwMeWmos=;
-	b=noOOF5HIgHs9z5sT4MvYAxCPsTWfBbkvD24pnkDkj+gKT2c1ZADOPBffFqipLasvreqP
-	 Qm1FEyNtXYWoQncWBOIltWXcOS7XrufgPvk5D8+nOngBI0qGUTF+2+yJOh5IKQerBf5Pj
-	 SqVRhl/qq6GbvBKE2+EWpm4y1zHVBP9jDdYNB2QataKtOZBVRwRGzl6NOXlIvva5wyMOU
-	 PGuq+xuiEDemmS6IZPIqJkuGEI4Pki3mVB138jhblxEfzptFivWAgk/m1QCldslxqBjM3
-	 D/HLXvMnK9tJslxuqSYI1yPPFFNIB9alLmi/uiR/vzLp8OZ1DEZ8I/hSzkLkeXE5Vag==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=zx2c4.com;
-	spf=pass smtp.mailfrom=zx2c4.com;
-	dkim=pass header.d=zx2c4.com header.i=@zx2c4.com header.a=rsa-sha256 header.s=20261015.g header.b=cUkBWRES;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.41
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	 X-Gm-Message-State:X-Received:Date:Mime-Version:X-Developer-Key:
+	 X-Developer-Signature:X-Mailer:Message-ID:Subject:From:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=gye6xNqFGway1d+vQ3pfKatGq8l2alYxmVtM490lIag=;
+	b=uUPKIJCLo6uWzT+fL1ZF1qC5CBNMwKxypqw3d/wXJ2sizeczjNTELzigIpK+ViB3Js+v
+	 0gHB+EbX2ZhT6QtpKnypAEU+5/WqUEkzBY4877owt1+UkBK4FS52Y1a7Mgy3xGtJJ1EjK
+	 fvomaSIkidFz8JdSV/riR5KvU9P7z6mQZuckxyymCD++Wln+MrSojZavkgyojnkguoAU8
+	 2azdPGiRlQwWuq1xq3SDd4gHI4O5jSY0WMDWc6nyAeWi9IQSmo9/mjGctz5WJxaC1maXq
+	 vkJ3QhFe32Fu9pqHSnbtu/TIy4KcFr4GhDKnxIE6e3QSzlqUWEGDlYSjJ8j+fwmMSUQ==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--ardb.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Gc9DeQQQ;
+	arc=none smtp.remote-ip=209.85.221.69
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CD3606A321
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 16:45:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D3CD3606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=zx2c4.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zx2c4.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A621606A32D
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 16:47:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2A621606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=zx2c4.com header.i=@zx2c4.com header.a=rsa-sha256 header.s=20261015.g header.b=cUkBWRES
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c4d58c50743so476090366b.1
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 08:45:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794501900; cv=none;
-        d=google.com; s=arc-20260327;
-        b=azJP9XMx2/9K/79gmJiiG87Z8OFIdmP8mmfdXs+i7tY73k4pFTEXTdy7q2Pk99rSYd
-         l2UHQJHbR08iTFNYoBWZFJoVrFWNhZcDYQG6H6cY2I6PQXdyioJTMNcBOpxnlnHx5fy9
-         IqtuSi6d5fR2CEKpWiYwVamz/bFhqwwZ0zHqXZXd/XWjpV5EAEGB86PNuTDnqi9PBTvy
-         stMJmHYbqnaiiYNArM1OCnN3mjHMO4HrydmO/k8GpnR+o9VcApEjfsrqKvwcwwKW/ib4
-         +zqCPf9whZawLbl/B/p1a059mUY+BLyRskUdUmNA9TnbtbPixqtk4XliQ/RyxVjnx0ax
-         5qLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=8aQvohkJadEw6IMbc6hGb2fWlHEzcIWW9oqIwMeWmos=;
-        fh=BBr/Lqk0R+3525obsNuUTqR8MoH66E6dZyKVihDS6y4=;
-        b=rA6RpUunNflz0B6kCK6AT9mX9oJM1v9LkzROW8lWjLfHYZV5XNzBUPqUJ9NVyEYOYS
-         Fx8xofvMXDRxJRpfjf+6glp46GZUK/PNAovurLT0k/OjSthe5AkaWzVQigSuAzcBBDWf
-         jITu0ByIY1BiDnqM/WoqD9f+BmfdEWoRR6E06+xW67QKZ+Q/XO3XNddMIoQ+EJ2mMvl8
-         z9VdATbkM7KbSNkO8afzB6ibKMutE2Eh01Wqo73pY0QuUwTeo2U2AfAaaWgAxGgaNUfq
-         VvYDRVFd/yawFydADxhPJ/Js7b/Hk+J1imajiJyOU+EClevngPxs0tsDg5THa04JmFOU
-         faOA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key, unprotected) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=Gc9DeQQQ
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-490a0e72578so3308925f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 08:47:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=zx2c4.com; s=20261015.g; t=1794501900; x=1795106700; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=8aQvohkJadEw6IMbc6hGb2fWlHEzcIWW9oqIwMeWmos=;
-        b=cUkBWRESqda9Tr++34ybMC47OvLCem7HXfoECMUruW9MWko2zVysiwoqS00BXX6Y+P
-         mPlmoVvlbhcxSlUCC1KF47xvU6lydyRBjI4Dztn2X06VVGuLDDqGqtK0CU1yXZXdaOjk
-         p2QB5DNlBNmj0AbQX71ejmzhXEW1/bA/2O50xONS82nmR8EJJy9zVslp79mXTqSQRtP3
-         rbGEtZx9MmHGdP/wgXuEoosrwWfpuPz0+tjScAgs4j6uu1WCecEktRtUh+mgSeuGHgdP
-         woJyd+r83lYycw6SC+8XHH/uIcqE7AyWim7yTIB5QRGX+2iBDOIFOjDPf84FG3vTPf4T
-         3wyA==
+        d=google.com; s=20260707; t=1794502064; x=1795106864; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:mime-version:date:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=gye6xNqFGway1d+vQ3pfKatGq8l2alYxmVtM490lIag=;
+        b=Gc9DeQQQr0fJ2VeAJJ1fbXkJmpHah2kG6v/WmzCrG80fvsSQD/3tMDbBjorP5v1vf6
+         sEU+gs+miOjR/9kc8vBh5eGTGlWxqVZ+ZWPEAiBV6Djz5YA5i8nWrdRVwQsTdCY/owTX
+         Gh39nx28L7QcElSEt5sf5wDhmCRkhL5Fha3MvcyF1pSPBrCqeseIho0nCrJrEDhbpxha
+         3+zJR43Fg6HZID/lg9XcFP8rwenajrdFnpXa5eMpYKFw13150t/sAHLbnKGc1yShJifz
+         DlDwuV+f4xDr+z94TGhq/205dZI5hU3xoZZee0B0sAYXO3oGtXamGKzJYKlVshFOLQ9m
+         HBiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794501900; x=1795106700;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=8aQvohkJadEw6IMbc6hGb2fWlHEzcIWW9oqIwMeWmos=;
-        b=in7EldZVkB5Vi1unb2q5CzyfGTEEtTkA6j5MdXbvTMVhZ4RZ7QRyF0xdXZYeujaLEI
-         EOaIfM8hzgv3xCxY+QbO33t+GJpj6B+OMM4dKrJxD+o7orXiqoHNT+FiOfqLFpeL2xHO
-         Tj4cy/IxjaOw/exbShInzAeeSBzdhNMyc+Ys+2ex1i6hYKwIk+IwPq9GQYzbWE+oMd9Z
-         YwCdvPVo+pRnznZuZ2MzqOJ6ydrTlEwv3gT2CyoyvzgZkitQw8mSE80sRcRM2nf97N48
-         0nbacvzWUpoCRDX0yOgJSi/+GYnsEP4KfU38Qd4EpdSvR8LDxuB9QyFPvz5+kONbdPEa
-         /bEw==
-X-Forwarded-Encrypted: i=1; AL+hErGxrAw02KsSG92sNjYi4REx0cR/IP3tv1vVd/3setO58UY87LALXXv3UnZ+va9Ll34D0BtVJQV+Vg5ABc0=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+J5ZrDzgF+wnFr5O3/DtGbROCASLHTDU3uTP8irjnTKzxE9BvF
-	pUBrQnSVv4iUHsICKmdhPafV+eUJXm+sgKeockzImUbbT2hMcLOKHdUSob291Dkgqprztd+DM2w
-	ceSmDqDzzSmATf1k0l57bTWUdaYRTaCryB1KUdxn/qj74/dQ8fB20KN6+JZw=
-X-Gm-Gg: AYBFou0Q07f3Qx2ZWjfaXymPbHMCOYXJ+slmVSIQglV3NgkKgor5nl7AB3hAZdRAPRq
-	QHfC/pVJlVbbZ7IlZnBk8I+fnTgRwvtISaWdxl7AgTLd4nDUdGcdmDmkZE5VtJyMJ/gU/dbsMbL
-	0CRx+TrVDyZjOgF9x6ZfCBml/ernyR7oX/NNm55Sze42HHvLHXRyxiavdvdcc/kHxk8ohpxpFGq
-	YOaqKGPU8m6Hn2PQyJmmQUE7zeusKPJpT7BPDFBz4TRxAIoN07cqBG4g15xsq1dWzN0yT9E4xqn
-	d9R10MluJA6i4Jao0sKdvIsVX6gwmHGaOP7Fu30+w395SYZtpCNeTrE7U5EIymYbl564uoEJFSC
-	gwWwgnEoNcf9XrLqUwY3OqieOQNoiQUx9nE3SJhNZ9armLMURBnLEUx6NnlnVYBQwW2hsKtNbJn
-	DxffDYFLR1yHUMSfrhzew5teU3MtrjGw5lZDqIEuiSy4z0M96CqQ==
-X-Received: by 2002:a17:906:c10b:b0:c38:ee33:2931 with SMTP id
- a640c23a62f3a-c5066ce850cmr498197366b.37.1794501899705; Thu, 12 Nov 2026
- 08:44:59 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794502064; x=1795106864;
+        h=content-transfer-encoding:content-type:cc:to:from:subject
+         :message-id:mime-version:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=gye6xNqFGway1d+vQ3pfKatGq8l2alYxmVtM490lIag=;
+        b=aChajZ32/v9qxVyneLVPAul1JXlaCF+8K5G9W5zeXXdelEfYqoY7WEPAdV0gALeIq+
+         6g17JjDeJ2P8nytnu+sYx5AOWSLtz2fRBLjDwsrG3D5G4nXyy0i4P4lkgwJ2k0319Af8
+         FiotMLVrPVIn7A44tAxyNAQY1cEaqtNviMqLN6OwyMEhHZKRTX01nhPkl5C5CtgcXGyP
+         khzSGdQF7M0iROnb3sS4Td/mm+gdm7brCVqV/ZX55pf3AlyRSMCJwUFmg1K2vXobom3Z
+         9XONSVSf5hAiQMctjYF62mow38kJVNRQsD085m5TFECyTeXo/vOlhRHejF6LoCbR6tpt
+         mFkA==
+X-Gm-Message-State: APuU4Z9ZPJc+T3A5KKVpn0514Dass4Nl/uI1bA8g98RHX9woyhIlMgIq
+	5bUGLzO7UObedOhtP94UbuYAlTEYyc+dtLgpeGTc5PEPyunot9DVz1D/gKpmCg/ro0lRUIrpRHv
+	nCx+DjcX0o2SGNa4LaaRlHKPgzyaLnFwyQ1sNrLHNRjLyQFu7rRFKeMwc95aDpfrjAP6Chm5clx
+	Xu+t1kiyMlAHjpdf87WC41Jc6X0Qfh8yGD6A==
+X-Received: from wrbdd30.prod.google.com ([2002:a05:6000:161e:b0:48e:5bd0:12a])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5d84:0:b0:48a:f59f:8b70
+ with SMTP id ffacd0b85a97d-499c8b70ad9mr10928954f8f.46.1794502064073; Thu, 12
+ Nov 2026 08:47:44 -0800 (PST)
+Date: Thu, 12 Nov 2026 17:44:16 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -104,65 +77,72 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <20261112125432.3064939-1-antonio@openvpn.net> <1906b5ed-7650-484c-9eb0-a99c8e27c943@app.fastmail.com>
-In-Reply-To: <1906b5ed-7650-484c-9eb0-a99c8e27c943@app.fastmail.com>
-From: "Jason A. Donenfeld" <jason@zx2c4.com>
-Date: Thu, 12 Nov 2026 17:44:47 +0100
-X-Gm-Features: AclHuK9_Vfi1koQLi63-pyXx_SJHPERnevDsknEyXeUNfUTFttrORi09nSkRNWw
-Message-ID: <CAHmME9qSPWDhrvoQH=QX2hj+Ei7mcTYFqy-M+kMnJhgzRuJ1dQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/5] lib/crypto: Add AEGIS-128X4
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Antonio Quartulli <antonio@openvpn.net>, linux-crypto@vger.kernel.org, 
-	Antonio Quartulli <antonio@mandelbit.com>, Eric Biggers <ebiggers@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2071; i=ardb@kernel.org;
+ h=from:subject; bh=IvMu+pgzs5BzMNjtJfkJhVNyDhUvuAKYVZqGwZjteT4=;
+ b=kA0DAAoWMG4JVi59LVwByyZiAGr17OOgvkHKyPgbhwsfuxVS77ns2MkCvKgHkLZDypmijVnal
+ 4h1BAAWCgAdFiEEEJv97rnLkRp9Q5odMG4JVi59LVwFAmr17OMACgkQMG4JVi59LVy2ygD/em11
+ eKRCjRQK+3nABhbwyKWuAoVPVgIuUaRV8eCjnjgA/11EtzY4VgxkqRzmF7sV5R3vWvnwhlcS/3C TrhXrEsYI
+X-Mailer: git-send-email 2.56.0.567.gdb80ae8cd5-goog
+Message-ID: <20261112164419.1769428-4-ardb+git@google.com>
+Subject: [PATCH 0/2] crypto: remove aegis128 support
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, ebiggers@kernel.org, 
+	Ard Biesheuvel <ardb@kernel.org>, Antonio Quartulli <antonio@mandelbit.com>, 
+	"=?UTF-8?q?Ondrej=20Mosn=C3=A1=C4=8Dek?=" <omosnacek@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 12, 2026 at 5:20=E2=80=AFPM Ard Biesheuvel <ardb@kernel.org> wr=
-ote:
-> > This series adds AEGIS-128X4, the 4-way parallel variant of AEGIS-128L
-> > specified in RFC 10032 (Informational, September 2026), as a crypto
-> > library with an x86_64 VAES-AVX512 implementation, a KUnit test suite
-> > and benchmark, and a crypto API wrapper.
-> >
-> > AEGIS-128X4 runs four AEGIS-128L instances, one per 128-bit lane of a
-> > 512-bit vector, so that each state update is eight VAESENC instructions
-> > on zmm registers.  On CPUs with VAES and AVX-512 it is very fast even f=
-or
-> > short messages, which is what makes it attractive for network protocols=
-.
-> >
-> > The intended user is ovpn, the OpenVPN data channel offload driver. In
-> > single-stream ovpn tests over a 100 Gbit/s link, with both ciphers used
-> > through the crypto API, the sending CPU spent 1266 cycles per packet wi=
-th
-> > AEGIS-128X4 against 1448 with AES-GCM over TCP, and 1032 against 1122
-> > with UDP GSO input. It is posted as an RFC because ovpn can't use it
-> > yet.
-> >
->
-> We used to have implementations of aegis128l and aegis256 in the kernel a=
-s
-> well (along with morus), but we removed them on the basis that it was
-> aegis128 that won the competition.
->
-> As far as I know, nobody actually uses any of that code, though, so I am
-> quite to surprised to see now that it was aegis128 that was dropped
-> from the portfolio, and aegis128l and aegis256 have made a miraculous
-> return, along with some other variants that appear to be tied to the
-> register width. What happens when 8-way vector registers become
-> commonplace? Create yet another aegis variant that case use them
-> efficiently?
->
-> So I'm struggling to see why we should take this RFC seriously, to be
-> honest ...
+From: Ard Biesheuvel <ardb@kernel.org>
 
-I'm also not really sure what's going on. CAESAR competition selected
-aegis128 and listed 128l and 256 as "additional finalists". And then
-RFC10032 has written up 128L, 256, 128X, 256X, but not the original
-128 that was selected. And then none of this has been picked up by
-NIST. Meanwhile, NIST's light weight crypto competition selected
-ASCON, which as the "lightweight" as opposed to "high performance"
-pick in CAESAR. So I dunno! I've been waiting for the dust to settle
-for a little bit.
+Remove aegis128 support, which has become obsolete.
+
+Cc: Antonio Quartulli <antonio@mandelbit.com>
+Cc: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
+
+Ard Biesheuvel (2):
+  crypto: x86 - remove aegis128 support
+  crypto: remove aegis128 support
+
+ arch/m68k/configs/amiga_defconfig     |   1 -
+ arch/m68k/configs/apollo_defconfig    |   1 -
+ arch/m68k/configs/atari_defconfig     |   1 -
+ arch/m68k/configs/bvme6000_defconfig  |   1 -
+ arch/m68k/configs/hp300_defconfig     |   1 -
+ arch/m68k/configs/mac_defconfig       |   1 -
+ arch/m68k/configs/multi_defconfig     |   1 -
+ arch/m68k/configs/mvme147_defconfig   |   1 -
+ arch/m68k/configs/mvme16x_defconfig   |   1 -
+ arch/m68k/configs/q40_defconfig       |   1 -
+ arch/m68k/configs/sun3_defconfig      |   1 -
+ arch/m68k/configs/sun3x_defconfig     |   1 -
+ arch/s390/configs/debug_defconfig     |   1 -
+ arch/s390/configs/defconfig           |   1 -
+ arch/x86/crypto/Kconfig               |  11 -
+ arch/x86/crypto/Makefile              |   3 -
+ arch/x86/crypto/aegis128-aesni-asm.S  | 602 --------------------
+ arch/x86/crypto/aegis128-aesni-glue.c | 286 ----------
+ crypto/Kconfig                        |  17 -
+ crypto/Makefile                       |  20 -
+ crypto/aegis-neon.h                   |  17 -
+ crypto/aegis.h                        |  79 ---
+ crypto/aegis128-core.c                | 577 -------------------
+ crypto/aegis128-neon-inner.c          | 343 -----------
+ crypto/aegis128-neon.c                |  60 --
+ crypto/tcrypt.c                       |   7 -
+ crypto/testmgr.c                      |   6 -
+ crypto/testmgr.h                      | 444 ---------------
+ 28 files changed, 2486 deletions(-)
+ delete mode 100644 arch/x86/crypto/aegis128-aesni-asm.S
+ delete mode 100644 arch/x86/crypto/aegis128-aesni-glue.c
+ delete mode 100644 crypto/aegis-neon.h
+ delete mode 100644 crypto/aegis.h
+ delete mode 100644 crypto/aegis128-core.c
+ delete mode 100644 crypto/aegis128-neon-inner.c
+ delete mode 100644 crypto/aegis128-neon.c
+
+--=20
+2.56.0.567.gdb80ae8cd5-goog
+
