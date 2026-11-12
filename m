@@ -1,62 +1,77 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.9
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794522548;
-	b=VDZU2wJe2j4j/qGZzNNRUQwWJ0ElHJH0c1jTQ25Toam10BVmtRn+4hFSy1KInGWZOrRC
-	 L3tCRO9+4siRsq4qCv+3ypS3GXminMWoqP0e/iiwHFaVMEruJZZVWhyn5tSSIJi48nG3k
-	 CZb3wppbbj0utqZqkYnR2BhXiLhIV73caS0wgFY1no7ByHQ7fyEkEE3dn+SvQgRjHJZdc
-	 YzW2IXPfovT75d2MMql4Twu9sofFK0B1afIulc0rDVvVXuWkTh9AqD5CF+eOnVaROd3PR
-	 qZVl3Kfn6d6TJrQKwg0xtHgOJxhnSp2rphUAzBaPXEGa5yKstYFLW1olsotoOzGnLnQ==
+	t=1794522887;
+	b=VoUm6L2dTZAv6j1UmcbnRh/x4Jnvv3ZDrflxVH6Bb9A7541p32Lx/+MaRKYlyHp7N5Lw
+	 Fi4LyqO20pbbXK7Go/x2GZmdmUw7BqzCapRNkn0/fFEOPjQ5p/LrzpTecb2QFk+7bTYmr
+	 3L9UPlpL+wMcd+RRfzRBpvUV9MWou8TEj7wDcREr10e2KzNQmMMYgVUIc0Asoy2uRHFYd
+	 swU3MiJDwT7bWHS07NzE9fpjK2nub85KxhAXcQ3D63TWZLCdOPbz31ei7Ko/Zx7gfh52y
+	 9PMmyiDZ9S4gnr68jg0ZoNlFF4GC1Q4s36MLZAnb8QrxYMKhxsibu81o/lQq1gytWNA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794522548;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=d9HqcoeNHJyDgz6tOXUr/ILnaf4DmJWp/tpITSQKCxw=;
-	b=Yt5q9e7ZV5pcImZ3eIfusdP6752DgSu3ITXEl6ScyXgS1SK77CRA6I5irtKgKQh3QAcS
-	 kQGEl4cbGwpz2QY9p9o6kIJJmWjF6MxQfEhJg+SpXA/JqloHZsjHsC8TqQZxWrXjlH6oz
-	 Bdz9FeOXMQfAn6lt7PFm0dIKg50WMGpIVmAhyXUT3ZTped+/41lXw4jfgtdo2bCN8cOXU
-	 A8+nX65NGZIQ/EpE+raUe2YhqQFthvmnVN2ItNrO/lkIQJYZD2uLBPbFSoV0Xwj1xI0PV
-	 OPv89IegYkU8KCpza/cQQUAQnu0otAFDJp6pZldYQOn+zgFKWXREipRH4rMRgD3Krng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794522887;
+	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
+	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
+	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:From:To:Cc:Subject:
+	 In-Reply-To:References:Date:Message-ID:MIME-Version:Content-Type;
+	bh=stCSDCk1Xz9wPGWW1xwLdd2SYAWvhjzP8nY3HJs1wdU=;
+	b=eA3u3fZEk4pjQO3kgwoZSeb13j1/VrXmKrpHyJZjhQfyLsyVqRMvc5qNEoJ7GK+S4VR5
+	 O06ViZM7SwGmouf6P5kmxh5dV30nayymT9EfxS4kPSBy1wYAtoiT4s3hJyNqnhShHgGim
+	 HICwu5EPMPbjV/cRXY7eHO1eOubBqq6R8v9I4uk2rpvbOMZCILOJQ4RLCr/v8NCcB9oN3
+	 egtRayVDRMjkYcTrUBtBvYj3kA27KfK/28JrQU+ERxNbTyaFLHINC0lHjfLVR3zPn0oJ1
+	 5rIIpsxmEX8+0A06IoQWpFSGzvUVTM+iZSpP1HDGD1NJd4icccTqvdDRHwPtvhKXumQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ezdQW6pq;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=intel.com;
+	spf=pass smtp.mailfrom=intel.com;
+	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fi6Dqt0V;
+	arc=none smtp.remote-ip=198.175.65.9
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1218606A321;
-	Thu, 12 Nov 2026 22:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8696C606A323;
+	Thu, 12 Nov 2026 22:34:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8696C606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ezdQW6pq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE9F51F000C4;
-	Thu, 12 Nov 2026 22:29:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794522548;
-	bh=d9HqcoeNHJyDgz6tOXUr/ILnaf4DmJWp/tpITSQKCxw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ezdQW6pqcxFMJcYJFFPD9hbeweIh+6jYpHzoEXouApF9tIO6lTRiFLNyNaFFcO9oP
-	 f/BIxsHrpBFkP3UjTVFc6KCPv1ei0fmG/bElj3Fg7iQFLETwZRXVffsGbkvgYwy8Mr
-	 u407Fr2IrXfW6R5XTjti7rPckeX/mAF/6A7kTSZZu5jVlPE/OCOilDQ8/CkhI74NNc
-	 03WcmuI0R+cSwz/IjRhd85nRi9sE36yXUdsGzUOl9LMRjOdkK8JDXHId+CixkjzOOF
-	 r0M5RXxl+6IcxZLzWltD8wpCviNk7eO9ZjP3MwUCj7+4ejguyi3HtVJFTpXoeq/ep3
-	 fNL3Xo8QV7i/g==
-Date: Thu, 12 Nov 2026 16:29:06 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Alex Ousherovitch <aousherovitch@rambus.com>
-Cc: linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
-	devicetree@vger.kernel.org, Thi Nguyen <thin@rambus.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org,
-	Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Joel Wittenauer <Joel.Wittenauer@cryptography.com>,
-	linux-doc@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v8 1/5] dt-bindings: crypto: add Rambus CryptoManager Hub
-Message-ID: <179452254555.1729707.16190118012277319671.robh@kernel.org>
-References: <20261110-cmh-b4-a-v8-v8-0-4cea8ebc1d40@rambus.com>
- <20261110-cmh-b4-a-v8-v8-1-4cea8ebc1d40@rambus.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=fi6Dqt0V
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1794522888; x=1826058888;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=GnYlyiHsQlWyu80oZdVgy0nS70dYZn1om8cq+Q2hwLo=;
+  b=fi6Dqt0VTjF+2WHStac0ZPX+t7kpx0DD8WLOR8u6pLKBfWg8C/LSYdr2
+   vstCOwD5+s3Q6kvvIW7GsqgKmtHmcct7UoNvGVLHUK7aWxpvXH4f9YaWC
+   SppWcFb6ghbs7QG0p64T0nGyRwxzlzhwdoJLSjo5QHWqj30Yk2CDcQDQl
+   6xwr6IFt2y9DSspvr+uTgl+pcWU0k0HaM6YvVYUxf38XmIa6mvSPpH6Yv
+   uFPXIZygPrRUll3YCJnqo0Bj4Qs6dZciS5p1bfmFzwUHjQPuh2CEcaDV2
+   9+vi4saoOWnnkPUIG3yVeZHlqHUoMVtepxYwD/5Y0OLJ5tu1qNAlX4912
+   Q==;
+X-CSE-ConnectionGUID: 36qICpPWT3een8bIKOUnXg==
+X-CSE-MsgGUID: 3wo1nL7yQ3yZPO4QjDQNTA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11964"; a="3181922"
+X-IronPort-AV: E=Sophos;i="6.27,210,1787036400"; 
+   d="scan'208";a="3181922"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2026 14:34:48 -0800
+X-CSE-ConnectionGUID: A1hu9ftDQMWpmm3BF2lIXQ==
+X-CSE-MsgGUID: Xbn59vmBSn+BHgZPRHv4/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.27,210,1787036400"; 
+   d="scan'208";a="8846765"
+Received: from vcostago-desk.jf.intel.com (HELO vcostago-desk) ([10.98.24.84])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2026 14:34:47 -0800
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kristen Accardi <kristen.c.accardi@intel.com>, "David S. Miller"
+ <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] crypto: iaa - use RCU per-package WQ tables
+In-Reply-To: <avRHIuISSNUxfAU4@gondor.apana.org.au>
+References: <20261019-iaa-crypto-wq-tables-v1-0-fab67b2a1538@intel.com>
+ <20261019-iaa-crypto-wq-tables-v1-3-fab67b2a1538@intel.com>
+ <avRHIuISSNUxfAU4@gondor.apana.org.au>
+Date: Thu, 12 Nov 2026 14:34:46 -0800
+Message-ID: <87pkw9u1a1.fsf@intel.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -66,31 +81,53 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261110-cmh-b4-a-v8-v8-1-4cea8ebc1d40@rambus.com>
+Content-Type: text/plain
+
+Hi,
+
+Herbert Xu <herbert@gondor.apana.org.au> writes:
+
+> On Mon, Oct 19, 2026 at 04:06:22PM -0700, Vinicius Costa Gomes wrote:
+>> rebalance_wq_table() gives CPU n all the WQs of IAA device
+>> n / cpus_per_iaa. The flat index ignores package boundaries, so a CPU
+>> can be paired with a device on another package, and each CPU sends all
+>> its requests to one device while the other devices of its package stay
+>> idle. The table is also rebuilt in place, so a request issued during a
+>> probe or remove can read a NULL WQ and fail with -ENODEV.
+>> 
+>> Replace it with one table per package, holding the WQs of every IAA
+>> device on that package, and have each CPU round-robin over its package's
+>> table. Rebalance builds the whole set of tables and publishes it with
+>> rcu_replace_pointer(). The submit paths look the WQ up, and take their
+>> reference on it, inside an RCU read-side section.
+>> 
+>> - A package without IAA devices gets a copy of another package's table,
+>>   so the lookup needs no fallback.
+>> - Every table has room for all the WQs, a few pointers more than it
+>>   needs, so they can be sized without counting per package.
+>> - If a rebalance fails, the current tables are kept. On removal they
+>>   are cleared instead, because they still hold the removed WQ. Removal
+>>   then waits for a grace period before returning, because the idxd_wq
+>>   can be freed after that.
+>> 
+>> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+>> ---
+>>  drivers/crypto/intel/iaa/iaa_crypto.h      |   7 -
+>>  drivers/crypto/intel/iaa/iaa_crypto_main.c | 346 ++++++++++-------------------
+>>  2 files changed, 117 insertions(+), 236 deletions(-)
+>
+> Please respond to this comment:
+>
+> https://sashiko.dev/#/patchset/20261019-iaa-crypto-wq-tables-v1-0-fab67b2a1538%40intel.com
+>
+
+Weird that I haven't received any notification about these comments.
+
+Anyway, as I moved some code around, sashiko considers it a "new" issue,
+but from a quick look, it's a pre-existing one. Doesn't seem too hard to
+fix, will include the fix on v2.
 
 
-On Tue, 10 Nov 2026 08:52:27 -0800, Alex Ousherovitch wrote:
-> Add device tree binding schema for the Rambus CryptoManager Hub (CMH)
-> hardware crypto accelerator.  The binding describes the parent
-> SoC-level node with its SIC register region and one queue@N child
-> node per mailbox the host owns, each carrying a reg (mailbox instance
-> index), an optional interrupt, VCQ ring geometry (rambus,num-slots /
-> rambus,slot-stride-bytes) and a rambus,cores affinity list.  Which
-> crypto cores are present is discovered from the SIC CORE_ENABLE
-> register at probe, not described in the device tree.
-> 
-> Register the 'rambus' vendor prefix for Rambus Inc.
-> 
-> Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
-> ---
->  .../bindings/crypto/rambus,cmh-v1030.yaml          | 145 +++++++++++++++++++++
->  .../devicetree/bindings/vendor-prefixes.yaml       |   2 +
->  2 files changed, 147 insertions(+)
-> 
-
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-
+Cheers,
+-- 
+Vinicius
