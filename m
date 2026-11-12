@@ -1,57 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794472237;
-	b=qZJSq94W70Q0iF3lgwhFCXyvfMwkH4LbnTrfeI9xTgdfvBQRMHR/Xhat+SS33JwIANs7
-	 bSPV4rAbzN4uBsaV3iPtswtXwTKDI0alEbRk3/sSKsbzjTMKUJUPWAXmUDfeD6Rcc31wa
-	 7wcFNIik3X23mZxdpVkrNj4J9BB2awXDvcD3MC0xr/UKPU/y5XtTTy4H8JyT2htNe/MNt
-	 fgIwacmdZ/NZDENT6TwoCeUZYY1U0Yi1psMqg7rnpAU8Zow07aHDYWOOeZ/MYmh2qXCQU
-	 fEZtakwDMUQN37vW25szMYVNDR5SFmJ217fL+uGAwhbNL0cqXqxBk21MPtj8SJdjiTQ==
+	t=1794474410;
+	b=fTHfK0krPgMitkMkbSLBZ76feg92JiOcB0+28mjv9LXS7cRaXTMYG5QJRqsz+GO5CGwB
+	 TUOU0/zKbUCgEoUHCdSaVceRupFtEygpuYvN7aSt60gaorgYB8HhbYl2XgWn2QrWSVvA3
+	 NAZo5WqtrcFgWJP8Xvl0GNZig60ckVQ52SsUyIphMVYolYOlyFUKBULUzB3r4D3qf/t7J
+	 5gsxtsRz6Nv+WQ5YILr24Q54lFIVVeIXZ3OYxN9GDZnzdfmpGj5wzBoMR/uZDHNdyciPW
+	 BipHYrkcWcYboRcv4e7RQhCOIXLg6oWqzdYGF86lcp4r/MEE2S91PwuIwvcS1GGSlPQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794472237;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=NuHjBeX5gc2vWc4Jh/lAUZwGlGLhhUL13+fMAmvZk7I=;
-	b=IxFFoYnC2pfStec0FWOqR8/mW/6S0cnW8/c2R7fuo/RyVIDCkN8vIijnSS8vlDvm+Dxz
-	 EgjXKAKg1AHPFkA3qptcLcjWd8GBGmoJ+kKqkRFboUq4XhRfwQoLwz87U+BUHGS9Ke7Bs
-	 ws3IuaYb5EAVCaKbTgQ2WwDYKGmg1s/F3mdXl1Ehpb4lP3ksj+Oa3+jbMQqGL2B1Er1X4
-	 y5v+PSwnw3NNpb8G3OJYV5V51rK9mDVNtrmMMJkE/JbwEEN7eSVusNlRumOxFT/HKx/m6
-	 cIxZORJDi6+qZBzclNn4K11DPfw1SbzTF66NZOYHhAVYYXMP5jG2cOBkCtNDxU7ngMg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794474410;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:Subject:From:To:
+	 Cc:In-Reply-To:References:Date:Message-Id:X-Mailer;
+	bh=AOEFU8qzpm93qZ0ASBa3G2K2mt+nms7YtGgBndT2NAs=;
+	b=Rg9eFcEzZNjQDTxtpRNdLOg6EIXnJrUNMyLbDXNmIl4LJnM5b5IZmvP4E2vRQ2AaJNt0
+	 MURoCI8yXZQY/8ac8V7PfJW71TDGE3djG4qGr6TpjapIN5MGHo/D82Hxyfbb6QZGwpH6f
+	 kxeAee72kfuc/abgsuiRDiSVUze3OkXXhPDyDL722vp1Cxut3KjirK1F3myH/xp7QJIHo
+	 p4C++sP9VQC8qScum5y0wa1A/DwxAkzcl5gbXuMGdk0HDM8Xs8UyDRx6ieNzsSTzcAPps
+	 QbLXCzs82x+07Od8xV3OsWSRnzXHMAWwR88MiHgC2k9f8oRadPfrfytq6wFuyewuljw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="enWNi+/R";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=baylibre.com;
+	spf=pass smtp.mailfrom=baylibre.com;
+	dkim=pass header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=fJQCMBQ6;
+	arc=none smtp.remote-ip=209.85.128.47
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE32606A330
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 08:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59275606A31C
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 09:06:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 59275606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=enWNi+/R
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B557A1F00A09;
-	Thu, 12 Nov 2026 08:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794472236;
-	bh=NuHjBeX5gc2vWc4Jh/lAUZwGlGLhhUL13+fMAmvZk7I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=enWNi+/R7CWxvkj13vS5Z7hxEkTF7zQIN8yt//pFZ1eufit8HTIeroSlfpFCjBe80
-	 O8EBNwRwWcMPhj1zC3Mwzalv+OaC7dQZRM5Wcyi0jskaIE/hyxhvoSMcKeXd0Kej5u
-	 wUbo5XvETit9o8NFhT3eQ7y67Rs/pvg91CXyjIFevxe7ob/DEYFJ1SHpKOCWkxSiWe
-	 2gu0YqvRlIEp8o8ZNt/8bblCAjfwB3JlBB28ltr9OvldGJarwlUiVFAOw4CsxbIhGU
-	 7iC+dP9XQwSKqHwHWCevoOUXsfmVBWK9TgG0rHgrViw7+kwEF6PwfJetLvjNReo2my
-	 jNW3MaWaUDT+g==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	x86@kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 2/2] lib/crypto: x86/sha512: Partially roll up sha512_transform_ssse3()
-Date: Thu, 12 Nov 2026 00:28:39 -0800
-Message-ID: <20261112082839.414786-3-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261112082839.414786-1-ebiggers@kernel.org>
-References: <20261112082839.414786-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.a=rsa-sha256 header.s=google header.b=fJQCMBQ6
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4a60f9474c4so49381855e9.0
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 01:06:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre.com; s=google; t=1794474407; x=1795079207; darn=vger.kernel.org;
+        h=message-id:date:references:in-reply-to:cc:to:from:subject
+         :content-transfer-encoding:content-type:mime-version:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=AOEFU8qzpm93qZ0ASBa3G2K2mt+nms7YtGgBndT2NAs=;
+        b=fJQCMBQ6bEfikb53H2FDBkryxY8kd7OKhsso6FL8J1BMHNLRRUPDHng5PEiNSdOTsi
+         6X5VjQMWOTQSAPL3adCNUcJp66Kl3GMR8uusg55hfNQE+Yw5HDt8QTXKIeoxrEmRGR7l
+         iaqTeccg4O3Vy6X+hjjAr5wsATeZrBzjeamgUci4RCTP+zYt2JSPquCemKE1dQjo1jvL
+         Zo3Liu9DKGRbZJ33FbFESxEOLlNApiXLfKR3BajjefqerhZOqbPpspvWoEZQxnIH5kDV
+         i81Y6SUTuxb5uWkntohRGmel2+N/qmEhDpV7WNE4S/WcNj12jdUMgBTqWsbQ+/TaoSIi
+         yyPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794474407; x=1795079207;
+        h=message-id:date:references:in-reply-to:cc:to:from:subject
+         :content-transfer-encoding:content-type:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=AOEFU8qzpm93qZ0ASBa3G2K2mt+nms7YtGgBndT2NAs=;
+        b=2imihgOlbJ43jawQb5t5FCVm5s9GvkmoJG767xZC/+7gnczGz8q42L6VEqAh8Ah/Vc
+         ZFSbw3QDbEQKLD1xfULFAd3Z5O+ZWGkw31hrz62sTTN4BG/polZUD8ifBXid3r+iP+Qp
+         UyjUSMsEXRHKuyiTp6NgUGuiUlup/rMdo2dTLSYw9tW4U7f3ACVNHf3xs5tw6zcOjX8h
+         PBcIzZsR7XpI9xNkUO24L+59f2WdFBU7EZbb60u9ypE+J3BYBbTyUNI5ckZsjLJaaJ44
+         jGFIuK2mapJT1mAh5v8j/bGWUy8iFh690+fdBLwMQvmb1XRQPCEal7w4NerG2EFnBais
+         Sy1A==
+X-Forwarded-Encrypted: i=1; AL+hErF9nQW5AfQK4vIMOQ+405ykrPI2BTlVBxUBiHTYsOp0aDVODTWtmztzgDeYDXA7VpZRO2c7m6F/oIHAuD4=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/Jtq/Wba+OFkQSU1jdwstM01RbPyKl0S7hMU1rFOxwDW6Tz4XM
+	g4Zby+uHRhZndE9TMBJ3CIA+3yHOgze9v+UAl0IiEkYq2d4KhVHXx5LzoUsrm0WXtkvhFN7c/v/
+	hYqNoaow=
+X-Gm-Gg: AYBFou0s+zVwTV9Ft9xhtJ2St4NGcJFw6iuL9PEPDrmYaq6mw6v+uBhRgu7+9xQl1Wl
+	hPbZewE2fI8772/0WYP/CzM2JK2To3g/dRFRc2io4flhAQWJcsHSJjB/XnD//KT0PewPR9tFBvT
+	jEOpVrZg2f2KFIt6Sm5wSR6D9G6ZUPJHc6UB2fiV8cFJR0Uu5YqqG+CztdjF/K/thXVwkvkXQKO
+	6pbvndhBFNOfkLHEyG6mXXmRz2/pjptST8xYldx/kStUnp6jjIWrDMx3+VHuq3PVlDgV8eFW52f
+	s8yWK//sLGU9Tpjk5FpSPkpXnmjusGBXS1Z1Pxo4sZdBfOsCHxsGWUeUMpBQy2BReSLtJalmi9C
+	TUqNFy7lDUJXd0LYCMcMnaWcEYU3e+tGBMllD0kVX6rmMmhaGeJZ+6Oev4RytzjbMFmLmbqjoPV
+	2BwAkoGquyRi6+/uqySlXcEOWJvxWK4zhIA4P+weHaXeyVnaVStP2roHIMS2YESFT0U44BrXl1l
+	SrUmTKmO9jhZ2t5erRg8kQzjKrL2XTZfiZ2CroQ5H6JyLrivr+z+kWOmbKIAOnb+YaMicolXYPm
+	uxB3r1Le/oX7A6ow/qiI+p0dFKQ+TyHLrers01TpcfYCZLkYwFexUyM=
+X-Received: by 2002:a05:600c:1549:b0:4a2:cbe:bebc with SMTP id 5b1f17b1804b1-4ba0938ba0amr89292435e9.23.1794474407550;
+        Thu, 12 Nov 2026 01:06:47 -0800 (PST)
+Received: from [127.0.1.1] ([2a01:e0a:1264:e140:4d18:9bd3:e16:ab6f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb4e26c2casm49653405e9.12.2026.11.12.01.06.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Nov 2026 01:06:47 -0800 (PST)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,258 +89,46 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 1/4] crypto: engine - clear busy and recheck running in
+ the retry pump loop
+From: Jean-Michel Hautbois <jmhautbois@baylibre.com>
+To: Chenghai Huang <huangchenghai2@huawei.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, 
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ liulongfang@huawei.com, qianweili@huawei.com, wangzhou1@hisilicon.com, 
+ linwenkai6@hisilicon.com
+In-Reply-To: <20261109073556.2517351-2-huangchenghai2@huawei.com>
+References: <20261109073556.2517351-1-huangchenghai2@huawei.com>
+ <20261109073556.2517351-2-huangchenghai2@huawei.com>
+Date: Thu, 12 Nov 2026 10:06:41 +0100
+Message-Id: <179447440150.262855.920255293147441135.b4-review@b4>
+X-Mailer: b4 0.16.0
 
-Currently, sha512_transform_ssse3() unrolls all 80 SHA-512 rounds,
-generating 13.4 KB of text.  This is wasted on most systems, which
-execute the AVX2 code anyway.  And it's also likely to be harmful on
-systems that do run this code, due to cache pollution.
+Hi Chenghai,
 
-Roll up rounds 14 through 77 into 8 groups of 8 rounds.  This requires
-some additional GPRs, as the offsets into the message schedule words and
-round constants are no longer immediates.  Therefore, free up two GPRs
-by spilling the 'digest' and 'msglen' arguments to the stack; use them
-to store a pointer to the round constants and an offset into it.
+> When the loop drains the queue it exits with busy still set, and
+> crypto_transfer_request() queues a pump only when the engine is not
+> busy: if the loop ends with the inline error completion in req_err_1,
+> which queues no pump, the next request is enqueued with nothing to run
+> it and the engine queue stalls. crypto_engine_stop() also spins
+> waiting for the stale busy flag, up to failing with -EBUSY, and the
+> loop keeps submitting to hardware after stop was requested because it
+> never rechecks running.
 
-This reduces the text size from 13.4 KB to 3.3 KB.  (For some
-perspective, the 10.1 KB saved is greater than the size of all four
-variants of the AES-XTS assembly code combined at 7.5 KB.)
+I ran into the same stale busy flag while measuring crypto_engine, and
+had a narrower fix for it in crypto_transfer_request(). Yours also
+covers crypto_engine_stop(), so I dropped mine.
 
-I also ran the sha512 benchmark on a Haswell system (the oldest I could
-easily get access to) with the AVX and AVX2 code disabled.  SHA-512
-throughput actually increased by 5% as a result of this commit, likely
-as a result of the code fitting much better into caches.
+> Jump to the idle check instead: the loop now clears busy and exits
+> when the queue is empty, and stops submitting once the engine is no
+> longer running. Engines without retry support are unaffected.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- lib/crypto/x86/sha512-ssse3-asm.S | 126 ++++++++++++++++--------------
- 1 file changed, 68 insertions(+), 58 deletions(-)
+Tested with virtio-crypto under QEMU/KVM: a small request no longer
+waits for a big one in flight (about 350 us down to 4-8 us).
 
-diff --git a/lib/crypto/x86/sha512-ssse3-asm.S b/lib/crypto/x86/sha512-ssse3-asm.S
-index 1a37b7a735cf9..4eccce486ab60 100644
---- a/lib/crypto/x86/sha512-ssse3-asm.S
-+++ b/lib/crypto/x86/sha512-ssse3-asm.S
-@@ -69,15 +69,20 @@ f_64 =		%r14
- g_64 =		%r15
- h_64 =		%rbx
- tmp0 =		%rax
-+# Used in the rounds 14-77 loop, while digest and msglen are spilled
-+kptr =		%rdi	# Pointer to K512
-+toff =		%rdx	# 8*t, where W[t] is the first QWORD scheduled in the iteration.
- 
- # Local variables (stack frame)
- 
- W_SIZE = 80*8
- WK_SIZE = 2*8
- 
--frame_W = 0
--frame_WK = frame_W + W_SIZE
--frame_size = frame_WK + WK_SIZE
-+frame_WK = 0
-+frame_W = frame_WK + WK_SIZE
-+frame_digest = frame_W + W_SIZE
-+frame_msglen = frame_digest + 8
-+frame_size = frame_msglen + 8
- 
- # Useful QWORD "arrays" for simpler memory references
- # MSG, DIGEST, K_t, W_t are arrays
-@@ -121,8 +126,7 @@ frame_size = frame_WK + WK_SIZE
- 	and	e_64, T1          # T1 = (f ^ g) & e
- 	xor	e_64, tmp0        # tmp = (e ror 23) ^ e
- 	xor	g_64, T1          # T1 = ((f ^ g) & e) ^ g = CH(e,f,g)
--	idx = \rnd
--	add	WK_2(idx), T1     # W[t] + K[t] from message scheduler
-+	add	WK_2(\rnd), T1    # W[t] + K[t] from message scheduler
- 	ror	$4, tmp0  # 18    # tmp = ((e ror 23) ^ e) ror 4
- 	xor	e_64, tmp0        # tmp = (((e ror 23) ^ e) ror 4) ^ e
- 	mov	a_64, T2          # T2 = a
-@@ -146,18 +150,21 @@ frame_size = frame_WK + WK_SIZE
- 	RotateState
- .endm
- 
--.macro SHA512_2Sched_2Round_sse rnd
-+.macro SHA512_2Sched_2Round_sse offset
- 
- 	# Compute rounds t-2 and t-1
- 	# Compute message schedule QWORDS t and t+1
-+	# where t = (toff + \offset) / 8
- 
- 	#   Two rounds are computed based on the values for K[t-2]+W[t-2] and
--	# K[t-1]+W[t-1] which were previously stored at WK_2 by the message
-+	# K[t-1]+W[t-1] which were previously stored at frame_WK by the message
- 	# scheduler.
--	#   The two new schedule QWORDS are stored at [W_t(%%t)] and [W_t(%%t+1)].
-+	#   The two new schedule QWORDS are stored at
-+	# (frame_W + \offset)(%rsp, toff) and (frame_W + \offset + 8)(%rsp, toff).
- 	# They are then added to their respective SHA512 constants at
--	# [K_t(%%t)] and [K_t(%%t+1)] and stored at dqword [WK_2(%%t)]
--	#   For brievity, the comments following vectored instructions only refer to
-+	# \offset(kptr, toff) and (\offset + 8)(kptr, toff) and stored at
-+	# dqword frame_WK(%rsp).
-+	#   For brevity, the comments following vectored instructions only refer to
- 	# the first of a pair of QWORDS.
- 	# Eg. XMM2=W[t-2] really means XMM2={W[t-2]|W[t-1]}
- 	#   The computation of the message schedule and the rounds are tightly
-@@ -167,16 +174,13 @@ frame_size = frame_WK + WK_SIZE
- 	# by two tabs.
- 
- 	mov	f_64, T1
--	idx = \rnd -2
--	movdqa	W_t(idx), %xmm2		    # XMM2 = W[t-2]
-+	movdqa	(frame_W + \offset - 16)(%rsp, toff), %xmm2	    # XMM2 = W[t-2]
- 	xor	g_64, T1
- 	and	e_64, T1
- 	movdqa	%xmm2, %xmm0	            # XMM0 = W[t-2]
- 	xor	g_64, T1
--	idx = \rnd
--	add	WK_2(idx), T1
--	idx = \rnd - 15
--	movdqu	W_t(idx), %xmm5		    # XMM5 = W[t-15]
-+	add	frame_WK(%rsp), T1
-+	movdqu	(frame_W + \offset - 120)(%rsp, toff), %xmm5	    # XMM5 = W[t-15]
- 	mov	e_64, tmp0
- 	ror	$23, tmp0 # 41
- 	movdqa	%xmm5, %xmm3	            # XMM3 = W[t-15]
-@@ -219,8 +223,7 @@ frame_size = frame_WK + WK_SIZE
- 	and	e_64, T1
- 	xor	g_64, T1
- 	psllq	$(64-19)-(64-61) , %xmm1    # XMM1 = W[t-2] << 42
--	idx = \rnd + 1
--	add	WK_2(idx), T1
-+	add	frame_WK + 8(%rsp), T1
- 	mov	e_64, tmp0
- 	psllq	$(64-1)-(64-8), %xmm4	    # XMM4 = W[t-15] << 7
- 	ror	$23, tmp0 # 41
-@@ -240,24 +243,21 @@ frame_size = frame_WK + WK_SIZE
- 	pxor	%xmm1, %xmm0		    # XMM0 = s1(W[t-2])
- 	mov	a_64, tmp0
- 	and	c_64, tmp0
--	idx = \rnd - 7
--	movdqu	W_t(idx), %xmm1		    # XMM1 = W[t-7]
-+	movdqu	(frame_W + \offset - 56)(%rsp, toff), %xmm1 # XMM1 = W[t-7]
- 	xor	tmp0, T2
- 	pxor	%xmm4, %xmm3                # XMM3 = s0(W[t-15])
- 	mov	a_64, tmp0
- 	paddq	%xmm3, %xmm0		    # XMM0 = s1(W[t-2]) + s0(W[t-15])
- 	ror	$5, tmp0 # 39
--	idx =\rnd-16
--	paddq	W_t(idx), %xmm0		    # XMM0 = s1(W[t-2]) + s0(W[t-15]) + W[t-16]
-+	paddq	(frame_W + \offset - 128)(%rsp, toff), %xmm0 # XMM0 = s1(W[t-2]) + s0(W[t-15]) + W[t-16]
- 	xor	a_64, tmp0
- 	paddq	%xmm1, %xmm0	            # XMM0 = s1(W[t-2]) + W[t-7] + s0(W[t-15]) + W[t-16]
- 	ror	$6, tmp0 # 34
--	movdqa	%xmm0, W_t(\rnd)	    # Store scheduled qwords
-+	movdqa	%xmm0, (frame_W + \offset)(%rsp, toff)	    # Store scheduled qwords
- 	xor	a_64, tmp0
--	paddq	K_t(\rnd), %xmm0	    # Compute W[t]+K[t]
-+	paddq	\offset(kptr, toff), %xmm0  # Compute W[t]+K[t]
- 	ror	$28, tmp0 # 28
--	idx = \rnd
--	movdqa	%xmm0, WK_2(idx)	    # Store W[t]+K[t] for next rounds
-+	movdqa	%xmm0, frame_WK(%rsp)	    # Store W[t]+K[t] for next rounds
- 	add	tmp0, T2
- 	add	T1, d_64
- 	lea	(T1, T2), h_64
-@@ -289,9 +289,13 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	sub	$frame_size, %rsp
- 	and	$~(0x20 - 1), %rsp
- 
-+	# Spill digest and msglen to free up %rdi and %rdx for kptr and toff.
-+	mov	digest, frame_digest(%rsp)
-+	mov	msglen, frame_msglen(%rsp)
-+
- .Lupdateblock:
- 
--# Load state variables
-+	# Load state variables
- 	mov	DIGEST(0), a_64
- 	mov	DIGEST(1), b_64
- 	mov	DIGEST(2), c_64
-@@ -301,39 +305,45 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	mov	DIGEST(6), g_64
- 	mov	DIGEST(7), h_64
- 
--	t = 0
--	.rept 80/2 + 1
--	# (80 rounds) / (2 rounds/iteration) + (1 iteration)
--	# +1 iteration because the scheduler leads hashing by 1 iteration
--		.if t < 2
--			# BSWAP 2 QWORDS
--			movdqa	XMM_QWORD_BSWAP(%rip), %xmm1
--			movdqu	MSG(t), %xmm0
--			pshufb	%xmm1, %xmm0	# BSWAP
--			movdqa	%xmm0, W_t(t)	# Store Scheduled Pair
--			paddq	K_t(t), %xmm0	# Compute W[t]+K[t]
--			movdqa	%xmm0, WK_2(t)	# Store into WK for rounds
--		.elseif t < 16
--			# BSWAP 2 QWORDS# Compute 2 Rounds
--			movdqu	MSG(t), %xmm0
--			pshufb	%xmm1, %xmm0	# BSWAP
--			SHA512_Round t-2	# Round t-2
--			movdqa	%xmm0, W_t(t)	# Store Scheduled Pair
--			paddq	K_t(t), %xmm0	# Compute W[t]+K[t]
--			SHA512_Round t-1	# Round t-1
--			movdqa	%xmm0, WK_2(t)	# Store W[t]+K[t] into WK
--		.elseif t < 79
--			# Schedule 2 QWORDS# Compute 2 Rounds
--			SHA512_2Sched_2Round_sse t
--		.else
--			# Compute 2 Rounds
--			SHA512_Round t-2
--			SHA512_Round t-1
--		.endif
--		t = t+2
-+	# Rounds 0 - 13: BSWAP 2 QWORDS and compute 2 rounds
-+	movdqa	XMM_QWORD_BSWAP(%rip), %xmm1
-+	movdqu	MSG(0), %xmm0
-+	pshufb	%xmm1, %xmm0	# BSWAP
-+	movdqa	%xmm0, W_t(0)	# Store Scheduled Pair
-+	paddq	K_t(0), %xmm0	# Compute W[t]+K[t]
-+	movdqa	%xmm0, WK_2(0)	# Store into WK for rounds
-+	.irp t, 2,4,6,8,10,12,14
-+		movdqu	MSG(\t), %xmm0
-+		pshufb	%xmm1, %xmm0	# BSWAP
-+		SHA512_Round (\t-2)	# Round t-2
-+		movdqa	%xmm0, W_t(\t)	# Store Scheduled Pair
-+		paddq	K_t(\t), %xmm0	# Compute W[t]+K[t]
-+		SHA512_Round (\t-1)	# Round t-1
-+		movdqa	%xmm0, WK_2(\t)	# Store W[t]+K[t] into WK
- 	.endr
- 
-+	# Rounds 14 - 77: Schedule 2 QWORDS and compute 2 rounds,
-+	# rolled into 8 iterations of 8 rounds.
-+	lea	K512(%rip), kptr
-+	mov	$16*8, toff
-+
-+.p2align 4
-+.Lsched_loop:
-+	SHA512_2Sched_2Round_sse 0
-+	SHA512_2Sched_2Round_sse 16
-+	SHA512_2Sched_2Round_sse 32
-+	SHA512_2Sched_2Round_sse 48
-+
-+	add	$8*8, toff
-+	cmp	$80*8, toff
-+	jne	.Lsched_loop
-+
-+	# Compute last 2 Rounds
-+	SHA512_Round 78
-+	SHA512_Round 79
-+
- 	# Update digest
-+	mov	frame_digest(%rsp), digest
- 	add	a_64, DIGEST(0)
- 	add	b_64, DIGEST(1)
- 	add	c_64, DIGEST(2)
-@@ -345,7 +355,7 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 
- 	# Advance to next message block
- 	add	$16*8, msg
--	dec	msglen
-+	decq	frame_msglen(%rsp)
- 	jnz	.Lupdateblock
- 
- 	# Deallocate Stack Space
+Tested-by: Jean-Michel Hautbois <jmhautbois@baylibre.com>
+
 -- 
-2.56.1
-
+Jean-Michel Hautbois <jmhautbois@baylibre.com>
