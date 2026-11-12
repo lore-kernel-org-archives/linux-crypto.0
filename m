@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794488080;
-	b=K87PKMrNkgi1GP4gn16rrumVg/2x4wxP6YZmIYEtImnFyCcSw5dQtc4lOmnkyMkksg+a
-	 v24G27aTPUGBTfAvD9+4g/Euz+G+AauZxxxbul2a/yHRJNHeba8K1klDmVNc9SUR8oPV1
-	 rZazfTvnF31Hb9OV2IWlQO2EVlxhMMznTmnK0sPnjHS5Bj1/3gIiFoawtk34hNpzVTop2
-	 FxTwvDqtzP3nWHfT7jsu/wwghx0xRqsekQwDrWagCWbDhYYCkCOjCXCKLJGEKR6ufNDld
-	 rj22fJlQ7y15sBUzR4keK7Ug5GroXCGfBqVEgaJ+A6uGuiuxaQ/sBwgdb5ZpmbFx6IA==
+	t=1794488081;
+	b=GDa5xN+Y+im2BqJFw4KedjGx51fGIGYdMqIpGlA9ck0KvNcLLHu06QtKqqc8nLUHOZmP
+	 YVW+6n+iQRzekjnYM5l/CimvYDpp2ueg2N/8TSpxbsBjq6iNdnkaN1Vi72p55RwKeh+UJ
+	 DIXVAGJkySnUDyISa09hmka+hrkpVhDgQCUki0XhXCVta/nrrS0ifwTrOe2l5iWdltqFA
+	 PnXQvqTu/CXya6+cWe0BkqYAO1fstbRjgjVcaJAJGdpBbuGyAYTBPRpewIHQepGPqqMbd
+	 xtcIMCAqVxU387ghk80kzWzTu3SCFrVDqIswh4mVPaiRESk2GN/JyaexuO9OZIE5BAQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794488080;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794488081;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=eW3nNpyH1jyxKHaKw6h/4dF8TToSbxOcVkVsaWeaXt8=;
-	b=GZhHdXNuJWVHeSmXmrYZ4O2fvm/4Dos3VP7sydHMJBSCSAXXs2W7kzRkDhh/vQzV/jwv
-	 b7i8bOlRwnsGckInjPMaiYt1z0/Zl62KDctpGYms/eu12HN4x8PzdA/Wr+/vuWJiUMcwJ
-	 RDF7fgW8Hs6GkeLtnrzxryp6gew2RhdGaPfwwyRQoYTN6dz6m8HM7rQq4Qzaa2ZNBW5JA
-	 JP0Yw5ssrYN/NlqJ/M2NlathLuO83AKXX+BCQ6Jzmgdkzp6awbH5cMjkPFpmVKjTPy/kf
-	 rvVGKa7rqMlsp8K6yoAWgr2Zy8ffz/ipMNgbsEs7YtzZ8p4kF1d8FKSKe2yYiRAqE5w==
+	bh=hzlxXvnC/+YdOqjz3c1czoZaHe3EM9JRnCB94dj8Gmc=;
+	b=0TsAlEVVDFcsS+srdZYw04NxLduKHyHSC0s8lnGHxyKy2BKsAlKNvvKf44C7pVfgrjsP
+	 Lo3hrGecnA8lSMB7vce4jh7Fpu6tfeBtcMpOX+H9zAsryVNOyb5ulra9ggiJmZyzAVM90
+	 7ReXoWgVQdDl+k2n7Nb+mg6xn+w0rLZRgCBxbxtg+gaw2yPeHRNYFyku2Sn7XtBvD1PLk
+	 7TufcVP2m3f4VNIuoaS0Agjsf1x+kIonuZHE5AGxWY9TAwTVgqJwGr95/NlbsYf77bDWJ
+	 8H5fwuZIyneIE31ykMkukHec2L0BWHidDXNSEAKGOq9KyNZ0TfoFjjORypvrgrViDQg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=openvpn.net;
 	spf=pass smtp.mailfrom=openvpn.com;
-	dkim=pass header.d=openvpn.net header.i=@openvpn.net header.a=rsa-sha256 header.s=google header.b=Ij8Nqle4;
-	arc=none smtp.remote-ip=209.85.128.51
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	dkim=pass header.d=openvpn.net header.i=@openvpn.net header.a=rsa-sha256 header.s=google header.b=U+EoLLG3;
+	arc=none smtp.remote-ip=209.85.221.47
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239F0606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1971D606A332
 	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 12:54:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 239F0606A321
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1971D606A332
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.a=rsa-sha256 header.s=google header.b=Ij8Nqle4
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4a1fbd52ab6so29547035e9.0
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.a=rsa-sha256 header.s=google header.b=U+EoLLG3
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-48e10a70540so2566943f8f.1
         for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 04:54:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=openvpn.net; s=google; t=1794488079; x=1795092879; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=eW3nNpyH1jyxKHaKw6h/4dF8TToSbxOcVkVsaWeaXt8=;
-        b=Ij8Nqle47CyemC9MrBMVA0rwpny4uIJ2g4zFjA7QGlxZ0apwGFzWE27Z8gZd9qBTCa
-         aLt7K9jr5zj345CeWYq9XeH9hQFqsiOLAL+H+NJufmHEj+MslE4eS8jNuQus9ILcT4pQ
-         dZNeEwk3rTLjRaTr9GU24G8pSdZhItSoKXk2UP03wBU+CFNmzPzph3UbSl+/37Gn607I
-         9lqH79SlUvMotibZnntX4UoZDjKzMdHEhuJwlcotMn0hix04O1pj0jsGu/QquFKoZVi1
-         9TbNZmfKkd6cFWAgWdVCDOOSV638g0ykOU7I/ytySpZz8CPTTenGCMwE4w5rEuoa72qe
-         HRSQ==
+        bh=hzlxXvnC/+YdOqjz3c1czoZaHe3EM9JRnCB94dj8Gmc=;
+        b=U+EoLLG3OTjdBrWxKD5k+XOSW96yP9lCNyb39cl7tgCjqVfocPv0+JJWB0JUVbdQP9
+         QwNWi8KKIetB830UjJK68TzxsNVqbnUHV1WBcwZxI0sA03UBrGjz3FioxjyMxh5CF4fk
+         tQMG/Kto3ZCEttoE7OyloE38iGE86ycGj5CKioQNkctyBbwRaTDOlvJnTJXEx/8jht7N
+         DIGUNDwH+V8IqmWupX84XC+QK0wkyYTEfwRKjGY0YVVua5QvrJaqja0lIPsQ5o/RLCE3
+         uUDqX5h8pM257NNXPjnyiFrcuMEg2lUg+qeoZi/COJwbv4okYIHPoGqV9gwVHaieDLaG
+         t8qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1794488079; x=1795092879;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=eW3nNpyH1jyxKHaKw6h/4dF8TToSbxOcVkVsaWeaXt8=;
-        b=iW8hnrvBTJPLlzj8YILJq0J7eQ68b830eJKW3lDhqnEZdPJERMTiuLGLZawthtxP74
-         5CpQoBqwBGXmQGjrJ8vRYkAdVZH9FlE1vdimDOsCTzLrNtTH6soOSMMRxCghEYhCdVYb
-         zbAMSyaErExegQAPA0jippKEpnGcli91mF5M8iHOqqbCGExYaBk+o+Ij/tJafp33gjxl
-         7bc9tUduT/ljG+v6p1MSl3GKdegqfqdB0Ost0SQt37ucKuuCz0zZWHZzFecIXM5y9CWH
-         CoXU3VLgSa2EsCewbPBS7ocTXwiPaG80vuZ8MP8xfMOGSgz8zkEsZklrDv/eIbg9eCWf
-         vptQ==
-X-Gm-Message-State: APuU4Z9Etvjj+z3Tnb9rALUv3tepjhIQTGQn00jIBZNlzv0SH0YOD3Cd
-	MhW4gqZuL7Bha53NOJW6q9ys5xalTiHe5EUd1arHAZz3yJhP7IH0hV99rGqTM+JKL9weo+n8u71
-	hY/mBHtIMdkHrRurjcswq2MQ8V5mnmbU9PSextmj7W1A9K7PCczDH9uZ9aMtZDxgsOe9f9rkw
-X-Gm-Gg: AYBFou2ADSJZO6jSyN8NS2kRtSvy0jHR2lHzItbATQ1/lOI1X14W7O7zhWCYivbQvkF
-	7HsBxettAwAq2iuqS13Rz5JpFKS8rd8kIttIqHtQR0Nm84zReaE0ZaYom3m87z7WQ/mZW7Ouwbe
-	22Dtl9dl8P42sWgwM/1OCAYGlKYMUJ2frn+9+Nuy+7tYZHO+NKBNSA+PAnUdc0p1UMORH6iMv9D
-	U692tsNjBCzYUJrSw2x81fj+EEBAwkyLCxSSgsKwuPKeQlB04lD+odmcGyw+H0MLIpn0Jb2uCdk
-	Vy2GAabVYFmPw4DgH5zEpYR5VSO933Uv+b1qKYdGpH9O41E/KNpqkeMMDIvhv7Gwg8Cm1FaLe3z
-	0RGqiiNw57mUDKJSec4wAfxk9hdeTvNmecyOGBb4ET5UwxAFSujd1Ksvay0RJkEDz2Rj3ieRfxJ
-	rUfleNTh+dB2Ynz2ZTszs4ZeOWz5gNIQIy8Id6OFyH9pdcBKNO4l+YOa7zeQFg3H6fNjckUzLs+
-	VYaw/MI2Km9KsTpRsLfkJmW3ySEsY2/lwDgCWHsIxuvolb6DuTTLzXz4H997BcyEpxmFqYxu9mn
-	K/a7jzrdb7F+hnjUxJZHvUCdsXX9sDXvhr0x9EOFNNB0D3cJk0gb//M/uTeiZsQyTynmUyyEQg=
+        bh=hzlxXvnC/+YdOqjz3c1czoZaHe3EM9JRnCB94dj8Gmc=;
+        b=SgTaPfXIa6vZ5rkHeNRzFip+BTPVYTaxzcy3/1XYgrNW82ECSbpckEe8iPjFgEU+eg
+         mcywkMOpaeL3hQ0buWpCKwfMSrZqzkagnaUCWJX1QBjHNeSGIz7LKubca/DkhmJaxa7C
+         yyM9i3jDVmFvBbo7IeL3EtngQC7RzEczHR7QvkCeRBP1J7uwIkmmk0XhN+btsdskqytT
+         Q63WtnO6RPHoen0r7dxEwkxVmF0ETSHC5ldXRhSoAtAavsPtLFMIiOuuYXmrDDlVSCjx
+         vWprhaE6JAdBWOGktig1d33Y66YLjhUHiYjYgDXPINr7vKqZopYEbRG1zR/s220btNCT
+         a9yQ==
+X-Gm-Message-State: APuU4Z/0fIRJJxESW/yYMMuCR3z6gVr+ndIb5Zb+uPRrSjr4mj1Nkf/D
+	f2mEZINVUGfo5Vf/k5bmFjaekxs0voVT6PeDDqTUZ9WSPFfiibvuIj///2HmOxC5nkFGMc2gXx/
+	Gp+3z81OQG2d2VJfJZ4Vu5pZwXVdc6QD/LD8IC6fUt7z3PbVRRoHD69GBfa7/zoV8Yr/i7v0t
+X-Gm-Gg: AYBFou0JJ7H0XrkjzzLreSIuXgkQe2FoZhNRLgystjP8OxzT2YdHx9ijqE9Xwzoh1ye
+	Swxzd2UCgx0tyvgUVAw6TJ6JWfleZH3ThndAuaFcnD5TU4+xxUxvdXdz6U0sEG1WVefrpGcNmXl
+	ZFEfITxWK6+AnxY9JcfKMrCgPdEsWNFZwXs1R+WcckU8EDfPBFZ4bwcDx4NhMAwV2XqJKVbZeSI
+	3hHGP9lHoD6VaDWzoCC+NOgnYM5kofDqYVajescljuCNzIRTmDX/VmglAs1SuPpNUMxCM9wV7+T
+	Y0U2dKiM5ro28AeFo5uWDOI9lANiyKX/L67EOQeqCV+mdxcwLUYs9xhO07jozteTfToT3YimM61
+	f8QD48+Q59o2JAzfg4FgHFpPUBjka0alifQlLzsWYebmAfEIJFe8rL/En3JeHy0X1/HKztbIZJx
+	Hk5oGJJKwmpDlfbWGL5nwP22wb0mzc5NcaudKKVTJJx3OFsSmEJ4UabTbu7jVTQ75WK+8nD1Nuu
+	VykGjYeXwMHK7wjWZ1oSS5r35TAig1ifiMO6pBT22Sbi0PxcL3ZuOMpPJSIOAEfEBrfpJ9KNV1Q
+	Fkdts0IYqIlaoCGCnNX0vvfhIZTbSgrgJVA2I76LArWuhnMEs6V9BaVAHYEDCLH6sGrjoE4ePA=
 	=
-X-Received: by 2002:a05:600c:19d0:b0:4a3:7344:13b5 with SMTP id 5b1f17b1804b1-4ba093ab25dmr98030675e9.16.1794488078354;
-        Thu, 12 Nov 2026 04:54:38 -0800 (PST)
+X-Received: by 2002:a05:6000:4699:b0:49c:192f:cf19 with SMTP id ffacd0b85a97d-49c192fd095mr468043f8f.39.1794488079292;
+        Thu, 12 Nov 2026 04:54:39 -0800 (PST)
 Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:56b9:769a:f836:6390])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49835858f26sm17202726f8f.18.2026.11.12.04.54.37
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49835858f26sm17202726f8f.18.2026.11.12.04.54.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 04:54:37 -0800 (PST)
+        Thu, 12 Nov 2026 04:54:38 -0800 (PST)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: linux-crypto@vger.kernel.org
 Cc: Antonio Quartulli <antonio@mandelbit.com>,
@@ -86,9 +86,9 @@ Cc: Antonio Quartulli <antonio@mandelbit.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [RFC PATCH 3/5] lib/crypto: tests: Add KUnit test suite for AEGIS-128X4
-Date: Thu, 12 Nov 2026 13:54:28 +0100
-Message-ID: <20261112125432.3064939-4-antonio@openvpn.net>
+Subject: [RFC PATCH 4/5] lib/crypto: x86/aegis128x4: Add VAES-AVX512 optimized code
+Date: Thu, 12 Nov 2026 13:54:29 +0100
+Message-ID: <20261112125432.3064939-5-antonio@openvpn.net>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261112125432.3064939-1-antonio@openvpn.net>
 References: <20261112125432.3064939-1-antonio@openvpn.net>
@@ -105,648 +105,721 @@ Content-Transfer-Encoding: 8bit
 
 From: Antonio Quartulli <antonio@mandelbit.com>
 
-Add a KUnit test suite for the AEGIS-128X4 library, using the AEAD test
-template and the AEGIS-128X4 test vectors from RFC 10032.
+Add an x86_64 implementation of AEGIS-128X4 using VAES and AVX-512,
+ported to assembly from the libaegis AVX-512 code by Frank Denis, which
+uses C intrinsics and is MIT licensed, so the file is dual-licensed
+GPL-2.0-only OR MIT.  Each state word is a zmm register holding the
+corresponding block of the four AEGIS-128L instances, so that the update
+function takes eight VAESENC instructions.
 
-python-cryptography doesn't support AEGIS, so add an implementation of
-AEGIS-128X written from the RFC to gen-aead-testvecs.py, to generate the
-Monte Carlo checksum.
+Messages of up to 4 KiB are processed by one call that keeps the state
+in registers.  Longer messages and the incremental API go through the
+per-block functions, in kernel-mode FPU sections of at most 4 KiB.
+
+There is no 256-bit code yet, so unlike AES-GCM this code is used on
+CPUs with X86_FEATURE_PREFER_YMM too.
+
+Encryption throughput from the KUnit benchmark on a Ryzen 9 9950X,
+in MB/s:
+
+  data_len   generic   VAES-AVX512
+        16        10           581
+        64        41          2351
+       256       159          8986
+      1420       576         34521
+      4096       987         46761
+     16384      1308         79588
 
 Signed-off-by: Antonio Quartulli <antonio@mandelbit.com>
 ---
- lib/crypto/.kunitconfig             |   1 +
- lib/crypto/tests/Kconfig            |  10 +
- lib/crypto/tests/Makefile           |   1 +
- lib/crypto/tests/aegis128x4_kunit.c | 352 ++++++++++++++++++++++++++++
- scripts/crypto/gen-aead-testvecs.py | 166 ++++++++++++-
- 5 files changed, 524 insertions(+), 6 deletions(-)
- create mode 100644 lib/crypto/tests/aegis128x4_kunit.c
+ lib/crypto/Kconfig                      |   5 +
+ lib/crypto/Makefile                     |   4 +
+ lib/crypto/x86/aegis128x4-vaes-avx512.S | 470 ++++++++++++++++++++++++
+ lib/crypto/x86/aegis128x4.h             | 167 +++++++++
+ 4 files changed, 646 insertions(+)
+ create mode 100644 lib/crypto/x86/aegis128x4-vaes-avx512.S
+ create mode 100644 lib/crypto/x86/aegis128x4.h
 
-diff --git a/lib/crypto/.kunitconfig b/lib/crypto/.kunitconfig
-index 6d83badf4292..61a28c1554cb 100644
---- a/lib/crypto/.kunitconfig
-+++ b/lib/crypto/.kunitconfig
-@@ -2,6 +2,7 @@ CONFIG_KUNIT=y
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 3e53dd570b78..195c047843ac 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -15,6 +15,11 @@ config CRYPTO_LIB_AEGIS128X4
+ 	  Select this if your module uses any of the functions from
+ 	  <crypto/aegis128x4.h>.
  
- CONFIG_CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT=y
- 
-+CONFIG_CRYPTO_LIB_AEGIS128X4_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST=y
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 5a86a02d25b7..2584aa74c450 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -1,5 +1,14 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
- 
-+config CRYPTO_LIB_AEGIS128X4_KUNIT_TEST
-+	tristate "KUnit tests for AEGIS-128X4" if !KUNIT_ALL_TESTS
-+	depends on KUNIT && CRYPTO_LIB_AEGIS128X4
-+	default KUNIT_ALL_TESTS
-+	select CRYPTO_LIB_BENCHMARK_VISIBLE
-+	# This test uses BLAKE2s, but that's always built-in.
-+	help
-+	  KUnit tests for the AEGIS-128X4 authenticated encryption algorithm.
++config CRYPTO_LIB_AEGIS128X4_ARCH
++	bool
++	depends on CRYPTO_LIB_AEGIS128X4 && !UML && !KMSAN
++	default y if X86_64
 +
- config CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST
- 	tristate "KUnit tests for AES-CMAC, AES-XCBC-MAC, and AES-CBC-MAC" if !KUNIT_ALL_TESTS
- 	depends on KUNIT && CRYPTO_LIB_AES_CBC_MACS
-@@ -179,6 +188,7 @@ config CRYPTO_LIB_SM3_KUNIT_TEST
- config CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT
- 	tristate "Enable all crypto library code for KUnit tests"
- 	depends on KUNIT
-+	select CRYPTO_LIB_AEGIS128X4
- 	select CRYPTO_LIB_AES_CBC
- 	select CRYPTO_LIB_AES_CBC_MACS
- 	select CRYPTO_LIB_AES_CCM
-diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index 40c9624eaaa8..73e9851dbb14 100644
---- a/lib/crypto/tests/Makefile
-+++ b/lib/crypto/tests/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
+ config CRYPTO_LIB_AES
+ 	tristate
+ 	# Select dependencies of modes that are part of libaes.
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index be43ab974c0f..cbb8b9c93de8 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -23,6 +23,10 @@ libcryptoutils-y				:= memneq.o utils.o
  
-+obj-$(CONFIG_CRYPTO_LIB_AEGIS128X4_KUNIT_TEST) += aegis128x4_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST) += aes_cbc_macs_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST) += aes_ccm_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST) += aes_gcm_kunit.o
-diff --git a/lib/crypto/tests/aegis128x4_kunit.c b/lib/crypto/tests/aegis128x4_kunit.c
+ obj-$(CONFIG_CRYPTO_LIB_AEGIS128X4) += libaegis128x4.o
+ libaegis128x4-y := aegis128x4.o
++ifeq ($(CONFIG_CRYPTO_LIB_AEGIS128X4_ARCH),y)
++CFLAGS_aegis128x4.o += -I$(src)/$(SRCARCH)
++libaegis128x4-$(CONFIG_X86) += x86/aegis128x4-vaes-avx512.o
++endif
+ 
+ ################################################################################
+ 
+diff --git a/lib/crypto/x86/aegis128x4-vaes-avx512.S b/lib/crypto/x86/aegis128x4-vaes-avx512.S
 new file mode 100644
-index 000000000000..1e271e4a1756
+index 000000000000..080f83a14ca9
 --- /dev/null
-+++ b/lib/crypto/tests/aegis128x4_kunit.c
-@@ -0,0 +1,352 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
++++ b/lib/crypto/x86/aegis128x4-vaes-avx512.S
+@@ -0,0 +1,470 @@
++/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
 +/*
-+ * KUnit test suite for AEGIS-128X4
++ * VAES + AVX512 implementation of AEGIS-128X4
++ *
++ * AEGIS-128X4 is the 4-way parallel variant of AEGIS-128L defined in
++ * RFC 10032.  Each of the eight state words is a 512-bit
++ * vector holding the corresponding word of four independent AEGIS-128L
++ * states, one per 128-bit lane, so that every AES round in the update function
++ * is computed with a single VAESENC on a zmm register.
++ *
++ * Ported to assembly from the libaegis AVX-512 implementation, which uses C
++ * intrinsics (https://github.com/aegis-aead/libaegis).  See RFC 10032 for the
++ * algorithm.
++ *
++ * Copyright (c) 2023-2026 Frank Denis
++ * Copyright (c) 2026 Antonio Quartulli <antonio@mandelbit.com>
++ */
++
++#include <linux/linkage.h>
++
++#define STATE0		%zmm0
++#define STATE1		%zmm1
++#define STATE2		%zmm2
++#define STATE3		%zmm3
++#define STATE4		%zmm4
++#define STATE5		%zmm5
++#define STATE6		%zmm6
++#define STATE7		%zmm7
++#define MSG0		%zmm8
++#define MSG1		%zmm9
++#define T0		%zmm10
++#define T1		%zmm11
++#define T2		%zmm12
++#define T3		%zmm13
++#define ZERO		%zmm15
++#define ZERO_XMM	%xmm15
++
++/* Size of the AEGIS-128X4 rate, i.e. of the data absorbed by one update */
++#define RATE		128
++
++.section .rodata.cst32.aegis128x4_const, "aM", @progbits, 32
++.align 16
++.Laegis128x4_const_0:
++	.byte 0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d
++	.byte 0x15, 0x22, 0x37, 0x59, 0x90, 0xe9, 0x79, 0x62
++.Laegis128x4_const_1:
++	.byte 0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1
++	.byte 0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd
++
++/*
++ * Per-lane context injected during initialization: byte 0 is the lane index,
++ * byte 1 is the number of lanes minus one.
++ */
++.section .rodata.cst64.aegis128x4_ctx, "aM", @progbits, 64
++.align 64
++.Laegis128x4_ctx:
++	.octa 0x0300
++	.octa 0x0301
++	.octa 0x0302
++	.octa 0x0303
++
++.text
++
++/*
++ * aegis128x4_update
++ * input:
++ *   STATE[0-7] - input state
++ *   m0, m1     - message vectors (128 bytes in total)
++ *   ZERO       - all-zeroes vector
++ * output:
++ *   STATE[0-7] - output state (same positions)
++ * changed:
++ *   T0, T1
++ *
++ * AESENC(x, k) == AESENC(x, 0) ^ k, therefore the two words that absorb the
++ * message are computed as AESENC(x, 0) ^ S ^ M with a single VPTERNLOGQ, which
++ * also allows updating every state word in place.
++ */
++.macro aegis128x4_update m0, m1
++	vaesenc		ZERO, STATE7, T0
++	vaesenc		ZERO, STATE3, T1
++	vaesenc		STATE7, STATE6, STATE7
++	vaesenc		STATE6, STATE5, STATE6
++	vaesenc		STATE5, STATE4, STATE5
++	vpternlogq	$0x96, \m1, T1, STATE4
++	vaesenc		STATE3, STATE2, STATE3
++	vaesenc		STATE2, STATE1, STATE2
++	vaesenc		STATE1, STATE0, STATE1
++	vpternlogq	$0x96, \m0, T0, STATE0
++.endm
++
++/*
++ * Initialize STATE[0-7] from the key at KEYP and the nonce at IVP, and set
++ * ZERO.  Changed: MSG0, MSG1, T0-T2.
++ */
++.macro aegis128x4_init
++	vpxor		ZERO_XMM, ZERO_XMM, ZERO_XMM
++
++	/* broadcast nonce and key to the four lanes: */
++	vbroadcasti32x4	(IVP), MSG0
++	vbroadcasti32x4	(KEYP), MSG1
++
++	/* load the constants: */
++	vbroadcasti32x4	.Laegis128x4_const_0(%rip), STATE2
++	vbroadcasti32x4	.Laegis128x4_const_1(%rip), STATE1
++	vmovdqa64	.Laegis128x4_ctx(%rip), T2
++
++	vpxorq		MSG0, MSG1, STATE0	/* key ^ nonce */
++	vmovdqa64	STATE0, STATE4		/* key ^ nonce */
++	vmovdqa64	STATE1, STATE3		/* c1 */
++	vpxorq		STATE2, MSG1, STATE5	/* key ^ c0 */
++	vpxorq		STATE1, MSG1, STATE6	/* key ^ c1 */
++	vmovdqa64	STATE5, STATE7		/* key ^ c0 */
++
++	/* update 10 times with nonce / key: */
++	.rept 10
++	vpxorq		T2, STATE3, STATE3
++	vpxorq		T2, STATE7, STATE7
++	aegis128x4_update MSG0, MSG1
++	.endr
++.endm
++
++/*
++ * Encrypt (\enc=1) or decrypt (\enc=0) the 128 bytes in MSG0/MSG1 in place
++ * using the keystream of the current state:
++ *   z0 = S1 ^ S6 ^ (S2 & S3)
++ *   z1 = S2 ^ S5 ^ (S6 & S7)
++ * On encryption the result goes to T2/T3 and MSG0/MSG1 keep the plaintext.
++ * On decryption MSG0/MSG1 are replaced by the plaintext.
++ */
++.macro crypt_msg enc
++.if \enc
++	vmovdqa64	STATE2, T2
++	vmovdqa64	STATE6, T3
++	vpternlogq	$0x6a, MSG0, STATE3, T2		/* (A & B) ^ C */
++	vpternlogq	$0x6a, MSG1, STATE7, T3
++	vpternlogq	$0x96, STATE6, STATE1, T2
++	vpternlogq	$0x96, STATE5, STATE2, T3
++.else
++	vpternlogq	$0x78, STATE3, STATE2, MSG0	/* A ^ (B & C) */
++	vpternlogq	$0x78, STATE7, STATE6, MSG1
++	vpternlogq	$0x96, STATE6, STATE1, MSG0
++	vpternlogq	$0x96, STATE5, STATE2, MSG1
++.endif
++.endm
++
++/*
++ * Encrypt or decrypt the 128-byte block at SRC into DST and absorb the
++ * plaintext.  Changed: MSG0, MSG1, T0-T3.
++ */
++.macro crypt_block enc
++	vmovdqu64	0x00(SRC), MSG0
++	vmovdqu64	0x40(SRC), MSG1
++	crypt_msg	\enc
++.if \enc
++	vmovdqu64	T2, 0x00(DST)
++	vmovdqu64	T3, 0x40(DST)
++.else
++	vmovdqu64	MSG0, 0x00(DST)
++	vmovdqu64	MSG1, 0x40(DST)
++.endif
++	aegis128x4_update MSG0, MSG1
++.endm
++
++/*
++ * Encrypt or decrypt the partial block at SRC into DST and absorb the
++ * zero-padded plaintext.  %k1 and %k2 must hold the masks set up by
++ * tail_masks.  Changed: MSG0, MSG1, T0-T3.
++ */
++.macro crypt_tail enc
++	/* masked loads zero the padding and never fault past the end */
++	vmovdqu8	0x00(SRC), MSG0{%k1}{z}
++	vmovdqu8	0x40(SRC), MSG1{%k2}{z}
++	crypt_msg	\enc
++.if \enc
++	vmovdqu8	T2, 0x00(DST){%k1}
++	vmovdqu8	T3, 0x40(DST){%k2}
++.else
++	vmovdqu8	MSG0, 0x00(DST){%k1}
++	vmovdqu8	MSG1, 0x40(DST){%k2}
++	/* zero the keystream bytes past the end before absorbing: */
++	vmovdqu8	MSG0, MSG0{%k1}{z}
++	vmovdqu8	MSG1, MSG1{%k2}{z}
++.endif
++	aegis128x4_update MSG0, MSG1
++.endm
++
++/*
++ * Encrypt or decrypt LEN bytes (nonzero multiple of RATE) from SRC to DST,
++ * advancing SRC and DST.  LEN is zero on exit.
++ */
++.macro crypt_loop enc
++.Lcrypt\@:
++	crypt_block	\enc
++	add		$RATE, SRC
++	add		$RATE, DST
++	sub		$RATE, LEN
++	jnz		.Lcrypt\@
++.endm
++
++/* Absorb the 128-byte block at \src. */
++.macro ad_block src
++	vmovdqu64	0x00(\src), MSG0
++	vmovdqu64	0x40(\src), MSG1
++	aegis128x4_update MSG0, MSG1
++.endm
++
++.macro load_state
++	vmovdqu64	0x000(STATEP), STATE0
++	vmovdqu64	0x040(STATEP), STATE1
++	vmovdqu64	0x080(STATEP), STATE2
++	vmovdqu64	0x0c0(STATEP), STATE3
++	vmovdqu64	0x100(STATEP), STATE4
++	vmovdqu64	0x140(STATEP), STATE5
++	vmovdqu64	0x180(STATEP), STATE6
++	vmovdqu64	0x1c0(STATEP), STATE7
++.endm
++
++.macro store_state
++	vmovdqu64	STATE0, 0x000(STATEP)
++	vmovdqu64	STATE1, 0x040(STATEP)
++	vmovdqu64	STATE2, 0x080(STATEP)
++	vmovdqu64	STATE3, 0x0c0(STATEP)
++	vmovdqu64	STATE4, 0x100(STATEP)
++	vmovdqu64	STATE5, 0x140(STATEP)
++	vmovdqu64	STATE6, 0x180(STATEP)
++	vmovdqu64	STATE7, 0x1c0(STATEP)
++.endm
++
++/*
++ * Set %k1 and %k2 to the byte masks covering the first \len bytes of a
++ * 128-byte block, split into its two 64-byte halves.  1 <= \len <= 127.
++ * \len is a 32-bit register and \len64 its 64-bit alias; both are clobbered,
++ * as well as %rax and %r11.
++ */
++.macro tail_masks len, len64
++	mov		$-1, %rax
++	bzhi		\len64, %rax, %r11	/* bzhi only uses bits [7:0] */
++	kmovq		%r11, %k1
++	xor		%r11d, %r11d
++	sub		$64, \len
++	cmovl		%r11d, \len
++	bzhi		\len64, %rax, %rax
++	kmovq		%rax, %k2
++.endm
++
++/*
++ * XOR the four 128-bit lanes of the zmm register \z together into the xmm
++ * register \x (the low part of \z).  \y is the ymm alias of \z.
++ */
++.macro fold_lanes z, y, x, tmpy, tmpx
++	vextracti64x4	$1, \z, \tmpy
++	vpxor		\tmpy, \y, \y
++	vextracti128	$1, \y, \tmpx
++	vpxor		\tmpx, \x, \x
++.endm
++
++/*
++ * Finalize and store the AUTHSIZE-byte (16 or 32) tag at TAG, then return.
++ * ASSOCLEN and CRYPTLEN are 64-bit registers.  Changed: %rax, %r9, MSG0 and
++ * all the state.
++ */
++.macro aegis128x4_final_and_ret
++	/* t = S2 ^ (LE64(assoclen * 8) || LE64(cryptlen * 8)) in each lane */
++	mov		ASSOCLEN, %rax
++	shl		$3, %rax
++	mov		CRYPTLEN, %r9
++	shl		$3, %r9
++	vmovq		%rax, %xmm8
++	vpinsrq		$1, %r9, %xmm8, %xmm8
++	vshufi64x2	$0, MSG0, MSG0, MSG0
++	vpxorq		STATE2, MSG0, MSG0
++
++	.rept 7
++	aegis128x4_update MSG0, MSG0
++	.endr
++
++	cmp		$16, AUTHSIZE
++	jne		.Lfinal_256\@
++
++	/* tag = fold(S0 ^ S1 ^ S2 ^ S3 ^ S4 ^ S5 ^ S6) */
++	vpternlogq	$0x96, STATE2, STATE1, STATE0
++	vpternlogq	$0x96, STATE4, STATE3, STATE0
++	vpternlogq	$0x96, STATE6, STATE5, STATE0
++	fold_lanes	STATE0, %ymm0, %xmm0, %ymm10, %xmm10
++	vmovdqu		%xmm0, 0x00(TAG)
++	vzeroupper	// This is needed after using ymm or zmm registers.
++	RET
++
++.Lfinal_256\@:
++	/* tag = fold(S0 ^ S1 ^ S2 ^ S3) || fold(S4 ^ S5 ^ S6 ^ S7) */
++	vpternlogq	$0x96, STATE2, STATE1, STATE0
++	vpxorq		STATE3, STATE0, STATE0
++	vpternlogq	$0x96, STATE6, STATE5, STATE4
++	vpxorq		STATE7, STATE4, STATE4
++	fold_lanes	STATE0, %ymm0, %xmm0, %ymm10, %xmm10
++	fold_lanes	STATE4, %ymm4, %xmm4, %ymm11, %xmm11
++	vmovdqu		%xmm0, 0x00(TAG)
++	vmovdqu		%xmm4, 0x10(TAG)
++	vzeroupper	// This is needed after using ymm or zmm registers.
++	RET
++.endm
++
++/*
++ * void aegis128x4_init_vaes_avx512(union aegis128x4_state *state,
++ *				    const u8 key[AEGIS128X4_KEY_SIZE],
++ *				    const u8 nonce[AEGIS128X4_NONCE_SIZE]);
++ */
++SYM_FUNC_START(aegis128x4_init_vaes_avx512)
++	.set STATEP, %rdi
++	.set KEYP, %rsi
++	.set IVP, %rdx
++
++	aegis128x4_init
++	store_state
++	vzeroupper	// This is needed after using ymm or zmm registers.
++	RET
++SYM_FUNC_END(aegis128x4_init_vaes_avx512)
++
++/*
++ * void aegis128x4_absorb_vaes_avx512(union aegis128x4_state *state,
++ *				      const u8 *src, size_t len);
++ *
++ * len must be a multiple of 128.
++ */
++SYM_FUNC_START(aegis128x4_absorb_vaes_avx512)
++	.set STATEP, %rdi
++	.set SRC, %rsi
++	.set LEN, %rdx
++
++	test		LEN, LEN
++	jz		.Lad_out
++
++	vpxor		ZERO_XMM, ZERO_XMM, ZERO_XMM
++	load_state
++.Lad_loop:
++	ad_block	SRC
++	add		$RATE, SRC
++	sub		$RATE, LEN
++	jnz		.Lad_loop
++
++	store_state
++	vzeroupper	// This is needed after using ymm or zmm registers.
++.Lad_out:
++	RET
++SYM_FUNC_END(aegis128x4_absorb_vaes_avx512)
++
++/*
++ * void aegis128x4_enc_vaes_avx512(union aegis128x4_state *state,
++ *				   u8 *dst, const u8 *src, size_t len);
++ * void aegis128x4_dec_vaes_avx512(union aegis128x4_state *state,
++ *				   u8 *dst, const u8 *src, size_t len);
++ *
++ * len must be nonzero and a multiple of 128.
++ */
++.macro aegis128x4_crypt enc
++	.set STATEP, %rdi
++	.set DST, %rsi
++	.set SRC, %rdx
++	.set LEN, %rcx
++
++	vpxor		ZERO_XMM, ZERO_XMM, ZERO_XMM
++	load_state
++	crypt_loop	\enc
++	store_state
++	vzeroupper	// This is needed after using ymm or zmm registers.
++	RET
++.endm
++
++SYM_FUNC_START(aegis128x4_enc_vaes_avx512)
++	aegis128x4_crypt 1
++SYM_FUNC_END(aegis128x4_enc_vaes_avx512)
++
++SYM_FUNC_START(aegis128x4_dec_vaes_avx512)
++	aegis128x4_crypt 0
++SYM_FUNC_END(aegis128x4_dec_vaes_avx512)
++
++/*
++ * void aegis128x4_final_vaes_avx512(union aegis128x4_state *state, u8 *tag,
++ *				     u64 assoclen, u64 cryptlen,
++ *				     unsigned int authsize);
++ *
++ * authsize must be 16 or 32.
++ */
++SYM_FUNC_START(aegis128x4_final_vaes_avx512)
++	.set STATEP, %rdi
++	.set TAG, %rsi
++	.set ASSOCLEN, %rdx
++	.set CRYPTLEN, %rcx
++	.set AUTHSIZE, %r8d
++
++	vpxor		ZERO_XMM, ZERO_XMM, ZERO_XMM
++	load_state
++	aegis128x4_final_and_ret
++SYM_FUNC_END(aegis128x4_final_vaes_avx512)
++
++/*
++ * void aegis128x4_encrypt_vaes_avx512(const u8 key[AEGIS128X4_KEY_SIZE],
++ *				       const u8 nonce[AEGIS128X4_NONCE_SIZE],
++ *				       const u8 *ad, size_t adlen,
++ *				       const u8 *src, u8 *dst, size_t len,
++ *				       u8 *tag, unsigned int authsize);
++ * void aegis128x4_decrypt_vaes_avx512(...same arguments...);
++ *
++ * En/decrypt a whole message, keeping the state in registers throughout.
++ * authsize must be 16 or 32, and the computed tag is stored at tag.
++ */
++.macro aegis128x4_oneshot enc
++	.set KEYP, %rdi
++	.set IVP, %rsi
++	.set ADP, %rdx
++	.set ASSOCLEN, %r10
++	.set SRC, %r8
++	.set DST, %r9
++	.set LEN, %rcx
++
++	mov		%rcx, ASSOCLEN
++	aegis128x4_init			/* KEYP and IVP are free after this */
++
++	/* absorb the associated data: */
++	cmp		$RATE, %rcx
++	jb		.Lad_tail\@
++.Lad_loop\@:
++	ad_block	ADP
++	add		$RATE, ADP
++	sub		$RATE, %rcx
++	cmp		$RATE, %rcx
++	jae		.Lad_loop\@
++.Lad_tail\@:
++	test		%rcx, %rcx
++	jz		.Lad_done\@
++	tail_masks	%ecx, %rcx
++	vmovdqu8	0x00(ADP), MSG0{%k1}{z}
++	vmovdqu8	0x40(ADP), MSG1{%k2}{z}
++	aegis128x4_update MSG0, MSG1
++.Lad_done\@:
++
++	/*
++	 * en/decrypt the payload; len, tag and authsize are passed on the
++	 * stack at 8(%rsp), 16(%rsp) and 24(%rsp) respectively.
++	 */
++	mov		8(%rsp), LEN
++	mov		LEN, %rsi
++	and		$RATE - 1, %esi
++	and		$~(RATE - 1), LEN
++	jz		.Lcrypt_tail\@
++	crypt_loop	\enc
++.Lcrypt_tail\@:
++	test		%esi, %esi
++	jz		.Lcrypt_done\@
++	tail_masks	%esi, %rsi
++	crypt_tail	\enc
++.Lcrypt_done\@:
++
++	.set TAG, %rdi
++	.set CRYPTLEN, %rcx
++	.set AUTHSIZE, %r8d
++	mov		16(%rsp), TAG
++	mov		8(%rsp), CRYPTLEN
++	mov		24(%rsp), AUTHSIZE
++	aegis128x4_final_and_ret
++.endm
++
++SYM_FUNC_START(aegis128x4_encrypt_vaes_avx512)
++	aegis128x4_oneshot 1
++SYM_FUNC_END(aegis128x4_encrypt_vaes_avx512)
++
++SYM_FUNC_START(aegis128x4_decrypt_vaes_avx512)
++	aegis128x4_oneshot 0
++SYM_FUNC_END(aegis128x4_decrypt_vaes_avx512)
+diff --git a/lib/crypto/x86/aegis128x4.h b/lib/crypto/x86/aegis128x4.h
+new file mode 100644
+index 000000000000..dcb9853062fd
+--- /dev/null
++++ b/lib/crypto/x86/aegis128x4.h
+@@ -0,0 +1,167 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * AEGIS-128X4 optimized using VAES and AVX-512
 + *
 + * Copyright 2026 Antonio Quartulli <antonio@mandelbit.com>
 + */
-+#include <crypto/aegis128x4.h>
-+#include <crypto/blake2s.h>
-+#include "test-utils.h"
 +
-+/* AEGIS-128X4 test vectors from RFC 10032, Appendix A.5 */
-+static const struct aegis128x4_testvec {
-+	const char *name;
-+	const char *key;
-+	const char *nonce;
-+	const char *ad;
-+	size_t ad_len;
-+	const char *ptext;
-+	const char *ctext;
-+	size_t data_len;
-+	const char *tag;
-+	size_t tag_len;
-+} aegis128x4_testvecs[] = {
-+	{
-+		.name = "RFC 10032 A.5.2 (128-bit tag)",
-+		.key = "\x00\x01\x02\x03\x04\x05\x06\x07"
-+		       "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.nonce = "\x10\x11\x12\x13\x14\x15\x16\x17"
-+			 "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-+		.ad = "",
-+		.ad_len = 0,
-+		.ptext = "",
-+		.ctext = "",
-+		.data_len = 0,
-+		.tag = "\x5b\xef\x76\x2d\x09\x47\xc0\x04"
-+		       "\x55\xb9\x7b\xb3\xaf\x30\xdf\xa3",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "RFC 10032 A.5.2 (256-bit tag)",
-+		.key = "\x00\x01\x02\x03\x04\x05\x06\x07"
-+		       "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.nonce = "\x10\x11\x12\x13\x14\x15\x16\x17"
-+			 "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-+		.ad = "",
-+		.ad_len = 0,
-+		.ptext = "",
-+		.ctext = "",
-+		.data_len = 0,
-+		.tag = "\xa4\xb2\x54\x37\xf4\xbe\x93\xcf"
-+		       "\xa8\x56\xa2\xf2\x7e\x44\x16\xb4"
-+		       "\x2c\xac\x79\xfd\x46\x98\xf2\xcd"
-+		       "\xbe\x6a\xf2\x56\x73\xe1\x0a\x68",
-+		.tag_len = 32,
-+	},
-+	{
-+		.name = "RFC 10032 A.5.3 (128-bit tag)",
-+		.key = "\x00\x01\x02\x03\x04\x05\x06\x07"
-+		       "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.nonce = "\x10\x11\x12\x13\x14\x15\x16\x17"
-+			 "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-+		.ad = "\x01\x02\x03\x04\x01\x02\x03\x04",
-+		.ad_len = 8,
-+		.ptext = "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07",
-+		.ctext = "\xe8\x36\x11\x85\x62\xf4\x47\x9c"
-+			 "\x9d\x35\xc1\x73\x56\xa8\x33\x11"
-+			 "\x4c\x21\xf9\xaa\x39\xe4\xdd\xa5"
-+			 "\xe5\xc8\x7f\x41\x52\xa0\x0f\xce"
-+			 "\x9a\x7c\x38\xf8\x32\xea\xfe\x8b"
-+			 "\x1c\x12\xf8\xa7\xcf\x12\xa8\x1a"
-+			 "\x1a\xd8\xa9\xc2\x4b\xa9\xde\xdf"
-+			 "\xbd\xaa\x58\x6f\xfe\xa6\x7d\xdc"
-+			 "\x80\x1e\xa9\x7d\x9a\xb4\xa8\x72"
-+			 "\xf4\x2d\x0e\x35\x2e\x27\x13\xda"
-+			 "\xcd\x60\x9f\x94\x42\xc1\x75\x17"
-+			 "\xc5\xa2\x9d\xaf\x3e\x2a\x3f\xac"
-+			 "\x4f\xf6\xb1\x38\x0c\x4e\x46\xdf"
-+			 "\x7b\x08\x6a\xf6\xce\x6b\xc1\xed"
-+			 "\x59\x4b\x8d\xd6\x4a\xed\x2a\x7e",
-+		.data_len = 120,
-+		.tag = "\x0e\x56\xab\x94\xe2\xe8\x5d\xb8"
-+		       "\x0f\x9d\x54\x01\x0c\xaa\xbf\xb4",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "RFC 10032 A.5.3 (256-bit tag)",
-+		.key = "\x00\x01\x02\x03\x04\x05\x06\x07"
-+		       "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.nonce = "\x10\x11\x12\x13\x14\x15\x16\x17"
-+			 "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-+		.ad = "\x01\x02\x03\x04\x01\x02\x03\x04",
-+		.ad_len = 8,
-+		.ptext = "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07"
-+			 "\x04\x05\x06\x07\x04\x05\x06\x07",
-+		.ctext = "\xe8\x36\x11\x85\x62\xf4\x47\x9c"
-+			 "\x9d\x35\xc1\x73\x56\xa8\x33\x11"
-+			 "\x4c\x21\xf9\xaa\x39\xe4\xdd\xa5"
-+			 "\xe5\xc8\x7f\x41\x52\xa0\x0f\xce"
-+			 "\x9a\x7c\x38\xf8\x32\xea\xfe\x8b"
-+			 "\x1c\x12\xf8\xa7\xcf\x12\xa8\x1a"
-+			 "\x1a\xd8\xa9\xc2\x4b\xa9\xde\xdf"
-+			 "\xbd\xaa\x58\x6f\xfe\xa6\x7d\xdc"
-+			 "\x80\x1e\xa9\x7d\x9a\xb4\xa8\x72"
-+			 "\xf4\x2d\x0e\x35\x2e\x27\x13\xda"
-+			 "\xcd\x60\x9f\x94\x42\xc1\x75\x17"
-+			 "\xc5\xa2\x9d\xaf\x3e\x2a\x3f\xac"
-+			 "\x4f\xf6\xb1\x38\x0c\x4e\x46\xdf"
-+			 "\x7b\x08\x6a\xf6\xce\x6b\xc1\xed"
-+			 "\x59\x4b\x8d\xd6\x4a\xed\x2a\x7e",
-+		.data_len = 120,
-+		.tag = "\x69\xab\xf0\xf6\x4a\x13\x7d\xd6"
-+		       "\xe1\x22\x47\x8d\x77\x7e\x98\xbc"
-+		       "\x42\x28\x23\x00\x6c\xf5\x7f\x5e"
-+		       "\xe8\x22\xdd\x78\x39\x72\x30\xb2",
-+		.tag_len = 32,
-+	},
-+};
++#include <asm/fpu/api.h>
++#include <linux/jump_label.h>
++#include <linux/sizes.h>
 +
-+static void test_aegis128x4_one_test_vector(struct kunit *test,
-+					    const struct aegis128x4_testvec *tv)
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_vaes_avx512);
++
++asmlinkage void
++aegis128x4_init_vaes_avx512(union aegis128x4_state *state,
++			    const u8 key[AEGIS128X4_KEY_SIZE],
++			    const u8 nonce[AEGIS128X4_NONCE_SIZE]);
++asmlinkage void aegis128x4_absorb_vaes_avx512(union aegis128x4_state *state,
++					      const u8 *src, size_t len);
++asmlinkage void aegis128x4_enc_vaes_avx512(union aegis128x4_state *state,
++					   u8 *dst, const u8 *src, size_t len);
++asmlinkage void aegis128x4_dec_vaes_avx512(union aegis128x4_state *state,
++					   u8 *dst, const u8 *src, size_t len);
++asmlinkage void aegis128x4_final_vaes_avx512(union aegis128x4_state *state,
++					     u8 *tag, u64 assoclen,
++					     u64 cryptlen,
++					     unsigned int authsize);
++asmlinkage void
++aegis128x4_encrypt_vaes_avx512(const u8 key[AEGIS128X4_KEY_SIZE],
++			       const u8 nonce[AEGIS128X4_NONCE_SIZE],
++			       const u8 *ad, size_t ad_len, const u8 *src,
++			       u8 *dst, size_t len, u8 *tag,
++			       unsigned int authsize);
++asmlinkage void
++aegis128x4_decrypt_vaes_avx512(const u8 key[AEGIS128X4_KEY_SIZE],
++			       const u8 nonce[AEGIS128X4_NONCE_SIZE],
++			       const u8 *ad, size_t ad_len, const u8 *src,
++			       u8 *dst, size_t len, u8 *tag,
++			       unsigned int authsize);
++
++static bool aegis128x4_simd_usable(void)
 +{
-+	u8 *ctext = alloc_buf(test, tv->data_len);
-+	u8 *decrypted = alloc_buf(test, tv->data_len);
-+	u8 *tag = alloc_buf(test, tv->tag_len);
-+	struct aegis128x4_key key;
-+	int err;
-+
-+	err = aegis128x4_preparekey(&key, tv->key, AEGIS128X4_KEY_SIZE,
-+				    tv->tag_len);
-+	KUNIT_ASSERT_EQ_MSG(test, 0, err, "Failed to prepare key for %s",
-+			    tv->name);
-+
-+	aegis128x4_encrypt(ctext, tv->ptext, tv->data_len, tag, tv->ad,
-+			   tv->ad_len, tv->nonce, &key);
-+	KUNIT_ASSERT_MEMEQ_MSG(test, tv->ctext, ctext, tv->data_len,
-+			       "Wrong ciphertext for %s", tv->name);
-+	KUNIT_ASSERT_MEMEQ_MSG(test, tag, tv->tag, tv->tag_len,
-+			       "Wrong tag for %s", tv->name);
-+
-+	err = aegis128x4_decrypt(decrypted, ctext, tv->data_len, tag, tv->ad,
-+				 tv->ad_len, tv->nonce, &key);
-+	KUNIT_ASSERT_EQ_MSG(test, 0, err, "Decryption failed for %s", tv->name);
-+	KUNIT_ASSERT_MEMEQ_MSG(test, tv->ptext, decrypted, tv->data_len,
-+			       "Wrong plaintext for %s", tv->name);
++	return static_branch_likely(&have_vaes_avx512) && irq_fpu_usable();
 +}
 +
-+static void test_aegis128x4_test_vectors(struct kunit *test)
++static bool aegis128x4_init_arch(union aegis128x4_state *st,
++				 const u8 key[AEGIS128X4_KEY_SIZE],
++				 const u8 nonce[AEGIS128X4_NONCE_SIZE])
 +{
-+	for (size_t i = 0; i < ARRAY_SIZE(aegis128x4_testvecs); i++)
-+		test_aegis128x4_one_test_vector(test, &aegis128x4_testvecs[i]);
++	if (!aegis128x4_simd_usable())
++		return false;
++	kernel_fpu_begin_mask(0);
++	aegis128x4_init_vaes_avx512(st, key, nonce);
++	kernel_fpu_end();
++	return true;
 +}
 +
-+/* The (data, associated data) lengths of AEGIS128X4_LONG_LENS in the script */
-+static const struct {
-+	size_t data_len;
-+	size_t ad_len;
-+} aegis128x4_long_lens[] = {
-+	{ 4097, 0 },
-+	{ 8320, 4100 },
-+	{ 12345, 129 },
-+};
++static bool aegis128x4_absorb_arch(union aegis128x4_state *st, const u8 *src,
++				   size_t nblocks)
++{
++	size_t len = nblocks * AEGIS128X4_BLOCK_SIZE;
 +
-+/* This value was generated by gen-aead-testvecs.py. */
-+static const u8 aegis128x4_long_checksum[BLAKE2S_HASH_SIZE] = {
-+	0x0a, 0x18, 0x21, 0x25, 0x48, 0xe7, 0x99, 0x53, 0x09, 0x00, 0x0d,
-+	0xf5, 0x61, 0x1b, 0xa4, 0x11, 0xe1, 0x91, 0xef, 0xf5, 0x60, 0x84,
-+	0x79, 0x26, 0x4c, 0x20, 0xb2, 0x0d, 0x22, 0x70, 0x10, 0xfb,
-+};
++	if (!len)
++		return true;
++	if (!aegis128x4_simd_usable())
++		return false;
++	do {
++		size_t n = min_t(size_t, len, SZ_4K);
++
++		kernel_fpu_begin_mask(0);
++		aegis128x4_absorb_vaes_avx512(st, src, n);
++		kernel_fpu_end();
++		src += n;
++		len -= n;
++	} while (len);
++	return true;
++}
++
++static bool aegis128x4_crypt_blocks_arch(union aegis128x4_state *st, u8 *dst,
++					 const u8 *src, size_t nblocks,
++					 bool enc)
++{
++	size_t len = nblocks * AEGIS128X4_BLOCK_SIZE;
++
++	if (!len)
++		return true;
++	if (!aegis128x4_simd_usable())
++		return false;
++	do {
++		size_t n = min_t(size_t, len, SZ_4K);
++
++		kernel_fpu_begin_mask(0);
++		if (enc)
++			aegis128x4_enc_vaes_avx512(st, dst, src, n);
++		else
++			aegis128x4_dec_vaes_avx512(st, dst, src, n);
++		kernel_fpu_end();
++		src += n;
++		dst += n;
++		len -= n;
++	} while (len);
++	return true;
++}
++
++static bool aegis128x4_enc_arch(union aegis128x4_state *st, u8 *dst,
++				const u8 *src, size_t nblocks)
++{
++	return aegis128x4_crypt_blocks_arch(st, dst, src, nblocks, true);
++}
++
++static bool aegis128x4_dec_arch(union aegis128x4_state *st, u8 *dst,
++				const u8 *src, size_t nblocks)
++{
++	return aegis128x4_crypt_blocks_arch(st, dst, src, nblocks, false);
++}
++
++static bool aegis128x4_final_arch(union aegis128x4_state *st, u8 *authtag,
++				  u64 ad_len, u64 data_len, size_t authtag_len)
++{
++	if (!aegis128x4_simd_usable())
++		return false;
++	kernel_fpu_begin_mask(0);
++	aegis128x4_final_vaes_avx512(st, authtag, ad_len, data_len,
++				     authtag_len);
++	kernel_fpu_end();
++	return true;
++}
 +
 +/*
-+ * Test messages longer than the 4 KiB that the x86 code processes at a time,
-+ * out-of-place, in-place and incrementally in pieces of random length.
++ * Process a whole message in one call, keeping the state in registers, if it
++ * is short enough for a single kernel-mode FPU section.  Longer messages go
++ * through the incremental functions, which split them.
 + */
-+static void test_aegis128x4_long(struct kunit *test)
++static bool aegis128x4_crypt_arch(u8 *dst, const u8 *src, size_t data_len,
++				  u8 *authtag, const u8 *ad, size_t ad_len,
++				  const u8 nonce[AEGIS128X4_NONCE_SIZE],
++				  const struct aegis128x4_key *key, bool enc)
 +{
-+	const size_t max_len = 12345;
-+	u8 *pt = alloc_buf(test, max_len);
-+	u8 *ad = alloc_buf(test, max_len);
-+	u8 *ct = alloc_buf(test, max_len);
-+	u8 *buf = alloc_buf(test, max_len);
-+	u8 tag[AEGIS128X4_MAX_AUTHTAG_SIZE], tag2[AEGIS128X4_MAX_AUTHTAG_SIZE];
-+	u8 raw_key[AEGIS128X4_KEY_SIZE], nonce[AEGIS128X4_NONCE_SIZE];
-+	u8 checksum[BLAKE2S_HASH_SIZE];
-+	struct blake2s_ctx checksum_ctx;
-+	struct aegis128x4_key key;
-+	struct aegis128x4_ctx ctx;
-+	size_t pos, n;
-+	int err;
-+
-+	blake2s_init(&checksum_ctx, BLAKE2S_HASH_SIZE);
-+	for (size_t i = 0; i < ARRAY_SIZE(aegis128x4_long_lens); i++) {
-+		size_t data_len = aegis128x4_long_lens[i].data_len;
-+		size_t ad_len = aegis128x4_long_lens[i].ad_len;
-+
-+		rand_bytes_seeded_from_len(pt, data_len);
-+		rand_bytes_seeded_from_len(ad, ad_len);
-+		rand_bytes_seeded_from_len(raw_key, sizeof(raw_key));
-+		rand_bytes_seeded_from_len(nonce, sizeof(nonce));
-+		err = aegis128x4_preparekey(&key, raw_key, sizeof(raw_key),
-+					    sizeof(tag));
-+		KUNIT_ASSERT_EQ(test, 0, err);
-+
-+		aegis128x4_encrypt(ct, pt, data_len, tag, ad, ad_len, nonce,
-+				   &key);
-+		blake2s_update(&checksum_ctx, ct, data_len);
-+		blake2s_update(&checksum_ctx, tag, sizeof(tag));
-+
-+		memcpy(buf, pt, data_len);
-+		aegis128x4_encrypt(buf, buf, data_len, tag2, ad, ad_len, nonce,
-+				   &key);
-+		KUNIT_ASSERT_MEMEQ(test, ct, buf, data_len);
-+		KUNIT_ASSERT_MEMEQ(test, tag, tag2, sizeof(tag));
-+
-+		aegis128x4_init(&ctx, nonce, &key);
-+		for (pos = 0; pos < ad_len; pos += n) {
-+			n = min(ad_len - pos, 1 + rand_length(1000));
-+			aegis128x4_auth_update(&ctx, &ad[pos], n);
-+		}
-+		for (pos = 0; pos < data_len; pos += n) {
-+			n = min(data_len - pos, 1 + rand_length(5000));
-+			aegis128x4_encrypt_update(&ctx, &buf[pos], &pt[pos], n);
-+		}
-+		aegis128x4_encrypt_final(&ctx, tag2);
-+		KUNIT_ASSERT_MEMEQ(test, ct, buf, data_len);
-+		KUNIT_ASSERT_MEMEQ(test, tag, tag2, sizeof(tag));
-+
-+		memcpy(buf, ct, data_len);
-+		err = aegis128x4_decrypt(buf, buf, data_len, tag, ad, ad_len,
-+					 nonce, &key);
-+		KUNIT_ASSERT_EQ(test, 0, err);
-+		KUNIT_ASSERT_MEMEQ(test, pt, buf, data_len);
-+	}
-+	blake2s_final(&checksum_ctx, checksum);
-+	KUNIT_EXPECT_MEMEQ(test, checksum, aegis128x4_long_checksum,
-+			   BLAKE2S_HASH_SIZE);
++	if (ad_len + data_len > SZ_4K || !aegis128x4_simd_usable())
++		return false;
++	kernel_fpu_begin_mask(0);
++	if (enc)
++		aegis128x4_encrypt_vaes_avx512(key->key, nonce, ad, ad_len, src,
++					       dst, data_len, authtag,
++					       key->authtag_len);
++	else
++		aegis128x4_decrypt_vaes_avx512(key->key, nonce, ad, ad_len, src,
++					       dst, data_len, authtag,
++					       key->authtag_len);
++	kernel_fpu_end();
++	return true;
 +}
 +
-+static int aegis128x4_init_test(struct aegis128x4_ctx *ctx, u64 data_len,
-+				u64 ad_len, const u8 *nonce, size_t nonce_len,
-+				const struct aegis128x4_key *key)
++#define aegis128x4_mod_init_arch aegis128x4_mod_init_arch
++static void aegis128x4_mod_init_arch(void)
 +{
-+	if (nonce_len != AEGIS128X4_NONCE_SIZE)
-+		return -EINVAL;
 +	/*
-+	 * Ignore data_len and ad_len.  Incremental AEGIS-128X4 doesn't need
-+	 * them at initialization time.
++	 * There is no 256-bit code yet, so unlike AES-GCM this is also used on
++	 * CPUs with X86_FEATURE_PREFER_YMM: the alternative is the much slower
++	 * generic code.
 +	 */
-+	aegis128x4_init(ctx, nonce, key);
-+	return 0;
++	if (boot_cpu_has(X86_FEATURE_VAES) &&
++	    boot_cpu_has(X86_FEATURE_AVX2) &&
++	    boot_cpu_has(X86_FEATURE_AVX512BW) &&
++	    boot_cpu_has(X86_FEATURE_BMI2))
++		static_branch_enable(&have_vaes_avx512);
 +}
-+
-+static int aegis128x4_encrypt_test(u8 *dst, const u8 *src, size_t data_len,
-+				   u8 *authtag, const u8 *ad, size_t ad_len,
-+				   const u8 *nonce, size_t nonce_len,
-+				   const struct aegis128x4_key *key)
-+{
-+	if (nonce_len != AEGIS128X4_NONCE_SIZE)
-+		return -EINVAL;
-+	/* aegis128x4_encrypt() returns void. */
-+	aegis128x4_encrypt(dst, src, data_len, authtag, ad, ad_len, nonce, key);
-+	return 0;
-+}
-+
-+static int aegis128x4_decrypt_test(u8 *dst, const u8 *src, size_t data_len,
-+				   const u8 *authtag, const u8 *ad,
-+				   size_t ad_len, const u8 *nonce,
-+				   size_t nonce_len,
-+				   const struct aegis128x4_key *key)
-+{
-+	if (nonce_len != AEGIS128X4_NONCE_SIZE)
-+		return -EINVAL;
-+	return aegis128x4_decrypt(dst, src, data_len, authtag, ad, ad_len,
-+				  nonce, key);
-+}
-+
-+static const size_t aegis128x4_valid_key_lens[] = { AEGIS128X4_KEY_SIZE };
-+#define AEAD_MAX_KEY_LEN AEGIS128X4_KEY_SIZE
-+#define AEAD_VALID_KEY_LENS aegis128x4_valid_key_lens
-+
-+static const size_t aegis128x4_valid_nonce_lens[] = { AEGIS128X4_NONCE_SIZE };
-+#define AEAD_MAX_NONCE_LEN AEGIS128X4_NONCE_SIZE
-+#define AEAD_VALID_NONCE_LENS aegis128x4_valid_nonce_lens
-+
-+static const size_t aegis128x4_valid_tag_lens[] = { 16, 32 };
-+#define AEAD_MAX_TAG_LEN AEGIS128X4_MAX_AUTHTAG_SIZE
-+#define AEAD_VALID_TAG_LENS aegis128x4_valid_tag_lens
-+
-+#define AEAD_KEY aegis128x4_key
-+#define AEAD_CTX aegis128x4_ctx
-+#define AEAD_PREPAREKEY aegis128x4_preparekey
-+#define AEAD_ENCRYPT aegis128x4_encrypt_test
-+#define AEAD_DECRYPT aegis128x4_decrypt_test
-+
-+#define AEAD_INIT aegis128x4_init_test
-+#define AEAD_AUTH_UPDATE aegis128x4_auth_update
-+#define AEAD_ENCRYPT_UPDATE aegis128x4_encrypt_update
-+#define AEAD_DECRYPT_UPDATE aegis128x4_decrypt_update
-+#define AEAD_ENCRYPT_FINAL aegis128x4_encrypt_final
-+#define AEAD_DECRYPT_FINAL aegis128x4_decrypt_final
-+
-+/* This value was generated by gen-aead-testvecs.py. */
-+static const u8 aegis128x4_monte_carlo_checksum[BLAKE2S_HASH_SIZE] = {
-+	0x57, 0xf2, 0x44, 0xb4, 0x43, 0x71, 0x7c, 0x34, 0x94, 0x93, 0x22,
-+	0xaa, 0xaf, 0x75, 0x5b, 0xa9, 0x5c, 0x23, 0x26, 0xbb, 0x4f, 0xf2,
-+	0x61, 0x43, 0xa6, 0x92, 0xc7, 0x46, 0x3a, 0x17, 0x58, 0x67,
-+};
-+#define AEAD_MONTE_CARLO_CHECKSUM aegis128x4_monte_carlo_checksum
-+
-+#include "aead-test-template.h"
-+
-+static struct kunit_case aegis128x4_test_cases[] = {
-+	KUNIT_CASE(test_aegis128x4_test_vectors),
-+	KUNIT_CASE(test_aegis128x4_long),
-+	AEAD_KUNIT_CASES,
-+	{},
-+};
-+
-+static struct kunit_suite aegis128x4_test_suite = {
-+	.name = "aegis128x4",
-+	.test_cases = aegis128x4_test_cases,
-+};
-+kunit_test_suite(aegis128x4_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit tests and benchmark for AEGIS-128X4");
-+MODULE_LICENSE("GPL");
-diff --git a/scripts/crypto/gen-aead-testvecs.py b/scripts/crypto/gen-aead-testvecs.py
-index d77d646f75b5..6917be65f5ab 100755
---- a/scripts/crypto/gen-aead-testvecs.py
-+++ b/scripts/crypto/gen-aead-testvecs.py
-@@ -3,13 +3,12 @@
- #
- # Script that generates known-good data used in the AEAD tests.
- #
--# Requires that python-cryptography be installed.
-+# Requires that python-cryptography be installed, except for AEGIS-128X4.
- #
- # Copyright 2026 Google LLC
- 
- import hashlib
- import sys
--import cryptography.hazmat.primitives.ciphers.aead
- 
- 
- # Deterministically generate 'length' random bytes.
-@@ -22,6 +21,129 @@ def rand_bytes(length):
-     return bytes(out)
- 
- 
-+# Multiply two elements of GF(2^8), using the AES polynomial.
-+def gf256_mul(a, b):
-+    product = 0
-+    for _ in range(8):
-+        if b & 1:
-+            product ^= a
-+        a = (a << 1) ^ (0x11B if a & 0x80 else 0)
-+        b >>= 1
-+    return product
-+
-+
-+# The AES S-box: the multiplicative inverse in GF(2^8), then the affine map.
-+def gen_aes_sbox():
-+    sbox = []
-+    for x in range(256):
-+        inv = next((y for y in range(256) if gf256_mul(x, y) == 1), 0)
-+        s = inv
-+        for i in range(1, 5):
-+            s ^= ((inv << i) | (inv >> (8 - i))) & 0xFF
-+        sbox.append(s ^ 0x63)
-+    return sbox
-+
-+
-+AES_SBOX = gen_aes_sbox()
-+
-+
-+def xor_bytes(a, b):
-+    return bytes(x ^ y for x, y in zip(a, b))
-+
-+
-+def and_bytes(a, b):
-+    return bytes(x & y for x, y in zip(a, b))
-+
-+
-+# The AES round function: SubBytes, ShiftRows, MixColumns and AddRoundKey.
-+def aes_round(block, round_key):
-+    s = [AES_SBOX[block[(i + 4 * (i % 4)) % 16]] for i in range(16)]
-+    out = []
-+    for c in range(4):
-+        col = s[4 * c : 4 * c + 4]
-+        for r in range(4):
-+            out.append(
-+                gf256_mul(col[r], 2)
-+                ^ gf256_mul(col[(r + 1) % 4], 3)
-+                ^ col[(r + 2) % 4]
-+                ^ col[(r + 3) % 4]
-+            )
-+    return xor_bytes(out, round_key)
-+
-+
-+# AEGIS-128X encryption with parallelism degree 'd', as specified in RFC 10032
-+# section 5.4, since python-cryptography doesn't support AEGIS.
-+def aegis128x_encrypt(d, key, nonce, ad, pt, tag_len):
-+    c0 = bytes.fromhex("000101020305080d1522375990e97962")
-+    c1 = bytes.fromhex("db3d18556dc22ff12011314273b528dd")
-+    rate = 32 * d
-+    half = rate // 2
-+
-+    def update(v, m0, m1):
-+        for i, s in enumerate(v):
-+            v[i] = [
-+                aes_round(s[7], xor_bytes(s[0], m0[16 * i : 16 * i + 16])),
-+                aes_round(s[0], s[1]),
-+                aes_round(s[1], s[2]),
-+                aes_round(s[2], s[3]),
-+                aes_round(s[3], xor_bytes(s[4], m1[16 * i : 16 * i + 16])),
-+                aes_round(s[4], s[5]),
-+                aes_round(s[5], s[6]),
-+                aes_round(s[6], s[7]),
-+            ]
-+
-+    # Init
-+    kn = xor_bytes(key, nonce)
-+    kc0 = xor_bytes(key, c0)
-+    kc1 = xor_bytes(key, c1)
-+    v = [[kn, c1, c0, c1, kn, kc0, kc1, kc0] for _ in range(d)]
-+    for _ in range(10):
-+        for i in range(d):
-+            ctx = bytes([i, d - 1]) + bytes(14)
-+            v[i][3] = xor_bytes(v[i][3], ctx)
-+            v[i][7] = xor_bytes(v[i][7], ctx)
-+        update(v, nonce * d, key * d)
-+
-+    # Absorb
-+    padded = ad + bytes(-len(ad) % rate)
-+    for i in range(0, len(padded), rate):
-+        update(v, padded[i : i + half], padded[i + half : i + rate])
-+
-+    # Enc
-+    ct = b""
-+    padded = pt + bytes(-len(pt) % rate)
-+    for i in range(0, len(padded), rate):
-+        z0 = b"".join(
-+            xor_bytes(xor_bytes(s[1], s[6]), and_bytes(s[2], s[3])) for s in v
-+        )
-+        z1 = b"".join(
-+            xor_bytes(xor_bytes(s[2], s[5]), and_bytes(s[6], s[7])) for s in v
-+        )
-+        block = padded[i : i + rate]
-+        ct += xor_bytes(block, z0 + z1)
-+        update(v, block[:half], block[half:])
-+
-+    # Finalize
-+    u = (len(ad) * 8).to_bytes(8, "little")
-+    u += (len(pt) * 8).to_bytes(8, "little")
-+    t = b"".join(xor_bytes(s[2], u) for s in v)
-+    for _ in range(7):
-+        update(v, t, t)
-+    if tag_len == 16:
-+        tag = bytes(16)
-+        for s in v:
-+            for j in range(7):
-+                tag = xor_bytes(tag, s[j])
-+    else:
-+        tag0 = tag1 = bytes(16)
-+        for s in v:
-+            for j in range(4):
-+                tag0 = xor_bytes(tag0, s[j])
-+                tag1 = xor_bytes(tag1, s[j + 4])
-+        tag = tag0 + tag1
-+    return ct[: len(pt)] + tag
-+
-+
- # Deterministically generate many different AEAD inputs using exactly the same
- # method that the test uses; encrypt them using an independent implementation of
- # the algorithm; compute the checksum of all the resulting (ciphertext, authtag)
-@@ -32,7 +154,14 @@ def gen_monte_carlo_checksum(alg):
-         ad_len = data_len % 293
-         pt = rand_bytes(data_len)
-         ad = rand_bytes(ad_len)
--        if alg == "aes-ccm":
-+        if alg == "aegis128x4":
-+            key = rand_bytes(16)
-+            nonce = rand_bytes(16)
-+            tag_len = [16, 32][data_len % 2]
-+            ct_and_tag = aegis128x_encrypt(4, key, nonce, ad, pt, tag_len)
-+        elif alg == "aes-ccm":
-+            import cryptography.hazmat.primitives.ciphers.aead
-+
-             key_len = [16, 24, 32][data_len % 3]
-             key = rand_bytes(key_len)
-             nonce = rand_bytes([7, 8, 9, 10, 11, 12, 13][data_len % 7])
-@@ -42,6 +171,8 @@ def gen_monte_carlo_checksum(alg):
-             )
-             ct_and_tag = ccm.encrypt(nonce, pt, ad)
-         elif alg == "aes-gcm":
-+            import cryptography.hazmat.primitives.ciphers.aead
-+
-             key_len = [16, 24, 32][data_len % 3]
-             key = rand_bytes(key_len)
-             nonce = rand_bytes(12)
-@@ -53,7 +184,27 @@ def gen_monte_carlo_checksum(alg):
- 
-         blake2s.update(ct_and_tag)
- 
--    name = f"{alg.replace('-', '_')}_monte_carlo_checksum"
-+    print_checksum(f"{alg.replace('-', '_')}_monte_carlo_checksum", blake2s)
-+
-+
-+# Lengths of the (data, associated data) pairs in test_aegis128x4_long(), which
-+# cross the 4 KiB units that the x86 code splits its work into.
-+AEGIS128X4_LONG_LENS = ((4097, 0), (8320, 4100), (12345, 129))
-+
-+
-+# Checksum of the (ciphertext, authtag) pairs of test_aegis128x4_long().
-+def gen_aegis128x4_long_checksum():
-+    blake2s = hashlib.blake2s()
-+    for data_len, ad_len in AEGIS128X4_LONG_LENS:
-+        pt = rand_bytes(data_len)
-+        ad = rand_bytes(ad_len)
-+        key = rand_bytes(16)
-+        nonce = rand_bytes(16)
-+        blake2s.update(aegis128x_encrypt(4, key, nonce, ad, pt, 32))
-+    print_checksum("aegis128x4_long_checksum", blake2s)
-+
-+
-+def print_checksum(name, blake2s):
-     value = blake2s.digest()
-     print(f"static const u8 {name}[BLAKE2S_HASH_SIZE] = {{")
-     for i in range(0, len(value), 11):
-@@ -62,8 +213,11 @@ def gen_monte_carlo_checksum(alg):
-     print("};")
- 
- 
--if len(sys.argv) != 2 or sys.argv[1] not in ("aes-ccm", "aes-gcm"):
--    sys.stderr.write("Usage: gen-aead-testvecs.py [aes-ccm|aes-gcm]\n")
-+ALGS = ("aegis128x4", "aes-ccm", "aes-gcm")
-+if len(sys.argv) != 2 or sys.argv[1] not in ALGS:
-+    sys.stderr.write(f"Usage: gen-aead-testvecs.py [{'|'.join(ALGS)}]\n")
-     sys.exit(1)
- 
- gen_monte_carlo_checksum(sys.argv[1])
-+if sys.argv[1] == "aegis128x4":
-+    gen_aegis128x4_long_checksum()
 -- 
 2.56.0
 
