@@ -1,65 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=148.163.158.5
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794524950;
-	b=DjNtF2EkcGP2aRKiTONZL9AaETMr+pVQSEwN9MfrMAm3xuUIBSavVNs0ofw2yctYbQ7k
-	 hS2Dv5tTcFWWW0q2ur99RSan5e+FRUdvtxNyZJbGPHgCLrOdRoLjW1hawyDiwCOqR8LX/
-	 jAM132GMpZ1bvOyUQh4yy1r8dP10XQt5HQHG0MExEGiTbD1hkyim4PsQYT7DL/EIl+227
-	 90gLDUsZxwufRud2PfBFLMBQH01ZR9FBWJKQD1lSRrhaeffPsMO5kKATK8K6SoTmF5D6g
-	 lv1RNNkVF+yWMXAcRQ22gqHBymEs1+Zs56j4nF2ZWLNxlzHe6Ppn7wezdHbggaz/COQ==
+	t=1794526751;
+	b=QTe+rE8VJmOkvMZCmNFtkg/HCJFE7ZWaIM8R9HEAKpUwXimLi1cNFi9bR/5ts4wMhCjo
+	 woXmVez0cef9RIF4Jf/y5uF3/k27UUSQWYIATVOZ9f5AcOKajHX308248FLEwLsDOJdO/
+	 142RJV9N0iWFE/e+QKMwNb9SiU3JIb7a5DNaWi4BQrPHlYo4SK4QMIbwKyZNv+9wwSQuz
+	 IPYtyoLcuy4wGvzx/ycXJQTt0JpIO3L3tsX3F/ZV0Rs2NvTs5pHuzNdIAxKKhfqdSic+F
+	 ICvIA3w1TkFb24KHc3m4MlTfpYo5CunLsH6iZJHogQcTEkJrFA8UHBFrT7TuRHfZqFw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794524950;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=jBIoGmo7JFFX82SEeE73qtD3GyZxn6nVs6zZ0aNe29g=;
-	b=kpH7iOsEY3UlFp5lXsP63iku51uyjkU4QSqsknz99R04SeY4sOkoc2zeIiUFi1o7ThkV
-	 oaV26CMO19zKNR3d2xKTb4hnC3yubB5VplvYlgo52L3pGRdBXj96axwI6U/XVujN+urxU
-	 n/wKY88XrQp2tXlhI8Ca3IQp0/LyMjM2ojTJaotsBHv3GFCr1P2T0pu5ErOxE4c5udwHu
-	 njpo7fkRKfdfrKvpgc24oW9K+pWVhZZ6xeKY6fwyP15Tquyh7bbmSrNPvcVUYJuCDRC95
-	 8ZmM3PLeKxQjBFD7sFBDkccqI4oAZ+PTdbujAZzRI3CcSOdz1oOCa5J5ll+rkaejNJw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794526751;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:Received:
+	 Received:Received:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:From:To:Cc:References:Content-Language:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-TM-AS-GCONF:
+	 X-Authority-Analysis:X-Proofpoint-Spam-Details-Enc:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=4zVGoVjCRdgaWBt94fG/mAD1qJpqINHzjmtczK3XPec=;
+	b=MtqIrX9tfxcyOu/LjuM/aV6MX0HbmC1YDzCmUjJhIwdAabuy2T+HsTblERNG7PfSChoM
+	 CIzyn9dwYhdccu6y/wWLuVWJJXNPwj9GDOJp5lV9Y2kZtnrhyqSoKzDHMZFfDZG62cf3Z
+	 tb2R6l2PrGZP1sDzly+BB7eMOCph7dFuboa2FAKcsfqRlf+vuCmkVYcZOJ74dnmj1Oxro
+	 iM/KPf0bIjzC2oWxyw2nm28E9SbQM0X5XfA93xbw+5DoYELDAFChEwwyiidMAuARpdXue
+	 PGI1M5TBzQ4RG7PUjsQ/6G+2+6uK35pQPNFOF6HUZEYZjSB3BQvTZmfCxF4ZrdbD31w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RrCYY7Av;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=linux.ibm.com;
+	spf=pass smtp.mailfrom=linux.ibm.com;
+	dkim=pass header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=trU3VAvW;
+	arc=none smtp.remote-ip=148.163.158.5
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0DB606A888;
-	Thu, 12 Nov 2026 23:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBD3606A321;
+	Thu, 12 Nov 2026 23:39:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8EBD3606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RrCYY7Av
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FF331F000CE;
-	Thu, 12 Nov 2026 23:09:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794524949;
-	bh=jBIoGmo7JFFX82SEeE73qtD3GyZxn6nVs6zZ0aNe29g=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=RrCYY7AvCuTNFWIH5O2Id7zYUJUHHdKNBLB4B0ewDy78nIRFM8iU3icaKWICzM09r
-	 tPnL6PYXYZuPMLp1mGEiBqnKlS7Er1WhjIUA3V/PK9uNGI9TIax986C1f1eb1TFdiP
-	 QYXhiy9X3B40TjfCDlh7/DwDinPknx4egM5evupojDtSwzCUJOp25NgMsxHZhdzscq
-	 shbU/x/UPxvS7Qi0sBcgPulRH5yvcctA1ZevadIP//0LMT7a6aKOIEdzVMSyPgc0CS
-	 NqwWDo48uXYCA9TQdrF5sEGg4V/4n80YBwWU5c8xpSDtkzKgkg4Zo1ThxHl3gb12Ph
-	 YuR37/5E6KSBQ==
-Message-ID: <sashiko-outbox-211932@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v13 1/6] soc: qcom: ice: Add OPP-based clock scaling
- support for ICE
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Abhinaba Rakshit" <abhinaba.rakshit@oss.qualcomm.com>, "Abel Vesa" <abelvesa@kernel.org>, "Bjorn
- Andersson" <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Manivannan
- Sadhasivam" <mani@kernel.org>, "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, "Martin
- K. Petersen" <mkp@kernel.org>, "Adrian Hunter" <adrian.hunter@intel.com>, "Ulf
- Hansson" <ulfh@kernel.org>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Neeraj
- Soni" <neeraj.soni@oss.qualcomm.com>, "Harshal Dev" <harshal.dev@oss.qualcomm.com>, "Kuldeep
- Singh" <kuldeep.singh@oss.qualcomm.com>
-Cc: linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org, devicetree@vger.kernel.org, "Abel
- Vesa" <abel.vesa@oss.qualcomm.com>
-In-Reply-To: <20261113-enable-ice-clock-scaling-v13-1-258dc817bd63@oss.qualcomm.com>
-References: <20261113-enable-ice-clock-scaling-v13-0-258dc817bd63@oss.qualcomm.com>
- <20261113-enable-ice-clock-scaling-v13-1-258dc817bd63@oss.qualcomm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Nov 2026 23:09:08 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=ibm.com header.i=@ibm.com header.a=rsa-sha256 header.s=pp1 header.b=trU3VAvW
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ACNEaB51062135;
+	Thu, 12 Nov 2026 23:38:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=4zVGoV
+	jCRdgaWBt94fG/mAD1qJpqINHzjmtczK3XPec=; b=trU3VAvWaJDmxLu3pdiPZw
+	wBim2nu1uoYTG+3Is84O1VmzrRVpEc9KnEqohJcMJedEEGXuEVN56ITKZdHBzpNm
+	pANxU+WwkzYsNKw3zftLPD/vQetu22B8AiaHRtTIFZ9BpcFaPRNqrZ3Fqc5RWm5e
+	tgoN7MnLHFigcxsViq6V3F+u430pvZ6n1xMbV+PciQmdiFtyafvK+pFgOdRwJdLf
+	/N9t91IOWnyvongnjs92fzuELwRONXGg8SaLk61qTfhNZxM3SnxCXSNVenK2V1PP
+	Ngokx61F+F2zUoWM0RwrvxaTp9nONOHESf1lC9TTP7aCfzrgGEL2zpu8H0t1o0VQ
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4hssdm12j1-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 12 Nov 2026 23:38:48 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.11/8.18.1.11) with ESMTP id 6ACNJpoQ1433233;
+	Thu, 12 Nov 2026 23:38:48 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4hvkq0y89u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Nov 2026 23:38:48 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6ACNclgC19202598
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Nov 2026 23:38:47 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AF76E5804E;
+	Thu, 12 Nov 2026 23:38:47 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DA27B5803F;
+	Thu, 12 Nov 2026 23:38:46 +0000 (GMT)
+Received: from [9.47.158.153] (unknown [9.47.158.153])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 12 Nov 2026 23:38:46 +0000 (GMT)
+Message-ID: <d3a49bde-769f-48a9-ab1b-0374d3d4753e@linux.ibm.com>
+Date: Thu, 12 Nov 2026 18:38:46 -0500
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -68,163 +84,132 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: ecdsa - Reject non-DER X9.62 signatures
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: florian.bauckholt@cispa.de, Lukas Wunner <lukas@wunner.de>,
+        Ignat Korchagin <ignat@linux.win>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc: linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20261112-ecdsa-x962-der-v1-1-36b24c5f5e11@cispa.de>
+ <e852580d-9e18-4733-a431-2db8c5f9c2a3@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <e852580d-9e18-4733-a431-2db8c5f9c2a3@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=POqaavqC c=1 sm=1 tr=0 ts=6af64e08 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=NEAV23lmAAAA:8
+ a=mwj20vjdbvDfV6NRdAIA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTEyMDA5MiBTYWx0ZWRfX9SHWQoKPC6oq
+ U/znpCb7CofyXopXG92JmttE19o7Agr5y6IIhb1XnBczeYMp9CjVfwX6Xs/3YDY0fkkHRRXAhft
+ ewxgrtbhjLUrd8im5oAWJSkgkhNJHEvuKYcGzQj0/t0Ky8wNOivgGSxLPEL+CXR/g3smdaJdEF9
+ j4ciCjU9WW9UqD6Deb9i6RU8JR34J8IRDi+4ox6KGQ2bP/IlqrT6iwVjF2dRP8gPYKReLMOH3Zo
+ nXXHDdzmKG0FtppdbbPs6q93DGTRz1RnBhqYVCjpfEMp0f8sKtgEDNJqOi3+IyQT8CK8Pz32gPA
+ wejyjidb4kbizwWBphjDfEcngkKC4yz6eQfCEvskaxnEuYUj57nE8HyHd0zErBsef6yOJhsCyVk
+ 0LDbSRd1mAROU3WrxcnOBZpfHM/2G5Fd8Q/1Wehxvf2g92xY25u1FH7+UuprGvuVMRAxpGyiwCe
+ UmEBTUYHLFdBFo1DnIg==
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTEyMDA5MiBTYWx0ZWRfX+kz9qZD7TgXo
+ YEXEYm19zDJLDs+I0BE5MeQrVYtqaUE1spaNXChQ9m/gp7tTi/BPb7MpFLwOOivvr/3cg90pFSQ
+ r2HF8YgIpdLMroINeO4ExCB2rTWOr/0=
+X-Proofpoint-ORIG-GUID: 6lFRnLOOA61UAmLwNkwJR1cYIqylLTiU
+X-Proofpoint-GUID: 6lFRnLOOA61UAmLwNkwJR1cYIqylLTiU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-12_04,2026-11-11_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 malwarescore=0 phishscore=0
+ lowpriorityscore=0 suspectscore=0 adultscore=0 spamscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611120092
 
-Thank you for your contribution! Sashiko AI review found 2 potential
-issues to consider:
-- [Medium] soc: qcom: ice: qcom_ice_probe() fails with -EOPNOTSUPP when
-  !CONFIG_PM_OPP
-- [Medium] soc: qcom: ice: unreleased OPP power-domain vote in
-  qcom_ice_suspend()
---
 
-commit 9800ed91573a2f35826acc3c3e7577fb8636aaef
-Author: Abhinaba Rakshit <abhinaba.rakshit@oss.qualcomm.com>
 
-soc: qcom: ice: Add OPP-based clock scaling support for ICE
+On 11/12/26 12:06 PM, Stefan Berger wrote:
+> 
+> 
+> On 11/12/26 5:47 AM, Florian Bauckholt via B4 Relay wrote:
+>> From: Florian Bauckholt <florian.bauckholt@cispa.de>
+>>
+>> The x962(ecdsa-nist-*) template decodes Ecdsa-Sig-Value with the
+>> generic BER decoder, and ecdsa_get_signature_rs() only strips one
+>> leading zero byte without looking at the INTEGER's sign or encoding.
+>> As a result the following encodings of a valid signature are accepted
+>> as well:
+>>
+>>   - a SEQUENCE tag without the constructed bit (0x10 instead of 0x30),
+>>     as the decoder ignores that bit when matching a constructed tag
+>>   - non-minimal length encodings of the SEQUENCE, r or s (long form
+>>     where the short form fits, or padded with zero bytes)
+>>   - indefinite length for the SEQUENCE
+>>   - data following the SEQUENCE (the decoder does not check that the
+>>     whole buffer was consumed)
+>>   - r or s with the most significant bit set but without the leading
+>>     zero byte, i.e. a negative INTEGER read as positive
+>>   - r or s with a superfluous leading zero byte
+>>
+> 
+> I have a user-space test suite here:
+> https://github.com/stefanberger/eckey-testing
+> 
+> It tries to load openssl-generated self-signed certs into the kernel and 
+> this fails now:
+> 
+> $ ./test-ecc-kernel-keys.sh
+> Testing with curves:  prime256v1 secp384r1 secp521r1
+> Testing with hashes:  sha224 sha256 sha384 sha512 sha3-256 sha3-384 
+> sha3-512
+> Good: curve: prime256v1 hash:   sha224 keyid: 927415098 
+> keyctl_pkey_verify: Invalid argument
+> 
+> 
+> 
+>> RFC 3279 section 2.2.3 and SEC 1 section C.5 require Ecdsa-Sig-Value to
+>> be DER-encoded, so all of these are invalid and should be rejected.
+>>
+>> This is a behaviour change for every user of the x962 template (X.509
 
-This commit registers an optional OPP table for the ICE device during
-probe and introduces qcom_ice_scale_clk() to scale the ICE core clock via
-the PM OPP framework.
+I would say a 'potential but unlikely behaviour change' because if you 
+signed with a tool (e.g., OpenSSL) that created properly (DER-)formatted 
+signatures in X.509 certificates, then those signatures still verify 
+with your patch applied. I would assume that most people signed with 
+such a tool. In your patch you seem to add more tests for proper DER 
+formatting that all existing x.509 certs and signatures should meet, right?
 
-> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
-> index f9ac45505908f..2259dbecb8b51 100644
-> --- a/drivers/soc/qcom/ice.c
-> +++ b/drivers/soc/qcom/ice.c
+>> certificates, module and IMA signatures, KEYCTL_PKEY_VERIFY): signatures
+>> that are valid ECDSA signatures but are not DER-encoded used to verify
+>> and are now rejected with -EINVAL. The p1363 template is not affected.
 
-[ ... ]
+What breaks the signature verification test in my test suite currently 
+was pointed out by AI. For signature verifications using the 
+KEYCTL_PKEY_VERIFY interface, it currently would pass along an input 
+size of 72 bytes for a secp256r1 signature, which is the max. size, but 
+this does not always correspond to the application provided signature 
+size, which may for example be just 71 bytes. Your patch now detects 
+that commit cb481e59ea6ca extended the input buffer by a byte that 
+shouldn't be there. So this fixes it for me and is an error introduced 
+for signature verification in that patch. Bbefore that patch it used to 
+set params->out_len = uparams.out_len which is equivalent to 
+params->in2_len = uparams->in2_len per that union used in that structure.
 
-> @@ -560,6 +562,50 @@ int qcom_ice_import_key(struct qcom_ice *ice,
->  }
->  EXPORT_SYMBOL_GPL(qcom_ice_import_key);
-> =20
-> +/**
-> + * qcom_ice_scale_clk() - Scale ICE clock for DVFS-aware operations
-> + * @ice: ICE driver data
-> + * @target_freq: requested frequency in Hz
-> + * @round_ceil: when true, selects nearest freq >=3D @target_freq;
-> + *              otherwise, selects nearest freq <=3D @target_freq
-> + *
-> + * Selects an OPP frequency based on @target_freq and the rounding direc=
-tion
-> + * specified by @round_ceil, then programs it using dev_pm_opp_set_rate(=
-),
-> + * including any voltage or power-domain transitions handled by the OPP
-> + * framework.
-> + *
-> + * Return: 0 on success; -EOPNOTSUPP if no OPP table; or errno from
-> + *         dev_pm_opp_set_rate()/OPP lookup.
-> + */
-> +int qcom_ice_scale_clk(struct qcom_ice *ice, unsigned long target_freq,
-> +		       bool round_ceil)
-> +{
-> +	unsigned long ice_freq =3D target_freq;
-> +	struct dev_pm_opp *opp;
-> +	int ret;
-> +
-> +	if (!ice->has_opp)
-> +		return -EOPNOTSUPP;
-> +
-> +	if (round_ceil)
-> +		opp =3D dev_pm_opp_find_freq_ceil(ice->dev, &ice_freq);
-> +	else
-> +		opp =3D dev_pm_opp_find_freq_floor(ice->dev, &ice_freq);
-> +
-> +	if (IS_ERR(opp))
-> +		return PTR_ERR(opp);
-> +	dev_pm_opp_put(opp);
-> +
-> +	ret =3D dev_pm_opp_set_rate(ice->dev, ice_freq);
-> +	if (ret) {
-> +		dev_err(ice->dev, "Unable to scale ICE clock rate\n");
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(qcom_ice_scale_clk);
+index 15b6bf6399b5..d27f8b22224a 100644
+--- a/security/keys/keyctl_pkey.c
++++ b/security/keys/keyctl_pkey.c
+@@ -160,7 +160,7 @@ static int keyctl_pkey_params_get_2(const struct 
+keyctl_pkey_params __user *_par
+                     uparams.in2_len > info.max_sig_size)
+                         return -EINVAL;
 
-[Severity: Medium]
-Does the performance state vote set here by dev_pm_opp_set_rate() stay
-asserted when ICE suspends?
+-               params->out_len = info.max_sig_size;
++               params->in2_len = uparams.in2_len;
+                 break;
+         default:
+                 return -EOPNOTSUPP;
 
-When dev_pm_opp_set_rate() scales up the clock, it sets the required-opps
-performance state on ice->dev's power domain (and its parent RPMHPD_CX).
-genpd only drops a device's performance state in genpd_runtime_suspend(),
-but runtime PM is never enabled on ice->dev, and qcom_ice_suspend() only
-disables iface_clk and core_clk without calling
-dev_pm_opp_set_rate(ice->dev, 0):
 
-drivers/soc/qcom/ice.c:qcom_ice_suspend() {
-	clk_disable_unprepare(ice->iface_clk);
-	clk_disable_unprepare(ice->core_clk);
-	ice->hwkm_init_complete =3D false;
-
-	return 0;
-}
-
-Once a storage consumer scales the ICE clock, the CX rail vote remains
-elevated across both runtime suspend and system suspend.
-
->  static struct qcom_ice *qcom_ice_create(struct device *dev,
->  					void __iomem *base)
->  {
-> @@ -738,6 +784,7 @@ static int qcom_ice_probe(struct platform_device *pde=
-v)
->  	unsigned long phandle =3D pdev->dev.of_node->phandle;
->  	struct qcom_ice *engine;
->  	void __iomem *base;
-> +	int err;
-> =20
->  	guard(mutex)(&ice_mutex);
-> =20
-> @@ -756,6 +803,34 @@ static int qcom_ice_probe(struct platform_device *pd=
-ev)
->  		return PTR_ERR(engine);
->  	}
-> =20
-> +	err =3D devm_pm_opp_set_clkname(&pdev->dev, "core");
-> +	if (err && err !=3D -ENOENT) {
-> +		dev_err(&pdev->dev, "Unable to set core clkname to OPP-table\n");
-> +		/* Store the error pointer for devm_of_qcom_ice_get() */
-> +		xa_store(&ice_handles, phandle, ERR_PTR(err), GFP_KERNEL);
-> +		return err;
-> +	}
-> +
-> +	/* OPP table is optional */
-> +	err =3D devm_pm_opp_of_add_table(&pdev->dev);
-> +	if (err && err !=3D -ENODEV) {
-> +		dev_err(&pdev->dev, "Invalid OPP table in Device tree\n");
-> +		/* Store the error pointer for devm_of_qcom_ice_get() */
-> +		xa_store(&ice_handles, phandle, ERR_PTR(err), GFP_KERNEL);
-> +		return err;
-> +	}
-> +
-> +	/*
-> +	 * The OPP table is optional. devm_pm_opp_of_add_table() returns
-> +	 * -ENODEV when no OPP table is present in DT, which is not treated
-> +	 * as an error. Therefore, track successful OPP registration only
-> +	 * when err is not -ENODEV.
-> +	 */
-> +	if (err =3D=3D -ENODEV)
-> +		dev_dbg(&pdev->dev, "ICE OPP table is not registered, please update yo=
-ur DT\n");
-> +	else
-> +		engine->has_opp =3D true;
-
-[Severity: Medium]
-Does qcom_ice_probe() fail with -EOPNOTSUPP when CONFIG_PM_OPP is
-disabled?
-
-QCOM_INLINE_CRYPTO_ENGINE does not select or depend on PM_OPP.  When
-CONFIG_PM_OPP is disabled, the stubs for devm_pm_opp_set_clkname() and
-devm_pm_opp_of_add_table() in include/linux/pm_opp.h both return
--EOPNOTSUPP.  Because the error checks only allow -ENOENT and -ENODEV,
-qcom_ice_probe() stores ERR_PTR(-EOPNOTSUPP) in ice_handles and fails,
-preventing ufs-qcom and sdhci-msm from using inline crypto.  Also, if
--EOPNOTSUPP is ignored above, the final check needs to test !err before
-setting engine->has_opp =3D true so it is not set when CONFIG_PM_OPP is
-disabled.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261113-enable-ice=
--clock-scaling-v13-0-258dc817bd63@oss.qualcomm.com?part=3D1
