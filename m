@@ -1,62 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794494083;
-	b=GcMFCDJjCm8JLRUnJNXzcqOfntF3YzuO0wRnBiHC0AcxGyH8rDiEGnPyhCfKNUjnemUd
-	 1ENuGEukpRmbRe/E/AYz1m+oNzotsVQxHGzKnBXTs4TuW1rw/BukCdHg1UAUBu6/W7BAH
-	 qxH8iKIT0y/LhtxZJ9w3SE08uFRtrvduSpjwVgx4PptxjU+eF9YxMuhJOtwuFsTZPqcZS
-	 o9FkGWMKE244PtR6u3SCmwNrNrCJS1ofGawSb0ROhrX5D39yKEIW6DYcPKhr6YYrxs+l/
-	 LrgBpmIFYDbNvKs4xjtTDN/McaVwdQ2QKBp6f6Hf3CrL7ociB/9f+1YYP1WBPiQZOtQ==
+	t=1794500426;
+	b=aW2ZNjwOWgWpqRFXWAkpoIybABM2cYow5ENQx61Z5H2nJ+NsVRGLIilJ1dVIKdEEC4/6
+	 uXvrPu8aU012psDquN3kVu4LvESAaIz7GX/G6YEplaAGJerTm9HrH+fqIc84c2WscG0xx
+	 tz085uFI47w/F6nFBjpb5A+W+i1kwQWIN8Sb6SZKNdWjy7mENRJSzUeZpxmRKEf1pyYrv
+	 Bd6BHbB02g3lGcX2/GyOwNwU9yXEuj3MguBMbtBuw6a/F/twJun2XG9fhN6VmXpH1+g9s
+	 4LLsfhnDuA+Jy+VuAzohjTcRBWZ0WxW/QlrIFwHczQioYovCqmAezhm3+x0ASE/64kw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794494083;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=oKGOE90JjtF1ivf+YIrpKLut8WiEBtXXB8vgIF1ajQg=;
-	b=DJggbUVUldFvGZPWa2hqyFWrscNOL/7sQo5FROcQNr2qzxhch8hSVGSQLL5vHVOqJnUJ
-	 VlYyIhF/ax+njYu2GZJQoYD2DiPavvti/ZaAn2F/pT4ZCWoD2kJgFblFREQbShHyZ5hep
-	 EdBohVWnCd0N+Uwdtxu4ds8wtd3y/rhborVpsVENjNoG+7tnWUHNLzEKbQZZ4b79I5Eqj
-	 JpoJkvTuso+U17XiliizMglTr9EuEab9kYkZ6yy+cZ1r9d6Xr3a8ahsq+uetvWL10Ab1N
-	 wCrM4lOh4YiYOtnUB9Jx20A53LxPr+LOQkErNeB3slEEGfXAzCHzOFCqf6QHHc8eZ4w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794500426;
+	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
+	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type:Content-Transfer-Encoding;
+	bh=dNCfrHBpRmRNa7Gswo6HSlGa1At52OBt8g4cO4mvDE0=;
+	b=F5XuqBXb+qZUSBO2Y01iuPFHgSWPxFdqqtMovJ//F41FSK1o9ekOErjccXp5IaaBklKE
+	 p5vsmQu8uO1fbBWF420+VAFA1w1GpWVjLALsYPTA+tv9waXI5otiAnQ5+M09rddFgTgXm
+	 YmonVnWm+1sQKhF4qvJOXvFGD3LcbEE1ekCY/IhZbWwAi5iH58tqKnxzUv6KgSLVi4Lj2
+	 /DN6GtfW3jkh7p3ZnKPO4e5lbdwE1uuuBZL5QVI6omAS23xwf6f9sGFFd0fWBzaomuVLE
+	 gsLd/Ak3QgfiJ/E85ZII75wRTHQ0omXpAOS+NsNE3MN3N9J/kB54XLwXl+tqHu+ANFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LMwUUDv0;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fJIs5x2p;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64B1606A881
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 14:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804FF606A327
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 16:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LMwUUDv0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B77AA1F00A05;
-	Thu, 12 Nov 2026 14:34:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fJIs5x2p
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E45B31F000C4;
+	Thu, 12 Nov 2026 16:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794494082;
-	bh=oKGOE90JjtF1ivf+YIrpKLut8WiEBtXXB8vgIF1ajQg=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=LMwUUDv0xQNn6f3uc5y+JrEwPQLm4+zQnHOEyGNJAPWJy0LaYuMwWdKFD+aG3DZ5i
-	 D+HHCUI4oTFGmq+30g3w6jB0G3Cy+EFaz0GcEb2XsJNoi102wYl4teXMTrd7I4vkrY
-	 r9Zazfws7W0VADbVCQEQM6jOjCtM4/ruUg4UHOFxWYnWvwVM8YLMIziZ9/6c4og22V
-	 K0qchBcG5jHQz5KGqLmSMn0/hKMsonTs5KS0GzVChN21yYYtfdnvy4HbeEnGoSbUvu
-	 gB7f6QTreyvGEf0ilEtwRwHIIY3weRSlLwihesgrYowQTZnGHAJrXssRqgBCap4qIf
-	 Gao7SetoPvr8A==
-Message-ID: <sashiko-outbox-211343@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v11 1/4] crypto: qce - convert to auxiliary bus
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Bartosz Golaszewski" <bartosz.golaszewski@oss.qualcomm.com>, "Thara
- Gopinath" <thara.gopinath@gmail.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
- S. Miller" <davem@davemloft.net>, "Stanimir Varbanov" <svarbanov@mm-sol.com>, "Eneas
- U de Queiroz" <cotequeiroz@gmail.com>, "Kuldeep Singh" <kuldeep.singh@oss.qualcomm.com>, "Eric
- Biggers" <ebiggers@kernel.org>, "Demi Marie Obenour" <demiobenour@gmail.com>, "Bjorn
- Andersson" <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Russell
- King" <linux@armlinux.org.uk>, "Abel Vesa" <abelvesa@kernel.org>
-Cc: linux-crypto@vger.kernel.org, brgl@kernel.org, "Pankaj Patil" <pankaj.patil@oss.qualcomm.com>
-In-Reply-To: <20261112-qce-fix-self-tests-v11-1-b86a65ee7107@oss.qualcomm.com>
-References: <20261112-qce-fix-self-tests-v11-0-b86a65ee7107@oss.qualcomm.com>
- <20261112-qce-fix-self-tests-v11-1-b86a65ee7107@oss.qualcomm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Nov 2026 14:34:41 +0000
+	s=k20260515; t=1794500426;
+	bh=dNCfrHBpRmRNa7Gswo6HSlGa1At52OBt8g4cO4mvDE0=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=fJIs5x2psk2ToojAwv71vfPF2ggriYJLDQD6bZbB8EFAZrOn5P4+rk3LoNhfEhqzN
+	 uX/WGbKhd3fN+Xk/NRKIuWsnQfUBrd2zgELl3TT8lHHqSxXbaIT9ygefDElvKkVPXv
+	 9Ic17xo6Y8pTE+Qfd9V9sdfuTMv6A0ZxAiGj02ntkPIsYvkawsA/xkdv44/BjCbzgx
+	 isPLC3tti2A0RE5oQ/SMXdG3aHEhqbHSiAiBIeOE4lwct+eoePNm2AqfW4GeNjL8G0
+	 uq/ZhcTeTx8WDch1BD3RaIXr2QR62wJTTNH0i2igcEa+QXa0BUDWuEHmeUT2nQlqRw
+	 fOwqHAS85ZZ4A==
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 0611D1980047;
+	Thu, 12 Nov 2026 11:20:23 -0500 (EST)
+Received: from ams-imap-11 ([10.64.2.31])
+  by ams-compute-02.internal (MEProxy); Thu, 12 Nov 2026 11:20:24 -0500
+X-ME-Sender: <xms:Ref1altNSs_yp7himxjazOL0UGRHbSTtvrf-jUW2Q1JAPVEUInTSdA>
+    <xme:Ref1apSFlRmBZU_MkY63RcoQonFn4PCn015HeZU5CUcvIuXGYmZ2tohwbhcpaPuDm
+    BSaZ93-tP30rnsbjrvnRcrK4Dq0BJW1SLaC2NpVltvcFHu71FDlDN8>
+X-ME-Proxy-Cause: dmFkZTEbQOowYef7VyDwomYDk8ihuQS4wJiXzuFxQOc/aZivBSaqTY6YbbWbi2YAE+A/Zd
+    VlXHGDj7LVnBAQnggfdsZ2eZSTucqH+gbUHwed3/6AGCloPuXYZKYr8gooYq/hf5iOxqxO
+    x6YijWIC6rFOCiI1WG6FaBu1HyNgv0G1wHcqvm56fAdqaa4X863q6rHtPGANJbzjohQ03P
+    9PTQPumIkghVBxRnawmyOPvLuJ3VpWRTCzDx/LO8doPTsyCkAA8WKJWhKNfbNqSgw2gz8f
+    WX6RzDogq/czVUPPK+NKMfvoChQ9kQ6mEDsKPowYy3tFFPVyDXG6VeRaUxs5HgE1X6TGkz
+    9hh64qXBJ1pvRAc+INlusvPHIY+Uw+vMCwSezFxmQGye996AtFIoV6o7FMfLxxFlMOEQcs
+    69W/Qla4E3u0F2XeQMMVpat90OYqW+vw6GrWeEKorgQG+x6jWH7m5MupCXjhEYBmAOaljL
+    jJZdNXVWcmtBLGNv/2duIDrezb32xKfIldL/Izj2GfAc3DOfk+waQTKDwRaulXoFgaldmu
+    STXS/XGax+vhaUb59Ik/1tbWwF7JcQ0a0ZC7zSpgAgk4xSNvbgYjNwi4smOXvHRxk1tHjE
+    ar77GHlkXzSiV8Gek4K5X77pkOAqu1LMGGDPfOZKLmMXzmckiAgF5zym5VUA
+X-ME-Proxy: <xmx:R-f1anQgjLgfTXV6gVzfq93GwtiO5SyoI55j9Iwi-rDL7o1epYUevw>
+    <xmx:R-f1arANkPrds7w59VprE0BzeeyEh0tGOHb7lIBqP5N4PJnoq84YQg>
+    <xmx:R-f1avHPJUUhBQ01XFXJ4xbqquOQ-MudYiF0r6I5t5M_n-bp9xRNvw>
+    <xmx:R-f1atB9x6iZiV1VltYapoWl6Yl-qQsyQr3EfzjAnEj5c8shAxDdPQ>
+    <xmx:R-f1avVFbruFqWkoj4zTAGndryQCmdKgdxS8tt3ehy35BoU9PdO0rIku>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 396C3F80096; Thu, 12 Nov 2026 11:20:21 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,96 +76,58 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Date: Thu, 12 Nov 2026 17:20:00 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Antonio Quartulli" <antonio@openvpn.net>, linux-crypto@vger.kernel.org
+Cc: "Antonio Quartulli" <antonio@mandelbit.com>,
+ "Eric Biggers" <ebiggers@kernel.org>,
+ "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>
+Message-Id: <1906b5ed-7650-484c-9eb0-a99c8e27c943@app.fastmail.com>
+In-Reply-To: <20261112125432.3064939-1-antonio@openvpn.net>
+References: <20261112125432.3064939-1-antonio@openvpn.net>
+Subject: Re: [RFC PATCH 0/5] lib/crypto: Add AEGIS-128X4
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 2 potential
-issues to consider:
-- [Low] crypto: qce: ignored .driver.name initializer in
-  qce_crypto_driver
-- [Low] crypto: qce - stale ICC comment in qce_crypto_probe()
---
+Hello Antonio,
 
-commit 29e94f7689b20cef79914c127c10bb58d32472f1
-Author: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+On Thu, 12 Nov 2026, at 13:54, Antonio Quartulli wrote:
+> From: Antonio Quartulli <antonio@mandelbit.com>
+>
+> This series adds AEGIS-128X4, the 4-way parallel variant of AEGIS-128L
+> specified in RFC 10032 (Informational, September 2026), as a crypto
+> library with an x86_64 VAES-AVX512 implementation, a KUnit test suite
+> and benchmark, and a crypto API wrapper.
+>
+> AEGIS-128X4 runs four AEGIS-128L instances, one per 128-bit lane of a
+> 512-bit vector, so that each state update is eight VAESENC instructions
+> on zmm registers.  On CPUs with VAES and AVX-512 it is very fast even for
+> short messages, which is what makes it attractive for network protocols.
+>
+> The intended user is ovpn, the OpenVPN data channel offload driver. In
+> single-stream ovpn tests over a 100 Gbit/s link, with both ciphers used
+> through the crypto API, the sending CPU spent 1266 cycles per packet with
+> AEGIS-128X4 against 1448 with AES-GCM over TCP, and 1032 against 1122
+> with UDP GSO input. It is posted as an RFC because ovpn can't use it
+> yet.
+>
 
-crypto: qce - convert to auxiliary bus
+We used to have implementations of aegis128l and aegis256 in the kernel as
+well (along with morus), but we removed them on the basis that it was
+aegis128 that won the competition.
 
-This commit converts the Qualcomm crypto engine driver from a platform
-driver to an auxiliary bus driver, removes interconnect bandwidth scaling,
-updates runtime PM handling, and uses the parent device for DMA mappings.
+As far as I know, nobody actually uses any of that code, though, so I am
+quite to surprised to see now that it was aegis128 that was dropped
+from the portfolio, and aegis128l and aegis256 have made a miraculous
+return, along with some other variants that appear to be tied to the
+register width. What happens when 8-way vector registers become
+commonplace? Create yet another aegis variant that case use them
+efficiently?
 
-> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> index ddb4df3d227f8..346e9ea0fe0f0 100644
-> --- a/drivers/crypto/qce/core.c
-> +++ b/drivers/crypto/qce/core.c
+So I'm struggling to see why we should take this RFC seriously, to be
+honest ...
 
-[ ... ]
 
-> @@ -228,10 +243,6 @@ static int qce_crypto_probe(struct platform_device *=
-pdev)
->  	if (IS_ERR(qce->bus))
->  		return PTR_ERR(qce->bus);
-> =20
-> -	qce->mem_path =3D devm_of_icc_get(dev, "memory");
-> -	if (IS_ERR(qce->mem_path))
-> -		return PTR_ERR(qce->mem_path);
-> -
->  	/*
->  	 * Enable runtime PM after clocks and ICC path are acquired so that
->  	 * the resume callback can enable clocks and apply the ICC bandwidth
 
-[Severity: Low]
-This isn't a bug, but this comment in qce_crypto_probe() still mentions
-acquiring the ICC path and applying the ICC bandwidth vote, which this
-commit removes from the driver.
-
-[ ... ]
-
-> @@ -336,25 +330,22 @@ static const struct dev_pm_ops qce_crypto_pm_ops =
-=3D {
->  	SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
->  };
-> =20
-> -static const struct of_device_id qce_crypto_of_match[] =3D {
-> -	{ .compatible =3D "qcom,crypto-v5.1", },
-> -	{ .compatible =3D "qcom,crypto-v5.4", },
-> -	{ .compatible =3D "qcom,qce", },
-> +static const struct auxiliary_device_id qce_crypto_ids[] =3D {
-> +	{ .name =3D "qce.crypto", },
->  	{}
->  };
-> -MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
-> +MODULE_DEVICE_TABLE(auxiliary, qce_crypto_ids);
-> =20
-> -static struct platform_driver qce_crypto_driver =3D {
-> +static struct auxiliary_driver qce_crypto_driver =3D {
->  	.probe =3D qce_crypto_probe,
-> +	.id_table =3D qce_crypto_ids,
->  	.driver =3D {
-> -		.name =3D KBUILD_MODNAME,
-> -		.of_match_table =3D qce_crypto_of_match,
-> +		.name =3D "qce-crypto",
->  		.pm =3D pm_ptr(&qce_crypto_pm_ops),
->  	},
->  };
-
-[Severity: Low]
-Should qce_crypto_driver set .name instead of .driver.name, or drop
-.driver.name?  __auxiliary_driver_register() unconditionally overwrites
-auxdrv->driver.name based on auxdrv->name and the module name:
-
-drivers/base/auxiliary.c:__auxiliary_driver_register() {
-	...
-	if (auxdrv->name)
-		auxdrv->driver.name =3D kasprintf(GFP_KERNEL, "%s.%s", modname,
-						auxdrv->name);
-	else
-		auxdrv->driver.name =3D kasprintf(GFP_KERNEL, "%s", modname);
-	...
-}
-
-Because qce_crypto_driver.name is NULL, the "qce-crypto" initializer is
-ignored and overwritten with KBUILD_MODNAME ("qcrypto").
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261112-qce-fix-se=
-lf-tests-v11-0-b86a65ee7107@oss.qualcomm.com?part=3D1
