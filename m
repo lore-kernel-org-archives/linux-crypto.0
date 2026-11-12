@@ -1,61 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794478536;
-	b=pNnIOzDcmLd7Oa4ucyK3PFxCZBflTphaoiajkQ/0JyHM9+QBp9clP0qmZu0EToIVO+a4
-	 p+7Zb9zpmWnCe1w6gO+NFzfXTjKq6x06kEgaDTaptstHjU4RMO3dr9CopkAhIKfAntaau
-	 1Y+KHYTY3tQnc8Dg/pRdoOzB6hXAxAu3U5/X01M6X1dWk+qAwQszawNJ9tPjbKSjT49Ka
-	 S2s5hN0s5C2h8j9rtaTqIUOgCl37CMKgQXgZ0m4ieL7IgMtHZ4N1CkgMJ6ykC800LQqCn
-	 CPS3A335C4FkKKJrpb1Q3qn9qLhAIu1gB7j2Su+U1e2/4yuSJxnuxUVt4mcHqhxBwgQ==
+	t=1794478544;
+	b=ymoz8wMYS5LiGSYeP1T/PQjmxztOvzUz0uUHb47KJOiJdRI3CdqodBxR8UavS01RTNjb
+	 qyYTPgICu3yWKva+Wydqysnw3WDszFybkKCfr9E8w7b2VwxoHIPZcoCy0kLUAgVNuhyd0
+	 ZIRQ98yaMaGaiHItBYnNDe9YP3cLsoHX3EC0yGukMr/ypY7rgmKgDyXzFbv6u+dXxTPii
+	 JkRI3D4KKVeXYaOyb498HJqeOHm3/tkRujC7FHqYMNIyrVQ/5mhUFbVe24hCBPMN6Q37r
+	 2SXn9t94+T7iw6g2V80YYbWeEJ2or9TxAJMvo6hCzlJnt4+Y85k5Tk7obHTTal6fIKg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794478536;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794478544;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=jGEXQeCUm38UyrjLGty8bX3RGpMJZp9wxl5zMeALPd0=;
-	b=JWahCLHMm++3kPqIQxFRPocAJu1yxNGHEGiDb+1q9daMOceGBBUJvXK8J2L29QkQc9VG
-	 dcFZYRRGYS6BDQSTVE/z205dIc+Fko8V9TyOVm6ViKPfRN3NTz+T027hJdcOXQ2OmDn2J
-	 DgAaSLKq5tiuaxvlGZe3ohDdKfACY3v4+45IROGiwrgv5tiOHojguqRd4Bsadr+nsOyVd
-	 2I/JVwlQdGfH77FnDc11n68fRL9LdLvFJgPxQcsAzJ/DiKuG5oJr6HKWC440T6LxIWU8z
-	 59L0v8g+tfOaxG6mIeXyjDDfepNadFHpmu9+HPNBsiiLHRelIloGjQHaXqPdMW1++eg==
+	bh=zyTh7ykvQz+s9FkH5ObutlkuVJTiFEvX2XiA/Eo73dU=;
+	b=AFvKzwJjvrnYcl7EPIWJpkcZZsihyYcQa+M/7QJSt3vYYxgrvmc08lHpPdJp4dRtZUH+
+	 yJUu2ZrL2LNxWgx3KvSOM1St2jgqKCHzBECbQ0JNaQc94WNr5kpGfgXyGmonTGbKZftru
+	 okbTiqmKA/+6tp41GAN53NLLe9EzsA+KZQj2JCY8eejfFbWLNYAkujhxGH2aV6nLAa7X4
+	 bjyO21gH+DG0VrrXVS/mhSVUyFTDPX/3UKdz2vsZp+1VPdkB3Iy6NFdNt4LPO4zEpWtA2
+	 eCh5jGUbrUimZG6Q7Ze02j3TIcT1x5H67sP8SbFN0H7w0We9w3LdUSt/YOlezhhTUbg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=FDRVrZEB;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=RNsYYjU7;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB7B606A327
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 10:15:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6EB7B606A327
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D3B606A327
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 10:15:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 86D3B606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=FDRVrZEB
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=RNsYYjU7
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=jGEXQeCUm38UyrjLGty8bX3RGpMJZp9wxl5zMeALPd0=; 
-	b=FDRVrZEBjsNgKb40C2NcooI2jO/uzFvwhsw8npBpKrgwMpisA4T92nnWfqLgU2NsE4G9UBQk/tb
-	m4RBsgDJ057PE3W3cOvemrraMhXvKmf5EKMMWluJXkWik3Q8lMbe9ABD3CTUkwf7I+0TycB/ez5gS
-	mQ7RWBcHS346XwRjFf1MD6GxWbmd1jf/QJ/1p7xHjTV0jH8VQwhHEfKY1u4oE1LfJFPJcQ07ZlFY6
-	NgChVx/K8KvrXfOUCkvNQTWFfoOQgLZsP00kPuq0ISLsMnF4AQ4UsAIkrltp3ZyoWrZiies9iCAVe
-	M2FE1bYkqbjRgFV8RrEPZAJFmm9C3Q6PXOOQ==;
+	from:content-type:reply-to; bh=zyTh7ykvQz+s9FkH5ObutlkuVJTiFEvX2XiA/Eo73dU=; 
+	b=RNsYYjU7uacr2YEgC0Nyq6JrON7+qx4vWGZRwQroy60I/Upson9mrzddDboqSNNTToh0xKzBMam
+	DYHP6N/uoHSClWA622BkyCVuDUivJri+xrjQGFaMhUlgyVf40o8YGqRvJ//CYeaOLZOiAz4vpzwRv
+	sX0IrbzUP8jYpRSyOeyOImlQTorsh00lYPEKdXiPwQ97/pBv5oFHjs0NFY09dDB5udN4G86lIpbu8
+	X1yNOdXwOgJW9mBf1kU9S0ztwwwSf06tlwSh56Pts/xG5E7wXqTU/PFFeKTAsF5fZv3jMqPL60sdv
+	W/XUeyckHyIkG4CApJ1SmqLUphM6fNVO8NKg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xRRq8-0000000EEE7-2jVp;
-	Thu, 12 Nov 2026 18:15:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Nov 2026 18:15:32 +0800
-Date: Thu, 12 Nov 2026 18:15:32 +0800
+	id 1xRRqG-0000000EEED-0D8M;
+	Thu, 12 Nov 2026 18:15:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Nov 2026 18:15:40 +0800
+Date: Thu, 12 Nov 2026 18:15:40 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Ahsan Atta <ahsan.atta@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH] crypto: qat - make adf_ae_shutdown() a void function
-Message-ID: <avWRxEOu6JGoK-tD@gondor.apana.org.au>
-References: <20261030111916.483870-1-ahsan.atta@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com
+Subject: Re: [PATCH v2 0/2] crypto: qat - enable three-service mode for QAT
+ GEN5
+Message-ID: <avWRzFMEjntrIPX1@gondor.apana.org.au>
+References: <20261030143019.484280-1-ahsan.atta@intel.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,26 +66,56 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261030111916.483870-1-ahsan.atta@intel.com>
+In-Reply-To: <20261030143019.484280-1-ahsan.atta@intel.com>
 
-On Fri, Oct 30, 2026 at 11:19:16AM +0000, Ahsan Atta wrote:
-> From: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
+On Fri, Oct 30, 2026 at 02:30:17PM +0000, Ahsan Atta wrote:
+> QAT GEN5 devices (qat_420xx) have enough accelerator engines to run
+> three services concurrently, but the driver currently only allows a
+> maximum of two to be configured at a time, matching the GEN4 limit.
 > 
-> adf_ae_shutdown() has no failure mode and has always returned 0, yet
-> its only caller in adf_dev_shutdown() carries an error branch that
-> reports a shutdown failure and skips clearing
-> ADF_STATUS_AE_INITIALISED. That branch is unreachable.
+> This series lifts that restriction so that symmetric crypto, asymmetric
+> crypto and compression can be enabled together on GEN5, as is already
+> possible on GEN6 (qat_6xxx).
 > 
-> Change the return type to void and drop the dead error handling.
+> In summary:
+> Patch #1: Define the firmware object layout, ring-to-service mapping
+> and thread-to-arbiter mapping required for the sym;asym;dc
+> configuration on GEN5, and register the new service combination in
+> adf_cfg_services so that it can be selected through the cfg_services
+> sysfs attribute.
 > 
-> Signed-off-by: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
-> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  drivers/crypto/intel/qat/qat_common/adf_accel_engine.c | 5 ++---
->  drivers/crypto/intel/qat/qat_common/adf_common_drv.h   | 2 +-
->  drivers/crypto/intel/qat/qat_common/adf_init.c         | 8 ++------
->  3 files changed, 5 insertions(+), 10 deletions(-)
+> Patch #2: Update the cfg_services ABI documentation to state that GEN5
+> devices (qat_420xx) support a maximum of three combined services,
+> alongside the existing GEN6 entry. Documentation only, no functional
+> change.
+> 
+> There is an existing issue opened by Sashiko regarding the AE count when
+> different services are configured on the device. That shall be addressed in
+> later commits if applicable.
+> 
+> Changes in v2:
+> - Dropped the per-service AE accounting for rate limiting in
+>   three-service mode; it now uses the same AE count as the other
+>   GEN4/GEN5 configurations. This also resolves the stale-count issue
+>   reported by Sashiko.
+> - Renamed ADF_GEN4_SYM_ASYM_DC_RING_TO_SRV_MAP to
+>   ADF_420XX_SYM_ASYM_DC_RING_TO_SRV_MAP.
+> 
+> Bairavi Alagappan (2):
+>   crypto: qat - enable three-service mode for QAT GEN5 devices
+>   Documentation: qat: document three-service mode for QAT GEN5 devices
+> 
+>  Documentation/ABI/testing/sysfs-driver-qat    |  4 +-
+>  .../intel/qat/qat_420xx/adf_420xx_hw_data.c   | 59 ++++++++++++++++++-
+>  .../intel/qat/qat_420xx/adf_420xx_hw_data.h   |  6 ++
+>  .../intel/qat/qat_common/adf_cfg_services.c   |  3 +
+>  .../intel/qat/qat_common/adf_cfg_services.h   |  1 +
+>  5 files changed, 69 insertions(+), 4 deletions(-)
+> 
+> 
+> base-commit: 9c5d66e1ea78912b8a43ce16a1c14db1357e0ae0
+> -- 
+> 2.50.1
 
 Patch applied.  Thanks.
 -- 
