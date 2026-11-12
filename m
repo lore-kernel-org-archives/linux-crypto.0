@@ -1,112 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.42
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794487912;
-	b=iRCkqW5sQOwSr90OBjO2xy3dqp8lj+nxvCk924SlT7AN8evL7j4lkiOMgMOJIIB3xsia
-	 GlM6EfqiZFcJoRPYZTC2ul3GeMYzNvcAyo2QjyTpUIMIB/KuzxDQ8HsKfjTLMEskd7QZj
-	 g9g4MftnW9jmjspdJdDnbS828tlmJqHW91+XZA08bV4OccXMbYffYm8mhhkT6mNyBdBNN
-	 OOfbK2BVkfWwHN09KWPOt2odIqRaRF5JU4UbDv70kaymlIhfTJe9W4wTzAd2Cj4DwB7oh
-	 5iRoxGljQjkkJJLuFO7qpUS4Z774duJOQwaMQ5JFeYlGAWmH/3vNzbftQdtttvTShuA==
+	t=1794488077;
+	b=F2tc0LxJajxlc8NwR7z0zZbn1pi2oBKoEDK6D7rHYtbPxmdqRLs7ZRwKn/g1rTU8sypN
+	 kLCzM4YCz+yjzkfTAy04xWoljYFMCiW2U6Y+J6nKMuuBPbtNfFLn380ZsVSCzJSeGQGR8
+	 1omajCvb9Q3LBYoasLuAhf1zekGaJZ8aJ+xaLhgx6Zy+S++UA5AdvLOLsoNS/iP79Lspi
+	 jWRsl6pxavzR5JXI4Gz1wceyCyqQlAuZjWtO+PDEXqc1A4mwwXeARg4FgbAWG74WGVc2l
+	 S8GkFHbMBDVUezKt2IyuQzGg2pFMCBP8lIKwQJii5xslaxQ5QP8TJHOx26V5YQvRe2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794487912;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:Date:
-	 Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-Spam-Info:X-Proofpoint-GUID:X-Authority-Analysis:
-	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
-	bh=Xon4MxyvfV7RksGi/nZjGymYtYhAhYgMqriG4HzeboY=;
-	b=pEi35lNytg3HVkXC43PBVbIGgcRqpA/AB6/+irDzNG6kPSEKdrfzOh1nExRhIY/HMK6K
-	 thggDvpYcF9Vc/YvWOcI0snSrBDVF6s14LQ8xAlJmEzt+O6OPrfJIGWqHS3y3XhZWyPit
-	 Ei0NhUrU2AY1G+gWcaKllhUUpR5Ph+/AtnvfzjnIIk7mlDUyxvA1nsiEW+XfOSaPsdTYr
-	 T4twxuJl+iNowYdkfQCCfBluoebTRcSB5otLgdTgjxTviDEmTEnPImJeimYh+71eOhPjm
-	 wiRIHCzniBdtSLuzgdJiLJ02/H/6icFWsUJSqinJvuYuwttfE2nIrcyp4MpQqLcG7xg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794488077;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=trcQmX+BbAYz38DRWZP+EI6bjRcKKYLCaAy48svB6+g=;
+	b=BUBNhfmTUy6SRaMH7Pd7/ih2tt+Lswe4DnXEGKiOh4bUh2pHjrAPg/1jZpujpVHg8ieA
+	 G/ysGukSm8zwKVjw2dk6AvBMZ4ctH1Kghg9giWCYIqOy5BM31IyHGNiHOCW/ZbA35Iz3r
+	 FKxZ6Orcgethn1m7Md9Spmu6ukRe0EkgjvyGy9oWSYtWeteN3ITGCwhD0xcGMIC5cPeIG
+	 hdh8esWfpDnTKdcaBWZzDpfqKhd1hs1mirs3y9btdBWsUyaJYlnqS5Em65Knx6hi54SPc
+	 ryYLFpIlYg4NXd+hWX4R2S40dY/bZYGpOhB+F+2IVHw8fDt/TdVqyCxtMIIJZZ+t8dQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=VbRs5i+1;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=KmFryWxt;
-	arc=none smtp.remote-ip=205.220.180.131
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=openvpn.net;
+	spf=pass smtp.mailfrom=openvpn.com;
+	dkim=pass header.d=openvpn.net header.i=@openvpn.net header.a=rsa-sha256 header.s=google header.b=BENPB5id;
+	arc=none smtp.remote-ip=209.85.221.42
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55ADC606A336
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 12:51:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55ADC606A336
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B62606A31C
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 12:54:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 21B62606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=VbRs5i+1;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=KmFryWxt
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AC8qlji4149469
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 12:51:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Xon4MxyvfV7RksGi/nZjGymYtYhAhYgMqriG4HzeboY=; b=VbRs5i+1+/PtZ9UA
-	E4uuAhmEG7XRPSBXVxphmO9LZEF86BXyAACeumnvnU+2S47/gjdwPTaTI7ohSV+A
-	5OAXUJmog0c+ULJBs4SKDeyMuZFkZd+bwxtrgRFqIkXp7oZD7wPCUrOw3136k2gS
-	mdN4Qa5xvJZZgl/zFOZ+X1FdK37wh812F2JK8JIgUSLPsimpcOHzUBZgJPLou0lg
-	Bf65oSOEkEp9QgH9SEN6mm8qutVbW3yU28b8jimwtVErGmJdugurqcHAAOfdezxj
-	JOH4bhADL9e2gDRLh5cqXMPF4nqsgCTSIjWnku9OExQvCK0I8Z8T9jBav6TIXJYG
-	HbU28A==
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hvxc63f3f-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 12:51:51 +0000 (GMT)
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-860e65f42a5so3256815a34.3
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 04:51:51 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=openvpn.net header.i=@openvpn.net header.a=rsa-sha256 header.s=google header.b=BENPB5id
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-492690dd5daso3418939f8f.1
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 04:54:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1794487911; x=1795092711; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Xon4MxyvfV7RksGi/nZjGymYtYhAhYgMqriG4HzeboY=;
-        b=KmFryWxt0ppgR9ha5R9psCo19GZT94mu1GCpaRj+YrbWVazIvU+M+KSyXeUKiNko1W
-         wejQtE4bC4Rlpr5zhG1UI2heEP7Hgh8HFFFdEu4qsM51soaDGwUgPjsXfvJQ0zDyRLCl
-         ZwkNEuOT25HuPAQAYsFiRf2R4knq5ceSF8QyRvLvp715jjABjBWd6BbFzzoUCAALHYB3
-         F/StiNWj7vlh03WlPRu3cAjA1LuK1aMGenAaM3vzZxsen0HOOQyNtS8OfJ/bbs3LJEuE
-         /ENcsmF5qDKzUKCEKIesrZBEtLJo3SbpqVp/oz8S3GxrKqIreYeVZoI6CbMUCCt9abye
-         Romw==
+        d=openvpn.net; s=google; t=1794488075; x=1795092875; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=trcQmX+BbAYz38DRWZP+EI6bjRcKKYLCaAy48svB6+g=;
+        b=BENPB5idg8kq2/ZFM8OJ0oELpFkoDWcJDfWeAMA4P5kRvuaSgF+ujJGmlVDVE7dxpU
+         66hGKufnwvAHXQ093bNPlmu3uhqqNE7UdFdepYLY7fBKCUJXVBdCgcPaNAEAPqBmo+5D
+         wLyfOhf+7M3EQubrvZL8D0vA1qXKr6Dzec6liTCJsmg6qAHfGc8yuI0J/iK8jvL0mhg1
+         JCdOXSavhNE11/nP2r27RJpPMBjQv9/p9I2oq6k1uUZ3DPsWHkoE0ZBHDm04K2r7iy8P
+         ss6EMVZhPVsjSOLZZXXC+7hUSCGRBkf8bX4gCi6IZrA9IcPV6x+Tq2LHL8DBRQ5CVASo
+         Cmxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794487911; x=1795092711;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Xon4MxyvfV7RksGi/nZjGymYtYhAhYgMqriG4HzeboY=;
-        b=ClMh3Jw/j2nWWs77yso91E5MDaaqWf2CHVhKD6zMFVdaHyu1FInSvzh/oc/+J77I3U
-         INIrzGXmRAkMW6V6xPEllJFElvhRo/UFGBa3u/SYxsNKkuKfX0G0EwZtWbIPfJDdINB7
-         vNA4A1oMO0wZYchE6x2z1RM0t5ImEatSl/5t8LdwtBHM7wz7jmA/CCKAKVJVcPdVXIDH
-         yHui32D6DaHLDw5kr/Zh3OxbLShx5fMSCmZU7+5+P6ctz/PhDazDxNclnLeStftsgeVJ
-         P5Nur3FSrEJvW2eQkXUSYAvmN4RRXOUWzd1zKDVrqAekuS6kXpylmqvpFMShnnlh4E/U
-         5udg==
-X-Forwarded-Encrypted: i=1; AL+hErFEHGXQfSv00ilfABTqWoLzn6r8Mb+UasvlRaVds8sYzEgELZaM/LOVqqN3mo50ZordGuLVFlExeFA1ndo=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8l8ay2m4d3B90vHqyNWWRdr8/Em4kTjhI11UbG16oCXo1Mh917
-	o/B+Oy/8fZnoP9BJdd+t1A8ienzBToVvOWLg+4/VM9OCfiFeyxoeSDGL7knxUEKKvtQPfVCY593
-	ZRTUZeiQ9gUpJ8LhXGbBXWsds8/I7MS0/6J3pOlFDlgCSW04KUVJ6xXY7I0FDtgq2MYQ=
-X-Gm-Gg: AYBFou3ZH1z79LDwyQhtchpvSbvLpP8LEz/uvC6DR1osjJw+IsFttC0zPmJx+OGG7cO
-	O/mSpYTh4FK8YnsC8wIRKE9gwkD9CGaHznyggIO1/d3uzcYsjQUJtuvmPMw3wBD/9fYz52QLupj
-	ybj2sdIV5OW0ojuAoBUuXUUHV9XpXqgpnUH71JPAXo91fjAEC+lHgp3N60YPuiLqb6CaqzuS6cg
-	WlcIF4yilrw9UZTgiKV8PZ+6LGY9yq8F68tqWJRqZLDej0GxUzNH6BGJmzzEhXCxlfk+acrC846
-	qykQ8JEqxCSJNwaJ9EOGEnwM0UQl5R+YEKP44SA94Hjg0r+ylNeZtbhZ65zLlaMD3ni4KbGoBg9
-	8xl6XeHXQPVYHqY51//62xsJsX9acDCcgyGOa9WhIZa7fXxF784+URmwvaX+YbrsJIXUglc+tMb
-	tX/pUFhQ==
-X-Received: by 2002:a05:6830:906:b0:80c:d34f:5f5e with SMTP id 46e09a7af769-860f292723cmr7032488a34.23.1794487910659;
-        Thu, 12 Nov 2026 04:51:50 -0800 (PST)
-X-Received: by 2002:a05:6830:906:b0:80c:d34f:5f5e with SMTP id 46e09a7af769-860f292723cmr7032459a34.23.1794487910241;
-        Thu, 12 Nov 2026 04:51:50 -0800 (PST)
-Received: from hu-kuldsing-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-860dcbc7eecsm7608191a34.15.2026.11.12.04.51.43
+        d=1e100.net; s=20260707; t=1794488075; x=1795092875;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=trcQmX+BbAYz38DRWZP+EI6bjRcKKYLCaAy48svB6+g=;
+        b=EKQhGTiPZnU3JSVztKosmfc0vcdGZtIkMXS3dt1d0Hsvyv39JYoLf4BYE8a5cebgbD
+         fbZIxIkdI3B6tXP+R7v3m/qDeZv6FRgsXXK9hqfESsY8NAnHrbQdVrKgohiFHUKWW8WP
+         OpvstYCOEq/uybRMIKIM4TokL3qfpOWUig93E/m8mk+9sC1KYXNo/V5CD0G6UK63Wgdp
+         lAqyhL9I54g89/vCgixlG5IevmO1t0IjHERH+Eu5Uu6fyGsQcNz6BCY7vYGwfmCzX7EL
+         lto+EHwGoKymK8aX6Ma40Dn+Sou6HOMbkef5c7mPtm6CB6nqSQfVF14pDdHKxmTjlPAu
+         K9Aw==
+X-Gm-Message-State: APuU4Z+funSYFzlP8f8k6m6l3Pcr1k7cRdEp7RBN+r3fzp/GZEu4zDKW
+	OMG7ml0aOeEX1JAufNC8MAQva6aITK2EI9uJeQgftEi0Qncih6g09ZPbcbE76YjeTn7w/VYyW90
+	U3FGia6m4JKe2pWqLnnIVFy/VChLXuYi4EOScF3hJufHQdZVWJmLYHarKFp6out08jwSXVtD9
+X-Gm-Gg: AYBFou1wqdznx+oKouuwTZFndb/CxSwaQE81qhdYh2h/P3vBxFCVZXS53ZTWfIXNJD8
+	E/rsF/a6TeyK4FoXfF+TTWh3LwUiQrvI1ruEhS+JbRdIQoGDaP8upNH4694UHvlpxEzoj56CT1u
+	uA0/ovvc5OvpkpIWPmhfcKimsM39Nq02eTKdUvZiGZ5u233I7MtIWYyR1Tfwe+lBp4W8IG/HVpV
+	ltx4qB61NdCmLxriA/9QmLbMHlLpsl0FDdXB51OL2KxfqcUKCwAl7UgWKFYVwM9Kqf3+5AIklMb
+	zNF6F7SUWXJAskrXk3V3COevBC9+2MMeTBlbWF+vUf5MGy5xzHN5RCElnQvqGVY5oom3jrUdNGZ
+	Wv7m9eE0rTcMvFxIjF42UiPR4sfoTQ0sM4PY0g+JeLS6e/1nQhIGz8kWGO6yQMGxV8ab73nKgao
+	dMpfq4/GV1NJtIxtcF1RaWgBms4mXYfZKnmv0d4RIi5mhQHkMBPfS9okIyMr3aFCGZQPohn4xy6
+	QcxpenAu/kwO8QVf/UFbd9jh3uHmUnOWMtQ7UomyjzKyybbJhM+/HOPTyVC8kTTjeRnsUwenTZO
+	01HZwt0/7RDJsJll3w2MGlGTbTiYJKfGoHCb5md3NpWxrepOVTyGkpjPmQcGNxG3NcuGANRQBA=
+	=
+X-Received: by 2002:a05:6000:25ee:b0:493:edc3:6659 with SMTP id ffacd0b85a97d-499ca56383dmr8890621f8f.49.1794488075428;
+        Thu, 12 Nov 2026 04:54:35 -0800 (PST)
+Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:56b9:769a:f836:6390])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49835858f26sm17202726f8f.18.2026.11.12.04.54.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 04:51:49 -0800 (PST)
-From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Date: Thu, 12 Nov 2026 18:21:08 +0530
-Subject: [PATCH v2 2/2] arm64: dts: qcom: shikra: Correct QCE node
- configuration
+        Thu, 12 Nov 2026 04:54:34 -0800 (PST)
+From: Antonio Quartulli <antonio@openvpn.net>
+To: linux-crypto@vger.kernel.org
+Cc: Antonio Quartulli <antonio@mandelbit.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [RFC PATCH 0/5] lib/crypto: Add AEGIS-128X4
+Date: Thu, 12 Nov 2026 13:54:25 +0100
+Message-ID: <20261112125432.3064939-1-antonio@openvpn.net>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -116,95 +97,105 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261112-shikra_qce_fix-v2-2-2ce112cc2ccf@oss.qualcomm.com>
-References: <20261112-shikra_qce_fix-v2-0-2ce112cc2ccf@oss.qualcomm.com>
-In-Reply-To: <20261112-shikra_qce_fix-v2-0-2ce112cc2ccf@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Abel Vesa <abelvesa@kernel.org>
-Cc: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Wenjia Zhang <wenjia.zhang@oss.qualcomm.com>
-X-Mailer: b4 0.15.2
-X-Proofpoint-ORIG-GUID: iGSW5RNOZqCMoo3OM8-Yd8_EZZO4jRni
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTEyMDA1MSBTYWx0ZWRfX5wkSxxWwWTEP
- PScAq3to/xlUlZB34wzI0LV8xdaIB1wJr3QpcQxSGxTL+xOy8u/abr7mfrUr9n1Jz/tT8t/WACb
- G2DMju/hakG/LU4ACZZ4NFrLODG4+iIPzeduS4ZvkEwTMoNrfe5Kmc/nv1vrmctBV9dcRp+SPOD
- /Z93Gl5nEVgXfy2yO3lcbQqCoeOr3fAkrlvaFjvREk10R699DjHLdb5PKRfnQBySqvpbFj0R4vZ
- 73CpJGr6YQ5TYDPvIAbl+2hR6BVbfjkjuzDz3XlFBXNJcbDtIgxst1btbROXt4agTIk6/fkB3NK
- KxA96zr6tMfQDuX+t4h3+sK2JFQLFC0vMcZqJDynizoNi18ZZYhHf0d/TvyOL/ES9fb9Q9xqa6+
- 60TntG7G+p09eu7fs6O57uVuPg+33M1zv8t8CK2xNGw56PU5Tix+sooTfKB6z2KAjRS6sXRMlUB
- Bu8hIghriHU6dF2zl6g==
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTEyMDA1MSBTYWx0ZWRfX1WCAVcp3JaCf
- 0NC0C4pj4gfbdgsI5NUXrD2oh3Dr3/1cJTRNYvtlDlXMc80wJEXAuT+VfwEAY5n8521MHsv0h2P
- g5mtrrMQlwsVu8ORa3jxc7NlIa0gNqU=
-X-Proofpoint-GUID: iGSW5RNOZqCMoo3OM8-Yd8_EZZO4jRni
-X-Authority-Analysis: v=2.4 cv=O/ysLx9W c=1 sm=1 tr=0 ts=6af5b667 cx=c_pps
- a=+3WqYijBVYhDct2f5Fivkw==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=EUspDBNiAAAA:8 a=nsAWE0-7qdAvx2JcIW4A:9 a=QEXdDO2ut3YA:10
- a=eYe2g0i6gJ5uXG_o6N4q:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-12_01,2026-11-11_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 suspectscore=0 lowpriorityscore=0 priorityscore=1501
- bulkscore=0 adultscore=0 malwarescore=0 impostorscore=0 phishscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
- definitions=main-2611120051
+Content-Transfer-Encoding: 8bit
 
-Shikra QCE requires an explicit core clock, which is missing from the
-current configuration. Add core clock and adjust fallback compatible to
-match updated binding description.
+From: Antonio Quartulli <antonio@mandelbit.com>
 
-Cryptobam is controlled remotely and its clocks are therefore managed by
-remote crypto subsystem.
+This series adds AEGIS-128X4, the 4-way parallel variant of AEGIS-128L
+specified in RFC 10032 (Informational, September 2026), as a crypto
+library with an x86_64 VAES-AVX512 implementation, a KUnit test suite
+and benchmark, and a crypto API wrapper.
 
-Fixes: 099cd05d200b ("arm64: dts: qcom: shikra: Add ICE, TRNG and QCE nodes")
-Tested-by: Wenjia Zhang <wenjia.zhang@oss.qualcomm.com> #on shikra device
-Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
----
- arch/arm64/boot/dts/qcom/shikra.dtsi | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+AEGIS-128X4 runs four AEGIS-128L instances, one per 128-bit lane of a
+512-bit vector, so that each state update is eight VAESENC instructions
+on zmm registers.  On CPUs with VAES and AVX-512 it is very fast even for
+short messages, which is what makes it attractive for network protocols.
 
-diff --git a/arch/arm64/boot/dts/qcom/shikra.dtsi b/arch/arm64/boot/dts/qcom/shikra.dtsi
-index 0a95ad5a5582..d5f0ef863173 100644
---- a/arch/arm64/boot/dts/qcom/shikra.dtsi
-+++ b/arch/arm64/boot/dts/qcom/shikra.dtsi
-@@ -1208,7 +1208,7 @@ cryptobam: dma-controller@1b04000 {
- 		};
- 
- 		crypto: crypto@1b3a000 {
--			compatible = "qcom,shikra-qce", "qcom,sm8150-qce", "qcom,qce";
-+			compatible = "qcom,shikra-qce", "qcom,ipq4019-qce", "qcom,qce";
- 			reg = <0x0 0x01b3a000 0x0 0x6000>;
- 			dmas = <&cryptobam 4>, <&cryptobam 5>;
- 			dma-names = "rx", "tx";
-@@ -1219,9 +1219,8 @@ crypto: crypto@1b3a000 {
- 				 <&apps_smmu 0x96 0x0011>,
- 				 <&apps_smmu 0x98 0x0001>,
- 				 <&apps_smmu 0x9f 0x0>;
--			interconnects = <&system_noc MASTER_CRYPTO_CORE0 0
--					 &mc_virt SLAVE_EBI_CH0 0>;
--			interconnect-names = "memory";
-+			clocks = <&rpmcc RPM_SMD_CE1_CLK>;
-+			clock-names = "core";
- 		};
- 
- 		qfprom: efuse@1b44000 {
+The intended user is ovpn, the OpenVPN data channel offload driver. In
+single-stream ovpn tests over a 100 Gbit/s link, with both ciphers used
+through the crypto API, the sending CPU spent 1266 cycles per packet with
+AEGIS-128X4 against 1448 with AES-GCM over TCP, and 1032 against 1122
+with UDP GSO input. It is posted as an RFC because ovpn can't use it
+yet.
 
+The library mirrors the AES-GCM one: one-shot encryption and decryption,
+and an incremental API for nonlinear data.  The generic code keeps the
+state in the same layout as the assembly, so the incremental functions
+can switch between the two between any two calls, as needed when the FPU
+isn't usable.
+
+Encryption throughput from the KUnit benchmark on a Ryzen 9 9950X, in
+MB/s:
+
+  data_len   generic   VAES-AVX512
+        16        10           581
+        64        41          2351
+       256       159          8986
+      1420       576         34521
+      4096       987         46761
+     16384      1308         79588
+
+Open questions:
+
+- There is no AVX2 code yet. AEGIS-128X4 can also run with VAES on
+  ymm registers, two per state word, which would cover CPUs without
+  AVX-512; for now they use the generic code. For the same reason,
+  unlike AES-GCM, the AVX-512 code is used on CPUs with
+  X86_FEATURE_PREFER_YMM too. Should an AVX2 version be part of this
+  series?
+
+- Is the crypto API wrapper (patch 5) wanted? ovpn currently uses the
+  crypto API for AES-GCM and ChaCha20-Poly1305 (but it could call the
+  library directly).
+
+- The assembly is a port of the libaegis AVX-512 code by Frank Denis
+  from C intrinsics; as libaegis is MIT licensed, the file is
+  dual-licensed GPL-2.0-only OR MIT and keeps his copyright line.
+
+Patch 1 is independent of the rest: the AEAD test template's check that
+decryption clears dst on authentication failure can't fail with its
+all-zero plaintext. AES-GCM and AES-CCM pass it with a random one.
+
+Testing: the KUnit suite passes (RFC 10032 test vectors, the shared AEAD
+test cases and a Monte Carlo checksum from an independent Python
+implementation in gen-aead-testvecs.py) with the VAES-AVX512 code, with
+it built in but AVX-512 hidden from the guest, and with the generic code
+only. The crypto API self-tests pass with CRYPTO_SELFTESTS_FULL.
+
+Antonio Quartulli (5):
+  lib/crypto: tests: Make the AEAD dst clearing check effective
+  lib/crypto: aegis128x4: Add AEGIS-128X4 library
+  lib/crypto: tests: Add KUnit test suite for AEGIS-128X4
+  lib/crypto: x86/aegis128x4: Add VAES-AVX512 optimized code
+  crypto: aegis128x4 - Add AEGIS-128X4 AEAD algorithm
+
+ crypto/Kconfig                          |  11 +
+ crypto/Makefile                         |   1 +
+ crypto/aegis128x4.c                     | 173 ++++++++
+ crypto/testmgr.c                        |   7 +
+ crypto/testmgr.h                        | 119 ++++++
+ include/crypto/aegis128x4.h             | 275 +++++++++++++
+ lib/crypto/.kunitconfig                 |   1 +
+ lib/crypto/Kconfig                      |  14 +
+ lib/crypto/Makefile                     |   9 +
+ lib/crypto/aegis128x4.c                 | 509 ++++++++++++++++++++++++
+ lib/crypto/tests/Kconfig                |  10 +
+ lib/crypto/tests/Makefile               |   1 +
+ lib/crypto/tests/aead-test-template.h   |   5 +
+ lib/crypto/tests/aegis128x4_kunit.c     | 352 ++++++++++++++++
+ lib/crypto/x86/aegis128x4-vaes-avx512.S | 470 ++++++++++++++++++++++
+ lib/crypto/x86/aegis128x4.h             | 167 ++++++++
+ scripts/crypto/gen-aead-testvecs.py     | 166 +++++++-
+ 17 files changed, 2284 insertions(+), 6 deletions(-)
+ create mode 100644 crypto/aegis128x4.c
+ create mode 100644 include/crypto/aegis128x4.h
+ create mode 100644 lib/crypto/aegis128x4.c
+ create mode 100644 lib/crypto/tests/aegis128x4_kunit.c
+ create mode 100644 lib/crypto/x86/aegis128x4-vaes-avx512.S
+ create mode 100644 lib/crypto/x86/aegis128x4.h
+
+
+base-commit: 33b4f31b1aea3f62b61c892daefc0e6a77859032
 -- 
-2.34.1
+2.56.0
 
