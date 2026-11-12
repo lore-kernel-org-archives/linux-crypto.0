@@ -1,112 +1,67 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794476527;
-	b=OUURQ/6vCuoYsgq0QWhC9xbhiLozRF45jQUMIfh+7kDJSQuBXkHTewKtPh9/QH0kybDh
-	 tBmQmaatBOsg2xPC3e0+m2/ziGY3DIQpNeLS4O35G+46+kK2oFUVnVEqxPNDuWkDni23T
-	 BVQTIJm1bPLwysud0g99dDcyu2L3kScmHjD/ZFPonyYu69VWJ+N2GvUF+Ye5sQGi+nVRd
-	 hOh0KQ18zKkrAJ4lvp9nzaBnTS9QPuB03caIDjLP7gPuId80N6v//Xw1A1Rr0fJGyhoen
-	 fW6EIqbbl2ooBcWx7fbFbi9FlcTRfISOTbh3h8l97bKUehhh4kiWWEq8OVeG3OfJzKQ==
+	t=1794477321;
+	b=n57L9AuReUafq5NOnScQJ7vy6/RXJO4c7rIYA1me5qSBNerBHKsuQTdOToEmpwpBVCoE
+	 SrT23wZdYSHg885LuFlDiv7/nkAR3qhUA5rZPz1XMPgRCcGDeIbHYkBPXC8zIfrTil9x1
+	 ACiJwvsQWvo+qJzZfg3871/ZMecWQllWMQsMW7w+eTr/rlHaC04sdySozocq7V21WbAhB
+	 0S1N+nXAZ8/9u82m/LZj0RT+EjORSn6Kop/wwR3gPDNIdNFcn+pEVfPViMU5DGAkvcNp/
+	 HLD57qpSOXVST6mSHfHu+GxXi0pufnBN2lrGx8M02EKMGJ8Mhl6qm+jMDdSCNjp1HQA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794476527;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Proofpoint-Spam-Info:X-Authority-Analysis:
-	 X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
-	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=nt2xdcrsDBXkfw85VObtuji4vNEs3iCSWZ4QwJDYQYM=;
-	b=qIm9Qq9b6VYySAR5eDrPdYIjk+PImgvaHDXo6e3qhtOJTu+IXnM4Lcu9U3E57AZTwmdU
-	 rgB3vxWvIcOaA//ZDXuoUQepV7qA68Wzf6cBdMPM0eNx1mT9HH3236YNNsQh6LOaTy3YL
-	 /oz4h5yCD665tv5rDGEyErKO8vf9ftK8ZSRKu/HwmeADLtEcLIBk0QI5w0mLLFBkcIlGv
-	 Xp58t0LtEvRhQeQSQSdy4M5iNrZve6MXiXRlzXlambpPoj8wmWWsFTmkJ31wgvvzdmJnu
-	 3Bwv/xHlav/jPHvUvoo/FwLgI1qPmxWMe/vCQTrmESQ5SgZF+G08Z641B5rG3qIAuhw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794477321;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=daYdxD4j4VrMaCUKay40VU3EbgYmyzjrfDBHdslgp3M=;
+	b=bh4iOP9ebbbCows1MI8jIS5Ro/VY8iAyaJ4/XBY7Zjf2sCvzoZ6lvN7dDiEd6oE6wWTe
+	 1YtgoZqc0fEwyr1cCK3wQUE/i/ceZnMBySiTHkpF3sY1lZ11o1T1cPlJk1UQAEfKQvK7T
+	 rMsEXnrViHWTrcaGLQ/i02TW8O1smdQHsAHPLYwyGvkRNODlX3DD6bCcQb3g45juhaAM4
+	 KgE++ps7KGZBG4sanlf0KqSZSDTPH18HrL3M6Ec6LRXYsilRVb2tXtJ5jif/k9NzdTCKq
+	 haG4W4k429lXOzwMfttLrKOktN7v6eR/un+cHzKug9+NNQrpssj2hm9e48xild7+IRg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Hx3v5crM;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=YxIEq3pd;
-	arc=none smtp.remote-ip=205.220.180.131
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=rjbfADIe;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB770606A323
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 09:42:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DB770606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6465606A31C;
+	Thu, 12 Nov 2026 09:55:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E6465606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=Hx3v5crM;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=YxIEq3pd
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AC8rcAj597692
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 09:42:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nt2xdcrsDBXkfw85VObtuji4vNEs3iCSWZ4QwJDYQYM=; b=Hx3v5crMD7fZ0tUG
-	H6Yd2G2fptq2eQL8VifPCei8qqWNoh0xfSTI/5rrcIHF+pmmO8Gm6QAoXLWqvTWc
-	gJPJzgLTZYlxF/I47Kv8pMbEVgT0etivLOdubn2SSAfIjgk79Bc95Smjf8YfvITn
-	Tg29Ef41AcWVR5Y1n0WRx+HddvmPLmw8gPfo4W0cwHDBIoq5jBPBtSuYK0OFrG+1
-	UN1bc892SzAqaS4VEAGB35jkrGO0SnyeBuFeGtLRTJViOdqAua31gpAXp5sXcdfY
-	y0DoXhbULxMHMvtsnS5PseH920Aa4XLSafrcqOVS1dc4YeBGmJNpt94waLmisrHP
-	ifPutQ==
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hvt1543va-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 09:42:05 +0000 (GMT)
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2ed077a15c3so42325365ad.0
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 01:42:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1794476525; x=1795081325; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=nt2xdcrsDBXkfw85VObtuji4vNEs3iCSWZ4QwJDYQYM=;
-        b=YxIEq3pdRHgG8bAw0t6tglYuUfoEF0ToXp5xLVargiTNmk8xkRnhj2UXn6IEhNAW8H
-         G+YZF9rixywlDrecDXJahoOWC2uh4wYxNgo5i8bo1Y8N73mi3G3P35XTKBcl75V6e6RX
-         waeDd8x1znWWfSgOQYzswY9jG9Y3SdUpjEzJapT9uEwPd8FUjJr63arSpG52TWBN4KxU
-         LkSUSZ0UEOohqyXMACp158szDPGEjbFbOR3ob2ZLy7s532Nfdk/NhEaSfLPKhYBNMAz7
-         cABvV/OF5HVb3ttyijh2Zi1pkrcTquHsEIb2dMzovXMJD30TTyzyF4un31tUxGCsJiqQ
-         8jDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794476525; x=1795081325;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=nt2xdcrsDBXkfw85VObtuji4vNEs3iCSWZ4QwJDYQYM=;
-        b=qQcilO3c2CJYrz5STDoYh8uFYi5aHlfNhtRbVhx2Gdg5bY1A2+VXUVkhSz0toEkXVS
-         mbGOrN1NUnPIYl/eSyF27WJ/94M+FKFzIw0U4FOs6IKVxU0bIR7ptQMbbYvnCxS9voM7
-         VqFp/9nvJdwdjAlz5ZDy9bRn8XUb0lL/Ei3sqGTpH5z5AmeRiIfvnCEuEd4S+a+EDU7e
-         gfE05TERIolccHZQ7UCiewN4FXH34CzroH1Gfcx3367ijPhzsMIJ7qDTE+djH0YFaJli
-         x7Kx9WMFr9tSb2W+9nkALRB3iNINEIMe+TcaylrWJ9w2zkzWAnITgCpxcwkKoc4b71u+
-         bo8g==
-X-Forwarded-Encrypted: i=1; AL+hErEI0UFbohEM0HGQAIYU9wIBjfX94AkKlz5L7kKdNJHQXw/x2ei9jP6y7n2/Om2dW6DTvB6+22vmZcdpBWM=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/k5Qslyj3z+k5n7S/+EimK/dqlZgiIWFHzzUaTzlvXaQuOJttc
-	OWQirf/MBDyRfBg4TPNni9O62u3Z32ouomJC1WRw5b3zYAO/X6qnn/2VxJGZhjZM3hy8CLEYpG/
-	pCngjsbtwnfUvtaQHRecjQ0OTp9CXMmwbFnYN7asK7/ftLGcihb9Xse/3m3Zu6MX4aDE=
-X-Gm-Gg: AYBFou3jWiBQxhoE8RzhhLp8BG6hZsvocX3MDKch+/bQ+cPEgEciBL3CVDO+gJ0WkLd
-	HpuT5BHgaR/bBGB7RIRhPiz71L3v3CzmaNBSoxTTxqWN91uySpskhYTHmMHQr5Q9+qoQPwm0pjI
-	EpQFqnanMVHx7D7EHwo+w+z/teJThPXiGT5+6PXmIJYYT404vQ4XjMWdFdn/9KmyUKNLJ3SPMHd
-	DOp3yjVoUisk1FxKaC3Xr4em3lTcboSLryPUYWTL9OJ3fagVPwKGFsNiWDoQou4b5zuSQZhsGYd
-	Tz/vktJyTH7BSzPzJ2EnC6s3QOrav5Z+OD4iioSZzMviesVM3l/k5Mo5Y3Z+a3rb6bbw3IJ9dAM
-	PRF04NkJXpcFopFLBpAA1AJ7WglG4J5YyXmw3k025wgHev0bvRcqI7tj/AoJb5IbB6cKV/lTBU5
-	APAKs=
-X-Received: by 2002:a17:902:f683:b0:2e8:93b5:c555 with SMTP id d9443c01a7336-2edd7aeae6dmr51892275ad.61.1794476524721;
-        Thu, 12 Nov 2026 01:42:04 -0800 (PST)
-X-Received: by 2002:a17:902:f683:b0:2e8:93b5:c555 with SMTP id d9443c01a7336-2edd7aeae6dmr51892065ad.61.1794476524241;
-        Thu, 12 Nov 2026 01:42:04 -0800 (PST)
-Received: from [10.218.31.125] ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2edb6d7eafbsm30813505ad.36.2026.11.12.01.42.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Nov 2026 01:42:03 -0800 (PST)
-Message-ID: <c8ec7abb-cd6d-4f27-83b4-bd76a459958f@oss.qualcomm.com>
-Date: Thu, 12 Nov 2026 15:11:58 +0530
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=rjbfADIe
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=daYdxD4j4VrMaCUKay40VU3EbgYmyzjrfDBHdslgp3M=; 
+	b=rjbfADIeRC+SXRzNKMV7WfT/TGkkV+2VbFSNJGhDW3wRToHbNxkXvbAONNA79sgzM1ZQODJBUcI
+	n3FFHtLoNo75rhAqJ3nF+k2BMJMkIAnNLZ66NV8/CEWznwAZyVwTnn/jClKRbKna1tVb8pQwUMpZ0
+	X7Pi6k43LFeSpPC9CQxYOE1KXchpTmnZ4kRKopTHvBpMQTigfWd3Ck5YXmUraSwfljfcuSvHrQhm/
+	PKaw/DnDKjAKFSE/9k78XKFA4f3RBLCYsm50qWm6XVe5k3xzZrarRZ/smE9mSQaHVCuCUH7FpIPlL
+	MKgY2FkcDqkou4Nve8LoCDomJN4KC8fuFJ+w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xRRWL-0000000EDds-3fiC;
+	Thu, 12 Nov 2026 17:55:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Nov 2026 17:55:05 +0800
+Date: Thu, 12 Nov 2026 17:55:05 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Erwin Pawliczek <pawliczekerwin@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ignat Korchagin <ignat@linux.win>,
+	"David S . Miller" <davem@davemloft.net>,
+	Lukas Wunner <lukas@wunner.de>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Paul Louvel <paul.louvel@bootlin.com>
+Subject: Re: [PATCH] crypto: ecc - Randomize the initial Z in
+ ecc_make_pub_key()
+Message-ID: <avWM-fsR_sC11zXB@gondor.apana.org.au>
+References: <20260928042641.307683-1-pawliczekerwin@gmail.com>
+ <20261026034429.742489-1-pawliczekerwin@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -116,69 +71,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] soc: qcom: ice: Add runtime PM support
-To: Eric Biggers <ebiggers@kernel.org>, sashiko-reviews@lists.linux.dev
-Cc: Adrian Hunter <adrian.hunter@intel.com>, Ulf Hansson <ulfh@kernel.org>,
-        Abel Vesa <abelvesa@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        "Martin K. Petersen" <mkp@kernel.org>,
-        Bjorn Andersson
- <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, linux-scsi@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-References: <20261022-qcom_ice_pm_enable-v1-0-f7a84086c651@oss.qualcomm.com>
- <20261022-qcom_ice_pm_enable-v1-3-f7a84086c651@oss.qualcomm.com>
- <sashiko-outbox-181342@kernel.org> <20261024183424.GE2553@quark>
-Content-Language: en-US
-From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-In-Reply-To: <20261024183424.GE2553@quark>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTEyMDAzOCBTYWx0ZWRfXxD4iO8vOJbyp
- aAabXob6slV1A0OMkxgHxkOrkLUeCkBENvN9NxinU0kmRSY0OkFcXMucCjzVHCQilPCxkTuI7jZ
- eaiospYig3V3NjdlD+AMxNvxslXng/0=
-X-Authority-Analysis: v=2.4 cv=Yrya1IYX c=1 sm=1 tr=0 ts=6af589ed cx=c_pps
- a=cmESyDAEBpBGqyK7t0alAg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
- a=VwQbUJbxAAAA:8 a=FQAUsAXO1x4B5DPK-TgA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
- a=1OuFwYUASf3TG4hYMiVC:22
-X-Proofpoint-GUID: l_hffnk1Ni_ZywZHIwmpu_N1C_uR6Z7o
-X-Proofpoint-ORIG-GUID: l_hffnk1Ni_ZywZHIwmpu_N1C_uR6Z7o
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTEyMDAzOCBTYWx0ZWRfX34vp9clSZHZz
- cBsc9PuJjAbYz3slukl0AcabcLuwBHfIdIXxlrawngsfkj5mr1iWmmOCjXbAtGeZr3z+s5G9e27
- fjI9p+VArJiU9LKYtzhrk6fg+Phq2M1S4/EnjMiN0lu7qdE79Xn3szg6JtE6gipcL7VJJfHAEo0
- EZQymetNz2T+iUSOcBFnDDUvvg1QTga+HkgpmC/AOUPwbR80a6ASYuwoQVP54Z0Vf/XhNCBVgNb
- 1p5w2q1SxpjrU539EcxrBL+hPh6kRde0k3YWtmyeoklzR5YyLGKbcmGGsUL528tr8LD5BLHsK4p
- c7piUe4ByJL4IDdL/Xs1aTNOev/R+h0ktznRK0NZOjwX+dbVEFrpEqXRAeyXOxE5jQDFSLbTxnp
- MxViXAT7tLsnz6iia8dXR/1YbCT51yRs43erqolR+y6Vhre+Ss7U74oY6dSfa3vYaYFb8q5YQck
- 3X/Rezm9GZDMhMM2iPw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-12_01,2026-11-11_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 malwarescore=0 suspectscore=0 impostorscore=0 adultscore=0
- lowpriorityscore=0 phishscore=0 priorityscore=1501 spamscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611120038
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261026034429.742489-1-pawliczekerwin@gmail.com>
 
-On 25-10-2026 00:04, Eric Biggers wrote:
-> On Thu, Oct 22, 2026 at 10:34:40AM +0000, sashiko-bot@kernel.org wrote:
->> Thank you for your contribution! Sashiko AI review found 5 potential issue(s) to consider:
->> - [High] soc: qcom: ice: unclocked MMIO access in qcom_ice_enable() when !CONFIG_PM
->> - [High] soc: qcom: ice: unbalanced runtime PM refcount in qcom_ice_enable()
->> - [High] soc: qcom: ice: clock and runtime PM leak on probe failure or unbind
->> - [High] soc: qcom: ice: broken pm_runtime return handling in qcom_ice_suspend()
->> - [High] soc: qcom: ice: skipped HWKM re-init and unclocked restore across system PM
+On Sun, Oct 25, 2026 at 10:44:29PM -0500, Erwin Pawliczek wrote:
+> ecc_make_pub_key() calls ecc_point_mult() without an initial Z, so the
+> final Z, and therefore the input to vli_mod_inv(), is a deterministic
+> function of the private key. vli_mod_inv() is not constant time, so
+> key generation leaks information about the private key through its
+> running time.
 > 
-> I'll review this more carefully once these issues have been addressed.
+> crypto_ecdh_shared_secret() already passes a random initial Z, which
+> blinds the inversion input. Do the same in ecc_make_pub_key().
+> 
+> Key generation is used in the kernel by Bluetooth SMP and TPM2 HMAC
+> sessions, which generate ephemeral P-256 keys.
+> 
+> crypto_kpp_generate_public_key(), KVM guest on an i7-1165G7 (median
+> over 4 boots of the best of 9 runs of 300 calls):
+> 
+>     P-256:   744.9 us ->  753.2 us (+1.1%; within noise)
+>     P-384:  1674.2 us -> 1651.6 us (-1.4%; within noise)
+> 
+> Suggested-by: Ignat Korchagin <ignat@linux.win>
+> Signed-off-by: Erwin Pawliczek <pawliczekerwin@gmail.com>
+> ---
+> Replaces "crypto: ecc - Use constant-time modular inversion in ecc_point_mult()":
+> https://lore.kernel.org/all/20260928042641.307683-1-pawliczekerwin@gmail.com/
+> 
+>  crypto/ecc.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 
-Sure Eric, sashiko pointed valid issues in current code.
-I'll fix in next rev and then please feel free to review.
-
+Patch applied.  Thanks.
 -- 
-Regards
-Kuldeep
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
