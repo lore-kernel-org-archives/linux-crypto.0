@@ -1,57 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=210.118.77.11
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794481220;
-	b=l5NkKSIqsBfMcuXnGBJCDiIc92e6eR/oRFR8DSSncYxBVTnUa8cxeKGQDFMYGeLFw9/X
-	 rYizAHNbATZjdmbHS61aY4FSUfT66nxtsU43KKXD2Guch/Cp3GVtb1JLuXIe6a3b+MBR4
-	 ujF0aqkJxYk9pi++WPuGq+JuM/qbPxhk3RYF3FbXPdVeWV3frA897q+jHWXv8L/Z1MPsH
-	 x+CWcEb5eOULuGoSbvP110ocACCxdcWJAa+a5DsyX6Xi/6RyZUe6Wa/Sok/F+Z852qka5
-	 wOPlb4prZYCx46+XWoraSpvPeT7nrfgSbXM4celuM+Jbe7bEKvHUpY/M8lr55STVETQ==
+	t=1794482753;
+	b=uyn3ezUhKHZDketJEvQsshKc+C2LUCakBRMUb1rZD505lo/7ELTT/OHxmqXbebTb+Bkj
+	 bIMt1AlyFKHlItoImxR5gr9jR0i2NX43kM3vY6Efq2Hl7fdqF2AT8q2DLbGQqV/krXtG0
+	 gfIvrrU46yuoKqmNgE3LA/u3INTqEa6OSyyb5ikVE7jhub38JBvHaPyNwTCHNz33CXZys
+	 plhKrbT65PZBK/5mtca5yTstYgzP0jqVhMJGVQ3Nc2pORV/4uKSUiSaws/ViS9S+I00Lr
+	 I+ZkVAq9PhZKnebNNbTpXxNiyMlWX/UWKBbycfmsuf4Jc8I1JuxjipVoXVqhttLsq2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794481220;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Ji73FbGWrdaMviN2yljUtW8HkBEVveCjduuH/AySRBw=;
-	b=x5dO9jLOA4lfxnER2l7VOU23gMF+KUAcQvJkGpesan+u4wbgEFDR7rg+g8CZq7r0HRVz
-	 QTWIEWsFf6eKQtQMEOGD0yl3YBHaPDsHAPnpRnxrt7ugs1Hh3Vf6FIWnP6qVRGC8cv3By
-	 FivaIMKEt7Ws/vlkdgmZ40HvmxhiV6zJtmGaRXJtwu/bvDE7rSUxXkrX+2o2MW7lVTbB1
-	 eRdjYVaG0/e9E2pz3jEFEF0docKDj9jeKbLkdHBKngxGhLeJSf19akKtOTcODjPw8RJCQ
-	 9GnzQ8gFHOakdRC5YwWvZXQ0LCE5bvJDXa4osa1r+0aw5f6T2s+ZSMx+mrrJFB5js3g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794482753;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:
+	 Content-Language:From:In-Reply-To:Content-Transfer-Encoding:
+	 X-CMS-MailID:X-Msg-Generator:Content-Type:X-RootMTR:X-EPHeader:
+	 X-CMS-RootMailID:References;
+	bh=ipHsKGzdySUFK43kUSa1EUse/xjwdqGzCAkyYU+4IsQ=;
+	b=wOjgBBnKlTbkNYq1oXMwxGdYjuep2KycyIihhh8gv/iXoDyANppBkgwAOIItL4VpQZq8
+	 XHEpKfUxECJU2628+BNWeE3MHnrGjW/jhMqnKHolh8pIe1p/8uBn6aAfjU5mLo4XZMzWH
+	 z63ykvgpE9t3F9f4+e2G1b1YrhKBYOlvVNRxqJT356OEFy0z2ZZoYd0+1vBGm9bV4QMhF
+	 fOvJUdd7vaX3/Diqtfgzr2RtEKOkr4fuRjIPgZ3jJjNBQOvwgggmCATogi6WXKb5sKxwc
+	 DYaEcHezSL2HunlmfSSb7i0m+E6QIpZACNwDIaZCYgY0SmgWpXzwaGwh5QHV470MDxg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="eB/oB02a";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=samsung.com;
+	spf=pass smtp.mailfrom=samsung.com;
+	dkim=pass header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=AvhYjNqW;
+	arc=none smtp.remote-ip=210.118.77.11
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B0F606A321;
-	Thu, 12 Nov 2026 11:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBDC606A880;
+	Thu, 12 Nov 2026 11:25:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ABBDC606A880
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eB/oB02a
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25AAD1F00A05;
-	Thu, 12 Nov 2026 11:00:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794481219;
-	bh=Ji73FbGWrdaMviN2yljUtW8HkBEVveCjduuH/AySRBw=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=eB/oB02atLGi6Z1dPMiOSd78bKpNvo9PnonbLmcNYBhMV2mbIgJgDTESUpyJySRyt
-	 Ej9BMJgd7RgZN3L+9Tq7Agj2xwPdLCYEN5jv0Ldsw9Vz9ieIqwPabvINbHwkca6trl
-	 dtLCLxz47SS+j2BvoBeAv+9K4B20x4MNL+Ze3ZPNRBpFRFZ5AmA9xfErYEF5AslOAh
-	 3NiJ9+Wc3Jas5qeKmXi7zKUIC9TixJm94jRXksNRy2h+Tzc3bD/Yigx//XlCtV3Sm/
-	 T21MSeE6qu0zn+7cjDwUh46tyEqpD8LjvjCg5x1HaDkyxSedp1IyiUJvN/kAGhEQEs
-	 3gfO5oFWcXlWw==
-Message-ID: <sashiko-outbox-210983@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH] crypto: ecdsa - Reject non-DER X9.62 signatures
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Florian Bauckholt" <florian.bauckholt@cispa.de>, "Lukas Wunner" <lukas@wunner.de>, "Ignat
- Korchagin" <ignat@linux.win>, "Stefan Berger" <stefanb@linux.ibm.com>, "Herbert
- Xu" <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
-In-Reply-To: <20261112-ecdsa-x962-der-v1-1-36b24c5f5e11@cispa.de>
-References: <20261112-ecdsa-x962-der-v1-1-36b24c5f5e11@cispa.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Nov 2026 11:00:18 +0000
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.a=rsa-sha256 header.s=mail20170921 header.b=AvhYjNqW
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20261112112543euoutp010f016eb7fa47ed13835ab3afff799d5d~nSIxA7B940644806448euoutp01J;
+	Thu, 12 Nov 2026 11:25:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20261112112543euoutp010f016eb7fa47ed13835ab3afff799d5d~nSIxA7B940644806448euoutp01J
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1794482743;
+	bh=ipHsKGzdySUFK43kUSa1EUse/xjwdqGzCAkyYU+4IsQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=AvhYjNqWqGDSDWciDHfOXU3HOJjD8I0PqyiBFvEino+CXJ/Ts8YCaLP0CTP7r83SV
+	 D0u2NoLv9bExEfdz3CuNTS48kAhibm5QmC2eYY3NRLEJ1vo1+7ksYjGgKf8B93b7Ln
+	 eIdw+0vhCIWca8FGDq/+owQFBplfxnoB2Ht47E5M=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20261112112543eucas1p2f3aa7565474df56edb967cbecfd1858d~nSIwwzSqJ0570005700eucas1p2G;
+	Thu, 12 Nov 2026 11:25:43 +0000 (GMT)
+Received: from [192.168.1.44] (unknown [106.210.136.40]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20261112112540eusmtip2793b80df566384250842db8b2aa8054b~nSIuZrphA1705017050eusmtip2o;
+	Thu, 12 Nov 2026 11:25:40 +0000 (GMT)
+Message-ID: <feca1837-fb17-4d96-b6d9-7e5d413ef222@samsung.com>
+Date: Thu, 12 Nov 2026 12:25:40 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,90 +63,62 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/15] lib/lz4: stop forking upstream LZ4, vendor it
+ instead
+To: Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+	<ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+	<justinstitt@google.com>, Russell King <linux@armlinux.org.uk>, Thomas
+	Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+	<James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, Heiko
+	Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander
+	Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
+	<borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
+	Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, Minchan Kim <minchan@kernel.org>, Sergey
+	Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>, Andrew
+	Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-block@vger.kernel.org, Yann Collet <yann.collet.73@gmail.com>, Nick
+	Terrell <terrelln@meta.com>, Gao Xiang <xiang@kernel.org>, Chao Yu
+	<chao@kernel.org>, Jaegeuk Kim <jaegeuk@kernel.org>, Eric Biggers
+	<ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, David
+	Laight <david.laight.linux@gmail.com>, Sungguk <sungguk.na@samsung.com>,
+	Jaehoon Chung <jh80.chung@samsung.com>, Marek Szyprowski
+	<m.szyprowski@samsung.com>, linux-erofs@lists.ozlabs.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-crypto@vger.kernel.org
+Content-Language: en-US
+From: Michal Wilczynski <m.wilczynski@samsung.com>
+In-Reply-To: <20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20261112112543eucas1p2f3aa7565474df56edb967cbecfd1858d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20261106144247eucas1p15bdd0704f32d1cb3b19f9d2296a0cbc3
+X-EPHeader: CA
+X-CMS-RootMailID: 20261106144247eucas1p15bdd0704f32d1cb3b19f9d2296a0cbc3
+References: <CGME20261106144247eucas1p15bdd0704f32d1cb3b19f9d2296a0cbc3@eucas1p1.samsung.com>
+	<20261106-lz4-vendor-upstream-v2-0-ee04c3f0d7dc@samsung.com>
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [High] crypto: ecdsa - keyctl_pkey_params_get_2() breaks
-  ecdsa_x962_verify()
---
+Hi everyone,
 
-commit 507f70b0a1dc8642ced214dd9427e506b434b4b9
-Author: Florian Bauckholt <florian.bauckholt@cispa.de>
+On 11/6/26 15:42, Michal Wilczynski wrote:
+> 
+> The import is the v1.10.0 release tag.
 
-crypto: ecdsa - Reject non-DER X9.62 signatures
+It appears v1.11.0, followed by v1.11.1 were released in the
+meantime. The next revision of this patchset will import from the
+v1.11.1 release tag to take advantage of the newest code. It already
+contains the backported commits so I will drop the backports.
 
-This commit enforces strict DER encoding for X9.62 ECDSA signatures by
-validating the INTEGER and SEQUENCE headers and rejecting trailing bytes,
-along with adding Wycheproof test vectors for invalid BER encodings.
+I will redo all the measurements with the newr version for the v3.
 
-> diff --git a/crypto/ecdsa-x962.c b/crypto/ecdsa-x962.c
-> index ee71594d10a06..69e932bbd5511 100644
-> --- a/crypto/ecdsa-x962.c
-> +++ b/crypto/ecdsa-x962.c
-[ ... ]
-> @@ -73,6 +88,24 @@ int ecdsa_get_signature_s(void *context, size_t hdrlen=
-, unsigned char tag,
->  				      sig_ctx->ndigits);
->  }
-> =20
-> +/*
-> + * The BER decoder accepts a SEQUENCE tag without the constructed bit,
-> + * long-form and indefinite lengths, and ignores data following the SEQU=
-ENCE.
-> + * DER permits only the constructed tag, the shortest length encoding and
-> + * nothing after the SEQUENCE.  The decoder has already checked that r a=
-nd s
-> + * fill a definite-length SEQUENCE exactly.
-> + */
-> +static bool ecdsa_x962_seq_is_der(const u8 *src, unsigned int slen)
-> +{
-> +	if (src[0] !=3D (ASN1_CONS_BIT | ASN1_SEQ))
-> +		return false;
-> +
-> +	if (src[1] < 0x80)
-> +		return slen =3D=3D 2 + src[1];
-> +
-> +	return src[1] =3D=3D 0x81 && src[2] >=3D 0x80 && slen =3D=3D 3 + src[2];
-> +}
-> +
->  static int ecdsa_x962_verify(struct crypto_sig *tfm,
->  			     const void *src, unsigned int slen,
->  			     const void *digest, unsigned int dlen)
-> @@ -88,6 +121,9 @@ static int ecdsa_x962_verify(struct crypto_sig *tfm,
->  	if (err < 0)
->  		return err;
-> =20
-> +	if (!ecdsa_x962_seq_is_der(src, slen))
-> +		return -EINVAL;
+> 
 
-[Severity: High]
-Does requiring slen to match the exact DER SEQUENCE length break
-keyctl(KEYCTL_PKEY_VERIFY) for valid X9.62 signatures in this tree?
-
-In struct kernel_pkey_params, out_len and in2_len share an anonymous union.
-Since commit cb481e59ea6c ("KEYS: fix overflow in
-keyctl_pkey_params_get_2()"), keyctl_pkey_params_get_2() overwrites
-params->in2_len with info.max_sig_size:
-
-security/keys/keyctl_pkey.c:keyctl_pkey_params_get_2() {
-    ...
-	case KEYCTL_PKEY_VERIFY:
-		if (uparams.in_len  > info.max_data_size ||
-		    uparams.in2_len > info.max_sig_size)
-			return -EINVAL;
-
-		params->out_len =3D info.max_sig_size;
-		break;
-    ...
-}
-
-keyctl_pkey_verify() -> asymmetric_key_verify_signature() then passes
-info.max_sig_size as slen to ecdsa_x962_verify().  As noted in the patch
-commentary, until the separate keyctl fix is applied in this tree, any
-valid DER-encoded X9.62 signature shorter than max_sig_size (for example, a
-70- or 71-byte NIST P-256 signature where max_sig_size is 72) fails the
-slen check in ecdsa_x962_seq_is_der() with -EINVAL.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261112-ecdsa-x962=
--der-v1-1-36b24c5f5e11@cispa.de?part=3D1
+Best regards,
+-- 
+Michal Wilczynski <m.wilczynski@samsung.com>
