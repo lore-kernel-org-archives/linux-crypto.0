@@ -1,55 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794455154;
-	b=Wyl787qifmPp8rjUsnYr/Gj9M6EMlYEIWK0LL4xkS5qSAurAjnOqSS5JJuzG7hzum9+C
-	 KIrQ/AUXo2zNuiXlwJQpPRxBCxfbvpBgrI0qoSNKR3vTTValz6JRuXqa8mmoSfUXQNlb+
-	 pavQwvUm+qO1TXByZZiVBqPtCGKU6HvScR8f2/vefNOI/s5aVvMGB7q+DHSR0MdlZ2ALK
-	 VMWmnGB1+34KVREBrPjvwHa5Pr7+BYK7G+k6hKK8qlEk513ea8gUvt/Rhl1wQ/NNP8s3G
-	 TSvsmGqJLsoTCDO45wVjH/2YXVW8DL2U7XKySn2QPBNcp1vfJxhHuC/NX4WVhEwLysg==
+	t=1794457631;
+	b=S/LnUejvPBEAFBEKheK89YZ0zTK/GY82WeRH8KZTrnKvI6GKiwD4AbPKL98shGRboP8w
+	 fKBbqHS3GB2Zi3AGjsAOuEsalpOfZmC2Jxgyxb0uNjqetWECsmDz8iwQvAllujpMecMv/
+	 tvv7SmxZCzzwniJHQoJBIXk+Xdx28uxKbwyuFkaTgPcN7EuqV4Vl9pA1Kid+1/hPPSy1L
+	 PTsrW/nzt+kkEsA26/VTqqx7zcZYs9AoVj2pTvrUSlGgn2Ibpo+3aA5eHUbvwRefr5wUp
+	 CVGmscLv9UdkhiXAH8TEaAU45AiZu2MZa0vCwPEkVeyr1kNVp6IzWawfIv4DGx2uH+g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794455154;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794457631;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=GhMkAxlrgZvJq+aYBTKCsm8OTlssgu5fZjKQVbsC2mw=;
-	b=RWVbGfMAm8dWNg38jyAkjnWRnBLwb5MnNVSH5CnKNf3zP2qy9OFNr9r2Up8C2s/K2Qnb
-	 0AhBB7YwpKRcBdvpqN20UuTWc9srjDrkPb+0uHb50kMRQsVQBH+mJ9EsOHuAYZw+Uto0g
-	 f9Q/MY6mgcNHS6UETlebSfwcHdtupAqMlalhJI31hPdRrsipdsGotAI80lewPlwf9TpLf
-	 jxzUu2z8BhWaWqkvp6aUKWgyE6LvieEooVlxAhj5AnBOqLPAKLdiaVKSvUumlR0G+6MsH
-	 aMaegTNy0uKqvCry9u/ATBJAkVK/MdH+Zp/yArQX6uTLPnOaLRTU3qNXN56+BkP+6YA==
+	bh=U2h1lZEY2PbYdQeNMuKrFcrQ2dPE2NBW0uXaXen51pw=;
+	b=zSc98kJd1pI79t1T6HUIY57NKyTqRBkbFb4qYzgCifodG7W7cWSsIrR6vkVCKXpeWJPG
+	 xrqXiXMsMIGDBrELc761EOZGI2qzOewkxnTkbgna34aynUZH0PC9ZySPbvGaXxak6hZ8V
+	 YuEp55i0V+R8oJzjmlEZXWSnF8pbdDp6P9KJ2frmgp6S0U9vACWYROyx/Hjz51OF4Trt5
+	 29dCpx+l4MzXyow5yT5Vn/vwLbn4j8mJj37rAiXDszbSI44NPMM+kxdYAesDzQ4HLWwuH
+	 bD+li7VsHjw1jy6qgAJ1x8wa2ERmYvPR8p7tc7N4Y8J2wJz61MxeCJOXXe4Cye7vS6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QvnhCtGz;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k8ciVudu;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42096606A323
-	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 03:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848BE606A321
+	for <linux-crypto@vger.kernel.org>; Thu, 12 Nov 2026 04:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QvnhCtGz
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1B7C1F00A05;
-	Thu, 12 Nov 2026 03:45:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k8ciVudu
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F35331F00A05;
+	Thu, 12 Nov 2026 04:27:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794455153;
-	bh=GhMkAxlrgZvJq+aYBTKCsm8OTlssgu5fZjKQVbsC2mw=;
+	s=k20260515; t=1794457631;
+	bh=U2h1lZEY2PbYdQeNMuKrFcrQ2dPE2NBW0uXaXen51pw=;
 	h=From:To:Cc:Subject:Date;
-	b=QvnhCtGzsmbzZ3TduJH3KNVTbCKZ9DMPN4JhuR41GhDelFfKI8eZWzZItChcN0yJI
-	 N4MMj+V2VxCAfic3NTN8M5arVAo9UX7YgoxesyPqDUeKV765VGNxFfHAUoTV6eTpyD
-	 OxuUDSns3fzDpBme1vcKnHzYqbAtrb3yuFFnEjvGJfViwes+eHJcfa6walUr54c6Sz
-	 bEyelgXskNDcSCUbl15z11eqHLrA7ODxM2ith52o16dr8CVVUy+mOhdxvWM5h4cYdk
-	 4m8RGS2HysrCdc+LlcfwtWYBaF7TrIRm13uPFJgCDeUgg2Ijme68sEOGZtUGPdsbB9
-	 fiQp/vhG77wBQ==
+	b=k8ciVudufzl9QirAqR8t+wLUmUv5qRflD5NI3rfLLoEkqW/7fzgyTjHDYtfC/hL9Z
+	 qJ+QvT7JnvFRXZswSQ2P3+cOOYs5DORJe/57ECg47QKJNWJ63qHmSW8HiAjxeQzx08
+	 Yno48IofFM4FnCUt+rdfW6h6NHol6pgO119auuCsYA9gEhH7//xKppHs/nWI4f2gAC
+	 DBGQ7eeybqhN36bOtzF8kPXr50GUzff36vItwnVv4+MHt/PfUW+OxmTaJ9HcKQVMEi
+	 tMk2fhmqkqxSt3j+OVGNkDLzVnzEKsG2ev/QfLu2eoRkAWmP7RGILG5xfbnU/1cNGd
+	 JysFWjE3sR/5Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Martin Willi <martin@strongswan.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: x86/chacha: Fix mistakes and inconsistencies in comments
-Date: Wed, 11 Nov 2026 19:44:53 -0800
-Message-ID: <20261112034453.12795-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: x86/blake2s: Permute original message words in AVX-512 code
+Date: Wed, 11 Nov 2026 20:25:13 -0800
+Message-ID: <20261112042513.59919-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,219 +60,71 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix various mistakes in comments, many probably originating from
-copy+pasting: incorrect block ranges, duplicate words, and stray text.
+Each round of BLAKE2s takes a different fixed permutation of the message
+words as an input.  For each round, blake2s_compress_avx512() applies
+that permutation on the message words in %ymm6-%ymm7, writing the
+permuted words to %ymm8-%ymm9 where they are used for the round.
 
-Also make chacha_1to4blocks_ssse3() refer to the state matrix using flat
-indexing, like the equivalent AVX2 and AVX512 functions.  It was the
-only place using 2D row-column indexing of the state matrix.
+Oddly, though, it also copies the permuted words back into %ymm6-%ymm7.
+That means the next round has to apply the previous round's inverse
+permutation, then the next round's permutation.  Which it does, by using
+the 'sigma2' table which has the permutations precomposed in this way.
+
+However, this is not necessary at all, as we can simply do each round's
+permutation on the original message words, using the 'sigma' table which
+is already present in the file for blake2s_compress_ssse3().
+
+Do that instead.  This eliminates 160 unnecessary bytes of rodata, two
+unnecessary instructions per round, and a loop-carried dependency.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/x86/chacha-avx2-x86_64.S   | 12 ++++-----
- lib/crypto/x86/chacha-avx512-x86_64.S |  8 +++---
- lib/crypto/x86/chacha-ssse3-x86_64.S  | 36 +++++++++++++--------------
- 3 files changed, 28 insertions(+), 28 deletions(-)
+ lib/crypto/x86/blake2s-core.S | 18 +-----------------
+ 1 file changed, 1 insertion(+), 17 deletions(-)
 
-diff --git a/lib/crypto/x86/chacha-avx2-x86_64.S b/lib/crypto/x86/chacha-avx2-x86_64.S
-index 18ae03e05074f..5cf009616f7cb 100644
---- a/lib/crypto/x86/chacha-avx2-x86_64.S
-+++ b/lib/crypto/x86/chacha-avx2-x86_64.S
-@@ -46,7 +46,7 @@ SYM_FUNC_START(chacha_1to2blocks_avx2)
- 	# on four words in each matrix in parallel, but requires shuffling to
- 	# rearrange the words after each round.
+diff --git a/lib/crypto/x86/blake2s-core.S b/lib/crypto/x86/blake2s-core.S
+index 7b1d98ca7482c..f9105764686b7 100644
+--- a/lib/crypto/x86/blake2s-core.S
++++ b/lib/crypto/x86/blake2s-core.S
+@@ -36,20 +36,6 @@
+ .byte  6, 14, 11,  0, 15,  9,  3,  8, 10, 12, 13,  1,  5,  2,  7,  4
+ .byte 10,  8,  7,  1,  2,  4,  6,  5, 13, 15,  9,  3,  0, 11, 14, 12
  
--	# x0..3[0-2] = s0..3
-+	# x0..3[0-1] = s0..3
- 	vbroadcasti128	0x00(%rdi),%ymm0
- 	vbroadcasti128	0x10(%rdi),%ymm1
- 	vbroadcasti128	0x20(%rdi),%ymm2
-@@ -212,7 +212,7 @@ SYM_FUNC_START(chacha_2to4blocks_avx2)
- 	# required word shuffling has a rather high latency, we can do the
- 	# arithmetic on two matrix-pairs without much slowdown.
+-.section .rodata.cst64.sigma2, "aM", @progbits, 160
+-.align 64
+-.Lsigma2:
+-.byte  0,  2,  4,  6,  1,  3,  5,  7, 14,  8, 10, 12, 15,  9, 11, 13
+-.byte  8,  2, 13, 15, 10,  9, 12,  3,  6,  4,  0, 14,  5, 11,  1,  7
+-.byte 11, 13,  8,  6,  5, 10, 14,  3,  2,  4, 12, 15,  1,  0,  7,  9
+-.byte 11, 10,  7,  0,  8, 15,  1, 13,  3,  6,  2, 12,  4, 14,  9,  5
+-.byte  4, 10,  9, 14, 15,  0, 11,  8,  1,  7,  3, 13,  2,  5,  6, 12
+-.byte  2, 11,  4, 15, 14,  3, 10,  8, 13,  6,  5,  7,  0, 12,  1,  9
+-.byte  4,  8, 15,  9, 14, 11, 13,  5,  3,  2,  1, 12,  6, 10,  7,  0
+-.byte  6, 13,  0, 14, 12,  2,  1, 11, 15,  4,  5,  8,  7,  9,  3, 10
+-.byte 15,  5,  4, 13, 10,  7,  3, 11, 12,  2,  0,  6,  9,  8,  1, 14
+-.byte  8,  7, 14, 11, 13, 15,  0, 12, 10,  4,  5,  6,  3,  2,  1,  9
+-
+ #define CTX		%rdi
+ #define DATA		%rsi
+ #define NBLOCKS		%rdx
+@@ -226,7 +212,7 @@ SYM_FUNC_START(blake2s_compress_avx512)
+ 	vmovdqu		(DATA),%ymm6		// Load first 8 data words
+ 	vmovdqu		32(DATA),%ymm7		// Load second 8 data words
+ 	addq		$64,DATA
+-	leaq		.Lsigma2(%rip),%rax
++	leaq		.Lsigma(%rip),%rax
+ 	movb		$10,%cl			// Set num rounds remaining
  
--	# x0..3[0-4] = s0..3
-+	# x0..3[0-3] = s0..3
- 	vbroadcasti128	0x00(%rdi),%ymm0
- 	vbroadcasti128	0x10(%rdi),%ymm1
- 	vbroadcasti128	0x20(%rdi),%ymm2
-@@ -495,7 +495,7 @@ SYM_FUNC_START(chacha_4to8blocks_avx2)
- 	vmovdqa		ROT8(%rip),%ymm2
- 	vmovdqa		ROT16(%rip),%ymm3
- 
--	# x12 += counter values 0-3
-+	# x12 += counter values 0-7
- 	vpaddd		%ymm1,%ymm12,%ymm12
- 
- .Ldoubleround8:
-@@ -596,7 +596,7 @@ SYM_FUNC_START(chacha_4to8blocks_avx2)
- 	vmovdqa		%ymm0,0x00(%rsp)
- 	vpxor		%ymm0,%ymm15,%ymm15
- 	vpshufb		%ymm3,%ymm15,%ymm15
--	# x1 += x6, x12 = rotl32(x12 ^ x1, 16)%ymm0
-+	# x1 += x6, x12 = rotl32(x12 ^ x1, 16)
- 	vpaddd		0x20(%rsp),%ymm6,%ymm0
- 	vmovdqa		%ymm0,0x20(%rsp)
- 	vpxor		%ymm0,%ymm12,%ymm12
-@@ -686,7 +686,7 @@ SYM_FUNC_START(chacha_4to8blocks_avx2)
- 	sub		$2,%r8d
- 	jnz		.Ldoubleround8
- 
--	# x0..15[0-3] += s[0..15]
-+	# x0..15[0-7] += s[0..15]
- 	vpbroadcastd	0x00(%rdi),%ymm0
- 	vpaddd		0x00(%rsp),%ymm0,%ymm0
- 	vmovdqa		%ymm0,0x00(%rsp)
-@@ -724,7 +724,7 @@ SYM_FUNC_START(chacha_4to8blocks_avx2)
- 	vpbroadcastd	0x3c(%rdi),%ymm0
- 	vpaddd		%ymm0,%ymm15,%ymm15
- 
--	# x12 += counter values 0-3
-+	# x12 += counter values 0-7
- 	vpaddd		%ymm1,%ymm12,%ymm12
- 
- 	# interleave 32-bit words in state n, n+1
-diff --git a/lib/crypto/x86/chacha-avx512-x86_64.S b/lib/crypto/x86/chacha-avx512-x86_64.S
-index 127a94f1843bb..3a70608d4a7d2 100644
---- a/lib/crypto/x86/chacha-avx512-x86_64.S
-+++ b/lib/crypto/x86/chacha-avx512-x86_64.S
-@@ -55,7 +55,7 @@ SYM_FUNC_START(chacha_0to2blocks_avx512vl)
- 	# on four words in each matrix in parallel, but requires shuffling to
- 	# rearrange the words after each round.
- 
--	# x0..3[0-2] = s0..3
-+	# x0..3[0-1] = s0..3
- 	vbroadcasti128	0x00(%rdi),%ymm0
- 	vbroadcasti128	0x10(%rdi),%ymm1
- 	vbroadcasti128	0x20(%rdi),%ymm2
-@@ -195,7 +195,7 @@ SYM_FUNC_START(chacha_2to4blocks_avx512vl)
- 	# required word shuffling has a rather high latency, we can do the
- 	# arithmetic on two matrix-pairs without much slowdown.
- 
--	# x0..3[0-4] = s0..3
-+	# x0..3[0-3] = s0..3
- 	vbroadcasti128	0x00(%rdi),%ymm0
- 	vbroadcasti128	0x10(%rdi),%ymm1
- 	vbroadcasti128	0x20(%rdi),%ymm2
-@@ -400,14 +400,14 @@ SYM_FUNC_END(chacha_2to4blocks_avx512vl)
- 	# %r8d: nrounds
- 
- 	# This encrypts VL/4 consecutive ChaCha blocks by loading the state
--	# matrix in as many vector registers. Compared to AVX2, this mostly
-+	# matrix in vector registers VL/4 times. Compared to AVX2, this mostly
- 	# benefits from the new rotate instructions and the additional
- 	# registers.
- 	#
- 	# VL=32 encrypts eight blocks in 256-bit ymm registers.
- 	# VL=64 encrypts sixteen blocks in 512-bit zmm registers.
- 
--	# x0..15[0-VL/4] = s[0..15]
-+	# x0..15[0-(VL/4 - 1)] = s[0..15]
- 	vpbroadcastd	0x00(%rdi),V0
- 	vpbroadcastd	0x04(%rdi),V1
- 	vpbroadcastd	0x08(%rdi),V2
-diff --git a/lib/crypto/x86/chacha-ssse3-x86_64.S b/lib/crypto/x86/chacha-ssse3-x86_64.S
-index b9884ec979fae..ea25d2cc796e3 100644
---- a/lib/crypto/x86/chacha-ssse3-x86_64.S
-+++ b/lib/crypto/x86/chacha-ssse3-x86_64.S
-@@ -227,7 +227,7 @@ SYM_FUNC_START(chacha_1to4blocks_ssse3)
- 	# %rcx: input/output data length in bytes: 1 to 4 blocks inclusive
- 	# %r8d: nrounds
- 
--	# This function encrypts four consecutive ChaCha blocks by loading the
-+	# This function encrypts four consecutive ChaCha blocks by loading
- 	# the state matrix in SSE registers four times. As we need some scratch
- 	# registers, we save the first four registers on the stack. The
- 	# algorithm performs each operation on the corresponding word of each
-@@ -242,7 +242,7 @@ SYM_FUNC_START(chacha_1to4blocks_ssse3)
- 	and		$~63,%rsp
- 	mov		%rcx,%rax
- 
--	# x0..15[0-3] = s0..3[0..3]
-+	# x0..15[0-3] = s[0..15]
- 	movq		0x00(%rdi),%xmm1
- 	pshufd		$0x00,%xmm1,%xmm0
- 	pshufd		$0x55,%xmm1,%xmm1
-@@ -500,8 +500,8 @@ SYM_FUNC_START(chacha_1to4blocks_ssse3)
- 	sub		$2,%r8d
- 	jnz		.Ldoubleround4
- 
--	# x0[0-3] += s0[0]
--	# x1[0-3] += s0[1]
-+	# x0[0-3] += s[0]
-+	# x1[0-3] += s[1]
- 	movq		0x00(%rdi),%xmm3
- 	pshufd		$0x00,%xmm3,%xmm2
- 	pshufd		$0x55,%xmm3,%xmm3
-@@ -509,8 +509,8 @@ SYM_FUNC_START(chacha_1to4blocks_ssse3)
- 	movdqa		%xmm2,0x00(%rsp)
- 	paddd		0x10(%rsp),%xmm3
- 	movdqa		%xmm3,0x10(%rsp)
--	# x2[0-3] += s0[2]
--	# x3[0-3] += s0[3]
-+	# x2[0-3] += s[2]
-+	# x3[0-3] += s[3]
- 	movq		0x08(%rdi),%xmm3
- 	pshufd		$0x00,%xmm3,%xmm2
- 	pshufd		$0x55,%xmm3,%xmm3
-@@ -519,45 +519,45 @@ SYM_FUNC_START(chacha_1to4blocks_ssse3)
- 	paddd		0x30(%rsp),%xmm3
- 	movdqa		%xmm3,0x30(%rsp)
- 
--	# x4[0-3] += s1[0]
--	# x5[0-3] += s1[1]
-+	# x4[0-3] += s[4]
-+	# x5[0-3] += s[5]
- 	movq		0x10(%rdi),%xmm3
- 	pshufd		$0x00,%xmm3,%xmm2
- 	pshufd		$0x55,%xmm3,%xmm3
- 	paddd		%xmm2,%xmm4
- 	paddd		%xmm3,%xmm5
--	# x6[0-3] += s1[2]
--	# x7[0-3] += s1[3]
-+	# x6[0-3] += s[6]
-+	# x7[0-3] += s[7]
- 	movq		0x18(%rdi),%xmm3
- 	pshufd		$0x00,%xmm3,%xmm2
- 	pshufd		$0x55,%xmm3,%xmm3
- 	paddd		%xmm2,%xmm6
- 	paddd		%xmm3,%xmm7
- 
--	# x8[0-3] += s2[0]
--	# x9[0-3] += s2[1]
-+	# x8[0-3] += s[8]
-+	# x9[0-3] += s[9]
- 	movq		0x20(%rdi),%xmm3
- 	pshufd		$0x00,%xmm3,%xmm2
- 	pshufd		$0x55,%xmm3,%xmm3
- 	paddd		%xmm2,%xmm8
- 	paddd		%xmm3,%xmm9
--	# x10[0-3] += s2[2]
--	# x11[0-3] += s2[3]
-+	# x10[0-3] += s[10]
-+	# x11[0-3] += s[11]
- 	movq		0x28(%rdi),%xmm3
- 	pshufd		$0x00,%xmm3,%xmm2
- 	pshufd		$0x55,%xmm3,%xmm3
- 	paddd		%xmm2,%xmm10
- 	paddd		%xmm3,%xmm11
- 
--	# x12[0-3] += s3[0]
--	# x13[0-3] += s3[1]
-+	# x12[0-3] += s[12]
-+	# x13[0-3] += s[13]
- 	movq		0x30(%rdi),%xmm3
- 	pshufd		$0x00,%xmm3,%xmm2
- 	pshufd		$0x55,%xmm3,%xmm3
- 	paddd		%xmm2,%xmm12
- 	paddd		%xmm3,%xmm13
--	# x14[0-3] += s3[2]
--	# x15[0-3] += s3[3]
-+	# x14[0-3] += s[14]
-+	# x15[0-3] += s[15]
- 	movq		0x38(%rdi),%xmm3
- 	pshufd		$0x00,%xmm3,%xmm2
- 	pshufd		$0x55,%xmm3,%xmm3
+ .Lavx512_roundloop:
+@@ -236,8 +222,6 @@ SYM_FUNC_START(blake2s_compress_avx512)
+ 	addq		$16,%rax
+ 	vpermi2d	%ymm7,%ymm6,%ymm8
+ 	vpermi2d	%ymm7,%ymm6,%ymm9
+-	vmovdqa		%ymm8,%ymm6
+-	vmovdqa		%ymm9,%ymm7
+ 	vpaddd		%xmm8,%xmm0,%xmm0
+ 	vpaddd		%xmm1,%xmm0,%xmm0
+ 	vpxor		%xmm0,%xmm3,%xmm3
 
 base-commit: 33b4f31b1aea3f62b61c892daefc0e6a77859032
 -- 
