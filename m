@@ -1,69 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.15
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.72.31
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794469552;
-	b=1ipUC7H77lYfFhyAhG5tjsj3Mmie5BRjwo0na4izMPx9AOShZ+grh4BIXOjkCJS8SYUO
-	 eFECWmG0Xjtojz6WXJ6g8lrd8eHHZ/6s3mrzwtxvXR8gmI2hQg/jX5WDLZ6QatypB1YRr
-	 95pLSfCqKVTl9/XwAB1pczPyo1L+pOxSjtSytEcbP4yJHODsCM8YQE+a8MLXSiT3HfgVQ
-	 Xb+0DzirAGz75yYshpCFM4+CjfXDsnmprSGoEez2tcnMTh+WI+vwKNMPAO9US2j9rjDGS
-	 ppsm4xNfdSDbDP8zARMHXblaQKfv0mU9xZh9ojgzMxzfuXTNPdtnKXe4B19RUIxTe4w==
+	t=1794469747;
+	b=o0/tdFqbqJX+FhVGNtxhLqzmBuHxdaE1ZjU6mEvC+uFnq0vZTrDd5S8XbLnZcYZ9IwhC
+	 OCB/P51LJrM9QDVGAiCV1rUMG2um3RWJpVjXnlpjm+PciSHizEl5fhTAXfoiiskzn13P7
+	 ztZ2G6RUqSJHVhQ9bRSPAV/LPMpZmWzmDY1WudvWClO96Rs8espjqVVJqB1ec7Ato/+6p
+	 lJwnXnTyGJrZImKIv7WO+WR4QpYwJerkHei89sJsPI6L0qGd4N6918309/39/g2WhhRcx
+	 oBsSrTnCwY4AUz/U/CDnfMZFaEovIQWeOAWIPZZi+hAJhapFNeBhhhCOADo6plCWQzQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794469552;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-ZohoMailClient;
-	bh=y3w7lCKhUDSJO1hMkA378GpKP59GBJjooc29uy32nbU=;
-	b=B8iomBkcTJGClFG8FSWWTDP16eCiwsj7d1yGBk3USVYy3EZ/MFKSQ0RWTahgyp1hlBES
-	 GsPo049LvHaUyeQeawtEiDlnRybKxzwZZhY8IF39dss//ZDy5MpZIuEje9SD6e/p8HNHK
-	 F4GVBv5Bs4kBvxN2pVHCxs1qV8QVlZJ2XRi/IKsbN21Rku0CPXIt6Xb3ZdcBEfa7SLK9E
-	 bDdmOPtpvXvdH22kx4ca8lEKp3xeu5rOTz3rAAXASaP8mTxntj95vwjwtPEh3kIhsUwJ+
-	 FDlyClVVGRgVbmJ2Mb9ycUWW/3epILafTVAF8D2SVloJFOpQXw9YS/CF2cr7aS5B1ig==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794469747;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=Ozl8ZeMsV0kH1hnZO3VystZbTs2G7Knw5UEzzIPmHtM=;
+	b=Ii/VJOdSPnkDX8NK0X2sop8mT0TaFEexHW+RJ4ascu7z0LTyV+fF9zsUvYIAglWcT7Av
+	 8k6Mfw8JjM7i80WJyFl1I/Z84NwFCaDr9fxsnAhH/3vxTIH0mobGW1IRCnsJCJMDv6Qt6
+	 7f+gcgewmFAmhtk4vNl473SSSRgflSzaacIBrdsTIRbUZbnPv+n9Dt5jJKGw5kohSCHfV
+	 uWgA5eUKLT3I1i5R30plN+zA69URbbTyoU3jwZmU3YCc2AZpFgqC4IIKRwhBCmDGsIzy6
+	 1aTkD8HjNW4fHeyaX5BYZWjoqSH+ENK3kzABCWkFXViUnnckHmV+oaY7PHMIF546Zbg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=laveeshbansal.com;
-	spf=pass smtp.mailfrom=laveeshbansal.com;
-	dkim=pass header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=EqxCaVpx;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.15
-Received: from sender6-op-o15.zoho.com (sender6-op-o15.zoho.com [165.173.180.15])
+	dmarc=pass header.from=oss.nxp.com;
+	spf=pass smtp.mailfrom=oss.nxp.com;
+	dkim=pass header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-NXP1-onmicrosoft-com header.b=Aqq6F1bo;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.72.31
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013031.outbound.protection.outlook.com [52.101.72.31])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B65606A321;
-	Thu, 12 Nov 2026 07:45:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 72B65606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1175E606A8B4;
+	Thu, 12 Nov 2026 07:49:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1175E606A8B4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=EqxCaVpx
-ARC-Seal: i=1; a=rsa-sha256; t=1794469439; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=oCUrl9IwMAMXQQlv0+PSYzq5FNDjzyU5MXLX5EPwX+ZbdC0yBhl+tULfTqhG4O4GB6GihjnbDrqqF/1sUWlOasYD4ZjH0gVNxzaY8oEZgWVYLWEW8hVecwiw9KJfJV72iErscjNXJAGyjk6w9QJ7VgxFDETpDuixGC1KYAuYvu0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1794469439; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=y3w7lCKhUDSJO1hMkA378GpKP59GBJjooc29uy32nbU=; 
-	b=D//EkCDesnrkC8hSBSKs+caHHhQisMJnJEaqS6WJWsy/F1WWoK3dh/p/CXWyK3QEqTRs+Ou2M6KTZbnPvU9V7PORmdEs16SMoimcOH+hCSQ14aMfaRO4YxEwBJP0icoZg4u6PEy+qFtRsTcB8zjX1VnXSpRFxNDEr51OAcnVw6E=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=laveeshbansal.com;
-	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
-	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
-DKIM-Signature: a=rsa-sha256; b=EqxCaVpxSxZ2zq+LHH34yhkhLvzHMY6AqtXagGyp0K1P3wY3nMUYchRyTkQNa3IJGKOE+vLqCpnyO8YRZsvvJ0y3HCi0rY0xdMxS40Bskc9fiq7zSH9ppfusXxs/sTcFhphgVwUSBuUGotIYYLQ09Arh6GXCLOztx1JWBb5LqqE=; c=relaxed/relaxed; s=zoho; d=laveeshbansal.com; v=1; bh=y3w7lCKhUDSJO1hMkA378GpKP59GBJjooc29uy32nbU=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
-Received: by smtp.zohomail.com with SMTPS id 1794469437222955.0085428812287;
-	Wed, 11 Nov 2026 23:43:57 -0800 (PST)
-From: Laveesh Bansal <laveeshb@laveeshbansal.com>
-To: David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>,
-	"David S . Miller" <davem@davemloft.net>,
-	Denis Kenzior <denkenz@gmail.com>,
-	Maximilian Stahlberg <maximilian.stahlberg@uni-bremen.de>,
-	keyrings@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-NXP1-onmicrosoft-com header.b=Aqq6F1bo
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IFG8EQwywlkwPkNtDzok6ALAiR2dAmS9nyzU5CxLt76lvWYI+Z0MufJzv0mtUnR+6iypIiVf3N1H9yBrEjVUrcbRwfWhP0TXE1S/4cOfILvKvCDtk6DMbDHNnW3wICPFOyxkZluvS7rDOc+4rhriMfR/667Q75CRYdgwDBAPZoI37o1M9LllrdyK5JAHDN6H31BUlgN2EjsW/gv6vhtKuu/1DDGoFyr7NMZ9ed0QhXc9SJPaXpxJhKUGN7OBwx7g2e1vXsgyx0r8taZDroy1tQZkCFUr/t6WnEpMhB8EvbfYg/63uJVppmhucry9e0bKoy10znHv87qi0VOZdqg3Cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ozl8ZeMsV0kH1hnZO3VystZbTs2G7Knw5UEzzIPmHtM=;
+ b=Ano2OYe5yiQxUVWa3sJDZHchnb9FQTOrgnIawHJyQIvpXy2xXUYnmiEh9nBsZPnwqEbWxGEuC6oWrQXiwyDhiX1zpGDt2dSQ3bsu0yQMJ0smKC/XMoDyEo91f32UQxhBkiaPUn0aWdJ0ONLfGTHRlqZgMdxxReG2autbpFzlOEQCiLTRL1d0zY+LXSRUeCPbB7IjUi4CAWiHLFPJdnLnd1wCVWDwFYi3paOSy/8b9eWbTgmn9P5FOLBGkZT1/URz5D3ugGv6hI68Aab3AURcpGJQptFM8J5m8fnerqsZN95XrpPnOXoj0IZw0oMHf2s5UkN4DfWB0/MBazg1/zj5sQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ozl8ZeMsV0kH1hnZO3VystZbTs2G7Knw5UEzzIPmHtM=;
+ b=Aqq6F1bo9+5rT68qoLcz7TE/ggLM9tw2VVzvRY7IbDrRNffWiBI4XR+LxpuHU/f5ENaixDTicpsAFpXI7G7SWPC2C3Xj18Y7lPPuONPflk9y/zTxjp2CAFGVMC+f3ZYIxzfo8kZpYhX1my/2sOq/WdeDZ+Ve/NLawjzP3IxTeuINl+VuxTX3I2/uNRlbTxZQs/3MwTymIHbc9RG5URkoUZsf3Hcpp78YVrHZ1CZfzud30Mbna/dHKZp9XrdKXz1wDxU91Z2bY9wNDJou4pIpAUBs0Wc8L1x4UrLPrrfuMpOZxy2PCsNkK7mvImTYIzf9iol+cd30k2uyzb5wwH0xcA==
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AS1PR04MB9358.eurprd04.prod.outlook.com (2603:10a6:20b:4dc::19)
+ by OSKPR04MB11367.eurprd04.prod.outlook.com (2603:10a6:e10:9d::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.9; Thu, 12 Nov
+ 2026 07:49:04 +0000
+Received: from AS1PR04MB9358.eurprd04.prod.outlook.com
+ ([fe80::677:d5bf:c3ce:3ad4]) by AS1PR04MB9358.eurprd04.prod.outlook.com
+ ([fe80::677:d5bf:c3ce:3ad4%5]) with mapi id 15.21.0615.009; Thu, 12 Nov 2026
+ 07:49:04 +0000
+From: Sahil Malhotra <sahil.malhotra@oss.nxp.com>
+To: Changwei Zou <changwei.zou@canonical.com>
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com,
+	iuliana.prodan@nxp.com,
+	jeffbarnes@linux.microsoft.com,
+	stephane.debusne@cynove.com,
+	martin.kepplinger-novakovic@ginzinger.com,
+	lukas@wunner.de,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] X.509: Add KUnit tests for the certificate parser
-Date: Wed, 11 Nov 2026 23:42:46 -0800
-Message-ID: <20261112074246.99421-3-laveeshb@laveeshbansal.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20261112074246.99421-1-laveeshb@laveeshbansal.com>
-References: <20261112074246.99421-1-laveeshb@laveeshbansal.com>
+Subject: Re: [PATCH v4 2/2] crypto: caam - Use bounce buffer for unaligned RSA destination buffers
+Date: Thu, 12 Nov 2026 08:49:03 +0100
+Message-ID: <20261112074903.462744-1-sahil.malhotra@oss.nxp.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261111230221.40297-3-changwei.zou@canonical.com>
+References: <20261111230221.40297-1-changwei.zou@canonical.com> <20261111230221.40297-3-changwei.zou@canonical.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR2P281CA0082.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9b::9) To AS1PR04MB9358.eurprd04.prod.outlook.com
+ (2603:10a6:20b:4dc::19)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -73,222 +106,111 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR04MB9358:EE_|OSKPR04MB11367:EE_
+X-MS-Office365-Filtering-Correlation-Id: f714e893-95fb-4f36-eda4-08df40916c93
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|376014|23010399003|1800799024|366016|18002099003|22082099003|4143699003|5023799004|11063799006|261026121527099003|261022105027099003|261026140227099003|261022075727099003|261009223027099003|261028144727099003|56012099006|261021121427099003|261102123227099003|10067099003;
+X-Microsoft-Antispam-Message-Info:
+	+9+pRR4GWXK6aYunY48ORXzmgToit3KqdvHrC4gQsOxlblKgph8ykR4+9Ya+cp8IPCMN3U5rLRO0s0SSm9P6DYK4qNk7S9cehrk1Mk7hkFJNeBsQDiFvmRh3v5Rtk57a74RY/WtzXQnUm4UpmKMK8bzByLhMFDuK2QavobRBMA12r8NP92ji0TH/e08hQb/t82jPwShGbQOTN9xxZuZjQn7vKyhu2e3RhR9e6cyPDdxwmQRKN96PLTjXN3+5uAGI7UNcoCfMeB9DQ5mySjHaNVKjNtOm+xyVbzkurjTpe0W6YU5GYxPtFehxU5G/0s16Pb2XgnEYrASg6e5NJCRaN34+eHTCMvEytGLZEQEbcSJpJDVzNFCVKUEuNufN8dor/kn3H+FXoyIx+R/9tYruRxLSFO2rdhsKcmHKxkVDGT2Xeplz1LgqzsELR/vw50yIgCd5RW5xn/BjKrqKdfY67opnnjxdQVO/LpoGy1rXz70IOEGQz+JQkobmwKEePGWIOqmzJ2igoELxOyGGT4cYIfxEpPPl1VdBC12W32S0sE/M1+jo/HyNkHdA0Bu9oq6NdbcWp8b4Fy91NOlu+vtSh5NrFa1BvpR4mHIKQFKLzoIuKC+b2nBeqi20kiA/YGADVL6/MiH0s43nIdRV3hXo9sUyxWXDYG1lBWJK++1GPAE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR04MB9358.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(23010399003)(1800799024)(366016)(18002099003)(22082099003)(4143699003)(5023799004)(11063799006)(261026121527099003)(261022105027099003)(261026140227099003)(261022075727099003)(261009223027099003)(261028144727099003)(56012099006)(261021121427099003)(261102123227099003)(10067099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VkQyOWVPdmFpczRJR1lnN0xOWlJ6NFlpdXp0RVRsdTZqRkw5OFBSTFZtNDN1?=
+ =?utf-8?B?TTQyWmxwWnIxTWNTS1o5RnlJQXdQR0Q5REdndzczS09ZTmZIaktEWEpCZ1Vr?=
+ =?utf-8?B?SXA0WGpWdTY2SVdvNC9GNU9sdDUyWkdsWTdxNS9BZjJCNzRCM2M1ckpSRkt5?=
+ =?utf-8?B?ZUsyZ3B3VDNoYUZhMDVoei9vOWY0dUIxWkh3MnIwTkpBU2ZkK1M2Rmo5cGlP?=
+ =?utf-8?B?aFYxeVNLWU1KclF4cng4T2MzdzhhN1FBRkFmZDBKampXOVdydU9QbUlzWjBy?=
+ =?utf-8?B?UlNWVSsrd0pEbnphZkdGSGE1ZzJORUk1TG00U3RYUFJnRmljR2p4T1didUg5?=
+ =?utf-8?B?MXZ6V3JRVm9yWXZCTmhXMExrclduOHJnNjFZM290Tmg1QWNQMCt0S29CYU1I?=
+ =?utf-8?B?OXA0Ymp1dVp6WkF6N0Jtbk0yVG9VQWswV1lFeENVMmxCaGR5UndLSUNpY0pm?=
+ =?utf-8?B?Tm9KdkZtUUtnaUdHZ0FxZzJydEl4T2Erb2NSS2YxTy9mZ2gxUGZ2Yytvdklu?=
+ =?utf-8?B?K1ovREo2VEV1WUZYTThSYmZRcG05TkthWWpyQlE3TGlzRG1nenpCdVZZS2JB?=
+ =?utf-8?B?U1R2em5EOWEyc2dwajBDM3ZwZDFBbkgweTZBREF0VlllMVdaU3dXUTc5M2JU?=
+ =?utf-8?B?aUpsNXJTZ3RVc3E4c2RRRDdoekJqdlhCSUlkWUxLVUhmNFEreFhMODdBazhq?=
+ =?utf-8?B?anZNcWtzakhWUkdYWXZ6NTh5ZXJRVitTMzZuSmFsMGFtS3F2OGtBMHFHaDBZ?=
+ =?utf-8?B?Y3NTN3dMb2c2NWZUOGQ0OVhxVVJ5LzZwUE9vZG8xcEZuQzUycm5WVEk0YzJ3?=
+ =?utf-8?B?U1R4MjN4QWZHanBnNVZabTJlS1RXVVZEcmlqa1o2RTVWTUNDUy95TTd5a0N0?=
+ =?utf-8?B?WTJJNi9SZ3UyU082bWNtYlNoMzRSbmtGTE5ZTkZVY2t4R2QrRXhYOWhTUThl?=
+ =?utf-8?B?UEpsQXpXREFOZE95ZHdlQU00UWZoeGduTi9FcjZOU2duNWdnejJ4eFkxeHkz?=
+ =?utf-8?B?SXRvOHd4K29OMnZ6UGM5dE4wZ3BRb3RCRFNVdFNqeVI3SGRXYXhZMjZOcGVJ?=
+ =?utf-8?B?Q3NiNlBYYmFJL1ZEUXNIelhra2lHdkRzZ3RHOGs4M0g2dU5JU0twc04zYXEz?=
+ =?utf-8?B?RkpWY2pwVk0rNW03Ulo2a3JpNURPYXpYV2ZtY1BOSUJWUndLRVVZckh6bDhB?=
+ =?utf-8?B?U2t6bU8wekZJOTBVdnU2TE0yQWQ4YnZPZnFVTlEzVTh6anl6NjBENVowMWtO?=
+ =?utf-8?B?VHBDRmpFQW1uNkV5ZG0ybTB0aUlqbk02WkpVM1RLYWIwS0ZJRGtFK1l0QUVN?=
+ =?utf-8?B?RGkzRjlwamlYTThYUjE2dFpaazVhMzZlUnQ4NWR5dzlxVlZ3RjlHVTkxYnNr?=
+ =?utf-8?B?Wm9TNTJ0ZTV5WEFHN2RXSkl4MlNEUXVlR0pXZHpLRmdkUGVNbWJIMkVyYjVy?=
+ =?utf-8?B?NDY2LzIvcWUycHg2cGFiT1dFMEFmR3JlMmtHUXBJeGNPbWRxTGRUSTc3T3ZV?=
+ =?utf-8?B?YVhNMlZscjRBN3J0bE5CamNoaVBndHU5dldMYzNvaDQ5MGpNdXhZdDZSNnNK?=
+ =?utf-8?B?UmdyamJlL3g2TDJwMnVJc0VuRHpLcmxTTi93Y1hrdlBOTFRkUTc4eURDUTVC?=
+ =?utf-8?B?Rnk3ZEhxZVE3bjVaSFhtS1R4K0FDYllFTVFXVEtNUEJrZVBlTTZ0Z2Z2d2l2?=
+ =?utf-8?B?ZkgzaW5uN1FZSDNBZWJBUXhNSmhqR1RQQ0xZNzcxUnJpeE5LdEladXdOelR3?=
+ =?utf-8?B?NnJZOUcwYzFNTm1FK204SHUxa0pJaUNtUUpMakprb0M2eVJJbysraVJrWWp0?=
+ =?utf-8?B?a1RyU2F4alhWMDVIYmh4ejExaDJCL3JmejJueGh4ZThLTGZGWWRNL1BldFk4?=
+ =?utf-8?B?cGk4S29SMHo5NE1TVUNDY3FIcmdjYzNnQU5PVDh3aG1jRTd6V0xnb2Z6U1ll?=
+ =?utf-8?B?RnNHTGovVjU5akVkNDZoSTE3T2s2eDY4TVJXL3VEb0tNazNWWEUyN2tnU2ZW?=
+ =?utf-8?B?enIwWW4xWHZITjNCaVo4K3hVVW9iNzhBRVdLU3JIQVY0eGJwTWliV200TEhJ?=
+ =?utf-8?B?Q1lDMUVZNitGSDVhZzFpa0xrcEZpeVlLTThmcUhlMFQyejF4RVdPQXh3bUUw?=
+ =?utf-8?B?Y210Wm5MaW82Vk1WM3F4bklBRGUwcFpGV09JbFd6MWUrY2JnbU9VeWJJM3Jh?=
+ =?utf-8?B?VkliU2lWSG8rNXNQZ3Y5akUxNlRlYWFHdytGY1FvbldhRTltYVFpRUNZU1I0?=
+ =?utf-8?B?eVVHNm9VMGxKaS9kWlVMM0JYd3YvVml1WWllbEkyZnd4L3YvWDI1ZHFwd1NP?=
+ =?utf-8?B?VWRSVExMajhOZzhJS3dhSWNuRmgvNmxGNmJSa2xVUE0vb3FUbXBqZGlVU05v?=
+ =?utf-8?Q?n1S2pbFAVcmYTq+iY5BIUSCNDCxA0E9wxkFA2?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f714e893-95fb-4f36-eda4-08df40916c93
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR04MB9358.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2026 07:49:04.7463
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AJ3wNBYCQnsBNG8LFXvVGQy1AyoqTYanIUheoE7Y3Tyc9Q7Qv6Vm+foJI84Jw3CSzKWC3n1tIf43eJabiiR4NeogMb3GslkSVpnnlm/WUTq1/i5vd+I/z+WHbjgC5+KU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSKPR04MB11367
 
-Add a KUnit test for x509_cert_parse() that builds a small certificate
-in memory with different Subject and Issuer names. It checks that a
-certificate with an empty Subject parses, and that a Subject with a
-member that is not a SET and an empty Issuer are rejected.
+On Thu, Nov 12, 2026 at 10:02:21AM +1100, Changwei Zou wrote:
+> The rsa-caam driver directly DMA-maps the destination buffer supplied by
+> the caller via req->dst without checking whether it meets the cacheline
+> alignment requirements of DMA-incoherent hardware such as i.MX8.
 
-Signed-off-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
----
-Without patch 1, x509_empty_subject fails and the other three cases pass;
-with it, all four pass (arm64 QEMU/KVM guest, cbbddb6b08cc, 7.3.0).
- crypto/asymmetric_keys/Kconfig            |  11 ++
- crypto/asymmetric_keys/Makefile           |   1 +
- crypto/asymmetric_keys/x509_parser_test.c | 160 ++++++++++++++++++++++
- 3 files changed, 172 insertions(+)
- create mode 100644 crypto/asymmetric_keys/x509_parser_test.c
+Hi Changwei,
 
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index c73979b2e98e..ca2c11f82e32 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -126,4 +126,15 @@ config VERIFY_PEFILE_KUNIT_TEST
- 
- 	  If unsure, say N.
- 
-+config X509_PARSER_KUNIT_TEST
-+	tristate "KUnit tests for X.509 certificate parsing" if !KUNIT_ALL_TESTS
-+	depends on KUNIT && X509_CERTIFICATE_PARSER
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Enable KUnit tests for the X.509 certificate parser.  The tests build
-+	  small certificates in memory and check which Subject and Issuer
-+	  names x509_cert_parse() accepts.
-+
-+	  If unsure, say N.
-+
- endif # ASYMMETRIC_KEY_TYPE
-diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-index 35172685c533..1ce91737ac89 100644
---- a/crypto/asymmetric_keys/Makefile
-+++ b/crypto/asymmetric_keys/Makefile
-@@ -22,6 +22,7 @@ x509_key_parser-y := \
- 	x509_cert_parser.o \
- 	x509_loader.o \
- 	x509_public_key.o
-+obj-$(CONFIG_X509_PARSER_KUNIT_TEST) += x509_parser_test.o
- obj-$(CONFIG_FIPS_SIGNATURE_SELFTEST) += x509_selftest.o
- x509_selftest-y += selftest.o
- x509_selftest-$(CONFIG_FIPS_SIGNATURE_SELFTEST_RSA) += selftest_rsa.o
-diff --git a/crypto/asymmetric_keys/x509_parser_test.c b/crypto/asymmetric_keys/x509_parser_test.c
-new file mode 100644
-index 000000000000..c005b6fe68a6
---- /dev/null
-+++ b/crypto/asymmetric_keys/x509_parser_test.c
-@@ -0,0 +1,160 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KUnit tests for the X.509 certificate parser.
-+ *
-+ * The cases build a minimal certificate in memory, vary the Subject or Issuer
-+ * name, and call x509_cert_parse().  The key and signature are dummies, so
-+ * Issuer and Subject must differ or the parser tries to verify the signature
-+ * as a self-signed certificate.
-+ */
-+#include <kunit/test.h>
-+#include <linux/cleanup.h>
-+#include <linux/err.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include "x509_parser.h"
-+
-+/* Name DERs: empty, CN=x, CN=y, and one whose member is not a SET. */
-+static const u8 name_empty[] = { 0x30, 0x00 };
-+static const u8 name_cn[] = {
-+	0x30, 0x0c, 0x31, 0x0a, 0x30, 0x08, 0x06, 0x03, 0x55, 0x04, 0x03,
-+	0x0c, 0x01, 0x78
-+};
-+
-+static const u8 name_other_cn[] = {
-+	0x30, 0x0c, 0x31, 0x0a, 0x30, 0x08, 0x06, 0x03, 0x55, 0x04, 0x03,
-+	0x0c, 0x01, 0x79
-+};
-+
-+static const u8 name_not_a_set[] = { 0x30, 0x03, 0x02, 0x01, 0x00 };
-+
-+static const u8 cert_version[] = { 0xa0, 0x03, 0x02, 0x01, 0x02 };
-+static const u8 cert_serial[] = { 0x02, 0x01, 0x01 };
-+/* sha256WithRSAEncryption, NULL parameters */
-+static const u8 cert_sig_algo[] = {
-+	0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01,
-+	0x0b, 0x05, 0x00
-+};
-+
-+/* 2026-01-01 to 2036-01-01 */
-+static const u8 cert_validity[] = {
-+	0x30, 0x1e,
-+	0x17, 0x0d, '2', '6', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z',
-+	0x17, 0x0d, '3', '6', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z'
-+};
-+
-+/* rsaEncryption with a dummy 4-byte key; the key is not parsed here */
-+static const u8 cert_spki[] = {
-+	0x30, 0x16,
-+	0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01,
-+	0x01, 0x05, 0x00,
-+	0x03, 0x05, 0x00, 0x01, 0x02, 0x03, 0x04
-+};
-+
-+static const u8 cert_signature[] = { 0x03, 0x05, 0x00, 0x01, 0x02, 0x03, 0x04 };
-+
-+/* Write tag, length (up to 255) and @len bytes of @val at @out. */
-+static u8 *put_tlv(u8 *out, u8 tag, const u8 *val, size_t len)
-+{
-+	*out++ = tag;
-+	if (len > 127)
-+		*out++ = 0x81;
-+	*out++ = len;
-+	memcpy(out, val, len);
-+	return out + len;
-+}
-+
-+static u8 *put_raw(u8 *out, const u8 *val, size_t len)
-+{
-+	memcpy(out, val, len);
-+	return out + len;
-+}
-+
-+static struct x509_certificate *parse_cert(struct kunit *test,
-+					   const u8 *issuer, size_t issuer_len,
-+					   const u8 *subject, size_t subject_len)
-+{
-+	/* The parsed certificate keeps pointers into this buffer. */
-+	u8 *cert = kunit_kzalloc(test, 256, GFP_KERNEL);
-+	u8 tbs[160], body[256], *p = tbs, *q = body;
-+
-+	KUNIT_ASSERT_NOT_NULL(test, cert);
-+	/* Keep tbs[] and body[] large enough for the fixed parts plus the names. */
-+	KUNIT_ASSERT_LE(test, issuer_len + subject_len, 64);
-+
-+	p = put_raw(p, cert_version, sizeof(cert_version));
-+	p = put_raw(p, cert_serial, sizeof(cert_serial));
-+	p = put_raw(p, cert_sig_algo, sizeof(cert_sig_algo));
-+	p = put_raw(p, issuer, issuer_len);
-+	p = put_raw(p, cert_validity, sizeof(cert_validity));
-+	p = put_raw(p, subject, subject_len);
-+	p = put_raw(p, cert_spki, sizeof(cert_spki));
-+
-+	q = put_tlv(q, 0x30, tbs, p - tbs);
-+	q = put_raw(q, cert_sig_algo, sizeof(cert_sig_algo));
-+	q = put_raw(q, cert_signature, sizeof(cert_signature));
-+	p = put_tlv(cert, 0x30, body, q - body);
-+
-+	return x509_cert_parse(cert, p - cert);
-+}
-+
-+/* RFC 5280 allows an empty Subject, so the certificate must parse. */
-+static void x509_empty_subject(struct kunit *test)
-+{
-+	struct x509_certificate *cert __free(x509_free_certificate) =
-+		parse_cert(test, name_other_cn, sizeof(name_other_cn),
-+			   name_empty, sizeof(name_empty));
-+
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, cert);
-+	/* raw_subject_size counts the contents, not the tag and length. */
-+	KUNIT_EXPECT_EQ(test, cert->raw_subject_size, 0);
-+}
-+
-+/* Control: the same certificate with a one-RDN Subject parses. */
-+static void x509_named_subject(struct kunit *test)
-+{
-+	struct x509_certificate *cert __free(x509_free_certificate) =
-+		parse_cert(test, name_other_cn, sizeof(name_other_cn),
-+			   name_cn, sizeof(name_cn));
-+
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, cert);
-+	KUNIT_EXPECT_EQ(test, cert->raw_subject_size, sizeof(name_cn) - 2);
-+}
-+
-+/* A Subject member that is not a SET must be rejected, not looped over. */
-+static void x509_subject_not_a_set(struct kunit *test)
-+{
-+	struct x509_certificate *cert __free(x509_free_certificate) =
-+		parse_cert(test, name_other_cn, sizeof(name_other_cn),
-+			   name_not_a_set, sizeof(name_not_a_set));
-+
-+	KUNIT_EXPECT_EQ(test, PTR_ERR_OR_ZERO(cert), -EBADMSG);
-+}
-+
-+/* The Issuer must not be empty. */
-+static void x509_empty_issuer(struct kunit *test)
-+{
-+	struct x509_certificate *cert __free(x509_free_certificate) =
-+		parse_cert(test, name_empty, sizeof(name_empty),
-+			   name_cn, sizeof(name_cn));
-+
-+	KUNIT_EXPECT_EQ(test, PTR_ERR_OR_ZERO(cert), -EBADMSG);
-+}
-+
-+static struct kunit_case x509_parser_cases[] = {
-+	KUNIT_CASE(x509_empty_subject),
-+	KUNIT_CASE(x509_named_subject),
-+	KUNIT_CASE(x509_subject_not_a_set),
-+	KUNIT_CASE(x509_empty_issuer),
-+	{}
-+};
-+
-+static struct kunit_suite x509_parser_suite = {
-+	.name = "x509_parser",
-+	.test_cases = x509_parser_cases,
-+};
-+
-+kunit_test_suite(x509_parser_suite);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("KUnit tests for the X.509 certificate parser");
--- 
-2.54.0
+Thanks for v4. I went through all completion and error paths
+(rsa_pub_done, rsa_priv_f_done, akcipher_do_one_req incl. -ENOSPC retry,
+akcipher_enqueue_req incl. -EBUSY, the init_fail paths and the
+rsa_edesc_alloc() labels): unmap happens before the bounce buffer is
+freed and nothing leaks. The v4 bounce_len change is also correct.
+A few comments, mostly on structure and the commit message.
 
+[...]
+
+> +	req_ctx->bounce_buf = NULL;
+> +	req_ctx->orig_dst = req->dst;
+> +	if (req->dst_len > 0) {
+[...]
+> +				sg_init_one(&req_ctx->dst, req_ctx->bounce_buf,
+> +					    bounce_len);
+> +				req->dst = &req_ctx->dst;
+
+1) Please do not overwrite req->dst. It belongs to the caller and is
+visible to it while the request is in flight; it also forces every
+exit path (and any future one) to remember to restore it. The driver
+already uses req_ctx->fixup_src/fixup_src_len for the same purpose on
+the input side. Adding req_ctx->fixup_dst (= req->dst or the bounce sg)
+and using it in rsa_edesc_alloc(), set_rsa_*_pdb() and rsa_io_unmap()
+would remove orig_dst and the restore logic entirely, and make the
+patch smaller.
+
+2) Commit message: on arm64 with CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC,
+small unaligned kmalloc buffers are already bounced by the DMA API
+(dma_kmalloc_needs_bounce() only looks at the size, not the offset).
+Could you state which caller hands in the misaligned dst in the
+module-signature path (offset into a larger buffer, stack, ...) and
+why the DMA layer does not cover it? That helps judge whether this
+belongs in the driver or the caller.
+
+Thanks,
+Sahil
