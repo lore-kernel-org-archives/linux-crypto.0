@@ -1,106 +1,108 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794568854;
-	b=qAAKLyI/O7x8IOb2J/5mpcobc8tcR8JEcGmHxKK/rpN244010JnbecNFpRKjq7zqWJgA
-	 TojZHxhuv+vrurtFNDS3gFDqxNEDgVqEzW41brj0Sm+TMxxPKWPwLFYLHO61VY4COy0s1
-	 dq503vGxsnFC6K6dIdrbdia4xw2FB4lgk6Guzw0omLIMx+T+x75aKHTS4Jz9YDx1p2Ed7
-	 jzAEjRdZJ/W1I1UcY9K/MJUkXegmjeGbixBoJfJG6F6FUfbZsCm4JqrQ1cYGtntCeNO6K
-	 gyuUyem0YZl6J21TV1HSXsrpPkMggyPaGeEa8EuNNjVOu1VWylssBcUwuLfW8Zi277Q==
+	t=1794569298;
+	b=ykuM94KOs8X/ECA3EPw2UEMBLr5i76nC+BiUVcPNgkcol4gQOJkC6fI7rmrehgHUnOEk
+	 nwW1MjCxzd61x0PHBsZ6Gc32C7qTPM3DDH/83D+hP3P+w9VQg7YbPs7CThDmAsQPa6uZi
+	 86WKzyIaCph59tUz5Llf54ehIkiaiphc2OgvxneBR8R2iU/ZhEnpNfTJzsTTS3Y/4I9+N
+	 dOWNCbBEvX52zpdgGpDcOfXpsj+N4609rzzHBkszP7LmnhwHdDm89D7hMCH6/ZZlh64Xd
+	 wjr852zSax+ajynnmimBrx+N8K+6H75EWq4K4WpJBVj8JSDgwkVQyJh9c4sfKnEyxbQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794568854;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794569298;
 	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
 	 X-Mimecast-MFC-AGG-ID:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:Autocrypt:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=z45whPdKr9S3p7TkkwcoWCQyt+iMm3cvuo8IR0skgLI=;
-	b=bdNSuU6U+pnCxfjeVv1skSh4F0P7sRk0hGoneBBbpPxiOH2IyOpTITqvuuvdMJQpUpXn
-	 UpI6lTWARzGMIXydMcnpnN2uI1XhDAnZFTanPkQgjIqXWRohNwEtymIxbtIEZuwM7kRg2
-	 4carypq372JtWOgrKrcYEoxxJ7QKe0gvkOyZwaqvtNsOTBJzhJfLdFa4FxAJZGbBBB9oa
-	 Xd5LdTDQ8cTKJSdvfd1hpsGMNwpS+QB1+m/tmprBfvi9pLGsmtiGwdGrteuB7aZZwUKCQ
-	 tMDJHUHZdUgMaef6sC7GYnujYKyGXXgXcbCyyZefjZjvYTsYiI3eevoA20Q7IlG8OLg==
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 X-Received:Received:Message-ID:Date:MIME-Version:User-Agent:Subject:
+	 To:Cc:References:Content-Language:From:Autocrypt:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=mJ7s+syXoT90r15smycj+SigpCQvPifOz44qvjuC1Lo=;
+	b=v+apZKDWgIS88aOfpMKvtLem8TipKBAkLmXInmdDXFp/965VQsIJ+tYj3cGhYeAvX306
+	 5TnrgAt+ZFDa0PwwjRz3aNzFRTIAJ2jyrQLuZ+GwZsc4Y9k/JIR+6KDYQMtHG3X/2X0K/
+	 KZNN9wHtEOxX7YLMQZkVLtJDBPwdd1BGciiFmTxwTbqPvvJcPOzjQEm8rgqvplOfs8Slb
+	 pg+PlZi9jwieODAhQTGB9ugvfUoFRd131i3ngAfLS3WTe2TSZqxx+cfiQwv+OvSbUXYcN
+	 mDnTHof3zpoqXrDiEI40uzObTy7NwV8VE2t92h0IkCY0upgXUUu5RsPEPYqAv6dZmQg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=redhat.com;
 	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=hk8IIM04;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=cvZdc3IP;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ahMa2osV;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b="Ey5/3toZ";
 	arc=none smtp.remote-ip=170.10.133.124
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88976606A32E
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 11:20:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88976606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2A8606A31C
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 11:28:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E2A8606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=hk8IIM04;
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=cvZdc3IP
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ahMa2osV;
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=Ey5/3toZ
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1794568852;
+	s=mimecast20190719; t=1794569297;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=z45whPdKr9S3p7TkkwcoWCQyt+iMm3cvuo8IR0skgLI=;
-	b=hk8IIM04ucOU4JF75MUhd1qlw1IRA533W2NbsWskREOSXmHhytghNFxKETmbdEBys0s/Uy
-	zD4HmcggoOPNzrvR+QWMWT1JRlU6rYzJDQfAJmRwpKxXz+71kR03syo30Vn8cTrPrVF0Ao
-	ZdIJDga5zBvP9Uq1h2IZ4sln6LCnBzg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mJ7s+syXoT90r15smycj+SigpCQvPifOz44qvjuC1Lo=;
+	b=ahMa2osVPRiXnhS+GW5urSWdF1za7vQpgvAZ/tn9XhPTe2N1gunJ/pDbbtEevE0JXheu8r
+	nNtPHn8hfwFmvg2lwy2eKSFlBdaWxn7Pb1p2aoRKgHvc/1PDUrzVLYo5sWCZmfflhPoucF
+	vMKHblyvZ6LderM2Hrt5rTkJwWRNQFw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-244-uhpsB9rjMYeQNHXVelrEiQ-1; Fri, 13 Nov 2026 06:20:51 -0500
-X-MC-Unique: uhpsB9rjMYeQNHXVelrEiQ-1
-X-Mimecast-MFC-AGG-ID: uhpsB9rjMYeQNHXVelrEiQ_1794568850
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4ba078abd78so5706775e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 03:20:51 -0800 (PST)
+ us-mta-86-lbQsuclUP5-pD26wuVFPow-1; Fri, 13 Nov 2026 06:28:15 -0500
+X-MC-Unique: lbQsuclUP5-pD26wuVFPow-1
+X-Mimecast-MFC-AGG-ID: lbQsuclUP5-pD26wuVFPow_1794569295
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4930269afdcso537636f8f.2
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 03:28:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1794568850; x=1795173650; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1794569295; x=1795174095; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=z45whPdKr9S3p7TkkwcoWCQyt+iMm3cvuo8IR0skgLI=;
-        b=cvZdc3IPsegK3KK4I/DGt/1VpNhGyPFaagHX7F1DAMiKuC7nYz/DRZvFqV4xcXexQ0
-         XdwY430I6BDbjdRRWmKhMxa4GUv+JbVcU+YX5KBz9ONk9+3a0vlBlOruho1iBfznaSE4
-         mmtPnmPVlaM6Un23h1W+9ebIcXvq9SncM8rKwMcuivs5gjWXe07Bu/PqfC1PCMf5z4gs
-         NrB+Pd2YOj/T+L/gS1yGYiPZmXWIdPzs6DePCfUJsaIK6XNEWPIdfDTFl0kv435KjCIR
-         yJj7U5MKOwMtHCtrEHkt5oQVQOY4svkFsVmME9yRI1hJXNPciT4m2IZHsJnLpoPcncTw
-         tRUA==
+        bh=mJ7s+syXoT90r15smycj+SigpCQvPifOz44qvjuC1Lo=;
+        b=Ey5/3toZAFwvO2ZscbEgBAtBmUktbaPMiZjBlYcTr8d0x0nIn+pkgowLXVo/+Ncj8S
+         Lc401WBm7gAeOidWbcRZSMkatF5QEVMaHHhpvUcoi0odDixYih2P56VxAneDQoKLoCyy
+         YFR6kTWhKolY3z5PhHcRqgynGEOzVRQ+aKEGK5zvxz+h2tLWNJYOUz4t+Z2Jbg5emk6m
+         yFYbkn7k1qWEgUJQGtPfJ1kWi3gpSDnR2SwAZgSTPNsoQ4Ik5xS5XQkOorfV5pi2UMje
+         thOLN2pcqLviJvNFvqsA11bQm8GW3Q01td/gvKfHVhXrZjgEia4R6TFAhzQnybqRWq2D
+         tOKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794568850; x=1795173650;
+        d=1e100.net; s=20260707; t=1794569295; x=1795174095;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=z45whPdKr9S3p7TkkwcoWCQyt+iMm3cvuo8IR0skgLI=;
-        b=OgzpB//FwOxOMHqXTGA/t8joSDFmLidt/roKvg+Zl+v354+PSLtI8OtmOUElPxpysa
-         ZEyfdKV6+5P1rLf4lZU8dTSUOrQTrK4YAPH2kywREincMh9tvvpQTn4+fxal+8d/OZhO
-         GGhrD/dN7Abw91l/c8dqJd8rKaQGLIoiWwe9HqDpfW4DP3SnnUVKYQ00U2rZ8on6X0Go
-         XOPUAmZE1lobHn7Y9w3nMemLDgUuldfpvEUURGPFpa2iwke4Ifn22E2+X4C/HaDlbl8d
-         0K+N3fdTkApUsjXGeDNAAAN+eAcn5RyI9NO47PwkcK6mHiY9lXR26/VzzeceMiVgyeQ6
-         Q4lg==
-X-Gm-Message-State: APuU4Z9w5F5MxgEa2jELK7wG4oSXztXUoyKF0OINJEjvElJLdVwdTsyu
-	h6gs9YciuVpoS4qf1KvXfdE0oPv8AlU/S1f2i2/PfybNAHBS62g9a9TZ1f/WQC6piA3f1PzeWdt
-	1Lc+xeQjVNintuoHgTQyxqOFg4ca2Xr8M9a0zqsTUm61c55xfJwjvIcTDvC/e05QNQw==
-X-Gm-Gg: AYBFou0Js/Ut5eokUFMjwfO1x5yFBmzQf11DVMIIIC7yTuuEkZ3CfisgaXVZBgFEl/d
-	aB0E1AOu94PWlVN4QzTUtc5Ejp9kNdB/Sxd2XN+hzfL9JNvdbai8mprEkcQD9MBaRKg0Ysu6+lA
-	a1BIM7l4TQYJpXqWYw/hIuLxulit0A7++4/O6uhj0qGMZHFQoW+jhyw/YuFEhSv5IZevY4Xlx7y
-	4+oNKMd6eiI6oDJ3eZGwsyllUD37odg/laauKLZpcVk5m8Qm0LlcB8a6F4eyjyS8UvmKegWAEJ3
-	gbe4QfeLILwR37ah3XY7R5rmIUMYj1HzaLV9DV5q58Lwje+0LIYAnMvJ4JBjdBpzo5+4hxJOUwq
-	7A7g+C+WGsvAIj2B+MDd/hIuZp+uU8LqdDHEIQ/5n9FFH
-X-Received: by 2002:a05:6000:2886:b0:490:6e0f:a02e with SMTP id ffacd0b85a97d-49c70b05145mr5376565f8f.17.1794568850065;
-        Fri, 13 Nov 2026 03:20:50 -0800 (PST)
-X-Received: by 2002:a05:6000:2886:b0:490:6e0f:a02e with SMTP id ffacd0b85a97d-49c70b05145mr5376507f8f.17.1794568849570;
-        Fri, 13 Nov 2026 03:20:49 -0800 (PST)
+        bh=mJ7s+syXoT90r15smycj+SigpCQvPifOz44qvjuC1Lo=;
+        b=msoGOZ7fOnPOkel6FShXj0aCjE5yEBCHFo/PGrxj2Q1d3j/XdshgbK/EmN0kswr7n9
+         AurO5ho9zPWX/64Xre94IFONezFQaFEBuBrB2r/hwgaf3yF+eeTMaI1aM9q2zk62ur2j
+         2tSp7AP0zyWmJF7TbX6kCPJwJvsnG5ynB821VFYNxLOFSP6C3xVNW+rk2Ch3LEL3uMcb
+         yxrR4BhecK1WbvJywKvQe3C7nEpxWKl1e0dMn9ZG0VWGSBiPKIoYTMsnkIHlkWs/rE7L
+         e5J3QZLeTP0KfoVLxZrCR+rVakQ7KnDIN4m5lv21Cg/rW+Wj5UYBaR+ESxuUTkhJitqr
+         7I7Q==
+X-Forwarded-Encrypted: i=1; AL+hErESp4YsExIf7pKD6t+9ggQBhu1gPFvGlspdjy2JqzDLme3wpWgcvjLMkcFNBNw38P5hxMLjmcIrI3Az9BQ=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+AJb20xzWf5xyMytleBashQ3jbk7UPD3BfSupy6+TlE0y/52R/
+	YqX+7ICEczOwxs9SOfYwTf3KpmHNTGSodT2OR7sr2zIcrWCnn327Iw7jyduO2kg4CoaEuNDT4ZL
+	fKleXH1cj0LAovrJr2SeyEx4JM3eH2bP1gszrZgYqiECUbaxU5dtJoss+/eZ8wATDxY6v6uF01g
+	==
+X-Gm-Gg: AYBFou1DEVkaOsXWyKqkJhMm0ASqaTFjra4/g/3sQQhuYQUU0dVm6n4hVIbqt+OzMXM
+	zj4XnQ+FiXM1C3lvsZwwUBVbSIbgVaUcQ2t4ndniLAlurwN1HtglBxdAziz9oeP5Tzb8TrlkYb+
+	UssjNEdnMkMYgZR2Y0M/rhh/dGGwOc05w5AgpxK/LpGZ92THt2NyJmC69yZ6KvJWmLDT9g3soMr
+	zzkhi13weoMSrr2DuQ7ao5/gxVAzh/MQN3cXBhJkkaZhItHAOPUCCGAA4DpCVlhdA6ntOaZ8DUe
+	ncT+lbv+wPFEn0Vft6VLS6nAt+GObDcFAiZzCfZ4MYRuXx7y7U7rtwZogtLi5vrd3sT6HZAF1VN
+	5h3YB1YhiX/WTDfHKOGv3QppElCfP0NgxKP5LVOmTX0aN
+X-Received: by 2002:a05:6000:4b05:b0:49c:d519:7ba9 with SMTP id ffacd0b85a97d-49cd5197c97mr2689709f8f.17.1794569294661;
+        Fri, 13 Nov 2026 03:28:14 -0800 (PST)
+X-Received: by 2002:a05:6000:4b05:b0:49c:d519:7ba9 with SMTP id ffacd0b85a97d-49cd5197c97mr2689660f8f.17.1794569294077;
+        Fri, 13 Nov 2026 03:28:14 -0800 (PST)
 Received: from [192.168.0.9] ([47.64.115.75])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c609c602dsm4473677f8f.46.2026.11.13.03.20.48
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c605e5b2fsm4940129f8f.40.2026.11.13.03.28.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Nov 2026 03:20:48 -0800 (PST)
-Message-ID: <545910af-9ff4-4fcc-92bb-43a56f88753e@redhat.com>
-Date: Fri, 13 Nov 2026 12:20:47 +0100
+        Fri, 13 Nov 2026 03:28:13 -0800 (PST)
+Message-ID: <cc552609-ece5-4f82-94b2-b00edf0f92a7@redhat.com>
+Date: Fri, 13 Nov 2026 12:28:12 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -111,12 +113,12 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: qat - clear fw_loader pointer on adf_ae_init()
- failure
-To: Ahsan Atta <ahsan.atta@intel.com>, herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
- Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-References: <20261103100126.534424-1-ahsan.atta@intel.com>
+Subject: Re: [PATCH 04/14] crypto: jitterentropy - Add library API
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+References: <20261018204618.104876-1-ebiggers@kernel.org>
+ <20261018204618.104876-5-ebiggers@kernel.org>
 Content-Language: en-US
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -161,37 +163,49 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20261103100126.534424-1-ahsan.atta@intel.com>
+In-Reply-To: <20261018204618.104876-5-ebiggers@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Am 03.11.26 um 11:01 schrieb Ahsan Atta:
-> adf_ae_init() stores the newly allocated loader data in
-> accel_dev->fw_loader before calling qat_hal_init(), as the latter
-> publishes the HAL handle through that pointer. If either
-> qat_hal_init() or adf_ae_reset() fails, the error paths free the
-> allocation but leave accel_dev->fw_loader pointing at freed memory,
-> so the device is left holding a dangling pointer.
+Am 18.10.26 um 22:46 schrieb Eric Biggers:
+> Make the jitterentropy RNG accessible using a regular set of functions.
 > 
-> No code path dereferences that stale pointer today. This is therefore
-> a robustness improvement with no observable failure behind it, hence
-> no Fixes tag.
+> This will allow drbg.c to just access it directly, instead of going
+> through the overly-general crypto_rng abstraction.
 > 
-> Clear accel_dev->fw_loader when the allocation is released, and fold
-> the duplicated error handling into a cascading goto chain. Report the
-> error returned by the callee rather than a generic -EFAULT;
-> adf_dev_init() still maps any failure to -EFAULT, so this is a
-> readability improvement and not a functional change.
-
-The -EFAULT in adf_dev_init() should likely also go away: EFAULT means "Bad 
-address", i.e. a page could not be accessed. Thus it's likely the wrong 
-error code for most cases there.>
-> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Later commits will remove crypto_rng.
+> 
+> Note that the library API should also continue to meet all the same
+> certification requirements, including the health check which occurs on
+> the first call to crypto_jent_alloc().
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->   .../intel/qat/qat_common/adf_accel_engine.c   | 21 ++++++++++++-------
->   1 file changed, 14 insertions(+), 7 deletions(-)
-Anyway, this patch is already a proper step into the right direction, so:
+...
+> +int crypto_jent_get_bytes(struct jitterentropy *rng, u8 *out,
+> +			  unsigned int out_len)
+> +{
+> +	int ret;
+> +
+> +	guard(mutex)(&rng->jent_lock);
+> +
+> +	ret = jent_read_entropy(rng->entropy_collector, out, out_len);
+> +
+> +	if (ret == -3) {
+> +		/* Handle permanent health test error */
+> +		/*
+> +		 * If the kernel was booted with fips=1, it implies that
+> +		 * the entire kernel acts as a FIPS 140 module. In this case
+> +		 * an SP800-90B permanent health test error is treated as
+> +		 * a FIPS module error.
+> +		 */
+> +		if (fips_enabled)
+> +			panic("Jitter RNG permanent health test failure\n");
+> +
+> +		pr_err("Jitter RNG permanent health test failure\n");
+> +		return -EFAULT;
+EFAULT means "bad address" in the sense of a page fault ... not sure whether 
+this is the appropriate error code here? Maybe -EIO would be a better fit?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+  Thomas
 
