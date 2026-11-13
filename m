@@ -1,62 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794575486;
-	b=eaVv9Ol4Ylp2JYmZIb3peY4zHhq7urLZk3c6LjF9Q05Uejw1Syram2RHP3D8H46t539d
-	 DWudSwWgP47Z9LPkZ7aCagQI+gZHa+bT7uYH47mQvYJ0FDuesLIlDBzsgrg3rRrnFVnKi
-	 /LYA/jFTToElbBRlOhUDcvCT8z4P2gv2ZIhRRzeh+FWv8VA/D1fPsDUrB8HByXphlVI8O
-	 Kk1A74ID69GSvMKUkkB+DsoxXrkJOagafPMwLyyslKxXQwEnhvjx8zcgQKUV1MxaB1CKE
-	 HgsSeQdtoamELh4+oKDqoyQote/usuMESpL6CaZtv8HNDJ8sjsk/T2VQAF8fOn0XbVA==
+	t=1794575543;
+	b=YerH6BV0tokI6rX4KzhDiPcOM8EOxrpw3PIL1cEYrTer2k3Kr+k8KMZhD82Z2DrOvi3y
+	 QnxZsw5w872QZb5KidSBR8mBU8I8n8906pQiXIt5AlzG/3fE84Ij3RWVn5Y/jn7aYSG8t
+	 pBugx+6UkIb6WmlX+ORL01RveMyohUOGy/XBh0LTgJe0gPea26UGbYPhM2QfA1Gp423t3
+	 dNnflAQiS7wfs5fAiI4i2D9ytY9PB9WWbw6LoAJJJr1PCD2Vt/18OChNt4V5RqsOw2oMo
+	 Cc6IH5p5wxiugWc5NvJIB8LzIjwhskk6NXevLwmymGIgtl7IrRhv8DG0Tp4jjhmWd5g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794575486;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794575543;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=U0ygKyLutILP/XtWeh+LVZtQfdAEhW04usgP+2QPJoY=;
-	b=rO1pjSDn/5TooiQaMMLATTb5xikxUlZA0ZQ7gX7RtLfyzbmfjQHUmy9dAc9ie0taGs6b
-	 nMyRtsk00jgoipBPB9yqrSbYa53HEj1tvY4UI5REHnz7T3KzZc1Bk0V1YmvcWPqK6zuxd
-	 x16BzYOGdz1waTwWJVOTKEBK1HGfr8lFydgE7vObEc3ii0Ns2HU9SmQIIf2f+vSQhFhpR
-	 zWOMSHT8O46NSJewUnnCaFjC/Mpx/VeDq+o109bEWgJsq5RFp6b6srXG+r2G5ERTsmxFz
-	 Qd12orP/s7sWqnPNsVSJt5wke4gEE0JohM8nwzJ/hw4uK9DIxsMM2meC0HVMUP9iCfQ==
+	bh=BEAe5s9SBOdqODPn2arcQPFCRRyq9enYmZjtSCRz1Oo=;
+	b=M7PZuUgkWIzSuLWq1IkNe5BltOxDGkgWGNgDLXccbzBNxXZSYgAlYF/JyRobJnFKjrpM
+	 V/+JCaHHd9y4Dg0zNYR3jOFHPzvChiGW7CtgJcfc6/v82Lgj58Wso2QTsfs15yQ0s22hC
+	 u+3/EgjWmmFiZsF7poVWCOC2C/miaWEw48TSKCGBI/KZO4Gk56/rm14vOTGzNhBowCAHJ
+	 b8In/JIUEFYNQcAVRA8xwrLcLaotP1g1sxtnkPbU6gE6eKUswEXmIKdkxj8ekkudcNq7W
+	 sBuxaIzGP55uGGae/bagoSn9cyHKCXV601DEu9y5X8NHzJa7JQ/IK+7grfcYKd+1sSg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=FQHXsfW6;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=G5KCHl4X;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FE6606A333;
-	Fri, 13 Nov 2026 13:11:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F0FE6606A333
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73CD606A327;
+	Fri, 13 Nov 2026 13:12:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E73CD606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=FQHXsfW6
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=G5KCHl4X
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=U0ygKyLutILP/XtWeh+LVZtQfdAEhW04usgP+2QPJoY=; 
-	b=FQHXsfW6A/lZ13C3f/x7iX9wJM4zgUp9cTH18l0OawuFvH2A/hIVKmCVIabC0KOACNNTNgOFpEc
-	lW/oRvZ9po56s7phT+lDfDVLtYXOOdVTTOXUPOuhkU41JjTifH8GF4/GCuUsCZ+X4P9Ejz+qtoJO6
-	RrgTVSjIdtsF1PPZbaklfyChr+cX7vrUKwnjjift+bjqDgjE7Sp2iUok+WHM17kMVHWKtUp75fd4q
-	aqRb5GsFSbErpXSBXuJY/lk9ekUopwULyZSHt2bVVHt+KqKSedn/Ed9CsnE/EpYSTQB4GHhA9IRsM
-	E7vIyEPTaGisJ4vClzzGC2R+Ow/P43BDwPWQ==;
+	from:content-type:reply-to; bh=BEAe5s9SBOdqODPn2arcQPFCRRyq9enYmZjtSCRz1Oo=; 
+	b=G5KCHl4X9JAYLXV+UR6WMuWOvyn2xn45bCaN/Sczi6/HCfzAPGf+LEwbhyTw1wyz44VkWp6HB3Y
+	eQyd/2xFDPGw+Fo4a/L0KR+qgenHox9IWCyVR9zkPdW9KW3wq8RgsMvN46nD7bHPSk7Utix2EGwhd
+	hUAfS3kwnV5ZHJmbm/WyhwBhvUZUWLMJh82T0351KpvIk/P4YIGA636bNtXc+CnUPeX0rTgeghKOe
+	xnUV9B6JQr2omfNnfw2vCpnZKAISgIAhm7GhfWsZl1WbUyD6Yj7Ah5hbRjRa5wc0Dkb40KC64A+F8
+	nO7dxAMafwt8YAz4/lL0J0GZpgIHoIgvGkEA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xRr3q-0000000EfPV-15oM;
-	Fri, 13 Nov 2026 21:11:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Nov 2026 21:11:22 +0800
-Date: Fri, 13 Nov 2026 21:11:22 +0800
+	id 1xRr4l-0000000EfRb-2DAK;
+	Fri, 13 Nov 2026 21:12:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Nov 2026 21:12:19 +0800
+Date: Fri, 13 Nov 2026 21:12:19 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Walter McKelvie <walt@mckelvie.org>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org, ebiggers@kernel.org,
+To: Wentao Liang <vulab@iscas.ac.cn>
+Cc: ayush.sawal@chelsio.com, harsh@chelsio.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: algif_aead - Allow gcm(aes) for privileged
- users
-Message-ID: <avcMesCb2A70wzKj@gondor.apana.org.au>
-References: <2e4c2648-72b2-4249-89d3-8dd111b84395@app.fastmail.com>
- <20261106043459.1169202-1-walt@mckelvie.org>
+Subject: Re: [PATCH v2] crypto: chelsio - Fix wrcount leak in AES encrypt and
+ decrypt
+Message-ID: <avcMsxrji3DeptQY@gondor.apana.org.au>
+References: <20260916092359.2001753-1-vulab@iscas.ac.cn>
+ <arNk6ujyrvTsFBfS@gondor.apana.org.au>
+ <179395069486.2116632.4190811765560584696@iscas.ac.cn>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -68,46 +70,37 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261106043459.1169202-1-walt@mckelvie.org>
+In-Reply-To: <179395069486.2116632.4190811765560584696@iscas.ac.cn>
 
-On Thu, Nov 05, 2026 at 11:34:59PM -0500, Walter McKelvie wrote:
-> iwd depends on the AF_ALG algorithm "gcm(aes)", although iwd's own
-> source never mentions "gcm(aes)" or L_AEAD_CIPHER_AES_GCM.  The
-> dependency is indirect, through the TLS implementation in libell (ell)
-> that iwd uses for EAP-TLS, EAP-TTLS and EAP-PEAP: iwd's
-> src/eap-tls-common.c hands the EAP tunnel to l_tls_new().  In ell, the
-> TLS 1.2 cipher suite table in ell/tls-suites.c uses
-> L_AEAD_CIPHER_AES_GCM for the eight *_WITH_AES_{128,256}_GCM_* suites,
-> ell/cipher.c maps that to the AF_ALG name "gcm(aes)", and
-> tls_change_cipher_spec() in ell/tls.c instantiates it with
-> l_aead_cipher_new().  Before offering a suite, ell checks that its AEAD
-> could be bound on an AF_ALG socket (l_aead_cipher_is_supported()) and
-> drops the suites whose bind() failed.
+On Fri, Nov 06, 2026 at 07:38:14AM -0000, Wentao Liang wrote:
+> chcr_aes_encrypt() and chcr_aes_decrypt() increment the device inflight
+> count with chcr_inc_wrcount() before building the work request, but both
+> can return early without dropping the count.
 > 
-> With af_alg_restrict=1 the bind of "gcm(aes)" fails even for iwd, which
-> holds CAP_NET_ADMIN, so the AES-GCM suites silently disappear from
-> iwd's ClientHello and EAP authentication fails against RADIUS servers
-> that only accept GCM suites (common for eduroam deployments).  This
-> contradicts the intent of commit 2f204fe718f5 ("crypto: af_alg - Add
-> af_alg_restrict sysctl, defaulting to 1"), which was to keep iwd
-> working under the default restriction level; the iwd algorithm list it
-> was based on evidently did not account for the algorithms used by
-> ell's TLS code.
+> chcr_aes_encrypt() leaks the count when process_cipher() fails or
+> returns no skb. chcr_aes_decrypt() leaks it when the tx queue is full or
+> when process_cipher() fails and returns no skb. No completion can
+> balance those increments, so every failed request permanently skews the
+> count and eventually blocks the device from being detached, with the
+> detach worker warning "CHCR:request Still Pending".
 > 
-> Add "gcm(aes)" to the privileged part of the AEAD allowlist.  It is
-> the only AEAD that iwd actually uses: ell's TLS code has no CCM or
-> ChaCha20-Poly1305 suites, and no other ell or iwd code creates an AEAD
-> cipher.  (ell does bind "ccm(aes)" once at startup, in
-> init_supported() in ell/cipher.c, to probe which AEADs are available,
-> but nothing uses it, so its allowlist comment is left as is.)
+> chcr_aes_encrypt() already has an error label that calls
+> chcr_dec_wrcount(), so jump to it on the remaining failure path. Add the
+> same label to chcr_aes_decrypt() and jump to it from both of its failure
+> paths, mirroring the encrypt side.
 > 
-> Fixes: 2f204fe718f5 ("crypto: af_alg - Add af_alg_restrict sysctl, defaulting to 1")
-> Link: https://github.com/NixOS/nixpkgs/issues/583203
+> Fixes: fef4912b66d6 ("crypto: chelsio - Handle PCI shutdown event")
 > Cc: stable@vger.kernel.org
-> Signed-off-by: Walter McKelvie <walt@mckelvie.org>
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 > ---
->  crypto/algif_aead.c | 1 +
->  1 file changed, 1 insertion(+)
+> Changes in v2:
+> - Fix chcr_aes_encrypt() and chcr_aes_decrypt() in a single patch, as
+>   requested. Sorry for the late reply.
+> - Link to v1: https://lore.kernel.org/all/20260916092527.2002187-1-vulab@iscas.ac.cn/
+>   https://lore.kernel.org/all/20260916092359.2001753-1-vulab@iscas.ac.cn/
+> ---
+>  drivers/crypto/chelsio/chcr_algo.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 
 Patch applied.  Thanks.
 -- 
