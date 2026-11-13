@@ -1,62 +1,106 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.10.208.62
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794566226;
-	b=wj1/j1TbyicW1VqKkDG8B7KlujE6lFfOAEx9w7FdN+0lSkuR8F0ctQCUDZh7Q6dC5wJ/
-	 WAYC6je5Cldwc+78GmW7FUytSa05bzG1UWpuwWmIv02DMZUHMfzXplftdQuEYN4X+fHpu
-	 S1UYZ8ijdf3o5KtvaFyxclRBIwJPij8EHPpeYCMaJ8Az8IVcO7H1jQa9e+CUuEpvSVEuk
-	 66/bimDzrZPLpzBdyyynjOOYhG2X44rPz73TmNIeIKAkvXsEY72ntUK47huyW+wr+w5PL
-	 fSOoL55eX5leXjkAcO71QG4Da0eZXyAkP0JHIvKfc4c3HV9v1JsLZ2DdXCghfHDmXrQ==
+	t=1794568854;
+	b=qAAKLyI/O7x8IOb2J/5mpcobc8tcR8JEcGmHxKK/rpN244010JnbecNFpRKjq7zqWJgA
+	 TojZHxhuv+vrurtFNDS3gFDqxNEDgVqEzW41brj0Sm+TMxxPKWPwLFYLHO61VY4COy0s1
+	 dq503vGxsnFC6K6dIdrbdia4xw2FB4lgk6Guzw0omLIMx+T+x75aKHTS4Jz9YDx1p2Ed7
+	 jzAEjRdZJ/W1I1UcY9K/MJUkXegmjeGbixBoJfJG6F6FUfbZsCm4JqrQ1cYGtntCeNO6K
+	 gyuUyem0YZl6J21TV1HSXsrpPkMggyPaGeEa8EuNNjVOu1VWylssBcUwuLfW8Zi277Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794566226;
-	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:
-	 Organization:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 X-Rspamd-Queue-Id;
-	bh=mcEaM2ur2M0qtp8COwjOtk3VZ9VEp78bGrqfRJ8uL1c=;
-	b=BeYlSEIPorOTx0y4R0ZoZazyZ0hyWB1RxB32fbPclQF7NbR+hbRET8zM3La/YwYYAInL
-	 +v6F9BoMDNJaT3vViEdLvzJAHkyYDs8OQ+cdbqwOU83Z47A0Qoofz7u/VB/AdWLuw2/od
-	 ZaE7iUnGJJYx45s4XPfvO41HeIJ/xF8pbQCmyczYPTzH2ep5SEaMtYUBO/dRlguqlB7In
-	 5vKKzVY0vmZsjCi6wciMm4NKqkBipwKimB5efGZj+aKTR0UphCzddGfZR8PT25y1Uu20N
-	 mVVSwBmwdm9SH1lTg1XTJUEDPyBJ38ICyJp3G4FqZOAQKCiPBpk8rRQwKxlFjiS2rpQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794568854;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:Autocrypt:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=z45whPdKr9S3p7TkkwcoWCQyt+iMm3cvuo8IR0skgLI=;
+	b=bdNSuU6U+pnCxfjeVv1skSh4F0P7sRk0hGoneBBbpPxiOH2IyOpTITqvuuvdMJQpUpXn
+	 UpI6lTWARzGMIXydMcnpnN2uI1XhDAnZFTanPkQgjIqXWRohNwEtymIxbtIEZuwM7kRg2
+	 4carypq372JtWOgrKrcYEoxxJ7QKe0gvkOyZwaqvtNsOTBJzhJfLdFa4FxAJZGbBBB9oa
+	 Xd5LdTDQ8cTKJSdvfd1hpsGMNwpS+QB1+m/tmprBfvi9pLGsmtiGwdGrteuB7aZZwUKCQ
+	 tMDJHUHZdUgMaef6sC7GYnujYKyGXXgXcbCyyZefjZjvYTsYiI3eevoA20Q7IlG8OLg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=mandelbit.com;
-	spf=pass smtp.mailfrom=mandelbit.com;
-	dkim=pass header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b="z/6Ep7Db";
-	arc=none smtp.remote-ip=195.10.208.62
-Received: from mout-b-202.mailbox.org (mout-b-202.mailbox.org [195.10.208.62])
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=hk8IIM04;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=cvZdc3IP;
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B8C606A31C
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 10:37:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 40B8C606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88976606A32E
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 11:20:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88976606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=z/6Ep7Db
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-b-202.mailbox.org (Postfix) with ESMTPS id 4jQtwj6wrYzKpVf;
-	Fri, 13 Nov 2026 11:36:53 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1794566214;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=hk8IIM04;
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=cvZdc3IP
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1794568852;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mcEaM2ur2M0qtp8COwjOtk3VZ9VEp78bGrqfRJ8uL1c=;
-	b=z/6Ep7DbGqcVICFzW4IH9MPnta0dyYFODxR47Fv7wN/VRycZ/RjHZntix8iAsY2k3T7n0f
-	AGj4m3nR13rdXlB/SowGPiUjLQ4S9stx/xOcGhL1FKY2gAY2VXOqm2vSNGVp5mWRdIFB1j
-	iouLpu5ny7NMV3+L7dutSWOpDZJsqqvuRtwQMA5gy1cKmd1uOm5CSh9aFCPJC9IRX+aGwk
-	bo9pA85tTYP+IHOZydRHLfpIiq18Wu1yyy3hftz54Crctu2FEK5MUzTSnQHhSR0DX8lV2c
-	TEdTeKZmQl8U0GnpyrZlEt59PtLWZjlVVU/qxESyCzpnU1u/+dMctD37AyqU5Q==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of antonio@mandelbit.com designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=antonio@mandelbit.com
-Message-ID: <818d8649-5bfc-46ac-a0d8-b9a5a2a052e9@mandelbit.com>
-Date: Fri, 13 Nov 2026 11:36:50 +0100
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=z45whPdKr9S3p7TkkwcoWCQyt+iMm3cvuo8IR0skgLI=;
+	b=hk8IIM04ucOU4JF75MUhd1qlw1IRA533W2NbsWskREOSXmHhytghNFxKETmbdEBys0s/Uy
+	zD4HmcggoOPNzrvR+QWMWT1JRlU6rYzJDQfAJmRwpKxXz+71kR03syo30Vn8cTrPrVF0Ao
+	ZdIJDga5zBvP9Uq1h2IZ4sln6LCnBzg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-244-uhpsB9rjMYeQNHXVelrEiQ-1; Fri, 13 Nov 2026 06:20:51 -0500
+X-MC-Unique: uhpsB9rjMYeQNHXVelrEiQ-1
+X-Mimecast-MFC-AGG-ID: uhpsB9rjMYeQNHXVelrEiQ_1794568850
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4ba078abd78so5706775e9.1
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 03:20:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1794568850; x=1795173650; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=z45whPdKr9S3p7TkkwcoWCQyt+iMm3cvuo8IR0skgLI=;
+        b=cvZdc3IPsegK3KK4I/DGt/1VpNhGyPFaagHX7F1DAMiKuC7nYz/DRZvFqV4xcXexQ0
+         XdwY430I6BDbjdRRWmKhMxa4GUv+JbVcU+YX5KBz9ONk9+3a0vlBlOruho1iBfznaSE4
+         mmtPnmPVlaM6Un23h1W+9ebIcXvq9SncM8rKwMcuivs5gjWXe07Bu/PqfC1PCMf5z4gs
+         NrB+Pd2YOj/T+L/gS1yGYiPZmXWIdPzs6DePCfUJsaIK6XNEWPIdfDTFl0kv435KjCIR
+         yJj7U5MKOwMtHCtrEHkt5oQVQOY4svkFsVmME9yRI1hJXNPciT4m2IZHsJnLpoPcncTw
+         tRUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794568850; x=1795173650;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=z45whPdKr9S3p7TkkwcoWCQyt+iMm3cvuo8IR0skgLI=;
+        b=OgzpB//FwOxOMHqXTGA/t8joSDFmLidt/roKvg+Zl+v354+PSLtI8OtmOUElPxpysa
+         ZEyfdKV6+5P1rLf4lZU8dTSUOrQTrK4YAPH2kywREincMh9tvvpQTn4+fxal+8d/OZhO
+         GGhrD/dN7Abw91l/c8dqJd8rKaQGLIoiWwe9HqDpfW4DP3SnnUVKYQ00U2rZ8on6X0Go
+         XOPUAmZE1lobHn7Y9w3nMemLDgUuldfpvEUURGPFpa2iwke4Ifn22E2+X4C/HaDlbl8d
+         0K+N3fdTkApUsjXGeDNAAAN+eAcn5RyI9NO47PwkcK6mHiY9lXR26/VzzeceMiVgyeQ6
+         Q4lg==
+X-Gm-Message-State: APuU4Z9w5F5MxgEa2jELK7wG4oSXztXUoyKF0OINJEjvElJLdVwdTsyu
+	h6gs9YciuVpoS4qf1KvXfdE0oPv8AlU/S1f2i2/PfybNAHBS62g9a9TZ1f/WQC6piA3f1PzeWdt
+	1Lc+xeQjVNintuoHgTQyxqOFg4ca2Xr8M9a0zqsTUm61c55xfJwjvIcTDvC/e05QNQw==
+X-Gm-Gg: AYBFou0Js/Ut5eokUFMjwfO1x5yFBmzQf11DVMIIIC7yTuuEkZ3CfisgaXVZBgFEl/d
+	aB0E1AOu94PWlVN4QzTUtc5Ejp9kNdB/Sxd2XN+hzfL9JNvdbai8mprEkcQD9MBaRKg0Ysu6+lA
+	a1BIM7l4TQYJpXqWYw/hIuLxulit0A7++4/O6uhj0qGMZHFQoW+jhyw/YuFEhSv5IZevY4Xlx7y
+	4+oNKMd6eiI6oDJ3eZGwsyllUD37odg/laauKLZpcVk5m8Qm0LlcB8a6F4eyjyS8UvmKegWAEJ3
+	gbe4QfeLILwR37ah3XY7R5rmIUMYj1HzaLV9DV5q58Lwje+0LIYAnMvJ4JBjdBpzo5+4hxJOUwq
+	7A7g+C+WGsvAIj2B+MDd/hIuZp+uU8LqdDHEIQ/5n9FFH
+X-Received: by 2002:a05:6000:2886:b0:490:6e0f:a02e with SMTP id ffacd0b85a97d-49c70b05145mr5376565f8f.17.1794568850065;
+        Fri, 13 Nov 2026 03:20:50 -0800 (PST)
+X-Received: by 2002:a05:6000:2886:b0:490:6e0f:a02e with SMTP id ffacd0b85a97d-49c70b05145mr5376507f8f.17.1794568849570;
+        Fri, 13 Nov 2026 03:20:49 -0800 (PST)
+Received: from [192.168.0.9] ([47.64.115.75])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c609c602dsm4473677f8f.46.2026.11.13.03.20.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Nov 2026 03:20:48 -0800 (PST)
+Message-ID: <545910af-9ff4-4fcc-92bb-43a56f88753e@redhat.com>
+Date: Fri, 13 Nov 2026 12:20:47 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,149 +111,87 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/5] lib/crypto: Add AEGIS-128X4
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: "Jason A. Donenfeld" <jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
- Antonio Quartulli <antonio@openvpn.net>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, Ralf Lici <ralf@mandelbit.com>
-References: <20261112125432.3064939-1-antonio@openvpn.net>
- <1906b5ed-7650-484c-9eb0-a99c8e27c943@app.fastmail.com>
- <CAHmME9qSPWDhrvoQH=QX2hj+Ei7mcTYFqy-M+kMnJhgzRuJ1dQ@mail.gmail.com>
- <c24fdd26-7e77-4dca-a0fc-94c998ebdff8@mandelbit.com>
- <20261113020601.GA1742@sol>
+Subject: Re: [PATCH] crypto: qat - clear fw_loader pointer on adf_ae_init()
+ failure
+To: Ahsan Atta <ahsan.atta@intel.com>, herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+ Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+References: <20261103100126.534424-1-ahsan.atta@intel.com>
 Content-Language: en-US
-From: Antonio Quartulli <antonio@mandelbit.com>
-Organization: Mandelbit SRL
-In-Reply-To: <20261113020601.GA1742@sol>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20261103100126.534424-1-ahsan.atta@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 4jQtwj6wrYzKpVf
 
-On 13/11/2026 03:06, Eric Biggers wrote:
-> On Thu, Nov 12, 2026 at 11:54:05PM +0100, Antonio Quartulli wrote:
->>>> We used to have implementations of aegis128l and aegis256 in the kernel as
->>>> well (along with morus), but we removed them on the basis that it was
->>>> aegis128 that won the competition.
->>>>
->>>> As far as I know, nobody actually uses any of that code, though, so I am
->>>> quite to surprised to see now that it was aegis128 that was dropped
->>>> from the portfolio, and aegis128l and aegis256 have made a miraculous
->>>> return, along with some other variants that appear to be tied to the
->>>> register width. What happens when 8-way vector registers become
->>>> commonplace? Create yet another aegis variant that case use them
->>>> efficiently?
->>>>
->>>> So I'm struggling to see why we should take this RFC seriously, to be
->>>> honest ...
->>>
->>> I'm also not really sure what's going on. CAESAR competition selected
->>> aegis128 and listed 128l and 256 as "additional finalists". And then
->>> RFC10032 has written up 128L, 256, 128X, 256X, but not the original
->>> 128 that was selected. And then none of this has been picked up by
->>> NIST. Meanwhile, NIST's light weight crypto competition selected
->>> ASCON, which as the "lightweight" as opposed to "high performance"
->>> pick in CAESAR. So I dunno! I've been waiting for the dust to settle
->>> for a little bit.
->>
->> To be honest I did not try to figure out what was going on, but for sure
->> there was "some confusion".
->>
->> By looking at RFC10032 and its references, it seems that various studies
->> were conducted on AEGIS128 after it won CAESAR and they highlighted some
->> deficiencies. I am assuming that this is why it was decided to skip it
->> during the standardization process and focus on its stronger siblings.
->>
->> This said, our decision to work on AEGIS128X4 came from the fact that it was
->> expected to be faster than AES-GCM (current default for ovpn), especially
->> when working on chunks larger than a standard packet (i.e. TSO/GSO/GRO
->> case).
->>
->> With RFC10032 standardizing it (and its siblings), we thought this would be
->> the beginning of the AEGIS era, with more use cases popping up.
->>
->> RFC10032 was published last September - why wouldn't you take this seriously
->> at this point?
+Am 03.11.26 um 11:01 schrieb Ahsan Atta:
+> adf_ae_init() stores the newly allocated loader data in
+> accel_dev->fw_loader before calling qat_hal_init(), as the latter
+> publishes the HAL handle through that pointer. If either
+> qat_hal_init() or adf_ae_reset() fails, the error paths free the
+> allocation but leave accel_dev->fw_loader pointing at freed memory,
+> so the device is left holding a dangling pointer.
 > 
-> The kernel previously carried 5 AEGIS and MORUS algorithms, and that was
-> a mistake.  We ended up having to maintain all of them, with heavily
-> duplicated code (and often buggy, generating syzbot reports).
-> Eventually we were able to drop 4 -- after 2 were even cryptographically
-> broken.  Now it seems even the last 1 was a mistake too.
+> No code path dereferences that stale pointer today. This is therefore
+> a robustness improvement with no observable failure behind it, hence
+> no Fixes tag.
 > 
+> Clear accel_dev->fw_loader when the allocation is released, and fold
+> the duplicated error handling into a cascading goto chain. Report the
+> error returned by the callee rather than a generic -EFAULT;
+> adf_dev_init() still maps any failure to -EFAULT, so this is a
+> readability improvement and not a functional change.
 
-I see..it definitely sounds like a maintenance nightmare.
+The -EFAULT in adf_dev_init() should likely also go away: EFAULT means "Bad 
+address", i.e. a page could not be accessed. Thus it's likely the wrong 
+error code for most cases there.>
+> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> ---
+>   .../intel/qat/qat_common/adf_accel_engine.c   | 21 ++++++++++++-------
+>   1 file changed, 14 insertions(+), 7 deletions(-)
+Anyway, this patch is already a proper step into the right direction, so:
 
-> Now we have RFC 10032, which specifies an unbounded number of
-> incompatible AEAD algorithms in four families.  It leaves the degree of
-> parallelism "D" unspecified, with only a few examples given in the
-> "Operational Considerations" section -- not the actual specification.
-> 
-
-This is indeed a non-negligible detail I underestimated.
-
->> I am not the one writing ciphers and judging them during competitions,
->> therefore I think the 8-way question should not be for me :-)
-> 
-> I'm afraid it is for you, as you're the one proposing that the kernel
-> carry this particular variant.  This proposal does not seem to consider
-> any of the other incompatible variants specified in RFC 10032, including
-> 256-bit key variants which are generally preferred these days.  It also
-> still has the flaw of a fixed degree of parallelism.  Finally, it also
-> ignores the kernel's existing legacy AEGIS-128 code, which we still have
-> to support too, and doesn't attempt to share any code with it.
-> 
-
-Fair enough.
-
-> Fragmentation is a huge problem, especially when code cannot be shared
-> and each algorithm has to be optimized for each architecture.
-> 
->> As a side note, our tests on a prototype ovpn using AEGIS128X4 confirmed
->> higher throughput, therefore we were hoping to have a chance to see it
->> merged.
-> 
-> Anyway, we do not support things just because they have an RFC.  There
-> has to be a technical reason.
-> 
-> Being faster than AES-GCM is indeed a technical reason, so there is
-> still a chance this could be worth doing.
-> 
-> It's just not very convincing when AES-GCM is already so fast.  It got
-> 3-4x faster on x86_64 in the last few years, due to the VAES
-> instructions and the code I wrote to use them, and of course AES-GCM's
-> natural parallelism (there's no need for "AES-GCMX4").
-> 
-> Moreover, from the benchmark numbers you gave, it seems most of the
-> remaining overhead is not in the crypto algorithm itself anyway.
-> 
-> So perhaps it's best to focus optimizations elsewhere in the networking
-> stack for now, maybe work on switching from crypto_aead to lib/crypto/
-> to eliminate the known-problematic crypto_aead overhead too, and wait
-> for the dust to settle on AEGIS a bit?
-
-At this point I believe this is the right thing to do.
-
-Better wait for situation to be a bit more clear and then we can 
-re-evaluate the path forward for AEGIS.
-
-
-Thank you all for taking the time to explain in larger detail what 
-happened in the past and why we should be cautious with (re-)introducing 
-this code.
-
-Regards,
-
-> 
-> If we are going to support this, we would at least need to know that it
-> is actually worthwhile and will be "the one", rather than the first of
-> many variants springing up with duplicated code.
-> 
-> - Eric
-
--- 
-Antonio Quartulli
-
-CEO and Co-Founder
-Mandelbit Srl
-https://www.mandelbit.com
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
