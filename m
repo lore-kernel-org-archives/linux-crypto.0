@@ -1,108 +1,107 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794569298;
-	b=ykuM94KOs8X/ECA3EPw2UEMBLr5i76nC+BiUVcPNgkcol4gQOJkC6fI7rmrehgHUnOEk
-	 nwW1MjCxzd61x0PHBsZ6Gc32C7qTPM3DDH/83D+hP3P+w9VQg7YbPs7CThDmAsQPa6uZi
-	 86WKzyIaCph59tUz5Llf54ehIkiaiphc2OgvxneBR8R2iU/ZhEnpNfTJzsTTS3Y/4I9+N
-	 dOWNCbBEvX52zpdgGpDcOfXpsj+N4609rzzHBkszP7LmnhwHdDm89D7hMCH6/ZZlh64Xd
-	 wjr852zSax+ajynnmimBrx+N8K+6H75EWq4K4WpJBVj8JSDgwkVQyJh9c4sfKnEyxbQ==
+	t=1794569687;
+	b=tRZxin7ux1PnejqvuqdxAT+ZsNKsuLZ5zSP7qcf8rdfd56r0a2GEHLAdKeWjho01eVh5
+	 7NfWGVzqn8ULTtvg1++nR09bcnzx4kXjAkVbModtCgRuPDen/1evv7kCzdlW0sqrRjMka
+	 1KFaZm2J7r5TVUOigRnFOBpQ1+OGbDBDFoftbhwrsw/HKKFqkE/U7GWOiZ6f27ZG0zY3A
+	 a9Zcw1Ltxi79rkmn1aZg773Oj1y7cFYn0JGKYuCMZNjM+cubwxchr61K5Lo9dMGDozEFr
+	 GuVn4b79+/zbpT2eZpRnn7MGvgsI7FO3F0tzZ0FWSxBRhCO53KB93ESL0yzNeTZO+Lw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794569298;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794569687;
 	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
 	 X-Mimecast-MFC-AGG-ID:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 X-Received:Received:Message-ID:Date:MIME-Version:User-Agent:Subject:
-	 To:Cc:References:Content-Language:From:Autocrypt:In-Reply-To:
+	 From:To:Cc:References:Content-Language:Autocrypt:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=mJ7s+syXoT90r15smycj+SigpCQvPifOz44qvjuC1Lo=;
-	b=v+apZKDWgIS88aOfpMKvtLem8TipKBAkLmXInmdDXFp/965VQsIJ+tYj3cGhYeAvX306
-	 5TnrgAt+ZFDa0PwwjRz3aNzFRTIAJ2jyrQLuZ+GwZsc4Y9k/JIR+6KDYQMtHG3X/2X0K/
-	 KZNN9wHtEOxX7YLMQZkVLtJDBPwdd1BGciiFmTxwTbqPvvJcPOzjQEm8rgqvplOfs8Slb
-	 pg+PlZi9jwieODAhQTGB9ugvfUoFRd131i3ngAfLS3WTe2TSZqxx+cfiQwv+OvSbUXYcN
-	 mDnTHof3zpoqXrDiEI40uzObTy7NwV8VE2t92h0IkCY0upgXUUu5RsPEPYqAv6dZmQg==
+	bh=/rTG8Xv4QM16TrDirC79mfSinok/0aGdU0jCZkb0miU=;
+	b=2KMPiWafWToa2fo+0WUMEEztLxY2/LKFWQG0Su2k/jmMwH+UUhH7ILRRCc4DOyuuY9S+
+	 I2Gmn5LogVt8CNK0mqZJ7FUerxN7gsZ2iSzRdSKmHZ2yn960R2nx//Pf9gAy/IIEpqXYG
+	 AtnKju+pvFpPunmmjAEl8p2rMO7WhIHRyGBdjDTee0HprnD6Wp8gTLAPKFf9zjA0VdjGq
+	 tKGVuSsTM8xcnsmRlpgcEdEh1fCB2rCJmgZXjw/qUBA/uJNBgIKCHg5zlhZ4h+N6nmYUi
+	 YxOHzbDsrd5AkyQ5CXHaK5X2N/VDQSOHKg7UJ3kpAtS6JEHIEuJK6swso8sptN8sfXg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=redhat.com;
 	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ahMa2osV;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b="Ey5/3toZ";
-	arc=none smtp.remote-ip=170.10.133.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=F3QSObOf;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=YC8GccfH;
+	arc=none smtp.remote-ip=170.10.129.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2A8606A31C
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 11:28:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E2A8606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738AE606A335
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 11:34:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 738AE606A335
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=ahMa2osV;
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=Ey5/3toZ
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=F3QSObOf;
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=YC8GccfH
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1794569297;
+	s=mimecast20190719; t=1794569686;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mJ7s+syXoT90r15smycj+SigpCQvPifOz44qvjuC1Lo=;
-	b=ahMa2osVPRiXnhS+GW5urSWdF1za7vQpgvAZ/tn9XhPTe2N1gunJ/pDbbtEevE0JXheu8r
-	nNtPHn8hfwFmvg2lwy2eKSFlBdaWxn7Pb1p2aoRKgHvc/1PDUrzVLYo5sWCZmfflhPoucF
-	vMKHblyvZ6LderM2Hrt5rTkJwWRNQFw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=/rTG8Xv4QM16TrDirC79mfSinok/0aGdU0jCZkb0miU=;
+	b=F3QSObOfKJg+O7Jo0tGTx67MfayKS/Q0fw4e/Kz9QEf2O4LGw613YN8SHRJTcwh13kq0Ok
+	dLocZopa83WCBGGguBq5NpvdaS/ddP5XD0BA5E1CMiTZWj1JzlNXKlsiyeEdhG6JxTtcQA
+	cCy+dbY2O2cOv38u/PPxU75JBnuDCvU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-lbQsuclUP5-pD26wuVFPow-1; Fri, 13 Nov 2026 06:28:15 -0500
-X-MC-Unique: lbQsuclUP5-pD26wuVFPow-1
-X-Mimecast-MFC-AGG-ID: lbQsuclUP5-pD26wuVFPow_1794569295
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4930269afdcso537636f8f.2
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 03:28:15 -0800 (PST)
+ us-mta-663-GGgU0rCbOie_zas18A9YVQ-1; Fri, 13 Nov 2026 06:34:43 -0500
+X-MC-Unique: GGgU0rCbOie_zas18A9YVQ-1
+X-Mimecast-MFC-AGG-ID: GGgU0rCbOie_zas18A9YVQ_1794569682
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4a4654add56so6437945e9.2
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 03:34:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1794569295; x=1795174095; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=mJ7s+syXoT90r15smycj+SigpCQvPifOz44qvjuC1Lo=;
-        b=Ey5/3toZAFwvO2ZscbEgBAtBmUktbaPMiZjBlYcTr8d0x0nIn+pkgowLXVo/+Ncj8S
-         Lc401WBm7gAeOidWbcRZSMkatF5QEVMaHHhpvUcoi0odDixYih2P56VxAneDQoKLoCyy
-         YFR6kTWhKolY3z5PhHcRqgynGEOzVRQ+aKEGK5zvxz+h2tLWNJYOUz4t+Z2Jbg5emk6m
-         yFYbkn7k1qWEgUJQGtPfJ1kWi3gpSDnR2SwAZgSTPNsoQ4Ik5xS5XQkOorfV5pi2UMje
-         thOLN2pcqLviJvNFvqsA11bQm8GW3Q01td/gvKfHVhXrZjgEia4R6TFAhzQnybqRWq2D
-         tOKA==
+        d=redhat.com; s=google; t=1794569682; x=1795174482; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=/rTG8Xv4QM16TrDirC79mfSinok/0aGdU0jCZkb0miU=;
+        b=YC8GccfHbZ7QIYbjdp1YWNMTXLkOKhwetjx0NbbZH84r+HjriwJEXOgfQV+v3uT5PL
+         iGUJihEq5q9Y+qsokMNWTMYImnK9hYXQIGY1R17+0MnYAvoyUPGNPJljaOk2BVCq3tG0
+         IblmNefHs7ijVw4fHdpqiPICB5ejs4sX6AUQMa9Op/jiOvV1a+y/K9XlZy9shwEAhS8P
+         sxM8KzNJfSCGxRZWdsaGwoEGAuH4Rm2tav9TY7HtMYdl37sVti4fROrzakh/R3KLfsQx
+         ELf/MWXzBWr4ogDjpU5pmM59HjGbIZUCEPoECKGdqZTxEaTPHMi0VfSZH4rMtymC+8wJ
+         jl4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794569295; x=1795174095;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mJ7s+syXoT90r15smycj+SigpCQvPifOz44qvjuC1Lo=;
-        b=msoGOZ7fOnPOkel6FShXj0aCjE5yEBCHFo/PGrxj2Q1d3j/XdshgbK/EmN0kswr7n9
-         AurO5ho9zPWX/64Xre94IFONezFQaFEBuBrB2r/hwgaf3yF+eeTMaI1aM9q2zk62ur2j
-         2tSp7AP0zyWmJF7TbX6kCPJwJvsnG5ynB821VFYNxLOFSP6C3xVNW+rk2Ch3LEL3uMcb
-         yxrR4BhecK1WbvJywKvQe3C7nEpxWKl1e0dMn9ZG0VWGSBiPKIoYTMsnkIHlkWs/rE7L
-         e5J3QZLeTP0KfoVLxZrCR+rVakQ7KnDIN4m5lv21Cg/rW+Wj5UYBaR+ESxuUTkhJitqr
-         7I7Q==
-X-Forwarded-Encrypted: i=1; AL+hErESp4YsExIf7pKD6t+9ggQBhu1gPFvGlspdjy2JqzDLme3wpWgcvjLMkcFNBNw38P5hxMLjmcIrI3Az9BQ=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+AJb20xzWf5xyMytleBashQ3jbk7UPD3BfSupy6+TlE0y/52R/
-	YqX+7ICEczOwxs9SOfYwTf3KpmHNTGSodT2OR7sr2zIcrWCnn327Iw7jyduO2kg4CoaEuNDT4ZL
-	fKleXH1cj0LAovrJr2SeyEx4JM3eH2bP1gszrZgYqiECUbaxU5dtJoss+/eZ8wATDxY6v6uF01g
-	==
-X-Gm-Gg: AYBFou1DEVkaOsXWyKqkJhMm0ASqaTFjra4/g/3sQQhuYQUU0dVm6n4hVIbqt+OzMXM
-	zj4XnQ+FiXM1C3lvsZwwUBVbSIbgVaUcQ2t4ndniLAlurwN1HtglBxdAziz9oeP5Tzb8TrlkYb+
-	UssjNEdnMkMYgZR2Y0M/rhh/dGGwOc05w5AgpxK/LpGZ92THt2NyJmC69yZ6KvJWmLDT9g3soMr
-	zzkhi13weoMSrr2DuQ7ao5/gxVAzh/MQN3cXBhJkkaZhItHAOPUCCGAA4DpCVlhdA6ntOaZ8DUe
-	ncT+lbv+wPFEn0Vft6VLS6nAt+GObDcFAiZzCfZ4MYRuXx7y7U7rtwZogtLi5vrd3sT6HZAF1VN
-	5h3YB1YhiX/WTDfHKOGv3QppElCfP0NgxKP5LVOmTX0aN
-X-Received: by 2002:a05:6000:4b05:b0:49c:d519:7ba9 with SMTP id ffacd0b85a97d-49cd5197c97mr2689709f8f.17.1794569294661;
-        Fri, 13 Nov 2026 03:28:14 -0800 (PST)
-X-Received: by 2002:a05:6000:4b05:b0:49c:d519:7ba9 with SMTP id ffacd0b85a97d-49cd5197c97mr2689660f8f.17.1794569294077;
-        Fri, 13 Nov 2026 03:28:14 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794569682; x=1795174482;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=/rTG8Xv4QM16TrDirC79mfSinok/0aGdU0jCZkb0miU=;
+        b=fZCwpRhrPOSy2MB7cKvRIDbyKPerBYrL6qdrlAfdvPN40XJjknysVLoI/4oUN3UO48
+         gOELxpyayOOgDDFy3vWYotUAqJQWHU4kT8BMTBlIlLjb3JWa1CbCKH2pUhgscL1zISbL
+         HVA/BifOOsyAPivA1ZVoY15gorNrYENgZEfkP6nowbXsb+058W7wBrD2QKc6G6/Lxveh
+         SvkagzzhMjJDFvX9qXI5vkA/66JPUw2LhV+3JZgAtAnwSj40MSBpDxDXU3Ila28Wz9uF
+         tmiu6jtbb7/9GdUy1TAHEHZTWVrMLgJEomTlgIO9mBH8MJfgQKT4Jme7RvFdVJM2B9jx
+         qsRA==
+X-Forwarded-Encrypted: i=1; AL+hErF7eS8757UK6se2SYLaxC6k7emt4ZkuwZ5BaaUMMecO3d60iUn4M9DofwtXVAQEGfScKq+FStKL7fc6UCc=@vger.kernel.org
+X-Gm-Message-State: APuU4Z93ax3ROSOlBf/O7mOPIKvQhW3W1Q/FtT18/8cemVDbRpvUTAhW
+	f7xwyr/p/qgnbq7JP9mKhgE90vX4OhWePXw/9vW+yPyOQwnYvlEhO1H4/McM+haAJdCcVyOVF6L
+	U7c08MfuotBYgLZ6SQzzQOgs4UjZRZziCFg8Xl7ZDtw9cwo1v8GgcENzuqr4xwbIOkg==
+X-Gm-Gg: AYBFou02yFmUB50KmocJggTVrtr7Ie5Qcqf3qKW5o6RLsEuWo3sb/0hDvgEmxh9VYbF
+	dawiC5+xwnhQH9gdCcM/RkKJsU07YmlW5J2/H1b4DM/TtmHbq4ffi5tO8vywQcoJtIKA1AZS0kl
+	gTP3V0mGgrz17vDN8eoio5zvPGNl3BB2aUa6Jh+vjvQMiyoHdMdYtyqRV4v9sM985QPHiG3ZPhG
+	7bwa0TK6rB/gWDR9lAt+QNU4iBokfeWT55iokCnRXKYuyyoq3Fjc8vro5Fmh/PlQIcB3l1VUAB3
+	IYYCMfRdnA8/KMN11vhaY5wk+ENCcFW5C9OMlA6XfOn/V/3HMUapay8Y3mW0wAzwbys5/58con2
+	0v8b+SIV4c8SEk1qojHkagCwA3aXKL6GtC8EXrABf2vH0
+X-Received: by 2002:a05:600c:3b2a:b0:4a8:9a2f:d27 with SMTP id 5b1f17b1804b1-4bb55aabdf9mr46231845e9.25.1794569681927;
+        Fri, 13 Nov 2026 03:34:41 -0800 (PST)
+X-Received: by 2002:a05:600c:3b2a:b0:4a8:9a2f:d27 with SMTP id 5b1f17b1804b1-4bb55aabdf9mr46231215e9.25.1794569681337;
+        Fri, 13 Nov 2026 03:34:41 -0800 (PST)
 Received: from [192.168.0.9] ([47.64.115.75])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c605e5b2fsm4940129f8f.40.2026.11.13.03.28.12
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb4e2842e6sm147813025e9.4.2026.11.13.03.34.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Nov 2026 03:28:13 -0800 (PST)
-Message-ID: <cc552609-ece5-4f82-94b2-b00edf0f92a7@redhat.com>
-Date: Fri, 13 Nov 2026 12:28:12 +0100
+        Fri, 13 Nov 2026 03:34:40 -0800 (PST)
+Message-ID: <6eb809cc-de84-459e-a580-ea4eceb045a7@redhat.com>
+Date: Fri, 13 Nov 2026 12:34:39 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -113,14 +112,16 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/14] crypto: jitterentropy - Add library API
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-References: <20261018204618.104876-1-ebiggers@kernel.org>
- <20261018204618.104876-5-ebiggers@kernel.org>
-Content-Language: en-US
+Subject: Re: [PATCH] crypto: qat - Don't use -EFAULT as error code during
+ setkey()
 From: Thomas Huth <thuth@redhat.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Ahsan Atta <ahsan.atta@intel.com>
+References: <20260824122403.630026-1-thuth@redhat.com>
+Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
  yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
@@ -163,49 +164,109 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20261018204618.104876-5-ebiggers@kernel.org>
+In-Reply-To: <20260824122403.630026-1-thuth@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Am 18.10.26 um 22:46 schrieb Eric Biggers:
-> Make the jitterentropy RNG accessible using a regular set of functions.
+Am 24.08.26 um 14:24 schrieb Thomas Huth:
+> EFAULT means "Bad Address", it's the error code that is meant to
+> be returned when userspace provided the kerknel with a pointer to
+> memory that is not part of its address space. However, the QAT driver
+> abuses this error code during its setkey() function to signal that
+> there was something wrong with the selected algorithm, which is just
+> confusing.
 > 
-> This will allow drbg.c to just access it directly, instead of going
-> through the overly-general crypto_rng abstraction.
+> The best choice for an error code would likely have been EINVAL here,
+> but qat_alg_aead_init_sessions() seems to make an effort to use this
+> for another error case already, so there is likely the desire to
+> distinguish the different errors here. Thus use EOPNOTSUPP as a
+> replacement now, so qat_alg_aead_init_sessions() continues to return
+> two different error codes depending on what went wrong.
 > 
-> Later commits will remove crypto_rng.
+> Anyway, instead of hard-coding the error codes in the function
+> qat_alg_aead_init_sessions() again, let's also simply rather pass
+> the error code from the called functions up to the caller instead,
+> this way we can also get rid of the need to call memzero_explicit()
+> here three times.
 > 
-> Note that the library API should also continue to meet all the same
-> certification requirements, including the health check which occurs on
-> the first call to crypto_jent_alloc().
-> 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-...
-> +int crypto_jent_get_bytes(struct jitterentropy *rng, u8 *out,
-> +			  unsigned int out_len)
-> +{
-> +	int ret;
+>   .../crypto/intel/qat/qat_common/qat_algs.c    | 31 +++++++++----------
+>   1 file changed, 14 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/crypto/intel/qat/qat_common/qat_algs.c b/drivers/crypto/intel/qat/qat_common/qat_algs.c
+> index 91663805d9e60..91da9cad1d89a 100644
+> --- a/drivers/crypto/intel/qat/qat_common/qat_algs.c
+> +++ b/drivers/crypto/intel/qat/qat_common/qat_algs.c
+> @@ -135,7 +135,7 @@ static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
+>   		return 0;
+>   	}
+>   	default:
+> -		return -EFAULT;
+> +		return -EOPNOTSUPP;
+>   	}
+>   }
+>   
+> @@ -186,7 +186,7 @@ static int qat_alg_aead_init_enc_session(struct crypto_aead *aead_tfm,
+>   		cpu_to_be32(ctx->hash_blocksize);
+>   
+>   	if (qat_alg_do_precomputes(hash, ctx, keys->authkey, keys->authkeylen))
+> -		return -EFAULT;
+> +		return -EOPNOTSUPP;
+>   
+>   	/* Request setup */
+>   	qat_alg_init_common_hdr(header);
+> @@ -273,7 +273,7 @@ static int qat_alg_aead_init_dec_session(struct crypto_aead *aead_tfm,
+>   		cpu_to_be32(ctx->hash_blocksize);
+>   
+>   	if (qat_alg_do_precomputes(hash, ctx, keys->authkey, keys->authkeylen))
+> -		return -EFAULT;
+> +		return -EOPNOTSUPP;
+>   
+>   	/* Request setup */
+>   	qat_alg_init_common_hdr(header);
+> @@ -472,28 +472,25 @@ static int qat_alg_aead_init_sessions(struct crypto_aead *tfm, const u8 *key,
+>   				      unsigned int keylen,  int mode)
+>   {
+>   	struct crypto_authenc_keys keys;
+> -	int alg;
+> -
+> -	if (crypto_authenc_extractkeys(&keys, key, keylen))
+> -		goto bad_key;
+> +	int alg, ret;
+>   
+> -	if (qat_alg_validate_key(keys.enckeylen, &alg, mode))
+> -		goto bad_key;
+> +	ret = crypto_authenc_extractkeys(&keys, key, keylen);
+> +	if (ret)
+> +		goto error;
+>   
+> -	if (qat_alg_aead_init_enc_session(tfm, alg, &keys, mode))
+> +	ret = qat_alg_validate_key(keys.enckeylen, &alg, mode);
+> +	if (ret)
+>   		goto error;
+>   
+> -	if (qat_alg_aead_init_dec_session(tfm, alg, &keys, mode))
+> +	ret = qat_alg_aead_init_enc_session(tfm, alg, &keys, mode);
+> +	if (ret)
+>   		goto error;
+>   
+> -	memzero_explicit(&keys, sizeof(keys));
+> -	return 0;
+> -bad_key:
+> -	memzero_explicit(&keys, sizeof(keys));
+> -	return -EINVAL;
+> +	ret = qat_alg_aead_init_dec_session(tfm, alg, &keys, mode);
 > +
-> +	guard(mutex)(&rng->jent_lock);
-> +
-> +	ret = jent_read_entropy(rng->entropy_collector, out, out_len);
-> +
-> +	if (ret == -3) {
-> +		/* Handle permanent health test error */
-> +		/*
-> +		 * If the kernel was booted with fips=1, it implies that
-> +		 * the entire kernel acts as a FIPS 140 module. In this case
-> +		 * an SP800-90B permanent health test error is treated as
-> +		 * a FIPS module error.
-> +		 */
-> +		if (fips_enabled)
-> +			panic("Jitter RNG permanent health test failure\n");
-> +
-> +		pr_err("Jitter RNG permanent health test failure\n");
-> +		return -EFAULT;
-EFAULT means "bad address" in the sense of a page fault ... not sure whether 
-this is the appropriate error code here? Maybe -EIO would be a better fit?
+>   error:
+>   	memzero_explicit(&keys, sizeof(keys));
+> -	return -EFAULT;
+> +	return ret;
+>   }
+>   
+>   static int qat_alg_skcipher_init_sessions(struct qat_alg_skcipher_ctx *ctx,
+
+Friendly ping! Anybody got a comment on this patch?
 
   Thomas
 
