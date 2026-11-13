@@ -1,139 +1,107 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=192.198.163.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794580906;
-	b=inckUMvb64pZGsDDiole5ZG+0qX3PPF1EtW1ZMVgJVGcR4YdEvWBSwInOwK/HgvdzBR8
-	 Bvo/5RiGB/Ab4ehYRzsxSbH7X/afkSBgmYOe7n/Iim2mAJ/kz6d/+HlbqaDeMhmo/CiHF
-	 C8Gi62HJ7m46hF2y++0CocFYYA45Zjyo/MwDy1HoK3/5OaZ9C/yfN7ZYnTkfPedTxeav0
-	 qZwyLFP/bJzSjOVU+LjxPEmOTlij1mFFMo7ATNF+kKpoS20nJYrCqc9iMJ9lLm43BzZRR
-	 kzvRv69VgYQIRudUYOHNmCRz5u3/xEd1Q1HCCPneKejA2tUtTCUsp6JrYMJtQsXhHDQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794580906;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Received:
-	 Received:DKIM-Signature:Received:Received:Date:From:To:CC:Subject:
-	 Message-ID:References:Content-Type:Content-Disposition:In-Reply-To:
-	 Organization:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:
-	 X-MS-Exchange-AntiSpam-MessageData-1:X-Exchange-RoutingPolicyChecked:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
-	bh=3D36xf/nlWECnnxXReIxZRY8MaIO/UjnYI7D9CTjPeQ=;
-	b=2vZtT6V4ukmLRNT6eRj0GYYwEm7lSdJwpKcCgxNxkETXjrIR8BP9a52aU6+8dHK8J7Dq
-	 3N6lphAZpYPBkxxXjKdN0gHrgKPCfT7WePBqG9b3xjM1+Wzxa6Gvs50CQBciCRKZnYB4/
-	 KEMqaC1LVtZW8rPBpdj5ZHzf4ihv3rtfbOm4fRMvpNb+xRoJvb9JFuM/1PJfrFgE9vDky
-	 Wv9LaaYiy3x+rAvN6EfzhmyiE/M8kU5CHRIrQpsvEoq3m3gMBMESE5UfJdE0ZBevxA156
-	 80ddWegWgWEcIY+rBQEEQijrsINA3wOtiDDfhxZre6cKsS7lrtrSIlcqPWIJ4LmoYag==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=d8LVT7IJ;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=selector1 header.b=ELj2iwj1;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=192.198.163.18
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794581121;
+	b=3wafTLjVas0MuwJRtHvnsnaZrDM/lRcWjd8d7VB3rP3YBmEuXsgkHhvIMiIB+kg0uSGz
+	 EaRk/exQZTV0bJn2GrVYkZoATyOZpvrrDsGoVokeo4bQM78UTRJrDRSb5NBvVFtCr1Ltg
+	 ngMkoB5uj5MRD+PRPCU8GxjaHp0eggSfexnymBV0B5XhnIx15Wtul+IeO7b05k1c3mNom
+	 ebJO60JXJAhsQDlUKjWCXAsQ/2DLUkAUX9iP8TF7LnvT2y+lm/ktwNfptXD2a7rmDzhZT
+	 0pBQlKVprjU76+R6gfhzdmmS9JrbxTr7qiU20iEikJk+207lXk7rHcAFhRQg7hwuI/Q==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794581121;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 X-Received:Received:Message-ID:Date:MIME-Version:User-Agent:Subject:
+	 To:Cc:References:Content-Language:From:Autocrypt:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=d5B2zEeilJgntlVgXF/glstsFLQo0sZSqhK2VGBr1DA=;
+	b=f4DpMIy91kU2EnrMh+JRQDmBpx4d2Kljs6ewSorgeRjnaH7wFsE50OKNyMHMG6xnQa/B
+	 QKk8knCFrltbT8d9VX7z2yMdthnz2FBRcO18JKOkRfD6tD3Gd1NtnC/eGBFwoY1QR7BQl
+	 hjBBMrgsAjGqO8YEM69jKjBYyBYCy5TNW8Az6mhEx/FdkmMPaANtB/izOK/5Tis7eh7Wv
+	 JFzh3gUA7NgY95aC2axpT++OcO8XnuGspctu6z6MVQHU1fJkSx6uZZk2PvkhbJ40v138b
+	 fGtgKk6WCumsdsEaotu4hbry28XOgDxPwYZDCSRYY9w9wgI5DHRtCe73qFCzneaA5uA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=LyiXPU3K;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=YSCrjUmU;
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4029E606A887
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 14:41:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4029E606A887
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E64A606A327
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 14:45:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7E64A606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=d8LVT7IJ;
-	dkim=pass (1024-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=selector1 header.b=ELj2iwj1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1794580907; x=1826116907;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=zz4uyzGM5UO0QYSqj9OUNMsHNXaW9ZyC99LBeecFO80=;
-  b=d8LVT7IJoFFhl9TKHAopNTo11N8WqA5euc5urbC+wGJ5PRDRtWYLvb80
-   cLuwA2a1BTmYU2QpVFoj9iLBZ5ueF+OJ/4Ont5qDBdYVuTa2n7OOF1aRm
-   leaw6vH7vM67TNSZD8BgvMBVs4y2rxGTCwB5pVwkZeeOxYLgp3LP7h64W
-   q6l+20Tn2PZmJso5OVgYPKZzPhDcT7ZeS4Jz0tXccQkUVUI1z81XSVwF4
-   wCJMA2t+BO7GcX6nLnTedQLko1wQocSEhVghL1sJGrrLdRfYgVwQE+/SG
-   oQ/BG590bobsmlBLiL05V3G0Ua2JUhWHCgDaMFGdzxjwSksN/lTtOvvlf
-   g==;
-X-CSE-ConnectionGUID: qjrQwspZSf2DX2bxKpIaSQ==
-X-CSE-MsgGUID: h1/ZJAPMS6ucEJXRJitktw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11965"; a="3416142"
-X-IronPort-AV: E=Sophos;i="6.27,211,1787036400"; 
-   d="scan'208";a="3416142"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2026 06:41:45 -0800
-X-CSE-ConnectionGUID: T4/m3326S4CaRB8TM2G/rw==
-X-CSE-MsgGUID: QtrOi2xuRTa/k/msbA83Zw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,211,1787036400"; 
-   d="scan'208";a="9024484"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2026 06:41:45 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.56; Fri, 13 Nov 2026 06:41:44 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.56 via Frontend Transport; Fri, 13 Nov 2026 06:41:44 -0800
-Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.35) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.56; Fri, 13 Nov 2026 06:41:42 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WBuxMRkVAgT6lUb0NeQSlYomK/M2+r6wxixGI8JLVtUQprdeCfmCJsInzwciDq1krtm40xfsn9nLkJJwJed4OePAl8uIP7BYDNtOgUue3H2sXSsgaURJK/FIH+cjHNsOKxvUVWXreEjzCxT39dwaNG+wqRi/yZViUJDCKK81VpJi5yrn8lzrHNjdxSkHsyhqA0IYE7Q0mwEGmUhjL6dYYW6a8WhYoGiDtzPKY8AsPytqrbrGSFS4A6v1nbIPoGlMK3r+8Oa1dAu+w195OqweeiCjMHthKVXe/fv1P+Z/1IkXUDK2ApQunTQhGwbWSNiChJYkGdfBzDXLOxIoh76uNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3D36xf/nlWECnnxXReIxZRY8MaIO/UjnYI7D9CTjPeQ=;
- b=u00qBrz1XE+lQTSim/CdMKZbn4yWCwtdWUw+11lE5fM9AGvsdxI72Rn30GpOy+ggpIlbaCKYvpXtkTgxgS+5oe59u3C8NHyituJK/e0uihbJNCXKywdGJPON2ANti7rOGXsO1La1QBtoWuod1RIlMniJKeDKTuM2/Cw3g2zgbRJxR2th11YXkyZ4DDk+1/9Sh41jHzv8CvYhdID/cAvgKkUdXnRKolXIDJwihuxvz13T+YHtoYY3BDd99Ua8Uc9X7ZkGMKDSSTvBCZRrXRTdl1w5u3V4uRp632OuQ0VKT79u/YvPnS+SbYiMlfjrR7LCn62hr9vuRTQNLvszUbIIEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3D36xf/nlWECnnxXReIxZRY8MaIO/UjnYI7D9CTjPeQ=;
- b=ELj2iwj1GdbjIaiDCOjJu7K9pEsDzf01JJcHwuNb4VAMN4Y5hRoKgztv0yQY/miKvapsXjlM+s/RnC446fBPz7drZ7V0Mp8nUoO5Bh2GXeFm6fiU3mfIRfgb6EmuxRel/BiHs6UplwwM+wbzlIXT8Ba0EG+gdw6JWOYG4FwlVlQ=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN0PR11MB6253.namprd11.prod.outlook.com (2603:10b6:208:3c6::18)
- by PH7PR11MB6793.namprd11.prod.outlook.com (2603:10b6:510:1b7::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.8; Fri, 13 Nov
- 2026 14:41:36 +0000
-Received: from MN0PR11MB6253.namprd11.prod.outlook.com
- ([fe80::2d7e:97a6:b6cb:acdf]) by MN0PR11MB6253.namprd11.prod.outlook.com
- ([fe80::2d7e:97a6:b6cb:acdf%4]) with mapi id 15.21.0615.009; Fri, 13 Nov 2026
- 14:41:36 +0000
-Date: Fri, 13 Nov 2026 14:41:33 +0000
-From: Ahsan Atta <ahsan.atta@intel.com>
-To: Thomas Huth <thuth@redhat.com>
-CC: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-	<qat-linux@intel.com>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH] crypto: qat - clear fw_loader pointer on adf_ae_init()
- failure
-Message-ID: <avchnYuwouXKyRgS@soc-PF5467PW.clients.intel.com>
-References: <20261103100126.534424-1-ahsan.atta@intel.com>
- <545910af-9ff4-4fcc-92bb-43a56f88753e@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <545910af-9ff4-4fcc-92bb-43a56f88753e@redhat.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DU2P251CA0001.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:10:230::12) To MN0PR11MB6253.namprd11.prod.outlook.com
- (2603:10b6:208:3c6::18)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=LyiXPU3K;
+	dkim=pass (2048-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=google header.b=YSCrjUmU
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1794581119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=d5B2zEeilJgntlVgXF/glstsFLQo0sZSqhK2VGBr1DA=;
+	b=LyiXPU3KU4RxXuE1h1dzY7AuEg5He3eFhiLiVXUeCR1krZLQ1UKByUcWGcNjFbJ0Fax9XM
+	PwDWSleVSv9o1oCPNdcL8lhzUi0+g/PrOLEzzfgMuElzhkV/ZWviiFJ4ySq0Id/2b58Cmp
+	m5qlXY76k+BNzv0Fh+5rXzpcW5JBep0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-526-nsMBfZXsPHu7H835KFArUQ-1; Fri, 13 Nov 2026 09:45:16 -0500
+X-MC-Unique: nsMBfZXsPHu7H835KFArUQ-1
+X-Mimecast-MFC-AGG-ID: nsMBfZXsPHu7H835KFArUQ_1794581116
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4ba078f26f4so6381745e9.2
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 06:45:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1794581115; x=1795185915; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=d5B2zEeilJgntlVgXF/glstsFLQo0sZSqhK2VGBr1DA=;
+        b=YSCrjUmUJkDNIvcfSJII77J7zw0Z3iRG0ld0D9F45GNFRj0a8KFus97fNc87rBdygU
+         esJORXsOuifzHsK4Nd0PBlyySeDok3af19aqx0QYccVdL6/rZmc8BWJ6dcbl1uuPs60g
+         eIKCuvnfPo9GtRTj/tbcqfL3rQ05Zrfxdop0RzpTrDjmA0xb5ntQBJfiN45OcWLxQvkM
+         gpCtnk1F+4gge/C4yKspSCI03MCFI5UR8eJZxPJRhdUxV9jymKLJ+jmtC+ru+dA21I5d
+         vdgxrg0LZqusSXGWf2Muh9XirFHakby3CaXS8mam8xPfCq2GhtdVnrWCq+SxBJDSyTJB
+         pndQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794581115; x=1795185915;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=d5B2zEeilJgntlVgXF/glstsFLQo0sZSqhK2VGBr1DA=;
+        b=PC95aVS31aTW/p3syze0wu2om0Qj/abIIMF2vLSqi+PX8t/n43AlTBKoccgTQxChTF
+         15HvInbeulYQHlFQYLgkdcCb7pdDXGS9dhQ7ine+UWaeiXmdPPjlXCi52mTmTqctPtEQ
+         CBebUbF34unKQ4Qyn8nqegfNcn1DkGijzS3A1nPHu8+SmML1/XBs6EXRxLKEP4V5PUPA
+         DZvoHGuUB8sWOKvDw23G4TkKcommxkDYZANQqnGFX9uBoAG7pvciQTqpt5KZUDn2iPUN
+         vCl1VwcfwT4qDEbRPksDQeKyu5sBn532xYGSWDtgJ0mzF24QYqFNp3CpReY5IPW+ptCg
+         JAAw==
+X-Forwarded-Encrypted: i=1; AL+hErGZcRXQHZ3wpOwFNffS2iwUqMPZbtvdj+J1L/5nCSZCiLTSCILdY1Sq5McRnmTptIfUByk+D9JwJbUEvxQ=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9MKPWYjVkz5YDnXE1RRsJd948C0NACBEIHmWRCktxJDoF7lRwU
+	Hk+0UhNInG9Mi6gtSiehi5UV9gswfhTmfFyag8x2/3mSQYYDb1E0vsVO8IwqP0TbOz0uFFfYcHU
+	2A1iITWukzDg2zUDfPXWO/w03OGwh/09eWEb0eFN0AXbg+GLzBFU4i+/7Gqzkj4KrhA==
+X-Gm-Gg: AYBFou1ixXAROc7yVcicO5XS8i37Vr16QQW/axpTKLtRbdqLuNq65xekIhfIqV+F3p5
+	CmLDj3hl4lmzlrPvhYjNs4DwUmdw0udUUNU1UETayQx+wqDIPwrSkZ67j0AjGT05+9uPajnIsSu
+	SMVXrNL8icoiw+VRWmVjwnwPMt9dfyE3tMvPYxZ73QLdrVSqReRvAB7o8SQZEvxCXs1+ffRHrAC
+	y56n+b0E6+xho94PY0PaQHfboZpYREy2fPu+vdxIX3S1OBaEvcHIdVbJXYBcFx4l5diiv5CI4lN
+	i/VnuAmUQOPmZhDilwhi/RZrJYS5ZgJ/Np4NhLFMW+lwmPTHm1RAku8Xo53X/SexgH5oEbBuczv
+	R6YsnU6wAH9vLxFNBzlJc3AyKyhcvjoq0X4uRAw+b7YDV
+X-Received: by 2002:a05:600c:628c:b0:4bb:5345:606b with SMTP id 5b1f17b1804b1-4bb55a7f885mr53671385e9.31.1794581115604;
+        Fri, 13 Nov 2026 06:45:15 -0800 (PST)
+X-Received: by 2002:a05:600c:628c:b0:4bb:5345:606b with SMTP id 5b1f17b1804b1-4bb55a7f885mr53670855e9.31.1794581115212;
+        Fri, 13 Nov 2026 06:45:15 -0800 (PST)
+Received: from [192.168.0.9] ([47.64.115.75])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c60f8d66esm5005578f8f.57.2026.11.13.06.45.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Nov 2026 06:45:14 -0800 (PST)
+Message-ID: <ff20eb2c-4bfe-4960-a642-c9e366a3524e@redhat.com>
+Date: Fri, 13 Nov 2026 15:45:11 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -143,92 +111,99 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR11MB6253:EE_|PH7PR11MB6793:EE_
-X-MS-Office365-Filtering-Correlation-Id: a62cf635-0f37-4847-bd9e-08df41943858
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|23010399003|366016|1800799024|10070799003|376014|4143699003|11063799006|56012099006|22082099003|18002099003|6133799003|261102123227099003|261022105027099003|10067099003|261028144727099003|261026140227099003|261022075727099003|261021121427099003;
-X-Microsoft-Antispam-Message-Info: MuIKLJ0x+PJX6adlbOe+LqbolykhdFWuLXqxOAgBrxpwGMyVnqbLQ8GnJQysRb67lSujLhbmcqyJ/W5Aoty8rzhYZ/xvdbxg379YS6MXaaFbXTdsp6UjwqmET54Y4g0rN2oC6+CCIMNxGAZwXHyPtt7y2HB/JySGkTe3xbB4U1o5rhDYkTY5bCKjaMRPhfulQgM6VMgjNL6QIAYPNHRZZEYWlZqAdJTr+5imqAYK5D8sO4wLp1m6L4AkcsodByA2kLhCS69lxDSoz9JcthCcRnGiYc3AICexXY3BEyyJo8QHQOmh7V3CpAtDb5LjUhuSEqeirRqsosCdTWrUSzptyHkWzZaMsZaWRfAuedGumRf6VhXbuaWh/+df74+ig9c7lX7U5pGJB/XDjLpSOo18tqzj0W7kPXCx+Qu/odY1eL63NEb+k52LL746jYL56rJnOOqwDQhvORgwmhG60G7C03QIGy76KrrGDnbTd+C9TussyQGv9ktW+b7s/hvfFwDI6XQ/A9OxODby8u+ejzLAYgpuRJcJ87jFe0+bXJwvt6kEP/e1qiTQXYarFB2oKuxEQVFDZCy2TuhkkK6+t/+HpC8+rcGsd4cI67i2oOAtYmsfpE/x8cnGpm+4rAMXUlbv9X7pk3oZ1WbSbdiaUbhQeFnXloqexEFy8SwPxJ+iS4M=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6253.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(1800799024)(10070799003)(376014)(4143699003)(11063799006)(56012099006)(22082099003)(18002099003)(6133799003)(261102123227099003)(261022105027099003)(10067099003)(261028144727099003)(261026140227099003)(261022075727099003)(261021121427099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hZDZrQ7E/hxaxCh0YIf2Xxxv8ExDE6dpbH6ZKk2j3iZ8vYu1Uqh/bXOWQ34Y?=
- =?us-ascii?Q?/VUAE+LaGWtmqoJ94ZvSAuIArIlNGcMh5uK5HlxTEXuC9c2VmI2COkVgT2IG?=
- =?us-ascii?Q?/YdJnSxxezUC5BhleEnzOOOlUmnVfT05OpkCb+hskezEaHz8UQHtaxRnzRmC?=
- =?us-ascii?Q?PrUHDPwMRk9nOA56PYZdmLuweaAlUXaPweGQJUFmkojR4N8HY/LM1yhzCpOh?=
- =?us-ascii?Q?v/3Y7PPAJ0pLJTyEJSw4XYa8+uxOufTkovNldzafsTk8L+8gNmgx2asR7tT/?=
- =?us-ascii?Q?BCnTTVzjYmz+DxRCwWrtuU0+MFqgzAdFUXRZ9WCwvt1VK1U8QLcJq9uhNZki?=
- =?us-ascii?Q?lLwmRQMoTQ0mo3UfmkBlhKB+70SSq2jtWJb4bI3OCVL0wmBRrX+uvpGcOLk9?=
- =?us-ascii?Q?y5UFpZCmfSICf+i5dODjYF8hV54uzYb3S3kQMhEtNNlp4uN/LfEiqAnm8nAh?=
- =?us-ascii?Q?glR47VGfU/9OiGWERp3yO2xVsGQxC1opbvu54G8lQco9WdSE7mECxgzteOG7?=
- =?us-ascii?Q?fXqfeGlorLWWZanQP9KuLWhNSa+w5V8c/438ds63bjvRgS70PS3KDUQMsESp?=
- =?us-ascii?Q?lvB0oItAkSiJMrR/4XVDWJuP/QXG2+ibuMg0120Ju44RK2fXTwTswsOsrE4i?=
- =?us-ascii?Q?TyWdewRPRII4BetNwf4mN2lh52dq5uDlS4hV3HjQbFzknwA5noi03i2rDBoj?=
- =?us-ascii?Q?hvPpqukuC4uwNVg9bs0QEFq5+iAFBFpKs68tBmOQkg2hk4S5fGNV/r9ap4K6?=
- =?us-ascii?Q?PvCwDmJqTiStjaBNKvRyd1ZsjJlVh01vh4u47UhWZIZJmCkGIE/ElkvLBp8y?=
- =?us-ascii?Q?UP2VbRblOirC5qN91XkC7BmHmmXBJAQUYCBUlFS8V2uUDpl0osOV29Pjnubn?=
- =?us-ascii?Q?0OdcoVq1MzwEy8HMlKey2hVZ16osKHf/oARMYOGGdnX2h1xZCFuw4O/47Sjd?=
- =?us-ascii?Q?T8hGFiqexPbxghTzW7ISjFxGjDuvHuRGi/P0ToBJruxpCBuHPYI0bRayQWJC?=
- =?us-ascii?Q?zFcfamlvd9sGuix6oFFhqfTTUXgg5Fo+TQUgeo/Ldou8+bz1MuQVf5gVW5hG?=
- =?us-ascii?Q?a8dd0897mP3Bnl1GVtTn21RGSUEhVBDqYwr/Yr8wohGf9+M7BO8VHBBEoSCK?=
- =?us-ascii?Q?VbWWov87GpM/RGyByQ4EnFgzlOPxvbixw5+rEI7Od8TJAvKvI/QTU7FueXKy?=
- =?us-ascii?Q?wy3x9PsI2sK78VYycd6iAQnE9jNwaKud5m6yqpVyhhQTDdhdnbVhmHusrFbq?=
- =?us-ascii?Q?1wS7a5UAVkSc0f2vwFLFf3EcSRPqFefV8gzBVLfo843kFlaY9X21/KXQ4vCo?=
- =?us-ascii?Q?MrM8/piPZoLCGjr9PUlUUqXk3poDTbgfd2HiXABLttS9eWjQ0Ou7Ek1nZ4h9?=
- =?us-ascii?Q?53Qn6Bf4VvtgWThdOqi+G/wPywO1gshQNR4t1KLorjhbk0ZWN4UMTowmQM15?=
- =?us-ascii?Q?vzMImYflljB1gj03q3YQefOHeoTidGUFZCCj6QY6K9UOO925zBfI/ul5TDMe?=
- =?us-ascii?Q?dxqSZs+njQl8ig8avvAQHERb5CuOvnrm3v1qvRc5fHTbTW+Tyhta7hp+AeSt?=
- =?us-ascii?Q?TMqOX5qHdkzP02tGmAPIrj4ubmZSqzvE+0l5zixvix2ifmS05kOWspO1KIwo?=
- =?us-ascii?Q?QtHsMEAfN7rvLH/YAHnsCdZFWMgJjnPz5m+yBDyaPqTL2G0VyxttTmrTXy7p?=
- =?us-ascii?Q?nL//xKlAIKAyqgdGkXsU2Ip3nrGoQz7dUKPAGsgxsndzuZBC5OueaALNQFvd?=
- =?us-ascii?Q?Hsf4WJWXzQc0XmfKa39uOkIMZcBWxIcuG9r9ogsfCtwFOTInSWRNI5kcaI62?=
-X-MS-Exchange-AntiSpam-MessageData-1: fM5912W7MUbPSQ==
-X-Exchange-RoutingPolicyChecked: 2RGcvTai6awYgJ8TO81oKMp1nen6A56vsrUxrgY94tqXRjthajqfzwS3FzmH39MxNX30B0nqs4ftTW5DOlVVgRJZ7+mGFxFruA9URRjAiG15prcP3N5dyHh+gw/m752JkQU1rZzTTQMeIkcno3Osepwky9fuYmUXR0ZQ3TN8Yay9bFoRcamxy1UO8CAGIBXUZdPOfyw1v9crPlrsmNNZp4wo7dut5HPDDeYBwfAOounc7Za39ALkT5qUyLNlCJJMsZCHUk7h68nDQ5dAxcZosl+86qZoS2oKooUlf/08zUyCKv9ps3FCz4HwWCnHC1/tT+N5EtXZHsEtib5lHxJgnQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: a62cf635-0f37-4847-bd9e-08df41943858
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6253.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2026 14:41:36.8175
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rz4EK9EVUurH8PwUiwDFGwZx9+MErX18Z11zKoYt2DRdz+/b/hfuIsHTt9c5yLO2N6pye6cl/1Ig7pl/5one9A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6793
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qat - clear fw_loader pointer on adf_ae_init()
+ failure
+To: Ahsan Atta <ahsan.atta@intel.com>
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+ qat-linux@intel.com, Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+References: <20261103100126.534424-1-ahsan.atta@intel.com>
+ <545910af-9ff4-4fcc-92bb-43a56f88753e@redhat.com>
+ <avchnYuwouXKyRgS@soc-PF5467PW.clients.intel.com>
+Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <avchnYuwouXKyRgS@soc-PF5467PW.clients.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 13, 2026 at 12:20:47PM +0100, Thomas Huth wrote:
-> Am 03.11.26 um 11:01 schrieb Ahsan Atta:
-> > adf_ae_init() stores the newly allocated loader data in
-> > accel_dev->fw_loader before calling qat_hal_init(), as the latter
-> > publishes the HAL handle through that pointer. If either
-> > qat_hal_init() or adf_ae_reset() fails, the error paths free the
-> > allocation but leave accel_dev->fw_loader pointing at freed memory,
-> > so the device is left holding a dangling pointer.
-> > 
-> > No code path dereferences that stale pointer today. This is therefore
-> > a robustness improvement with no observable failure behind it, hence
-> > no Fixes tag.
-> > 
-> > Clear accel_dev->fw_loader when the allocation is released, and fold
-> > the duplicated error handling into a cascading goto chain. Report the
-> > error returned by the callee rather than a generic -EFAULT;
-> > adf_dev_init() still maps any failure to -EFAULT, so this is a
-> > readability improvement and not a functional change.
+Am 13.11.26 um 15:41 schrieb Ahsan Atta:
+> On Fri, Nov 13, 2026 at 12:20:47PM +0100, Thomas Huth wrote:
+>> Am 03.11.26 um 11:01 schrieb Ahsan Atta:
+>>> adf_ae_init() stores the newly allocated loader data in
+>>> accel_dev->fw_loader before calling qat_hal_init(), as the latter
+>>> publishes the HAL handle through that pointer. If either
+>>> qat_hal_init() or adf_ae_reset() fails, the error paths free the
+>>> allocation but leave accel_dev->fw_loader pointing at freed memory,
+>>> so the device is left holding a dangling pointer.
+>>>
+>>> No code path dereferences that stale pointer today. This is therefore
+>>> a robustness improvement with no observable failure behind it, hence
+>>> no Fixes tag.
+>>>
+>>> Clear accel_dev->fw_loader when the allocation is released, and fold
+>>> the duplicated error handling into a cascading goto chain. Report the
+>>> error returned by the callee rather than a generic -EFAULT;
+>>> adf_dev_init() still maps any failure to -EFAULT, so this is a
+>>> readability improvement and not a functional change.
+>>
+>> The -EFAULT in adf_dev_init() should likely also go away: EFAULT means "Bad
+>> address", i.e. a page could not be accessed. Thus it's likely the wrong
+>> error code for most cases there.>
 > 
-> The -EFAULT in adf_dev_init() should likely also go away: EFAULT means "Bad
-> address", i.e. a page could not be accessed. Thus it's likely the wrong
-> error code for most cases there.>
+> Hi Thomas,
+> With this patch adf_dev_init() would still return -EFAULT when
+> adf_ae_init() fails.
+> 
+>          if (adf_ae_init(accel_dev)) {
+>                  dev_err(&GET_DEV(accel_dev),
+>                          "Failed to initialise Acceleration Engine\n");
+>                  return -EFAULT;
+>          }
+> Let me know if you would like me to add your reviewed by tag.
+Yes, sorry, I didn't meant that you should change this patch here, my 
+comment was rather meant as a suggestion for another future patch.
 
-Hi Thomas,
-With this patch adf_dev_init() would still return -EFAULT when
-adf_ae_init() fails.
+  Thomas
 
-        if (adf_ae_init(accel_dev)) {
-                dev_err(&GET_DEV(accel_dev),
-                        "Failed to initialise Acceleration Engine\n");
-                return -EFAULT;
-        }
-Let me know if you would like me to add your reviewed by tag.
-
-Thanks,
-Ahsan Atta
