@@ -1,69 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=134.76.10.21
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794563940;
-	b=n3U5/MfMWb9ol/EB/5vN4eARKqC0Y3E/f7B9jV5vIurvQxZhsJK7TZZn2C99+tWgP0lh
-	 IZhjIBkCazrL/9iMks1XHol9K763r/0v72QFkq1Eh4NUh6yB8ISNX3AHUaemp2k4cDHUW
-	 t4f0T/i67pnBuIV4j6Ow8MUs5Zkg05C9Qz+DkC7sXPtxhI+HVOM9ORW8V6/t44GnEKfYB
-	 oOnYRp7c8Fqqq6PXPwfjo5rYlAPpysyn2DWe/KKW059TuriAlt0GfZdcE+8Q5yzpFv2c+
-	 B0NbUlwVKDnsP4Qol9zb5x+dtNJvyTnwY24mB9NcVA4qBbir4Tl6L4fYxVewJl3QwkA==
+	t=1794565125;
+	b=sZAAa+yeGvKMotwaBCmdty6wFzmj/fsSH7DJzK6m+F28Bh5FH+QlbdVi+grJ3mh71c7i
+	 8VNrF+9ZUf68oaKkSEYC/tz9xVZgtSo86uHo8G274GyWr/dMPjytkFa1/KycQn03s9IQM
+	 CeLvlHsy+5ToN74RTpfvTuamYejXC0rJ83HNDJ0Oe+hT3GePHj4sfnq8n8Auh0YnCmMxd
+	 R2+6jHC4aOfdOLMub8YJSzqvmmqWeLW3Srn8PnI7Em4d3R7y6h14BSG82xLP7z55dp4QB
+	 OgCvO78VotSKSgVkQDgekO4k7kFMhZteONOErYUHVzzOlyhGpSbASNvdRSAJ9yVkicQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794563940;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:Subject:To:CC:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy:
-	 X-Virus-Scanned:X-Spam-Level;
-	bh=Z8ldHOW7Jh2F6tB55n2yK83TrHX8HOmq++gHNOoKpbM=;
-	b=43jvoaCv874uqU1x8uT5PTuQ2i9fWN7cm4lG3IIiM/3VmiK3rQH1kdfuzRwVf3Y/fdz4
-	 OqkOsiM1kOCA/mKorLvpuKElMJJrAkl9SaYYRfodjFc2TDfs2OpSNHCviQ9KwomWh/n30
-	 v2J9pYdCjROAR8vDj5N9H59ubl/mbXBIclstvgdgXakdRJsVDTczow1d6qhP820ewrlSP
-	 hwDFYsjoNdaqajCH/5BdUO9ogJ8NxIfhDi1BpuN59j5rCEBYKiqtdZGpLytwAQCZAapc1
-	 zl7AjJMjtO+BupO1sOoOLoOM4JUTjxk5oOQicCEyww8vQA23JeoRf4xir5Q3hPx0jQQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794565125;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=XTQp8SKrmmjGdaoj3cLoQpYxyDLtluff/URZttFHqVM=;
+	b=YH65eDMXtqStgDZ+oDywfAn2Fk89PYVPJdeXPhRME083BvYFwEFwRg+3WpltkgtKNnEX
+	 Nz7Okh/ZdIVsVm968ymHHnuiimYBvdw04RhWrqywNoaQNG6dXaj1zb6cbnRLkC9kMgV5V
+	 10+IRdZcHs2c76n3Nh70BYLzDduTECxU4XUZYGtKuWiczSK82Bu2GdrZHUxQVah7wRI0V
+	 u7HXLVgARbJNHt12W4TF8/yaREiIIj9gFEXbxHN8UrItLCOsk5ydfEXD3+l9GHKyMHF/C
+	 5auF3rlVIWG+NlK0AegDtbZ8a4o9b3zou/cCEqhvcNUP8unMj2NNCvAMMiHVY0HXBQg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cispa.de;
-	spf=pass smtp.mailfrom=cispa.de;
-	dkim=pass header.d=cispa.de header.i=@cispa.de header.a=rsa-sha256 header.s=2023-rsa header.b=ceKLPTAx;
-	arc=none smtp.remote-ip=134.76.10.21
-Received: from mx-2023-1.gwdg.de (mx-2023-1.gwdg.de [134.76.10.21])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iLe85MkD;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AD9606A32A;
-	Fri, 13 Nov 2026 09:58:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 09AD9606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cispa.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cispa.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBAC606A323;
+	Fri, 13 Nov 2026 10:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=cispa.de header.i=@cispa.de header.a=rsa-sha256 header.s=2023-rsa header.b=ceKLPTAx
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cispa.de;
-	s=2023-rsa; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:CC:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Z8ldHOW7Jh2F6tB55n2yK83TrHX8HOmq++gHNOoKpbM=; b=ceKLPTAxriYEtBfMFr+ly6Q9CQ
-	P7Avfhi9L1WtV7iv0ZXw2uSAKcG/AkXEnFYRsbvk0MpG4pHcEHWum1FVYqFNjzKgXsOQSikcpGiBO
-	dDVHnvr8vO0REmUjiVDRCSNOfFHVLU5Av7CkF/e7FjYQoLxF3Xek9kTchzK2KRJGZlZMrL6/lj2Ws
-	uLLpqbt2yZpn2apgBP0QUftPswkQJp1K+qdYAXzR5woacDoNRYAYNjAa+a2K9YuukgW07FlHITDX/
-	MydLuvaIxObpAccFLfHYOh5P4UHktu/P43wYPIm5Zd1h15F9L8jrhVfrb4QcuCJ7dNhRYSBbPSQML
-	8vi8ruDg==;
-Received: from mailer.gwdg.de ([134.76.10.26]:53240)
-	by mailer.gwdg.de with esmtp (GWDG Mailer)
-	(envelope-from <florian.bauckholt@cispa.de>)
-	id 1xRo3R-005Tb9-1b;
-	Fri, 13 Nov 2026 10:58:45 +0100
-Received: from mbx19-sub-11.um.gwdg.de ([10.108.142.88] helo=email.gwdg.de)
-	by mailer.gwdg.de with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-	(GWDG Mailer)
-	(envelope-from <florian.bauckholt@cispa.de>)
-	id 1xRo3S-000Y5M-0Q;
-	Fri, 13 Nov 2026 10:58:45 +0100
-Received: from [192.168.0.168] (10.250.9.199) by mbx19-sub-11.um.gwdg.de
- (10.108.142.88) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.56; Fri, 13 Nov
- 2026 10:58:45 +0100
-Message-ID: <473700a3-f5d7-4a7a-b89a-12c51adcc3df@cispa.de>
-Date: Fri, 13 Nov 2026 10:58:44 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iLe85MkD
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EB741F000C4;
+	Fri, 13 Nov 2026 10:18:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794565125;
+	bh=XTQp8SKrmmjGdaoj3cLoQpYxyDLtluff/URZttFHqVM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=iLe85MkDwoT4kspMx2Xssew/DsC5s1mT3SeGP5/ZXBUTBs9e8mrQT2op29NIWNVT0
+	 sTmqKZeiq+pYwGCwkQJIqVUmVIkhUHRJwXoTXU+ShAQ8UybboJW4PPkxBtkZRzVYPP
+	 6dJ87JrYw5MC9q6qk63RPSXXrreyR6zFCC3bpLFZrUI9//O1kZeMcj9XhaUEVEhaek
+	 9ZECLY9buqOwwVW4j58jUXyuImWDrrVyamx91aqdw+vweHvzVf7Dt6GgKxd/xLDWOx
+	 XH4mH76ngEt7jxj2G5IZdXXdk4l08sJvCK0p1OQBdDB3DA+6FMEjIuS6QhYyBS1bKH
+	 j0DKveJvrz0uA==
+Date: Fri, 13 Nov 2026 11:18:42 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Stanislav Aleksandrov <lightofmysoul@gmail.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Abel Vesa <abelvesa@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Robert Marko <robimarko@gmail.com>, Guru Das Srinagesh <linux@gurudas.dev>, 
+	Thomas Gleixner <tglx@kernel.org>, Radu Rendec <radu@rendec.net>, Lee Jones <lee@kernel.org>, 
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
+	"Joerg Roedel (AMD)" <joro@8bytes.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Wesley Cheng <wesley.cheng@oss.qualcomm.com>, Vinod Koul <vkoul@kernel.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>, 
+	Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, 
+	Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	Amit Kucheria <amitk@kernel.org>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>, 
+	Lukasz Luba <lukasz.luba@arm.com>, Georgi Djakov <djakov@kernel.org>, 
+	Sibi Sankar <sibi.sankar@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mfd@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	iommu@lists.linux.dev, linux-usb@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: [PATCH 03/17] dt-bindings: interrupt-controller: qcom,pdc:
+ Document Halliday PDC
+Message-ID: <20261113-accomplished-impressive-pillbug-c0811f@quoll>
+References: <20261109-halliday-dts-v1-0-289114ab8197@gmail.com>
+ <20261109-halliday-dts-v1-3-289114ab8197@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -73,82 +76,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ecdsa - Reject non-DER X9.62 signatures
-To: Stefan Berger <stefanb@linux.ibm.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, Jarkko Sakkinen <jarkko@kernel.org>
-CC: <linux-crypto@vger.kernel.org>, <keyrings@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20261112-ecdsa-x962-der-v1-1-36b24c5f5e11@cispa.de>
- <e852580d-9e18-4733-a431-2db8c5f9c2a3@linux.ibm.com>
- <d3a49bde-769f-48a9-ab1b-0374d3d4753e@linux.ibm.com>
-Content-Language: en-US
-From: Florian Bauckholt <florian.bauckholt@cispa.de>
-In-Reply-To: <d3a49bde-769f-48a9-ab1b-0374d3d4753e@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MBX19-FMZ-07.um.gwdg.de (10.108.142.66) To
- mbx19-sub-11.um.gwdg.de (10.108.142.88)
-X-Virus-Scanned: (clean) by clamav
-X-Spam-Level: -
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20261109-halliday-dts-v1-3-289114ab8197@gmail.com>
 
-Hi Stefan,
-
-thanks for testing.
-
-On 11/13/26 00:38, Stefan Berger wrote:
-> On 11/12/26 12:06 PM, Stefan Berger wrote:
->> I have a user-space test suite here:
->> https://github.com/stefanberger/eckey-testing
->>
->> It tries to load openssl-generated self-signed certs into the kernel
->> and this fails now:
->>
->> $ ./test-ecc-kernel-keys.sh
-
-I can reproduce this with your script. It fails without the
-KEYCTL_PKEY_VERIFY patch and passes with it.
-
->>> This is a behaviour change for every user of the x962 template (X.509
+On Mon, Nov 09, 2026 at 12:33:15AM +0000, Stanislav Aleksandrov wrote:
+> Document the Power Domain Controller on the Qualcomm Halliday SoC.
 > 
-> I would say a 'potential but unlikely behaviour change' because if you
-> signed with a tool (e.g., OpenSSL) that created properly (DER-)formatted
-> signatures in X.509 certificates, then those signatures still verify
-> with your patch applied. I would assume that most people signed with
-> such a tool. In your patch you seem to add more tests for proper DER
-> formatting that all existing x.509 certs and signatures should meet, right?
->
+> Signed-off-by: Stanislav Aleksandrov <lightofmysoul@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/interrupt-controller/qcom,pdc.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 
-Yes, this only changes behaviour for non-conforming signatures. Anything
-generated by OpenSSL behaves the same. I'll change the wording to be
-explicit about this for v2.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-The existing testmgr vectors covered only valid DER encodings and this
-patch adds new ones for the BER edge cases.
+Best regards,
+Krzysztof
 
->>> certificates, module and IMA signatures, KEYCTL_PKEY_VERIFY): signatures
->>> that are valid ECDSA signatures but are not DER-encoded used to verify
->>> and are now rejected with -EINVAL. The p1363 template is not affected.
-> 
-> What breaks the signature verification test in my test suite currently
-> was pointed out by AI. For signature verifications using the
-> KEYCTL_PKEY_VERIFY interface, it currently would pass along an input
-> size of 72 bytes for a secp256r1 signature, which is the max. size, but
-> this does not always correspond to the application provided signature
-> size, which may for example be just 71 bytes.
-> -               params->out_len = info.max_sig_size;
-> +               params->in2_len = uparams.in2_len;
-
-Yes, sorry, maybe I should have mentioned this in the commit message.
-The notes below the --- link to this exact fix:
-
-https://lore.kernel.org/r/20261111-keyctl-pkey-fixes-v1-1-934ebaa267a7@cispa.de
-
-The AI review in the thread also ran the patch without the keyctl fix.
-
-I'll move this dependency to the commit message for v2, or wait until
-the keyctl fix is in mainline.
-
-Thanks!
-Florian
