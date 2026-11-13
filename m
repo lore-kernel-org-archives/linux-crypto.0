@@ -1,59 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.254.200.92
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794552931;
-	b=HE0rBd/xrNE3p8u+7vF7mzLUOWAwyz6JrCQ2PC+Da26F7XzkiEFHmY92yx8LAgQ4kP+i
-	 WH0qgArvUa2rCETfjPh91S3Wwwm852atYDefUSd63miQswk3RJF3blfbxmAcwA9vFoT08
-	 uRYB0EYWteX+WcQ5m8RhtoN0oGiHRB3rsmk29EiQ2niGgj46/HgUVoBN/YpqwtrjYlNWX
-	 o25n9h1JgMA+fQUvNW1HzkEI0b43MnwOT5v6U2UsBwrUR6fVWfRLVgzbRrPkflEZ+ZFvl
-	 gmWzFmNcOwyaMFWLaYp1S0wu1Zm3RabqUcGR/W5rZAZVOFHL7Uh3EK3xgX2NM8088mg==
+	t=1794552932;
+	b=bsymDbzpjk27dupcQqM9W4cGK7AuSPFf8OLA06vjvtuN6dA+7780+QrcMCK33+gHG/JH
+	 UOEWZEWm8NHUMPisx1DhGEyfnXVhcWYS6Qb2cgWQVFR7yI/NVHW9xGo6X1le5Q15K+Vqs
+	 MmE3GnYubCs2nuhcGi3E/PC8WzgrC+faGgddHB5yySAnq/fQfbosDN6Npaaxykl035SQG
+	 43DE2P4F1uPXjZEh62z1gvjEVFiGlnp44WbWFg2474IlLG6u1v2Z3PYAwqoIVZ8f/5o0b
+	 GueSoVcWt9C6lMjw8pqDQWAIJ4TjHeTiR3HjNPUfYvXyitJ5NIuleykeUvtZoo2v8Ow==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794552931;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794552932;
 	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
 	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:From:Date:
 	 Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:X-QQ-SENDSIZE:
 	 Feedback-ID:X-QQ-XMAILINFO:X-QQ-XMRINFO:X-QQ-RECHKSPAM;
-	bh=uwj6r9dxBe0KPAQLQ2ZEBT+/Ur+cpWwUyD1v84lejmo=;
-	b=z05pAB45qrie3B6P7vXA+TjVWRKtmY+KknQ8WVXBYMgKlPiEGZpP/Tq6M2C0N2QrSnmT
-	 /+Ix337hp8o61Pt5klWYjGZ0LeabGIikAHVBUpMrxiyvseUyFPFxXsjD0cG4jtAGmXP7A
-	 Eei5c38EaS+TJOAoQCZLrYGN33ahs7DdoGf/rRn0MHAjaUniT11TTWsUV6HfTWiqfDhIb
-	 FRTfMudHtX8TviPZwwnPN/6kGlbaUJqrn1qHrYDX0HlCKMXLFzZ6Rgc3TLsrF/3CPapnl
-	 x1zInxSsLBW6H5nfcxhoZmKuE3KGO33TVwYqPiY9eE/GyPzYg6mFBdWMusHYMj7AKgQ==
+	bh=S9xB5/BduPnlfWQ8P7KI8rH/Fvga0iHfv65Yb/2nG5s=;
+	b=N9FMsv2FRNUVyT644NBIBobojKHf4WCBK+As9pbqK89kzi7uaYNzedR9/pDisYWqqSjH
+	 am35g5EGNAXG3ghAmSympLQRrgwhjIFGevhxDIEZzlFHFjHOHqcSzBIjLXKKLItYqHNwe
+	 rjFnPkRbRdteoyX/ebE/lg1dFCYCcPbWoiUNO3IRR7umYc5rPMNR/srjAcmt/qWRO7VWA
+	 avjG7tnUR1hJSysCt+9jBBwMqAevgAMTxRKJJLZTnpBT+RqIe04eD9TVOlGlgUtV6/psk
+	 qolRWx8rj2C0rNc0jJTWAyzHSjSiKCH5pffAx4L0AYJjVW+UjjSzjEs3Q3nBQTsrCfg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=uniontech.com;
 	spf=pass smtp.mailfrom=uniontech.com;
-	dkim=pass header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=Fw8oDbRu;
-	arc=none smtp.remote-ip=54.92.39.34
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+	dkim=pass header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=WEheNwh9;
+	arc=none smtp.remote-ip=54.254.200.92
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2096A606A31C;
-	Fri, 13 Nov 2026 06:55:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2096A606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F1F606A321;
+	Fri, 13 Nov 2026 06:55:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8F1F606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=Fw8oDbRu
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=WEheNwh9
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1794552909;
-	bh=uwj6r9dxBe0KPAQLQ2ZEBT+/Ur+cpWwUyD1v84lejmo=;
+	s=onoh2408; t=1794552901;
+	bh=S9xB5/BduPnlfWQ8P7KI8rH/Fvga0iHfv65Yb/2nG5s=;
 	h=From:Date:Subject:MIME-Version:Message-Id:To;
-	b=Fw8oDbRuTkgvERyy2Pl69EDwi0JyFiv9H+MtSZpiukkGZtIEAaJRJlErOxgyExpAH
-	 0jd14k/kmKh6WDvL+acuI0L3YyaztnAub1TXOf0Gxm3Ify4q33Mh2rP7Ot1slmBzdQ
-	 +Zbst5Jt1n4Nff/IP5N711OHE0xlxbM/S9qKeHk8=
-X-QQ-mid: zesmtpsz3t1794552904t88dd6f2c
-X-QQ-Originating-IP: LJ5LHhw4btnKZNUqXes+Qcjtq+9R51HgR3D4wO1S5jg=
+	b=WEheNwh94CEdakxGyR8FV36cUwXYzfP1LIClSeHr6UHvuLSObhpTRaxwp5+hgDkut
+	 aV4jqKK451ZYBeFssmcyuhR310XeRLNM5cyGmFD70whu5nscutCiUlFgOI7YXeYCbX
+	 DhwsJ/qj+1Lu6he/+2EY4N3KoIExDe3ZRNU8Ynso=
+X-QQ-mid: zesmtpsz3t1794552896tb95be6bd
+X-QQ-Originating-IP: bpw1viB69li/X4G06J1ke0dy5JyGWFnhbJ6iJ2mocbw=
 Received: from [10.10.7.69] ( [124.126.19.250])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 13 Nov 2026 14:55:03 +0800 (CST)
+	id ; Fri, 13 Nov 2026 14:54:55 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 1603796568235897067
+X-BIZMAIL-ID: 9421328609788192417
 EX-QQ-RecipientCnt: 9
 From: ZhaoJinming <zhaojinming@uniontech.com>
-Date: Fri, 13 Nov 2026 14:54:25 +0800
-Subject: [PATCH v2 7/7] crypto: qce - release dst_tbl when the source
- scatterlist is invalid
+Date: Fri, 13 Nov 2026 14:54:23 +0800
+Subject: [PATCH v2 5/7] crypto: qce - terminate the DMA channels if
+ descriptor preparation fails
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,7 +65,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20261113-fix-qce-ccm-adata-leak-v2-7-914501377a62@uniontech.com>
+Message-Id: <20261113-fix-qce-ccm-adata-leak-v2-5-914501377a62@uniontech.com>
 References: <20261113-fix-qce-ccm-adata-leak-v2-0-914501377a62@uniontech.com>
 In-Reply-To: <20261113-fix-qce-ccm-adata-leak-v2-0-914501377a62@uniontech.com>
 To: Bartosz Golaszewski <brgl@kernel.org>, 
@@ -78,53 +78,70 @@ Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
 X-Mailer: b4 0.15.2
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4b-0
-X-QQ-XMAILINFO: M83iEva+1QDB3MtWpZZZoC87SLZaCRyoJe3FOmRYPhP0Nnepxb18Vd7/
-	tgzbbf1KRRSMkR04BlyPE430duU92SVNR0GN28HXFDR3RiFpQV7uxLFZxxUd90mWwBCrBZf
-	bA4zFtZbfZ7BT3IVnqY6FWz2/09ISoBoTBjjYmG0rlglk164b1osWOOic00JY8f01qxeKPx
-	eWibbAwrfDrqvRQX/b7XXUIoGUJ5WrOTytDpZratWDr+cGdXJkL1jjieXQXTuSApevlrxw6
-	epTBl1rhhSd30svTjNQ9wM7Fo9uAMKuxr2vwSvm0ZhkbiYu4o7H6l4bmBej+UXOCOwzSVtu
-	+zV8r/sjZGWaiLNTozO/MjB86SxNHxU9/TDBeiLqjuK4ghC0ObdL88A0hVJZuzb+JaeANPC
-	68KR60ylHsoP3SKm0h4cb4qsSGJHTj+R7kAMamK3V84/fSkmyJ34sYF0uP0s7Mj4ixBnlYP
-	zMYYCRSexldrH5YnYIZitvP0xSIzUJxblckK6x7d8zHIJ4xjCdZ5dDtOBR9PbmBLz0tV+ZI
-	6pRey7MDacs54jyHntaSUehVWBjkeCEZFy875bZxIiIv9GASMwn1C1QTYAtcfG8Bnu3iWGw
-	tQSM5tVrCvSxUydn7z4fI7/O9ZehDsn3hmgFvDDbPmNsR9EWYpYJIHEnutdP6RyJtq2awdT
-	VF6nsA503m/PjzCTH2mksNCufrakxW0Bw0NecViUG1/3V3VWwvESkOv3Zsy16G2sq17Dih9
-	32iagUMTQM2lJytiPnX87fMPpt8IPyKo3bkZmqSj84OEtH1fAa9wyk50zOiAPsPkBttWpAQ
-	4PEZoPSk7oJOxB7O0oJGYecxCOXSgamgmQxvf/fucuExCqDutW/gFP/R6CmICrLWrpSm0Z3
-	V1GqaetIhgLS/xcH1hYc1QKwf7mqEY0yiRmWcwVneyAWeeaKHugIyj/ioUrSPQXSllKM0Cw
-	QXAqLimmJ5nEVIJsi8Uzkq3oZ6muYuBM/VCCQb+XPfsZsefdeN4QPd37TBfpGoCZLmv69lK
-	T91moyCcfhg1/Cj6WJ+BZWq4YTRzgMe56fghh6/ZMojfZL/IvJ
-X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+X-QQ-XMAILINFO: N71rnkwxYMwynW6MV13nhmWGzw5rGRej3Ycw8xYoVBEPdLVQCMCCyv+W
+	kaJM4vwzgR/ZqyVdxVjTY3aTBMml5h5BfN5rUW24JBOYxOybian32Vcd2ZSPQfE5Wjg1Il/
+	dVnd6AQ9PW9nbdhlJ0ImLylQ8kCpUtaVFOl3Qak+P9A9Q5uoaXayZz42ITzdPeDHW60ukXQ
+	7h8N56us5JXkM3MTJIxfJbDloEZi5tgGOjVPjaOWMudN/B98hJT3w0ay3dQbb1BFBnBTpKG
+	OwxwIQzOPtqdR1uzMOxQaqa0aarqrIsmL97INYZTWTcj74sbiJnm+qtBtUaALAPzVTiTuPS
+	2R6CwdNPbqEN2Xix7dgPy3jvsCmoVDhBRDdsds+5Iec7Oiu3mQq6LaKVXWu7AwsTkLdJbys
+	eEM8719rPTt799xOGy/AVdjw6Xm9auCc9g4k9EnV8414/vTIFiipZ7e1QT4OL5eJx9Zne7J
+	pft73HTheu8amJjNmD9qAGeKl/vYV+5jZgcVsCEQzUf/nzdzDvjTvRodcWid62z3sbifEBU
+	LvqQDpqHmO2NKJlPneE7/DquxHw5lmG/pO44xrH0jDw2ymsMcQHMvOHTz1Vq8qMVB85D7Kl
+	+h7KIE7oYnU3Jmt/lsK1kwlLyGxqQMRzRlqQn0ScYFUyA8qMczAfmDg5paXYR9qnGEBSrmT
+	0OrfYWF0j6ftk0MwCJtRag9C4/NZf4mUH5SlVXAiyfxDsjgVrbZXFamLkXqT8RORklozYKh
+	QiqjufKdlC3xQPzjixRh7dAW4puGejL9st4E6lKoucp977b5IbNgX3GSfNdl9/hoVMRZsKe
+	1/kDXiYuQHF6tBIWxKNYaeOsV5gHgaZkZ9mILeQPAGtA6fuUHxfS1xnkC3gqoq5EZzvbh7K
+	P1EG9H2xTgL25yjdxg57pjAmDePclFnMyHwlHgeo3Vun68+LYe9Mu+b4da6Pr8+T7Fj9CD8
+	PtSclPz0EGMZD1wPPAT9Zb9aCaknpiYxkHObEjK5OvIYy/GOdxO6GoYwo4JEq4LAgFw958y
+	gkhkKPoFQuYoBw6fFMdRvlHrBoKr6MttmOWfrV7VXuzUuZN1tNLbeUE54AUG9++HFZaK4qu
+	g==
+X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
 X-QQ-RECHKSPAM: 0
 
-qce_aead_prepare_buf() calls qce_aead_prepare_dst_buf(), which allocates
-rctx->dst_tbl, and then validates the source scatterlist with
-sg_nents_for_len().  If the source is shorter than the requested length,
-the function returns -EINVAL without freeing rctx->dst_tbl, and
-qce_aead_async_req_handle() propagates the error with a plain return
-instead of going through its error_free cleanup.
+qce_dma_prep_sgs() submits the source descriptor to the RX channel before
+preparing the destination descriptor on the TX channel.  If the TX
+preparation fails, the RX descriptor stays on the channel's pending queue
+and qce_dma_prep_sgs() returns an error.
 
-Free rctx->dst_tbl on this error path.
+qce_aead_async_req_handle() then jumps to error_unmap_src, which unmaps
+the scatterlists without terminating the channels.  A later
+qce_dma_issue_pending() from another request will run the stale RX
+descriptor against memory that has already been unmapped and possibly
+reused.
+
+Jump to error_terminate on this failure as well, so
+qce_dma_terminate_all() drops the partially submitted descriptor before
+the scatterlists are unmapped.  The error_unmap_src label is no longer
+needed; error_terminate falls through to the same source unmap.
 
 Fixes: 9363efb4181c ("crypto: qce - Add support for AEAD algorithms")
 Cc: stable@vger.kernel.org
 Signed-off-by: ZhaoJinming <zhaojinming@uniontech.com>
 ---
- drivers/crypto/qce/aead.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/qce/aead.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
-index f75e3827d8bc..78c168086c5b 100644
+index dd369328c8a6..00c5924c057e 100644
 --- a/drivers/crypto/qce/aead.c
 +++ b/drivers/crypto/qce/aead.c
-@@ -322,6 +322,7 @@ static int qce_aead_prepare_buf(struct aead_request *req)
- 		rctx->src_nents = sg_nents_for_len(req->src, totallen);
- 		if (rctx->src_nents < 0) {
- 			dev_err(qce->dev, "Invalid numbers of src SG.\n");
-+			sg_free_table(&rctx->dst_tbl);
- 			return -EINVAL;
- 		}
- 		rctx->src_sg = req->src;
+@@ -470,7 +470,7 @@ qce_aead_async_req_handle(struct crypto_async_request *async_req)
+ 	ret = qce_dma_prep_sgs(&qce->dma, rctx->src_sg, src_nents, rctx->dst_sg, dst_nents,
+ 			       qce_aead_done, async_req);
+ 	if (ret)
+-		goto error_unmap_src;
++		goto error_terminate;
+ 
+ 	qce_dma_issue_pending(&qce->dma);
+ 
+@@ -482,7 +482,6 @@ qce_aead_async_req_handle(struct crypto_async_request *async_req)
+ 
+ error_terminate:
+ 	qce_dma_terminate_all(&qce->dma);
+-error_unmap_src:
+ 	if (diff_dst)
+ 		dma_unmap_sg(qce->dev, rctx->src_sg, rctx->src_nents, dir_src);
+ error_unmap_dst:
 
 -- 
 2.50.1
