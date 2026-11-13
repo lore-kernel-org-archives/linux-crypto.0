@@ -1,59 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794553686;
-	b=z2QJfoRzdrzdW28Hhn4qzg2u4urML2T3QYkrmI+DHxaiPmLjKAf099mduA7ek9cnjSmb
-	 +zzSSpBtl6ifkDbZKGUEKEh77qRGjCV7jVyPnIqJchY41RQ0FUMxHdx/TAMq6ToFK7/78
-	 HfThTJDzdkmYAmr0h5q+QZ4eYzbSdB15w7Mimsy5xJEbfoNOEZH2qxLACwzKa4RQZZYuS
-	 jg7Q7vpV2QntC7Np4HW0TSVNeuDfw1li5Eq2+BAuGUbPbkk25bbWEFrFFn7nRx/k7tYLj
-	 UgfbVLkn6jVEYqrlWvYWS9ETy2GJZOLKciDYMGGtxJ5kIQFwpsliWGF9dqsUx8MtJNw==
+	t=1794558099;
+	b=17IFY42J/sexdYbJxYLUxjoC1jv+K76ZDxQS71aMcnr1/hZc3s8XrFIXsLC33vDMVpDX
+	 jCRhloK/4XmXhb3Kxx3y5F7MRnAtv/q8xGFsigoxl4dB9VmA99ShjahCJy0fyupuSSB3F
+	 yfG3WHTSCMt774nRu0yke9L3KF42I4H3IvnCZvoBrQmON+wbwAGWsYz3w1R8Re4qssnz9
+	 gW4w0el6GH88hJiydB52/1bdqab/NR2i3prnxragI1SejZOURZ9+8c+EiHsmSh0VrDeEX
+	 keSX9vOnadgkgETcnMZQ3V4J9pRRu5Dras6kIZgoaIVoClepxb6cmdKmiTUYCCyj3TQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794553686;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=OL4dzJNOuLqLseJzL0ilTzIpSLYP/dNRhVD1xaqa39Q=;
-	b=BfO8I8fZUF30Vyee4N84NmhObP9h0T3KdTwKkdCt6tA4xwgJ7NGiOIXlJ696TBzuk+Vo
-	 BelZyaa1AeqwRvNzTel/83mj5qWRJ09nnjA4HJbuSxhqpUDpHtfm3ZHH3+gTi8fk13PtF
-	 x/ULPfUUGEBGw7YAvx5LCyDdg1LCgaX8gLUZr98r9s/L0QcSLmvEljM8VtwCu1fYzChlA
-	 iKYfhT6vuujjrfMbLsSLdzEJdpOd/HZ7NgWFcyF9qKbauCRtsMrl7WS9d0KSdpIrEFJyG
-	 7dAx9KDFTo+J4q6AOKObByhrShJ0Z6RAvhYcid65Kdz+rWdD8Yxm8MCykn3JvwXWnYw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794558099;
+	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
+	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
+	 References:Subject:Content-Type:Content-Transfer-Encoding;
+	bh=1Tcvpi3LpKzePvlc0jvv759IgtyBU7ME80xAVQKcXpA=;
+	b=jkFz9o/Dl39xzT/aesA4bJJixJ+bkv9q7+neE8DYQXRtgHRo8mXR4h2GQLG4G9cRelpV
+	 o9DjJ3V91b8VKA8GD4kDFK0g5bgAK/uXqG3TYgdwr1O7V1yF6xHCxmZgvwmEh6iFqu2+a
+	 /WjuAlrLo/pLB31q0XphWtblKc5m7KNAc89Kka5/yjI7rEgukVugLqQFfdNk41IJTXI4H
+	 VX/pQ5YaRXsJlB++m6GSHlSYjWeIXGo0af5A+NEhabBUzpDT1xuv6nIu8qXtWnbIO6N1J
+	 kc/dxF7YmZIzzhQ8myg2WKKVd+dYs1xUs8sWGuw9K+96evm6UaX6VKwQGHpqcDGNrqw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kV8nOu3s;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CBZIhk3c;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124EC606A321
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 07:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1A7606A891
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 08:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kV8nOu3s
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 826251F000C9;
-	Fri, 13 Nov 2026 07:08:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CBZIhk3c
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E41FC1F000C8;
+	Fri, 13 Nov 2026 08:21:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794553685;
-	bh=OL4dzJNOuLqLseJzL0ilTzIpSLYP/dNRhVD1xaqa39Q=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=kV8nOu3s+9M0go6YIHcNQq9YJx5afPQszMPUcCtw36CI1rvzyURNvf8VyqB3IAfvy
-	 0ptt7H+x/kCwQmJQsCcyY+9EuH2icPEjVh3BB6/nPh4bXBh7VWCLBAI22z8jR05B4z
-	 l4SLXbGdmzPCbyopHL/AUiiDlxE5fnpmMGQz3Y9Uo79GDFs7Z/Pvc/skrd/RwdP43W
-	 UhERnuLnSiB+fsm+TL4N8hrxQ3O+UXFMU+UFa1ql6clmcubwW58qu5QQmwpuHoBJXF
-	 N2nrov9P++INI4UsyYtgfmobfL7knK4pD89W3GYPVOc1OaaY+HNkNKUEFEZNyZx/MQ
-	 /Woj/3pS0Hjng==
-Message-ID: <sashiko-outbox-212320@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2 6/7] crypto: qce - reject a negative scatterlist
- count in CCM AAD preparation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: ZhaoJinming <zhaojinming@uniontech.com>, "Bartosz Golaszewski" <brgl@kernel.org>, "Herbert
- Xu" <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Thara
- Gopinath" <thara.gopinath@linaro.org>
-Cc: linux-crypto@vger.kernel.org
-In-Reply-To: <20261113-fix-qce-ccm-adata-leak-v2-6-914501377a62@uniontech.com>
-References: <20261113-fix-qce-ccm-adata-leak-v2-0-914501377a62@uniontech.com>
- <20261113-fix-qce-ccm-adata-leak-v2-6-914501377a62@uniontech.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Nov 2026 07:08:05 +0000
+	s=k20260515; t=1794558098;
+	bh=1Tcvpi3LpKzePvlc0jvv759IgtyBU7ME80xAVQKcXpA=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=CBZIhk3c+GsfIZPJ5DGBm9aeZqfaA/dYF/DllxWo7o3osW/teH3S3+CdWeG3fX/mI
+	 Eoqq23cc73NbteQhh+iGfXTwFc3WI1ULYmzxCiOWVQQBNXembNw6kQvSs7+hwKqhSF
+	 vtepEO8QbyhFnl1Rv0MxhvDcdCN8BSBzoHAdWWeHTXQEUohlVnWU9RmcDvVBd5oGey
+	 FhKKaXHQjw+T3Cbg0Jz5WPCJ4MVGoEhxUKDgzc8TTXKLbN2U/DTwCzRptOrOgh4A8A
+	 Moq39NCY2oyyPMPo0B+ZBtxmkt7ExlZkZRU8mnT1Ad99OF6HN7eTA9mjBAtYob5HSF
+	 v+BQknc9qVFDg==
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 1AD50198003A;
+	Fri, 13 Nov 2026 03:21:36 -0500 (EST)
+Received: from ams-imap-11 ([10.64.2.31])
+  by ams-compute-02.internal (MEProxy); Fri, 13 Nov 2026 03:21:36 -0500
+X-ME-Sender: <xms:jsj2ako0GMoOR_MUFB39ms0_r0h2vE9Jz5MD7OYLoErOvB2ilTmmZQ>
+    <xme:jsj2aleTDwddePZnWOBiAD066V1E3JiLN5jIbv71RCoojgeinVNbbnz-Y52B1Wg1K
+    wvBYEfd2rKXy4wq-r1sc1r_OhjY0Wp18gwLIfzklGN5xaILXLUYamY>
+X-ME-Proxy-Cause: dmFkZTGHEOpvFjmBlJKeiFz+CGPGN6rTqAg2GvLAJvFMQZkl3OzFSTaIh7BGtI6o8R5iPl
+    QeT7duB20g2AM67/Mwfi5bm9GeCRw3JqV/QDDVmgeuYCrklaV2MRQTUPC69HnUJ+2B++h9
+    wMrnQxznPl1ArJBZH7CFCvJS/pKPzFIrsBJIZNagfsbXSBgSB7cdEHo1vzj6d1RG/G2bID
+    KxnzGabTHhwIG3b0efW3v0FaY6ujKlQbmRaOa3393CiORxUhS8XuVBFu0BweH2ZEFKKbTU
+    CT4cnq31TtpFwEM5qehrUSQzDl6aOGzM+tLlA3zbEj0NxYgjwPm1c8vehjLg7cs5sEMUE2
+    0wrmO1q1oAG3UKEeriQGe2to5sV+I61W3ZaVDG0mW26ja7C0Bb4/hdKcpo2Q5GCdxoPut+
+    eWmYtJ6h+Bb1ekNzEf8MBxqPxW1seqIam+9rwJA7xPtd/s6vq2FulHvuui6anawiCkpznv
+    UvSGu84MF86ucm5EQh1Zd3v/3nDT3m1uI646zcetIs6zu8vhMWraYGyC6LRQNpEpS2NdpP
+    ZcrS1a/Nci0v55HGx0GxLnrHYTtWA09YT16ubgDtx004tgYZCn1zToE1lghVbeKRKyBEiJ
+    WoQXUp4/EzWaypnMBablVTy2t4L9jDer3IsKK2nrEDTv+OKp6crDeGh/X94Q
+X-ME-Proxy: <xmx:kMj2avsKfxXsDUqmLmQY1HPXTk_RSq-1CdMHcNCQU4WiY055Ih302g>
+    <xmx:kMj2avgpwqIyYYPH7-9AG1wd4PNCNdPu5NZfSSSbzQiwAsm3Z3ByiQ>
+    <xmx:kMj2ao9sjRIqq_3WwyPHSarZLzkTLmBSh1F5xrxMH8p3hwzO0k1x7w>
+    <xmx:kMj2aqvQfID1E17SnaGVbvJVHgTcqJjHHexQUD6vaFkDTEdToglh3Q>
+    <xmx:kMj2akoJgahwi4ikXmYBJNDahtXUymAw9ZMDiGZbLxYNfsof_PuZfcMr>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 19DB2F8008E; Fri, 13 Nov 2026 03:21:34 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -62,88 +76,94 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+X-ThreadId: AtU-W_z_8zgF
+Date: Fri, 13 Nov 2026 09:21:13 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>,
+ "Antonio Quartulli" <antonio@mandelbit.com>
+Cc: "Jason A . Donenfeld" <jason@zx2c4.com>,
+ "Antonio Quartulli" <antonio@openvpn.net>, linux-crypto@vger.kernel.org,
+ "Herbert Xu" <herbert@gondor.apana.org.au>, "Ralf Lici" <ralf@mandelbit.com>
+Message-Id: <edce094e-2cbe-4b7f-8d5e-6e99f3aa5320@app.fastmail.com>
+In-Reply-To: <20261113020601.GA1742@sol>
+References: <20261112125432.3064939-1-antonio@openvpn.net>
+ <1906b5ed-7650-484c-9eb0-a99c8e27c943@app.fastmail.com>
+ <CAHmME9qSPWDhrvoQH=QX2hj+Ei7mcTYFqy-M+kMnJhgzRuJ1dQ@mail.gmail.com>
+ <c24fdd26-7e77-4dca-a0fc-94c998ebdff8@mandelbit.com>
+ <20261113020601.GA1742@sol>
+Subject: Re: [RFC PATCH 0/5] lib/crypto: Add AEGIS-128X4
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [High] crypto: qce: late sg_nents_for_len() check after
-  scatterwalk_ffwd()
---
 
-commit 68e95033f32d45aeb2e2a9a17114843648589d9a
-Author: ZhaoJinming <zhaojinming@uniontech.com>
+On Fri, 13 Nov 2026, at 03:06, Eric Biggers wrote:
+> On Thu, Nov 12, 2026 at 11:54:05PM +0100, Antonio Quartulli wrote:
+>> > > We used to have implementations of aegis128l and aegis256 in the kernel as
+>> > > well (along with morus), but we removed them on the basis that it was
+>> > > aegis128 that won the competition.
+>> > > 
+>> > > As far as I know, nobody actually uses any of that code, though, so I am
+>> > > quite to surprised to see now that it was aegis128 that was dropped
+>> > > from the portfolio, and aegis128l and aegis256 have made a miraculous
+>> > > return, along with some other variants that appear to be tied to the
+>> > > register width. What happens when 8-way vector registers become
+>> > > commonplace? Create yet another aegis variant that case use them
+>> > > efficiently?
+>> > > 
+>> > > So I'm struggling to see why we should take this RFC seriously, to be
+>> > > honest ...
+>> > 
+>> > I'm also not really sure what's going on. CAESAR competition selected
+>> > aegis128 and listed 128l and 256 as "additional finalists". And then
+>> > RFC10032 has written up 128L, 256, 128X, 256X, but not the original
+>> > 128 that was selected. And then none of this has been picked up by
+>> > NIST. Meanwhile, NIST's light weight crypto competition selected
+>> > ASCON, which as the "lightweight" as opposed to "high performance"
+>> > pick in CAESAR. So I dunno! I've been waiting for the dust to settle
+>> > for a little bit.
+>> 
+>> To be honest I did not try to figure out what was going on, but for sure
+>> there was "some confusion".
+>> 
+>> By looking at RFC10032 and its references, it seems that various studies
+>> were conducted on AEGIS128 after it won CAESAR and they highlighted some
+>> deficiencies. I am assuming that this is why it was decided to skip it
+>> during the standardization process and focus on its stronger siblings.
+>> 
+>> This said, our decision to work on AEGIS128X4 came from the fact that it was
+>> expected to be faster than AES-GCM (current default for ovpn), especially
+>> when working on chunks larger than a standard packet (i.e. TSO/GSO/GRO
+>> case).
+>> 
+>> With RFC10032 standardizing it (and its siblings), we thought this would be
+>> the beginning of the AEGIS era, with more use cases popping up.
+>> 
+>> RFC10032 was published last September - why wouldn't you take this seriously
+>> at this point?
+>
+> The kernel previously carried 5 AEGIS and MORUS algorithms, and that was
+> a mistake.  We ended up having to maintain all of them, with heavily
+> duplicated code (and often buggy, generating syzbot reports).
+> Eventually we were able to drop 4 -- after 2 were even cryptographically
+> broken.  Now it seems even the last 1 was a mistake too.
+>
+> Now we have RFC 10032, which specifies an unbounded number of
+> incompatible AEAD algorithms in four families.  It leaves the degree of
+> parallelism "D" unspecified, with only a few examples given in the
+> "Operational Considerations" section -- not the actual specification.
+>
 
-crypto: qce - reject a negative scatterlist count in CCM AAD preparation
+The RFC also mentions
 
-This commit checks the return value of sg_nents_for_len(req->src, totallen)
-in qce_aead_ccm_prepare_buf_assoclen() before passing the entry count to
-sg_alloc_table().
+"""
+Protocols SHOULD opt for a parallel mode only when all the involved parties
+agree on a specific variant. AEGIS-128L and AEGIS-256 SHOULD remain the
+default choices.
+"""
 
-> diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
-> index 00c5924c057e3..f75e3827d8bcb 100644
-> --- a/drivers/crypto/qce/aead.c
-> +++ b/drivers/crypto/qce/aead.c
-> @@ -186,6 +186,7 @@ qce_aead_ccm_prepare_buf_assoclen(struct aead_request=
- *req)
->  	unsigned int adata_header_len, cryptlen, totallen;
->  	gfp_t gfp;
->  	bool diff_dst;
-> +	int nents;
->  	int ret;
-> =20
->  	if (IS_DECRYPT(rctx->flags))
-> @@ -231,10 +232,16 @@ qce_aead_ccm_prepare_buf_assoclen(struct aead_reque=
-st *req)
-> =20
->  	diff_dst =3D (req->src !=3D req->dst) ? true : false;
-> =20
-> +	nents =3D sg_nents_for_len(req->src, totallen);
-> +	if (nents < 0) {
-> +		ret =3D nents;
-> +		goto err_free_adata;
-> +	}
-> +
->  	if (diff_dst)
-> -		rctx->src_nents =3D sg_nents_for_len(req->src, totallen) + 1;
-> +		rctx->src_nents =3D nents + 1;
->  	else
-> -		rctx->src_nents =3D sg_nents_for_len(req->src, totallen) + 2;
-> +		rctx->src_nents =3D nents + 2;
-> =20
->  	gfp =3D (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ? GFP_KERNEL : GFP=
-_ATOMIC;
->  	ret =3D sg_alloc_table(&rctx->src_tbl, rctx->src_nents, gfp);
+If the degree of parallelism is an unbounded design parameter of the cipher,
+I don't see how this can ever be used optimally in an asymmetrical context
+such as VPN concentrators serving numerous VPN clients: the optimal D value
+for the server is highly unlikely to be optimal for all clients.
 
-[Severity: High]
-Is this sg_nents_for_len(req->src, totallen) check placed too late in
-qce_aead_ccm_prepare_buf_assoclen()?
-
-Earlier in the function, req->src is already walked and copied before
-reaching this check:
-
-drivers/crypto/qce/aead.c:qce_aead_ccm_prepare_buf_assoclen() {
-	...
-	totallen =3D cryptlen + req->assoclen;
-
-	/* Get the msg */
-	msg_sg =3D scatterwalk_ffwd(__sg, req->src, req->assoclen);
-	...
-	/* Copy the associated data */
-	if (sg_copy_to_buffer(req->src, sg_nents_for_len(req->src, assoclen),
-			      rctx->adata + adata_header_len,
-			      assoclen) !=3D assoclen) {
-	...
-}
-
-If req->src is shorter than req->assoclen, scatterwalk_ffwd() walks past the
-end of the scatterlist and triggers a NULL pointer dereference before the n=
-ew
-check is reached, and sg_copy_to_buffer() also receives an unchecked negati=
-ve
-return value from sg_nents_for_len(req->src, assoclen) as its unsigned int
-nents argument.  Checking sg_nents_for_len(req->src, totallen) immediately
-after computing totallen would validate req->src before scatterwalk_ffwd(),
-the rctx->adata allocation, and sg_copy_to_buffer() run.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261113-fix-qce-cc=
-m-adata-leak-v2-0-914501377a62@uniontech.com?part=3D6
