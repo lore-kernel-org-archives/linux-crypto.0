@@ -1,112 +1,52 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=57.103.88.161
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794610714;
-	b=zwhlFxkfcGfxon7lUuOR9z3t8mSP/ecf9wZir2SyBkCNmGizQuXuT5Bp+lu1DJuTQr10
-	 k6UvQYEPZCf7FwHc4rXlZ1NJozFh5K/z2NvzH6VPNqGBOv2Dtkw8+5mtArPLK1dA/Bowc
-	 BxSkmFi48xQKqrWIkkcvtRvBzl8VBaJGA567Nf3F3FsdzfFtsfiKOWy8ArlPXvkxk8Sx1
-	 UqzHs+6wzIw2opE5iRTDoAIW6Xk+WwmKcnSv2ggPY6mm90bTm2LvYFyVE3fDMIDCqt4tG
-	 z5dwxw78SLWbHl3js2sOvTQun2nGkHtrOPLap0Z3EiTGBQzdkGQ+bhsg8BJA0upbdqg==
+	t=1794626843;
+	b=3af3JHvfCZAcesEorsiBDGGy7Lq9k4gBITlaFlpJhEod8EyRxP8Ypyrn7Ox+WGkFB4b/
+	 GR5u6dOikr2xASz/An3/qLq5MytdiO4DB1Le2UJBEdX0qdzQnaGSC6hOYJ67amHfObvYO
+	 jdoKROdtdB9wGiYLKY42L0IqgJN9aMBZMvKoXUmck2XVQkdEwNuRrZC4Tf2R13pwYmW9p
+	 N34+xSlB1AbWAN79ZJyAZlSAR5vIIs2NvYPgqpKqGvMF9pkiGhw5pw6Y3koPRTY6XVZK1
+	 wqoD+M5OGIN31B3K3G7GaNxPaObhSt0gJtT+RPvjvPoNeHusrXttRgH0AnMcfJpZWnw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794610714;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:
-	 X-Google-DKIM-Signature:X-Forwarded-Encrypted:X-Gm-Message-State:
-	 X-Gm-Gg:X-Received:X-Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=p9AJLkeNoge+nOrroi09CUXkurgmO09wLDwnTiHFkBg=;
-	b=Q0Tvsk+mwZJUX26Ss805OsIkQZN5DwVtK5PdZX1iHS7nsGSsM8XdixB0RHwjPevOUC17
-	 LuGQ7TSrA1iR11fIYZ9AIYQpzO3EEghW2W535s8D2G4FLB0G2sn8anQY859EbVyDC3fH4
-	 NptBvFGIyE43ZxHWJN3e7e512VxKhp4/p2WbWW+LY4Q8UUjMDEvF9nZjmMWCLjcAKV1k/
-	 UbedmyMShGrpjdba9YuyR2bW/vFB8/YoFzEi3MAIAwQfWhj/EoKQMO3njLXF8/QHaElUk
-	 tDhptwPLPjMFCV0rfjCUzb821sSq1T5Oy+P7r8/L4gVVOKOTMhwfzgQH8S8msSVRG5w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794626843;
+	h=DMARC-Filter:Received:X-ICL-RepId:Dkim-Signature:
+	 mail-alias-created-date:Received:Content-Type:
+	 Content-Transfer-Encoding:From:Mime-Version:Date:Subject:Message-Id:
+	 Cc:To:X-Mailer:X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Spam-Details-Enc:X-Authority-Info-Out:X-JNJ;
+	bh=3ah/TscWt//9fJDWOth8C3PcjS1jtwJy3eVkp1yjoD8=;
+	b=W960dXQPW2dvFjePv8tsbxJTqxCm/i+n9p+uFlsA55eDzJzTLyYh00Rw7mllBUG0dR5t
+	 L9NcLFg69l4aK/MosKQv+kyj52yRwoJ6taVjsnNTP3euvXp+f9HALdCjtlwFArG4i687D
+	 D1RBhE10M+o9h9pQGoRztM1CUddtgVR+gLbSpWNqJjKccZE72nUM8yuYAZP8zcDBK8gvm
+	 I3RIlQjkcqqzoF21hqMoU30pm7wkDrs/O8BbPnk2xdDed+eJWfNjx8HBydu6pWapdKw7I
+	 Iv6efsCQUkpRFfT//cdijqnRCv7F/vKKc0vJ38Gns7oyQAHkhcCXzA6rWQF6HNfwkKA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=canonical.com;
-	spf=pass smtp.mailfrom=canonical.com;
-	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=Kqzf5xvz;
-	arc=none smtp.remote-ip=185.125.188.123
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	dmarc=none header.from=cronstable.dev;
+	spf=pass smtp.mailfrom=cronstable.dev;
+	dkim=pass header.d=cronstable.dev header.i=@cronstable.dev header.a=rsa-sha256 header.s=sig1 header.b="avUO9/F+";
+	arc=none smtp.remote-ip=57.103.88.161
+Received: from outbound.ci.icloud.com (ci-2002c-snip4-11.eps.apple.com [57.103.88.161])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CACA606A330
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 22:58:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5CACA606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6012D606A883
+	for <linux-crypto@vger.kernel.org>; Sat, 14 Nov 2026 03:27:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6012D606A883
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cronstable.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cronstable.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=Kqzf5xvz
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id B07D94013A
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 22:58:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1794610711;
-	bh=p9AJLkeNoge+nOrroi09CUXkurgmO09wLDwnTiHFkBg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=Kqzf5xvzNkM/dH4jvATDApWLHO5MIrZVsyj5UIkwqe5375lGO7wD4igKnmQ+eNM6f
-	 9BtvprVM1vxNUSx/otdnYbd7wdMSS6CamUM/XAfQCqvTyMu24ymdnLsdkrIC9gQxDe
-	 EUMgzzr4ulUsIP9MMTVMT7gTMaKojrIz4MHirgNYBTnYAEo6J/uygHDY2WYCZDutAW
-	 jAxQK0tMRuaV4GqFxpP0XZyU6FjsoupZXqSINx+3PHW8o2Y4Di9n7ViDYprz06DeM+
-	 vVRHnrPYr8BY/5cqTRd/INBFiEG1bxb4q9R2e6G+EtE+iiSQRVJ0HhAFKG6Lro3G8x
-	 EGXMG+qUDkyXAFEW6RokKM61eDx3t/4R3Sz+fcZRqoo0+cfrylp+T7km1L81XH3UfS
-	 Yk03FMSAFzi16Cj+H0Y5S8eEGqhzsFBYBvwHqRq3iWcUa7zYjRb98WjDg3p37nDCkB
-	 O14O3eO4U0rnNsL4jQ9xTRqqmouYpuALi/e5awWjJHbv8FxEaah2qQ2W17wNntBqF4
-	 R8ME7R/m36I1WtP5IOQ6nm1GXB8RCOzVMgjr+jyXDoPlB2+A0UxKuSa8iEZv/S4WKB
-	 ewB/4yCafTUxH/we0ywRO62fK7PSkPBgb9vY003jNEZPUSAT5305mlrWOX68mqrrs5
-	 QgK9xUM713WgXAqH1Lc++mNI=
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-30c0d568830so2004244eec.1
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Nov 2026 14:58:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794610708; x=1795215508;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=p9AJLkeNoge+nOrroi09CUXkurgmO09wLDwnTiHFkBg=;
-        b=uojiQ29LtFTNgO5HV9zrCWoXWG4m4HPS+MQpZq9TJWPB95PzPkR31vJC0PDnWonPsG
-         yunsVCBz4cNYEx4Xup9PV9dw+YCejmOk3+Gc9Hqqk5EICLvwu4oVKRdHBIsQqGuTsdlw
-         mrrqsQUlBysP6L7qQcVDRF1QIWV9S1GwWKuPAWWJNqcityj16ZzQNS37QRPSg7qz0a/L
-         mjnr0xrhkm76/8X23fdpJWICMu007XPfJxxzD/33wIyRh5smkrvQ6sL7C32K1XKrDBCy
-         9uuENXblR+qPpm0hvXoTNyzjUPM9iqInW+NuAzp60IMjwznSTGr1//cM4xYEn1HTzv6x
-         Bh6w==
-X-Forwarded-Encrypted: i=1; AL+hErHiThQrVEn7TWaH5hzkCT42jGsU2dTClITPthKUXSD+tzWq4+Up+H5zGqSDAgWgh4zzqSLWZcNgXvhkMKA=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+rUgCMg1nCzvxC63KiUCt/r0IDYtv0iLedRXLlSQ0TsAvQR2+d
-	of3EpLdO9skW+9RE94dWjHnI7t8iH8hLrj39MjjFakmpOlk07TfUiE9A4bkmKwkCeuzdL7lGtb5
-	6Btlo6h1t06lE+kr6T84oLlo4hYHHVHSPY10+a8LFkyAKE4S80fLUgBXS4GUEXlRQt16fihLAb9
-	qYJoP0fQ==
-X-Gm-Gg: AYBFou3Le0R/5X6lcZuYJmaJDPjHbTi138spX/q63IaxkAMW5rC4HFByiCi6TfcnUjv
-	7j9Yn9rwGTTWtqbokWkAcHJYXjvqdKIZHosy6CZcZJFCabU48ENzNjJB8kBGUkKQleTdkgErxsk
-	QOFJXaDmzlwO6Uz07jBoq7qJeSaWP55+9KZnwt/AbjqIbKr+zV4OdvZO7tf5WjpvH1P2YZduQ7R
-	EpyEoi8Ldq9eeaCWlSAKX4ceQMqxobmYPejDMM1tJLssYInadd+IQ1D90D74DvLz67K3w8bmNFf
-	eCpU7+Wusfp80gTHHwvQNcZkCl5pBEDKIesBSctlTiFtrP3MQ4s8aUC3xBre6mpoWxkPItS7kn6
-	r9EEnk+/EuiKAp0qPaku1W/8VkQKYL3ULhtH9etOqBs3Di2Cix/RzuWJN/0c=
-X-Received: by 2002:a05:693c:8110:b0:377:e99a:22a5 with SMTP id 5a478bee46e88-37966a5ceefmr3173288eec.6.1794610708515;
-        Fri, 13 Nov 2026 14:58:28 -0800 (PST)
-X-Received: by 2002:a05:693c:8110:b0:377:e99a:22a5 with SMTP id 5a478bee46e88-37966a5ceefmr3173271eec.6.1794610707907;
-        Fri, 13 Nov 2026 14:58:27 -0800 (PST)
-Received: from ZBook.gateway ([123.208.39.53])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-37955ffcbc9sm15721423eec.18.2026.11.13.14.58.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Nov 2026 14:58:27 -0800 (PST)
-From: Changwei Zou <changwei.zou@canonical.com>
-To: jeffbarnes@linux.microsoft.com
-Cc: changwei.zou@canonical.com,
-	davem@davemloft.net,
-	gaurav.jain@nxp.com,
-	herbert@gondor.apana.org.au,
-	horia.geanta@nxp.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pankaj.gupta@nxp.com,
-	sahil.malhotra@oss.nxp.com
-Subject: Re: [RFC PATCH 1/1] crypto: caam - fix in-place RSA payload DMA mapping
-Date: Sat, 14 Nov 2026 09:58:21 +1100
-Message-ID: <20261113225821.32339-1-changwei.zou@canonical.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <4155D08C-95D5-4636-85A0-709911E2CB2F@getmailspring.com>
-References: <4155D08C-95D5-4636-85A0-709911E2CB2F@getmailspring.com>
+	dkim=pass (2048-bit key, unprotected) header.d=cronstable.dev header.i=@cronstable.dev header.a=rsa-sha256 header.s=sig1 header.b=avUO9/F+
+Received: from outbound.ci.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-central-1k-100-percent-8 (Postfix) with ESMTPS id 19624180101F;
+	Sat, 14 Nov 2026 03:27:20 +0000 (UTC)
+X-ICL-RepId: 01a1d818-68e9-7632-9587-6a9aac6be57a
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cronstable.dev; s=sig1; t=1794626842; x=1826162842; bh=3ah/TscWt//9fJDWOth8C3PcjS1jtwJy3eVkp1yjoD8=; h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To:x-icloud-hme; b=avUO9/F+vlrsU95Z/iJX8hrz2VkaZUZ3s72ePG57lix1yQxq6fFK7D14LK+9OKMbvo57Rbgu6OM1bbu+GynpcmW1S+KAUbcbJkGI3wn7DoBqjLlt7oOiMn8Q5Pu4+CzAf/AZH8WnPpaXOsLmzG8EH0U63x2T8i7ElFGMmm53AWsNIJ5EN0fF61uKdJgcRjGv6kvV5wG/D8SjFpcuFyRVqkvxtnhURrxTAtOOGurwxJ1on307tq0tode18SVplxOgcwOZljvrHMvjBhkNiiLqCHDnSCLNGJ6HeISid70FkQV+mqmlvKo0KkabfW6rYKYlCY293Ck8O09MoU5843rlIg==
+mail-alias-created-date: 1786142479336
+Received: from smtpclient.apple (unknown [17.57.156.36])
+	by p00-icloudmta-asmtp-us-central-1k-100-percent-8 (Postfix) with ESMTPSA id 39C391800C66;
+	Sat, 14 Nov 2026 03:27:20 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+From: parker@cronstable.dev
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -115,13 +55,73 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (1.0)
+Date: Fri, 13 Nov 2026 22:27:09 -0500
+Subject: lib/crc: x86/crc32c: question about the "Future work" note (crc32q + VPCLMULQDQ on Zen)
+Message-Id: <84998C7E-A862-4483-BB1B-D2C63AB45C7D@cronstable.dev>
+Cc: linux-crypto@vger.kernel.org, ardb@kernel.org
+To: ebiggers@kernel.org
+X-Mailer: iPhone Mail (24C5037i)
+X-Proofpoint-GUID: COQ2YaVXLVPJnVDtmYnTCaDMfN4Atx5k
+X-Proofpoint-ORIG-GUID: COQ2YaVXLVPJnVDtmYnTCaDMfN4Atx5k
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE0MDAxMyBTYWx0ZWRfX2MSE8moypsp9
+ lMhOv49jOysY9tc7YybXP6tVCNFK9S+c5sSEogSQgZKaTDFyfN8yJ5IK255I4g9pXwG0zm6zx/Z
+ speXiHEnSvL2cUd3QhDvL2ttfsqmlYywkCGvT/Fv+Q6J/I9cibNuBz2gjzrgPaRHybejWqhoHda
+ ObiZKBxYPTqEX64cvCnJ3bv3/duNmoh4N3kaZ2Hz4XOj5t0RHDHdS3/XNC0gT7CmRE3sm93as/a
+ FT5G8f3w9/+eaJGEDYnahfK4WvxoQDBw+NG4c7/SmsL55kSJHti3v4nSrpxs7J0T84FB0RFecXS
+ ind9Ri5/CcymgXCRftDobJ2cvy8iFl4Zq2EjSxpxC1nh7n8e2zDZLxU1fO5LvA=
+X-Authority-Info-Out: v=2.4 cv=WrYm8Nfv c=1 sm=1 tr=0 ts=6af7d519
+ cx=c_apl:c_pps:t_out a=2G65uMN5HjSv0sBfM2Yj2w==:117
+ a=2G65uMN5HjSv0sBfM2Yj2w==:17 a=kj9zAlcOel0A:10 a=zJRp6_cAMcgA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=LEAcPSDhJbP4U6-UQGEA:9 a=CjuIK1q_8ugA:10
+X-JNJ: AAAAAAABlJxnty5Xdfc0ZYBTJiA9JpIHS6Ag4LZ/nNZZyY+kJapvpOU+rQKzj17gTYfrx+
+ fgBXqy4E+ULqXPTh46G11FYj3v4oYy4k3B8KwDB2BoeveHbFq4dGr6H1p/bzg2gq9Vr8nU
+ cdUat/eD/IuXTo+6vSTSbCYYN6W8XTZbiMbbwNx8ztvx4RgeTmxTvQlKCYi/telnie5Cxb
+ x/rPhRaO0P0eGUBb0pmP3kJQryNWO+pHLR97fCB4QrvwJvOXJPH2YQ0sMkD0IlnatFSEIr
+ HVvSdN2Qeu7vA978uaxJShMb0o0E5yabH22x4w2OJzlqTK5FzM8Qpn0hpXKY05Im/+9TTe
+ /5BzR1+RJgbTHP2Np7vIcX0NUrWxsqIFTJTDgXpXx8ITmCVboYW8Q1IqoqKtRhaU3m9HiJ
+ 7bLK31DlBd1LP8HJ6ODGmyWwHulg6sPRFEPGudNrinl0X7Qwj1Tm66VkL2f6q0vvQtSBLB
+ gLuBvYzB45ap8iCDSPkUytOpv0jkSid1fOR2xlsP4LgbAxXb5Cv5LBlH4+CK82gfrBWqcL
+ BQd3FnegkvyYW0Ru2XQWv2BnOnU+e0rl38NNPTh7A9v9TqQLr6MY3MtvdGWfeK1H5cMYCw
+ tEp0BYbk3T35Uh9GZWYpw8ytEM8HFFerVRAIXN2ZaaSSiRL7R1c+5n7bb6kSSo3v3Rii98
+ uvdEBUYDDs8lIf9FqApMS0XOB7bYShj2OPMp1DjfgIhUPa74OXLOT6ZYxga9GYKS3nNVFT
+ vMUwLrJR9ThvJUMKcEfJ4Ze8ODI8eDN9HwQN5dev/p1TWuSu8rV19SpdOhMBhY2sDjAIIG
+ y6+NyAh+NIPjbC9nobBD5s+Nlmv3Lkvx+ePnrJ9NIQE6IMxZWkHnSW6edA719J5pgtz9dO
+ U7DhmjRKJOxMxrU7Duken/Y/eTzPRfsF0cl5M/vsvrVctqGiQhzyWAP6y3AxhWq6V1GGK6
+ 9d08W9u6Sv2Ad+xWKuf1yjhx8brIiFpBVc6vXrT69BOISo39/QyMl+KPowVPO7cKpZYVBa
+ V8kEVT8Jq5HH8ErCBBc+iw2QnhV2T1ptOUF6VrGEeZ0sR7cbnOpWVBNnzkzw+du64GbB3h
+ v1GvPtU6zetHTIOHQmATeer1MyQfHaEdo5PbkLIIPTuIFYs1WDXNGjbVB7EkXKukKs5AbW
+ U69RI0V8x4LuR87u336ODOxqCzVrE+RCOhscsjSjoaefrGBasaxkIGo9S8BsSX7ySPTOHb
+ z5FyFSt7t8KnyrEdSEe5x3g9kXTm2jDjvQEpo8w5QBSCSGJJG7TvOj1QNRbSGGNhzAaItM
+ ZZ6iYcLBpBuwWcHG4iFBm+ZIgEN10/gRKDqTR0p5o6nLa/GREiqeSNskeoSfVBSjw7Gllw
+ h+c27vtjc4hKP2Fkz5YGgIPMemEXpBE60fiiL5SVkkrJ6soJsMM=
 
-Hi Jeff,
+Hi Eric,
 
-Yes. I agree with that.
-Thank you very much.
+There's a comment in crc32c_arch() in lib/crc/x86/crc32.h that says that
+the optimal strategy on Zen 3--5 is to use crc32q and VPCLMULQDQ in
+parallel, but that different numbers of streams and vector lengths are
+optimal on each microarchitecture.  I've been experimenting with this on
+Zen 5, and am curious about what you're looking for here.
 
-Kind regards,
-Changwei
+I've tuned an impl for Zen 5 only: two zmm registers folding with
+VPCLMULQDQ while four crc32q streams run alongside, merged at the end
+using multipliers from a 1 KiB table.  Compared with
+crc32_lsb_vpclmul_avx512() at len=4096:
+
+    AMD Ryzen 7 9800X3D (Zen 5)            +53%   (crc_kunit)
+    AMD EPYC 9V45 (Zen 5)                  +57%   (userspace)
+    AMD EPYC 9V74 (Zen 4)                  +15%, but slower at len=1024
+    Intel Xeon 6975P-C (Granite Rapids)    -43%
+
+
+1. What would you want a solution to look like?  A variant per
+   microarchitecture, a single variant for whichever one is worth it, or
+   nothing until there's an approach that covers several of them?
+
+2. Would a Zen 5-only variant be acceptable for now?
+
+
+Thanks,
+Parker
+
