@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794688983;
-	b=2XBA7Tw6awdQVZJHesgGPMHYl6oxhrQnEIRlnT3fL1kQmUk4YnG1vknF5IAPnKmzGJCp
-	 +xpAYfLnPH/LvsITtLOaix37M2Pic31bgXtjqXBU2l1jHMS1FoN2/KAAJ+3sQM9r8NhQY
-	 xTBDoFC7uwG2u9HXYqhFE57Qzc26I5j3/EL1yLH9bSr92l7rlGf1Cto5llprDSi7N1oMt
-	 DAjBRY1RVGsDYmUxzKaj67T5cJu+btEWZcSADOiuWazA0TeUnjq2tMX2Paa80E8L8SXIq
-	 dyA8qo3qV/Yq9PidZvo0Adja4pr3W6e4two/pPnX8H76bn1CLIC87V2LFO7Aa8CS01Q==
+	t=1794690666;
+	b=Zk1z2pjI9TOjJ0dlYwwMRKV5CrwqaRX23zlsikh4WUFvpvZX5R16xkV8GvEwWrswWnJe
+	 ND/huxu48Os6WpPVTNRhJy9D5tCanou+/7duZD8b7Ex2znS4hfEuoxQFGAVb6HJbBTE1u
+	 edBZRS/E+fiCxMKjbFvLhTOZOv/rZFEL1dOdkKjMoEb6ox2Df6qottXVJ4OUp0ca+5LU1
+	 yoSIRDES9EG05ITdpeoHbAFRGAFp7Y55QwLN4iedvFhFlY4XKtv4bZz7B11kDC6hrgLSp
+	 H8/P8eaEWxmnAg6hy823thOeEMN9tK9wAlzJf5SX1m0NlomxExyuIwdqk3XtLTqc6iA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794688983;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794690666;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=3cTSklSM869HvZ/lNR+9JrA84aFdBBlR64yvM3C+hpM=;
-	b=Nzupp8Og5ORUx927xIUVzcZk5YDNhthx8zALlNRljpXDau5r4OMaLd2+p6rdPhy4Uwda
-	 4hIaxfpO2pXY7EZAfrAYMYpavNaCdXh7CqzBdnqjozEwtBy6QVHmuAZMjUM9GvVtc/Q00
-	 B0Pe88egF1RBV66nCs9LzIN9hnZWyA8i0hYZHmCLRNbWctPNUXonc3rMHo1uYmSgIjKOL
-	 TfpBP/2lSBa1qlI591SyDCg6aI2KTnIFg8XPMJVqcmMG7l1CRripHNBvbkeSISIBzngrS
-	 5cL+aAtZ65zbcxGVoGpykQ3MEPwGiSCZkxEsh1W0p5d/Js24Wg3UsILRD9OA0KUJ9Ew==
+	bh=PWySbDG6gTOOgHtX0X2Egn1jbX/EYKXSYGg78Rt2ZiU=;
+	b=aEhwquTNJHaUunWsNkuqCQ7C3F488l98bGFFAAmYeVdFerW1AzbUvUPk2tqgf3XUPTG8
+	 AOMcIxeKw7fHcEKKASz6pWcscS1QhAfZgjjaWCSW62/4Bv8H7OTVe/h/0aj/g3Rz3gKSr
+	 ox4q6KzeZ6YN2JaavdLF2l30XyH5NAInFGTkPpxEmMF1M+VtQqmnZECGP5c+Ipmcb8q3u
+	 FUhUlu2GkAhwTyZFs87EmvHKvaZPuxJXwgt8eomt4M8eigfLWvGrPD244KOSdJXX29r7T
+	 /qqhhKFWL+Tdjpvo/eG8OKR8njSSjmwNLsZFj7gnSqzN7vmItlpOGnfChV6zCV2XEgg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aIXCbvlh;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Or9yRx1k;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849D0606A323
-	for <linux-crypto@vger.kernel.org>; Sat, 14 Nov 2026 20:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A142606A329
+	for <linux-crypto@vger.kernel.org>; Sat, 14 Nov 2026 21:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aIXCbvlh
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF92A1F000C4;
-	Sat, 14 Nov 2026 20:43:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Or9yRx1k
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6FFA1F000C4;
+	Sat, 14 Nov 2026 21:11:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794688983;
-	bh=3cTSklSM869HvZ/lNR+9JrA84aFdBBlR64yvM3C+hpM=;
+	s=k20260515; t=1794690666;
+	bh=PWySbDG6gTOOgHtX0X2Egn1jbX/EYKXSYGg78Rt2ZiU=;
 	h=From:To:Cc:Subject:Date;
-	b=aIXCbvlhiSeCGeX2Vjg/JhSiD5e/b0zXPWRMnxwOdQgKGOp2bF0J3AIUvTqBQvKBS
-	 DbiXlXjZMb2f2mO5eYROkQRN6+U2WOLCILc4lvmy+uOZaZUIcKguZTHpnvc8p8hkuY
-	 p2mnXXJhoA3HB4NxJtZCpiwnCGFvmCq1rW4jpTyg8BqPvwgx+A1TXuiJVZ1VTBD4j/
-	 P0d50oLZlWpS9E0hJSRT3Nxg4MXQXshzLaisb4X5U1b168cjWMRHzGrvRUD9NtnDiA
-	 39B0sVPuvxzVTJWfB01ZJ+H/4Ws/8kBr2JaaOVT0djSRqWChXMW3rG/tVjVyfRWlpG
-	 GHZL3kPRZRyAg==
+	b=Or9yRx1k8yAjmkMKC5SLTIhH2rKDeTiRNH7mB9HVU7mkKdAqlYV/wcHOnZiLrK+Js
+	 iTi+angU0P+umzgB+0Wsr85H5WjM7M6f0IzZjLbkoa2oNHVl+lkvAV2ZNDG6nuimGt
+	 EOw0fH0tcwJE5iBfejQhAvLkLRC8LYRxomTsiGhmCpVmx9lQ+UwFBza/CaeZCS1zbR
+	 /ydQkmdQDDymATE9LoRV9RHGfaE8PbeWBxhIJxRCPNWzHx7xJqyFwC+dLmimdIvKKl
+	 ii2z5D08FJapCQ/zpy9QnfRTqfJqqo9hf7h6S25/woGHkx4JabwX4SapEEo6qQmfSz
+	 2C+21g7PerA7g==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
@@ -47,9 +47,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	Emanuele Rocca <emanuele.rocca@arm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: arm64/sha3: Use assembler for sha3 instructions
-Date: Sat, 14 Nov 2026 12:42:45 -0800
-Message-ID: <20261114204245.67919-1-ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: arm64/sm3: Use assembler for sm3 instructions
+Date: Sat, 14 Nov 2026 13:10:19 -0800
+Message-ID: <20261114211019.80609-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,22 +63,17 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 All supported assemblers (binutils 2.30 and later, and clang 17.0.1 and
-later) support the sha3 instructions now.
+later) support the sm3 instructions now.
 
-Therefore, drop the use of '.inst' in sha3-ce-core.S and just have the
+Therefore, drop the use of '.inst' in sm3-ce-core.S and just have the
 assembler generate the instructions.
 
-This requires adding '.arch armv8.2-a+sha3'.  I also tried just
-'.arch_extension sha3', but that doesn't work with binutils 2.40 and
-earlier because they consider sha3 to depend on armv8.2-a or later (and
-this file isn't built with -march=armv8.2-a or later).  This was fixed
-in binutils 2.41 commit 205e4380c800, but the kernel currently supports
-binutils 2.30 and later.
-
-Also prefix the immediate operands to 'xar' with '#', now that they no
-longer need to be plain numbers to generate an .inst.  This isn't
-required, but it follows the standard convention for immediates in arm64
-assembly, including elsewhere in the same file.
+This requires adding '.arch armv8.2-a+sm4'.  (Yes, the assemblers want
+sm4, not sm3.)  I also tried just '.arch_extension sm4', but that
+doesn't work with binutils 2.40 and earlier because they consider sm3 to
+depend on armv8.2-a or later (and this file isn't built with
+-march=armv8.2-a or later).  This was fixed in binutils 2.41 commit
+205e4380c800, but the kernel currently supports binutils 2.30 and later.
 
 No change in the resulting .text section with either binutils or clang.
 
@@ -87,100 +82,66 @@ Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
 This patch is intended to be taken through libcrypto-next
 
- lib/crypto/arm64/sha3-ce-core.S | 73 ++++++++++++---------------------
- 1 file changed, 26 insertions(+), 47 deletions(-)
+ lib/crypto/arm64/sm3-ce-core.S | 41 +++++++---------------------------
+ 1 file changed, 8 insertions(+), 33 deletions(-)
 
-diff --git a/lib/crypto/arm64/sha3-ce-core.S b/lib/crypto/arm64/sha3-ce-core.S
-index b8ab01987ae07..02f225fd86ced 100644
---- a/lib/crypto/arm64/sha3-ce-core.S
-+++ b/lib/crypto/arm64/sha3-ce-core.S
-@@ -12,29 +12,8 @@
+diff --git a/lib/crypto/arm64/sm3-ce-core.S b/lib/crypto/arm64/sm3-ce-core.S
+index ee7f900d7cff7..91eee7d760f93 100644
+--- a/lib/crypto/arm64/sm3-ce-core.S
++++ b/lib/crypto/arm64/sm3-ce-core.S
+@@ -8,44 +8,19 @@
  #include <linux/linkage.h>
  #include <asm/assembler.h>
  
--	.irp	b,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
--	.set	.Lv\b\().2d, \b
--	.set	.Lv\b\().16b, \b
+-	.irp		b, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+-	.set		.Lv\b\().4s, \b
 -	.endr
 -
--	/*
--	 * ARMv8.2 Crypto Extensions instructions
--	 */
--	.macro	eor3, rd, rn, rm, ra
--	.inst	0xce000000 | .L\rd | (.L\rn << 5) | (.L\ra << 10) | (.L\rm << 16)
+-	.macro		sm3partw1, rd, rn, rm
+-	.inst		0xce60c000 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
 -	.endm
 -
--	.macro	rax1, rd, rn, rm
--	.inst	0xce608c00 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
+-	.macro		sm3partw2, rd, rn, rm
+-	.inst		0xce60c400 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
 -	.endm
 -
--	.macro	bcax, rd, rn, rm, ra
--	.inst	0xce200000 | .L\rd | (.L\rn << 5) | (.L\ra << 10) | (.L\rm << 16)
+-	.macro		sm3ss1, rd, rn, rm, ra
+-	.inst		0xce400000 | .L\rd | (.L\rn << 5) | (.L\ra << 10) | (.L\rm << 16)
 -	.endm
 -
--	.macro	xar, rd, rn, rm, imm6
--	.inst	0xce800000 | .L\rd | (.L\rn << 5) | ((\imm6) << 10) | (.L\rm << 16)
+-	.macro		sm3tt1a, rd, rn, rm, imm2
+-	.inst		0xce408000 | .L\rd | (.L\rn << 5) | ((\imm2) << 12) | (.L\rm << 16)
 -	.endm
-+	/* In binutils 2.40 and earlier, sha3 depends on armv8.2-a or later. */
-+	.arch	armv8.2-a+sha3
+-
+-	.macro		sm3tt1b, rd, rn, rm, imm2
+-	.inst		0xce408400 | .L\rd | (.L\rn << 5) | ((\imm2) << 12) | (.L\rm << 16)
+-	.endm
+-
+-	.macro		sm3tt2a, rd, rn, rm, imm2
+-	.inst		0xce408800 | .L\rd | (.L\rn << 5) | ((\imm2) << 12) | (.L\rm << 16)
+-	.endm
+-
+-	.macro		sm3tt2b, rd, rn, rm, imm2
+-	.inst		0xce408c00 | .L\rd | (.L\rn << 5) | ((\imm2) << 12) | (.L\rm << 16)
+-	.endm
++	/*
++	 * The assemblers group the sm3 and sm4 instructions under the sm4
++	 * feature.  So we need to request sm4, despite this file being sm3.
++	 * In binutils 2.40 and earlier, armv8.2 or later is also required.
++	 */
++	.arch		armv8.2-a+sm4
  
- 	/*
- 	 * void sha3_ce_transform(struct sha3_state *state, const u8 *data,
-@@ -125,30 +104,30 @@ SYM_FUNC_START(sha3_ce_transform)
- 	rax1	v27.2d, v27.2d, v29.2d	// bc[3]
+ 	.macro		round, ab, s0, t0, t1, i
+ 	sm3ss1		v5.4s, v8.4s, \t0\().4s, v9.4s
+ 	shl		\t1\().4s, \t0\().4s, #1
+ 	sri		\t1\().4s, \t0\().4s, #31
+-	sm3tt1\ab	v8.4s, v5.4s, v10.4s, \i
+-	sm3tt2\ab	v9.4s, v5.4s, \s0\().4s, \i
++	sm3tt1\ab	v8.4s, v5.4s, v10.s[\i]
++	sm3tt2\ab	v9.4s, v5.4s, \s0\().s[\i]
+ 	.endm
  
- 	eor	 v0.16b,  v0.16b, v30.16b
--	xar	 v29.2d,   v1.2d,  v25.2d, (64 - 1)
--	xar	  v1.2d,   v6.2d,  v25.2d, (64 - 44)
--	xar	  v6.2d,   v9.2d,  v28.2d, (64 - 20)
--	xar	  v9.2d,  v22.2d,  v26.2d, (64 - 61)
--	xar	 v22.2d,  v14.2d,  v28.2d, (64 - 39)
--	xar	 v14.2d,  v20.2d,  v30.2d, (64 - 18)
--	xar	 v31.2d,   v2.2d,  v26.2d, (64 - 62)
--	xar	  v2.2d,  v12.2d,  v26.2d, (64 - 43)
--	xar	 v12.2d,  v13.2d,  v27.2d, (64 - 25)
--	xar	 v13.2d,  v19.2d,  v28.2d, (64 - 8)
--	xar	 v19.2d,  v23.2d,  v27.2d, (64 - 56)
--	xar	 v23.2d,  v15.2d,  v30.2d, (64 - 41)
--	xar	 v15.2d,   v4.2d,  v28.2d, (64 - 27)
--	xar	 v28.2d,  v24.2d,  v28.2d, (64 - 14)
--	xar	 v24.2d,  v21.2d,  v25.2d, (64 - 2)
--	xar	  v8.2d,   v8.2d,  v27.2d, (64 - 55)
--	xar	  v4.2d,  v16.2d,  v25.2d, (64 - 45)
--	xar	 v16.2d,   v5.2d,  v30.2d, (64 - 36)
--	xar	  v5.2d,   v3.2d,  v27.2d, (64 - 28)
--	xar	 v27.2d,  v18.2d,  v27.2d, (64 - 21)
--	xar	  v3.2d,  v17.2d,  v26.2d, (64 - 15)
--	xar	 v25.2d,  v11.2d,  v25.2d, (64 - 10)
--	xar	 v26.2d,   v7.2d,  v26.2d, (64 - 6)
--	xar	 v30.2d,  v10.2d,  v30.2d, (64 - 3)
-+	xar	 v29.2d,   v1.2d,  v25.2d, #64 - 1
-+	xar	  v1.2d,   v6.2d,  v25.2d, #64 - 44
-+	xar	  v6.2d,   v9.2d,  v28.2d, #64 - 20
-+	xar	  v9.2d,  v22.2d,  v26.2d, #64 - 61
-+	xar	 v22.2d,  v14.2d,  v28.2d, #64 - 39
-+	xar	 v14.2d,  v20.2d,  v30.2d, #64 - 18
-+	xar	 v31.2d,   v2.2d,  v26.2d, #64 - 62
-+	xar	  v2.2d,  v12.2d,  v26.2d, #64 - 43
-+	xar	 v12.2d,  v13.2d,  v27.2d, #64 - 25
-+	xar	 v13.2d,  v19.2d,  v28.2d, #64 - 8
-+	xar	 v19.2d,  v23.2d,  v27.2d, #64 - 56
-+	xar	 v23.2d,  v15.2d,  v30.2d, #64 - 41
-+	xar	 v15.2d,   v4.2d,  v28.2d, #64 - 27
-+	xar	 v28.2d,  v24.2d,  v28.2d, #64 - 14
-+	xar	 v24.2d,  v21.2d,  v25.2d, #64 - 2
-+	xar	  v8.2d,   v8.2d,  v27.2d, #64 - 55
-+	xar	  v4.2d,  v16.2d,  v25.2d, #64 - 45
-+	xar	 v16.2d,   v5.2d,  v30.2d, #64 - 36
-+	xar	  v5.2d,   v3.2d,  v27.2d, #64 - 28
-+	xar	 v27.2d,  v18.2d,  v27.2d, #64 - 21
-+	xar	  v3.2d,  v17.2d,  v26.2d, #64 - 15
-+	xar	 v25.2d,  v11.2d,  v25.2d, #64 - 10
-+	xar	 v26.2d,   v7.2d,  v26.2d, #64 - 6
-+	xar	 v30.2d,  v10.2d,  v30.2d, #64 - 3
- 
- 	bcax	v20.16b, v31.16b, v22.16b,  v8.16b
- 	bcax	v21.16b,  v8.16b, v23.16b, v22.16b
+ 	.macro		qround, ab, s0, s1, s2, s3, s4
 
 base-commit: 7475ea8b58616b33c04afb976cf0fbaad9dd63fb
 -- 
