@@ -1,56 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794630301;
-	b=rZGTIGjhupoZb4xIe0hFsVWOzja//cf8NWJ/EcaHS8+HPdh71ANwiLy3vhuC85K8i8Z+
-	 70jSbZ4X5hSJ71zsXvtksMvfLOOR9ex9+XVtRAf2PuB4rPDExb5IxSOrOnAYGWoKgAok8
-	 QItQb+qeubZpWpI75/ZL+0/6UEDnGKTrux07Xrqcg2fxKaxs3PwnNLJ9SzX/BeQl1SoTf
-	 kOfKwYBtlb9iy6UUK+KNCgYBeMHbEAJKV4Sbp+p+DPpCEXwKZFH9w+i5U9+PePJCBaJUC
-	 ucOsj4Qp0ctO4GVBaGUrQBxHxY3rt6sx73OJnYEniay0nIJkVs42n7gAKewMzMukaMA==
+	t=1794630322;
+	b=Xt1qTZBhCAzTVz3K5UStovvfZH8ehEyuoPCDY6oJWGQ/qRBn3GWrpz8OcvIrOEVZf2kj
+	 fVIXPzQzcDp/H5ptMvGFVhNbW/IC6cz81gEJawayM/z9+3Xn+2RdfBqls7OVPOgXL/xW/
+	 1mAcz40llQRQS1RpggRGLYyh3H9ncQRybCP2Tf7YXrrah4/cGg5z+At11eT6rC/8StvUX
+	 4kzVV6+MEWPGc+XYmkIViWbdAEfOr3rljFmV7dzf3o0FrtRAqCeIkpvWfDIhZzUVHOL3N
+	 Edn8QIPcBeYCBjGUX5T30b6mti7YQY6flRdESKg826eNlhCnVlW9OFHwku2TgCVYyRg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794630301;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794630322;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=qjZsEaWUyewgfl3HD4bludnmfVeUhTu32MbYGqOSuQI=;
-	b=aiX3aFurZRaDhIIeynh4lnH8k4kWrZuySIIgAMkPRBZfm+4etKOihts5bR/oPXLIWC6F
-	 whnFLPmkhEGKL6zLV1m5ExlcOm+sbUqNZPhZug97Ex69H0WacHH8rS0dN3DyuF2d20XEH
-	 quROX2qZGv4uIkS0QOlvqbZtDwVtxpMzBRUEh2z91kFJdkRR7NzMm742/xMPuhktdXBrn
-	 LIQVuJOMVGM/NNBI48SAuX71X3AvBp6LgzjreNQiVZCnNJP1jzouilX2kWFJe8wgGegWY
-	 RtEnBQvz05F9Fu58r4pPA8ISDtvOkbCJ5ONqtDbymYZoV8JXJf9rdWui5sdRutqmEJQ==
+	bh=SOTglEK1n//VilRTtXmeRUp24ns1hIk0y+N4KBvTdqM=;
+	b=ROb8Ow0gbPk/mWz78WRMTjhbf1LfftEGUPyBCKptQM1Lx2DyiFEILv41gCs5YUCrCGXh
+	 3c0pJSD/vYve43HM+PeS758wQxXNzAiLNCXTUYssotc4aY6bQ12ieyEONEdNtmTIziRSL
+	 iv/0XFqQXAKHvAZhqNEIv7mVbtHTq2NEagaOaGFbylSdNfZfINiGNdsyn5GoKUH0rfiyz
+	 Lcy+rRUR7rlxYPZBAj5V0a1zyWkrZ8YhQtik+JW1/zzpE4e6goGTCiQcYYWTOFFBPhbE1
+	 /99o/ipOL/dr5FeGjw8PpZ/hrJ2FvStY4Xf2flfLTN0d5+ZS6boH+11hLmujpUSxx1w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nhcnke35;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CR7ZW2Lm;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8C6606A323
-	for <linux-crypto@vger.kernel.org>; Sat, 14 Nov 2026 04:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1667606A329
+	for <linux-crypto@vger.kernel.org>; Sat, 14 Nov 2026 04:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nhcnke35
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D68BB1F000C4;
-	Sat, 14 Nov 2026 04:25:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CR7ZW2Lm
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F1A81F000C4;
+	Sat, 14 Nov 2026 04:25:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794630301;
-	bh=qjZsEaWUyewgfl3HD4bludnmfVeUhTu32MbYGqOSuQI=;
+	s=k20260515; t=1794630321;
+	bh=SOTglEK1n//VilRTtXmeRUp24ns1hIk0y+N4KBvTdqM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=nhcnke35jzDrmi9jXgY5X/cTPKmqTkxAzrxUhg4P4Km8iGIyGHJt4LM6MgmFO4EhG
-	 xT8nM34zXWbUCIFGBJy+UMto9w31GVLtKktyrJQ2vGcaKj9psUuOTiWYC6OYmtilrR
-	 3/pp/7MlcdjfmGlSxsf7hwLln2OKtDDFAaRjCq6X7yNmcOftJj95NxUV7pROxZKsNE
-	 TnaR1Lu2l4DNPEj6j6agf2nFy3zoA4C7skQLNq9jq+oRZIlzZnMvveflLTEp26Eqhl
-	 i/+dDboWJelEHzZ3gdAqLuHxELDsEqExBEN9Rf6Q/IO5UfCF07lKyHvG4KRqtyur3K
-	 divm3KOKb+Zng==
-Date: Fri, 13 Nov 2026 20:24:59 -0800
+	b=CR7ZW2LmtFDjtnPu7wprvHCyoWhb5X4fwtgPn9eACVpdKvQxIddpoNJGVGrujetUi
+	 XfTNFMsUkCstMEVFs0F7KzJmqQ/PfJKB8aNucMiYjni7igoj8voyY54z/IuX5pmWPL
+	 2ikENUdkra81agmHHSv5dbcQiR6bmdIIF7dxJh/VD54/iVQCVYKypt4Jl/iSw15YNe
+	 HLZPUt/YsVEhAy5nKT5iZQaKvZj07A+NCn3oJxgisgyqgi2YjfWakKoXeFnoQZ/mCY
+	 d7rRYq0rXndwl3XolmReZh8Ude3/PehCY6uxRlXag6sSprFfJSN4PVKIxH/17A9y12
+	 MlsupDHFtIQuQ==
+Date: Fri, 13 Nov 2026 20:25:20 -0800
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Martin Willi <martin@strongswan.org>
-Subject: Re: [PATCH v2] lib/crypto: x86/chacha: Fix mistakes and
- inconsistencies in comments
-Message-ID: <20261114042459.GE2025@sol>
-References: <20261113031340.63688-1-ebiggers@kernel.org>
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] lib/crypto: x86/blake2s: Permute original message words
+ in AVX-512 code
+Message-ID: <20261114042520.GF2025@sol>
+References: <20261112042513.59919-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -62,25 +60,30 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261113031340.63688-1-ebiggers@kernel.org>
+In-Reply-To: <20261112042513.59919-1-ebiggers@kernel.org>
 
-On Thu, Nov 12, 2026 at 07:13:40PM -0800, Eric Biggers wrote:
-> Fix various mistakes in comments, many probably originating from
-> copy+pasting: incorrect block ranges, duplicate words, and stray text.
+On Wed, Nov 11, 2026 at 08:25:13PM -0800, Eric Biggers wrote:
+> Each round of BLAKE2s takes a different fixed permutation of the message
+> words as an input.  For each round, blake2s_compress_avx512() applies
+> that permutation on the message words in %ymm6-%ymm7, writing the
+> permuted words to %ymm8-%ymm9 where they are used for the round.
 > 
-> Also make chacha_1to4blocks_ssse3() refer to the state matrix using flat
-> indexing, like the equivalent AVX2 and AVX512 functions.  It was the
-> only place using 2D row-column indexing of the state matrix.
+> Oddly, though, it also copies the permuted words back into %ymm6-%ymm7.
+> That means the next round has to apply the previous round's inverse
+> permutation, then the next round's permutation.  Which it does, by using
+> the 'sigma2' table which has the permutations precomposed in this way.
+> 
+> However, this is not necessary at all, as we can simply do each round's
+> permutation on the original message words, using the 'sigma' table which
+> is already present in the file for blake2s_compress_ssse3().
+> 
+> Do that instead.  This eliminates 160 unnecessary bytes of rodata, two
+> unnecessary instructions per round, and a loop-carried dependency.
 > 
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
-> 
-> v2: Fixed another inconsistency pointed out by Antonio
-> 
->  lib/crypto/x86/chacha-avx2-x86_64.S   | 12 ++++-----
->  lib/crypto/x86/chacha-avx512-x86_64.S | 10 ++++----
->  lib/crypto/x86/chacha-ssse3-x86_64.S  | 36 +++++++++++++--------------
->  3 files changed, 29 insertions(+), 29 deletions(-)
+>  lib/crypto/x86/blake2s-core.S | 18 +-----------------
+>  1 file changed, 1 insertion(+), 17 deletions(-)
 
 Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
