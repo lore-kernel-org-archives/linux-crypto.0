@@ -1,54 +1,56 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794810849;
-	b=VRrm+we8HilH2AAUD8tD1fsOJmJEh++ztJa/vrC6zZ0XJ4Ccu0Nehl8PVHtdewy5nd6p
-	 8JTLSRgb6+TQrOIPYDl8EWTjJjE3Svs5coWEmdOkEo3xbUj1oyAel6a4RhoS01ZILvPHF
-	 UMJOdZ2J960mLgqef7rLMcGn/caDoRuTOKAnK7EBDPT4FbeppSUK7qpBjXYVSgU2Lnjl+
-	 y4Mces6IOb/LGc/xRCsohuQuT5/OT1gWNqt9lYpj3OEHi8XfjenKcyCnxZaXao+X9BT3s
-	 JRyZAGvWfGPcjASo9nNkRMG1A7c1Xw3r8rlLkgv9Jg79o/BvnOJORwQAdeqyESP2eeQ==
+	b=tqZCAfuVdl1cKioQxgQPrSo7X831fqa9tRPEeIW8fnR2Ux3ViPbsOksoM4WTri3uSDM9
+	 ToPxCEE2yaMoC1MEQH/YblJ1vy17f5a+A5he32UozAuPaF1H35tRDu07VLFPlLHHg+lSd
+	 fyIx2w5Fk47QSrhy6PAno1FnG9kzshm/A0/N1YuEnHwiXse5rCIN7m5LkB6+46OCNssHK
+	 i1BwzdhUK2cKB0I16TautUw92F1E2q9kOv8DBKjzgAEoI7Kz4RnySPwaVMn9111Kn2ziS
+	 N7eQRHrJhihJKzc1I1fNJXz9ZkdUF8CjO4jTz1pGVeYgxdVfZrBLF8UsElDJtRSMpmw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794810849;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=3Iz2R5IC2knVv8D8jDr5uaacvb/CEa3oJZo2XHnTD4k=;
-	b=XbDZelUkxK/cR1kMdBnCCbDzQMwfV3M+na6BL+zLlr2Mjsqmckj3WohsDsNuhho6u8ao
-	 w+kAA2Sc2Ot917ADbpi/h5EoqBqWBmTXx5SUKrHKToyx9Tqzsm5cBesg5XK0nITq1mHp+
-	 5lEoHYB1wzuCcT+9XfxqqcyXxza2PuuU1Gk/4TrpLOaISIxVX9IqPoD8ky9CGwg4GKy34
-	 dLrGMOtapz5O6CsCaXYh/UAGH/YhzJ2kPKZLNPivTge8aPO/UJM8hTDK6y/1jstRRDZXe
-	 SxMJTz7SseJ2iL+rEncPQ8AcGhhkJDPOmTEH1FxSZbG6uSw3m9YGCQX159yEcHqvsyQ==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=d/1qMIcnFAPqMMOtLzysYEyE0jAsO3C6UgsMCv+4UK0=;
+	b=tGFhNNR1Ei/75nWmDlwC7O2JT3PlQKm6/pPB0M8qXE40R3aTQcq4a5xQKUPe0pOzSgEV
+	 mFNNJLS2ijY8jSlVqdWouc8DwyoBOK7BeXb/zCsYGpYkI6yzU4yPLpa/dI2IQtL47ekof
+	 0E9AuKlEhvW7GYW80KYBsE7wpqJtmLmD2bS0V1eGKC7p1mfP3fG1OSHyZu2+kfxgUvAIk
+	 ex6kOOxM3ZaC0NA/NWqBDU7K4WJ9EArCIEzDUwLB7eeLXgQqD37tKUqiqTQbi9AVGu3dI
+	 uyLN4tCVH7Ur4nrGDnRFZTTuU/ZD+QFjpD7pGcBLyuhFUfVO0mDfk+Emc79srJqGf5Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AnL29uOA;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d10jl4El;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D37606A31C
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EAD606A323
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AnL29uOA
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64CAD1F000C4;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d10jl4El
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACEEF1F000C5;
 	Mon, 16 Nov 2026 06:34:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1794810848;
-	bh=3Iz2R5IC2knVv8D8jDr5uaacvb/CEa3oJZo2XHnTD4k=;
-	h=From:To:Cc:Subject:Date;
-	b=AnL29uOAlpgoLUKHanytJkYr3Zb6NOk+YCoA7r5hzhYOrJR774Sy8pOgdNpz4t2iY
-	 iDv2pVnyhujFcgGwbVfperGcihO+PPxeTpOyZJWaYbES+7Bc6K22OacgnV8uQX4oee
-	 l7YzxXq1QvmNC7rIHGuEH/tAOqFi0+x5zR4OnqTBaLNs2iPKZ2we86bsy3QOkpy33g
-	 v9IbvNaRucOHOj6egdFQhOJEFbTDrYjVa+JXLDY/HsLogfS50gLxihbCfNwFEZAOQu
-	 ossBTp82Q6CbwKTVAXFI2z+LQMpxW4gEAq1ChlsiK22BX+4HNviLofLEC0Me4ec4mC
-	 I/QsLIW5vlXow==
+	bh=d/1qMIcnFAPqMMOtLzysYEyE0jAsO3C6UgsMCv+4UK0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=d10jl4El+1AHMdhPPPbWy/IvJ2JebSAvSBhXMOELt35S0QZfLGX8jItjwwCtNfm/g
+	 YF1o7znTAOwKKUebx38PqofbroDwjoBanilVfKb8GrB4wt791Vrg3OcmJ6btsgpxWe
+	 2xlAPD6qLrA/XlLqhmioN1iQpEQ13lq6DhkKABZHp+b+O5ntwxYwuMt3ZPhkhihhKl
+	 o6AQG3VETpV4/4lT7n1dYJ6AypWyB+IzehpXmnnLSvvSDzDPul5OpG/5hbAhjHPz20
+	 cFvJOtOzEP7ntHf8jZ1pjRZZkgn+gcl703lYJ8yXkPsIeUh9xDRjQkBC2eCjw9wpCe
+	 20Y2WkfZ0NB0g==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 0/7] lib/crypto: KUnit tests for unauthenticated AES modes
-Date: Sun, 15 Nov 2026 22:28:42 -0800
-Message-ID: <20261116062849.1071038-1-ebiggers@kernel.org>
+Subject: [PATCH 1/7] lib/crypto: tests: Add skcipher-test-template.h and gen-skcipher-testvecs.py
+Date: Sun, 15 Nov 2026 22:28:43 -0800
+Message-ID: <20261116062849.1071038-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.1
+In-Reply-To: <20261116062849.1071038-1-ebiggers@kernel.org>
+References: <20261116062849.1071038-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,54 +62,1613 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series applies to libcrypto-next.  It can also be retrieved from:
+Add skcipher-test-template.h which contains shared test logic for
+length-preserving symmetric ciphers, analogous to the existing
+hash-test-template.h and aead-test-template.h.  It generates the
+following KUnit test cases:
 
-    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-kunit-v1
+    test_skcipher_all_key_lens
+    test_skcipher_monte_carlo
+    test_skcipher_incremental  (when incremental operation is supported)
+    test_skcipher_incremental_all_splits  (ditto)
+    test_skcipher_buffer_overruns
+    test_skcipher_alignment_consistency
+    test_skcipher_inplace
+    test_skcipher_enckey  (when encryption-only key struct is supported)
+    test_skcipher_interrupt_context
+    benchmark_skcipher  (when CONFIG_CRYPTO_LIB_BENCHMARK=y)
 
-This series adds comprehensive KUnit test suites for the remaining AES
-modes that got new library APIs in v7.3: AES-ECB, AES-CBC, AES-CBC-CTS,
+The initial use cases for this will be AES-ECB, AES-CBC, AES-CBC-CTS,
 AES-CTR, AES-XCTR, and AES-XTS.
 
-Most of the test code is placed in a common header file, like it is in
-many of the existing tests.
+Move a couple helper functions from aead-test-template.h into
+test-utils.h so that skcipher-test-template.h can use them too.
 
-Eric Biggers (7):
-  lib/crypto: tests: Add skcipher-test-template.h and
-    gen-skcipher-testvecs.py
-  lib/crypto: tests: Add KUnit test suite for AES-ECB
-  lib/crypto: tests: Add KUnit test suite for AES-CBC
-  lib/crypto: tests: Add KUnit test suite for AES-CBC-CTS
-  lib/crypto: tests: Add KUnit test suite for AES-CTR
-  lib/crypto: tests: Add KUnit test suite for AES-XCTR
-  lib/crypto: tests: Add KUnit test suite for AES-XTS
+Also add a Python script gen-skcipher-testvecs.py which generates the
+expected Monte-Carlo checksum for each mode using python-cryptography
+and reference implementations.
 
- lib/crypto/.kunitconfig                   |    4 +
- lib/crypto/tests/Kconfig                  |   36 +
- lib/crypto/tests/Makefile                 |    4 +
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
  lib/crypto/tests/aead-test-template.h     |   67 +-
- lib/crypto/tests/aes_cbc_cts_kunit.c      |  239 ++++
- lib/crypto/tests/aes_cbc_kunit.c          |  137 +++
- lib/crypto/tests/aes_ctr_kunit.c          |  196 ++++
- lib/crypto/tests/aes_ecb_kunit.c          |  227 ++++
- lib/crypto/tests/aes_xctr_kunit.c         |  149 +++
- lib/crypto/tests/aes_xts_kunit.c          |  365 ++++++
  lib/crypto/tests/skcipher-test-template.h | 1241 +++++++++++++++++++++
- lib/crypto/tests/sp800-38a-data.h         |   36 +
  lib/crypto/tests/test-utils.h             |   25 +
  scripts/crypto/gen-skcipher-testvecs.py   |  167 +++
- 14 files changed, 2846 insertions(+), 47 deletions(-)
- create mode 100644 lib/crypto/tests/aes_cbc_cts_kunit.c
- create mode 100644 lib/crypto/tests/aes_cbc_kunit.c
- create mode 100644 lib/crypto/tests/aes_ctr_kunit.c
- create mode 100644 lib/crypto/tests/aes_ecb_kunit.c
- create mode 100644 lib/crypto/tests/aes_xctr_kunit.c
- create mode 100644 lib/crypto/tests/aes_xts_kunit.c
+ 4 files changed, 1453 insertions(+), 47 deletions(-)
  create mode 100644 lib/crypto/tests/skcipher-test-template.h
- create mode 100644 lib/crypto/tests/sp800-38a-data.h
  create mode 100755 scripts/crypto/gen-skcipher-testvecs.py
 
-
-base-commit: 84abb955b1015477aa11a96e2f3ac1b938b77f48
+diff --git a/lib/crypto/tests/aead-test-template.h b/lib/crypto/tests/aead-test-template.h
+index 894a927c6f39..7689567c86f9 100644
+--- a/lib/crypto/tests/aead-test-template.h
++++ b/lib/crypto/tests/aead-test-template.h
+@@ -64,30 +64,6 @@ static struct AEAD_KEY *aead_alloc_random_key(struct kunit *test,
+ 	return key;
+ }
+ 
+-/*
+- * Allocate a KUnit-managed slab buffer of length @len bytes and initialize it
+- * with random data.
+- */
+-static u8 *aead_alloc_random_data(struct kunit *test, size_t len)
+-{
+-	u8 *buf = alloc_buf(test, len);
+-
+-	rand_bytes(buf, len);
+-	return buf;
+-}
+-
+-/*
+- * Allocate a KUnit-managed guarded buffer of length @len bytes and initialize
+- * it with random data.
+- */
+-static u8 *aead_alloc_random_data_guarded(struct kunit *test, size_t len)
+-{
+-	u8 *buf = alloc_guarded_buf(test, len);
+-
+-	rand_bytes(buf, len);
+-	return buf;
+-}
+-
+ /* Process the given associated data using a random incremental strategy. */
+ static size_t aead_auth_incrementally(struct AEAD_CTX *ctx, const u8 *ad,
+ 				      size_t ad_len)
+@@ -262,15 +238,12 @@ aead_alloc_basic_validation_test_ctx(struct kunit *test)
+ 	 * dst on authentication failure can actually fail.
+ 	 */
+ 	rand_bytes(ctx->pt, sizeof(ctx->pt));
+-	ctx->raw_key_buf_end =
+-		aead_alloc_random_data_guarded(test, AEAD_MAX_KEY_LEN) +
+-		AEAD_MAX_KEY_LEN;
+-	ctx->nonce_buf_end =
+-		aead_alloc_random_data_guarded(test, AEAD_MAX_NONCE_LEN) +
+-		AEAD_MAX_NONCE_LEN;
+-	ctx->tag_buf_end =
+-		aead_alloc_random_data_guarded(test, AEAD_MAX_TAG_LEN) +
+-		AEAD_MAX_TAG_LEN;
++	ctx->raw_key_buf_end = alloc_guarded_rand_buf(test, AEAD_MAX_KEY_LEN) +
++			       AEAD_MAX_KEY_LEN;
++	ctx->nonce_buf_end = alloc_guarded_rand_buf(test, AEAD_MAX_NONCE_LEN) +
++			     AEAD_MAX_NONCE_LEN;
++	ctx->tag_buf_end = alloc_guarded_rand_buf(test, AEAD_MAX_TAG_LEN) +
++			   AEAD_MAX_TAG_LEN;
+ 
+ 	/*
+ 	 * A pointer to this buffer is passed when passing a length that is
+@@ -519,9 +492,9 @@ static void test_aead_incremental_updates(struct kunit *test)
+ 	size_t tag_len;
+ 	struct AEAD_KEY *key = aead_alloc_random_key(test, &tag_len);
+ 	struct AEAD_CTX *ctx = alloc_buf(test, sizeof(*ctx));
+-	u8 *pt = aead_alloc_random_data(test, max_data_len);
+-	u8 *ad = aead_alloc_random_data(test, max_ad_len);
+-	u8 *nonce = aead_alloc_random_data(test, nonce_len);
++	u8 *pt = alloc_rand_buf(test, max_data_len);
++	u8 *ad = alloc_rand_buf(test, max_ad_len);
++	u8 *nonce = alloc_rand_buf(test, nonce_len);
+ 	u8 *ct = alloc_buf(test, max_data_len);
+ 	u8 *ct2 = alloc_buf(test, max_data_len);
+ 	u8 *decrypted = alloc_buf(test, max_data_len);
+@@ -584,11 +557,11 @@ static void test_aead_data_buffer_overruns(struct kunit *test)
+ 	const size_t nonce_len = AEAD_MAX_NONCE_LEN;
+ 	size_t tag_len;
+ 	struct AEAD_KEY *key = aead_alloc_random_key(test, &tag_len);
+-	const u8 *nonce = aead_alloc_random_data(test, nonce_len);
+-	const u8 *pt_end = aead_alloc_random_data_guarded(test, max_data_len) +
+-			   max_data_len;
++	const u8 *nonce = alloc_rand_buf(test, nonce_len);
++	const u8 *pt_end =
++		alloc_guarded_rand_buf(test, max_data_len) + max_data_len;
+ 	const u8 *ad_end =
+-		aead_alloc_random_data_guarded(test, max_ad_len) + max_ad_len;
++		alloc_guarded_rand_buf(test, max_ad_len) + max_ad_len;
+ 	u8 *ct_end = alloc_guarded_buf(test, max_data_len) + max_data_len;
+ 	u8 *decrypted_end =
+ 		alloc_guarded_buf(test, max_data_len) + max_data_len;
+@@ -725,10 +698,10 @@ static void test_aead_inplace(struct kunit *test)
+ 	const size_t nonce_len = AEAD_MAX_NONCE_LEN;
+ 	size_t tag_len;
+ 	struct AEAD_KEY *key = aead_alloc_random_key(test, &tag_len);
+-	u8 *data = aead_alloc_random_data(test, max_data_len + tag_len);
++	u8 *data = alloc_rand_buf(test, max_data_len + tag_len);
+ 	u8 *data2 = alloc_buf(test, max_data_len + tag_len);
+-	u8 *ad = aead_alloc_random_data(test, max_ad_len);
+-	const u8 *nonce = aead_alloc_random_data(test, nonce_len);
++	u8 *ad = alloc_rand_buf(test, max_ad_len);
++	const u8 *nonce = alloc_rand_buf(test, nonce_len);
+ 
+ 	for (int i = 0; i < 100; i++) {
+ 		size_t data_len = rand_length(max_data_len);
+@@ -970,10 +943,10 @@ static void benchmark_aead(struct kunit *test)
+ 	if (!IS_ENABLED(CONFIG_CRYPTO_LIB_BENCHMARK))
+ 		kunit_skip(test, "not enabled");
+ 
+-	raw_key = aead_alloc_random_data(test, key_len);
+-	nonce = aead_alloc_random_data(test, nonce_len);
+-	ad = aead_alloc_random_data(test, ad_len);
+-	pt = aead_alloc_random_data(test, max_data_len);
++	raw_key = alloc_rand_buf(test, key_len);
++	nonce = alloc_rand_buf(test, nonce_len);
++	ad = alloc_rand_buf(test, ad_len);
++	pt = alloc_rand_buf(test, max_data_len);
+ 	ct = alloc_buf(test, max_data_len);
+ 	tag = alloc_buf(test, tag_len);
+ 
+diff --git a/lib/crypto/tests/skcipher-test-template.h b/lib/crypto/tests/skcipher-test-template.h
+new file mode 100644
+index 000000000000..e68be28b003b
+--- /dev/null
++++ b/lib/crypto/tests/skcipher-test-template.h
+@@ -0,0 +1,1241 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Shared KUnit test cases for length-preserving symmetric ciphers, including a
++ * benchmark
++ *
++ * Copyright 2026 Google LLC
++ */
++
++/*
++ * This file implements KUnit test cases shared by the different KUnit test
++ * suites for length-preserving symmetric ciphers.
++ *
++ * Test suites including this file must #define the following:
++ *
++ * Data structs:
++ *
++ * - SKCIPHER_KEY: name of key struct
++ *
++ * Constants:
++ *
++ * - SKCIPHER_VALID_KEY_LENS: array of all valid key lengths in bytes
++ *
++ * - SKCIPHER_MAX_KEY_LEN: max key length in bytes (assumed to fit on stack)
++ *
++ * - SKCIPHER_IV_LEN: length of the initialization vector.  If
++ *   SKCIPHER_INCREMENTAL is defined, the initialization vector buffer is also
++ *   assumed to contain the carried-forward state.
++ *
++ * - SKCIPHER_MIN_DATA_LEN: minimum valid data length in bytes.  Must be a
++ *   (possibly zero) multiple of SKCIPHER_DATA_LEN_ALIGN, and a (possibly zero)
++ *   multiple of SKCIPHER_NONFINAL_DATA_LEN_ALIGN if that is defined.
++ *
++ * - SKCIPHER_DATA_LEN_ALIGN: valid data lengths are multiples of this.
++ *   Must be a power of 2.
++ *
++ * - SKCIPHER_MONTE_CARLO_CHECKSUM: checksum of a deterministically generated
++ *   series of ciphertexts (see test_skcipher_monte_carlo())
++ *
++ * Functions:
++ *
++ * - SKCIPHER_PREPAREKEY(key, raw_key, key_len): key preparation, returning 0 or
++ *   -EINVAL.
++ *
++ * - SKCIPHER_ENCRYPT(dst, src, len, iv, key, cont) and
++ *   SKCIPHER_DECRYPT(dst, src, len, iv, key, cont): en/decryption functions.
++ *   'iv' is the IV state, which is updated in place.  'cont' is false on the
++ *   first call for a message and true on any subsequent calls.
++ *
++ * Optionally, test suites may #define the following:
++ *
++ * - SKCIPHER_ENCKEY: encryption-only key struct.  If defined,
++ *   SKCIPHER_ENCRYPT must accept either SKCIPHER_KEY or SKCIPHER_ENCKEY.
++ *
++ * - SKCIPHER_PREPAREENCKEY(key, raw_key, key_len):
++ *   function to prepare a struct SKCIPHER_ENCKEY.
++ *
++ * - SKCIPHER_IS_KEY_LEN_ALLOWED(key_len): returns false if a key length in
++ *   SKCIPHER_VALID_KEY_LENS is currently disallowed (e.g. due to FIPS mode).
++ *
++ * - SKCIPHER_INCREMENTAL: if defined, en/decryption may be split across
++ *   multiple calls.  The length of each non-final call must be a multiple of
++ *   SKCIPHER_NONFINAL_DATA_LEN_ALIGN and at least SKCIPHER_MIN_DATA_LEN, and
++ *   the updated IV state must be passed to the next call.  In this case, if the
++ *   total length is a multiple of SKCIPHER_NONFINAL_DATA_LEN_ALIGN (or if
++ *   SKCIPHER_NEXT_IV_ALWAYS_DEFINED is also defined), the final IV state is
++ *   expected to be the same regardless of how the message was split.
++ *
++ * - SKCIPHER_NONFINAL_DATA_LEN_ALIGN: non-final calls require a data length
++ *   that is a multiple of this.  Must be a power of 2 and a multiple of
++ *   SKCIPHER_DATA_LEN_ALIGN.
++ *
++ * - SKCIPHER_NEXT_IV_ALWAYS_DEFINED: if defined alongside SKCIPHER_INCREMENTAL,
++ *   the final IV state is well-defined for all valid data lengths, not just
++ *   multiples of SKCIPHER_NONFINAL_DATA_LEN_ALIGN.
++ *
++ * After including this file, include SKCIPHER_KUNIT_CASES in the kunit_case
++ * array.  This file also provides struct skcipher_testvec and
++ * skcipher_run_testvecs() for running known-answer test vectors.
++ */
++
++#include <crypto/blake2s.h>
++#include <kunit/run-in-irq-context.h>
++#include <kunit/test.h>
++#include <linux/preempt.h>
++#include <linux/timekeeping.h>
++#include "test-utils.h"
++
++#ifndef SKCIPHER_IS_KEY_LEN_ALLOWED
++#define SKCIPHER_IS_KEY_LEN_ALLOWED(key_len) ((void)(key_len), true)
++#endif
++
++#define SKCIPHER_IS_POWER_OF_2(x) ((x) != 0 && ((x) & ((x) - 1)) == 0)
++
++static_assert(SKCIPHER_IS_POWER_OF_2(SKCIPHER_DATA_LEN_ALIGN));
++static_assert(SKCIPHER_MIN_DATA_LEN % SKCIPHER_DATA_LEN_ALIGN == 0);
++#ifdef SKCIPHER_INCREMENTAL
++static_assert(SKCIPHER_IS_POWER_OF_2(SKCIPHER_NONFINAL_DATA_LEN_ALIGN));
++static_assert(SKCIPHER_NONFINAL_DATA_LEN_ALIGN % SKCIPHER_DATA_LEN_ALIGN == 0);
++static_assert(SKCIPHER_MIN_DATA_LEN % SKCIPHER_NONFINAL_DATA_LEN_ALIGN == 0);
++#endif
++
++/* Size to use for IV buffers.  Avoids zero-length arrays. */
++#define SKCIPHER_IV_BUF_SIZE (SKCIPHER_IV_LEN > 0 ? SKCIPHER_IV_LEN : 1)
++
++struct skcipher_testvec {
++	const char *name;
++	const char *key;
++	size_t key_len;
++	const char *iv; /* Unused if SKCIPHER_IV_LEN == 0 */
++	const char *ptext;
++	const char *ctext;
++	size_t data_len;
++	/* Optional: the expected IV state after en/decrypting the message */
++	const char *next_iv;
++};
++
++static void skcipher_crypt(u8 *dst, const u8 *src, size_t len, u8 *iv,
++			   const struct SKCIPHER_KEY *key, bool cont, bool enc)
++{
++	if (enc)
++		SKCIPHER_ENCRYPT(dst, src, len, iv, key, cont);
++	else
++		SKCIPHER_DECRYPT(dst, src, len, iv, key, cont);
++}
++
++static void skcipher_copy_iv(u8 *dst, const u8 *src)
++{
++	if (SKCIPHER_IV_LEN)
++		memcpy(dst, src, SKCIPHER_IV_LEN);
++}
++
++/*
++ * Return true if the IV state is defined after en/decrypting a message of
++ * length @data_len.
++ */
++static bool skcipher_is_next_iv_defined(size_t data_len)
++{
++#if defined(SKCIPHER_INCREMENTAL) && defined(SKCIPHER_NEXT_IV_ALWAYS_DEFINED)
++	return SKCIPHER_IV_LEN != 0;
++#elif defined(SKCIPHER_INCREMENTAL)
++	return SKCIPHER_IV_LEN != 0 &&
++	       data_len % SKCIPHER_NONFINAL_DATA_LEN_ALIGN == 0;
++#else
++	return false;
++#endif
++}
++
++/* Return true if data_len is a valid data length. */
++static bool skcipher_is_data_len_valid(size_t data_len)
++{
++	return data_len >= SKCIPHER_MIN_DATA_LEN &&
++	       data_len % SKCIPHER_DATA_LEN_ALIGN == 0;
++}
++
++/*
++ * Generate a random valid data length that is <= @max_len.  @max_len must be at
++ * least SKCIPHER_MIN_DATA_LEN.
++ */
++static size_t skcipher_rand_data_len(size_t max_len)
++{
++	size_t len = round_down(rand_length(max_len), SKCIPHER_DATA_LEN_ALIGN);
++
++	return max(len, SKCIPHER_MIN_DATA_LEN);
++}
++
++/* Return true if key_len is a valid key length and is currently allowed. */
++static bool skcipher_is_key_len_expected_valid(size_t key_len)
++{
++	for (size_t i = 0; i < ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS); i++) {
++		if (SKCIPHER_VALID_KEY_LENS[i] == key_len)
++			return SKCIPHER_IS_KEY_LEN_ALLOWED(key_len);
++	}
++	return false;
++}
++
++/* Select a random key length that is valid and currently allowed. */
++static size_t skcipher_rand_key_len(void)
++{
++	size_t key_len;
++
++	do {
++		key_len = SKCIPHER_VALID_KEY_LENS
++			[rand32() % ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS)];
++	} while (!SKCIPHER_IS_KEY_LEN_ALLOWED(key_len));
++	return key_len;
++}
++
++struct skcipher_test_keys {
++	struct SKCIPHER_KEY keys[ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS)];
++	size_t num_keys;
++};
++
++/*
++ * Allocate and prepare one struct SKCIPHER_KEY for each currently-allowed key
++ * length in SKCIPHER_VALID_KEY_LENS, using random key bytes.
++ */
++static struct skcipher_test_keys *skcipher_alloc_test_keys(struct kunit *test)
++{
++	struct skcipher_test_keys *keys = alloc_buf(test, sizeof(*keys));
++	u8 raw_key[SKCIPHER_MAX_KEY_LEN];
++	int err;
++
++	keys->num_keys = 0;
++	for (size_t i = 0; i < ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS); i++) {
++		size_t key_len = SKCIPHER_VALID_KEY_LENS[i];
++
++		KUNIT_ASSERT_LE(test, key_len, SKCIPHER_MAX_KEY_LEN);
++		if (!SKCIPHER_IS_KEY_LEN_ALLOWED(key_len))
++			continue;
++		rand_bytes(raw_key, key_len);
++		err = SKCIPHER_PREPAREKEY(&keys->keys[keys->num_keys++],
++					  raw_key, key_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++	}
++	KUNIT_ASSERT_GT(test, keys->num_keys, 0);
++	return keys;
++}
++
++static const struct SKCIPHER_KEY *
++skcipher_pick_key(const struct skcipher_test_keys *keys, size_t idx)
++{
++	return &keys->keys[idx % keys->num_keys];
++}
++
++/*
++ * Allocate a KUnit-managed IV state buffer that is immediately followed by an
++ * unmapped page.  If SKCIPHER_IV_LEN == 0, the returned pointer points to the
++ * unmapped page itself, so any access to the IV state will fault.
++ */
++static u8 *skcipher_alloc_guarded_iv(struct kunit *test)
++{
++	return alloc_guarded_buf(test, SKCIPHER_IV_BUF_SIZE) +
++	       SKCIPHER_IV_BUF_SIZE - SKCIPHER_IV_LEN;
++}
++
++/*
++ * Run the given test vectors.  This is called by each test suite, which defines
++ * its own test vectors after including this file.
++ */
++static __maybe_unused void
++skcipher_run_testvecs(struct kunit *test, const struct skcipher_testvec *tvs,
++		      size_t num_tvs)
++{
++	const size_t max_data_len = 512;
++	struct SKCIPHER_KEY *key = alloc_buf(test, sizeof(*key));
++	u8 *out = alloc_buf(test, max_data_len);
++	u8 iv[SKCIPHER_IV_BUF_SIZE];
++	int err;
++
++	for (size_t i = 0; i < num_tvs; i++) {
++		const struct skcipher_testvec *tv = &tvs[i];
++
++		if (!SKCIPHER_IS_KEY_LEN_ALLOWED(tv->key_len))
++			continue;
++
++		KUNIT_ASSERT_LE(test, tv->data_len, max_data_len);
++		KUNIT_ASSERT_TRUE(test,
++				  skcipher_is_data_len_valid(tv->data_len));
++		if (tv->next_iv)
++			KUNIT_ASSERT_TRUE(test, skcipher_is_next_iv_defined(
++							tv->data_len));
++
++		err = SKCIPHER_PREPAREKEY(key, tv->key, tv->key_len);
++		KUNIT_ASSERT_EQ_MSG(test, 0, err,
++				    "Failed to prepare key for %s", tv->name);
++
++		skcipher_copy_iv(iv, tv->iv);
++		SKCIPHER_ENCRYPT(out, tv->ptext, tv->data_len, iv, key, false);
++		KUNIT_ASSERT_MEMEQ_MSG(test, tv->ctext, out, tv->data_len,
++				       "Wrong ciphertext for %s", tv->name);
++		if (tv->next_iv)
++			KUNIT_ASSERT_MEMEQ_MSG(
++				test, tv->next_iv, iv, SKCIPHER_IV_LEN,
++				"Wrong next IV after encryption for %s",
++				tv->name);
++
++		skcipher_copy_iv(iv, tv->iv);
++		SKCIPHER_DECRYPT(out, tv->ctext, tv->data_len, iv, key, false);
++		KUNIT_ASSERT_MEMEQ_MSG(test, tv->ptext, out, tv->data_len,
++				       "Wrong plaintext for %s", tv->name);
++		if (tv->next_iv)
++			KUNIT_ASSERT_MEMEQ_MSG(
++				test, tv->next_iv, iv, SKCIPHER_IV_LEN,
++				"Wrong next IV after decryption for %s",
++				tv->name);
++	}
++}
++
++/*
++ * Given an expected-valid key_len, verify that preparing a key with that length
++ * succeeds and that encryption and decryption round-trip with it.  Use guarded
++ * buffers for the key struct, the raw key, and the IV state to detect any
++ * buffer overruns.
++ */
++static void skcipher_verify_valid_key_len(struct kunit *test,
++					  struct SKCIPHER_KEY *key,
++					  const u8 *raw_key_buf_end,
++					  size_t key_len, u8 *iv,
++					  const u8 *orig_iv)
++{
++	const u8 *raw_key = raw_key_buf_end - key_len;
++	u8 pt[64], ct[64], decrypted[64];
++	int err;
++
++	static_assert(sizeof(pt) >= SKCIPHER_MIN_DATA_LEN);
++	static_assert(sizeof(pt) % SKCIPHER_DATA_LEN_ALIGN == 0);
++	rand_bytes(pt, sizeof(pt));
++
++	err = SKCIPHER_PREPAREKEY(key, raw_key, key_len);
++	KUNIT_ASSERT_EQ_MSG(test, 0, err, "key_len=%zu wasn't accepted",
++			    key_len);
++
++	skcipher_copy_iv(iv, orig_iv);
++	SKCIPHER_ENCRYPT(ct, pt, sizeof(pt), iv, key, false);
++	skcipher_copy_iv(iv, orig_iv);
++	SKCIPHER_DECRYPT(decrypted, ct, sizeof(pt), iv, key, false);
++	KUNIT_ASSERT_MEMEQ_MSG(
++		test, pt, decrypted, sizeof(pt),
++		"Decryption didn't invert encryption with key_len=%zu",
++		key_len);
++}
++
++/* Verify that the given expected-invalid key_len is actually rejected. */
++static void skcipher_verify_invalid_key_len(struct kunit *test,
++					    struct SKCIPHER_KEY *key,
++					    const u8 *unmapped_ptr,
++					    size_t key_len)
++{
++	int err;
++
++	/*
++	 * The preparekey function should reject the key_len without
++	 * dereferencing the raw key pointer, and it should leave the key struct
++	 * zeroed.  (It may either not write to it at all or zeroize it.)
++	 */
++	memset(key, 0, sizeof(*key));
++	err = SKCIPHER_PREPAREKEY(key, unmapped_ptr, key_len);
++	KUNIT_ASSERT_EQ_MSG(test, -EINVAL, err,
++			    "key_len=%zu wasn't rejected with -EINVAL",
++			    key_len);
++	KUNIT_ASSERT_TRUE_MSG(
++		test, mem_is_zero(key, sizeof(*key)),
++		"Key struct wasn't left zeroed on invalid key_len=%zu",
++		key_len);
++}
++
++/*
++ * Test that every valid key length is accepted and works, and test that invalid
++ * key lengths are rejected.
++ */
++static void test_skcipher_all_key_lens(struct kunit *test)
++{
++	struct SKCIPHER_KEY *key = alloc_guarded_buf(test, sizeof(*key));
++	/*
++	 * raw_key_buf_end points to the unmapped guard page immediately
++	 * following the guarded buffer.  Passing it when testing invalid key
++	 * lengths ensures that any dereference of the raw key pointer faults.
++	 */
++	const u8 *raw_key_buf_end =
++		alloc_guarded_rand_buf(test, SKCIPHER_MAX_KEY_LEN) +
++		SKCIPHER_MAX_KEY_LEN;
++	u8 *iv = skcipher_alloc_guarded_iv(test);
++	u8 orig_iv[SKCIPHER_IV_BUF_SIZE];
++
++	rand_bytes(orig_iv, sizeof(orig_iv));
++
++	for (size_t i = 0; i < ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS); i++)
++		KUNIT_ASSERT_LE(test, SKCIPHER_VALID_KEY_LENS[i],
++				SKCIPHER_MAX_KEY_LEN);
++
++	for (size_t key_len = 0; key_len <= SKCIPHER_MAX_KEY_LEN; key_len++) {
++		if (skcipher_is_key_len_expected_valid(key_len))
++			skcipher_verify_valid_key_len(test, key,
++						      raw_key_buf_end, key_len,
++						      iv, orig_iv);
++		else
++			skcipher_verify_invalid_key_len(
++				test, key, raw_key_buf_end, key_len);
++	}
++	skcipher_verify_invalid_key_len(test, key, raw_key_buf_end,
++					SKCIPHER_MAX_KEY_LEN + 1);
++	skcipher_verify_invalid_key_len(test, key, raw_key_buf_end,
++					SKCIPHER_MAX_KEY_LEN * 2);
++	skcipher_verify_invalid_key_len(test, key, raw_key_buf_end, U32_MAX);
++	skcipher_verify_invalid_key_len(test, key, raw_key_buf_end, SIZE_MAX);
++#ifdef CONFIG_64BIT
++	/* Check for 64-to-32-bit truncation of key_len. */
++	for (size_t i = 0; i < ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS); i++)
++		skcipher_verify_invalid_key_len(
++			test, key, raw_key_buf_end,
++			((size_t)U32_MAX + 1) + SKCIPHER_VALID_KEY_LENS[i]);
++#endif
++}
++
++/*
++ * Monte-Carlo test.  This deterministically generates random inputs for every
++ * valid data length up to 1024 bytes, encrypts them, verifies decryption, and
++ * computes and verifies the checksum of all the computed ciphertexts.  The
++ * expected checksum was computed using an independent implementation of the
++ * algorithm (see scripts/crypto/gen-skcipher-testvecs.py), so this test
++ * provides known-answer test coverage for many inputs at once.
++ */
++static void test_skcipher_monte_carlo(struct kunit *test)
++{
++	const size_t max_data_len = 1024;
++	u8 raw_key[SKCIPHER_MAX_KEY_LEN];
++	u8 orig_iv[SKCIPHER_IV_BUF_SIZE];
++	u8 iv[SKCIPHER_IV_BUF_SIZE];
++	u8 *pt = alloc_buf(test, max_data_len);
++	u8 *ct = alloc_buf(test, max_data_len);
++	u8 *decrypted = alloc_buf(test, max_data_len);
++	struct SKCIPHER_KEY *key = alloc_buf(test, sizeof(*key));
++	struct blake2s_ctx checksum_ctx;
++	u8 actual_checksum[BLAKE2S_HASH_SIZE];
++	int err;
++
++	for (size_t i = 0; i < ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS); i++) {
++		/*
++		 * The expected checksum covers all the valid key lengths, so
++		 * this test isn't applicable if any of them is disallowed.
++		 */
++		if (!SKCIPHER_IS_KEY_LEN_ALLOWED(SKCIPHER_VALID_KEY_LENS[i]))
++			kunit_skip(
++				test,
++				"not applicable, since key_len=%zu is disallowed (FIPS mode)",
++				SKCIPHER_VALID_KEY_LENS[i]);
++	}
++
++	blake2s_init(&checksum_ctx, BLAKE2S_HASH_SIZE);
++
++	for (size_t data_len = 0; data_len <= max_data_len; data_len++) {
++		size_t key_len;
++
++		if (!skcipher_is_data_len_valid(data_len))
++			continue;
++
++		key_len = SKCIPHER_VALID_KEY_LENS
++			[(data_len / SKCIPHER_DATA_LEN_ALIGN) %
++			 ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS)];
++
++		random_seed = data_len;
++		rand_bytes(raw_key, key_len);
++		rand_bytes(orig_iv, SKCIPHER_IV_LEN);
++		rand_bytes(pt, data_len);
++
++		err = SKCIPHER_PREPAREKEY(key, raw_key, key_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		skcipher_copy_iv(iv, orig_iv);
++		SKCIPHER_ENCRYPT(ct, pt, data_len, iv, key, false);
++		skcipher_copy_iv(iv, orig_iv);
++		SKCIPHER_DECRYPT(decrypted, ct, data_len, iv, key, false);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt, decrypted, data_len,
++			"Decryption didn't invert encryption; data_len=%zu",
++			data_len);
++
++		blake2s_update(&checksum_ctx, ct, data_len);
++	}
++
++	blake2s_final(&checksum_ctx, actual_checksum);
++	KUNIT_EXPECT_MEMEQ_MSG(test, actual_checksum,
++			       SKCIPHER_MONTE_CARLO_CHECKSUM, BLAKE2S_HASH_SIZE,
++			       "Monte-Carlo checksum mismatch");
++}
++
++#ifdef SKCIPHER_INCREMENTAL
++/*
++ * En/decrypt a message using a random incremental strategy.  The length of each
++ * part will be at least SKCIPHER_MIN_DATA_LEN (assuming @len >=
++ * SKCIPHER_MIN_DATA_LEN), and if it's a non-final part the length will also be
++ * a multiple of SKCIPHER_NONFINAL_DATA_LEN_ALIGN.  Return the number of parts.
++ */
++static size_t skcipher_crypt_incrementally(u8 *dst, const u8 *src, size_t len,
++					   u8 *iv,
++					   const struct SKCIPHER_KEY *key,
++					   bool enc)
++{
++	size_t num_parts = 0;
++	size_t pos = 0;
++
++	while (rand_bool() && len - pos >= 2 * SKCIPHER_MIN_DATA_LEN) {
++		size_t part_len = round_down(
++			rand_length(len - pos - SKCIPHER_MIN_DATA_LEN),
++			SKCIPHER_NONFINAL_DATA_LEN_ALIGN);
++
++		part_len = max(part_len, SKCIPHER_MIN_DATA_LEN);
++		skcipher_crypt(&dst[pos], &src[pos], part_len, iv, key,
++			       num_parts != 0, enc);
++		pos += part_len;
++		num_parts++;
++	}
++	if (pos < len || rand_bool()) {
++		skcipher_crypt(&dst[pos], &src[pos], len - pos, iv, key,
++			       num_parts != 0, enc);
++		num_parts++;
++	}
++	return num_parts;
++}
++
++/*
++ * Test that one-shot encryption and decryption are consistent with incremental
++ * encryption and decryption using random split points.
++ */
++static void test_skcipher_incremental(struct kunit *test)
++{
++	const size_t max_data_len = 4096;
++	const struct skcipher_test_keys *keys = skcipher_alloc_test_keys(test);
++	const u8 *pt = alloc_rand_buf(test, max_data_len);
++	u8 *ct = alloc_buf(test, max_data_len);
++	u8 *ct2 = alloc_buf(test, max_data_len);
++	u8 *decrypted = alloc_buf(test, max_data_len);
++	u8 orig_iv[SKCIPHER_IV_BUF_SIZE];
++	u8 iv[SKCIPHER_IV_BUF_SIZE];
++	u8 iv2[SKCIPHER_IV_BUF_SIZE];
++
++	for (int i = 0; i < 500; i++) {
++		const struct SKCIPHER_KEY *key = skcipher_pick_key(keys, i);
++		size_t data_len = skcipher_rand_data_len(max_data_len);
++		bool check_iv = skcipher_is_next_iv_defined(data_len);
++		size_t num_parts;
++
++		rand_bytes(orig_iv, sizeof(orig_iv));
++
++		/* Encrypt one-shot, then incrementally. */
++		memset(ct, 0, data_len);
++		skcipher_copy_iv(iv, orig_iv);
++		SKCIPHER_ENCRYPT(ct, pt, data_len, iv, key, false);
++		memset(ct2, 0, data_len);
++		skcipher_copy_iv(iv2, orig_iv);
++		num_parts = skcipher_crypt_incrementally(ct2, pt, data_len, iv2,
++							 key, true);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, ct, ct2, data_len,
++			"One-shot and incremental encryption differ; data_len=%zu num_parts=%zu",
++			data_len, num_parts);
++		if (check_iv)
++			KUNIT_ASSERT_MEMEQ_MSG(
++				test, iv, iv2, SKCIPHER_IV_LEN,
++				"One-shot and incremental encryption gave different next IV; data_len=%zu num_parts=%zu",
++				data_len, num_parts);
++
++		/* Decrypt one-shot, then incrementally. */
++		memset(decrypted, 0, data_len);
++		skcipher_copy_iv(iv, orig_iv);
++		SKCIPHER_DECRYPT(decrypted, ct, data_len, iv, key, false);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt, decrypted, data_len,
++			"Decryption didn't invert encryption; data_len=%zu",
++			data_len);
++		memset(decrypted, 0, data_len);
++		skcipher_copy_iv(iv2, orig_iv);
++		num_parts = skcipher_crypt_incrementally(
++			decrypted, ct, data_len, iv2, key, false);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt, decrypted, data_len,
++			"Incremental decryption gave wrong plaintext; data_len=%zu num_parts=%zu",
++			data_len, num_parts);
++		if (check_iv)
++			KUNIT_ASSERT_MEMEQ_MSG(
++				test, iv, iv2, SKCIPHER_IV_LEN,
++				"One-shot and incremental decryption gave different next IV; data_len=%zu num_parts=%zu",
++				data_len, num_parts);
++	}
++}
++
++static void skcipher_check_all_splits(struct kunit *test,
++				      const struct SKCIPHER_KEY *key,
++				      const u8 *pt, u8 *ct, u8 *out,
++				      size_t max_data_len)
++{
++	u8 orig_iv[SKCIPHER_IV_BUF_SIZE];
++	u8 next_iv_enc[SKCIPHER_IV_BUF_SIZE];
++	u8 next_iv_dec[SKCIPHER_IV_BUF_SIZE];
++	u8 iv[SKCIPHER_IV_BUF_SIZE];
++
++	rand_bytes(orig_iv, sizeof(orig_iv));
++
++	for (size_t data_len = 0; data_len <= max_data_len; data_len++) {
++		bool check_iv = skcipher_is_next_iv_defined(data_len);
++
++		if (!skcipher_is_data_len_valid(data_len))
++			continue;
++
++		/* Compute the expected results using one-shot en/decryption. */
++		skcipher_copy_iv(next_iv_enc, orig_iv);
++		SKCIPHER_ENCRYPT(ct, pt, data_len, next_iv_enc, key, false);
++		skcipher_copy_iv(next_iv_dec, orig_iv);
++		SKCIPHER_DECRYPT(out, ct, data_len, next_iv_dec, key, false);
++		KUNIT_ASSERT_MEMEQ(test, pt, out, data_len);
++
++		for (size_t split = SKCIPHER_MIN_DATA_LEN;
++		     split + SKCIPHER_MIN_DATA_LEN <= data_len;
++		     split += SKCIPHER_NONFINAL_DATA_LEN_ALIGN) {
++			skcipher_copy_iv(iv, orig_iv);
++			SKCIPHER_ENCRYPT(out, pt, split, iv, key, false);
++			SKCIPHER_ENCRYPT(&out[split], &pt[split],
++					 data_len - split, iv, key, true);
++			KUNIT_ASSERT_MEMEQ_MSG(
++				test, ct, out, data_len,
++				"Wrong ciphertext with data_len=%zu split=%zu",
++				data_len, split);
++			if (check_iv)
++				KUNIT_ASSERT_MEMEQ_MSG(
++					test, next_iv_enc, iv, SKCIPHER_IV_LEN,
++					"Wrong next IV after encryption with data_len=%zu split=%zu",
++					data_len, split);
++
++			skcipher_copy_iv(iv, orig_iv);
++			SKCIPHER_DECRYPT(out, ct, split, iv, key, false);
++			SKCIPHER_DECRYPT(&out[split], &ct[split],
++					 data_len - split, iv, key, true);
++			KUNIT_ASSERT_MEMEQ_MSG(
++				test, pt, out, data_len,
++				"Wrong plaintext with data_len=%zu split=%zu",
++				data_len, split);
++			if (check_iv)
++				KUNIT_ASSERT_MEMEQ_MSG(
++					test, next_iv_dec, iv, SKCIPHER_IV_LEN,
++					"Wrong next IV after decryption with data_len=%zu split=%zu",
++					data_len, split);
++		}
++	}
++}
++
++/*
++ * For every valid data length up to a small maximum, try every possible way of
++ * splitting the message into two parts, and verify that the result matches
++ * one-shot en/decryption.  This deterministically covers the edge cases in the
++ * handling of the end of the message, e.g. partial blocks and ciphertext
++ * stealing, in combination with continuing a message.
++ */
++static void test_skcipher_incremental_all_splits(struct kunit *test)
++{
++	const size_t max_data_len = 96;
++	const struct skcipher_test_keys *keys = skcipher_alloc_test_keys(test);
++	const u8 *pt = alloc_rand_buf(test, max_data_len);
++	u8 *ct = alloc_buf(test, max_data_len);
++	u8 *out = alloc_buf(test, max_data_len);
++
++	for (size_t i = 0; i < keys->num_keys; i++)
++		skcipher_check_all_splits(test, &keys->keys[i], pt, ct, out,
++					  max_data_len);
++}
++#endif /* SKCIPHER_INCREMENTAL */
++
++#define SKCIPHER_POISON 0xa5
++#define SKCIPHER_POISON_LEN 64
++
++static void skcipher_check_buffer_overruns(struct kunit *test,
++					   const struct SKCIPHER_KEY *key,
++					   size_t data_len, const u8 *pt_orig,
++					   u8 *src_end, u8 *dst_end, u8 *ct,
++					   u8 *iv)
++{
++	/* Set up exact-size guarded buffers. */
++	u8 *src = src_end - data_len;
++	u8 *dst = dst_end - data_len;
++	u8 orig_iv[SKCIPHER_IV_BUF_SIZE];
++
++	rand_bytes(orig_iv, sizeof(orig_iv));
++
++	for (int enc = 1; enc >= 0; enc--) {
++		const u8 *expected_src = enc ? pt_orig : ct;
++
++		memcpy(src, expected_src, data_len);
++		memset(dst - SKCIPHER_POISON_LEN, SKCIPHER_POISON,
++		       SKCIPHER_POISON_LEN + data_len);
++		memset(iv - SKCIPHER_POISON_LEN, SKCIPHER_POISON,
++		       SKCIPHER_POISON_LEN);
++		skcipher_copy_iv(iv, orig_iv);
++
++		skcipher_crypt(dst, src, data_len, iv, key, false, enc);
++
++		KUNIT_ASSERT_MEMEQ_MSG(test, src, expected_src, data_len,
++				       "Source modified; data_len=%zu enc=%d",
++				       data_len, enc);
++		KUNIT_ASSERT_NULL_MSG(
++			test,
++			memchr_inv(dst - SKCIPHER_POISON_LEN, SKCIPHER_POISON,
++				   SKCIPHER_POISON_LEN),
++			"Write before dst; data_len=%zu enc=%d", data_len, enc);
++		KUNIT_ASSERT_NULL_MSG(
++			test,
++			memchr_inv(iv - SKCIPHER_POISON_LEN, SKCIPHER_POISON,
++				   SKCIPHER_POISON_LEN),
++			"Write before IV state; data_len=%zu enc=%d", data_len,
++			enc);
++		if (data_len == 0 && SKCIPHER_IV_LEN != 0)
++			KUNIT_ASSERT_MEMEQ_MSG(
++				test, iv, orig_iv, SKCIPHER_IV_LEN,
++				"IV state modified with data_len=0; enc=%d",
++				enc);
++		if (enc)
++			memcpy(ct, dst, data_len);
++		else
++			KUNIT_ASSERT_MEMEQ_MSG(
++				test, dst, pt_orig, data_len,
++				"Decryption didn't invert encryption; data_len=%zu",
++				data_len);
++	}
++}
++
++/*
++ * Test using guarded buffers for the source, destination, and IV state.  This
++ * detects out-of-bounds accesses past the end of the buffers, even in assembly
++ * code.  Also check for writes before the beginning of the destination and IV
++ * state buffers, check that the source buffer isn't modified, and check that
++ * the IV state isn't modified when the data length is 0.
++ *
++ * Note: test_skcipher_all_key_lens() covers overrun of the raw key and key
++ * struct.
++ */
++static void test_skcipher_buffer_overruns(struct kunit *test)
++{
++	const size_t max_data_len = 4096;
++	const size_t buf_len = max_data_len + SKCIPHER_POISON_LEN;
++	const size_t iv_buf_len = SKCIPHER_POISON_LEN + SKCIPHER_IV_LEN;
++	const struct skcipher_test_keys *keys = skcipher_alloc_test_keys(test);
++	const u8 *pt_orig = alloc_rand_buf(test, max_data_len);
++	u8 *src_end = alloc_guarded_buf(test, max_data_len) + max_data_len;
++	u8 *dst_end = alloc_guarded_buf(test, buf_len) + buf_len;
++	u8 *ct = alloc_buf(test, max_data_len);
++	/*
++	 * The IV state is immediately followed by an unmapped page and is
++	 * preceded by SKCIPHER_POISON_LEN bytes of poison.  If
++	 * SKCIPHER_IV_LEN == 0, 'iv' points to the unmapped page itself.
++	 */
++	u8 *iv = alloc_guarded_buf(test, iv_buf_len) + iv_buf_len -
++		 SKCIPHER_IV_LEN;
++
++	/* Deterministically test all valid short lengths with every key. */
++	for (size_t i = 0; i < keys->num_keys; i++) {
++		for (size_t data_len = SKCIPHER_MIN_DATA_LEN; data_len <= 256;
++		     data_len += SKCIPHER_DATA_LEN_ALIGN)
++			skcipher_check_buffer_overruns(test, &keys->keys[i],
++						       data_len, pt_orig,
++						       src_end, dst_end, ct,
++						       iv);
++	}
++
++	/* Also test random lengths up to max_data_len. */
++	for (int i = 0; i < 200; i++)
++		skcipher_check_buffer_overruns(
++			test, skcipher_pick_key(keys, i),
++			skcipher_rand_data_len(max_data_len), pt_orig, src_end,
++			dst_end, ct, iv);
++}
++
++/*
++ * Test that encryption and decryption produce the same results regardless of
++ * how the buffers and key structs are aligned in memory.
++ */
++static void test_skcipher_alignment_consistency(struct kunit *test)
++{
++	const size_t max_data_len = 4096;
++	const size_t max_offset = 128;
++	const size_t key_align = __alignof__(struct SKCIPHER_KEY);
++	const size_t key_buf_len =
++		sizeof(struct SKCIPHER_KEY) + max_offset + key_align - 1;
++	u8 *key1_buf = alloc_buf(test, key_buf_len);
++	u8 *key2_buf = alloc_buf(test, key_buf_len);
++	u8 *raw_key1_buf = alloc_buf(test, SKCIPHER_MAX_KEY_LEN + max_offset);
++	u8 *raw_key2_buf = alloc_buf(test, SKCIPHER_MAX_KEY_LEN + max_offset);
++	u8 *iv1_buf = alloc_buf(test, SKCIPHER_IV_BUF_SIZE + max_offset);
++	u8 *iv2_buf = alloc_buf(test, SKCIPHER_IV_BUF_SIZE + max_offset);
++	u8 *pt1_buf = alloc_buf(test, max_data_len);
++	u8 *pt2_buf = alloc_buf(test, max_data_len);
++	u8 *ct1_buf = alloc_buf(test, max_data_len);
++	u8 *ct2_buf = alloc_buf(test, max_data_len);
++	u8 *pt_orig = alloc_buf(test, max_data_len);
++	u8 orig_iv[SKCIPHER_IV_BUF_SIZE];
++	int err;
++
++	for (int i = 0; i < 100; i++) {
++		/* Generate lengths. */
++		const size_t data_len = skcipher_rand_data_len(max_data_len);
++		const size_t key_len = skcipher_rand_key_len();
++		const bool check_iv = skcipher_is_next_iv_defined(data_len);
++
++		/* Generate two sets of alignments. */
++		struct SKCIPHER_KEY *key1 = (void *)PTR_ALIGN(
++			key1_buf + rand_offset(max_offset), key_align);
++		struct SKCIPHER_KEY *key2 = (void *)PTR_ALIGN(
++			key2_buf + rand_offset(max_offset), key_align);
++		u8 *raw_key1 = raw_key1_buf + rand_offset(max_offset);
++		u8 *raw_key2 = raw_key2_buf + rand_offset(max_offset);
++		u8 *iv1 = iv1_buf + rand_offset(max_offset);
++		u8 *iv2 = iv2_buf + rand_offset(max_offset);
++		u8 *pt1 = pt1_buf + rand_offset(max_data_len - data_len);
++		u8 *pt2 = pt2_buf + rand_offset(max_data_len - data_len);
++		u8 *ct1 = ct1_buf + rand_offset(max_data_len - data_len);
++		u8 *ct2 = ct2_buf + rand_offset(max_data_len - data_len);
++
++		/* Generate inputs and copy them to both sets of buffers. */
++		rand_bytes(raw_key1, key_len);
++		rand_bytes(orig_iv, sizeof(orig_iv));
++		rand_bytes(pt1, data_len);
++		memcpy(raw_key2, raw_key1, key_len);
++		memcpy(pt2, pt1, data_len);
++
++		/* Verify encryption consistency. */
++
++		err = SKCIPHER_PREPAREKEY(key1, raw_key1, key_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		skcipher_copy_iv(iv1, orig_iv);
++		SKCIPHER_ENCRYPT(ct1, pt1, data_len, iv1, key1, false);
++
++		err = SKCIPHER_PREPAREKEY(key2, raw_key2, key_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		skcipher_copy_iv(iv2, orig_iv);
++		SKCIPHER_ENCRYPT(ct2, pt2, data_len, iv2, key2, false);
++
++		KUNIT_ASSERT_MEMEQ(test, ct1, ct2, data_len);
++		if (check_iv)
++			KUNIT_ASSERT_MEMEQ(test, iv1, iv2, SKCIPHER_IV_LEN);
++
++		/* Verify decryption consistency. */
++
++		/*
++		 * Decryption overwrites pt1 and pt2, so save the original
++		 * plaintext for the round-trip check, and clear pt1 and pt2 so
++		 * that a decryption that doesn't write to dst gets detected.
++		 */
++		memcpy(pt_orig, pt1, data_len);
++		memset(pt1, 0, data_len);
++		memset(pt2, 0, data_len);
++
++		skcipher_copy_iv(iv1, orig_iv);
++		SKCIPHER_DECRYPT(pt1, ct1, data_len, iv1, key1, false);
++
++		skcipher_copy_iv(iv2, orig_iv);
++		SKCIPHER_DECRYPT(pt2, ct2, data_len, iv2, key2, false);
++
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt_orig, pt1, data_len,
++			"Decryption didn't invert encryption; data_len=%zu",
++			data_len);
++		KUNIT_ASSERT_MEMEQ(test, pt1, pt2, data_len);
++		if (check_iv)
++			KUNIT_ASSERT_MEMEQ(test, iv1, iv2, SKCIPHER_IV_LEN);
++	}
++}
++
++static void skcipher_check_inplace(struct kunit *test,
++				   const struct SKCIPHER_KEY *key,
++				   size_t data_len, u8 *buf1, u8 *buf2,
++				   size_t max_offset)
++{
++	const bool check_iv = skcipher_is_next_iv_defined(data_len);
++	const size_t offset = rand_offset(max_offset);
++	u8 *data = buf1 + offset;
++	u8 orig_iv[SKCIPHER_IV_BUF_SIZE];
++	u8 iv[SKCIPHER_IV_BUF_SIZE];
++	u8 iv2[SKCIPHER_IV_BUF_SIZE];
++
++	rand_bytes(orig_iv, sizeof(orig_iv));
++
++	for (int enc = 1; enc >= 0; enc--) {
++		/* En/decrypt out-of-place. */
++		skcipher_copy_iv(iv, orig_iv);
++		skcipher_crypt(buf2, data, data_len, iv, key, false, enc);
++
++		/* En/decrypt in-place. */
++		skcipher_copy_iv(iv2, orig_iv);
++		skcipher_crypt(data, data, data_len, iv2, key, false, enc);
++
++		/* Compare the results. */
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, buf2, data, data_len,
++			"In-place and out-of-place results differ; data_len=%zu offset=%zu enc=%d",
++			data_len, offset, enc);
++		if (check_iv)
++			KUNIT_ASSERT_MEMEQ(test, iv, iv2, SKCIPHER_IV_LEN);
++	}
++}
++
++/* Test that in-place en/decryption gives the same results as out-of-place. */
++static void test_skcipher_inplace(struct kunit *test)
++{
++	const size_t max_data_len = 4096;
++	const size_t max_offset = 128;
++	const struct skcipher_test_keys *keys = skcipher_alloc_test_keys(test);
++	u8 *buf1 = alloc_rand_buf(test, max_data_len + max_offset);
++	u8 *buf2 = alloc_buf(test, max_data_len);
++
++	/* Deterministically test all valid short lengths with every key. */
++	for (size_t i = 0; i < keys->num_keys; i++) {
++		for (size_t data_len = SKCIPHER_MIN_DATA_LEN; data_len <= 256;
++		     data_len += SKCIPHER_DATA_LEN_ALIGN)
++			skcipher_check_inplace(test, &keys->keys[i], data_len,
++					       buf1, buf2, max_offset);
++	}
++
++	/* Also test random lengths up to max_data_len. */
++	for (int i = 0; i < 100; i++)
++		skcipher_check_inplace(test, skcipher_pick_key(keys, i),
++				       skcipher_rand_data_len(max_data_len),
++				       buf1, buf2, max_offset);
++}
++
++#ifdef SKCIPHER_ENCKEY
++/*
++ * Verify that the given expected-invalid key_len is rejected by
++ * SKCIPHER_PREPAREENCKEY().
++ */
++static void skcipher_verify_invalid_enckey_len(struct kunit *test,
++					       struct SKCIPHER_ENCKEY *enckey,
++					       const u8 *unmapped_ptr,
++					       size_t key_len)
++{
++	int err;
++
++	memset(enckey, 0, sizeof(*enckey));
++	err = SKCIPHER_PREPAREENCKEY(enckey, unmapped_ptr, key_len);
++	KUNIT_ASSERT_EQ_MSG(test, -EINVAL, err,
++			    "key_len=%zu wasn't rejected with -EINVAL",
++			    key_len);
++	KUNIT_ASSERT_TRUE_MSG(
++		test, mem_is_zero(enckey, sizeof(*enckey)),
++		"Key struct wasn't left zeroed on invalid key_len=%zu",
++		key_len);
++}
++
++/*
++ * Test that encryption using a key prepared for encryption only
++ * (SKCIPHER_ENCKEY) gives the same results as encryption using SKCIPHER_KEY.
++ * Also test that SKCIPHER_PREPAREENCKEY verifies the key length properly.
++ */
++static void test_skcipher_enckey(struct kunit *test)
++{
++	const size_t max_data_len = 4096;
++	struct SKCIPHER_KEY *key = alloc_buf(test, sizeof(*key));
++	struct SKCIPHER_ENCKEY *enckey =
++		alloc_guarded_buf(test, sizeof(*enckey));
++	const u8 *pt = alloc_rand_buf(test, max_data_len);
++	u8 *ct = alloc_buf(test, max_data_len);
++	u8 *ct2 = alloc_buf(test, max_data_len);
++	u8 *raw_key_buf_end = alloc_guarded_buf(test, SKCIPHER_MAX_KEY_LEN) +
++			      SKCIPHER_MAX_KEY_LEN;
++	u8 orig_iv[SKCIPHER_IV_BUF_SIZE];
++	u8 iv[SKCIPHER_IV_BUF_SIZE];
++	u8 iv2[SKCIPHER_IV_BUF_SIZE];
++	int err;
++
++	for (size_t key_len = 0; key_len <= SKCIPHER_MAX_KEY_LEN; key_len++) {
++		if (!skcipher_is_key_len_expected_valid(key_len))
++			skcipher_verify_invalid_enckey_len(
++				test, enckey, raw_key_buf_end, key_len);
++	}
++	skcipher_verify_invalid_enckey_len(test, enckey, raw_key_buf_end,
++					   SKCIPHER_MAX_KEY_LEN + 1);
++	skcipher_verify_invalid_enckey_len(test, enckey, raw_key_buf_end,
++					   SKCIPHER_MAX_KEY_LEN * 2);
++	skcipher_verify_invalid_enckey_len(test, enckey, raw_key_buf_end,
++					   U32_MAX);
++	skcipher_verify_invalid_enckey_len(test, enckey, raw_key_buf_end,
++					   SIZE_MAX);
++#ifdef CONFIG_64BIT
++	/* Check for 64-to-32-bit truncation of key_len. */
++	for (size_t i = 0; i < ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS); i++)
++		skcipher_verify_invalid_enckey_len(
++			test, enckey, raw_key_buf_end,
++			((size_t)U32_MAX + 1) + SKCIPHER_VALID_KEY_LENS[i]);
++#endif
++
++	for (int i = 0; i < 100; i++) {
++		const size_t data_len = skcipher_rand_data_len(max_data_len);
++		const size_t key_len = skcipher_rand_key_len();
++		u8 *raw_key = raw_key_buf_end - key_len;
++
++		rand_bytes(raw_key, key_len);
++		rand_bytes(orig_iv, sizeof(orig_iv));
++		err = SKCIPHER_PREPAREKEY(key, raw_key, key_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = SKCIPHER_PREPAREENCKEY(enckey, raw_key, key_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		skcipher_copy_iv(iv, orig_iv);
++		SKCIPHER_ENCRYPT(ct, pt, data_len, iv, key, false);
++		skcipher_copy_iv(iv2, orig_iv);
++		SKCIPHER_ENCRYPT(ct2, pt, data_len, iv2, enckey, false);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, ct, ct2, data_len,
++			"Encryption with enckey differs; data_len=%zu key_len=%zu",
++			data_len, key_len);
++		if (skcipher_is_next_iv_defined(data_len))
++			KUNIT_ASSERT_MEMEQ(test, iv, iv2, SKCIPHER_IV_LEN);
++	}
++}
++#endif /* SKCIPHER_ENCKEY */
++
++/*
++ * The data length used by the interrupt context test.  When the algorithm
++ * allows it, this isn't a multiple of the block size, so that the fallback code
++ * for handling partial blocks (or ciphertext stealing) gets tested too.
++ */
++#define IRQ_TEST_DATA_LEN round_down(263, SKCIPHER_DATA_LEN_ALIGN)
++static_assert(IRQ_TEST_DATA_LEN >= SKCIPHER_MIN_DATA_LEN);
++static_assert(IRQ_TEST_DATA_LEN > 0);
++#define IRQ_TEST_NUM_BUFFERS 3 /* matches max concurrency level */
++
++struct skcipher_irq_test_slot {
++	/* Fields written only at test case initialization time */
++	u8 raw_key[SKCIPHER_MAX_KEY_LEN];
++	size_t key_len;
++	u8 iv[SKCIPHER_IV_BUF_SIZE];
++	u8 next_iv_enc[SKCIPHER_IV_BUF_SIZE];
++	u8 next_iv_dec[SKCIPHER_IV_BUF_SIZE];
++	u8 pt[IRQ_TEST_DATA_LEN];
++	u8 ct[IRQ_TEST_DATA_LEN];
++
++	/* Fields written throughout the test case */
++	struct SKCIPHER_KEY key;
++	u8 scratch_iv[SKCIPHER_IV_BUF_SIZE];
++	u8 scratch_buf[IRQ_TEST_DATA_LEN];
++	int phase;
++	atomic_t in_use;
++};
++
++struct skcipher_irq_test_state {
++	struct skcipher_irq_test_slot slots[IRQ_TEST_NUM_BUFFERS];
++};
++
++static bool skcipher_irq_test_func(void *state_)
++{
++	struct skcipher_irq_test_state *state = state_;
++	struct skcipher_irq_test_slot *slot;
++	bool ok = true;
++
++	/*
++	 * Find a free slot.  This should always succeed, since the number of
++	 * slots is equal to the max concurrency level of kunit_run_irq_test().
++	 */
++	for (slot = &state->slots[0];
++	     slot < &state->slots[ARRAY_SIZE(state->slots)]; slot++) {
++		if (atomic_cmpxchg(&slot->in_use, 0, 1) == 0)
++			break;
++	}
++	if (WARN_ON_ONCE(slot == &state->slots[ARRAY_SIZE(state->slots)]))
++		return false;
++	/*
++	 * This execution context now has exclusive access to 'slot'.
++	 * Next, execute the next operation that the slot is set to perform.
++	 */
++
++	if (slot->phase == 0) {
++		/* Phase 0: Prepare slot's key in current context. */
++		ok = SKCIPHER_PREPAREKEY(&slot->key, slot->raw_key,
++					 slot->key_len) == 0;
++	} else if (slot->phase == 1) {
++		/*
++		 * Phase 1: Encrypt plaintext using key that may have been
++		 * prepared in a different context.
++		 */
++		skcipher_copy_iv(slot->scratch_iv, slot->iv);
++		SKCIPHER_ENCRYPT(slot->scratch_buf, slot->pt, IRQ_TEST_DATA_LEN,
++				 slot->scratch_iv, &slot->key, false);
++		ok = memcmp(slot->scratch_buf, slot->ct, IRQ_TEST_DATA_LEN) ==
++		     0;
++		if (skcipher_is_next_iv_defined(IRQ_TEST_DATA_LEN))
++			ok = ok && memcmp(slot->scratch_iv, slot->next_iv_enc,
++					  SKCIPHER_IV_LEN) == 0;
++	} else {
++		/*
++		 * Phase 2: Decrypt ciphertext using key that may have been
++		 * prepared in a different context.
++		 */
++		skcipher_copy_iv(slot->scratch_iv, slot->iv);
++		SKCIPHER_DECRYPT(slot->scratch_buf, slot->ct, IRQ_TEST_DATA_LEN,
++				 slot->scratch_iv, &slot->key, false);
++		ok = memcmp(slot->scratch_buf, slot->pt, IRQ_TEST_DATA_LEN) ==
++		     0;
++		if (skcipher_is_next_iv_defined(IRQ_TEST_DATA_LEN))
++			ok = ok && memcmp(slot->scratch_iv, slot->next_iv_dec,
++					  SKCIPHER_IV_LEN) == 0;
++	}
++	slot->phase = (slot->phase + 1) % 3;
++	atomic_set_release(&slot->in_use, 0);
++	return ok;
++}
++
++/*
++ * Test that encryption and decryption produce the correct results in task,
++ * softirq, and hardirq contexts running concurrently -- including with keys
++ * prepared in other contexts.  This is needed to cover fallback code paths that
++ * execute in contexts where FPU or vector registers cannot be used.
++ */
++static void test_skcipher_interrupt_context(struct kunit *test)
++{
++	struct skcipher_irq_test_state *state = alloc_buf(test, sizeof(*state));
++	size_t allowed_key_lens[ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS)];
++	size_t num_allowed_key_lens = 0;
++
++	memset(state, 0, sizeof(*state));
++
++	for (size_t i = 0; i < ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS); i++) {
++		size_t key_len = SKCIPHER_VALID_KEY_LENS[i];
++
++		if (SKCIPHER_IS_KEY_LEN_ALLOWED(key_len))
++			allowed_key_lens[num_allowed_key_lens++] = key_len;
++	}
++	KUNIT_ASSERT_GT(test, num_allowed_key_lens, 0);
++
++	/*
++	 * For each slot, generate a key, an IV state, and a plaintext.  Then
++	 * generate the corresponding ciphertext and expected final IV states.
++	 */
++	for (int i = 0; i < IRQ_TEST_NUM_BUFFERS; i++) {
++		struct skcipher_irq_test_slot *slot = &state->slots[i];
++		int err;
++
++		slot->key_len = allowed_key_lens[i % num_allowed_key_lens];
++		rand_bytes(slot->raw_key, slot->key_len);
++		rand_bytes(slot->iv, sizeof(slot->iv));
++		rand_bytes(slot->pt, sizeof(slot->pt));
++		err = SKCIPHER_PREPAREKEY(&slot->key, slot->raw_key,
++					  slot->key_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		skcipher_copy_iv(slot->next_iv_enc, slot->iv);
++		SKCIPHER_ENCRYPT(slot->ct, slot->pt, IRQ_TEST_DATA_LEN,
++				 slot->next_iv_enc, &slot->key, false);
++		skcipher_copy_iv(slot->next_iv_dec, slot->iv);
++		SKCIPHER_DECRYPT(slot->scratch_buf, slot->ct, IRQ_TEST_DATA_LEN,
++				 slot->next_iv_dec, &slot->key, false);
++		KUNIT_ASSERT_MEMEQ(test, slot->pt, slot->scratch_buf,
++				   IRQ_TEST_DATA_LEN);
++	}
++
++	kunit_run_irq_test(test, skcipher_irq_test_func, 100000, state);
++}
++
++/* Benchmark encryption and decryption on various data lengths. */
++static void benchmark_skcipher(struct kunit *test)
++{
++	static const size_t data_lens_to_test[] = {
++		16, 64, 128, 256, 512, 1024, 1420, 4096, 16384,
++	};
++	const bool enc_is_dec = (void *)SKCIPHER_ENCRYPT ==
++				(void *)SKCIPHER_DECRYPT;
++	const size_t max_data_len = 16384;
++	size_t key_len = 0;
++	u8 iv[SKCIPHER_IV_BUF_SIZE] = {};
++	const u8 *raw_key;
++	struct SKCIPHER_KEY *key;
++	u8 *data;
++	int err;
++
++	if (!IS_ENABLED(CONFIG_CRYPTO_LIB_BENCHMARK))
++		kunit_skip(test, "not enabled");
++
++	for (size_t i = 0; i < ARRAY_SIZE(SKCIPHER_VALID_KEY_LENS); i++) {
++		if (SKCIPHER_IS_KEY_LEN_ALLOWED(SKCIPHER_VALID_KEY_LENS[i]))
++			key_len = max(key_len, SKCIPHER_VALID_KEY_LENS[i]);
++	}
++	KUNIT_ASSERT_GT(test, key_len, 0);
++
++	raw_key = alloc_rand_buf(test, key_len);
++	data = alloc_rand_buf(test, max_data_len);
++	key = alloc_buf(test, sizeof(*key));
++	err = SKCIPHER_PREPAREKEY(key, raw_key, key_len);
++	KUNIT_ASSERT_EQ(test, 0, err);
++
++	/* Warm-up */
++	for (size_t i = 0; i < 10000000; i += max_data_len) {
++		SKCIPHER_ENCRYPT(data, data, max_data_len, iv, key, false);
++		if (!enc_is_dec)
++			SKCIPHER_DECRYPT(data, data, max_data_len, iv, key,
++					 false);
++	}
++
++	for (size_t i = 0; i < ARRAY_SIZE(data_lens_to_test); i++) {
++		size_t data_len = round_down(data_lens_to_test[i],
++					     SKCIPHER_DATA_LEN_ALIGN);
++		size_t num_iters = 10000000 / (data_len + 128);
++		u64 t_enc, t_dec = 0;
++
++		if (data_len < SKCIPHER_MIN_DATA_LEN)
++			continue;
++
++		KUNIT_ASSERT_LE(test, data_len, max_data_len);
++		KUNIT_ASSERT_TRUE(test, skcipher_is_data_len_valid(data_len));
++
++		preempt_disable();
++
++		t_enc = ktime_get_ns();
++		for (size_t j = 0; j < num_iters; j++)
++			SKCIPHER_ENCRYPT(data, data, data_len, iv, key, false);
++		t_enc = ktime_get_ns() - t_enc;
++
++		if (!enc_is_dec) {
++			t_dec = ktime_get_ns();
++			for (size_t j = 0; j < num_iters; j++)
++				SKCIPHER_DECRYPT(data, data, data_len, iv, key,
++						 false);
++			t_dec = ktime_get_ns() - t_dec;
++		}
++
++		preempt_enable();
++
++		if (enc_is_dec)
++			kunit_info(test, "data_len=%zu: %llu MB/s", data_len,
++				   div64_u64((u64)data_len * num_iters * 1000,
++					     t_enc ?: 1));
++		else
++			kunit_info(test,
++				   "data_len=%zu: enc %llu MB/s, dec %llu MB/s",
++				   data_len,
++				   div64_u64((u64)data_len * num_iters * 1000,
++					     t_enc ?: 1),
++				   div64_u64((u64)data_len * num_iters * 1000,
++					     t_dec ?: 1));
++	}
++}
++
++/* clang-format off */
++#ifdef SKCIPHER_INCREMENTAL
++#define SKCIPHER_INCREMENTAL_KUNIT_CASES			\
++	KUNIT_CASE(test_skcipher_incremental),			\
++	KUNIT_CASE(test_skcipher_incremental_all_splits),
++#else
++#define SKCIPHER_INCREMENTAL_KUNIT_CASES
++#endif
++
++#ifdef SKCIPHER_ENCKEY
++#define SKCIPHER_ENCKEY_KUNIT_CASES KUNIT_CASE(test_skcipher_enckey),
++#else
++#define SKCIPHER_ENCKEY_KUNIT_CASES
++#endif
++
++#define SKCIPHER_KUNIT_CASES					\
++	KUNIT_CASE(test_skcipher_all_key_lens),			\
++	KUNIT_CASE(test_skcipher_monte_carlo),			\
++	SKCIPHER_INCREMENTAL_KUNIT_CASES			\
++	KUNIT_CASE(test_skcipher_buffer_overruns),		\
++	KUNIT_CASE(test_skcipher_alignment_consistency),	\
++	KUNIT_CASE(test_skcipher_inplace),			\
++	SKCIPHER_ENCKEY_KUNIT_CASES				\
++	KUNIT_CASE(test_skcipher_interrupt_context),		\
++	KUNIT_CASE(benchmark_skcipher)
++/* clang-format on */
+diff --git a/lib/crypto/tests/test-utils.h b/lib/crypto/tests/test-utils.h
+index 73ca21f9176e..c39b1dd93453 100644
+--- a/lib/crypto/tests/test-utils.h
++++ b/lib/crypto/tests/test-utils.h
+@@ -73,6 +73,31 @@ static __maybe_unused void rand_bytes(u8 *out, size_t len)
+ 		out[i] = rand32();
+ }
+ 
++/*
++ * Allocate a KUnit-managed slab buffer of length @size bytes and initialize it
++ * with random data.
++ */
++static __maybe_unused void *alloc_rand_buf(struct kunit *test, size_t size)
++{
++	void *buf = alloc_buf(test, size);
++
++	rand_bytes(buf, size);
++	return buf;
++}
++
++/*
++ * Allocate a KUnit-managed guarded buffer of length @size bytes (> 0) and
++ * initialize it with random data.
++ */
++static __maybe_unused void *alloc_guarded_rand_buf(struct kunit *test,
++						   size_t size)
++{
++	void *buf = alloc_guarded_buf(test, size);
++
++	rand_bytes(buf, size);
++	return buf;
++}
++
+ static __maybe_unused void rand_bytes_seeded_from_len(u8 *out, size_t len)
+ {
+ 	random_seed = len;
+diff --git a/scripts/crypto/gen-skcipher-testvecs.py b/scripts/crypto/gen-skcipher-testvecs.py
+new file mode 100755
+index 000000000000..8e2d8c6be59b
+--- /dev/null
++++ b/scripts/crypto/gen-skcipher-testvecs.py
+@@ -0,0 +1,167 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# Script that generates known-good data used in the KUnit tests for
++# length-preserving symmetric ciphers.
++#
++# Requires that python-cryptography be installed.
++#
++# Copyright 2026 Google LLC
++
++import hashlib
++import sys
++from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
++
++AES_BLOCK_SIZE = 16
++
++
++# Linear congruential generator matching rand32() in
++# lib/crypto/tests/test-utils.h
++class Rng:
++    def __init__(self, seed):
++        self.seed = seed
++
++    def rand_bytes(self, length):
++        out = []
++        for _ in range(length):
++            self.seed = (self.seed * 25214903917 + 11) % 2**48
++            out.append((self.seed >> 16) % 256)
++        return bytes(out)
++
++
++def xor(a, b):
++    return bytes(x ^ y for x, y in zip(a, b))
++
++
++def aes_encrypt_with_mode(key, mode, data):
++    encryptor = Cipher(algorithms.AES(key), mode).encryptor()
++    return encryptor.update(data) + encryptor.finalize()
++
++
++def aes_ecb_encrypt(key, ptext):
++    return aes_encrypt_with_mode(key, modes.ECB(), ptext)
++
++
++def aes_cbc_encrypt(key, iv, ptext):
++    return aes_encrypt_with_mode(key, modes.CBC(iv), ptext)
++
++
++# AES-CBC-CTS, CS3 variant (i.e., the last two blocks are always swapped)
++def aes_cbc_cts_encrypt(key, iv, ptext):
++    data_len = len(ptext)
++    assert data_len >= AES_BLOCK_SIZE
++    padded_len = -(-data_len // AES_BLOCK_SIZE) * AES_BLOCK_SIZE
++    ctext = aes_cbc_encrypt(key, iv, ptext.ljust(padded_len, b"\0"))
++    if padded_len == AES_BLOCK_SIZE:
++        return ctext
++    pn_len = data_len - (padded_len - AES_BLOCK_SIZE)
++    return (
++        ctext[: padded_len - 2 * AES_BLOCK_SIZE]
++        + ctext[padded_len - AES_BLOCK_SIZE :]
++        + ctext[padded_len - 2 * AES_BLOCK_SIZE :][:pn_len]
++    )
++
++
++# AES-CTR with a 128-bit big endian counter
++def aes_ctr_crypt(key, ctr, data):
++    return aes_encrypt_with_mode(key, modes.CTR(ctr), data)
++
++
++# AES-XCTR.  For consistency with the kernel tests, 'state' is the 64-bit little
++# endian block counter followed by the 16-byte IV.
++def aes_xctr_crypt(key, state, data):
++    ctr = int.from_bytes(state[:8], byteorder="little")
++    iv = state[8:]
++    out = b""
++    for i in range(0, len(data), AES_BLOCK_SIZE):
++        ctr_block = ctr.to_bytes(8, byteorder="little") + bytes(8)
++        keystream = aes_ecb_encrypt(key, xor(iv, ctr_block))
++        out += xor(data[i : i + AES_BLOCK_SIZE], keystream)
++        ctr = (ctr + 1) % 2**64
++    return out
++
++
++# AES-XTS, implemented manually since python-cryptography doesn't support
++# AES-192-XTS.  Includes ciphertext stealing.
++def aes_xts_encrypt_manual(key, tweak, ptext):
++    assert len(ptext) >= AES_BLOCK_SIZE
++    key1, key2 = key[: len(key) // 2], key[len(key) // 2 :]
++    t = int.from_bytes(aes_ecb_encrypt(key2, tweak), byteorder="little")
++    num_full_blocks = len(ptext) // AES_BLOCK_SIZE
++    partial_len = len(ptext) % AES_BLOCK_SIZE
++
++    def encrypt_block(block, t):
++        t_bytes = t.to_bytes(AES_BLOCK_SIZE, byteorder="little")
++        return xor(aes_ecb_encrypt(key1, xor(block, t_bytes)), t_bytes)
++
++    def mul_x(t):
++        t <<= 1
++        if t >> 128:
++            t = (t & (2**128 - 1)) ^ 0x87
++        return t
++
++    out = b""
++    for i in range(num_full_blocks):
++        out += encrypt_block(ptext[i * AES_BLOCK_SIZE :][:AES_BLOCK_SIZE], t)
++        t = mul_x(t)
++    if partial_len:
++        cc = out[-AES_BLOCK_SIZE:]
++        pp = ptext[num_full_blocks * AES_BLOCK_SIZE :] + cc[partial_len:]
++        out = out[:-AES_BLOCK_SIZE] + encrypt_block(pp, t) + cc[:partial_len]
++    return out
++
++
++def aes_xts_encrypt(key, tweak, ptext):
++    ctext = aes_xts_encrypt_manual(key, tweak, ptext)
++    # Cross-check against python-cryptography where possible.  It supports
++    # neither AES-192-XTS nor keys whose two halves are the same.
++    if len(key) != 48 and key[: len(key) // 2] != key[len(key) // 2 :]:
++        assert ctext == aes_encrypt_with_mode(key, modes.XTS(tweak), ptext)
++    return ctext
++
++
++# For each mode: (encryption function, valid key lengths, IV state size,
++# minimum data length, data length alignment).  These must match the values
++# used by the corresponding test in lib/crypto/tests/.
++MODES = {
++    "aes-ecb": (lambda k, iv, p: aes_ecb_encrypt(k, p), [16, 24, 32], 0, 0, 16),
++    "aes-cbc": (aes_cbc_encrypt, [16, 24, 32], 16, 0, 16),
++    "aes-cbc-cts": (aes_cbc_cts_encrypt, [16, 24, 32], 16, 16, 1),
++    "aes-ctr": (aes_ctr_crypt, [16, 24, 32], 16, 0, 1),
++    "aes-xctr": (aes_xctr_crypt, [16, 24, 32], 24, 0, 1),
++    "aes-xts": (aes_xts_encrypt, [32, 48, 64], 16, 16, 1),
++}
++
++
++# Deterministically generate many different inputs using exactly the same
++# method that test_skcipher_monte_carlo() uses; encrypt them using an
++# independent implementation of the algorithm; compute the checksum of all the
++# resulting ciphertexts concatenated to each other; and print the checksum as a
++# C array.
++def gen_monte_carlo_checksum(alg):
++    encrypt, key_lens, iv_size, min_data_len, data_len_align = MODES[alg]
++    blake2s = hashlib.blake2s()
++    for data_len in range(1025):
++        if data_len < min_data_len or data_len % data_len_align != 0:
++            continue
++        rng = Rng(data_len)
++        key_len = key_lens[(data_len // data_len_align) % len(key_lens)]
++        key = rng.rand_bytes(key_len)
++        iv = rng.rand_bytes(iv_size)
++        ptext = rng.rand_bytes(data_len)
++        blake2s.update(encrypt(key, iv, ptext))
++
++    name = f"{alg.replace('-', '_')}_monte_carlo_checksum"
++    value = blake2s.digest()
++    print(f"static const u8 {name}[BLAKE2S_HASH_SIZE] = {{")
++    for i in range(0, len(value), 11):
++        line = "\t" + "".join(f"0x{b:02x}, " for b in value[i : i + 11])
++        print(f"{line.rstrip()}")
++    print("};")
++
++
++if __name__ == "__main__":
++    if len(sys.argv) != 2 or sys.argv[1] not in MODES:
++        sys.stderr.write(f"Usage: gen-skcipher-testvecs.py [{'|'.join(MODES)}]\n")
++        sys.exit(1)
++    gen_monte_carlo_checksum(sys.argv[1])
 -- 
 2.56.1
 
