@@ -1,60 +1,70 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=178.238.236.174
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794759540;
-	b=SHsbcTUbMne3nyRzruH5AuYrChzkxaIoeoPf4pjuJKzlLTRkNNnbcVrsgcrI0aBGrbnM
-	 WuenjmeCgv/Euc2nzRon/J3DYX3+GnR+9Ifiam6WEW3BHuzwcOApB3aNyACVfTN4veq+l
-	 8QkmiyeoR0n/GP4bw0gFB8yYJyMQRmKf2HLzd63sRI12fV+0TXb6KlDKZW535DEMgWy9k
-	 wWeoLA4ERHDusJEX0IGwmUXjj5ra8rveXu7cYFtOdBxNjCcajs3Uje1I7ZdKv1q8CAuSL
-	 fDktEGhnvLLvMb0h9aE9UQI3pxwgA4X1TqTCRvQFceS4ALWHqNv8dSm2QxphI5yQTAg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794759540;
-	h=DMARC-Filter:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 In-Reply-To:References:X-Mailer:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=j9WU+1CjSv2jxs9dt8exoheP8N0Wgk/Y19soIda22ZI=;
-	b=wCpw/+mfDUtxohBEVcOx+cftW8XL/2l6U9CAIFlVVPvJlq4T2kjE0EHxs0X2G3ZXaA7e
-	 osSpEL6cYyUzRzB/jzbQKduzXSw4ef5rGgmUh823T4/uqDh18JBYbpVN0BydxGtMvyI9g
-	 G8CEQoJYTT+YUsbEn8mY2PLBngd3Vo0d0pFL62kdY5iOk8j/ko8E/Kd43KAr7rBOIHBwP
-	 Cvvhq7QcwgCq58gfEqcmyn02YnO5EQXAVXS3h+jjiHgkym7tkW3zk9h4aq2MzoGOMjVpq
-	 9dR+b20NwuRsRrTRBf8CbjfGcTS1DVOs/gm26+3OkZBzPIhJlR+ZGufhwvFCXZwFusw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=kemnade.info;
-	spf=pass smtp.mailfrom=kemnade.info;
-	dkim=pass header.d=kemnade.info header.i=@kemnade.info header.a=rsa-sha256 header.s=20220719 header.b="C/l6sHzq";
-	arc=none smtp.remote-ip=178.238.236.174
-Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.15
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794806496;
+	b=QxuoNR0g8ZIlQhWXq0HzCionjKF+m/XqXkd5et96qfvc8EpxMfziXmhDYJ27jWC7MJuu
+	 //crW8t+Bg0g76Bukox6Emg8jQsAuJcz24RQNfBXgKbdadDTj9uITxIkL0xtwvfEdSzGh
+	 cNgzD4a9pnFWhJxlncQdVyar9q7Iz03u3GooYv5Z6nHhf6UVRQbex9hYBP1ELZZqP8yNL
+	 lmKPxDhtj5v+xJBOQ2KgN0AYzulFI8eivOo8+yt/Nv3g9F82TBqmeFkRzASxud784T0lf
+	 hF/nZ2KlI6cqgGKBl3s06T1doKIcRxN75nqfaJ3ajZCcnjvij2G9k+ojt/Yl0pQDxXw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794806496;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-ZohoMailClient;
+	bh=wL4evpu/sMuCT2yjtCxtMs0Z2IjM+L4EnAdUbQ07bFI=;
+	b=DDMC3cpCR1pA7BLZQIcYLi3BmxAuQAOyD3B5b1iEH6PSXxOro6mqtQi3dKqMOydZlMe2
+	 QkipyWbFMhk/lPSa9L2wbwVPBBPj32BmOdvgAMmAJkmnXvB8ZJW/6M++DL+B5GNoq67uu
+	 EqHrtj/N+eJAVz9PPeNBZzD//z9PZF04m/J76iMdotkkJQFE6Jp08UBOTk8KHy1WzyT5I
+	 gJLPZahXzNlLXWelK854uAuY1100zIR38J+Xmrp0XMPSi8l+M73D0pA0Fq5ntRU+6pTG5
+	 QdhmEgX/vIs7xJ7/5lQwlvWgH/lL3Eu2YlrCUgUM9ECphH26s1czwUenHK9GbfTBqzQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=none header.from=laveeshbansal.com;
+	spf=pass smtp.mailfrom=laveeshbansal.com;
+	dkim=pass header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=XTLB4SwD;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.15
+Received: from sender6-op-o15.zoho.com (sender6-op-o15.zoho.com [165.173.180.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E67606A897;
-	Sun, 15 Nov 2026 16:19:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 28E67606A897
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D81606A323;
+	Mon, 16 Nov 2026 05:21:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D4D81606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kemnade.info header.i=@kemnade.info header.a=rsa-sha256 header.s=20220719 header.b=C/l6sHzq
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=References:In-Reply-To:Subject:Cc:To:From:
-	Reply-To:Content-ID:Content-Description;
-	bh=j9WU+1CjSv2jxs9dt8exoheP8N0Wgk/Y19soIda22ZI=; t=1794759539; x=1795969139; 
-	b=C/l6sHzqC+IlM1CIhKhhVA/OFVQnOq9fPJb0xTivZ+hXE4m2/yNLaiHxDLkNb4LYmnmiQEjzvD3
-	RVOJNIVsGqs5EWqXZyv0cPLnJSluAgZgVy0LqXJpTrXF2E0kXOKPeWvzg0EiwMAF17MnIXQ9dg83P
-	cQQbf3Kk7fNgrIPits/Xbcv6edKfEldpbzLi4/CH/Nye6RlQefdZKF43udq2RopibMmJochxc8gx6
-	0SopXENGDLks12d2IExq8gVed+yBN4uDZJNXhb84hebf7KPURTun+rmS3C5LwaxlvsjVS6iG23QfC
-	pDJ4SXT6FJr47XlZY8pegnuIdjgVjW8ee5CA==;
-Date: Sun, 15 Nov 2026 17:18:43 +0100
-From: Andreas Kemnade <andreas@kemnade.info>
-To: Nhat Tran <nhat.tranminhk2@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Olivia Mackall
- <olivia@selenic.com>, Deepak Saxena <dsaxena@plexity.net>,
- linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] hwrng: omap - Unregister hwrng before disabling the
- device on remove
-Message-ID: <20261115171843.063c11c9@kemnade.info>
-In-Reply-To: <20261115145050.88427-1-nhat.tranminhk2@gmail.com>
-References: <20261115145050.88427-1-nhat.tranminhk2@gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; aarch64-unknown-linux-gnu)
+	dkim=pass (1024-bit key, unprotected) header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=XTLB4SwD
+ARC-Seal: i=1; a=rsa-sha256; t=1794806479; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=cImJN7HjE2bR63FymF5AFkx+kBivXpVRzcJdaDSr4qBF/f1uWOSx1PLXUNrqpLMHRRrSYvNRZ2LDb/mMvUrVYipteu719lXm+WMympS6jppoGTwoFkgrT5pkypsqb6kOQ0EKZxsJz6i65Ju489VslVN3P3l3ODcr6FXJFmfYzsg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1794806479; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=wL4evpu/sMuCT2yjtCxtMs0Z2IjM+L4EnAdUbQ07bFI=; 
+	b=VUyGzt4eaqw1lUPi4//YEqSwtPRy1l+bKL4N+sETKCiIlicMSd2Ge4mbeUoZ1Ca15x2YTw6yotzJbyJVDJUJkE7mbi/PQlYc3N0JZqxD8U+UlO9Q1jRa191OusgtD4qRpnvgXCHesKAhnLWjyQDXaq3T/R9JzRHS4HlIrJIURpw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=laveeshbansal.com;
+	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
+	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
+DKIM-Signature: a=rsa-sha256; b=XTLB4SwDXsod8ZMTCvp3fmkZUnHs6uyjJHTW8Ygzhr9+07ctjlMUDNhWNXJFwVtdtTZDvSP8nY2iTeaF8yWPIngblrszfXW/80egDqkyZym6YRdFRG1unVnV+Xvx8oLDuIewMhZo2V3SoXi8Eh4uEYH/nuG0rA0GlkD86UlIO98=; c=relaxed/relaxed; s=zoho; d=laveeshbansal.com; v=1; bh=wL4evpu/sMuCT2yjtCxtMs0Z2IjM+L4EnAdUbQ07bFI=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
+Received: by smtp.zohomail.com with SMTPS id 1794806477346417.52595436202114;
+	Sun, 15 Nov 2026 21:21:17 -0800 (PST)
+From: Laveesh Bansal <laveeshb@laveeshbansal.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@linux.win>,
+	"David S . Miller" <davem@davemloft.net>,
+	Denis Kenzior <denkenz@gmail.com>,
+	Maximilian Stahlberg <maximilian.stahlberg@uni-bremen.de>,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] X.509: Accept a certificate with an empty subject
+Date: Sun, 15 Nov 2026 21:20:43 -0800
+Message-ID: <20261116052043.63530-1-laveeshb@laveeshbansal.com>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20261112080906.GA375698@sol>
+References: <20261112080906.GA375698@sol>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,81 +74,15 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Sun, 15 Nov 2026 21:50:50 +0700
-Nhat Tran <nhat.tranminhk2@gmail.com> wrote:
+On Thu, Nov 12, 2026 at 12:09:06AM -0800, Eric Biggers wrote:
+> This problem (and many others) could also be solved if iwd switched to
+> use a userspace crypto library instead of misusing the kernel APIs.
 
-> Commit 3e75241be808 ("hwrng: drivers - Use device-managed registration
-> API") switched omap-rng to devm_hwrng_register() and dropped the
-> hwrng_unregister() call from the start of omap_rng_remove(). Since then
-> the hwrng is unregistered by devres only after omap_rng_remove() has
-> returned, i.e. after the device has been runtime suspended and its
-> runtime PM disabled.
-> 
-> When the omap-rng is the current hwrng, hwrng_unregister() drops the
-> last reference and schedules cleanup_rng_work(), which calls
-> omap_rng_cleanup() and in turn omap4_rng_cleanup(). That reads and
-> writes RNG_CONTROL_REG while the module clock is gated. On a
-> BeagleBone Black (AM335x) unbinding the driver triggers:
-> 
->   # echo 48310000.rng > /sys/bus/platform/drivers/omap_rng/unbind
->   Unhandled fault: external abort on non-linefetch (0x1028) at 0xfa310014
->   Internal error: : 1028 [#1] SMP ARM
->   Workqueue: events cleanup_rng_work
->   PC is at omap4_rng_cleanup+0x14/0x24
->   LR is at cleanup_rng_work+0x30/0x48
->   Call trace:
->    omap4_rng_cleanup from cleanup_rng_work+0x30/0x48
->    cleanup_rng_work from process_scheduled_works+0xf0/0x518
->    process_scheduled_works from worker_thread+0x140/0x2f0
->    worker_thread from kthread+0xfc/0x134
->    kthread from ret_from_fork+0x14/0x28
-> 
-> The worker dies before it completes rng->cleanup_done, so the unbind
-> also never returns because hwrng_unregister() waits for that
-> completion. The same window lets the hwrng fill thread call
-> omap_rng_do_read() on the suspended device.
-> 
-> Restore the original teardown order: register with hwrng_register()
-> and call hwrng_unregister() first in omap_rng_remove(), while the
-> device is still powered.
-> 
-> Fixes: 3e75241be808 ("hwrng: drivers - Use device-managed registration API")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Nhat Tran <nhat.tranminhk2@gmail.com>
-> ---
->  drivers/char/hw_random/omap-rng.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-> index 49d7f021fd31..e5b14ab1b7e4 100644
-> --- a/drivers/char/hw_random/omap-rng.c
-> +++ b/drivers/char/hw_random/omap-rng.c
-> @@ -493,7 +493,7 @@ static int omap_rng_probe(struct platform_device *pdev)
->  	if (ret)
->  		goto err_register;
->  
-> -	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
-> +	ret = hwrng_register(&priv->rng);
->  	if (ret)
->  		goto err_register;
->  
-> @@ -520,6 +520,7 @@ static void omap_rng_remove(struct platform_device *pdev)
->  {
->  	struct omap_rng_dev *priv = platform_get_drvdata(pdev);
->  
-> +	hwrng_unregister(&priv->rng);
->  
->  	priv->pdata->cleanup(priv);
->  
-what about going forward add add a devm_add_action_or_reset() for this instead.
-And use some devm_runtime for enabling runtime?
-
-I guess we are done then.
-
-Regards,
-Andreas
-
-
+You're right that iwd could avoid this. My reasoning for fixing it in
+the kernel is that RFC 5280 requires the Subject to be empty when the
+name is only in the SAN, and the Name rule in x509.asn1 rejects that.
+So this is a case the parser doesn't handle, not something specific to
+iwd.
