@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794810850;
-	b=kXeG/NWHhlwotYp5zBI0v/VodIGX0XGRxGR8KPBc8TsfRjNmQ/9F6o9F01YtLfJDjALU
-	 0YXvW/TmH/YDH/asP8IapcwGky4dq6TDfsFNRrsNZu8/8kCOq77U6RBA+SURVlP+QKFdc
-	 b4MPoYjrFuiwaSc4gjqmgybXzQCjxZrF8f0qIkl5W3sO3rgsJa9q8D6tzTnYCdNv9PLUW
-	 aKbWWBhifXGCtGFpEr9iajsDwy30JJ+ZWDZ5iy3VUXbilcdgWhOhG5L3AcFVDAKNaGFi+
-	 +RBnmjKmG+S0ECAsILJeSKWUX6vOb8R8lJdN6U5PWdmJaV52ymbR2A3PZ6tOpOGXrXA==
+	t=1794810849;
+	b=HiIBLfOX1XZs0rpNgUm7fePdKFFRPztBAQC8eZDsc+SerKxwj/YcPAMQkJpE5ytOf8ao
+	 iEtBCNiDdgNVVnn9TM0QBiV13YKJux055O1iyRs+arxU4gg4rC2KjWgveB9J8NnKCWOiq
+	 jrqDIAt7KQQOgHfHoKO0b5EjoPWYyqVzcGf6nF0P9PpLMCGMLueC81MPoMWAqmgoHrQh+
+	 CwRgordW2Bty60R60L8Iv+QXFu0HCJR1d2bw6mPxU1AlkYPQnVGE/QVsl8lgF1dF9S2KF
+	 BLId/itNQrC5v40Vb+364v684BWmbijYMh25h+FJuujJ+DPqV/ZxVNHce0JaQkkZ54A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794810850;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794810849;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=bCIrSu/SaOB8QxvvykyswlGyiDIeCAnADxUbLdVsqIE=;
-	b=mjizTYK2bihwaXf/sesJjQelSfnUuubBT8ED3OtFeO1K13wVxTa6WL/X/dwsxXLlsm0b
-	 XUNfNGzDfKkd7SG2SKKqD04ChO4Ov6uTqQX3Pw2J0P4VshMH/I3/RYKljp29zEjJBlp2N
-	 gY33bjkmI3by5r3JCkSzyKWt/XqGnYSca5IPqM3r3YL8HwJKcUOlxYdZQ1cq9PLjleg8G
-	 CoIkoBAq2wpZjmqOOth7MCkSoroQReGMKXSxpT/isyXdfvRBj/Uf6issonWI35R8kecbK
-	 ZNdhU2cRbO/iu9ZGMFMemiNWKZCad0iomNRhyf/P5zvm1dy+pQmasD1gOn+kxycARYw==
+	bh=HKR6ten/6YjPuaZ47lymDUFoeE9afGGsFOU2PEXuip0=;
+	b=u04YubqOpHuVdsi0XlwTISS0pfN1WlJj95JZaiGp/I/XHj/AytpK5QjY6s5ap5n8F+Yp
+	 cmZMIVlP3lkhMJ8zdooqzztLtrcgHjUOAXs+iPdFbY2CcZOBS1MXD1nK1HN38mZ4GOZ3o
+	 t+hd71NrcTK+2UpUSnJgXYRxKPS+eaMJDz7p0LYkZsetaNbni7PfDNTEFbq8OfdRTFdUu
+	 yUMu+V+NCsCgcDJ4Q2dkSj6iqaJGEBtJkANX4sMd4mdbl8BjRs70pc3PbiROKbEyJX1Q3
+	 ggsDZYwzrD9aG3HKiShNJsb6+qaoXvY6kgWEXkRO3qMfbzof/4X3xSP94PkQQQG//Vg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hTAEmdPE;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHYM+McR;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA9F606A88A
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEE1606A33F
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hTAEmdPE
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 731F71F000C4;
-	Mon, 16 Nov 2026 06:34:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHYM+McR
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 941741F000C6;
+	Mon, 16 Nov 2026 06:34:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794810850;
-	bh=bCIrSu/SaOB8QxvvykyswlGyiDIeCAnADxUbLdVsqIE=;
+	s=k20260515; t=1794810849;
+	bh=HKR6ten/6YjPuaZ47lymDUFoeE9afGGsFOU2PEXuip0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=hTAEmdPE2huRMWDwgzpIHd/Gkun1O4mNlxf7dXrg/vWtv7Qla1XaEPM2Hx7k53h85
-	 1Qv8aKONDpVkeH1vHePY3FbaCpC/DrlSNRg2dcFRM0PCTUeFPp5eUlKH3Ilz8CvSkX
-	 9Ahfba1a3YZcRoON1GVnwybPdULi3HBr//j9gNPxonolPjOQdrj88/BmrkrewdI+tk
-	 O/T5DnRXa3SDlD9JjkZsColzp2rkh8JZKwBSlWlFeITcDuOKm9VB9sleVg93uIfimA
-	 x44S8LP320uOvcYmCw/ZWCZkvEEk14dBIiAg0wNDvTxd55MQZvNBWYfU9b18GO3I+z
-	 H2WQ7afB4A+XA==
+	b=NHYM+McRf3ib9iLCoDo/LTeXiWhLtT96h34qb1/xqfcmUnD/wA8YaZ6wvQBQVITza
+	 v0OqZCLBekhvt59Xpo2gHMQyeSMX0ouUljZrJ7VseZ5BwABfOOxOLOig3ojFJRC6X2
+	 NGOd/uDXLNPwFMAiMXlZ+bcA+BPaedt5mvJckXEA7s5hcqbVQzkiwY1xDeJ5l6f0m7
+	 ZKiP3Vc8jyXevhCk1FHx3BtDwe/faWz/49czBOBW17wKaihFRU2teC/KU/3H+97gsW
+	 WjiBxxHzsXG6wqPq6G+AelDpNdeC87jH5F06lqrIXBejGX+EZgO2gsuCsibu/hnkzf
+	 d8if+ZDg3A0Lg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 7/7] lib/crypto: tests: Add KUnit test suite for AES-XTS
-Date: Sun, 15 Nov 2026 22:28:49 -0800
-Message-ID: <20261116062849.1071038-8-ebiggers@kernel.org>
+Subject: [PATCH 4/7] lib/crypto: tests: Add KUnit test suite for AES-CBC-CTS
+Date: Sun, 15 Nov 2026 22:28:46 -0800
+Message-ID: <20261116062849.1071038-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261116062849.1071038-1-ebiggers@kernel.org>
 References: <20261116062849.1071038-1-ebiggers@kernel.org>
@@ -62,7 +62,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a KUnit test suite for the AES-XTS library API.
+Add a KUnit test suite for the AES-CBC-CTS library API.
 
 It consists of:
 
@@ -70,434 +70,295 @@ It consists of:
   include extensive consistency tests, a "Monte-Carlo test", and a
   benchmark.
 
-- Tests against hardcoded AES-XTS test vectors from IEEE 1619-2007,
-  including ciphertext stealing test vectors.
+- Tests against hardcoded AES-CBC-CTS test vectors from RFC 3962.
 
-- A test for weak key rejection (keys whose two halves are identical).
+- A test comparing AES-CBC-CTS against a reference implementation built
+  on top of aes_cbc_encrypt().
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/.kunitconfig          |   1 +
- lib/crypto/tests/Kconfig         |   9 +
- lib/crypto/tests/Makefile        |   1 +
- lib/crypto/tests/aes_xts_kunit.c | 365 +++++++++++++++++++++++++++++++
- 4 files changed, 376 insertions(+)
- create mode 100644 lib/crypto/tests/aes_xts_kunit.c
+ lib/crypto/tests/Kconfig             |   4 +-
+ lib/crypto/tests/Makefile            |   2 +-
+ lib/crypto/tests/aes_cbc_cts_kunit.c | 239 +++++++++++++++++++++++++++
+ 3 files changed, 242 insertions(+), 3 deletions(-)
+ create mode 100644 lib/crypto/tests/aes_cbc_cts_kunit.c
 
-diff --git a/lib/crypto/.kunitconfig b/lib/crypto/.kunitconfig
-index 465375a1a14c..1be91698a654 100644
---- a/lib/crypto/.kunitconfig
-+++ b/lib/crypto/.kunitconfig
-@@ -8,6 +8,7 @@ CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_AES_CTR_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_AES_ECB_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST=y
-+CONFIG_CRYPTO_LIB_AES_XTS_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_CHACHA_KUNIT_TEST=y
 diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 4f7a07b0e3c0..98fcf053e937 100644
+index 7076ea606ce8..b0b0ae84a02e 100644
 --- a/lib/crypto/tests/Kconfig
 +++ b/lib/crypto/tests/Kconfig
-@@ -54,6 +54,15 @@ config CRYPTO_LIB_AES_GCM_KUNIT_TEST
- 	help
- 	  KUnit tests for the AES-GCM authenticated encryption algorithm.
+@@ -1,13 +1,13 @@
+ # SPDX-License-Identifier: GPL-2.0-or-later
  
-+config CRYPTO_LIB_AES_XTS_KUNIT_TEST
-+	tristate "KUnit tests for AES-XTS" if !KUNIT_ALL_TESTS
-+	depends on KUNIT && CRYPTO_LIB_AES_XTS
-+	default KUNIT_ALL_TESTS
-+	select CRYPTO_LIB_BENCHMARK_VISIBLE
-+	# This test uses BLAKE2s, but that's always built-in.
-+	help
-+	  KUnit tests for the AES-XTS encryption mode.
-+
- config CRYPTO_LIB_BLAKE2B_KUNIT_TEST
- 	tristate "KUnit tests for BLAKE2b" if !KUNIT_ALL_TESTS
- 	depends on KUNIT && CRYPTO_LIB_BLAKE2B
+ config CRYPTO_LIB_AES_CBC_KUNIT_TEST
+-	tristate "KUnit tests for AES-CBC" if !KUNIT_ALL_TESTS
++	tristate "KUnit tests for AES-CBC and AES-CBC-CTS" if !KUNIT_ALL_TESTS
+ 	depends on KUNIT && CRYPTO_LIB_AES_CBC
+ 	default KUNIT_ALL_TESTS
+ 	select CRYPTO_LIB_BENCHMARK_VISIBLE
+ 	# This test uses BLAKE2s, but that's always built-in.
+ 	help
+-	  KUnit tests for the AES-CBC encryption mode.
++	  KUnit tests for the AES-CBC and AES-CBC-CTS encryption modes.
+ 
+ config CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST
+ 	tristate "KUnit tests for AES-CMAC, AES-XCBC-MAC, and AES-CBC-MAC" if !KUNIT_ALL_TESTS
 diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index 50e4a3f70ebf..048ceb1d595d 100644
+index e7b7efee663a..fa22a4138a68 100644
 --- a/lib/crypto/tests/Makefile
 +++ b/lib/crypto/tests/Makefile
-@@ -6,6 +6,7 @@ obj-$(CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST) += aes_ccm_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_CTR_KUNIT_TEST) += aes_ctr_kunit.o aes_xctr_kunit.o
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0-or-later
+ 
+-obj-$(CONFIG_CRYPTO_LIB_AES_CBC_KUNIT_TEST) += aes_cbc_kunit.o
++obj-$(CONFIG_CRYPTO_LIB_AES_CBC_KUNIT_TEST) += aes_cbc_kunit.o aes_cbc_cts_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST) += aes_cbc_macs_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST) += aes_ccm_kunit.o
  obj-$(CONFIG_CRYPTO_LIB_AES_ECB_KUNIT_TEST) += aes_ecb_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST) += aes_gcm_kunit.o
-+obj-$(CONFIG_CRYPTO_LIB_AES_XTS_KUNIT_TEST) += aes_xts_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST) += blake2b_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST) += blake2s_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_CHACHA_KUNIT_TEST) += chacha_kunit.o
-diff --git a/lib/crypto/tests/aes_xts_kunit.c b/lib/crypto/tests/aes_xts_kunit.c
+diff --git a/lib/crypto/tests/aes_cbc_cts_kunit.c b/lib/crypto/tests/aes_cbc_cts_kunit.c
 new file mode 100644
-index 000000000000..b45741567d2f
+index 000000000000..2890515ded0f
 --- /dev/null
-+++ b/lib/crypto/tests/aes_xts_kunit.c
-@@ -0,0 +1,365 @@
++++ b/lib/crypto/tests/aes_cbc_cts_kunit.c
+@@ -0,0 +1,239 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * KUnit test suite for AES-XTS
++ * KUnit test suite for AES-CBC-CTS
 + *
 + * Copyright 2026 Google LLC
 + */
-+#include <crypto/aes-xts.h>
++#include <crypto/aes-cbc.h>
 +#include <crypto/blake2s.h>
-+#include <linux/fips.h>
 +#include "test-utils.h"
 +
-+static int aes_xts_preparekey_test(struct aes_xts_key *key, const u8 *in_key,
-+				   size_t key_len)
++static void aes_cbc_cts_encrypt_test(u8 *dst, const u8 *src, size_t len, u8 *iv,
++				     aes_encrypt_arg key, bool cont)
 +{
-+	return aes_xts_preparekey(key, in_key, key_len, 0);
++	aes_cbc_cts_encrypt(dst, src, len, iv, key);
 +}
 +
-+/* In FIPS mode, AES-192-XTS (48-byte keys) isn't allowed. */
-+static bool aes_xts_is_key_len_allowed(size_t key_len)
++static void aes_cbc_cts_decrypt_test(u8 *dst, const u8 *src, size_t len, u8 *iv,
++				     const struct aes_key *key, bool cont)
 +{
-+	return !fips_enabled || key_len != 2 * AES_KEYSIZE_192;
++	aes_cbc_cts_decrypt(dst, src, len, iv, key);
 +}
 +
-+static const size_t aes_xts_valid_key_lens[] = { 2 * AES_KEYSIZE_128,
-+						 2 * AES_KEYSIZE_192,
-+						 2 * AES_KEYSIZE_256 };
-+#define SKCIPHER_VALID_KEY_LENS aes_xts_valid_key_lens
-+#define SKCIPHER_MAX_KEY_LEN (2 * AES_MAX_KEY_SIZE)
-+#define SKCIPHER_IV_LEN AES_BLOCK_SIZE /* the tweak */
++static const size_t aes_cbc_cts_valid_key_lens[] = { AES_KEYSIZE_128,
++						     AES_KEYSIZE_192,
++						     AES_KEYSIZE_256 };
++#define SKCIPHER_VALID_KEY_LENS aes_cbc_cts_valid_key_lens
++#define SKCIPHER_MAX_KEY_LEN AES_MAX_KEY_SIZE
++#define SKCIPHER_IV_LEN AES_BLOCK_SIZE
 +#define SKCIPHER_MIN_DATA_LEN AES_BLOCK_SIZE
 +#define SKCIPHER_DATA_LEN_ALIGN 1
 +
-+#define SKCIPHER_KEY aes_xts_key
-+#define SKCIPHER_PREPAREKEY aes_xts_preparekey_test
-+#define SKCIPHER_ENCRYPT aes_xts_encrypt
-+#define SKCIPHER_DECRYPT aes_xts_decrypt
++#define SKCIPHER_KEY aes_key
++#define SKCIPHER_PREPAREKEY aes_preparekey
++#define SKCIPHER_ENCRYPT aes_cbc_cts_encrypt_test
++#define SKCIPHER_DECRYPT aes_cbc_cts_decrypt_test
 +
-+#define SKCIPHER_IS_KEY_LEN_ALLOWED aes_xts_is_key_len_allowed
-+#define SKCIPHER_INCREMENTAL
-+#define SKCIPHER_NONFINAL_DATA_LEN_ALIGN AES_BLOCK_SIZE
++#define SKCIPHER_ENCKEY aes_enckey
++#define SKCIPHER_PREPAREENCKEY aes_prepareenckey
 +
 +/* This value was generated by gen-skcipher-testvecs.py. */
-+static const u8 aes_xts_monte_carlo_checksum[BLAKE2S_HASH_SIZE] = {
-+	0x24, 0x93, 0x8f, 0x89, 0x72, 0x6f, 0xfb, 0x59, 0x4a, 0xea, 0x32,
-+	0x74, 0x15, 0x6a, 0x8f, 0x9a, 0xba, 0xde, 0x9e, 0xc3, 0x5c, 0x58,
-+	0x98, 0xa9, 0xb6, 0x9f, 0xeb, 0xe5, 0xfb, 0x3a, 0xf0, 0x87,
++static const u8 aes_cbc_cts_monte_carlo_checksum[BLAKE2S_HASH_SIZE] = {
++	0x9a, 0xc5, 0x99, 0xaf, 0x25, 0x2d, 0x56, 0x52, 0xd6, 0x50, 0x14,
++	0x33, 0x61, 0x0b, 0xb6, 0x40, 0x5e, 0xc5, 0x9c, 0x8e, 0xfd, 0x6c,
++	0xae, 0xa1, 0x1d, 0x47, 0x43, 0xd4, 0x19, 0x01, 0xc9, 0x6b,
 +};
-+#define SKCIPHER_MONTE_CARLO_CHECKSUM aes_xts_monte_carlo_checksum
++#define SKCIPHER_MONTE_CARLO_CHECKSUM aes_cbc_cts_monte_carlo_checksum
 +
 +#include "skcipher-test-template.h"
 +
-+/* Byte sequence 0x00..0xff, used in IEEE 1619-2007 Vector 10 */
-+#define IEEE1619_SEQ256                    \
-+	"\x00\x01\x02\x03\x04\x05\x06\x07" \
-+	"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f" \
-+	"\x10\x11\x12\x13\x14\x15\x16\x17" \
-+	"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f" \
-+	"\x20\x21\x22\x23\x24\x25\x26\x27" \
-+	"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f" \
-+	"\x30\x31\x32\x33\x34\x35\x36\x37" \
-+	"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f" \
-+	"\x40\x41\x42\x43\x44\x45\x46\x47" \
-+	"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f" \
-+	"\x50\x51\x52\x53\x54\x55\x56\x57" \
-+	"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f" \
-+	"\x60\x61\x62\x63\x64\x65\x66\x67" \
-+	"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f" \
-+	"\x70\x71\x72\x73\x74\x75\x76\x77" \
-+	"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f" \
-+	"\x80\x81\x82\x83\x84\x85\x86\x87" \
-+	"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f" \
-+	"\x90\x91\x92\x93\x94\x95\x96\x97" \
-+	"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f" \
-+	"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7" \
-+	"\xa8\xa9\xaa\xab\xac\xad\xae\xaf" \
-+	"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7" \
-+	"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf" \
-+	"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7" \
-+	"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf" \
-+	"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7" \
-+	"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf" \
-+	"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7" \
-+	"\xe8\xe9\xea\xeb\xec\xed\xee\xef" \
-+	"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7" \
-+	"\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff"
-+
-+/* Inputs shared by IEEE 1619-2007 Vectors 15-17 */
-+#define IEEE1619_VEC15_KEY                 \
-+	"\xff\xfe\xfd\xfc\xfb\xfa\xf9\xf8" \
-+	"\xf7\xf6\xf5\xf4\xf3\xf2\xf1\xf0" \
-+	"\xbf\xbe\xbd\xbc\xbb\xba\xb9\xb8" \
-+	"\xb7\xb6\xb5\xb4\xb3\xb2\xb1\xb0"
-+#define IEEE1619_VEC15_TWEAK               \
-+	"\x9a\x78\x56\x34\x12\x00\x00\x00" \
-+	"\x00\x00\x00\x00\x00\x00\x00\x00"
-+#define IEEE1619_VEC15_PTEXT               \
-+	"\x00\x01\x02\x03\x04\x05\x06\x07" \
-+	"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f" \
-+	"\x10\x11\x12"
++#define RFC3962_KEY "chicken teriyaki"
++#define RFC3962_IV "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
++#define RFC3962_PTEXT \
++	"I would like the General Gau's Chicken, please, and wonton soup."
 +
 +/*
-+ * AES-XTS test vectors from IEEE Std 1619-2007.  Vector 10 covers AES-256-XTS
-+ * with a 512-byte data unit, and Vectors 15-17 cover ciphertext stealing.
++ * AES-CBC-CTS test vectors from RFC 3962 Appendix B.  The ciphertext stealing
++ * variant used in RFC 3962 is the same as CS3, i.e. the variant implemented by
++ * aes_cbc_cts_encrypt() and aes_cbc_cts_decrypt().
++ *
++ * RFC 3962 doesn't include a 16-byte test vector.  The one below was derived
++ * from the 32-byte one: when the length is exactly one block, CS3 is the same
++ * as plain CBC, so the ciphertext is just the first CBC ciphertext block.
 + */
-+static const struct skcipher_testvec aes_xts_testvecs[] = {
++static const struct skcipher_testvec aes_cbc_cts_testvecs[] = {
 +	{
-+		.name = "IEEE 1619-2007 Vector 1",
-+		.key = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.key_len = 32,
-+		.iv = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		      "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.ptext = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.ctext = "\x91\x7c\xf6\x9e\xbd\x68\xb2\xec"
-+			 "\x9b\x9f\xe9\xa3\xea\xdd\xa6\x92"
-+			 "\xcd\x43\xd2\xf5\x95\x98\xed\x85"
-+			 "\x8c\x02\xc2\x65\x2f\xbf\x92\x2e",
-+		.data_len = 32,
-+		.next_iv = "\x98\xa5\x2f\x51\xbf\x2b\xb2\xec"
-+			   "\x20\x32\xe9\x67\x29\xd3\xac\xb8",
++		.name = "Derived from RFC 3962 Appendix B, 16 bytes",
++		.key = RFC3962_KEY,
++		.key_len = 16,
++		.iv = RFC3962_IV,
++		.ptext = RFC3962_PTEXT,
++		.ctext = "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
++			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84",
++		.data_len = 16,
 +	},
 +	{
-+		.name = "IEEE 1619-2007 Vector 2",
-+		.key = "\x11\x11\x11\x11\x11\x11\x11\x11"
-+		       "\x11\x11\x11\x11\x11\x11\x11\x11"
-+		       "\x22\x22\x22\x22\x22\x22\x22\x22"
-+		       "\x22\x22\x22\x22\x22\x22\x22\x22",
-+		.key_len = 32,
-+		.iv = "\x33\x33\x33\x33\x33\x00\x00\x00"
-+		      "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.ptext = "\x44\x44\x44\x44\x44\x44\x44\x44"
-+			 "\x44\x44\x44\x44\x44\x44\x44\x44"
-+			 "\x44\x44\x44\x44\x44\x44\x44\x44"
-+			 "\x44\x44\x44\x44\x44\x44\x44\x44",
-+		.ctext = "\xc4\x54\x18\x5e\x6a\x16\x93\x6e"
-+			 "\x39\x33\x40\x38\xac\xef\x83\x8b"
-+			 "\xfb\x18\x6f\xff\x74\x80\xad\xc4"
-+			 "\x28\x93\x82\xec\xd6\xd3\x94\xf0",
-+		.data_len = 32,
-+		.next_iv = "\xf2\x01\xee\x34\x37\xfc\x49\xcf"
-+			   "\xd6\x61\x05\x7d\x66\x55\x37\x9b",
-+	},
-+	{
-+		.name = "IEEE 1619-2007 Vector 10",
-+		.key = "\x27\x18\x28\x18\x28\x45\x90\x45"
-+		       "\x23\x53\x60\x28\x74\x71\x35\x26"
-+		       "\x62\x49\x77\x57\x24\x70\x93\x69"
-+		       "\x99\x59\x57\x49\x66\x96\x76\x27"
-+		       "\x31\x41\x59\x26\x53\x58\x97\x93"
-+		       "\x23\x84\x62\x64\x33\x83\x27\x95"
-+		       "\x02\x88\x41\x97\x16\x93\x99\x37"
-+		       "\x51\x05\x82\x09\x74\x94\x45\x92",
-+		.key_len = 64,
-+		.iv = "\xff\x00\x00\x00\x00\x00\x00\x00"
-+		      "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.ptext = IEEE1619_SEQ256 IEEE1619_SEQ256,
-+		.ctext = "\x1c\x3b\x3a\x10\x2f\x77\x03\x86"
-+			 "\xe4\x83\x6c\x99\xe3\x70\xcf\x9b"
-+			 "\xea\x00\x80\x3f\x5e\x48\x23\x57"
-+			 "\xa4\xae\x12\xd4\x14\xa3\xe6\x3b"
-+			 "\x5d\x31\xe2\x76\xf8\xfe\x4a\x8d"
-+			 "\x66\xb3\x17\xf9\xac\x68\x3f\x44"
-+			 "\x68\x0a\x86\xac\x35\xad\xfc\x33"
-+			 "\x45\xbe\xfe\xcb\x4b\xb1\x88\xfd"
-+			 "\x57\x76\x92\x6c\x49\xa3\x09\x5e"
-+			 "\xb1\x08\xfd\x10\x98\xba\xec\x70"
-+			 "\xaa\xa6\x69\x99\xa7\x2a\x82\xf2"
-+			 "\x7d\x84\x8b\x21\xd4\xa7\x41\xb0"
-+			 "\xc5\xcd\x4d\x5f\xff\x9d\xac\x89"
-+			 "\xae\xba\x12\x29\x61\xd0\x3a\x75"
-+			 "\x71\x23\xe9\x87\x0f\x8a\xcf\x10"
-+			 "\x00\x02\x08\x87\x89\x14\x29\xca"
-+			 "\x2a\x3e\x7a\x7d\x7d\xf7\xb1\x03"
-+			 "\x55\x16\x5c\x8b\x9a\x6d\x0a\x7d"
-+			 "\xe8\xb0\x62\xc4\x50\x0d\xc4\xcd"
-+			 "\x12\x0c\x0f\x74\x18\xda\xe3\xd0"
-+			 "\xb5\x78\x1c\x34\x80\x3f\xa7\x54"
-+			 "\x21\xc7\x90\xdf\xe1\xde\x18\x34"
-+			 "\xf2\x80\xd7\x66\x7b\x32\x7f\x6c"
-+			 "\x8c\xd7\x55\x7e\x12\xac\x3a\x0f"
-+			 "\x93\xec\x05\xc5\x2e\x04\x93\xef"
-+			 "\x31\xa1\x2d\x3d\x92\x60\xf7\x9a"
-+			 "\x28\x9d\x6a\x37\x9b\xc7\x0c\x50"
-+			 "\x84\x14\x73\xd1\xa8\xcc\x81\xec"
-+			 "\x58\x3e\x96\x45\xe0\x7b\x8d\x96"
-+			 "\x70\x65\x5b\xa5\xbb\xcf\xec\xc6"
-+			 "\xdc\x39\x66\x38\x0a\xd8\xfe\xcb"
-+			 "\x17\xb6\xba\x02\x46\x9a\x02\x0a"
-+			 "\x84\xe1\x8e\x8f\x84\x25\x20\x70"
-+			 "\xc1\x3e\x9f\x1f\x28\x9b\xe5\x4f"
-+			 "\xbc\x48\x14\x57\x77\x8f\x61\x60"
-+			 "\x15\xe1\x32\x7a\x02\xb1\x40\xf1"
-+			 "\x50\x5e\xb3\x09\x32\x6d\x68\x37"
-+			 "\x8f\x83\x74\x59\x5c\x84\x9d\x84"
-+			 "\xf4\xc3\x33\xec\x44\x23\x88\x51"
-+			 "\x43\xcb\x47\xbd\x71\xc5\xed\xae"
-+			 "\x9b\xe6\x9a\x2f\xfe\xce\xb1\xbe"
-+			 "\xc9\xde\x24\x4f\xbe\x15\x99\x2b"
-+			 "\x11\xb7\x7c\x04\x0f\x12\xbd\x8f"
-+			 "\x6a\x97\x5a\x44\xa0\xf9\x0c\x29"
-+			 "\xa9\xab\xc3\xd4\xd8\x93\x92\x72"
-+			 "\x84\xc5\x87\x54\xcc\xe2\x94\x52"
-+			 "\x9f\x86\x14\xdc\xd2\xab\xa9\x91"
-+			 "\x92\x5f\xed\xc4\xae\x74\xff\xac"
-+			 "\x6e\x33\x3b\x93\xeb\x4a\xff\x04"
-+			 "\x79\xda\x9a\x41\x0e\x44\x50\xe0"
-+			 "\xdd\x7a\xe4\xc6\xe2\x91\x09\x00"
-+			 "\x57\x5d\xa4\x01\xfc\x07\x05\x9f"
-+			 "\x64\x5e\x8b\x7e\x9b\xfd\xef\x33"
-+			 "\x94\x30\x54\xff\x84\x01\x14\x93"
-+			 "\xc2\x7b\x34\x29\xea\xed\xb4\xed"
-+			 "\x53\x76\x44\x1a\x77\xed\x43\x85"
-+			 "\x1a\xd7\x7f\x16\xf5\x41\xdf\xd2"
-+			 "\x69\xd5\x0d\x6a\x5f\x14\xfb\x0a"
-+			 "\xab\x1c\xbb\x4c\x15\x50\xbe\x97"
-+			 "\xf7\xab\x40\x66\x19\x3c\x4c\xaa"
-+			 "\x77\x3d\xad\x38\x01\x4b\xd2\x09"
-+			 "\x2f\xa7\x55\xc8\x24\xbb\x5e\x54"
-+			 "\xc4\xf3\x6f\xfd\xa9\xfc\xea\x70"
-+			 "\xb9\xc6\xe6\x93\xe1\x48\xc1\x51",
-+		.data_len = 512,
-+		.next_iv = "\xd7\xcf\x75\x24\x5c\x26\x75\x77"
-+			   "\xa9\x0c\xaa\xd6\xae\x98\x8e\x22",
-+	},
-+	{
-+		.name = "IEEE 1619-2007 Vector 15",
-+		.key = IEEE1619_VEC15_KEY,
-+		.key_len = 32,
-+		.iv = IEEE1619_VEC15_TWEAK,
-+		.ptext = IEEE1619_VEC15_PTEXT,
-+		.ctext = "\x6c\x16\x25\xdb\x46\x71\x52\x2d"
-+			 "\x3d\x75\x99\x60\x1d\xe7\xca\x09"
-+			 "\xed",
++		.name = "RFC 3962 Appendix B, 17 bytes",
++		.key = RFC3962_KEY,
++		.key_len = 16,
++		.iv = RFC3962_IV,
++		.ptext = RFC3962_PTEXT,
++		.ctext = "\xc6\x35\x35\x68\xf2\xbf\x8c\xb4"
++			 "\xd8\xa5\x80\x36\x2d\xa7\xff\x7f"
++			 "\x97",
 +		.data_len = 17,
 +	},
 +	{
-+		.name = "IEEE 1619-2007 Vector 16",
-+		.key = IEEE1619_VEC15_KEY,
-+		.key_len = 32,
-+		.iv = IEEE1619_VEC15_TWEAK,
-+		.ptext = IEEE1619_VEC15_PTEXT,
-+		.ctext = "\xd0\x69\x44\x4b\x7a\x7e\x0c\xab"
-+			 "\x09\xe2\x44\x47\xd2\x4d\xeb\x1f"
-+			 "\xed\xbf",
-+		.data_len = 18,
++		.name = "RFC 3962 Appendix B, 31 bytes",
++		.key = RFC3962_KEY,
++		.key_len = 16,
++		.iv = RFC3962_IV,
++		.ptext = RFC3962_PTEXT,
++		.ctext = "\xfc\x00\x78\x3e\x0e\xfd\xb2\xc1"
++			 "\xd4\x45\xd4\xc8\xef\xf7\xed\x22"
++			 "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
++			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5",
++		.data_len = 31,
 +	},
 +	{
-+		.name = "IEEE 1619-2007 Vector 17",
-+		.key = IEEE1619_VEC15_KEY,
-+		.key_len = 32,
-+		.iv = IEEE1619_VEC15_TWEAK,
-+		.ptext = IEEE1619_VEC15_PTEXT,
-+		.ctext = "\xe5\xdf\x13\x51\xc0\x54\x4b\xa1"
-+			 "\x35\x0b\x33\x63\xcd\x8e\xf4\xbe"
-+			 "\xed\xbf\x9d",
-+		.data_len = 19,
++		.name = "RFC 3962 Appendix B, 32 bytes",
++		.key = RFC3962_KEY,
++		.key_len = 16,
++		.iv = RFC3962_IV,
++		.ptext = RFC3962_PTEXT,
++		.ctext = "\x39\x31\x25\x23\xa7\x86\x62\xd5"
++			 "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8"
++			 "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
++			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84",
++		.data_len = 32,
++	},
++	{
++		.name = "RFC 3962 Appendix B, 47 bytes",
++		.key = RFC3962_KEY,
++		.key_len = 16,
++		.iv = RFC3962_IV,
++		.ptext = RFC3962_PTEXT,
++		.ctext = "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
++			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84"
++			 "\xb3\xff\xfd\x94\x0c\x16\xa1\x8c"
++			 "\x1b\x55\x49\xd2\xf8\x38\x02\x9e"
++			 "\x39\x31\x25\x23\xa7\x86\x62\xd5"
++			 "\xbe\x7f\xcb\xcc\x98\xeb\xf5",
++		.data_len = 47,
++	},
++	{
++		.name = "RFC 3962 Appendix B, 48 bytes",
++		.key = RFC3962_KEY,
++		.key_len = 16,
++		.iv = RFC3962_IV,
++		.ptext = RFC3962_PTEXT,
++		.ctext = "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
++			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84"
++			 "\x9d\xad\x8b\xbb\x96\xc4\xcd\xc0"
++			 "\x3b\xc1\x03\xe1\xa1\x94\xbb\xd8"
++			 "\x39\x31\x25\x23\xa7\x86\x62\xd5"
++			 "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8",
++		.data_len = 48,
++	},
++	{
++		.name = "RFC 3962 Appendix B, 64 bytes",
++		.key = RFC3962_KEY,
++		.key_len = 16,
++		.iv = RFC3962_IV,
++		.ptext = RFC3962_PTEXT,
++		.ctext = "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
++			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84"
++			 "\x39\x31\x25\x23\xa7\x86\x62\xd5"
++			 "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8"
++			 "\x48\x07\xef\xe8\x36\xee\x89\xa5"
++			 "\x26\x73\x0d\xbc\x2f\x7b\xc8\x40"
++			 "\x9d\xad\x8b\xbb\x96\xc4\xcd\xc0"
++			 "\x3b\xc1\x03\xe1\xa1\x94\xbb\xd8",
++		.data_len = 64,
 +	},
 +};
 +
-+static void test_aes_xts_test_vectors(struct kunit *test)
++static void test_aes_cbc_cts_test_vectors(struct kunit *test)
 +{
-+	for (size_t i = 0; i < ARRAY_SIZE(aes_xts_testvecs); i++) {
-+		const struct skcipher_testvec *tv = &aes_xts_testvecs[i];
-+		const size_t half = tv->key_len / 2;
-+
-+		/*
-+		 * In FIPS mode, keys whose two halves are the same are
-+		 * rejected, so skip any test vectors that use such keys.
-+		 */
-+		if (fips_enabled && memcmp(tv->key, &tv->key[half], half) == 0)
-+			continue;
-+		skcipher_run_testvecs(test, tv, 1);
-+	}
++	skcipher_run_testvecs(test, aes_cbc_cts_testvecs,
++			      ARRAY_SIZE(aes_cbc_cts_testvecs));
 +}
 +
 +/*
-+ * Test that keys whose two halves are the same are rejected when
-+ * XTS_FORBID_WEAK_KEYS is given (or in FIPS mode), and otherwise accepted, and
-+ * that struct aes_xts_key is zeroized on failure.
++ * Test AES-CBC-CTS against a reference implementation built on top of AES-CBC,
++ * using random lengths up to 4096 bytes.  In the CS3 variant of CBC-CTS, the
++ * ciphertext is the AES-CBC encryption of the zero-padded plaintext, but with
++ * the last two blocks swapped and the (new) last block truncated to the length
++ * of the final plaintext block, which may be partial.  When the length is
++ * exactly one block, the ciphertext is the same as AES-CBC.
 + */
-+static void test_aes_xts_weak_keys(struct kunit *test)
++static void test_aes_cbc_cts_vs_cbc(struct kunit *test)
 +{
-+	struct aes_xts_key *key = alloc_buf(test, sizeof(*key));
-+	u8 *raw_key_buf_end = alloc_guarded_buf(test, SKCIPHER_MAX_KEY_LEN) +
-+			      SKCIPHER_MAX_KEY_LEN;
-+	int err;
++	const size_t max_data_len = 4096;
++	const struct skcipher_test_keys *keys = skcipher_alloc_test_keys(test);
++	const u8 *pt = alloc_rand_buf(test, max_data_len);
++	u8 *padded_pt = alloc_buf(test, round_up(max_data_len, AES_BLOCK_SIZE));
++	u8 *ct = alloc_buf(test, max_data_len);
++	u8 *ref_ct = alloc_buf(test, round_up(max_data_len, AES_BLOCK_SIZE));
++	u8 *decrypted = alloc_buf(test, max_data_len);
++	u8 orig_iv[AES_BLOCK_SIZE];
++	u8 iv[AES_BLOCK_SIZE];
 +
-+	for (size_t i = 0; i < ARRAY_SIZE(aes_xts_valid_key_lens); i++) {
-+		const size_t key_len = aes_xts_valid_key_lens[i];
-+		const size_t half = key_len / 2;
-+		const bool allowed = aes_xts_is_key_len_allowed(key_len);
-+		u8 *raw_key = raw_key_buf_end - key_len;
++	for (size_t i = 0; i < 200; i++) {
++		const struct aes_key *key = skcipher_pick_key(keys, i);
++		const size_t data_len =
++			i < keys->num_keys ?
++				AES_BLOCK_SIZE :
++				skcipher_rand_data_len(max_data_len);
++		const size_t padded_len = round_up(data_len, AES_BLOCK_SIZE);
++		const size_t pn_offset = padded_len - AES_BLOCK_SIZE;
++		const size_t pn_len = data_len - pn_offset;
 +
-+		/* Generate a weak key in an exact-size guarded buffer. */
-+		rand_bytes(raw_key, half);
-+		memcpy(&raw_key[half], raw_key, half);
++		rand_bytes(orig_iv, sizeof(orig_iv));
 +
-+		memset(key, 0xff, sizeof(*key));
-+		err = aes_xts_preparekey(key, raw_key, key_len,
-+					 XTS_FORBID_WEAK_KEYS);
-+		KUNIT_ASSERT_EQ_MSG(
-+			test, -EINVAL, err,
-+			"Weak key wasn't rejected with XTS_FORBID_WEAK_KEYS; key_len=%zu",
-+			key_len);
-+		KUNIT_ASSERT_TRUE_MSG(
-+			test, mem_is_zero(key, sizeof(*key)),
-+			"Key struct wasn't zeroized on failure; key_len=%zu",
-+			key_len);
++		/* Compute the expected ciphertext using AES-CBC. */
++		memcpy(padded_pt, pt, data_len);
++		memset(&padded_pt[data_len], 0, padded_len - data_len);
++		memcpy(iv, orig_iv, sizeof(iv));
++		aes_cbc_encrypt(ref_ct, padded_pt, padded_len, iv, key);
++		if (padded_len > AES_BLOCK_SIZE) {
++			u8 tmp[AES_BLOCK_SIZE];
 +
-+		memset(key, 0xff, sizeof(*key));
-+		err = aes_xts_preparekey(key, raw_key, key_len, 0);
-+		if (fips_enabled)
-+			KUNIT_ASSERT_EQ_MSG(
-+				test, -EINVAL, err,
-+				"Weak key wasn't rejected in FIPS mode; key_len=%zu",
-+				key_len);
-+		else
-+			KUNIT_ASSERT_EQ_MSG(
-+				test, 0, err,
-+				"Weak key wasn't accepted in non-FIPS mode; key_len=%zu",
-+				key_len);
-+		if (err)
-+			KUNIT_ASSERT_TRUE(test, mem_is_zero(key, sizeof(*key)));
-+
-+		/*
-+		 * Make the key non-weak by flipping a bit at each byte position
-+		 * in turn, to verify that all bytes of the halves are compared.
-+		 */
-+		for (size_t j = 0; j < key_len; j++) {
-+			raw_key[j] ^= 1;
-+			memset(key, 0xff, sizeof(*key));
-+			err = aes_xts_preparekey(key, raw_key, key_len,
-+						 XTS_FORBID_WEAK_KEYS);
-+			KUNIT_ASSERT_EQ_MSG(
-+				test, allowed ? 0 : -EINVAL, err,
-+				"Wrong result for non-weak key; key_len=%zu diff_byte=%zu",
-+				key_len, j);
-+			if (err)
-+				KUNIT_ASSERT_TRUE(
-+					test, mem_is_zero(key, sizeof(*key)));
-+			raw_key[j] ^= 1;
++			memcpy(tmp, &ref_ct[pn_offset - AES_BLOCK_SIZE],
++			       AES_BLOCK_SIZE);
++			memcpy(&ref_ct[pn_offset - AES_BLOCK_SIZE],
++			       &ref_ct[pn_offset], AES_BLOCK_SIZE);
++			memcpy(&ref_ct[pn_offset], tmp, pn_len);
 +		}
++
++		memcpy(iv, orig_iv, sizeof(iv));
++		aes_cbc_cts_encrypt(ct, pt, data_len, iv, key);
++		KUNIT_ASSERT_MEMEQ_MSG(test, ref_ct, ct, data_len,
++				       "Wrong ciphertext; data_len=%zu",
++				       data_len);
++
++		memset(decrypted, 0, data_len);
++		memcpy(iv, orig_iv, sizeof(iv));
++		aes_cbc_cts_decrypt(decrypted, ct, data_len, iv, key);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt, decrypted, data_len,
++			"Decryption didn't invert encryption; data_len=%zu",
++			data_len);
 +	}
 +}
 +
-+static struct kunit_case aes_xts_test_cases[] = {
-+	KUNIT_CASE(test_aes_xts_test_vectors),
-+	KUNIT_CASE(test_aes_xts_weak_keys),
++static struct kunit_case aes_cbc_cts_test_cases[] = {
++	KUNIT_CASE(test_aes_cbc_cts_test_vectors),
++	KUNIT_CASE(test_aes_cbc_cts_vs_cbc),
 +	SKCIPHER_KUNIT_CASES,
 +	{},
 +};
 +
-+static struct kunit_suite aes_xts_test_suite = {
-+	.name = "aes_xts",
-+	.test_cases = aes_xts_test_cases,
++static struct kunit_suite aes_cbc_cts_test_suite = {
++	.name = "aes_cbc_cts",
++	.test_cases = aes_cbc_cts_test_cases,
 +};
-+kunit_test_suite(aes_xts_test_suite);
++kunit_test_suite(aes_cbc_cts_test_suite);
 +
-+MODULE_DESCRIPTION("KUnit tests and benchmark for AES-XTS");
++MODULE_DESCRIPTION("KUnit tests and benchmark for AES-CBC-CTS");
 +MODULE_LICENSE("GPL");
 -- 
 2.56.1
