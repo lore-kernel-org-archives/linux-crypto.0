@@ -1,56 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794810849;
-	b=HiIBLfOX1XZs0rpNgUm7fePdKFFRPztBAQC8eZDsc+SerKxwj/YcPAMQkJpE5ytOf8ao
-	 iEtBCNiDdgNVVnn9TM0QBiV13YKJux055O1iyRs+arxU4gg4rC2KjWgveB9J8NnKCWOiq
-	 jrqDIAt7KQQOgHfHoKO0b5EjoPWYyqVzcGf6nF0P9PpLMCGMLueC81MPoMWAqmgoHrQh+
-	 CwRgordW2Bty60R60L8Iv+QXFu0HCJR1d2bw6mPxU1AlkYPQnVGE/QVsl8lgF1dF9S2KF
-	 BLId/itNQrC5v40Vb+364v684BWmbijYMh25h+FJuujJ+DPqV/ZxVNHce0JaQkkZ54A==
+	t=1794812233;
+	b=EaMvSB4KHqwhNSoc5dnMw/qZssPInT9EHUgTaDML2xJ77n4HLH7QVAUQZfU4+7NHPV45
+	 U1aPFldz4BhnF9WvkoXT9TjHaEjPRgY/Bw6zgSeYV8q/mLrNC5SkZIx3vg+Y28Kd09sgR
+	 c1udNC9e5FtSuoLXiQopzowAMPJ2PUG2UTl3QpLYoqGZn9L4iwxupSJa1h3oTz5t0oulQ
+	 6ZHA+PLzDSzkqtm5YwrUawUIHesw/XWb+9g4mL+Mrt/T/3QJ2h5cmq8LydNG80MIcwYZl
+	 ynEUIZMA0B8GIwHz3KeuusbhbiXXEs1rSJjdCKWyF7weT46KHAqhwv09fSu9H3J5mRg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794810849;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=HKR6ten/6YjPuaZ47lymDUFoeE9afGGsFOU2PEXuip0=;
-	b=u04YubqOpHuVdsi0XlwTISS0pfN1WlJj95JZaiGp/I/XHj/AytpK5QjY6s5ap5n8F+Yp
-	 cmZMIVlP3lkhMJ8zdooqzztLtrcgHjUOAXs+iPdFbY2CcZOBS1MXD1nK1HN38mZ4GOZ3o
-	 t+hd71NrcTK+2UpUSnJgXYRxKPS+eaMJDz7p0LYkZsetaNbni7PfDNTEFbq8OfdRTFdUu
-	 yUMu+V+NCsCgcDJ4Q2dkSj6iqaJGEBtJkANX4sMd4mdbl8BjRs70pc3PbiROKbEyJX1Q3
-	 ggsDZYwzrD9aG3HKiShNJsb6+qaoXvY6kgWEXkRO3qMfbzof/4X3xSP94PkQQQG//Vg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794812233;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:From:Subject:To:Cc:References:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 X-Authority-Analysis:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Spam-Details-Enc:X-Proofpoint-GUID:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=8kVbLa2hYPiQsN9qOzj3DO2zSgYLfY1noEtwJGDEPiM=;
+	b=RuVZ1BGkt3JrGRn2D9Lcapxj5nwfhObudjNNuHhhj8SvVfG6jR7fvxTFWqecsgtFgiPS
+	 Se5sznGz6MklEkAoH6OMcILIt9FfzjO9Y95GeAcBEIv2OWjmMUgquyJigHUs/nmk1A6EM
+	 Au3W6RlodA5pZkDySCa/CUkmsGLnpRYUfniNs7RoH9ysoDVjVyQ+YMWS5yf3tGq/Hxh4R
+	 IdYR8jfiv1osBnQimlVJunl+WOOUco3AscYHRBFlWv6L8Kw9Yr4b6mXay80eQcZppp8BD
+	 PsBxrGT/6MCivo94cPbYcrE70cm50UqGbdWVRioM1A2jNt5jw5OY2tGVs9J8KDyC6Iw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHYM+McR;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=FLCw5W7Q;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=BDG8ylHP;
+	arc=none smtp.remote-ip=205.220.180.131
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEE1606A33F
-	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7502B606A32A
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:57:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7502B606A32A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NHYM+McR
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 941741F000C6;
-	Mon, 16 Nov 2026 06:34:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794810849;
-	bh=HKR6ten/6YjPuaZ47lymDUFoeE9afGGsFOU2PEXuip0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=NHYM+McRf3ib9iLCoDo/LTeXiWhLtT96h34qb1/xqfcmUnD/wA8YaZ6wvQBQVITza
-	 v0OqZCLBekhvt59Xpo2gHMQyeSMX0ouUljZrJ7VseZ5BwABfOOxOLOig3ojFJRC6X2
-	 NGOd/uDXLNPwFMAiMXlZ+bcA+BPaedt5mvJckXEA7s5hcqbVQzkiwY1xDeJ5l6f0m7
-	 ZKiP3Vc8jyXevhCk1FHx3BtDwe/faWz/49czBOBW17wKaihFRU2teC/KU/3H+97gsW
-	 WjiBxxHzsXG6wqPq6G+AelDpNdeC87jH5F06lqrIXBejGX+EZgO2gsuCsibu/hnkzf
-	 d8if+ZDg3A0Lg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 4/7] lib/crypto: tests: Add KUnit test suite for AES-CBC-CTS
-Date: Sun, 15 Nov 2026 22:28:46 -0800
-Message-ID: <20261116062849.1071038-5-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.1
-In-Reply-To: <20261116062849.1071038-1-ebiggers@kernel.org>
-References: <20261116062849.1071038-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=FLCw5W7Q;
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=BDG8ylHP
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AG5LaRd214136
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:57:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	8kVbLa2hYPiQsN9qOzj3DO2zSgYLfY1noEtwJGDEPiM=; b=FLCw5W7Q7NkeVCGU
+	yuUOnerr82EOmNUhiSOX2nGjnVGRAMsexFpHYCIfr3Ha51qinHKBh8x323+XYXve
+	L9f67DnSziCuEMlxEr34fazeYbkYBDMGw9F4qZooZatHME8M02cujI/l4Wvt+hHM
+	KD7wzIusA3EAA6SAAaQoMBDlWpxp4Xnf1nmTxGtagzqsvuniB4fb57OCA3fE1LN/
+	HgpLtkLNQZBsO95/Fqedn6PPuyi2nfNUOcbg+Vem5TdgG3HJxaLB8b33/bHwisCg
+	j1v6fIC6QPjQTiUQrx/pBdPjV3J+kRNcmXAY2s/873c+QJZZBMv9dwCNLF8UjlO5
+	L6NKfQ==
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4hxhjqnbg4-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:57:12 +0000 (GMT)
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-8b32efd7ec4so2920418b3a.3
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Nov 2026 22:57:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1794812231; x=1795417031; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:subject:from:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8kVbLa2hYPiQsN9qOzj3DO2zSgYLfY1noEtwJGDEPiM=;
+        b=BDG8ylHP85zP3NraEzlVsFnSt/VhVC2pTmVrULFYefJUmRT4S2rHMjovPPgJ2XuY4F
+         JJKlfhpDp+906ZcAbOQm7U/TS6CqfRjMyAUxsyMXdhc7F//V5tWP/GIOT9laFoQt42r+
+         jPAwusWs1aG5w8Fc3L+yaQSI/wHl9pDG7Mfzt4CO7VrAZbA3+p7F3fcTl/OUgRlpUt3U
+         /+XeownhoeAaFfvBY1nRVUJRYxC1Vv83oRnNNQNSzGZCTWV+xFSYqsght28QmfgwmGxe
+         dEVgnyluBOUwYJJJbOrxmc1YbOdPyz0mVyLyD6/jupwTCwMaYm8By8nQf8ZAmNeCJom+
+         tWrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794812231; x=1795417031;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:subject:from:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=8kVbLa2hYPiQsN9qOzj3DO2zSgYLfY1noEtwJGDEPiM=;
+        b=cVi1hhiYKKxRtdkP7Ta+jfsj0jna3siMeuGIj5njbfzcc+Cycs/2tvXLLUz9jLL/Xq
+         Dtqg0qZDWWEBs0xy1PC9TPV8dVJz+akl9Sb+4cW2LmohcnxeWBTTg6F/+3r+B4JSybUf
+         nXgHhfOxxWgkPDbiPHKcE88ztwr2143toVMsj2/t3EsXKwRRhibpTYeI6Glbq9l+ZTCX
+         MSJWmVyq8e/k2F/7Yx+07nGbHuQ+jZPPQ15XUnl98c9tllmiCEn7X6AJOG0jcyR3Rm/8
+         z12jnyFBF3ML6SKyXcBiU+96wPIwvnpEbd3XN+OVCFe4RZ+B40s7qgO6dYApqo7cEXoK
+         qwHQ==
+X-Forwarded-Encrypted: i=1; AL+hErF7UlEW8cYvWNW+Dt6k3178SwlWBjrHhkw9hIa4JhQP/sTSG3jRPg1bXJj+pdCsrfGFDQlySrpnmHj0/60=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/ZCJp9sVhExhDSWy5EX7USXt1Sdd9jPnvWpycnSV2kvPhqZOre
+	xGfljVeLCfTlRw4uKjxpm0RAeE547B5RaRgp5JqZq1RpmWYZN7AbWiRiua7O8OVILkOwbLfY8u2
+	4njFYdOUvVbwXlxg/hQFMuDv8Ynb4ByH71zWJS0+L5eCKJi7xbiKqNPeHlY8RFSxQSCg=
+X-Gm-Gg: AYBFou29QciX+zrm0zUosUuFt8zQnapTcC2a9UqV2fBPTQLOEaG9yUcHtQ22p5IBqyT
+	4RgtphxCGjSJA3y5lpOL3g0mDOM6HCGY8ln6n9ekNFVrucErnYMn+Zf+dzlz+wxvo8YRT8DehPP
+	m+cPasskI3qmHYneTG8RRsXwb1c2RQfjT6K7+mPnBZJAHgUY1Mi2/2ElvHKFMvFF6RDBT0Uzqa8
+	Eyt2eP409D6NEabk2draLLjyHhFSy07mJiX6fO84pjNc5Tvuh587gClqWPZcdLPiRhDW/w67+YV
+	yFzELEi+GjEAfddqBL4/cPfiuCVevZD2i2vIhfA782JwTXjovMo5zOKG6x7napGEBkfatmD5OV6
+	0KDCdB1b7xkcbf4JsanB3hnQqpUSkt6Z5L1UgPAnFCYwzr6wQHV5ppfNUp4xtbaFLQ6mRmMftJq
+	WTr3zD
+X-Received: by 2002:a05:6a21:3405:b0:3e2:b15d:56a8 with SMTP id adf61e73a8af0-3f7a95f156cmr9720585637.50.1794812231417;
+        Sun, 15 Nov 2026 22:57:11 -0800 (PST)
+X-Received: by 2002:a05:6a21:3405:b0:3e2:b15d:56a8 with SMTP id adf61e73a8af0-3f7a95f156cmr9720565637.50.1794812230960;
+        Sun, 15 Nov 2026 22:57:10 -0800 (PST)
+Received: from [10.218.31.125] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cddc18c09fesm3754506a12.26.2026.11.15.22.57.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 15 Nov 2026 22:57:10 -0800 (PST)
+Message-ID: <304e72a9-2def-40c0-9314-0b7413e45e17@oss.qualcomm.com>
+Date: Mon, 16 Nov 2026 12:27:03 +0530
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,306 +115,87 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Subject: Re: [PATCH 1/3] mmc: sdhci-msm: Enable ICE before enabling crypto
+ support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Adrian Hunter <adrian.hunter@intel.com>, Ulf Hansson <ulfh@kernel.org>,
+        Abel Vesa <abelvesa@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        "Martin K. Petersen" <mkp@kernel.org>,
+        Bjorn Andersson
+ <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, linux-mmc@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20261022-qcom_ice_pm_enable-v1-0-f7a84086c651@oss.qualcomm.com>
+ <20261022-qcom_ice_pm_enable-v1-1-f7a84086c651@oss.qualcomm.com>
+ <20261024182904.GD2553@quark>
+ <172229a8-a4c5-4103-a38b-e4cce3f18718@oss.qualcomm.com>
+ <20261113035858.GD1742@sol>
+Content-Language: en-US
+In-Reply-To: <20261113035858.GD1742@sol>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=KelHIgYD c=1 sm=1 tr=0 ts=6afaa948 cx=c_pps
+ a=mDZGXZTwRPZaeRUbqKGCBw==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
+ a=VwQbUJbxAAAA:8 a=AalTVwZ0bjgfRv4LwVwA:9 a=QEXdDO2ut3YA:10
+ a=zc0IvFSfCIW2DFIPzwfm:22
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTE2MDAyNyBTYWx0ZWRfX/s7hEZoiFwPN
+ dtc3D7ISfD6hf4QQSB1dTRnpZpcVAFwBwDphVT88PtvtXXrRc1A4Kq4f9Xt9I3f9d6bgFDutS9g
+ KDzOlb4rVnaFvMcSUTwcT38CpGA26rg=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTE2MDAyNyBTYWx0ZWRfXxvJusPJAO5cl
+ 8c0j11RMW+ELrW3vfXr3UWhEgTPqlDZpVJgdstMluKLdQXcabrhDYlluekX2RknmSMRZ/YPlfD7
+ /Lkq7p4hVhfZE2nF5++pAf44QsBx2bCSa0yFCzlw8f1RZWhUGEvPzra9lo4ZtHlUIKkzdTO/lXb
+ rHETPaCnsqnd597METQnNwP4xwwVKTiLRxvCYpRei0R58ztb6ON480YqKRZesH3k9UhflRObZ0x
+ AuW1V3WrpHtu00sAIriRFMAR1Z+lDhe8MXNqQWchw+nPvzPoy2KoKoYpj7r9mPc1Q0fbdRo/Gq1
+ q5ursIR4x8E/SKxUH4FWEKlU211EPRIca8ZyUdDGN+of6Co3PqN9T6fOdz+l62e8+xo/1703XsF
+ S8UL+ZBiC4A3DVaUDqyzlhxqu88QEozeqknpruSR+WAZEv1jSD8Z9s7R/72pa9W2S5vBf5Wf0IR
+ e7YZb0upgw0OWNa6omQ==
+X-Proofpoint-GUID: YX_IEDZ4k_m6SXlDhe9sAsZT1mzFIMGY
+X-Proofpoint-ORIG-GUID: YX_IEDZ4k_m6SXlDhe9sAsZT1mzFIMGY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-16_02,2026-11-11_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0 phishscore=0
+ clxscore=1015 spamscore=0 adultscore=0 priorityscore=1501 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611160027
 
-Add a KUnit test suite for the AES-CBC-CTS library API.
+On 13-11-2026 09:28, Eric Biggers wrote:
+> On Thu, Nov 12, 2026 at 05:00:56PM +0530, Kuldeep Singh wrote:
+>> On 24-10-2026 23:59, Eric Biggers wrote:
+>>> On Thu, Oct 22, 2026 at 03:21:50PM +0530, Kuldeep Singh wrote:
+>>>> Remove ICE enable call from CQE path, since ICE is now enabled
+>>>> during SDHCI crypto initialization only.
+>>
+>> Sorry for delayed response as I was away on vacation for more than
+>> 2weeks and hence couldn't catchup on the thread!!
+>>
+>>>
+>>> This change makes the low-power and "optimization" settings in
+>>> QCOM_ICE_REG_ADVANCED_CONTROL be set only once, during probe.  Is that
+>>> correct?  Those settings never get lost at runtime?
+>>
+>> Yes, the low-power and optimization settings are set once and are
+>> retained over suspend/resume cycle.
+> 
+> What about hibernation?  We recently went through this for keyslot
+> reprogramming, and it was established that keyslots need to be
+> reprogrammed after a hibernation image is restored.  See the commit
+> https://git.kernel.org/linus/8b190e9c0b36aac5
+> Doesn't the same apply to qcom_ice_enable()?  If so, this commit breaks
+> ICE upon restoring a hibernation image.
 
-It consists of:
+Ok, I didn't verify hibernation with this change.
+Let me verify and get back with results.
 
-- All the shared test cases from skcipher-test-template.h.  These
-  include extensive consistency tests, a "Monte-Carlo test", and a
-  benchmark.
-
-- Tests against hardcoded AES-CBC-CTS test vectors from RFC 3962.
-
-- A test comparing AES-CBC-CTS against a reference implementation built
-  on top of aes_cbc_encrypt().
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- lib/crypto/tests/Kconfig             |   4 +-
- lib/crypto/tests/Makefile            |   2 +-
- lib/crypto/tests/aes_cbc_cts_kunit.c | 239 +++++++++++++++++++++++++++
- 3 files changed, 242 insertions(+), 3 deletions(-)
- create mode 100644 lib/crypto/tests/aes_cbc_cts_kunit.c
-
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 7076ea606ce8..b0b0ae84a02e 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -1,13 +1,13 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
- 
- config CRYPTO_LIB_AES_CBC_KUNIT_TEST
--	tristate "KUnit tests for AES-CBC" if !KUNIT_ALL_TESTS
-+	tristate "KUnit tests for AES-CBC and AES-CBC-CTS" if !KUNIT_ALL_TESTS
- 	depends on KUNIT && CRYPTO_LIB_AES_CBC
- 	default KUNIT_ALL_TESTS
- 	select CRYPTO_LIB_BENCHMARK_VISIBLE
- 	# This test uses BLAKE2s, but that's always built-in.
- 	help
--	  KUnit tests for the AES-CBC encryption mode.
-+	  KUnit tests for the AES-CBC and AES-CBC-CTS encryption modes.
- 
- config CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST
- 	tristate "KUnit tests for AES-CMAC, AES-XCBC-MAC, and AES-CBC-MAC" if !KUNIT_ALL_TESTS
-diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index e7b7efee663a..fa22a4138a68 100644
---- a/lib/crypto/tests/Makefile
-+++ b/lib/crypto/tests/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-or-later
- 
--obj-$(CONFIG_CRYPTO_LIB_AES_CBC_KUNIT_TEST) += aes_cbc_kunit.o
-+obj-$(CONFIG_CRYPTO_LIB_AES_CBC_KUNIT_TEST) += aes_cbc_kunit.o aes_cbc_cts_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST) += aes_cbc_macs_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST) += aes_ccm_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_ECB_KUNIT_TEST) += aes_ecb_kunit.o
-diff --git a/lib/crypto/tests/aes_cbc_cts_kunit.c b/lib/crypto/tests/aes_cbc_cts_kunit.c
-new file mode 100644
-index 000000000000..2890515ded0f
---- /dev/null
-+++ b/lib/crypto/tests/aes_cbc_cts_kunit.c
-@@ -0,0 +1,239 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * KUnit test suite for AES-CBC-CTS
-+ *
-+ * Copyright 2026 Google LLC
-+ */
-+#include <crypto/aes-cbc.h>
-+#include <crypto/blake2s.h>
-+#include "test-utils.h"
-+
-+static void aes_cbc_cts_encrypt_test(u8 *dst, const u8 *src, size_t len, u8 *iv,
-+				     aes_encrypt_arg key, bool cont)
-+{
-+	aes_cbc_cts_encrypt(dst, src, len, iv, key);
-+}
-+
-+static void aes_cbc_cts_decrypt_test(u8 *dst, const u8 *src, size_t len, u8 *iv,
-+				     const struct aes_key *key, bool cont)
-+{
-+	aes_cbc_cts_decrypt(dst, src, len, iv, key);
-+}
-+
-+static const size_t aes_cbc_cts_valid_key_lens[] = { AES_KEYSIZE_128,
-+						     AES_KEYSIZE_192,
-+						     AES_KEYSIZE_256 };
-+#define SKCIPHER_VALID_KEY_LENS aes_cbc_cts_valid_key_lens
-+#define SKCIPHER_MAX_KEY_LEN AES_MAX_KEY_SIZE
-+#define SKCIPHER_IV_LEN AES_BLOCK_SIZE
-+#define SKCIPHER_MIN_DATA_LEN AES_BLOCK_SIZE
-+#define SKCIPHER_DATA_LEN_ALIGN 1
-+
-+#define SKCIPHER_KEY aes_key
-+#define SKCIPHER_PREPAREKEY aes_preparekey
-+#define SKCIPHER_ENCRYPT aes_cbc_cts_encrypt_test
-+#define SKCIPHER_DECRYPT aes_cbc_cts_decrypt_test
-+
-+#define SKCIPHER_ENCKEY aes_enckey
-+#define SKCIPHER_PREPAREENCKEY aes_prepareenckey
-+
-+/* This value was generated by gen-skcipher-testvecs.py. */
-+static const u8 aes_cbc_cts_monte_carlo_checksum[BLAKE2S_HASH_SIZE] = {
-+	0x9a, 0xc5, 0x99, 0xaf, 0x25, 0x2d, 0x56, 0x52, 0xd6, 0x50, 0x14,
-+	0x33, 0x61, 0x0b, 0xb6, 0x40, 0x5e, 0xc5, 0x9c, 0x8e, 0xfd, 0x6c,
-+	0xae, 0xa1, 0x1d, 0x47, 0x43, 0xd4, 0x19, 0x01, 0xc9, 0x6b,
-+};
-+#define SKCIPHER_MONTE_CARLO_CHECKSUM aes_cbc_cts_monte_carlo_checksum
-+
-+#include "skcipher-test-template.h"
-+
-+#define RFC3962_KEY "chicken teriyaki"
-+#define RFC3962_IV "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-+#define RFC3962_PTEXT \
-+	"I would like the General Gau's Chicken, please, and wonton soup."
-+
-+/*
-+ * AES-CBC-CTS test vectors from RFC 3962 Appendix B.  The ciphertext stealing
-+ * variant used in RFC 3962 is the same as CS3, i.e. the variant implemented by
-+ * aes_cbc_cts_encrypt() and aes_cbc_cts_decrypt().
-+ *
-+ * RFC 3962 doesn't include a 16-byte test vector.  The one below was derived
-+ * from the 32-byte one: when the length is exactly one block, CS3 is the same
-+ * as plain CBC, so the ciphertext is just the first CBC ciphertext block.
-+ */
-+static const struct skcipher_testvec aes_cbc_cts_testvecs[] = {
-+	{
-+		.name = "Derived from RFC 3962 Appendix B, 16 bytes",
-+		.key = RFC3962_KEY,
-+		.key_len = 16,
-+		.iv = RFC3962_IV,
-+		.ptext = RFC3962_PTEXT,
-+		.ctext = "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
-+			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84",
-+		.data_len = 16,
-+	},
-+	{
-+		.name = "RFC 3962 Appendix B, 17 bytes",
-+		.key = RFC3962_KEY,
-+		.key_len = 16,
-+		.iv = RFC3962_IV,
-+		.ptext = RFC3962_PTEXT,
-+		.ctext = "\xc6\x35\x35\x68\xf2\xbf\x8c\xb4"
-+			 "\xd8\xa5\x80\x36\x2d\xa7\xff\x7f"
-+			 "\x97",
-+		.data_len = 17,
-+	},
-+	{
-+		.name = "RFC 3962 Appendix B, 31 bytes",
-+		.key = RFC3962_KEY,
-+		.key_len = 16,
-+		.iv = RFC3962_IV,
-+		.ptext = RFC3962_PTEXT,
-+		.ctext = "\xfc\x00\x78\x3e\x0e\xfd\xb2\xc1"
-+			 "\xd4\x45\xd4\xc8\xef\xf7\xed\x22"
-+			 "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
-+			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5",
-+		.data_len = 31,
-+	},
-+	{
-+		.name = "RFC 3962 Appendix B, 32 bytes",
-+		.key = RFC3962_KEY,
-+		.key_len = 16,
-+		.iv = RFC3962_IV,
-+		.ptext = RFC3962_PTEXT,
-+		.ctext = "\x39\x31\x25\x23\xa7\x86\x62\xd5"
-+			 "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8"
-+			 "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
-+			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84",
-+		.data_len = 32,
-+	},
-+	{
-+		.name = "RFC 3962 Appendix B, 47 bytes",
-+		.key = RFC3962_KEY,
-+		.key_len = 16,
-+		.iv = RFC3962_IV,
-+		.ptext = RFC3962_PTEXT,
-+		.ctext = "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
-+			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84"
-+			 "\xb3\xff\xfd\x94\x0c\x16\xa1\x8c"
-+			 "\x1b\x55\x49\xd2\xf8\x38\x02\x9e"
-+			 "\x39\x31\x25\x23\xa7\x86\x62\xd5"
-+			 "\xbe\x7f\xcb\xcc\x98\xeb\xf5",
-+		.data_len = 47,
-+	},
-+	{
-+		.name = "RFC 3962 Appendix B, 48 bytes",
-+		.key = RFC3962_KEY,
-+		.key_len = 16,
-+		.iv = RFC3962_IV,
-+		.ptext = RFC3962_PTEXT,
-+		.ctext = "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
-+			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84"
-+			 "\x9d\xad\x8b\xbb\x96\xc4\xcd\xc0"
-+			 "\x3b\xc1\x03\xe1\xa1\x94\xbb\xd8"
-+			 "\x39\x31\x25\x23\xa7\x86\x62\xd5"
-+			 "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8",
-+		.data_len = 48,
-+	},
-+	{
-+		.name = "RFC 3962 Appendix B, 64 bytes",
-+		.key = RFC3962_KEY,
-+		.key_len = 16,
-+		.iv = RFC3962_IV,
-+		.ptext = RFC3962_PTEXT,
-+		.ctext = "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
-+			 "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84"
-+			 "\x39\x31\x25\x23\xa7\x86\x62\xd5"
-+			 "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8"
-+			 "\x48\x07\xef\xe8\x36\xee\x89\xa5"
-+			 "\x26\x73\x0d\xbc\x2f\x7b\xc8\x40"
-+			 "\x9d\xad\x8b\xbb\x96\xc4\xcd\xc0"
-+			 "\x3b\xc1\x03\xe1\xa1\x94\xbb\xd8",
-+		.data_len = 64,
-+	},
-+};
-+
-+static void test_aes_cbc_cts_test_vectors(struct kunit *test)
-+{
-+	skcipher_run_testvecs(test, aes_cbc_cts_testvecs,
-+			      ARRAY_SIZE(aes_cbc_cts_testvecs));
-+}
-+
-+/*
-+ * Test AES-CBC-CTS against a reference implementation built on top of AES-CBC,
-+ * using random lengths up to 4096 bytes.  In the CS3 variant of CBC-CTS, the
-+ * ciphertext is the AES-CBC encryption of the zero-padded plaintext, but with
-+ * the last two blocks swapped and the (new) last block truncated to the length
-+ * of the final plaintext block, which may be partial.  When the length is
-+ * exactly one block, the ciphertext is the same as AES-CBC.
-+ */
-+static void test_aes_cbc_cts_vs_cbc(struct kunit *test)
-+{
-+	const size_t max_data_len = 4096;
-+	const struct skcipher_test_keys *keys = skcipher_alloc_test_keys(test);
-+	const u8 *pt = alloc_rand_buf(test, max_data_len);
-+	u8 *padded_pt = alloc_buf(test, round_up(max_data_len, AES_BLOCK_SIZE));
-+	u8 *ct = alloc_buf(test, max_data_len);
-+	u8 *ref_ct = alloc_buf(test, round_up(max_data_len, AES_BLOCK_SIZE));
-+	u8 *decrypted = alloc_buf(test, max_data_len);
-+	u8 orig_iv[AES_BLOCK_SIZE];
-+	u8 iv[AES_BLOCK_SIZE];
-+
-+	for (size_t i = 0; i < 200; i++) {
-+		const struct aes_key *key = skcipher_pick_key(keys, i);
-+		const size_t data_len =
-+			i < keys->num_keys ?
-+				AES_BLOCK_SIZE :
-+				skcipher_rand_data_len(max_data_len);
-+		const size_t padded_len = round_up(data_len, AES_BLOCK_SIZE);
-+		const size_t pn_offset = padded_len - AES_BLOCK_SIZE;
-+		const size_t pn_len = data_len - pn_offset;
-+
-+		rand_bytes(orig_iv, sizeof(orig_iv));
-+
-+		/* Compute the expected ciphertext using AES-CBC. */
-+		memcpy(padded_pt, pt, data_len);
-+		memset(&padded_pt[data_len], 0, padded_len - data_len);
-+		memcpy(iv, orig_iv, sizeof(iv));
-+		aes_cbc_encrypt(ref_ct, padded_pt, padded_len, iv, key);
-+		if (padded_len > AES_BLOCK_SIZE) {
-+			u8 tmp[AES_BLOCK_SIZE];
-+
-+			memcpy(tmp, &ref_ct[pn_offset - AES_BLOCK_SIZE],
-+			       AES_BLOCK_SIZE);
-+			memcpy(&ref_ct[pn_offset - AES_BLOCK_SIZE],
-+			       &ref_ct[pn_offset], AES_BLOCK_SIZE);
-+			memcpy(&ref_ct[pn_offset], tmp, pn_len);
-+		}
-+
-+		memcpy(iv, orig_iv, sizeof(iv));
-+		aes_cbc_cts_encrypt(ct, pt, data_len, iv, key);
-+		KUNIT_ASSERT_MEMEQ_MSG(test, ref_ct, ct, data_len,
-+				       "Wrong ciphertext; data_len=%zu",
-+				       data_len);
-+
-+		memset(decrypted, 0, data_len);
-+		memcpy(iv, orig_iv, sizeof(iv));
-+		aes_cbc_cts_decrypt(decrypted, ct, data_len, iv, key);
-+		KUNIT_ASSERT_MEMEQ_MSG(
-+			test, pt, decrypted, data_len,
-+			"Decryption didn't invert encryption; data_len=%zu",
-+			data_len);
-+	}
-+}
-+
-+static struct kunit_case aes_cbc_cts_test_cases[] = {
-+	KUNIT_CASE(test_aes_cbc_cts_test_vectors),
-+	KUNIT_CASE(test_aes_cbc_cts_vs_cbc),
-+	SKCIPHER_KUNIT_CASES,
-+	{},
-+};
-+
-+static struct kunit_suite aes_cbc_cts_test_suite = {
-+	.name = "aes_cbc_cts",
-+	.test_cases = aes_cbc_cts_test_cases,
-+};
-+kunit_test_suite(aes_cbc_cts_test_suite);
-+
-+MODULE_DESCRIPTION("KUnit tests and benchmark for AES-CBC-CTS");
-+MODULE_LICENSE("GPL");
 -- 
-2.56.1
+Regards
+Kuldeep
 
