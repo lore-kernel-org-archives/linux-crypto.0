@@ -1,54 +1,103 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794847431;
-	b=YzormqFi2AgOUF3j0PIuCsiuqlR4VJa8xz+U8tXOjeLb53TfAr4ydU8MRxsfgV+Y55SX
-	 cxTqNw9FLm5+YzDQ+AH8PpgGj/Q/rFGrjrEIC76pamXKekj+MVnV+/zGw/pfqh1+bVgUG
-	 yj9Se8V+jYLQJvTLMZX1aTV2hRn9caJ8q8yi+/BYsgwt6sQxUSnost0DWsHlxWOlARn2N
-	 /t1hyn9uiTMs9WCFBLk6L8Nkbbo6G7xjxm3UOdud0yUHXRfVj4ZT8O6cop9Om0nxNGvkI
-	 Qa7M1GsVJPAsqGFi7QU/GezTf3xzJY1FHTcbGMZ1VYasTtukJJGkXLC4hNJer9quiuw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794847431;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 MIME-Version:Content-Type:Content-Disposition;
-	bh=ye/hK2doMI3EoGzSdThmb4Gz7dllWhG/+IfmHJjN0XQ=;
-	b=vTvWNyWN46LxtZ9wVXS1dNaXIohVaOVS80ul579cVaO+r0nzNASWFfrapyhMUObfvH60
-	 0SDKzdul/+NhVXq5xDA3iIinQ53rgupSRXL8+f2EEm73l4rJwTe4SR/Yf/CEoWapMk6aq
-	 vUKiPHj8YhnxyI1dujqnMpdjlSWLbRq1V4iDQVAMqTFRZB1PwvXjJrUyrknlOLu13+6A6
-	 49FSdN7p3zmGPuJGgyPmPeekSLW9q0p7Uc2wonyGdxCJyhA4qgDGeXTjEUwbrBQGVp9t1
-	 9avIiWBkicOBJnB+l7ZjHHLVhsh7OxHaTPfcYXbaYycPfxPOK6EcR7db/3pYg1r0xgg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EnjLPxC2;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.69.24
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794852327;
+	b=GkIqbN5okNgQIdLcoiQRik8KkqWM6Scg4CjafvEVycHqnXgmLrMyENhWqgocBTEQUDcr
+	 HfPb7XIZBd7Lxf8BBwQmHLd/8RlwLjABcEvCxLwu23QUewT/Hx5SPeB65dIdgxtX4i5au
+	 fzv5xP3RXMp+OcQm3fu7FgcSggNMh7eQti9qlwYF2H21gn6RYWLuYXyUtuTcqdl9efmhp
+	 vxyAYOGOMXGmta28hixQHzJLRl6HyeJqIONlOFXzqw+3rby4indZDLI+KkCR9qAO5Tqio
+	 8FBYblenLILE9F7b/RAGnlOIR8j3LFHR43uR2BBWrzLG9YtfMY4nz9/efFRwW/7Vhiw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794852327;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:Content-Type:
+	 Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:
+	 X-MS-Exchange-AntiSpam-MessageData-1:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=yfbTZZMDf19Tb4FOksSvTCcLwqkf0rDzaRcTZlPMclU=;
+	b=5JegGrbEwZVebvHbW55QdDcR9kKy912EemiEp71N9OigBi950vpUgSxvNmjpngUefITA
+	 gjfHXMG9Jx8Kb/2Kg41pKImQaQCmVwYsjINI6NagtCdzp1ReXczJPa3D9mGXVsjVQ+Y2o
+	 oxmM2INV8kQUZ2jsxVnLu2jVPsdBlKN4xGgRT+ZPXxU9ojMWXgmKAfchtIqVYPF1DUMPB
+	 nknizykfS1dYN1c5bQ6aLT+tgxyr3rLfVyMp3KLdG38D7ycjex/t8ifchb7PslibCXZXH
+	 ptbe2h31O2ZSg1LuyEILilV28j38BiKazkhVKL0uJAANjOJt+x2plrao5IF7VriSkJw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=oss.nxp.com;
+	spf=pass smtp.mailfrom=oss.nxp.com;
+	dkim=pass header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-NXP1-onmicrosoft-com header.b="B/8j9lGt";
+	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.69.24
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010024.outbound.protection.outlook.com [52.101.69.24])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E706606A329;
-	Mon, 16 Nov 2026 16:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88644606A31C;
+	Mon, 16 Nov 2026 18:05:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88644606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=EnjLPxC2
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2C031F000CA;
-	Mon, 16 Nov 2026 16:43:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794847430;
-	bh=ye/hK2doMI3EoGzSdThmb4Gz7dllWhG/+IfmHJjN0XQ=;
-	h=Date:From:To:Cc:Subject;
-	b=EnjLPxC2kOoxVtS1jG4VH2MAc375eHh6qiZ2+hFrjoZ3JfOgoKfAehUEmEJVUM9W3
-	 EzyB7g3Z8pcKEedlZKpgnnCkjjqNqHwE4rg2hIyhJB83mPkkvRWFN6cKJaTi1z+3bO
-	 m2wWPo6PR4o8YxKR2xdnQhokVSswPWwea7YYuja7Z4NqQBGk+pPzaO5GA9GLtZQXnI
-	 PPaRBey61HNxv1lG9mQs67q4GIncu9MebvVQn6FLYnlYVTFyaFbwDoMhlzILFQFXpQ
-	 ElmhrmsG5GSiTG34mb2LTK944cHL2asiHeKwIrYYaCaxr56xm+SdSuwhkZ739FcvAN
-	 LAYBEtD215Oyw==
-Date: Mon, 16 Nov 2026 16:43:47 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Thorsten Blum <blum@kernel.org>
-Subject: linux-next: manual merge of the crypto tree with the origin tree
-Message-ID: <avsyw-Q9dfMw45zX@sirena.org.uk>
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.a=rsa-sha256 header.s=selector1-NXP1-onmicrosoft-com header.b=B/8j9lGt
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PZbIfppICUj645vak6ps4sTB/gBQuS7SjxDzdszVxRCCbJF5KsIc6IYHdf3y/yo7U37QFqMgX5//bGg/UyskLLLzrhrHJhKhnUj7aY2LSnsXLurATL2Q1FmqpHv7IOTYfsxR4CHRka9SQIpB+2aW7iJd8bKAmxPDTAJop0i31I3JYRVLk1OhKnHrCF0blJJDUPiI9MA+t0YJ7DmP2JVuzXNTTSIRbVtYBZpbc46x+oxOyGWmmputzXiKFaYfSOA//HckgDhr4vGIjEDGATe2ztcbxuSVmXE/3kx/jybKQw6dDNAZxx0O9KMQpqj4uLnBnugaN63Q89qFFTjXO+4NpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yfbTZZMDf19Tb4FOksSvTCcLwqkf0rDzaRcTZlPMclU=;
+ b=d06bu2YZSOf3hkGzdkkDvfeiz456DDDJXYJB2kJStSY1ac66vf5FDBOXr6djl43KtNybxr48HbPQtDKKhhUAAnKTCVgdGKnyizOw9I04f0d34eNFH6VkgdoSNvH5JkfVi7qVjDIQtyUoKCxYyJPGRD+DznxrsrX0SYw/fLpkNOxMUlVn3++Ua/KMOL72mwXtNt0SPANSwsu+bgQn5vIexnnW12sGTNs9efeU2UEYqXWtQYh8SFwC6O/AnxI4DfnzycdR8ipUf+p5QiEZn0SA29TE7c0C7F0TX+ki3W5Z17J2VrCG9YIh+XvSLpBNYxJ6qb59CXcxDTgqJ5hYdC9MZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yfbTZZMDf19Tb4FOksSvTCcLwqkf0rDzaRcTZlPMclU=;
+ b=B/8j9lGtWAYvj1c7c5hMWilyC0Gk1oD3JfTs/qF3Rl2jer4BbsdEa+QamdNU90VEuZeYb6MaDOXxtwsQYhuJ+3poGIknsMSjp9s56t42qf5SDejTKrsNiyLryvsK7bFE1hlG0Gho9Lig0lNUIcn8UgKEuhDrlckyKMc32AqvXb3cJOof6qRL8Tt9RItaWTjqbtlKfDKAkuKTQa/XrCwKbsLfQq5DKqYxwbS0PVNDogOWb9sfeyWnfjSuqUwUHXmo2LTYHdjiUxb96+lMH+4D1sz8qUQQ9gGcYnkUk+8HhD90cxag5Hz/8czcquWMVQSUU6azy/Bnq4y8i2wToNM6HA==
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AS1PR04MB9358.eurprd04.prod.outlook.com (2603:10a6:20b:4dc::19)
+ by AM9PR04MB8971.eurprd04.prod.outlook.com (2603:10a6:20b:40a::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.13; Mon, 16 Nov
+ 2026 18:05:23 +0000
+Received: from AS1PR04MB9358.eurprd04.prod.outlook.com
+ ([fe80::677:d5bf:c3ce:3ad4]) by AS1PR04MB9358.eurprd04.prod.outlook.com
+ ([fe80::677:d5bf:c3ce:3ad4%5]) with mapi id 15.21.0615.013; Mon, 16 Nov 2026
+ 18:05:23 +0000
+From: Sahil Malhotra <sahil.malhotra@oss.nxp.com>
+To: Changwei Zou <changwei.zou@canonical.com>
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com,
+	iuliana.prodan@nxp.com,
+	jeffbarnes@linux.microsoft.com,
+	stephane.debusne@cynove.com,
+	martin.kepplinger-novakovic@ginzinger.com,
+	lukas@wunner.de,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 1/2] crypto: caam - Fix wrong unmap operations
+Date: Mon, 16 Nov 2026 19:05:22 +0100
+Message-ID: <20261116180522.863479-1-sahil.malhotra@oss.nxp.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261114060032.872141-2-changwei.zou@canonical.com>
+References: <20261114060032.872141-1-changwei.zou@canonical.com> <20261114060032.872141-2-changwei.zou@canonical.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS4P190CA0049.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:656::20) To AS1PR04MB9358.eurprd04.prod.outlook.com
+ (2603:10a6:20b:4dc::19)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -58,174 +107,83 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="H927aFy//RcS94+R"
-Content-Disposition: inline
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR04MB9358:EE_|AM9PR04MB8971:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7c2ed695-b002-4b70-07c9-08df440c2f65
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|376014|23010399003|366016|1800799024|18002099003|22082099003|4143699003|11063799006|56012099006|10067099003|261026121527099003;
+X-Microsoft-Antispam-Message-Info:
+	SR5kzZ7zJmtaKt37Dg0qCQemUJVF9xq22kHYcRP5aV+LPQvlUJsXt0mchEsi0G11mtOecUpj1i+JBG17I/yGKkyCZNXof+pVvnzY/YYSdT4/FZxytb01Z8WF0J385dlyKMFodWT3aC1auAWawbybJoeBWrSaZcbShQbgPjC3RgHgU36BhUqBQdXWah2VRwCGTrQluveWTbShihd/bdvfXV1rpZme4sJ6pduDKJ6DDRzIt55+SHrWSHkqHW2qqJDhXCz6lom6ceWEDuUOPDpsdDWxED/VgEb5LoQb0riJ532U0WkknSRuUMwt4xlt93Fm56kt9+XOGo/dd635lH6YdvdkcjL4XuqkDE9ihSCnhwmzGve6fQylPAR6pan/lo+Z48x45lVwZhMBO1pvVlvjZMjb9AQpweyOq2eRXWPqRKJJauqNfzmoycvHXzZbKl4xj94Wealktt0xhgGMhIruwvF5AQfDEz9oTIUiHvzuJ7K1A3E8BbLlxkJeM+qWWdKzw6ukxfbdC+z8bhJIuf06tb5iMTF1WIl8rgypJZHcpoBmKk6zhFAD3ROX/WWlBcUeHtOiqHUDPS/CF1/W52id1RZIy/bcTELfNAnNaRPlSqqfl2LfbhcKpLpdJo0PTvvpYs017Wye1lmO3IQluJDqQgbMzhiMvKYNDTitJGGLJpc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR04MB9358.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(23010399003)(366016)(1800799024)(18002099003)(22082099003)(4143699003)(11063799006)(56012099006)(10067099003)(261026121527099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZkFtbTNYc2ZRTWNvUWJQRjhxUHc4cnJHR1Q0WFNjOXV0b3pXWm9XVW1XVEdw?=
+ =?utf-8?B?aEJlK2s3d1UyZHNiMmNkT2JqQ0wxNXM0WmR4enAxaFJJaHhUMEszMDF1RzJS?=
+ =?utf-8?B?eFZUaWcxUlN5Ykk0OS9LaThobCtFb2lJYXVoLzVBMkpmZGt5dEl0RFE3TkFw?=
+ =?utf-8?B?bHZoK1g4a1lndjNMTE4venFHMkVielZDOURMcUVmT1pvcE5LR3JsVFdBdjlE?=
+ =?utf-8?B?cGRUSlU1UXZyUytNTm4rU005UVUyQ05RYndlZ0VQMmRBcnpCdzEraUk5NjlD?=
+ =?utf-8?B?TXNUR0YweU9kbGJIOVczdTdiNHRVR0FyS0x0L1h3ZHYyMDB3MG82eHorZHYz?=
+ =?utf-8?B?ak5lcnZYVGc2RzYyenFuU3FTYWdEWENpdm1vTTd2SkprNWd1OENLdzlseE1K?=
+ =?utf-8?B?aytQOENqR0FYa2NHSlVRTG1aRHg1YkFRUlFjN3E3Q2hWVDB5Y1NoTWROVXRH?=
+ =?utf-8?B?U3hvRXJGL0h3bk1Ubmdodm9rMjFITFNmcm1HTFU3cmFSbmg0QjZmZjhqejFI?=
+ =?utf-8?B?akllRy9yL2NpZzZScGdjQ0pPa1VlWGZQRW04ckFVQ21pSlpRcjVjdlpvTnRT?=
+ =?utf-8?B?QkVrZFhDVGhMMXBuR0FPRHJlQUtIVXJxYmRORzlxWEowdHVPam8zOUt1OG1m?=
+ =?utf-8?B?WlR6aGk4ZjJtM0NJdDcyMEt1R2VJcXovMUhHS2lEODR0MEtQVFNiWXo5VDBV?=
+ =?utf-8?B?WnRSTkp1NjhDRDNQRmN3M0ZCRy9EZE1mMTRDeG5SWnYvSmNFNjVaZGhwMUhZ?=
+ =?utf-8?B?WEZja3JhSVdxZFNFQUpId0UvRy9TL0NTTG53R3pTRDJ4UjF1eDVlNlFNUDF4?=
+ =?utf-8?B?MlhkZVdmaWxvSVlsMWladkN1V3d2SDBQYVZzSGxKWmVoK1dOSGdqS0o1NCtT?=
+ =?utf-8?B?WTREV2hoaTBBNkpNZG1WbW5vT000dW1EbFJhTlJkRXNDVlBZNkF4NVpZUjBV?=
+ =?utf-8?B?VzYybGsxN0JuS2J2NlRscDlUNFNkc2x1dmluNEpzSXNFcHNFSHJES05BSVl4?=
+ =?utf-8?B?QS92RUh0Qm1najkwNFF6RGIxYTJUV0FhYTdvYTJ0clNNZ3NrT0NpVDRUam15?=
+ =?utf-8?B?a2VTd2VDb0RUNndtYlpjdk4wSk1WT0xxa2V5Z0xoYWt6bUpQa05PT1UweThO?=
+ =?utf-8?B?UFRsa1dSd0JzTjV4dklhUXBxQmpyaFZTVDlXU0pYS1p2RzZDc1NoUkhYWjR3?=
+ =?utf-8?B?YmREZGk1OU9ad2xoMEdTclF0NHVWYXpPVFVwSDRObXJaTFcwMVZuS3lGaXBC?=
+ =?utf-8?B?NDdOM2t1aEFOc0RZVDU5ZHJkbFJxUitmaEJhQjAvLzJ1cldhWFBLbUs0amRW?=
+ =?utf-8?B?RDcvNjZCaXhsTGhpU2VLZmdERC84QmtEdGtYcFlMc05lcXVmeUFwZU1QTVlJ?=
+ =?utf-8?B?bHl1VVdtNnRBK2FwbFBERDBJcEtsT25NQ3JmeFJvaEU2cjhYQ3BSalFycmhn?=
+ =?utf-8?B?WUZsd1JmVDMyQnlaN0pUTEZwTUxGR0M5OGFEZTZaQ3A0NlI5MzI3eWMrWU9Z?=
+ =?utf-8?B?K0xaUlcxNE50ZFRSMitlQS9mT2NMUDJidEVaUVkzUXI3NUhrb0IycWdhNktR?=
+ =?utf-8?B?aGQrMjlnRS9NMGhSWlZoYndPN1lDR3dOMThGOUkrQjNnQm13U3AzMTZaNTh5?=
+ =?utf-8?B?cjBQdmlwdE9QS2lkbUYwNWM5MitQc09Ma0RzUlJsQkFkcU1ZNkwwRzR1dnlK?=
+ =?utf-8?B?SnVEakRjMVBYSzJFNVlDSXZpd0J3S1RMeklLcXNTZUgxU1FDbFBVcW9VeVhZ?=
+ =?utf-8?B?aWplYUFRNExzS1NNL3kwQm5VMk5LZVZUWlZubHNWMVFNdk5NYSs4NVczVlNy?=
+ =?utf-8?B?OHV5ek5FOExNK2NCdWlqdEtlcS9ac3JZbmlOc0ZYcmxRamlWUTRsT3dYc3Qy?=
+ =?utf-8?B?L3hEdXluRXcxQ0hFZHJMN0FUeUUxMkhBQUo3ZXZubjNuWTFLUzNBNGZYVnlt?=
+ =?utf-8?B?Ynd0R1V5NDhDUXEwTGpydXNRYm1iczBPTDIvSTNHTTBTUjdkakRtSlk0R0kr?=
+ =?utf-8?B?RW5QdEtCR3RYRno4MGZIZlpZRm1TaEtFL2g1L3ZMU0J1YVpxZ1MrWGZWTTRn?=
+ =?utf-8?B?dE5WYk5iUWxNTlJGUlU1bUdqVy8yTHByVlJtVU5Gczl4SkdUZXNoZmlUaFhn?=
+ =?utf-8?B?RWQ1ZFJJb0w4aHZPTVc1NDVyL1JRUXJtcmdaOThQa2pxVldENTVhalAwTUxS?=
+ =?utf-8?B?emM2UzFJRTRuRDBmbEp1QVl4R3FTL2tZbXJBb1ZXZmZZVVk5dlRRNDdRZzZo?=
+ =?utf-8?B?S2RSZ1oyeVU2endPZGJOZTdyYjYrZjdDMlczMUlQdndmbXlOcU1aMnd4Y1pq?=
+ =?utf-8?B?RW1MNC9tYU1tTkNFbW1Ddlo2UTlZZHlNRWR6TTd1bDV6ai96cFhSa0xTMGhw?=
+ =?utf-8?Q?ADnUFAB6qP9TNx52PJSFNweNhqN23qAxZW4OD/i4HrodG?=
+X-MS-Exchange-AntiSpam-MessageData-1: ddLjp+4XVQWWmw==
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c2ed695-b002-4b70-07c9-08df440c2f65
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR04MB9358.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2026 18:05:23.7221
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B1iqgY/IOFMPd/PwK9UAFTpAq6hnWUgOn+Sv50jgx8iAQws0sr/X3L1ZTnr5qR83KoeGNKe9X7uHoKYGBmluKnBhVT14nn+yT6SZVAcAu8yoZ73B+1kweUrBz2GbjTeu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8971
 
+On Sat, Nov 14, 2026 at 05:00:31PM +1100, Changwei Zou wrote:
+> Since priv_form only takes values FORM1/FORM2/FORM3 with no distinct
+> public key enumerator, rsa_pub_unmap() was not called correctly in
+> akcipher_do_one_req() and akcipher_enqueue_req().
 
---H927aFy//RcS94+R
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Changwei,
 
-Hi all,
+Thanks for factoring out rsa_priv_unmap()/rsa_pdb_unmap(), looks good.
+Since the code changed after v2, re-confirming my tag on this version:
 
-Today's linux-next merge of the crypto tree got a conflict in:
+Reviewed-by: Sahil Malhotra <sahil.malhotra@nxp.com>
 
-  drivers/char/hw_random/virtio-rng.c
-
-between commit:
-
-  0f7bf47f5a0cc ("hwrng: virtio - prevent use-after-free after a failed res=
-tore")
-
-=66rom the origin tree and commits:
-
-  a3eaee98eecc4 ("hwrng: virtio - prevent use-after-free after a failed res=
-tore")
-  277b0dae660c3 ("hwrng: virtio - simplify probe_common()")
-
-=66rom the crypto tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --combined drivers/char/hw_random/virtio-rng.c
-index 45d87c0614a5e,892720b1ac6f9..0000000000000
---- a/drivers/char/hw_random/virtio-rng.c
-+++ b/drivers/char/hw_random/virtio-rng.c
-@@@ -70,7 -70,7 +70,7 @@@ static void request_entropy(struct virt
-  static unsigned int copy_data(struct virtrng_info *vi, void *buf,
-  			      unsigned int size)
-  {
-- 	unsigned int idx, avail;
-+ 	unsigned int idx;
- =20
-  	/*
-  	 * vi->data_avail was set from the device-reported used.len and
-@@@ -81,13 -81,13 +81,13 @@@
-  	 * steered into adjacent slab memory, including under
-  	 * speculation.
-  	 */
-- 	avail =3D min(vi->data_avail, sizeof(vi->data));
-- 	if (vi->data_idx >=3D avail) {
-+ 	if (vi->data_idx >=3D sizeof(vi->data)) {
-  		vi->data_avail =3D 0;
-  		request_entropy(vi);
-  		return 0;
-  	}
-- 	size =3D min(size, avail - vi->data_idx);
-+ 	vi->data_avail =3D min(vi->data_avail, sizeof(vi->data) - vi->data_idx);
-+ 	size =3D min(size, vi->data_avail);
-  	idx =3D array_index_nospec(vi->data_idx, sizeof(vi->data));
-  	memcpy(buf, vi->data + idx, size);
-  	vi->data_idx +=3D size;
-@@@ -150,17 -150,17 +150,17 @@@ static void virtio_cleanup(struct hwrn
- =20
-  static int probe_common(struct virtio_device *vdev)
-  {
-- 	int err, index;
-- 	struct virtrng_info *vi =3D NULL;
-+ 	int err;
-+ 	struct virtrng_info *vi;
- =20
-  	vi =3D kzalloc_obj(struct virtrng_info);
-  	if (!vi)
-  		return -ENOMEM;
- =20
-- 	vi->index =3D index =3D ida_alloc(&rng_index_ida, GFP_KERNEL);
-- 	if (index < 0) {
-- 		err =3D index;
-- 		goto err_ida;
-+ 	vi->index =3D ida_alloc(&rng_index_ida, GFP_KERNEL);
-+ 	if (vi->index < 0) {
-+ 		err =3D vi->index;
-+ 		goto err;
-  	}
-  	snprintf(vi->name, sizeof(vi->name), "virtio_rng.%d", vi->index);
-  	init_completion(&vi->have_data);
-@@@ -177,7 -177,8 +177,8 @@@
-  	vi->vq =3D virtio_find_single_vq(vdev, random_recv_done, "input");
-  	if (IS_ERR(vi->vq)) {
-  		err =3D PTR_ERR(vi->vq);
-- 		goto err_find;
-+ 		ida_free(&rng_index_ida, vi->index);
-+ 		goto err;
-  	}
- =20
-  	virtio_device_ready(vdev);
-@@@ -187,9 -188,7 +188,7 @@@
- =20
-  	return 0;
- =20
-- err_find:
-- 	ida_free(&rng_index_ida, index);
-- err_ida:
-+ err:
-  	vdev->priv =3D NULL;
-  	kfree(vi);
-  	return err;
-@@@ -245,26 -244,27 +244,27 @@@ static int virtrng_freeze(struct virtio
- =20
-  static int virtrng_restore(struct virtio_device *vdev)
-  {
-+ 	struct virtrng_info *vi;
-  	int err;
- =20
-  	err =3D probe_common(vdev);
-- 	if (!err) {
-- 		struct virtrng_info *vi =3D vdev->priv;
-+ 	if (err)
-+ 		return err;
-+ 	vi =3D vdev->priv;
- =20
-- 		/*
-- 		 * Set hwrng_removed to ensure that virtio_read()
-- 		 * does not block waiting for data before the
-- 		 * registration is complete.
-- 		 */
-- 		vi->hwrng_removed =3D true;
-- 		err =3D hwrng_register(&vi->hwrng);
-- 		if (!err) {
-- 			vi->hwrng_register_done =3D true;
-- 			vi->hwrng_removed =3D false;
-- 		}
-- 	}
-+ 	/*
-+ 	 * Set hwrng_removed to ensure that virtio_read()
-+ 	 * does not block waiting for data before the
-+ 	 * registration is complete.
-+ 	 */
-+ 	vi->hwrng_removed =3D true;
-+ 	err =3D hwrng_register(&vi->hwrng);
-+ 	if (err)
-+ 		return err;
- =20
-- 	return err;
-+ 	vi->hwrng_register_done =3D true;
-+ 	vi->hwrng_removed =3D false;
-+ 	return 0;
-  }
- =20
-  static const struct virtio_device_id id_table[] =3D {
-
---H927aFy//RcS94+R
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmr7MsIACgkQJNaLcl1U
-h9CsEgf/UlPOorwfsEeifVQO8HHjdNVNiHmqEzdeU8hgSTdARmqjDx142BIqziF3
-jWyZ4I+Gbf3OvE4G65jFs2y7MsO99R+akeHMf+guzW7sntMg7wSY+XlaO34WNaub
-XyGFTqI4scfIikuu+u5iJeuAhc1vlQGZpIkceDwqVRtweol2wY394l29uniCCGo7
-iXY3Xi7Y+JLnZ4viyJkZq5FAZvQx/HYb2VIHIyouduhCqXPxPagrnBzhlbbn+ovx
-LFIGEUYhGtmlkdH7bc4gJ8ctVM1OgnaD6vNgzTEmkhe4AYNcn5CZ6T+4/pmUCB1D
-6jQGy0G1c78md8vC1a2Y2vpo0+mkig==
-=SlGs
------END PGP SIGNATURE-----
-
---H927aFy//RcS94+R--
+Thanks,
+Sahil
