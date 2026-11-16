@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794810850;
-	b=rZxlwQYUYD/zkmKzfUafcx/LpFnzEQ4PhIl1UFXiGB8N4XynXjpN0aJrgf4u/ohSOT4J
-	 00U/B/CqsBFBx6gLSJRvmyzvJYoHpjVQ8nemCiMIZGP4VDIUJE6fvNHxFsZjTgu6FomcH
-	 n8YlFIjVXa9Koqf63yFKsCuJjRVCEaMhOPoL/gUizUT12BQl5y3tHxfIqyAepB6h2i5YQ
-	 UVU23xdhSoSUNeeENutE5QEafzdVr7+zZ19FKr2zV0whbiMPy7nDMkmV0pHYN0+XCT11Y
-	 RDrx9f3M9p+KCNO2VyjXSvT1Ra0pGNX77kep+C8QODfeHrQ5Hj7us57KOQBPyjT5xGg==
+	b=kXeG/NWHhlwotYp5zBI0v/VodIGX0XGRxGR8KPBc8TsfRjNmQ/9F6o9F01YtLfJDjALU
+	 0YXvW/TmH/YDH/asP8IapcwGky4dq6TDfsFNRrsNZu8/8kCOq77U6RBA+SURVlP+QKFdc
+	 b4MPoYjrFuiwaSc4gjqmgybXzQCjxZrF8f0qIkl5W3sO3rgsJa9q8D6tzTnYCdNv9PLUW
+	 aKbWWBhifXGCtGFpEr9iajsDwy30JJ+ZWDZ5iy3VUXbilcdgWhOhG5L3AcFVDAKNaGFi+
+	 +RBnmjKmG+S0ECAsILJeSKWUX6vOb8R8lJdN6U5PWdmJaV52ymbR2A3PZ6tOpOGXrXA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794810850;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=a51QapgjKF9KvpJMyhh31m8hE0X2l4gH47LkrQxMibE=;
-	b=WXnTh24ZefrVgs8flIGnGzquqeX8TLWuNA5NpdwSFUdAtB0mloj1yy9eActZJEYpOiMR
-	 sLTiCBFBaEhKhz8PxJNqe5xkYxoR63P0uHubsk8TGNfKHuzKE2h9RIs35fwserkuCNxjr
-	 oLcFui9XAooLENFPji0w7T+/HMtIm4pyCWZNagtZltOFdlE2cnbHjHht/YGjOfC45PM5j
-	 Wb5O3UM3t5SX29w70Erf+fX4g9o9l6Bz5cYCWgSM0Qmyjo5jJXsU6ddf1BR/9J08vTooa
-	 4ZaADp/nTSkuNiEn6D5ymGZPZVhEEpYVUajAun44gz0CvUTQCbwYEuXufcu+s31R3HQ==
+	bh=bCIrSu/SaOB8QxvvykyswlGyiDIeCAnADxUbLdVsqIE=;
+	b=mjizTYK2bihwaXf/sesJjQelSfnUuubBT8ED3OtFeO1K13wVxTa6WL/X/dwsxXLlsm0b
+	 XUNfNGzDfKkd7SG2SKKqD04ChO4Ov6uTqQX3Pw2J0P4VshMH/I3/RYKljp29zEjJBlp2N
+	 gY33bjkmI3by5r3JCkSzyKWt/XqGnYSca5IPqM3r3YL8HwJKcUOlxYdZQ1cq9PLjleg8G
+	 CoIkoBAq2wpZjmqOOth7MCkSoroQReGMKXSxpT/isyXdfvRBj/Uf6issonWI35R8kecbK
+	 ZNdhU2cRbO/iu9ZGMFMemiNWKZCad0iomNRhyf/P5zvm1dy+pQmasD1gOn+kxycARYw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oL8B2q+U;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hTAEmdPE;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D4F606A885
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA9F606A88A
 	for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 06:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oL8B2q+U
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CC6D1F000C7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hTAEmdPE
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 731F71F000C4;
 	Mon, 16 Nov 2026 06:34:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1794810850;
-	bh=a51QapgjKF9KvpJMyhh31m8hE0X2l4gH47LkrQxMibE=;
+	bh=bCIrSu/SaOB8QxvvykyswlGyiDIeCAnADxUbLdVsqIE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=oL8B2q+UMj9XjHxFmbubrJ2e22DRQnKXqM2yAnlet3fnbUDhLyjJv2/xlHGrt6yLZ
-	 ZxM6A2E0YKNOsFxjGHC4w2XDfZwH7jRJ7SmqC/GUHsHHasAUwXS9C83TYSxkHxBGov
-	 ucljYMBmDdmadIvv0KaHW/syADbkC2G9w+nqERDmPY1Rzxxj7ikisoiNC+41CkGhip
-	 I2a/AMcGaN5qFSKWcWe9oU87hOlY7iwoBGn74c6iC44ld2/SgGtSP8zgUNlfIXW7XM
-	 SOz65Gz0fw1wHg/tWyc+j+Nn3xHwe9MbICcj3MnvG6/aE6rlj5Xc5HfrcSmgpw6E+b
-	 XvXE3Md3IRuDg==
+	b=hTAEmdPE2huRMWDwgzpIHd/Gkun1O4mNlxf7dXrg/vWtv7Qla1XaEPM2Hx7k53h85
+	 1Qv8aKONDpVkeH1vHePY3FbaCpC/DrlSNRg2dcFRM0PCTUeFPp5eUlKH3Ilz8CvSkX
+	 9Ahfba1a3YZcRoON1GVnwybPdULi3HBr//j9gNPxonolPjOQdrj88/BmrkrewdI+tk
+	 O/T5DnRXa3SDlD9JjkZsColzp2rkh8JZKwBSlWlFeITcDuOKm9VB9sleVg93uIfimA
+	 x44S8LP320uOvcYmCw/ZWCZkvEEk14dBIiAg0wNDvTxd55MQZvNBWYfU9b18GO3I+z
+	 H2WQ7afB4A+XA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6/7] lib/crypto: tests: Add KUnit test suite for AES-XCTR
-Date: Sun, 15 Nov 2026 22:28:48 -0800
-Message-ID: <20261116062849.1071038-7-ebiggers@kernel.org>
+Subject: [PATCH 7/7] lib/crypto: tests: Add KUnit test suite for AES-XTS
+Date: Sun, 15 Nov 2026 22:28:49 -0800
+Message-ID: <20261116062849.1071038-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261116062849.1071038-1-ebiggers@kernel.org>
 References: <20261116062849.1071038-1-ebiggers@kernel.org>
@@ -62,7 +62,7 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a KUnit test suite for the AES-XCTR library API.
+Add a KUnit test suite for the AES-XTS library API.
 
 It consists of:
 
@@ -70,204 +70,434 @@ It consists of:
   include extensive consistency tests, a "Monte-Carlo test", and a
   benchmark.
 
-- Tests against hardcoded AES-XCTR test vectors from the HCTR2 reference
-  implementation.
+- Tests against hardcoded AES-XTS test vectors from IEEE 1619-2007,
+  including ciphertext stealing test vectors.
+
+- A test for weak key rejection (keys whose two halves are identical).
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/tests/Kconfig          |   4 +-
- lib/crypto/tests/Makefile         |   2 +-
- lib/crypto/tests/aes_xctr_kunit.c | 149 ++++++++++++++++++++++++++++++
- 3 files changed, 152 insertions(+), 3 deletions(-)
- create mode 100644 lib/crypto/tests/aes_xctr_kunit.c
+ lib/crypto/.kunitconfig          |   1 +
+ lib/crypto/tests/Kconfig         |   9 +
+ lib/crypto/tests/Makefile        |   1 +
+ lib/crypto/tests/aes_xts_kunit.c | 365 +++++++++++++++++++++++++++++++
+ 4 files changed, 376 insertions(+)
+ create mode 100644 lib/crypto/tests/aes_xts_kunit.c
 
+diff --git a/lib/crypto/.kunitconfig b/lib/crypto/.kunitconfig
+index 465375a1a14c..1be91698a654 100644
+--- a/lib/crypto/.kunitconfig
++++ b/lib/crypto/.kunitconfig
+@@ -8,6 +8,7 @@ CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST=y
+ CONFIG_CRYPTO_LIB_AES_CTR_KUNIT_TEST=y
+ CONFIG_CRYPTO_LIB_AES_ECB_KUNIT_TEST=y
+ CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST=y
++CONFIG_CRYPTO_LIB_AES_XTS_KUNIT_TEST=y
+ CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST=y
+ CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST=y
+ CONFIG_CRYPTO_LIB_CHACHA_KUNIT_TEST=y
 diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 0d13ce05f2de..4f7a07b0e3c0 100644
+index 4f7a07b0e3c0..98fcf053e937 100644
 --- a/lib/crypto/tests/Kconfig
 +++ b/lib/crypto/tests/Kconfig
-@@ -28,13 +28,13 @@ config CRYPTO_LIB_AES_CCM_KUNIT_TEST
- 	  KUnit tests for the AES-CCM authenticated encryption algorithm.
- 
- config CRYPTO_LIB_AES_CTR_KUNIT_TEST
--	tristate "KUnit tests for AES-CTR" if !KUNIT_ALL_TESTS
-+	tristate "KUnit tests for AES-CTR and AES-XCTR" if !KUNIT_ALL_TESTS
- 	depends on KUNIT && CRYPTO_LIB_AES_CTR
- 	default KUNIT_ALL_TESTS
- 	select CRYPTO_LIB_BENCHMARK_VISIBLE
- 	# This test uses BLAKE2s, but that's always built-in.
+@@ -54,6 +54,15 @@ config CRYPTO_LIB_AES_GCM_KUNIT_TEST
  	help
--	  KUnit tests for the AES-CTR stream cipher.
-+	  KUnit tests for the AES-CTR and AES-XCTR stream ciphers.
+ 	  KUnit tests for the AES-GCM authenticated encryption algorithm.
  
- config CRYPTO_LIB_AES_ECB_KUNIT_TEST
- 	tristate "KUnit tests for AES-ECB" if !KUNIT_ALL_TESTS
++config CRYPTO_LIB_AES_XTS_KUNIT_TEST
++	tristate "KUnit tests for AES-XTS" if !KUNIT_ALL_TESTS
++	depends on KUNIT && CRYPTO_LIB_AES_XTS
++	default KUNIT_ALL_TESTS
++	select CRYPTO_LIB_BENCHMARK_VISIBLE
++	# This test uses BLAKE2s, but that's always built-in.
++	help
++	  KUnit tests for the AES-XTS encryption mode.
++
+ config CRYPTO_LIB_BLAKE2B_KUNIT_TEST
+ 	tristate "KUnit tests for BLAKE2b" if !KUNIT_ALL_TESTS
+ 	depends on KUNIT && CRYPTO_LIB_BLAKE2B
 diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index 1deb07c2558f..50e4a3f70ebf 100644
+index 50e4a3f70ebf..048ceb1d595d 100644
 --- a/lib/crypto/tests/Makefile
 +++ b/lib/crypto/tests/Makefile
-@@ -3,7 +3,7 @@
- obj-$(CONFIG_CRYPTO_LIB_AES_CBC_KUNIT_TEST) += aes_cbc_kunit.o aes_cbc_cts_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST) += aes_cbc_macs_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST) += aes_ccm_kunit.o
--obj-$(CONFIG_CRYPTO_LIB_AES_CTR_KUNIT_TEST) += aes_ctr_kunit.o
-+obj-$(CONFIG_CRYPTO_LIB_AES_CTR_KUNIT_TEST) += aes_ctr_kunit.o aes_xctr_kunit.o
+@@ -6,6 +6,7 @@ obj-$(CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST) += aes_ccm_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_AES_CTR_KUNIT_TEST) += aes_ctr_kunit.o aes_xctr_kunit.o
  obj-$(CONFIG_CRYPTO_LIB_AES_ECB_KUNIT_TEST) += aes_ecb_kunit.o
  obj-$(CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST) += aes_gcm_kunit.o
++obj-$(CONFIG_CRYPTO_LIB_AES_XTS_KUNIT_TEST) += aes_xts_kunit.o
  obj-$(CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST) += blake2b_kunit.o
-diff --git a/lib/crypto/tests/aes_xctr_kunit.c b/lib/crypto/tests/aes_xctr_kunit.c
+ obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST) += blake2s_kunit.o
+ obj-$(CONFIG_CRYPTO_LIB_CHACHA_KUNIT_TEST) += chacha_kunit.o
+diff --git a/lib/crypto/tests/aes_xts_kunit.c b/lib/crypto/tests/aes_xts_kunit.c
 new file mode 100644
-index 000000000000..86fe4356cb66
+index 000000000000..b45741567d2f
 --- /dev/null
-+++ b/lib/crypto/tests/aes_xctr_kunit.c
-@@ -0,0 +1,149 @@
++++ b/lib/crypto/tests/aes_xts_kunit.c
+@@ -0,0 +1,365 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * KUnit test suite for AES-XCTR
++ * KUnit test suite for AES-XTS
 + *
 + * Copyright 2026 Google LLC
 + */
-+#include <crypto/aes-ctr.h>
++#include <crypto/aes-xts.h>
 +#include <crypto/blake2s.h>
-+#include <linux/unaligned.h>
++#include <linux/fips.h>
 +#include "test-utils.h"
 +
-+/*
-+ * For the purpose of the tests, the IV state for AES-XCTR is the 64-bit little
-+ * endian block counter followed by the 16-byte IV.  The IV is placed last so
-+ * that when the IV state is in a guarded buffer, over-reads of the IV in
-+ * aes_xctr() are detected.
-+ */
-+#define AES_XCTR_STATE_SIZE (sizeof(__le64) + AES_BLOCK_SIZE)
-+
-+static void aes_xctr_test(u8 *dst, const u8 *src, size_t len, u8 *state,
-+			  aes_encrypt_arg key, bool cont)
++static int aes_xts_preparekey_test(struct aes_xts_key *key, const u8 *in_key,
++				   size_t key_len)
 +{
-+	u64 ctr = get_unaligned_le64(state);
-+
-+	aes_xctr(dst, src, len, &ctr, &state[sizeof(__le64)], key);
-+	put_unaligned_le64(ctr, state);
++	return aes_xts_preparekey(key, in_key, key_len, 0);
 +}
 +
-+static const size_t aes_xctr_valid_key_lens[] = { AES_KEYSIZE_128,
-+						  AES_KEYSIZE_192,
-+						  AES_KEYSIZE_256 };
-+#define SKCIPHER_VALID_KEY_LENS aes_xctr_valid_key_lens
-+#define SKCIPHER_MAX_KEY_LEN AES_MAX_KEY_SIZE
-+#define SKCIPHER_IV_LEN AES_XCTR_STATE_SIZE
-+#define SKCIPHER_MIN_DATA_LEN 0
++/* In FIPS mode, AES-192-XTS (48-byte keys) isn't allowed. */
++static bool aes_xts_is_key_len_allowed(size_t key_len)
++{
++	return !fips_enabled || key_len != 2 * AES_KEYSIZE_192;
++}
++
++static const size_t aes_xts_valid_key_lens[] = { 2 * AES_KEYSIZE_128,
++						 2 * AES_KEYSIZE_192,
++						 2 * AES_KEYSIZE_256 };
++#define SKCIPHER_VALID_KEY_LENS aes_xts_valid_key_lens
++#define SKCIPHER_MAX_KEY_LEN (2 * AES_MAX_KEY_SIZE)
++#define SKCIPHER_IV_LEN AES_BLOCK_SIZE /* the tweak */
++#define SKCIPHER_MIN_DATA_LEN AES_BLOCK_SIZE
 +#define SKCIPHER_DATA_LEN_ALIGN 1
 +
-+#define SKCIPHER_KEY aes_key
-+#define SKCIPHER_PREPAREKEY aes_preparekey
-+#define SKCIPHER_ENCRYPT aes_xctr_test
-+#define SKCIPHER_DECRYPT aes_xctr_test
++#define SKCIPHER_KEY aes_xts_key
++#define SKCIPHER_PREPAREKEY aes_xts_preparekey_test
++#define SKCIPHER_ENCRYPT aes_xts_encrypt
++#define SKCIPHER_DECRYPT aes_xts_decrypt
 +
-+#define SKCIPHER_ENCKEY aes_enckey
-+#define SKCIPHER_PREPAREENCKEY aes_prepareenckey
++#define SKCIPHER_IS_KEY_LEN_ALLOWED aes_xts_is_key_len_allowed
 +#define SKCIPHER_INCREMENTAL
 +#define SKCIPHER_NONFINAL_DATA_LEN_ALIGN AES_BLOCK_SIZE
-+#define SKCIPHER_NEXT_IV_ALWAYS_DEFINED
 +
 +/* This value was generated by gen-skcipher-testvecs.py. */
-+static const u8 aes_xctr_monte_carlo_checksum[BLAKE2S_HASH_SIZE] = {
-+	0x40, 0xc0, 0x13, 0x02, 0xc6, 0x12, 0x5c, 0x86, 0xce, 0x85, 0x9d,
-+	0xcb, 0x8f, 0x9b, 0xda, 0x17, 0x6f, 0x15, 0x73, 0x71, 0x0f, 0x6c,
-+	0x68, 0x41, 0xb5, 0x7d, 0x29, 0xe9, 0xb1, 0xb5, 0xa4, 0xb5,
++static const u8 aes_xts_monte_carlo_checksum[BLAKE2S_HASH_SIZE] = {
++	0x24, 0x93, 0x8f, 0x89, 0x72, 0x6f, 0xfb, 0x59, 0x4a, 0xea, 0x32,
++	0x74, 0x15, 0x6a, 0x8f, 0x9a, 0xba, 0xde, 0x9e, 0xc3, 0x5c, 0x58,
++	0x98, 0xa9, 0xb6, 0x9f, 0xeb, 0xe5, 0xfb, 0x3a, 0xf0, 0x87,
 +};
-+#define SKCIPHER_MONTE_CARLO_CHECKSUM aes_xctr_monte_carlo_checksum
++#define SKCIPHER_MONTE_CARLO_CHECKSUM aes_xts_monte_carlo_checksum
 +
 +#include "skcipher-test-template.h"
 +
-+/* Initial XCTR block counter of 1, in the format of the IV state */
-+#define AES_XCTR_CTR1 "\x01\x00\x00\x00\x00\x00\x00\x00"
++/* Byte sequence 0x00..0xff, used in IEEE 1619-2007 Vector 10 */
++#define IEEE1619_SEQ256                    \
++	"\x00\x01\x02\x03\x04\x05\x06\x07" \
++	"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f" \
++	"\x10\x11\x12\x13\x14\x15\x16\x17" \
++	"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f" \
++	"\x20\x21\x22\x23\x24\x25\x26\x27" \
++	"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f" \
++	"\x30\x31\x32\x33\x34\x35\x36\x37" \
++	"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f" \
++	"\x40\x41\x42\x43\x44\x45\x46\x47" \
++	"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f" \
++	"\x50\x51\x52\x53\x54\x55\x56\x57" \
++	"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f" \
++	"\x60\x61\x62\x63\x64\x65\x66\x67" \
++	"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f" \
++	"\x70\x71\x72\x73\x74\x75\x76\x77" \
++	"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f" \
++	"\x80\x81\x82\x83\x84\x85\x86\x87" \
++	"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f" \
++	"\x90\x91\x92\x93\x94\x95\x96\x97" \
++	"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f" \
++	"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7" \
++	"\xa8\xa9\xaa\xab\xac\xad\xae\xaf" \
++	"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7" \
++	"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf" \
++	"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7" \
++	"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf" \
++	"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7" \
++	"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf" \
++	"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7" \
++	"\xe8\xe9\xea\xeb\xec\xed\xee\xef" \
++	"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7" \
++	"\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff"
 +
-+/* XCTR block counter after 2 blocks (initial counter 1 + 2 = 3) */
-+#define AES_XCTR_CTR3 "\x03\x00\x00\x00\x00\x00\x00\x00"
++/* Inputs shared by IEEE 1619-2007 Vectors 15-17 */
++#define IEEE1619_VEC15_KEY                 \
++	"\xff\xfe\xfd\xfc\xfb\xfa\xf9\xf8" \
++	"\xf7\xf6\xf5\xf4\xf3\xf2\xf1\xf0" \
++	"\xbf\xbe\xbd\xbc\xbb\xba\xb9\xb8" \
++	"\xb7\xb6\xb5\xb4\xb3\xb2\xb1\xb0"
++#define IEEE1619_VEC15_TWEAK               \
++	"\x9a\x78\x56\x34\x12\x00\x00\x00" \
++	"\x00\x00\x00\x00\x00\x00\x00\x00"
++#define IEEE1619_VEC15_PTEXT               \
++	"\x00\x01\x02\x03\x04\x05\x06\x07" \
++	"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f" \
++	"\x10\x11\x12"
 +
 +/*
-+ * AES-XCTR test vectors generated by the HCTR2 reference implementation
-+ * (https://github.com/google/hctr2).
++ * AES-XTS test vectors from IEEE Std 1619-2007.  Vector 10 covers AES-256-XTS
++ * with a 512-byte data unit, and Vectors 15-17 cover ciphertext stealing.
 + */
-+static const struct skcipher_testvec aes_xctr_testvecs[] = {
++static const struct skcipher_testvec aes_xts_testvecs[] = {
 +	{
-+		.name = "HCTR2 reference AES-128-XCTR, 31 bytes",
-+		.key = "\x44\x03\xbf\x4c\x30\xf0\xa7\xd6"
-+		       "\xbd\x54\xbb\x66\x8e\xa6\x0e\x8a",
-+		.key_len = 16,
-+		.iv = AES_XCTR_CTR1 "\xe6\xf7\x26\xdf\x8c\x3c\xaa\x88"
-+				    "\xce\xc1\xbd\x43\x3b\x09\x62\xad",
-+		.ptext = "\x3c\xe3\x46\xb9\x8f\x9d\x3f\x8d"
-+			 "\xef\xf2\x53\xab\x24\xe2\x29\x08"
-+			 "\xf8\x7e\x1d\xa6\x6d\x86\x7d\x60"
-+			 "\x97\x63\x93\x29\x71\x94\xb4",
-+		.ctext = "\xd4\xa3\xc6\xb8\xc1\x6f\x70\x1a"
-+			 "\x52\x0c\xed\x4c\xaf\x51\x56\x23"
-+			 "\x48\x45\x07\x10\x34\xc5\xba\x71"
-+			 "\xe5\xf8\x1e\xd8\xcb\xa6\xe7",
-+		.data_len = 31,
-+		.next_iv = AES_XCTR_CTR3 "\xe6\xf7\x26\xdf\x8c\x3c\xaa\x88"
-+					 "\xce\xc1\xbd\x43\x3b\x09\x62\xad",
-+	},
-+	{
-+		.name = "HCTR2 reference AES-192-XCTR, 17 bytes",
-+		.key = "\xc8\xa0\x27\x67\x04\x3f\xed\xa5"
-+		       "\xb4\x0c\x51\x91\x2d\x27\x77\x33"
-+		       "\xa5\xfc\x2a\x9f\x78\xd8\x1c\x68",
-+		.key_len = 24,
-+		.iv = AES_XCTR_CTR1 "\x83\x99\x1a\xe2\x84\xca\xa9\x16"
-+				    "\x8d\xc4\x2d\x1b\x67\xc8\x86\x21",
-+		.ptext = "\xd6\x22\x85\xb8\x5d\x7e\x26\x2e"
-+			 "\xbe\x04\x9d\x0c\x03\x91\x45\x4a"
-+			 "\x36",
-+		.ctext = "\x0f\x44\xa9\x62\x72\xec\x12\x26"
-+			 "\x3a\xc6\x83\x26\x62\x5e\xb7\x13"
-+			 "\x05",
-+		.data_len = 17,
-+		.next_iv = AES_XCTR_CTR3 "\x83\x99\x1a\xe2\x84\xca\xa9\x16"
-+					 "\x8d\xc4\x2d\x1b\x67\xc8\x86\x21",
-+	},
-+	{
-+		.name = "HCTR2 reference AES-256-XCTR, 31 bytes",
-+		.key = "\x77\x5c\xc0\x73\x9a\x64\x97\x91"
-+		       "\x2f\xee\xe0\x20\xc2\x04\x59\x2e"
-+		       "\x97\xd2\xa7\x70\xb3\xb0\x21\x6b"
-+		       "\x8f\xbf\xb8\x51\xa8\xea\x0f\x62",
++		.name = "IEEE 1619-2007 Vector 1",
++		.key = "\x00\x00\x00\x00\x00\x00\x00\x00"
++		       "\x00\x00\x00\x00\x00\x00\x00\x00"
++		       "\x00\x00\x00\x00\x00\x00\x00\x00"
++		       "\x00\x00\x00\x00\x00\x00\x00\x00",
 +		.key_len = 32,
-+		.iv = AES_XCTR_CTR1 "\x31\x8e\x1f\xcd\xfd\x23\xeb\x7f"
-+				    "\x8a\x1f\x1b\x23\x53\x27\x44\xe5",
-+		.ptext = "\xcd\xff\x8c\x9b\x94\x5a\x51\x3f"
-+			 "\x40\x93\x56\x93\x66\x39\x63\x1f"
-+			 "\xbf\xe6\xa4\xfa\xbe\x79\x93\x03"
-+			 "\xf5\x66\x74\x16\xfc\xe4\xce",
-+		.ctext = "\x8b\xd3\xc3\xce\x66\xf8\x66\x4c"
-+			 "\xad\xd6\xf5\x0f\xd8\x99\x5a\x75"
-+			 "\xa1\x3c\xab\x0b\x21\x36\x57\x72"
-+			 "\x88\x29\xe9\xea\x4a\x8d\xe9",
-+		.data_len = 31,
-+		.next_iv = AES_XCTR_CTR3 "\x31\x8e\x1f\xcd\xfd\x23\xeb\x7f"
-+					 "\x8a\x1f\x1b\x23\x53\x27\x44\xe5",
++		.iv = "\x00\x00\x00\x00\x00\x00\x00\x00"
++		      "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ptext = "\x00\x00\x00\x00\x00\x00\x00\x00"
++			 "\x00\x00\x00\x00\x00\x00\x00\x00"
++			 "\x00\x00\x00\x00\x00\x00\x00\x00"
++			 "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ctext = "\x91\x7c\xf6\x9e\xbd\x68\xb2\xec"
++			 "\x9b\x9f\xe9\xa3\xea\xdd\xa6\x92"
++			 "\xcd\x43\xd2\xf5\x95\x98\xed\x85"
++			 "\x8c\x02\xc2\x65\x2f\xbf\x92\x2e",
++		.data_len = 32,
++		.next_iv = "\x98\xa5\x2f\x51\xbf\x2b\xb2\xec"
++			   "\x20\x32\xe9\x67\x29\xd3\xac\xb8",
++	},
++	{
++		.name = "IEEE 1619-2007 Vector 2",
++		.key = "\x11\x11\x11\x11\x11\x11\x11\x11"
++		       "\x11\x11\x11\x11\x11\x11\x11\x11"
++		       "\x22\x22\x22\x22\x22\x22\x22\x22"
++		       "\x22\x22\x22\x22\x22\x22\x22\x22",
++		.key_len = 32,
++		.iv = "\x33\x33\x33\x33\x33\x00\x00\x00"
++		      "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ptext = "\x44\x44\x44\x44\x44\x44\x44\x44"
++			 "\x44\x44\x44\x44\x44\x44\x44\x44"
++			 "\x44\x44\x44\x44\x44\x44\x44\x44"
++			 "\x44\x44\x44\x44\x44\x44\x44\x44",
++		.ctext = "\xc4\x54\x18\x5e\x6a\x16\x93\x6e"
++			 "\x39\x33\x40\x38\xac\xef\x83\x8b"
++			 "\xfb\x18\x6f\xff\x74\x80\xad\xc4"
++			 "\x28\x93\x82\xec\xd6\xd3\x94\xf0",
++		.data_len = 32,
++		.next_iv = "\xf2\x01\xee\x34\x37\xfc\x49\xcf"
++			   "\xd6\x61\x05\x7d\x66\x55\x37\x9b",
++	},
++	{
++		.name = "IEEE 1619-2007 Vector 10",
++		.key = "\x27\x18\x28\x18\x28\x45\x90\x45"
++		       "\x23\x53\x60\x28\x74\x71\x35\x26"
++		       "\x62\x49\x77\x57\x24\x70\x93\x69"
++		       "\x99\x59\x57\x49\x66\x96\x76\x27"
++		       "\x31\x41\x59\x26\x53\x58\x97\x93"
++		       "\x23\x84\x62\x64\x33\x83\x27\x95"
++		       "\x02\x88\x41\x97\x16\x93\x99\x37"
++		       "\x51\x05\x82\x09\x74\x94\x45\x92",
++		.key_len = 64,
++		.iv = "\xff\x00\x00\x00\x00\x00\x00\x00"
++		      "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ptext = IEEE1619_SEQ256 IEEE1619_SEQ256,
++		.ctext = "\x1c\x3b\x3a\x10\x2f\x77\x03\x86"
++			 "\xe4\x83\x6c\x99\xe3\x70\xcf\x9b"
++			 "\xea\x00\x80\x3f\x5e\x48\x23\x57"
++			 "\xa4\xae\x12\xd4\x14\xa3\xe6\x3b"
++			 "\x5d\x31\xe2\x76\xf8\xfe\x4a\x8d"
++			 "\x66\xb3\x17\xf9\xac\x68\x3f\x44"
++			 "\x68\x0a\x86\xac\x35\xad\xfc\x33"
++			 "\x45\xbe\xfe\xcb\x4b\xb1\x88\xfd"
++			 "\x57\x76\x92\x6c\x49\xa3\x09\x5e"
++			 "\xb1\x08\xfd\x10\x98\xba\xec\x70"
++			 "\xaa\xa6\x69\x99\xa7\x2a\x82\xf2"
++			 "\x7d\x84\x8b\x21\xd4\xa7\x41\xb0"
++			 "\xc5\xcd\x4d\x5f\xff\x9d\xac\x89"
++			 "\xae\xba\x12\x29\x61\xd0\x3a\x75"
++			 "\x71\x23\xe9\x87\x0f\x8a\xcf\x10"
++			 "\x00\x02\x08\x87\x89\x14\x29\xca"
++			 "\x2a\x3e\x7a\x7d\x7d\xf7\xb1\x03"
++			 "\x55\x16\x5c\x8b\x9a\x6d\x0a\x7d"
++			 "\xe8\xb0\x62\xc4\x50\x0d\xc4\xcd"
++			 "\x12\x0c\x0f\x74\x18\xda\xe3\xd0"
++			 "\xb5\x78\x1c\x34\x80\x3f\xa7\x54"
++			 "\x21\xc7\x90\xdf\xe1\xde\x18\x34"
++			 "\xf2\x80\xd7\x66\x7b\x32\x7f\x6c"
++			 "\x8c\xd7\x55\x7e\x12\xac\x3a\x0f"
++			 "\x93\xec\x05\xc5\x2e\x04\x93\xef"
++			 "\x31\xa1\x2d\x3d\x92\x60\xf7\x9a"
++			 "\x28\x9d\x6a\x37\x9b\xc7\x0c\x50"
++			 "\x84\x14\x73\xd1\xa8\xcc\x81\xec"
++			 "\x58\x3e\x96\x45\xe0\x7b\x8d\x96"
++			 "\x70\x65\x5b\xa5\xbb\xcf\xec\xc6"
++			 "\xdc\x39\x66\x38\x0a\xd8\xfe\xcb"
++			 "\x17\xb6\xba\x02\x46\x9a\x02\x0a"
++			 "\x84\xe1\x8e\x8f\x84\x25\x20\x70"
++			 "\xc1\x3e\x9f\x1f\x28\x9b\xe5\x4f"
++			 "\xbc\x48\x14\x57\x77\x8f\x61\x60"
++			 "\x15\xe1\x32\x7a\x02\xb1\x40\xf1"
++			 "\x50\x5e\xb3\x09\x32\x6d\x68\x37"
++			 "\x8f\x83\x74\x59\x5c\x84\x9d\x84"
++			 "\xf4\xc3\x33\xec\x44\x23\x88\x51"
++			 "\x43\xcb\x47\xbd\x71\xc5\xed\xae"
++			 "\x9b\xe6\x9a\x2f\xfe\xce\xb1\xbe"
++			 "\xc9\xde\x24\x4f\xbe\x15\x99\x2b"
++			 "\x11\xb7\x7c\x04\x0f\x12\xbd\x8f"
++			 "\x6a\x97\x5a\x44\xa0\xf9\x0c\x29"
++			 "\xa9\xab\xc3\xd4\xd8\x93\x92\x72"
++			 "\x84\xc5\x87\x54\xcc\xe2\x94\x52"
++			 "\x9f\x86\x14\xdc\xd2\xab\xa9\x91"
++			 "\x92\x5f\xed\xc4\xae\x74\xff\xac"
++			 "\x6e\x33\x3b\x93\xeb\x4a\xff\x04"
++			 "\x79\xda\x9a\x41\x0e\x44\x50\xe0"
++			 "\xdd\x7a\xe4\xc6\xe2\x91\x09\x00"
++			 "\x57\x5d\xa4\x01\xfc\x07\x05\x9f"
++			 "\x64\x5e\x8b\x7e\x9b\xfd\xef\x33"
++			 "\x94\x30\x54\xff\x84\x01\x14\x93"
++			 "\xc2\x7b\x34\x29\xea\xed\xb4\xed"
++			 "\x53\x76\x44\x1a\x77\xed\x43\x85"
++			 "\x1a\xd7\x7f\x16\xf5\x41\xdf\xd2"
++			 "\x69\xd5\x0d\x6a\x5f\x14\xfb\x0a"
++			 "\xab\x1c\xbb\x4c\x15\x50\xbe\x97"
++			 "\xf7\xab\x40\x66\x19\x3c\x4c\xaa"
++			 "\x77\x3d\xad\x38\x01\x4b\xd2\x09"
++			 "\x2f\xa7\x55\xc8\x24\xbb\x5e\x54"
++			 "\xc4\xf3\x6f\xfd\xa9\xfc\xea\x70"
++			 "\xb9\xc6\xe6\x93\xe1\x48\xc1\x51",
++		.data_len = 512,
++		.next_iv = "\xd7\xcf\x75\x24\x5c\x26\x75\x77"
++			   "\xa9\x0c\xaa\xd6\xae\x98\x8e\x22",
++	},
++	{
++		.name = "IEEE 1619-2007 Vector 15",
++		.key = IEEE1619_VEC15_KEY,
++		.key_len = 32,
++		.iv = IEEE1619_VEC15_TWEAK,
++		.ptext = IEEE1619_VEC15_PTEXT,
++		.ctext = "\x6c\x16\x25\xdb\x46\x71\x52\x2d"
++			 "\x3d\x75\x99\x60\x1d\xe7\xca\x09"
++			 "\xed",
++		.data_len = 17,
++	},
++	{
++		.name = "IEEE 1619-2007 Vector 16",
++		.key = IEEE1619_VEC15_KEY,
++		.key_len = 32,
++		.iv = IEEE1619_VEC15_TWEAK,
++		.ptext = IEEE1619_VEC15_PTEXT,
++		.ctext = "\xd0\x69\x44\x4b\x7a\x7e\x0c\xab"
++			 "\x09\xe2\x44\x47\xd2\x4d\xeb\x1f"
++			 "\xed\xbf",
++		.data_len = 18,
++	},
++	{
++		.name = "IEEE 1619-2007 Vector 17",
++		.key = IEEE1619_VEC15_KEY,
++		.key_len = 32,
++		.iv = IEEE1619_VEC15_TWEAK,
++		.ptext = IEEE1619_VEC15_PTEXT,
++		.ctext = "\xe5\xdf\x13\x51\xc0\x54\x4b\xa1"
++			 "\x35\x0b\x33\x63\xcd\x8e\xf4\xbe"
++			 "\xed\xbf\x9d",
++		.data_len = 19,
 +	},
 +};
 +
-+static void test_aes_xctr_test_vectors(struct kunit *test)
++static void test_aes_xts_test_vectors(struct kunit *test)
 +{
-+	skcipher_run_testvecs(test, aes_xctr_testvecs,
-+			      ARRAY_SIZE(aes_xctr_testvecs));
++	for (size_t i = 0; i < ARRAY_SIZE(aes_xts_testvecs); i++) {
++		const struct skcipher_testvec *tv = &aes_xts_testvecs[i];
++		const size_t half = tv->key_len / 2;
++
++		/*
++		 * In FIPS mode, keys whose two halves are the same are
++		 * rejected, so skip any test vectors that use such keys.
++		 */
++		if (fips_enabled && memcmp(tv->key, &tv->key[half], half) == 0)
++			continue;
++		skcipher_run_testvecs(test, tv, 1);
++	}
 +}
 +
-+static struct kunit_case aes_xctr_test_cases[] = {
-+	KUNIT_CASE(test_aes_xctr_test_vectors),
++/*
++ * Test that keys whose two halves are the same are rejected when
++ * XTS_FORBID_WEAK_KEYS is given (or in FIPS mode), and otherwise accepted, and
++ * that struct aes_xts_key is zeroized on failure.
++ */
++static void test_aes_xts_weak_keys(struct kunit *test)
++{
++	struct aes_xts_key *key = alloc_buf(test, sizeof(*key));
++	u8 *raw_key_buf_end = alloc_guarded_buf(test, SKCIPHER_MAX_KEY_LEN) +
++			      SKCIPHER_MAX_KEY_LEN;
++	int err;
++
++	for (size_t i = 0; i < ARRAY_SIZE(aes_xts_valid_key_lens); i++) {
++		const size_t key_len = aes_xts_valid_key_lens[i];
++		const size_t half = key_len / 2;
++		const bool allowed = aes_xts_is_key_len_allowed(key_len);
++		u8 *raw_key = raw_key_buf_end - key_len;
++
++		/* Generate a weak key in an exact-size guarded buffer. */
++		rand_bytes(raw_key, half);
++		memcpy(&raw_key[half], raw_key, half);
++
++		memset(key, 0xff, sizeof(*key));
++		err = aes_xts_preparekey(key, raw_key, key_len,
++					 XTS_FORBID_WEAK_KEYS);
++		KUNIT_ASSERT_EQ_MSG(
++			test, -EINVAL, err,
++			"Weak key wasn't rejected with XTS_FORBID_WEAK_KEYS; key_len=%zu",
++			key_len);
++		KUNIT_ASSERT_TRUE_MSG(
++			test, mem_is_zero(key, sizeof(*key)),
++			"Key struct wasn't zeroized on failure; key_len=%zu",
++			key_len);
++
++		memset(key, 0xff, sizeof(*key));
++		err = aes_xts_preparekey(key, raw_key, key_len, 0);
++		if (fips_enabled)
++			KUNIT_ASSERT_EQ_MSG(
++				test, -EINVAL, err,
++				"Weak key wasn't rejected in FIPS mode; key_len=%zu",
++				key_len);
++		else
++			KUNIT_ASSERT_EQ_MSG(
++				test, 0, err,
++				"Weak key wasn't accepted in non-FIPS mode; key_len=%zu",
++				key_len);
++		if (err)
++			KUNIT_ASSERT_TRUE(test, mem_is_zero(key, sizeof(*key)));
++
++		/*
++		 * Make the key non-weak by flipping a bit at each byte position
++		 * in turn, to verify that all bytes of the halves are compared.
++		 */
++		for (size_t j = 0; j < key_len; j++) {
++			raw_key[j] ^= 1;
++			memset(key, 0xff, sizeof(*key));
++			err = aes_xts_preparekey(key, raw_key, key_len,
++						 XTS_FORBID_WEAK_KEYS);
++			KUNIT_ASSERT_EQ_MSG(
++				test, allowed ? 0 : -EINVAL, err,
++				"Wrong result for non-weak key; key_len=%zu diff_byte=%zu",
++				key_len, j);
++			if (err)
++				KUNIT_ASSERT_TRUE(
++					test, mem_is_zero(key, sizeof(*key)));
++			raw_key[j] ^= 1;
++		}
++	}
++}
++
++static struct kunit_case aes_xts_test_cases[] = {
++	KUNIT_CASE(test_aes_xts_test_vectors),
++	KUNIT_CASE(test_aes_xts_weak_keys),
 +	SKCIPHER_KUNIT_CASES,
 +	{},
 +};
 +
-+static struct kunit_suite aes_xctr_test_suite = {
-+	.name = "aes_xctr",
-+	.test_cases = aes_xctr_test_cases,
++static struct kunit_suite aes_xts_test_suite = {
++	.name = "aes_xts",
++	.test_cases = aes_xts_test_cases,
 +};
-+kunit_test_suite(aes_xctr_test_suite);
++kunit_test_suite(aes_xts_test_suite);
 +
-+MODULE_DESCRIPTION("KUnit tests and benchmark for AES-XCTR");
++MODULE_DESCRIPTION("KUnit tests and benchmark for AES-XTS");
 +MODULE_LICENSE("GPL");
 -- 
 2.56.1
