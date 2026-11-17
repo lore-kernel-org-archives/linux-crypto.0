@@ -1,96 +1,52 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.149.156.72
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794906037;
-	b=1em5wtJaCZnwNDSsCT+aq3v15VR8d/CQYhSEMvjxEq8yPm2DjEVh6qMpyfoDyzK05mh3
-	 ESG0luwSrWFZ6QIBytLmEDPUt09lw2TWfS5QEy+yGVXK25SwCV6CglDLuDofboAD+Fvj0
-	 +A6uJdmO20Z0aD/dPQ0RcilY2svnrnpp35YYswefIcLeisW1W77OFlwp4A6UwJ4UZU/IA
-	 PAHUq/Z0XvQKZNkOKkcgnD9sehcV7OTK/gKih1uTOgAogE9UzCnGLp63s7jYbl9kZLvFE
-	 1NCHBfSVceDE/XM+N81OZafNEzTp+qa3cYWnk3PyjbklV/OiTYN8HZig9ADFMl+4q1A==
+	t=1794921699;
+	b=NSwFDPemuJw5Ct0UeNqrd+/CdRiOn8S/hxnK89T4qbRhx7eoZlLlvGF7CrogEnSWqnTS
+	 rA+I/xwMd1gY9EaGRgJuObHsZqVASm1qrPh8fOIrF0xP3r9T3u5V6lDcsGO3/KbFbvwaR
+	 4l5pd8QaOJlV3IYUbGLJ7WRFY4xuq+HbcddOuH0MOhaV7gPiIAONxxCL5v2gT4MbrzsY7
+	 iFusK2/PrlnRFPlwIe4J0tc0bMDKfZM1dCfYJ5Pzing/CYTkDuycA/3vkiFungyxNoZXF
+	 NtfFEnKI4Jo3JZivBJlN7jD6J20n//OM9Hy5ZAx/evnul3SSFL+6+YNTBSFb3L0pkdA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794906037;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:X-Mailer:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=5u5bJSzXugShbfEp5UR1gFg7szWoYhbTfjqpcPqVFWA=;
-	b=ZW0R9bJDpGMfgxZc2y726SPB203uL8Ky9gl3bJ/xvd5FnwlL3rrZM1z19BBU9qyYUo0j
-	 QQE8nJb6G9aFIl9Hn2ZJOhUPvf2STMe9to6VtE9iCnWGzEdDtwS5qz4bLmMXORIwUEiCS
-	 GiqAmJqbFdgWcan0NfQYav+mS92itpaWJlsHoZqQkrF9O7lDLaQtBaAZRD508vnwMGE55
-	 1F6iMm9M11b/4eXV+j8oycKvP/CoIjUNmsrvzkAe1TgcH9S1IFk4onmx9YQ693b3qDBeK
-	 G8MBQP3yeXSqfKBQkgDZqsZMW9LyXnzsGQlPAA67hHZOjHVIFSHbuWMQ72swXpWrlrQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794921699;
+	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:Content-Language:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-CMAE-Envelope;
+	bh=CWKy/Xe5D3WLDxIMxxMZifmNFWiFuSMPKw85DviN7N8=;
+	b=dp8iL/uhh3alDPYgxyD6phlpQf0Sxyhxb7gPJKSgysMTHL6WdwHCgiA5eg1O5D31K+Cp
+	 drphAY9k1fLySII0nHgruFdwKn1mjzn1ynWdXwjv/8N7kwOzeN90ow4m7FxWh8Wq5mTxb
+	 TRpkVUtL4mqkpLquSGNalfdCi8Q/d8cnXR2x4wa1LFoZrqsXIoJJDrS8X4zOxxuYXwNJH
+	 AuJIV0/cey+RP/Lkq6fLXnmWFJCJ0XPG1fvAlnsKttbga+SpV/C2BYW0efR+QRDVxOrgY
+	 68s+i0etbjS1a7ADxq/rlYd890DADalPtALIfFgpUADzHkOKbfQX1YIBCmKKZDjAcxA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QAn7hM23;
-	arc=none smtp.remote-ip=209.85.128.52
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=enneenne.com;
+	spf=pass smtp.mailfrom=enneenne.com;
+	dkim=pass header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=D3LHUF9a;
+	arc=none smtp.remote-ip=62.149.156.72
+Received: from smtpcmd0872.aruba.it (smtpcmd0872.aruba.it [62.149.156.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB374606A32F
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 09:00:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB374606A32F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDC6606A329
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 13:21:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EEDC6606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QAn7hM23
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4bb72b44a97so12507635e9.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 01:00:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794906034; x=1795510834; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=5u5bJSzXugShbfEp5UR1gFg7szWoYhbTfjqpcPqVFWA=;
-        b=QAn7hM23baxfPhsDQ0jl0gZPWe5fEMGa6ZBQjqmz88PU18LSSpYy2ZYYf4UU4Kxw3U
-         MJjdsLi68eBdm1OAxC5msfHNhlR+npmI5j5yrmtuPKbbVKJ8qsK7GfbJOiiuylMxOKMh
-         3+g3VPyoIhWaZ4C9QXK4L67uKqIa1sDq+chZ42oomLTUL19MKjCDEqlAmwUN/Zc5Jl43
-         J4nD3GrPUoEPzmifvNax4rIbSS7BEde0F4gdNc8mIxaMj3AUMsgoxcIji4eAXQdu6dSM
-         edoOZwX13+K+D7PZ74LpqLtCXQYdeRwTjkQddJrQ8R+ns+fmAxPSRmZgTS4L3Oj2U1Z5
-         w04w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794906034; x=1795510834;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=5u5bJSzXugShbfEp5UR1gFg7szWoYhbTfjqpcPqVFWA=;
-        b=gJ5B8Uvi2IhFVWX8oBSVxTfl1ZklKQwGYRsFius6dAE/RlCOs/sKFGy4doYeIVsJA7
-         05QwvbacBgmo4Mc2tZv/ai+rQgTHrcztWkoXgeR9OMc7ExsIhsPZWyJAigrDwPrfb3YT
-         j2T2ba2BsNq7zuP1mtoZ8VpwYIMvyRqgKnTFTxEnT0i5asjSSJKXsspc64Uco4lR1LNU
-         wEEvMl84y+nffuInokXcC1HDOVHzKw+ZRaBp0sBZA/rZuluss77XbhJ2h6BbbYNrxvdw
-         dPK0dfBr0xItR6CKoLCqutGy9b43Ly6SiTaOK09ZKKQBozhMhARY58o0+3oMatYePrxE
-         nSlg==
-X-Forwarded-Encrypted: i=1; AL+hErHOLYSN2/rs9Nri6b2ST1Ixv/ezGltMS1x3z3UPQVLKD88CfZ4MtyHrIZP0iI0U8qCPNOGg9bWHmFt0fJQ=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8lM/HXFmoxmkSbUXkRUb0JUxddfRWrmr5oxjIXxRCwDeIt5XaX
-	pO65OVUzTGuYnXn2YKdmvPlFx8qAyIfS10Ya/51zuXRumk6dfSBwuXtk
-X-Gm-Gg: AYBFou1FjYw8il5RLzdCTh0OvvUeBfm+m8jdsle1HObhtQnBnrrSXqQ+K8kQMeMOk8s
-	ZyZds4c9YfErAKnJAns7G2qLn/POMBD3g/yU/hXDgGsXtlZM4RYer1s9DXTZT0WGleh9/sTBI7t
-	OAF5PNWTx7/2OVRY9RCa+65LC85JZN4nNcESZQdRZCpQ45CAnpVBHlPG0jCqImFJDvJOfBHkGc5
-	1+q7qaBtyrdRujGeOatc217MgU1gy+siVBkuHIU2OaNcJ9XjT4/3ZGh6JvENMNWiGVqkwIYoC5B
-	ELru45nVF4cgW4SjZgeF6rGmCZG8OEyX8AbKqO1CU2tKeVUcssZLQmnt/MJLHX0lwZoinGLhS6y
-	o93uDJihw0nhAUN9gFSL+EulOagq8FPFvFi6T50brAfOUaBF/Ju17jrNsXcJspTxc8P25dxIicd
-	vKF6MYp8UQvIZ6/U1bvjA55FpoG+3jV3+hPVmFTag3JhP50LaCn3M0AgfR3WvpiPi7CM18nLSVW
-	d34MiYGFnVmDteNtO+L1tQNeqJpOf8Mp2mOgROvw3xSIK6+pajPWClG88I65rxAyB/wtNhZQeaf
-	QzQa6TgKhEFMC8WAZYC2ijaRAV4YD0Chl/KgA/zSHAfXEL6yvOljc5QMZHqWnQViyw==
-X-Received: by 2002:a05:600c:3b93:b0:4bb:6f67:ca0b with SMTP id 5b1f17b1804b1-4bb6f67caf0mr164847925e9.29.1794906033976;
-        Tue, 17 Nov 2026 01:00:33 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb783862d6sm46768355e9.2.2026.11.17.01.00.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2026 01:00:33 -0800 (PST)
-Date: Tue, 17 Nov 2026 09:00:32 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Shreesh Adiga <16567adigashreesh@gmail.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
- Demian Shulhan <demyansh@gmail.com>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] lib/crc: arm64: Add NEON PMULL+EOR3 crc64_nvme
- implementation
-Message-ID: <20261117090032.0abf7198@pumpkin>
-In-Reply-To: <20261114172955.1598929-1-16567adigashreesh@gmail.com>
-References: <20261114172955.1598929-1-16567adigashreesh@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=D3LHUF9a
+Received: from [192.168.0.186] ([101.57.122.26])
+	by Aruba SMTP with ESMTPSA
+	id TJ7nx1DnacPcsTJ7nxe0qW; Tue, 17 Nov 2026 14:21:29 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1794921689; bh=oT2PXSW88ArmQaqNSfEwrssUL0dmXrSRZQiuFx9AOd0=;
+	h=Date:MIME-Version:Subject:To:From:Content-Type;
+	b=D3LHUF9aQVXKQ9UYUAuA7NcPsl7BxfeUkL4oPBUdEqZXYDqb3z7e6J1CpDrKNvAaW
+	 FjXwqAeTCHmUYrrMsoTo9ECEVQSofvqgnLkdS16Huf5+yxZ36R6EkrMC1lwJPKt/dP
+	 W5Yv3mmn4/UEChNu7vuU6HPWQ7WotSwx9EBRzr/ilp803lg6O9lBrSeJc4kTtuW5T9
+	 JMRv6rH/v/F9jevkqU6/KbzUxwECPrTwg3y4tU/Oqod3O6X4vdWq+sdE+zr+7lJ63R
+	 smxM4IyZIlcdPa4oVOV/2RZkjbTo4owA78Gutm179EV2aTRPTlI117fu7Jmbr/WRft
+	 V6RJOdFZJ80bA==
+Message-ID: <0e20f799-e389-40d2-aaee-2f174748faae@enneenne.com>
+Date: Tue, 17 Nov 2026 14:21:26 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -100,180 +56,121 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KEYS: fix signature length passed to
+ KEYCTL_PKEY_VERIFY
+Content-Language: en-US
+To: Florian Bauckholt <florian.bauckholt@cispa.de>,
+ David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>, Hui Peng <benquike@gmail.com>,
+ Stefan Berger <stefanb@linux.ibm.com>, keyrings@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20261111-keyctl-pkey-fixes-v1-0-934ebaa267a7@cispa.de>
+ <20261111-keyctl-pkey-fixes-v1-1-934ebaa267a7@cispa.de>
+From: Rodolfo Giometti <giometti@enneenne.com>
+In-Reply-To: <20261111-keyctl-pkey-fixes-v1-1-934ebaa267a7@cispa.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfDg+biMxW//ioyRGFd9IFIlidEW1a2KiKD2evhiscr/Ncy3LgypJUgynMd+o8RcM6m0eFTTCJ1Y8aXl826d0s2qqGHBPJuRg8drh+k/ewjJ5c2Ng73LR
+ N1Sj2F7NHEHNenpSVYzQjg322kfqmTdrNt6CuKC306/WtrTJ4wHiazfLjV8+mQgXARt9KWCyR8mz5Q2XRks657UfSiRgqNd1ZYLcQs9OlasaNk6dGFhFFmoc
+ Z2FUAQk5bG+wrDzFA+GhruflgGh4nb6+rZh82j3ZE2lkIL8s4ax2X0j+qB2EBx5WDzCUIs7cD//QfBopsXqJhBSSY3asWR4psvoAO2V5DCHwWR+8fqzwZVQ3
+ zWxAZXS6nvWdCV8z6ZLxLGXwOheVDOkyjoT0+v3JinadqrBrK6t/n0Okxk/VuHAFPtIkkfgYq6Vy4j1IGNdU24E9idR72uM67iouzpuPw9J6Jja6IaR1wbL+
+ jAB4i0/IEubK9G0Zzhd8ALVt+hyPUT9Av/tFfSpZWWpWweuUW5FLEiP95GfseydpODLCfV771PTvl/oMXt1dYSIj2lWGReGq2vVbifJoiSfW5HnLMG2dyhXC
+ jiMSlAznQPDMk5GEpsO0TNidxiRm6MzTbXqm5/7lWUZAXsLBql/Qex9lAVI7JZpTq7q4veUjqLK1gtQYpyUcvHc47fqhA5ay/gp+aB5BS/wfb4HHJJChllbv
+ HUgKPjrfCjq0IoHhg1AENiug5UQqKvMh
 
-On Sat, 14 Nov 2026 22:59:51 +0530
-Shreesh Adiga <16567adigashreesh@gmail.com> wrote:
-
-> Add a 4x-folding implementation for CPUs with FEAT_SHA3 which benefits
-> newer ARMv9 CPUs like Cortex-X925.
-> Usage of EOR3 from SHA3 extension improves performance by 20% compared
-> to the regular PMULL without EOR3 on Cortex-X925 measure in userspace
-> application via libbenchmark for 512 byte input size.
-> Measured about 3x speedup for 512 byte input compared with the existing
-> NEON single fold implementation on Cortex-X925 in userspace.
+On 11/11/2026 16:56, Florian Bauckholt wrote:
+> Commit cb481e59ea6c ("KEYS: fix overflow in keyctl_pkey_params_get_2()")
+> made keyctl_pkey_params_get_2() set params->out_len to the maximum
+> output size of the operation instead of the size provided by the caller.
+> It does so for KEYCTL_PKEY_VERIFY as well, but verify has no output
+> buffer: out_len shares a union with in2_len, the length of the
+> signature.
 > 
-> Signed-off-by: Shreesh Adiga <16567adigashreesh@gmail.com>
+> As a result keyctl_pkey_verify() ignores the signature length passed by
+> the caller. It copies max_sig_size bytes from the signature pointer and
+> passes max_sig_size as the signature size to the verification.
+> 
+> This makes no difference for signatures that are always max_sig_size
+> bytes long, such as RSA. A shorter signature, e.g. a DER-encoded ECDSA
+> signature, is followed by whatever is behind it in the caller's memory,
+> or the call fails with -EFAULT if that memory is not readable. The
+> x962 ECDSA template currently ignores data following the signature,
+> which hides the problem.
+
+The test suite of craf (https://github.com/giometti/crypto-afalg,
+test3008) hits this with RSA too: it cuts a genuine 256-byte RSA-2048
+PKCS#1 signature to 255 bytes and expects the verify to fail. On
+Ubuntu's 6.8.0-147 kernel, which carries the stable backport of
+cb481e59ea6c, the cut signature verifies about once in 256 runs. Over
+2000 runs per build:
+
+    plain: ok=1991 ko=9
+    asan: ok=1997 ko=3
+
+and a failing run prints (line wrapped here):
+
+    libkcrypto  [pkey-cert]: kc-check pkey-verify cert:test3008.cert
+        enc=pkcs1 hash=sha256 test3008.d256 test3008.bad: exit 0, not 1:
+    KO!
+
+To reproduce it (the count printed is the number of failures; here it
+gave 3 out of 1000 runs):
+
+    git clone https://github.com/giometti/crypto-afalg
+    cd crypto-afalg/tests
+    export TESTS_TMPDIR=$(mktemp -d)
+    for i in $(seq 1000); do ./do_test.sh 3008; done | grep -c 'KO!'
+
+I also replayed the inputs of one failing run on a UML kernel of
+current mainline (666539eecdf4, after v7.4-rc3): the 255-byte signature
+verifies 20 times out of 20, and with your patch applied it is refused
+20 times out of 20.
+
+Maybe it is worth saying so in the commit message, since this is going
+to stable?
+
+I'll send my Tested-by once test3008 has run 2000 times on a kernel
+with your patch applied.
+
+> 
+> Use the length provided by the caller, which has already been checked
+> against max_sig_size.
+> 
+> Fixes: cb481e59ea6c ("KEYS: fix overflow in keyctl_pkey_params_get_2()")
+> Cc: stable@vger.kernel.org
+> Link: https://lore.kernel.org/all/20260919221742.3709658-1-benquike@gmail.com/
+> Signed-off-by: Florian Bauckholt <florian.bauckholt@cispa.de>
 > ---
-> Changes in v2:
->   Improved the 4x to 1x reduction by using x^255 and x^319 x2 reduction.
->   Added static keys for the CPU feature checks instead of regular
->   branches.
+>  security/keys/keyctl_pkey.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->  lib/crc/arm64/crc64.h | 24 +++++++++++--
->  lib/crc/crc64-neon.c  | 83 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 104 insertions(+), 3 deletions(-)
-> 
-> diff --git a/lib/crc/arm64/crc64.h b/lib/crc/arm64/crc64.h
-> index c7a69e1f3d8f..e5be0ef21140 100644
-> --- a/lib/crc/arm64/crc64.h
-> +++ b/lib/crc/arm64/crc64.h
-> @@ -9,20 +9,38 @@
->  #include <linux/sizes.h>
+> diff --git a/security/keys/keyctl_pkey.c b/security/keys/keyctl_pkey.c
+> index 15b6bf6399b5..794fa3d01911 100644
+> --- a/security/keys/keyctl_pkey.c
+> +++ b/security/keys/keyctl_pkey.c
+> @@ -160,7 +160,7 @@ static int keyctl_pkey_params_get_2(const struct keyctl_pkey_params __user *_par
+>  		    uparams.in2_len > info.max_sig_size)
+>  			return -EINVAL;
 >  
->  u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
-> +u64 crc64_nvme_neon_pmull_eor3(u64 crc, const u8 *p, size_t len);
-> +
-> +static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_eor3);
-> +static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
->  
->  #define crc64_be_arch crc64_be_generic
->  
->  static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
->  {
-> -	if (len >= 128 && cpu_have_named_feature(PMULL) &&
-> +	if (len >= 128 && static_branch_likely(&have_pmull) &&
+> -		params->out_len = info.max_sig_size;
+> +		params->in2_len = uparams.in2_len;
+>  		break;
+>  	default:
+>  		return -EOPNOTSUPP;
+>
 
-Would it be better to swap the order of the checks?
-Otherwise I think you get the 'len >= 128' conditional branch
-even when the static branch is false.
+Ciao,
 
-David
+Rodolfo
 
->  	    likely(may_use_simd())) {
->  		size_t chunk = len & ~15;
->  
-> -		scoped_ksimd()
-> -			crc = crc64_nvme_neon(crc, p, chunk);
-> +		scoped_ksimd() {
-> +			if (static_branch_likely(&have_eor3))
-> +				crc = crc64_nvme_neon_pmull_eor3(crc, p, chunk);
-> +			else
-> +				crc = crc64_nvme_neon(crc, p, chunk);
-> +		}
->  
->  		p += chunk;
->  		len &= 15;
->  	}
->  	return crc64_nvme_generic(crc, p, len);
->  }
-> +
-> +#define crc64_mod_init_arch crc64_mod_init_arch
-> +static void crc64_mod_init_arch(void)
-> +{
-> +	if (cpu_have_named_feature(PMULL)) {
-> +		static_branch_enable(&have_pmull);
-> +		if (cpu_have_named_feature(SHA3))
-> +			static_branch_enable(&have_eor3);
-> +	}
-> +}
-> diff --git a/lib/crc/crc64-neon.c b/lib/crc/crc64-neon.c
-> index 4753fb94a4be..767e55edc0e0 100644
-> --- a/lib/crc/crc64-neon.c
-> +++ b/lib/crc/crc64-neon.c
-> @@ -10,6 +10,17 @@
->  
->  u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
->  
-> +#ifdef CONFIG_ARM64
-> +u64 crc64_nvme_neon_pmull_eor3(u64 crc, const u8 *p, size_t len);
-> +
-> +/* x^575 mod G, x^511 mod G */
-> +static const u64 fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
-> +					   0x62242240ace5045aULL };
-> +/* x^319 mod G, x^255 mod G */
-> +static const u64 fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
-> +					   0xe1e0bb9d45d7a44cULL };
-> +#endif
-> +
->  /* x^191 mod G, x^127 mod G */
->  static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
->  					0x21e9761e252621acULL };
-> @@ -45,3 +56,75 @@ u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len)
->  
->  	return vgetq_lane_u64(v0, 1);
->  }
-> +
-> +#ifdef CONFIG_ARM64
-> +#define SHA3_TARGET __attribute__((target("arch=armv8.2-a+crypto+sha3")))
-> +
-> +SHA3_TARGET
-> +static inline uint64x2_t fold_single_round(uint64x2_t fold,
-> +					   uint64x2_t temp,
-> +					   uint64x2_t consts)
-> +{
-> +	uint64x2_t temp1 = pmull64(consts, fold);
-> +	uint64x2_t temp2 = pmull64_high(consts, fold);
-> +
-> +	return veor3q_u64(temp, temp1, temp2);
-> +}
-> +
-> +SHA3_TARGET
-> +u64 crc64_nvme_neon_pmull_eor3(u64 crc, const u8 *p, size_t len)
-> +{
-> +	/* Assumes len >= 64. */
-> +	uint64x2_t fold_consts = vld1q_u64(fold_consts_val);
-> +	uint64x2_t fold_consts_4x = vld1q_u64(fold_consts_4x_val);
-> +	uint64x2_t fold_consts_2x = vld1q_u64(fold_consts_2x_val);
-> +	uint64x2_t v0 = { crc, 0 };
-> +	uint64x2_t zero = { };
-> +	uint64x2_t v1, v2, v3;
-> +
-> +	v0 ^= vreinterpretq_u64_u8(vld1q_u8(p));
-> +	v1  = vreinterpretq_u64_u8(vld1q_u8(p + 16));
-> +	v2  = vreinterpretq_u64_u8(vld1q_u8(p + 32));
-> +	v3  = vreinterpretq_u64_u8(vld1q_u8(p + 48));
-> +
-> +	p += 64;
-> +	len -= 64;
-> +	while (len >= 64) {
-> +		uint64x2_t t0 = vreinterpretq_u64_u8(vld1q_u8(p +  0));
-> +		uint64x2_t t1 = vreinterpretq_u64_u8(vld1q_u8(p + 16));
-> +		uint64x2_t t2 = vreinterpretq_u64_u8(vld1q_u8(p + 32));
-> +		uint64x2_t t3 = vreinterpretq_u64_u8(vld1q_u8(p + 48));
-> +
-> +		v0 = fold_single_round(v0, t0, fold_consts_4x);
-> +		v1 = fold_single_round(v1, t1, fold_consts_4x);
-> +		v2 = fold_single_round(v2, t2, fold_consts_4x);
-> +		v3 = fold_single_round(v3, t3, fold_consts_4x);
-> +		p += 64;
-> +		len -= 64;
-> +	}
-> +
-> +	v0 = fold_single_round(v0, v2, fold_consts_2x);
-> +	v1 = fold_single_round(v1, v3, fold_consts_2x);
-> +	v0 = fold_single_round(v0, v1, fold_consts);
-> +
-> +	while (len >= 16) {
-> +		uint64x2_t t0 = vreinterpretq_u64_u8(vld1q_u8(p));
-> +
-> +		v0 = fold_single_round(v0, t0, fold_consts);
-> +		p += 16;
-> +		len -= 16;
-> +	}
-> +
-> +	/* Multiply the 128-bit value by x^64 and reduce it back to 128 bits. */
-> +	v0 = vextq_u64(v0, zero, 1) ^ pmull64_hi_lo(fold_consts, v0);
-> +
-> +	/* Final Barrett reduction */
-> +	uint64x2_t bconsts = vld1q_u64(bconsts_val);
-> +	uint64x2_t final = pmull64(bconsts, v0);
-> +
-> +	v0 = veor3q_u64(v0, vextq_u64(zero, final, 1),
-> +			pmull64_hi_lo(bconsts, final));
-> +
-> +	return vgetq_lane_u64(v0, 1);
-> +}
-> +#endif
-
+-- 
+GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+Linux Device Driver                          giometti@linux.it
+Embedded Systems                     phone:  +39 349 2432127
+UNIX programming
