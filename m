@@ -1,152 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.201.85
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794869549;
-	b=2ggVBlg6fOCaS8Z9XlQEGwoZNcZkkHTa8CJDV1YSkwBnR9AvouP7bOv/sX/Nzfou2TWw
-	 Cwae5dmbU/eIdtj+eo3D7i8pqKs9yyCQJnMy20ZPwUkL2cWmwssCxslKFHJJKL9Bs0V0d
-	 SOBBPx8BfNEzkG7+2bi9J4ZnJsW18lLlX5d4cvt11EFw7WwBio1c8uPKg6EH5wyiWDvhl
-	 V5mHmgTX0/UYwfPvjVYQinl7BIwpxIDffc8MiYrLoXL0Yrb1eRNcZHqcvl/moucZbqqn+
-	 19z6Rz/M/fGb7+mN3oN2glS4hjyrsOpp4gqokTvU5XuiEsxrFGCt7RLQbO2h167DxQg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794869549;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:CC:Subject:
-	 Thread-Topic:Thread-Index:Date:Message-ID:References:In-Reply-To:
-	 Accept-Language:Content-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:
-	 dlp-product:dlp-version:dlp-reaction:x-ms-publictraffictype:
-	 x-ms-traffictypediagnostic:x-ms-office365-filtering-correlation-id:
-	 x-ms-exchange-senderadcheck:x-ms-exchange-antispam-relay:
-	 x-microsoft-antispam:x-microsoft-antispam-message-info:
-	 x-forefront-antispam-report:
-	 x-ms-exchange-antispam-messagedata-chunkcount:
-	 x-ms-exchange-antispam-messagedata-0:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-AuthAs:X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-originalarrivaltime:
-	 X-MS-Exchange-CrossTenant-fromentityheader:
-	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
-	 X-MS-Exchange-CrossTenant-userprincipalname:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=E1VTK4oJYRrvWcSnK2r8Pc1f/i3tTwi2y1VMmaZ2H/g=;
-	b=zCJUJnBYAIL0IXyn5yxDn4Xxf+9xPtm/VC3X122WSHElkpXPWtcCdOABkTMDQY5BsV2r
-	 wBLVqivavQenHO92IC/7aCF19FrHDc56wvY+gCMSTLhFgxP7bCIfoS0IoUG+NyWR39y5m
-	 +q6qXzLgMxet1iTCcniI7qKKfSBtY5HOdu0t022pZjw6HPFxA2MyRpWA7pTSYfzMSGJlt
-	 s+1UtsDQhnTmAxIPW7fN6n+c452bYOVvhZbWjqwE5YLs5fWqCdLWg6DRrl94SYy6fmWEI
-	 eb3uFaQfSZpigQdnIHZfeafivLF1jR1JKJynPcZamjwSdmjyu+flyTkgPW+drh7BQXA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=rambus.com;
-	spf=fail smtp.mailfrom=rambus.com;
-	dkim=pass header.d=rambus.com header.i=@rambus.com header.a=rsa-sha256 header.s=selector1 header.b=l4hpRWdY;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.201.85
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11020085.outbound.protection.outlook.com [52.101.201.85])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794873681;
+	b=w9/MqCzCoRdYdS6+qyGmB0RozicbJLRH3hsgZYutc1mSdK763LdRMewIJ42qCoQVw+yL
+	 oPnhqTOKFuUI2m8IRxrsBrtdyNJegCCS6IFZv3wIjwC+q/1LKtuTlMOPl383aYZ1bsoUB
+	 Y3ttFKFqpGL0X/R4S040czOEloxGyA5zSeXIXsD8VFQdxEcZff2t9mwtOe8g05EZIcn+2
+	 qWVIKRwsPg1aS3fBnVWPPilY1QqmcvSEfiLCtHJFCiuA4f1OCght7obbM0E0nkpGI0Tso
+	 dCzHPxtFA8YNiyBbpngfPU9iNUq7Gylb0XlS1m4Kr3SjJ9omSywPlwRoz23RolWUZUA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794873681;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=K1ZF2KDYPZjWmgXYpRnfPLQMZhHrewkjaJJVimnVSxs=;
+	b=eJMIxNCeuWNtdlilKt0bMTKUai6mDiKKcLICBPRiPZ7vlRou9EgPI7+XjhBd/bLq4jFF
+	 ajRMNfcJWBI6JzFiMEVqE82C5qBmN1WhYh+JvqWPbWN9Oqd0YaPOJozzENjzd3sVcByhx
+	 rHJNw9bf7LdO3tflUDs+Lckgimd4GYzXp+22DYHCxUrji9iAui72yoaZmp7euLRSngrcW
+	 pUSh3FX+WXpNSge8P2EbC9YK+p89+dQwtHVov+VCNdNPuf5HsGIVMgX1Mz2oBbEB0C5+y
+	 p+zJHPs8pLBBxQQX5tt/E/jX9ptMW8TUZ9xujCtALRVTqWe5JFAe1sPDdIbu0fID7DA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GoX9fW28;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A7C606A31C;
-	Mon, 16 Nov 2026 22:52:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 61A7C606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=rambus.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FC8606A31C;
+	Tue, 17 Nov 2026 00:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=rambus.com header.i=@rambus.com header.a=rsa-sha256 header.s=selector1 header.b=l4hpRWdY
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B1N454HHI+PRO6opTTjSIJHHjxyD07TWE2DNinQ8tZmUcSWbO6EGWVxaIUKhCLd01l/gMU1mAXWMaz7i5eqTD9Kk8knmkFD8BvxHhwA9SwFeNNL3bcx/vqXwbeIW2AD3gA7ANtYHZyCShtqETbqYV9bG+JGs6Zpuli1+JAa3jtZdhE35hV6xSMm2PXQY/W/QslSLcTXnSAvPiqOaWdiIjUtlaSG40SiZLIYXUTQaFudB5TzuNZFjC6czcRCf5fvY7FYRy5pAQcErQslw+zQuoa82v+uthXNpnxXFcmPOM9GHKYJbO+YwB7dSpMZrkdb60pTeFllAHYylXQg3PlVmwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=E1VTK4oJYRrvWcSnK2r8Pc1f/i3tTwi2y1VMmaZ2H/g=;
- b=pdX9lkmpRgklYy+k+Upp/OHlOBKmJ1JvicWRTCCbIJiiqshBkrKTFOlbdoCPfd+tntzp/cf5uRwOP3PmDJVlGvv7smc/TmZfAiymBG0vuH2Gnmch6w25mcXxdoFTOP3UXV5EXaO39WRD46nNbgslW62i3E3tOuDxqx5wn+k3KVMXmC3IOW1HIqiSXB2WY+7mojrKQQa9XdIsA3J40yFSjdELRnAuK+epi1GVyuDzlL1O/ARqYbvFUKx3E5uOt3F79gLvQ0hc7UvH1X87xlT4Ym+kO5cKYmMq1N+3LopOWKDfyMGVYfLCRzVk8zzQWvMEUKSTngLYhJm05QynibaPWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=rambus.com; dmarc=pass action=none header.from=rambus.com;
- dkim=pass header.d=rambus.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E1VTK4oJYRrvWcSnK2r8Pc1f/i3tTwi2y1VMmaZ2H/g=;
- b=l4hpRWdYZKK8AQLv6NmmBylNNVd4+O7Roz5NzmdySTv7sai+Os5oye1m37mixtUB129WtmvkaTXCJjtiDDYzLM+Z9hAmZjTqX83d9OkJsH1oFb+MmBQOTG8wa+9agheFCz8kUNQ7z+qMpMXZ47vvIwsl3hYjWiPio71bHJYlbrtsArNNV+P4R6/YWt93HYPRR4LCkpQR2K+yUU+F5oTw9lwvJ4fge+lsgaxOzqZ4HvlftC2540c2Phw3tOZnUiAznlxzpOhy5T8MuoiZjikuvZdjB2yFaeoo/gVEfiVEZDZ7AbewGu9m5ZJOz++7kB4xVKBidzVZieB3jAztO8zOWg==
-Received: from SJ0PR04MB8406.namprd04.prod.outlook.com (2603:10b6:a03:3d3::14)
- by PH0PR04MB7415.namprd04.prod.outlook.com (2603:10b6:510:18::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.14; Mon, 16 Nov
- 2026 22:52:27 +0000
-Received: from SJ0PR04MB8406.namprd04.prod.outlook.com
- ([fe80::cbad:dfcc:82:7dbf]) by SJ0PR04MB8406.namprd04.prod.outlook.com
- ([fe80::cbad:dfcc:82:7dbf%6]) with mapi id 15.21.0615.013; Mon, 16 Nov 2026
- 22:52:26 +0000
-From: "Ousherovitch, Alex" <aousherovitch@rambus.com>
-To: "sashiko-reviews@lists.linux.dev" <sashiko-reviews@lists.linux.dev>,
-	"Krishnamoorthy, Saravanakrishnan" <skrishnamoorthy@rambus.com>, "Wittenauer,
- Joel" <Joel.Wittenauer@cryptography.com>, "Nguyen, Thi" <thin@rambus.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
-	<rdunlap@infradead.org>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-Subject: RE: [PATCH v8 2/5] crypto: cmh - add core platform driver
-Thread-Topic: [PATCH v8 2/5] crypto: cmh - add core platform driver
-Thread-Index: AQHdcTPv3CpPtr8Hb0SYqB37I1+L6bcnlZGAgAnBluA=
-Date: Mon, 16 Nov 2026 22:52:26 +0000
-Message-ID:
- <SJ0PR04MB84066047ADAB0F643E908AF1D77C2@SJ0PR04MB8406.namprd04.prod.outlook.com>
-References: <20261110-cmh-b4-a-v8-v8-0-4cea8ebc1d40@rambus.com>
- <20261110-cmh-b4-a-v8-v8-2-4cea8ebc1d40@rambus.com>
- <sashiko-outbox-207521@kernel.org>
-In-Reply-To: <sashiko-outbox-207521@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-dlp-product: dlpe-windows
-dlp-version: 11.14.1.396
-dlp-reaction: no-action
-authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=rambus.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR04MB8406:EE_|PH0PR04MB7415:EE_
-x-ms-office365-filtering-correlation-id: be2de984-d634-449c-551d-08df4434494c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|23010399003|366016|18002099003|6133799003|22082099003|261009223027099003|3023799007|921020|11063799006|56012099006|10067099003|4143699003|261102123227099003|261028144727099003|261026121527099003|261026140227099003|261021121427099003|261022105027099003|261022075727099003|261022113327099003|38070700021;
-x-microsoft-antispam-message-info:
- wnLmPic4F01c4ROnjS2U3/ERLFGq2XlHdbuPGVZeEfm2hzJ+fc+NjF7/0O/Xo0tmrlbxL2DxegUH8AcO/aTSijL0ThZ1Y91yzyajR5v0zm8geZ1ePstEq2xsU1nWA09cqq9hGnTM469KBollViJSwGLKLCviXqQlz7iHJL4e5+/TP8don3PL2YDOMmMrq0oVk3ovqDqetxTnZ8iPsMF6vEn6IbgM/Viux8ol+mk5hP8MF6NgWYkR/7zEhUgNxs1BQr4KZtKdiA+r+otq78rBAmYzHV14h3fAOfWUirUrS6qCu2161cgOVu5IWO0Z6cOzBd1ORZomy6GttGn58Ik3bqPaXEvathiXJXdt1h6aFPd/+IKMREYOYjccGnpffGYp/rmxkJWuxBYLSD5if3qwxbXoi6Byx1g8JhlD9bUZiTEjUJ594gGodozE9AkB7OiSvnNjMGMD4erVGlUr5O3VYH+6m0HRu3mVnYIBNKbitFc/RG0AdjH29LDevU20ltQW0Kh+eO9r4pwRuER3xXi3j7RVkJ51EX5turvJ/MznCTtPC35yflZ7j8Sb2GIVSVdGZNoRbRqyc/e4+Pn7q3cWlr88jN0W1wYKu4UluDauAHEk8K984V80w6pyYAZr3609uachrA3RG4u0EGyGZgNjcs7f0bgsjglCnESm7C0mSJmhad35TFr9xKi55PVbh8RZBGC4hLmofZcfWD6+gw5FCb+ivkDsB3YzCXYfMcK37mAUB2XS2/E3GXnkHlJhvdC7
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR04MB8406.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(23010399003)(366016)(18002099003)(6133799003)(22082099003)(261009223027099003)(3023799007)(921020)(11063799006)(56012099006)(10067099003)(4143699003)(261102123227099003)(261028144727099003)(261026121527099003)(261026140227099003)(261021121427099003)(261022105027099003)(261022075727099003)(261022113327099003)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?lBLkl9x8mEUmdOBzataKIbbuzntcs3f8vxFlZfqYpGolysqmOOZRSBQ4dZYT?=
- =?us-ascii?Q?dIGbLMCFCiVrxexCfPyY1OGl3fy//7bA4i+ToAZqoGu4gf3gimXTnd/Tlep+?=
- =?us-ascii?Q?aOwT4lPOnNDg84ORqgJ940/iXcoAnsYUL+umvK+nBn8rHTcYRqS0C3/xRK3Q?=
- =?us-ascii?Q?FEjjNSxDm67/PJpkDE2Qhat6A/hvKEJANVaZOiCsmlLdiHA9gLof4uvSAOCZ?=
- =?us-ascii?Q?j6S1eA0ssTUQ7SxylcSxtqxuvoJxz3sw3zVqeAIZVLjHgKOf4ZfyV0JsRnp7?=
- =?us-ascii?Q?Lh64gCVH5yZur9ysbFKWDnCGUzX+nZ5pVCONX2L8ImWz9Kx00hRmgWglhZMR?=
- =?us-ascii?Q?dKpIBQfZfmSiGM6CD0Oc+LRaYf38KBYvuawexIyNxm9p0wS3YrVpqbkxwW03?=
- =?us-ascii?Q?SpfcHzbdFLMX03LgI4ICs3QYG3VR/u7hsRw0gkuvl8MetF62LOZ6qNpgCZsk?=
- =?us-ascii?Q?Qik7nObmNFeqCUIqn8whD66dYTANzXac6ajjESR7tk21x/qHQsdmiBhg3eAd?=
- =?us-ascii?Q?yFK8226Uk4ApeBdwMqMHptbHYLgxe/CDIKKzV4FhIm2Novg2zUOJRBiNZAoN?=
- =?us-ascii?Q?x2CuuFeVHuQAm5MRMz1M8LA5mGzSn0H0jVX2w/4u4AmifY3tLVD3QznBNJ87?=
- =?us-ascii?Q?tMs1W0wUjZtkOqccSUODB81Au7tnFSdyYDSvEy8NsREgNU7rO7X8UgCizR+V?=
- =?us-ascii?Q?hN0K77uX2NqZrvRZ45JH0NlFB8xY7AdCStWzor/aULsOwsnfgFOYm8hKiv2w?=
- =?us-ascii?Q?ntvFbn59HP6ocz26Wmpb+TpzcruCgOq1MbV5K72R/GIHCvHzfJkj2LwD6FNz?=
- =?us-ascii?Q?U/8dZWaRSeObfp5CUFE5YLcnwGESb4uF3fe+UksSpLsV+T6lcAWuuIgka1tC?=
- =?us-ascii?Q?sho1ZTJNwUzllA7LKMQgchvw5LkgSq0iptHdzCpdSoBUrWTlkD8Z3sukP1u6?=
- =?us-ascii?Q?SdWlO4K9M/R33kin5IujadTcbyGztP20SCr/bCZz+FhTt1MV2/9dBwIx+moa?=
- =?us-ascii?Q?NFR8+YLUnpzjASUUoT3mL5fgcbxRBF3mIwp4Ey7afxnC4bnsD/tLbMyGRNrD?=
- =?us-ascii?Q?V/7BAblNBlhlMceCYjk9BiUtKmVV91h58mQmi0WkdM1dT45nJAbPMtEGUWgf?=
- =?us-ascii?Q?BgKB53oxv/2dzUJRgkUMkgxRD/MA+s5HmtyvCgmduGoctRl0PHYmAZMFe76n?=
- =?us-ascii?Q?RyFYcNRljWuCwmYt7H2Jp+1TH/prdyZ1+uFvW9GNwPaTQXGtiYlIWuY1f51Y?=
- =?us-ascii?Q?eEMsUGXgsjQTbTbfGMFV60VX7tyNfSSGoxkhjuLNZkKr4xe6IUXX8Zg9FDgu?=
- =?us-ascii?Q?HQXsYLd7o0NcPovwhkTgseIJugI5ovs/NF9u/xiXrN6EeFxJMVRWOgTe4gvD?=
- =?us-ascii?Q?sJXeUM3xqhyejZwoC5OXqKw2DiEuybT0C/gwF8fHfEjlkuEES0pQoJ4kdlYI?=
- =?us-ascii?Q?3OaYAtu3Z00LWDW/UCSOR0s6To9ZWeiuRVGCeSqk3UW0IKYUolP2oKi919zc?=
- =?us-ascii?Q?a7NoMeMb+seW91hOUYbYZuoIodu4iezMg22NkpvlG21T2/DIpHJgPd/JCrNb?=
- =?us-ascii?Q?ded8p9OzXC3amOY1Z9VS0OhOM4XFvC36ghVDyu+u/ZHHUobDnB6/S5vClwAs?=
- =?us-ascii?Q?V7JUtf2gxtH78IzN6wHeL6jl2IfLB0GUEXipE+DliuCHXi0kbuborbO4eUzh?=
- =?us-ascii?Q?aPPxnbGQFDC0N4i0owxiRG6YjU9efDQzoZ2xLPVpwsdQdArwbGHL0bdUNziB?=
- =?us-ascii?Q?YGgeZSPKtA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GoX9fW28
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D9E01F000C4;
+	Tue, 17 Nov 2026 00:01:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794873680;
+	bh=K1ZF2KDYPZjWmgXYpRnfPLQMZhHrewkjaJJVimnVSxs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=GoX9fW28HH2359NOfFg0P9xkJRArgLVZxtLeEIe9cDXJYM7G54evwdy6sqCCoek2V
+	 4V6ImVs2iOBcbYlICJyz43hSA9SOuyglGyAuPZZkirz3rM5xO56nO5LlPZDpG1vTwO
+	 ShDKtvun2Ue+dm6JBE0HAR4fbANoK17SoSZv9WkawiWgTd9k2ni5Hu8/gmCTp/ROX1
+	 eEvi0BvZLYVhkVvagByRuvvXCZu/XmrOcSnNYvo1OiyGytCw3oZFw1oKI2YucF2+Kw
+	 Jsx60bhG+Q29wsdlVtnhLuOR964cKuxoAYnI0gL9eidDrgV+NpCCg8yDNrs9RrP3YZ
+	 KkQFmlQ+vAS/A==
+Date: Tue, 17 Nov 2026 00:01:19 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Shreesh Adiga <16567adigashreesh@gmail.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Demian Shulhan <demyansh@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] lib/crc: arm64: Add NEON PMULL+EOR3 crc64_nvme
+ implementation
+Message-ID: <20261117000119.GH229817@google.com>
+References: <20261114172955.1598929-1-16567adigashreesh@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -156,40 +57,67 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-OriginatorOrg: rambus.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR04MB8406.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be2de984-d634-449c-551d-08df4434494c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2026 22:52:26.8606
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lxjDSZq5H4R/RFsKaPyjhkNud2SuNQtGyp7OLEmtf218RIiKT9J/uUQC6lu4avZMyE6J00omjAiIQuungHtWi505NxnU/f1ULcdMTOyyb04=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7415
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261114172955.1598929-1-16567adigashreesh@gmail.com>
 
-On 10/11/2026 17:50, sashiko-bot@kernel.org wrote:
-> - [High] crypto: cmh - race in cmh_tm_try_cancel_command() during CMQ
->   backoff
-> - [High] crypto: cmh - unaborted sync timeouts and missing watchdog
->   escalation
-[...]
+On Sat, Nov 14, 2026 at 10:59:51PM +0530, Shreesh Adiga wrote:
+> Add a 4x-folding implementation for CPUs with FEAT_SHA3 which benefits
+> newer ARMv9 CPUs like Cortex-X925.
+> Usage of EOR3 from SHA3 extension improves performance by 20% compared
+> to the regular PMULL without EOR3 on Cortex-X925 measure in userspace
+> application via libbenchmark for 512 byte input size.
+> Measured about 3x speedup for 512 byte input compared with the existing
+> NEON single fold implementation on Cortex-X925 in userspace.
 
-These are addressed for v9, apart from the two points at the end
+Was crc_kunit run?  It already has a benchmark in it.
 
-Cancelling a timed-out synchronous command is now decided under the
-command-queue lock, so a command the transaction manager holds is
-finished undispatched instead of being submitted later.  Commands
-submitted with cmh_tm_submit_sync_tmo() carry their timeout, so the
-watchdog escalates them on the device.
+The commit message should also clarify that this benefits ARMv8.2 and
+later processors with the sha3 extension, not just ARMv9.  (E.g., Apple
+M1 is an example of an ARMv8.4 processor that benefits.)
 
-The recovery findings (FLUSH/RESTART reissue, FLUSH on an error with an
-empty queue, wedged mailboxes skipped, last_head and abort-stall
-tracking, the probe/teardown FLUSH), the dma_live and quarantine ones,
-and the completion counter are fixed as reported.
+> +#ifdef CONFIG_ARM64
+> +#define SHA3_TARGET __attribute__((target("arch=armv8.2-a+crypto+sha3")))
 
-Suspend with recovery pending waits for the mailbox's requests like any
-other, and the watchdog resumes the recovery after resume.  A
-synchronous command cancelled before dispatch still returns -ETIMEDOUT.
+Doesn't this break the build with gcc 8.1?  The kernel supports gcc 8.1
+and later, but support for the sha3 target and intrinsics were added in
+gcc 9.1.  Either this code will need to check the gcc version, or inline
+assembly will need to be used for eor3 like lib/raid/xor/ does.
 
-Alex
+> +	v0 = fold_single_round(v0, v2, fold_consts_2x);
+> +	v1 = fold_single_round(v1, v3, fold_consts_2x);
+> +	v0 = fold_single_round(v0, v1, fold_consts);
+> +
+> +	while (len >= 16) {
+> +		uint64x2_t t0 = vreinterpretq_u64_u8(vld1q_u8(p));
+> +
+> +		v0 = fold_single_round(v0, t0, fold_consts);
+> +		p += 16;
+> +		len -= 16;
+> +	}
+> +
+> +	/* Multiply the 128-bit value by x^64 and reduce it back to 128 bits. */
+> +	v0 = vextq_u64(v0, zero, 1) ^ pmull64_hi_lo(fold_consts, v0);
+> +
+> +	/* Final Barrett reduction */
+> +	uint64x2_t bconsts = vld1q_u64(bconsts_val);
+> +	uint64x2_t final = pmull64(bconsts, v0);
+> +
+> +	v0 = veor3q_u64(v0, vextq_u64(zero, final, 1),
+> +			pmull64_hi_lo(bconsts, final));
+> +
+> +	return vgetq_lane_u64(v0, 1);
+
+Note that this is missing several optimizations compared to the x86
+version (lib/crc/x86/crc-pclmul-template.S), including using
+fold_consts_2x for a tail of 'len & 32', efficiently handling lengths
+that aren't a multiple of 16 bytes, and reducing to the final CRC in two
+carryless multiplication instructions rather than three.
+
+This is also just one of several CRC variants.  This would have to be
+done all over again for each variant if they are not going to be
+generated by a template like x86 and riscv do.
+
+So we can do this for now, but it isn't a very scalable solution.
+
+- Eric
