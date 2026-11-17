@@ -1,97 +1,72 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.196.26
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794886502;
-	b=Im8pmRga/b4X9sECkUlSyBhx2Y3wX6AGndTOg6sKgXfGluyHFiIAwsKAsr/ow9ywG3vH
-	 ZKLJMoWNpgBSRm4SceX9eOjnIA5cBfzZ7G/97bIMlN3bVEjPCGsN/hEUXENiIpNiesYZC
-	 XdcTKyeN4VwW8/lFwF/b0BxNILAkEodXwNjXZb5Mgv+fZ2+2ZJoNLaDkSAbgSpW1UMsRk
-	 4ewKVvdCWEBEUqtZbAt/16ECS1ZfDPyNiKxcHHhcK7SorJeSu2f/k4HX+DqHKBsQmDLxz
-	 /XrFKxLBrOMb9i2IUK//ZsDFRTcxnWBcbWoyrAgRjHakcRnWOE9KzdLOyKt1a6nfnfQ==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794886502;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Message-ID:Date:
-	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
-	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
-	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
-	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=bl5qGGbw/T9alykmySoTq0ETNQVOHYwTYYyg5gbSfdY=;
-	b=WnyLpbiOzkogDra6ul8OZKq3WcCdooDvfNyE7lu9PrtV2cHOiH+vxmqNAj7zBSyEbQWF
-	 0GtIc533dFDnRLyNyMbyerbPznwgmJexVxGGjzRTvy6uhaYf20BztkcBplITBuRKdiWJy
-	 IHd4ByHixrmyb6zjrzuLw4ZHKBynzqbzOU765MPGdA2QYWKae9xPgaMMRDlAghYrMWeYz
-	 dX6UzL3dILfZbcBiguDiI7+Me+iyizKFowOz4GQj4dPc5p5FN4btWuaZYUoLCXRwH3D+g
-	 c3X7lwhjeCqF3DE5fOPy2qTgqIab2RK0WUGzOGOPgHDkPXfEpc3+l8XmY5wEiH1OQ8w==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=amd.com;
-	spf=fail smtp.mailfrom=amd.com;
-	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=m7Z3wBeQ;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.196.26
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013026.outbound.protection.outlook.com [40.93.196.26])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.72
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794890108;
+	b=BPfpqSsBB/ez+VHGF9T/7DT3/9OgEGUhS8XWra1VY8BIr1s+nyIs7CxSqfTXzkzraHZW
+	 /29BgGCgj0HQuiD8lnH/Yd/9ZEgKBZ7WzKvyebKnjhZ+2mZdp25l44xV25dTCds2pNoQA
+	 6pMYaG2Fyu4XvYgEJbWiMGA6MeaG7Po9KAYEUiaN4KPhqTSvQsQi+k+g96dclX0RR2hhp
+	 vGC/xIQHNrjPrlx1y/9aT7X/2g3ih78LegpdMPeZn/Zomg8xsbv4yBe3jK5nen6g7SjuN
+	 QHUb6oJxxDGtxNZruZ5no3YtUCq/RQ0Gs1nySYCwXKJgk2v4s9BECqamt8ySU/PyNYg==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794890108;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:Mime-Version:
+	 X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
+	bh=9ljMd+8qHZtmdzxzGXfXq4+janfrVyX1V/6KLR49owU=;
+	b=HyRjfoCcBsNMVTRNrxPtoY0ZYYfWIEIZZ8PLBQMJwq0Ux0oidc5UDoXV67d7RTV+a+DV
+	 yfYydVzZgSXbeB9wI2RKNLmcxF/Gnqq1V0GI0hMySXBJu8nTmdsEO9CKB0+21yw8AR5ew
+	 lKuLpFm+0gyeeun5aT+SsaAv62X+YddKXYnthnlgpmzLtSaOpaCahcxZXatbFaqzrxwoK
+	 lVvQHCi425liL4lZIBigEm13NSgYED4AsUfMoQUaviMqmhzV55chz5ym7uLnhfBTvQ4YW
+	 TpI2b7dePiC1u+81OQwImDG4wGe7mSh6X/WGzX7hNxDU2dLVwJWQsRN7KIesDK72Idg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=google.com;
+	spf=pass smtp.mailfrom=flex--dylanbhatch.bounces.google.com;
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=hRy90PAP;
+	arc=none smtp.remote-ip=209.85.216.72
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A2D606A31C;
-	Tue, 17 Nov 2026 03:35:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A8A2D606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BA4606A331
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 04:35:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E0BA4606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dylanbhatch.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=m7Z3wBeQ
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=L9By7uOvEgf35n7gKdDFubasD+mwRp+6jslhDsqCT53psS/4YxduV7qFFCw2HTq72Qs9PiLmNup8qlymNXd1tI76uzm9wucdnS0UXK87aSqVYSQ7w11BZoo4eZH3yOXczjKNd/EDAIQGpC1+7tx6pHM9Z0PQ5VDucYrdxKliqnfBfmE9HHfhlPF89mMnP30xKUR7ESVt6Dmww1kjFsKpQmDkMSV4EJoF8Odf3eBV628u3yYtqCTKe9ygKHRyrjVB8ex62bWkzXZ1IVzEgx5sdqjSjH7gvpZLRsRnN+hUA2Voh/uIYwSxJt8SJWhDRgPsl1vY3pKTost3QYI0OhvWDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bl5qGGbw/T9alykmySoTq0ETNQVOHYwTYYyg5gbSfdY=;
- b=i250CUJ/NzuNSOT2w3bTteQzw0Ok/l3gC0KKCklQCnSiGDmMUE6lvfyiFEMQyiNGsiZPGNz6hADMa/S/3ujeQCPU4uK0Gv67wLhv8cz0R40MvjlDh1Vfit7c4AeOizyKeYdMOd8EQjZNOELqex0DB8NKW4dxmWoERpCcdHovOmiFw/GbfLw3lJDCgD8/CYUOeOZ4oo3qTCLT6DucnxQucdOUT6fyGyADqPUrLIG94LAg83BZLZrh+hMaexp2K6NSItt9bIB8Ne1foZ9GBZV/qTATciBhKBWUcXimkqNvmteSVkXasEAudwxjMt0x/NeWnlbkGsK8sOGc4VhBJPSceg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bl5qGGbw/T9alykmySoTq0ETNQVOHYwTYYyg5gbSfdY=;
- b=m7Z3wBeQqSYMxc5FvJI9iybP9k6/tP/y6oVFUNfo5QweAVa76vbnDEoX84d337AR9/3uUJKACsv6XOlGZqHrjwKjOB8ynqteTbb6ClloRoHDbUH52AUdHlBihjJBU6S6HzveANZ5ElYTy8n2E7mBaug6Di5cCNchHjcdyGE9aGk=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA1PR12MB6188.namprd12.prod.outlook.com (2603:10b6:208:3e4::6)
- by PH7PR12MB7425.namprd12.prod.outlook.com (2603:10b6:510:200::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.14; Tue, 17 Nov
- 2026 03:34:57 +0000
-Received: from IA1PR12MB6188.namprd12.prod.outlook.com
- ([fe80::e933:4d1e:8759:e9a0]) by IA1PR12MB6188.namprd12.prod.outlook.com
- ([fe80::e933:4d1e:8759:e9a0%2]) with mapi id 15.21.0615.009; Tue, 17 Nov 2026
- 03:34:57 +0000
-Message-ID: <54e24f60-bd59-4609-aad7-902c93c38f79@amd.com>
-Date: Tue, 17 Nov 2026 09:04:51 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] crypto: ccp - unwind PSP sub-devices on partial
- psp_init() failure
-To: Mario Limonciello <superm1@kernel.org>,
- Kim Phillips <kim.phillips@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sashiko <sashiko-bot@kernel.org>, stable@vger.kernel.org
-References: <20261116203622.615371-1-kim.phillips@amd.com>
- <c99b891f-05fb-4629-b439-ac3828a4ea0a@kernel.org>
-Content-Language: en-US
-From: Rijo Thomas <Rijo-john.Thomas@amd.com>
-In-Reply-To: <c99b891f-05fb-4629-b439-ac3828a4ea0a@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MA5P287CA0358.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:219::17) To IA1PR12MB6188.namprd12.prod.outlook.com
- (2603:10b6:208:3e4::6)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=hRy90PAP
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3ad30487d55so3218199a91.2
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 20:35:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20260707; t=1794890107; x=1795494907; darn=vger.kernel.org;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=9ljMd+8qHZtmdzxzGXfXq4+janfrVyX1V/6KLR49owU=;
+        b=hRy90PAPuzLiC1Ugzow1TqtYICVR0C/3m9NpC/vL5oLQYPg+GMvdStu0VTqU9YJ/uo
+         sQjCyubE25syH9V+O3bwTt/MPCTRKW0T+tQCrlr27bSmfATVS4elvLUGAbA9Z6cqb29M
+         981NMSmqQjtvX1LhpBKfSQMDX8uhG5MgO8vEFip3vUKirgx4qehkhvJij7szW6WlEQiy
+         reOcS+Nt3FeJ+euRqQ9xLAkLACMmx9rGQK+rcOOa1kcCxmuh5/ubqEQXrxACoxAoxaWW
+         6/m/ZGHwHyL8zRCcKnbdvnUfABykJg1v9q6GvlkbsLflwACioNF3PgGLLnyYfl9kxGxo
+         Ihkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794890107; x=1795494907;
+        h=content-type:cc:to:from:subject:message-id:mime-version:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=9ljMd+8qHZtmdzxzGXfXq4+janfrVyX1V/6KLR49owU=;
+        b=SIkB5/SH0GBUGvp2lEWg0TQIf2NZDsb12Gu9iSGFPoBRmoXx627cYynJLs06PaGxc5
+         ws5IdPWEukbRGAoahSxQm9bME+JbOrDBKIaRA2OkoYOTR23rhmPAvS+8E8j3BnQ2cghO
+         m9nzrZjRkyy9WONT4+ECp4rtyoJb6ThYXqv4GCzBIF9ByDrYkZIMZovlRZLPjIA0rTFk
+         fFqHIWj9A03iLwNYZ+J1q59+vbUIndrD8c+Foyj6s2tKlK+zGX3J4pYyTV9iXlIruwsq
+         Rjrf0QaI2noXSfoH26+fWPuAyK6BCmSGG9B2mo7vZxFLLVEMYpVo8LRxudPLAG4IIj1L
+         hP0w==
+X-Forwarded-Encrypted: i=1; AL+hErGAYPjh4o7yy3Cm9qXkn9N/lsUqRSEKt1pogig9ghHDAJHayIa5eGOSeQmEOOU9lWq+W7vN3ZELTs2Sd5U=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+gEqG3JRpYENAz+RjMaWUYHXuNZX8XT+7EnT/wGxPkFdI4Yntz
+	3j7FRLR3mi04pH6x78JpXkcgX6jzKhCK3FyWXpC4KLmRx2Is5SNlYpTFq4wCsHdCKeZ8zN2TQUA
+	LpMI29GVyVqV1EQo9wWwid4aw7A==
+X-Received: from pgfd23-n2.prod.google.com ([2002:a05:6a02:6557:20b0:cd6:1195:61cb])
+ (user=dylanbhatch job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:3841:b0:3a6:e99b:bbdb with SMTP id 98e67ed59e1d1-3b1b0cfe3d9mr12853706a91.50.1794890106931;
+ Mon, 16 Nov 2026 20:35:06 -0800 (PST)
+Date: Tue, 17 Nov 2026 04:34:52 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -100,169 +75,187 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB6188:EE_|PH7PR12MB7425:EE_
-X-MS-Office365-Filtering-Correlation-Id: c27b8f74-e665-4053-ca46-08df445bc076
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|376014|366016|261028144727099003|261026121527099003|261102123227099003|261026140227099003|261022105027099003|261021121427099003|261021123027099003|4143699003|11063799006|56012099006|10067099003|18002099003|22082099003|261009223027099003|261009221227099003;
-X-Microsoft-Antispam-Message-Info:
-	sL1FaG8cSWlzn0tZkWBiOXaF2uqoouejeI+flx4cJ3WoUr2n48c/ZXrFjO7JhEaTiTTTJtsyRfY2sLGf8Lnhn54teVW2LSRikD4qo0ciRCwRlWtDwCnzXlMatcClzq5fkarad6kCUvnGMEHPwiiMaHMUu0iPKDePbQ/zPIJC74BswjAOf8LknsPupLLCKJBvnxZAE4tZ4VNiu2dp6NfyL7/TpidVNnNUXlB1a6cgzJpSVQLrN32wisZCrR4kFPOU4cED8UxoBRPStXTeV8qPI5Co61VIcsGlOja+1UMnm4wiso5b6dXBPUkmXdh2bAPWdqXXkeoq6Ke+xyfbq1mroCgrhNTA9oGaqoDawIetwKDIAUABMv9ipp3Pej2FRdUApj81H9DDVFWBYAaH75qnU1Qs7Y0t+JL0ZlB/Ufqx+8FFahL5EWCdB3ehsNpZrx/gVZv4w03tI3rAdsUgxQ85A0a9vz7SwiYILKZLPbRcC688Y9A1ThALnb7nlfZOPnQS0bNDdB7iAwROT3tLik3i7X97+mBL5tkSRmIfU0khGTy3K/HlS5+ozYF8wAj571JZgWPTLE65yOC/g1U8UqZPF/QdfcvTPvzSBryLo943reg=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB6188.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(366016)(261028144727099003)(261026121527099003)(261102123227099003)(261026140227099003)(261022105027099003)(261021121427099003)(261021123027099003)(4143699003)(11063799006)(56012099006)(10067099003)(18002099003)(22082099003)(261009223027099003)(261009221227099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cW5XS3pmSER6U2VuaFJkME9mSzJJMGNoRDJNdDA1QUh6eGVjWnBpaUM5MW1K?=
- =?utf-8?B?RG44TFlYUE5rWllTY1NRckZKZExlbG5xTHI3cjlaaWlIK0pFRUpsM2VwN3RF?=
- =?utf-8?B?RzJ3YmRPQ3k5QVNPekdBWkpRVUxabjh6R0NMUWhaUStLRTJ5Nld5eHpsSlVv?=
- =?utf-8?B?a1BwUE02RElsaHF0OHYxbVB1UjBJeFFRWmlmYWRDTlRxMmt2TW82VWJRaEhK?=
- =?utf-8?B?RDR3UDc3b2lkODZVUzNTeVpVWXFmUjlWVU1lM0FmUXdvc1l0Z2hHbEhEeWtP?=
- =?utf-8?B?ZjlZSkoxWitBY3dMMllkeEVpZ3RNV3lNcVo2V3dZWGdlU1VQZ2E0UGFVOHQ1?=
- =?utf-8?B?aU9aYWwrSm9xMno0VXB2TWxyVWZaOG5WbW9mU21IR1lUckdYOEFJcngrTVF2?=
- =?utf-8?B?anFSREpyMFlBaVpINkFXejNCUU1RYzVyRHdOU05qRXlzVVQ1Ui9aWktKVVZu?=
- =?utf-8?B?VnFOUjRjWE51RS9vUTZ5U2c5NnI4LzRRbnlwNTJtU1BqbWZJQ0QveWFtRzk1?=
- =?utf-8?B?N0JoMXVlQnh1R0MrYnFraTNKQVJaSmQ5d3dTQ0hTYXIrYzhhbHBlLzl2MERY?=
- =?utf-8?B?YWl5MGNYOGZDV08ycFNHdXQ4M1hJMFhDZEFPVkh4YXhPY0tXS3dsUFNmVHVS?=
- =?utf-8?B?SGlTOG1mUU9zT1gvSGsrcnBEcTBya2FPRFdNTU5BemNsbXdIOHRJaHBhcExp?=
- =?utf-8?B?c0w4N0k2akJybkt5UTEwRHhMOEZLSFRuYUlpeldTRWV0ejh1d01mVjBzZkt4?=
- =?utf-8?B?dnNtSE1JYmdoVGIwQVVDQ0VWVzZhS3J5VUZSVmFIaU1kTzUvMjBDdVVpUXkz?=
- =?utf-8?B?SElLVm1vZHd4UEtEbXhPRVdkWTlJOHZSdVZVRDBHWm9qc2g2RFR0T3AweVlP?=
- =?utf-8?B?b3dsL1Q2bks4aWkzejlldzlXWisyV3JqVWF1SStYNTJRRDNONDArdUpvRWdu?=
- =?utf-8?B?aXVCemRBazMzT2JBdXBpK2diTXNIbVJKVVBoVFU3OXZPb2YwVDFJOFV5OGRB?=
- =?utf-8?B?eTVycU16eXZWcXRwV2FqdEFoQmtTcER2WHk3Zks1aDdqWDdDbGUxVVJGV1Nn?=
- =?utf-8?B?eUNhOGZPb2Y2Sm1OVWpXdVBEYURsempvejdDcisxeGMxb1B6YzZsbytCbmYx?=
- =?utf-8?B?a0pKZ1pxbng0WXFLN0ZtbWdPckpoT2xwYkVHcGQwYmhkWHl0dXYra0V5dDZY?=
- =?utf-8?B?cXptL1plMU9nQjhYaWtaMWdMSjMyZ0xSVytvTitvcHczQUpJMXFRTW11UHBZ?=
- =?utf-8?B?eGw4am9abmNTV2Y0U3ZjN0pBdlJLVEJYVURkcGZvbGFjMGRhRks3RGNZbU5R?=
- =?utf-8?B?R3BIN0JsV1I5MkFCa2tJczlrTUVPSVpvNmtUWTAvMmFHTWh4UjJJcTN2dHh1?=
- =?utf-8?B?aUhteFZZTUR6SVBBUlNjM2VPUmdYZzVKa0NsY1hSN1dhdW1nMXBEUVJwU01Q?=
- =?utf-8?B?UkZOVGVOQ3lFSk04aVg3aStYN3J0NFJnV3J4MkdKenN4MC83U2NYNzJTdElO?=
- =?utf-8?B?NFVUaFk0YmFZKzV4UVROVGVlaGIvWFVKK3hjdi9MbURTVFQvUmJvbTZ6aFpv?=
- =?utf-8?B?am1ZeVJWeEVsaFZzVE0yWVBPWkovZnVrS2lobjNWZFJjN3hGMkp0YWVuRERZ?=
- =?utf-8?B?S0VqcDQ5dE81NFpMenlOYVdhUnlPbGM1aDdXaXY0cXBrU2JYZ1ZiK0Rycmdk?=
- =?utf-8?B?THV5MHQvWUxnZDVRSWZ6T2cxUDc1cTBOcExKdnRKTGJZOHQ2TUZWS2hzNW8y?=
- =?utf-8?B?V2pxM1RlWXQxanl1OGdaK05kNkw3NTJPL2c2NlZZM2doSjVZMDA0UVY0bDZE?=
- =?utf-8?B?U1BlZnY3T2tmcjBSZDZDR3VaSTJGRm4wN1NIdXdYMkFQd0RhM1NnTkhzVTd1?=
- =?utf-8?B?NnljajJ6d1Rod2wxcTFISjdSbGQ1R2ZjS2VqQWxxWWYxSFk2dHZHWVNPMUQv?=
- =?utf-8?B?WHAwQWdubzlmTGZYbEkwdm1iL0UvaURYOFFrQUcyMk41bDdweEc2QktWRjU2?=
- =?utf-8?B?OStkcUtrYzFPQit3blE4Zk5qNlVhUDBXYmpqd2hTdnY3T0hqMkRSdVRTN0Vv?=
- =?utf-8?B?ejlya01XbkQraTVMWmVzWDFhL0NXRUVYNHczcjZDUEVmZ2lqQy9ITS90Vysr?=
- =?utf-8?B?UVZ5MG9XL1RUMlZrTE9nSG5Dc2lyU3hNcmNwYWg2aDE1R00xT0RPOUZOSEUz?=
- =?utf-8?B?Yzl5T3dqSjZ1aHhFelkreGVkTUZqTTNUZWpmUjQySlZqZTk0czQwOHE1dXd5?=
- =?utf-8?B?cjFGN2tLOTNiSkxRU2ExT3U1WlJhb3JUY2N6VTY3SE1VcXBwKzd1bnh6cEZm?=
- =?utf-8?Q?QIwIVtePYkaSjowAMo?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c27b8f74-e665-4053-ca46-08df445bc076
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB6188.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2026 03:34:57.5841
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /aM/WJ2zjSL3cr6Xw3lC2lRTy+Lu6ygZ/yZYDLxzQWKQd94YiSJUAuircUH4S1UHDtiVne6lnJbctol6DC6PuA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7425
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
+Message-ID: <20261117043504.1021063-1-dylanbhatch@google.com>
+Subject: [RFC PATCH 00/12] arm64, unwind: add .lr_unwind unwinder for reliable stacktrace
+From: Dylan Hatch <dylanbhatch@google.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
+	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Weinan Liu <wnliu@google.com>, 
+	Jens Remus <jremus@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, llvm@lists.linux.dev, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ard Biesheuvel <ardb@kernel.org>, Indu Bhagat <ibhagatgnu@gmail.com>, 
+	Prasanna Kumar T S M <ptsm@linux.microsoft.com>, live-patching@vger.kernel.org, 
+	Dylan Hatch <dylanbhatch@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/17/2026 2:54 AM, Mario Limonciello wrote:
-> 
-> 
-> On 11/16/26 14:36, Kim Phillips wrote:
->> psp_init() initializes sub-devices sequentially but returns immediately
->> on the first failure, leaving earlier sub-devices registered. Its caller
->> psp_dev_init() then sets sp->psp_data = NULL, so the later
->> psp_dev_destroy() on unbind bails out early and never unregisters them.
->>
->> Non-devm resources such as the /dev/sev and /dev/dbc character devices
->> stay globally visible while their devm-allocated backing structures are
->> freed by the driver core, giving a use-after-free if userspace opens the
->> orphaned device.
->>
->> Add reverse-order unwind labels to psp_init() so each sub-device is torn
->> down before the error is propagated. Every *_dev_destroy() is already
->> NULL-guarded on its own psp->*_data pointer, so skipped or unreached
->> sub-devices are no-ops.
->>
->> sp_init() continues to ignore the psp_dev_init() return value on
->> purpose: a PSP failure must not fail the probe, as the CCP can still
->> initialize successfully.
->>
->> Fixes: 33960acccfbd ("crypto: ccp - add TEE support for Raven Ridge")
->> Reported-by: Sashiko <sashiko-bot@kernel.org>
->> Closes: https://sashiko.dev/#/bug/linux-0de87f0c-0f5a-4dad-8ef1-f49844eb4cce
->> Cc: Tom Lendacky <thomas.lendacky@amd.com>
->> Cc: Rijo Thomas <Rijo-john.Thomas@amd.com>
->> Cc: Mario Limonciello <mario.limonciello@amd.com>
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
->> ---
->> v1: https://lore.kernel.org/linux-crypto/20261021215716.1076732-1-kim.phillips@amd.com/
-> 
+Implement a build-time .eh_frame-to-.lr_unwind table generator and
+in-kernel unwinder for arm64. The primary goal is to support reliable
+stacktrace (arch_stack_walk_reliable()) across in-kernel exception
+boundaries (pt_regs).
 
-Looks good to me.
+On arm64, normal stack unwinding follows frame pointer (x29) chains.
+However, when an asynchronous exception or interrupt occurs inside the
+kernel, the frame pointer chain alone is insufficient to unwind reliably
+from the interrupted context (pt_regs):
 
-Reviewed-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
+  1. Before the prologue updates x29 (mov x29, sp), after the epilogue
+     restores x29/x30, or throughout a leaf function, the interrupted
+     function's return address is live in x30 (pt_regs->regs[30]) while
+     x29 still points to the caller's frame record.
+  2. Between saving the frame record on the stack (e.g.
+     stp x29, x30, [sp, #-N]!) and updating x29 (mov x29, sp), or in
+     functions where the compiler restores x29/x30 before adjusting sp,
+     the interrupted function's frame record resides at [sp + sp_off]
+     while x29 still points to the caller's frame record.
+  3. Inside the function body after mov x29, sp, [x29] points to the
+     interrupted function's own frame record and x30 may have been
+     clobbered by nested calls.
 
-> Reviewed-by: Mario Limonciello (AMD) <superm1@kernel.org>
-> 
->>
->>   drivers/crypto/ccp/psp-dev.c | 23 ++++++++++++++++++-----
->>   1 file changed, 18 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
->> index b14ce51065d5..3d9341c2876d 100644
->> --- a/drivers/crypto/ccp/psp-dev.c
->> +++ b/drivers/crypto/ccp/psp-dev.c
->> @@ -207,19 +207,19 @@ static int psp_init(struct psp_device *psp)
->>       if (!psp_check_tee_support(psp)) {
->>           ret = tee_dev_init(psp);
->>           if (ret)
->> -            return ret;
->> +            goto e_sev;
->>       }
->>         if (!psp_check_sfs_support(psp)) {
->>           ret = sfs_dev_init(psp);
->>           if (ret)
->> -            return ret;
->> +            goto e_tee;
->>       }
->>         if (psp->vdata->platform_access) {
->>           ret = platform_access_dev_init(psp);
->>           if (ret)
->> -            return ret;
->> +            goto e_sfs;
->>       }
->>         /* dbc must come after platform access as it tests the feature */
->> @@ -227,15 +227,28 @@ static int psp_init(struct psp_device *psp)
->>           psp->capability.dbc_thru_ext) {
->>           ret = dbc_dev_init(psp);
->>           if (ret)
->> -            return ret;
->> +            goto e_platform_access;
->>       }
->>         /* HSTI uses platform access on some systems. */
->>       ret = psp_init_hsti(psp);
->>       if (ret)
->> -        return ret;
->> +        goto e_dbc;
->>         return 0;
->> +
->> +e_dbc:
->> +    dbc_dev_destroy(psp);
->> +e_platform_access:
->> +    platform_access_dev_destroy(psp);
->> +e_sfs:
->> +    sfs_dev_destroy(psp);
->> +e_tee:
->> +    tee_dev_destroy(psp);
->> +e_sev:
->> +    sev_dev_destroy(psp);
->> +
->> +    return ret;
->>   }
->>     int psp_dev_init(struct sp_device *sp)
->>
->> base-commit: 26ca5f34841f0a86d0883664a1c13be89a01d351
-> 
+Without knowing which state holds at the interrupted PC, the unwinder
+cannot determine whether pt_regs->regs[30] is a valid frame or a
+duplicate of [x29 + 8], nor can it recover a frame record at
+[sp + sp_off] before x29 is updated, forcing arch_stack_walk_reliable()
+to reject stack traces that cross an in-kernel exception boundary.
+
+This RFC is proposed as an alternative to an SFrame [1] based solution:
+[2]. While SFrame works well with recent GNU binutils (2.46+), it is not
+yet supported by LLVM/Clang toolchains. Conversely, compiler-generated
+.eh_frame tables (-fasynchronous-unwind-tables, enabled by
+CONFIG_UNWIND_TABLES) are supported today by both GCC and Clang/LLVM,
+and arm64 already includes a DWARF .eh_frame parser in
+arch/arm64/kernel/pi/patch-scs.c for dynamic Shadow Call Stack patching.
+
+Rather than retaining bulky raw .eh_frame sections in kernel memory and
+interpreting variable-length DWARF CFI opcodes during stack unwinding,
+this series introduces a build-time host tool (scripts/gen_lr_unwind)
+that reuses and extends arm64's .eh_frame parser (<asm/eh_frame.h>) to
+distill .eh_frame into compact, fixed-width .lr_unwind_fde and
+.lr_unwind_ranges sections, and strips .eh_frame from the final vmlinux
+and module binaries.
+
+Each annotated function is described by an 8-byte struct lr_fde entry
+(32-bit PC-relative start_offset + 32-bit range_desc), sorted at build
+time by scripts/sorttable (and at module load time) for O(log N) lookup.
+Each instruction range within a function is classified into one of three
+exception-boundary unwind modes:
+  - LR_UNWIND_LIVE: x30 holds the return address, x29 is the caller's FP
+  - LR_UNWIND_FP:   [x29] holds the saved {x29, x30} frame record
+  - LR_UNWIND_SP:   [sp + sp_off] holds the saved {x29, x30} frame record
+
+Functions with non-standard x30 spills (such as frameless leaf functions
+spilling x30 without x29) are omitted from .lr_unwind_fde so the
+unwinder treats them as unreliable.
+
+For functions following the canonical 4-phase LIVE -> FP/SP -> SP -> LIVE
+layout (prologue <= 31 insns, body <= 4095 insns, epilogue/return <= 15
+insns each, and sp_off <= 496 bytes), the ranges and sp_off are packed
+directly into the 32-bit range_desc word of struct lr_fde; functions
+with more ranges or larger lengths reference 2-byte lr_range_t entries
+in .lr_unwind_ranges. Across vmlinux, .lr_unwind_fde and
+.lr_unwind_ranges total ~800-935 KiB (~4x smaller than raw .eh_frame).
+
+This series is available on github: [3].
+
+Structure of the series:
+  - Patches 1-6: Enable .eh_frame generation for CONFIG_ARM64_LR_UNWIND,
+    factor the .eh_frame parser out of patch-scs.c into <asm/eh_frame.h>,
+    extend it to track CFA and x29/x30 state, and implement
+    scripts/gen_lr_unwind (including --dump) to emit .lr_unwind sections.
+  - Patch 7: Teach scripts/sorttable to sort .lr_unwind_fde at build time.
+  - Patches 8-9: Add in-kernel .lr_unwind lookup, optional boot/module
+    validation (CONFIG_ARM64_LR_UNWIND_VALIDATION), and module support.
+  - Patches 10-11: Annotate call_on_irq_stack() and arm64 leaf assembly
+    functions (SYM_LEAF_FUNC_START / SYM_LEAF_FUNC_END) with CFI
+    directives so they are covered by .lr_unwind.
+  - Patch 12: Use .lr_unwind in arch/arm64/kernel/stacktrace.c to
+    reliably unwind across in-kernel exception boundaries.
+
+Ref:
+[1]: https://sourceware.org/binutils/docs/sframe-spec.html
+[2]: https://lore.kernel.org/all/20261117020648.323464-1-dylanbhatch@google.com/
+[3]: https://github.com/dylanbhatch/linux/tree/eh_frame
+
+Dylan Hatch (11):
+  arm64, unwind: build with .eh_frame and add gen_lr_unwind skeleton
+  arm64: factor .eh_frame parser out of patch-scs.c into
+    <asm/eh_frame.h>
+  arm64: eh_frame: track CFA and x29/x30 register state in CFI parser
+  arm64, unwind: parse .eh_frame into .lr_unwind entries in
+    gen_lr_unwind
+  scripts/gen_lr_unwind: emit .lr_unwind_fde and .lr_unwind_ranges
+  scripts/gen_lr_unwind: add --dump option to inspect .lr_unwind tables
+  scripts/sorttable: sort .lr_unwind_fde by start_offset
+  arm64, unwind: add in-kernel .lr_unwind lookup and validation
+  arm64/module, unwind: add .lr_unwind support for modules
+  arm64, crypto/lib: annotate leaf functions with CFI info
+  unwind: arm64: use .lr_unwind to unwind interrupt frames
+
+Weinan Liu (1):
+  arm64: entry: add unwind info for call_on_irq_stack()
+
+ MAINTAINERS                            |   1 +
+ arch/arm64/Kconfig                     |  20 +
+ arch/arm64/crypto/aes-ce-ccm-core.S    |  12 +-
+ arch/arm64/crypto/aes-neonbs-core.S    |  16 +-
+ arch/arm64/crypto/ghash-ce-core.S      |  20 +-
+ arch/arm64/crypto/sm4-ce-ccm-core.S    |  16 +-
+ arch/arm64/crypto/sm4-ce-cipher-core.S |   4 +-
+ arch/arm64/crypto/sm4-ce-core.S        |  44 +-
+ arch/arm64/crypto/sm4-ce-gcm-core.S    |  16 +-
+ arch/arm64/crypto/sm4-neon-core.S      |  12 +-
+ arch/arm64/include/asm/eh_frame.h      | 552 +++++++++++++++++
+ arch/arm64/include/asm/linkage.h       |  33 +
+ arch/arm64/include/asm/lr_unwind.h     | 149 +++++
+ arch/arm64/include/asm/module.h        |   6 +
+ arch/arm64/include/asm/module.lds.h    |   2 +-
+ arch/arm64/include/asm/scs.h           |   7 -
+ arch/arm64/include/asm/sections.h      |   3 +
+ arch/arm64/kernel/Makefile             |   5 +
+ arch/arm64/kernel/entry.S              |  12 +-
+ arch/arm64/kernel/lr_unwind.c          | 395 ++++++++++++
+ arch/arm64/kernel/module.c             |  11 +
+ arch/arm64/kernel/pi/patch-scs.c       | 259 +-------
+ arch/arm64/kernel/setup.c              |   3 +
+ arch/arm64/kernel/stacktrace.c         |  85 ++-
+ arch/arm64/kernel/vmlinux.lds.S        |  27 +-
+ arch/arm64/lib/clear_user.S            |   4 +-
+ arch/arm64/lib/copy_from_user.S        |   4 +-
+ arch/arm64/lib/copy_page.S             |   4 +-
+ arch/arm64/lib/copy_to_user.S          |   4 +-
+ arch/arm64/lib/memchr.S                |   4 +-
+ arch/arm64/lib/memcmp.S                |   4 +-
+ arch/arm64/lib/memcpy.S                |   8 +-
+ arch/arm64/lib/memset.S                |   8 +-
+ arch/arm64/lib/mte.S                   |  28 +-
+ arch/arm64/lib/strchr.S                |   4 +-
+ arch/arm64/lib/strcmp.S                |   4 +-
+ arch/arm64/lib/strlen.S                |   4 +-
+ arch/arm64/lib/strncmp.S               |   4 +-
+ arch/arm64/lib/strnlen.S               |   4 +-
+ arch/arm64/lib/strrchr.S               |   4 +-
+ arch/arm64/lib/tishift.S               |  12 +-
+ scripts/.gitignore                     |   1 +
+ scripts/Makefile                       |   2 +
+ scripts/Makefile.modfinal              |  10 +-
+ scripts/Makefile.vmlinux_o             |   8 +-
+ scripts/gen_lr_unwind.c                | 821 +++++++++++++++++++++++++
+ scripts/link-vmlinux.sh                |   2 +-
+ scripts/sorttable.c                    |  50 +-
+ 48 files changed, 2325 insertions(+), 383 deletions(-)
+ create mode 100644 arch/arm64/include/asm/eh_frame.h
+ create mode 100644 arch/arm64/include/asm/lr_unwind.h
+ create mode 100644 arch/arm64/kernel/lr_unwind.c
+ create mode 100644 scripts/gen_lr_unwind.c
+
+
+base-commit: 6628e7d4c6b25c8d18f1345e3a20d21829aae7e4
+-- 
+2.56.0.679.gc527c65306-goog
 
