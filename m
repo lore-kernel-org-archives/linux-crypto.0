@@ -1,74 +1,74 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.200
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.199
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794890110;
-	b=jxeNeBZtZrRQzh6+H7feuiJTOQLTKsp6RuTs7F5DH2Nu33gaGIoeXMVUgxZrIk2Up/ZT
-	 NckTnFn35Vqp4HT+zIGd5wZuFp/ePxhHZUPIeDyPS0YXNWT3Y9iiGuomZA9ugieD/GA3L
-	 6LECs94lnNvBcu34uCz4fbn10t3cWeOZ7p99XZcbriWu1eHPu8zrXP/xv96Ib1D9wVz3U
-	 XeHICmfYq33SYLMMzf9opvley6ZgV887wFgkvpoXl9+WM/FadcKh6NjE8FqWC2LmWxgh+
-	 GN5wLNHLOA+9QGGPDAqztSSzcpxpoWtGq0L0jqudO1vbEXw7pt2s4Vk2D5Ir0vLhWmA==
+	t=1794890111;
+	b=ou+ehIJKrYhjsJkbHFNeymLDQ7PbC498RB6SCxleQ43NaUw5gTinIFFDc/elL3ydeTpN
+	 v1Qvv/DGtsockKCVS2qiryQrpSd08cJgQditEsRSZiPiaPUfSnJRGuXohmm836NRPIx+r
+	 YsmT5eEUo0wkGCIOtFvEPwyYHWkynLDZl9fCkmIDpa2+jPOY0FnXkhu/eT3uwZyOtj0Rr
+	 w3keZNwCJzAEMvkU4hIQTDqYJscDZtZx8z/7cXEuwUHAnC8dedzjQgeMOgl2+jIs0aufX
+	 +zNzWRJYwqrpmeKJ0aIYZNjPWhHY0PsLQ24ozCecdfj3k3nZfFtVd0MHS5vnic83khw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794890110;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794890111;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
 	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
 	 Content-Type;
-	bh=kv88xp0i2ySFrcN1aLaQoGF5JG/nfVb1F5vxVlAqWpE=;
-	b=MC+zXKUuV9ynGo/GRzWYLtINy2brWOnevDRUBlPbZNgmt/tFfYuTMlOiCN5Qn+DO4xTV
-	 HsLZJ0LVwfcnCanVLGPgX0o9Go07Ihrzytl7ye0H4oGcJ75wJoplWlKP1YKVtfrYFVbyw
-	 V/MZXVKXX3Ed44M5mHFVsO7+M3DbGUsNbGauHsqOuQABudw9dZyVEcgnQQlX3FI2obQ74
-	 qneC/FSaLogCcQhu6FUgc2iWXFgAlQhubLp9vlHO97bhiaMeg51iHJ6qlnyJYOw0cqL35
-	 kurCOgOX+DfeP4pxeZPuYSbDFa3Zci8qodo9q0RAGsaeECUtfG5MZ1hIWU/70kCnmqg==
+	bh=BoRzsqu7GOPq4Dqk3y3lgS/gv/EkkCJiKVH2/gGcSE0=;
+	b=CyD7Lm5k+rRBvf6VEMFQSSm+/j7B7iEZddpNxRT4GLSW+TljcIn77YQ1nB494S9C6imC
+	 1ZNbcdjpYj6qz8h7v9f4ubEATUnm64JfrYLye7WLn/68XvCm1cdF3zEfn0FoJHpFVYBT0
+	 iayorofI02AcwLOEKdV6GnfzYIu7SXVDDlCLOdn7yWJ4M3FkNMcq93juMDptInY9Atjpq
+	 8UnyzJI7QN7lc1wC9lOUIHWg7OmJ0LeK6k/WH8Xt7Z667d0x/C6FsN5cVIVk0siJVSFkX
+	 1wv9ipNIrL1qvz391mBfWEjvrHOFiT0rykU7R42EtehXmVMaWsT6i87GcsghuPK3kXA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=google.com;
 	spf=pass smtp.mailfrom=flex--dylanbhatch.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BE8CHpUb;
-	arc=none smtp.remote-ip=209.85.215.200
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=AvvIIf8i;
+	arc=none smtp.remote-ip=209.85.214.199
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0CE606A33D
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 04:35:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF0CE606A33D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5E3606A89F
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 04:35:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3C5E3606A89F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dylanbhatch.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=BE8CHpUb
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-cd66551e02cso4837134a12.2
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 20:35:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=AvvIIf8i
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2eaf8ea208bso32373535ad.1
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 20:35:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794890109; x=1795494909; darn=vger.kernel.org;
+        d=google.com; s=20260707; t=1794890110; x=1795494910; darn=vger.kernel.org;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=kv88xp0i2ySFrcN1aLaQoGF5JG/nfVb1F5vxVlAqWpE=;
-        b=BE8CHpUbo1A8F2N8jud83PeFXNJ45RULrX9f9zgXBfQqak0Cx6K+B6SoqE03BX32uw
-         YgXmrd8hnQP8wNcCSVE9xsnp+P3mZaPDHbhikYShnXTJmOp8rBSAySw51/TUtG9feHzA
-         aGAY0nAqDK5pXLjn27Jg2GgirpSP8VcA724YKHTaLrcpBZjTlvntcDHQgwmT/ps5NxVj
-         87kpzQ/XiAcg8twEjRpREUwoFBdoge08fy4NO1K144CwQ8DFXRIxop04EHJkW89I4IJm
-         UkuUAaA5yJqRFW9HuFAqxNsPSGl10tUCBohyaQXTcZcMeKpCJJMgiJC2duESmxz6U7Xg
-         XMqg==
+        bh=BoRzsqu7GOPq4Dqk3y3lgS/gv/EkkCJiKVH2/gGcSE0=;
+        b=AvvIIf8ie/N5F6rUMuhw7VTEX3usoCq53IIh+x9t7tjlNtHjBlrsjVNzY+Sg3MtDKa
+         kyQulqMdSrgECcFKLMQt8JlWmwDs3DmioNO2P7nvUZ4eMdq0ytL4o2ed6hj8wHDO3UTu
+         ohRM2HPI6H0rC/y+4L87QkRh8c7xWaCOjOCM8hlGDdQquE0AaRzrQkzYBnjvYjLG3hXj
+         40WkWXHO00qLCs9z5FPOXAtDpqWjtVVS+8KYqJp/WNeK1B4C2sQUDuLm0eBcwn4iJkqj
+         pgTcLLk97mpQX3EeWheM3kCkvjky2Irh8Fs6pYTNxYm28j/HPkUxfa41isOKjf0ax3SL
+         ZA7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794890109; x=1795494909;
+        d=1e100.net; s=20260707; t=1794890110; x=1795494910;
         h=content-type:cc:to:from:subject:message-id:references:mime-version
          :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=kv88xp0i2ySFrcN1aLaQoGF5JG/nfVb1F5vxVlAqWpE=;
-        b=BY95GYxJ4df/iigu+unPlUQt0fO3LzUuT6gkyWnqFwqZLF2O0cgfjPAv4MkI8b1QD5
-         +Y6wtlpQiNmXc136EsVPGWjpl+SJoBC2aoGghL2ET6KtQl67n6QUgPJX35aWO7qQM/TL
-         eZZLe1JN7NyfuUV+uBS/ppzYEVrqir32L3UTWjF4t+xTCSo4jeo3UPok8AGlCDKNN8XR
-         zpIn00on97CRWg/L7azjQQct2oP6527mjix/rwCwSkkn1VUKVOvH2uMvNDP6xIcclRSQ
-         tDaeVPvM36QrUl6xan8fDQEOeoO+ILGdfy9IxXF60G3DFdgc3bP+zprsz0bvtYfSpcy9
-         p5rw==
-X-Forwarded-Encrypted: i=1; AL+hErEjjZx1SBpxoG9adWbVVIemKJg9ekaAW0gTQSnki/UiMHDoQzyC3Wszclq3TUSJzaNXGmK2eJboqoAdA6Y=@vger.kernel.org
-X-Gm-Message-State: APuU4Z8dAdUkQrZtr1LIFZ1IHa5/zPhqt34jps5kYj9lsX4ZHkeARqQ9
-	XwjNElXdlPHeGXCrRwEGUZ5SOiZou2Z23my+RvjNXvaILo9JI+ysuD/xN+aSy7McAISxbT1ev7B
-	Obh4k25uUAecWZ82ZQNU4WRrjKQ==
-X-Received: from pgcle3-n1.prod.google.com ([2002:a05:6a02:8b83:10b0:cdd:9295:e893])
+        bh=BoRzsqu7GOPq4Dqk3y3lgS/gv/EkkCJiKVH2/gGcSE0=;
+        b=MOHeRz/1AcMrbyvzEv2g+YtS2k92fBUrqsPHZHhtaaeIFta4jAEyt7ryK/54KUuoh+
+         GdcsH6BCeJFZNzapbNccWLy0WYHfTM3p6QAN5lguIxYoLHDDCMVr5eE/CyrLkQ+FdYJU
+         P4PqAawkQm1bOC3v68FbEFeNdyiFEqFfVQDfpyDEJWMT5RYdnn9TUvfAgceg94NarO3b
+         vyKQFQNzJR56M04n3qibuPnLRtcdmNmXg4KA2xU6FtvAcx/jeuLU5hYIbcWQ/PdhbhCz
+         I5fiGwCRKwnH4aai87Yw1VfjToreceX5ELIZcUf2KhAgQXdwOYCVTZiKyAe4LuvZXF+9
+         Y6Sw==
+X-Forwarded-Encrypted: i=1; AL+hErFz+SkPvzYC+4ooyY45k28yJ/+eIr6S86QLiItuo/E3+0li7C74J9xOobzW+ortCyusw4OsU426xWTwu1c=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+zMxdtvNsi8r7tXBY/tM/jV2Iytb38Mn19Zl7m56oyCuzGiNVX
+	zuRLwySvecmZ9mbsMVgUpYhWlkGjCgfhLWEE7+9evLbuotrlufHk1d7NmBG15o3q+lCPIiaJXqU
+	nh8i4C33my6oX++Y0CjYYntTUiQ==
+X-Received: from pltk11.prod.google.com ([2002:a17:902:694b:b0:2eb:50b1:b505])
  (user=dylanbhatch job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:e347:b0:3eb:67a9:20cd with SMTP id adf61e73a8af0-3f7a6baa73fmr9854448637.18.1794890108718;
- Mon, 16 Nov 2026 20:35:08 -0800 (PST)
-Date: Tue, 17 Nov 2026 04:34:53 +0000
+ 2002:a17:903:1a83:b0:2ed:fd0:e736 with SMTP id d9443c01a7336-2ee0d66293dmr128863165ad.6.1794890110271;
+ Mon, 16 Nov 2026 20:35:10 -0800 (PST)
+Date: Tue, 17 Nov 2026 04:34:54 +0000
 In-Reply-To: <20261117043504.1021063-1-dylanbhatch@google.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -81,9 +81,9 @@ Precedence: list
 Mime-Version: 1.0
 References: <20261117043504.1021063-1-dylanbhatch@google.com>
 X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
-Message-ID: <20261117043504.1021063-2-dylanbhatch@google.com>
-Subject: [RFC PATCH 01/12] arm64, unwind: build with .eh_frame and add
- gen_lr_unwind skeleton
+Message-ID: <20261117043504.1021063-3-dylanbhatch@google.com>
+Subject: [RFC PATCH 02/12] arm64: factor .eh_frame parser out of patch-scs.c
+ into <asm/eh_frame.h>
 From: Dylan Hatch <dylanbhatch@google.com>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
 	Mark Rutland <mark.rutland@arm.com>
@@ -100,350 +100,676 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemlof
 	Dylan Hatch <dylanbhatch@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add CONFIG_ARM64_LR_UNWIND to build the kernel with .eh_frame unwind
-tables while discarding .eh_frame in the final vmlinux and module linker
-scripts unless CONFIG_UNWIND_PATCH_PAC_INTO_SCS is enabled. Wire up a
-skeleton scripts/gen_lr_unwind host tool invoked on vmlinux.o.
+Move the DWARF .eh_frame CIE/FDE iterator and opcode stepper out of
+arch/arm64/kernel/pi/patch-scs.c into a shared <asm/eh_frame.h> header
+so it can be reused by build-time unwind table generation.
 
 Signed-off-by: Dylan Hatch <dylanbhatch@google.com>
 ---
- MAINTAINERS                         |   1 +
- arch/arm64/Kconfig                  |  11 +++
- arch/arm64/include/asm/module.lds.h |   2 +-
- arch/arm64/kernel/vmlinux.lds.S     |  25 ++++-
- scripts/.gitignore                  |   1 +
- scripts/Makefile                    |   2 +
- scripts/Makefile.vmlinux_o          |   8 +-
- scripts/gen_lr_unwind.c             | 137 ++++++++++++++++++++++++++++
- scripts/link-vmlinux.sh             |   2 +-
- 9 files changed, 185 insertions(+), 4 deletions(-)
- create mode 100644 scripts/gen_lr_unwind.c
+ arch/arm64/include/asm/eh_frame.h | 329 ++++++++++++++++++++++++++++++
+ arch/arm64/include/asm/scs.h      |   7 -
+ arch/arm64/kernel/pi/patch-scs.c  | 258 +++--------------------
+ 3 files changed, 358 insertions(+), 236 deletions(-)
+ create mode 100644 arch/arm64/include/asm/eh_frame.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 93abbb315065d..c7c8673291702 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4047,6 +4047,7 @@ F:	include/linux/arm-rmi-cmds.h
- F:	include/linux/arm-rsi-cmds.h
- F:	include/linux/arm-smccc-rmi.h
- F:	include/linux/arm-smccc-rsi.h
-+F:	scripts/gen_lr_unwind.c
- F:	tools/testing/selftests/arm64/
- X:	arch/arm64/boot/dts/
- X:	arch/arm64/configs/defconfig
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 1075bc6618330..aa09c7ea61be3 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -2506,6 +2506,17 @@ config UNWIND_PATCH_PAC_INTO_SCS
- 	select UNWIND_TABLES
- 	select DYNAMIC_SCS
- 
-+config ARM64_LR_UNWIND
-+	bool "Generate exception-boundary unwind tables from .eh_frame"
-+	default y
-+	select UNWIND_TABLES
-+	help
-+	  Generate compact .lr_unwind_fde and .lr_unwind_ranges sections at
-+	  build time from DWARF .eh_frame unwind information to determine how
-+	  to unwind across exception boundaries (whether the return address is
-+	  live in x30, saved in the frame record at [x29], or saved in the
-+	  frame record at an SP-relative offset).
+diff --git a/arch/arm64/include/asm/eh_frame.h b/arch/arm64/include/asm/eh_frame.h
+new file mode 100644
+index 0000000000000..6c17fed1860f1
+--- /dev/null
++++ b/arch/arm64/include/asm/eh_frame.h
+@@ -0,0 +1,329 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Minimal DWARF .eh_frame CFI parser for arm64.
++ *
++ * This minimal DWARF CFI parser is partially based on the code in
++ * arch/arc/kernel/unwind.c, and on the document below:
++ * https://refspecs.linuxbase.org/LSB_4.0.0/LSB-Core-generic/LSB-Core-generic/ehframechpt.html
++ */
++#ifndef __ASM_EH_FRAME_H
++#define __ASM_EH_FRAME_H
 +
- config ARM64_CONTPTE
- 	bool "Contiguous PTE mappings for user memory" if EXPERT
- 	depends on TRANSPARENT_HUGEPAGE
-diff --git a/arch/arm64/include/asm/module.lds.h b/arch/arm64/include/asm/module.lds.h
-index 603f92a8a73ed..84e5fa0250435 100644
---- a/arch/arm64/include/asm/module.lds.h
-+++ b/arch/arm64/include/asm/module.lds.h
-@@ -4,7 +4,7 @@ SECTIONS {
- 	.text.ftrace_trampoline 0 : { BYTE(0) }
- 	.init.text.ftrace_trampoline 0 : { BYTE(0) }
- 
--#ifdef CONFIG_UNWIND_TABLES
-+#ifdef CONFIG_UNWIND_PATCH_PAC_INTO_SCS
- 	/*
- 	 * Currently, we only use unwind info at module load time, so we can
- 	 * put it into the .init allocation.
-diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-index 1869b44ae1909..b8f2963d10030 100644
---- a/arch/arm64/kernel/vmlinux.lds.S
-+++ b/arch/arm64/kernel/vmlinux.lds.S
-@@ -144,15 +144,35 @@ jiffies = jiffies_64;
- #define TRAMP_TEXT
- #endif
- 
--#ifdef CONFIG_UNWIND_TABLES
-+#ifdef CONFIG_UNWIND_PATCH_PAC_INTO_SCS
- #define UNWIND_DATA_SECTIONS				\
- 	.eh_frame : {					\
- 		__pi___eh_frame_start = .;		\
- 		*(.eh_frame)				\
- 		__pi___eh_frame_end = .;		\
- 	}
-+#define EH_FRAME_DISCARDS
- #else
- #define UNWIND_DATA_SECTIONS
-+#define EH_FRAME_DISCARDS	*(.eh_frame)
++#include <linux/bits.h>
++#include <linux/compiler.h>
++#include <linux/stddef.h>
++#include <linux/string.h>
++#include <linux/types.h>
++
++#ifndef U32_MAX
++#define U32_MAX				((u32)~0U)
 +#endif
 +
-+#ifdef CONFIG_ARM64_LR_UNWIND
-+#define LR_UNWIND_SECTIONS				\
-+	. = ALIGN(4);					\
-+	.lr_unwind_fde : {				\
-+		__start_lr_unwind_fde = .;		\
-+		KEEP(*(.lr_unwind_fde))			\
-+		__stop_lr_unwind_fde = .;		\
-+	}						\
-+	. = ALIGN(2);					\
-+	.lr_unwind_ranges : {				\
-+		__start_lr_unwind_ranges = .;		\
-+		KEEP(*(.lr_unwind_ranges))		\
-+		__stop_lr_unwind_ranges = .;		\
-+	}
-+#else
-+#define LR_UNWIND_SECTIONS
- #endif
- 
- /*
-@@ -184,6 +204,7 @@ SECTIONS
- 		*(.interp .dynamic)
- 		*(.dynsym .dynstr .hash .gnu.hash)
- 		*(.ARM.attributes)
-+		EH_FRAME_DISCARDS
- 	}
- 
- 	. = KIMAGE_VADDR;
-@@ -212,6 +233,8 @@ SECTIONS
- 	/* everything from this point to __init_begin will be marked RO NX */
- 	RO_DATA(PAGE_SIZE)
- 
-+	LR_UNWIND_SECTIONS
++#define AARCH64_DWARF_LR		30
 +
- 	HYPERVISOR_RODATA_SECTIONS
- 
- #ifdef CONFIG_NVHE_EL2_TRACING
-diff --git a/scripts/.gitignore b/scripts/.gitignore
-index 7004565439107..a56a49fee309c 100644
---- a/scripts/.gitignore
-+++ b/scripts/.gitignore
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- /asn1_compiler
- /gen_init_cpio
-+/gen_lr_unwind
- /gen_packed_field_checks
- /generate_rust_target
- /insert-sys-cert
-diff --git a/scripts/Makefile b/scripts/Makefile
-index d7fbb7ca098b1..cb5af9339e4ac 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -12,6 +12,7 @@ hostprogs-always-$(CONFIG_SYSTEM_EXTRA_CERTIFICATE)	+= insert-sys-cert
- hostprogs-always-$(CONFIG_RUST_KERNEL_DOCTESTS)		+= rustdoc_test_builder
- hostprogs-always-$(CONFIG_RUST_KERNEL_DOCTESTS)		+= rustdoc_test_gen
- hostprogs-always-$(CONFIG_TRACEPOINTS)			+= tracepoint-update
-+hostprogs-always-$(CONFIG_ARM64_LR_UNWIND)		+= gen_lr_unwind
- 
- kallsyms-objs := kallsyms.o kallsyms-sysmap.o elf-parse.o
- sorttable-objs := sorttable.o elf-parse.o
-@@ -31,6 +32,7 @@ rustdoc_test_builder-rust := y
- rustdoc_test_gen-rust := y
- 
- HOSTCFLAGS_tracepoint-update.o = -I$(srctree)/tools/include
-+HOSTCFLAGS_gen_lr_unwind.o = -I$(srctree)/tools/include
- HOSTCFLAGS_kallsyms.o = -I$(srctree)/tools/include
- HOSTCFLAGS_kallsyms-sysmap.o = -I$(srctree)/tools/include
- HOSTCFLAGS_elf-parse.o = -I$(srctree)/tools/include
-diff --git a/scripts/Makefile.vmlinux_o b/scripts/Makefile.vmlinux_o
-index 0b37bd5dc3a49..362382ec58b15 100644
---- a/scripts/Makefile.vmlinux_o
-+++ b/scripts/Makefile.vmlinux_o
-@@ -57,6 +57,10 @@ objtool-args = $(vmlinux-objtool-args-y) --link
- 
- vmlinux-o-ld-args-$(CONFIG_BUILTIN_MODULE_RANGES)	+= -Map=$@.map
- 
-+gen_lr_unwind := $(objtree)/scripts/gen_lr_unwind
-+cmd_gen_lr_unwind = $(if $(CONFIG_ARM64_LR_UNWIND), ; $(gen_lr_unwind) $@)
-+cmd_gen_lr_unwinddep = $(if $(CONFIG_ARM64_LR_UNWIND), { echo ; echo '$@: $$(wildcard $(gen_lr_unwind))' ; } >> $(dot-target).cmd)
++#define DW_CFA_nop			0x00
++#define DW_CFA_advance_loc1		0x02
++#define DW_CFA_advance_loc2		0x03
++#define DW_CFA_advance_loc4		0x04
++#define DW_CFA_offset_extended		0x05
++#define DW_CFA_restore_extended		0x06
++#define DW_CFA_same_value		0x08
++#define DW_CFA_remember_state		0x0a
++#define DW_CFA_restore_state		0x0b
++#define DW_CFA_def_cfa			0x0c
++#define DW_CFA_def_cfa_register		0x0d
++#define DW_CFA_def_cfa_offset		0x0e
++#define DW_CFA_def_cfa_offset_sf	0x13
++#define DW_CFA_negate_ra_state		0x2d
 +
- quiet_cmd_ld_vmlinux.o = LD      $@
-       cmd_ld_vmlinux.o = \
- 	$(LD) ${KBUILD_LDFLAGS} -r -o $@ \
-@@ -64,13 +68,15 @@ quiet_cmd_ld_vmlinux.o = LD      $@
- 	$(addprefix -T , $(initcalls-lds)) \
- 	--whole-archive vmlinux.a --no-whole-archive \
- 	--start-group $(KBUILD_VMLINUX_LIBS) --end-group \
--	$(cmd_objtool)
-+	$(cmd_objtool) \
-+	$(cmd_gen_lr_unwind)
- 
- cmd_check_function_names = $(srctree)/scripts/check-function-names.sh $@
- 
- define rule_ld_vmlinux.o
- 	$(call cmd_and_savecmd,ld_vmlinux.o)
- 	$(call cmd,gen_objtooldep)
-+	$(call cmd,gen_lr_unwinddep)
- 	$(call cmd,check_function_names)
- endef
- 
-diff --git a/scripts/gen_lr_unwind.c b/scripts/gen_lr_unwind.c
-new file mode 100644
-index 0000000000000..1b52662838653
---- /dev/null
-+++ b/scripts/gen_lr_unwind.c
-@@ -0,0 +1,137 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Generate .lr_unwind_fde and .lr_unwind_ranges sections from .eh_frame
-+ * for arm64 exception-boundary unwinding.
-+ */
++#define DW_EH_PE_sdata4			0x0b
++#define DW_EH_PE_sdata8			0x0c
++#define DW_EH_PE_pcrel			0x10
 +
-+#include <elf.h>
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/mman.h>
-+#include <sys/stat.h>
-+#include <unistd.h>
-+
-+struct lr_unwind_ctx {
-+	const void	*map;
-+	size_t		map_size;
-+
-+	const Elf64_Shdr *eh_sec;
-+	const Elf64_Shdr *rela_eh_sec;
-+	const Elf64_Shdr *fde_sec;
-+	unsigned int	symtab_shndx;
++enum {
++	EDYNSCS_INVALID_CIE_HEADER		= 1,
++	EDYNSCS_INVALID_CIE_SDATA_SIZE		= 2,
++	EDYNSCS_INVALID_FDE_AUGM_DATA_SIZE	= 3,
++	EDYNSCS_INVALID_CFA_OPCODE		= 4,
 +};
 +
-+static int parse_eh_frame(struct lr_unwind_ctx *ctx)
++struct eh_frame_cfi_state {
++	u64	loc;
++	bool	ra_negated;
++};
++
++struct eh_frame {
++	/*
++	 * The size of this frame if 0 < size < U32_MAX, 0 terminates the list.
++	 */
++	u32	size;
++
++	/*
++	 * The first frame is a Common Information Entry (CIE) frame, followed
++	 * by one or more Frame Description Entry (FDE) frames. In the former
++	 * case, this field is 0, otherwise it is the negated offset relative
++	 * to the associated CIE frame.
++	 */
++	u32	cie_id_or_pointer;
++
++	union {
++		struct { /* CIE */
++			u8	version;
++			char	augmentation_string[3];
++			u8	code_alignment_factor;
++			u8	data_alignment_factor;
++			u8	return_address_register;
++			u8	augmentation_data_size;
++			u8	fde_pointer_format;
++		};
++
++		struct { /* FDE (sdata4) */
++			s32	initial_loc;
++			s32	range;
++			u8	opcodes[];
++		};
++
++		struct { /* FDE (sdata8) */
++			s64	initial_loc64;
++			s64	range64;
++			u8	opcodes64[];
++		};
++	};
++};
++
++struct eh_frame_fde_iter {
++	const u8		*start;
++	const u8		*p;
++	int			size;
++	int			code_align;
++	bool			use_sdata8;
++	const struct eh_frame	*cie;
++	const struct eh_frame	*fde;
++};
++
++#define EH_FRAME_FDE_ITER_INIT(buf, len) \
++	{ .start = (buf), .p = (buf), .size = (len), .code_align = 1 }
++
++/*
++ * Skip one uleb128/sleb128 encoded quantity from the opcode stream. All bytes
++ * except the last one have bit #7 set.
++ */
++static __always_inline int skip_xleb128(const u8 **opcode, int *size)
 +{
-+	/* TODO: Parse CIEs/FDEs from .eh_frame and .rela.eh_frame */
-+	(void)ctx;
++	u8 c;
++
++	do {
++		if (*size <= 0)
++			return EDYNSCS_INVALID_CFA_OPCODE;
++		c = *(*opcode)++;
++		(*size)--;
++	} while (c & BIT(7));
++
 +	return 0;
 +}
 +
-+static int emit_lr_unwind_sections(const char *fname, struct lr_unwind_ctx *ctx,
-+				   unsigned int orig_shnum,
-+				   unsigned int shstrndx)
++static __always_inline int eh_frame_step_opcode(const u8 **opcode, int *size,
++						const struct eh_frame_fde_iter *it,
++						struct eh_frame_cfi_state *st)
 +{
-+	/* TODO: Emit .lr_unwind_fde, .rela.lr_unwind_fde, and .lr_unwind_ranges */
-+	(void)fname;
-+	(void)ctx;
-+	(void)orig_shnum;
-+	(void)shstrndx;
++	u8 op;
++
++	if (*size <= 0)
++		return EDYNSCS_INVALID_CFA_OPCODE;
++
++	op = *(*opcode)++;
++	(*size)--;
++	st->ra_negated = false;
++
++	switch (op) {
++	case DW_CFA_nop:
++	case DW_CFA_remember_state:
++	case DW_CFA_restore_state:
++		break;
++
++	case DW_CFA_advance_loc1:
++		if (*size < 1)
++			return EDYNSCS_INVALID_CFA_OPCODE;
++		st->loc += *(*opcode)++ * it->code_align;
++		(*size)--;
++		break;
++
++	case DW_CFA_advance_loc2:
++		if (*size < 2)
++			return EDYNSCS_INVALID_CFA_OPCODE;
++		st->loc += ((*opcode)[0] | ((*opcode)[1] << 8)) *
++			   it->code_align;
++		*opcode += 2;
++		*size -= 2;
++		break;
++
++	case DW_CFA_advance_loc4:
++		if (*size < 4)
++			return EDYNSCS_INVALID_CFA_OPCODE;
++		st->loc += (u64)((*opcode)[0] | ((*opcode)[1] << 8) |
++				 ((*opcode)[2] << 16) |
++				 ((u32)(*opcode)[3] << 24)) *
++			   it->code_align;
++		*opcode += 4;
++		*size -= 4;
++		break;
++
++	case DW_CFA_def_cfa:
++	case DW_CFA_offset_extended:
++		if (skip_xleb128(opcode, size))
++			return EDYNSCS_INVALID_CFA_OPCODE;
++		fallthrough;
++	case DW_CFA_def_cfa_offset:
++	case DW_CFA_def_cfa_offset_sf:
++	case DW_CFA_def_cfa_register:
++	case DW_CFA_same_value:
++	case DW_CFA_restore_extended:
++	case 0x80 ... 0xbf: /* DW_CFA_offset */
++		if (skip_xleb128(opcode, size))
++			return EDYNSCS_INVALID_CFA_OPCODE;
++		break;
++
++	case DW_CFA_negate_ra_state:
++		st->ra_negated = true;
++		break;
++
++	case 0x40 ... 0x7f: /* DW_CFA_advance_loc (delta in low 6 bits) */
++		st->loc += (op & 0x3f) * it->code_align;
++		break;
++
++	case 0xc0 ... 0xff: /* DW_CFA_restore (reg in low 6 bits) */
++		break;
++
++	default:
++		return EDYNSCS_INVALID_CFA_OPCODE;
++	}
++
 +	return 0;
 +}
 +
-+int main(int argc, char *argv[])
++static __always_inline int eh_frame_parse_cie(const struct eh_frame *frame,
++					      struct eh_frame_fde_iter *it)
 +{
-+	struct lr_unwind_ctx ctx = { 0 };
-+	unsigned int shnum, shstrndx;
-+	const Elf64_Ehdr *ehdr;
-+	const Elf64_Shdr *shdrs;
-+	const char *shstrtab;
-+	struct stat sb;
-+	int fd, ret = 1;
++	if (sizeof(frame->size) + frame->size < sizeof(*frame))
++		return EDYNSCS_INVALID_CIE_HEADER;
 +
-+	if (argc != 2) {
-+		fprintf(stderr, "Usage: %s <file>\n", argv[0]);
-+		return 1;
++	/*
++	 * Require presence of augmentation data (z) with a specifier for the
++	 * size of the FDE initial_loc and range fields (R), and nothing else.
++	 */
++	if (memcmp(frame->augmentation_string, "zR", 3))
++		return EDYNSCS_INVALID_CIE_HEADER;
++
++	/*
++	 * Require single-byte uleb128/sleb128 alignment factors, LR as the
++	 * return address register, and a 1-byte augmentation payload.
++	 */
++	if ((frame->code_alignment_factor & BIT(7)) ||
++	    (frame->data_alignment_factor & BIT(7)) ||
++	    frame->return_address_register != AARCH64_DWARF_LR ||
++	    frame->augmentation_data_size != 1)
++		return EDYNSCS_INVALID_CIE_HEADER;
++
++	it->code_align = frame->code_alignment_factor;
++
++	switch (frame->fde_pointer_format) {
++	case DW_EH_PE_pcrel | DW_EH_PE_sdata4:
++		it->use_sdata8 = false;
++		break;
++	case DW_EH_PE_pcrel | DW_EH_PE_sdata8:
++		it->use_sdata8 = true;
++		break;
++	default:
++		return EDYNSCS_INVALID_CIE_SDATA_SIZE;
 +	}
 +
-+	fd = open(argv[1], O_RDONLY);
-+	if (fd < 0) {
-+		fprintf(stderr, "gen_lr_unwind: cannot open %s: %s\n",
-+			argv[1], strerror(errno));
-+		return 1;
-+	}
-+	if (fstat(fd, &sb) < 0 || (size_t)sb.st_size < sizeof(Elf64_Ehdr)) {
-+		fprintf(stderr, "gen_lr_unwind: invalid file %s\n", argv[1]);
-+		close(fd);
-+		return 1;
-+	}
-+
-+	ctx.map_size = sb.st_size;
-+	ctx.map = mmap(NULL, ctx.map_size, PROT_READ, MAP_PRIVATE, fd, 0);
-+	close(fd);
-+	if (ctx.map == MAP_FAILED) {
-+		fprintf(stderr, "gen_lr_unwind: mmap failed on %s: %s\n",
-+			argv[1], strerror(errno));
-+		return 1;
-+	}
-+
-+	ehdr = ctx.map;
-+	if (memcmp(ehdr->e_ident, ELFMAG, SELFMAG) ||
-+	    ehdr->e_ident[EI_CLASS] != ELFCLASS64 ||
-+	    ehdr->e_ident[EI_DATA] != ELFDATA2LSB ||
-+	    ehdr->e_type != ET_REL ||
-+	    ehdr->e_machine != EM_AARCH64) {
-+		fprintf(stderr, "gen_lr_unwind: %s is not an AArch64 ET_REL ELF\n",
-+			argv[1]);
-+		goto out;
-+	}
-+
-+	shdrs = ctx.map + ehdr->e_shoff;
-+	shnum = ehdr->e_shnum == SHN_UNDEF ? shdrs[0].sh_size : ehdr->e_shnum;
-+	shstrndx = ehdr->e_shstrndx == SHN_XINDEX ?
-+		   shdrs[0].sh_link : ehdr->e_shstrndx;
-+	shstrtab = ctx.map + shdrs[shstrndx].sh_offset;
-+
-+	for (unsigned int i = 0; i < shnum; i++) {
-+		const char *name = shstrtab + shdrs[i].sh_name;
-+
-+		if (!strcmp(name, ".lr_unwind_fde"))
-+			ctx.fde_sec = &shdrs[i];
-+		else if (!strcmp(name, ".eh_frame") ||
-+			 !strcmp(name, ".init.eh_frame"))
-+			ctx.eh_sec = &shdrs[i];
-+		else if (!strcmp(name, ".rela.eh_frame") ||
-+			 !strcmp(name, ".rela.init.eh_frame"))
-+			ctx.rela_eh_sec = &shdrs[i];
-+		else if (!strcmp(name, ".symtab"))
-+			ctx.symtab_shndx = i;
-+	}
-+
-+	if (ctx.fde_sec) {
-+		ret = 0;
-+		goto out;
-+	}
-+
-+	if (!ctx.eh_sec || !ctx.rela_eh_sec || !ctx.symtab_shndx) {
-+		ret = 0;
-+		goto out;
-+	}
-+
-+	if (!parse_eh_frame(&ctx) &&
-+	    !emit_lr_unwind_sections(argv[1], &ctx, shnum, shstrndx))
-+		ret = 0;
-+	else
-+		fprintf(stderr, "gen_lr_unwind: failed to generate .lr_unwind for %s\n",
-+			argv[1]);
-+
-+out:
-+	if (ctx.map)
-+		munmap((void *)ctx.map, ctx.map_size);
-+	return ret;
++	it->cie = frame;
++	return 0;
 +}
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index d5710e900bd40..9c8bfb6ff05e0 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -61,7 +61,7 @@ vmlinux_link()
- 	shift
++
++static __always_inline int eh_frame_next_fde(struct eh_frame_fde_iter *it)
++{
++	while (it->size > 4) {
++		const struct eh_frame *frame = (const void *)it->p;
++		const struct eh_frame *cie;
++		const u8 *cie_ptr;
++		size_t min_size;
++		int step, ret;
++
++		if (frame->size == 0 || frame->size == U32_MAX ||
++		    frame->size > (u32)(it->size - sizeof(frame->size)))
++			break;
++
++		if (frame->size < sizeof(frame->cie_id_or_pointer))
++			return EDYNSCS_INVALID_CIE_HEADER;
++
++		step = sizeof(frame->size) + frame->size;
++		it->p += step;
++		it->size -= step;
++
++		if (frame->cie_id_or_pointer == 0) {
++			ret = eh_frame_parse_cie(frame, it);
++			if (ret)
++				return ret;
++			continue;
++		}
++
++		cie_ptr = (const u8 *)&frame->cie_id_or_pointer;
++		if (frame->cie_id_or_pointer > (u32)(cie_ptr - it->start))
++			return EDYNSCS_INVALID_CIE_HEADER;
++
++		cie = (const void *)(cie_ptr - frame->cie_id_or_pointer);
++		if (cie != it->cie) {
++			if (cie->cie_id_or_pointer != 0 ||
++			    cie->size == 0 || cie->size == U32_MAX ||
++			    cie->size > (u32)(cie_ptr - (const u8 *)cie -
++					      sizeof(cie->size)))
++				return EDYNSCS_INVALID_CIE_HEADER;
++			ret = eh_frame_parse_cie(cie, it);
++			if (ret)
++				return ret;
++		}
++
++		min_size = it->use_sdata8 ?
++			   offsetof(struct eh_frame, opcodes64) :
++			   offsetof(struct eh_frame, opcodes);
++		if ((size_t)step < min_size)
++			return EDYNSCS_INVALID_FDE_AUGM_DATA_SIZE;
++
++		it->fde = frame;
++		return 0;
++	}
++
++	it->fde = NULL;
++	return 0;
++}
++
++static __always_inline int eh_frame_fde_opcodes(const struct eh_frame *frame,
++						bool use_sdata8,
++						const u8 **opcode_out,
++						int *size_out)
++{
++	size_t hdr_size = use_sdata8 ?
++			  offsetof(struct eh_frame, opcodes64) :
++			  offsetof(struct eh_frame, opcodes);
++	size_t total = sizeof(frame->size) + frame->size;
++	const u8 *opcode = use_sdata8 ? frame->opcodes64 : frame->opcodes;
++	int size, l;
++
++	if (total < hdr_size + 1 || (*opcode & BIT(7)))
++		return EDYNSCS_INVALID_FDE_AUGM_DATA_SIZE;
++
++	size = (int)(total - hdr_size);
++	l = *opcode++;
++	if (l > size - 1)
++		return EDYNSCS_INVALID_FDE_AUGM_DATA_SIZE;
++
++	opcode += l;
++	size -= l + 1;
++
++	*opcode_out = opcode;
++	*size_out = size;
++	return 0;
++}
++
++#endif /* __ASM_EH_FRAME_H */
+diff --git a/arch/arm64/include/asm/scs.h b/arch/arm64/include/asm/scs.h
+index a15a2968e7b66..f49fc27a8a9b2 100644
+--- a/arch/arm64/include/asm/scs.h
++++ b/arch/arm64/include/asm/scs.h
+@@ -54,13 +54,6 @@ static inline void dynamic_scs_init(void)
+ static inline void dynamic_scs_init(void) {}
+ #endif
  
- 	if is_enabled CONFIG_LTO_CLANG || is_enabled CONFIG_X86_KERNEL_IBT ||
--	   is_enabled CONFIG_KLP_BUILD; then
-+	   is_enabled CONFIG_KLP_BUILD || is_enabled CONFIG_ARM64_LR_UNWIND; then
- 		# Use vmlinux.o instead of performing the slow LTO link again.
- 		objs=vmlinux.o
- 		libs=
+-enum {
+-	EDYNSCS_INVALID_CIE_HEADER		= 1,
+-	EDYNSCS_INVALID_CIE_SDATA_SIZE		= 2,
+-	EDYNSCS_INVALID_FDE_AUGM_DATA_SIZE	= 3,
+-	EDYNSCS_INVALID_CFA_OPCODE		= 4,
+-};
+-
+ int __pi_scs_patch(const u8 eh_frame[], int size, bool skip_dry_run);
+ 
+ #endif /* __ASSEMBLER__ */
+diff --git a/arch/arm64/kernel/pi/patch-scs.c b/arch/arm64/kernel/pi/patch-scs.c
+index 3944ad899021c..b240144f7d80e 100644
+--- a/arch/arm64/kernel/pi/patch-scs.c
++++ b/arch/arm64/kernel/pi/patch-scs.c
+@@ -9,51 +9,13 @@
+ #include <linux/linkage.h>
+ #include <linux/types.h>
+ 
++#include <asm/eh_frame.h>
+ #include <asm/scs.h>
+ 
+ #include "pi.h"
+ 
+ bool dynamic_scs_is_enabled;
+ 
+-//
+-// This minimal DWARF CFI parser is partially based on the code in
+-// arch/arc/kernel/unwind.c, and on the document below:
+-// https://refspecs.linuxbase.org/LSB_4.0.0/LSB-Core-generic/LSB-Core-generic/ehframechpt.html
+-//
+-
+-#define DW_CFA_nop                          0x00
+-#define DW_CFA_set_loc                      0x01
+-#define DW_CFA_advance_loc1                 0x02
+-#define DW_CFA_advance_loc2                 0x03
+-#define DW_CFA_advance_loc4                 0x04
+-#define DW_CFA_offset_extended              0x05
+-#define DW_CFA_restore_extended             0x06
+-#define DW_CFA_undefined                    0x07
+-#define DW_CFA_same_value                   0x08
+-#define DW_CFA_register                     0x09
+-#define DW_CFA_remember_state               0x0a
+-#define DW_CFA_restore_state                0x0b
+-#define DW_CFA_def_cfa                      0x0c
+-#define DW_CFA_def_cfa_register             0x0d
+-#define DW_CFA_def_cfa_offset               0x0e
+-#define DW_CFA_def_cfa_expression           0x0f
+-#define DW_CFA_expression                   0x10
+-#define DW_CFA_offset_extended_sf           0x11
+-#define DW_CFA_def_cfa_sf                   0x12
+-#define DW_CFA_def_cfa_offset_sf            0x13
+-#define DW_CFA_val_offset                   0x14
+-#define DW_CFA_val_offset_sf                0x15
+-#define DW_CFA_val_expression               0x16
+-#define DW_CFA_lo_user                      0x1c
+-#define DW_CFA_negate_ra_state              0x2d
+-#define DW_CFA_GNU_args_size                0x2e
+-#define DW_CFA_GNU_negative_offset_extended 0x2f
+-#define DW_CFA_hi_user                      0x3f
+-
+-#define DW_EH_PE_sdata4                     0x0b
+-#define DW_EH_PE_sdata8                     0x0c
+-#define DW_EH_PE_pcrel                      0x10
+-
+ enum {
+ 	PACIASP		= 0xd503233f,
+ 	AUTIASP		= 0xd50323bf,
+@@ -61,7 +23,7 @@ enum {
+ 	SCS_POP		= 0xf85f8e5e,
+ };
+ 
+-static void __always_inline scs_patch_loc(u64 loc)
++static __always_inline void scs_patch_loc(u64 loc)
+ {
+ 	u32 insn = le32_to_cpup((void *)loc);
+ 
+@@ -91,211 +53,49 @@ static void __always_inline scs_patch_loc(u64 loc)
+ 		    :: "r"(loc));
+ }
+ 
+-/*
+- * Skip one uleb128/sleb128 encoded quantity from the opcode stream. All bytes
+- * except the last one have bit #7 set.
+- */
+-static int __always_inline skip_xleb128(const u8 **opcode, int size)
+-{
+-	u8 c;
+-
+-	do {
+-		c = *(*opcode)++;
+-		size--;
+-	} while (c & BIT(7));
+-
+-	return size;
+-}
+-
+-struct eh_frame {
+-	/*
+-	 * The size of this frame if 0 < size < U32_MAX, 0 terminates the list.
+-	 */
+-	u32	size;
+-
+-	/*
+-	 * The first frame is a Common Information Entry (CIE) frame, followed
+-	 * by one or more Frame Description Entry (FDE) frames. In the former
+-	 * case, this field is 0, otherwise it is the negated offset relative
+-	 * to the associated CIE frame.
+-	 */
+-	u32	cie_id_or_pointer;
+-
+-	union {
+-		struct { // CIE
+-			u8	version;
+-			u8	augmentation_string[3];
+-			u8	code_alignment_factor;
+-			u8	data_alignment_factor;
+-			u8	return_address_register;
+-			u8	augmentation_data_size;
+-			u8	fde_pointer_format;
+-		};
+-
+-		struct { // FDE
+-			s32	initial_loc;
+-			s32	range;
+-			u8	opcodes[];
+-		};
+-
+-		struct { // FDE
+-			s64	initial_loc64;
+-			s64	range64;
+-			u8	opcodes64[];
+-		};
+-	};
+-};
+-
+-static int scs_handle_fde_frame(const struct eh_frame *frame,
+-				int code_alignment_factor,
+-				bool use_sdata8,
++static int scs_handle_fde_frame(const struct eh_frame_fde_iter *it,
+ 				bool dry_run)
+ {
+-	int size = frame->size - offsetof(struct eh_frame, opcodes) + 4;
+-	u64 loc = (u64)offset_to_ptr(&frame->initial_loc);
+-	const u8 *opcode = frame->opcodes;
+-	int l;
+-
+-	if (use_sdata8) {
+-		loc = (u64)&frame->initial_loc64 + frame->initial_loc64;
+-		opcode = frame->opcodes64;
+-		size -= 8;
+-	}
+-
+-	// assume single byte uleb128_t for augmentation data size
+-	if (*opcode & BIT(7))
+-		return EDYNSCS_INVALID_FDE_AUGM_DATA_SIZE;
++	const struct eh_frame *frame = it->fde;
++	struct eh_frame_cfi_state st = {
++		.loc = it->use_sdata8 ?
++		       (u64)&frame->initial_loc64 + frame->initial_loc64 :
++		       (u64)offset_to_ptr(&frame->initial_loc),
++	};
++	const u8 *opcode;
++	int size, ret;
+ 
+-	l = *opcode++;
+-	opcode += l;
+-	size -= l + 1;
++	ret = eh_frame_fde_opcodes(frame, it->use_sdata8, &opcode, &size);
++	if (ret)
++		return ret;
+ 
+ 	/*
+ 	 * Starting from 'loc', apply the CFA opcodes that advance the location
+ 	 * pointer, and identify the locations of the PAC instructions.
+ 	 */
+-	while (size-- > 0) {
+-		switch (*opcode++) {
+-		case DW_CFA_nop:
+-		case DW_CFA_remember_state:
+-		case DW_CFA_restore_state:
+-			break;
+-
+-		case DW_CFA_advance_loc1:
+-			loc += *opcode++ * code_alignment_factor;
+-			size--;
+-			break;
+-
+-		case DW_CFA_advance_loc2:
+-			loc += *opcode++ * code_alignment_factor;
+-			loc += (*opcode++ << 8) * code_alignment_factor;
+-			size -= 2;
+-			break;
+-
+-		case DW_CFA_advance_loc4:
+-			loc += *opcode++ * code_alignment_factor;
+-			loc += (*opcode++ << 8) * code_alignment_factor;
+-			loc += (*opcode++ << 16) * code_alignment_factor;
+-			loc += ((u64)*opcode++ << 24) * code_alignment_factor;
+-			size -= 4;
+-			break;
+-
+-		case DW_CFA_def_cfa:
+-		case DW_CFA_offset_extended:
+-			size = skip_xleb128(&opcode, size);
+-			fallthrough;
+-		case DW_CFA_def_cfa_offset:
+-		case DW_CFA_def_cfa_offset_sf:
+-		case DW_CFA_def_cfa_register:
+-		case DW_CFA_same_value:
+-		case DW_CFA_restore_extended:
+-		case 0x80 ... 0xbf:
+-			size = skip_xleb128(&opcode, size);
+-			break;
+-
+-		case DW_CFA_negate_ra_state:
+-			if (!dry_run)
+-				scs_patch_loc(loc - 4);
+-			break;
++	while (size > 0) {
++		ret = eh_frame_step_opcode(&opcode, &size, it, &st);
++		if (ret)
++			return ret;
+ 
+-		case 0x40 ... 0x7f:
+-			// advance loc
+-			loc += (opcode[-1] & 0x3f) * code_alignment_factor;
+-			break;
+-
+-		case 0xc0 ... 0xff:
+-			break;
+-
+-		default:
+-			return EDYNSCS_INVALID_CFA_OPCODE;
+-		}
++		if (st.ra_negated && !dry_run)
++			scs_patch_loc(st.loc - 4);
+ 	}
+ 	return 0;
+ }
+ 
+ int scs_patch(const u8 eh_frame[], int size, bool skip_dry_run)
+ {
+-	int code_alignment_factor = 1;
+-	bool fde_use_sdata8 = false;
+-	const u8 *p = eh_frame;
+-
+-	while (size > 4) {
+-		const struct eh_frame *frame = (const void *)p;
+-		int ret;
+-
+-		if (frame->size == 0 ||
+-		    frame->size == U32_MAX ||
+-		    frame->size > size)
+-			break;
+-
+-		if (frame->cie_id_or_pointer == 0) {
+-			/*
+-			 * Require presence of augmentation data (z) with a
+-			 * specifier for the size of the FDE initial_loc and
+-			 * range fields (R), and nothing else.
+-			 */
+-			if (strcmp(frame->augmentation_string, "zR"))
+-				return EDYNSCS_INVALID_CIE_HEADER;
++	struct eh_frame_fde_iter it = EH_FRAME_FDE_ITER_INIT(eh_frame, size);
++	int ret;
+ 
+-			/*
+-			 * The code alignment factor is a uleb128 encoded field
+-			 * but given that the only sensible values are 1 or 4,
+-			 * there is no point in decoding the whole thing.  Also
+-			 * sanity check the size of the data alignment factor
+-			 * field, and the values of the return address register
+-			 * and augmentation data size fields.
+-			 */
+-			if ((frame->code_alignment_factor & BIT(7)) ||
+-			    (frame->data_alignment_factor & BIT(7)) ||
+-			    frame->return_address_register != 30 ||
+-			    frame->augmentation_data_size != 1)
+-				return EDYNSCS_INVALID_CIE_HEADER;
++	while (!(ret = eh_frame_next_fde(&it)) && it.fde) {
++		ret = scs_handle_fde_frame(&it, !skip_dry_run);
++		if (ret)
++			return ret;
+ 
+-			code_alignment_factor = frame->code_alignment_factor;
+-
+-			switch (frame->fde_pointer_format) {
+-			case DW_EH_PE_pcrel | DW_EH_PE_sdata4:
+-				fde_use_sdata8 = false;
+-				break;
+-			case DW_EH_PE_pcrel | DW_EH_PE_sdata8:
+-				fde_use_sdata8 = true;
+-				break;
+-			default:
+-				return EDYNSCS_INVALID_CIE_SDATA_SIZE;
+-			}
+-		} else {
+-			ret = scs_handle_fde_frame(frame, code_alignment_factor,
+-						   fde_use_sdata8, !skip_dry_run);
+-			if (ret)
+-				return ret;
+-
+-			if (!skip_dry_run)
+-				scs_handle_fde_frame(frame, code_alignment_factor,
+-						     fde_use_sdata8, false);
+-		}
+-
+-		p += sizeof(frame->size) + frame->size;
+-		size -= sizeof(frame->size) + frame->size;
++		if (!skip_dry_run)
++			scs_handle_fde_frame(&it, false);
+ 	}
+-	return 0;
++	return ret;
+ }
 -- 
 2.56.0.679.gc527c65306-goog
 
