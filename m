@@ -1,75 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.70
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794890126;
-	b=IDVpzF6YyFofqUnMBZiM/ej/jS4kZv21n2JiENSViopRZBU49tIUXYrqA33dEQ9NfoYe
-	 93+/m59Va/jhhrffcY0MTzATpNIBvk80QoBKf2lJbhP/AqCOZ0yyVaH99ZYRlo8AS2aEJ
-	 8KIC/B7GM0DUAYw8duMbAmBOG0Dl1YE/Co42x2gtEDtFnqd+u8vd4gqhGG88/nqAWvGlZ
-	 c7rqsAcQyHclW89yGxLfTcgmOUk6BUiXTHFE9AytninhtKy1xj838iCwmDEYXPtooT+2R
-	 DeRQ5PdTpNyU8FXjsl4QGOUVVa2dIiioyZQf6oMFOV2DAkDXev+TzPygAvmMuYgQ6Fg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794890126;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.47
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794898225;
+	b=wI1UKMQQEI0HoTNrnjpHVw35LY84+fHxVJE/QafXcdTGApUyxPbM6hYEOdV1+bt8p3Ju
+	 487sopTB/KY9k9kNJCsHgARCwTh7tSuSk7OXZn6AupGUOgOs1GEF+WNSMNvMj7/xIPzYX
+	 1BJyDFq4Dqkub9NuZl+mrAInhBIbNvCT2PT2Q14Xf9z/B+CYc00ruodxlDNCyIh2NqZAQ
+	 34tDx/vTkgD6dUl3hS5TeG6SlXcMQFBcLSdFF7GgcGfiYLvojLZNWLDUUHJxvkxd0FgkL
+	 8UVVYl4kE1jP/Bic4u5sMUVSR9I64YmfsUfCmA1BtXbZi4yWVHKbRmD77Z9y2yGgdkg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794898225;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:X-Mailer:Message-ID:Subject:From:To:Cc:
-	 Content-Type;
-	bh=g8r2rmW8mXTC4Y+YUXI9eRvrm7kgFqB9xo4pH3w0HkU=;
-	b=CZMpcNQqGy9pZ0BsNSYoFA0p1uRj7F2xdFqvIKCrCGr0LeqgrmweOJvHd/YTd6Nn6W4S
-	 Q3rM7x50JtfE9ZKpCSTZ+SNa43FGyUP8TkB5cyrVvFfq3I3l5RmpkWUnz6+3EnIUSXWS6
-	 7ByqKPwVqOsJ742Lt9ex4f1r0D5alsJotEnV5X5Dzxh3fmZAWoRcafMQrtvXm5ESumD+g
-	 G3Wbf7OAD5Guj9uV7J3kY1E5q4/fcbbpVhfSU0z6nnOw1bE6I4DxSfif2oXVkGyqm+Yum
-	 hFVpAwyHg/o20ptSJL/EE037f+Msjb2h9lcaqLsPetbafHY3Q1fBEVYcbj/M8CuBzxQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--dylanbhatch.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=qFrDIG9e;
-	arc=none smtp.remote-ip=209.85.216.70
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=w2ujTW8JKgVpi8GBaPpe+a6Vi5r6q/k7HuBea5FdHPY=;
+	b=VjA0efGT0g3Epl3hO8H2Znu/OxSrHPduZU+FRpsCtiz11BlPDdAyMxBSYnBNhLPwkeHe
+	 7qJowb/fn3iWghgn7qS+8YnCAWisGuwClhNpcNs/JJAu8w658B6BB3LLNcBhYkamth/Dv
+	 cgl/YBJMdMDDFIdvYMV3kHUTDfSyjNAX/bcUqg8gVeKV0aUTaYNt3b69C2XQyzWsYlQAX
+	 iXSEXcIv6RwtAIQzShC2rGpLdsJAl+VCrjrQIxevZ5I0rovnnOEf60rliElMXJv0bUlAw
+	 DK2pD0wWx9JLjRyRbcLI1cvLE6TKmGu4kH8YCRyHDmxjN4jJMNKory6QDDklr+r/jHQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=P1oVbfCH;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.218.47
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF8F60A5BC3
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 04:35:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7FF8F60A5BC3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dylanbhatch.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992B7606A31C
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 06:50:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 992B7606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=qFrDIG9e
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-3ad30487d55so3218461a91.2
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 20:35:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=P1oVbfCH
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c4d28f75d62so833757766b.0
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 22:50:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1794898223; cv=none;
+        d=google.com; s=arc-20260327;
+        b=UsrtKaZ9xpR2hg2Mf8VdheAnsDvbnOWuGEeJ4w1pLytGk15JanpZWiXeaCCIqeTuNL
+         pZh/n1urpuUi4DA5DN45ABhFTQuLfCePQp5bZYp0A8zMDarMMMSrggJ1WieAYOaQ41x5
+         KNHKN78bFhxgpUhjmLJnXErpmFYmOpdtSb+BFTw2ZGFWD2H1YZsn6BfEG8Nmc//Y1thq
+         I4SnKZDoVGl7adtiCWVIyYOLZZOreE3K9pU2ok0KNL1+u5UYZ4ZMM3ccxNDsPf4k1CpQ
+         EbEyLbRms7itNYBk1M8MCSUnH9VR+B5dQv7yKeJETLzzimYehG/ddZdrgvvWljRhaq2u
+         Hclw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=w2ujTW8JKgVpi8GBaPpe+a6Vi5r6q/k7HuBea5FdHPY=;
+        fh=1ATazT+q71u/unGTqkqYD6+7PYN8LNB/uvWUnkxwZL8=;
+        b=oBhiDwW2v1Auo7HtjaBoOC0+GPxe2l8eZ7dIFsvdZUwauhIlKYBItZ5n77YWKgV7Xz
+         GKTMPeayDQnHYd6CfoTN7aZjI9CfqoMZ3CficMkMk52BdXadTnQlEyWta12l5sXIfoKU
+         SvDneB+/fjmkwiFFLtZ0LOMlQD4Y3k7OsgaoJGJrN3l2H8TZOomla+xWiMytYE0hNG2p
+         /N9Gt1gnQIhIcddzsT86IhH/DrHrtfttFmXhM6P74QJ6dngGSJ09x2HU29jxdiNKAweD
+         XgrKYw1DQrgfOBLRy5SUuNeAeodb9eW+39QeRX/1bYg21YwcqYe2pno0q70IM2NFXtLa
+         F1yA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794890125; x=1795494925; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=g8r2rmW8mXTC4Y+YUXI9eRvrm7kgFqB9xo4pH3w0HkU=;
-        b=qFrDIG9e8KWIFfCS6zBqtNp2dz1VdBzEA+ejwoT2Rvo/qjH8XZVwB4ZkdrxnRodl/Y
-         hLg66soQSb4Ifk9aMqHQaaiWOiW7pYTQJFgPsAO/JYtAzYwuqugmQ6xtcYhRd43gbH31
-         ct3RNDdTTTOrziuOgNyE+jEMUJMJ1ADa6abQOhsHLeGWzz2qEZGyDUoPk4iSzUR3Jkhp
-         PCIkW2RPkg9XV/8JTISXZFjgvBUKHhFL+Yrc+WJ28QNODtZRf78dm61B3v9sXRLBty2q
-         0CaedMRo9w1H8X6VOIwwQaWq1azVNJ+I2kD3lr72agpPnAN0sJ0M8h/Pw8H633vqAyE4
-         /veA==
+        d=gmail.com; s=20260707; t=1794898223; x=1795503023; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=w2ujTW8JKgVpi8GBaPpe+a6Vi5r6q/k7HuBea5FdHPY=;
+        b=P1oVbfCHWu7ZeOe6V6J+56WX4ByaVZbKr5AJjLMGW4YJg/tWNlf2I4SmHO+VyEkLQU
+         F2z0P53N4ceMfOZyOBTUrtyPBNQcUD9cVj6vJyw7db3ULaD7Nanm6zEebtphadw6l7gt
+         d79E9M+/KD6mo05ppncQAx1jqTcZmEvoZpSSxLEymXXdqv4eJn19pFv6BEDoO0sdE2YW
+         yYsdgzP1jMc/Ljm+zOqFX4iNo6iDbRvrR2n211VGZ98/c5Gtd8PQDjDe3yrepLq9ME+G
+         23la/HEWK5lovYS7EQtS8VxG7AXNELWGr6htTpKLUoWiSWBWjABsJPNrvNLPQ/uiwZ97
+         KBJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794890125; x=1795494925;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=g8r2rmW8mXTC4Y+YUXI9eRvrm7kgFqB9xo4pH3w0HkU=;
-        b=ueEdEGgY5wVCnaYB/AxDv2KUreqvU1Z5701pNER+vhaojULQO6k78adLkGpxZzpY5v
-         NsWAN9WXMfirA6OKAdCHzBx0LNgN4eStz8jZisMVRQcQUSLEhqFlsUPyJ22NHdRcuraO
-         X76iPE82qubevXcHOkVFLu0pnxboc8xlhxbdHBKVPH1+FC/2t0PCKxSOAM0I80Sbf3v5
-         J4PzRqGMGDX6DsMVPg2wPx+ePz3q9sEayS6fOlls2m8DtriL222tS0zO4GrIVe22fH5J
-         IFjeF7LvZkn62gXBajPBVttSmL6E2npYw1q4ZqEUf2zS3JVEA76hJ2LKEx+YeAtDTtXa
-         2Xfw==
-X-Forwarded-Encrypted: i=1; AL+hErH03bUMlGLCjRNt/tG5tZ06mPsJ/LdPXHPN7wEdVUIh4xhTgL0F63wJj/qoIbpjnFKYSkR7n1cE2NTZmB8=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/adrzwkDDkssL3gAWm+XFopoVcmfmeEixhkrJccKwzbdKEDDmg
-	UiASz3595JUFpBkQdrptrXOBZlsCvivnMoyHC553sj8rASPixaftnPBMS4dLNpD/oL3douOdeEp
-	z27+7GJ9jT3sbRuKkhSa0tMjo7A==
-X-Received: from pjto7.prod.google.com ([2002:a17:90a:c707:b0:3b3:b6df:b0be])
- (user=dylanbhatch job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:3f50:b0:3b0:a1af:e4fc with SMTP id 98e67ed59e1d1-3b1b0d984bcmr13134201a91.63.1794890124572;
- Mon, 16 Nov 2026 20:35:24 -0800 (PST)
-Date: Tue, 17 Nov 2026 04:35:04 +0000
-In-Reply-To: <20261117043504.1021063-1-dylanbhatch@google.com>
+        d=1e100.net; s=20260707; t=1794898223; x=1795503023;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=w2ujTW8JKgVpi8GBaPpe+a6Vi5r6q/k7HuBea5FdHPY=;
+        b=vQkTSgBhGurKpZEFpJCUiJ28jLHEwVgGNIZ0pyjfmo8YQsXhrHivS+D5+UZTGmbgJ5
+         pL1BxC34IMcyeRKSDw2UOITqEWza0Q743pZdq3RJr/hoMFhcOSSU3Ya5bq34fVJoMV/s
+         f6YHs/pWC70drnV6op7YRHF8wiSgFRhx1774BkboV8SNU/fRhWMWEib/wt+KyS4iLHxv
+         UPdxdsM2ACx2V1x+x9gVg2iucyjiC+PtwjYxjuiq03itIIPFvXDHT3R50/fzMEUQlRxY
+         2l/iD/zha2NrVEdTuwoGCm/4j8I2eM2qjIi7SbDKHxVGw1fgi4zNa15HyGpWx87vjqHx
+         E88A==
+X-Forwarded-Encrypted: i=1; AL+hErFFNi7ulHScRhvjIInfjVJvq5plSE01IV+Js3oi+g/KT95JnbOp0bY1zibZJ/2t2bmjNW9HMVOJS8WzVm4=@vger.kernel.org
+X-Gm-Message-State: APuU4Z+SB0lsNkvp2hUtDD/4q82vSoTLl09IWJ1FWot8Q7l/imE4iAhM
+	uAZgieUfo7R7RqB7czG8FuHv1jHKvq7+Sckt+5OcfiAkVq5I7Vtrbpvr5r7P82zegUel1J55RUK
+	LSpkUs9nZX5uC5RPDa1/i9eX++D8THgk=
+X-Gm-Gg: AYBFou2C1cDUnL1JV8dYVhPb5nRWxFTA1dTMffvS+iBLXGoDtmBCja+D+NeJ2U6F7yZ
+	gXoOXZlIrJwcD6znrRcuu2ASVGICObOQ3xyCRoi/QDCo+iXfd96xd6zJxeTnFS+B77EAgktl6Tv
+	aD8rf3mAS9jUKIJg8+UVQ0S5BIkZV9PUsJoOzK+cwuLIhx9tmXXFyDKiLXfdC/3qCN934f/Q6PG
+	02ajvZ0ZLUbigGsG+mNtPMQOo/E6k/+/1oxbvlduuTcWn/p59Wb6PlUJSuhRnZCVkOF2yDZcINF
+	0ln+GHsn26/jl8sDhypYa8kaXyK1SYjoxiIkJax+U+7k2+b1VXZY55xPkE/eD/jrZ2XLTXe6XMT
+	2yew8gPJehKPmvQ0WdDYnVxun39XOBR8on6M=
+X-Received: by 2002:a17:907:868f:b0:c50:475d:980e with SMTP id
+ a640c23a62f3a-c50963ced7cmr1066601266b.38.1794898222816; Mon, 16 Nov 2026
+ 22:50:22 -0800 (PST)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -78,215 +103,125 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-References: <20261117043504.1021063-1-dylanbhatch@google.com>
-X-Mailer: git-send-email 2.56.0.679.gc527c65306-goog
-Message-ID: <20261117043504.1021063-13-dylanbhatch@google.com>
-Subject: [RFC PATCH 12/12] unwind: arm64: use .lr_unwind to unwind interrupt frames
-From: Dylan Hatch <dylanbhatch@google.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Weinan Liu <wnliu@google.com>, 
-	Jens Remus <jremus@linux.ibm.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, llvm@lists.linux.dev, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Indu Bhagat <ibhagatgnu@gmail.com>, 
-	Prasanna Kumar T S M <ptsm@linux.microsoft.com>, live-patching@vger.kernel.org, 
-	Dylan Hatch <dylanbhatch@google.com>
+MIME-Version: 1.0
+References: <20261114172955.1598929-1-16567adigashreesh@gmail.com> <20261117000119.GH229817@google.com>
+In-Reply-To: <20261117000119.GH229817@google.com>
+From: Shreesh Adiga <16567adigashreesh@gmail.com>
+Date: Tue, 17 Nov 2026 12:20:08 +0530
+X-Gm-Features: AclHuK-4WgArdEcKAhaJtwM4CxSAsBuUG1yPsujVDm8kX8ujvzUg2VCGIExhdGw
+Message-ID: <CA+-x59b-gUddP2cfHbzDrv9jupmeM1LeHkQnNXhE8_y6B+JC1A@mail.gmail.com>
+Subject: Re: [PATCH v2] lib/crc: arm64: Add NEON PMULL+EOR3 crc64_nvme implementation
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Demian Shulhan <demyansh@gmail.com>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add kunwind_next_regs_lr_unwind() to unwind across pt_regs exception
-boundaries using .lr_unwind mode and SP-offset metadata (live x30, [x29]
-frame record, or [sp + sp_off] frame record), falling back to
-frame-pointer unwinding and marking the stacktrace unreliable on
-failure.
+Hi Eric,
 
-Signed-off-by: Dylan Hatch <dylanbhatch@google.com>
----
- arch/arm64/kernel/stacktrace.c | 85 ++++++++++++++++++++++++++++++----
- 1 file changed, 75 insertions(+), 10 deletions(-)
+On Tue, Nov 17, 2026 at 5:31=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+> Was crc_kunit run?  It already has a benchmark in it.
+No, I have access to only one aarch64 device that is Android Mediatek
+Dimensity 9400 SoC without root access.
+Therefore I can't run crc_kunit on that, instead I have done userspace
+comparisons for the same kernel with libbenchmark.
+This is based on my earlier work for FFmpeg:
+https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/21651
+I also have Corporate MacOS M5 and did check inside Ubuntu VM but that
+is not accurate due to virtualization.
 
-diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
-index 3ebcf8c53fb04..842555a4a3fe2 100644
---- a/arch/arm64/kernel/stacktrace.c
-+++ b/arch/arm64/kernel/stacktrace.c
-@@ -10,6 +10,7 @@
- #include <linux/filter.h>
- #include <linux/ftrace.h>
- #include <linux/kprobes.h>
-+#include <linux/overflow.h>
- #include <linux/sched.h>
- #include <linux/sched/debug.h>
- #include <linux/sched/task_stack.h>
-@@ -17,6 +18,7 @@
- 
- #include <asm/efi.h>
- #include <asm/irq.h>
-+#include <asm/lr_unwind.h>
- #include <asm/stack_pointer.h>
- #include <asm/stacktrace.h>
- 
-@@ -26,6 +28,7 @@ enum kunwind_source {
- 	KUNWIND_SOURCE_CALLER,
- 	KUNWIND_SOURCE_TASK,
- 	KUNWIND_SOURCE_REGS_PC,
-+	KUNWIND_SOURCE_REGS_LR,
- };
- 
- union unwind_flags {
-@@ -45,6 +48,7 @@ union unwind_flags {
-  * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
-  *               associated with the most recently encountered replacement lr
-  *               value.
-+ * @unreliable:  Stacktrace is unreliable.
-  */
- struct kunwind_state {
- 	struct unwind_state common;
-@@ -56,6 +60,7 @@ struct kunwind_state {
- 	enum kunwind_source source;
- 	union unwind_flags flags;
- 	struct pt_regs *regs;
-+	bool unreliable;
- };
- 
- static __always_inline void
-@@ -67,6 +72,7 @@ kunwind_init(struct kunwind_state *state,
- 	state->source = KUNWIND_SOURCE_UNKNOWN;
- 	state->flags.all = 0;
- 	state->regs = NULL;
-+	state->unreliable = false;
- }
- 
- /*
-@@ -181,7 +187,6 @@ int kunwind_next_regs_pc(struct kunwind_state *state)
- 	state->regs = regs;
- 	state->common.pc = regs->pc;
- 	state->common.fp = regs->regs[29];
--	state->regs = NULL;
- 	state->source = KUNWIND_SOURCE_REGS_PC;
- 	return 0;
- }
-@@ -244,6 +249,65 @@ kunwind_next_frame_record(struct kunwind_state *state)
- 	return 0;
- }
- 
-+#ifdef CONFIG_ARM64_LR_UNWIND
-+
-+/*
-+ * Unwind from a pt_regs according to .lr_unwind info.
-+ */
-+static __always_inline int
-+kunwind_next_regs_lr_unwind(struct kunwind_state *state)
-+{
-+	struct pt_regs *regs = state->regs;
-+	enum lr_unwind_mode mode;
-+	unsigned int sp_off;
-+	unsigned long fp;
-+	int err;
-+
-+	if (WARN_ON_ONCE(state->source != KUNWIND_SOURCE_REGS_PC))
-+		return -EINVAL;
-+	if (WARN_ON_ONCE(!regs))
-+		return -EINVAL;
-+
-+	state->regs = NULL;
-+
-+	err = lr_unwind_find(state->common.pc, &mode, &sp_off);
-+	if (err) {
-+		/* Fallback to FP based unwinder */
-+		state->unreliable = true;
-+		return kunwind_next_frame_record(state);
-+	}
-+
-+	switch (mode) {
-+	case LR_UNWIND_LIVE:
-+		if (state->common.fp & 0x7)
-+			return -EINVAL;
-+		state->common.pc = regs->regs[30];
-+		state->source = KUNWIND_SOURCE_REGS_LR;
-+		return 0;
-+	case LR_UNWIND_FP:
-+		return kunwind_next_frame_record(state);
-+	case LR_UNWIND_SP:
-+		if (check_add_overflow(regs->sp, (unsigned long)sp_off, &fp))
-+			return -EINVAL;
-+		state->common.fp = fp;
-+		return kunwind_next_frame_record(state);
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
-+#else /* !CONFIG_ARM64_LR_UNWIND */
-+
-+static __always_inline int
-+kunwind_next_regs_lr_unwind(struct kunwind_state *state)
-+{
-+	state->regs = NULL;
-+	state->unreliable = true;
-+	return kunwind_next_frame_record(state);
-+}
-+
-+#endif /* CONFIG_ARM64_LR_UNWIND */
-+
- /*
-  * Unwind from one frame record (A) to the next frame record (B).
-  *
-@@ -259,10 +323,13 @@ kunwind_next(struct kunwind_state *state)
- 	state->flags.all = 0;
- 
- 	switch (state->source) {
-+	case KUNWIND_SOURCE_REGS_PC:
-+		err = kunwind_next_regs_lr_unwind(state);
-+		break;
- 	case KUNWIND_SOURCE_FRAME:
- 	case KUNWIND_SOURCE_CALLER:
- 	case KUNWIND_SOURCE_TASK:
--	case KUNWIND_SOURCE_REGS_PC:
-+	case KUNWIND_SOURCE_REGS_LR:
- 		err = kunwind_next_frame_record(state);
- 		break;
- 	default:
-@@ -294,7 +361,7 @@ do_kunwind(struct kunwind_state *state, kunwind_consume_fn consume_state,
- 			return -EINVAL;
- 		ret = kunwind_next(state);
- 		if (ret == -ENOENT)
--			return 0;
-+			return state->unreliable ? -EINVAL : 0;
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -394,14 +461,11 @@ static __always_inline bool
- arch_reliable_kunwind_consume_entry(const struct kunwind_state *state, void *cookie)
- {
- 	/*
--	 * At an exception boundary we can reliably consume the saved PC. We do
--	 * not know whether the LR was live when the exception was taken, and
--	 * so we cannot perform the next unwind step reliably.
--	 *
--	 * All that matters is whether the *entire* unwind is reliable, so give
--	 * up as soon as we hit an exception boundary.
-+	 * If unwinding across an exception boundary fell back to frame-pointer
-+	 * unwinding without a valid .lr_unwind entry, the caller frame may
-+	 * have been skipped or duplicated. Abort reliable stack walks.
- 	 */
--	if (state->source == KUNWIND_SOURCE_REGS_PC)
-+	if (state->unreliable)
- 		return false;
- 
- 	return arch_kunwind_consume_entry(state, cookie);
-@@ -452,6 +516,7 @@ static const char *state_source_string(const struct kunwind_state *state)
- 	case KUNWIND_SOURCE_CALLER:	return "C";
- 	case KUNWIND_SOURCE_TASK:	return "T";
- 	case KUNWIND_SOURCE_REGS_PC:	return "P";
-+	case KUNWIND_SOURCE_REGS_LR:	return "L";
- 	default:			return "U";
- 	}
- }
--- 
-2.56.0.679.gc527c65306-goog
+> The commit message should also clarify that this benefits ARMv8.2 and
+> later processors with the sha3 extension, not just ARMv9.  (E.g., Apple
+> M1 is an example of an ARMv8.4 processor that benefits.)
+Sure I will take care of it, but for now I am thinking of first
+improving the existing PMULL to have 4x unrolling as per Demian's
+suggestion.
+Therefore I will revisit EOR3 addition later, will keep this in mind.
 
+> > +#ifdef CONFIG_ARM64
+> > +#define SHA3_TARGET __attribute__((target("arch=3Darmv8.2-a+crypto+sha=
+3")))
+>
+> Doesn't this break the build with gcc 8.1?  The kernel supports gcc 8.1
+> and later, but support for the sha3 target and intrinsics were added in
+> gcc 9.1.  Either this code will need to check the gcc version, or inline
+> assembly will need to be used for eor3 like lib/raid/xor/ does.
+Yes it seems to be unsupported even on GCC 8.2 and works on GCC 8.5
+onwards, I wasn't aware of older toolchain support.
+Will keep this in mind. Unfortunately compiler explorer is missing
+ARM64 GCC 8.1, will check 8.2 support which hopefully should be
+accurate.
+Will adopt the existing code in lib/raid/xor itself which should make
+it compatible with GCC 8.1.
+
+> > +     v0 =3D fold_single_round(v0, v2, fold_consts_2x);
+> > +     v1 =3D fold_single_round(v1, v3, fold_consts_2x);
+> > +     v0 =3D fold_single_round(v0, v1, fold_consts);
+> > +
+> > +     while (len >=3D 16) {
+> > +             uint64x2_t t0 =3D vreinterpretq_u64_u8(vld1q_u8(p));
+> > +
+> > +             v0 =3D fold_single_round(v0, t0, fold_consts);
+> > +             p +=3D 16;
+> > +             len -=3D 16;
+> > +     }
+> > +
+> > +     /* Multiply the 128-bit value by x^64 and reduce it back to 128 b=
+its. */
+> > +     v0 =3D vextq_u64(v0, zero, 1) ^ pmull64_hi_lo(fold_consts, v0);
+> > +
+> > +     /* Final Barrett reduction */
+> > +     uint64x2_t bconsts =3D vld1q_u64(bconsts_val);
+> > +     uint64x2_t final =3D pmull64(bconsts, v0);
+> > +
+> > +     v0 =3D veor3q_u64(v0, vextq_u64(zero, final, 1),
+> > +                     pmull64_hi_lo(bconsts, final));
+> > +
+> > +     return vgetq_lane_u64(v0, 1);
+>
+> Note that this is missing several optimizations compared to the x86
+> version (lib/crc/x86/crc-pclmul-template.S), including using
+> fold_consts_2x for a tail of 'len & 32', efficiently handling lengths
+> that aren't a multiple of 16 bytes, and reducing to the final CRC in two
+> carryless multiplication instructions rather than three.
+I was looking at the crc-pclmul-template.S code and I have a few queries.
+In this aarch64 version we only dispatch to this SIMD routine only
+when len>=3D128.
+Since we have 128 bytes available, do we have to add the tail of `len
+& 32` handling?
+Handling len not a multiple of 16 bytes (partial block) I will add but
+I am assuming that the dispatch will maintain 128 minimum len.
+
+I was trying to understand your "reducing to the final CRC in two
+carryless multiplications rather than three" statement.
+From going through the code in crc-pclmul-template.S:
+.Lreduce_128bits_to_crc tracing the logic below this label, I see
+three clmul operations:
+_pclmulqdq CONSTS_XMM, LO64_TERMS, %xmm0, HI64_TERMS, %xmm1
+
+_cond_vex movdqa, OFFSETOF_BARRETT_REDUCTION_CONSTS(CONSTS_PTR), CONSTS_XMM
+_pclmulqdq CONSTS_XMM, HI64_TERMS, %xmm0, HI64_TERMS, %xmm1
+
+.if LSB_CRC && \n =3D=3D 64
+_cond_vex punpcklqdq, %xmm1, %xmm2, %xmm2
+_pclmulqdq CONSTS_XMM, LO64_TERMS, %xmm1, HI64_TERMS, %xmm1
+
+I even checked the Intel Whitepaper and the reduction for 64-bit CRC
+section "Final Reduction of 128-bits" also mentions 3 clmul.
+One for using x^128 followed by xor, and then 2 more for final barrett
+reduction with mu and poly.
+Thus I am confused about accomplishing this with just 2 clmul. Could
+you provide details on this?
+
+Based on inputs I am thinking of only extending the PMULL version to
+have unrolling with inline assembly for better codegen.
+I will revisit EOR3 afterwards when the PMULL base version has
+incorporated all the optimizations.
+Mostly we can have always_inline function which can be instantiated
+with/without EOR3 I think for approach.
+Will submit new separate patch for just PMULL unrolling shortly in a
+couple of days based on Demian's inputs.
+
+Thanks,
+Shreesh
