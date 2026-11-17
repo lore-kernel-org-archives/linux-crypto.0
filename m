@@ -1,100 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.196.26
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794876337;
-	b=FuYiPRR7xSIpAgnK15xxPT8jhZx+MjdYBOzVGEjcyUqG98CTuPLrQZYgE1AjQDrny39g
-	 u8HAmk7fVn+gJATPgE8zXP+YgzZS/rhpz+9y5KFbRn8UmNkNdCRkHLWMtVU2KjqvijLqG
-	 q7CQf0Q3vlXODt83DGqqXRZqhogj5OsDTLimfBw6O28s7orbHlG8AJfUonq93fSKXrP/8
-	 WF1ysTlIgeMWaGIutIe/gtdiGGYpktt29Jso2waROycygjBmb5qPVw3I7jN3/cMy5UhjG
-	 xRHOF7rg4pfFXUTVQmQVlPVlG6Okd3lODac0s6UlollO9hJ0880bAiTRrCHwd+S7B7Q==
+	t=1794886502;
+	b=Im8pmRga/b4X9sECkUlSyBhx2Y3wX6AGndTOg6sKgXfGluyHFiIAwsKAsr/ow9ywG3vH
+	 ZKLJMoWNpgBSRm4SceX9eOjnIA5cBfzZ7G/97bIMlN3bVEjPCGsN/hEUXENiIpNiesYZC
+	 XdcTKyeN4VwW8/lFwF/b0BxNILAkEodXwNjXZb5Mgv+fZ2+2ZJoNLaDkSAbgSpW1UMsRk
+	 4ewKVvdCWEBEUqtZbAt/16ECS1ZfDPyNiKxcHHhcK7SorJeSu2f/k4HX+DqHKBsQmDLxz
+	 /XrFKxLBrOMb9i2IUK//ZsDFRTcxnWBcbWoyrAgRjHakcRnWOE9KzdLOyKt1a6nfnfQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794876337;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=F6U8yDnaAKEsxN41i16ABdHINXflxp/mH+Yg0Frg3G8=;
-	b=e5WVha7TtBw7fYmK9lJT/RN/IlTjGNj/uH63yKgFoUS1EfC3x2Ovhj5pgP4vNqUvnrmz
-	 kf+mowGysx5xF8ElaGoJK4oNBUeU7U64Lyn5wM+bMFkaNd0aGlBVcYDe+lKG3KvqcOjW+
-	 xAMn8PMmNEOQNoVV7cnzj4RZisCuh+ghOfPqbInXSuM9SWle1HMw2T2LWskeUyB4tibTI
-	 IXCnAOfw3/9u8psBQBJ5Nc3r1U7O2lQiuG+KXAad3R0q6kpobQXDu0C/ZscAP25rmvc6M
-	 rR5pFNpxHGLcJX3kyJWnLUm0B0HZvfQPS6KZLXqlhmCqiztYqNU4urak46O9OLBMdhQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794886502;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Message-ID:Date:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:X-MS-Exchange-SenderADCheck:
+	 X-MS-Exchange-AntiSpam-Relay:X-Microsoft-Antispam:
+	 X-Microsoft-Antispam-Message-Info:X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
+	bh=bl5qGGbw/T9alykmySoTq0ETNQVOHYwTYYyg5gbSfdY=;
+	b=WnyLpbiOzkogDra6ul8OZKq3WcCdooDvfNyE7lu9PrtV2cHOiH+vxmqNAj7zBSyEbQWF
+	 0GtIc533dFDnRLyNyMbyerbPznwgmJexVxGGjzRTvy6uhaYf20BztkcBplITBuRKdiWJy
+	 IHd4ByHixrmyb6zjrzuLw4ZHKBynzqbzOU765MPGdA2QYWKae9xPgaMMRDlAghYrMWeYz
+	 dX6UzL3dILfZbcBiguDiI7+Me+iyizKFowOz4GQj4dPc5p5FN4btWuaZYUoLCXRwH3D+g
+	 c3X7lwhjeCqF3DE5fOPy2qTgqIab2RK0WUGzOGOPgHDkPXfEpc3+l8XmY5wEiH1OQ8w==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bDoj8XDp;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.82.47
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=amd.com;
+	spf=fail smtp.mailfrom=amd.com;
+	dkim=pass header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=m7Z3wBeQ;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.196.26
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013026.outbound.protection.outlook.com [40.93.196.26])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D16606A31C
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Nov 2026 00:45:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88D16606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A2D606A31C;
+	Tue, 17 Nov 2026 03:35:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A8A2D606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bDoj8XDp
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1ae58d17cd9so3265464c88.1
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Nov 2026 16:45:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794876336; cv=none;
-        d=google.com; s=arc-20260327;
-        b=gKVtm5Bhdx92m2p8IzAug2+1xO750VziHb6o2c3tu3ONAJA9LesejoqL4WGYrN2Pt4
-         zO16W8YvhrcXlh8oeafM7ELkgKx9WWl4zQ/5+oJ1NlpcUw0KYUNcdj1znslW02IE1nr0
-         Xc4kTSrF+NqbHzKH/PBu+6SaEpJ9t59Ob/zEEZRLuyYAUn+en0chEXqho3bt4g3BSN5W
-         iKgB4gr8R7+qDlEZhTtXWpTGpfxnqszCH1M1doSErQY5v0mK6mkuX/CyGlmFXvROBTpJ
-         4WlSdj43SbjyLHaF/NZXEeH5TM0P5omIEOApzU05hzD95EFt5HmbtcrAY4fXRNtEbRv/
-         NRsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=F6U8yDnaAKEsxN41i16ABdHINXflxp/mH+Yg0Frg3G8=;
-        fh=mAM/Iav/CDOKZUTU6zzey3vWVwiLhnKpGPrh7b4tCY0=;
-        b=Yw5VnOPo58ABGWdnKc05NgnmH2JwzofP69F2EZmDAfKz0RSDTK5fYwG+PP8EGt35+L
-         7q2W9cKDMBuY1MO44K/C1lUaVyo1bi6h7nIlgKCz2USgunxqxSU2VGyqbqjJrkAR9TjH
-         5CAnqAPpNq77GtSRA+Cz8gtNpGea66SHjUgWCf4tQO2GX1akr/vy7k4KrJHyY7+bF8ZT
-         VL2SZurnCybS/SC7R+0DWaXctvOiaHcslH4jlVDh8h11QBwhgoTt3oZ3IWlePyqFEetU
-         pgrD0myL2oLFGok0ECiIs4/mVEewow0O6RE0X44UXlHqxoRlQmvncX5ww5QOrEL87+OA
-         DEcg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794876336; x=1795481136; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=F6U8yDnaAKEsxN41i16ABdHINXflxp/mH+Yg0Frg3G8=;
-        b=bDoj8XDpo5GOBvvaAwJRblzAbhqrHmnpM5A8sKalHmSXl9bPAYalpPgrnAlXltWc+W
-         7yYiBAH/6trqk3w4HWjHXPKfLPw1lQnOmtYeJDej88Voo7W26cdPoSdY/kcUk1OwupaT
-         Ws09/a8qP3jsqYLKXUgFhi0l+0IyanG6N16sPbJj0aqnn1tKyga3BIjpguRSKJhjNbI/
-         5TAcxJ8sNEoxgBUcXjKeAI2lxkN3Xil+I7d7Bm1kaBkf+QxcKjNuzFgL+4gQLEOAiH+v
-         I9NyJGuLQTUmzvGXtmDmIdGzfQm0BW3pdzvIUIdNXDXNhKswobNGMvbUjnilgjxyLe4e
-         DmNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794876336; x=1795481136;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=F6U8yDnaAKEsxN41i16ABdHINXflxp/mH+Yg0Frg3G8=;
-        b=1NRW/coBL3bYD82QUkdGDdFZoCkFwlGE52FH+zazLafek/v59fJaaFqS//txLflY9L
-         bmfycN3HXSQKythb2sl41toi13tfZ0uNDqx0mMDW9X3WixFVu8XY+xm9yS4qcmvaPfIP
-         WczBO7+6x1eQ11iJ6yqUD3wLW2rUFV3OLBVafIimP0BczOJDk84dRKgMHjBFEfW/ZX9B
-         xwIF6JOg6UPM1rP3fTGS73XgcHw70sQH8UStJl0WYpG6POi00NMrhLRTischKrKdPEv9
-         4ZW7hRA8AHsUJt6chRoq2+VJj8xtOWXXEIcl7vzxPUuIATbEKYwfWlOJibLuOdv0v5mT
-         0nsQ==
-X-Forwarded-Encrypted: i=1; AL+hErHgyneSZxKjHLYKbMLwNIl2RSmMKEY9Is9LWiG9710s1PC7lPxq8cbWEGHQTbGfuMTKy4j+Gl4J4z4NO9s=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9sEOzkybMtvASVoWvnZXpezLGRLDTypE64fkRLa5zKP+I+nlfs
-	tr1zS0Q1WywublZ2RB4ahwOOftftG+fNXZvTRDgI+7EqbdqJF1oP5etpsZlOVy+s8rHRySJMZSI
-	NiyrrrHKYq7n789uBUXlOx82ZJWVy/co=
-X-Gm-Gg: AYBFou1GYnSdg4WdiQ+b7dBNFG6Mb0H59T5TMbraYr9SxjXiKWHK/XYzVCOeZxhFNI3
-	/8e/4CgKwxQcHU3RwEFaY1aMhaIBhPlJh2GyPQ99q0z6wT40hwLFgjQ2BUUSzLL5LhIM1pwaUuI
-	rKrQuO/i5QzC4Mwb6jy/uKJuUjDcyMhRdJHpzl6TlLWvHzC28A53wShSHnX3NfQlu4BhcKODJYs
-	fZfY8G89eJDuUNMA6u9jjhrohmgALlK34bSk2eaYeA76L/pZ3UlKTgO87ioQpNHPr48G+Tx59bo
-	oSOa5LfMotSJEdchifL49YVNU96hGenOGgMTYOAOgU248q6sIClvtaf4WJ/KfE3SfAY+cRcNq9s
-	CsQmPdOjPwQIbLMYSMH1Z66Js/s01wylx3ESWbiMzC/GkUFwsjEArm+6F2MZbPwF9X3yR
-X-Received: by 2002:a05:7022:f4e:b0:1a9:f3d2:6262 with SMTP id
- a92af1059eb24-1b5030ee522mr9770372c88.36.1794876335340; Mon, 16 Nov 2026
- 16:45:35 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=amd.com header.i=@amd.com header.a=rsa-sha256 header.s=selector1 header.b=m7Z3wBeQ
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=L9By7uOvEgf35n7gKdDFubasD+mwRp+6jslhDsqCT53psS/4YxduV7qFFCw2HTq72Qs9PiLmNup8qlymNXd1tI76uzm9wucdnS0UXK87aSqVYSQ7w11BZoo4eZH3yOXczjKNd/EDAIQGpC1+7tx6pHM9Z0PQ5VDucYrdxKliqnfBfmE9HHfhlPF89mMnP30xKUR7ESVt6Dmww1kjFsKpQmDkMSV4EJoF8Odf3eBV628u3yYtqCTKe9ygKHRyrjVB8ex62bWkzXZ1IVzEgx5sdqjSjH7gvpZLRsRnN+hUA2Voh/uIYwSxJt8SJWhDRgPsl1vY3pKTost3QYI0OhvWDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bl5qGGbw/T9alykmySoTq0ETNQVOHYwTYYyg5gbSfdY=;
+ b=i250CUJ/NzuNSOT2w3bTteQzw0Ok/l3gC0KKCklQCnSiGDmMUE6lvfyiFEMQyiNGsiZPGNz6hADMa/S/3ujeQCPU4uK0Gv67wLhv8cz0R40MvjlDh1Vfit7c4AeOizyKeYdMOd8EQjZNOELqex0DB8NKW4dxmWoERpCcdHovOmiFw/GbfLw3lJDCgD8/CYUOeOZ4oo3qTCLT6DucnxQucdOUT6fyGyADqPUrLIG94LAg83BZLZrh+hMaexp2K6NSItt9bIB8Ne1foZ9GBZV/qTATciBhKBWUcXimkqNvmteSVkXasEAudwxjMt0x/NeWnlbkGsK8sOGc4VhBJPSceg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bl5qGGbw/T9alykmySoTq0ETNQVOHYwTYYyg5gbSfdY=;
+ b=m7Z3wBeQqSYMxc5FvJI9iybP9k6/tP/y6oVFUNfo5QweAVa76vbnDEoX84d337AR9/3uUJKACsv6XOlGZqHrjwKjOB8ynqteTbb6ClloRoHDbUH52AUdHlBihjJBU6S6HzveANZ5ElYTy8n2E7mBaug6Di5cCNchHjcdyGE9aGk=
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB6188.namprd12.prod.outlook.com (2603:10b6:208:3e4::6)
+ by PH7PR12MB7425.namprd12.prod.outlook.com (2603:10b6:510:200::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.615.14; Tue, 17 Nov
+ 2026 03:34:57 +0000
+Received: from IA1PR12MB6188.namprd12.prod.outlook.com
+ ([fe80::e933:4d1e:8759:e9a0]) by IA1PR12MB6188.namprd12.prod.outlook.com
+ ([fe80::e933:4d1e:8759:e9a0%2]) with mapi id 15.21.0615.009; Tue, 17 Nov 2026
+ 03:34:57 +0000
+Message-ID: <54e24f60-bd59-4609-aad7-902c93c38f79@amd.com>
+Date: Tue, 17 Nov 2026 09:04:51 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] crypto: ccp - unwind PSP sub-devices on partial
+ psp_init() failure
+To: Mario Limonciello <superm1@kernel.org>,
+ Kim Phillips <kim.phillips@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sashiko <sashiko-bot@kernel.org>, stable@vger.kernel.org
+References: <20261116203622.615371-1-kim.phillips@amd.com>
+ <c99b891f-05fb-4629-b439-ac3828a4ea0a@kernel.org>
+Content-Language: en-US
+From: Rijo Thomas <Rijo-john.Thomas@amd.com>
+In-Reply-To: <c99b891f-05fb-4629-b439-ac3828a4ea0a@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA5P287CA0358.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:219::17) To IA1PR12MB6188.namprd12.prod.outlook.com
+ (2603:10b6:208:3e4::6)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -104,237 +101,168 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261114172955.1598929-1-16567adigashreesh@gmail.com>
-In-Reply-To: <20261114172955.1598929-1-16567adigashreesh@gmail.com>
-From: Demian Shulhan <demyansh@gmail.com>
-Date: Tue, 17 Nov 2026 02:45:25 +0200
-X-Gm-Features: AclHuK8Hdqf0l41Oo8YCxxY3l_4qLeJNdLXkZijbeK6d0nAWuJkX5q1GXFBfDOU
-Message-ID: <CAOLeWCtEMZrg74nrfCVfjo9ZqGAxXyNb3mZD+n8AqgxT5PvC7A@mail.gmail.com>
-Subject: Re: [PATCH v2] lib/crc: arm64: Add NEON PMULL+EOR3 crc64_nvme implementation
-To: Shreesh Adiga <16567adigashreesh@gmail.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB6188:EE_|PH7PR12MB7425:EE_
+X-MS-Office365-Filtering-Correlation-Id: c27b8f74-e665-4053-ca46-08df445bc076
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|1800799024|376014|366016|261028144727099003|261026121527099003|261102123227099003|261026140227099003|261022105027099003|261021121427099003|261021123027099003|4143699003|11063799006|56012099006|10067099003|18002099003|22082099003|261009223027099003|261009221227099003;
+X-Microsoft-Antispam-Message-Info:
+	sL1FaG8cSWlzn0tZkWBiOXaF2uqoouejeI+flx4cJ3WoUr2n48c/ZXrFjO7JhEaTiTTTJtsyRfY2sLGf8Lnhn54teVW2LSRikD4qo0ciRCwRlWtDwCnzXlMatcClzq5fkarad6kCUvnGMEHPwiiMaHMUu0iPKDePbQ/zPIJC74BswjAOf8LknsPupLLCKJBvnxZAE4tZ4VNiu2dp6NfyL7/TpidVNnNUXlB1a6cgzJpSVQLrN32wisZCrR4kFPOU4cED8UxoBRPStXTeV8qPI5Co61VIcsGlOja+1UMnm4wiso5b6dXBPUkmXdh2bAPWdqXXkeoq6Ke+xyfbq1mroCgrhNTA9oGaqoDawIetwKDIAUABMv9ipp3Pej2FRdUApj81H9DDVFWBYAaH75qnU1Qs7Y0t+JL0ZlB/Ufqx+8FFahL5EWCdB3ehsNpZrx/gVZv4w03tI3rAdsUgxQ85A0a9vz7SwiYILKZLPbRcC688Y9A1ThALnb7nlfZOPnQS0bNDdB7iAwROT3tLik3i7X97+mBL5tkSRmIfU0khGTy3K/HlS5+ozYF8wAj571JZgWPTLE65yOC/g1U8UqZPF/QdfcvTPvzSBryLo943reg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB6188.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(366016)(261028144727099003)(261026121527099003)(261102123227099003)(261026140227099003)(261022105027099003)(261021121427099003)(261021123027099003)(4143699003)(11063799006)(56012099006)(10067099003)(18002099003)(22082099003)(261009223027099003)(261009221227099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cW5XS3pmSER6U2VuaFJkME9mSzJJMGNoRDJNdDA1QUh6eGVjWnBpaUM5MW1K?=
+ =?utf-8?B?RG44TFlYUE5rWllTY1NRckZKZExlbG5xTHI3cjlaaWlIK0pFRUpsM2VwN3RF?=
+ =?utf-8?B?RzJ3YmRPQ3k5QVNPekdBWkpRVUxabjh6R0NMUWhaUStLRTJ5Nld5eHpsSlVv?=
+ =?utf-8?B?a1BwUE02RElsaHF0OHYxbVB1UjBJeFFRWmlmYWRDTlRxMmt2TW82VWJRaEhK?=
+ =?utf-8?B?RDR3UDc3b2lkODZVUzNTeVpVWXFmUjlWVU1lM0FmUXdvc1l0Z2hHbEhEeWtP?=
+ =?utf-8?B?ZjlZSkoxWitBY3dMMllkeEVpZ3RNV3lNcVo2V3dZWGdlU1VQZ2E0UGFVOHQ1?=
+ =?utf-8?B?aU9aYWwrSm9xMno0VXB2TWxyVWZaOG5WbW9mU21IR1lUckdYOEFJcngrTVF2?=
+ =?utf-8?B?anFSREpyMFlBaVpINkFXejNCUU1RYzVyRHdOU05qRXlzVVQ1Ui9aWktKVVZu?=
+ =?utf-8?B?VnFOUjRjWE51RS9vUTZ5U2c5NnI4LzRRbnlwNTJtU1BqbWZJQ0QveWFtRzk1?=
+ =?utf-8?B?N0JoMXVlQnh1R0MrYnFraTNKQVJaSmQ5d3dTQ0hTYXIrYzhhbHBlLzl2MERY?=
+ =?utf-8?B?YWl5MGNYOGZDV08ycFNHdXQ4M1hJMFhDZEFPVkh4YXhPY0tXS3dsUFNmVHVS?=
+ =?utf-8?B?SGlTOG1mUU9zT1gvSGsrcnBEcTBya2FPRFdNTU5BemNsbXdIOHRJaHBhcExp?=
+ =?utf-8?B?c0w4N0k2akJybkt5UTEwRHhMOEZLSFRuYUlpeldTRWV0ejh1d01mVjBzZkt4?=
+ =?utf-8?B?dnNtSE1JYmdoVGIwQVVDQ0VWVzZhS3J5VUZSVmFIaU1kTzUvMjBDdVVpUXkz?=
+ =?utf-8?B?SElLVm1vZHd4UEtEbXhPRVdkWTlJOHZSdVZVRDBHWm9qc2g2RFR0T3AweVlP?=
+ =?utf-8?B?b3dsL1Q2bks4aWkzejlldzlXWisyV3JqVWF1SStYNTJRRDNONDArdUpvRWdu?=
+ =?utf-8?B?aXVCemRBazMzT2JBdXBpK2diTXNIbVJKVVBoVFU3OXZPb2YwVDFJOFV5OGRB?=
+ =?utf-8?B?eTVycU16eXZWcXRwV2FqdEFoQmtTcER2WHk3Zks1aDdqWDdDbGUxVVJGV1Nn?=
+ =?utf-8?B?eUNhOGZPb2Y2Sm1OVWpXdVBEYURsempvejdDcisxeGMxb1B6YzZsbytCbmYx?=
+ =?utf-8?B?a0pKZ1pxbng0WXFLN0ZtbWdPckpoT2xwYkVHcGQwYmhkWHl0dXYra0V5dDZY?=
+ =?utf-8?B?cXptL1plMU9nQjhYaWtaMWdMSjMyZ0xSVytvTitvcHczQUpJMXFRTW11UHBZ?=
+ =?utf-8?B?eGw4am9abmNTV2Y0U3ZjN0pBdlJLVEJYVURkcGZvbGFjMGRhRks3RGNZbU5R?=
+ =?utf-8?B?R3BIN0JsV1I5MkFCa2tJczlrTUVPSVpvNmtUWTAvMmFHTWh4UjJJcTN2dHh1?=
+ =?utf-8?B?aUhteFZZTUR6SVBBUlNjM2VPUmdYZzVKa0NsY1hSN1dhdW1nMXBEUVJwU01Q?=
+ =?utf-8?B?UkZOVGVOQ3lFSk04aVg3aStYN3J0NFJnV3J4MkdKenN4MC83U2NYNzJTdElO?=
+ =?utf-8?B?NFVUaFk0YmFZKzV4UVROVGVlaGIvWFVKK3hjdi9MbURTVFQvUmJvbTZ6aFpv?=
+ =?utf-8?B?am1ZeVJWeEVsaFZzVE0yWVBPWkovZnVrS2lobjNWZFJjN3hGMkp0YWVuRERZ?=
+ =?utf-8?B?S0VqcDQ5dE81NFpMenlOYVdhUnlPbGM1aDdXaXY0cXBrU2JYZ1ZiK0Rycmdk?=
+ =?utf-8?B?THV5MHQvWUxnZDVRSWZ6T2cxUDc1cTBOcExKdnRKTGJZOHQ2TUZWS2hzNW8y?=
+ =?utf-8?B?V2pxM1RlWXQxanl1OGdaK05kNkw3NTJPL2c2NlZZM2doSjVZMDA0UVY0bDZE?=
+ =?utf-8?B?U1BlZnY3T2tmcjBSZDZDR3VaSTJGRm4wN1NIdXdYMkFQd0RhM1NnTkhzVTd1?=
+ =?utf-8?B?NnljajJ6d1Rod2wxcTFISjdSbGQ1R2ZjS2VqQWxxWWYxSFk2dHZHWVNPMUQv?=
+ =?utf-8?B?WHAwQWdubzlmTGZYbEkwdm1iL0UvaURYOFFrQUcyMk41bDdweEc2QktWRjU2?=
+ =?utf-8?B?OStkcUtrYzFPQit3blE4Zk5qNlVhUDBXYmpqd2hTdnY3T0hqMkRSdVRTN0Vv?=
+ =?utf-8?B?ejlya01XbkQraTVMWmVzWDFhL0NXRUVYNHczcjZDUEVmZ2lqQy9ITS90Vysr?=
+ =?utf-8?B?UVZ5MG9XL1RUMlZrTE9nSG5Dc2lyU3hNcmNwYWg2aDE1R00xT0RPOUZOSEUz?=
+ =?utf-8?B?Yzl5T3dqSjZ1aHhFelkreGVkTUZqTTNUZWpmUjQySlZqZTk0czQwOHE1dXd5?=
+ =?utf-8?B?cjFGN2tLOTNiSkxRU2ExT3U1WlJhb3JUY2N6VTY3SE1VcXBwKzd1bnh6cEZm?=
+ =?utf-8?Q?QIwIVtePYkaSjowAMo?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c27b8f74-e665-4053-ca46-08df445bc076
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB6188.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2026 03:34:57.5841
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /aM/WJ2zjSL3cr6Xw3lC2lRTy+Lu6ygZ/yZYDLxzQWKQd94YiSJUAuircUH4S1UHDtiVne6lnJbctol6DC6PuA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7425
 
-Hi Shreesh,
+On 11/17/2026 2:54 AM, Mario Limonciello wrote:
+> 
+> 
+> On 11/16/26 14:36, Kim Phillips wrote:
+>> psp_init() initializes sub-devices sequentially but returns immediately
+>> on the first failure, leaving earlier sub-devices registered. Its caller
+>> psp_dev_init() then sets sp->psp_data = NULL, so the later
+>> psp_dev_destroy() on unbind bails out early and never unregisters them.
+>>
+>> Non-devm resources such as the /dev/sev and /dev/dbc character devices
+>> stay globally visible while their devm-allocated backing structures are
+>> freed by the driver core, giving a use-after-free if userspace opens the
+>> orphaned device.
+>>
+>> Add reverse-order unwind labels to psp_init() so each sub-device is torn
+>> down before the error is propagated. Every *_dev_destroy() is already
+>> NULL-guarded on its own psp->*_data pointer, so skipped or unreached
+>> sub-devices are no-ops.
+>>
+>> sp_init() continues to ignore the psp_dev_init() return value on
+>> purpose: a PSP failure must not fail the probe, as the CCP can still
+>> initialize successfully.
+>>
+>> Fixes: 33960acccfbd ("crypto: ccp - add TEE support for Raven Ridge")
+>> Reported-by: Sashiko <sashiko-bot@kernel.org>
+>> Closes: https://sashiko.dev/#/bug/linux-0de87f0c-0f5a-4dad-8ef1-f49844eb4cce
+>> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+>> Cc: Rijo Thomas <Rijo-john.Thomas@amd.com>
+>> Cc: Mario Limonciello <mario.limonciello@amd.com>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+>> ---
+>> v1: https://lore.kernel.org/linux-crypto/20261021215716.1076732-1-kim.phillips@amd.com/
+> 
 
-> +#define SHA3_TARGET __attribute__((target("arch=3Darmv8.2-a+crypto+sha3"=
-)))
-> +
-> +SHA3_TARGET
-> +static inline uint64x2_t fold_single_round(uint64x2_t fold,
-> +   uint64x2_t temp,
-> +   uint64x2_t consts)
-> +{
-> + uint64x2_t temp1 =3D pmull64(consts, fold);
-> + uint64x2_t temp2 =3D pmull64_high(consts, fold);
-> +
-> + return veor3q_u64(temp, temp1, temp2);
-> +}
-> +
-> +SHA3_TARGET
-> +u64 crc64_nvme_neon_pmull_eor3(u64 crc, const u8 *p, size_t len)
-> +{
-> + /* Assumes len >=3D 64. */
-> + uint64x2_t fold_consts =3D vld1q_u64(fold_consts_val);
-> + uint64x2_t fold_consts_4x =3D vld1q_u64(fold_consts_4x_val);
-> + uint64x2_t fold_consts_2x =3D vld1q_u64(fold_consts_2x_val);
+Looks good to me.
 
-Scalar vmull_p64() makes compilers materialize the constants via mov/movk +=
- fmov
-(42/97 insns on Clang). SHA3_TARGET also makes codegen fragile: with
--march=3Darmv8.5-a+crypto, GCC stops inlining pmull64*(). On Neoverse-V2, E=
-OR3
-contends with PMULL on pipe V0, whereas regular EOR runs on all SIMD pipes.
-Using inline-asm pmull/pmull2 and a clean 4x unroll in crc64_nvme_neon() wi=
-thout
-EOR3 should give better performance across all sizes and cleaner code.
+Reviewed-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
 
-/* clang -O2 */
-      24: mov   x10, #0x45a
-      28: movk  x10, #0xace5, lsl #16
-      2c: movk  x10, #0x2240, lsl #32
-      30: movk  x10, #0x6224, lsl #48
-      34: dup   v4.2d, x10
-      38: mov   x10, #0xa84a
-      3c: movk  x10, #0x1e18, lsl #16
-      40: movk  x10, #0xcdb3, lsl #32
-      44: movk  x10, #0xc32, lsl #48
-      48: fmov  d5, x10
+> Reviewed-by: Mario Limonciello (AMD) <superm1@kernel.org>
+> 
+>>
+>>   drivers/crypto/ccp/psp-dev.c | 23 ++++++++++++++++++-----
+>>   1 file changed, 18 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+>> index b14ce51065d5..3d9341c2876d 100644
+>> --- a/drivers/crypto/ccp/psp-dev.c
+>> +++ b/drivers/crypto/ccp/psp-dev.c
+>> @@ -207,19 +207,19 @@ static int psp_init(struct psp_device *psp)
+>>       if (!psp_check_tee_support(psp)) {
+>>           ret = tee_dev_init(psp);
+>>           if (ret)
+>> -            return ret;
+>> +            goto e_sev;
+>>       }
+>>         if (!psp_check_sfs_support(psp)) {
+>>           ret = sfs_dev_init(psp);
+>>           if (ret)
+>> -            return ret;
+>> +            goto e_tee;
+>>       }
+>>         if (psp->vdata->platform_access) {
+>>           ret = platform_access_dev_init(psp);
+>>           if (ret)
+>> -            return ret;
+>> +            goto e_sfs;
+>>       }
+>>         /* dbc must come after platform access as it tests the feature */
+>> @@ -227,15 +227,28 @@ static int psp_init(struct psp_device *psp)
+>>           psp->capability.dbc_thru_ext) {
+>>           ret = dbc_dev_init(psp);
+>>           if (ret)
+>> -            return ret;
+>> +            goto e_platform_access;
+>>       }
+>>         /* HSTI uses platform access on some systems. */
+>>       ret = psp_init_hsti(psp);
+>>       if (ret)
+>> -        return ret;
+>> +        goto e_dbc;
+>>         return 0;
+>> +
+>> +e_dbc:
+>> +    dbc_dev_destroy(psp);
+>> +e_platform_access:
+>> +    platform_access_dev_destroy(psp);
+>> +e_sfs:
+>> +    sfs_dev_destroy(psp);
+>> +e_tee:
+>> +    tee_dev_destroy(psp);
+>> +e_sev:
+>> +    sev_dev_destroy(psp);
+>> +
+>> +    return ret;
+>>   }
+>>     int psp_dev_init(struct sp_device *sp)
+>>
+>> base-commit: 26ca5f34841f0a86d0883664a1c13be89a01d351
+> 
 
-Thanks,
-Demian
-
-=D1=81=D0=B1, 14 =D0=BB=D0=B8=D1=81=D1=82. 2026=E2=80=AF=D1=80. =D0=BE 18:3=
-0 Shreesh Adiga <16567adigashreesh@gmail.com> =D0=BF=D0=B8=D1=88=D0=B5:
->
-> Add a 4x-folding implementation for CPUs with FEAT_SHA3 which benefits
-> newer ARMv9 CPUs like Cortex-X925.
-> Usage of EOR3 from SHA3 extension improves performance by 20% compared
-> to the regular PMULL without EOR3 on Cortex-X925 measure in userspace
-> application via libbenchmark for 512 byte input size.
-> Measured about 3x speedup for 512 byte input compared with the existing
-> NEON single fold implementation on Cortex-X925 in userspace.
->
-> Signed-off-by: Shreesh Adiga <16567adigashreesh@gmail.com>
-> ---
-> Changes in v2:
->   Improved the 4x to 1x reduction by using x^255 and x^319 x2 reduction.
->   Added static keys for the CPU feature checks instead of regular
->   branches.
->
->  lib/crc/arm64/crc64.h | 24 +++++++++++--
->  lib/crc/crc64-neon.c  | 83 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 104 insertions(+), 3 deletions(-)
->
-> diff --git a/lib/crc/arm64/crc64.h b/lib/crc/arm64/crc64.h
-> index c7a69e1f3d8f..e5be0ef21140 100644
-> --- a/lib/crc/arm64/crc64.h
-> +++ b/lib/crc/arm64/crc64.h
-> @@ -9,20 +9,38 @@
->  #include <linux/sizes.h>
->
->  u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
-> +u64 crc64_nvme_neon_pmull_eor3(u64 crc, const u8 *p, size_t len);
-> +
-> +static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_eor3);
-> +static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
->
->  #define crc64_be_arch crc64_be_generic
->
->  static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
->  {
-> -       if (len >=3D 128 && cpu_have_named_feature(PMULL) &&
-> +       if (len >=3D 128 && static_branch_likely(&have_pmull) &&
->             likely(may_use_simd())) {
->                 size_t chunk =3D len & ~15;
->
-> -               scoped_ksimd()
-> -                       crc =3D crc64_nvme_neon(crc, p, chunk);
-> +               scoped_ksimd() {
-> +                       if (static_branch_likely(&have_eor3))
-> +                               crc =3D crc64_nvme_neon_pmull_eor3(crc, p=
-, chunk);
-> +                       else
-> +                               crc =3D crc64_nvme_neon(crc, p, chunk);
-> +               }
->
->                 p +=3D chunk;
->                 len &=3D 15;
->         }
->         return crc64_nvme_generic(crc, p, len);
->  }
-> +
-> +#define crc64_mod_init_arch crc64_mod_init_arch
-> +static void crc64_mod_init_arch(void)
-> +{
-> +       if (cpu_have_named_feature(PMULL)) {
-> +               static_branch_enable(&have_pmull);
-> +               if (cpu_have_named_feature(SHA3))
-> +                       static_branch_enable(&have_eor3);
-> +       }
-> +}
-> diff --git a/lib/crc/crc64-neon.c b/lib/crc/crc64-neon.c
-> index 4753fb94a4be..767e55edc0e0 100644
-> --- a/lib/crc/crc64-neon.c
-> +++ b/lib/crc/crc64-neon.c
-> @@ -10,6 +10,17 @@
->
->  u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
->
-> +#ifdef CONFIG_ARM64
-> +u64 crc64_nvme_neon_pmull_eor3(u64 crc, const u8 *p, size_t len);
-> +
-> +/* x^575 mod G, x^511 mod G */
-> +static const u64 fold_consts_4x_val[2] =3D { 0x0c32cdb31e18a84aULL,
-> +                                          0x62242240ace5045aULL };
-> +/* x^319 mod G, x^255 mod G */
-> +static const u64 fold_consts_2x_val[2] =3D { 0xb0bc2e589204f500ULL,
-> +                                          0xe1e0bb9d45d7a44cULL };
-> +#endif
-> +
->  /* x^191 mod G, x^127 mod G */
->  static const u64 fold_consts_val[2] =3D { 0xeadc41fd2ba3d420ULL,
->                                         0x21e9761e252621acULL };
-> @@ -45,3 +56,75 @@ u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len)
->
->         return vgetq_lane_u64(v0, 1);
->  }
-> +
-> +#ifdef CONFIG_ARM64
-> +#define SHA3_TARGET __attribute__((target("arch=3Darmv8.2-a+crypto+sha3"=
-)))
-> +
-> +SHA3_TARGET
-> +static inline uint64x2_t fold_single_round(uint64x2_t fold,
-> +                                          uint64x2_t temp,
-> +                                          uint64x2_t consts)
-> +{
-> +       uint64x2_t temp1 =3D pmull64(consts, fold);
-> +       uint64x2_t temp2 =3D pmull64_high(consts, fold);
-> +
-> +       return veor3q_u64(temp, temp1, temp2);
-> +}
-> +
-> +SHA3_TARGET
-> +u64 crc64_nvme_neon_pmull_eor3(u64 crc, const u8 *p, size_t len)
-> +{
-> +       /* Assumes len >=3D 64. */
-> +       uint64x2_t fold_consts =3D vld1q_u64(fold_consts_val);
-> +       uint64x2_t fold_consts_4x =3D vld1q_u64(fold_consts_4x_val);
-> +       uint64x2_t fold_consts_2x =3D vld1q_u64(fold_consts_2x_val);
-> +       uint64x2_t v0 =3D { crc, 0 };
-> +       uint64x2_t zero =3D { };
-> +       uint64x2_t v1, v2, v3;
-> +
-> +       v0 ^=3D vreinterpretq_u64_u8(vld1q_u8(p));
-> +       v1  =3D vreinterpretq_u64_u8(vld1q_u8(p + 16));
-> +       v2  =3D vreinterpretq_u64_u8(vld1q_u8(p + 32));
-> +       v3  =3D vreinterpretq_u64_u8(vld1q_u8(p + 48));
-> +
-> +       p +=3D 64;
-> +       len -=3D 64;
-> +       while (len >=3D 64) {
-> +               uint64x2_t t0 =3D vreinterpretq_u64_u8(vld1q_u8(p +  0));
-> +               uint64x2_t t1 =3D vreinterpretq_u64_u8(vld1q_u8(p + 16));
-> +               uint64x2_t t2 =3D vreinterpretq_u64_u8(vld1q_u8(p + 32));
-> +               uint64x2_t t3 =3D vreinterpretq_u64_u8(vld1q_u8(p + 48));
-> +
-> +               v0 =3D fold_single_round(v0, t0, fold_consts_4x);
-> +               v1 =3D fold_single_round(v1, t1, fold_consts_4x);
-> +               v2 =3D fold_single_round(v2, t2, fold_consts_4x);
-> +               v3 =3D fold_single_round(v3, t3, fold_consts_4x);
-> +               p +=3D 64;
-> +               len -=3D 64;
-> +       }
-> +
-> +       v0 =3D fold_single_round(v0, v2, fold_consts_2x);
-> +       v1 =3D fold_single_round(v1, v3, fold_consts_2x);
-> +       v0 =3D fold_single_round(v0, v1, fold_consts);
-> +
-> +       while (len >=3D 16) {
-> +               uint64x2_t t0 =3D vreinterpretq_u64_u8(vld1q_u8(p));
-> +
-> +               v0 =3D fold_single_round(v0, t0, fold_consts);
-> +               p +=3D 16;
-> +               len -=3D 16;
-> +       }
-> +
-> +       /* Multiply the 128-bit value by x^64 and reduce it back to 128 b=
-its. */
-> +       v0 =3D vextq_u64(v0, zero, 1) ^ pmull64_hi_lo(fold_consts, v0);
-> +
-> +       /* Final Barrett reduction */
-> +       uint64x2_t bconsts =3D vld1q_u64(bconsts_val);
-> +       uint64x2_t final =3D pmull64(bconsts, v0);
-> +
-> +       v0 =3D veor3q_u64(v0, vextq_u64(zero, final, 1),
-> +                       pmull64_hi_lo(bconsts, final));
-> +
-> +       return vgetq_lane_u64(v0, 1);
-> +}
-> +#endif
-> --
-> 2.56.1
->
