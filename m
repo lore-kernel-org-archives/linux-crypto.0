@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794976571;
-	b=oaW4LN49eZA4kB1URm0cmcmMfxYAh9/eEbV9ptjjjdRZwin/rRy4AWoyuV3VBJrRIL0+
-	 +v6v307C5M3cjbXEKR7rGeUWWfuF/IXshvlsie/2wbPQSyzjIq4+4jV+/NmPhGs8Gdvuz
-	 nnuO9/BkmkfjbNvxYEmrFiYv34KP8zKvjOvUZBYgQKSvrGFsB3RiZUB0r1V1ng7orvcCZ
-	 zj6PhAeOrwOz2xZMLMnaipmOogtkYbZMz9e1IVihSloJq0POLw0GpTa39zjX0+kr0jsGM
-	 w43DpAhKIXX2i23WBcPQwrXtoiK2YEZETkEhOxi5O9TZ2IP/tujb+X1iiJGCkn7/dAw==
+	t=1794976573;
+	b=1DOr6wm/JCcpoNy163Uu+DZXeE9uQoVmctQjSRxREmEi5G+pXPClmdYzF/hHmKTP1vNC
+	 VY7B2Q9KKqMu12Q/H3VisG2r8hDal487Jbxn4x6wOVnzp1ruM6Ey9AVLFAH54ZgtB3FMm
+	 6rd0eBezrx57nttlZbix3t+H+f7v7dPRwmI9md1C+HmFslu7du6fJJnVtvKDOlrKPR4iz
+	 QVgplY5TmWmoFm67NLyC5Hg0HIwA0g3oEbxVwgecYRNCm98LGR0n48AagH1dHg+eX7cds
+	 w0P05Ch4t4VH7fbxQcEuJQ/ibTXjAv25DrQ4cnQO3upi5fftUOXGsSb8nZ9vX5vFE9A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794976571;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794976573;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=bWhsupzqST2YDFi7Z+kA7bV2+V+suTkSyOFZvZUSV1o=;
-	b=rccn0YI9P6qdknGdUT/Ddh2I2BQKqW70d00lKJP4elUZuSXdup/06pyRZZqLUo3gw2kj
-	 6YEAn4cDZgfmL7UKwkyKoYQZzKtH0sQGSMU7eZ9H4RWiTYZ+oHHLQIkzNVlVgpWM2fdOV
-	 Ki6+BqeiPSI4Gtgai2fo+BQo0DBwRs73GOMjddMGxyRLJ0A0lvfVcgjYF7C0M9QWE5ttA
-	 stf44GD0S+ecnvA4/08r3X6IjqIaWk6Q5BbeTqFeim81d8gyKYWACAPjL0anxUo3JQtIs
-	 wvvHKOmL0TtCHBwWQJzlkJpFI4WKjVSBOmVVgZeCICwBaQmWm7j4DQw5AkwVzf3D/ng==
+	bh=qNnE6g3+PUwbzFucpvqDKcl4G6oLiP5CvG99ZoUAkFQ=;
+	b=2y62r3TTKeVKB27eUzbdcfLffQOGrwfgO6p/O+RUYad9PlCBPZs+NjSLkswIPHBL6cHG
+	 tySfCoQFD7YGnA6LKhhwjIbf4d4s7gxFCwJxKHchDBRezxr3as/EzPOgiJsnkMPAOViKH
+	 FGpn6ki87DZbwQfblmfNLv7FfUTg3bUI+GoNGUIiRdCfQqoj17u/biW+z/gLWQNuhFQHq
+	 2AGFApZhXlkxX/j+8UKZmS/TTc2xp3+8mUPPzOA+V3tAI9CXd9HJPYVy/Z3SN149vCBzT
+	 4te6Ad3xsmLLKzFh3JUuIsrckAIp6jt9KUYhKiYNx7FlqkRCU/gQRhkteVrgzID/ENg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OqxBkg5A;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ijCxQD2C;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7D6606A31C;
-	Wed, 18 Nov 2026 04:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1012606A31C;
+	Wed, 18 Nov 2026 04:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OqxBkg5A
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 523351F000C4;
-	Wed, 18 Nov 2026 04:36:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ijCxQD2C
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF5081F000C5;
+	Wed, 18 Nov 2026 04:36:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794976571;
-	bh=bWhsupzqST2YDFi7Z+kA7bV2+V+suTkSyOFZvZUSV1o=;
+	s=k20260515; t=1794976572;
+	bh=qNnE6g3+PUwbzFucpvqDKcl4G6oLiP5CvG99ZoUAkFQ=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=OqxBkg5AzXNpXHN+3oGuA0Wfiu7mnxm3mVT/iooavwTUoOKNQt9YVpv7KCbgryvj0
-	 +eNweuRsg9E/D+ae0mKIh1UsAaJur38WQN8CWR6ti8l2VYixp6lFlnaJWDhJinVsQW
-	 CrxxPaWTYbYG+sNb00Eu1eeepDAMRptZM23kQq8uuNVVOmKuLKTQCjxcfGnJbCZdg+
-	 bl0TEVuAdZxktI7rZFl4QJoBZ6qIn2Yw114kL/Ulg8QeYHoEF0bc6/Rhc0U1kR4R7B
-	 cQnIhnoLO0o8NRg/CIAPKsQjep21WQLv77uP+MNNzKEggyfkFv42o5sTsLvTVKKobb
-	 FzjWzqyBsZAjQ==
-Message-ID: <sashiko-outbox-220104@kernel.org>
+	b=ijCxQD2CQ+kBezr8SXEdJnk49KsHdZXBK3kaxICRgO4D66yPjZ9Lw0DM+Zl9A7xtN
+	 ucmCdXYp4Xa1anZ17asNRahtQNGOy4kVJ8Ihl/LQ9aymwzhmH5r5xFtMQfMXFkr0bH
+	 eoGvIpB8MjIef7vXhHTFLfUJFtogQcNuhuJMN1DCHAf/sQZfOBH9lbiK3mZu1ZZ9zy
+	 +J8Yu9aQ4dpAe94Wjtgp17+oc6JTSRt0B3fpknmtoiI+PaCGOAdNUWTN99VIJ1zPys
+	 j2jyZ5Jdp88CeJwFBCY7EAdvuXtyXE50I2P+hgdr5bY4B5tYa0yQ2JJyxGJ5MiSuuk
+	 R2uupAQY2sy+Q==
+Message-ID: <sashiko-outbox-220105@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [RFC PATCH 01/12] arm64, unwind: build with .eh_frame and add
- gen_lr_unwind skeleton
+Subject: Re: [RFC PATCH 02/12] arm64: factor .eh_frame parser out of
+ patch-scs.c into <asm/eh_frame.h>
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Dylan Hatch" <dylanbhatch@google.com>, "Catalin Marinas" <catalin.marinas@arm.com>, "Will
  Deacon" <will@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>
@@ -54,12 +54,12 @@ Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S . Miller" <davem@daveml
  Poimboeuf" <jpoimboe@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>, "Ard
  Biesheuvel" <ardb@kernel.org>, "Indu Bhagat" <ibhagatgnu@gmail.com>, "Prasanna
  Kumar T S M" <ptsm@linux.microsoft.com>, live-patching@vger.kernel.org
-In-Reply-To: <20261117043504.1021063-2-dylanbhatch@google.com>
+In-Reply-To: <20261117043504.1021063-3-dylanbhatch@google.com>
 References: <20261117043504.1021063-1-dylanbhatch@google.com>
- <20261117043504.1021063-2-dylanbhatch@google.com>
+ <20261117043504.1021063-3-dylanbhatch@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Nov 2026 04:36:09 +0000
+Date: Wed, 18 Nov 2026 04:36:11 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -71,53 +71,65 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential
 issue to consider:
-- [Low] scripts/gen_lr_unwind: unswapped little-endian ELF reads in
-  main()
+- [Medium] arm64: integer underflow in CIE bounds check in
+  eh_frame_next_fde()
 --
 
-commit 4321126beda1768f44ea752930b88bd2f0c6cb2c
+commit 0cead277c4697d2464f308f0fb23b8a3a16a0749
 Author: Dylan Hatch <dylanbhatch@google.com>
 
-arm64, unwind: build with .eh_frame and add gen_lr_unwind skeleton
+arm64: factor .eh_frame parser out of patch-scs.c into <asm/eh_frame.h>
 
-This commit adds CONFIG_ARM64_LR_UNWIND to build the kernel with
-.eh_frame unwind tables while discarding them in the final linker
-scripts, and wires up a skeleton scripts/gen_lr_unwind host tool invoked
-on vmlinux.o.
+This commit moves the DWARF .eh_frame CIE/FDE iterator and opcode stepper
+out of arch/arm64/kernel/pi/patch-scs.c into a shared <asm/eh_frame.h>
+header.
 
-> diff --git a/scripts/gen_lr_unwind.c b/scripts/gen_lr_unwind.c
+> diff --git a/arch/arm64/include/asm/eh_frame.h b/arch/arm64/include/asm/e=
+h_frame.h
 > new file mode 100644
-> index 0000000000000..1b52662838653
+> index 0000000000000..6c17fed1860f1
 > --- /dev/null
-> +++ b/scripts/gen_lr_unwind.c
+> +++ b/arch/arm64/include/asm/eh_frame.h
 [ ... ]
-> +	ehdr =3D ctx.map;
-> +	if (memcmp(ehdr->e_ident, ELFMAG, SELFMAG) ||
-> +	    ehdr->e_ident[EI_CLASS] !=3D ELFCLASS64 ||
-> +	    ehdr->e_ident[EI_DATA] !=3D ELFDATA2LSB ||
-> +	    ehdr->e_type !=3D ET_REL ||
-> +	    ehdr->e_machine !=3D EM_AARCH64) {
-> +		fprintf(stderr, "gen_lr_unwind: %s is not an AArch64 ET_REL ELF\n",
-> +			argv[1]);
-> +		goto out;
-> +	}
+> +static __always_inline int eh_frame_next_fde(struct eh_frame_fde_iter *i=
+t)
+> +{
+> +	while (it->size > 4) {
+> +		const struct eh_frame *frame =3D (const void *)it->p;
+> +		const struct eh_frame *cie;
+> +		const u8 *cie_ptr;
+> +		size_t min_size;
+> +		int step, ret;
+[ ... ]
+> +		cie_ptr =3D (const u8 *)&frame->cie_id_or_pointer;
+> +		if (frame->cie_id_or_pointer > (u32)(cie_ptr - it->start))
+> +			return EDYNSCS_INVALID_CIE_HEADER;
 > +
-> +	shdrs =3D ctx.map + ehdr->e_shoff;
-> +	shnum =3D ehdr->e_shnum =3D=3D SHN_UNDEF ? shdrs[0].sh_size : ehdr->e_s=
-hnum;
-> +	shstrndx =3D ehdr->e_shstrndx =3D=3D SHN_XINDEX ?
-> +		   shdrs[0].sh_link : ehdr->e_shstrndx;
-> +	shstrtab =3D ctx.map + shdrs[shstrndx].sh_offset;
-> +
-> +	for (unsigned int i =3D 0; i < shnum; i++) {
-> +		const char *name =3D shstrtab + shdrs[i].sh_name;
+> +		cie =3D (const void *)(cie_ptr - frame->cie_id_or_pointer);
+> +		if (cie !=3D it->cie) {
+> +			if (cie->cie_id_or_pointer !=3D 0 ||
+> +			    cie->size =3D=3D 0 || cie->size =3D=3D U32_MAX ||
+> +			    cie->size > (u32)(cie_ptr - (const u8 *)cie -
+> +					      sizeof(cie->size)))
+> +				return EDYNSCS_INVALID_CIE_HEADER;
+> +			ret =3D eh_frame_parse_cie(cie, it);
 
-[Severity: Low]
-Do these Elf64_Ehdr and Elf64_Shdr field reads need little-endian-to-host
-conversion?  Cross-compiling an arm64 kernel on a big-endian host will
-reject vmlinux.o at the e_type / e_machine check and misinterpret the
-section header offsets.
+[Severity: Medium]
+Can the cie->size bounds check in eh_frame_next_fde() underflow when
+frame->cie_id_or_pointer is 1, 2, or 3?
+
+Since cie is cie_ptr - frame->cie_id_or_pointer, the distance
+cie_ptr - (const u8 *)cie equals frame->cie_id_or_pointer.  Subtracting
+sizeof(cie->size) (4) when frame->cie_id_or_pointer < 4 wraps to
+0xfffffffd..0xffffffff, bypassing the upper-bound check on cie->size and
+allowing eh_frame_parse_cie() to read past the end of a malformed
+.eh_frame buffer.
+
+Also, even when frame->cie_id_or_pointer >=3D 4, subtracting
+sizeof(cie->size) from cie_ptr - (const u8 *)cie bounds the end of the CIE
+against cie_ptr ((const u8 *)frame + 4) rather than (const u8 *)frame,
+which allows the CIE to overlap frame->size.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261117043504.1021=
-063-1-dylanbhatch@google.com?part=3D1
+063-1-dylanbhatch@google.com?part=3D2
