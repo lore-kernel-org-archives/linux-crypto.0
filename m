@@ -1,79 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.126.103.232
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795014471;
-	b=i7xHja6TX4k2vyKVkTIxxZGJ9X9lDgKZeyQUGHeWihz2Ayxl0RJZBmawedv75lma9zWN
-	 8i/Nk7u7ojiSdk3GT8y0gnfvysRsokmn528PV12JIq+d2SOzFlk0CZoezrMWTTfN6FRuK
-	 vsfzB9qbFbMRUBrzKJVi/dmZyWZyELWSvdLB62kRJDEue3TVxZ/JCW3qac0Q9HblL9/jO
-	 3foVhJi/A85J1O5Pcq+u4VywX2CUOwbX13s7CvOzuoRz753TDtiI0OGLXgeI63Y/6olKy
-	 PKGUmYuJ/Q59N+5GbZUsj9c7DFu70rOHiIN2gjpWhMV45L8rQRiod4SvfDAVWgN3/8g==
+	t=1795016913;
+	b=eZVDpAcSilRRz7zxIecGoYqOgXYnCpL3uHTELbMVYErnGsccYuJf5+I0pyjipYXe3GoF
+	 3JTJtCgkNu7WdTEKdraBK2wavZv7HLtEHHePLdgu+/sN7ZctVh3bCENB544xwcQgmSIF3
+	 JW/6yqI3/W5nvyfwAt/jSGa7ILGDj+osvRfh4Wy8MGYnG0kAgn6C+y0Gn1oOCrCkjSWu5
+	 +getUF1FfDDXQdSoY8CO5EbTp+kPu2puYcNyVxyBimWFuiALQ3PuuenmBOC/BInPkQrpk
+	 stUMo0y9e9JKstIibkGvx9GuzDwQI5tsfMn65wI/UNvTBh2ayQEnC99dStSJuwU7RaA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795014471;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=WpNvKlvQgWs4nlBDzrAzqY0K1wpz+T9bN3CMOunjYys=;
-	b=Fl/TV1qL8pXXYwQtwzaPISgKZqc9cgUbzPKdsyvhlL1vaPsX09DGzchUesLj8AqWekO6
-	 grFoSgSx3PEW1Fl6fN/1K/CPXsrj6jsXmYVQ7FDfex42qBz/4g+jxeIAR1LRyK34Po7oL
-	 fZ2sLD+g02DwI/Upn28HXV4tzv65YR46g6RHkGKIpiXoKRHjJhFXxC7FY217hpK5Dcm3D
-	 JoMIbttbo/E/0gTy+AF6FxrPQVHA5mqr8ePxveg9SGM7+R/7MSIUk4UsxVQXGmbkKV6vA
-	 wuPiyahEJTeeRXqrJM2HPCneGJbfJK0ubTpu0UZHZblMXQBLFKkSVJZzUf1T5PRfLyA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795016913;
+	h=DMARC-Filter:X-UUID:X-CTIC-Tags:X-CID-P-RULE:X-CID-O-INFO:X-CID-INFO:
+	 X-CID-META:X-CID-BVR:X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:X-User:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=t1a4VxT+Pk2crxdHaNNbCokZ/OkMNurAwIpmr6aLpac=;
+	b=pq8dXUSLXeCb7d8qv3oQ0Wu72rWT9varv5Mo95rbOv1eQzmwqjKB+I8DVvLeMLQF70V1
+	 quQzB/lJGDpgpDOBI979FFLdJKLrxvwzf7BbldKOyr0KwiXfQ5ESLIgjqzVfvmxxzNILZ
+	 HntwID0EyMZ5NTwtVPfuT1pZ2OXti8bgCj+Mkk6cHnWP8+PgN7RURuBaaUYLx5g5UGGGE
+	 UPoiHLY2Ys/redg0ylgyh2w+uS2cz86n/M42IaeatcJAxGTs3lHSrAieDjrQ92JfTIKM1
+	 Ox5fHUsnkg0T9xmopyppbFY/JrYUSl1ZJjj7U8LNl9doYBDa7RwlT/3h1GHXsfi+H3Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ik0wB+4P;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=none header.from=kylinos.cn;
+	spf=pass smtp.mailfrom=kylinos.cn;
+	arc=none smtp.remote-ip=124.126.103.232
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id CE5E0606A32A;
-	Wed, 18 Nov 2026 15:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ik0wB+4P
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id C01C41F000C4;
-	Wed, 18 Nov 2026 15:07:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795014471;
-	bh=WpNvKlvQgWs4nlBDzrAzqY0K1wpz+T9bN3CMOunjYys=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ik0wB+4PWOYL2hmQiNwFTeBBvupZ2nUcJiZ54iyfaa2tU77mnLlpFifyj8n1RAoxc
-	 JiFr1whbKGn9jctVHgQHsWlXlRxqGaOAejYgryvppYJ1hYUJPmJajsbl1RZNJZ2urH
-	 fAR3taWBeKxDwuMnnlsPRwbWW5GR06M9hA5dv1M1pEA51yEPNLWXKWfBsoGOA85JWU
-	 RdSwiNfRnISgDS/zRQ8IFyTjSctGJRDAEhTnp4ENDN8HwGtDmIypnNR9Lro8os8drC
-	 gH5m26+2mcTSgygYysYIO2BPjm0gAz6kctoO3OxBWgeB2Wg89nS8C+lhRUQ+5galCW
-	 RrUE6ZrvqIprA==
-Date: Wed, 18 Nov 2026 17:07:46 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Marco Felsch <m.felsch@pengutronix.de>
-Cc: Rodolfo Giometti <giometti@enneenne.com>,
-	David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jens Wiklander <jenswi@kernel.org>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	op-tee@lists.trustedfirmware.org,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Sahil Malhotra <sahil.malhotra@nxp.com>,
-	Ahmad Fatoum <a.fatoum@pengutronix.de>,
-	Richard Weinberger <richard@nod.at>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Demi Marie Obenour <demiobenour@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>, Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, linux-crypto@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: Re: [RFC PATCH 0/9] KEYS: keycrypt: keys that user space can use but
- never read
-Message-ID: <av2_QoJHp1gMTFMp@kernel.org>
-References: <20261118140421.584086-1-giometti@enneenne.com>
- <mvyqqjhvfka3kkumztixzozrthutkq6mfakkonxqbpm5gvzb62@eitzzleeyioe>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00D1606A332;
+	Wed, 18 Nov 2026 15:48:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A00D1606A332
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 79cf064ae36711f19a56ed5b684f684d-20261118
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NAME
+	IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR, SA_UNTRUSTED
+	SA_UNFAMILIAR, SN_UNTRUSTED, SN_UNFAMILIAR, SPF_NOPASS, DKIM_NOPASS
+	DMARC_NOPASS, CIE_BAD, CIE_GOOD_SPF, CIE_UNKNOWN, GTI_FG_BS
+	GTI_RG_INFO, GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:b2c141c3-b415-426c-9499-9d1cf7a5fc5f,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:10
+X-CID-INFO: VERSION:1.3.19,REQID:b2c141c3-b415-426c-9499-9d1cf7a5fc5f,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:10
+X-CID-META: VersionHash:7db8b62,CLOUDID:4de01b488f591930c82e08556fa3400e,BulkI
+	D:2611182329446W18NI2N,BulkQuantity:1,SF:19|38|66|72|78|102|127|153|850|86
+	5|898,TC:nil,Content:0|15|50|99,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:40
+	,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:
+	0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 79cf064ae36711f19a56ed5b684f684d-20261118
+X-User: maguicai@kylinos.cn
+Received: from localhost.localdomain [(106.47.122.66)] by mailgw.kylinos.cn
+	(envelope-from <maguicai@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1243958509; Wed, 18 Nov 2026 23:48:18 +0800
+From: Guicai Ma <maguicai@kylinos.cn>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Guicai Ma <maguicai@kylinos.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] crypto: af_alg - Fix data-race in af_alg_wait_for_data() and af_alg_wait_for_wmem()
+Date: Wed, 18 Nov 2026 10:48:15 -0500
+Message-ID: <20261118154815.607879-1-maguicai@kylinos.cn>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -83,28 +83,118 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <mvyqqjhvfka3kkumztixzozrthutkq6mfakkonxqbpm5gvzb62@eitzzleeyioe>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 18, 2026 at 03:57:27PM +0100, Marco Felsch wrote:
-> These are basically the trusted-key purpose.
+KCSAN reported a data-race between af_alg_sendmsg() and
+af_alg_wait_for_data():
 
-This is it.
+  BUG: KCSAN: data-race in af_alg_sendmsg / af_alg_wait_for_data
 
-If I was adding something like this, I would at least:
+  write to 0xffff8eec18118fa4 of 1 bytes by task 17152 on cpu 17:
+   af_alg_sendmsg+0x1c7/0xfa0 crypto/af_alg.c:949
+   skcipher_sendmsg+0x78/0x90 crypto/algif_skcipher.c:47
+   ...
 
-1. Discuss the solution that would extend trusted keys to the level
-   that makes it crystal clear that this is won't work out too
-   well.
-2. Then show how the new thing addresses all of this.
+  read to 0xffff8eec18118fa4 of 1 bytes by task 17143 on cpu 1:
+   af_alg_wait_for_data+0x1f9/0x3c0 crypto/af_alg.c:854
+   _skcipher_recvmsg+0x52f/0x720 crypto/algif_skcipher.c:65
+   ...
 
-If there is any gist this should not require whole a lot of text
-dump.
+  value changed: 0x13 -> 0x1b
 
-AI assistance should not be really even mentioned the cover letters in
-my opinion. It's equal to text editor; or smoke signals. It does not
-level down anything i.e., I'm equally dissatified however this was
-produced :-) 
+Both af_alg_wait_for_data() and af_alg_wait_for_wmem() are called with
+the socket lock held and use sk_wait_event() to wait for the condition.
+However, sk_wait_event() calls release_sock() before evaluating the
+condition expression for the first time, which reads ctx->init,
+ctx->more, and ctx->used without the socket lock. Meanwhile,
+af_alg_sendmsg() acquires the socket lock and modifies ctx->write (which
+shares the same 1-byte bitfield as ctx->more and ctx->init), as well as
+ctx->init, ctx->more, and ctx->used.
 
-Br, Jarkko
+Unlike TCP/UDP sockets, af_alg updates these context fields only in
+process context under lock_sock(sk). Since add_wait_queue() with
+woken_wake_function is already done while holding the socket lock, check
+the wait condition under lock_sock(sk) before calling release_sock(sk)
+and wait_woken(), avoiding the lockless read entirely.
+
+Fixes: 2d97591ef43d ("crypto: af_alg - consolidation of duplicate code")
+Cc: stable@vger.kernel.org
+Signed-off-by: Guicai Ma <maguicai@kylinos.cn>
+---
+Testing:
+Verified with a concurrent AF_ALG skcipher (ecb(aes)) send/recv stress
+test under CONFIG_KCSAN=y (QEMU arm64, 8 vCPUs, 60s per run, ~470k rounds):
+- Baseline (6.6.156): 51 af_alg KCSAN data-race reports (both the 1-byte
+  bitfield race and the 8-byte ctx->used race).
+- Patched (6.6.156, 2 runs): 0 af_alg KCSAN reports; roundtrip
+  functional check passed and unrelated KCSAN reports remained active.
+- Upstream (20eef29b7c84, arm64 defconfig + KCSAN): compile-tested
+  crypto/af_alg.o, crypto/algif_skcipher.o, and crypto/algif_aead.o
+  with W=1 cleanly (0 warnings/errors).
+
+ crypto/af_alg.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 7524070f26d8..000000000000 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -840,7 +840,6 @@ static int af_alg_wait_for_wmem(struct sock *sk, unsigned int flags)
+ {
+ 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+ 	int err = -ERESTARTSYS;
+-	long timeout;
+ 
+ 	if (flags & MSG_DONTWAIT)
+ 		return -EAGAIN;
+@@ -849,13 +848,15 @@ static int af_alg_wait_for_wmem(struct sock *sk, unsigned int flags)
+ 
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	for (;;) {
+-		if (signal_pending(current))
+-			break;
+-		timeout = MAX_SCHEDULE_TIMEOUT;
+-		if (sk_wait_event(sk, &timeout, af_alg_writable(sk), &wait)) {
++		if (af_alg_writable(sk)) {
+ 			err = 0;
+ 			break;
+ 		}
++		if (signal_pending(current))
++			break;
++		release_sock(sk);
++		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
++		lock_sock(sk);
+ 	}
+ 	remove_wait_queue(sk_sleep(sk), &wait);
+ 
+@@ -898,7 +900,6 @@ int af_alg_wait_for_data(struct sock *sk, unsigned flags, unsigned min)
+ 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct af_alg_ctx *ctx = ask->private;
+-	long timeout;
+ 	int err = -ERESTARTSYS;
+ 
+ 	if (flags & MSG_DONTWAIT)
+@@ -908,16 +909,15 @@ int af_alg_wait_for_data(struct sock *sk, unsigned flags, unsigned min)
+ 
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	for (;;) {
+-		if (signal_pending(current))
+-			break;
+-		timeout = MAX_SCHEDULE_TIMEOUT;
+-		if (sk_wait_event(sk, &timeout,
+-				  ctx->init && (!ctx->more ||
+-						(min && ctx->used >= min)),
+-				  &wait)) {
++		if (ctx->init && (!ctx->more || (min && ctx->used >= min))) {
+ 			err = 0;
+ 			break;
+ 		}
++		if (signal_pending(current))
++			break;
++		release_sock(sk);
++		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
++		lock_sock(sk);
+ 	}
+ 	remove_wait_queue(sk_sleep(sk), &wait);
+ 
