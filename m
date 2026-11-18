@@ -1,62 +1,69 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=134.76.10.21
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795033700;
-	b=R29YlkqZ7Fx+2Fa7oktfKhVHafPDOjrEQSI9iUt6JoNbeM2ai8jCgRz68r3EXw8GYh+t
-	 WflO3aAhH92lTm6cshiR8gYIbFI2tEvUOvIQq3HYcY29oCWEKW/KLDukp4BBqRAa2241h
-	 6dtq0fidsZlqDCH5m4UNmXS5onmx24WWosjjJULydtfijuRWlzlo4DTltPNTDJcM4Ef+1
-	 Yc3WmuEUtQojo8F5u4S0Rfy8c+hV07Yqt6NPXB/BvXfN5aPrlgDblvm4bTJAT7z7YnPBf
-	 zFZjpbB0rvqjUn7j2x/ghF5jDkiiIvv4hIyiVRnlKRsjgPGKhfvZFduRKPfUnGiY8Ug==
+	t=1795042928;
+	b=S4XSbVUSzYLwHMePDL6T6wWMECmO3Vt6orjRkEeeDBjMomwiEleZ+qvvRfrkArlKguXX
+	 Ex9MYvVhbvvEh+v13oZrptevBro0w1G3viYIDsxu1RsoWQHRtHLWH3Lc8fueOMnRjTIsx
+	 vHAu/2pxm4RJcLz7Oeagy+eHM5R4seNjYabehckqkXQ0u5By3k4056fDS6t3GtBIovnpy
+	 c2WzTh4tKOcrBRvF02dWEPBUykp3fajimgVpYJLJNAVysPP3QwGGsz7/sHoeYJH2FdvHu
+	 2FU6e+DbIKmBiHzrGqxTjVlKx1d9qRxFNmPoS/gALFQzhDsqAV9O6seUUxqhHhT706Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795033700;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=90tAbqMzJaQia7XfxJtfvbD0HtWu+CPWAaXAGRp0tI0=;
-	b=eSxZsu+b/rtflfLLzeHw3EWO2dqnjau6vbdIF0NrtYvK5of2sUcmzNHvE4M0qYy9FYyE
-	 sdCLoWQ3mWzCBBaWO2TrhdJZTkG2Oe4uCWuTCa3OOZPL7NJAgbfc+nANfMcMUUcpD14Nc
-	 YmsiZ76In5kBhgiEFQjF8ICUBQbaUrAlwu5tbO3bodRGQm4wVxecGgWz1AaRGXy3F8rRD
-	 OdD8OGeueAZM8Bjj6Kfu8PMRN0px+0zBGLcdOljG/09CgN0RHyikZfqxpTLh3DJw2t0fC
-	 9CVLLgbK7ml3lUX7hnDTeihQ7PHWasZNvMw+GezHVT76iHcXiwc06rH76Yxi8u0YAOw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795042928;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:
+	 Content-Language:From:Autocrypt:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy:
+	 X-Virus-Scanned:X-Spam-Level;
+	bh=X3maKqnYdaEm9n614F6elzN2A+NycPJ175S/7AVqG8E=;
+	b=oPbln6MiqELDFxjdrD1lUfT5bzwNKg0L+kWEV8WVB9Z8ptk8s9T/wYeDJ+qjizOwlmR+
+	 1+9sADIvv9kxY3PU3kiCSiKgZncgsEPhvOE3VYwmX2Oni/OPy9ZzpXZUU35tUkJYDX3QJ
+	 iN6MYvKdJHvCmd2kgU3FNtfXi4Yb5A3NOpHhNxdAjfECtQikgm9vXjHxQjc8ZBVQaTGm4
+	 A2FUatblBCfBP1PgcVow8hVfNz2Bz/ZPoNh2ru+EHsAYQ/ydxLj/ojL4A3p/Owq12x+Y5
+	 zPVCHhKnOH2iroZHt7dpwXnVuqXgKVNbZKfLZ1+f8FxOna1dF81BiJxA/QOe71OS+Lw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VrhzcSDi;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=cispa.de;
+	spf=pass smtp.mailfrom=cispa.de;
+	dkim=pass header.d=cispa.de header.i=@cispa.de header.a=rsa-sha256 header.s=2023-rsa header.b=QqrCcce7;
+	arc=none smtp.remote-ip=134.76.10.21
+Received: from mx-2023-1.gwdg.de (mx-2023-1.gwdg.de [134.76.10.21])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id D4E9F606A320;
-	Wed, 18 Nov 2026 20:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90D1606A32C;
+	Wed, 18 Nov 2026 23:02:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B90D1606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cispa.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cispa.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VrhzcSDi
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 1B5521F000C4;
-	Wed, 18 Nov 2026 20:28:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795033700;
-	bh=90tAbqMzJaQia7XfxJtfvbD0HtWu+CPWAaXAGRp0tI0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=VrhzcSDiurSe9ldgs2udIVaBrSIngIZY5+J7rZn/0s4/XzvcBKsorRzq2WWQW1CNY
-	 u8ARLcNfd0cl3AMLg239pXxuZjbzQtaabTPQkk+cbn1vePA8i9ZB5laJJCqlSPdvFx
-	 v1tX0CMNV+NlkcviWgBYN7koZAfiYUefuorAglHAnxdE751ZwnSe7gYIIsAbQSwLTQ
-	 NkYapB5um7nefemtlSVuqJ3HkD9gz8hUe52NtXZKKUrlBpUq4zh99CXvM8T1ly5djN
-	 tkWNZdxSYjkH85Fagx1MNjrsqvw1ov4vJlnVo/YndXiguh/cwuvuCJYhjdzsGZDJk7
-	 q1g3+CHj1u6lg==
-Date: Wed, 18 Nov 2026 22:28:16 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Cc: florian.bauckholt@cispa.de, David Howells <dhowells@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>, Hui Peng <benquike@gmail.com>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] KEYS: fix signature length passed to
- KEYCTL_PKEY_VERIFY
-Message-ID: <av4KYKy7pZHyErVs@kernel.org>
-References: <20261111-keyctl-pkey-fixes-v1-0-934ebaa267a7@cispa.de>
- <20261111-keyctl-pkey-fixes-v1-1-934ebaa267a7@cispa.de>
- <f38f6d32-16d3-4986-8d6a-9d65517f5317@linux.ibm.com>
+	dkim=pass (2048-bit key, unprotected) header.d=cispa.de header.i=@cispa.de header.a=rsa-sha256 header.s=2023-rsa header.b=QqrCcce7
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cispa.de;
+	s=2023-rsa; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:CC:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=X3maKqnYdaEm9n614F6elzN2A+NycPJ175S/7AVqG8E=; b=QqrCcce7/ZtqJ96qzrymjyPUfx
+	m23rRr113aOGL0hLHDCQuOxOLJTkpVmrF8Cx7sQRW0agYz3L/XyVZVsDO2DtoThU2mVJ4M157vaG4
+	5rd8zZoALzDjJYBCFe5JikGKuBwBbI+0aZCKEYbr6gbWFFLDZY080jvpoFErE05P7MIu+zwIur+bR
+	WmBwfrsaJBoibBcS6VtRNNKISynX0qu5QueDEZS5jNaD7T8YGFXcj9HRf+4nGKB5rTKq+DrxBjtAX
+	uvPNX2q3KWf5Fy/l2bYIEWSxqjcUkQz/vTzE7K3+FP5SDIFcGncvIgTrhXO1qDPhm9Pzb62hlkhwD
+	amK4jOGA==;
+Received: from mailer.gwdg.de ([134.76.10.26]:59524)
+	by mailer.gwdg.de with esmtp (GWDG Mailer)
+	(envelope-from <florian.bauckholt@cispa.de>)
+	id 1xToes-008jo8-1e;
+	Thu, 19 Nov 2026 00:01:42 +0100
+Received: from mbx19-sub-11.um.gwdg.de ([10.108.142.88] helo=email.gwdg.de)
+	by mailer.gwdg.de with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+	(GWDG Mailer)
+	(envelope-from <florian.bauckholt@cispa.de>)
+	id 1xToes-00050j-2B;
+	Thu, 19 Nov 2026 00:01:42 +0100
+Received: from [192.168.0.168] (10.250.9.200) by mbx19-sub-11.um.gwdg.de
+ (10.108.142.88) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.57; Thu, 19 Nov
+ 2026 00:01:42 +0100
+Message-ID: <e33d2059-0b63-40fc-996f-c962509c9c63@cispa.de>
+Date: Thu, 19 Nov 2026 00:01:41 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -66,48 +73,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f38f6d32-16d3-4986-8d6a-9d65517f5317@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KEYS: fix signature length passed to
+ KEYCTL_PKEY_VERIFY
+To: Jarkko Sakkinen <jarkko@kernel.org>, Stefan Berger <stefanb@linux.ibm.com>
+CC: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, Ignat
+ Korchagin <ignat@linux.win>, Herbert Xu <herbert@gondor.apana.org.au>, "David
+ S. Miller" <davem@davemloft.net>, Paul Moore <paul@paul-moore.com>, James
+ Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Hui Peng
+	<benquike@gmail.com>, <keyrings@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
+References: <20261111-keyctl-pkey-fixes-v1-0-934ebaa267a7@cispa.de>
+ <20261111-keyctl-pkey-fixes-v1-1-934ebaa267a7@cispa.de>
+ <f38f6d32-16d3-4986-8d6a-9d65517f5317@linux.ibm.com>
+ <av4KYKy7pZHyErVs@kernel.org>
+Content-Language: en-US
+From: Florian Bauckholt <florian.bauckholt@cispa.de>
+Autocrypt: addr=florian.bauckholt@cispa.de; keydata=
+ xjMEav3GRRYJKwYBBAHaRw8BAQdAnELDrQj5frnVfDEzfgTLq+dYQyGwNlrF4RK4Lnh0EtLN
+ LkZsb3JpYW4gQmF1Y2tob2x0IDxmbG9yaWFuLmJhdWNraG9sdEBjaXNwYS5kZT7CjwQTFggA
+ NxYhBCzYgazhZyFPZBJ6GB4ZurGrnfo1BQJq/cZFBQkFo5qAAhsDBAsJCAcFFQgJCgsFFgID
+ AQAACgkQHhm6saud+jWpqAEAvdY72AqnlDNhbzgaDPghigkZxQsXy0SguVI4rIFdkYoA/RRN
+ yQMEpqS/x1bseRnNFeLmtDviMLMoLUrKGY23VuUPzjgEav3GRhIKKwYBBAGXVQEFAQEHQElQ
+ tDrQlEp5XdrAZUWzYVj26t0q0BhMLOqKLXSMmA5xAwEIB8J+BBgWCAAmFiEELNiBrOFnIU9k
+ EnoYHhm6saud+jUFAmr9xkYFCQWjmoACGwwACgkQHhm6saud+jUl5AD/S78nLqAgIn53lOzT
+ A8NTSByrtVvDBb9G9heETfLzVBIBANDFhjZQpssjUeVZ7QV/1GDL9ZhGssjnTQmzHKavboEK
+In-Reply-To: <av4KYKy7pZHyErVs@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MBX19-SUB-05.um.gwdg.de (10.108.142.70) To
+ mbx19-sub-11.um.gwdg.de (10.108.142.88)
+X-Virus-Scanned: (clean) by clamav
+X-Spam-Level: -
 
-On Wed, Nov 18, 2026 at 03:08:19PM -0500, Stefan Berger wrote:
-> 
-> 
-> On 11/11/26 10:56 AM, Florian Bauckholt via B4 Relay wrote:
-> > From: Florian Bauckholt <florian.bauckholt@cispa.de>
-> > 
-> > Commit cb481e59ea6c ("KEYS: fix overflow in keyctl_pkey_params_get_2()")
-> > made keyctl_pkey_params_get_2() set params->out_len to the maximum
-> > output size of the operation instead of the size provided by the caller.
-> > It does so for KEYCTL_PKEY_VERIFY as well, but verify has no output
-> > buffer: out_len shares a union with in2_len, the length of the
-> > signature.
-> > 
-> > As a result keyctl_pkey_verify() ignores the signature length passed by
-> > the caller. It copies max_sig_size bytes from the signature pointer and
-> > passes max_sig_size as the signature size to the verification.
-> > 
-> > This makes no difference for signatures that are always max_sig_size
-> > bytes long, such as RSA. A shorter signature, e.g. a DER-encoded ECDSA
-> > signature, is followed by whatever is behind it in the caller's memory,
-> > or the call fails with -EFAULT if that memory is not readable. The
-> > x962 ECDSA template currently ignores data following the signature,
-> > which hides the problem.
-> > 
-> > Use the length provided by the caller, which has already been checked
-> > against max_sig_size.
-> > 
-> > Fixes: cb481e59ea6c ("KEYS: fix overflow in keyctl_pkey_params_get_2()")
-> > Cc: stable@vger.kernel.org
-> > Link: https://lore.kernel.org/all/20260919221742.3709658-1-benquike@gmail.com/
-> > Signed-off-by: Florian Bauckholt <florian.bauckholt@cispa.de>
-> 
-> Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+On 11/18/26 21:28, Jarkko Sakkinen wrote:
+> Can these patches be rebased? They don't apply.
 
-Can these patches be rebased? They don't apply.
+Sure, I'll rebase and send a v2.
 
-I've probably missed b4 shazam issue last time.
+I'll keep 2/2 in v2 in case you take it. Let me know if I should send it
+separately to linux-crypto instead.
 
-Was just wondering why I don't have these yet.
-
-Br, Jarkko
+Thanks,
+Florian
