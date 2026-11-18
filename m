@@ -1,48 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=117.135.210.4
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794988621;
-	b=O+eIXsklYZRdPi2JQ2pdIqnucuM3YgWxz+UWz31srTnhfUe0l6d7Tjrp/WFaEFXt0Plz
-	 PdYO4kXv1DOQljhNYM7szBfH+NfkunAH87gf8Y/VWzpcf/solCUQ1ykjDiRe8m+uKAspn
-	 +hixDiMtYDGVw1SvBvjJGt94DzeINoGVm/b+yj8pEvQ1SM86RMIQyVMCQAVSTgJSraAoL
-	 r9pOUsInyKIGuGOqZtkBduaSx30HmgcpzF9Zb5Cgb48nznhk7wQODCdZOXuUt+5ly1FH2
-	 zcUNl5jpMacEW4edcFTsNlBn+mApiifWtjcGxNZwvVnRe31rE/Hw55Yj4lVMJkvfr0Q==
+	t=1794988629;
+	b=3fwUfEmYBZlF7AFZdYpdbzwLEHGy62B+uuH+cm7bMzNRMbrwglhJoFtKy8/v3rbtDgZs
+	 /O5nU0F2XNXEcXQgi4aSO9Pb1+XwtHrOhpvMa0/Uddy/ki726ydEaAL5pgOHzsQ1rlXTf
+	 VhaVmfG1ziGgjaumWCKsB9J+W2XMzIutAP9PL9bC23CBsWnzw5a7wA7FCRMFcpaZoyze+
+	 osfQw4DlauKRhC5OTEHbT0keYbPrGFUXgGOZ9wnp1YwoVVrSbJirAfQBS507S+oBoe9Fz
+	 ji1+7T5sHqmVFv5izm0Ybs0OTs1T9CeDwplnepULx32s5ms5eUuvK29talfiR5sIG4A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794988621;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794988629;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:
-	 X-Originating-IP:X-CM-SenderInfo;
-	bh=JK5tQhAchsUvGd3TkaYklyX4XMkYwKlBnGJVxVMlOcs=;
-	b=ZKPxY3picFdQOxDOThBTKaVkheJjvFSdyyiSbjoBF0XhvZuxtXKDGEt0tmh9ijjibIOt
-	 yglaDOWw9iCHYEElASER6OudS57V7030zXyigfJg1Ev94e+8ol5wb06Y1HpP0y84Iry7L
-	 gCMajmP92iie3WPia/fjGv0toGcTG95vOtvWiARol023ElT4y9SA6baDua3OImdaTITuv
-	 qR0w+bCNtxFsHHzn/PbJSTqcJXHZ7WkKG4q+v6XGEn8KvyCm8YUBTAB8zltYQPv4m5iGF
-	 YbS1O/D98ubiG//JOVW70frFDXx0XnhlVoaaRBu+kYniGD0gmLt8yY3MCGf8DS6PuKA==
+	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-CM-TRANSID:X-Coremail-Antispam:X-Originating-IP:X-CM-SenderInfo;
+	bh=KjrArLb9IqfHjfAy62DXYGUT6Rnc6Kig1XxV83nQhEQ=;
+	b=w6Aj9/z1Qhc2LvAFnTUQfIqxROgHE6dx9nHBpBGOeGfGy7E8MnENjej1mk/lAJ+fs/Jq
+	 3cClEIjlGVCVrjLW1gud6iSJ89o4ghq3tNfpFo0RM/Hsj/YdNsOdCVPEE72tr2TxFTcPT
+	 Yk3LYOWt0zxs632ivdpNjiE/Rmoirx5NwB+MMHDXxGwD6Zls4/v3bFG9GO9t6UbYUG4lL
+	 /XwY9xnX5PU0QOW8tBgKSXGxoJjVeYckTgsNq6cRHDKDw263YdqS2Id0Cpv4k2uJIEEO+
+	 954srebPzjCp04LFmPmt4tDnHSMOAa1KnkZvckSTuovxx6Fl0ztOVIQkDhKz0FnBF0w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=163.com;
 	spf=pass smtp.mailfrom=163.com;
-	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b="O3XQgCR/";
-	arc=none smtp.remote-ip=220.197.31.5
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=PGvxmTEz;
+	arc=none smtp.remote-ip=117.135.210.4
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EC1606A325;
-	Wed, 18 Nov 2026 07:56:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 98EC1606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74064606A330;
+	Wed, 18 Nov 2026 07:57:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 74064606A330
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=O3XQgCR/
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=PGvxmTEz
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=JK
-	5tQhAchsUvGd3TkaYklyX4XMkYwKlBnGJVxVMlOcs=; b=O3XQgCR/9zuFpMnYxq
-	iwNPiwD7f5x3eBTgOgS3O0nW3nJym5kEvZvmWGSaHHkwioPVJOFK5wO18QCwpB4J
-	aqOnIEyj9WRnWb8EpBKdOtzT5qzFUI6fZRWCL5l7dE2d5ojaC61ZAWvjKorC365G
-	EoPRdkp0QlctsFVQ2hPZyHeXA=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Kj
+	rArLb9IqfHjfAy62DXYGUT6Rnc6Kig1XxV83nQhEQ=; b=PGvxmTEzOgWI17Vmj5
+	m2eB0suLjP6bQBBp957M7D37LRNn/cJV3Xz6QjVK7nloNg6ysuJsvXtFFJqE7zK7
+	6UMUYNF5zQ5syO8WGFSE5ZxLiX2Ha2q064w5/A65oI6zHzv+RnXgsoAEi3mES5iO
+	wyt6eZ0ObMkiyy3eVZ57ZNCH8=
 Received: from localhost.localdomain (unknown [])
-	by gzsmtp4 (Coremail) with SMTP id PygvCgD3P6M1Wv1qx8alGg--.56103S4;
-	Wed, 18 Nov 2026 15:56:44 +0800 (CST)
+	by gzsmtp4 (Coremail) with SMTP id PygvCgD3P6M1Wv1qx8alGg--.56103S2;
+	Wed, 18 Nov 2026 15:56:39 +0800 (CST)
 From: Haoxiang Li <haoxiang_li2024@163.com>
 To: schalla@marvell.com,
 	bbhushan2@marvell.com,
@@ -50,12 +49,10 @@ To: schalla@marvell.com,
 Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Haoxiang Li <haoxiang_li2024@163.com>
-Subject: [PATCH 2/3] crypto: marvell/cesa - Fix padding cleanup on hash setup errors
-Date: Wed, 18 Nov 2026 15:56:35 +0800
-Message-Id: <20261118075636.2152451-3-haoxiang_li2024@163.com>
+Subject: [PATCH 0/3] crypto: marvell/cesa - Fix hash DMA buffer cleanup
+Date: Wed, 18 Nov 2026 15:56:33 +0800
+Message-Id: <20261118075636.2152451-1-haoxiang_li2024@163.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20261118075636.2152451-1-haoxiang_li2024@163.com>
-References: <20261118075636.2152451-1-haoxiang_li2024@163.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -66,41 +63,44 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PygvCgD3P6M1Wv1qx8alGg--.56103S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZrW8tr4Dtr4rWF48ArW7XFb_yoWkZrbEkr
-	13Wr92qryFvr4kXr1Fk393Jr43tasaqF98WrW2qryfJa47Jan0gF12gFs8ZF1rurW7tr4D
-	GF45tr13J34FvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xR_2Nt7UUUUU==
-X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbC7Ry-Lmr9WjzAHAAA3N
+X-CM-TRANSID:PygvCgD3P6M1Wv1qx8alGg--.56103S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7uw1Dur1UAr13JrWUtF1DJrb_yoW8Gr1Upr
+	W5WFWjyr18XryxKwnrXay0y34xWrZ5JFW3GrW8tw4UArn8WFyIvFW2yrWxXa47uryfu342
+	qrn0vw1DZrn0kw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRLmiAUUUUU=
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbC7Re9LGr9Wje-MwAA3d
 
-The hash DMA initialization error path clears the TDMA chain before
-calling mv_cesa_ahash_last_cleanup(). The empty chain makes the request
-appear to be a non-DMA request, so padding is not released. This also
-happens if the first TDMA descriptor allocation fails after padding has
-been allocated.
+This series fixes DMA cache and padding buffer leaks in the CESA hash
+request error paths.
 
-Call the DMA-specific padding cleanup helper directly, since this is
-already known to be the DMA initialization path.
+The DMA cache is not released when request preparation fails. Padding
+cleanup can also be skipped because request type detection depends on a
+TDMA chain that has already been cleared. In addition, final requests
+rejected by the queue leave their padding allocated.
 
-Fixes: 53da740fed30 ("crypto: marvell - Move tdma chain out of mv_cesa_tdma_req and remove it")
-Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
----
- drivers/crypto/marvell/cesa/hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The patches address these cleanup paths and clear the DMA cache pointer
+after freeing it to prevent stale-pointer reuse.
 
-diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
-index 35f5937b2f8b..f698d3df535b 100644
---- a/drivers/crypto/marvell/cesa/hash.c
-+++ b/drivers/crypto/marvell/cesa/hash.c
-@@ -751,7 +751,7 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
- 	mv_cesa_ahash_dma_cleanup(req);
- 
- err:
--	mv_cesa_ahash_last_cleanup(req);
-+	mv_cesa_ahash_dma_last_cleanup(req);
- 
- 	return ret;
- }
+Testing:
+- ARM compile testing of hash.o for each intermediate revision, using
+  Clang with W=1 and KCFLAGS=-Werror.
+- Userspace mock tests of extracted driver functions covering allocation
+  failures, queue rejection, backlog acceptance, completion cleanup,
+  retries and non-DMA requests.
+
+The mock tests, which is assisted by codex, validate resource lifetimes
+with DMA pools and hardware interfaces mocked. No hardware testing was performed.
+
+Haoxiang Li (3):
+  crypto: marvell/cesa - Fix DMA cache leaks on hash setup errors
+  crypto: marvell/cesa - Fix padding cleanup on hash setup errors
+  crypto: marvell/cesa - Free hash padding when queueing fails
+
+ drivers/crypto/marvell/cesa/hash.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+
+base-commit: 666539eecdf4db623f5e3c3e55cf9f2dfad24aa4
 -- 
 2.25.1
 
