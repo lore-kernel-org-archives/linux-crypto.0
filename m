@@ -1,56 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=220.197.31.3
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794985380;
-	b=x8rEh6LODlf68d/dK5kUAN+GbFOmUiUAohr+NQYTYrg/Kc+f3w1Ys6orJ67W/6BAR+YT
-	 tmwtA3eigoW60bVBg9I1OFSdoub9cCADt7ldjQGf5nddumtdMffVhIFSek/FlOlxXg7aw
-	 Srbgwusju3hyOnswbkJg7SSFLe1BlWJ5F+kM9P0L6H7hLroqkX5J2urYOwtTp23L+tLat
-	 Ln3N8CvygCIq/6rLEa/cVukXYYRJt8Zl0CGjkA090vsvKtF3iU0sn2LI6sMUad028OxWu
-	 FBP733backBA2ufHjSl8MXiBpI/0XTSs1UX/FajWXXaCx6I8aLefJNB1erPtIH1rHew==
+	t=1794988618;
+	b=VD4OAqEKgpUKrW6L46UfzU73iXisTdiGZPHd/Nw4QV47dgjR121Ca+1HmeXGCZne3My8
+	 6wWp2kmDmftfkN5TBkvw270ENuyVL4g+yTuZmckfu4FlCcbgz7IE5etInrKy2fyKchqr8
+	 xsRD11D+2HBcr+6bdL6zZBiWt0vku4HvzX0k2tRklaPnpe4JGC2T7IZnYTg8AY5RFG5+Q
+	 ENZAMgP5rVRWIuaHP17HJiuGA+Y7EkgQUGhan74TtZGp+KiwbIvGu2vbg9mqAnG4SnuI6
+	 NT5DFFAlaH4TFgT0COQKUF4OUQaKgrUz7OCcY+wVT+GvdkBFVRjfNPTjQ8DcAzYHEZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794985380;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=SevIeu+mOjoRZRNZ4BNvAhnG6Y1Gdw64UBJT33ewGFI=;
-	b=5C6puwEBnE+jp506y10doujs57POqNsblq3MHOdcpxgXR15OMcAC+Fk+0ZqJJHC5BzeH
-	 UpXceIld0a7yxp8UZloP5YG4g4D39Htf+9JP8q8q0OUyg2RG8PB9Iq4/pKGTD+OtxdBQE
-	 LQ3kOxcycxs4jX9WHu1bQ/ilz4Qdzm8ka7BkrKvXV2Oql1BbbW6+kawBpao+DZpDlXNzZ
-	 BRjCyXq7KGSS2K9EKXCECgagySyjb/+H+UxMvaZcYnsTt1ujOSwv2WHEADj+bM1akHjJk
-	 Z5vG8juGChytrVJl2HY0IyLiZ/E7E6wZTOjWoyNRIP1xGwb6IXQtoTVaBepgJQipglw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794988618;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:
+	 X-Originating-IP:X-CM-SenderInfo;
+	bh=rm6FPL/hIEQA9bxW60D0xmRsXN6O2gQIc+olwmiqFTY=;
+	b=uEmJEgNrU8gru93tBj4DHfFFU/IZbz2PibdbYLNfJSD4ZvpWqf9UpycVbu6ezJVYHJRj
+	 Cw2G3+ReXFgcVnGCJfmpD9dSWYXg7Z6gbu3+1aMJ56i5nnVa1Dqd/Iabpd2oOVGhzmMDR
+	 mOWg1fjid1h59L5Ypy2YvCBT0mNnnfU9OOkefmo8owrabpqkwLyseK6+qjhdY0TEh+UqR
+	 S7t5gHVWROmXSba3DwFHZQSLZ0N5pSNMoBMTIceb9Yf10LwRLFiMzXgdXSY8yYbs4vbgo
+	 9L60NTLtKUQsDBdmsOyKoKQEgLFq8XQUk8DHams2FtRymHQFAnO8wdZij1FpOs5Aa+A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PB7TZHOZ;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=163.com;
+	spf=pass smtp.mailfrom=163.com;
+	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=VOLOvUZU;
+	arc=none smtp.remote-ip=220.197.31.3
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B544606A325;
-	Wed, 18 Nov 2026 07:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27751606A31C;
+	Wed, 18 Nov 2026 07:56:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 27751606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PB7TZHOZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 789FE1F000C4;
-	Wed, 18 Nov 2026 07:02:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794985380;
-	bh=SevIeu+mOjoRZRNZ4BNvAhnG6Y1Gdw64UBJT33ewGFI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=PB7TZHOZNXZSPEiE4U1pObmoZyB1q4y9hlUzRJyg7EucbCJ7R4b89pj9ugmAq4q//
-	 uqc92JcgYQsbI+arPpiWjT+ABa2rgZ8bORkugRnkTfLSERRtK0wUGPpUfSjMz6uW7g
-	 395Z8I7kKJmll17tFEI0NB2glyrmoO6zz5rXATWy2JVT0MkK7sydlS+S74ywruK6Qq
-	 Mv6HUW2/q+b8IxtO5dSsvzYubZmu+QK3F7RZJDoBvNNd/dU1A5y1GL/MKEiyr2TOt7
-	 GktbX57mJJlJB+7ikO0eoND0OUC3ILdMMJGpbuwy6ZUu+knIOwtrGPDXtLPx7k8Kvn
-	 Y18KlwQZpbqlg==
-Message-ID: <sashiko-outbox-220283@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v30 4/4] crypto: spacc - Add SPAcc Kconfig and Makefile
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Pavitrakumar Managutte" <pavitrakumarm@vayavyalabs.com>, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, herbert@gondor.apana.org.au, robh@kernel.org
-Cc: krzk@kernel.org, conor+dt@kernel.org, ruud.derwig@gf.com, rbannerm@synopsys.com, manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com, navami.telsang@vayavyalabs.com, bhoomikak@vayavyalabs.com, nazim.khan@vayavyalabs.com
-In-Reply-To: <20261118063504.835259-5-pavitrakumarm@vayavyalabs.com>
-References: <20261118063504.835259-1-pavitrakumarm@vayavyalabs.com>
- <20261118063504.835259-5-pavitrakumarm@vayavyalabs.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Nov 2026 07:02:59 +0000
+	dkim=pass (1024-bit key, unprotected) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=VOLOvUZU
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=rm
+	6FPL/hIEQA9bxW60D0xmRsXN6O2gQIc+olwmiqFTY=; b=VOLOvUZUXAYxImkjXf
+	02F06e6y9+Fql1gUFz1GRx057KTuXZQvH/WCYqISUnbdfzXe4ujWe5nOVawqhoWq
+	4FBPgcJPSZxFEnry4l2F4f28ihFyUqK5buYoQFU/8/jIUbUpx0YEnpUrUyIRg+WF
+	NI5RX2JBBM4/SSX6WvDXxoW/0=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp4 (Coremail) with SMTP id PygvCgD3P6M1Wv1qx8alGg--.56103S3;
+	Wed, 18 Nov 2026 15:56:40 +0800 (CST)
+From: Haoxiang Li <haoxiang_li2024@163.com>
+To: schalla@marvell.com,
+	bbhushan2@marvell.com,
+	herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <haoxiang_li2024@163.com>
+Subject: [PATCH 1/3] crypto: marvell/cesa - Fix DMA cache leaks on hash setup errors
+Date: Wed, 18 Nov 2026 15:56:34 +0800
+Message-Id: <20261118075636.2152451-2-haoxiang_li2024@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20261118075636.2152451-1-haoxiang_li2024@163.com>
+References: <20261118075636.2152451-1-haoxiang_li2024@163.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -59,78 +64,49 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PygvCgD3P6M1Wv1qx8alGg--.56103S3
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KrWkXw1DAF4xJF43CFyUZFb_yoW8Gry8pa
+	yUAayjkryFva47KrWUXan5XF18Z3s0va43KrWrA345Z3sxuw1IvFZrCFyxZF1UJFWrAa1x
+	tanrAw15Xrn8u3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pKYLyiUUUUU=
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbC7hi+LWr9Wji7IQAA3K
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] crypto: spacc: DMA buffer and DDT leak in
-  spacc_xof_stringsize_autodetect()
---
+The hash DMA initialization error path frees TDMA descriptors and unmaps
+the source scatterlist, but leaves the DMA cache allocated.
 
-commit 7f28b560104fe0765e17ef1a3786eb35ead09c4e
-Author: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Use the full DMA cleanup helper on this path. Clear the cache pointer
+after freeing it to prevent stale-pointer reuse on subsequent requests.
 
-crypto: spacc - Add SPAcc Kconfig and Makefile
+Fixes: 7850c91b175d ("crypto: marvell/cesa - fix memory leak")
+Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+---
+ drivers/crypto/marvell/cesa/hash.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This commit adds the Kconfig and Makefile for the Synopsys DesignWare SPAcc
-driver and hooks it into the crypto subsystem build.
+diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
+index 2f203042d9bd..35f5937b2f8b 100644
+--- a/drivers/crypto/marvell/cesa/hash.c
++++ b/drivers/crypto/marvell/cesa/hash.c
+@@ -65,6 +65,7 @@ mv_cesa_ahash_dma_free_cache(struct mv_cesa_ahash_dma_req *req)
+ 
+ 	dma_pool_free(cesa_dev->dma->cache_pool, req->cache,
+ 		      req->cache_dma);
++	req->cache = NULL;
+ }
+ 
+ static int mv_cesa_ahash_dma_alloc_padding(struct mv_cesa_ahash_dma_req *req,
+@@ -747,8 +748,7 @@ static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
+ 	return 0;
+ 
+ err_free_tdma:
+-	mv_cesa_dma_cleanup(basereq);
+-	dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents, DMA_TO_DEVICE);
++	mv_cesa_ahash_dma_cleanup(req);
+ 
+ err:
+ 	mv_cesa_ahash_last_cleanup(req);
+-- 
+2.25.1
 
-[ ... ]
-
-> diff --git a/drivers/crypto/dwc-spacc/Makefile b/drivers/crypto/dwc-spacc=
-/Makefile
-> new file mode 100644
-> index 0000000000000..b7125a7797ba0
-> --- /dev/null
-> +++ b/drivers/crypto/dwc-spacc/Makefile
-> @@ -0,0 +1,7 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +obj-$(CONFIG_CRYPTO_DEV_SPACC) +=3D snps-spacc.o
-> +
-> +snps-spacc-y :=3D spacc_hal.o spacc_core.o \
-> +spacc_manager.o spacc_interrupt.o spacc_device.o
-
-[Severity: Medium]
-Does the err_timeout path in spacc_xof_stringsize_autodetect() leak the
-coherent DMA buffer virt and the DDT entry ddt?
-
-drivers/crypto/dwc-spacc/spacc_core.c:spacc_xof_stringsize_autodetect() {
-	...
-	virt =3D dma_alloc_coherent(spacc->dptr, SPACC_TEST_DMA_BUFF_SIZE,
-				  &dma, GFP_KERNEL);
-	...
-	if (pdu_ddt_init(spacc->dptr, &ddt, 1)) {
-		kfree(buf);
-		dma_free_coherent(spacc->dptr, SPACC_TEST_DMA_BUFF_SIZE,
-				  virt, dma);
-		return -EIO;
-	}
-	...
-			ret =3D spacc_wait_for_job_completion(spacc, virt,
-							    md[alg], &match);
-			if (ret)
-				goto err_timeout;
-	...
-	kfree(buf);
-	pdu_ddt_free(&ddt);
-	dma_free_coherent(spacc->dptr, SPACC_TEST_DMA_BUFF_SIZE,
-			  virt, dma);
-
-	return spacc->config.string_size ? 0 : -ENODEV;
-
-err_timeout:
-	dev_err(spacc->dptr,
-		"XOF autodetect job timed out, engine not responding\n");
-	kfree(buf);
-	return -ETIMEDOUT;
-}
-
-When spacc_wait_for_job_completion() times out during spacc_init(),
-err_timeout only frees buf, omitting pdu_ddt_free(&ddt),
-dma_free_coherent(), and the register cleanup done on the normal exit path.
-The error unwind in spacc_init_device() then calls pdu_mem_deinit(), which
-calls dma_pool_destroy(priv->ddt4_pool) while ddt.virt is still allocated
-from that pool.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261118063504.8352=
-59-1-pavitrakumarm@vayavyalabs.com?part=3D4
