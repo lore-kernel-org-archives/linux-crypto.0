@@ -1,47 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795017930;
-	b=e9Imj/yhlSEgKIM5O4RMfpLOF3OXNLlBS0p9wpiyNnsH9l3oAi/pUWSQYyR7VRzKT0+H
-	 k0/y9I7mbhbEJmbxJNiFvCHCb8dA5g7PerqWItBAK7g1eYG80/wLiXw4QzTAxnjCsN30V
-	 hNdLOT85349cmC49hwvmHhEy8s0Ch4H8Jm71QMpL3jMKqIvb9O5WFEbz1utnm5fnbLsrY
-	 tDkLiw/ufjXzuA/klwue6ojarwaqjJWOSLS246prwLGEgHtB5f2qmST8BY/PYZfglz1T4
-	 fxfJXtXrQFQQa4AE7vLODCa/9Oq6HflA9OgpvgvCcK7B/cJ4yqEYDlGYc6vKagWfX1w==
+	t=1795019394;
+	b=Bkc+l0YK7dFRxqIl7yOYX4WjAYjESHmzFRvYud2Z53vzyjRgq6ubawQYwPG7nJBt60sI
+	 nvD9fPybZcgjwzh6U6+NOqFtpYI6bJHX7z92FWn4PBTZeg2el+gF4DZzUyD6LdYo6+yVP
+	 CaC8XND9nMCgoTXitUC96YRZNcFIf3lBRvkEB2EwW9DRoeiaGOQ144UryEG7JQCTuVNJ1
+	 eccYZq+awprarFDGZyO8VFek2KiT0jMcMr0oIo726D/JZpkTYNEg1Jfdj0vlxse4TyS9S
+	 34ibNfkt8RWIPZoIB/grzu3sk1JfbhbiyNCG4RnwFyyN1Ed+LQvE0LXJlswuWUpIOZg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795017930;
-	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:Content-Language:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=HRPLTzRrv6fW92M9cJ9cmOC6B1lii9nz4yl+pVUSZMo=;
-	b=uEKy7pcJztadS9IUbc3a67W15vbH9TQBtuKMGzMZIYfPo5Z2CR9pdYU1+HZDSie7tBGb
-	 8HfSdghHdYzT2EYUpfcX4t2ICcflXnjHQ8lahc0odhXoJ56fJg7l9BtbyLYEiJVyXkR2Z
-	 CWRb8ORwvEb8v72O8of50vFE1xdxVRHtibZ2R0uxmiyEveU/I4KEJxbH5d9VR86D5sZHJ
-	 o4yr2JC37gIUEEeSFM2mGGuwSEtenWHviBXJv8EpxyepvSmSyBvJjPbhkrXJ2bThxnpDy
-	 sZFiiYnd2QObhJDGAOtb7ctEuzHFnRP93Dd3Z9DHkgZ6pNgf0FSsEKgr39OKO/H7HbQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795019394;
+	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
+	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type:Content-Transfer-Encoding;
+	bh=mpQ14+GdLtaXBs1vAiS/H/Eb+nDbMBoHEA7knBdij5w=;
+	b=Ux/fdoAfuBW5vt4hpzPMh0Oa/qKzwr37CciBdPbdaMer9KYUwSOddoFNC4m2oq1Q2++I
+	 kd9OHN+AoI/kr7mSD9RrOOLoU45c7YFkpLUJqC7DqU8W9DMKQt72KR4vk0w58bHbsbXCx
+	 TOaIvFl4fR+ie/+uY9bOYQexHHZ+/MVEkDi891SMnTN+HRRQTLJQm15BNhoAuNIoZD/L7
+	 BzGmVAp8vPZyC13Zp9M6oiHApVCxQd3FQZgicrFwHdcwtoyJoypRCTawMZsP5Z17DbAiI
+	 kpbdwV02DvZXPnqhfwbfquajMF+hR7U1wHB7LWzLP0jbhxbJ7EPs25ORfXAeku6dNkA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aMdTnBOn;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=itVYuwkl;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C50606A330;
-	Wed, 18 Nov 2026 16:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA69606A331
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Nov 2026 16:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aMdTnBOn
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9C0C1F000C4;
-	Wed, 18 Nov 2026 16:05:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=itVYuwkl
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A8171F000CC
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Nov 2026 16:29:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795017930;
-	bh=HRPLTzRrv6fW92M9cJ9cmOC6B1lii9nz4yl+pVUSZMo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=aMdTnBOn7BZx3f1c4qgSwoVvjMJaTayBxmi4P3UkT7TnMM/iJv8x2xEdcIsJo+x8z
-	 tMbCL4heAIMiLzwrsfM/WSReHyVwienwz5th5/5HOmvkOcktKP+oQ1iHyYE7E4Cg8B
-	 k8SAmQcCOodgOovdeuFUQ3H1f0BdxX5I14K0MmCjZmTZm3+04ccfbL9rCcGk4/KFLC
-	 a/wThZRyEqYb3tJ8padldJDYUvj6dNzWC9KIsiAsPQQcCEmdWkZC6gb8hUlM5c8cd/
-	 YfBpWgrBTWuYYXXPBkM9Q97yz6vxyd/w6C4xu7x3KbGLlNBy2nF01m4mYs8OmJuiuN
-	 vVrp/jEkokpbA==
-Message-ID: <8dc563e1-b5f4-49d3-80bc-5bd54e58392b@kernel.org>
-Date: Wed, 18 Nov 2026 10:05:28 -0600
+	s=k20260515; t=1795019394;
+	bh=mpQ14+GdLtaXBs1vAiS/H/Eb+nDbMBoHEA7knBdij5w=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=itVYuwklDspWlq8vJuLDAGA1BJFiROvjYjwtu00NPmaoNsGBI5pGaiAdYCY1cACQb
+	 4Q18QkeAg9JWB6kAb9BJTRYWmJu6TuGhElVXjyNRk/2FXq50BAKbQhWCo/Mw4/G7uA
+	 h2aMq/hHt8ZWXhgzm//Kl3bnIb4N/BjwXeNZfymnIS565TxpxZpX08OxXOfy2wvvnQ
+	 /rL8F6qCgjcNq7Ri58UZB5FN45K7tzPXg6AlU8WLPppmZTNhY9netCBkEWMuVZeXey
+	 vlXqRXY19PYz7uoAtqkFPfkx61Ls+RQJ7BAxD01bsi+gOafvtSGcqHdJVoo41K0Ydt
+	 IfAT6oASoNycA==
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfauth.ams.internal (Postfix) with ESMTP id A87E1198003A;
+	Wed, 18 Nov 2026 11:29:52 -0500 (EST)
+Received: from ams-imap-11 ([10.64.2.31])
+  by ams-compute-02.internal (MEProxy); Wed, 18 Nov 2026 11:29:52 -0500
+X-ME-Sender: <xms:f9L9apq19Ryr7KH_yz1NKM0WVlgkqCDGn_CUqRo_i2k_5FLZJCGvZA>
+    <xme:f9L9ameCTefFfKes1BM-R9tXrz_bgszNxMo5ZLiMSDewgbdcDNCX37euaSaRH3gmf
+    zS0xpvH8peQmc26kIKvnoZ7FGFuTrM0RvUKcZrVKv-Myv2ttp2zUT6j>
+X-ME-Proxy-Cause: dmFkZTFAAJmpZpKPLgk3sScaSkQC9ZGHxDZWVPj0UB744Jregi1PyrTsYpTk8DjlRmYKsP
+    xOAibSBE6NizBm1jUjeUnR/gwFgv84q4UZhl/va8bLULEPu1wpnSDNH91/ptYGybkwB0Dq
+    Ox4KpPg+B3XHmoADUyjj6eeVma37k6LJdCJcHy5+NTChCRa8M346xYL8KpAGQgupRw1wGo
+    8dRYUMFha8SEb7LhMQqsuR9j0EY3+2I0jvtF1tKSC0A90KJ5D+9OBB609tR5AI/7Y9uUhH
+    mb6g+leHAQJnW0pg5z7S8QEMsuSZidbg+hWP5LKuUOzm+GfxnEocEuJ0kavRDDTXLaFZis
+    UBxrdwr3mDp3JUwKd1My4ExGHTn1305j6DDGwsCLWu7BERhi19AWg6jR1kUpMJgGfceqnH
+    rKlzwttwcsn8AMvrToeHyk8GhLpei4aV88BwdWpcfGqv38TuGovCC80XGAJ4y3IA77r13Y
+    sctkSUjnBPLQZQyZvNwKrgaKjDBWdHudkBld/UeFMLtgSsFihLLUyXz4fCr0HCoPgphNAv
+    +EDMHFmSvak/PvsJ2Umd8kbKbfMzlhurPYTmk8p97dbs2uSwMu712R6CLYsppowJ00rhd5
+    /ybwCsRYphByL38iPr58OTcVGPE8+cNwPOdh4WCaoJmeLiHTiSo3xlz/t+fg
+X-ME-Proxy: <xmx:gNL9aq27Gkfmzrmg3I6nY_fQ-y2YnfpF_jmeU85DI41TCwERolgt6Q>
+    <xmx:gNL9amCwd1jJzdM9PyO__0YykA8zNeaiuTt0bG6daqVFR-OiKNXe0g>
+    <xmx:gNL9auegJWLbuu6AuBsd2oxi2u44fAhleastDa9sbIlBeXjATiTy1Q>
+    <xmx:gNL9ar5N-jaGZnSsAdScJ_btqRjM_7BugcLp442Q0ratAFWEGNjx9g>
+    <xmx:gNL9apUoVwK7fM7E_seOREoSGMCJFEDmhESFxB8hHtCgf9gsyQKibXxU>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 5AD05F80093; Wed, 18 Nov 2026 11:29:51 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -51,76 +77,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] crypto: ccp - fix misc_register() failure paths in
- SEV and SFS
-Content-Language: en-US
-To: Kim Phillips <kim.phillips@amd.com>,
- Tom Lendacky <thomas.lendacky@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>
-Cc: Ashish Kalra <ashish.kalra@amd.com>,
- Rijo Thomas <Rijo-john.Thomas@amd.com>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20261117221901.746427-1-kim.phillips@amd.com>
-From: Mario Limonciello <superm1@kernel.org>
-In-Reply-To: <20261117221901.746427-1-kim.phillips@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Wed, 18 Nov 2026 17:29:30 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Shreesh Adiga" <16567adigashreesh@gmail.com>,
+ "Eric Biggers" <ebiggers@kernel.org>, "Demian Shulhan" <demyansh@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <de1538b0-bb42-4a7f-af9d-f7311a452fe1@app.fastmail.com>
+In-Reply-To: <20261118160110.1662470-1-16567adigashreesh@gmail.com>
+References: <20261118160110.1662470-1-16567adigashreesh@gmail.com>
+Subject: Re: [PATCH] lib/crc: Add 4-way folding in NEON crc64_nvme implementation
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
+On Wed, 18 Nov 2026, at 17:01, Shreesh Adiga wrote:
+> Use 4-way folding in the shared NEON crc64_nvme for AArch64
+> as well as AArch32. This improves performance by about 2x for 512 byte
+> data size on Cortex-X925.
+>
+> Add similar optimizations from x86 implementation like reducing
+> the 4x to 2x and doing a tail (len >= 32) 2x fold as well as partial
+> block handling to process lengths which are not multiple of 16 bytes.
+>
+> The partial block stage is enabled only for AArch64 as it needs the
+> 128-bit TBL instruction not available in AArch32.
+> Modified the loop dispatch on AArch64 to allow any len >= 128 rather
+> than just multiple of 16 bytes.
+>
+> Modified the pmull intrinsics from crc64-neon.h to use inline
+> assembly as the intrinsic usage was causing the compiler to
+> generate the fold constants via mov+movk+fmov/dup which was about 10
+> instructions for 16-byte constant instead of expected adrp+ld1.
+>
 
-On 11/17/26 16:18, Kim Phillips wrote:
-> sev_misc_init() and sfs_misc_init() both publish their newly allocated
-> sev_misc_dev/sfs_misc_dev to a file-global pointer before registering
-> the misc device, then return early if misc_register() fails.  Neither
-> frees the allocation nor clears the global, and the early return is
-> ahead of the kref_init(), so the embedded refcount is left at the zero
-> from kzalloc_obj().
-> 
-> Both features can be detected on more than one device, and a failure
-> here only aborts the probe of the device that hit it.  The next device
-> to probe therefore sees a stale non-NULL global, takes the else branch,
-> and calls kref_get() on a zeroed refcount:
-> 
->    refcount_t: addition on 0; use-after-free.
-> 
-> The count stays at zero, so the matching kref_put() on teardown warns in
-> the same way and never reaches sev_exit()/sfs_exit().  What is left is a
-> leaked allocation plus a device whose ->misc points at a miscdevice that
-> was never registered, while the driver still reports the feature as
-> available and no /dev/sev or /dev/sfs node exists.
-> 
-> Both patches free the allocation and reset the global on the
-> misc_register() error path.
-> 
-> Note the differing Fixes: tags.  The SEV stale-pointer half goes back to
-> the original SEV support commit, but the allocation was devm_kzalloc()
-> then, so backporting the kfree() that far would turn the leak into a
-> double free; the tag points at the commit from which the fix is safe.
-> 
-> Found by review of the equivalent bug reports; no hardware failure was
-> observed, as misc_register() only fails here on minor exhaustion or an
-> OOM.  Compile-tested on x86_64 with CONFIG_CRYPTO_DEV_SP_PSP=y.
-> 
-> The two patches are independent of each other, and of the pending
-> 
->    https://lore.kernel.org/linux-crypto/20261116203622.615371-1-kim.phillips@amd.com/
-> 
-> which touches psp-dev.c only.  This series applies on top of it, but
-> also applies cleanly to cryptodev master without it.
-> 
-> Kim Phillips (2):
->    crypto: ccp - fix leak and stale misc_dev on SFS misc_register()
->      failure
->    crypto: ccp - fix leak and stale misc_dev on SEV misc_register()
->      failure
-> 
->   drivers/crypto/ccp/sev-dev.c | 5 ++++-
->   drivers/crypto/ccp/sfs.c     | 5 ++++-
->   2 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> 
-> base-commit: 26ca5f34841f0a86d0883664a1c13be89a01d351
-
-Reviewed-by: Mario Limonciello (AMD) <superm1@kernel.org>
+Why is that better?
