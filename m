@@ -1,33 +1,33 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.43.10.250
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795002328;
-	b=sbybTf6RmTJPTyOyPHdmb0Pp34i5G+wVGrGSdKTNoqtZiJoytMolZHcpqpuc8OoWxl0m
-	 yoo8yidgM/HqfD8oNGp2BO9jl6eHOa99STjGvPepL95Udlfl2DsLyzdopSMGI4Hj+EOFk
-	 AhA17noLUXWryPKGj+f4beyWlRIkyBXDdJOInx30WhbtM7D+pgjvqCH14AilTcbMi3YRY
-	 4u3LYcUmrK0/UPrtShgM38QiTaofDHSVIL/N9rsfu+XgqgB6z38JL7u6jrQSrCo6n1kWZ
-	 T8Uz9t7hXEMJOYB0Ae8QwiGNH9/MwT34IAP75o/d573Oxe2zxcZGklP2+6hQfX/+6gw==
+	t=1795002329;
+	b=DhIJdmXPSlx7sE2+FKRQ+ddw0aoQ1w+3KR0ZRQ9mCidOpn4v8uM4NrzjNVRMQDAyvMps
+	 W6r08FTbT4mz50o42A0fis09i4Cm2ufSb+XsiWefl+GXv291TW5mbTGxu7OEncFCRJIfM
+	 kGfnkCPmZvIcLF0LG4eGKnraR1OY+m/77FIe+Z0Rg+GuuAjEVt6WJ4VunXMIH4/XZYO0Q
+	 nZwlW1GrSTR15VOMhUlE3yR1MWIUY4IWm5lBx2HwnOsXlHsCvEe+6FOtUVE0u+7KwNQPt
+	 z1eQlM25WDScae2d8WurU+L4E/CSngCVpANGutSLqQVYI3uMuaEMLRmj2N++seDNqJQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795002328;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795002329;
 	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=TNr17IsDH3CMJAsBddlI8ulC9BfuyexkixP3yKX5G7k=;
-	b=RmWl3FpW+1kNAE1jxET9Q8xJXThaZRtxcWGkoHze9bdo+DZR7rqPHxSqb8WeftrS+WrE
-	 zjl7weVO/UT+X0e0+TzA06IFW5eI9ojlfpxh6uJ97w00of4/RV5b2o2nBAr4C3dofZSVv
-	 XHTpXKjljyCt44OGOejxUYac5EBf2JuID1zNrAZTN2pXKV6TdZKA6QMppD/tpa0ptm9Jp
-	 BezR/ez6f6HR+87Gj4X+OYaImRAc/yQ/uaAvrJcrZjHwMScwN+r2iI0xfQqsb1l+DYfv0
-	 NyZEpJ6A55UKLns7+wlQ/XprB/Jo1onF+FUW0QemBijfTa3ZRO9s1+kI5GtJ87sJUCQ==
+	bh=n/4YuWrfAQqk/xsIOFX5QWbhI71JUm7olf1s2Xf7Gwc=;
+	b=ECSEtO7FMhGBsi9kvsGbkg/Dgm7mYOx+ZNlDHjlZZ163RmDAdS+OROrleA1RhYbR/w5Z
+	 jNeBrKVt/nNMBWLrDpvSJbUD7KnYDs/LZ/hwd1K7csQeTvMsubOuhfb3alMkdjJ+JLFiX
+	 7G1eHIwyaY9ujH+oOKYE9jmQBvEGffgMEjz5JrcJvQ43O6Rc2z/Qu8cPE6WPRxlAolav4
+	 33awUz8Mn08q8zHnh50yTFNOLc2M9MdWo9ryLrqKup5m+rZDKXL9Rkg3gQqfLeFdrIB1t
+	 CRSc+g2ky2zT+1ebOF/eMR+E1TDz/cwKiAGS96HM8OmlfJU9aA5Zxjw48pWGqNzHVow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=altlinux.org;
 	spf=fail smtp.mailfrom=altlinux.org;
 	arc=none smtp.remote-ip=193.43.10.250
 Received: from basalt.external.altlinux.org (unknown [193.43.10.250])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83985606A32C;
-	Wed, 18 Nov 2026 11:45:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83985606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C76C60A2637;
+	Wed, 18 Nov 2026 11:45:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2C76C60A2637
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=altlinux.org
 Received: by basalt.external.altlinux.org (Postfix, from userid 1137)
-	id D76372DF335; Wed, 18 Nov 2026 14:45:18 +0300 (MSK)
+	id 19D9E2DF355; Wed, 18 Nov 2026 14:45:19 +0300 (MSK)
 From: Alexey Shabalin <shaba@altlinux.org>
 To: devel-kernel@altlinux.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -43,9 +43,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-nfs@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH 6.12/sisyphus 03/29] crypto/krb5: Add an API to query the layout of the crypto section
-Date: Wed, 18 Nov 2026 14:44:52 +0300
-Message-ID: <20261118114518.3605222-4-shaba@altlinux.org>
+Subject: [PATCH 6.12/sisyphus 19/29] crypto/krb5: Add API Documentation
+Date: Wed, 18 Nov 2026 14:45:08 +0300
+Message-ID: <20261118114518.3605222-20-shaba@altlinux.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20261118114518.3605222-1-shaba@altlinux.org>
 References: <20261118114518.3605222-1-shaba@altlinux.org>
@@ -62,16 +62,7 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-Provide some functions to allow the called to find out about the layout of
-the crypto section:
-
- (1) Calculate, for a given size of data, how big a buffer will be
-     required to hold it and where the data will be within it.
-
- (2) Calculate, for an amount of buffer, what's the maximum size of data
-     that will fit therein, and where it will start.
-
- (3) Determine where the data will be in a received message.
+Add API documentation for the kerberos crypto library.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
@@ -86,147 +77,290 @@ cc: linux-afs@lists.infradead.org
 cc: linux-nfs@vger.kernel.org
 cc: linux-crypto@vger.kernel.org
 cc: netdev@vger.kernel.org
-(cherry picked from commit 025ac491f4eeb48c03353719f0de20a6db36b826)
+(cherry picked from commit 903be6989032267550450bbb9132225e12f61312)
 ---
- crypto/krb5/krb5_api.c | 108 +++++++++++++++++++++++++++++++++++++++++
- include/crypto/krb5.h  |   9 ++++
- 2 files changed, 117 insertions(+)
+ Documentation/crypto/index.rst |   1 +
+ Documentation/crypto/krb5.rst  | 262 +++++++++++++++++++++++++++++++++
+ 2 files changed, 263 insertions(+)
+ create mode 100644 Documentation/crypto/krb5.rst
 
-diff --git a/crypto/krb5/krb5_api.c b/crypto/krb5/krb5_api.c
-index 5c1cd5d07fc3..f6d1bc813daa 100644
---- a/crypto/krb5/krb5_api.c
-+++ b/crypto/krb5/krb5_api.c
-@@ -40,3 +40,111 @@ const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype)
- 	return NULL;
- }
- EXPORT_SYMBOL(crypto_krb5_find_enctype);
+diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
+index 92eec78b5713..100b47d049c0 100644
+--- a/Documentation/crypto/index.rst
++++ b/Documentation/crypto/index.rst
+@@ -26,3 +26,4 @@ for cryptographic use cases, as well as programming examples.
+    api-samples
+    descore-readme
+    device_drivers/index
++   krb5
+diff --git a/Documentation/crypto/krb5.rst b/Documentation/crypto/krb5.rst
+new file mode 100644
+index 000000000000..beffa0133446
+--- /dev/null
++++ b/Documentation/crypto/krb5.rst
+@@ -0,0 +1,262 @@
++.. SPDX-License-Identifier: GPL-2.0
 +
-+/**
-+ * crypto_krb5_how_much_buffer - Work out how much buffer is required for an amount of data
-+ * @krb5: The encoding to use.
-+ * @mode: The mode in which to operated (checksum/encrypt)
-+ * @data_size: How much data we want to allow for
-+ * @_offset: Where to place the offset into the buffer
-+ *
-+ * Calculate how much buffer space is required to wrap a given amount of data.
-+ * This allows for a confounder, padding and checksum as appropriate.  The
-+ * amount of buffer required is returned and the offset into the buffer at
-+ * which the data will start is placed in *_offset.
-+ */
-+size_t crypto_krb5_how_much_buffer(const struct krb5_enctype *krb5,
-+				   enum krb5_crypto_mode mode,
-+				   size_t data_size, size_t *_offset)
-+{
-+	switch (mode) {
-+	case KRB5_CHECKSUM_MODE:
-+		*_offset = krb5->cksum_len;
-+		return krb5->cksum_len + data_size;
++===========================
++Kerberos V Cryptography API
++===========================
 +
-+	case KRB5_ENCRYPT_MODE:
-+		*_offset = krb5->conf_len;
-+		return krb5->conf_len + data_size + krb5->cksum_len;
++.. Contents:
 +
-+	default:
-+		WARN_ON(1);
-+		*_offset = 0;
-+		return 0;
-+	}
-+}
-+EXPORT_SYMBOL(crypto_krb5_how_much_buffer);
++  - Overview.
++    - Small Buffer.
++  - Encoding Type.
++  - Key Derivation.
++    - PRF+ Calculation.
++    - Kc, Ke And Ki Derivation.
++  - Crypto Functions.
++    - Preparation Functions.
++    - Encryption Mode.
++    - Checksum Mode.
++  - The krb5enc AEAD algorithm
 +
-+/**
-+ * crypto_krb5_how_much_data - Work out how much data can fit in an amount of buffer
-+ * @krb5: The encoding to use.
-+ * @mode: The mode in which to operated (checksum/encrypt)
-+ * @_buffer_size: How much buffer we want to allow for (may be reduced)
-+ * @_offset: Where to place the offset into the buffer
-+ *
-+ * Calculate how much data can be fitted into given amount of buffer.  This
-+ * allows for a confounder, padding and checksum as appropriate.  The amount of
-+ * data that will fit is returned, the amount of buffer required is shrunk to
-+ * allow for alignment and the offset into the buffer at which the data will
-+ * start is placed in *_offset.
-+ */
-+size_t crypto_krb5_how_much_data(const struct krb5_enctype *krb5,
-+				 enum krb5_crypto_mode mode,
-+				 size_t *_buffer_size, size_t *_offset)
-+{
-+	size_t buffer_size = *_buffer_size, data_size;
++Overview
++========
 +
-+	switch (mode) {
-+	case KRB5_CHECKSUM_MODE:
-+		if (WARN_ON(buffer_size < krb5->cksum_len + 1))
-+			goto bad;
-+		*_offset = krb5->cksum_len;
-+		return buffer_size - krb5->cksum_len;
++This API provides Kerberos 5-style cryptography for key derivation, encryption
++and checksumming for use in network filesystems and can be used to implement
++the low-level crypto that's needed for GSSAPI.
 +
-+	case KRB5_ENCRYPT_MODE:
-+		if (WARN_ON(buffer_size < krb5->conf_len + 1 + krb5->cksum_len))
-+			goto bad;
-+		data_size = buffer_size - krb5->cksum_len;
-+		*_offset = krb5->conf_len;
-+		return data_size - krb5->conf_len;
++The following crypto types are supported::
 +
-+	default:
-+		WARN_ON(1);
-+		goto bad;
-+	}
++	KRB5_ENCTYPE_AES128_CTS_HMAC_SHA1_96
++	KRB5_ENCTYPE_AES256_CTS_HMAC_SHA1_96
++	KRB5_ENCTYPE_AES128_CTS_HMAC_SHA256_128
++	KRB5_ENCTYPE_AES256_CTS_HMAC_SHA384_192
++	KRB5_ENCTYPE_CAMELLIA128_CTS_CMAC
++	KRB5_ENCTYPE_CAMELLIA256_CTS_CMAC
 +
-+bad:
-+	*_offset = 0;
-+	return 0;
-+}
-+EXPORT_SYMBOL(crypto_krb5_how_much_data);
++	KRB5_CKSUMTYPE_HMAC_SHA1_96_AES128
++	KRB5_CKSUMTYPE_HMAC_SHA1_96_AES256
++	KRB5_CKSUMTYPE_CMAC_CAMELLIA128
++	KRB5_CKSUMTYPE_CMAC_CAMELLIA256
++	KRB5_CKSUMTYPE_HMAC_SHA256_128_AES128
++	KRB5_CKSUMTYPE_HMAC_SHA384_192_AES256
 +
-+/**
-+ * crypto_krb5_where_is_the_data - Find the data in a decrypted message
-+ * @krb5: The encoding to use.
-+ * @mode: Mode of operation
-+ * @_offset: Offset of the secure blob in the buffer; updated to data offset.
-+ * @_len: The length of the secure blob; updated to data length.
-+ *
-+ * Find the offset and size of the data in a secure message so that this
-+ * information can be used in the metadata buffer which will get added to the
-+ * digest by crypto_krb5_verify_mic().
-+ */
-+void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+				   enum krb5_crypto_mode mode,
-+				   size_t *_offset, size_t *_len)
-+{
-+	switch (mode) {
-+	case KRB5_CHECKSUM_MODE:
-+		*_offset += krb5->cksum_len;
-+		*_len -= krb5->cksum_len;
-+		return;
-+	case KRB5_ENCRYPT_MODE:
-+		*_offset += krb5->conf_len;
-+		*_len -= krb5->conf_len + krb5->cksum_len;
-+		return;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return;
-+	}
-+}
-+EXPORT_SYMBOL(crypto_krb5_where_is_the_data);
-diff --git a/include/crypto/krb5.h b/include/crypto/krb5.h
-index 8fa6715ab35b..b414141b8b42 100644
---- a/include/crypto/krb5.h
-+++ b/include/crypto/krb5.h
-@@ -101,5 +101,14 @@ struct krb5_enctype {
-  * krb5_api.c
-  */
- const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
-+size_t crypto_krb5_how_much_buffer(const struct krb5_enctype *krb5,
-+				   enum krb5_crypto_mode mode,
-+				   size_t data_size, size_t *_offset);
-+size_t crypto_krb5_how_much_data(const struct krb5_enctype *krb5,
-+				 enum krb5_crypto_mode mode,
-+				 size_t *_buffer_size, size_t *_offset);
-+void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+				   enum krb5_crypto_mode mode,
++The API can be included by::
++
++	#include <crypto/krb5.h>
++
++Small Buffer
++------------
++
++To pass small pieces of data about, such as keys, a buffer structure is
++defined, giving a pointer to the data and the size of that data::
++
++	struct krb5_buffer {
++		unsigned int	len;
++		void		*data;
++	};
++
++Encoding Type
++=============
++
++The encoding type is defined by the following structure::
++
++	struct krb5_enctype {
++		int		etype;
++		int		ctype;
++		const char	*name;
++		u16		key_bytes;
++		u16		key_len;
++		u16		Kc_len;
++		u16		Ke_len;
++		u16		Ki_len;
++		u16		prf_len;
++		u16		block_len;
++		u16		conf_len;
++		u16		cksum_len;
++		...
++	};
++
++The fields of interest to the user of the API are as follows:
++
++  * ``etype`` and ``ctype`` indicate the protocol number for this encoding
++    type for encryption and checksumming respectively.  They hold
++    ``KRB5_ENCTYPE_*`` and ``KRB5_CKSUMTYPE_*`` constants.
++
++  * ``name`` is the formal name of the encoding.
++
++  * ``key_len`` and ``key_bytes`` are the input key length and the derived key
++    length.  (I think they only differ for DES, which isn't supported here).
++
++  * ``Kc_len``, ``Ke_len`` and ``Ki_len`` are the sizes of the derived Kc, Ke
++    and Ki keys.  Kc is used for in checksum mode; Ke and Ki are used in
++    encryption mode.
++
++  * ``prf_len`` is the size of the result from the PRF+ function calculation.
++
++  * ``block_len``, ``conf_len`` and ``cksum_len`` are the encryption block
++    length, confounder length and checksum length respectively.  All three are
++    used in encryption mode, but only the checksum length is used in checksum
++    mode.
++
++The encoding type is looked up by number using the following function::
++
++	const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
++
++Key Derivation
++==============
++
++Once the application has selected an encryption type, the keys that will be
++used to do the actual crypto can be derived from the transport key.
++
++PRF+ Calculation
++----------------
++
++To aid in key derivation, a function to calculate the Kerberos GSSAPI
++mechanism's PRF+ is provided::
++
++	int crypto_krb5_calc_PRFplus(const struct krb5_enctype *krb5,
++				     const struct krb5_buffer *K,
++				     unsigned int L,
++				     const struct krb5_buffer *S,
++				     struct krb5_buffer *result,
++				     gfp_t gfp);
++
++This can be used to derive the transport key from a source key plus additional
++data to limit its use.
++
++Crypto Functions
++================
++
++Once the keys have been derived, crypto can be performed on the data.  The
++caller must leave gaps in the buffer for the storage of the confounder (if
++needed) and the checksum when preparing a message for transmission.  An enum
++and a pair of functions are provided to aid in this::
++
++	enum krb5_crypto_mode {
++		KRB5_CHECKSUM_MODE,
++		KRB5_ENCRYPT_MODE,
++	};
++
++	size_t crypto_krb5_how_much_buffer(const struct krb5_enctype *krb5,
++					   enum krb5_crypto_mode mode,
++					   size_t data_size, size_t *_offset);
++
++	size_t crypto_krb5_how_much_data(const struct krb5_enctype *krb5,
++					 enum krb5_crypto_mode mode,
++					 size_t *_buffer_size, size_t *_offset);
++
++All these functions take the encoding type and an indication the mode of crypto
++(checksum-only or full encryption).
++
++The first function returns how big the buffer will need to be to house a given
++amount of data; the second function returns how much data will fit in a buffer
++of a particular size, and adjusts down the size of the required buffer
++accordingly.  In both cases, the offset of the data within the buffer is also
++returned.
++
++When a message has been received, the location and size of the data with the
++message can be determined by calling::
++
++	void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
++					   enum krb5_crypto_mode mode,
++					   size_t *_offset, size_t *_len);
++
++The caller provides the offset and length of the message to the function, which
++then alters those values to indicate the region containing the data (plus any
++padding).  It is up to the caller to determine how much padding there is.
++
++Preparation Functions
++---------------------
++
++Two functions are provided to allocated and prepare a crypto object for use by
++the action functions::
++
++	struct crypto_aead *
++	crypto_krb5_prepare_encryption(const struct krb5_enctype *krb5,
++				       const struct krb5_buffer *TK,
++				       u32 usage, gfp_t gfp);
++	struct crypto_shash *
++	crypto_krb5_prepare_checksum(const struct krb5_enctype *krb5,
++				     const struct krb5_buffer *TK,
++				     u32 usage, gfp_t gfp);
++
++Both of these functions take the encoding type, the transport key and the usage
++value used to derive the appropriate subkey(s).  They create an appropriate
++crypto object, an AEAD template for encryption and a synchronous hash for
++checksumming, set the key(s) on it and configure it.  The caller is expected to
++pass these handles to the action functions below.
++
++Encryption Mode
++---------------
++
++A pair of functions are provided to encrypt and decrypt a message::
++
++	ssize_t crypto_krb5_encrypt(const struct krb5_enctype *krb5,
++				    struct crypto_aead *aead,
++				    struct scatterlist *sg, unsigned int nr_sg,
++				    size_t sg_len,
++				    size_t data_offset, size_t data_len,
++				    bool preconfounded);
++	int crypto_krb5_decrypt(const struct krb5_enctype *krb5,
++				struct crypto_aead *aead,
++				struct scatterlist *sg, unsigned int nr_sg,
++				size_t *_offset, size_t *_len);
++
++In both cases, the input and output buffers are indicated by the same
++scatterlist.
++
++For the encryption function, the output buffer may be larger than is needed
++(the amount of output generated is returned) and the location and size of the
++data are indicated (which must match the encoding).  If no confounder is set,
++the function will insert one.
++
++For the decryption function, the offset and length of the message in buffer are
++supplied and these are shrunk to fit the data.  The decryption function will
++verify any checksums within the message and give an error if they don't match.
++
++Checksum Mode
++-------------
++
++A pair of function are provided to generate the checksum on a message and to
++verify that checksum::
++
++	ssize_t crypto_krb5_get_mic(const struct krb5_enctype *krb5,
++				    struct crypto_shash *shash,
++				    const struct krb5_buffer *metadata,
++				    struct scatterlist *sg, unsigned int nr_sg,
++				    size_t sg_len,
++				    size_t data_offset, size_t data_len);
++	int crypto_krb5_verify_mic(const struct krb5_enctype *krb5,
++				   struct crypto_shash *shash,
++				   const struct krb5_buffer *metadata,
++				   struct scatterlist *sg, unsigned int nr_sg,
 +				   size_t *_offset, size_t *_len);
- 
- #endif /* _CRYPTO_KRB5_H */
++
++In both cases, the input and output buffers are indicated by the same
++scatterlist.  Additional metadata can be passed in which will get added to the
++hash before the data.
++
++For the get_mic function, the output buffer may be larger than is needed (the
++amount of output generated is returned) and the location and size of the data
++are indicated (which must match the encoding).
++
++For the verification function, the offset and length of the message in buffer
++are supplied and these are shrunk to fit the data.  An error will be returned
++if the checksums don't match.
++
++The krb5enc AEAD algorithm
++==========================
++
++A template AEAD crypto algorithm, called "krb5enc", is provided that hashes the
++plaintext before encrypting it (the reverse of authenc).  The handle returned
++by ``crypto_krb5_prepare_encryption()`` may be one of these, but there's no
++requirement for the user of this API to interact with it directly.
++
++For reference, its key format begins with a BE32 of the format number.  Only
++format 1 is provided and that continues with a BE32 of the Ke key length
++followed by a BE32 of the Ki key length, followed by the bytes from the Ke key
++and then the Ki key.
++
++Using specifically ordered words means that the static test data doesn't
++require byteswapping.
 -- 
 2.50.1
 
