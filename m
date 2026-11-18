@@ -1,65 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795021699;
-	b=YBaCcSzx/AV6jgYERdpToHHQU9ZewCrMltkuAG5NUU2oPtIO7w3Ied5SxeTxHA/e9HUE
-	 4VNcvhtaVsI4vukc3CUgGCaXqnKQlOPIMoPSXyHcgLvixgcQTFPvg++SjDBsoYZp5nRYq
-	 AWHrTtv/E2MOs92M53uL8p7nXF05pvasENFVjWIJNSXjscaAuLJhyDdkysVLZ7PFPaI4G
-	 FrnDizpQoXejZEk1q/2Eay/6i+hIgh7+Igvy3PsFv/qaU5dcvW0sJ8HYUWLla/EPWTGHK
-	 FaSJE2FzHd0Zr19E8uBybxqhvBIoqB+BlRHaT8bjUaWhZ7qfavSLxir93Y7W4fIdHNg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795021699;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer;
-	bh=7azEG4KUAyB1sP7mjOcSqRsl7y5AO0uY6cBUlzfxq4A=;
-	b=3Y2XwZ8SzBIE4yqIAJCOxiba2Yw+Af5d34dNERSNOY9RKQ4Vlgiht5X6BQWJowv2fG9p
-	 fcAu/8hve/IVp4hsFW6HEeu1xNfB4VheFC2VB+4iiwvWnkaEWUAE0m12rPMLKiVBp0UN+
-	 SYlj3/rTKge+aJtsMEc1aTOVcDN/x434mFfePRt/pehzjv3q6cgMFyTa7ec/KFIgSim00
-	 bLl5/xe1wzqNatmTKHEqO62ABM2gRIMIL4Dhnr3+kzbbZ/yz1vOhDyuQh3WouEslBG6FZ
-	 hWek6w+pv/pBnoLKZGaGozhV837yq5uyh8SnU6ZpbTqw4C5i5S7EHMW/wcMvs1349Cg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YzLiQr3N;
-	arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795024324;
+	b=3GnljN+KOKtDXt/JXx89G9hV5ZQXt3/4J4hq1Z2IgZRPsbg2eGg1yThs+ge+vqq1b8Sk
+	 +yxGNTdCj4ZoLOiVCo1va1k/pyxEsysoWIxHp4CZMafBtFnujBURgrK2LvQLLcC8lzJif
+	 VCtJAPXUU1YX6WYICgJ9WwPy7Xf4eP81H0E6K71wrQM11q5KGLiMWTEbZwBxaWBNEByM7
+	 aFmzl8w6mlZDeyhQLTQS1CBRgADDHD8yJEaEgdia4ddojxsRz92KfDL2O2Kz3E6jWL/ND
+	 +XJYoQEYuiN4+z7p3vM1NTSVbNGL8KJdpeIFGu76biVV9iDk0xOFz1Gu5uKvMJvNYQw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795024324;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=dNzk52VvT+ieD7HHNJgyt12mlMnxt57ONA25ZqvsUgs=;
+	b=hJyrM8EKbAyd65Qko7lHRc9eT+J67f5+wHwgSlDmApG/Nih33p01PiQ7ay438Y2qWvd4
+	 KwRfA5p0H5ejqcDkjM+VpItfvBh3sjgvMQKFSh5pacx5autl/W0TEXNrz8mPvshhRWUCN
+	 0xlAZRCtEv3YyCce+jOoPfKbXexfJqy+RLkm4aOBjp7kujgY+SKQ9Ib3W86J3DA4D6WKp
+	 IQ+TkPuGX1XpzszUJ7tJ3sR9lSa52NuZnV3x3INcK/p/ydfUsgEZ2QdZFVb24ODAWdQEV
+	 2LhMm9C+l2DEYp4PMw/x8R9gE1VWjeS1uwfkqi5yliI8eBhtjG6cS7644HD0Wkf1rew==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cXpYSHKB;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8710F606A32C;
-	Wed, 18 Nov 2026 17:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AFF60A2610;
+	Wed, 18 Nov 2026 17:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YzLiQr3N
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1E581F000C5;
-	Wed, 18 Nov 2026 17:08:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cXpYSHKB
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795024324;
+	b=cEE7nXWyfjhdkXwlLTLCewpIlfVbnQBLav8WHjCR/wzjHQYqGDil1ChE2HAPJTsx8RTK
+	 +8vgNJ4l7g67Uaprpqu0ZN1q97abZ7Gw01dcT3xmbDwxYDrkMchnPhkpgVSZ2rx3Ki0O5
+	 +XnxtGwL521Pl8cRV8Br3tLsi+rMURGYtC59Af9yKEuT5krrsZFZi3KJm5KnzWKQ/xEfD
+	 4KVzydq2o0oMzZSkwXbwldRksnhZ4jscz3x1ari59wMBOLjeUeUZ1Ev6LCar+IGN/Wvft
+	 PvVYWya9CVC+NYil6VJsekdxHAbw162+W6A6LAPcXPKJcW/qj8/Zh8VZ+F0w1Q/t+kw==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795024324;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=dNzk52VvT+ieD7HHNJgyt12mlMnxt57ONA25ZqvsUgs=;
+	b=L2wQhMjfkf+rv/7BKUfaR9BpvVtk+A+FU17BwjGfG7DWoiQi8TM1Nyd918GkXVqaSWGo
+	 mEqRzPJhkaoKqz1jKZAgb5Aver9v5JVYSQh3/vvfNa4mj8z5vU0DslyMfv5XQv5Nq5mGC
+	 N/aQpR6MWA86Wip4ebB5cBlM09OS5kH39Cx+ncEd9ZHVZ18CZ1jaDua5snhN0GKEFFFFc
+	 W2C7IppUeIoAfRs3ikADamjTtzJrIFctheIxhAFB7WhL0xTEjMY/W+Z5CesqV4MEqldWJ
+	 CTCMPJhLpYPbiGfYH8Bp/yaZNXgFTvZWKdtW063xq54SirHzN33O2Mc1so9ktDtO3Bw==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id 9505C1F000C4;
+	Wed, 18 Nov 2026 17:52:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795021699;
-	bh=7azEG4KUAyB1sP7mjOcSqRsl7y5AO0uY6cBUlzfxq4A=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=YzLiQr3NKs/FdPe9YkBNn2yrMmEl9lA5sDBWfGqQMcxfR6LfC+/HlARUMsQJIDrgs
-	 H3V7T79tpzQIsSIN2b6f/vv1mG/nljpt8jsRLbAIMm6UpwNTKEm+hzpjQ8BhwYap16
-	 NZfycQvYCHab7ml7xb2uddCkBMvwtiU5nz+WBBV1rtjNWHTmJH15I56BB5FdwRqeiT
-	 qeG4CYMKTOiT1LqbbT/kJ3PrWKZOVuInsvmM90fEca75W2JQG8aWA9L49m66Rn+o53
-	 GEe9DwZhjgpaM2EoYR3G7ex01IJ588P3T0e6y32/QhcMfZrrdPxE3JN4eBUWCoWnst
-	 X4DAspsvFtxBw==
-From: Lee Jones <lee@kernel.org>
-To: Lee Jones <lee@kernel.org>, Chen-Yu Tsai <wens@kernel.org>, 
- David Rhodes <david.rhodes@cirrus.com>, 
- Richard Fitzgerald <rf@opensource.cirrus.com>, 
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
- Mika Westerberg <mika.westerberg@linux.intel.com>, 
- Zha Qipeng <qipeng.zha@intel.com>, Qunqin Zhao <zhaoqunqin@loongson.cn>, 
- Thomas Richard <thomas.richard@bootlin.com>, 
- Andy Shevchenko <andy@kernel.org>, 
- Pawel Zalewski <pzalewski@thegoodpenguin.co.uk>
-Cc: mfd@lists.linux.dev, linux-kernel@vger.kernel.org, 
- linux-sound@vger.kernel.org, patches@opensource.cirrus.com, 
- linux-crypto@vger.kernel.org, 
- Charles Keepax <ckeepax@opensource.cirrus.com>
-In-Reply-To: <20261104-acpi-mfd-v2-0-64b9dee3baaf@thegoodpenguin.co.uk>
-References: <20261104-acpi-mfd-v2-0-64b9dee3baaf@thegoodpenguin.co.uk>
-Subject: Re: [PATCH v2 0/2] mfd: use designated initializers for
- acpi_device_id
-Message-Id: <179502169643.55369.12852293397895853310.b4-ty@b4>
-Date: Wed, 18 Nov 2026 17:08:16 +0000
+	s=k20260515; t=1795024324;
+	bh=dNzk52VvT+ieD7HHNJgyt12mlMnxt57ONA25ZqvsUgs=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=cXpYSHKBI4173ghw+UBA3l2wr98BLeDcGlLblT2fJfPSDOcOPelrVRrmyDN1YcLvx
+	 1qRtvt/Ss7txwoax2+DcuB5w3S+NneFEnEsEn5iCRwXvlQFV4x3GgOrPNPPrBszZfT
+	 iMPl81RKSOKWbFcQmhrAiJ5PzwJW4KeSTAUQN/Lzl/tloS+Or1D6NmKG7yR1DDvBTb
+	 xIopLyNoTQNupKx8U34h7epEmfA6t17caLUc7X4jiWqDcpFF7jJXhk3pmE8IL/tleg
+	 ioNtgRi+9FLH9Rd+cdP/NoFFFYH0Ngp3xdYekzBX7s3ugZTSar2y+7AF1+lgF9+yrF
+	 tu2hYisKHfz0A==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 0FEF04AF19;
+	Wed, 18 Nov 2026 17:52:02 +0000 (UTC)
+From: Alex Ousherovitch via B4 Relay <devnull+aousherovitch.rambus.com@kernel.org>
+Date: Wed, 18 Nov 2026 09:51:49 -0800
+Subject: [PATCH v9 5/5] MAINTAINERS: add Rambus CryptoManager Hub (CMH)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -70,29 +83,72 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.16-dev-ad80c
+Message-Id: <20261118-cmh-b4-a-v9-v9-5-70385613fd50@rambus.com>
+References: <20261118-cmh-b4-a-v9-v9-0-70385613fd50@rambus.com>
+In-Reply-To: <20261118-cmh-b4-a-v9-v9-0-70385613fd50@rambus.com>
+To: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>, 
+ Joel Wittenauer <Joel.Wittenauer@cryptography.com>, 
+ Thi Nguyen <thin@rambus.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <skhan@linuxfoundation.org>, 
+ Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Alex Ousherovitch <aousherovitch@rambus.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795024320; l=1310;
+ i=aousherovitch@rambus.com; s=20261026; h=from:subject:message-id;
+ bh=Bd9aCgWNbaQADX7NBB116ORW6UoH7r2h1um/oYEgcMw=;
+ b=aMkbvYg2CRZOnVRGQj4fqUUprtTxk8fyFbQvY2SxqdwDuDzXvvU1bm6CNjWpvV8mrXCGwNIJa
+ x+NxxwmhH94AhK146L69aFyQJG8VfVD+wywgERp5yPzAhLFHr5dXNlR
+X-Developer-Key: i=aousherovitch@rambus.com; a=ed25519;
+ pk=ECFtTdQUPAolK+qGZ6v7Xm3sRf7rnM7wxpTeFzbqpmA=
+X-Endpoint-Received: by B4 Relay for aousherovitch@rambus.com/20261026 with
+ auth_id=1330
+X-Original-From: Alex Ousherovitch <aousherovitch@rambus.com>
+Reply-To: aousherovitch@rambus.com
+Content-Transfer-Encoding: 7bit
 
-On Wed, 04 Nov 2026 16:09:29 +0000, Pawel Zalewski wrote:
-> This series is converting lists that contain the acpi_device_id struct,
-> which is defined in the include/linux/device-id/acpi.h to make use of named
-> initializers (which they do not use currently). This work is part of the on
-> going effort in the kernel associated with device-ids [1]
-> 
-> The plan is to convert acpi_device_id::driver_data to have an anonymous
-> union, similarly to what was introduced for PCI and I2C device ID tables.
-> The goal is to increase type-safety (most of the existing casts are gone),
-> to improve readability and to make use intent a bit more clear:
-> 
-> [...]
+From: Alex Ousherovitch <aousherovitch@rambus.com>
 
-Applied, thanks!
+Add MAINTAINERS entry for the Rambus CryptoManager Hub (CMH) hardware
+crypto accelerator driver under drivers/crypto/cmh/.
 
-[1/2] mfd: intel-lpss-acpi: Use named initializers for acpi_device_id
-      commit: 88e9107ee8adf111b7b8e13b009eb78db9044140
-[2/2] mfd: Use named initializers for acpi_device_id
-      commit: 9f3af17b87120ec1aa6bf0fa8121e3bfef687cb3
+Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
+---
+ MAINTAINERS | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
---
-Lee Jones [李琼斯]
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 93abbb315065..0dc921a090ec 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -23305,6 +23305,19 @@ L:	linux-wireless@vger.kernel.org
+ S:	Maintained
+ F:	drivers/net/wireless/ralink/
+ 
++RAMBUS CRYPTOMANAGER HUB (CMH) HARDWARE CRYPTO ACCELERATOR
++M:	Alex Ousherovitch <aousherovitch@rambus.com>
++M:	Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
++R:	Joel Wittenauer <Joel.Wittenauer@cryptography.com>
++R:	Thi Nguyen <thin@rambus.com>
++L:	linux-crypto@vger.kernel.org
++S:	Maintained
++F:	Documentation/ABI/testing/debugfs-driver-cmh
++F:	Documentation/ABI/testing/sysfs-driver-cmh
++F:	Documentation/crypto/device_drivers/cmh.rst
++F:	Documentation/devicetree/bindings/crypto/rambus,cmh-v1030.yaml
++F:	drivers/crypto/cmh/
++
+ RAMDISK RAM BLOCK DEVICE DRIVER
+ M:	Jens Axboe <axboe@kernel.dk>
+ S:	Maintained
+
+-- 
+2.43.7
+
 
