@@ -1,80 +1,78 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795024323;
-	b=wYO+H7l+du+uYJnC/yosSeDtDdmAka5XsYOvnmex0Z4izqrY8f8XXO3n1iNFAbtaZKg7
-	 +Sr6ffGUU20tvIUnYXpY0/trbDODaTA0E78jqq53G66i67Eq6JbN/D8wGfygFcMVO6izW
-	 g0RyPPXCfR/86lW5QyiYKc873E3fEhjIvxWXAAwYwgaRN1HEX9gSxzKSvu22o1/Sikuge
-	 qRsTe4/MieCbLAjxIMb/5pitL4sE/CmprcwILr1Ad6f/+it3QJM6MncKfwSNPCu/ut6ch
-	 BxjOZY5ZxjtMS2srbcW9gD9Y/QfbKz5yOiPjL8r74HBtlJ/13p6ze27Yn+wTZUgbCgg==
+	t=1795024325;
+	b=abK8MduZ7UiDo5Q2dhyM6/I6gMKEEMjE7E8ryep+jiZIygM5XECKG1gEmKVR0CMMzH33
+	 fr9/Wj1nAWswJD0pnnJHFOvSDjQsDaJzgX8Ei9GLvBOwVorLQOqDnC3vf/kliDcHL70cy
+	 4DRSQkwsWOup6v6mqyS4UlLa8kmUe4J9iWvlhntsbNaLDJ6gwmfNs7iNxIiR+ki7UL20I
+	 6TB0zbJt7lGme6yTKMckugaSFSHkprjJ1wYuZrv3EOrY5xC1l1MrtVF4z7wq3vtsJ1QFn
+	 1sbZPvpZt4oobBqAqhunNfl18GvK76zLWMB5e7/CubL3v4OG4SKFsvPZekmc8uZjKIg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795024323;
-	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
-	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=OroAK432n9SEOGbiOwoUtoMX373xF8irWJtttVpaPKE=;
-	b=tJ1/czJadjPxd8rCu47TY+7C5JWkLHorddtuZTILaDGG8qoXUWdBlGORFCHCsIzvkHHS
-	 qvG1qe1AXyCMpdwirT1PsgbrC7Gab1dSrTGPsV81iy1+2PVLsT//Uy5/iuR43qy9z63A1
-	 n1QodcvHHEH1iQiKVcBOYESAVTrhFtfGA9tn5803cvoSepM2F9JXaMfurM9ds/9CcrmSS
-	 /fowvncE0rV23Mzd6FUpJ7HWrTI3AwsYV3Y85nZVsAM/NajQ0bQdwWBLkmQeaQnl0aGcT
-	 b6qM17GlsHv0EQgP96joQEvOlVKN0lo9dOnGjoZccNZY+5sk5zcLYqEj/0gOWdmlmbg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795024325;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=kiASrWI0uoJRMk9S73U2RxVLSDv/VMJzAWczcwrDMt4=;
+	b=iQhKeI/4WkWESOM7n9KIfjs7/2YbNOJzPCBI2Au+4gtGb4/jDEHqsuag9qGlDP9ySyZL
+	 kJRHUNrFmsZT+posrv2S8BnmG907AFcbNjy3BqNpppl3mS8jNV5bhfctGhJFQmrGVZGuw
+	 WNEO+1hHWo1antEk9NW/6mO2QGrDPjiJVf09Bavy0CuR8e2GRmDarowx0+FvoBdXNpcTR
+	 gz8Tv+T/rcdQtDt6jzNUySXQWZ6H7qbvJS4ptluEnSjozxIXTal6992xx/NqJN2g3mXdr
+	 EhHffzQMWbZUPY+Ui+U8uyWSivXsbaFyV93+Tx+upVwegA4FvM0/pS/H4pZA3g5vIWg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i7rBclsd;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kPPYBZV0;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED6860A2601;
-	Wed, 18 Nov 2026 17:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F0560A2629;
+	Wed, 18 Nov 2026 17:52:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i7rBclsd
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kPPYBZV0
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1795024323;
-	b=YsZzPSVUUrDs3MUpcXIvZzDFFwo57Z4tCQFube7PT1lplnBillp6TGN5UDgZHVTujUDs
-	 yE4J60R5UM6IP3nZURRaFrhO54/NX7PuHFxcDKUrTCsNLEag1TO6CL0g0s+Sl06Ae3wfi
-	 qeqdUjXqqDTen/XO5VC/4IylMG1WpSuG6ghcBzbZTUgAE56e2//S97qCT7QR8dWblC1Oy
-	 Rq17oeCkO9otw/TEn1vydlWiBOn+BScBmE1aAISEcZmAQy54tEbu57utx5P8/Wh79tb5v
-	 nF6lO79IKMmJVxAfv7KBXAa7vDy6uC8ScIAMKiAUtP/TdVSZmVKmH8U+TG8ZriWsujQ==
+	t=1795024325;
+	b=yloBw1YmyLCJeYpflyPl6r2lP8q5yNpwcaQ4KnrKcPov7aGqUagEgCrvC1SLi/YVl45k
+	 +qJezSN1Ua3R5miWW8WHRG89d1j7B01kmizFN3F6KFc5BjmgP4GJnyY/UZeAkyzK82yXj
+	 xnyhWaZplmiXO4mJuDHchJMKXvO2UgD/aT9Qa1nuxwA1w1ev46ZfN5l2T/9T01BJagSt/
+	 vxIQ2UB6onoikqOdp7rjOAMqf3a0yT1b8HTycuhwekVFFN+IaMG5csyppuUuFFZieFl2p
+	 zhEQ8aDsKBccuh8NctPCeq7cDhGtWGhYXqKvlsT2goInpH7BwcDDg1H+y5BvVaAvxxw==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1795024323;
-	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To;
-	bh=OroAK432n9SEOGbiOwoUtoMX373xF8irWJtttVpaPKE=;
-	b=ZqhdMeN6nIpX5GRZ2aQoiEVFRlWUyp8GANC80zDAuPOGi8p70QZtSOC7aCbAKmCxk+cy
-	 ILucwwidl2Qx8Jutm7NZnJKZAPXf4cAVZXzRRwKx+UK0N1IjZ8mTQYQxxWu87VJZqg/Tz
-	 GkUEBFN8hLdM1KWKTP3pV+MHtENduHa0e+WwuppyiIL5fQXoibYLeGDM/uz+VrVJu60wt
-	 Pa6pQ4DoYs7sGaCsT/gYEnDnsrWCuaS7jmBn+Oebn0T+mHY96kOBSg1kGROl5MYyHjSQM
-	 1wt0224/Q4XK57LY4ILssWDzEmh36Yl06SffU4/Ur+SvOAvjt5pD2OifPGjV5+nQxQQ==
+	c=relaxed/relaxed; t=1795024325;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=kiASrWI0uoJRMk9S73U2RxVLSDv/VMJzAWczcwrDMt4=;
+	b=trQWiMC38hLTSN/6xZkqp/dBJwfGnBFYObWbodsYWPsreUfq9IL73y5+ysSn//coV5OT
+	 Tr7luX1Y5Aa3yq6B9QGlH6zhd/PR1ObVPmOy1wI72JDb244FHIT/Ltv2tE8Y0oslnp1IJ
+	 JmUWcI+k80XEXIOhEs3cMUSGogAqiE6b4JupR3os1OXlFnu1pwbQmNgfb0XmGh7k8GRRt
+	 f6BhJayG+dc11PM8QR2p4ulSnYWSiCj7K+yHDKTdUijdPj235lal8gT5O3HFQAzRRgZ9u
+	 KVEFfWJicV5cRVrAGd/iP0HkJdGlaSey+YC+nqJFqvhfEbipX+HprSAtp5BpG0aLcsg==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 34FD11F000C8;
+	by smtp.kernel.org (Postfix) with ESMTPS id 5992A1F000C5;
 	Wed, 18 Nov 2026 17:52:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795024323;
-	bh=OroAK432n9SEOGbiOwoUtoMX373xF8irWJtttVpaPKE=;
-	h=From:Subject:Date:To:Cc:Reply-To;
-	b=i7rBclsdAjWundfy//Wjt44/CoSgdtk+Bhhoiun9mN2D2bKpgVmoqsHPjp3blFLIZ
-	 SZyHO0essHtkDf8tm+t1gtRjEhnqG9IR9EeI2bqcsqyAoQNOZNqIN308OZ2pf1Kplo
-	 GrgfkX9nF42PyLMXUsHWAObiB2FJDaSHOVWLJBOR59WwXcLiHuxqhMNPZU/cgvkgU9
-	 8YLBOfaAz3FuAbydUTZ/rfr/5x8HvAn2KvF0D3ZD/G5NJSVv2LvhCARtob8cKzPTwK
-	 Nl1IPq4bVG5l9Zg7g8FhPmqkX5MXP+8ZDkn9qoshOQYvr6i7JhbA42GXxBnYS348oV
-	 +gpsTfIoZ6e3Q==
+	s=k20260515; t=1795024325;
+	bh=kiASrWI0uoJRMk9S73U2RxVLSDv/VMJzAWczcwrDMt4=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=kPPYBZV0QK+/21wSFiTvFbJGbKfrYewXZOdKUy1ltlIKLIhQQWrM3IU2aH43oWyIB
+	 pwulFOwau+01r5LKxn1ztEfPB/5IFtMFMOJzEFcqamVohfyr0yRGn1vCgU/+9/chFE
+	 0/S/7M5yibgh20rr3FThkkyhpwKeSN/LxGIVfWs18EQ1IDZTlKPO3Sn2KSCSmtYSyp
+	 idAw52rMpPZPK4kFF15+0gGfP/HOi+JUfE8txfUQDef6rtmEY1TD7f07oVQy+gK+30
+	 gfAB0NTbMfXarkAWSD0RSLZE+RwEIzH00mj+Q9+ErPIN4d0vJvO7vYfqPzbbqa8fP1
+	 6PNNehAPJY8Pw==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 82E2B4AEF9;
+	by lkml.kernel.org (Postfix) with ESMTP id D59024AF11;
 	Wed, 18 Nov 2026 17:52:01 +0000 (UTC)
 From: Alex Ousherovitch via B4 Relay <devnull+aousherovitch.rambus.com@kernel.org>
-Subject: [PATCH v9 0/5] crypto: cmh - add Rambus CryptoManager Hub core
- driver and AES
-Date: Wed, 18 Nov 2026 09:51:44 -0800
-Message-Id: <20261118-cmh-b4-a-v9-v9-0-70385613fd50@rambus.com>
+Date: Wed, 18 Nov 2026 09:51:47 -0800
+Subject: [PATCH v9 3/5] crypto: cmh - add key/datastore infrastructure
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -85,11 +83,9 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIALDl/WoC/yXMTQ5AMBBA4avIrE3SESRcRSzamjISP2kRibi7Y
- vkt3rsgsBcOUCcXeD4kyDJHVGkCdtBzzyhdNGQqK4moRDsNaHLUeFRIjoxyShWF0xCL1bOT87s
- 17e+wm5Ht9i7gvh/8qt4YbwAAAA==
-X-Change-ID: 20261116-cmh-b4-a-v9-1f1b0f0055fa
+Message-Id: <20261118-cmh-b4-a-v9-v9-3-70385613fd50@rambus.com>
+References: <20261118-cmh-b4-a-v9-v9-0-70385613fd50@rambus.com>
+In-Reply-To: <20261118-cmh-b4-a-v9-v9-0-70385613fd50@rambus.com>
 To: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>, 
  Joel Wittenauer <Joel.Wittenauer@cryptography.com>, 
  Thi Nguyen <thin@rambus.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
@@ -102,259 +98,392 @@ Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
  Alex Ousherovitch <aousherovitch@rambus.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795024320; l=14011;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795024320; l=14234;
  i=aousherovitch@rambus.com; s=20261026; h=from:subject:message-id;
- bh=KbfzosJ3C3ZLBJvmLddH1ikGsbPON3i/y3vfx0Y3EAk=;
- b=+Y7xg7fJK9Aed/J/qDm1DE8M6LWddNtKDOHTAqt4JVIdE/YDXzC4LU8aTQ265cxOMCXxP2u3R
- 4NRPcwnLj3sDA4eL9v3jP/wSKrxqSm2rE76ax/5fDpuDJLZvrAweTzd
+ bh=aBs+nocUJdIRphtZyCEZOKdyqMdDMfSvXq4qG7B1gPw=;
+ b=a1No3NnVnBMDd06qhfTqfV7KCcp7ZIy3wmnNsC7EY9L2dALRmoprvgFXhgqVQTdCPOECMwiRw
+ kUsni1kVHBACjdF5rKctL9m7If5kjEVZiVRKGViF2jNTNzjKQSAdWXs
 X-Developer-Key: i=aousherovitch@rambus.com; a=ed25519;
  pk=ECFtTdQUPAolK+qGZ6v7Xm3sRf7rnM7wxpTeFzbqpmA=
 X-Endpoint-Received: by B4 Relay for aousherovitch@rambus.com/20261026 with
  auth_id=1330
 X-Original-From: Alex Ousherovitch <aousherovitch@rambus.com>
 Reply-To: aousherovitch@rambus.com
+Content-Transfer-Encoding: 7bit
 
-The Rambus CryptoManager Hub (CMH) is a hardware cryptographic
-accelerator accessed through a mailbox-based VCQ (Virtual Command Queue)
-interface.  This part, the first of the split posting (lineage and
-changelog below), adds the core platform driver, the shared
-key/datastore layer and the AES transforms, plus the device-tree binding
-and the MAINTAINERS entry.  AES is the first and least-problematic
-algorithm family, so the core has a user and the VCQ/DMA/completion data
-path is reviewable end to end.  Later parts add the remaining symmetric
-ciphers (SM4, ChaCha20-Poly1305) and the hwrng, the hashes and MACs,
-and finally the asymmetric and post-quantum algorithms together with the
-/dev/cmh_mgmt management interface.
+From: Alex Ousherovitch <aousherovitch@rambus.com>
 
-The core driver binds the device, parses its device-tree description,
-sets up DMA, the mailbox queue interface and the transaction manager,
-and exposes sysfs/debugfs instrumentation.  The key/datastore patch adds
-the raw-key handling and the datastore (SYS) command helpers that the AES
-driver in this series, and the algorithm drivers in the following series,
-build on.
+Add the CMH key and datastore (system object) layer shared by the
+algorithm drivers.  cmh_key.c stages a raw key into a per-transform
+context and DMA-maps it for the lifetime of the transform; cmh_sys.c
+builds the SYS_WRITE datastore command that loads such a key into the
+per-mailbox temporary datastore slot (SYS_REF_TEMP) of a request's VCQ.
 
-The transaction manager runs as a kthread that packs VCQ entries and
-submits each request to the mailbox its core is bound to; completion is
-handled by per-mailbox threaded IRQs, or a watchdog poll without them.
-The data path is asynchronous: requests return -EINPROGRESS, and on a
-full queue a CRYPTO_TFM_REQ_MAY_BACKLOG request is backlogged (-EBUSY)
-while any other gets -ENOSPC.
-The CMH eSW is loaded independently by the hardware before probe; the
-driver loads no firmware.
+The AES driver that follows is the first user.  Builders for the other
+SYS datastore commands are added together with the drivers that use
+them.  No crypto API algorithm is registered by this patch.
 
-The CMH is a platform device matched via device tree (compatible
-"rambus,cmh-v1030").  Following the inside-secure,eip93 binding model
-and the DT maintainer's guidance, the schema requires a SoC-specific
-compatible ahead of the IP fallback and therefore carries no example.
-
-Public hardware documentation:
-  Product overview: https://www.rambus.com/security/crypto-hub/
-  No public datasheets or downloadable briefs are currently available.
-  The driver was developed against the Rambus CryptoManager Hub Hardware
-  Reference Manual (Rambus Inc. confidential).  Detailed hardware
-  reference is available under NDA from Rambus Inc.; contact the
-  maintainers listed in MAINTAINERS for access during review.
-
-Developed against Herbert Xu's cryptodev tree.  checkpatch.pl --strict,
-sparse (C=2) and a W=1 -Werror build are clean, and dtschema's
-dt-doc-validate accepts the binding.  Exercised on riscv64 and arm64 --
-QEMU with the CMH hardware model and a Xilinx VMK180 FPGA with the CMH
-IP -- under lockdep/PROVE_LOCKING, DEBUG_OBJECTS,
-KASAN/UBSAN/KMEMLEAK/KFENCE and (arm64) KCSAN with no findings;
-worst-case stack stays under 1 KB.
-
-Changes in v9:
- - dt-bindings: add Rob Herring's Reviewed-by (binding unchanged).
- - crypto: cmh: mailbox recovery: reissue a FLUSH, RESTART or ABORT the
-   device cleared before taking it, FLUSH rather than RESTART an error seen
-   with an empty queue, give each timed-out request at HEAD its own
-   ABORT, and leave a retired mailbox alone.
- - crypto: cmh: synchronous commands: a timed-out command still held by
-   the transaction manager is cancelled instead of dispatched later; one
-   on the device carries its timeout, so the watchdog escalates it, and
-   the caller waits for the drain.  An undrained command counts as
-   possibly live until it completes, and a full command queue is waited
-   on within the timeout instead of failing with -EAGAIN.
- - crypto: cmh: record possibly-live DMA on every mailbox retirement.
- - crypto: cmh: a refused suspend keeps the queued requests instead of
-   cancelling them.
- - crypto: cmh: probe and teardown FLUSHes clear the mailbox interrupt
-   and write TAIL, as recovery does.
- - crypto: cmh: AES: the ccm(aes) fallback masks CRYPTO_ALG_ASYNC, so it
-   cannot be built on the driver's own ctr(aes).
- - crypto: cmh: AES: setkey rejects a 384-bit XTS key (-EINVAL); the
-   device supports only XTS-AES-128/256.
- - crypto: cmh: debugfs: add config/inject_tm_hold_ms; recovery actions
-   are refused while suspended.
- - crypto: cmh: assorted small fixes and comment corrections.
-
-Changes in v8:
- - dt-bindings: rambus,slot-stride-bytes is 512 or 1024; reword
-   rambus,cores for cores that no mailbox lists.
- - crypto: cmh: harden mailbox error recovery against concurrent
-   interrupt and watchdog activity.
- - crypto: cmh: close transaction-manager races in timeout arming,
-   doorbell ringing and backlog promotion, and wake the manager for a
-   backlogged request.
- - crypto: cmh: never free memory the device may still write: DMA memory
-   is freed or allocated only behind an acknowledged mailbox FLUSH, a
-   mailbox that never acknowledges is retired with its buffers kept, and
-   suspend is refused with -EBUSY instead of cancelling in-flight work.
- - crypto: cmh: crypto API conformance: MAY_BACKLOG requests are never
-   refused (unbounded backlog), others get -ENOSPC on a full queue, final
-   completions run with BH disabled, CRYPTO_ALG_ALLOCATES_MEMORY is set,
-   and sysfs bind/unbind is disabled.
- - crypto: cmh: error codes: -EIO only for a device failure, -ECANCELED
-   after recovery, -ENODEV on a retired mailbox, -EBADMSG for an AEAD tag
-   mismatch.
- - crypto: cmh: AES: drop cfb(aes); zero-length xts(aes) returns -EINVAL;
-   out-of-place AEAD no longer writes the destination AAD; an oversized
-   CCM payload returns -EOVERFLOW; the empty CCM tag uses the AES
-   library; the second leg of a counter-wrap CTR request is backlogged.
- - crypto: cmh: assorted small fixes and comment corrections.
- - Documentation and patch split: each patch documents and adds only
-   what it needs; the PQC command sizes moved to the PQC series.
- - Rebased onto cryptodev-2.6 (7.4.0-rc1).
-
-Changes in v7:
- - Corrected the DCO sign-off chain so the co-developer attribution is
-   immediately followed by that author's own sign-off and the submitting
-   author signs last (the DCO point first raised on v3).
- - crypto: cmh: close a debugfs force-drain vs teardown use-after-free --
-   the response-handler lock now also covers freeing the per-mailbox state
-   on teardown, so a force-drain can no longer race it.
- - crypto: cmh: reclaim abandoned mailbox scratch with a non-destructive
-   flush ordered in the host command stream instead of a destructive
-   per-mailbox MBX_COMMAND_FLUSH -- removing the cmh_tm_flush_mbx helper
-   and its drain-wait -- so reclaiming scratch no longer cancels a crypto
-   VCQ that shares the mailbox.
- - Added the per-revision changelog and the prior-posting links below.
-   The previous posting was sent untagged as "[PATCH 0/5]" and was the
-   sixth revision (v6), so this is v7.
-
-Changes in v6:
- - Restructured the single v1-v5 series into smaller, independently
-   reviewable per-maintainer chunks.  This first series is the core
-   driver, the shared key/datastore layer and AES; later series add the
-   remaining algorithms and the management ioctl interface.
- - dt-bindings: simplified the clock-names schema -- the oneOf collapses
-   to a single items list (core, an optional core-div2 or rt, then rt,
-   minItems: 1) -- and bounded the per-mailbox queue reg to the hardware
-   range (maximum: 63), following the v5 DT review.
- - crypto: cmh: the response handler accumulates the IRQ status bits
-   before clearing the pending flag and releases its mailbox IRQs on
-   teardown even after a suspend; a wedged pinned mailbox now fails with
-   -EIO instead of head-of-line blocking; a second probe is rejected; and
-   debugfs ABORT injection and force-drain take the response-handler lock.
- - crypto: cmh: AES-CMAC hardware-accelerates the one-shot .digest()
-   only and forwards the incremental and virtual-address paths to a
-   generic cmac(aes) transform the driver allocates in .init_tfm()
-   (CRYPTO_ALG_NO_FALLBACK + CRYPTO_ALG_REQ_VIRT, as the generic
-   cmac(aes) shash has no export_core and cannot back crypto_ahash_fb()).
- - crypto: cmh: moved the datastore-type-to-core-id mapping into the
-   management layer so the key/datastore code no longer depends on the
-   management UAPI header; that header now lands with the ioctl
-   implementation in a later series.
-
-Changes in v5:
- - dt-bindings: reworked the compatible and rambus,cores per DT review --
-   require a SoC-specific compatible ahead of the "rambus,cmh-v1030" IP
-   fallback via the inside-secure,eip93 "not: {}" idiom (no example can
-   validate until a real SoC is upstreamed), switch rambus,cores to a
-   string-array of core names, and replace the positional clocks list with
-   a count-bounded description.
- - crypto: cmh: transaction-manager / response-handler race fixes -- FLUSH
-   and drain instead of restarting the eSW into freed slots, serialise the
-   mailbox TAIL doorbell, ABORT a sync timeout only at the mailbox HEAD,
-   and reject an over-large num_vcqs.
-
-Changes in v4:
- - dt-bindings: renamed the per-mailbox child to queue@N and described its
-   ring geometry as plain counts (rambus,num-slots / rambus,slot-stride-
-   bytes) rather than log2; renamed the binding to rambus,cmh-v1030.yaml.
- - crypto: cmh: convert to module_platform_driver() + dev_err_probe() and
-   drop the single-instance guard; remove informational probe logging; and
-   drop the production module parameters (built-in constants, with
-   debug-only knobs under debugfs).
-
-Changes in v3:
- - dt-bindings: reworked the mailbox topology per DT review -- mailbox@N
-   child nodes, with cores discovered from CORE_ENABLE rather than the DT
-   -- and adopted the "rambus" vendor prefix with a device-specific
-   "rambus,cmh-v1030" compatible (the IP revision).
-
-Changes in v2:
- - crypto: cmh: gate probe on both eSW readiness bits (MISSION and
-   MISSION2) so an operation offloaded to the sidecar engine cannot race an
-   engine that is not yet up.
-
-The CMH driver was first posted as a single series; following
-maintainer feedback it is now split into smaller, independently reviewable
-parts, numbered continuously across the split.  Earlier postings:
-  v1: https://lore.kernel.org/linux-crypto/20260625173328.1140487-1-skrishnamoorthy@rambus.com/
-  v2: https://lore.kernel.org/linux-crypto/20260709203037.1884436-1-skrishnamoorthy@rambus.com/
-  v3: https://lore.kernel.org/linux-crypto/20260806195519.2703224-1-skrishnamoorthy@rambus.com/
-  v4: https://lore.kernel.org/linux-crypto/20260825221539.255951-1-aousherovitch@rambus.com/
-  v5: https://lore.kernel.org/linux-crypto/20260917225929.2494111-1-aousherovitch@rambus.com/
-  v6: https://lore.kernel.org/linux-crypto/20261013174847.2192609-1-aousherovitch@rambus.com/
-  v7: https://lore.kernel.org/linux-crypto/20261026-cmh-b4-a-v7-v7-0-500a83faf500@rambus.com/
-  v8: https://lore.kernel.org/linux-crypto/20261110-cmh-b4-a-v8-v8-0-4cea8ebc1d40@rambus.com/
-
+Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
+Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
 Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
 ---
-Alex Ousherovitch (5):
-      dt-bindings: crypto: add Rambus CryptoManager Hub
-      crypto: cmh - add core platform driver
-      crypto: cmh - add key/datastore infrastructure
-      crypto: cmh - add AES skcipher/aead/cmac
-      MAINTAINERS: add Rambus CryptoManager Hub (CMH)
+ drivers/crypto/cmh/Makefile          |   4 +-
+ drivers/crypto/cmh/cmh_key.c         | 152 +++++++++++++++++++++++++++++++++++
+ drivers/crypto/cmh/cmh_sys.c         |  58 +++++++++++++
+ drivers/crypto/cmh/include/cmh_key.h |  76 ++++++++++++++++++
+ drivers/crypto/cmh/include/cmh_sys.h |  23 ++++++
+ 5 files changed, 312 insertions(+), 1 deletion(-)
 
- Documentation/ABI/testing/debugfs-driver-cmh       |  161 ++
- Documentation/ABI/testing/sysfs-driver-cmh         |   62 +
- Documentation/crypto/device_drivers/cmh.rst        |  326 +++
- Documentation/crypto/device_drivers/index.rst      |    1 +
- .../bindings/crypto/rambus,cmh-v1030.yaml          |  145 ++
- .../devicetree/bindings/vendor-prefixes.yaml       |    2 +
- MAINTAINERS                                        |   13 +
- drivers/crypto/Kconfig                             |    1 +
- drivers/crypto/Makefile                            |    1 +
- drivers/crypto/cmh/Kconfig                         |   48 +
- drivers/crypto/cmh/Makefile                        |   30 +
- drivers/crypto/cmh/cmh_aes.c                       |  709 +++++
- drivers/crypto/cmh/cmh_aes_aead.c                  |  935 +++++++
- drivers/crypto/cmh/cmh_aes_cmac.c                  |  460 ++++
- drivers/crypto/cmh/cmh_config.c                    |  625 +++++
- drivers/crypto/cmh/cmh_debugfs.c                   |  309 +++
- drivers/crypto/cmh/cmh_dma.c                       |  332 +++
- drivers/crypto/cmh/cmh_key.c                       |  152 ++
- drivers/crypto/cmh/cmh_main.c                      |  413 +++
- drivers/crypto/cmh/cmh_mqi.c                       |  471 ++++
- drivers/crypto/cmh/cmh_rh.c                        | 1497 +++++++++++
- drivers/crypto/cmh/cmh_sys.c                       |   58 +
- drivers/crypto/cmh/cmh_sysfs.c                     |  108 +
- drivers/crypto/cmh/cmh_txn.c                       | 2712 ++++++++++++++++++++
- drivers/crypto/cmh/include/cmh.h                   |   24 +
- drivers/crypto/cmh/include/cmh_aes.h               |   24 +
- drivers/crypto/cmh/include/cmh_aes_abi.h           |   98 +
- drivers/crypto/cmh/include/cmh_config.h            |  110 +
- drivers/crypto/cmh/include/cmh_debugfs.h           |   94 +
- drivers/crypto/cmh/include/cmh_dma.h               |  195 ++
- drivers/crypto/cmh/include/cmh_key.h               |   76 +
- drivers/crypto/cmh/include/cmh_mqi.h               |   59 +
- drivers/crypto/cmh/include/cmh_registers.h         |  147 ++
- drivers/crypto/cmh/include/cmh_rh.h                |   99 +
- drivers/crypto/cmh/include/cmh_sys.h               |   23 +
- drivers/crypto/cmh/include/cmh_sys_abi.h           |  148 ++
- drivers/crypto/cmh/include/cmh_sysfs.h             |   14 +
- drivers/crypto/cmh/include/cmh_txn.h               |  655 +++++
- drivers/crypto/cmh/include/cmh_vcq.h               |  203 ++
- 39 files changed, 11540 insertions(+)
----
-base-commit: 82e91fe19fb838f235f7c8829afc1eb389c93bdf
-change-id: 20261116-cmh-b4-a-v9-1f1b0f0055fa
+diff --git a/drivers/crypto/cmh/Makefile b/drivers/crypto/cmh/Makefile
+index 742e65e3917e..485247405cb2 100644
+--- a/drivers/crypto/cmh/Makefile
++++ b/drivers/crypto/cmh/Makefile
+@@ -12,7 +12,9 @@ cmh-y := \
+ 	cmh_txn.o \
+ 	cmh_rh.o \
+ 	cmh_dma.o \
+-	cmh_sysfs.o
++	cmh_sysfs.o \
++	cmh_sys.o \
++	cmh_key.o
+ 
+ ccflags-y += -I$(src)/include
+ 
+diff --git a/drivers/crypto/cmh/cmh_key.c b/drivers/crypto/cmh/cmh_key.c
+new file mode 100644
+index 000000000000..0990e25f4dad
+--- /dev/null
++++ b/drivers/crypto/cmh/cmh_key.c
+@@ -0,0 +1,152 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- Raw key context
++ *
++ * Keys come from the crypto API .setkey() as raw key bytes:
++ *
++ * Raw key:  key bytes -> stored in tfm context ->
++ *   SYS_CMD_WRITE(SYS_REF_TEMP) packed into every crypto VCQ.
++ *   The raw key buffer is DMA-mapped once at setkey time and remains
++ *   mapped for the lifetime of the transform (unmapped in destroy).
++ *
++ * Raw key DMA lifetime rationale
++ * ------------------------------
++ * Raw keys are DMA-mapped at setkey time and the mapping persists
++ * until the transform is destroyed (cmh_key_destroy).  This is a
++ * deliberate design choice, consistent with upstream HW crypto
++ * drivers (CAAM, ccree, CCP) that also map keys at setkey for
++ * transform-lifetime reuse:
++ *
++ *   - The Linux crypto framework expects setkey to prepare the
++ *     transform for repeated encrypt/decrypt calls.  Remapping the
++ *     same key on every request would add DMA API overhead per crypto
++ *     operation with no security benefit.
++ *   - On destroy, kfree_sensitive() scrubs the key buffer and the
++ *     DMA mapping is released.
++ *   - No key material is ever logged; dev_dbg() messages only show
++ *     CIDs (content identifiers), not key bytes.
++ *
++ * Hardware-required behaviors (not driver policy)
++ * ------------------------------------------------
++ * - SYS_REF_TEMP lifetime:  a temporary object lives in a per-mailbox
++ *   area until a command consumes it or the area is reset (a SYS flush
++ *   or MBX_COMMAND_FLUSH); it is not tied to a VCQ.  The driver packs
++ *   SYS_CMD_WRITE into every VCQ to re-provision the raw key for each
++ *   operation.
++ * - Mailbox flush (SYS_CMD_FLUSH):  reclaims temp-stack space on the
++ *   target MBX.  Required by HW to prevent temp-stack exhaustion
++ *   across multi-VCQ operations.
++ *
++ * Net-zero temp invariant (driver policy that MUST hold)
++ * ------------------------------------------------------
++ * Each crypto VCQ stages its raw key with SYS_CMD_WRITE(SYS_REF_TEMP) and
++ * consumes it in the SAME VCQ (the core key-load drops it on use), leaving
++ * the mailbox temporary memory unchanged.  A mailbox can also carry
++ * commands that keep temporary objects across VCQs; that memory is a
++ * per-mailbox stack that persists until it is freed (by a SYS flush or
++ * MBX_COMMAND_FLUSH), so an op that left a temp object behind would
++ * march toward exhaustion (SYS_CMD_WRITE to SYS_REF_TEMP then fails) and
++ * could shadow a live object.  Never carry SYS_REF_TEMP across VCQs
++ * here.  A VCQ that fails between the write and the key-load leaves its
++ * object behind: RESTART does not reclaim it.
++ */
++
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++
++#include "cmh_key.h"
++#include "cmh_sys.h"
++#include "cmh_txn.h"
++#include "cmh_dma.h"
++#include "cmh_sys_abi.h"
++
++/**
++ * cmh_key_setkey_raw() - Store a raw key in the key context
++ * @ctx: Key context to populate
++ * @key: Pointer to the raw key bytes
++ * @keylen: Length of @key in bytes
++ * @core_id: Logical core ID for SYS_TYPE tagging
++ *
++ * Duplicates the raw key, DMA-maps the copy for the lifetime of the
++ * transform, and stores the mapping in @ctx.  Any previously held key
++ * is destroyed first.
++ *
++ * The DMA mapping persists until cmh_key_destroy() is called (typically
++ * from the algorithm .exit_tfm callback).  This avoids per-request DMA
++ * mapping overhead and matches the setkey-to-destroy lifetime model used
++ * by other upstream HW crypto drivers (CAAM, ccree, CCP).  The key
++ * buffer is freed via kfree_sensitive() on destroy.
++ *
++ * Return: 0 on success, negative errno on failure.
++ */
++int cmh_key_setkey_raw(struct cmh_key_ctx *ctx, const u8 *key,
++		       u32 keylen, u32 core_id)
++{
++	dma_addr_t dma;
++	u8 *copy;
++
++	if (!keylen || !key)
++		return -EINVAL;
++
++	copy = kmemdup(key, keylen, GFP_KERNEL);
++	if (!copy)
++		return -ENOMEM;
++
++	/* Pre-map for the lifetime of the transform */
++	dma = cmh_dma_map_single(copy, keylen, DMA_TO_DEVICE);
++	if (cmh_dma_map_error(dma)) {
++		kfree_sensitive(copy);
++		return -ENOMEM;
++	}
++
++	/* Clean up any previous key */
++	cmh_key_destroy(ctx);
++
++	ctx->mode = CMH_KEY_RAW;
++	ctx->raw.data = copy;
++	ctx->raw.len = keylen;
++	ctx->raw.dma = dma;
++	ctx->raw.sys_type = SYS_TYPE_SET(SYS_TYPE_FLAG_PT, core_id);
++
++	return 0;
++}
++
++/**
++ * cmh_key_destroy() - Destroy and zero-fill a key context
++ * @ctx: Key context to destroy
++ *
++ * For raw keys, unmaps the DMA buffer and securely frees the key material.
++ * If the device may still be reading memory (cmh_tm_dma_quiescent() is
++ * false: a retired mailbox, or an abandoned synchronous command still on
++ * the device), the key buffer is zeroed and quarantined instead of freed,
++ * since such a VCQ may still reference it.
++ * Resets the key mode to CMH_KEY_NONE.
++ */
++void cmh_key_destroy(struct cmh_key_ctx *ctx)
++{
++	if (ctx->mode == CMH_KEY_RAW && ctx->raw.data) {
++		if (cmh_tm_dma_quiescent()) {
++			cmh_dma_unmap_single(ctx->raw.dma, ctx->raw.len,
++					     DMA_TO_DEVICE);
++			kfree_sensitive(ctx->raw.data);
++		} else {
++			/*
++			 * The device may still read this mapping, so it is not
++			 * freed.  Wiping it first is a CPU write to a buffer
++			 * the device may still own, contrary to the DMA API
++			 * ownership rule, and deliberate: a late device read
++			 * then sees zeros or the old key, and its result lands
++			 * in quarantined memory, while without the wipe the key
++			 * would stay in memory if the quarantine is never
++			 * released.  A SWIOTLB bounce copy is not wiped.
++			 */
++			memzero_explicit(ctx->raw.data, ctx->raw.len);
++			cmh_tm_dma_quarantine_buf(ctx->raw.data, ctx->raw.dma,
++						  ctx->raw.len, DMA_TO_DEVICE);
++		}
++		memzero_explicit(&ctx->raw, sizeof(ctx->raw));
++	}
++	ctx->mode = CMH_KEY_NONE;
++}
+diff --git a/drivers/crypto/cmh/cmh_sys.c b/drivers/crypto/cmh/cmh_sys.c
+new file mode 100644
+index 000000000000..eb8fe44b1cd9
+--- /dev/null
++++ b/drivers/crypto/cmh/cmh_sys.c
+@@ -0,0 +1,58 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- SYS Core VCQ Builders
++ *
++ * VCQ builder functions for SYS core datastore commands and the other
++ * shared core commands.  Each function populates a single vcq_cmd slot.
++ * Callers assemble complete VCQs by combining header + command(s) +
++ * flush, then submit them through the transaction manager.
++ *
++ * Hardware-required datastore semantics
++ * --------------------------------------
++ * The SYS builders are direct mappings of the eSW firmware SYS core
++ * command set.  The eSW maintains per-mailbox datastore namespaces
++ * with two object classes:
++ *
++ *   SYS_REF_TEMP   -- Temporary objects in a small per-mailbox area.
++ *                      Held until a command consumes them or a SYS
++ *                      flush or mailbox FLUSH resets the area, so they
++ *                      can outlive the VCQ that created them (see
++ *                      cmh_key.c).  Used for raw-key provisioning.
++ *
++ *   SYS_REF_PERSIST -- Persistent objects.  Survive across slots;
++ *                      a grant with no access wipes one, but its space
++ *                      is reclaimed only by a device reset.  Identified
++ *                      by a 64-bit Content ID (CID) and resolved to
++ *                      a per-MBX ref via SYS_CMD_FIND.
++ *
++ * These semantics are hardware requirements, not driver policy.
++ * The per-MBX temp-stack and per-MBX ref namespace are eSW firmware
++ * design constraints that cannot be changed by the kernel driver.
++ */
++
++#include <linux/string.h>
++
++#include "cmh_sys.h"
++
++/**
++ * vcq_add_sys_write() - Build a SYS_WRITE VCQ command
++ * @slot: VCQ command slot to populate
++ * @ref: Datastore object reference handle
++ * @src_dma: DMA address of source data buffer
++ * @wrap_key: Wrapping key reference (0 if none)
++ * @len: Length of data to write in bytes
++ * @sys_type: Datastore object type identifier
++ */
++void vcq_add_sys_write(struct vcq_cmd *slot, u64 ref, u64 src_dma,
++		       u64 wrap_key, u32 len, u32 sys_type)
++{
++	memset(slot, 0, sizeof(*slot));
++	slot->magic = VCQ_CMD_MAGIC;
++	slot->id = VCQ_CMD_ID(CORE_ID_SYS, 0, 1, SYS_CMD_WRITE);
++	slot->hwc.sys.cmd_write.ref = ref;
++	slot->hwc.sys.cmd_write.src = src_dma;
++	slot->hwc.sys.cmd_write.key = wrap_key;
++	slot->hwc.sys.cmd_write.len = len;
++	slot->hwc.sys.cmd_write.type = sys_type;
++}
+diff --git a/drivers/crypto/cmh/include/cmh_key.h b/drivers/crypto/cmh/include/cmh_key.h
+new file mode 100644
+index 000000000000..5df18ff7bfee
+--- /dev/null
++++ b/drivers/crypto/cmh/include/cmh_key.h
+@@ -0,0 +1,76 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- Per-transform key context
++ *
++ * Per-transform key context used by the keyed crypto algorithms.  Stores
++ * raw key bytes supplied via the crypto API .setkey() callback: the key
++ * is DMA-mapped once at setkey time and written to SYS_REF_TEMP in every
++ * VCQ.
++ *
++ * Each keyed algorithm driver embeds a struct cmh_key_ctx in its
++ * per-transform context and calls cmh_key_setkey_raw() from its
++ * .setkey() callback.
++ *
++ * Raw-key atomicity (SYS_REF_TEMP)
++ * ---------------------------------
++ * SYS_CMD_WRITE to SYS_REF_TEMP is packed into the same VCQ as the
++ * algorithm command that uses it (e.g. AES_CMD_INIT).  SYS_REF_TEMP
++ * is per-MBX -- the CMH eSW allocates it in the tail of each mailbox's
++ * own VCQ buffer (mbx_alloc_temp), so concurrent raw-key requests on
++ * different MBXes do not interfere.
++ */
++
++#ifndef CMH_KEY_H
++#define CMH_KEY_H
++
++#include <linux/types.h>
++#include "cmh_config.h"
++#include "cmh_vcq.h"
++
++/* Key context mode */
++enum cmh_key_mode {
++	CMH_KEY_NONE = 0,	/* no key set yet */
++	CMH_KEY_RAW,		/* raw key bytes in memory */
++};
++
++/* Per-transform key context */
++struct cmh_key_ctx {
++	enum cmh_key_mode mode;
++	struct {
++		u8 *data;	/* kmemdup'd raw key bytes */
++		u32 len;	/* key length in bytes */
++		u32 sys_type;	/* SYS_TYPE_SET(flags, core_id) */
++		dma_addr_t dma;	/* pre-mapped DMA addr (DMA_TO_DEVICE) */
++	} raw;
++};
++
++/**
++ * cmh_key_setkey_raw() - Store raw key bytes in the transform context
++ * @ctx: Per-transform key context
++ * @key: Raw key bytes
++ * @keylen: Key length in bytes
++ * @core_id: Target algorithm core (e.g. CORE_ID_AES)
++ *
++ * The key is host-supplied plaintext, so it is tagged SYS_TYPE_FLAG_PT
++ * (readable as plaintext), as the eSW tags its own raw-key writes to
++ * SYS_REF_TEMP; the object is consumed in the VCQ that writes it.  The
++ * actual SYS_CMD_WRITE
++ * to SYS_REF_TEMP is deferred to each encrypt/decrypt VCQ, where it
++ * is packed inline for atomicity.
++ *
++ * Return: 0 on success, -ENOMEM on allocation failure.
++ */
++int cmh_key_setkey_raw(struct cmh_key_ctx *ctx, const u8 *key,
++		       u32 keylen, u32 core_id);
++
++/**
++ * cmh_key_destroy() - Free key resources
++ * @ctx: Per-transform key context
++ *
++ * Zeroises and frees the raw key buffer, or zeroises and quarantines it
++ * if the device may still be reading memory (see cmh_tm_dma_quiescent()).
++ */
++void cmh_key_destroy(struct cmh_key_ctx *ctx);
++
++#endif /* CMH_KEY_H */
+diff --git a/drivers/crypto/cmh/include/cmh_sys.h b/drivers/crypto/cmh/include/cmh_sys.h
+new file mode 100644
+index 000000000000..4f74dbbfadf3
+--- /dev/null
++++ b/drivers/crypto/cmh/include/cmh_sys.h
+@@ -0,0 +1,23 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2026 Cryptography Research, Inc. (CRI).
++ * CMH LKM -- SYS Core VCQ Builders
++ *
++ * VCQ builder functions for the SYS (datastore) core and the other
++ * cores whose commands are issued by more than one driver.  Each builder
++ * populates one vcq_cmd slot with the appropriate magic, command ID, and
++ * payload.
++ *
++ * Callers combine these with vcq_set_header() + vcq_add_flush()
++ * and submit via cmh_tm_submit_sync().
++ */
++
++#ifndef CMH_SYS_H
++#define CMH_SYS_H
++
++#include "cmh_vcq.h"
++
++void vcq_add_sys_write(struct vcq_cmd *slot, u64 ref, u64 src_dma,
++		       u64 wrap_key, u32 len, u32 sys_type);
++
++#endif /* CMH_SYS_H */
 
-Best regards,
---  
-Alex Ousherovitch <aousherovitch@rambus.com>
+-- 
+2.43.7
 
 
