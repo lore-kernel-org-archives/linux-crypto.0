@@ -1,33 +1,33 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=193.43.10.250
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795002328;
-	b=vplznaVJe6jJFoFMeXzt+nCy43LzdyugNMeb4OHPl2BayPo5iwoy53H070hMRW17krRw
-	 zc8GavvhTO/Xk4OBOw7oGwAjCSC8ywPK3KPFVJtZphDl7F3xitcZK3Ix7j07+gOwzmN4Y
-	 JdYTUqVuKacm7HXmO85CaOzr/3OkJMuoNhThvThFxZ5ZE1XZgPCzRVjbpaHzmJgsv0GP9
-	 PIiY1CEMlTUKLYwp1/z3eBCYFwAFiNY0wzJlUxkFdHVyDStgohA9zz+JkbFtzhXVSBP8Q
-	 6qyDtsrBx9ufK6iWzbLydu3swOHX83tR6aKsHFNGsWOWyVKQUuV1QilCUePBlTCoscQ==
+	t=1795002329;
+	b=vVHts+3sh2FxxUte3HUUB0hXq4qIwfdjueGPRDVkmTW7nCcSqxgiYmRs5/VHl0EmpXGr
+	 U1pSnuWMiI4TIG3/InMldBFQ30FLoXqXuFjfPrtrpFknMyaXdgs0ANbUUaTFTddipgywn
+	 F4HXhBBjFg1cDvKIJF3CjnC6ElR/Qe0/Zb4xcK2YmkrqQqKssNgTwWJIMvkLck9Zf9Dwx
+	 u6TE5PFH4tZw+kyHHOv6GiSwBmyGs2Nnn1r/i4PtXRVxLU0aXqG7P8rzUBQHLJ+5XO5Ov
+	 ByR7wf00a2/U+zKOXWaz+z9HU9JapXfFCvF2JudHhLttk1j3ZY8y5qo/vzfLU88ddSQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795002328;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795002329;
 	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=eEEYHofTJddEyOiZB5wjpRaqUZPqyp1VwwRDUW9Lw0U=;
-	b=0q3I91vBWQgXN7uZnHLk9qGPQUHemFpXvEk4B6VbtWj4ileJkSsyTYjmPVB8VPim87mO
-	 qTd04HlgEY6B1/MfdxqaNMafWbkMh8vXUbZBxTaT2ma0awCo2VYBrqM8XGyF2lboO8/Nc
-	 XgB/kFev1xd0BAMfpbY7yFmVpL3w3Urr3c+kZ4DLW+DQoifJ6rQ3p8OubB0DukVygZzno
-	 NkTuZKOtmDRC/4TNum4KJezR1+PBxw8v/d/X6LMmnUMCrY5fC2+2aovu65IV8qnWxyCPO
-	 d54pT/D3zx/5qghQhTv90H857+cODzrhW6+2ZfFaSIixE04iVpTPTbMDHbbqalJ8Ogw==
+	bh=5ZMYu4mQzr5k24NEjgotAtJz+vr+l89zz4PGKfMIu1U=;
+	b=dDmH93HcMzdLsrzAl8Lv1vyIeUpXWzLXzjNW+zN3zzalKz45EzHQeKSJTL/lKtrWSyhF
+	 W71+8SOyWjVemVo/1deHW+55QfREpS+d+ppDPAtpU4R9JVjGKup923499A+p3G8Kr4XjO
+	 4ASUzA8PhXdUrnSNvH6eFtiV/XrQWm9s5xJKTFm4EM+kesFzdouVcKfP/p1kSwoRJtI0L
+	 mA4kFzEy6k9tSuK4WPieOfyOKsnkd8mn3JgIknKmAtYMcCqnxGvn9MVHx7eyYpKDQ6F/R
+	 QZJk516W+LjAwlcn7oXaIGf8pYtfIMJds6Cj0g7f/LYHa0rIShodmI0rsJSiZbpgMTQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=altlinux.org;
 	spf=fail smtp.mailfrom=altlinux.org;
 	arc=none smtp.remote-ip=193.43.10.250
 Received: from basalt.external.altlinux.org (unknown [193.43.10.250])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83799606A325;
-	Wed, 18 Nov 2026 11:45:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83799606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB2B60A262E;
+	Wed, 18 Nov 2026 11:45:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EDB2B60A262E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=altlinux.org
 Received: by basalt.external.altlinux.org (Postfix, from userid 1137)
-	id DE8412DF339; Wed, 18 Nov 2026 14:45:18 +0300 (MSK)
+	id 038522DF347; Wed, 18 Nov 2026 14:45:19 +0300 (MSK)
 From: Alexey Shabalin <shaba@altlinux.org>
 To: devel-kernel@altlinux.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -43,9 +43,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-nfs@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH 6.12/sisyphus 05/29] crypto/krb5: Add an API to perform requests
-Date: Wed, 18 Nov 2026 14:44:54 +0300
-Message-ID: <20261118114518.3605222-6-shaba@altlinux.org>
+Subject: [PATCH 6.12/sisyphus 12/29] crypto/krb5: Implement the AES enctypes from rfc8009
+Date: Wed, 18 Nov 2026 14:45:01 +0300
+Message-ID: <20261118114518.3605222-13-shaba@altlinux.org>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20261118114518.3605222-1-shaba@altlinux.org>
 References: <20261118114518.3605222-1-shaba@altlinux.org>
@@ -62,9 +62,9 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-Add an API by which users of the krb5 crypto library can perform crypto
-requests, such as encrypt, decrypt, get_mic and verify_mic.  These
-functions take the previously prepared crypto objects to work on.
+Implement the aes128-cts-hmac-sha256-128 and aes256-cts-hmac-sha384-192
+enctypes from rfc8009, overriding the rfc3961 kerberos 5 simplified crypto
+scheme.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
@@ -79,192 +79,460 @@ cc: linux-afs@lists.infradead.org
 cc: linux-nfs@vger.kernel.org
 cc: linux-crypto@vger.kernel.org
 cc: netdev@vger.kernel.org
-(cherry picked from commit 0392b110ccaf543b31842b04c8142f4f8ce7bdec)
+(cherry picked from commit 6c3c0e86c2acf53bf67c095c67335a0bec2a16af)
 ---
- crypto/krb5/krb5_api.c | 141 +++++++++++++++++++++++++++++++++++++++++
- include/crypto/krb5.h  |  21 ++++++
- 2 files changed, 162 insertions(+)
+ crypto/krb5/Kconfig        |   2 +
+ crypto/krb5/Makefile       |   3 +-
+ crypto/krb5/internal.h     |   6 +
+ crypto/krb5/krb5_api.c     |   2 +
+ crypto/krb5/rfc8009_aes2.c | 362 +++++++++++++++++++++++++++++++++++++
+ include/crypto/krb5.h      |   4 +
+ 6 files changed, 378 insertions(+), 1 deletion(-)
+ create mode 100644 crypto/krb5/rfc8009_aes2.c
 
+diff --git a/crypto/krb5/Kconfig b/crypto/krb5/Kconfig
+index 2ad874990dc8..52f0ed2d7820 100644
+--- a/crypto/krb5/Kconfig
++++ b/crypto/krb5/Kconfig
+@@ -7,6 +7,8 @@ config CRYPTO_KRB5
+ 	select CRYPTO_HASH_INFO
+ 	select CRYPTO_HMAC
+ 	select CRYPTO_SHA1
++	select CRYPTO_SHA256
++	select CRYPTO_SHA512
+ 	select CRYPTO_CBC
+ 	select CRYPTO_CTS
+ 	select CRYPTO_AES
+diff --git a/crypto/krb5/Makefile b/crypto/krb5/Makefile
+index 35f21411abf8..7fd215ec3a85 100644
+--- a/crypto/krb5/Makefile
++++ b/crypto/krb5/Makefile
+@@ -7,6 +7,7 @@ krb5-y += \
+ 	krb5_kdf.o \
+ 	krb5_api.o \
+ 	rfc3961_simplified.o \
+-	rfc3962_aes.o
++	rfc3962_aes.o \
++	rfc8009_aes2.o
+ 
+ obj-$(CONFIG_CRYPTO_KRB5) += krb5.o
+diff --git a/crypto/krb5/internal.h b/crypto/krb5/internal.h
+index 43f904a69e32..f537f6eb86eb 100644
+--- a/crypto/krb5/internal.h
++++ b/crypto/krb5/internal.h
+@@ -185,3 +185,9 @@ int rfc3961_verify_mic(const struct krb5_enctype *krb5,
+  */
+ extern const struct krb5_enctype krb5_aes128_cts_hmac_sha1_96;
+ extern const struct krb5_enctype krb5_aes256_cts_hmac_sha1_96;
++
++/*
++ * rfc8009_aes2.c
++ */
++extern const struct krb5_enctype krb5_aes128_cts_hmac_sha256_128;
++extern const struct krb5_enctype krb5_aes256_cts_hmac_sha384_192;
 diff --git a/crypto/krb5/krb5_api.c b/crypto/krb5/krb5_api.c
-index f7f2528b3895..8fc3a1b9d4ad 100644
+index ecc6655953d5..5b94cc5db461 100644
 --- a/crypto/krb5/krb5_api.c
 +++ b/crypto/krb5/krb5_api.c
-@@ -292,3 +292,144 @@ struct crypto_shash *crypto_krb5_prepare_checksum(const struct krb5_enctype *krb
- 	return ERR_PTR(ret);
- }
- EXPORT_SYMBOL(crypto_krb5_prepare_checksum);
-+
-+/**
-+ * crypto_krb5_encrypt - Apply Kerberos encryption and integrity.
-+ * @krb5: The encoding to use.
-+ * @aead: The keyed crypto object to use.
-+ * @sg: Scatterlist defining the crypto buffer.
-+ * @nr_sg: The number of elements in @sg.
-+ * @sg_len: The size of the buffer.
-+ * @data_offset: The offset of the data in the @sg buffer.
-+ * @data_len: The length of the data.
-+ * @preconfounded: True if the confounder is already inserted.
+@@ -19,6 +19,8 @@ MODULE_LICENSE("GPL");
+ static const struct krb5_enctype *const krb5_supported_enctypes[] = {
+ 	&krb5_aes128_cts_hmac_sha1_96,
+ 	&krb5_aes256_cts_hmac_sha1_96,
++	&krb5_aes128_cts_hmac_sha256_128,
++	&krb5_aes256_cts_hmac_sha384_192,
+ };
+ 
+ /**
+diff --git a/crypto/krb5/rfc8009_aes2.c b/crypto/krb5/rfc8009_aes2.c
+new file mode 100644
+index 000000000000..d39851fc3a4e
+--- /dev/null
++++ b/crypto/krb5/rfc8009_aes2.c
+@@ -0,0 +1,362 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* rfc8009 AES Encryption with HMAC-SHA2 for Kerberos 5
 + *
-+ * Using the specified Kerberos encoding, insert a confounder and padding as
-+ * needed, encrypt this and the data in place and insert an integrity checksum
-+ * into the buffer.
-+ *
-+ * The buffer must include space for the confounder, the checksum and any
-+ * padding required.  The caller can preinsert the confounder into the buffer
-+ * (for testing, for example).
-+ *
-+ * The resulting secured blob may be less than the size of the buffer.
-+ *
-+ * Returns the size of the secure blob if successful, -ENOMEM on an allocation
-+ * failure, -EFAULT if there is insufficient space, -EMSGSIZE if the confounder
-+ * is too short or the data is misaligned.  Other errors may also be returned
-+ * from the crypto layer.
++ * Copyright (C) 2025 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
 + */
-+ssize_t crypto_krb5_encrypt(const struct krb5_enctype *krb5,
-+			    struct crypto_aead *aead,
-+			    struct scatterlist *sg, unsigned int nr_sg,
-+			    size_t sg_len,
-+			    size_t data_offset, size_t data_len,
-+			    bool preconfounded)
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/slab.h>
++#include <crypto/authenc.h>
++#include "internal.h"
++
++static const struct krb5_buffer rfc8009_no_context = { .len = 0, .data = "" };
++
++/*
++ * Calculate the key derivation function KDF-HMAC-SHA2(key, label, [context,] k)
++ *
++ *	KDF-HMAC-SHA2(key, label, [context,] k) = k-truncate(K1)
++ *
++ *	Using the appropriate one of:
++ *		K1 = HMAC-SHA-256(key, 0x00000001 | label | 0x00 | k)
++ *		K1 = HMAC-SHA-384(key, 0x00000001 | label | 0x00 | k)
++ *		K1 = HMAC-SHA-256(key, 0x00000001 | label | 0x00 | context | k)
++ *		K1 = HMAC-SHA-384(key, 0x00000001 | label | 0x00 | context | k)
++ *	[rfc8009 sec 3]
++ */
++static int rfc8009_calc_KDF_HMAC_SHA2(const struct krb5_enctype *krb5,
++				      const struct krb5_buffer *key,
++				      const struct krb5_buffer *label,
++				      const struct krb5_buffer *context,
++				      unsigned int k,
++				      struct krb5_buffer *result,
++				      gfp_t gfp)
 +{
-+	if (WARN_ON(data_offset > sg_len ||
-+		    data_len > sg_len ||
-+		    data_offset > sg_len - data_len))
-+		return -EMSGSIZE;
-+	return krb5->profile->encrypt(krb5, aead, sg, nr_sg, sg_len,
-+				      data_offset, data_len, preconfounded);
-+}
-+EXPORT_SYMBOL(crypto_krb5_encrypt);
++	struct crypto_shash *shash;
++	struct krb5_buffer K1, data;
++	struct shash_desc *desc;
++	__be32 tmp;
++	size_t bsize;
++	void *buffer;
++	u8 *p;
++	int ret = -ENOMEM;
 +
-+/**
-+ * crypto_krb5_decrypt - Validate and remove Kerberos encryption and integrity.
-+ * @krb5: The encoding to use.
-+ * @aead: The keyed crypto object to use.
-+ * @sg: Scatterlist defining the crypto buffer.
-+ * @nr_sg: The number of elements in @sg.
-+ * @_offset: Offset of the secure blob in the buffer; updated to data offset.
-+ * @_len: The length of the secure blob; updated to data length.
++	if (WARN_ON(result->len != k / 8))
++		return -EINVAL;
++
++	shash = crypto_alloc_shash(krb5->cksum_name, 0, 0);
++	if (IS_ERR(shash))
++		return (PTR_ERR(shash) == -ENOENT) ? -ENOPKG : PTR_ERR(shash);
++	ret = crypto_shash_setkey(shash, key->data, key->len);
++	if (ret < 0)
++		goto error_shash;
++
++	ret = -EINVAL;
++	if (WARN_ON(crypto_shash_digestsize(shash) * 8 < k))
++		goto error_shash;
++
++	ret = -ENOMEM;
++	data.len = 4 + label->len + 1 + context->len + 4;
++	bsize = krb5_shash_size(shash) +
++		krb5_digest_size(shash) +
++		crypto_roundup(data.len);
++	buffer = kzalloc(bsize, GFP_NOFS);
++	if (!buffer)
++		goto error_shash;
++
++	desc = buffer;
++	desc->tfm = shash;
++	ret = crypto_shash_init(desc);
++	if (ret < 0)
++		goto error;
++
++	p = data.data = buffer +
++		krb5_shash_size(shash) +
++		krb5_digest_size(shash);
++	*(__be32 *)p = htonl(0x00000001);
++	p += 4;
++	memcpy(p, label->data, label->len);
++	p += label->len;
++	*p++ = 0;
++	memcpy(p, context->data, context->len);
++	p += context->len;
++	tmp = htonl(k);
++	memcpy(p, &tmp, 4);
++	p += 4;
++
++	ret = -EINVAL;
++	if (WARN_ON(p - (u8 *)data.data != data.len))
++		goto error;
++
++	K1.len = crypto_shash_digestsize(shash);
++	K1.data = buffer +
++		krb5_shash_size(shash);
++
++	ret = crypto_shash_finup(desc, data.data, data.len, K1.data);
++	if (ret < 0)
++		goto error;
++
++	memcpy(result->data, K1.data, result->len);
++
++error:
++	kfree_sensitive(buffer);
++error_shash:
++	crypto_free_shash(shash);
++	return ret;
++}
++
++/*
++ * Calculate the pseudo-random function, PRF().
 + *
-+ * Using the specified Kerberos encoding, check and remove the integrity
-+ * checksum and decrypt the secure region, stripping off the confounder.
++ *	PRF = KDF-HMAC-SHA2(input-key, "prf", octet-string, 256)
++ *	PRF = KDF-HMAC-SHA2(input-key, "prf", octet-string, 384)
 + *
-+ * If successful, @_offset and @_len are updated to outline the region in which
-+ * the data plus the trailing padding are stored.  The caller is responsible
-+ * for working out how much padding there is and removing it.
-+ *
-+ * Returns the 0 if successful, -ENOMEM on an allocation failure; sets
-+ * *_error_code and returns -EPROTO if the data cannot be parsed, or -EBADMSG
-+ * if the integrity checksum doesn't match).  Other errors may also be returned
-+ * from the crypto layer.
++ *      The "prfconstant" used in the PRF operation is the three-octet string
++ *      "prf".
++ *      [rfc8009 sec 5]
 + */
-+int crypto_krb5_decrypt(const struct krb5_enctype *krb5,
-+			struct crypto_aead *aead,
-+			struct scatterlist *sg, unsigned int nr_sg,
-+			size_t *_offset, size_t *_len)
++static int rfc8009_calc_PRF(const struct krb5_enctype *krb5,
++			    const struct krb5_buffer *input_key,
++			    const struct krb5_buffer *octet_string,
++			    struct krb5_buffer *result,
++			    gfp_t gfp)
 +{
-+	return krb5->profile->decrypt(krb5, aead, sg, nr_sg, _offset, _len);
-+}
-+EXPORT_SYMBOL(crypto_krb5_decrypt);
++	static const struct krb5_buffer prfconstant = { 3, "prf" };
 +
-+/**
-+ * crypto_krb5_get_mic - Apply Kerberos integrity checksum.
-+ * @krb5: The encoding to use.
-+ * @shash: The keyed hash to use.
-+ * @metadata: Metadata to add into the hash before adding the data.
-+ * @sg: Scatterlist defining the crypto buffer.
-+ * @nr_sg: The number of elements in @sg.
-+ * @sg_len: The size of the buffer.
-+ * @data_offset: The offset of the data in the @sg buffer.
-+ * @data_len: The length of the data.
-+ *
-+ * Using the specified Kerberos encoding, calculate and insert an integrity
-+ * checksum into the buffer.
-+ *
-+ * The buffer must include space for the checksum at the front.
-+ *
-+ * Returns the size of the secure blob if successful, -ENOMEM on an allocation
-+ * failure, -EFAULT if there is insufficient space, -EMSGSIZE if the gap for
-+ * the checksum is too short.  Other errors may also be returned from the
-+ * crypto layer.
++	return rfc8009_calc_KDF_HMAC_SHA2(krb5, input_key, &prfconstant,
++					  octet_string, krb5->prf_len * 8,
++					  result, gfp);
++}
++
++/*
++ * Derive Ke.
++ *	Ke = KDF-HMAC-SHA2(base-key, usage | 0xAA, 128)
++ *	Ke = KDF-HMAC-SHA2(base-key, usage | 0xAA, 256)
++ *      [rfc8009 sec 5]
 + */
-+ssize_t crypto_krb5_get_mic(const struct krb5_enctype *krb5,
-+			    struct crypto_shash *shash,
-+			    const struct krb5_buffer *metadata,
-+			    struct scatterlist *sg, unsigned int nr_sg,
-+			    size_t sg_len,
-+			    size_t data_offset, size_t data_len)
++static int rfc8009_calc_Ke(const struct krb5_enctype *krb5,
++			   const struct krb5_buffer *base_key,
++			   const struct krb5_buffer *usage_constant,
++			   struct krb5_buffer *result,
++			   gfp_t gfp)
 +{
-+	if (WARN_ON(data_offset > sg_len ||
-+		    data_len > sg_len ||
-+		    data_offset > sg_len - data_len))
-+		return -EMSGSIZE;
-+	return krb5->profile->get_mic(krb5, shash, metadata, sg, nr_sg, sg_len,
-+				      data_offset, data_len);
++	return rfc8009_calc_KDF_HMAC_SHA2(krb5, base_key, usage_constant,
++					  &rfc8009_no_context, krb5->key_bytes * 8,
++					  result, gfp);
 +}
-+EXPORT_SYMBOL(crypto_krb5_get_mic);
 +
-+/**
-+ * crypto_krb5_verify_mic - Validate and remove Kerberos integrity checksum.
-+ * @krb5: The encoding to use.
-+ * @shash: The keyed hash to use.
-+ * @metadata: Metadata to add into the hash before adding the data.
-+ * @sg: Scatterlist defining the crypto buffer.
-+ * @nr_sg: The number of elements in @sg.
-+ * @_offset: Offset of the secure blob in the buffer; updated to data offset.
-+ * @_len: The length of the secure blob; updated to data length.
-+ *
-+ * Using the specified Kerberos encoding, check and remove the integrity
-+ * checksum.
-+ *
-+ * If successful, @_offset and @_len are updated to outline the region in which
-+ * the data is stored.
-+ *
-+ * Returns the 0 if successful, -ENOMEM on an allocation failure; sets
-+ * *_error_code and returns -EPROTO if the data cannot be parsed, or -EBADMSG
-+ * if the checksum doesn't match).  Other errors may also be returned from the
-+ * crypto layer.
++/*
++ * Derive Kc/Ki
++ *	Kc = KDF-HMAC-SHA2(base-key, usage | 0x99, 128)
++ *	Ki = KDF-HMAC-SHA2(base-key, usage | 0x55, 128)
++ *	Kc = KDF-HMAC-SHA2(base-key, usage | 0x99, 192)
++ *	Ki = KDF-HMAC-SHA2(base-key, usage | 0x55, 192)
++ *      [rfc8009 sec 5]
 + */
-+int crypto_krb5_verify_mic(const struct krb5_enctype *krb5,
-+			   struct crypto_shash *shash,
-+			   const struct krb5_buffer *metadata,
++static int rfc8009_calc_Ki(const struct krb5_enctype *krb5,
++			   const struct krb5_buffer *base_key,
++			   const struct krb5_buffer *usage_constant,
++			   struct krb5_buffer *result,
++			   gfp_t gfp)
++{
++	return rfc8009_calc_KDF_HMAC_SHA2(krb5, base_key, usage_constant,
++					  &rfc8009_no_context, krb5->cksum_len * 8,
++					  result, gfp);
++}
++
++/*
++ * Apply encryption and checksumming functions to a message.  Unlike for
++ * RFC3961, for RFC8009, we have to chuck the starting IV into the hash first.
++ */
++static ssize_t rfc8009_encrypt(const struct krb5_enctype *krb5,
++			       struct crypto_aead *aead,
++			       struct scatterlist *sg, unsigned int nr_sg, size_t sg_len,
++			       size_t data_offset, size_t data_len,
++			       bool preconfounded)
++{
++	struct aead_request *req;
++	struct scatterlist bsg[2];
++	ssize_t ret, done;
++	size_t bsize, base_len, secure_offset, secure_len, pad_len, cksum_offset;
++	void *buffer;
++	u8 *iv, *ad;
++
++	if (WARN_ON(data_offset != krb5->conf_len))
++		return -EINVAL; /* Data is in wrong place */
++
++	secure_offset	= 0;
++	base_len	= krb5->conf_len + data_len;
++	pad_len		= 0;
++	secure_len	= base_len + pad_len;
++	cksum_offset	= secure_len;
++	if (WARN_ON(cksum_offset + krb5->cksum_len > sg_len))
++		return -EFAULT;
++
++	bsize = krb5_aead_size(aead) +
++		krb5_aead_ivsize(aead) * 2;
++	buffer = kzalloc(bsize, GFP_NOFS);
++	if (!buffer)
++		return -ENOMEM;
++
++	req = buffer;
++	iv = buffer + krb5_aead_size(aead);
++	ad = buffer + krb5_aead_size(aead) + krb5_aead_ivsize(aead);
++
++	/* Insert the confounder into the buffer */
++	ret = -EFAULT;
++	if (!preconfounded) {
++		get_random_bytes(buffer, krb5->conf_len);
++		done = sg_pcopy_from_buffer(sg, nr_sg, buffer, krb5->conf_len,
++					    secure_offset);
++		if (done != krb5->conf_len)
++			goto error;
++	}
++
++	/* We may need to pad out to the crypto blocksize. */
++	if (pad_len) {
++		done = sg_zero_buffer(sg, nr_sg, pad_len, data_offset + data_len);
++		if (done != pad_len)
++			goto error;
++	}
++
++	/* We need to include the starting IV in the hash. */
++	sg_init_table(bsg, 2);
++	sg_set_buf(&bsg[0], ad, krb5_aead_ivsize(aead));
++	sg_chain(bsg, 2, sg);
++
++	/* Hash and encrypt the message. */
++	aead_request_set_tfm(req, aead);
++	aead_request_set_callback(req, 0, NULL, NULL);
++	aead_request_set_ad(req, krb5_aead_ivsize(aead));
++	aead_request_set_crypt(req, bsg, bsg, secure_len, iv);
++	ret = crypto_aead_encrypt(req);
++	if (ret < 0)
++		goto error;
++
++	ret = secure_len + krb5->cksum_len;
++
++error:
++	kfree_sensitive(buffer);
++	return ret;
++}
++
++/*
++ * Apply decryption and checksumming functions to a message.  Unlike for
++ * RFC3961, for RFC8009, we have to chuck the starting IV into the hash first.
++ *
++ * The offset and length are updated to reflect the actual content of the
++ * encrypted region.
++ */
++static int rfc8009_decrypt(const struct krb5_enctype *krb5,
++			   struct crypto_aead *aead,
 +			   struct scatterlist *sg, unsigned int nr_sg,
 +			   size_t *_offset, size_t *_len)
 +{
-+	return krb5->profile->verify_mic(krb5, shash, metadata, sg, nr_sg,
-+					 _offset, _len);
++	struct aead_request *req;
++	struct scatterlist bsg[2];
++	size_t bsize;
++	void *buffer;
++	int ret;
++	u8 *iv, *ad;
++
++	if (WARN_ON(*_offset != 0))
++		return -EINVAL; /* Can't set offset on aead */
++
++	if (*_len < krb5->conf_len + krb5->cksum_len)
++		return -EPROTO;
++
++	bsize = krb5_aead_size(aead) +
++		krb5_aead_ivsize(aead) * 2;
++	buffer = kzalloc(bsize, GFP_NOFS);
++	if (!buffer)
++		return -ENOMEM;
++
++	req = buffer;
++	iv = buffer + krb5_aead_size(aead);
++	ad = buffer + krb5_aead_size(aead) + krb5_aead_ivsize(aead);
++
++	/* We need to include the starting IV in the hash. */
++	sg_init_table(bsg, 2);
++	sg_set_buf(&bsg[0], ad, krb5_aead_ivsize(aead));
++	sg_chain(bsg, 2, sg);
++
++	/* Decrypt the message and verify its checksum. */
++	aead_request_set_tfm(req, aead);
++	aead_request_set_callback(req, 0, NULL, NULL);
++	aead_request_set_ad(req, krb5_aead_ivsize(aead));
++	aead_request_set_crypt(req, bsg, bsg, *_len, iv);
++	ret = crypto_aead_decrypt(req);
++	if (ret < 0)
++		goto error;
++
++	/* Adjust the boundaries of the data. */
++	*_offset += krb5->conf_len;
++	*_len -= krb5->conf_len + krb5->cksum_len;
++	ret = 0;
++
++error:
++	kfree_sensitive(buffer);
++	return ret;
 +}
-+EXPORT_SYMBOL(crypto_krb5_verify_mic);
++
++static const struct krb5_crypto_profile rfc8009_crypto_profile = {
++	.calc_PRF		= rfc8009_calc_PRF,
++	.calc_Kc		= rfc8009_calc_Ki,
++	.calc_Ke		= rfc8009_calc_Ke,
++	.calc_Ki		= rfc8009_calc_Ki,
++	.derive_encrypt_keys	= authenc_derive_encrypt_keys,
++	.load_encrypt_keys	= authenc_load_encrypt_keys,
++	.derive_checksum_key	= rfc3961_derive_checksum_key,
++	.load_checksum_key	= rfc3961_load_checksum_key,
++	.encrypt		= rfc8009_encrypt,
++	.decrypt		= rfc8009_decrypt,
++	.get_mic		= rfc3961_get_mic,
++	.verify_mic		= rfc3961_verify_mic,
++};
++
++const struct krb5_enctype krb5_aes128_cts_hmac_sha256_128 = {
++	.etype		= KRB5_ENCTYPE_AES128_CTS_HMAC_SHA256_128,
++	.ctype		= KRB5_CKSUMTYPE_HMAC_SHA256_128_AES128,
++	.name		= "aes128-cts-hmac-sha256-128",
++	.encrypt_name	= "authenc(hmac(sha256),cts(cbc(aes)))",
++	.cksum_name	= "hmac(sha256)",
++	.hash_name	= "sha256",
++	.derivation_enc	= "cts(cbc(aes))",
++	.key_bytes	= 16,
++	.key_len	= 16,
++	.Kc_len		= 16,
++	.Ke_len		= 16,
++	.Ki_len		= 16,
++	.block_len	= 16,
++	.conf_len	= 16,
++	.cksum_len	= 16,
++	.hash_len	= 20,
++	.prf_len	= 32,
++	.keyed_cksum	= true,
++	.random_to_key	= NULL, /* Identity */
++	.profile	= &rfc8009_crypto_profile,
++};
++
++const struct krb5_enctype krb5_aes256_cts_hmac_sha384_192 = {
++	.etype		= KRB5_ENCTYPE_AES256_CTS_HMAC_SHA384_192,
++	.ctype		= KRB5_CKSUMTYPE_HMAC_SHA384_192_AES256,
++	.name		= "aes256-cts-hmac-sha384-192",
++	.encrypt_name	= "authenc(hmac(sha384),cts(cbc(aes)))",
++	.cksum_name	= "hmac(sha384)",
++	.hash_name	= "sha384",
++	.derivation_enc	= "cts(cbc(aes))",
++	.key_bytes	= 32,
++	.key_len	= 32,
++	.Kc_len		= 24,
++	.Ke_len		= 32,
++	.Ki_len		= 24,
++	.block_len	= 16,
++	.conf_len	= 16,
++	.cksum_len	= 24,
++	.hash_len	= 20,
++	.prf_len	= 48,
++	.keyed_cksum	= true,
++	.random_to_key	= NULL, /* Identity */
++	.profile	= &rfc8009_crypto_profile,
++};
 diff --git a/include/crypto/krb5.h b/include/crypto/krb5.h
-index 94af2c558fa1..81739e9828d3 100644
+index b12f012cf354..b8fda81379ab 100644
 --- a/include/crypto/krb5.h
 +++ b/include/crypto/krb5.h
-@@ -117,5 +117,26 @@ struct crypto_aead *crypto_krb5_prepare_encryption(const struct krb5_enctype *kr
- struct crypto_shash *crypto_krb5_prepare_checksum(const struct krb5_enctype *krb5,
- 						  const struct krb5_buffer *TK,
- 						  u32 usage, gfp_t gfp);
-+ssize_t crypto_krb5_encrypt(const struct krb5_enctype *krb5,
-+			    struct crypto_aead *aead,
-+			    struct scatterlist *sg, unsigned int nr_sg,
-+			    size_t sg_len,
-+			    size_t data_offset, size_t data_len,
-+			    bool preconfounded);
-+int crypto_krb5_decrypt(const struct krb5_enctype *krb5,
-+			struct crypto_aead *aead,
-+			struct scatterlist *sg, unsigned int nr_sg,
-+			size_t *_offset, size_t *_len);
-+ssize_t crypto_krb5_get_mic(const struct krb5_enctype *krb5,
-+			    struct crypto_shash *shash,
-+			    const struct krb5_buffer *metadata,
-+			    struct scatterlist *sg, unsigned int nr_sg,
-+			    size_t sg_len,
-+			    size_t data_offset, size_t data_len);
-+int crypto_krb5_verify_mic(const struct krb5_enctype *krb5,
-+			   struct crypto_shash *shash,
-+			   const struct krb5_buffer *metadata,
-+			   struct scatterlist *sg, unsigned int nr_sg,
-+			   size_t *_offset, size_t *_len);
+@@ -31,6 +31,8 @@ struct scatterlist;
+ #define KRB5_ENCTYPE_DES3_CBC_SHA1		0x0010
+ #define KRB5_ENCTYPE_AES128_CTS_HMAC_SHA1_96	0x0011
+ #define KRB5_ENCTYPE_AES256_CTS_HMAC_SHA1_96	0x0012
++#define KRB5_ENCTYPE_AES128_CTS_HMAC_SHA256_128	0x0013
++#define KRB5_ENCTYPE_AES256_CTS_HMAC_SHA384_192	0x0014
+ #define KRB5_ENCTYPE_ARCFOUR_HMAC		0x0017
+ #define KRB5_ENCTYPE_ARCFOUR_HMAC_EXP		0x0018
+ #define KRB5_ENCTYPE_UNKNOWN			0x01ff
+@@ -45,6 +47,8 @@ struct scatterlist;
+ #define KRB5_CKSUMTYPE_HMAC_SHA1_DES3		0x000c
+ #define KRB5_CKSUMTYPE_HMAC_SHA1_96_AES128	0x000f
+ #define KRB5_CKSUMTYPE_HMAC_SHA1_96_AES256	0x0010
++#define KRB5_CKSUMTYPE_HMAC_SHA256_128_AES128	0x0013
++#define KRB5_CKSUMTYPE_HMAC_SHA384_192_AES256	0x0014
+ #define KRB5_CKSUMTYPE_HMAC_MD5_ARCFOUR		-138 /* Microsoft md5 hmac cksumtype */
  
- #endif /* _CRYPTO_KRB5_H */
+ /*
 -- 
 2.50.1
 
