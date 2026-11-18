@@ -1,78 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795050069;
-	b=W/g3lm9jTRdYo2hCcXaV1+V6W8Ap29zHjtRwZj2aOIByTQp0GusBPSvWVdnFz0TmQUSY
-	 vHjq7Lwpl1/v051Bl69ECVbOyVQrOeD5EnbsrhYQcVCj3X4GFqJZPBvKaTHJbfQekADpp
-	 nMoqhSOTtV9hcpdSMyLasbBrJQS5yQMAPJCCrg3yG9XTTbrUtereyoRQPopNH3G3qzHkM
-	 uSrtAHvzkMOovGYlJm0fe3vyHbfquBQGNbDY+chxn8fdgNYzNja4YClINyZ+CXF+PlGFs
-	 a/yNuncSbUak987zudP6Gv1VHIUWDUY8/uSqBg9tx3voB8AhqgtUKcUS2JoHa6cwcJg==
+	t=1795054993;
+	b=FZL9FVKcqM2qwEWLaasZyjLsVEDaQZZ7uCWL2hCFkvKVqmcRB80A/EF0di/bfqmZJ1YF
+	 SX7NRuok0rlyDab1nTe3wsX2v3Z/IeM2F24N/0DOeHSqFofc0bktpwbiUueImPImiaclf
+	 L0PUtw4uuARL68DkvN8I/6La1R+GyPv4xUbyU67sZ2AbdvPbuP0GJpi6g6igtjzni+FVq
+	 HleQeuPhVjJ4Io63QOeOF1gb2VluLbs2kxnudVr8s/wvPLksvRyjK0fdRmLd+bINieDiG
+	 qIN5sDbkZhkAQ2UARXdhL2y5te5n2+jkPIm/iJsBGi0A4nqznPcN181P6qLwzL136Kw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795050069;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=49NXjUTbzL4+xbJpcXKoJd4omTTJA3SheYrgPCgGq84=;
-	b=vS5J49mB1ax80RDM8gC/lh5KXPnw5Alz1PGjohGWgeG0NQG3AaUICpe4JTLs6ZOtYMQY
-	 JwtWoEYj/pwWcIn2uBz01NeCUjDcMubbirjJnvAjhsAhAbW2GODBwJjw4Z6KfKxdoAjy1
-	 nD8hfBhY2fKfQjzmYH9MwB8tZjgHV6J5FQiGcdj+R3ScAXWnM9kc7yx1itInHgvYmmwc+
-	 QcvVjpalSuJSeZeBDcuJQQ9LZsRYZZka4cPXuAYEw/yb+1NDx1nYzspWxIEzv6wgC6ZX1
-	 nOLrurltHwy2yptCh5rDP/xlhaAGdbyL/ws+CDN84RfjlZdQHlp5Ja3PUwbhEIj7bKQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795054993;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:User-Agent:X-stable:X-Patchwork-Hint:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=muBtTw03L5Q+ktViRHTg43LW47QauHPdA3EAg4zKHgQ=;
+	b=sZJPcTTd5eAC4CMCseAXEhG8LyjSWaEgGy3q+M29GfA60G5NBl7eF6eGYGjPM6WZALSu
+	 oXwSSUl9YrphzURKounsaC3p7RmkGPkDZjOfmZU9ciWMKio4uv7qI7Zn++D7+NYqgstxG
+	 4gpgtmfoESwc0tnXiUFI8cK4tnJYkG0WybLmRoGS+IWg88Kygy5EIWcokYAnYUL5oFQRF
+	 o46c/Vl3XhPJgIpZTxlCB8QLxLc95BCTu+jVwRJBK0RBfgaNFSRe475ugFd/F5+/2kaSL
+	 0DhSgBU2u64ciaFBVxcNXQwhcsHdW5qVluvXCvAMrZBoGDzMxEcPG7It3r3UA+b0Wqw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IQv06nro;
+	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=SNG9njAR;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 0E428606A332;
-	Thu, 19 Nov 2026 01:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E589F606A31C;
+	Thu, 19 Nov 2026 02:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IQv06nro
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 3E62E1F000C4;
-	Thu, 19 Nov 2026 01:01:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795050068;
-	bh=49NXjUTbzL4+xbJpcXKoJd4omTTJA3SheYrgPCgGq84=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=IQv06nrofbIqNARVVWh9JrAgHaEyRWKOud9QvOcchO4KY4ScIzXSqs80rNJ/ht3b1
-	 Tsu7VMYrIh/2Fi+hRTl7qSSsKz4S7jM8ebpPVfo17lwtEFZMdAvwfZsxatV/ZsWAUp
-	 PJgwsXqU+KqK3LvIcvOGucx9P9jANzCFHIamLnf4sC5rVp+bvnrP0sCUChwGa++Hwx
-	 a7awEoAOqry4Xom2vSVycaB2NRS9vG06yCTtwmMYjMTvqtDoBc6hHSkU5Dk5pOb1Ih
-	 GIaqltmVlM6m491tKp84gsZmgrtTNr8xvyupIzrYmeeJ//m5Bn5hJKwuAsDqwP+LxE
-	 +hNKrozwFIXmA==
-Date: Thu, 19 Nov 2026 03:01:05 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Demi Marie Obenour <demiobenour@gmail.com>
-Cc: Rodolfo Giometti <giometti@enneenne.com>,
-	David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=SNG9njAR
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02BF51F000C7;
+	Thu, 19 Nov 2026 02:23:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1795054992;
+	bh=muBtTw03L5Q+ktViRHTg43LW47QauHPdA3EAg4zKHgQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=SNG9njARziaXtEHSElrg/Wp6NNx7U0+Cxmy4BtndUZ8ljw0EkiYfFObiUaCh9BrOv
+	 jNinBl/8NdGv+xyMypU9KLL7vWeFrXWG0moumvazG6swe8sD/tYsLJMKQUmMaEXvyt
+	 8NpqL5IcDixIujGsVDYp/uCF16B+8OgupSSRpKe8=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Corentin Labbe <clabbe@baylibre.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jens Wiklander <jenswi@kernel.org>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	op-tee@lists.trustedfirmware.org,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Sahil Malhotra <sahil.malhotra@nxp.com>,
-	Ahmad Fatoum <a.fatoum@pengutronix.de>,
-	Richard Weinberger <richard@nod.at>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, linux-crypto@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/9] KEYS: keycrypt: keys that user space can use but
- never read
-Message-ID: <av5KUakRYdiaondn@kernel.org>
-References: <20261118140421.584086-1-giometti@enneenne.com>
- <650f89ef-9745-4f75-b254-80fa5ac4773d@gmail.com>
- <av5EyVHnNzT27dyK@kernel.org>
- <61ca7c37-7b42-48a3-be2e-95deb4d999a2@gmail.com>
+	linux-crypto@vger.kernel.org,
+	linux-amlogic@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.15 1473/2214] crypto: amlogic - Fix dma_map_sg error check
+Date: Wed, 18 Nov 2026 15:52:29 +0100
+Message-ID: <20261118150110.101789092@linuxfoundation.org>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261118150009.797899913@linuxfoundation.org>
+References: <20261118150009.797899913@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -82,82 +67,65 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <61ca7c37-7b42-48a3-be2e-95deb4d999a2@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 18, 2026 at 07:43:37PM -0500, Demi Marie Obenour wrote:
-> On 11/18/26 7:37 PM, Jarkko Sakkinen wrote:
-> > On Wed, Nov 18, 2026 at 06:42:15PM -0500, Demi Marie Obenour wrote:
-> >> On 11/18/26 9:04 AM, Rodolfo Giometti wrote:
-> >>> This RFC proposes a key type, "keycrypt", whose material user space can
-> >>> use for symmetric operations but never read: AES-256-CBC, HMAC-SHA256
-> >>> and an authenticated AES-256-GCM stream, through a file descriptor that
-> >>> KEYCTL_CRYPT_OPEN returns for one key and one operation.
-> >>
-> >> I haven't looked at the API, but from a cryptographic perspective,
-> >> this encourages very poor practices.  AES-GCM even allows userspace
-> >> to extract the secret authentication key.
-> >>
-> >> AES-256-CBC isn't a suitable mode on its own, unless it's combined
-> >> with a MAC in encrypt-then-MAC.  Even then, it has a 2^64 birthday
-> >> bound, so it should only be used 2^48 times with a single key unless
-> >> the key is ephemeral.
-> >>
-> >> AES-GCM is not a suitable algorithm either.  If you allow encrypting
-> >> with a key loaded from persistent storage, there is no way for the API
-> >> to ensure it is only used with a unique nonce.  Nonce reuse leaks the
-> >> authentication key and allows forgeries.  Using random nonces isn't
-> >> good enough either: NIST only allows 2^32 encryptions in this case,
-> >> and the API can't enforce that limit.
-> >>
-> >> For long-term keys, all of the following are much safer choices.
-> >> They have 192-bit nonces, which means that one can generate them
-> >> at random for each encryption without any problems.
-> >>
-> >> - XAES-256-GCM
-> >> - XChaCha20-Poly1305
-> >> - AEGIS-256
-> >>
-> >> AES-GCM-SIV is also okay, provided that you are fine with occasionally
-> >> leaking if two plaintexts are equal.  This happens whenever there is
-> >> a nonce collision, so with probability 2^-32 after 2^32 encryptions.
-> > 
-> > The exitential problem here is that KEYCTL_CRYPT_OPEN creates a circular
-> > relationship between the keyrings API and a specific key type.
-> > 
-> > At hardware level I did not see any support for TPM, which narrows down
-> > the potential user base.
-> > 
-> > The remaining potential user base is further reduced by those that use
-> > trusted keys; leaving out those who need to solve the assumed problem
-> > that only this patch set can presumebly sort out.
-> > 
-> > And we don't really know at this point that cut. This is pretty much
-> > the break down of what is wrong here.
-> > 
-> > If there is/was a problem to sort out, it should be so constrained that
-> > it should be as quick to describe as stepping over a nail really.
-> > 
-> > These are the main topics what I would focus on.
-> 
-> This whole patchset looks like a solution looking for a problem.
-> 
-> The usual solution to something like this is a userspace service
-> like ssh-agent.  Then you can do whatever key management you want.
-> That doesn't protect against root, but if someone can get root you
-> have bigger problems.
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
-This is true. Even if the code was like it is BUT it had a clear
-motivation, I would likely suggest to the author how to resolve the
-problem more properly.
+------------------
 
-I.e. bar is not too high in initial code quality but it is steep
-from the get go in the "utility value".
+From: Jack Wang <jinpu.wang@ionos.com>
 
-> -- 
-> Sincerely,
-> Demi Marie Obenour (she/her/hers)
+[ Upstream commit 45fa321e7de604146603e24ee5bf3c0b766efe46 ]
+
+dma_map_sg return 0 on error.
+
+Cc: Corentin Labbe <clabbe@baylibre.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-amlogic@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+
+Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Stable-dep-of: 6c2373dd818b ("crypto: amlogic - Fix DMA memory leak in cipher error path")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+index e79514fce731f..af017a087ebf0 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+@@ -177,7 +177,7 @@ static int meson_cipher(struct skcipher_request *areq)
+ 	if (areq->src == areq->dst) {
+ 		nr_sgs = dma_map_sg(mc->dev, areq->src, sg_nents(areq->src),
+ 				    DMA_BIDIRECTIONAL);
+-		if (nr_sgs < 0) {
++		if (!nr_sgs) {
+ 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgs);
+ 			err = -EINVAL;
+ 			goto theend;
+@@ -186,14 +186,14 @@ static int meson_cipher(struct skcipher_request *areq)
+ 	} else {
+ 		nr_sgs = dma_map_sg(mc->dev, areq->src, sg_nents(areq->src),
+ 				    DMA_TO_DEVICE);
+-		if (nr_sgs < 0 || nr_sgs > MAXDESC - 3) {
++		if (!nr_sgs || nr_sgs > MAXDESC - 3) {
+ 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgs);
+ 			err = -EINVAL;
+ 			goto theend;
+ 		}
+ 		nr_sgd = dma_map_sg(mc->dev, areq->dst, sg_nents(areq->dst),
+ 				    DMA_FROM_DEVICE);
+-		if (nr_sgd < 0 || nr_sgd > MAXDESC - 3) {
++		if (!nr_sgd || nr_sgd > MAXDESC - 3) {
+ 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgd);
+ 			err = -EINVAL;
+ 			goto theend;
+-- 
+2.53.0
 
 
-Br, Jarkko
+
