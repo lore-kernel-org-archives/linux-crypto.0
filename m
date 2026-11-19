@@ -1,81 +1,52 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.149.156.176
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795112450;
-	b=wIk/fRQzMAh7NHkaeoCiOia2aM7uR3FxR7zXifMeut/cLC9ExHzDqjgpxhCSKDmUnTC4
-	 ZuEWNBppQcoxQIkUVi3vK8j+XFSgHofmsyrhZLhU4pZzgWx035iR0oSN5HtXAI1z0cwkF
-	 nLl1l9gr6jg/wgOVV46OoebxBsag3UyBhVrLoUtc/fr3WrsYpeoabf1BBQ4e9vwK27IpS
-	 qf5u7eT+Rjan5he2nxDIX9xuLAMvnLJDA+0LZ70ay7R0ZTldMBQWlm/bWfyEGfXWdr7tO
-	 +C6N6RA4QxbuMljEvIi0pOvt+30XARC/70kYeFhOfjDj95mWmsL4bIoQsEgjh+xz4vw==
+	t=1795113213;
+	b=GD9sV5F5f+ADxmJO590IC0jaAE0kY2PMJehwUyvh94CMFTa+kiunwY6/594sZeBqhHp6
+	 rTKwug3hvu0BRFosiUfuawoVdW8bXq0zASBPfaLc25Mp3c4J4gft/eXfnEf1WW8M0tEXJ
+	 3Ykhsbvyg+q8unJ315ymZHLRoQK35OEKruLP7eV72PIJGfsFtjYOmkAQQFUvOPZPHwJbL
+	 TztXbaKzbnZSYVrGIj/TT6iy7yS25wqHjBTPZIP/3cEnK2A/yuWG0gwD63hNikdw6+5sR
+	 UA5s3FtIIA+P+fEbn2NPIQv+byYH3aGZjlUjl1xR3GcLX8GMim8WeLK+Lgu+LidRyKA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795112450;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer;
-	bh=5cY+QOFSRab+vw7Ar5Uc+Mh1ld4eiD0jvPyComZKkI8=;
-	b=MvCGHQeSVJeruMRl0a27+xVHcKTpNwtpxb7U+IAugbJqU2xMORWeZcZ+00XwvUKb/I6n
-	 KvhkbrKVemkwkJ+27LiniKf0vinp9mtOk45CmuZvERsK354OWiqgEAdJKyVSfP4Nu52aP
-	 dZblhoHdgcoR7u8qREJxVz1rVYZzaqYk5GfKuCMtBFKzKNeSRqC7E4oK0fgRWTWEs89UG
-	 Y5zJKG78ctaC0TuSKSIQhHvRkg2lgk8xFwdNTBfK3QFrPkyNSoAnt08EFYwvIJG3RD3un
-	 l5e5mgE2SL2LTQeLzRVPM/0HH860l4fLJnCEY2wpLi93/JLduiwphEH3cOb4PUkFdGw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795113213;
+	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:Content-Language:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-CMAE-Envelope;
+	bh=2TwysOH3jFptJLl7Zh65O6ibU0W1pO9RKYiZ6XUEe4o=;
+	b=heXRJUwLb3mCyuHgSwVW8UDZmtXSpwOQ/DZNJmX2UlzqfKJeQIGswnkwEs0kOMtLftGF
+	 CpuaeXtznCkvVEFGleWT0542leJlVmSLM+JbeR1H7/Xo77CVRT5qUzjsTK2WyykyfxlTP
+	 aQHZceeXYjLxxTJAGf2I9RPIQfQ/3a5EMfTgtH6pzHxx2EFh0zXO5LsvH/QT0aQyzDMqP
+	 dURjQUXCfQGhdFS3g6syfJyUcqFP7RWPaUSqGeNX9aslwEgxQ2CuViWBBeLm8FMoOIjLQ
+	 4xn+j7cqnIXRvyxysJbt4yiQPWTGguRsMj6KzEeHHSGlsn/at6vEhqQT+pXjHza2oqQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mFVkDPWN;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=enneenne.com;
+	spf=pass smtp.mailfrom=enneenne.com;
+	dkim=pass header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=iMCz4c4v;
+	arc=none smtp.remote-ip=62.149.156.176
+Received: from smtpcmd15176.aruba.it (smtpcmd15176.aruba.it [62.149.156.176])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7E5606A325;
-	Thu, 19 Nov 2026 18:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04F60A260C
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Nov 2026 18:33:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EF04F60A260C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mFVkDPWN
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B0EC1F000C5;
-	Thu, 19 Nov 2026 18:20:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795112449;
-	bh=5cY+QOFSRab+vw7Ar5Uc+Mh1ld4eiD0jvPyComZKkI8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=mFVkDPWNUUaI/lD8LZupI2Dv6P1hrK9IDKEmnqQP3hRcjIokrajVdotKHQAyu0NV/
-	 LRn7QDpEIl7PkujuQRr3JBOYQ+mJ0JJKhFd3EksrdvpLpq/b5w75RdtGldsmRSuWuG
-	 Ej9e2CQPJJ3vc6ty6KfikChr+J+4TieOCN5RUxlTysnTo90F+i3dQL/yhRCP6r9QKI
-	 ZUEOfNqI0qQI7nJ3efrl+mVFZSuYADsTl8cPGElqU4t+ZqtyImk+pdJ6b3Tve3I3qk
-	 6SUHTGBRqWjRzEw9B/SNFUNcnVx4t7sMsIkZvT0Ltu1LVrPnQ/gifStw7uYoI+dALN
-	 894KwzJuU9EZw==
-From: Lee Jones <lee@kernel.org>
-To: Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, Abel Vesa <abelvesa@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Robert Marko <robimarko@gmail.com>, 
- Guru Das Srinagesh <linux@gurudas.dev>, Thomas Gleixner <tglx@kernel.org>, 
- Radu Rendec <radu@rendec.net>, Lee Jones <lee@kernel.org>, 
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
- "Joerg Roedel (AMD)" <joro@8bytes.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Wesley Cheng <wesley.cheng@oss.qualcomm.com>, Vinod Koul <vkoul@kernel.org>, 
- Neil Armstrong <neil.armstrong@linaro.org>, 
- Manivannan Sadhasivam <mani@kernel.org>, 
- Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, 
- Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, 
- Viresh Kumar <viresh.kumar@linaro.org>, Amit Kucheria <amitk@kernel.org>, 
- Thara Gopinath <thara.gopinath@gmail.com>, 
- Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>, 
- Lukasz Luba <lukasz.luba@arm.com>, Georgi Djakov <djakov@kernel.org>, 
- Sibi Sankar <sibi.sankar@oss.qualcomm.com>, 
- Stanislav Aleksandrov <lightofmysoul@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, mfd@lists.linux.dev, 
- linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, 
- linux-usb@vger.kernel.org, linux-phy@lists.infradead.org, 
- linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org, 
- linux-pm@vger.kernel.org
-In-Reply-To: <20261109-halliday-dts-v1-5-289114ab8197@gmail.com>
-References: <20261109-halliday-dts-v1-5-289114ab8197@gmail.com>
-Subject: Re: (subset) [PATCH 05/17] dt-bindings: mfd: qcom,tcsr: Add
- Halliday TCSR
-Message-Id: <179511244123.91992.13336083093444200069.b4-ty@b4>
-Date: Thu, 19 Nov 2026 18:20:41 +0000
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=iMCz4c4v
+Received: from [192.168.0.186] ([101.57.122.26])
+	by Aruba SMTP with ESMTPSA
+	id U6wix2IW175O9U6wix0Oma; Thu, 19 Nov 2026 19:33:23 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1795113203; bh=2t8AtcRowxFNGYE8HteZpHIn9jAWUm8DVCWA8vMMYBE=;
+	h=Date:MIME-Version:Subject:To:From:Content-Type;
+	b=iMCz4c4vXgNfjaVsNwvBuMF7tZY4Yy54lPGmuAGKY6P71MLCV/srwMTceBQ/GAt34
+	 IwJr1uqnf/dmNjlMZQB9cLgUTxbIw6iVRuT9buaKQVDbz3kaNVFEIoEpXvAkCgmyEI
+	 PSFVCiHj3v8SvBzh912x32zMoFnRUAiLuKuPzH9wjTX7qSHSKg+cusdAEfdyhakn6U
+	 MDZ+sXbJbEnEXvAx8A/4DselQVxkwI8uuu0bk6VUSPoq8UUhqONY29s9ATTEIL13dy
+	 Cw/3hrysPCKNiLyF9KsJstL/jDdfxcyJ3j39BP5mlGiBGtXHINn2jlUD38UGg+FRMw
+	 xxp9/W63RlIFw==
+Message-ID: <4ad95ed5-26b6-4871-bcb6-cfebfe73917a@enneenne.com>
+Date: Thu, 19 Nov 2026 19:33:20 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -85,18 +56,77 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.16-dev-ad80c
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/9] KEYS: keycrypt: keys that user space can use but
+ never read
+Content-Language: en-US
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Jens Wiklander <jenswi@kernel.org>,
+ Sumit Garg <sumit.garg@kernel.org>, op-tee@lists.trustedfirmware.org,
+ =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+ Pankaj Gupta <pankaj.gupta@nxp.com>, Sahil Malhotra
+ <sahil.malhotra@nxp.com>, Ahmad Fatoum <a.fatoum@pengutronix.de>,
+ Richard Weinberger <richard@nod.at>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Eric Biggers <ebiggers@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
+ <rdunlap@infradead.org>, linux-crypto@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ Demi Marie Obenour <demiobenour@gmail.com>
+References: <20261118140421.584086-1-giometti@enneenne.com>
+ <650f89ef-9745-4f75-b254-80fa5ac4773d@gmail.com>
+ <av5EyVHnNzT27dyK@kernel.org> <av8In0Xyd5iI9N7K@kernel.org>
+From: Rodolfo Giometti <giometti@enneenne.com>
+In-Reply-To: <av8In0Xyd5iI9N7K@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfDXtWOlFTYpyTg35cFi8NKxn6M8tXvqRpaK6Te9d9LP538qpRWPqyhYCRUO7FN90zeUALjH4Pv0kc5qTXvx9JqFIICyIFmy8AMREg/ZL7rPvrVR8BOUd
+ cLloYWy2etZ8Iz2Dj35VuyDIDq5OJcXlqCU0GxFuELT2Ll0+SMmq0xT0b1NQ/mGJ1DRr6EgGHmwb1jcrz7jDiFyXggFkpjEOVUfCxm33Z+AP0WZg8zgrFJ0n
+ ffHu26kwKFVQdawAYFWmaAXnHN1p0WPTc2eQub+iUcKYdh/LB+1TMtCynW4g+PFuL/Ox/uZYSQ3twHUYmoc0NljKoPOQdr9z82B634PV+Tl5rFaczqEJswvL
+ RMT75ziH1aZFGiT3YGWODPXE3kKUfWeYw2ky9PgD86fbcUKc9YG7O6O4C555MM8R18YgP7zwMiMpC0MPLWUV4TYOFHuGzRI3nAMUWf2OAvcXsYsO9EJVC1dZ
+ /CJBXkFCk64KKzxL3y8DwpvUb58jZOH5wiXqHdVhVBx7moWR2O7fcnAGvb0ROFigOOWFyNifYgQAUKvRx0Gjo0aKANKYhIDOo9FoNc3nTrLMB+wllSvU908i
+ ZvkuwtX35joO+/L82trX60+HcodZHev58cbR0wIdppW64faoXjrD2ty6e3+iNo1wzj4r1WV6hSakPGcj+ITxJAyi+jIfJwOIVZnMMjwKHWWd276ZqiyPHgzR
+ tHcGBXPnD0+Y4FdwbDCkcDNcPihbMtNcarY0ckxuc2T0QuwtA6V5JI+qd+13NzNwBNaSBd9q0vR4Houfn0O1tVDSLHjYJhYnCW1hfd8zibQ4R4JUQeDCsiso
+ hDRhfUPbEdA73rTyHioYeBE2HST4BYaYzwzPHgFSowkALmKiOo3P6Y+sT2OdjUa1mi5YmmKKNIRc5pqRvd/Poq1X6e5PtLi+bMEeLu/tD0VuL3zYOGxE+sHW
+ BTqxG0WyQtxpY++s7NY1cpcH0qqhtrXP08lJaeDotFcKwlEQgSTkroRSzbXG9NMpu/BmvKQiIhI/dqa4MxRp7JEEFN/QNVR7WEj2UU0vqJswExy2aYWzzdw+
+ FkBYKTSapeFo97Im9jOUDeTGL1gcFhA/aHSIiD07c4PP/74NLMye+4RTaOnZlsrMaXjbB2/jn6s9k9AKtJfRSJPMFnBj3YyvI3YYi+xduehbptXY4hxkqo3D
+ c5x2hRhHNjhs0zg+GpmJGknXwvGaK4l4a6zTOKWmfv7xMtgIZ/Vn9d4GsOJdkemp7e3WX6RGITrcgwSghHENodqP2MvCkuvhyBHE4/kY7pUMNCMYz3xNrYgX
+ 6PdBjdKe
 
-On Mon, 09 Nov 2026 00:33:17 +0000, Stanislav Aleksandrov wrote:
-> Document the TCSR block on the Qualcomm Halliday SoC.
+On 19/11/2026 15:33, Jarkko Sakkinen wrote:
 
-Applied, thanks!
+[snip]
 
-[05/17] dt-bindings: mfd: qcom,tcsr: Add Halliday TCSR
-        commit: 51a1764ff434dff86994f7e03125033deebda6e3
+> And yeah, we don't have projected problems. I.e. "no users" is always
+> NAK. You have to step on the nail at first.
 
---
-Lee Jones [李琼斯]
+A customer of mine stepped on it. Their product, on i.MX6, encrypts its
+rootfs with dm-crypt and a CAAM black key, never in clear. Its backups,
+though, are encrypted in user space with a key kept as a CAAM blob; to
+use it, the blob is opened and the key handed to user space in clear.
 
+The next generation is on i.MX93, and the customer now wants the
+backups and other encrypted archives protected like the rootfs: the key
+must never be in clear outside a secure world. The i.MX93 has no CAAM.
+OP-TEE can hold the key, but every way the mainline keyring offers to
+use it (a trusted key, through dm-crypt or AF_ALG) unseals its bytes
+into kernel memory, and AF_ALG no longer reaches hardware drivers.
+keycrypt's OP-TEE backend does not unseal it: a key it generates leaves
+the TA only sealed.
+
+Ciao,
+
+Rodolfo
+
+-- 
+GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+Linux Device Driver                          giometti@linux.it
+Embedded Systems                     phone:  +39 349 2432127
+UNIX programming
