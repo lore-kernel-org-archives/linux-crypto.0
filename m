@@ -1,62 +1,61 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=13.77.154.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795118075;
-	b=ub+cPrMQs4LXMZjSLH3XnjE8O8dGuM6JUg0A/KzZmiJEV44FnQqtkvqCRyp6akiz5fD/
-	 rGQTkCnVN1q/gs5yzQyaRX4uSEkFn3h5ygBwNqqfBRKZ04ArZwTNMY27qotHakHvkyHxc
-	 fqwwIXUjK6NOLzfebqO+vmtn9H24FLvB+MY+oppzMidFRR7Y90/SGTmEjUxPcV9Cv9HJm
-	 XC1CwMU2p9fXuxVleKHgSpf1kLfqWYNO/r21EoatrjCecyS5KpzO6tenZH1IKBAM1ekQ8
-	 KW4lx/eApcyKeHxS5P47B+lxu3rzMLfrCDt5yhXQSqHSxoE1XL9WyLUFpZ68Hwv5jAg==
+	t=1795118400;
+	b=K+nP1OsBSLVI2f7RfN2K15Rk3UZVkbb1tg3P3f7UKrdVWunnw3cB2LKooTJK8+eoeb8H
+	 FPnqKlYYw4Z65l+pRArpjMWlQF/1HTz+a1ASQLWcMH/M9y+83z8/WrSUADeI7spdXn+6P
+	 N4ggeoBfyKh7Gfg8h9s2F/9wfLgWOpnc7pjhLi87TCF+B59KYwfA/+hwJ0T/8mOwKCBFF
+	 Z85NVS9KKq8lLTbBt+bSUYqmtg8Mp97rTwPJyLuz3JwBypvvyUJ5BHs6aqx2lpYFgLZbx
+	 T54vytFRdNSkJkgSpezCWzlxd/HDRlb/iirJV35CWcix1nXU35oDqjHi6RDdKPR+vwQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795118075;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795118400;
 	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Spam-Status:X-Spam-Checker-Version;
-	bh=Ru1e4Dsl9fl+y7pyjbXE8FmfV8fA53Dqg3REoaqq96c=;
-	b=Of+PzFnZjHaP0CY+Ql3SQZ9l3R2Uz23nUmtIO/VvEhm1KcutgaRPbvxi2X1QePCSePGr
-	 ArBU2kE5BnQLdU/cn0HT1dkNFLD1uFDxQQYdH9RbK06Nre1yLzatL7PIEMnU7c2CVuVE7
-	 KW/63qE/Ye0Jzi5CUHQn2yTpgckb3CqcpOlwoqldAZvbwALPtynJjyygj6obniaME6icH
-	 VUWRgQuWguZkvj+m6rrSV0D/soPyIi4+7XWMpeKEY652Zc2TkPovqBuKmBsd8fsgNRjYI
-	 wja60+2GjwLi7OZb9w88naLSnxCnTk/KC/pKqXjc8PD9imxpphmW/gQ2v71EbCUT7Tg==
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-Spam-Status:X-Spam-Checker-Version;
+	bh=PEjNlh3YBVnW5VZbE2ITqmaSEF4yPZYBZERekvnfZsY=;
+	b=x2Gd4cnKCYJsH4RcfX1AKLNQZ0FTuYHn7VePTXbdOs2aJa3zeulx4Vwckhnlm7bAN32p
+	 pCYfaEXsXUE++jo063LmTLeHe+vd2b4CNS5y0oRRYzJa6kUIv5TbTHIPdow9tRWHYN7k7
+	 6lR+t0oHk0yTWpSpSTSGtOADf02Ip6tm0wZxMErUV9YqmTvQMbg4OFzdXcd/7mPA7MjEX
+	 Yjim8rt5dPuQFzvDw5pvOF1Ztv97r+o2i+AUThJtTjEhGBgrUu4BAiBuMN6ZBaW5M0TKB
+	 yASc4mc3IKsXz3MmCCu8+Cs0EXUxJMF1T3MhkFHOCqrPE7k/F23YFk+CIHBJ5ovtVVQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.microsoft.com;
 	spf=pass smtp.mailfrom=linux.microsoft.com;
-	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=C2bFQ6Ti;
+	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=BImxGXu3;
 	arc=none smtp.remote-ip=13.77.154.182
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392F3606A320;
-	Thu, 19 Nov 2026 19:54:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 392F3606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E25606A32C;
+	Thu, 19 Nov 2026 19:59:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 42E25606A32C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=C2bFQ6Ti
-Received: from jeffbarnes-ThinkPad-P14s-Gen-2i.corp.microsoft.com (unknown [52.179.129.152])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 8445920B7166;
-	Thu, 19 Nov 2026 11:54:31 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8445920B7166
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=BImxGXu3
+Received: from jeffbarnes-ThinkPad-P14s-Gen-2i.corp.microsoft.com (unknown [52.177.6.190])
+	by linux.microsoft.com (Postfix) with ESMTPSA id AB63920B7166;
+	Thu, 19 Nov 2026 11:59:54 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AB63920B7166
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1795118073;
-	bh=Ru1e4Dsl9fl+y7pyjbXE8FmfV8fA53Dqg3REoaqq96c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=C2bFQ6Tim8TiwuK+dwri9qk9tnRZFNLVTvyRPcP/ZglzAc2H+6gnYFtvhYokJgg0V
-	 9ecOdngXXTDEWTRQUkVetktbRW1VW25g5UknhamBnnpZxbj3cBYigee3ucM4ISpIFt
-	 GcuCSui0XEZq0NCJQvvd+QBBgfQ2HY3VMs9tEz+k=
+	s=default; t=1795118396;
+	bh=PEjNlh3YBVnW5VZbE2ITqmaSEF4yPZYBZERekvnfZsY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BImxGXu3H2muuSjL8IMS+5ySW63nJMiCIFkiyYKlNlzJpTTk4DMOERMSImsAbfAfd
+	 RIt/pw51HsW0b4kOWBaQf5FrMfygG8kxnOvDa/HHfeEA6EAixxovtKaMKqwzElc86P
+	 OIGAvqpWKI5rg1+aGhu+mpYnVg0fUsSG6dLkMQ78=
 From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-To: herbert@gondor.apana.org.au
-Cc: horia.geanta@nxp.com,
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	horia.geanta@nxp.com,
 	pankaj.gupta@nxp.com,
 	sahil.malhotra@oss.nxp.com,
 	changwei.zou@canonical.com,
-	gaurav.jain@nxp.com,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
+	meenakshi.aggarwal@nxp.com,
+	tudor-dan.ambarus@nxp.com,
 	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/1] crypto: caam - fix in-place RSA payload DMA mapping
-Date: Thu, 19 Nov 2026 14:53:50 -0500
-Message-ID: <20261119195350.812246-1-jeffbarnes@linux.microsoft.com>
+Subject: [PATCH v2 0/2] crypto: caam - fix in-place RSA DMA mapping
+Date: Thu, 19 Nov 2026 14:59:46 -0500
+Message-ID: <20261119195948.816661-1-jeffbarnes@linux.microsoft.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <avRJW9494fF7Pyf4@gondor.apana.org.au>
-References: <20261020192511.3389133-2-jeffbarnes@linux.microsoft.com> <avRJW9494fF7Pyf4@gondor.apana.org.au>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -68,95 +67,84 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Herbert,
+This series fixes DMA ownership for in-place RSA requests in rsa-caam.
+Mapping the same scatterlist independently for source and destination
+can overwrite DMA metadata and cause ARM-LPAE/IOMMU unmap warnings.
 
-> Sashiko has some comments on this patch:
-
-Thanks for pointing me to the review, and sorry for the delayed response.
-The prepared v2 addresses two concerns, but the short-input SEC4/PDB
-accounting concern remains. Here is the disposition of each finding:
-
-1. PVF1: rejection of multi-segment in-place requests
-
-   Agreed. The RFC's -EOPNOTSUPP containment is not suitable as the final
-   fix. V2 removes it. An aligned exact alias retains one bidirectional
-   mapping only when dma_map_sg() returns a single DMA segment.
-
-   If it returns multiple segments, v2 releases that mapping using the
-   original entry count, then maps the source DMA_TO_DEVICE and a separate
-   destination bounce buffer DMA_FROM_DEVICE. This follows Sahil's
-   recommendation and reuses Changwei's destination-bounce infrastructure.
-
-   The padding/layout observations also included in PVF1 overlap PVF2
-   below; I am not claiming those are fixed by destination bouncing.
-
-2. PVF2: short-input padding and PDB source/table selection
-
-   The source shows the accounting mismatch described in the review.
-   The allocator reserves an extra SEC4 entry when diff_size is nonzero,
-   but edesc->mapped_src_nents does not include that entry. The private
-   PDB setters select a source S/G table only when that stored count is
-   greater than one. Their destination-table offset also uses that count.
-
-   I checked the unpatched baseline used by Sashiko,
-   178aff4cf425b3fc51ff09c571fa1bfbc1eb8ea4. It already contains these
-   allocation/count/selection rules, before applying this RFC. The issue
-   is therefore not introduced by the shared-mapping change, but it
-   remains present in the prepared v2 and needs separate treatment.
-
-   In particular, fixing the private padded-input view and auditing the
-   public input-length/table handling must not be conflated with simply
-   changing payload DMA ownership. I have not hardware-reproduced or
-   fixed this finding, and do not claim the public-operation tests below
-   validate private signing or decryption.
-
-3. PVF3: zero-length source passing the RFC's negative-only check
-
-   Agreed. V2 patch 1 rejects src_nents <= 0 before payload mapping or
-   SEC4 construction, returning -EINVAL for zero and propagating negative
-   extent errors. It applies the same checks to the destination extent.
-   A zero-length source therefore cannot reach the shared-mapping path
-   merely because the destination extent is nonempty.
-
-> Please also explain how your patch interacts with the other
-> patches on caam:
-
-The prepared v2 is based on both patches of Changwei's v6:
+The series is based on Changwei Zou's v6 error-path and destination
+bounce-buffer fixes:
 
 https://lore.kernel.org/linux-crypto/20261114060032.872141-1-changwei.zou@canonical.com/
 
-His error-path fix provides the operation-appropriate unmap dispatch.
-His alignment fix provides fixup_dst, destination allocation, and
-copy-back/free handling. V2 reuses that infrastructure rather than
-adding another destination-buffer implementation or modifying req->dst.
-The payload is unmapped before destination copy-back.
+Patch 1 validates source and destination scatterlist extents before
+walking or mapping them. It is separate so it can be backported
+independently.
 
-The ordering is Changwei's two patches, then the separate SG-extent
-validation patch, then the in-place DMA ownership patch. The latter also
-records req->src == req->dst before leading-zero stripping and forces a
-destination bounce if the effective source advances.
+Patch 2 maps an aligned, exact source/destination alias once with
+DMA_BIDIRECTIONAL when the mapping produces a single DMA segment.
+Multi-segment aliases use Changwei's destination bounce-buffer
+infrastructure instead of being rejected.
 
-A backport of that combination was tested on an arm64 system with CAAM
-behind an SMMUv2, a translated IOMMU domain, and DMA-API debugging
-enabled, running kernel 6.6.160.4. All 12 RSA-2048 public-operation alias
-tests passed, with no DMA-API, ARM-LPAE/IOMMU, or scatterlist-iterator
-warnings observed.
+The original alias relationship is recorded before stripping leading
+zeros. Requests whose effective source advances also use destination
+bouncing, avoiding overlapping streaming mappings through different
+scatterlist metadata.
 
-Those tests used direct and backlog-enabled submission; they did not
-establish that requests entered the backlog, test private operations, or
-cover noncoherent/dma-direct hardware.
+Changes since the RFC:
+- Split scatterlist extent validation into a separate patch.
+- Build on Changwei's fixup_dst and bounce-buffer infrastructure.
+- Replace multi-segment -EOPNOTSUPP rejection with destination bouncing.
+- Handle aliases whose effective source advances during zero stripping.
+- Add Fixes and stable CC tags.
 
-The test run also included the independent iterator-boundary correction
-now submitted separately:
+Previous RFC:
 
-https://lore.kernel.org/linux-crypto/20261119192007.786827-1-jeffbarnes@linux.microsoft.com/
+https://lore.kernel.org/linux-crypto/20261020192511.3389133-1-jeffbarnes@linux.microsoft.com/
 
-On the maintenance concern, Sahil has provided substantive review and
-offered noncoherent/dma-direct testing. I have copied the CAAM maintainers,
-but cannot speak for them regarding ongoing maintenance.
+Testing:
 
-GitHub Copilot assisted with the implementation, regression tests,
-source comparison, and drafting this response.
+A backport of the prerequisites and this series was tested on an
+arm64 system with CAAM behind an SMMUv2, a translated IOMMU domain,
+and DMA-API debugging enabled, running kernel 6.6.160.4.
 
-Thanks,
-Jeff
+All 12 RSA-2048 public-operation alias tests passed. These covered
+single-entry shared mapping, two- and three-entry bounce fallback,
+leading-zero stripping within and across entries, and unaligned
+buffers, each with direct and backlog-enabled submission.
+
+No DMA-API, ARM-LPAE/IOMMU, or scatterlist-iterator warnings were
+observed. The test run also included an independent leading-zero
+iterator boundary fix, which is not included in this series.
+
+Backlog-enabled submission does not establish that requests actually
+entered the backlog. Private RSA operations and noncoherent/dma-direct
+hardware were not covered by this test run.
+
+GitHub Copilot assisted with implementing the agreed DMA/bounce-buffer
+design, developing regression tests, and drafting commit messages.
+
+Link: https://lore.kernel.org/linux-crypto/20261119192007.786827-1-jeffbarnes@linux.microsoft.com/
+
+Review follow-up:
+The multi-segment rejection and zero-length-input concerns raised by
+Sashiko are addressed by this series. The short-input SEC4/PDB padding
+accounting issue exists in the unpatched baseline and remains unfixed
+by this series. The detailed response to Herbert is here:
+
+https://lore.kernel.org/linux-crypto/20261119195350.812246-1-jeffbarnes@linux.microsoft.com/
+
+Jeff Barnes (2):
+  crypto: caam - validate RSA scatterlist extents before mapping
+  crypto: caam - fix in-place RSA payload DMA mapping
+
+ drivers/crypto/caam/caampkc.c | 89 ++++++++++++++++++++++++++---------
+ drivers/crypto/caam/caampkc.h |  3 ++
+ 2 files changed, 70 insertions(+), 22 deletions(-)
+
+
+base-commit: 7e1392a42ea288d70a266f6553fe06f57f8647ea
+prerequisite-patch-id: de99c6374460d838f0474066325d03bea7a4f979
+prerequisite-patch-id: 33fe41f9cfd4a8ee1afa1fc6e915a9747acd2f37
+-- 
+2.43.0
+
