@@ -1,78 +1,81 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795098787;
-	b=2LreflKMo9u/a9lTYG9UY9DO9b1HsOQYfF07CU+u+6flOrjHgfIqVpt2N6PNGWFlsZVi
-	 kqZx6siMMcuVFmDtlCsMAEy3ymWcx57CFSf2sl0QbNQBi0RPNfgms/ibbGAjWC2m/+sA7
-	 5PHdwjYAn3ephDrFaXhyE5zEffXXu8oZNPoqvD3y7TMlMcrhMf2hHkbnDUb/loWxd3HIR
-	 hXBc7HCZqoh9FwBmSGtI8l/iIe78Fg6B0/s9YVO4+JAyZs+SIs9CsQLSn9oFVlqJ3SCNO
-	 i5jSc57LUDbyeRFwC2VPKo2yGdGhbTKVAc0Ns2a9lW0vEmNRMD9UkgZ2xJawiTAoehA==
+	t=1795112450;
+	b=wIk/fRQzMAh7NHkaeoCiOia2aM7uR3FxR7zXifMeut/cLC9ExHzDqjgpxhCSKDmUnTC4
+	 ZuEWNBppQcoxQIkUVi3vK8j+XFSgHofmsyrhZLhU4pZzgWx035iR0oSN5HtXAI1z0cwkF
+	 nLl1l9gr6jg/wgOVV46OoebxBsag3UyBhVrLoUtc/fr3WrsYpeoabf1BBQ4e9vwK27IpS
+	 qf5u7eT+Rjan5he2nxDIX9xuLAMvnLJDA+0LZ70ay7R0ZTldMBQWlm/bWfyEGfXWdr7tO
+	 +C6N6RA4QxbuMljEvIi0pOvt+30XARC/70kYeFhOfjDj95mWmsL4bIoQsEgjh+xz4vw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795098787;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=lv3NYu11pHprgRUUKX5nzbXJ9PYh0wkr94sy1z7rgm4=;
-	b=HhUz9P0F7LL2iWHLCqEtIIjRSjYOooDMWnHt/FHS0RGOuuepJWvL4pBjWc3XWKU0SUK+
-	 w/PA6i3tfp5AoaHIlqiMnM2VWjp21PlNjCfEa52mfCdMhQCtkxBmguQNbN/3djHSM45no
-	 Ak/AAIpGE8nDC1DSJlPRGy5eedfHT1NBUuAnDBJkZQ+dCNsEm7E/dOmLadC/idPE4GxZP
-	 2GWKzOj+IvNOCIYaF0n+PKDRLikW8wszbLrIF5F5tK4sB/pnFG75X59h040SfcLtU66kV
-	 p0nRE3anKMwJ4xQQns1OS57BTB3/eJGWCI/zz8m1TbNjw/1jZSMO6wjaY/fbzbvzgAQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795112450;
+	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
+	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Mailer;
+	bh=5cY+QOFSRab+vw7Ar5Uc+Mh1ld4eiD0jvPyComZKkI8=;
+	b=MvCGHQeSVJeruMRl0a27+xVHcKTpNwtpxb7U+IAugbJqU2xMORWeZcZ+00XwvUKb/I6n
+	 KvhkbrKVemkwkJ+27LiniKf0vinp9mtOk45CmuZvERsK354OWiqgEAdJKyVSfP4Nu52aP
+	 dZblhoHdgcoR7u8qREJxVz1rVYZzaqYk5GfKuCMtBFKzKNeSRqC7E4oK0fgRWTWEs89UG
+	 Y5zJKG78ctaC0TuSKSIQhHvRkg2lgk8xFwdNTBfK3QFrPkyNSoAnt08EFYwvIJG3RD3un
+	 l5e5mgE2SL2LTQeLzRVPM/0HH860l4fLJnCEY2wpLi93/JLduiwphEH3cOb4PUkFdGw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DkO9ZyBD;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mFVkDPWN;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id F34B1606A320;
-	Thu, 19 Nov 2026 14:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7E5606A325;
+	Thu, 19 Nov 2026 18:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DkO9ZyBD
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 3738E1F000CA;
-	Thu, 19 Nov 2026 14:33:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mFVkDPWN
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B0EC1F000C5;
+	Thu, 19 Nov 2026 18:20:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795098786;
-	bh=lv3NYu11pHprgRUUKX5nzbXJ9PYh0wkr94sy1z7rgm4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=DkO9ZyBD2TgaZMRcs8EgWiOCyNyqCS5GVpH0PIaxsiAxioBTNKOP1wNtv66D5cYUo
-	 SVbW8UDU1ecj5E3RCQAhHUNANk3OefmNfhyVcaUvR0Gz4clykNB0Ug9GoG1Ptr8ZuJ
-	 ONnfC20iTyqzzJ2bUJn6Pg6qw6zmZqZ3ZatVKnDFWAqwRPzMWGYReKxU4oRi50tS1Q
-	 1qTF54aQpt4AAtXTH2qm2wUUGVJhq8ji6yCXpiUz4OvXBnHZfzrVs9GnUElmUD670e
-	 vrz7s2wx6vlq7TxR3Li0W0SBs0mp7rRKPrBjNuC5IHgS3SdNuJjawMEJSGy/3xT0BT
-	 6PR8vQwsFHWZw==
-Date: Thu, 19 Nov 2026 16:33:03 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Rodolfo Giometti <giometti@enneenne.com>
-Cc: Rodolfo Giometti <giometti@enneenne.com>,
-	David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jens Wiklander <jenswi@kernel.org>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	op-tee@lists.trustedfirmware.org,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Sahil Malhotra <sahil.malhotra@nxp.com>,
-	Ahmad Fatoum <a.fatoum@pengutronix.de>,
-	Richard Weinberger <richard@nod.at>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Randy Dunlap <rdunlap@infradead.org>, linux-crypto@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	Demi Marie Obenour <demiobenour@gmail.com>
-Subject: Re: [RFC PATCH 0/9] KEYS: keycrypt: keys that user space can use but
- never read
-Message-ID: <av8In0Xyd5iI9N7K@kernel.org>
-References: <20261118140421.584086-1-giometti@enneenne.com>
- <650f89ef-9745-4f75-b254-80fa5ac4773d@gmail.com>
- <av5EyVHnNzT27dyK@kernel.org>
+	s=k20260515; t=1795112449;
+	bh=5cY+QOFSRab+vw7Ar5Uc+Mh1ld4eiD0jvPyComZKkI8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=mFVkDPWNUUaI/lD8LZupI2Dv6P1hrK9IDKEmnqQP3hRcjIokrajVdotKHQAyu0NV/
+	 LRn7QDpEIl7PkujuQRr3JBOYQ+mJ0JJKhFd3EksrdvpLpq/b5w75RdtGldsmRSuWuG
+	 Ej9e2CQPJJ3vc6ty6KfikChr+J+4TieOCN5RUxlTysnTo90F+i3dQL/yhRCP6r9QKI
+	 ZUEOfNqI0qQI7nJ3efrl+mVFZSuYADsTl8cPGElqU4t+ZqtyImk+pdJ6b3Tve3I3qk
+	 6SUHTGBRqWjRzEw9B/SNFUNcnVx4t7sMsIkZvT0Ltu1LVrPnQ/gifStw7uYoI+dALN
+	 894KwzJuU9EZw==
+From: Lee Jones <lee@kernel.org>
+To: Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>, Abel Vesa <abelvesa@kernel.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Robert Marko <robimarko@gmail.com>, 
+ Guru Das Srinagesh <linux@gurudas.dev>, Thomas Gleixner <tglx@kernel.org>, 
+ Radu Rendec <radu@rendec.net>, Lee Jones <lee@kernel.org>, 
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
+ "Joerg Roedel (AMD)" <joro@8bytes.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Wesley Cheng <wesley.cheng@oss.qualcomm.com>, Vinod Koul <vkoul@kernel.org>, 
+ Neil Armstrong <neil.armstrong@linaro.org>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, 
+ Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Viresh Kumar <viresh.kumar@linaro.org>, Amit Kucheria <amitk@kernel.org>, 
+ Thara Gopinath <thara.gopinath@gmail.com>, 
+ Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>, 
+ Lukasz Luba <lukasz.luba@arm.com>, Georgi Djakov <djakov@kernel.org>, 
+ Sibi Sankar <sibi.sankar@oss.qualcomm.com>, 
+ Stanislav Aleksandrov <lightofmysoul@gmail.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, mfd@lists.linux.dev, 
+ linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, 
+ linux-usb@vger.kernel.org, linux-phy@lists.infradead.org, 
+ linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ linux-pm@vger.kernel.org
+In-Reply-To: <20261109-halliday-dts-v1-5-289114ab8197@gmail.com>
+References: <20261109-halliday-dts-v1-5-289114ab8197@gmail.com>
+Subject: Re: (subset) [PATCH 05/17] dt-bindings: mfd: qcom,tcsr: Add
+ Halliday TCSR
+Message-Id: <179511244123.91992.13336083093444200069.b4-ty@b4>
+Date: Thu, 19 Nov 2026 18:20:41 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -82,56 +85,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <av5EyVHnNzT27dyK@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.16-dev-ad80c
 
-On Thu, Nov 19, 2026 at 02:37:33AM +0200, Jarkko Sakkinen wrote:
-> The exitential problem here is that KEYCTL_CRYPT_OPEN creates a circular
-> relationship between the keyrings API and a specific key type.
-> 
-> At hardware level I did not see any support for TPM, which narrows down
-> the potential user base.
-> 
-> The remaining potential user base is further reduced by those that use
-> trusted keys; leaving out those who need to solve the assumed problem
-> that only this patch set can presumebly sort out.
-> 
-> And we don't really know at this point that cut. This is pretty much
-> the break down of what is wrong here.
-> 
-> If there is/was a problem to sort out, it should be so constrained that
-> it should be as quick to describe as stepping over a nail really.
-> 
-> These are the main topics what I would focus on.
+On Mon, 09 Nov 2026 00:33:17 +0000, Stanislav Aleksandrov wrote:
+> Document the TCSR block on the Qualcomm Halliday SoC.
 
-I'm not disregarding that there might be something; and neither
-disregarding e.g., the use of Claude. Throwing a dice can apply as well
-human made code as for me code is just code. Perhaps using Claude,
-people just tend to have just a itchier trigger finger :-)
+Applied, thanks!
 
-The place where *in my personal opinion*  anyone who uses agents would
-be better to do manual work is the commit message. It enforces to use
-cognitive abilities even more so than writing code, if you with
-absolutely no self-deception, read it all through and write with your
-own words what the heck it does.
+[05/17] dt-bindings: mfd: qcom,tcsr: Add Halliday TCSR
+        commit: 51a1764ff434dff86994f7e03125033deebda6e3
 
-Usually when hitting the wall doing that leads into better code
-because of the healthy reality check. I'm not a medical doctor but
-I believe at least that thinking more stuff like this is also great
-for long-term health and cognitive abilities.
+--
+Lee Jones [李琼斯]
 
-AI is for mental health as a car is for physical health; for better or
-worse.
-
-Code quality is also over-rated although best effort should be done
-but that's all. If you get it, then it is done. It's harder than it
-sounds without self-deception part.
-
-And yeah, we don't have projected problems. I.e. "no users" is always
-NAK. You have to step on the nail at first.
-
-Just need to clear my thoughts on overall the topic :-) This is I guess
-where I stand now. Hope you find these helpful.
-
-Br, Jarkko
