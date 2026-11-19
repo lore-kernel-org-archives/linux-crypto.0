@@ -1,94 +1,52 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.149.156.116
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795074618;
-	b=CMKl8O5VuQkAJXzpjf+iRYSgFISMQwTRonxW4dundujdl5q064pn5TTvdixNEBqH3rc1
-	 uKEKkLaWPay/O7cjvjup+aZ7Wu1hGbQCMyHOns2XdlBDqDL4lJiTUoapWA3TgBll+MPp6
-	 XbgMijpQwzOQz23e51vBqGd0qXkXJS2l4Gf2RBBAwOBfnEDSNsL9e5PEGG7/WvaeMSNwj
-	 bjAfk7B4GKBu9Vd/NBAqSuRE0bd5kUPg+rgv/eCEfHR8waojmj4UjMUx7/RHsMD9HUJII
-	 rKpXSPxpNS1Gn+alldcJdSM4pfCI8v8xJ4SB2Vn/MzZ2v5OnyMlusi5A9hb//jqc09A==
+	t=1795083523;
+	b=Ugwu/bK0648okUqzeht2q3v67EVTue+67Gs3YWGaQGom71vGwl9Ppazvr8eIToUme3mq
+	 YNN+XHqTEHTDWaK76sR6ydwRGj3134UT6Lqg2Rs0VemaQ8aC9IO5mx0A+LxA+1E6LYxbF
+	 Cay1Df6Nsyk/j40ENiWJEyZ1uXTg43brVoAmr1mHY8gI76AzO4VOcN7PLb0janyZY+M6l
+	 xcNBGWsA8KA+w/+DS1VTpm1jrCuQzpm2IsO0i6Hw9K2KouFBHcwQ8ogQFsBSfOin50iO+
+	 OpUpMACo7C3ZoemFOVWidbXTUucikZxuAeIJQqRkNpZ3ohgM7sSoHWYqxBY4ch1GhoQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795074618;
-	h=DMARC-Filter:X-UUID:X-CTIC-Tags:X-CID-P-RULE:X-CID-O-INFO:X-CID-INFO:
-	 X-CID-META:X-CID-BVR:X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:X-User:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=M0fogLi5ax9AIJyqEcKXM/SFejfozKfYTgP4oiOHUjA=;
-	b=uaHqP6vZJ2VPR7Hj/IxVqLSFwpWb2+6QwgP0k6DBGbe5Zhoho2ZTuNHXkiFRg4Q9M/dZ
-	 +yQNYUl2Rks6PrYEOYBe7TtKWSzHL7UXlgYKF9izmQfW9iPXaJ9X87yz/JpHGwBsCI2E9
-	 /C6pm/2i3v39ttrUihm01ID3tpLIIq+1RUEadmPT+Zu0C+/FShTyu8p4UgQI2Cm7HAZWI
-	 mYUSF8LwCQxC70wGAxfkn2t11gvSANzzUG5g3rllxWx5adw82t+ErOuDv8gEZAUXLmx2K
-	 quJozU6E7KG/e35ybTrVu1sQAw9eDNy9PRliyCkbCtAo8JhDagEYMV4zKbYs0sJfYhQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795083523;
+	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:Content-Language:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-CMAE-Envelope;
+	bh=vxF6EachACi14PY9ozrbae5qo5jIjGyvh8VwxPiTjtI=;
+	b=cP7Fwv2+mfqQ3Nq5rUXPWhfF8tcK2tvEKCjEeOK/6qgT4zHObdZ2ButZcUdMR4dOTR08
+	 y11sA0C/ck+dRLASLJCsdH17zP+vukW/yYgdEMeU2NhhPReLZe6SNpxZ2Nm5tc7Zqbdmr
+	 iSHUa4Bo7DZEY/taP1nLOCAHGgXi4xdhtZIq04Q38w/4Q7P2XWeZKlmupQkMrIE8s8c2O
+	 ofuFrPzsXxNs2lJ/KXVKIfkW74gY92QAWaAPUtPDP3TjT0Z2U356lTcWH6K1hz0rITkFu
+	 gzToxTvSbUJHwBEe/Bg2TT7YsBTtcteLS4Hr+dOBZl19ajkExW2JJlYpcFSORoKEsCQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kylinos.cn;
-	spf=pass smtp.mailfrom=kylinos.cn;
-	arc=none smtp.remote-ip=124.126.103.232
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	dmarc=pass header.from=enneenne.com;
+	spf=pass smtp.mailfrom=enneenne.com;
+	dkim=pass header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=JRdDZEM1;
+	arc=none smtp.remote-ip=62.149.156.116
+Received: from smtpcmd11116.aruba.it (smtpcmd11116.aruba.it [62.149.156.116])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32096606A336;
-	Thu, 19 Nov 2026 07:50:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32096606A336
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: d8283e56e3ed11f19a56ed5b684f684d-20261119
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS, HR_TO_COUNT
-	HR_TO_DOMAIN_COUNT, HR_TO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR
-	SRC_UNFAMILIAR, SA_UNTRUSTED, SA_UNFAMILIAR, SN_UNTRUSTED, SN_UNFAMILIAR
-	SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD_SPF
-	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
-	ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:d572653d-0e28-49a1-b381-3b32eef7f5dc,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:10
-X-CID-INFO: VERSION:1.3.19,REQID:d572653d-0e28-49a1-b381-3b32eef7f5dc,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:10
-X-CID-META: VersionHash:7db8b62,CLOUDID:a84d96c141e57ebce9ec158666a80d79,BulkI
-	D:261119155012M4AVR27P,BulkQuantity:0,SF:19|38|64|66|72|78|80|81|82|83|102
-	|127|153|841|850|865|898|915,TC:nil,Content:0|15|50|99,EDM:-3,IP:-2,URL:0,
-	File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:N
-	O,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FSD
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: d8283e56e3ed11f19a56ed5b684f684d-20261119
-X-User: maguicai@kylinos.cn
-Received: from localhost.localdomain [(36.106.123.207)] by mailgw.kylinos.cn
-	(envelope-from <maguicai@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 794733331; Thu, 19 Nov 2026 15:50:09 +0800
-From: Guicai Ma <maguicai@kylinos.cn>
-To: Florian Bauckholt <florian.bauckholt@cispa.de>,
-	David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E . Hallyn" <serge@hallyn.com>,
-	Hui Peng <benquike@gmail.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Rodolfo Giometti <giometti@enneenne.com>,
-	keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Guicai Ma <maguicai@kylinos.cn>
-Subject: Re: [PATCH v2 2/2] KEYS: asymmetric: Fix PKCS#1 decryption of an empty message
-Date: Thu, 19 Nov 2026 02:50:07 -0500
-Message-ID: <20261119075007.689405-1-maguicai@kylinos.cn>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261119-keyctl-pkey-fixes-v2-2-9e2d1c7db7ec@cispa.de>
-References: <20261119-keyctl-pkey-fixes-v2-2-9e2d1c7db7ec@cispa.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6704606A324
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Nov 2026 10:18:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D6704606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=JRdDZEM1
+Received: from [192.168.0.186] ([101.57.122.26])
+	by Aruba SMTP with ESMTPSA
+	id TzDwxCivc6VShTzDwxQnb6; Thu, 19 Nov 2026 11:18:38 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1795083518; bh=aRc2mUQAMNF1zYaxkS0G15m7lGbkHwkBf36QtSll1JI=;
+	h=Date:MIME-Version:Subject:To:From:Content-Type;
+	b=JRdDZEM1FxuLixVNZ93BzrJfxnVP/26ipIlHN+dp61SIDQlEQQop3o7sRPTCaTyPS
+	 rEay+jZzRTrnxEK0zIPwaMeKVAy3ZAJ4VSQUpUXySdP/ZTuPPa0VTySV40cWcpYl/i
+	 S2JPpoWNlrAeMVzaV315uHz1J6YigtiMU5Wtqsp450GlhhhX/GyktfzXt5dwFWoZUm
+	 HWLJnzLs5kW2Uj3Rt4AaM+Iv7+JwtiWWYhNFbx91v7byIKfcN7B9iIz9lu6wIVI2uZ
+	 aN8cHrCXdLEOj1XTbIELAWsvQb4tvcfjY3NvHr7VuatOojMKu2K095m2lBR3n4bmLD
+	 GFVq9L0+t/Kow==
+Message-ID: <3929b9f6-6c75-4118-8565-0fa815daad73@enneenne.com>
+Date: Thu, 19 Nov 2026 11:18:35 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -98,28 +56,232 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/9] KEYS: keycrypt: keys that user space can use but
+ never read
+Content-Language: en-US
+To: Marco Felsch <m.felsch@pengutronix.de>
+Cc: David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ keyrings@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Jens Wiklander <jenswi@kernel.org>,
+ Sumit Garg <sumit.garg@kernel.org>, op-tee@lists.trustedfirmware.org,
+ =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+ Pankaj Gupta <pankaj.gupta@nxp.com>, Sahil Malhotra
+ <sahil.malhotra@nxp.com>, Ahmad Fatoum <a.fatoum@pengutronix.de>,
+ Richard Weinberger <richard@nod.at>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Eric Biggers <ebiggers@kernel.org>,
+ Demi Marie Obenour <demiobenour@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
+ <rdunlap@infradead.org>, linux-crypto@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ kernel@pengutronix.de
+References: <20261118140421.584086-1-giometti@enneenne.com>
+ <mvyqqjhvfka3kkumztixzozrthutkq6mfakkonxqbpm5gvzb62@eitzzleeyioe>
+From: Rodolfo Giometti <giometti@enneenne.com>
+In-Reply-To: <mvyqqjhvfka3kkumztixzozrthutkq6mfakkonxqbpm5gvzb62@eitzzleeyioe>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfPjnEm0KRtHAk7Xu1+wSM4ggxCt0j1Q9+oPLJi/gROcWWTrg+bgdMN95hJiGJBFhXNd6tGxHzy6xI0wdizsmJC4J007C4HZ7TjGFtLcp5Xb8cbyhKvCM
+ Uzi07n/ZVC55gl/w9PVaRMiTc3bcpg7tO05693rsuDxzyWOix/VwRUOBhu1IueXjgkym+5pWn1ALjtRadwrLMRdaeSsJDiVh2ZQca0aoz4u7G/gCZQ5faMsr
+ ZbtImVL6pGG0os0vzUhZoUoOYpQPmsGag1CbEOAQmLosnRs3OlfqWoAerckw6+IMg/RhJ2Eqo25H29DY9g+9jqF0sRCX2cGsed1zipjVQIv107xJ4oWajlMV
+ khd+68I3cGge4Vn8ffNyLMkKKo/iJL/DNFFERF5Xakxk9jeQ1HM6duQORfrCdoY1+r8sEyvhQ/pV+NHocBjmHdx8pOOJz1IB6ViJUjggNpQ4pShQJ/Q0UioG
+ IhxEvjeG/QWEA24O0wocRyCijL5a2PS+26ayplel3SFPR3QFQ78J/d5ndiwPhgD97VXhsJ21Oh6X7XhAuPBfd3vRgWNmsIXv0v3kcvvMkgBG6p+6iL3Pxl/x
+ zavj84ZHUgLKZe6f1tIP5SJ1YyiTyHA1gZEUCVUrz+Cx1+ovBDp41C0+Tgh/TGV4+VzONZHmBN0PxjOcZMxCSHjE1ah9po0YrQdl7HncKrIofFRZWo3TaiN1
+ AnpZYBtmoIVWG5AplanALkXXkv9Zs/27M2XlGOUHeaKmTURpTQQr4hsshpVDhQNrneeSlqfvQqqPnrI4xqEIHpYAYYvdZeMANJjibaJ9mC4v6nqc1Bs+KRG2
+ jPkbn8KFBW7GbgfStZw917JtIBvEl6o76lQaHbEgtff8DHMJeGoZE71fqFn0JiGSt6EInCz15aMu6GfXfOqmM+19YtIuslmqlsHAL293EHy97V6+H4tud7on
+ +EE6whsmEew7X2WFgAmj9MCDrlU7j/BWptczETpDpe1q+Ii4p49RTfBYxWATznipdt0Be9TcrlrSDmhipimKEIXDdPxn8Xopaf3Aci3FLX8b8rhQB6Y74bYO
+ juodC91CjWzTz/WjX25ga1p4q+NdG2JyM0Nl/WTr+MzBTDhumuqGKwWXiAEw1hR0ErwXJ9rSCyoOWdXXIZkLYBTXUFfVLXLMnd7NefRGBM9W6EP6GYPqVsIU
+ n+BzVDWKBf0t3eOT+SK7VteJdFVad5smIFK5PmcTex31jZ6ojvJLxT++uqvnxnj0DNZ8ZH0wHYXggM4S9WepwdbJ93fO0vAIYYdgVBZEnbHghoP6l3JZCQ8u
+ +VYxcC/6t+H9Iwr0dfEQelnD5aSSELDw+McFe47W2bPEVApk2DO7csk6K6D+fTQa41wkTVX1
 
-On Wed, Nov 18, 2026 at 11:19:29PM +0000, Florian Bauckholt wrote:
->  	case kernel_pkey_encrypt:
->  		if (issig)
->  			break;
->  		ret = crypto_akcipher_sync_encrypt(tfm, in, params->in_len,
->  						   out, params->out_len);
-> +		/* Returns 0 on success and always fills the whole output. */
-> +		if (ret == 0)
-> +			ret = crypto_akcipher_maxsize(tfm);
->  		break;
+On 18/11/2026 15:57, Marco Felsch wrote:
+> Hi Rodolfo,
 
-Checked both the pkcs1pad and raw RSA (mpi_write_to_sgl()) paths for
-!issig, and tested with an RSA-2048 PKCS#8 key on arm64:
+Hi.
 
-- KEYCTL_PKEY_DECRYPT (enc=pkcs1) on a valid ciphertext of an empty
-  message returned 256 and copied the ciphertext back to userspace before
-  this patch; with the patch applied it returns 0 and leaves the userspace
-  output buffer untouched.
-- Non-empty PKCS#1 and raw RSA (enc=raw) encrypt/decrypt roundtrips both
-  continue to work as expected.
+> thanks for the RFC and bringing this up. Please see my comments below.
 
-Reviewed-by: Guicai Ma <maguicai@kylinos.cn>
-Tested-by: Guicai Ma <maguicai@kylinos.cn>
+Thanks to you for reading it!
+
+> On 26-11-18 15:04, Rodolfo Giometti wrote:
+>> This RFC proposes a key type, "keycrypt", whose material user space can
+> 
+> Albeit I'm not against a new key-type we already have plenty types.
+> 
+> Furthermore the keyctl API is very open, lacks a common API. E.g. for the
+> 'trusted-key' keytype userspace needs to know the actual used backend
+> because each backend handles it differently.
+> 
+> Therefore I wouldn't add further keytypes till we have a common API
+> which the userspace can rely on.
+
+I agree that a common API is missing. keycrypt is meant to be one, for
+keys that user space uses but never reads: the same ioctls on the fd
+for every backend, and the same add_key() strings but for the sw
+backend's master=, so user space does not need to know which backend
+holds the key (unless it asks for one with backend=). What is missing
+is a way to ask which backends and algorithms exist (see below).
+
+[snip]
+
+> So it's not a new keytype but a new mechanism to handle trusted-keys
+> from userspace?
+
+No, a keycrypt key is not a trusted key. Only the sw backend uses a
+trusted key, as the master that seals its blobs; the OP-TEE and CAAM
+backends use none. Also, an ELE backend, not written yet, would use
+none, and it could be the first hsm backend!
+
+[snip]
+
+>> An embedded product that encrypts its own data (a root filesystem
+>> archive, configuration backups, logs) needs a key that does not sit in
+>> the root filesystem and that a compromised user space cannot copy. Today
+> 								^
+> 					What exactly do you mean by copy?
+> 
+> If you're using the standard LUKS2 scheme, the (volume)key never sits
+> inside encrypted device. The key is part of the LUKS2 header. Maybe I
+> didn't got your use-case, can you please elaborate a bit more?
+
+By copy I mean getting the key's bytes to use them elsewhere. A user
+key can be read back; a logon key cannot, but its bytes come from user
+space at every boot, so they sit in a file. A trusted or encrypted key
+fixes that, and the cover letter was wrong there: AF_ALG can use one
+from user space. But, as you note below, once unsealed its bytes are
+in kernel memory, so it falls with the kernel, and nothing binds it to
+an algorithm or a purpose.
+
+My use case is not a block device: it is files that an application
+encrypts itself (an archive of the root filesystem, configuration
+backups, logs), with a key that must not be readable on the device and
+that ideally may only encrypt, or only decrypt.
+
+You can see keycrypt keys as the symmetric counterpart of the
+asymmetric keys that KEYCTL_PKEY_* already lets user space use without
+reading them. The difference is that a symmetric mode keeps state
+across calls (the CBC chain, a stream's segments), hence an fd instead
+of one keyctl call per operation. And, as for KEYCTL_PKEY_*, the open
+could become a key_type operation, so that keyctl knows no key type.
+
+[snip]
+
+> Above you mentioned trusted-keys, but trusted-keys don't let the key
+> stay inside the TEE. Albeit the key is only reachable kernel (EL1) it is
+> always reachable from normal world. So a kernel CVE could leak the key
+> as well. This is different compared to protected keys like
+> p(rotected)aes. Here the keys always stay within firmware/secure-world.
+
+Yes. With the OP-TEE backend a generated key never leaves the TA,
+which runs the operation, and the kernel only holds a blob it cannot
+open, so even a compromised kernel can only use the key, and only for
+what it was sealed for. An hsm backend, as ELE could become, would do
+the same in dedicated hardware.
+
+> I didn't get your problem from your above description, sorry and
+> therefore I'm asking.
+> Do you want to use trusted-keys for partition (rootfs, data, ...)
+> encryption? In such case I've developed another idea which I'm about to
+> post as RFC.
+
+No, file encryption from user space, as above. In one sentence:
+keycrypt gives the keyring keys that user space can use but never
+read, bound to one algorithm and purpose; with a TEE backend they are
+never in clear in the kernel either, and they work from a minimal
+initramfs, before any user-space crypto stack exists.
+
+That last part matters a lot on embedded systems. The initramfs
+usually sits in the FIT image that the secure-boot chain must
+authenticate, and often decrypt, before running it, so it must be as
+small as possible (on our i.MX93 boards this runs at about 2.4MiB/s
+through ELE). In such an initramfs, OP-TEE's PKCS#11 TA would also need
+secure storage set up before the root filesystem (tee-supplicant with
+a writable filesystem, or a provisioned RPMB); keycrypt's OP-TEE
+backend needs no storage and no daemon, just the keyctl syscall and a
+small tool driving the fd.
+
+[snip]
+
+>> 1. A key type, "keycrypt", created with add_key() from "new <alg>
+>>    <purposes> [tier=|min-tier=] [backend=]", "load <blob>
+>>    [accepted-min-tier=] [purpose=]" or, when allowed, "import <alg>
+>>    <purposes> [tier=|min-tier=] [backend=] <hex>". User space states the
+> 
+> This is exactly what I meant at the begining. I'm not a maintainer, but
+> this string parsing "API" is very error-prone. Furthermore, how can a
+> userspace enum available backends? Instead of try and error I would like
+> to see a query/enum phase and later on userspace can decide which
+> backend and tier to use.
+
+The strings follow what trusted and encrypted keys already take in
+add_key(), but I'm open to another form, such as a versioned binary
+struct like the one KEYCTL_CRYPT_OPEN already takes with
+copy_struct_from_user().
+
+On the enumeration you're right, there is none: a key's line in
+/proc/keys and KEYCRYPT_IOC_INFO on an open fd tell its backend and
+tier only after the fact. A list of the backends, with their tier and
+algorithms, would be easy to add, and it is needed since algorithms
+differ per backend (the CAAM one does aes256-cbc only): would a keyctl
+or a file under /proc be what you have in mind?
+
+[snip]
+
+>>   tier     key in clear    purpose enforced by   who may use the key
+>>            in the kernel
+>>   kernel   yes             the kernel            the kernel
+> 
+> These are basically the trusted-key purpose.
+
+Yes, the kernel tier gives the protection of a trusted key, and it does
+not meet the goal above. It is there only so that the same interface
+works on systems with nothing better; its only backend, sw, is
+optional and off by default, and it can go if it is considered wrong.
+
+>>   engine   no              the kernel            the kernel
+>>   tee      no              the TA                the kernel
+>>   hsm      no              the HSM               the kernel
+> 
+> These are protected keys which we have already (see S390, CAAM, DCP,
+> Zynqmp, ...).
+> 
+> I don't see what you want to solve with your approach. Do you want to
+> have a common interface for generating/loading protected keys?
+
+Yes, and for using them from user space, with a purpose bound to each
+key (encrypt-only, decrypt-only, verify-only) that the TA, or an HSM,
+enforces. keycrypt does not replace the protected keys you name: a
+backend is where such a key lives.
+
+> That beeing said, loading protected keys can already be done by just
+> specifying the correct key-cipher. Generating the key is platform
+> specific and would need a common API.
+
+For user space that means AF_ALG with cbc(paes) only (the CAAM,
+CryptoCell and s390 register one AF_ALG can reach; DCP's is internal),
+each driver with its own key format, and since v7.3 privileged by
+default (d9506e82ced5). Generating is what "new" does in keycrypt:
+with OP-TEE the TA generates the key itself. The CAAM patches are only
+a prototype there: they still generate the key in kernel memory, and
+the aim is to have the CAAM generate it and keep it black (one of the
+questions to the CAAM maintainers in the cover letter).
+
+> Thanks for sharing your ideas :)
+
+:)
+
+Ciao,
+
+Rodolfo
+
+-- 
+GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+Linux Device Driver                          giometti@linux.it
+Embedded Systems                     phone:  +39 349 2432127
+UNIX programming
