@@ -1,62 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795116033;
-	b=rLtzCQubq3GXIcsNVb+Rnsw1HLi5rQQQsBbcYMkn1dwpbUlqJ+12qDIK7G296oXsWS9n
-	 XXgwOYsvdW4/UMtNMdEJl57hE2ovTyTEfVKVA++9i/ncwfDZlD5IHaEnOkA9UByheYWfJ
-	 /vShrgWDtPr/p4Jvn+iOeGd7aF6cGJxyVwZ5b8ivxjTNdhy6PUsJHiczgscn+9jF1xJuW
-	 tYHbIQaw7f3YlxZqwi4kSCYwF1yZt8+lytIxim+tnX0Tk+z5WAdjSCHIR8OkEbjjbmCkh
-	 w9S0SSuKEeHklP0PSyFzCMGF8b/l8aA8Q5X3MbKac8QkAWuV44QN0w34uFAGIk+EM7Q==
+	t=1795116533;
+	b=tsGb8pZfamByUrkRj/7eAR5FVn79S99qAXlEhQKZZEGWSvDrHEGx/YgTLeapi+k5JRIg
+	 KlF2RdXrhQe3RAMDdZlhLEVG+4p+f2T5W7gP1Z1FoJv1Qttw0JByR/LGl2bSFF6/+fBVn
+	 OaOocLNd+YRB2g/H3yrRni7t/GCNK3poaEvUj04pMkPwwIUZJ8CxpMung+utMcgmyTFdq
+	 nJMwCdt0o8e+30fDnsDaxxIo/0KTTcf0RXHvYusGRg46z/BVeTvrHAPp+6oiGncOb+4Lt
+	 L8aB+D4kqe0s3zRHMc04qtcS3xcn2ZeFm5g33L/EDmXyxunH0h/emkOtDBKFaztDYDA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795116033;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-Spam-Status:X-Spam-Checker-Version;
-	bh=RC0vdeOZgxVd7eCmVRzbH0n2/G3tA5ZR8HdgV3u6j3E=;
-	b=GPsQSzxKPSzg6PAB7UlL1SSDLRWShWTI2zAnWCnk6/Q/+lO+1qrJv6IhyYAJHJAW/+n3
-	 brwNBM+PrZ+zTBenSkwbRn910oF1dL1JhI2WxUEqM/q8F8FwOKv07FUfLFCAnI2tvhrTJ
-	 OgE5+vwI3kemHcww4Ttv3f2X5b8fVXXkP6NqlzKAvAXi+bc8MFFUranbDX6XjM54+2U9z
-	 f6UAPuyUMIH1ruM/pY2KK9gczpOjXYahysBi4hU2YE3ewmyGUCy1E7iUMnLoblGCnwq09
-	 jDaFioZdRdmBdVamMJc5b1x9+t/1yKk3ufNqZ211vaRuHzoRl+SLInD2ZIj+qJso2lg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795116533;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=uvvgHJk3GV58HV73c6RWqlDdgsR7MLu03XDpb7f+R5U=;
+	b=prrZlpBWeCC3MY1nm9J9PZPvcrtL0N2vbNzBpFHkAOAxfBTmkVzhnJFUuzWxk2xz+8uI
+	 qCEFx0W0f1S+3zB3TMLpjBeI6QqfJi/3Zzx5zRDe30VTos3jw1cu+or1LwWZruhXG2QyM
+	 JVbrQyzsf73/Rc6+v47EmMOuiJ5Rul/Yu3fk4w1894kFvg4JHfc0putDHBqJY37KfwVDm
+	 hg31y4GKs7oozLeht1CCXmT/sfE7CMbyk74QHSdtp39vqPiJABWBHPo93qz6Qez4fu0Zb
+	 tVZAhnaSa+PzLafDecJOYdoC+2IklRzvuziw1IBLUSeR8BtrN6QogEsHeQJ2guLAQFw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.microsoft.com;
-	spf=pass smtp.mailfrom=linux.microsoft.com;
-	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=iumooogl;
-	arc=none smtp.remote-ip=13.77.154.182
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B75606A33B;
-	Thu, 19 Nov 2026 19:20:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A6B75606A33B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G5r8Fcjv;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90E860A2601;
+	Thu, 19 Nov 2026 19:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=iumooogl
-Received: from jeffbarnes-ThinkPad-P14s-Gen-2i.corp.microsoft.com (unknown [52.167.112.163])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 227A220B7166;
-	Thu, 19 Nov 2026 11:20:29 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 227A220B7166
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1795116030;
-	bh=RC0vdeOZgxVd7eCmVRzbH0n2/G3tA5ZR8HdgV3u6j3E=;
-	h=From:To:Cc:Subject:Date:From;
-	b=iumooogl6A2hqfag5PHRYUs1x5fF2rPLtSftSzrk7rPQ9rxzduJkx8jDk2RccYdRN
-	 vrj3LIohmC2tYBFwO4WI3ywjYgpvW/aG4CpM+56WgrJZLIyAQVQuP9gX8kZAUCkikf
-	 xgN/u69HPnz0wh3SmjL59USz384mH16SaU4NQzhU=
-From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-To: linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	horia.geanta@nxp.com,
-	pankaj.gupta@nxp.com,
-	sahil.malhotra@oss.nxp.com,
-	changwei.zou@canonical.com,
-	gaurav.jain@nxp.com,
-	meenakshi.aggarwal@nxp.com,
-	tudor-dan.ambarus@nxp.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: caam - stop RSA zero scanning at the byte limit
-Date: Thu, 19 Nov 2026 14:20:07 -0500
-Message-ID: <20261119192007.786827-1-jeffbarnes@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G5r8Fcjv
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54D131F000C4;
+	Thu, 19 Nov 2026 19:28:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795116533;
+	bh=uvvgHJk3GV58HV73c6RWqlDdgsR7MLu03XDpb7f+R5U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=G5r8FcjvSJeE4+YGEKojS0fN+BgLOD+rITEuaTx/97IhlsXC+w0TDlduE9sEg7h7P
+	 1wD0UmOo+fPXObDWZhQtJttla1t0PPf/AHKfsUcsEn8KW+88KzO8QvZRtyW51xzsdm
+	 p+33grHuAQm6a3kdNwobT3j4Ry+YPBGPR0tYTTC6Cs3HCOoA1kixGp1VYIeJVUjqWi
+	 hWbHS1W9VlDnj0QEsLqVpI+6yCD7/gXPITeQqyUr3pioTR2WF/8kToOjKe6fsbk2Ff
+	 ujoWK79i94Jrqc+VmkNunbBtD9WxhRSB4xbfbTA9lbWZzyoApzethbxEP0aKxCdvbd
+	 a4B3Bt+mJszsA==
+Date: Thu, 19 Nov 2026 12:28:48 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kbuild@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb+git@google.com>, Will Deacon <will@kernel.org>,
+	Christoph Hellwig <hch@lst.de>, Eric Biggers <ebiggers@kernel.org>,
+	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fygo.io>
+Subject: Re: (subset) [PATCH 0/4] Get rid of all NEON intrinsics stdint.h
+ type hacks
+Message-ID: <20261119192848.GB875856@ax162>
+References: <20261029135020.272082-6-ardb+git@google.com>
+ <179508547602.2557572.9682726373932810888.b4-ty@b4>
+ <81ddf2f1-faec-47ec-b3b1-7210b4e7712b@app.fastmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -66,44 +62,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81ddf2f1-faec-47ec-b3b1-7210b4e7712b@app.fastmail.com>
 
-When the requested zero prefix ends at a scatterlist-entry boundary,
-caam_rsa_count_leading_zeros() calls sg_miter_next() after consuming
-all requested bytes. The iterator releases the current mapping and
-can return false because its bounded scatterlist is exhausted.
+On Thu, Nov 19, 2026 at 01:08:51PM +0100, Ard Biesheuvel wrote:
+> On Thu, 19 Nov 2026, at 11:51, Catalin Marinas wrote:
+> > Applied the first three patches to arm64 (for-next/fixes), thanks! I
+> > also added a cc stable, though it won't be a straightforward
+> > cherry-pick.
+> 
+> Thanks!
 
-The scanner then assigns the previous mapping's zero count to
-miter.consumed, although miter.length has been cleared. The final
-sg_miter_stop() consequently warns that consumed exceeds length.
+Yes, thanks a lot for picking this up.
 
-Stop scanning once the requested byte count has been reached, before
-advancing the iterator.
+Backports to 6.18 and older will definitely look completely different
+because we won't have all the refactoring to place this code in lib/.
 
-GitHub Copilot assisted with diagnosing the iterator boundary issue,
-developing the fix and regression tests, and drafting this message.
+> > I left the last patch out, IIUC it's just clean-up rather
+> > than fixing a problem on arm32 and can go separately via Russell's tree
+> > during the next merge window (let me know if you think otherwise).
+> >
+> 
+> I'll let Nathan respond to that.
 
-Fixes: e30685204711 ("crypto: caam - fix unchecked return value error")
-Cc: stable@vger.kernel.org
+Yeah, as far as I am aware, we only need the arm64 bits. arm builds are
+fine right now. Russell's tree would need to have the first two patches
+to apply the arm change if I understand correctly so it could either go
+to 7.5 with a backmerge or 7.6 with a base of 7.5-rc1.
 
-Signed-off-by: Jeff Barnes <jeffbarnes@linux.microsoft.com>
----
- drivers/crypto/caam/caampkc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 955a5dd450406..e730697678c30 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -302,7 +302,7 @@ static int caam_rsa_count_leading_zeros(struct scatterlist *sgl,
- 			buff++;
- 		}
- 
--		if (len && *buff)
-+		if (lzeros == nbytes || (len && *buff))
- 			break;
- 
- 		if (!sg_miter_next(&miter))
 -- 
-2.43.0
-
+Cheers,
+Nathan
