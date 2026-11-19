@@ -1,63 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=135.181.196.210
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795118411;
-	b=TK/GLd0SZottl2+P933grnc+nuU9wKXGhofRZO9m+2sBnHf42uRkwdy2ODLfOME9bqA6
-	 9QzZ5kXWbHGjPWNU7NLdh/+jXQ4iYrj7WJy5OcJmBAGfM13oIqMtonoocUKhcBNP07hw3
-	 M8g8mhYEZd5Now6Em0jam7kn+6xWxqQxhDo6lVSxgmvDHpeeJ1aMmi58DIsQIimzMKAOc
-	 HIeXorHQiDa6b05xw1EJ+UubBfXUISxtaXwVv8NarVKNb6XrKbgp2HA18UGPbqJ2oPzLu
-	 OCdEzN0aG72ekBhZHlMqoClZ+qGN50yymI9oRbYaEPSqypatdhgldle1KFWlewWTiDg==
+	t=1795132861;
+	b=5e7bnzetJuukCmfOkoRTjF35kdB9kGk02EQBOPJsrwZre4iBSoLqEJFbGcJqMencp0gR
+	 NuSTMxgmpWTKuOdQbUBGEC8OtV0O2l0cgnzB9ef/Hx/cRtPh6ujOT8/AAMxpu9faqTOWX
+	 R86F3vLha8kACoObktliSHOV/tjpo/txutqzo5XKQKDqgzCfEmdyYjQFO81tMy91GGsl7
+	 Iz+yTnOg+mZYBX/zvgCFubewhAMq2A+vI63NHrqP6oHuv0hQP427F/XSIIHSgqilRH21M
+	 qu6XCGH84ddPTjmjMuiW8dTJGkYTG/ld8dl4+PSUtiNYWzC/V8K12XXhRTVU/dRD8FQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795118411;
-	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-Spam-Status:X-Spam-Checker-Version;
-	bh=u3T49TBcuW+GWQFGmUjcIxddkpdG8L2Kbk0SKYBY3ZI=;
-	b=GLtrX1bffpbxFokGPp2FoD4LIWgjYz4a+nKHUkX1Av+6KOOv9ZZcLnkWsDvAn625BrBC
-	 Hq5GV+IMZM5WUgCssMwaaSWwm1uxwqN6C8foVzUZXnYXZd4EzO+KSj2gxZ2krHhU4avDl
-	 Nkkpjr5A1d+m7hIb/oiNOTwRpF7Q3regArawV4nLPySsDIeZPGSe6R60uoZC4d/Z4Ga/4
-	 vXZ+bHSfiepAsizFZQj+c9n/1F4ZnamG098UE4GEsXWkpScAnsqM8T0ye7DUeqsIUXqVT
-	 /x/tywYHIyXOiKNI7Opks+AucjFvRJ6Gm/nGxiblYqKHgwL4VpptaITmraCB717JznQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795132861;
+	h=DMARC-Filter:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:Message-Id:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=5FJBzUYikHTz9Jwg01bNdUYmr9ueJ0Ev2tfSqj/4shQ=;
+	b=Ioac4Ivhx/fpSQM3Td2B0kq48bTnJdq44tElwSww+HKmGa3UkTIIrnbdVp0LcFpk8EbC
+	 xdHHWzRaUKJ2CF6funEY1uNHoLpwQrqBo7eMxYC1dXVHphLBd/JJAqUBhJDrFPDFGt99M
+	 Hy7s2YlwRIyWe+Gifh4vmWMqtIOCvPEzXMWVDpORqLnqcJdtDkGJm8B3MxVXXgUyt/93V
+	 pNbSVDX4zt+LmKuKigwjo6LRJEUAKr7L4zYJhmI9FwncqVQ+OBY0pNYNC0qHGAi244KBu
+	 r0/vRibqA1Gs8U/L0DrFcqsmK6d6u2Uq9jXuseZfRCio1RUg5LenbyTU52vfiJbaEkQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=linux.microsoft.com;
-	spf=pass smtp.mailfrom=linux.microsoft.com;
-	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=jogMBtKA;
-	arc=none smtp.remote-ip=13.77.154.182
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C249606A339;
-	Thu, 19 Nov 2026 20:00:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6C249606A339
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	dmarc=pass header.from=puri.sm;
+	spf=pass smtp.mailfrom=puri.sm;
+	dkim=pass header.d=puri.sm header.i=@puri.sm header.a=rsa-sha256 header.s=smtp2 header.b=GWdmvqhq;
+	arc=none smtp.remote-ip=135.181.196.210
+Received: from ms.puri.sm (ms.puri.sm [135.181.196.210])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB2F606A32C;
+	Fri, 20 Nov 2026 00:01:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7BB2F606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=puri.sm
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=puri.sm
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=jogMBtKA
-Received: from jeffbarnes-ThinkPad-P14s-Gen-2i.corp.microsoft.com (unknown [52.177.6.190])
-	by linux.microsoft.com (Postfix) with ESMTPSA id BC65D20B7169;
-	Thu, 19 Nov 2026 12:00:05 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BC65D20B7169
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1795118407;
-	bh=u3T49TBcuW+GWQFGmUjcIxddkpdG8L2Kbk0SKYBY3ZI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jogMBtKAAFGGwzKgpwxKh1AFo4QOD9D8p1pKBU63ojuzNcRS5tG1CY4umIV+8Ve9G
-	 AFCpBO0PLvrOk1KDQ7QnK7Fn+ux6DluQUWLDj+e0xT0h5eXNIBTAiU+zFoKEzAVAtC
-	 3BbUER/ReP//r+vRKA4hNu6rjkYbzOXABNLKz1PM=
-From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-To: linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	horia.geanta@nxp.com,
-	pankaj.gupta@nxp.com,
-	sahil.malhotra@oss.nxp.com,
-	changwei.zou@canonical.com,
-	meenakshi.aggarwal@nxp.com,
-	tudor-dan.ambarus@nxp.com,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] crypto: caam - fix in-place RSA payload DMA mapping
-Date: Thu, 19 Nov 2026 14:59:48 -0500
-Message-ID: <20261119195948.816661-3-jeffbarnes@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261119195948.816661-1-jeffbarnes@linux.microsoft.com>
-References: <20261119195948.816661-1-jeffbarnes@linux.microsoft.com>
+	dkim=pass (2048-bit key, unprotected) header.d=puri.sm header.i=@puri.sm header.a=rsa-sha256 header.s=smtp2 header.b=GWdmvqhq
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=puri.sm; s=smtp2;
+	t=1795132853; bh=SiwjhZMnEdkRN2oANYVb8ccwnFJVVPfeFZQs/1CS3is=;
+	h=From:Date:Subject:To:Cc;
+	b=GWdmvqhqktMJerRbqIhgH8P6eflIwNH3kL2B/4RlJa9SQ/JDYI0mIb2jOQ8ow/ARg
+	 75H0+nzlxU92R9lvuYxAexr6POka6nOtCV0teCCDQmWj4rPETCxvDZQcLvwG/deT66
+	 L1F8DFTofKOjH9ODNt3k0kBrrHDW6BU9sGWcs0ZBAqPvJ9Q+gCBHrC0D8Vs4znQUdk
+	 FSADZLaqCgMUn9o9tldo/F9BKKI/BjSCyCTuXgfZbv2SMwoK1ajnDxCWGhKx8WD5fh
+	 THwfD0YDTUZNeLhhZta6vwftuGqr/gdb99BVlTgIHK3NK/6dYlJ7oRoQwSoFflgqhu
+	 D39gHKVoNHt0Q==
+Received: from pliszka.localdomain (83.24.14.135.ipv4.supernova.orange.pl [83.24.14.135])
+	by ms.puri.sm (Postfix) with ESMTPSA id 6FF661F770;
+	Thu, 19 Nov 2026 16:00:52 -0800 (PST)
+From: Sebastian Krzyszkowiak <sebastian.krzyszkowiak@puri.sm>
+Date: Fri, 20 Nov 2026 00:59:57 +0100
+Subject: [PATCH] crypto: caam - handle empty message in ahash_finup_first
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,209 +57,111 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261120-caam-empty-v1-1-d82106209428@puri.sm>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/z1Py26DMBD8FeRzjQFVSPArVQ7GmYITbMh6qagQ/
+ x4bV73tPDV7iACyCKIvDkH4scEuPoL6oxBm0n6EtPeIRVM1bV03lTRaOwm38q/s2s+u0mgroyF
+ iYCV82/0q+7plHLbhAcOpITkGHSAH0t5MifLYWTkdGPSXJ7y2uIFzSfYzAX0xMa+hV2q0XD5BH
+ nO50KjWbVDBODVbv+0qC8mjru6LleksI/e/wCzOWe6LJMj8Wd2J23m+AaxZ3coPAQAA
+X-Change-ID: 20261120-caam-empty-96490ae60cae
+To: =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, 
+ Pankaj Gupta <pankaj.gupta@nxp.com>, 
+ Sahil Malhotra <sahil.malhotra@nxp.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: kernel@puri.sm, linux-crypto@vger.kernel.org, stable@vger.kernel.org, 
+ Sebastian Krzyszkowiak <sebastian.krzyszkowiak@puri.sm>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2459;
+ i=sebastian.krzyszkowiak@puri.sm; h=from:subject:message-id;
+ bh=SiwjhZMnEdkRN2oANYVb8ccwnFJVVPfeFZQs/1CS3is=;
+ b=owEBbQKS/ZANAwAKAejyNc8728P/AcsmYgBq/420fMctKLZ8q5RAt1ZYuFXIEnWduLKmclRe+
+ jNgeF5JUUSJAjMEAAEKAB0WIQQi3Z+uAGoRQ1g2YXzo8jXPO9vD/wUCav+NtAAKCRDo8jXPO9vD
+ /+5+D/9WRgZ7yFruzo+TOC/w/FVrEQQv+fjuX2QuiPy08qtBgDidocLnXvaRlkVNyzCSsCf7ZpR
+ 6KqWGj6BBlyRJbGkc70VJxHLFSnZ7O7UY0Nd31IPzjnrgFiSebDB7S/GdF25eFf7VUhrU1dtJRV
+ QLEbHGLqTq2LFvoeCbOydAt6vz9F1S1+KRqbF5O4ju15QHPUKU4SyAYm1wdLv6gYeb86ve3SvVW
+ KP9eCO+ICPRqBFZPNHyG1PlqBxEL4Z7Zdt5j/FYT63sg0wzXcyDohJrlN33J+J23hOyXfqsgfyL
+ oI8FUbePIdYRNlE9uotdGIGvb4E8ahmKVYRuwkLJ28P5eLVYEBeVY+V5/ocGLgd+nYb6GVZiaoF
+ qVw2e6zZ/Vf9gCznTqNaWXRPQ5xn12xIFIdUdm/8uOKY15fiv0Q8d0UByCw850VO7btFe8j7vDu
+ ZXcF9mOhCq65oPz45sBr6OImvXdHemhkKm4VGUCUHTMnN7SrHPXy+7GDct5/sCdcHJuPbuOrGd2
+ giFgJrHyy3sFWrOSyo+lADqjBO3KFxmuZBCcQ1+XCHcEQK+anBgvMQLn/Ie9TEol+Wtjbta0T6b
+ ittqDH1akhkf5En3SHpYwidrMgLnqdCx5JCFQ9Ei+GGAEuC4OYnZiYQ4kHPUEg1wJh1ZaNxciXw
+ xk8JCbXfQGg6q8A==
+X-Developer-Key: i=sebastian.krzyszkowiak@puri.sm; a=openpgp;
+ fpr=22DD9FAE006A11435836617CE8F235CF3BDBC3FF
 
-CAAM maps the effective RSA source DMA_TO_DEVICE and the destination
-DMA_FROM_DEVICE independently. When both use the same scatterlist,
-the second mapping can overwrite the DMA metadata needed to release
-the first. On an arm64 system with CAAM behind an SMMU this caused
-ARM-LPAE/IOMMU unmap warnings and RSA signature self-test failures.
+Since commit 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in API"),
+crypto_ahash_final calls crypto_ahash_finup with req->nbytes == 0.
+This leads to an oops on an empty message to hash when ahash_edesc_add_src
+calls sg_dma_address(req->src) if the caller passes NULL as req->src:
 
-For an aligned exact effective-head alias, map the entries covering the
-larger source/destination extent once with DMA_BIDIRECTIONAL. If this
-returns a single DMA segment, retain that mapping and release it once
-with the original entry count on completion or allocation failure.
+    Unable to handle kernel NULL pointer dereference at virtual
+    address 0000000000000010
+    Call trace:
+     ahash_edesc_add_src+0x40/0x390 (P)
+     ahash_digest+0xcc/0x250
+     ahash_finup_first+0x18/0x30
+     ahash_finup+0x24/0x38
+     ahash_do_req_chain+0xc0/0x1b0
+     crypto_ahash_finup+0x168/0x200
+     hash_recvmsg+0xb0/0x1f0 [algif_hash]
 
-If the shared mapping returns multiple DMA segments, release it before
-mapping either hardware view independently. Use the existing destination
-bounce buffer, mapping the source DMA_TO_DEVICE and the distinct bounce
-buffer DMA_FROM_DEVICE. This avoids separate bounded SEC4 views without
-rejecting requests that previously worked on dma-direct systems.
+It can be reproduced on i.MX 8M Quad with the following Python snippet:
 
-Detect the original req->src == req->dst relationship before stripping
-leading zeros. If stripping advances the effective source, force the
-destination bounce path even though the effective heads differ. This
-avoids overlapping streaming mappings through different SG metadata.
-Arbitrary overlapping buffers described by otherwise distinct original
-and effective SG heads are outside the scope of this fix.
+    import socket
+    s = socket.socket(socket.AF_ALG, socket.SOCK_SEQPACKET, 0)
+    s.bind(("hash", "sha256"))
+    op, _ = s.accept()
+    print(op.recv(32).hex())
 
-Reuse the fixup_dst and bounce-buffer lifetime handling from Changwei's
-unaligned-destination fix. In particular, unmap the payload before
-copy-back, copy only the RSA output on successful completion, and retain
-the bounce buffer across job-ring retries and accepted backlog requests.
-Non-aliased requests retain their existing mapping directions.
+The oops was observed being triggered by iwd.
 
-Unlike the RFC, multi-segment aliases no longer return -EOPNOTSUPP.
+ahash_finup_first runs only when nothing has been hashed yet, so handle
+the empty-message case by routing it to ahash_final_no_ctx.
 
-Fixes: 8c419778ab57 ("crypto: caam - add support for RSA algorithm")
+Fixes: 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in API")
 Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/linux-crypto/20261114060032.872141-1-changwei.zou@canonical.com/
-Link: https://lore.kernel.org/linux-crypto/20261020192511.3389133-1-jeffbarnes@linux.microsoft.com/
-Signed-off-by: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+Signed-off-by: Sebastian Krzyszkowiak <sebastian.krzyszkowiak@puri.sm>
 ---
- drivers/crypto/caam/caampkc.c | 84 ++++++++++++++++++++++++++---------
- drivers/crypto/caam/caampkc.h |  3 ++
- 2 files changed, 65 insertions(+), 22 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.c | 3 +++
+ drivers/crypto/caam/caamhash.c    | 3 +++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index d81ef97861c0c..bffd499164436 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -51,8 +51,15 @@ static void rsa_io_unmap(struct device *dev, struct rsa_edesc *edesc,
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index ef67122bef57..d449634a9bfb 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -4331,6 +4331,9 @@ static int ahash_update_first(struct ahash_request *req)
+ 
+ static int ahash_finup_first(struct ahash_request *req)
  {
- 	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
- 
--	dma_unmap_sg(dev, req_ctx->fixup_dst, edesc->dst_nents, DMA_FROM_DEVICE);
--	dma_unmap_sg(dev, req_ctx->fixup_src, edesc->src_nents, DMA_TO_DEVICE);
-+	if (edesc->shared_nents) {
-+		dma_unmap_sg(dev, req_ctx->fixup_src, edesc->shared_nents,
-+			     DMA_BIDIRECTIONAL);
-+	} else {
-+		dma_unmap_sg(dev, req_ctx->fixup_dst, edesc->dst_nents,
-+			     DMA_FROM_DEVICE);
-+		dma_unmap_sg(dev, req_ctx->fixup_src, edesc->src_nents,
-+			     DMA_TO_DEVICE);
-+	}
- 
- 	if (edesc->sec4_sg_bytes)
- 		dma_unmap_single(dev, edesc->sec4_sg_dma, edesc->sec4_sg_bytes,
-@@ -330,14 +337,18 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
- 	struct caam_rsa_key *key = &ctx->key;
- 	struct rsa_edesc *edesc;
-+	struct scatterlist *sg;
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		       GFP_KERNEL : GFP_ATOMIC;
- 	int sg_flags = (flags == GFP_ATOMIC) ? SG_MITER_ATOMIC : 0;
- 	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
- 	int src_nents, dst_nents;
-+	int shared_nents = 0;
- 	int mapped_src_nents, mapped_dst_nents;
- 	unsigned int diff_size = 0;
--	int lzeros;
-+	bool in_place = req->src == req->dst;
-+	bool bounce;
-+	int lzeros, i;
- 
- 	if (req->src_len > key->n_sz) {
- 		/*
-@@ -373,26 +384,48 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 
- 	req_ctx->bounce_buf = NULL;
- 	req_ctx->fixup_dst = req->dst;
--	if (req->dst_len > 0) {
--		struct scatterlist *sg;
--		int i;
--
--		for_each_sg(req->dst, sg, dst_nents, i) {
--			if (!sg_is_dma_aligned(sg)) {
--				unsigned int bounce_len =
--					ALIGN(req->dst_len,
--					      dma_get_cache_alignment());
--
--				req_ctx->bounce_buf = kzalloc(bounce_len, flags);
--				if (!req_ctx->bounce_buf)
--					return ERR_PTR(-ENOMEM);
--				sg_init_one(&req_ctx->dst, req_ctx->bounce_buf,
--					    bounce_len);
--				req_ctx->fixup_dst = &req_ctx->dst;
--				dst_nents = 1;
--				break;
--			}
-+	bounce = in_place && req_ctx->fixup_src != req->src;
-+	for_each_sg(req->dst, sg, dst_nents, i) {
-+		if (!sg_is_dma_aligned(sg)) {
-+			bounce = true;
-+			break;
-+		}
-+	}
++	if (!req->nbytes)
++		return ahash_final_no_ctx(req);
 +
-+	if (!bounce && req_ctx->fixup_src == req_ctx->fixup_dst) {
-+		shared_nents = max(src_nents, dst_nents);
-+		mapped_src_nents = dma_map_sg(dev, req_ctx->fixup_src,
-+					      shared_nents, DMA_BIDIRECTIONAL);
-+		if (unlikely(!mapped_src_nents)) {
-+			dev_err(dev, "unable to map shared S/G\n");
-+			goto bounce_fail;
-+		}
-+
-+		if (mapped_src_nents == 1) {
-+			mapped_dst_nents = mapped_src_nents;
-+			goto alloc_edesc;
- 		}
-+
-+		/*
-+		 * Distinct DMA segments need independently bounded hardware
-+		 * views. Bounce the destination instead of sharing SEC4 tables.
-+		 */
-+		dma_unmap_sg(dev, req_ctx->fixup_src, shared_nents,
-+			     DMA_BIDIRECTIONAL);
-+		shared_nents = 0;
-+		bounce = true;
-+	}
-+
-+	if (bounce) {
-+		unsigned int bounce_len = ALIGN(req->dst_len,
-+						dma_get_cache_alignment());
-+
-+		req_ctx->bounce_buf = kzalloc(bounce_len, flags);
-+		if (!req_ctx->bounce_buf)
-+			goto bounce_fail;
-+		sg_init_one(&req_ctx->dst, req_ctx->bounce_buf, bounce_len);
-+		req_ctx->fixup_dst = &req_ctx->dst;
-+		dst_nents = 1;
- 	}
+ 	return ahash_digest(req);
+ }
  
- 	mapped_src_nents = dma_map_sg(dev, req_ctx->fixup_src, src_nents,
-@@ -408,6 +441,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 		goto src_fail;
- 	}
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 3cd71810380f..5794c26e0efb 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1499,6 +1499,9 @@ static int ahash_update_first(struct ahash_request *req)
  
-+alloc_edesc:
- 	if (!diff_size && mapped_src_nents == 1)
- 		sec4_sg_len = 0; /* no need for an input hw s/g table */
- 	else
-@@ -442,6 +476,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	/* Save nents for later use in Job Descriptor */
- 	edesc->src_nents = src_nents;
- 	edesc->dst_nents = dst_nents;
-+	edesc->shared_nents = shared_nents;
+ static int ahash_finup_first(struct ahash_request *req)
+ {
++	if (!req->nbytes)
++		return ahash_final_no_ctx(req);
++
+ 	return ahash_digest(req);
+ }
  
- 	req_ctx->edesc = edesc;
- 
-@@ -469,6 +504,11 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- sec4_sg_fail:
- 	kfree(edesc);
- dst_fail:
-+	if (shared_nents) {
-+		dma_unmap_sg(dev, req_ctx->fixup_src, shared_nents,
-+			     DMA_BIDIRECTIONAL);
-+		goto bounce_fail;
-+	}
- 	dma_unmap_sg(dev, req_ctx->fixup_dst, dst_nents, DMA_FROM_DEVICE);
- src_fail:
- 	dma_unmap_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
-diff --git a/drivers/crypto/caam/caampkc.h b/drivers/crypto/caam/caampkc.h
-index 8810bcc435ccd..5ec93d8973347 100644
---- a/drivers/crypto/caam/caampkc.h
-+++ b/drivers/crypto/caam/caampkc.h
-@@ -126,6 +126,8 @@ struct caam_rsa_req_ctx {
-  * rsa_edesc - s/w-extended rsa descriptor
-  * @src_nents     : number of segments in input s/w scatterlist
-  * @dst_nents     : number of segments in output s/w scatterlist
-+ * @shared_nents  : original shared DMA_BIDIRECTIONAL map/unmap count,
-+ *                 or zero for independent source and destination mappings
-  * @mapped_src_nents: number of segments in input h/w link table
-  * @mapped_dst_nents: number of segments in output h/w link table
-  * @sec4_sg_bytes : length of h/w link table
-@@ -138,6 +140,7 @@ struct caam_rsa_req_ctx {
- struct rsa_edesc {
- 	int src_nents;
- 	int dst_nents;
-+	int shared_nents;
- 	int mapped_src_nents;
- 	int mapped_dst_nents;
- 	int sec4_sg_bytes;
--- 
-2.43.0
+
+---
+base-commit: d785d132202e8e8e93335ebf74ad5b29fca0951f
+change-id: 20261120-caam-empty-96490ae60cae
+
+Best regards,
+--  
+Sebastian Krzyszkowiak <sebastian.krzyszkowiak@puri.sm>
 
