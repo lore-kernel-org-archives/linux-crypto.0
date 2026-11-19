@@ -1,52 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.149.156.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=13.77.154.182
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795113213;
-	b=GD9sV5F5f+ADxmJO590IC0jaAE0kY2PMJehwUyvh94CMFTa+kiunwY6/594sZeBqhHp6
-	 rTKwug3hvu0BRFosiUfuawoVdW8bXq0zASBPfaLc25Mp3c4J4gft/eXfnEf1WW8M0tEXJ
-	 3Ykhsbvyg+q8unJ315ymZHLRoQK35OEKruLP7eV72PIJGfsFtjYOmkAQQFUvOPZPHwJbL
-	 TztXbaKzbnZSYVrGIj/TT6iy7yS25wqHjBTPZIP/3cEnK2A/yuWG0gwD63hNikdw6+5sR
-	 UA5s3FtIIA+P+fEbn2NPIQv+byYH3aGZjlUjl1xR3GcLX8GMim8WeLK+Lgu+LidRyKA==
+	t=1795116033;
+	b=rLtzCQubq3GXIcsNVb+Rnsw1HLi5rQQQsBbcYMkn1dwpbUlqJ+12qDIK7G296oXsWS9n
+	 XXgwOYsvdW4/UMtNMdEJl57hE2ovTyTEfVKVA++9i/ncwfDZlD5IHaEnOkA9UByheYWfJ
+	 /vShrgWDtPr/p4Jvn+iOeGd7aF6cGJxyVwZ5b8ivxjTNdhy6PUsJHiczgscn+9jF1xJuW
+	 tYHbIQaw7f3YlxZqwi4kSCYwF1yZt8+lytIxim+tnX0Tk+z5WAdjSCHIR8OkEbjjbmCkh
+	 w9S0SSuKEeHklP0PSyFzCMGF8b/l8aA8Q5X3MbKac8QkAWuV44QN0w34uFAGIk+EM7Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795113213;
-	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:Content-Language:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-CMAE-Envelope;
-	bh=2TwysOH3jFptJLl7Zh65O6ibU0W1pO9RKYiZ6XUEe4o=;
-	b=heXRJUwLb3mCyuHgSwVW8UDZmtXSpwOQ/DZNJmX2UlzqfKJeQIGswnkwEs0kOMtLftGF
-	 CpuaeXtznCkvVEFGleWT0542leJlVmSLM+JbeR1H7/Xo77CVRT5qUzjsTK2WyykyfxlTP
-	 aQHZceeXYjLxxTJAGf2I9RPIQfQ/3a5EMfTgtH6pzHxx2EFh0zXO5LsvH/QT0aQyzDMqP
-	 dURjQUXCfQGhdFS3g6syfJyUcqFP7RWPaUSqGeNX9aslwEgxQ2CuViWBBeLm8FMoOIjLQ
-	 4xn+j7cqnIXRvyxysJbt4yiQPWTGguRsMj6KzEeHHSGlsn/at6vEhqQT+pXjHza2oqQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795116033;
+	h=DMARC-Filter:Received:DKIM-Filter:DKIM-Signature:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
+	 X-Spam-Status:X-Spam-Checker-Version;
+	bh=RC0vdeOZgxVd7eCmVRzbH0n2/G3tA5ZR8HdgV3u6j3E=;
+	b=GPsQSzxKPSzg6PAB7UlL1SSDLRWShWTI2zAnWCnk6/Q/+lO+1qrJv6IhyYAJHJAW/+n3
+	 brwNBM+PrZ+zTBenSkwbRn910oF1dL1JhI2WxUEqM/q8F8FwOKv07FUfLFCAnI2tvhrTJ
+	 OgE5+vwI3kemHcww4Ttv3f2X5b8fVXXkP6NqlzKAvAXi+bc8MFFUranbDX6XjM54+2U9z
+	 f6UAPuyUMIH1ruM/pY2KK9gczpOjXYahysBi4hU2YE3ewmyGUCy1E7iUMnLoblGCnwq09
+	 jDaFioZdRdmBdVamMJc5b1x9+t/1yKk3ufNqZ211vaRuHzoRl+SLInD2ZIj+qJso2lg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=enneenne.com;
-	spf=pass smtp.mailfrom=enneenne.com;
-	dkim=pass header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=iMCz4c4v;
-	arc=none smtp.remote-ip=62.149.156.176
-Received: from smtpcmd15176.aruba.it (smtpcmd15176.aruba.it [62.149.156.176])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04F60A260C
-	for <linux-crypto@vger.kernel.org>; Thu, 19 Nov 2026 18:33:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EF04F60A260C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
+	dmarc=pass header.from=linux.microsoft.com;
+	spf=pass smtp.mailfrom=linux.microsoft.com;
+	dkim=pass header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=iumooogl;
+	arc=none smtp.remote-ip=13.77.154.182
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B75606A33B;
+	Thu, 19 Nov 2026 19:20:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A6B75606A33B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=iMCz4c4v
-Received: from [192.168.0.186] ([101.57.122.26])
-	by Aruba SMTP with ESMTPSA
-	id U6wix2IW175O9U6wix0Oma; Thu, 19 Nov 2026 19:33:23 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1795113203; bh=2t8AtcRowxFNGYE8HteZpHIn9jAWUm8DVCWA8vMMYBE=;
-	h=Date:MIME-Version:Subject:To:From:Content-Type;
-	b=iMCz4c4vXgNfjaVsNwvBuMF7tZY4Yy54lPGmuAGKY6P71MLCV/srwMTceBQ/GAt34
-	 IwJr1uqnf/dmNjlMZQB9cLgUTxbIw6iVRuT9buaKQVDbz3kaNVFEIoEpXvAkCgmyEI
-	 PSFVCiHj3v8SvBzh912x32zMoFnRUAiLuKuPzH9wjTX7qSHSKg+cusdAEfdyhakn6U
-	 MDZ+sXbJbEnEXvAx8A/4DselQVxkwI8uuu0bk6VUSPoq8UUhqONY29s9ATTEIL13dy
-	 Cw/3hrysPCKNiLyF9KsJstL/jDdfxcyJ3j39BP5mlGiBGtXHINn2jlUD38UGg+FRMw
-	 xxp9/W63RlIFw==
-Message-ID: <4ad95ed5-26b6-4871-bcb6-cfebfe73917a@enneenne.com>
-Date: Thu, 19 Nov 2026 19:33:20 +0100
+	dkim=pass (1024-bit key, unprotected) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.a=rsa-sha256 header.s=default header.b=iumooogl
+Received: from jeffbarnes-ThinkPad-P14s-Gen-2i.corp.microsoft.com (unknown [52.167.112.163])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 227A220B7166;
+	Thu, 19 Nov 2026 11:20:29 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 227A220B7166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1795116030;
+	bh=RC0vdeOZgxVd7eCmVRzbH0n2/G3tA5ZR8HdgV3u6j3E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=iumooogl6A2hqfag5PHRYUs1x5fF2rPLtSftSzrk7rPQ9rxzduJkx8jDk2RccYdRN
+	 vrj3LIohmC2tYBFwO4WI3ywjYgpvW/aG4CpM+56WgrJZLIyAQVQuP9gX8kZAUCkikf
+	 xgN/u69HPnz0wh3SmjL59USz384mH16SaU4NQzhU=
+From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	sahil.malhotra@oss.nxp.com,
+	changwei.zou@canonical.com,
+	gaurav.jain@nxp.com,
+	meenakshi.aggarwal@nxp.com,
+	tudor-dan.ambarus@nxp.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: caam - stop RSA zero scanning at the byte limit
+Date: Thu, 19 Nov 2026 14:20:07 -0500
+Message-ID: <20261119192007.786827-1-jeffbarnes@linux.microsoft.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -56,77 +66,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/9] KEYS: keycrypt: keys that user space can use but
- never read
-Content-Language: en-US
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Jens Wiklander <jenswi@kernel.org>,
- Sumit Garg <sumit.garg@kernel.org>, op-tee@lists.trustedfirmware.org,
- =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
- Pankaj Gupta <pankaj.gupta@nxp.com>, Sahil Malhotra
- <sahil.malhotra@nxp.com>, Ahmad Fatoum <a.fatoum@pengutronix.de>,
- Richard Weinberger <richard@nod.at>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Eric Biggers <ebiggers@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
- <rdunlap@infradead.org>, linux-crypto@vger.kernel.org,
- linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- Demi Marie Obenour <demiobenour@gmail.com>
-References: <20261118140421.584086-1-giometti@enneenne.com>
- <650f89ef-9745-4f75-b254-80fa5ac4773d@gmail.com>
- <av5EyVHnNzT27dyK@kernel.org> <av8In0Xyd5iI9N7K@kernel.org>
-From: Rodolfo Giometti <giometti@enneenne.com>
-In-Reply-To: <av8In0Xyd5iI9N7K@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4xfDXtWOlFTYpyTg35cFi8NKxn6M8tXvqRpaK6Te9d9LP538qpRWPqyhYCRUO7FN90zeUALjH4Pv0kc5qTXvx9JqFIICyIFmy8AMREg/ZL7rPvrVR8BOUd
- cLloYWy2etZ8Iz2Dj35VuyDIDq5OJcXlqCU0GxFuELT2Ll0+SMmq0xT0b1NQ/mGJ1DRr6EgGHmwb1jcrz7jDiFyXggFkpjEOVUfCxm33Z+AP0WZg8zgrFJ0n
- ffHu26kwKFVQdawAYFWmaAXnHN1p0WPTc2eQub+iUcKYdh/LB+1TMtCynW4g+PFuL/Ox/uZYSQ3twHUYmoc0NljKoPOQdr9z82B634PV+Tl5rFaczqEJswvL
- RMT75ziH1aZFGiT3YGWODPXE3kKUfWeYw2ky9PgD86fbcUKc9YG7O6O4C555MM8R18YgP7zwMiMpC0MPLWUV4TYOFHuGzRI3nAMUWf2OAvcXsYsO9EJVC1dZ
- /CJBXkFCk64KKzxL3y8DwpvUb58jZOH5wiXqHdVhVBx7moWR2O7fcnAGvb0ROFigOOWFyNifYgQAUKvRx0Gjo0aKANKYhIDOo9FoNc3nTrLMB+wllSvU908i
- ZvkuwtX35joO+/L82trX60+HcodZHev58cbR0wIdppW64faoXjrD2ty6e3+iNo1wzj4r1WV6hSakPGcj+ITxJAyi+jIfJwOIVZnMMjwKHWWd276ZqiyPHgzR
- tHcGBXPnD0+Y4FdwbDCkcDNcPihbMtNcarY0ckxuc2T0QuwtA6V5JI+qd+13NzNwBNaSBd9q0vR4Houfn0O1tVDSLHjYJhYnCW1hfd8zibQ4R4JUQeDCsiso
- hDRhfUPbEdA73rTyHioYeBE2HST4BYaYzwzPHgFSowkALmKiOo3P6Y+sT2OdjUa1mi5YmmKKNIRc5pqRvd/Poq1X6e5PtLi+bMEeLu/tD0VuL3zYOGxE+sHW
- BTqxG0WyQtxpY++s7NY1cpcH0qqhtrXP08lJaeDotFcKwlEQgSTkroRSzbXG9NMpu/BmvKQiIhI/dqa4MxRp7JEEFN/QNVR7WEj2UU0vqJswExy2aYWzzdw+
- FkBYKTSapeFo97Im9jOUDeTGL1gcFhA/aHSIiD07c4PP/74NLMye+4RTaOnZlsrMaXjbB2/jn6s9k9AKtJfRSJPMFnBj3YyvI3YYi+xduehbptXY4hxkqo3D
- c5x2hRhHNjhs0zg+GpmJGknXwvGaK4l4a6zTOKWmfv7xMtgIZ/Vn9d4GsOJdkemp7e3WX6RGITrcgwSghHENodqP2MvCkuvhyBHE4/kY7pUMNCMYz3xNrYgX
- 6PdBjdKe
+Content-Transfer-Encoding: 8bit
 
-On 19/11/2026 15:33, Jarkko Sakkinen wrote:
+When the requested zero prefix ends at a scatterlist-entry boundary,
+caam_rsa_count_leading_zeros() calls sg_miter_next() after consuming
+all requested bytes. The iterator releases the current mapping and
+can return false because its bounded scatterlist is exhausted.
 
-[snip]
+The scanner then assigns the previous mapping's zero count to
+miter.consumed, although miter.length has been cleared. The final
+sg_miter_stop() consequently warns that consumed exceeds length.
 
-> And yeah, we don't have projected problems. I.e. "no users" is always
-> NAK. You have to step on the nail at first.
+Stop scanning once the requested byte count has been reached, before
+advancing the iterator.
 
-A customer of mine stepped on it. Their product, on i.MX6, encrypts its
-rootfs with dm-crypt and a CAAM black key, never in clear. Its backups,
-though, are encrypted in user space with a key kept as a CAAM blob; to
-use it, the blob is opened and the key handed to user space in clear.
+GitHub Copilot assisted with diagnosing the iterator boundary issue,
+developing the fix and regression tests, and drafting this message.
 
-The next generation is on i.MX93, and the customer now wants the
-backups and other encrypted archives protected like the rootfs: the key
-must never be in clear outside a secure world. The i.MX93 has no CAAM.
-OP-TEE can hold the key, but every way the mainline keyring offers to
-use it (a trusted key, through dm-crypt or AF_ALG) unseals its bytes
-into kernel memory, and AF_ALG no longer reaches hardware drivers.
-keycrypt's OP-TEE backend does not unseal it: a key it generates leaves
-the TA only sealed.
+Fixes: e30685204711 ("crypto: caam - fix unchecked return value error")
+Cc: stable@vger.kernel.org
 
-Ciao,
+Signed-off-by: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+---
+ drivers/crypto/caam/caampkc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Rodolfo
-
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index 955a5dd450406..e730697678c30 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -302,7 +302,7 @@ static int caam_rsa_count_leading_zeros(struct scatterlist *sgl,
+ 			buff++;
+ 		}
+ 
+-		if (len && *buff)
++		if (lzeros == nbytes || (len && *buff))
+ 			break;
+ 
+ 		if (!sg_miter_next(&miter))
 -- 
-GNU/Linux Solutions                  e-mail: giometti@enneenne.com
-Linux Device Driver                          giometti@linux.it
-Embedded Systems                     phone:  +39 349 2432127
-UNIX programming
+2.43.0
+
