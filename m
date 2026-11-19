@@ -1,73 +1,52 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.149.156.116
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795090199;
-	b=46uq+7V/YOxdqTCOhteaAnMXzpD57tEBBttjksq3WvlZ+wb7yptRh7KLGIdjbQAoOFda
-	 wUEWeUDUSDIfJE+snhPYiye7gYC03UHLEHABMVCKB7oAlrCjBeapVcddu0KvbbjDME+JA
-	 iHxULalFI4UWDZHZeu8n1VCLaTbQzzyhP3p526Ixzkxi0+ytSH/u5ZTuzi7wWCNRcvu5C
-	 rbFUcCdxf5yw6rsfEqGCgy58iS034HVvOmkBDOXN3p6Hpnb7hFjCj57tM3ez1L/jgg9DI
-	 l5h2We41Qoi3d3R9i76xQ0Tv50NcBpzokegqRNGvufNQgY8cvJz4uJs280o4cWuEx7Q==
+	t=1795090655;
+	b=QIdD05DdMvOkxCPsFZgKtElSLzWAMyIFod29Z9ReIcrWCnZQcnkNI5Ey+MbF+X9TbtMN
+	 mLDSPILoEOoxPDyWvFJxpB1affRgwVyFXLHxdxFHqpo4T/2jcKTcarOWpIWGhtOEIyu/T
+	 cqXtOd04rkfnTgDBmWXF57LJuWWHqjTzob0wen9FzxaX05Ln9yh+QYwrdlxiLP5WUXkP+
+	 su895ATH1AfaPTKOPAqgo9i9tFz0t8yrhzv4BIAkxhr03xa6SwrcYQhXoXT7M2lVnfNg0
+	 NIWiJowQbo4BP4oMvkrFxCWUJKP7AHFmEvk6fZFRg/YtBfDYhAOuckCx5i3PDPBrL0w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795090199;
-	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
-	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type:Content-Transfer-Encoding;
-	bh=6LJFWn3naggMAxxma3yUUM8v/APlUEqWWVGbEV4Kg+A=;
-	b=Kb+hrU9Y5P+KFtvsqwEcxmRwEhqpxV/xpqxmspF71z5cqFxYza0yjkG/pFC71aBH92f3
-	 6caRfCrKsT3o0yZgpvWmPQfMhKnNLL5sg1G2/MFKcL9JMg4HYg/XcB9roP61bCGEJyDRD
-	 +7lLJuYXx8S4dIBNqRpdJ7fJR8imCClF9z7qzIsUhXkEjfIJNbmuCBn26EaV8EmQn7/Iy
-	 8Pp4wdUQwkby5KLzyRgnsS1RhUqQiQGbvNBHeux3sxPKn9ViIja6WizmgFv7LvyPClzsq
-	 WYcifBSSzQIhZw9lLNm1Tm7+9Y1hJirLk5LCpphCd+FpbFHGdOctcadvXPWJvzGmBHw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795090655;
+	h=DMARC-Filter:Received:DKIM-Signature:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:Content-Language:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-CMAE-Envelope;
+	bh=4+hewYS5Xc85XMsrC6qSZHgaMk+5vxcwYlnKkuazLe8=;
+	b=lKXeolVksVBWfk4SPEvtcA7LdvPrfLuZEIqBh2FjBBRnGbLKmHdMmO6Bfy2CxHcWif/k
+	 +6VlOJSAGQkYAi/42AHM/5g2O4VBiwwSnZ0ImB8u50t7KL/SDvcCsb8B87A3jGSEM/dt+
+	 OZGX8o2i7iEenKUvXCquoABiXOPQVO5e+0ec8/5a9RUeiwTkoWUWOSQVG1vVYUFK9HzfE
+	 2+0eqB0pwHYdOmNAeoSPwBlDThA7Y2L8y8YkFOXQcdvaRnCis0Md2xkdGR/OIhNDmBORH
+	 Aiy49sj0E2RMCYRHsjJnoHGwMeWOL3P+vMpMtDy/fb/TgJ2U/bY9R04dflVyFnOldiQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fcgORxgO;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=enneenne.com;
+	spf=pass smtp.mailfrom=enneenne.com;
+	dkim=pass header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=CycFhd9A;
+	arc=none smtp.remote-ip=62.149.156.116
+Received: from smtpcmd11116.aruba.it (smtpcmd11116.aruba.it [62.149.156.116])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF98606A320;
-	Thu, 19 Nov 2026 12:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB49606A33B
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Nov 2026 12:17:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EBB49606A33B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fcgORxgO
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79F6D1F000C4;
-	Thu, 19 Nov 2026 12:09:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795090198;
-	bh=6LJFWn3naggMAxxma3yUUM8v/APlUEqWWVGbEV4Kg+A=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=fcgORxgOTFTuJZyidlrsUUseH2vw9WpMTkfQDAVvYR7921OVWKMjmyj+rjjwgL7+c
-	 0/CvXMswfb2i5J8d/hLqnUJ+wKtgKFOk81307Ld5WyiquK4c1SMZGz6gg9m98GdzoN
-	 ETMTWLG7N/AgkNdMlGDLPLZxLDjUuanuwyj4ryXhUEbHfi18qxAUvOARL0MKsCKgif
-	 0WbxnyZUf2hazIUfKNn3ogbOudmEDAtlEDkgcbPBDAPLQYyq44pjvtrwbp0RqCpfVL
-	 5iZVIMTNV7SrlQwLcMqv6ESOjilovK8P0MSoQrq0DxHqU4/MdAVWc2g2xSwJkEL/eY
-	 ikdDBohcn9Meg==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 94C71198003A;
-	Thu, 19 Nov 2026 07:09:55 -0500 (EST)
-Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Thu, 19 Nov 2026 07:09:55 -0500
-X-ME-Sender: <xms:Eef-amJK9l_BCMUK2VhzFR1XdMSN7C1qlDVsDnpNTuHobvGOCG6cgw>
-    <xme:Eef-ao-LmIxDK6wsJTjDNuHfenEWmvjjwYmcoGZpmf9qGvURuRavzzWfGWhiCX5Gq
-    w4YSi1UWrsfRqGyJRHlZiXS0fDwgFBVe1-GvC0CpNSQnqemFjrqZT8N>
-X-ME-Proxy-Cause: dmFkZTEPs+pTpqsSykY0cHn8c3BjhxpWToJiI2d/WvNYOSBG5WbHAr4gB9HwYeU1rI+Ukl
-    5yA9K3fbxfsUtwDGWCHV/8dhNihfd2JY+HMqLzqWki8fEpEXvjhQOWxtLtconhoNRUF+4P
-    eD09na/GCkvUysprk0D9XkfzhwFmtE2Kkiqv2603VnWx0+q8QXUm5JNtKXmdVb0tpNKpgn
-    01xd3RAR8279rk2TxToCkXVkp+ha4x6iPaF2+bkfjAjevONpVhdjfsHjAqQVYHi5HRjeoQ
-    b+bYC0axENB2f1bvWIioBLS5R/yyH4w+3tByB1jbP1Gulu4L+Ztpe3HdpnH6E7w64XijS3
-    numlyc1/tAECXmBVFpzbNv7wB4n16Bk32112lre6VUG/ITFMtfVC8t9DAxiwxP8NOOqr4H
-    CiYUufFqFGtnoP0LXSup9l3xDUnMoIxPgPRFbSaXSJvCG/F1VZuOV4S7pf7uswpQ9oBFau
-    UXBVH7nD4K1Rz4u7ntrbjW5CScugEbf3h0kaq7GneH4Uf5lEMaTlXyY4glT/hMeFq0OVP9
-    S16GHTD41LvnB2c2+TrcWtwFpS9gXdKwL3QHkPriI8IFEg2wEVzHV0qA+TLZCdEKfLWPt3
-    pPlsEN+5HFtuIflxA4sXRy9QUfRbr/wmtCPrWJ3SkaZGmPK4aJo6GSterkxg
-X-ME-Proxy: <xmx:E-f-anxm5dJqKIdkGVW5MtA2k-hz5LHbH7LFp1h9XPksXu0xkmqgug>
-    <xmx:E-f-arF1QaWLcvdE_vhONoBCIf4oKqEa8r10vdEe6yfhkfDm8-IkXA>
-    <xmx:E-f-astbGfJCr1wl-V_CzKxJox6W21sfE_cWclC2wBeepmQnc14n9g>
-    <xmx:E-f-arC0Frlx7QZxhQjsm06xY-OzeyiZmcvnzdmtEE9A2GXEc-yEuA>
-    <xmx:E-f-anCly603lB59av9yA27dK3qjpnFFYFAkrUFmL4CmjiJsFVPIwxIc>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 35476F80096; Thu, 19 Nov 2026 07:09:53 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.a=rsa-sha256 header.s=a1 header.b=CycFhd9A
+Received: from [192.168.0.186] ([101.57.122.26])
+	by Aruba SMTP with ESMTPSA
+	id U14zxDwan6VShU14zxRiua; Thu, 19 Nov 2026 13:17:31 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1795090651; bh=V3OZh4icVrzbMI2k6cXTPEjlLw6DW6zRycuz+4CAfec=;
+	h=Date:MIME-Version:Subject:To:From:Content-Type;
+	b=CycFhd9A1catDJK8mSVVnIjyH5ROQd1v+wC5+drY99wllUzOcvv0JnbleYae1QyWl
+	 BfXvel5+GlGK/smjYdZVOsE8ifTJ+aNn92e3/PHwymqXJ9vopCmtPNtiJdDDxgFhXQ
+	 gH0O5LL0GqGBMM5zzAqHd0YcDoUE/TebWvQKcOdv9bAt/QbHhwHYpgUqx3x1h4Ldgp
+	 75NfGZPT+sNKTTrA02giDUkiO0gk016/Jf4H4Ha37Gpw+3d0e3MxEHOw+7cjazCAy7
+	 12PcNhVzIViATgQFKluA/RK3kpXudgDDYCPNifgplaPxzA8PVajw1Iru4DOG02ulfO
+	 Vnl/JByjL9DVw==
+Message-ID: <10d27c34-72d7-4380-abc9-6f8eddc6c08c@enneenne.com>
+Date: Thu, 19 Nov 2026 13:17:29 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -77,51 +56,106 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Date: Thu, 19 Nov 2026 13:08:51 +0100
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Catalin Marinas" <catalin.marinas@arm.com>, linux-kbuild@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- "Ard Biesheuvel" <ardb+git@google.com>
-Cc: "Will Deacon" <will@kernel.org>, "Christoph Hellwig" <hch@lst.de>,
- "Eric Biggers" <ebiggers@kernel.org>,
- "Nathan Chancellor" <nathan@kernel.org>, "Song Liu" <song@kernel.org>,
- "Yu Kuai" <yukuai@fygo.io>
-Message-Id: <81ddf2f1-faec-47ec-b3b1-7210b4e7712b@app.fastmail.com>
-In-Reply-To: <179508547602.2557572.9682726373932810888.b4-ty@b4>
-References: <20261029135020.272082-6-ardb+git@google.com>
- <179508547602.2557572.9682726373932810888.b4-ty@b4>
-Subject: Re: (subset) [PATCH 0/4] Get rid of all NEON intrinsics stdint.h type hacks
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/9] KEYS: keycrypt: keys that user space can use but
+ never read
+Content-Language: en-US
+To: Demi Marie Obenour <demiobenour@gmail.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>
+Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Jens Wiklander <jenswi@kernel.org>,
+ Sumit Garg <sumit.garg@kernel.org>, op-tee@lists.trustedfirmware.org,
+ =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+ Pankaj Gupta <pankaj.gupta@nxp.com>, Sahil Malhotra
+ <sahil.malhotra@nxp.com>, Ahmad Fatoum <a.fatoum@pengutronix.de>,
+ Richard Weinberger <richard@nod.at>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Eric Biggers <ebiggers@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Randy Dunlap
+ <rdunlap@infradead.org>, linux-crypto@vger.kernel.org,
+ linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-api@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+References: <20261118140421.584086-1-giometti@enneenne.com>
+ <650f89ef-9745-4f75-b254-80fa5ac4773d@gmail.com>
+ <av5EyVHnNzT27dyK@kernel.org>
+ <61ca7c37-7b42-48a3-be2e-95deb4d999a2@gmail.com>
+ <01692969-8e92-4a08-bde9-aad86674504f@gmail.com>
+From: Rodolfo Giometti <giometti@enneenne.com>
+In-Reply-To: <01692969-8e92-4a08-bde9-aad86674504f@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfKBPrYJ2CDN4f71Kap/ixDsQG8LCW21ix5G/r+qduPuGoKFzPku3ui/3D6NrDy/I4fLjS/AZ5x4bSLPCyVIF0to5TjSclhUTdSU4uon2/XK98GioKEpu
+ t0DAXGgZowfR8EBdb4xlQI1aOmtiyouqFm6ozJqENawyIYsyVwWUPVtIrxKIMh6tgg2DcE0bNvKSfTxI4E/KX6og6HQ36T9SsUF5L6ywvP0CPLLtoj3XfOJK
+ KK6OL4sQiUzIGXyKYC/g5t6eDL7TGBKZYqtynb/EnlVDCDMoH+BMpug/FQzubq89PMXLKw1FzF7r79429pnKXBHAlDBdAGSZfIFNS5uHsw8Ky4Ryb//LMK9V
+ xLfwyhC5KBHWow0xsn0MR7mF6xbrK8rHOP6EY/6N+7N/mkYzZW0dxG31VP79/qgd0FE+u/f6bwMdsGglkPiv7Y+X/kQhNQovCMTLqK/xd4/A1//iDD4ibkuq
+ 1/kQFk3iW8okXGDrlVnZ6UkHWDYJU0H4V33JM+dA1KrG1s5yxelszfrfDGYXDXRvM9MRXG2C0JJFVnXDW1DBfX7oruz0XIMBt6ZuUqYpwYoCJYgDT8/Y94gB
+ RtndS527vikEPvkczW3D2qQoIsrt4+TG4WSJC3lfoPhIyloLUzoc3clohznlcZ5d41rbBCRbfQ1vSp4l+bVmTsLWseSQTZKxyCBx5FWky+xTaEm69CxDc2nW
+ HxMYdlYxr4DwnIfL+x2fqCJ5RbC7gBciMQd6ihsH1iadIXHfBcS4KhXDviVzexL7jL7TLPHnlpjTAhT/rODrCAAiT5G8Le0zqKlXI3LhP81Ke0+765dQ0e9y
+ vgu5MhNb82zl8mX48OJ9rhfGTJKQP6C/S1uHuzQOV8VuqFJx7jL006rc7ZGJIcc4/bSi4OzRvFhFOgNVnMJP+jAWIUvBJtJS4o9aDPfIoaC0wUPeec7ltUUx
+ 3YAptj8Js+/LJy8wIk8KSIHNu1+DIrXnbtSxZ48rdWX3ylBXpUU2OdzVbAPjylucDm+hVHDEnZGmwM4stN3z19Ce9cCXkLIDcyAWyz9J1zqQ0O2bu0XmE7hv
+ 9+HAxJgOrvm6fyiIZnDN/P7bOyh6SKydeOvoEul+E155hehVkqO41wFNa7awsiPXufzyRwo7sKbPtMCbyJ4P/mnlwQSbOC29VJQeoCboPfyks3hw+p1gJkwG
+ UStDxD9YrJOkVXUS048vbJ5rbuI5vxFjkO5bxo7Dsgk2WyJjnWav55v2ahPGzLX0t+XZEaY1n4iDLxnooNN/H35sYauqbDVs3RMMPG938OJL4wUKNVf/6fDh
+ Y3+0UYag
 
+On 19/11/2026 05:35, Demi Marie Obenour wrote:
+> On 11/18/26 7:43 PM, Demi Marie Obenour wrote:
+>> On 11/18/26 7:37 PM, Jarkko Sakkinen wrote:
+>>> On Wed, Nov 18, 2026 at 06:42:15PM -0500, Demi Marie Obenour wrote:
+>>>> AES-256-CBC isn't a suitable mode on its own, unless it's combined
+>>>> with a MAC in encrypt-then-MAC.  Even then, it has a 2^64 birthday
+>>>> bound, so it should only be used 2^48 times with a single key unless
+>>>> the key is ephemeral.
 
+CBC is there for existing formats (craf writes files that openssl enc
+can read) and because the CAAM path is CBC only. I take your points
+on it.
 
-On Thu, 19 Nov 2026, at 11:51, Catalin Marinas wrote:
-> On Thu, 29 Oct 2026 14:50:20 +0100, Ard Biesheuvel wrote:
->> Recent Clang has become more finicky when it comes to overriding the
->> type macros that the freestanding stdint.h consumes when defining the
->> uintXX_t types, and so it is time to finally get rid of this entirely.
->> 
->> So instead of making stdint.h (which comes from the compiler when
->> -ffreestanding is set on the command line) agree with the kernel's
->> linux/types.h header, avoid the latter entirely in the compilation units
->> that actually use the NEON intrinsics (which are always leaf functions
->> that are not tightly coupled to kernel APIs).
->> 
->> [...]
->
-> Applied the first three patches to arm64 (for-next/fixes), thanks! I
-> also added a cc stable, though it won't be a straightforward
-> cherry-pick.
+>>>> AES-GCM is not a suitable algorithm either.  If you allow encrypting
+>>>> with a key loaded from persistent storage, there is no way for the API
+>>>> to ensure it is only used with a unique nonce.  Nonce reuse leaks the
+>>>> authentication key and allows forgeries.  Using random nonces isn't
+>>>> good enough either: NIST only allows 2^32 encryptions in this case,
+>>>> and the API can't enforce that limit.
 
-Thanks!
+You are right that a construction of our own is the wrong choice:
+patch 9, the only GCM in the series, has no user yet and can go.
 
+[snip]
 
-> I left the last patch out, IIUC it's just clean-up rather
-> than fixing a problem on arm32 and can go separately via Russell's tree
-> during the next merge window (let me know if you think otherwise).
->
+>> The usual solution to something like this is a userspace service
+>> like ssh-agent.  Then you can do whatever key management you want.
+>> That doesn't protect against root, but if someone can get root you
+>> have bigger problems.
 
-I'll let Nathan respond to that.
+The threat here is root, on devices where root eventually falls: a
+key root can copy decrypts that device's data offline and forever. A
+service that holds the key in its memory gives that away. keycrypt
+with the OP-TEE backend does not: the TA keeps the key and checks the
+purpose sealed with it at every use, so even a compromised kernel can
+only use it on that device, and only for that purpose.
 
+> Also, if you need keys stored in hardware for some reason (compliance,
+> time-limited exfiltration), you can use a userspace library or
+> daemon that abstracts over whatever the hardware-specific API is.
 
+Yes, that is the case I mean, and a daemon over a TEE would not give
+the key away either. What it costs here is, for OP-TEE's PKCS#11 TA,
+secure storage before the root filesystem exists; for the CAAM, the
+only user-space path is AF_ALG cbc(paes), the one off-CPU exception
+left in an interface the kernel documents as deprecated, privileged by
+default, with a key format per driver and no purpose.
+
+Ciao,
+
+Rodolfo
+
+-- 
+GNU/Linux Solutions                  e-mail: giometti@enneenne.com
+Linux Device Driver                          giometti@linux.it
+Embedded Systems                     phone:  +39 349 2432127
+UNIX programming
