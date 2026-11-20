@@ -1,64 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=82.195.75.108
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795204343;
-	b=WvwIUnlvWU5vs6nPuTXLhiNOXHyma73p9XViqa9Eite9cYKGiJ6VheLlH+izYihG8w+k
-	 c8r8j2IaUA+PatLJnmMNAr9wU6Wil2K/SbhTeX8TfKSIt/IChqZzqlgUmSZys/2G9wfdZ
-	 ZfMFxwZ026D7ry1/lUXt3RCnkYNdlxdr5/O6mG9gVkONjRbwSIU/Ox8zmRjLvva9MPpDE
-	 jh4bNOv8C1fvtQatb2DfRgXM9QcyxiUaDgZ2Cr2jF2I1moZEN7V+ANuFc3mQxfDM3g67V
-	 h3tnOd238XCf+Nxnb99ZYHU0ceLvKegkcljyPyT/JQDo/VyJhwGyvRKfScVVEk3YOxw==
+	t=1795205683;
+	b=s4NQB/8g8m8hSuItyKSAX4oO2Qu217cqbwio8TCfjsmQqzpMKfdE9OzaCq+5ikdQBv3E
+	 D/s0UDOZdr0toQqQGty2OP+8a6AmLuFjiAI/G92xn6OKtNfB4QM8oRpyuKpCpOYr7/1TR
+	 JV1bL8m3Vb9Uwco9GR/oipzc+W42wC6VbJ10+HPHjRyx1J/vv5b2WmLMGg6c1nIbTj1Bo
+	 MNVi5Y/ip7DxavFQw4vl4PRuwU2HHFW6E9tNsv+te0nAJT+vSpRyYkz9y+Y1LlCuqPBZ0
+	 jLSmWNT4cte9LdHLnncGKSBl/wQcnrklgRLKT0eM0Zc7YYtv5df6IRG8UNCf14Hw8Zw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795204343;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=XxJsNtpTOv3BQRcOTmsjMpsRIvtl0qjRD5mX3/ihrPI=;
-	b=PuHF0dAWUn3sIIQ5jLyq66aHuSlHloDCtf5e6w38vai6s3BE9EqFbkLSUMK34o8prFfj
-	 dsIlPZy5Xm8VfQtHZnYXmSFsv44n4zJChzNMiAWV7iQDtwhR5zxH+KJCjWnRcyyhvYcUh
-	 kMo8e2e7eHD88HOhHwnOrBAeN0ePRsxmlJUCOUhYm3oLVDGbhbUgM/ofp+ZE1Tr8GpzUp
-	 YpNX96jQViopyQxH/QxMPqNYIXrUALD1V/E6XfXpxZ7ZevUtl3wLrd7fw2qcrwLY7Wm0a
-	 yW+b8CODu/PIbL4EWcAZVjorVmFS0n2x2hJcTubJqq7/pxOoVwPIzodnbKXRTAxDD+g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795205683;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-Debian-User;
+	bh=FFTP1NPza1DvwgzCri+N43IcvcyxR0U6bBZgpwRHscQ=;
+	b=GCsHNaBv6pfVHXpRDIweuay7yh9jwlMnUQFR2b/x95LYoSjeYUkcOrrIDa1F1Txy5HXZ
+	 E5sY7WAlsdKUsZ8duTa7NVev+gXrWPQcwv8Ifiu91XvhTM9UxrTsSWYM/3jYemYShWdpq
+	 dBO3vIv7yQMdf9m/JUogtx8W2VBoMaKlde3RjLRZ7kfZdSx79J2MJPPe8y7vfQNhjoB0B
+	 zf1in8d3eUVLeYoPntri77KN5xykEN03sbBypdlRnTEQwv14tAh08vlElrASkAzHc7VYT
+	 3uoNBkpRLO2X1SRAKA25C3y8VdGDE1k/NmC9LHFU6c9stp1cXk3mNfqp3t5E8WoLs1g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CnX03Nb+;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=debian.org;
+	spf=pass smtp.mailfrom=debian.org;
+	dkim=pass header.d=debian.org header.i=@debian.org header.a=rsa-sha256 header.s=smtpauto.stravinsky header.b=kOcxHrVk;
+	arc=none smtp.remote-ip=82.195.75.108
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41089606A6DA
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 19:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981CE606A6F1;
+	Fri, 20 Nov 2026 20:14:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 981CE606A6F1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CnX03Nb+
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE4051F000C0;
-	Fri, 20 Nov 2026 19:52:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795204342;
-	bh=XxJsNtpTOv3BQRcOTmsjMpsRIvtl0qjRD5mX3/ihrPI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=CnX03Nb+d0KPahNY/iXf/f/RuzDLY+lbkskRf+jVtdoTl6loFru7jmM9HwyEQfci0
-	 Lg0+CyiGQCGICkSSQNgO1iJi5B0xv3kGL1Xgl0RmItgfc3YmKo7Z4B87+7/z3cmYOF
-	 EpVlagLVRD7SYOes3xw9JUskNRebg9pv2odw4Dd9lRJS8AHbxYFCnk1brLhgo7YvjX
-	 wBPDJc7DKkQjw+dFBOubjJPzC3Gqt/PYpUXJsaAQTMHRm3UxmM8LKWfx+y/riMrZ1d
-	 XcIijH0jq48WaM4PC/V5moSMQtYWk9klnhzWX09BstFZtJ2YXHSSKMSVxVGxiW8Md6
-	 dt5RH8UKNTAyQ==
-Message-ID: <sashiko-outbox-225968@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v12 2/4] soc: qcom: add core driver for the Qualcomm
- Crypto Engine
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Bartosz Golaszewski" <bartosz.golaszewski@oss.qualcomm.com>, "Thara
- Gopinath" <thara.gopinath@gmail.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
- S. Miller" <davem@davemloft.net>, "Stanimir Varbanov" <svarbanov@mm-sol.com>, "Eneas
- U de Queiroz" <cotequeiroz@gmail.com>, "Kuldeep Singh" <kuldeep.singh@oss.qualcomm.com>, "Eric
- Biggers" <ebiggers@kernel.org>, "Demi Marie Obenour" <demiobenour@gmail.com>, "Bjorn
- Andersson" <andersson@kernel.org>, "Konrad Dybcio" <konradybcio@kernel.org>, "Russell
- King" <linux@armlinux.org.uk>, "Abel Vesa" <abelvesa@kernel.org>
-Cc: linux-crypto@vger.kernel.org, brgl@kernel.org, "Pankaj Patil" <pankaj.patil@oss.qualcomm.com>, "Abel
- Vesa" <abel.vesa@oss.qualcomm.com>
-In-Reply-To: <20261120-qce-fix-self-tests-v12-2-b5a2a44bc5ae@oss.qualcomm.com>
-References: <20261120-qce-fix-self-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com>
- <20261120-qce-fix-self-tests-v12-2-b5a2a44bc5ae@oss.qualcomm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Nov 2026 19:52:21 +0000
+	dkim=pass (2048-bit key, unprotected) header.d=debian.org header.i=@debian.org header.a=rsa-sha256 header.s=smtpauto.stravinsky header.b=kOcxHrVk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=FFTP1NPza1DvwgzCri+N43IcvcyxR0U6bBZgpwRHscQ=; b=kOcxHrVkAyIvrsNI5n9oXxz2Cd
+	zSYQ4zJyHNy9cHPfsv8prE2GWzy7pHB1MWM7Dj3TWGiCaruL8l65x0Sm5WFdyFaKLGLAITTLlWQ7m
+	rxdUlf8+KA1YJewSlLAbJruWpBcyvE7EfLgg2pzT3Km2AW0r8QF+/MRmMD1Ev0CPNzb4q5GJrjYH7
+	OgqwmsrEuxm5iLJ8NKVcuWbVYWz6ijqfbX0c9UZWFUaV2Hf0R/k537BzeIuPLyh7CyTM3hfaT1W20
+	iNoObdEBvfnwMcdKMCyDI1KV6UKItF9Ibv9+NKRYzMBPN9rZj4nxTp5mbzBxjSTq+2pve3SNhC4Aj
+	jjRH1Nww==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1xUV0E-0037jW-20;
+	Fri, 20 Nov 2026 20:14:34 +0000
+Date: Fri, 20 Nov 2026 12:14:29 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Danny Tsen <dtsen@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, stable@vger.kernel.org, 
+	herbert@gondor.apana.org.au, nayna@linux.ibm.com, appro@cryptogams.org, 
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au, 
+	ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
+Subject: Re: [PATCH v2] crypto: powerpc/p10-aes-gcm - Fix IPsec stall on bond
+ failover
+Message-ID: <awCpkj5wsxEPt-Vd@gmail.com>
+References: <20261120181657.6396-1-dtsen@linux.ibm.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,52 +68,44 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261120181657.6396-1-dtsen@linux.ibm.com>
+X-Debian-User: leitao
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Medium] soc: qcom: missing Kconfig dependency and default for
-  QCOM_CRYPTO_CORE
---
+On Fri, Nov 20, 2026 at 01:16:57PM -0500, Danny Tsen wrote:
+> The Power10 AES-GCM driver registers its gcm(aes) and
+> rfc4106(gcm(aes)) algorithms through the crypto SIMD helper. When
+> crypto_simd_usable() is false, for example in softirq context, the
+> helper defers requests to cryptd and completes them asynchronously
+> with -EINPROGRESS.
+> 
+> This breaks IPsec traffic during a bond failover. With the crypto
+> offload device active, traffic is switched to a passive device that
+> has only software encryption, and the ESP requests then go through
+> aes_gcm_p10_crypto. Under heavy load, some or all of the TCP streams
+> drop to zero throughput and do not recover. The stack is seen to drop
+> the ACKs as invalid, which points to the cryptd queueing delaying or
+> reordering the packets.
+> 
+> Fix this by registering the algorithms directly as aead_alg with
+> CRYPTO_ALG_NEED_FALLBACK, and allocating a "gcm(aes)" or
+> "rfc4106(gcm(aes))" fallback tfm in ->init(). When VSX cannot be used
+> (!crypto_simd_usable()), the key was not set up for SIMD, or
+> cryptlen < 64, the request is handed to the fallback and completed
+> synchronously in the caller's context. The driver no longer defers
+> work to cryptd.
+> 
+> Remove Kconfig option CRYPTO_SIMD and add CRYPTO_AES and CRYPTO_GCM.
+> 
+> Fixes: c954b252dee9 ("crypto: powerpc/p10-aes-gcm - Register modules as SIMD")
+> 
+> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
 
-commit 102209faf0f22bae7835821ad72826313dbef2e2
-Author: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
-soc: qcom: add core driver for the Qualcomm Crypto Engine
+> - * Copyright 2022- IBM Inc. All rights reserved
+> + * Copyright IBM Corp. 2022, 2023, 2024, 2025, 2026
 
-This commit adds the core platform driver for the Qualcomm Crypto Engine
-to bind to the QCE devicetree node, manage interconnect scaling via
-runtime PM, and register the crypto auxiliary device.
-
-> diff --git a/drivers/soc/qcom/Kconfig b/drivers/soc/qcom/Kconfig
-> index 535c8619197b3..67d54d5211ff2 100644
-> --- a/drivers/soc/qcom/Kconfig
-> +++ b/drivers/soc/qcom/Kconfig
-> @@ -121,6 +121,17 @@ config QCOM_PMIC_GLINK
->  	  Say yes here to support USB-C and battery status on modern Qualcomm
->  	  platforms.
-> =20
-> +config QCOM_CRYPTO_CORE
-> +	tristate "Qualcomm Crypto Engine core driver"
-> +	depends on PM
-> +	select AUXILIARY_BUS
-> +	help
-> +	  Core driver for the Qualcomm Crypto Engine. Say yes here to enable
-> +	  the top-level driver that binds to the devicetree node representing
-> +	  the QCE, registers the sub-devices implementing actual QCE
-> +	  functionalities and sets up runtime PM allowing the interconnects to
-> +	  scale down.
-
-[Severity: Medium]
-Should QCOM_CRYPTO_CORE have a default (or be depended on or selected by
-CRYPTO_DEV_QCE) so that existing configs with CONFIG_CRYPTO_DEV_QCE
-enabled keep working after commit "crypto: qce - convert to auxiliary
-bus"?
-
-Without a default or a dependency from CRYPTO_DEV_QCE, updating an
-existing config leaves CONFIG_QCOM_CRYPTO_CORE disabled, so nothing
-binds to the QCE devicetree node or creates the qce.crypto auxiliary
-device that the crypto driver now binds to.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261120-qce-fix-se=
-lf-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com?part=3D2
+Do we really want to change this in this "fix" commit?
