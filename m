@@ -1,127 +1,113 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.122
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795176600;
-	b=zFhwtbAEPGnOYimcfMQMI824ZGFYnC9BgUFDHtOXtVPZeaFbYgv0zIs0L4DsACeXgjkr
-	 a+Go+96fY6qfLW24OspWyrZfXgQ9aEANtUICf4V3C33j7W2J5u2qFxJBUn68rqtvGMoT8
-	 Z45euWLvj4vv/HrV4nKBqYxWxkbotfSfJykMy7nwVC0KQAYAWE9Z6VMceh+xkvDJuM6K1
-	 dZQpIUdwNuGxp8VYV9qU+4hIAJt0c9y+yveLQeawSU+E2oDrn36eaYAoBnUPStdNoRFYV
-	 iXxQZyAUPISe8oysKLCYr7hOywRDtpYWM0Ghrle7Gu4/oHQgb+c3EPp0PqpV4+j3jCA==
+	t=1795178267;
+	b=yLpF9Mvs/UzlpWV8Jsmw63+Gk+NrtEty/qB/NfEtiLDRWqQ0I2Gdwgz7GbD1EWEpdeWk
+	 idACIHur2HARIGgsu43CLwmeotmrDraodzmDNJ+vcxMVC6hfo8rUSrrtE5lVrj1SlYrf/
+	 XFE+I9ISVU7JwM3pCFVbco+BESSc3i3LVYdRIHxZlTIyujVXWXHGfg71u5x9r3+uikWGc
+	 UEClLgPyintytG+oQROKLjm+8DyIN7642ugF9bQYi18bgWP74TGhHeDE+UpcMHJIwYyPO
+	 OkslhvPc5r/ekU24v8U9MZw3FZr7+yOaz7uX3BeRPlfi2elEJ+jSO4DpG1zbE57tW1g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795176600;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Date:From:
-	 To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:X-Proofpoint-Spam-Info:
-	 X-Proofpoint-Spam-Details-Enc:X-Authority-Analysis:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=NgFZenonLIOYrddnj7GBaw7dtDGJBTol3GdISdWN9zA=;
-	b=HQSikbQ6cHCeqfsu8u1TvZfp2+5etfhV6c5oSy7N/G90zBsu1N7ICGj0wMuwN9cwJ9Pl
-	 mthi+Ef9GIW1gQuiI7aCqV30U4mN0WARtRa+Iv8oUYTazhwjcb7Jx9ZYFIAShUrkg69W2
-	 9QaFmn6GYZpE7AW+PSaBA17VmIaD5mPJ3t2fD0jm6iTb+1XDh3TD9XzTBeRUp0LtsvVY5
-	 wghAy5BBJtG0yT2AePsOZnHflBvlQesrz5kjzREjM8DPxfLJml9Hf1XqTuIpU2q4LOXJ1
-	 LNHDyizfHJpGd2qPWx+PgfEOfZuFBE0m89ei+NMgMljJYPVfeh4Mblo5nCIrUH2KD6w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795178267;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:
+	 X-Google-DKIM-Signature:X-Forwarded-Encrypted:X-Gm-Message-State:
+	 X-Gm-Gg:X-Received:X-Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=YIwDvTsoMbycD6a5DXs0DiVLhqVOlC/XPJ2Lhc+16Ao=;
+	b=Xh5eBqgbjxDW4QvabGypa3L6SnnDnrR0eZIXuFxC/nFcwk7jI/2p3vKtzFx3+AwvifSa
+	 bMcI47cb0wBghz4xlMvZ9qVzNj+DSdQMMifvHVRUlPKcV+ltudOU9NaOSx0RvQXYsLSXE
+	 EdRAuTag/8GHdnDzcXbIP4t3+xHjJrlY/WBrFEQ6sU3BXQuY27nmyMIhtrPGK0xBL8Jqc
+	 jjU8iX7OQQoIMNBZfUkNKap8j/lpb4I+8lav6nYuBIa5FL/LtSp6RsC+K3hUbjpE6rwMH
+	 TX+gobn+Dk/zIjhmexe/LCG/dMVOgTpo/eGEBXKu6imlBz+JoScKpJXOkXYwZsJT9KQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=UqHLWQpi;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=JPrSDN0x;
-	arc=none smtp.remote-ip=205.220.180.131
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	dmarc=pass header.from=canonical.com;
+	spf=pass smtp.mailfrom=canonical.com;
+	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=LYk7PZ6Z;
+	arc=none smtp.remote-ip=185.125.188.122
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FF6606A320
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:09:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B3FF6606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94609606A325
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:37:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 94609606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=UqHLWQpi;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=JPrSDN0x
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AKBoblv1203420
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:09:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=NgFZenonLIOYrddnj7GBaw7d
-	tDGJBTol3GdISdWN9zA=; b=UqHLWQpi1vKez1h/j4dKBd+k37dj9G2exi2kPZNR
-	VGUaCftrWXxEer91rCfRSiJ+94Xnq6Qh7hdGQ8tIqDLpgmkcjB5NiAPU8AOY3eSN
-	HJDcfDQhq8GE24Ao2/MKETS/+qQy0SQWXX2IqmCmk8HAXUculPOeX5u3yHJSOp2p
-	xH4W2D/0oLjxNS/4HvX8Z1MynpO/FhomeVd05WS5c0b6MzsQ/wRO88wbkmjfErQ+
-	/YTrL69kBb4hcZUPfeKNmjn5xiA/zm8PVLVazLIpDQW9rBYI1AyAIyfVZXtQqg6p
-	MHfvuAV9vbZ6FwbdpnhcJ8drdzdBVBg7zGZc4oju3VDpWw==
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j27fykj2u-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:09:58 +0000 (GMT)
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-94960131befso146134585a.0
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 04:09:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1795176598; x=1795781398; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=NgFZenonLIOYrddnj7GBaw7dtDGJBTol3GdISdWN9zA=;
-        b=JPrSDN0xE574o4MVMz74XqzX8BBzW94o0pcSq5sns6DvwJiVfhVybkatQum5RPgITR
-         UmLzChvWYGI09dcBFHK2n2J2ZY8YfUFaDY4b9mFU6dDsDatCJsy/TzeG4T5BDUrPuk9k
-         eaWPBEVzNwZb92OfTuBC17lzJU71yLGlbe0Ftpwj8kmJym3nRJ3LZO80M//jC5cpYA63
-         x9c2n30X3uI+JBuBFuS77ybyYaYghK7EhLntijjZ8dr+qpuUIiiQKFxOwXlXhTDtTczf
-         JlKhJRH2MukAJ7t/k0L/jpff/8MPZZq1zgktoOPRwsiFvBlZKAt6xhPpkLnYYgAJD6jt
-         H5rQ==
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=LYk7PZ6Z
+Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 14F5D3F788
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:37:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1795178264;
+	bh=YIwDvTsoMbycD6a5DXs0DiVLhqVOlC/XPJ2Lhc+16Ao=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=LYk7PZ6ZfZBtfkBHYiGZM6+tffhc1+P9HhGXwjLELzd4btilR7RH/14t815o93Duv
+	 vs9KMy99o7IXc+9OjCLukA0CDPrbEDxBWeoCKfhqCeSsPKrr3r1nZrhJ8aVZ5OC03l
+	 kDG3tNfWVSPZDOzpR8jg+qHXs6jNgWVEVfTSUc38XJO2er5usNSzt1kPb2x65ZZhdr
+	 CEBMhkV2zBBbLTPEyuKmcpK8UFoOiK+Vjrl/LRK+2I02EBzdJ4OkA69YbOwIbSwr7r
+	 cGHy2zO82VhBCFfenRhzbUdRWwkj5r/n0pRWqb7yvB8aPHjRpFZyPaEDMaqcKJadt9
+	 3nDo6F30gHXZ4wLAOTNjcSUJoIKJIXzBH/lIz2DsXUXSsp4Zl5YNNZUJnPIcjXA9zf
+	 wiCHi84CJoJ18HKN1Op2Z48jCvaFte3SOaWcSIeurioulYvSbsmEYEppGl2xUz7tbj
+	 oLgq2XQrrBLQnmoK3HPpIKoIZkjXa8HWKzB4rE51pzjBgPhvFm+et3QwX4SGb0wEjZ
+	 nIVHKO9iwUMoIa2kskrUEmp10Yn7pVoYv0PDGH+0iZYgIXLjjnmh7Fid/3vSuK5B9h
+	 ++LE83duR2ygjWW6CoDWs91j73CCa9DgJuvD7DmdOKWJ+eHUXRZnQqqoUr2ouwaM/H
+	 zpE71HoUEoRDpDDbqFUvd8RI=
+Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-386177b0516so1299176eec.1
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 04:37:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795176598; x=1795781398;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=NgFZenonLIOYrddnj7GBaw7dtDGJBTol3GdISdWN9zA=;
-        b=NAkaBo0h5ShlqxEoDiIqeAo1DRW6mXVXgvqa9Ts6kqHrQF4e1G6JRCZ2FnLXA/5+Mo
-         ndaqYbi+PPeQkng0hGfm+Sc2ZZCVqwPrdQGGq4xVKRjsFMSeqtP7W2j+9jLtiFozpzF9
-         cuu13YVxmwZLhwpYAUiAs6S5MV9zSjaUGdN+cLkzQSbjDDpk7VGcYpTDRhFwhwH+EVzk
-         8sLOFI1Jy6YfBptILIjcky9WSEcLHkiohal873z/rHvjPd/wXS3+wsRJA13sDXI+8g0R
-         FsHPwvuCj7RQoFABmKBdKpLXesx7Klr6Yfe7Wqyguq33l45PXAurKP8gJsltvx1puPWi
-         KNdQ==
-X-Forwarded-Encrypted: i=1; AL+hErEyGkgza9RKztRQ8nMai9bG7wMk4otd2eQL2lGC4AZJSBijdWcNr99jq1DE7FiGWTENgmCsjEliauTZL1E=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+6sztdBEyhhJ/Tp39Av9vqnY67vC9Qt6f4NZwW5+TwCRzXUdEC
-	hTutGNyAEtaVjaqwV3GUasEh/dIg+jwr+ueDQNNulZ2bnSMnPLrnPOZwbEebK9kb8/SaS1fsvE3
-	asSL0YfetZSJm5bF62U0K6LoVSmWdjI6n81nGYVZYrErEwHIWV6SJgsDERT9sOtystrw=
-X-Gm-Gg: AYBFou3RzCmrWL3Cbsze1zTWUvTXeab2/A2RJoyR+Xrpt6WIQyU/QTYbP/C4+MGi/MO
-	DuvALcuXL6ZwtuflQnaixeQm9RCwjVwKH7ax4ZHHsRymYbyjOOpc/Jbr2bct2622x0ga1OeTZVw
-	FEYbqbll0qkTnTp85LA/n0C+OH3q9ojoJ1te3SLBqXQ3pA62mzkjWETr0vtOy2KtEJAkAmyYESo
-	2xTBG1tdih8XYgzaT1Yiu5WSeppTgiEz5NYXNnYZLRixrLzcysbdxGHLzrhX/UdoKZDPvaIeEJi
-	FaCV2iLmtOfGAe38qsJog/7/N4qWj1zwdNjPqh5G8UhLcxZOTn8Dwa/ffR+dvDcvya0fYkcEk3G
-	gCMeSO4ARJ40qZ1v+EgVhqJlRx2lo9PObgWUE4Wcx93ax1hj1yngjW9K5ThCuuoXy
-X-Received: by 2002:a05:620a:199e:b0:947:82db:2f9d with SMTP id af79cd13be357-949ba7e18fdmr433991885a.2.1795176597829;
-        Fri, 20 Nov 2026 04:09:57 -0800 (PST)
-X-Received: by 2002:a05:620a:199e:b0:947:82db:2f9d with SMTP id af79cd13be357-949ba7e18fdmr433983685a.2.1795176596918;
-        Fri, 20 Nov 2026 04:09:56 -0800 (PST)
-Received: from oss.qualcomm.com ([188.27.161.77])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab65cb4341sm5645885f8f.4.2026.11.20.04.09.55
+        d=1e100.net; s=20260707; t=1795178262; x=1795783062;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=YIwDvTsoMbycD6a5DXs0DiVLhqVOlC/XPJ2Lhc+16Ao=;
+        b=AM73AceQwglHFeBOjGtV1idtt0AcdcVUsjXvjCXIGTOLrPw8FRpLSTbOHUzSCudXCn
+         8N9h1T6vsVmJ4K9imvHR8kBZgza1b+5pTLUS4NS2MkFgFDjHjwKhyExze1OaLvVokJwX
+         kOF16rZ8zV7ZaRL7/HHPzV+M3RRZaklVC2seMJ37psqi9Fd7IE0VXJFhvbreQdKJbR+D
+         95ANmN+Ze3fYD/i08KKc6i6hvPFcWCSxQZXE1RVsfWuZUZrwA6Wd3Z14/iyNB7Op3XV1
+         YVdwJ6RHk7BrqJva6U35c2jmMWHjRUQeYhuV9L5Ws+b5HrpX/STq3DXN7pyNw+agX+II
+         g5vQ==
+X-Forwarded-Encrypted: i=1; AL+hErHoBe0AyDEu6JehXQ8nUundgeypVFH+6c9xiWC1XxZjlHcvDJVnEhAJz4sSxct5gBwrlKJMpNRqQvoeDn4=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/GmXC+mgjU4ZaDslB/4V3cicspKD5EIy798zBgKGuc+JCaFeV7
+	6MXPirbAo9K4a9Sfsd6Py0o+yQIlJY/lEt0wVHcpTgofQJGGLz9D3ZRL9OoalRQSmgz86Qysi0Q
+	phuE1PKcBCZO0KB2CtI3keGdL0+x1bopO/R+ruIAhtw8N0MqhtoJrFZxTciy8YRZI/o0TKaAXLH
+	xwV7+3Dw==
+X-Gm-Gg: AZFdTZe5JQ+4BhJiWGBFbH3yn2UzNHkOUbYtE/TraaH5O8KF87o76DecqMc1j0Ye9NI
+	MgmwIGLEZni9Ro7ORHKeoIIwyGqqQo/V213hhclhh0BOpE7RbG1AvxcWdOl7Z2GmE9Vm6spQaQi
+	dpDLHA5zgtSE9hqIeBmwa+bWuZ0L4FGTUbItSytkWFUQShMXWwZsikKmzo7jqsHuRq4x8fH+UJo
+	zs2uBb3zLOYc6q6Ks8SVpOQRx9j1QIiFyE+WyKlcQ8I31Q13Rkq3C20Dse4X36kSB9w14WS9T/x
+	oPzwuOCTNP8dTS0/D0D9X1OnFtrs+ivWZcZqvUwo9V+D3oDVlRFvcdkWaU/fts+POdla3aCmyfF
+	FkqMHwpVMX89KiftFieiKuIdZv8a0Nc4X4RFcxu8k7sdCSrlSc3wch7QJD0M=
+X-Received: by 2002:a05:693c:20ce:20b0:37a:a9db:6bd2 with SMTP id 5a478bee46e88-3856e63b064mr2798260eec.11.1795178262223;
+        Fri, 20 Nov 2026 04:37:42 -0800 (PST)
+X-Received: by 2002:a05:693c:20ce:20b0:37a:a9db:6bd2 with SMTP id 5a478bee46e88-3856e63b064mr2798232eec.11.1795178261794;
+        Fri, 20 Nov 2026 04:37:41 -0800 (PST)
+Received: from ZBook.gateway ([123.208.39.53])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385677c371esm7994093eec.23.2026.11.20.04.37.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 04:09:56 -0800 (PST)
-Date: Fri, 20 Nov 2026 14:09:54 +0200
-From: Abel Vesa <abel.vesa@oss.qualcomm.com>
-To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Cc: Bartosz Golaszewski <brgl@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Abel Vesa <abelvesa@kernel.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Wenjia Zhang <wenjia.zhang@oss.qualcomm.com>
-Subject: Re: [PATCH v4 2/2] arm64: dts: qcom: shikra: Correct QCE node
- configuration
-Message-ID: <pjcdhrc7b3gs3ll5ml3d3ohnuivtc4rcotnhnx32rydc7htmfm@y37lvdnugj35>
-References: <20261120-shikra_qce_fix-v4-0-5249e31394ce@oss.qualcomm.com>
- <20261120-shikra_qce_fix-v4-2-5249e31394ce@oss.qualcomm.com>
+        Fri, 20 Nov 2026 04:37:41 -0800 (PST)
+From: Changwei Zou <changwei.zou@canonical.com>
+To: herbert@gondor.apana.org.au,
+	sahil.malhotra@nxp.com
+Cc: davem@davemloft.net,
+	horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com,
+	jeffbarnes@linux.microsoft.com,
+	stephane.debusne@cynove.com,
+	iuliana.prodan@nxp.com,
+	martin.kepplinger-novakovic@ginzinger.com,
+	lukas@wunner.de,
+	sahil.malhotra@oss.nxp.com,
+	changwei.zou@canonical.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v8 0/2] crypto: caam - Fix RSA error-path unmap and unaligned dst buffers
+Date: Fri, 20 Nov 2026 23:37:30 +1100
+Message-ID: <20261120123732.1200685-1-changwei.zou@canonical.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -131,48 +117,103 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261120-shikra_qce_fix-v4-2-5249e31394ce@oss.qualcomm.com>
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTIwMDA0OCBTYWx0ZWRfX1HC4l3PNdBEo
- JceGfRu51NXSrXeXFVNlrHZIK/5jitJbOR6GhJ74NkYP1HoWNmkO7NG6iEr7WRODlqoK7AjK1XI
- L5BMiXuVCvTqc0djrs4VwAZRBbmrTWw=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTIwMDA0OCBTYWx0ZWRfX2VAtTHTMNIdT
- 5bBg1speN3ZC5gaKEKaxzVpk1h18hCIuM/njt9VQcfSFEXFWBz4siqUQ3AkUF1XnmOD8jcdXV8C
- nkhNyXXVYY+8jkvdd7HwjVhDYjwHYX8X1mpxCxipo/9O90oJBKK6m6RMrucdfLnWkXtO/BDMvzS
- MzQTKJZHo8R5q42yldri5sK5q5jrvAm38F9yfoKSvnz+cuNUUgLZy1FWGL/0Z8kFH+ncoOA3BYm
- d8wtwTa/n9VOdRkdwZJ0GVKX7Wme8Zsi6WnKGBVLDh4Zk6kOXhvgSJb/9wEkDi/6hWTSiBXEGDq
- N1orehp0dKuQfTpCxSO/KumEdztEIg4vNcM0eyx3zwjwny+gsSuZDYw9DZYq7a1UfbOnd6HsK35
- 5TR2BoN9d+YAACgMZx9AZfCM1rCiR1tLqyWr4hnFLCLzwLIDRaSLJ7pqW85OupRa1qkRGnitJkC
- hYVKZmTFAhJtZAZSIYg==
-X-Authority-Analysis: v=2.4 cv=GZKCDgXL c=1 sm=1 tr=0 ts=6b003896 cx=c_pps
- a=50t2pK5VMbmlHzFWWp8p/g==:117 a=asF+/XNaGoxFafzDDLC1GQ==:17
- a=kj9zAlcOel0A:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
- a=EUspDBNiAAAA:8 a=l6_oCbVy_dZ6_alwpPcA:9 a=CjuIK1q_8ugA:10
- a=IoWCM6iH3mJn3m4BftBB:22
-X-Proofpoint-ORIG-GUID: SreGykgS5YXiEYJCNpa288cF1Nact7i-
-X-Proofpoint-GUID: SreGykgS5YXiEYJCNpa288cF1Nact7i-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-20_04,2026-11-19_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 malwarescore=0 lowpriorityscore=0 priorityscore=1501
- suspectscore=0 impostorscore=0 bulkscore=0 adultscore=0 spamscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2611040001
- definitions=main-2611200048
+Content-Transfer-Encoding: 8bit
 
-On 26-11-20 16:59:53, Kuldeep Singh wrote:
-> Shikra QCE requires an explicit core clock, which is missing from the
-> current configuration. Adjust fallback compatible to "qcom,ipq4019-qce"
-> and specify core clock to match updated binding description.
-> 
-> Cryptobam is controlled remotely and its clocks are therefore managed by
-> remote crypto subsystem.
-> 
-> Fixes: 099cd05d200b ("arm64: dts: qcom: shikra: Add ICE, TRNG and QCE nodes")
-> Tested-by: Wenjia Zhang <wenjia.zhang@oss.qualcomm.com> #on shikra device
-> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+This series fixes two issues in the rsa-caam driver.
 
-Reviewed-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
+Patch 1 fixes wrong unmap operations where rsa_pub_unmap() was called
+regardless of the key type.
+
+Patch 2 adds a bounce buffer to handle unaligned RSA destination
+buffers on DMA-incoherent hardware such as i.MX8, fixing intermittent
+-EKEYREJECTED errors when loading signed kernel modules.
+
+AI assistance disclosure (per Documentation/process/generated-content.rst):
+the OpenCode agent (claude-sonnet-4.6) was used to help analyse the code
+paths, draft parts of the changes and the changelogs.
+
+Changes in v8:
+- Patch 2: Add Fixes: 8c419778ab57 ("crypto: caam - add support for RSA
+  algorithm").
+
+Changes in v7:
+- Rebase onto the current tree; v6 no longer applied after the upstream
+  caam_rsa_set_priv_key_form() changes (a91d9346a70b, 828c3b265b6d). No
+  code changes.
+- Drop the non-standard "Assisted-by:" trailer from both patches; it is
+  not a recognised trailer (and fails checkpatch), and the AI assistance
+  is disclosed in this cover letter instead.
+- Pick up Reviewed-by from Sahil Malhotra on both patches.
+
+Changes in v6:
+- Patch 1: Factor the priv_form switch into rsa_priv_unmap(), shared by
+  rsa_priv_f_done() and rsa_pdb_unmap(), removing the duplicated switch.
+- Patch 2: Hoist req_ctx to function scope in set_rsa_priv_f{1,2,3}_pdb(),
+  removing the duplicate block-local declarations in the src/dst branches.
+
+Changes in v5:
+- Patch 1: Factor the public/FORM1/FORM2/FORM3 error-path unmap dispatch
+  into rsa_pdb_unmap(), so akcipher_do_one_req() and akcipher_enqueue_req()
+  no longer open-code it twice (Sahil).
+- Patch 2: Do not overwrite the caller's req->dst. Use req_ctx->fixup_dst
+  for the DMA side (mirroring fixup_src) and drop the orig_dst/restore
+  logic (Sahil). Expand the commit message to identify the caller that
+  hands in the misaligned dst (rsassa_pkcs1_verify() /
+  crypto_akcipher_sync_prep()) and why the DMA API does not bounce it.
+
+Changes in v4:
+- Patch 2: Describe the bounce scatterlist with the aligned allocation
+  size (ALIGN(dst_len, dma_get_cache_alignment())) instead of the
+  possibly-unaligned dst_len. Otherwise, on
+  CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC systems, dma_map_sg() evaluates
+  sg->length and can treat the already aligned bounce buffer as
+  unaligned, bouncing it again via swiotlb or failing with -ENOMEM.
+
+Changes in v3:
+- Patch 1: Dispatch the error-path unmap on the operation (the completion
+  callback rsa_pub_done vs rsa_priv_f_done) instead of key->d, so the
+  unmap always matches the map.
+- Patch 2: Bound the bounce-buffer copy-back to the RSA output size
+  (key->n_sz) instead of the full dst_len, so the trailing capacity of
+  the caller's destination buffer is left untouched; add Tested-by from
+  Stephane Debusne.
+
+Changes in v2:
+- Patch 1: Add Fixes: tag; pick up Reviewed-by from Sahil Malhotra.
+- Patch 2: Move the !bounce_buf check out of do_rsa_bounce_buf() into
+  the caller rsa_bounce_buf_done() so the helper is only entered when a
+  bounce buffer actually exists; add Reported-by/Closes and Tested-by
+  from Martin Kepplinger-Novakovic.
+
+Link to v7:
+https://lore.kernel.org/linux-crypto/20261120110525.1170175-1-changwei.zou@canonical.com/
+
+Link to v6:
+https://lore.kernel.org/linux-crypto/20261114060032.872141-1-changwei.zou@canonical.com/
+
+Link to v5:
+https://lore.kernel.org/linux-crypto/20261113113650.63038-1-changwei.zou@canonical.com/
+
+Link to v4:
+https://lore.kernel.org/linux-crypto/20261111230221.40297-1-changwei.zou@canonical.com/
+
+Link to v3:
+https://lore.kernel.org/linux-crypto/20261020025426.955531-1-changwei.zou@canonical.com/
+
+Link to v2:
+https://lore.kernel.org/linux-crypto/20261004210200.290119-1-changwei.zou@canonical.com/
+
+Link to v1:
+https://lore.kernel.org/linux-crypto/20260821045555.806471-1-changwei.zou@canonical.com/
+
+Changwei Zou (2):
+  crypto: caam - Fix wrong unmap operations
+  crypto: caam - Use bounce buffer for unaligned RSA destination buffers
+
+ drivers/crypto/caam/caampkc.c | 177 ++++++++++++++++++++++++++--------
+ drivers/crypto/caam/caampkc.h |   7 ++
+ 2 files changed, 142 insertions(+), 42 deletions(-)
+
+-- 
+2.43.0
+
