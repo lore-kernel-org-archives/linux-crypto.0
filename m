@@ -1,83 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795148364;
-	b=5Q6rlvNqidmdsVkPPgoSarGOrecIsSASyvrQJu61Fza7H0T3SnxGqiP0dgL11ojbx9Vd
-	 2I4HsVIMlKiuGRJEObQFVWhvxMjE6dBCO1yXd7Uk5hK2SwLW2GYVr/VLxgGaokymcY7zF
-	 0Cd/wEFXRwG4OrswZlQaNkkWDn3c+RAgYrNqNS/GyVuSBd+cY6AzQ2IfvpKkRO/R/NJPd
-	 7pjhl2Kuh5IprVMAugU1Bl9wbw/KpRPWshI9dFoORituUhtDoY21VJAuu6isktVn/7pDU
-	 VS1pxmlilvWyuefNb/SyyUvcggGxejYlmlOZGUTgthomddpBzZZC14LizDSNfr02zug==
+	t=1795148365;
+	b=3/spUUxFMx1tYA7H/c9GoD6C2Jt3f94UkyG4AqO3NaBMaao6OwX3hyVsglHXG28UvKq9
+	 CGHqWnkoejgVJ77xEzxRplh7zcQee6yij8DlBZDvDHsTiexFiqaK/JbJYGlaLovO+IuhM
+	 0kehy6DO83YLGeqw+iE68LQMuWf1Afun07O4gN4CLh9izLpSQYmKnkIJQfF+DxcVUWvlP
+	 cCIm0S81bkCr/G1dkhjzh7tdbT/tlevlCAOO4XpHoFpJwxC0txOrI/8zNO6bDX25+eGHR
+	 mY/NWsZIT1ONUzRGL2Wgnd9FByVRI1pzLK+22aEPF93Ext6gg28YhkxUIoTECLF1tow==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795148364;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795148365;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=hnkDMtwt0yq1d4PAeYVaT2YC+Oe3WZGJ26Fjv0oSbVo=;
-	b=UgFL9HZo03KZwozSmZ0f6/07pQgeNKeQu9llwbvIXsLAQGu+ZPErsB9rhNrn8XVm0MLf
-	 K98qLtS4fTuLMPON5iHMmu9cuhFrJAJMB9XKO7monDZf8Lff/1TjT6t/3MGkH8F4jsQlW
-	 CkqGYsDf8i0aFnoVG21V6DAm7eheF/e+XMV7KhfcX6pzpEIYnhyk97vsfkrbfUEjxth5F
-	 YNw/BsBpgHECxkX10wS2rHdPWrZQD3VeimrMIjOLwfAxEPRVTsDZaz0wg0FQW7OU+wWeb
-	 W5lU9GbgCvA2IzSyhBze5rZhOMVR8krcyC5qECqhFGH5GRrEgElB7/1WZLuBmdVxexg==
+	bh=Tw2IAI5wSBNupIKIxL5Ig7aobgIjCUpdJvEt5vs8Kl4=;
+	b=jWKcXaKCE3wat7a6fFX/WAfzwEokNeizPb89wdKSRw6ELo0lFk6sfwNo2UctARkJ8nrX
+	 +TuQjWRFH/QmsHHmrMB2cb8cbjxhkSfHUrgopUUTXMmJ0dt80E8lge3fh3Cfgybmvn0+y
+	 8sUDoTPj5J29fE1Bhev28rKTwYvSCYIH2UzBCLXxVn4xhw03xENLgfR19oZuN7SpzYlTX
+	 8aeMT+A4I4GAA9sLJ29rGyQagFPKG8r4tzwFYmVYSCFZqsGCIN1Yqt9zIptYgl+6wJW0+
+	 r+g70RC9HD47OC9gATBnnzrxUdB6KrjXgSb9KC3wgkyBb9+zFYsF9SmFnjJ7x63/AGA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j4lWuamG;
-	arc=none smtp.remote-ip=74.125.82.48
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vxTRE8OP;
+	arc=none smtp.remote-ip=74.125.82.46
+Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD79D60A263D
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 04:19:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD79D60A263D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D95A60A3810
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 04:19:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5D95A60A3810
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=j4lWuamG
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-1a8cc11ac42so677017c88.0
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Nov 2026 20:19:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=vxTRE8OP
+Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-1b3ada81853so542590c88.0
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Nov 2026 20:19:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795148363; x=1795753163; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795148364; x=1795753164; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=hnkDMtwt0yq1d4PAeYVaT2YC+Oe3WZGJ26Fjv0oSbVo=;
-        b=j4lWuamGqrp+0FhEODMdJBWWdsX6PMg1oouTQ3/954T41wnfXZFMj8i8/+vMchGMZj
-         LC10Lmyy8DRFpHCxbHBKJoh6Tz/kTowRjskS9V7gSh0RUBa9Z6EsNdbsRVMpPsUmpfmb
-         1vzghRzlxZgYvSYFqHQoC8gVDiMJ09sdNgLs5l2zl41cKqUSgiK0jJVhn6AEwI/bVgSm
-         C2sIZasWoWIzrJJv4/052BkqzZxs3KU5izVuxLXNDke46pFtHS13cFhiCgIjt9eHwaOx
-         WjVK7cbO7n6+7QCAC7ErR4wab/cUymy9hYrqh4iZRU/Nxuf4FgaYjJ6yOIhRDKcmDNxz
-         jRXQ==
+        bh=Tw2IAI5wSBNupIKIxL5Ig7aobgIjCUpdJvEt5vs8Kl4=;
+        b=vxTRE8OPeHqrGUKmjXMjN6bclXHCrqiOHW5v7f+vC0IOosiXZaakFI0plwoiny3h4V
+         45LTBXRpY0wENCMkhZvI9eCoDmrlHMB0gufo6mZIqoq7m45MMF9PS5Hp/ymqcnmqz+Y9
+         +dxze6qqVjJDisRHHuuIvtO7TYWJsnZe/BTIQkFuLCdZuDUBx3bC2kXidV4OLfHLY1+A
+         Wyn1lcbWgqARr1yz1isfJcLUhgw1HrwR1BJJwtvX7cCqEe3dND/3cT/tMFs6MPX9TMH3
+         NcGSVfHKTge6t5AO4/t2ALWlh+aj9TCk8QpLh20JHlOUA9xQdEVI3CiJlfJ2sabNsGba
+         rmRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795148363; x=1795753163;
+        d=1e100.net; s=20260707; t=1795148364; x=1795753164;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=hnkDMtwt0yq1d4PAeYVaT2YC+Oe3WZGJ26Fjv0oSbVo=;
-        b=gsYFS15zdRovy4lh4utPULWv1t5oNN2FjT/n+Ln3UcccMvRi3skPITOuVi1PpAnWhb
-         NMBwaQZnMYKMm17DsS3NP51YeUXWRPOhustwj75uqMKbL2bYAfOTmY1W8tYgxSqMwxkr
-         BGkXBGCc4MLBk5Mx7L/yDvrF9QiZ3bAdx9o3IT8HPBHq9E4jKMmntxsDW2RcWBpIiyl6
-         DthPA5TIX2wtx5yebGkF0mR5aWmcE5jBxbSyQGMgH7RicfCs+9eiufdDN9UXzjCDF8QG
-         KCQBSxSpUi1CkXkI2RSMQV3skzJ9WVf0eoNhkAcQz1rJIb1GOuHwqAgTyjz/yO3Ma9RL
-         PPIA==
-X-Forwarded-Encrypted: i=1; AL+hErEs3MIGTE7Hsn3ytFLETgThrBa4UpkJkfXtSk25jmFXnrjPY9DMz4kDy/QAIFZHaOzNTVwU3AJ0zMPp31k=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/OdsM8rZCV0M95t2xcMp4Ab0IpNqJa7WWmFPA+Qs7DBufqEwTd
-	gv9drjSkAsiXB0TCuAMjfik0S/q45hWWk0Fa24AVn2/QKnG01dIW0cPH
-X-Gm-Gg: AYBFou1NYnvBJktL6+1dLSiJLz3EWa/0VGVQHTFRiSH3MrrXCQ4tOGWpmLBs2aeT2q7
-	qN5rDzra6pfKsEM79iKWQWBaCN30VZRhcIxMuUD4TTPIAbarFlTwAIovSI2sXPzL9Wgcslfl2Ct
-	mJHjXumty/LIKRDdYbjKBDYYkFS0L+gM23EgSxhHNFPTXBxI0GgSTAOKGcwJ95dL5Yi37ugj0O3
-	EM+vJxBHVQzOzwxNXqZOEvkDeBfeG9dbNwTM/1Ixtaj4DcyYEZQGBIKotdm72XZTDG5H5YHj7Pb
-	32qZKBdNEhRPg3JqpZHxcBwV8Qn7S95prILjSzTw//brcLxs+dLTeC/JCQ1c35InAWPmyexypNk
-	GcV8nCG68g2rF1YAdv0XP8ydJFfQVFMxe0IztdqXfMLGBS00gGbiFJrRJ/lgic1SKrj3yHZTvpe
-	3bxzrauo51IyxS0PbLOIb3NnaAckPQ9e3ow2C7JGL/0cytlvLbZhmIgMA7EZk/qd3mkr0uUOhyh
-	TQ9IJ0VviEaIVXBRxt5VyCFuA/eSzLu9srSrJreSwulL2CrSt2hfNq2Poo0n1c2cg+iJeT07qPN
-	hKIjZnUwDpB77XRUPtXfbheIqW8l/caJlI7qHH1wlA==
-X-Received: by 2002:a05:701a:cccd:20b0:1b5:3819:f8f with SMTP id a92af1059eb24-1b55692aa4emr1650809c88.36.1795148362798;
-        Thu, 19 Nov 2026 20:19:22 -0800 (PST)
+        bh=Tw2IAI5wSBNupIKIxL5Ig7aobgIjCUpdJvEt5vs8Kl4=;
+        b=yI47vc5ZwvLR8aKafzVfkl6SngpfSAhT3X11Fohu6r4/YEpjm2mwRWEPtV2gqa0G7N
+         WnmkFBAe87FQK+ebaRxraPhHOitmNYypawikaIQlGExffSWA142GBrDt5cUfuSJr1Acf
+         27XhTnviacqjIgrg/P4/q335DP6wRUwgS7Hn3zn9IGH4nZOUKb1GNCLbYHwOn1OhBxZ1
+         Ue+D7mkX6K6dQoV3v28vBHQr2TowwIwQneCTUyZ7f7+HPmb/DEJGSWC/TbwweulHDl3g
+         3tJ3GxweYOTzvgOs2voxoo++NdVw31j0y9cdIo+giedOwVIKqQb2i6JvaFZdhOduJaXv
+         lKWw==
+X-Forwarded-Encrypted: i=1; AL+hErGud04FmCU0Pko9rUa3/rBzcODzXUI0XPYC0t4oNHb3JQFY9j/On4QJcyNzOKLLlpUI8ZWV1Chv5sVesLI=@vger.kernel.org
+X-Gm-Message-State: APuU4Z8JTSZ9XDCBhLvQABwXxi3oJ1HEwHQFuQpAhnE7M31Qrib73lBE
+	Pm+6udK4ORwsLtCIs41qis34+mllpt5bONUTy6euuMr1oL7qGd7z8AHb
+X-Gm-Gg: AYBFou3VMcgN3tCa42kzPOqVBlTCbcLQ2uH5h2pViZT/8D4iL3LhpAF1eh+01M1OK6p
+	9c0+apjlqT9ROCVp0HQU9NSptwVyB+IeIh/tcgzOdXGBStXZrIVx8hYo9lmW18j//cxvn5+pm8l
+	/VkErWZ8+/bF320AUC6omdi/J8cWSQQCHHysVYe8yUEWvDSymiNrnmJwAJZUnc/9K3JJQavSijr
+	mlgmCFSG8aqUIEfMwXO5bVKnQa0CdQjDPoNB1CfHT/k23vJK3PGtIi1vtE9yZcSWJItMn4L8W3b
+	4QzK5R2lEzk4V8kEWn6lqCrjPnryk+rqjBVPgUUO/lPSnvXe9jkOsg4PnqQlobS+3BDu5P8QmRr
+	IfpBi1AnCfvgYH/mrFk/E5NiEBeR4Q5RgT0r21LLOI191IdspGmNcZRIS1A6eT9zjvcMoOfoq2E
+	/fJp3QFp8lDFk0onaalRU53tJFsKLEA/QGpqbycRX6bSs6hUyMPFKKIy9e6aeEjKfZmzlB3FYjq
+	riHanGq718ZChCTiMpSafyQcuNddAzVWyjidiWSioco3gvQdgzHroOE0CQyatetOfWsssgLOEIY
+	c/3txA8tKQt0IW7kiQQNxuHI7d/Ad9/06LVVOPvbxQ==
+X-Received: by 2002:a05:7022:170c:b0:1ae:59d6:91cd with SMTP id a92af1059eb24-1b5568f522fmr1440476c88.38.1795148364438;
+        Thu, 19 Nov 2026 20:19:24 -0800 (PST)
 Received: from penguin.lxd ([12.187.136.98])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5567ffa8csm3124341c88.7.2026.11.19.20.19.21
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5567ffa8csm3124341c88.7.2026.11.19.20.19.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Nov 2026 20:19:22 -0800 (PST)
+        Thu, 19 Nov 2026 20:19:23 -0800 (PST)
 From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
 To: hannes@cmpxchg.org,
 	yosry@kernel.org,
@@ -93,9 +93,9 @@ To: hannes@cmpxchg.org,
 Cc: rientjes@google.com,
 	willy@infradead.org,
 	senozhatsky@chromium.org
-Subject: [PATCH v4 4/8] crypto: acomp - Add API to get a compression algorithm's batch-size.
-Date: Thu, 19 Nov 2026 20:19:02 -0800
-Message-Id: <20261120041906.5785-5-kanchanapsridhar2026@gmail.com>
+Subject: [PATCH v4 5/8] mm: zswap: Store the folio's node id in the zswap_entry.
+Date: Thu, 19 Nov 2026 20:19:03 -0800
+Message-Id: <20261120041906.5785-6-kanchanapsridhar2026@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261120041906.5785-1-kanchanapsridhar2026@gmail.com>
 References: <20261120041906.5785-1-kanchanapsridhar2026@gmail.com>
@@ -110,105 +110,144 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This commit adds a @batch_size data member to struct acomp_alg.
+When storing a folio in zswap, save the folio's node id in the zswap
+entry instead of relying on the zswap_entry being allocated on the same
+node. This enables optimizations such as batch allocation of zswap
+entries for large folios using kmem_cache_alloc_bulk() that does not
+support specifying a node id.
 
-An acomp_alg compression algorithm that supports batching of
-compressions and decompressions must provide a @batch_size greater
-than 1, representing the maximum batch-size that the compressor
-supports, so that kernel users of crypto_acomp, such as zswap, can
-allocate resources for submitting multiple compress/decompress jobs that
-can be batched, and invoke batching of [de]compressions.
+Accordingly, replace the SLUB allocation in zswap_entry_cache_alloc() to
+be node-agnostic.
 
-The new crypto_acomp_batch_size() API queries the crypto_acomp's
-acomp_alg for the batch-size. If the acomp_alg has registered a
-@batch_size greater than 1, this is returned. If not, a default of "1"
-is returned.
+The size of the zswap_entry remains unchanged as 'referenced' is lumped
+in with the 'length' (as it doesn't need a full unsigned int anyway).
+A build time assertion checks for the zswap_entry's 'length' bitfield
+being large enough to represent PAGE_SIZE, which can be 256KB on some
+architectures.
 
-zswap can invoke crypto_acomp_batch_size() to query the maximum number
-of requests that can be batch [de]compressed. Based on this, zswap
-can use the minimum of any zswap-specific upper limits for batch-size
-and the compressor's max @batch_size, to allocate batching resources.
-
-This enables zswap to compress/decompress multiple pages as a batch
-to improve swapout/swapin performance and memory savings.
-
+Suggested-by: Nhat Pham <nphamcs@gmail.com>
+Suggested-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Signed-off-by: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
 ---
- crypto/acompress.c                  | 14 ++++++++++++++
- include/crypto/acompress.h          | 12 ++++++++++++
- include/crypto/internal/acompress.h |  3 +++
- 3 files changed, 29 insertions(+)
+ mm/zswap.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
 
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index ac4dc52668b8..df9e42f519c3 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -327,6 +327,20 @@ int crypto_acomp_decompress(struct acomp_req *req)
- }
- EXPORT_SYMBOL_GPL(crypto_acomp_decompress);
- 
-+unsigned int crypto_acomp_batch_size(struct crypto_acomp *tfm)
-+{
-+	if (acomp_is_async(tfm) &&
-+	    (crypto_comp_alg_common(tfm)->base.cra_type == &crypto_acomp_type)) {
-+		struct acomp_alg *alg = crypto_acomp_alg(tfm);
-+
-+		if (alg && alg->batch_size > 1)
-+			return alg->batch_size;
-+	}
-+
-+	return 1;
-+}
-+EXPORT_SYMBOL_GPL(crypto_acomp_batch_size);
-+
- void comp_prepare_alg(struct comp_alg_common *alg)
- {
- 	struct crypto_alg *base = &alg->base;
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 93fa02ce818b..3ce4704dc879 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -593,6 +593,18 @@ int crypto_acomp_compress(struct acomp_req *req);
+diff --git a/mm/zswap.c b/mm/zswap.c
+index 9a323862bd59..78d9694f75b5 100644
+--- a/mm/zswap.c
++++ b/mm/zswap.c
+@@ -181,6 +181,7 @@ struct zswap_pool {
   */
- int crypto_acomp_decompress(struct acomp_req *req);
+ #define ZSWAP_FIRST_POOL_ID 1
+ #define ZSWAP_MAX_POOL_ID U8_MAX
++#define ZSWAP_MAX_COMPR_LENGTH_SHIFT 19U
+ static DEFINE_XARRAY_FLAGS(zswap_pools, XA_FLAGS_ALLOC1 | XA_FLAGS_LOCK_BH);
+ static struct zswap_pool __rcu *zswap_current_pool;
  
-+/**
-+ * crypto_acomp_batch_size() -- Get the algorithm's batch size
-+ *
-+ * Function returns the algorithm's batch size for batching operations
-+ *
-+ * @tfm:	ACOMPRESS tfm handle allocated with crypto_alloc_acomp()
-+ *
-+ * Return:	@tfm's acomp_alg's @batch_size, if it has defined a
-+ *		@batch_size greater than 1; else return 1.
-+ */
-+unsigned int crypto_acomp_batch_size(struct crypto_acomp *tfm);
-+
- static inline struct acomp_req *acomp_request_on_stack_init(
- 	char *buf, struct crypto_acomp *tfm)
+@@ -207,15 +208,19 @@ static struct shrinker *zswap_shrinker;
+  *              logic if referenced is unset. See comments in the shrinker
+  *              section for context.
+  * pool_idx - id of the zswap_pool that the entry's data is in.
++ * nid - NUMA node id of the page for which this is the zswap entry.
+  * handle - zsmalloc allocation handle that stores the compressed page data
+  * objcg - the obj_cgroup that the compressed memory is charged to
+  * lru - handle to the pool's lru used to evict pages.
+  */
+ struct zswap_entry {
+ 	swp_entry_t swpentry;
+-	unsigned int length;
+-	bool referenced;
+-	u8 pool_idx;
++	struct {
++		unsigned int length:ZSWAP_MAX_COMPR_LENGTH_SHIFT;
++		bool referenced:1U;
++		u8 pool_idx;
++	};
++	int nid;
+ 	struct zs_handle handle;
+ 	struct obj_cgroup *objcg;
+ 	struct list_head lru;
+@@ -680,14 +685,8 @@ static int zswap_enabled_param_set(const char *val,
+ * lru functions
+ **********************************/
+ 
+-static inline int entry_to_nid(struct zswap_entry *entry)
+-{
+-	return page_to_nid(virt_to_page(entry));
+-}
+-
+ static void zswap_lru_add(struct zswap_entry *entry)
  {
-diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
-index 0c0d3fc8a9fc..2d4d302d1b3f 100644
---- a/include/crypto/internal/acompress.h
-+++ b/include/crypto/internal/acompress.h
-@@ -28,6 +28,8 @@
-  *
-  * @compress:	Function performs a compress operation
-  * @decompress:	Function performs a de-compress operation
-+ * @batch_size:	Maximum batch-size for batching compress/decompress
-+ *		operations.
-  * @init:	Initialize the cryptographic transformation object.
-  *		This function is used to initialize the cryptographic
-  *		transformation object. This function is called only once at
-@@ -47,6 +49,7 @@
- struct acomp_alg {
- 	int (*compress)(struct acomp_req *req);
- 	int (*decompress)(struct acomp_req *req);
-+	unsigned int batch_size;
- 	int (*init)(struct crypto_acomp *tfm);
- 	void (*exit)(struct crypto_acomp *tfm);
+-	int nid = entry_to_nid(entry);
+ 	struct mem_cgroup *memcg;
  
+ 	/*
+@@ -704,19 +703,18 @@ static void zswap_lru_add(struct zswap_entry *entry)
+ 	rcu_read_lock();
+ 	memcg = obj_cgroup_memcg(entry->objcg);
+ 	/* will always succeed */
+-	list_lru_add(&zswap_list_lru, &entry->lru, nid, memcg);
++	list_lru_add(&zswap_list_lru, &entry->lru, entry->nid, memcg);
+ 	rcu_read_unlock();
+ }
+ 
+ static void zswap_lru_del(struct zswap_entry *entry)
+ {
+-	int nid = entry_to_nid(entry);
+ 	struct mem_cgroup *memcg;
+ 
+ 	rcu_read_lock();
+ 	memcg = obj_cgroup_memcg(entry->objcg);
+ 	/* will always succeed */
+-	list_lru_del(&zswap_list_lru, &entry->lru, nid, memcg);
++	list_lru_del(&zswap_list_lru, &entry->lru, entry->nid, memcg);
+ 	rcu_read_unlock();
+ }
+ 
+@@ -764,10 +762,11 @@ void zswap_memcg_offline_cleanup(struct mem_cgroup *memcg)
+ **********************************/
+ static struct kmem_cache *zswap_entry_cache;
+ 
+-static struct zswap_entry *zswap_entry_cache_alloc(gfp_t gfp, int nid)
++static struct zswap_entry *zswap_entry_cache_alloc(gfp_t gfp)
+ {
+ 	struct zswap_entry *entry;
+-	entry = kmem_cache_alloc_node(zswap_entry_cache, gfp, nid);
++
++	entry = kmem_cache_alloc(zswap_entry_cache, gfp);
+ 	if (!entry)
+ 		return NULL;
+ 	zs_handle_init(&entry->handle);
+@@ -1537,9 +1536,10 @@ static bool zswap_store_page(struct folio *folio, long index,
+ {
+ 	swp_entry_t page_swpentry = folio_swap_entry(folio, index);
+ 	struct zswap_entry *entry, *old;
++	int nid = folio_nid(folio);
+ 
+ 	/* allocate entry */
+-	entry = zswap_entry_cache_alloc(GFP_KERNEL, folio_nid(folio));
++	entry = zswap_entry_cache_alloc(GFP_KERNEL);
+ 	if (!entry) {
+ 		zswap_reject_kmemcache_fail++;
+ 		return false;
+@@ -1554,6 +1554,7 @@ static bool zswap_store_page(struct folio *folio, long index,
+ 	 * to an unrelated live pool.
+ 	 */
+ 	entry->pool_idx = pool->idx;
++	entry->nid = nid;
+ 
+ 	old = xa_store(swap_zswap_tree(page_swpentry),
+ 		       swp_offset(page_swpentry),
+@@ -1930,6 +1931,8 @@ static int zswap_setup(void)
+ 	struct zswap_pool *pool;
+ 	int ret;
+ 
++	BUILD_BUG_ON(ZSWAP_MAX_COMPR_LENGTH_SHIFT <= PAGE_SHIFT);
++
+ 	zswap_entry_cache = KMEM_CACHE(zswap_entry, 0);
+ 	if (!zswap_entry_cache) {
+ 		pr_err("entry cache creation failed\n");
 -- 
 2.39.5
 
