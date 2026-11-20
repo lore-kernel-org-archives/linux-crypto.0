@@ -1,63 +1,70 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795168479;
-	b=MHyp8/DV3Dth4BpD2gm18zRUtOkqNwW1KEwsV7T3dJU62rUaBgugeyhrh9ww1g2Ec1uW
-	 LlWF4zWoh0YvZ0HhXgqEOOFVNuTTRPBM3ArAdKisGPIZINM0C+kTIPGkOFaLlO9ouTQOS
-	 cmzZj6S1z+/pLqmzGMQO3HorF3B+oXeb8fwml6b/lqsIKzDbpGScKs6VEkDn/PjjStLjk
-	 nJQTn0YwPCPwHTWYnPl6y3dZubyOy2o20MlxaKkI31HEx4FtvWcoDwiB8MrKC+Ol2EBpJ
-	 +5Qs0dKtiqxKRX6m/XJQw0onB0BRgHDYDo63TfhhK2hmQLHprQWPybr9hibC3ZKBC0Q==
+	t=1795168527;
+	b=SK5pm4Gbnor08JOknlufSV+hgQY7ejcR+Z/lZj9SfJQgPnT7H+cMzepeSHBj2Nf0iR/0
+	 jp1gXR6TPSeSh5un8bmEnvDALCud3o6Fv6Ay2q/+q/TG6bAhJToyFydJV3GHbnxTonAkR
+	 BViroZ+3mUb61F1R9bNBxQ4/pK/tto8mFJXxW557Lu1AD3e9PWaSO07uuTuF9g1r+3+Z5
+	 GOey0r4p9piPrQ9s2bGRfKRrdaIkE/UneI2n9Wch6lZemVkCyCOC01i7797Wd3V8Reisa
+	 uF4J5yLkIxlAjh+vLVin10TnhwJybyQcUsvMDUZruC0BmxcPFUDEe2+FGXtwbpn82Gw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795168479;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795168527;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=rARoXv7ufFOzEMpSx2Pol3AL0xwvVnviWOlVEFct/Y4=;
-	b=nZ+FzeAZAnub0kRdBvGyWMSBN39rSaJfE12PVg9fOjHDyokOt1MpXMgT6bW/hu2MnYXQ
-	 /0Mhs6mEYVl2aXbucz/s0hnW27ISXJebcmzezxvPj7pBN3giwRcZvcOTmtwBUaICfZJEd
-	 VyP27v2Dos2MLt2vaBmcNNQnSF2FAW/GGvzrkp8R2ER8hJ3MRq8IMwz4gXzUHFRePleIQ
-	 pcTPV3pv2F2+4+EFTg3GiuETQHHT877M7Wjjne6GoBooHgVhNIYU16ycyZy2P4b+xzh5O
-	 YJkLhJbpho7XLbfG/9dC3qIzl7qHYGIQxUBZWM9bAuxj53bCKH5WVyGQfSc2PQRS3PA==
+	bh=WBq1coYA+tKY6l3zjpWcUqa8zsToSF905MLNKiI0tu4=;
+	b=tyMCnQtmzIraSJn2QDToqR7MT/ayBC/qThjwuLSbumJovzs9T5CmFerKJwndCzZ2qCNu
+	 0BibGRDGFs+iRJgCliHKrIrxkViDihaD8Tm/MvcsVqAMdrkua2uSyR8YQYsn/qDnW4/Kp
+	 1yaMCcFz5MvITbDK/cVl6kai+JXQaIsYCnPAcNQks1W3qiH69B0mTlI3duKfyF/GcdJ9J
+	 aM33b7UVN9IkUeQfaYMReEfSg+NRTJypQMpmV5MyMBOC/weAL/slAes0szg3d3brgf/pt
+	 CPa1/1FcXJ+Cdpm3ViTciqIVF8ECy4U5vXtshdvYyekFe/cz0Eu9W4j0JIsPyf7+EmQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=LyAAKOr0;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=bfBvu1k0;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D62606A32A;
-	Fri, 20 Nov 2026 09:54:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9D62606A32A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66B6606A320;
+	Fri, 20 Nov 2026 09:55:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E66B6606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=LyAAKOr0
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=bfBvu1k0
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=rARoXv7ufFOzEMpSx2Pol3AL0xwvVnviWOlVEFct/Y4=; 
-	b=LyAAKOr0Bp07knZ0MGPiLcrUZCB6NBdGuK5jTlkAs7bZTqXaRaMZ2bJuaHA+rbYiEtpzv1aJcls
-	qgzITrwhf4OyWtZYNq86nPDAkSIJI77bLKr9Eopc170lZRmuiZ2A2lrXR73631PZ3AzCr86Zact+h
-	Ji8we+pYC8aevoe4fU2bN3xyzkfWGGyTBUU2SdiC2KBrpNULGug1n4vo7BwX/vBCCTv223YDQiss3
-	U14JxDV/vET0+4TyzoiXCPJJmYvaQWJ3lXw2jEhRQWSUY+pxm/ee28yX4KugcnORDtOwGoF8NbfAB
-	+eYkjSthh/U80uh8S8ZReMZkdlwgt+uCzMCQ==;
+	from:content-type:reply-to; bh=WBq1coYA+tKY6l3zjpWcUqa8zsToSF905MLNKiI0tu4=; 
+	b=bfBvu1k0/EcVedOGEOLD5tB/aKzbSbP5h+6fHhj0F+VmHZJrE8GSoS8aWuTdX5wkxqQfLD8znGo
+	x5/AGcio30EQa1hGjQqtLw7KW9IxVhGtCPUke5hpzmvGTox5z6L3bJ0OOYd8rSwowPfrPg7ge8Qu3
+	sbwTQtIvhqKHbc/ef2f5ysWxtOAxPnk8qLlKxXbtWdh3gapDOui1ARZxyuvgdriUJf37iTwCVLB2D
+	6YroPHtNSbaSVCkjssly1PwTbSYzXGEPecpqbrPnVItMrVFZZCOUvgDOYKC5xRZpFX0UvPpxqO/yZ
+	YH9LX9xaKRoZzz5WevuimYby7tf1y1Ot/IAA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xULKE-0000000HYi9-3yWT;
-	Fri, 20 Nov 2026 17:54:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:54:34 +0800
-Date: Fri, 20 Nov 2026 17:54:34 +0800
+	id 1xULKs-0000000HYka-25SW;
+	Fri, 20 Nov 2026 17:55:15 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:55:14 +0800
+Date: Fri, 20 Nov 2026 17:55:14 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Sebin Francis <sebin.francis@ti.com>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>
-Subject: Re: [PATCH v13 00/15] Fix several issues in DTHEv2 driver
-Message-ID: <awAY2r7Rum8H6Vig@gondor.apana.org.au>
-References: <20261112081204.1146395-1-t-pratham@ti.com>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Bartosz Golaszewski <brgl@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Russell King <linux@armlinux.org.uk>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Demi Marie Obenour <demiobenour@gmail.com>,
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+	Pankaj Patil <pankaj.patil@oss.qualcomm.com>,
+	Birk Skyum <birk.skyum@pm.me>, linux-crypto@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Subject: Re: [PATCH v12 0/2] crypto - qce: make algos optional and remove the
+ BROKEN label
+Message-ID: <awAZAoNml0wYEiYM@gondor.apana.org.au>
+References: <20261112-qce-fixes-broken-label-v12-0-7b5b9c7083ed@oss.qualcomm.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -69,112 +76,102 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261112081204.1146395-1-t-pratham@ti.com>
+In-Reply-To: <20261112-qce-fixes-broken-label-v12-0-7b5b9c7083ed@oss.qualcomm.com>
 
-On Thu, Nov 12, 2026 at 01:41:48PM +0530, T Pratham wrote:
-> This series fixes a handful of independent and mostly benign till now
-> issues in the DTHEv2 driver which were flagged by bots and AI agents.
-> Except for the fifth patch in this series which was found in an internal
-> testing.
+On Thu, Nov 12, 2026 at 02:20:07PM +0100, Bartosz Golaszewski wrote:
+> This is the follow-up to the three smaller series fixing crypto
+> self-tests in the QCE driver. It makes the crypto algorithms opt-in via
+> a module parameter and removes the BROKEN label so that the driver is
+> built by default.
 > 
-> The Sashiko review on DTHEv2 hashing driver patch series v5 pointed out
-> some pre-existing issues which needed to be fixed [1].
-> 
-> One of the issues had already been flagged by kernel test bot and a fix
-> sent on the list by Mert [2].
-> 
-> I included this patch in this series with minor edits. Then the Sashiko
-> review page for [2] had more comments [3]
-> 
-> Overall this resulted in a bunch of fixes patches which would have
-> deviated the DTHEv2 hashing driver series had they been included with
-> it. So I clubbed them together in a new patch series which is this.
-> 
-> Signed-off-by: T Pratham <t-pratham@ti.com>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 > ---
-> Links:
-> [1]: https://sashiko.dev/#/patchset/20260807110501.975130-1-t-pratham%40ti.com
-> [2]: https://lore.kernel.org/all/20260613085858.32580-1-mertsftl@gmail.com/
-> [3]: https://sashiko.dev/#/patchset/20260613085858.32580-1-mertsftl%40gmail.com
+> Changes in v12:
+> - Add module description in patch 1/2
+> - Drop dependencies from the series as they're all in linux-next now
+> - Link to v11: https://patch.msgid.link/20261022-qce-fixes-broken-label-v11-0-0d33c34fd0c3@oss.qualcomm.com
 > 
-> Changelog:
-> v13:
->  - Put kref in probe error path (regression reported by Sashiko).
-> v12:
->  - Rebased and resolved merge conflicts. No functional changes.
-> v11:
->  - Changed order of operations in probe.
->  - Added comments in AEAD Tag helper functions.
-> v10:
->  - Corrected typo (dev --> ctx->dev)
-> v9:
->  - Changed extensive completion re-init based wait to using kref in
->    patch 04/15
-> v8:
->  - Minor fix based on Sashiko comment (corrected spinlock)
-> v7:
->  - Fixes based on Sashiko comments (added locking around
->    dthe_put_drvdata)
-> v6:
->  - Fixes based on Sashiko comments (waitqueue -> completion; DMA
->    alignment for cache coherency)
-> v5:
->  - Fix spinlock inconsistency patch
-> v4:
->  - Fixes based on Sashiko comments
-> v3:
->  - Fixes based on Sashiko comments
->  - Some reordering of patches
-> v2:
->  - Fixes based on Sashiko comments
+> Changes in v11:
+> - Split out the patches making algorithms optional and removing the
+>   BROKEN Kconfig label into their own series
+> - Link to v10: https://patch.msgid.link/20261013-qce-fix-self-tests-v10-0-57162a38a554@oss.qualcomm.com
 > 
-> Link to previous versions:
-> v12: https://lore.kernel.org/all/20261107160631.2592763-1-t-pratham@ti.com/
-> v11: https://lore.kernel.org/all/20261107145618.2349562-1-t-pratham@ti.com/
-> v10: https://lore.kernel.org/all/20261016124456.1802080-1-t-pratham@ti.com/
-> v9: https://lore.kernel.org/all/20261016114806.1749515-1-t-pratham@ti.com/
-> v8: https://lore.kernel.org/all/20261001085245.2922974-1-t-pratham@ti.com/
-> v7: https://lore.kernel.org/all/20260930125859.1749849-1-t-pratham@ti.com/
-> v6: https://lore.kernel.org/all/20260930112533.1593952-1-t-pratham@ti.com/
-> v5: https://lore.kernel.org/all/20260918102245.2784000-1-t-pratham@ti.com/
-> v4: https://lore.kernel.org/all/20260910175619.2122149-1-t-pratham@ti.com/
-> v3: https://lore.kernel.org/all/20260910104202.1537226-1-t-pratham@ti.com/
-> v2: https://lore.kernel.org/all/20260827132318.613876-1-t-pratham@ti.com/
-> v1: https://lore.kernel.org/all/20260827105711.527182-1-t-pratham@ti.com/
+> Changes in v10:
+> - don't pass a NULL buffer to sg_init_one()
+> - fix byte order of the imported hash state on empty finalization
+> - don't recompute the CTR counter in software for every request
+> - reject skcipher requests with a too short scatterlist
+> - check fragmentation for empty CCM decryption requests too
+> - don't use a static loop iterator (duh...)
+> - initialize the return value in qce_handle_queue()
+> - Link to v9: https://patch.msgid.link/20260922-qce-fix-self-tests-v9-0-b1aa742e79af@oss.qualcomm.com
+> 
+> Changes in v9:
+> - Rebase on top of cryptodev/master
+> - Rephrase Kconfig help text changes
+> - Link to v8: https://patch.msgid.link/20260921-qce-fix-self-tests-v8-0-107537869a72@oss.qualcomm.com
+> 
+> Changes in v8:
+> - Add a patch making the crypto driver *not* register algos by default
+>   but only if the user explicitly requests it with the provided module
+>   parameter
+> - Use the "offloader" name for the crypto IP instead of "accelerator"
+> - Fix device module table issues
+> - Make the core driver use a list (despite it only having a single
+>   member now) of child auxiliary devices to register to make it clear we
+>   have the intention of extending this once we start the work on secure
+>   media playback
+> - Link to v7: https://patch.msgid.link/20260910-qce-fix-self-tests-v7-0-cdbd2718af14@oss.qualcomm.com
+> 
+> Changes in v7:
+> - Add follow-up changes converting the QCE crypto driver to auxiliary
+>   bus, adding the core QCE driver under drivers/soc/ registering the
+>   auxiliary device and removing the BROKEN Kconfig label
+> - Link to v6: https://patch.msgid.link/20260717-qce-fix-self-tests-v6-0-455775fe5f6c@oss.qualcomm.com
+> 
+> Changes in v6:
+> - Handle all zero-length HMAC finalizations (like imported state with
+>   data already hashed), not only the genuinely empty message case
+> - Add an additional patch addressing the fragmented skcipher payload
+>   issue
+> - Link to v5: https://patch.msgid.link/20260706-qce-fix-self-tests-v5-0-86f461ff1829@oss.qualcomm.com
+> 
+> Changes in v5:
+> - Dropped patch 1/8 that's already queued
+> - Use the pre-allocated fallback ahash for HMAC transforms (Herbert)
+> - Link to v4: https://patch.msgid.link/20260622-qce-fix-self-tests-v4-0-4f82ffa716c6@oss.qualcomm.com
+> 
+> Changes in v4:
+> - Remove remaining ECB and DES3 bits
+> - Pick up tags
+> - Link to v3: https://patch.msgid.link/20260617-qce-fix-self-tests-v3-0-ecc2b4dedcfd@oss.qualcomm.com
+> 
+> Changes in v3:
+> - Remove even more algorithms and dead code in patch 1/8
+> - Link to v2: https://patch.msgid.link/20260615-qce-fix-self-tests-v2-0-dc911f1aad42@oss.qualcomm.com
+> 
+> Changes in v2:
+> - Add fixes for the full suite of crypto self-tests
+> - Add Fixes and Cc tags
+> - Link to v1: https://patch.msgid.link/20260610-qce_selftest_fix-v1-0-1b0504783a46@oss.qualcomm.com/
+> 
 > ---
+> Bartosz Golaszewski (2):
+>       crypto: qce - Only register algos if the user really wants it
+>       Revert "crypto: qce - Mark QCE as BROKEN"
 > 
-> Mert Seftali (1):
->   crypto: ti - Use list_first_entry_or_null() in dthe_get_dev()
+>  arch/arm/configs/multi_v7_defconfig |  1 +
+>  arch/arm64/configs/defconfig        |  1 +
+>  drivers/crypto/Kconfig              | 22 +++++++++++++---------
+>  drivers/crypto/qce/core.c           | 13 ++++++++++---
+>  4 files changed, 25 insertions(+), 12 deletions(-)
+> ---
+> base-commit: aaa2f954c21b205a0bcd0961e5b2be4e82e58455
+> change-id: 20261022-qce-fixes-broken-label-e6aaf9624fe9
 > 
-> T Pratham (14):
->   crypto: ti - Fix spinlock inconsistency in DTHEv2
->   crypto: ti - Fix potential memory corruption on highmem pages
->   crypto: ti - Fix use-after-free of dev_data on DTHEv2 driver removal
->   crypto: ti - Trim scatterlists to correct length in AES
->   crypto: ti - Align buffers to cacheline for DMA
->   crypto: ti - Separate padding buffer for src and dst
->   crypto: ti - Validate sg_nents_for_len() return value in DTHEv2 AES
->   crypto: ti - Validate sg_nents_for_len() return value in DTHEv2 AEAD
->   crypto: ti - Terminate DMA on all error paths in AES to clear
->     descriptors
->   crypto: ti - Terminate DMA on all error paths in AEAD to clear
->     descriptors
->   crypto: ti - Do AEAD software fallback on only ENOMEM
->   crypto: ti - Correct AEAD tag operations against dma cache
->     invalidation
->   crypto: ti - Change lengths in AES to u64 to avoid potential overflows
->   crypto: ti - Change lengths in AEAD to u64 to avoid potential
->     overflows
-> 
->  drivers/crypto/ti/dthev2-aes.c    | 378 +++++++++++++++++++-----------
->  drivers/crypto/ti/dthev2-common.c |  84 +++++--
->  drivers/crypto/ti/dthev2-common.h |  66 +++++-
->  3 files changed, 365 insertions(+), 163 deletions(-)
-> 
-> 
-> base-commit: 99f506c86bf8b6909564fff64eeaa64dec5996b9
+> Best regards,
 > -- 
-> 2.34.1
+> Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 
 All applied.  Thanks.
 -- 
