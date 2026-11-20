@@ -1,63 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795168771;
-	b=yJ+Zo12vj/9ibGQUwmTwC33YwkCFig3i+Xll5f2PM9jVG0R7/HRtZvJUe/3KHtV3NF/2
-	 ZZjUlXkzyl5b+FUwpXgTzFtprqEs9WaxyfOdSamJZjRLtuuxX0eVFSprJkfTKd5hvQNz3
-	 YOQSdRsCjECdfxcp/W8+Z5WxAxcqkl4y8B5o56hABS/+bL7OEKW3z4He/UZe0dR15Qyx/
-	 0+XNiwdnTic6g8r8kXFJ/lE7gYEIlmZM6OLgQpGyvXVBQYGEoykzQskxAfVratJpGf8xD
-	 3O81AZa4CGN83DG+pi+1f+SMwi1HMVfeULEOhE2PuAH0+cjY7lH7EKCa3kTMiT0M2Ug==
+	t=1795168863;
+	b=oYEvyDkbagu5/J/t3nDVuAUN8LyqbbPtxCImqJQxetym3Mk0kSIdV5CwSu/jPlkKy9LG
+	 w/M10MhQrSEafvz64USnjW2vyByqQsCL1dJFgkYakcQB3dBZbr4K7pjI2Itms5tV0bD/Y
+	 Pug2HjyVe4RORNxdYkyPbjXBcSvOALzy7TeEhH+e4VWKzq0YksYSrza7KMEbHSr87uGad
+	 OyvOB6RNSlFBB8VdTsVvNzRfqMeTfPrUodpJunbaJ5bpTw8OZywzTIN2dz85WK0/o/BVH
+	 /uFsu9whDaN7WDnHaDdiLhgQX8pD7Yd/v5jdtMtFPPvLqLL8W1hESBb8bO3DZOcspfg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795168771;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795168863;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=54MAWfFgyDXgdTIKy5UVC0oKpZt8Q+PuEtG+8qm+8/8=;
-	b=CN2uiCnIad3KdNdaxa9kP6CqE2WghjKImiYz2rgEZVqzfFeTY2QQOP3xx/gF/FBetxA0
-	 0ju1lu+SLM4MsSKrXRa5PeW9TW913+XitFAiGF6/0kdatzRGK7EMA+nggllVpzzA7sbnL
-	 pSyqNwpEvb4wYRn4KbWtksDvpeWHPwSJi4ar7lgSeKsvo9WjW9IO6U0LREjNwvhBSuf1l
-	 kovTPPWqMZ9jPQIZQOPrAWTyemR3SxnTM/u1QA1ajpoqTBpbKXAqzV2PL1E8B1D+oh1zX
-	 F6Jxx5/OXb5oGbgynI93ytyflQnB+vuOO+yrq86JMPv/ODKqzVXR0qRzH75RNDQRxOQ==
+	bh=1U7Hy2sMhArBZCxu2GDyjmJzGlD4GYMvvTvb31K5AEo=;
+	b=jUwWWlti5GX5jrCfeAZNbl3n2R+E4/ST1295W9sATO1r++xLZi9+jeXcNetMyewayeHK
+	 Ew/3Sz9qWdkSzwO3CsvGnYvDx26CH68ujmJcrzicuZ8qw7ovgLfH3qYUUkwVFylPVu/rw
+	 mQH6IbXOZndvJKBCRdGBz47+DTsjAzko1PzCRkfU6mRKxGp3tl2rbfz53MRFOuMDRJOLG
+	 m+sL8hNYa6kxVhlgJ3J6YgZLyttrgsZGSOYx3c3AhRy0QM/7rwsyO1DtzR1eOKgIJSyP3
+	 mcbbr8a0dTQ/vML6kU1vo3QC5Oo0U1DSsBW3hGlUyCD3pprGf2h7nhNg1ZBxbLZI36A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=D2M9T2oI;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=oVD8bui9;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19ABF606A320;
-	Fri, 20 Nov 2026 09:59:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19ABF606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5C160A2600;
+	Fri, 20 Nov 2026 10:01:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8A5C160A2600
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=D2M9T2oI
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=oVD8bui9
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=54MAWfFgyDXgdTIKy5UVC0oKpZt8Q+PuEtG+8qm+8/8=; 
-	b=D2M9T2oISXFsdJNM4+8zDbgXzvyGracayVxkPtRHdQmoC3EQcacj3jKjajMPAxfQGkIRPYvfW5I
-	1+3SGg6XhyIpDk1o1rejiTjaSkZOfxlyjC7Qbw/fFNaKYbOW4qzF5gtm4QkeqY0K0QuT70OKFk3Lz
-	78mjMSS2Cwl/xWaJjkE7dPZ8BfVyde2OUN0iPfAQzPa1zrOOMtsYlgE8p8eymeptRO2BdnS//5ynr
-	nH7HaUeYVQgkVQ6QyHwpjf1fRXsq3cFm4MnlH+FvlFIP5AxatxEhTmP2/tyyPoaLYQJe4h7CYBhl3
-	NUqbl8C+BXvpB4W78gNptLyvepEKACpCjcRg==;
+	from:content-type:reply-to; bh=1U7Hy2sMhArBZCxu2GDyjmJzGlD4GYMvvTvb31K5AEo=; 
+	b=oVD8bui9cOYU8Q/+DzeLXlCvZ/ZII2UZLIEquGhoNyM5Du29Dx1ksoxcAohJ4ftH0zd+NEEnBy+
+	AzCKyFf2G2xKEqteH9ps/1vbZV1aRM4vUll6+TN3zr9DhpG2Eo7uLyIo0gUrU2menCaCTZh5fKU14
+	tSDIIY/QdW5/UMX3AhUldwJS8u3hUjue9r/nNJtuL0QGEhg8h0qJ4kt+B2WGFKxWGuxP8aJ7f6JYK
+	iptZLClLJWBzFBNrNQMMr8LIT+/4SzPq4ZkI/oTnv/VRLUFsSVs6bQAh37PTK+BJrMv2KXZk2kyQs
+	PZnOMATag4DRbrHxC+z24wgpkjccqACDojFQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xULOx-0000000HYsL-0yVc;
-	Fri, 20 Nov 2026 17:59:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:59:27 +0800
-Date: Fri, 20 Nov 2026 17:59:27 +0800
+	id 1xULQR-0000000HYvw-3bIW;
+	Fri, 20 Nov 2026 18:01:00 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 18:00:59 +0800
+Date: Fri, 20 Nov 2026 18:00:59 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Nhat Tran <nhat.tranminhk2@gmail.com>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	Deepak Saxena <dsaxena@plexity.net>, linux-crypto@vger.kernel.org,
-	linux-omap@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] hwrng: omap - Unregister hwrng before disabling the
- device on remove
-Message-ID: <awAZ_4SngFhAPq0l@gondor.apana.org.au>
-References: <20261115145050.88427-1-nhat.tranminhk2@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	"David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: qat - Don't use -EFAULT as error code during
+ setkey()
+Message-ID: <awAaW4PhJxllUutD@gondor.apana.org.au>
+References: <20260824122403.630026-1-thuth@redhat.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -69,50 +68,33 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261115145050.88427-1-nhat.tranminhk2@gmail.com>
+In-Reply-To: <20260824122403.630026-1-thuth@redhat.com>
 
-On Sun, Nov 15, 2026 at 09:50:50PM +0700, Nhat Tran wrote:
-> Commit 3e75241be808 ("hwrng: drivers - Use device-managed registration
-> API") switched omap-rng to devm_hwrng_register() and dropped the
-> hwrng_unregister() call from the start of omap_rng_remove(). Since then
-> the hwrng is unregistered by devres only after omap_rng_remove() has
-> returned, i.e. after the device has been runtime suspended and its
-> runtime PM disabled.
+On Mon, Aug 24, 2026 at 02:24:02PM +0200, Thomas Huth wrote:
+> EFAULT means "Bad Address", it's the error code that is meant to
+> be returned when userspace provided the kerknel with a pointer to
+> memory that is not part of its address space. However, the QAT driver
+> abuses this error code during its setkey() function to signal that
+> there was something wrong with the selected algorithm, which is just
+> confusing.
 > 
-> When the omap-rng is the current hwrng, hwrng_unregister() drops the
-> last reference and schedules cleanup_rng_work(), which calls
-> omap_rng_cleanup() and in turn omap4_rng_cleanup(). That reads and
-> writes RNG_CONTROL_REG while the module clock is gated. On a
-> BeagleBone Black (AM335x) unbinding the driver triggers:
+> The best choice for an error code would likely have been EINVAL here,
+> but qat_alg_aead_init_sessions() seems to make an effort to use this
+> for another error case already, so there is likely the desire to
+> distinguish the different errors here. Thus use EOPNOTSUPP as a
+> replacement now, so qat_alg_aead_init_sessions() continues to return
+> two different error codes depending on what went wrong.
 > 
->   # echo 48310000.rng > /sys/bus/platform/drivers/omap_rng/unbind
->   Unhandled fault: external abort on non-linefetch (0x1028) at 0xfa310014
->   Internal error: : 1028 [#1] SMP ARM
->   Workqueue: events cleanup_rng_work
->   PC is at omap4_rng_cleanup+0x14/0x24
->   LR is at cleanup_rng_work+0x30/0x48
->   Call trace:
->    omap4_rng_cleanup from cleanup_rng_work+0x30/0x48
->    cleanup_rng_work from process_scheduled_works+0xf0/0x518
->    process_scheduled_works from worker_thread+0x140/0x2f0
->    worker_thread from kthread+0xfc/0x134
->    kthread from ret_from_fork+0x14/0x28
+> Anyway, instead of hard-coding the error codes in the function
+> qat_alg_aead_init_sessions() again, let's also simply rather pass
+> the error code from the called functions up to the caller instead,
+> this way we can also get rid of the need to call memzero_explicit()
+> here three times.
 > 
-> The worker dies before it completes rng->cleanup_done, so the unbind
-> also never returns because hwrng_unregister() waits for that
-> completion. The same window lets the hwrng fill thread call
-> omap_rng_do_read() on the suspended device.
-> 
-> Restore the original teardown order: register with hwrng_register()
-> and call hwrng_unregister() first in omap_rng_remove(), while the
-> device is still powered.
-> 
-> Fixes: 3e75241be808 ("hwrng: drivers - Use device-managed registration API")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Nhat Tran <nhat.tranminhk2@gmail.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  drivers/char/hw_random/omap-rng.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  .../crypto/intel/qat/qat_common/qat_algs.c    | 31 +++++++++----------
+>  1 file changed, 14 insertions(+), 17 deletions(-)
 
 Patch applied.  Thanks.
 -- 
