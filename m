@@ -1,100 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.51
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795202669;
-	b=5AoypAFdmt1y9gsnGp5vaDdbzMMMqu9MJJFZcNW84ZC0FKpRjec0re0jCcYkS4Wdd2+C
-	 UksyQ+orw+w72qx5Qr6rivgts5lLAh4YTz0prpmRZyXIVZkiwyyhPzh1ZBaSaFsOpq974
-	 Fu2mXxCTQJAt+RbmPhBouBNx0mU9xZR6MlpakOw8Vy8ASODs1lKr7U9ONA51PcgzQ4VPZ
-	 BPqHKsSvXaPZsP0Idrcc/jcAlmeN4xP5KAQaJj5M+meisQEp9FWfSfW6Kf+JGXcYOHBzi
-	 IRZO9dE6HYXEztzj2IKjdIbOub3kE/par8Y+xYjBVquxlbfJN4cQvtMoc6IXStrvVMg==
+	t=1795202674;
+	b=i/VlqTpOKh3/neKd0bPIPX6Cg+dxXXiZUyfUguNJxIhUcmlGSrpnxyIw/8WJG9XIMksu
+	 DwTYUhqkRFTzVo8+z6tWG2XYALtLAQUVd5CRBj46iaVK1QpKLmzk1SaZjcttKYeWzMP1n
+	 dUsI5stvO/aYAB/4uV2FiMOmRifQTH0ed8CQ5d2ihtBNvk+ikGDHtNXg8pDSPsfTRE79/
+	 4iiHhgErDH3/33ExFLzpfR0ClGCOIy9m/uWMLnyctegVHtYSu7mupXVYH4ijLiKt7FrYa
+	 n5nSo8DOgaJGgWybNBAYfXrcZ8nrPhbao4Dwy3d6PlD7Znc9EifBuwnFGSjFfQ4czhw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795202669;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795202674;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=hR7xJF+eh3lU/QGj+8ASNxswZFRyXVh6Oom4tDMt+sM=;
-	b=qBCOpKm1OGGDMjvz3YChVeafrQhEPUoMmjaAFmiMk9O7AgTyD1khTDOmYzVQApHL7VlB
-	 Q7jFfbchV8IG+fAgJqFw3E2sZxs17rOHD+//uD+J3jU+knIxxqez2XLl8Atsm0PDy+noj
-	 cOFPUGIoUUktlCPxAbFPaHMv6MZD648dZ5QaoqCedfdgegQoCVbSSS0udYkAMGhOV5YlZ
-	 4OCXRnBuAOsQeMxyVHmFwRSo+CWt7dtJMvBz/RANV8tHIfQD6J1KB2XFhAYMcqgdvIkYW
-	 7FRTncpHUcs08Z/Q1D/I0oRL59SX28on+weC9GbvzrAz+zfFqrX4WD52uov8h0cyKIw==
+	bh=EqIWlPRmhQa/qTttZkxhbBZ2a0xxoQ3QCxHq+S0xpPA=;
+	b=UE2VNjnec9h56pj90zy9+n4wQIRXR1YlADeUw9KY1JtzZZ2BbrOodCRCLpH2XDg4Iopu
+	 RdzjeMvfWvGz5GhgkQmXzKNQh5SSyumYLXRM4O2R94wJX+DAPDpgM7O3lFrx/xDucy7MY
+	 2R+1vBQY/p0G+9uLu0wQrw2Q93/TBZ6sjYhJaEJqa7AqWEiFOC03AEMr47caJJbCfoSb7
+	 xvd9hsZthYytaHMou23XbY6eDWzA5FXxgDGMd/wxVsaEXG7vPw47J5ofLZtCvioZGUtDJ
+	 1kYV7K4G/vbdo2lXEwUaPvVMt9SbFeZiRerHNllILORdZtwyncm/M739CeKpFV5FRvQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="0e2eQ/OA";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.172
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=kOkWALfb;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.51
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2627606A32C
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 19:24:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A2627606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9938606A6CF
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 19:24:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D9938606A6CF
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0e2eQ/OA
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-3adff684a52so10661271fa.1
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 11:24:28 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795202667; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=kOkWALfb
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5c126fa1e3aso759817e87.2
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 11:24:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795202672; cv=none;
         d=google.com; s=arc-20260327;
-        b=O112TO9pFkGE57iaOUe7bJWXpelDzovDP2YTfjCtFhY6XJdhM3NIjvg9mXsbC63XKi
-         LaUWnXh6rcE0DO7dvmksSn++lUCXXYQFmfnZg/jm1mqxhMYUFnPHSa3m68o8F9+QWwV/
-         O+t1h0K0Bv6kffjm59YGnuqk06qsaBLt1SXEHAtCiZeuRW+h90iMAMv91NerJkezyb+B
-         CsG8n4T6wrpYlJte0q+NAmGcXs9ZD0u+ENUsyWITcBGPBxH7Y4F0wnX0BxZRlJmmDwZ6
-         Zox1jpH562XcTo/BRUwePLOdbkHXCcDFS/FR3RQo8A1xJp3bRZEYr7RFpV6ZNGFu5XIL
-         YfQw==
+        b=QsKMsLXQ/5dNFQdewaRpUXC7gP3EFBpM1yf8jvoIJwZG21Rbosh7UDNP0UqrLBWp+h
+         WZvfxTx8Ulby6Dinzj8mLJ4Pdj/sMaujjF/8Wyzx8zTygqyRJiTBYmmE/ILfaVnN+5EH
+         EU89+wVQR8Yu6p/KsHWDvi4pTPT7KOb+udpRit0iWq/XD/2V2FqH4kDO8w4UNtYoKL+w
+         UgOW57lcFX54Prsd2ye/2HI7F0geiMCiDI1W/WB0IWrn222rERxTUFqN18lHmtrvtD6n
+         cRgjmTpv89u+n9795qKkk1e7VmtI0dHl/nG5ICNCMH8ymawQcvPn2aXlyQimCPaBSb7p
+         z7og==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=hR7xJF+eh3lU/QGj+8ASNxswZFRyXVh6Oom4tDMt+sM=;
-        fh=K7TN4dndbTf+ZSVi+BoeYo3xyflLVrbkn+p+IHnGIm4=;
-        b=IDEl9nSfOznCqkJ6kCTajCiyGLZZqgXybT7SusgtPQgGgx+jg8GFMvIKpK6Asno4fv
-         YMGon5ioi0MSA67wome/fWx2FFJmgB63luW3e8Pzat6LQsZC9upXQqxmLeI6AjA6tWKu
-         2a4etzZ9WckLZSQIRunfvh+w4J1FLqtfrQNn36OvLeZa1uvpzJjxDIIdFEbDSTe5terF
-         UxdFjF5LQ8E0rVjf6PFMJWu229juUl/uA0a8B6+1limBYyrGhosC/zHttUNGDPFt26vf
-         XFEeRbMfk+ssKhSDl0C7CnUc9SRtxRxZzvKZ15xVr8oiC392nQjO4znIyaPHB5w0UsIs
-         Yzew==;
+        bh=EqIWlPRmhQa/qTttZkxhbBZ2a0xxoQ3QCxHq+S0xpPA=;
+        fh=SL4wZ3dEOZ1Qfmn5aCbPvKpRe1GY2bWHcdQjFK1iFC8=;
+        b=cbKQi4n/0ASDggsCXEDCPaEaTHLhGX57kQgCgdjUsE0rdXUB2uBLadmX2sXiTphO05
+         7aQkeLdSqxIw3CvjsfQGiTxWiMDCcgeg+GUD8dRR64xbO5npq3oChffE8uo4hYjBrwrZ
+         ZKgTB2FE2C1gMz+UpLfB88WY2HhfsxqEkKf+zfYec2Krj2B0tU87FMXZxkCcrRmmbuXb
+         pckLovdQtQy/TDPLGt9+Kazt6lrcd81lfhb8KT/S0Ci8sC9pakCIq9W9jecB8JJimhgT
+         bN8focK1U/MWP4Lmw/l2vM7xsOVM93nxYWwCNxaNDW8n4rJ1Wuk806y7wuzlRO+UxQpd
+         TRSw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795202667; x=1795807467; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795202672; x=1795807472; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=hR7xJF+eh3lU/QGj+8ASNxswZFRyXVh6Oom4tDMt+sM=;
-        b=0e2eQ/OAyG2xrBA/EdA6cx1TxgiHSqQd+dhT49r/RJQP128VGV16TTTP+t3VtKt0dT
-         Cjgt+PftXKgY8p2zwDt/NfPUMdAGjDD7PkF7hlZlY867guERcI13NjUKneg2UWnG3446
-         nNigWKtr/4ZTSITHiLlWY8OcvS9bOR2u/qaI5+xBxDK5TqjYD06VpBKkpqSI3cKdnFth
-         pvEtwViH9Z65IKs7smSl2pMIW73eFRry+Ks9Wzt2r285bQF/WHLKrq699B2G9ulBYkK3
-         5WIuEHy4/fvqe676Q4hgCXVKMS1dy93WV1cpyDxHt8XyID4lH978xgQGRfGSvmFdBPgR
-         663A==
+        bh=EqIWlPRmhQa/qTttZkxhbBZ2a0xxoQ3QCxHq+S0xpPA=;
+        b=kOkWALfbXLSO0694AHocK6DiW/UnduFj4uDpr9lzQQ0oS33PpCuJdksr1xIn+9pVGS
+         aohn8VC/51IpDHUcOdmQFw460SANKYsDNFjUzoyNsXv2wiwxkTE7i1gRaA+R3KIOFm7+
+         ITCO/l4NTO1N71WdLXrhQ67aUgortKmZg2oBOo3pKRDTMIpYrmJHw012N/ZqZ3ijvFM7
+         NgrFgoNZ59N9G27DVv6Cl0/Aq12ez/LdBQPzcYfMuBs2Pfy+XRW2Y2CiVVYLMDoIk55P
+         uIIBzHFuf72iun+XCDoL0QBIyZCxvARM7KesVkM41zeicCkvcLioS4x77VvMRFE6sqV2
+         JN2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795202667; x=1795807467;
+        d=1e100.net; s=20260707; t=1795202672; x=1795807472;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=hR7xJF+eh3lU/QGj+8ASNxswZFRyXVh6Oom4tDMt+sM=;
-        b=hwtU9foaFK3bycuVsLq2ghSAfJ4SbyE6avNu3I+vaqa7QCBCkQ5JYNFfSRF6CzVV1s
-         lmTATYJ37oh2IlrpECreS1Nj6Kn7f27mLXonF7w81g4E1hzkngxgLIxaR5WhCdo8iGpc
-         VCwZMHOvWKo+1V/kesCjn7iiLYr0TUDDoM6SSNoSMo0A8MipSahUlWQNaPHHNSDsFrXI
-         IusNprufi6IjIPWhtz5pgSiSAPNrE6m5ZSIyQHaA+TLV9QwmtyyRRTDi3bjVLv8IHEZi
-         D5p0H0RAce/CfynqShPQpszZdjK98JfSAC393Nay1esxoKwqvzTyWECsKq8ql97FwF03
-         sRxQ==
-X-Forwarded-Encrypted: i=1; AL+hErE96LCGxRhthlITNfHZ0tgpDK7ZWLv4VjM8gJU/Tz7IsQlOh3Ok6K1eH3cwkD9oV3wlCZD8uP/icFfpCmk=@vger.kernel.org
-X-Gm-Message-State: APuU4Z9jEDgzPah5QmkAQYkqDi+UGcVSDur4TyUqS5tDFMNMU5goSTju
-	A6lXeG9cu7EwNt/z+1TDmpVMDGV0LeBWr2CJSbuuWL4Ymzs9o6sKzpQamOIcXqi4iX3W+xSB5eF
-	Zhnq6yLZLOoyltlMD0IPtCpzte8XY+6Q=
-X-Gm-Gg: AZFdTZeHiSJaJSqt5+/xIfokZQnHGuTLnhJYXIvjCBkk5qRq+ohDptffUt02i0ku9vc
-	7mBFjaZzxIDkE3OcBJVnGCYTcbgNraKmtcke5cOmVpNmw5MmC+t8mPTyZhBJ4GbIMX1pdR/ccOQ
-	HZwEUsnM9scz6Qyhv6Mc6OdzvbN5zaB9kpLw8fQiTcKe+c2UWSOuD2aQzD8tUN+O0FrU0+R/uRu
-	D483BMPDHtS+j8EhGMshfBCXkXN/eAAq8vqIH3qM5gB4T2aKsr1tiXVS84R3m1/mlE7jTUuFQJT
-	GKGcyT6sFNc+OCSBW06FiRV/E48skh74DSNtdieiaKzs1fk9JzyRITlLvjviDE1dEE/obmP9Krc
-	vWvyNixCRGLs/kWIMexUt+46vwByOkTccVpvyrW+V6i8uin+0wIE6ttAxt0E=
-X-Received: by 2002:a05:651c:991:b0:3aa:f4c5:8920 with SMTP id
- 38308e7fff4ca-3ae7fb0b5efmr9311671fa.12.1795202666436; Fri, 20 Nov 2026
- 11:24:26 -0800 (PST)
+        bh=EqIWlPRmhQa/qTttZkxhbBZ2a0xxoQ3QCxHq+S0xpPA=;
+        b=zW9ZTJ/jPPyQX3wshaoNoW+bTNIsB2t+w3f1/K1pjTTcsu+GsrvIBeLBeD+5fYz5Ky
+         CjMeq/YGvja0bXt2dLuOqgEQetMhSKooA1tBYm7dZYGX2zu0++sV6e7i2VnGPke1uaA+
+         V2sNxf8mGHDA4zFClu+KV/SqJqZe53Lwp6A3NUE/gFBhRvYcoj59aX58MOpI54KN2VpM
+         PNu/QCJ+8JtSJXRf4Wr2YhQEJ8UDuORmyAUYNmmyNmlDCjY0wH3lBhpn/4UURElb0MTV
+         o7FiHhywEzIOew9k61vux/ipmkC4ZhnakVJiyciZLFNnNaBtY9XwJGXZy425X5Jb4L6J
+         UFtA==
+X-Forwarded-Encrypted: i=1; AL+hErHSIoZftu7U3Nz2O2TxT374Exam6OdqusSeYJEKWLCBCferq+3idOGBADxoG7zQPAgWKJkmMAizZ5rPrkE=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/sPhV5H5MOjXiJ63p6sFe4KL9hHdtbpattM68TGoR0piAPQhy+
+	8gBksLHHXU1oQ+fNL0X0M6LaLg1CuhUCN3pjtsFx34dea3p8S1VN+9s9tD5MFRTeEc4CWgePE0P
+	o2v4MpuFjMc2HYuv27LOjgTnedfmJo1Q=
+X-Gm-Gg: AZFdTZfxkuvaDEW2VX8VEgqyypNBVv5jWtQhnCW4AIefVYbkSGwPL5HBZwKAGCV+Dnc
+	5Wt9tDwkfABoau9qv/ZkpgpaOuysdJTVi/46SPVmQZmpyHYrRP8EOE4o/tHbhh2SpTrj/kJY7MN
+	LN31RGW4b9KoB7yAGIssmLwiouwIOYqQlxVSC+AefF5+5CywVPFGOzmAAMLMHf64ks/IeiBSGgX
+	lszTzhfMsutCzatUKivjv7dQei29z+uXy4UkrcmuLFioTpj/4QW4Z5fojv1ugT7F3osYI/d5qcu
+	PA0yqoexOYcQU52S91sVzhQ7pwKQSVRTuJaHklG8jNvmWDuPx7am2OYYgOr5WTs5ws5OXHx61Fe
+	sSXwjii/jiedMzyglYgXPLc/uyKD3JZK/3B3D
+X-Received: by 2002:a05:6512:a92:b0:5c0:a7f:3ee8 with SMTP id
+ 2adb3069b0e04-5c1bc6f6f92mr1247082e87.8.1795202671893; Fri, 20 Nov 2026
+ 11:24:31 -0800 (PST)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -105,14 +105,13 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 References: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
- <20261106072412.7909-8-kanchanapsridhar2026@gmail.com> <sashiko-outbox-202713@kernel.org>
-In-Reply-To: <sashiko-outbox-202713@kernel.org>
+ <20261106072412.7909-4-kanchanapsridhar2026@gmail.com> <sashiko-outbox-202709@kernel.org>
+In-Reply-To: <sashiko-outbox-202709@kernel.org>
 From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Date: Fri, 20 Nov 2026 11:24:12 -0800
-X-Gm-Features: Aa3M54oUl6qJ5hZlCYYhmiDiQH5xqNAdQbMYZMdPI76DbB-hbPU55wGtY4uRrEQ
-Message-ID: <CACpmpoe44wzBDMdLX=Ryau8uuDYrfNRbGmAvuWF6p6rPc6_zbw@mail.gmail.com>
-Subject: Re: [PATCH v3 7/8] mm: zswap: Refactor and optimize
- zswap_store_pages() batch operations.
+Date: Fri, 20 Nov 2026 11:24:19 -0800
+X-Gm-Features: Aa3M54rhTUbna5usUdb29tdk64fNtvutRquhcws5sDaGP6EBJACKMJdTqBzkNNQ
+Message-ID: <CACpmpodxjJ3ZQt4xOsWfWQNjgMtPzKx0oGMy+mJTU1wxVWdMUw@mail.gmail.com>
+Subject: Re: [PATCH v3 3/8] crypto: acomp - Add trivial segmentation wrapper.
 To: sashiko-reviews@lists.linux.dev
 Cc: hannes@cmpxchg.org, yosry@kernel.org, nphamcs@gmail.com, 
 	chengming.zhou@linux.dev, akpm@linux-foundation.org, linux-mm@kvack.org, 
@@ -125,149 +124,121 @@ Content-Transfer-Encoding: quoted-printable
 
 On Fri, Nov 6, 2026 at 11:25=E2=80=AFPM <sashiko-bot@kernel.org> wrote:
 >
-> Thank you for your contribution! Sashiko AI review found 3 potential
+> Thank you for your contribution! Sashiko AI review found 2 potential
 > issues to consider:
-> - [High] mm: zswap: missing !CONFIG_MEMCG stub for obj_cgroup_get_many()
-> - [Low] mm: zswap: unconditional incompressible page stat updates on
->   zero delta
-> - [Low] mm: memcontrol: unused and duplicated obj_cgroup_charge_zswap()
+> - [Medium] crypto: acomp - missing non-zero unit_size check in
+>   crypto_acomp_compress()
+> - [Medium] crypto: acomp - union type confusion in
+>   acomp_reqchain_finish() on virt dst
 > --
 >
-> commit 55351c710f10c5fbb79d9201d80496dc658bbc19
+> commit c2a605231cabd5e0e15d6d778b3943a2c118d756
 > Author: Kanchana P. Sridhar <kanchanapsridhar2026@gmail.com>
 >
-> mm: zswap: Refactor and optimize zswap_store_pages() batch operations.
+> crypto: acomp - Add trivial segmentation wrapper.
 >
-> This commit factors zswap_store_pages() into batch helpers
-> zswap_init_entries() and zswap_tree_stores(), and introduces
-> obj_cgroup_charge_zswap_many() to charge and account zswap batches at
-> once.
+> This commit adds a single-segment compression wrapper for algorithms that=
+ do
+> not natively support segmentation, returning the compressed length or err=
+or
+> in req->dst->length when req->unit_size is set.
 >
-> > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> > index ac6c43ea8c5a6..ab280a448e8c4 100644
-> > --- a/mm/memcontrol.c
-> > +++ b/mm/memcontrol.c
-> > @@ -6368,6 +6368,42 @@ void obj_cgroup_charge_zswap(struct obj_cgroup *=
-objcg, size_t size)
-> >       rcu_read_unlock();
+> > diff --git a/crypto/acompress.c b/crypto/acompress.c
+> > index c8b4b8589769e..ac4dc52668b89 100644
+> > --- a/crypto/acompress.c
+> > +++ b/crypto/acompress.c
+> [ ... ]
+> > @@ -242,6 +246,10 @@ static int acomp_reqchain_finish(struct acomp_req =
+*req, int err)
+> >  {
+> >       acomp_reqchain_virt(req);
+> >       acomp_restore_req(req);
+> > +
+> > +     if (req->unit_size)
+> > +             req->dst->length =3D unlikely(err) ? err : req->dlen;
+> > +
+> >       return err;
 > >  }
 > >
-> > +/**
-> > + * obj_cgroup_charge_zswap_many - bulk charge compression backend memo=
-ry
-> > + *                                from compressing a batch of pages.
-> > + * @objcg: the object cgroup
-> > + * @size: total compressed length of a batch of compressed objects
-> > + * @nr_pages: # of pages that were compressed to store in zswap
-> > + * @nr_incomp_pages: # of incompressible pages to store in zswap
-> > + *
-> > + * This forces the charge after obj_cgroup_may_zswap() allowed
-> > + * compression and storage in zswap for this cgroup to go ahead.
-> > + */
-> > +void obj_cgroup_charge_zswap_many(struct obj_cgroup *objcg, size_t siz=
-e,
-> > +                               u8 nr_pages, u8 nr_incomp_pages)
-> > +{
-> > +     struct mem_cgroup *memcg;
-> > +
-> > +     if (!cgroup_subsys_on_dfl(memory_cgrp_subsys))
-> > +             return;
-> > +
-> > +     if (obj_cgroup_is_root(objcg))
-> > +             return;
-> > +
-> > +     VM_WARN_ON_ONCE(!(current->flags & PF_MEMALLOC));
-> > +
-> > +     /* PF_MEMALLOC context, charging must succeed */
-> > +     if (obj_cgroup_charge(objcg, GFP_KERNEL, size))
-> > +             VM_WARN_ON_ONCE(1);
-> > +
-> > +     rcu_read_lock();
-> > +     memcg =3D obj_cgroup_memcg(objcg);
-> > +     mod_memcg_state(memcg, MEMCG_ZSWAP_B, size);
-> > +     mod_memcg_state(memcg, MEMCG_ZSWAPPED, nr_pages);
-> > +     mod_memcg_state(memcg, MEMCG_ZSWAP_INCOMP, nr_incomp_pages);
-> > +     rcu_read_unlock();
-> > +}
->
-> [Severity: Low]
-> Could obj_cgroup_charge_zswap() be removed now that its only caller in
-> mm/zswap.c has switched to obj_cgroup_charge_zswap_many(), just as
-> zswap_pool_get() was replaced by zswap_pool_get_many()?  Leaving
-> obj_cgroup_charge_zswap() in mm/memcontrol.c and include/linux/memcontrol=
-.h
-> duplicates the charging logic with no remaining callers.
-
-Thanks Sashiko for the code review. I have modified
-obj_cgroup_charge_zswap() to call obj_cgroup_charge_zswap_many() to
-avoid the charging code duplication.
-
->
-> > diff --git a/mm/zswap.c b/mm/zswap.c
-> > index 8c36344000f51..5ef1ae67e67a9 100644
-> > --- a/mm/zswap.c
-> > +++ b/mm/zswap.c
->
-> [ ... ]
->
-> > @@ -1711,17 +1702,86 @@ static bool zswap_store_pages(struct zswap_stor=
-e_context *zc,
-> >                       zswap_lru_add(entry);
-> >       }
+> > @@ -266,10 +274,13 @@ static int acomp_do_req_chain(struct acomp_req *r=
+eq, bool comp)
+> >  {
+> >       int err;
 > >
-> > +     /*
-> > +      * Each batch entry is successfully compressed and stored in the =
-tree,
-> > +      * and further failures will be cleaned up in zswap_store().
-> > +      * Next, we do bulk accounting for the batch: grab refs to the po=
-ol and
-> > +      * objcg, charge zswap memory, increment zswap_stored_pages and
-> > +      * zswap_stored_incompressible_pages. The opposite actions will b=
-e
-> > +      * performed by zswap_entry_free() when the entry is removed from=
- the
-> > +      * tree.
-> > +      */
-> > +     zswap_pool_get_many(pool, zc->nr_pages);
-> > +     if (objcg) {
-> > +             obj_cgroup_get_many(objcg, zc->nr_pages);
+> > +     if (unlikely(req->unit_size && req->slen > req->unit_size))
+> > +             return -ENOSYS;
 >
-> [Severity: High]
-> Does calling obj_cgroup_get_many() here break the build when CONFIG_ZSWAP=
-=3Dy
-> and CONFIG_MEMCG=3Dn?
+> [Severity: Medium]
+> Can acomp_reqchain_finish() corrupt the destination buffer when a request
+> with a non-zero req->unit_size uses virtual addresses?
 >
-> include/linux/memcontrol.h only defines obj_cgroup_get_many() inside the
-> #ifdef CONFIG_MEMCG block, while the #else section only provides stubs fo=
-r
-> obj_cgroup_get() and obj_cgroup_put().
+> In struct acomp_req, dst and dvirt share an anonymous union.  When
+> acomp_do_req_chain() handles a virtual-address request
+> (CRYPTO_ACOMP_REQ_DST_VIRT), acomp_reqchain_virt() restores the raw u8 *
+> buffer pointer into req->dvirt before acomp_restore_req() restores
+> req->unit_size.  Writing to req->dst->length then treats req->dvirt as a
+> struct scatterlist * and overwrites 4 bytes inside the caller's output
+> buffer.
+>
+> In addition, acomp_do_req_chain() is called for decompression (comp =3D=
+=3D false),
+> so a decompression request with req->unit_size set will also hit the
+> compression-only req->slen > req->unit_size check and write to
+> req->dst->length.
 
-Added a stub for obj_cgroup_get_many() in the #else section.
+Herbert, is it Ok if this can be addressed as a follow-on to this patch-ser=
+ies?
 
 >
-> > +             obj_cgroup_charge_zswap_many(objcg, total_batch_comp_leng=
-th,
-> > +                                          zc->nr_pages, nr_incomp);
+> >       acomp_save_req(req, acomp_reqchain_done);
+> >
+> >       err =3D acomp_do_one_req(req, comp);
+> > -     if (err =3D=3D -EBUSY || err =3D=3D -EINPROGRESS)
+> > +     if (unlikely(err =3D=3D -EBUSY || err =3D=3D -EINPROGRESS))
+> >               return err;
+> >
+> >       return acomp_reqchain_finish(req, err);
+> > @@ -279,10 +290,27 @@ int crypto_acomp_compress(struct acomp_req *req)
+> >  {
+> >       struct crypto_acomp *tfm =3D crypto_acomp_reqtfm(req);
+> >
+> > +     if (likely((req->unit_size =3D=3D req->slen) && acomp_request_iss=
+g(req) &&
+> > +                 !crypto_acomp_req_seg(tfm) && !acomp_is_async(tfm))) =
+{
+> > +             int err =3D tfm->compress(req);
+> > +
+> > +             req->dst->length =3D unlikely(err) ? err : req->dlen;
+> > +             return err;
 > > +     }
-> > +     atomic_long_add(zc->nr_pages, &zswap_stored_pages);
-> > +     atomic_long_add(nr_incomp, &zswap_stored_incompressible_pages);
 >
-> [Severity: Low]
-> Should the incompressible page updates here and in
-> obj_cgroup_charge_zswap_many() be skipped when nr_incomp is 0?
+> [Severity: Medium]
+> Should this fast-path check also verify that req->unit_size is non-zero?
 >
-> In the common case where all pages in the batch are compressible,
-> atomic_long_add(0, &zswap_stored_incompressible_pages) still performs an
-> atomic read-modify-write on the shared global counter, and
-> mod_memcg_state(memcg, MEMCG_ZSWAP_INCOMP, 0) still runs get_cpu(), updat=
-es
-> per-CPU stats by 0, and fires trace_mod_memcg_state() with val =3D=3D 0.
+> Callers that do not use segmentation leave req->unit_size at 0.  If such =
+a
+> caller submits a scatterlist request with req->slen =3D=3D 0 on a synchro=
+nous
+> non-segmented transform, req->unit_size =3D=3D req->slen is true, so
+> crypto_acomp_compress() enters the segmentation path and writes the negat=
+ive
+> error from tfm->compress(req) into req->dst->length, corrupting the calle=
+r's
+> scatterlist or causing a NULL pointer dereference if req->dst is NULL (wh=
+ich
+> can also happen when req->unit_size is non-zero and req->dst is NULL here=
+ or
+> in acomp_reqchain_finish()).
+
+I left out the check for req->unit_size is non-zero, because it is
+implicit in the (req->unit_size =3D=3D req->slen) check, and also because:
+
+  - I did not see other places in acompress.c that specifically check
+for req->slen being non-zero.
+  - This is in latency-critical code. Fewer conditionals are preferable.
+
+
 >
-
-Good point. I have modified this such that if nr_incomp is 0, we skip
-the incompressible page updates.
-
-
 > --
 > Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261106072412.79=
-09-1-kanchanapsridhar2026@gmail.com?part=3D7
+09-1-kanchanapsridhar2026@gmail.com?part=3D3
