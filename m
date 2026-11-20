@@ -1,59 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795168673;
-	b=E1KNi/A248jUfiOYWabNhXesD8K4ZiyiINJgb0cqf62PFoblmXo+7F9IjnRrh+87I54j
-	 o0n43Herca6oM05PAGgy1efri+8naARiToQ6KqjDTvXJ1vFzFdvuodStdJtFPbMKuS/Vv
-	 aJ+uO5xTmcJlN+roGHgC7KntrriPjgzYBwfk3anNDR/itrBER6WAp81HLZFsus/Cm+E8M
-	 1aoHSvYc305QkINN6sF2F/YY93JXqTWhmIkSitLBR+RH5KYnH2RZoZnWBhxhMRzLSW+eH
-	 AeHQcQ8iMjILrkocVdLRhOjW/urIF4wsumIDvXwxs3NNo09cnRiE1EC8f0UeDI4EYUQ==
+	t=1795168699;
+	b=Z2Vx3usvz/7xw1zd8DhRcYmDK9C4OQLcHyuCgr2t7VCjIBz+X98M1N/nb+QbCHuqIvFo
+	 Hkr9VVlYeICHFXR/jH4AZd6rsLpj5uKLXIIgDzZ5UhRz4r74tciqJTPRGck9QrxPy46hK
+	 0Gj2h9qrxEDh4g3MZLA7UTaYP7nzE0MGXs9rmftzspbNQ0BEJlNl13F67MmXnzOHgp467
+	 4QVl53wUpceeAHseSWuCW2XrRBgwJ4+WqzjodNqKbvQeIxezSkLdwo/1zhjQ7YG8G9hKY
+	 JsTJxNsS//93q4a43/3xFCb5g+Gp3Vj/6nDny9K8x4Gs3JqqPQ8Exjy/dt25vebjqAQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795168673;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=0CJqhfaRwIf9n/RB1oADTEsSvNdb2w12OyIuhDSocvo=;
-	b=ZzhsF3YEJian89kiRpNtOXFEdmmxLlcwhw6/bfMYstCMbNEED92rnsW9MM27MdBkZMLB
-	 dWdGeszICTzpCIT8UhAAEDfLZDzjO2I+Wj+7WX8Tle8cVVUPX9jAjzUTNmPxsNbTxGpWB
-	 jlCHsGM+5f1MKztQoDSfO0dO97e8P16yAHL77qjxPwSrBuORPd0FGc6FMKP3sDxNwLP5h
-	 LqTNrR7VBSQ/F44O+az72jx/U2wwUttgVqEuOQWSO5xeeEwhjKhWgR/yotYxdHfuRQId0
-	 u9hZgOR6+aohIdaphtTEH6iQYibVqKvUr0/WrF8uFQe9s7e+OnwxdjY13W9HErGkt1w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795168699;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=uY8yz1qOoWb7maxNqQmHGS2DiNSUmLuGnnvbTyfBc4U=;
+	b=HyjQFZuL+HE1V2F0grFLRxfZWHwhvvGQeDCjRloSs1n+CfeysSRD5yjx7ZU3Em1WlRqc
+	 uVnbwctKFhZwLV7Dun6xJuo9yFWRm68bRzATTltzDlAgRMYTkLMy8LLEdb1G65g3oh6ma
+	 G1OjKtAhO88sovtNgodQE/vsRU8ynCmyvpqVUFYkFxPW3/xerzzxV19jqYZkeRfhMSKsN
+	 JSMXymnh0Oa8vGZO/+dDptQ0B6m/Yt0OQA2phvQVn4JU3sKCuyUI687Y0gec52F6DFWME
+	 i9+iHCr+NdjP9djO4tflgWlkICwzLX8mEgdLTwhkrB3dnFWKSlH0qRDTcQBW7n2LyFA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gmD2x3x6;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=dLA6REuD;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id C7900606A320;
-	Fri, 20 Nov 2026 09:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA1B606A325
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 09:58:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BDA1B606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gmD2x3x6
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id BEED51F000C6;
-	Fri, 20 Nov 2026 09:57:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795168673;
-	bh=0CJqhfaRwIf9n/RB1oADTEsSvNdb2w12OyIuhDSocvo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gmD2x3x6PsfNrEh+DSm+x40DYGTO+CoCR5AoiTvgLBZX9ziMreBXgWmWD8WD8lqfh
-	 piJw8nIoJxjKiWwlsNZsDiF6WQn2PI2+eTmX7OvdB8+sdOF+v7rDl8QjsobA/88k0V
-	 RZrhk3QPPKS7H95/ewdgJ4vM+5RS7twMry/5HvZ2chPMjWQWNENvgUB54LjYrre25e
-	 heeayolfYmqvt0kl/3xkCTtw6zWwkBFo9tQCGYfRL6qz6vBFUF+kxrovJFgoAS5zeZ
-	 I4vd4ZujYmfJNyjMRAcnokjEbKBpLFPgQJopjLDlgTCMCPJcRYpmS2tLA5Ex2LUC/p
-	 jT34Sn5zC0NEw==
-Date: Fri, 20 Nov 2026 10:57:46 +0100
-From: Bartosz Golaszewski <brgl@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Russell King <linux@armlinux.org.uk>, Eric Biggers <ebiggers@kernel.org>, 
-	Demi Marie Obenour <demiobenour@gmail.com>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Pankaj Patil <pankaj.patil@oss.qualcomm.com>, Birk Skyum <birk.skyum@pm.me>, linux-crypto@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH v12 0/2] crypto - qce: make algos optional and remove the
- BROKEN label
-Message-ID: <2bmlzgxt3xtjbrtt6gypvfkji3tvxclnwld2wjjmzef3cdpgfw@cgohz3kfd2wp>
-References: <20261112-qce-fixes-broken-label-v12-0-7b5b9c7083ed@oss.qualcomm.com>
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=dLA6REuD
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=uY8yz1qOoWb7maxNqQmHGS2DiNSUmLuGnnvbTyfBc4U=; 
+	b=dLA6REuDqD1CZJLP8PhzMk79uwjpFBIeXRwT6QlThpohXF/55mBIjv3rqOa63TG0S90b2B1msuR
+	W2DJS/UHbHD+KSx2LfWLzqZcr6Ezl5qYZRGIPOG89DiP9bVtZkhUSf/qzYHpo6PwgVu8dCm9hmFY9
+	DMHMDdFUK4HPSvBcaIUQfFsMzm4XARaDbb6caPpHZBCBkZEX9+hqS7L00h88Z3T2yE4eGUBJZJyGh
+	XyGOFyKuYpi+qXEy2V64VO+35CZnEGH6iKUAoXw4V7K78J1I7eK3HCEjjwzWBJyKhnj+Pf4AS2ePc
+	xtJfXqeLdks2w/pOZkC2XU5eZHrno+hxDrpA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xULNm-0000000HYrP-2GMt;
+	Fri, 20 Nov 2026 17:58:15 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:58:14 +0800
+Date: Fri, 20 Nov 2026 17:58:14 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ahsan Atta <ahsan.atta@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH RESEND] crypto: qat - clear fw_loader pointer on
+ adf_ae_init() failure
+Message-ID: <awAZtk4gqEFBi2CP@gondor.apana.org.au>
+References: <20261113145508.1556307-1-ahsan.atta@intel.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,19 +68,35 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261112-qce-fixes-broken-label-v12-0-7b5b9c7083ed@oss.qualcomm.com>
+In-Reply-To: <20261113145508.1556307-1-ahsan.atta@intel.com>
 
-On Thu, Nov 12, 2026 at 02:20:07PM +0100, Bartosz Golaszewski wrote:
-> This is the follow-up to the three smaller series fixing crypto
-> self-tests in the QCE driver. It makes the crypto algorithms opt-in via
-> a module parameter and removes the BROKEN label so that the driver is
-> built by default.
+On Fri, Nov 13, 2026 at 02:55:08PM +0000, Ahsan Atta wrote:
+> adf_ae_init() stores the newly allocated loader data in
+> accel_dev->fw_loader before calling qat_hal_init(), as the latter
+> publishes the HAL handle through that pointer. If either
+> qat_hal_init() or adf_ae_reset() fails, the error paths free the
+> allocation but leave accel_dev->fw_loader pointing at freed memory,
+> so the device is left holding a dangling pointer.
 > 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> No code path dereferences that stale pointer today. This is therefore
+> a robustness improvement with no observable failure behind it, hence
+> no Fixes tag.
+> 
+> Clear accel_dev->fw_loader when the allocation is released, and fold
+> the duplicated error handling into a cascading goto chain. Report the
+> error returned by the callee rather than a generic -EFAULT;
+> adf_dev_init() still maps any failure to -EFAULT, so this is a
+> readability improvement and not a functional change.
+> 
+> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
+>  .../intel/qat/qat_common/adf_accel_engine.c   | 21 ++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
 
-Hi Herbert! There are no more sashiko comments on this. Could you please
-take it for v7.4?
-
-Thanks,
-Bartosz
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
