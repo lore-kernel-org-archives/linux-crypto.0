@@ -1,88 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795168461;
-	b=Bu3nmLAXOVJGGZlQgt3Qhk3qZFJ3tnA3cLkD4vmFjEYzsEkDzrNi7/UfoJ73MIELhoj/
-	 09vs+5N+lPj6ibEzLJNZkk/ZjyOU89ND7Q79JnfnYIq9G+1ZefNsiMkQTiRJFk6IolQnG
-	 FSQmd5Ywt2x+ai6Oia6yhsAvQPjIRMEgPk+Lo+A8R5qbM/Rxw3zWMk+kQCodrGR2G6aOF
-	 knzFtbYsRKe3T+VD4JKXeFbgPr20Dk6Wf49Ji0lnqWKD6H892wR+yQMuIs858nqwUxAS9
-	 DBCr+KRMfs0IxWZSB5GcqLwqcdIm1q5FzUh7RHJIb192b4juTbcY0JRePlHj2TRgM1w==
+	t=1795168468;
+	b=tP1U/DtFLosgh/2YWGxzei6hnq0VDd59T8uXojXmiJX4qDrKofTRhdv3P+hsMGpRQHbX
+	 nlJdY+laDlGQ1o0i3R5Ybw9pj710kGhToAJUhcpRNRIjeFaWKRlqg2ZmzmUZ98PJrLFhb
+	 Rvc4xRdWAtl/iSmcm3UUfiIBkWwPpU7QZafCO4xzPVisb2cJw+lFQbjDijkzoXOiM9C0F
+	 7Xb7pouTtSaFYgOmYKiQlKX9bmT376n6Vppa8iTihkqk9aNrk/e7rlLwN2j5NnsW5QU8U
+	 iXki0gf+luIoETKtfq6O8hFqSHB3mHW3cquJN9iUCr2J0fFGg8Nrme8I2zSCJBTUqlg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795168461;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795168468;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=5H4SaiSHQZbbitE0VP8DxeDHKADjdTBjB65w822tiJo=;
-	b=sXeEWgUdH093BahQJUGYn4Tlet0ErzgUtvJeeW73ghltMEGCBtP5TsrKrfC9XGjuBTqj
-	 V6RCIe7k2QVq45a4q2LhZ9ApjjW4sLgwClfWu9oHnyUNcbCjxoD0H5FDIxRh1GF6Mh4Hu
-	 d+PWY7AZqVQmgCW/wZ7z3xmjD1Hlhl3zsRhGwzOmi9ETCRZmbTwJDhrTk0YWE6cqXkfev
-	 2yF9tTPi/U7DCEi24kCvpjatGgyVZ3RhbK5j/oy4fxk5XlfNFYh8lL1rT0V2vi/sJnaFe
-	 qnQGO4nEku3ZsJvonpW0MVAJ1FeU0d3qMhc8sr03aG4aex4vmxqd9Hh6mTa0BgacELg==
+	bh=wvm5O4QSr+2slEL7sSNtDaICWbKDd4kaL3RphmV8wS0=;
+	b=5aKiVN6Vl0sGPLqsoDRqHJ2P0Yy+rzqh/QTbKOZYWUiumPbUh8r4NSY4t1EsRHiaVXkk
+	 M2JlRmJd+VpkAaIofw3qoN7zmVfivra9RluhOtcrzgtOewAdrDrThs1Jkcjqv38KNPGk2
+	 bngklAYwnKFOzmidtTbCfFbUqChX/1AWUSVxgS/3ktUsA3HY7F4dO/pHbXRU2MteUg5C7
+	 vFW64Ns3XMS/koy6iIfK962zlJgNmlcDMQ3Vo4AU+cn8yenzTA/yqQDEiuZE6vBLzjaHe
+	 Ej19dnoENx4YVTJXkYz3AYCavkKLx9UlklSLq83X1VloEySszVESUI3fPmuaad0GrEw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=EcAwf6j0;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=dh7SoQY+;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A363F60A262A;
-	Fri, 20 Nov 2026 09:54:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A363F60A262A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A7B606A33A;
+	Fri, 20 Nov 2026 09:54:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 31A7B606A33A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=EcAwf6j0
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=dh7SoQY+
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=5H4SaiSHQZbbitE0VP8DxeDHKADjdTBjB65w822tiJo=; 
-	b=EcAwf6j0CntvZ07zEBA0EK7mGtRM6Ty9kNZvBf6cSfeCnUQIxwN3OjQZDd7K6GdsFR2OzUkBpsV
-	c7TDp/i9LBg2XdYy1M6gNr3XFwEoyPSvrmRyLrfHOzRxWmDr342iLO9fZuqzeXHpsfU+A7EaF7Z/9
-	YCt7WXWWR1eYd/GtGSpSHeME+zRUKqvXx12OjgFVjKGvNT0AAEIi2XlnD3uSg2pO53snN/fLlIaJq
-	moAsgef5vq2jLcET6rJBrKnshrbeueOTP7zzuVY4SINFGmkc1TTjpLMQDUkt0VbWKbp9pRFZbps9i
-	w46W2VEge/e+dJ3yg715glnlttUEofgA4hZA==;
+	from:content-type:reply-to; bh=wvm5O4QSr+2slEL7sSNtDaICWbKDd4kaL3RphmV8wS0=; 
+	b=dh7SoQY+YOdWpmwGsfPl1JIHoAtNavKeFsvj9blSEm/Te43IpDZqfKzMvwXIKY6ivpd2fZt8GKm
+	A+EVjMpt97/1dgyHl/8KOmG5BbUW08HL8S7tc+9OXw951XR0O3jv8s4fSs7v/WXg3hcV7yzeLkxHE
+	g5/Aevv0jm6SP0exp8qzh4rQx8yYvD4JGGg+x18V3XbCjMH8NwiWeB+gPqwoCPk2Xxl/OEGfMOMjo
+	W4k41MG+1Dv0aJlN6QK30ANVXXT95LWFWuDB8R8MVsq5lrReJX9Qu5xp7OiV1LqLu8NhI7mQNQJJK
+	QvjTXbBVP09gk4s2Nkb7j0QBobe9aBpu9JsA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xULJc-0000000HYhH-3TYH;
-	Fri, 20 Nov 2026 17:53:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:53:56 +0800
-Date: Fri, 20 Nov 2026 17:53:56 +0800
+	id 1xULJx-0000000HYhV-0uQd;
+	Fri, 20 Nov 2026 17:54:18 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:54:17 +0800
+Date: Fri, 20 Nov 2026 17:54:17 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Pavel Popov <pavel.e.popov@intel.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Hans de Goede <hansg@kernel.org>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Peter Huewe <peterhuewe@gmx.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Arnd Bergmann <arnd@arndb.de>, Len Brown <lenb@kernel.org>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	"David S . Miller" <davem@davemloft.net>, x86@kernel.org,
-	linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-pci@vger.kernel.org,
+To: Laveesh Bansal <laveeshb@laveeshbansal.com>
+Cc: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@linux.win>,
+	"David S . Miller" <davem@davemloft.net>,
+	Denis Kenzior <denkenz@gmail.com>,
+	Maximilian Stahlberg <maximilian.stahlberg@uni-bremen.de>,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 7/7] crypto: ccp - Drop unused <asm/cpu_device_id.h>
- include
-Message-ID: <awAYtBlS9Fg8iBDz@gondor.apana.org.au>
-References: <20261111234821.4814-1-pavel.e.popov@intel.com>
- <20261111234821.4814-8-pavel.e.popov@intel.com>
+Subject: Re: [PATCH 0/2] X.509: Accept a certificate with an empty subject
+Message-ID: <awAYyQ-cZ3Nl4Ja_@gondor.apana.org.au>
+References: <20261112074246.99421-1-laveeshb@laveeshbansal.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -94,19 +71,33 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261111234821.4814-8-pavel.e.popov@intel.com>
+In-Reply-To: <20261112074246.99421-1-laveeshb@laveeshbansal.com>
 
-On Wed, Nov 11, 2026 at 04:48:20PM -0700, Pavel Popov wrote:
-> Nothing in ccp-dev.c uses <asm/cpu_device_id.h>; the CPU match table
-> it was included for is long gone. Drop the include and the #ifdef
-> CONFIG_X86 around it.
+On Wed, Nov 11, 2026 at 11:42:44PM -0800, Laveesh Bansal wrote:
+> Patch 1 fixes loading a certificate with an empty Subject, which iwd
+> hits with an eduroam server certificate [1]. Patch 2 adds a KUnit test
+> for it.
 > 
-> Signed-off-by: Pavel Popov <pavel.e.popov@intel.com>
-> ---
->  drivers/crypto/ccp/ccp-dev.c | 3 ---
->  1 file changed, 3 deletions(-)
+> I developed this series using an LLM coding assistant.
+> 
+> [1] https://lore.kernel.org/r/9b05b89cf296b8a6392bbe6327228c1bc2f05c49.camel@uni-bremen.de
+> 
+> 
+> Laveesh Bansal (2):
+>   X.509: Accept a certificate with an empty subject
+>   X.509: Add KUnit tests for the certificate parser
+> 
+>  crypto/asymmetric_keys/Kconfig            |  11 ++
+>  crypto/asymmetric_keys/Makefile           |   1 +
+>  crypto/asymmetric_keys/x509.asn1          |   8 +-
+>  crypto/asymmetric_keys/x509_parser_test.c | 160 ++++++++++++++++++++++
+>  4 files changed, 179 insertions(+), 1 deletion(-)
+>  create mode 100644 crypto/asymmetric_keys/x509_parser_test.c
+> 
+> -- 
+> 2.54.0
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
