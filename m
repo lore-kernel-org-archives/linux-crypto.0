@@ -1,65 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795168219;
-	b=IjYrVfUTMzRu5aYA5R5R9wrCx/6jfGOeGrwiyWEwMU9XOqJlI8JAas3k2Q9NE4f7bNXG
-	 kLMkZMOXogGLKkKfaDqdkXdgm+lWhBrJ2n2Ocqbv6ARzwSyPtyhJ9ztiIIDQSrRv6iKRv
-	 tUS+HBxnz1w63IFKuUa/vTRwZBu7V9STn8Fb2b1OD5Gk6iW9bh3cCL+RgHuKIefEssmtU
-	 FSKIO5JDJLuKjisIPNOyelajqHg95qKXMIuBzEGCy0fmVlxYvbc5HEfNJgHccDaYu3EN0
-	 EvoEjJ+yVWeRgqz2J6B1GgLG0ZriVML6RLYDp8jtHxE3FRdVziIMEb4OW6LoC9vhb5w==
+	t=1795168262;
+	b=RnfLNhaPBM7AkTJGyOMfxiFPdLYv5JeggZOxO+SaQbbBG8OQ8YF6PoRYBM7I3jiScPpA
+	 v62MSdEJSemPcXBWB7b8FaCXdFFNZVWm3FRbz2kcozHPTRrRp5X0eYEcVpc/ZlZ5gMBmB
+	 z+wp9pUavx5lMmVXEKdEpKYhHaF7A/9oSjI9RNMgASsyhjgH18NG8Jvm8OPK2FW8O6Ssa
+	 ULhKdLE6kKmR+a/RevEhnNXbU93jzBI9bRwqvK0D0LZAotA1f00u3u1KG9ruo3hMCioHV
+	 Tfk5To/kbVLYHIUzXPfoG19Q2wzw2G114eOiDfGB1fUJsOwUukCucVTXjjnbUEQ2UrQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795168219;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795168262;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=F8y3ngxftG0ENPhoLrdIy/L2Ib00nYENk3A0Xinf4Y8=;
-	b=Gxqcc+zTxTZ4FjOlsDFQhlCQxdIR+eee182H2F8T2i8woLh8ZkTQWjCYTS1RnQlIQWSl
-	 MtB8iY6YmtJerrw10Ju3AhxhGjiGDTGB1W+EvYcQymWX3Vqu/ngwZ8tWCjqjWTalK/1nT
-	 in3R0WHqdkVgIc8+7ia8IcIi8I4bxsPY5KvI9QZn91L9PvxqxX2SNUmzjXdI8K6M7LEK4
-	 ufq9k8c/4m2QTzuaj0XApwY1hOgUCkvJGZS6TIdZIpzEMsKUFHuIEcof4yAAFzG7+H1Ix
-	 pGhv+sKGP8H5rgDc9asXhYpS9i1dLkMVjbEJohDHooq3ESNjMMlNbImYrdsUMguKk4A==
+	bh=kw4MOGGN2fTnqLv0+xMKyAPUpCIl+a10zWs3ZqFeU9w=;
+	b=iuzUlMC+nb1V8SGDTOg4k3Z1BwAlLOFr1LMhUy7F6acpTGk64+FJTuhJDf4gaJ33eaq/
+	 5/bn5qYXUXXbA0EVFjBFnz4sGg6RYHuxtcbnsiRx0bMrKpSI3qEKp96nCjX2R4iHOUGRt
+	 iDsexrEEXlobBaI05RxZalqGZvn4+Hy9Uto8uXETXgDiqhtjOI+6kHqIJmhSwrdRQhCio
+	 aqgcF+N8/D/nXXJx2oMFveveWIG67zxE5/JGwiBfz7vQKu7ciEZ/+jGibkreAHAvDviJl
+	 4YVvh5IbP7AIaCJxFQPvS0x6Y4iDpQiDxoUXsXwaumVYZOFQv5K7qYWaDZ9neqoLb1A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b="SXQ/CEAk";
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=FfA1GaUs;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D0B606A325;
-	Fri, 20 Nov 2026 09:50:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 41D0B606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18BB606A320;
+	Fri, 20 Nov 2026 09:51:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D18BB606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=SXQ/CEAk
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=FfA1GaUs
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=F8y3ngxftG0ENPhoLrdIy/L2Ib00nYENk3A0Xinf4Y8=; 
-	b=SXQ/CEAkEl4P6uDfTOq0HyKwpyL6AD4/eU5WMfxxtOWIvNdlkDTETKXyvFUADi2/hbAbOVQ6fzW
-	9W8jUDDDZ5PPfNRTmCGsvk3+Dkj4Z5eB1s9MVrDcIdQPaMj8ajBVomlee2zujyxQ9FDAKB62y2qHK
-	Bhe35QFgOXPigP6wDgCz/8TwOyrQv+34h+PgoW+5yPkmNyDIW1zG6IFbUKQaBEt/0oy9zm+5z14ou
-	wWQskJeK+WvItIUql5WR6YO2Sids11jh1G4Z3UBgOnSoEwgrZsJ56pFz80YFPLEWVcuej/A2Lv9R7
-	iPHYLJrEbOLRAW0QtpsdIWoXCt/9e9SxZtOw==;
+	from:content-type:reply-to; bh=kw4MOGGN2fTnqLv0+xMKyAPUpCIl+a10zWs3ZqFeU9w=; 
+	b=FfA1GaUsfGWKYGO3uW7mRiS9xgjl1K3n5FPRfkyLRG5O/JEsUopAEyMK9dMfC4wP9ldXOs3wpId
+	d3b0Pi7ozbsiftZK08R2AEpLBcAI4ntDGTLkmSfM9EIZxalLGh7wJ7u15HeH861qmOVBtbaXR/23V
+	++2r0ULUMlg8s2EE11BfIPu4utI89cKa5IfINYeHKP1GPbCw3y1dhVyTwj4QYlyMaToF96S4+kPdT
+	gdwQYCbrjK2b4ZLa5Qu9IbJbnn0XWdZy7xjLsV4Ld4V7f6s/Oj5Do8e7q4EaVJ3miNOr5C7lglXAF
+	3HkXQLkljdcMtQjKhgfdtJSxzxe91VerhnPA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xULG0-0000000HYYw-1Bsn;
-	Fri, 20 Nov 2026 17:50:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:50:12 +0800
-Date: Fri, 20 Nov 2026 17:50:12 +0800
+	id 1xULGj-0000000HYZu-3UHb;
+	Fri, 20 Nov 2026 17:50:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:50:57 +0800
+Date: Fri, 20 Nov 2026 17:50:57 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: aiyengar1990@gmail.com
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Chen-Yu Tsai <wens@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+To: Gu Bin <gubin@cmss.chinamobile.com>
+Cc: andrew@codeconstruct.com.au, avifishman70@gmail.com,
+	tmaimon77@gmail.com, tali.perry1@gmail.com, venture@google.com,
+	yuenn@google.com, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: sun8i-ce - Add AES-XTS for the H616
-Message-ID: <awAX1GM9UHkGkgPk@gondor.apana.org.au>
-References: <20261110-sun8i-ce-h616-xts-v2-1-0b99efabc1d8@gmail.com>
+Subject: Re: [PATCH] hwrng: npcm - use pm_runtime_resume_and_get() in
+ npcm_rng_read()
+Message-ID: <awAYAa1OY4_kk_Bg@gondor.apana.org.au>
+References: <20261111073309.1659-1-gubin@cmss.chinamobile.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -71,87 +69,31 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261110-sun8i-ce-h616-xts-v2-1-0b99efabc1d8@gmail.com>
+In-Reply-To: <20261111073309.1659-1-gubin@cmss.chinamobile.com>
 
-On Tue, Nov 10, 2026 at 06:25:05AM +0000, Arun Iyengar via B4 Relay wrote:
-> From: Arun Iyengar <aiyengar1990@gmail.com>
+On Wed, Nov 11, 2026 at 03:33:08PM +0800, Gu Bin wrote:
+> npcm_rng_read() calls pm_runtime_get_sync() without checking the return
+> value and then polls and reads the RNG registers: when resuming the
+> device fails (negative return), the loop reads a device that never
+> resumed and the failure is lost - the function returns the (zero) byte
+> count instead of an error.
 > 
-> The H616 crypto engine has a separate RAES unit (algorithm type 0x30)
-> that does AES-ECB, AES-CBC and AES-XTS. Its XTS mode (symmetric mode
-> 0b1001) takes the two keys back to back at the key address, the tweak
-> at the IV address, and an xts_first/xts_last pair of flags that mark the
-> first and the last block of a data unit. The key size field gives the
-> size of one of the two keys: 128 or 256 bits, there is no 192-bit XTS.
+> Use pm_runtime_resume_and_get() instead and bail out on the error: the
+> helper reports the resume failure and drops the usage counter reference
+> it took, which a failed pm_runtime_get_sync() leaves behind (the usage
+> counter is incremented before the resume attempt, so returning
+> directly after a failed get_sync() would leak the reference and the
+> device could never autosuspend again). The tail
+> pm_runtime_put_sync_autosuspend() must not be used for this bailout:
+> the device never resumed, so balancing the counter is all that is
+> needed. On success the helper returns 0, which is exactly what the
+> read counter expects at that point.
 > 
-> Register xts(aes) for the H616: each request is one data unit, so both
-> flags are set and the request IV is the tweak of its first block. XTS
-> returns no IV, so the CBC write-back of the last block is skipped.
-> Ciphertext stealing (lengths that are not a multiple of the block size)
-> and two 192-bit keys go to the fallback, as do the requests that the
-> existing checks already send there.
-> 
-> The engine is much slower at XTS than the CPU's ARMv8 AES instructions:
-> 4 times slower for 64 KiB requests (213 against 861 MB/s), 8 times for
-> 4 KiB and 17 times for 512 bytes. Register it below every CPU
-> implementation of xts(aes) (priority 90), so that the CPU stays the
-> default, for dm-crypt too, and the engine is only used when it is
-> asked for by driver name.
-> 
-> The other variants get CE_ID_NOTSUPP for the new mode, so nothing
-> changes for them.
-> 
-> Signed-off-by: Arun Iyengar <aiyengar1990@gmail.com>
+> Fixes: c98429297d8b ("hwrng: npcm - add NPCM RNG driver")
+> Signed-off-by: Gu Bin <gubin@cmss.chinamobile.com>
 > ---
-> The H616 crypto engine can do AES-XTS in its separate RAES unit. This
-> patch registers xts(aes) for the H616, below the CPU implementations
-> because the engine is slower than the ARMv8 Crypto Extensions; it stays
-> available by driver name (xts-aes-sun8i-ce) for users who want to
-> offload the CPU.
-> 
-> Testing on an Orange Pi Zero2 (H616), v7.3-based kernel with this
-> patch (sun8i-ce is unchanged between v7.3 and cryptodev-2.6):
-> - the boot-time self-test of xts-aes-sun8i-ce passes, and the testmgr
->   vectors run on the engine (debugfs request counters);
-> - 21 known-answer vectors (IEEE 1619 and generated, including
->   ciphertext stealing lengths, which go to the fallback) pass, and 3000
->   random requests (10% with misaligned buffers) give the same result as
->   xts-aes-ce;
-> - dm-crypt with capi:xts-aes-sun8i-ce-plain64, 512 and 4096-byte
->   sectors: 48 MiB written and read back with matching sha256, and the
->   raw sectors decrypt with xts-aes-ce; with this priority, xts(aes)
->   and plain aes-xts-plain64 resolve to the CPU's xts-aes-ce;
-> - the existing ECB/CBC ciphers, hashes and the TRNG still match their
->   software implementations.
-> Throughput, engine against xts-aes-ce: 20/352 MB/s for 512-byte
-> requests, 98/759 MB/s for 4 KiB, 213/861 MB/s for 64 KiB.
-> 
-> This patch was developed with Claude (Anthropic) as a
-> coding assistant: it investigated the problem, wrote the code and
-> the commit messages. I reviewed it, and it was tested on an
-> Orange Pi Zero2 (H616) as described above.
-> ---
-> Changes in v2:
-> - Select CRYPTO_XTS: the xts(aes) transform allocates an xts(aes)
->   fallback in sun8i_ce_cipher_init(), which fails without it (found by
->   the Sashiko AI review).
-> - Link to v1: https://patch.msgid.link/20261110-sun8i-ce-h616-xts-v1-1-2fff3eb0807a@gmail.com
-> 
-> To: Corentin Labbe <clabbe.montjoie@gmail.com>
-> To: Herbert Xu <herbert@gondor.apana.org.au>
-> To: "David S. Miller" <davem@davemloft.net>
-> To: Chen-Yu Tsai <wens@kernel.org>
-> To: Jernej Skrabec <jernej.skrabec@gmail.com>
-> To: Samuel Holland <samuel@sholland.org>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-sunxi@lists.linux.dev
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  drivers/crypto/allwinner/Kconfig                   |   1 +
->  .../crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c    | 102 +++++++++++++++++----
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c  |  44 +++++++--
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h       |  21 ++++-
->  4 files changed, 142 insertions(+), 26 deletions(-)
+>  drivers/char/hw_random/npcm-rng.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
