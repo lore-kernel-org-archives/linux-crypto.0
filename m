@@ -1,62 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795168351;
-	b=iH7Nh5RFa4T6BuxPYXxs/0mIBbiP44DAXJZ3iiDRuWhnob5zbMUNFxtF8hVqVvCCxO41
-	 /pJ/Pp2FzCCvHC7DCFJyuNQRK4D66TFxX3a7VWxTZWjeu/02N0Ncb2ogQcZ2/WGDTpXwV
-	 beTDIG753377bomvXIHxNcOGMp7pdb1UY6LNOl8SXQ17Sd8ENs7zmxauCepAC2QX62Pxx
-	 +KlCpWFag4e0CQ8fw6R9nvfUbilOZfRJyecPArtozRXm617QJPvoKPH8sxalYvVAWErKB
-	 sGwBiCPB49SejYhrKMTdFn1rU5iq8VgRy8ZNIDO/kciX+5nJyJ2IbAOlCcaI7IZwahw==
+	t=1795168367;
+	b=rNs2biX7prh6EBnb6yGRXzbr/zeAdbHT1IPhpOx/mrlJP+Ha99EWrYZmw8fNb5KJUuEF
+	 XoAske3J1x3tXwtnwFvW1e+HXUVWyWzfzqsvp0J8HBLhGMNU9OFkXq7Ujy18WFM0b+jTb
+	 MXZydtdMGdyjvIoxRVgCcgizo88p82MO2zZkcEiDw0yq3Idb9uoeIsekcaAOGeZkjajm2
+	 aYUxzXrWS9+gdiWSTac4FpW4e0oxBJU+b06zqzwlU3ibdOHA6KVYpGjG0uiYVT6kvDVt/
+	 NRovFbovBswjuHCvAubi8kftWpvaQgqSG46iL0gkrVNLKqcWHlOQxEwsBMe1rlMNZnA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795168351;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795168367;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=2XWww8i4ymISC1dR/irtFbeO8Vev90H8R+uxG9/wG2k=;
-	b=HSYsKMRUyy5KaY5b768EoLbfRm0PEkyIemhSZhSmDUwq16ahe4gx7s93HD1zn6NxNSuJ
-	 yAWKVYUd2aOFXimqcPP3FaY6B3hLC/2JgsJW/wfFIDringX3qhPnhhBk5lJPkXBpKpBak
-	 jGsq6HZ0Y233VeLXksLl3cCqi5XYtPILrbcw3JhxJt00r5xu+BgAzaDD/FExwmBB6eQxM
-	 zvTkcHLAZWOqSfhy3mpt3/tJRUXwnZeW0X2PGH0CrI5HulQm42SVG0TBX94w0HyX1PAEt
-	 +uV5JI0Ogst+KpuymEJwSp8XBAzACDU8xcBy37O7dQewi/9FS+Zs6wcPGTHAopkxTUg==
+	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
+	bh=aWI42pcN1z/Hd5o40uFRHKZPgvOeoK3APx1Ezx3rCNQ=;
+	b=Ng8hAI5X1yn64v+B6bJ4X4LTfy2nxUnMM/BbRgVUAHkypViT481PSwYGpmre9fpPt5ts
+	 Ci4gzq2K0CB0S+Jygk3LL7m/b9RLb6nfaO28ZFQje+TZ8WHmjwLz4UaEt6YeFZW102VpG
+	 q3sOrIUwILl9d5Ey+W18ynNTOjxBmX3sXROHJ/3DvuJX0sTuRv8XityUqRgEAKgC4AB5X
+	 +xtVanyohCq2v2CPcLaVWzQYHCg621Kr6Vom1/eGJp6myD7qdcv/XhZlbdnHRczZrmTNm
+	 LXtk1QB9uwtex2BbdbevEd/SWxYovZuve4JXaKrRINJsZ5oEKQm3gYd57PeiPBlhHDQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=T4TY0WPt;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=ZjGjgkEj;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290B1606A325;
-	Fri, 20 Nov 2026 09:52:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 290B1606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB7F606A320;
+	Fri, 20 Nov 2026 09:52:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5BB7F606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=T4TY0WPt
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=ZjGjgkEj
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=2XWww8i4ymISC1dR/irtFbeO8Vev90H8R+uxG9/wG2k=; 
-	b=T4TY0WPtyqcudFLfBy/tVZPc+e4NbKHk5MLaW/dULOkJiTaXgI3JZm0a02mKdAcjozAmaXl0Ral
-	1MIPyEpGOH4uSUevEgX697iQavmz16D/vPQPwcQ+QOlWdeOBB8CWItFcUQs8cpuu4w096DzLV/con
-	Lj94bCViZnGH7agF0ypfvUS/WwyXoiROo8ErUB/3Zmfw6YXmdceSHWZ2A4GzlaucombFTLTFmV7BM
-	sFScdpAfXzPf0jnHWCTusSwzzjOXGdO6SWivOr2CGah+2otF/xWUjPfmU5c73ib50iswrOzb00ykR
-	Jmm5YCA8/SNwriGzoGFteoHCaGifQByVlWJw==;
+	from:content-type:reply-to; bh=aWI42pcN1z/Hd5o40uFRHKZPgvOeoK3APx1Ezx3rCNQ=; 
+	b=ZjGjgkEjaAwURjO2ORIJHmEgyNAtDuXhDLBELVNjmH7N6D7EFTOozczmz5YZyc46EL2RCSmbNCI
+	9HJjmo1qMXeFT+zg/2YFQmIq0I4aj3HhMZEk7+bOMIlv+9YCeiSss5xVFuVoeP9e6/fFt/MyA/f/P
+	qqOGJRknuAgA5fO1qHpr/njyf6hXDb/jybHhSf1QPtDg1ybg+8CohyrDJp0RWUVUzh7Nu/FVqarsV
+	pOE+y4leDJL5OrQnTmuftdexzmyGOjqGhZOx4axT8pptHMaL7EbQtfg26BUJpnMCku7oIQF7GCCmh
+	mBmaxHUzXjH8vNg0V+GTnrBN/ZGHuQ5kaj1w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xULI6-0000000HYdi-0Yk6;
-	Fri, 20 Nov 2026 17:52:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:52:22 +0800
-Date: Fri, 20 Nov 2026 17:52:22 +0800
+	id 1xULIK-0000000HYdr-2Vgn;
+	Fri, 20 Nov 2026 17:52:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:52:36 +0800
+Date: Fri, 20 Nov 2026 17:52:36 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Gu Bin <gubin@cmss.chinamobile.com>
-Cc: sean.wang@mediatek.com, olivia@selenic.com, matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] hwrng: mtk - runtime PM fixes
-Message-ID: <awAYVvHMjqZGZCn8@gondor.apana.org.au>
-References: <20261111073237.1647-1-gubin@cmss.chinamobile.com>
- <20261111090704.1699-1-gubin@cmss.chinamobile.com>
+To: Usama Arif <usama.arif@linux.dev>
+Cc: davem@davemloft.net, terrelln@fb.com, dsterba@suse.com,
+	hannes@cmpxchg.org, yosry@kernel.org, nphamcs@gmail.com,
+	chengming.zhou@linux.dev, Andrew Morton <akpm@linux-foundation.org>,
+	linux-crypto@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, riel@surriel.com,
+	shakeel.butt@linux.dev, kernel-team@meta.com
+Subject: Re: [PATCH 0/2] crypto: use vmalloc() for large stream workspaces
+Message-ID: <awAYZHFnq2NBTDdA@gondor.apana.org.au>
+References: <20261111153532.1036709-1-usama.arif@linux.dev>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -66,29 +68,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261111090704.1699-1-gubin@cmss.chinamobile.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261111153532.1036709-1-usama.arif@linux.dev>
 
-On Wed, Nov 11, 2026 at 05:06:57PM +0800, Gu Bin wrote:
-> The sashiko review of v1 pointed out a pre-existing ordering problem:
-> mtk_rng_probe() registers the RNG before enabling runtime PM, so
-> mtk_rng_read() can run while runtime PM is disabled - both in the
-> probe window (hwrng_register() starts the fillfn kthread right away)
-> and on unbind (the devres teardown disables runtime PM before the RNG
-> is unregistered). Patch 2 moves the drvdata assignment and the
-> runtime PM setup above the registration, which closes both windows.
-> Patch 1 is unchanged.
+On Wed, Nov 11, 2026 at 07:07:38AM -0800, Usama Arif wrote:
+> The zstd and deflate acomp implementations retain per-CPU stream
+> workspaces until the algorithms are unregistered. On x86-64 with 4 KiB
+> pages, kvmalloc() can back them with order-9 and order-6 kmalloc()
+> blocks, respectively.
 > 
-> Gu Bin (2):
->   hwrng: mtk - use pm_runtime_resume_and_get() in mtk_rng_read()
->   hwrng: mtk - enable runtime PM before registering the RNG
+> Use vmalloc() and vfree() instead. For a server with 384 CPUs, if
+> we have streams on all of the CPUs and kvmalloc() takes the
+> kmalloc() path for every stream, their workspaces use 193.5 MiB more
+> for zstd and 42 MiB for deflate.
 > 
->  drivers/char/hw_random/mtk-rng.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
+> In five before/after boot pairs on a 96-vCPU x86-64 VM with 8 GiB RAM,
+> the test populated both algorithms crypto workspaces on every CPU. All
+> 192 baseline workspaces used kmalloc() without these patches. The patches
+> reduced workspace backing by 48.375 MiB for zstd and 10.5 MiB for deflate
+> —58.875 MiB combined—in each pair.
+> 
+> In five before/after runs in a 4-vCPU x86-64 VM, median compression
+> and decompression throughput changed by less than 1% (-0.93% to +0.64%).
+> Inputs were 4 KiB and 64 KiB synthetic buffers containing pseudorandom
+> data or a 50/50 mix of repeating-pattern and pseudorandom bytes.
+> The differences were within the observed run-to-run variation.
+>  
+> Usama Arif (2):
+>   crypto: zstd - use vmalloc() for stream workspaces
+>   crypto: deflate - use vmalloc() for stream workspaces
+> 
+>  crypto/deflate.c | 5 +++--
+>  crypto/zstd.c    | 4 ++--
+>  2 files changed, 5 insertions(+), 4 deletions(-)
 > 
 > -- 
-> 2.55.0.windows.3
+> 2.53.0-Meta
 
 All applied.  Thanks.
 -- 
