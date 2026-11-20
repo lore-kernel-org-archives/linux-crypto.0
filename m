@@ -1,61 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795166093;
-	b=4ktl6vXp/Dx1OMyqAACJZh46ZfwoDrcsTuy5T/IPPfjF6Q0jn94rW3hIuULoxw0h6XFk
-	 dxmG8z3v3nSQsBQNiWu4DpOlKgdMBuAKyRPWUMPXiy8rugGh43IgJT/1zi2Ffd9uxzzvd
-	 RwI6xRvD+368gedjw9Dr5UPvB6lGxAcWX5WrRWKfd70yLjgrYmVT5+CDWOVo+hf0DlEOy
-	 hwWza3g0WuFSFm0rzLczgDvqxDbFXKQZs/NYd2Qtx6k1kQ8yn9Ma0NVkzh+PMaHy15Wvz
-	 kUfxLs2M/nDmSMEP22GhU+xWeuMn6a3i4e8ZxmX6rD4H8XfX+5trXc2zC6AbuVFrE0w==
+	t=1795166992;
+	b=iXEokAc9bMVImL111o5NJif2hqDSmlXQ9/s28JJn7crY3Y2SOItCDG3Bxdo340pMlC/K
+	 QHqKFnCvknIMxbxELVfAPnV9LDkLzF2y4ugHwNjNyBjJ97fNZdQ30D/Z3y7g1cQ4V4mp0
+	 MLmmh+A6lwzavv5XvgkM1miW7Ri3NAYVM4vPYJI6gG8itZ+BHFtn/PG0TumQ+vOs6707D
+	 ooOI8gmdsL32oA9LBS2+ougkURC4+j3iVh2lDwgCataF0UgTzq6wqwHXqV6bIs0ma+mxC
+	 DtL6XwgvKdSUBp/PLw4EKfKK78S+NYph1kDZTIsgwX8odngqkbE4KXRH6ueloVbyQjw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795166093;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795166992;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=nlOZ4k4jiEeYMcrixrMUvGbyScUaQsUnjCuRsm6rEbU=;
-	b=5AIvE8XiW3aM57rGCX6zaTzjTzx8/y15F5z0AHKxyiMfZmc/0cCRbCE9X5ja7sb2/L0J
-	 LlO9JR98JU5uZ1RfmFlvOYGvJbEgV1EE1C67UwH2D6HdVio1yFwrxoBGmIaFP84WQ3AMd
-	 CCvn6tmiQB+nDIr2NnMlOQfEy+IYrrAiXeDsHJla60JrXd6diwaEfbPTMY3i9zBKVNIvS
-	 k0ixubGIPq1ch4EscXlp9bthbL6L9N/Lt3v1vxNzF3jSe2HilZBdWwuuatPg2t+Bjpce+
-	 z7Yo5wqCZ0AbTqA4lb/dWP1iqFkwyEGJx1HzyR/NV5UbC443p38nrFb6S2ZaryQIG5w==
+	bh=OneOAIqipo41bSZQOI9fI6qsJAqBEiRyetb1aN1SI40=;
+	b=up0zoSvfQlaphYX4uCf+eOL6lVhyDI9xQzBiEXAQ6g3lTf4ZRKHy5hr4lngXWpt+hG7T
+	 9OUPaB3crqEWOp+X8jdh3hBw5gwYGW5W/GN7dQ+ak4o4u4V5ZqNjH1qnOWwp5lfA6s2Hv
+	 7RxDdOaK+pn/8Xee3Cql3bNh1y4WTWG9AiHOFe5ttb1JLytZ/qn6Ck/GIzlwIydtd+dZD
+	 c3PCXJAlsj/+kUxQFKVrHlQPGrWQxw8bb5/3EFgqkykCkwbGywtNjtzd/Jl2mCdR+HMV7
+	 D5xxJawHQeJxOqa/YtOI4yWBsNnb4eE6SeT9k08JpQoOIkssWwhQGAygD8p3OaYHm5g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=ABG0hpLd;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=Hl6MbtI1;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9906606A320;
-	Fri, 20 Nov 2026 09:14:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A9906606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF7F606A326;
+	Fri, 20 Nov 2026 09:29:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DDF7F606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=ABG0hpLd
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=Hl6MbtI1
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=nlOZ4k4jiEeYMcrixrMUvGbyScUaQsUnjCuRsm6rEbU=; 
-	b=ABG0hpLd7nzq/bFlWOiIfZqPjpaaWWiXOTa/R2vAco9LWCUdjSCeA3Q07cLJs2FqPvDqnylwXm3
-	DoLYQ5qiur52x0OvZLTsZ+aD3nv0EWhSvberQkEZ5BPhWXcuHkhjqwCc0neyhqMcYlLGONAQis3mi
-	CY1T0lLYAsxzFtE8goDWlXnFojZCf7CZqAd/pmyh9T+HlN+ywH7nSWDrw8YnxjgF4eurkGFe9Nb5c
-	PhktsApS+dLCIYcOvT7ulp9UQHLivU36bY807Oifkdkm3RaeHQ4ufPmukusJJixPFWmwuRagzTuP1
-	UsFWsPBuSdHg4/2wjwb/4NjIiPDNAEaaIeDQ==;
+	from:content-type:reply-to; bh=OneOAIqipo41bSZQOI9fI6qsJAqBEiRyetb1aN1SI40=; 
+	b=Hl6MbtI1Rf6SLjejsPOKjAXvmMujLeuUubPVFLgiD+sfJtyh8V+ZaG8hts3dnRWO9sLK2PHn6W0
+	UW6DH43ksunxdDCH4RmVTuXvJQdQMkbmngMEzR0AQSjPtAcccUfvEjG5Y2ZA4RRsYpjC2pEbBBlsz
+	HtuLbOIeh74vPT3geb3oPwx5bxsxNxAmq7na3kUmCvMwfwk1Lgr2eulVo5UDe4YcB3R0itn3mnk1U
+	quAqvxfng0SxWp2K+P5gtEFBcI2LYZMYgYSJzxh4lCbW5bYJXK0YaIY+zwVGZrDKmEnwmSqOO7I3D
+	5pQEaYecJX23JNuvYPDGDrqG8m8c+K9qapmA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xUKhb-0000000HXnf-1emh;
-	Fri, 20 Nov 2026 17:14:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:14:39 +0800
-Date: Fri, 20 Nov 2026 17:14:39 +0800
+	id 1xUKw2-0000000HY28-2KbD;
+	Fri, 20 Nov 2026 17:29:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Nov 2026 17:29:34 +0800
+Date: Fri, 20 Nov 2026 17:29:34 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: efecanicoz@gmail.com
-Cc: lukas@wunner.de, ignat@linux.win, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Efe Can Icoz <efe.canicoz@atlascopco.com>
-Subject: Re: [PATCH] crypto: rsassa-pkcs1 - Allocate the RSA buffer separately
-Message-ID: <awAPfzBPyJ-gdVSw@gondor.apana.org.au>
-References: <20261111113022.2033191-1-efecanicoz@gmail.com>
+To: Changwei Zou <changwei.zou@canonical.com>
+Cc: sahil.malhotra@nxp.com, davem@davemloft.net, horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+	jeffbarnes@linux.microsoft.com, stephane.debusne@cynove.com,
+	iuliana.prodan@nxp.com, martin.kepplinger-novakovic@ginzinger.com,
+	lukas@wunner.de, sahil.malhotra@oss.nxp.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 0/2] crypto: caam - Fix RSA error-path unmap and
+ unaligned dst buffers
+Message-ID: <awAS_kKAVkL2uWKT@gondor.apana.org.au>
+References: <20261114060032.872141-1-changwei.zou@canonical.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,64 +71,29 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261111113022.2033191-1-efecanicoz@gmail.com>
+In-Reply-To: <20261114060032.872141-1-changwei.zou@canonical.com>
 
-On Wed, Nov 11, 2026 at 12:30:22PM +0100, efecanicoz@gmail.com wrote:
-> From: Efe Can Icoz <efe.canicoz@atlascopco.com>
+On Sat, Nov 14, 2026 at 05:00:30PM +1100, Changwei Zou wrote:
+> This series fixes two issues in the rsa-caam driver.
 > 
-> rsassa_pkcs1_verify() allocates the akcipher request, its private
-> context, and the RSA input/output buffer in a single allocation.
-> The buffer starts immediately after the request context, whose size
-> is not necessarily a multiple of ARCH_DMA_MINALIGN.
+> Patch 1 fixes wrong unmap operations where rsa_pub_unmap() was called
+> regardless of the key type.
 > 
-> Although kmalloc() aligns the allocation itself, this does not
-> guarantee suitable alignment of the interior buffer. On systems with
-> non-coherent DMA, the buffer can therefore share cache lines with
-> CPU-accessed request state. Updates to that state after DMA mapping
-> can interfere with the device-written result during cache maintenance.
+> Patch 2 adds a bounce buffer to handle unaligned RSA destination
+> buffers on DMA-incoherent hardware such as i.MX8, fixing intermittent
+> -EKEYREJECTED errors when loading signed kernel modules.
 > 
-> This is reproducible on i.MX7D with rsa-caam, whose request context is
-> 48 bytes while the kernel DMA alignment is 64 bytes. CAAM reports
-> successful completion, but the recovered output retains the original
-> signature prefix and PKCS#1 verification fails. This prevents the
-> shipped X.509 certificates and regulatory database signature from
-> being verified.
-> 
-> Allocate the RSA buffer separately with kmemdup() so that it benefits
-> from kmalloc's DMA alignment guarantees and does not share cache lines
-> with the request context. Keep a separate pointer to the allocation
-> base for sensitive cleanup, since verification may advance out_buf
-> past the leading zero byte.
-> 
-> Fixes: 1e562deacecc ("crypto: rsassa-pkcs1 - Migrate to sig_alg backend")
-> Signed-off-by: Efe Can Icoz <efe.canicoz@atlascopco.com>
-> ---
-> Tested on a custom board with i.MX7D and i.MX8QXP, running Linux
-> 6.18.37 with:
-> 
->      CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API=y
->      CONFIG_CFG80211_REQUIRE_SIGNED_REGDB=y
->      CONFIG_CFG80211_USE_KERNEL_REGDB_KEYS=y
-> 
-> During diagnosis, the selected signature driver was
-> pkcs1(rsa-caam,sha256), with a 256-byte RSA buffer and a 48-byte
-> child request context.
-> 
-> Before the change, hardware completion returned success, but
-> verification rejected the recovered output because it lacked the
-> expected leading zero byte. Its prefix matched the input signature.
-> 
-> After the change, the sforshee and wens certificates load successfully
-> and regulatory database signature verification succeeds.
-> 
-> The cache-line interference described above is supported by the
-> allocation layout and the runtime comparison; the exact corruption
-> sequence has not been directly traced.
-> 
->  crypto/rsassa-pkcs1.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+> Changes in v6:
+> - Patch 1: Factor the priv_form switch into rsa_priv_unmap(), shared by
+>   rsa_priv_f_done() and rsa_pdb_unmap(), removing the duplicated switch.
+> - Patch 2: Hoist req_ctx to function scope in set_rsa_priv_f{1,2,3}_pdb(),
+>   removing the duplicate block-local declarations in the src/dst branches.
 
-This issue is being addressed with patches to caam.
+Your series didn't apply for Sashiko:
+
+https://sashiko.dev/#/patchset/20261114060032.872141-1-changwei.zou%40canonical.com
+
+Please rebase and resubmit.
 
 Thanks,
 -- 
