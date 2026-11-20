@@ -1,93 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.125.188.123
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795178267;
-	b=yLpF9Mvs/UzlpWV8Jsmw63+Gk+NrtEty/qB/NfEtiLDRWqQ0I2Gdwgz7GbD1EWEpdeWk
-	 idACIHur2HARIGgsu43CLwmeotmrDraodzmDNJ+vcxMVC6hfo8rUSrrtE5lVrj1SlYrf/
-	 XFE+I9ISVU7JwM3pCFVbco+BESSc3i3LVYdRIHxZlTIyujVXWXHGfg71u5x9r3+uikWGc
-	 UEClLgPyintytG+oQROKLjm+8DyIN7642ugF9bQYi18bgWP74TGhHeDE+UpcMHJIwYyPO
-	 OkslhvPc5r/ekU24v8U9MZw3FZr7+yOaz7uX3BeRPlfi2elEJ+jSO4DpG1zbE57tW1g==
+	t=1795178272;
+	b=DOyM7Nb7XNyJJxPgBLjJIhH9xPhuUjq9m0dpgrT6VE7z58u1z5hlKWhQrBrS62Gnb353
+	 34muhfuXGF92ZlhyTlFa96pmcNVMHjDBfDmlJm3oAQAn5cJVUXhsc7uPTL1cZ6S3g+jUH
+	 6+EwBsVjx2Fh5zZUh5Pfv9q3EdDs8H95XbhsjSZse4G81wGI2p0NJNhhm44+35EArTuGd
+	 plQVBBc4d/+nebg7teD39QhqhB4U0ZnTRG2DbKbQzJ9VCInptnCe6slHw7PEyltvN6ybb
+	 zaTTKqTnoIcxJHZv21+lfw4mp7qij238yjPnAZYRNjVHNuvVgdqi3gIZR0flshTckeA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795178267;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795178272;
 	h=DMARC-Filter:Received:DKIM-Signature:Received:
 	 X-Google-DKIM-Signature:X-Forwarded-Encrypted:X-Gm-Message-State:
 	 X-Gm-Gg:X-Received:X-Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=YIwDvTsoMbycD6a5DXs0DiVLhqVOlC/XPJ2Lhc+16Ao=;
-	b=Xh5eBqgbjxDW4QvabGypa3L6SnnDnrR0eZIXuFxC/nFcwk7jI/2p3vKtzFx3+AwvifSa
-	 bMcI47cb0wBghz4xlMvZ9qVzNj+DSdQMMifvHVRUlPKcV+ltudOU9NaOSx0RvQXYsLSXE
-	 EdRAuTag/8GHdnDzcXbIP4t3+xHjJrlY/WBrFEQ6sU3BXQuY27nmyMIhtrPGK0xBL8Jqc
-	 jjU8iX7OQQoIMNBZfUkNKap8j/lpb4I+8lav6nYuBIa5FL/LtSp6RsC+K3hUbjpE6rwMH
-	 TX+gobn+Dk/zIjhmexe/LCG/dMVOgTpo/eGEBXKu6imlBz+JoScKpJXOkXYwZsJT9KQ==
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=i9H1Qf5VeBDEAJ+KENGPjuJrwt4TmksckkFthv/+CKg=;
+	b=Ud3bqdtb7snqHlfg4mXZmN3oSwBtrEceTN/O0C4s4JMPwWsOiKgUb/xuWDVzzSaFxLCI
+	 K8nRWKn7awzifyARZjX3gxlgwZpchDsSaNWm0ZDH3a4c+khvRUu1oK6vqyarGxib7Yljl
+	 XGeOJBvxXCYP13hEAdzTk6IJMh71hWjXB0tZ1duqwRZkfa5Wpum37KPOcfejvSfH/Fb4i
+	 +LUQLkg9aa3EVze/6/axDfp38C6t6U3wMCBZiRx+9v2pcGKRqftpr2V/gpJYEkMTt6vud
+	 PSTZ5hQy4g7e/V2VaBFArv76nnDMvLz8BSzUWBtQfC3v/vLwWAXAn4ODUS/T4JF/4eA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=canonical.com;
 	spf=pass smtp.mailfrom=canonical.com;
-	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=LYk7PZ6Z;
-	arc=none smtp.remote-ip=185.125.188.122
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	dkim=pass header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b="mz/XdwZ1";
+	arc=none smtp.remote-ip=185.125.188.123
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94609606A325
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:37:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 94609606A325
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97149606A32A
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:37:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 97149606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=LYk7PZ6Z
-Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.a=rsa-sha256 header.s=20251003 header.b=mz/XdwZ1
+Received: from mail-dy1-f199.google.com (mail-dy1-f199.google.com [74.125.82.199])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 14F5D3F788
-	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:37:44 +0000 (UTC)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 386E53F920
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 12:37:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1795178264;
-	bh=YIwDvTsoMbycD6a5DXs0DiVLhqVOlC/XPJ2Lhc+16Ao=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=LYk7PZ6ZfZBtfkBHYiGZM6+tffhc1+P9HhGXwjLELzd4btilR7RH/14t815o93Duv
-	 vs9KMy99o7IXc+9OjCLukA0CDPrbEDxBWeoCKfhqCeSsPKrr3r1nZrhJ8aVZ5OC03l
-	 kDG3tNfWVSPZDOzpR8jg+qHXs6jNgWVEVfTSUc38XJO2er5usNSzt1kPb2x65ZZhdr
-	 CEBMhkV2zBBbLTPEyuKmcpK8UFoOiK+Vjrl/LRK+2I02EBzdJ4OkA69YbOwIbSwr7r
-	 cGHy2zO82VhBCFfenRhzbUdRWwkj5r/n0pRWqb7yvB8aPHjRpFZyPaEDMaqcKJadt9
-	 3nDo6F30gHXZ4wLAOTNjcSUJoIKJIXzBH/lIz2DsXUXSsp4Zl5YNNZUJnPIcjXA9zf
-	 wiCHi84CJoJ18HKN1Op2Z48jCvaFte3SOaWcSIeurioulYvSbsmEYEppGl2xUz7tbj
-	 oLgq2XQrrBLQnmoK3HPpIKoIZkjXa8HWKzB4rE51pzjBgPhvFm+et3QwX4SGb0wEjZ
-	 nIVHKO9iwUMoIa2kskrUEmp10Yn7pVoYv0PDGH+0iZYgIXLjjnmh7Fid/3vSuK5B9h
-	 ++LE83duR2ygjWW6CoDWs91j73CCa9DgJuvD7DmdOKWJ+eHUXRZnQqqoUr2ouwaM/H
-	 zpE71HoUEoRDpDDbqFUvd8RI=
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-386177b0516so1299176eec.1
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 04:37:44 -0800 (PST)
+	s=20251003; t=1795178270;
+	bh=i9H1Qf5VeBDEAJ+KENGPjuJrwt4TmksckkFthv/+CKg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=mz/XdwZ1rC7uARepzQ2g+LPWLKZStFbDS4ZueAhwH1ZXAZbhU24T/56g6k5Zz2g1/
+	 JBy54xpce1M40Abt4Oh5i2zs7IwI0QJRPCbab92Zeehi456uPbhhhlhUVXpNtXUReU
+	 BZJA7FNAP4nJR57ZdrtE4eJpQ2/oxYZ3pZVuyRD5MA9LjKZnHCvF1BRzw8FcV55hlu
+	 0OnNvbL6925W90t9EUXg27vdoEABG3ntRa4y+pzEBxKJX9JTtiTOYS+0YLGErJHXMq
+	 DxHJledVg1LTFvqB+I54RajtKFZdhKbL76gn0F9L/OJwDorw2KriDysYMHqPhwJahk
+	 WiKvUIKONSrA3jX4CoplPGRFPql3joL/g3JRk/BmKsHk7UvPrziWwgjUvxtoVIpAmS
+	 DjYeyXEHQGr0hY8+UE/1D1sS3PDcNNcnBf97JE7A2fbKsgPjxaDWOFnF8DocrUUbxV
+	 Hco+696pp4KIeXxaT31RUvuaGPIMkQGkenHrL4gahzCJG/smtYkma7AmbJqmij77JR
+	 wFoe6/GPp/XzMkVmP90RLWlsFhw+YjohVCFJYFQ5gkqrDESNZ/mGjgaWTZp9O9cTsy
+	 hk2iAvkHyyuB4/E5ReRBsl4dDv8Cepn0N8UbHmbqc4/HUEGm7Bs+KiYhr3CvoVDoJA
+	 1kwLu3hlOWDyD3QYS0bOGuqg=
+Received: by mail-dy1-f199.google.com with SMTP id 5a478bee46e88-30bcb065bfdso896168eec.0
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Nov 2026 04:37:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795178262; x=1795783062;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YIwDvTsoMbycD6a5DXs0DiVLhqVOlC/XPJ2Lhc+16Ao=;
-        b=AM73AceQwglHFeBOjGtV1idtt0AcdcVUsjXvjCXIGTOLrPw8FRpLSTbOHUzSCudXCn
-         8N9h1T6vsVmJ4K9imvHR8kBZgza1b+5pTLUS4NS2MkFgFDjHjwKhyExze1OaLvVokJwX
-         kOF16rZ8zV7ZaRL7/HHPzV+M3RRZaklVC2seMJ37psqi9Fd7IE0VXJFhvbreQdKJbR+D
-         95ANmN+Ze3fYD/i08KKc6i6hvPFcWCSxQZXE1RVsfWuZUZrwA6Wd3Z14/iyNB7Op3XV1
-         YVdwJ6RHk7BrqJva6U35c2jmMWHjRUQeYhuV9L5Ws+b5HrpX/STq3DXN7pyNw+agX+II
-         g5vQ==
-X-Forwarded-Encrypted: i=1; AL+hErHoBe0AyDEu6JehXQ8nUundgeypVFH+6c9xiWC1XxZjlHcvDJVnEhAJz4sSxct5gBwrlKJMpNRqQvoeDn4=@vger.kernel.org
-X-Gm-Message-State: APuU4Z/GmXC+mgjU4ZaDslB/4V3cicspKD5EIy798zBgKGuc+JCaFeV7
-	6MXPirbAo9K4a9Sfsd6Py0o+yQIlJY/lEt0wVHcpTgofQJGGLz9D3ZRL9OoalRQSmgz86Qysi0Q
-	phuE1PKcBCZO0KB2CtI3keGdL0+x1bopO/R+ruIAhtw8N0MqhtoJrFZxTciy8YRZI/o0TKaAXLH
-	xwV7+3Dw==
-X-Gm-Gg: AZFdTZe5JQ+4BhJiWGBFbH3yn2UzNHkOUbYtE/TraaH5O8KF87o76DecqMc1j0Ye9NI
-	MgmwIGLEZni9Ro7ORHKeoIIwyGqqQo/V213hhclhh0BOpE7RbG1AvxcWdOl7Z2GmE9Vm6spQaQi
-	dpDLHA5zgtSE9hqIeBmwa+bWuZ0L4FGTUbItSytkWFUQShMXWwZsikKmzo7jqsHuRq4x8fH+UJo
-	zs2uBb3zLOYc6q6Ks8SVpOQRx9j1QIiFyE+WyKlcQ8I31Q13Rkq3C20Dse4X36kSB9w14WS9T/x
-	oPzwuOCTNP8dTS0/D0D9X1OnFtrs+ivWZcZqvUwo9V+D3oDVlRFvcdkWaU/fts+POdla3aCmyfF
-	FkqMHwpVMX89KiftFieiKuIdZv8a0Nc4X4RFcxu8k7sdCSrlSc3wch7QJD0M=
-X-Received: by 2002:a05:693c:20ce:20b0:37a:a9db:6bd2 with SMTP id 5a478bee46e88-3856e63b064mr2798260eec.11.1795178262223;
-        Fri, 20 Nov 2026 04:37:42 -0800 (PST)
-X-Received: by 2002:a05:693c:20ce:20b0:37a:a9db:6bd2 with SMTP id 5a478bee46e88-3856e63b064mr2798232eec.11.1795178261794;
-        Fri, 20 Nov 2026 04:37:41 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795178268; x=1795783068;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=i9H1Qf5VeBDEAJ+KENGPjuJrwt4TmksckkFthv/+CKg=;
+        b=IN2u2f4Zn9VW5ZEeNGMAGnXwog0wMvD8T+4x65h/eQ6FGIyngNgwAhYiqjhigN9LVe
+         wV1M3Jr5h2d6tgAnj/suN8AR5drEjexYjaDc5eW4JycSyk0AFJmeb8hhgeN7z5DZ/zAu
+         /KdRXSmE0TImcXAk96dAj9z3pAySK+b6+ksxZWpbgNPnqs+M89yjFba6Oo/rmQmFtOUO
+         sYf5NjKnquUDH7+3nsiayrpTJV4Xeey92VW0byUIS1vhgSTQ2CRhmoBPYg/Co1M9hVT/
+         O8o743VSh7viYURBk7iHeYe3Mnm/ap0S/xtSyj0i+i0geB2bOPJ/6NB/a+BVEJoNxDtu
+         dCxg==
+X-Forwarded-Encrypted: i=1; AL+hErHMb/GHOfEH4sJZVLM6T4uVDUH1Cb8fNIUfzqovBoYd3SbYRKppR14Vk6WtFU9ls7k8yXDQ5cjVkrDVm6c=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/QXMXhg/l7MvSTm6CTZ5RrV6qTrrVPWP39ai99/a+RllCN3BPn
+	IfPQd4dgYsw3fmU70FIBVkj8WIIeMIU40mkdDPW0PRxWu9TnabsknxDVxBpH8/RA94iUbSlfxx+
+	zvxsVXm/a0wyCnLuSV111mQ6oT+J3xBQjLPmKYhArtxAWkWs3HRMpB0WsyQ9xs3zEtPD+aVpKN+
+	D48acohA==
+X-Gm-Gg: AZFdTZcgsM5fLtnOoR8AeeDl+ISwdIs/zRr4YmKHl9V/IhTOy5zUK62RTj2E0Lmz+8b
+	1WhCxcNz6p7A30ybK6EbD6rXR/fRinv4JExH5YG8WJ8h+wQYd9BxTy6lveOWV0q+fqIRW9N3arb
+	Sm8eKCGmJnHUoWdUqUBZs/B2SGffHskA0pHsL4yDX9Fu0QAejLEAymIey9g6Cisq1SyeT7xBrhz
+	3zWrharfhm5KJ5EXK7tcQxhMwQWfTMosQJy4+8PRngy21/mZBlP52IH0PqQmMkQOvIcBXIWChU/
+	02V/0n4NBenFwlszNpiHNpd8i6bO1kwT/jr5LLSiaN8Ys1TYArFROmz9LpSFrj6pxsHiH2vNecx
+	GXimXi1g7f+XzJ6GeAWX4jEmxTCgg6nzGZmnk/n62XPbkFDY9y37cggltfSA=
+X-Received: by 2002:a05:7301:6183:20b0:384:b2cb:5f76 with SMTP id 5a478bee46e88-3856fe5ebddmr2577983eec.23.1795178268530;
+        Fri, 20 Nov 2026 04:37:48 -0800 (PST)
+X-Received: by 2002:a05:7301:6183:20b0:384:b2cb:5f76 with SMTP id 5a478bee46e88-3856fe5ebddmr2577952eec.23.1795178268073;
+        Fri, 20 Nov 2026 04:37:48 -0800 (PST)
 Received: from ZBook.gateway ([123.208.39.53])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385677c371esm7994093eec.23.2026.11.20.04.37.35
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385677c371esm7994093eec.23.2026.11.20.04.37.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2026 04:37:41 -0800 (PST)
+        Fri, 20 Nov 2026 04:37:47 -0800 (PST)
 From: Changwei Zou <changwei.zou@canonical.com>
 To: herbert@gondor.apana.org.au,
 	sahil.malhotra@nxp.com
@@ -104,10 +106,12 @@ Cc: davem@davemloft.net,
 	changwei.zou@canonical.com,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v8 0/2] crypto: caam - Fix RSA error-path unmap and unaligned dst buffers
-Date: Fri, 20 Nov 2026 23:37:30 +1100
-Message-ID: <20261120123732.1200685-1-changwei.zou@canonical.com>
+Subject: [PATCH v8 1/2] crypto: caam - Fix wrong unmap operations
+Date: Fri, 20 Nov 2026 23:37:31 +1100
+Message-ID: <20261120123732.1200685-2-changwei.zou@canonical.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261120123732.1200685-1-changwei.zou@canonical.com>
+References: <20261120123732.1200685-1-changwei.zou@canonical.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -119,101 +123,147 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series fixes two issues in the rsa-caam driver.
+Since priv_form only takes values FORM1/FORM2/FORM3 with no distinct
+public key enumerator, rsa_pub_unmap() was not called correctly in
+akcipher_do_one_req() and akcipher_enqueue_req().
 
-Patch 1 fixes wrong unmap operations where rsa_pub_unmap() was called
-regardless of the key type.
+Use the completion callback (rsa_pub_done vs rsa_priv_f_done) to
+distinguish public from private key operations, then dispatch to the
+correct unmap function based on key->priv_form. Factor the priv_form
+switch into rsa_priv_unmap() and the public/private dispatch into
+rsa_pdb_unmap(), so rsa_priv_f_done() and both error paths share one
+implementation.
 
-Patch 2 adds a bounce buffer to handle unaligned RSA destination
-buffers on DMA-incoherent hardware such as i.MX8, fixing intermittent
--EKEYREJECTED errors when loading signed kernel modules.
+caam_rsa_set_priv_key_form() implicitly relies on zero-initialization
+for priv_form. Set priv_form = FORM1 explicitly at the head of the function
+for clarity and robustness.
 
-AI assistance disclosure (per Documentation/process/generated-content.rst):
-the OpenCode agent (claude-sonnet-4.6) was used to help analyse the code
-paths, draft parts of the changes and the changelogs.
+Fixes: bf53795025a2 ("crypto: caam - add crypto_engine support for RSA algorithms")
+Signed-off-by: Changwei Zou <changwei.zou@canonical.com>
+Reviewed-by: Sahil Malhotra <sahil.malhotra@nxp.com>
+---
+ drivers/crypto/caam/caampkc.c | 66 +++++++++++++++++++++--------------
+ 1 file changed, 39 insertions(+), 27 deletions(-)
 
-Changes in v8:
-- Patch 2: Add Fixes: 8c419778ab57 ("crypto: caam - add support for RSA
-  algorithm").
-
-Changes in v7:
-- Rebase onto the current tree; v6 no longer applied after the upstream
-  caam_rsa_set_priv_key_form() changes (a91d9346a70b, 828c3b265b6d). No
-  code changes.
-- Drop the non-standard "Assisted-by:" trailer from both patches; it is
-  not a recognised trailer (and fails checkpatch), and the AI assistance
-  is disclosed in this cover letter instead.
-- Pick up Reviewed-by from Sahil Malhotra on both patches.
-
-Changes in v6:
-- Patch 1: Factor the priv_form switch into rsa_priv_unmap(), shared by
-  rsa_priv_f_done() and rsa_pdb_unmap(), removing the duplicated switch.
-- Patch 2: Hoist req_ctx to function scope in set_rsa_priv_f{1,2,3}_pdb(),
-  removing the duplicate block-local declarations in the src/dst branches.
-
-Changes in v5:
-- Patch 1: Factor the public/FORM1/FORM2/FORM3 error-path unmap dispatch
-  into rsa_pdb_unmap(), so akcipher_do_one_req() and akcipher_enqueue_req()
-  no longer open-code it twice (Sahil).
-- Patch 2: Do not overwrite the caller's req->dst. Use req_ctx->fixup_dst
-  for the DMA side (mirroring fixup_src) and drop the orig_dst/restore
-  logic (Sahil). Expand the commit message to identify the caller that
-  hands in the misaligned dst (rsassa_pkcs1_verify() /
-  crypto_akcipher_sync_prep()) and why the DMA API does not bounce it.
-
-Changes in v4:
-- Patch 2: Describe the bounce scatterlist with the aligned allocation
-  size (ALIGN(dst_len, dma_get_cache_alignment())) instead of the
-  possibly-unaligned dst_len. Otherwise, on
-  CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC systems, dma_map_sg() evaluates
-  sg->length and can treat the already aligned bounce buffer as
-  unaligned, bouncing it again via swiotlb or failing with -ENOMEM.
-
-Changes in v3:
-- Patch 1: Dispatch the error-path unmap on the operation (the completion
-  callback rsa_pub_done vs rsa_priv_f_done) instead of key->d, so the
-  unmap always matches the map.
-- Patch 2: Bound the bounce-buffer copy-back to the RSA output size
-  (key->n_sz) instead of the full dst_len, so the trailing capacity of
-  the caller's destination buffer is left untouched; add Tested-by from
-  Stephane Debusne.
-
-Changes in v2:
-- Patch 1: Add Fixes: tag; pick up Reviewed-by from Sahil Malhotra.
-- Patch 2: Move the !bounce_buf check out of do_rsa_bounce_buf() into
-  the caller rsa_bounce_buf_done() so the helper is only entered when a
-  bounce buffer actually exists; add Reported-by/Closes and Tested-by
-  from Martin Kepplinger-Novakovic.
-
-Link to v7:
-https://lore.kernel.org/linux-crypto/20261120110525.1170175-1-changwei.zou@canonical.com/
-
-Link to v6:
-https://lore.kernel.org/linux-crypto/20261114060032.872141-1-changwei.zou@canonical.com/
-
-Link to v5:
-https://lore.kernel.org/linux-crypto/20261113113650.63038-1-changwei.zou@canonical.com/
-
-Link to v4:
-https://lore.kernel.org/linux-crypto/20261111230221.40297-1-changwei.zou@canonical.com/
-
-Link to v3:
-https://lore.kernel.org/linux-crypto/20261020025426.955531-1-changwei.zou@canonical.com/
-
-Link to v2:
-https://lore.kernel.org/linux-crypto/20261004210200.290119-1-changwei.zou@canonical.com/
-
-Link to v1:
-https://lore.kernel.org/linux-crypto/20260821045555.806471-1-changwei.zou@canonical.com/
-
-Changwei Zou (2):
-  crypto: caam - Fix wrong unmap operations
-  crypto: caam - Use bounce buffer for unaligned RSA destination buffers
-
- drivers/crypto/caam/caampkc.c | 177 ++++++++++++++++++++++++++--------
- drivers/crypto/caam/caampkc.h |   7 ++
- 2 files changed, 142 insertions(+), 42 deletions(-)
-
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index 2082adaae585..4b5397f2ca64 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -119,6 +119,23 @@ static void rsa_priv_f3_unmap(struct device *dev, struct rsa_edesc *edesc,
+ 	dma_unmap_single(dev, pdb->tmp2_dma, q_sz, DMA_BIDIRECTIONAL);
+ }
+ 
++static inline void rsa_priv_unmap(struct device *dev, struct rsa_edesc *edesc,
++				  struct akcipher_request *req,
++				  struct caam_rsa_key *key)
++{
++	switch (key->priv_form) {
++	case FORM1:
++		rsa_priv_f1_unmap(dev, edesc, req);
++		break;
++	case FORM2:
++		rsa_priv_f2_unmap(dev, edesc, req);
++		break;
++	case FORM3:
++		rsa_priv_f3_unmap(dev, edesc, req);
++		break;
++	}
++}
++
+ /* RSA Job Completion handler */
+ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
+ {
+@@ -168,16 +185,7 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
+ 	edesc = req_ctx->edesc;
+ 	has_bklog = edesc->bklog;
+ 
+-	switch (key->priv_form) {
+-	case FORM1:
+-		rsa_priv_f1_unmap(dev, edesc, req);
+-		break;
+-	case FORM2:
+-		rsa_priv_f2_unmap(dev, edesc, req);
+-		break;
+-	case FORM3:
+-		rsa_priv_f3_unmap(dev, edesc, req);
+-	}
++	rsa_priv_unmap(dev, edesc, req, key);
+ 
+ 	rsa_io_unmap(dev, edesc, req);
+ 	kfree(edesc);
+@@ -192,6 +200,22 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
+ 		crypto_finalize_akcipher_request(jrp->engine, req, ecode);
+ }
+ 
++static void rsa_pdb_unmap(struct device *jrdev, struct rsa_edesc *edesc,
++			  struct akcipher_request *req,
++			  void (*cbk)(struct device *jrdev, u32 *desc,
++				      u32 err, void *context))
++{
++	if (cbk == rsa_pub_done) {
++		rsa_pub_unmap(jrdev, edesc, req);
++	} else {
++		struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++		struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
++		struct caam_rsa_key *key = &ctx->key;
++
++		rsa_priv_unmap(jrdev, edesc, req, key);
++	}
++}
++
+ /**
+  * caam_rsa_count_leading_zeros - Count leading zeros, need it to strip,
+  *                                from a given scatterlist
+@@ -391,7 +415,8 @@ static int akcipher_do_one_req(struct crypto_engine *engine, void *areq)
+ 		return ret;
+ 
+ 	if (ret != -EINPROGRESS) {
+-		rsa_pub_unmap(jrdev, req_ctx->edesc, req);
++		rsa_pdb_unmap(jrdev, req_ctx->edesc, req,
++			      req_ctx->akcipher_op_done);
+ 		rsa_io_unmap(jrdev, req_ctx->edesc, req);
+ 		kfree(req_ctx->edesc);
+ 	} else {
+@@ -670,9 +695,6 @@ static int akcipher_enqueue_req(struct device *jrdev,
+ 				struct akcipher_request *req)
+ {
+ 	struct caam_drv_private_jr *jrpriv = dev_get_drvdata(jrdev);
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+ 	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+ 	struct rsa_edesc *edesc = req_ctx->edesc;
+ 	u32 *desc = edesc->hw_desc;
+@@ -691,19 +713,7 @@ static int akcipher_enqueue_req(struct device *jrdev,
+ 		ret = caam_jr_enqueue(jrdev, desc, cbk, req);
+ 
+ 	if ((ret != -EINPROGRESS) && (ret != -EBUSY)) {
+-		switch (key->priv_form) {
+-		case FORM1:
+-			rsa_priv_f1_unmap(jrdev, edesc, req);
+-			break;
+-		case FORM2:
+-			rsa_priv_f2_unmap(jrdev, edesc, req);
+-			break;
+-		case FORM3:
+-			rsa_priv_f3_unmap(jrdev, edesc, req);
+-			break;
+-		default:
+-			rsa_pub_unmap(jrdev, edesc, req);
+-		}
++		rsa_pdb_unmap(jrdev, edesc, req, cbk);
+ 		rsa_io_unmap(jrdev, edesc, req);
+ 		kfree(edesc);
+ 	}
+@@ -993,6 +1003,8 @@ static int caam_rsa_set_priv_key_form(struct caam_rsa_ctx *ctx,
+ 	unsigned aligned_size;
+ 	int ret;
+ 
++	rsa_key->priv_form = FORM1;
++
+ 	rsa_key->p = caam_read_raw_data(raw_key->p, &p_sz);
+ 	if (!rsa_key->p)
+ 		return -ENOMEM;
 -- 
 2.43.0
 
