@@ -1,102 +1,47 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795256338;
-	b=cl0D2I1GDe5isOWZPhMwSJjU0f6F4C8nCQ/LcK5LH6pKjzpyd6H4FJEzN5gkpJ2E9t8+
-	 KnoPfyNXROl+BwrCknQK5zYruhaOcN71c5GQdzkhx4ZPrmSDVd90xxAfaIJNsExZPycbi
-	 61XXGdCRzM/+I0EUPmMhAm5xcFVtRap8MtAjT8fcAb5pCMDvz498gVKgcSJ0ZJfCZLKVr
-	 lXnzMy8n9nM6Tbr2P4KvInqmgPfO8bNU9erFvNP3ZfLUIaEU6WoWyt3V5djBhY1mRWLGI
-	 ECRGF/CzWwDWdXGxLZtej6uvip1pYZfCVWFFhzqIAq9o5UyHrAYgBQ3eMGrkfsqByXg==
+	t=1795260764;
+	b=tMGceOkmd4h2qx6cQsG6xNOzPdlx3XKrhhDwjYbWBXBgP9PPoh3JXymGQTESN94/eASP
+	 biGD7+D1DU25nweUZUw8UaUMKH+PhUFAQm/EjBwlHFb6Hb39rLDjIYmEXUbnun9yrS/QH
+	 RCngBn9Nj8Uuhf4wLFWyKVxwr7Z0JBZ5m3+gfXlFev/m88FQhTmJ1jJhgiwmulaAcQFwX
+	 azJIlq9VYWHTObZErHaL0Swm89hDoAUkRP1qmH0+eXREajH0glpV1+dW7iUHCAEfMeMhi
+	 u2ye3mdQTa+ATBHyUSJ+V0SmhEA82PS7dUryOY5ainFsGk+nPliUWIVXrQ0L1jRAnhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795256338;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:In-Reply-To:References:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version;
-	bh=dzaf2Z9uO/Z26dmJHQt/rzIG6OfXFllTIg41OzeeRLo=;
-	b=k+Q0jSUpUZiJBpLRkwdNdj4I26hIgtlJMQkf9Ga64zUFECkIdsThIdnSGWmec4P2DDo8
-	 CiYNFZP6rQq3wi6TosY842O58SRgnojJIJKyEqDHSi+SyW6YF1iHg7k14u8LZ5Jnry/go
-	 5LpoZo4z6pqnjea5/9NqYsz1sqxjBC0rfpwUy9d51/k2CrUgnpnqE2Tp9utELFZRZkrly
-	 wRGCNxHdSR73Dame3ZfcX73OccONhQKouK1n6DbDhn+8WY/Xd2JN8dHc/mc6R31zU0dlz
-	 vt3OLhmujh4f0m7Uf7180AiGr5siJRNf1fTnG5EVgLRd7/YrSinlBjZYfpU8oXaPWIw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795260764;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=udx8SVT7V+liskpAQLw+2t29k/7bmiaKmr8jMYA6QnM=;
+	b=Clpl4tSs/10IdYsUzSaGwOQDf058GCwi6GyHgLjYtfIDBV3w6gbsynLiKbnHfI0AFM4I
+	 VcRoRuZE5P80dBtZYz2+n2dYQ3GG2UHTCLMtC95I/x35xSIAIApXE2OLi1QhOwrF649am
+	 mQU0pFINAu0GwOEXRIq1qXE6hbpFuREfKrHlZcXiYgwskka5ItFe9f527Z0HiqLZx67XT
+	 a9eKH/+zz/7UEFGHAHGvIDC6kG/2nHsEEnbJwY3uBlY0afnjm9ElO8XFMqWzYpCHVzdAT
+	 TvRqG7jSOANMa//jqp+6HLdxA6WjMto+MKjF5UxDhOROcD/a+f+UskP22LOQJP3TPiw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=I7SAFHvG;
-	arc=none smtp.remote-ip=209.85.210.182
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IxjgJO2J;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D06606A32A
-	for <linux-crypto@vger.kernel.org>; Sat, 21 Nov 2026 10:18:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D5D06606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB05606A325;
+	Sat, 21 Nov 2026 11:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=I7SAFHvG
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8a06e79e152so864710b3a.0
-        for <linux-crypto@vger.kernel.org>; Sat, 21 Nov 2026 02:18:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795256337; x=1795861137; darn=vger.kernel.org;
-        h=mime-version:content-transfer-encoding:content-type:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=dzaf2Z9uO/Z26dmJHQt/rzIG6OfXFllTIg41OzeeRLo=;
-        b=I7SAFHvGEVCBm0J5+m2y3jr0xvZhrbLgb4JRfF5d3AbR4l4CiID2rJ89wQRPDk+qLQ
-         sbfn/BHHtEHxluv7Oiy01POHFJHNfub1xMCy9gqy3cNW/p1yHeeamx02bImhk9EmdlfP
-         mYolBA5Z2JOA++5xz640eA6IYLpaP8IGf98w8WCs7s/ZVI4NYEksZ5A+/mtSZURniLIW
-         2qHV+msb0HIo0O0wLdQ6Fc0l2XHKnWptHD+bIzDbTheHAyVUpe/vopLup81FlXNrQ/Hc
-         9YbijY8H8HakzFA+TxSKVEhce6qnA6g3cymuYVuyN8kataqFn7drgaB7aX4LYWoe9QBd
-         qpHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795256337; x=1795861137;
-        h=mime-version:content-transfer-encoding:content-type:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=dzaf2Z9uO/Z26dmJHQt/rzIG6OfXFllTIg41OzeeRLo=;
-        b=iufpRRlDUfhP46EvkiLUsWBmIQ6Xih7cG589CpKVFxhL8jIj8OZiHAMnsHSZ11GHQT
-         Aqhl4+jpf5Zina2pE8yy1uXqt3eRKTAqdPJSQxBTSAEjAnm4ahW6YTPdmLWqspgrILrI
-         5U6HZCYx3uFTVTNiIzWyVjAX3+effqt8pHPbLyaEdXN2BsOoL5xPj2HgK17bJiLhoH8u
-         Gf8lwP48nBY+patOGyVOL5ZWDuuCVwvAeFJy1Z90VgJ9MQkJRwECK8ut9qIMC/5MTcF+
-         A/xSnrjvHM7ykxRvSXLcDjb1lO5LvrdqOoFqi3JzySgsFMK584LWzKR2ISvmiiFbkjCT
-         ztcA==
-X-Gm-Message-State: APuU4Z8Gkr83cDtnHttij0wnlNrrN3fP72lZMJbVZK0Xe572ls6baZGf
-	TlR8ZSnr93qpuZR8fHmz/udKkMoTjuYcx20ln3bxF3Bzt7ySIutdwK9G
-X-Gm-Gg: AZFdTZfK3Dcc6AadDzdRXn4+/JCBBSKJmnEdgf9d7u/VlnsIFOtnninkWgUXxTeoV76
-	scVENXexFINA68EoWtOVb5vG9we3uUVYuPhqHxelvI9P0276PYSPFq6yqEzFecA1e5fdmD6sQ2r
-	xdSNF6REMHJiKOcLgjRleSMtqQjFwsXxzQ+6v5IOt8K6jRMyTFOPw7iYhZWQCZjJdO1WQjcuCE6
-	pNTrkANL7+pn+p53MJd/MYNa4tP6o37NTSyLg92BsEb1HUlwRaK4YDbPAxtAEak3iOh5Pr2VCPx
-	rCCQJp4hki0O/mUnEw7rig6PCXkMnx934lgy0R2e8+ImlG7b8DM1osKwGwvWM1JBE2pzO0lh4Vs
-	BZJGfi84PQCZQtgP7cPYhvCDfrpuHhDJiFw03yfs+uwHvLBGtnidrcpJdySp1eMn6IrK6BjlH6Q
-	O/lyESBvpD1Noac5N0Vjue+JxX1+VIhPvQsSr2jaJgIRkBO9ErQlxkkjji3ToTsjciKvqqqcrVK
-	zP1eFTEB1Awt9771cg7GRgPLDgkoXiSfWu82YTwcyqOwFDq9GLAZKrH1JjWO/KlrD8s8s98HwQs
-	UnYeOd/4nD8tAuqq/Jci6Rf2Un/F9OnVTMW1oU/S/Kz0FZiwdmnZQmRPu0gXscLqA9cQzUN5nHr
-	M5ALt+m08PzJHTlVzaaMhB0LyCiZBew==
-X-Received: by 2002:a05:6a00:2da7:b0:898:e7e7:c0df with SMTP id d2e1a72fcca58-8c87cf2ad15mr4832985b3a.45.1795256336951;
-        Sat, 21 Nov 2026 02:18:56 -0800 (PST)
-Received: from reply.eml (awork078078.netvigator.com. [203.198.250.78])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8c87077bff6sm2701360b3a.3.2026.11.21.02.18.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Nov 2026 02:18:55 -0800 (PST)
-From: Yuqi Xu <xuyuqiabc@gmail.com>
-To: Ignat Korchagin <ignat@linux.win>
-Cc: linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
- David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Rusty Russell <rusty@rustcorp.com.au>, stable@vger.kernel.org,
- Vega <vega@nebusec.ai>, Ren Wei <weir@nebusec.ai>, xuyq21@lenovo.com
-Subject:
- Re: [PATCH v4] KEYS: Account for asymmetric key payload data in the quota
-Date: Sat, 21 Nov 2026 18:18:41 +0800
-Message-ID: <20261121181841.58673-reply-xuyuqiabc@gmail.com>
-In-Reply-To:
- <CAOs+rJWf5JEMD7UC-4YS2ayAX5f2SUgr5s9DCwmWXExBhqaEJA@mail.gmail.com>
-References: <20261026024840.23482-1-xuyuqiabc@gmail.com>
- <CAOs+rJWf5JEMD7UC-4YS2ayAX5f2SUgr5s9DCwmWXExBhqaEJA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IxjgJO2J
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A2471F000C6;
+	Sat, 21 Nov 2026 11:32:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795260764;
+	bh=udx8SVT7V+liskpAQLw+2t29k/7bmiaKmr8jMYA6QnM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=IxjgJO2JARaXa318wA+5RmQgZb22aIRW76D9ixDXe/vBYQ9SGNddjmzoTteSClmsn
+	 0UbjTTybvvt/+eeGgQdh7bb45vTIhtQTMnrCoVXOGVy3rc4urPMLoD4Tg4N+6blQKU
+	 DvVtaMQ2/vP5r5m2wVE4Q9YJZBnmcaQsWen3cfHY3+5VFEeXVqljNIcs89Wl8zOBe/
+	 uSKFzBXW+Y+I2wx1i7RxxSoYfuDUCbn/xTfF7MP00N9zI4TILqlic3XLxdxencXfB5
+	 r5ixoK2t+CJOwEfwwwyeOglcb95p8dUBv8RzWYg+YoAlcdpFb5o7AnbMvv48fIThbp
+	 LvrX3ArWh+6wg==
+Message-ID: <7818fa09-8f9c-4d42-b746-0ec74ee1aa08@kernel.org>
+Date: Sat, 21 Nov 2026 12:32:34 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -106,32 +51,125 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 2/4] soc: qcom: add core driver for the Qualcomm
+ Crypto Engine
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+ Thara Gopinath <thara.gopinath@gmail.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Stanimir Varbanov <svarbanov@mm-sol.com>,
+ Eneas U de Queiroz <cotequeiroz@gmail.com>,
+ Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+ Eric Biggers <ebiggers@kernel.org>,
+ Demi Marie Obenour <demiobenour@gmail.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Russell King
+ <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, brgl@kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ Pankaj Patil <pankaj.patil@oss.qualcomm.com>,
+ Abel Vesa <abel.vesa@oss.qualcomm.com>
+References: <20261120-qce-fix-self-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com>
+ <20261120-qce-fix-self-tests-v12-2-b5a2a44bc5ae@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <20261120-qce-fix-self-tests-v12-2-b5a2a44bc5ae@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Ignat,
+On 20/11/2026 20:34, Bartosz Golaszewski wrote:
+> Add the core driver for the Qualcomm crypto engine. Its task is to bind
+> to the qce DT node, set up runtime PM for interconnect down-scaling and
+> register the auxiliary device using the crypto offloader driver.
 
-Thanks for the review.
+I dislike the "core driver" in the commit msg and subject. It suggests
+there is some core feature or core stuff, but that's not true. You are
+adding STUB driver only to handle Linux RPM things (which have impact on
+interconnects, of course).
 
-> SInce we touch PKCS8 as well, missing a relevant "Fixes:"
+The Kconfig has it nicely explained, but here I see it as confusing.
 
-You are right. v5 adds:
+> 
+> Tested-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+> Tested-by: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
+> Reviewed-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> ---
+>  drivers/soc/qcom/Kconfig    | 11 ++++++
+>  drivers/soc/qcom/Makefile   |  1 +
+>  drivers/soc/qcom/qce-core.c | 92 +++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 104 insertions(+)
+> 
+> diff --git a/drivers/soc/qcom/Kconfig b/drivers/soc/qcom/Kconfig
+> index 535c8619197b3e889e536da072ab89d3bb729804..67d54d5211ff21bae77cd8408fa47af630060949 100644
+> --- a/drivers/soc/qcom/Kconfig
+> +++ b/drivers/soc/qcom/Kconfig
+> @@ -121,6 +121,17 @@ config QCOM_PMIC_GLINK
+>  	  Say yes here to support USB-C and battery status on modern Qualcomm
+>  	  platforms.
+>  
 
-Fixes: 3c58b2362ba8 ("KEYS: Implement PKCS#8 RSA Private Key parser [ver #2]")
+...
 
-> While today indeed only the asymmetric keys hit this I wonder if the
-> fix is better to be in key_payload_reserve(). Something like a fail if
-> key->quotelen + delta > USHRT_MAX. That fixes all current and future
-> key types.
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("Qualcomm crypto engine core driver");
+> +MODULE_ALIAS("platform:" KBUILD_MODNAME);
 
-Agreed. v5 adds that guard to key_payload_reserve(), so every key type is
-covered. The asymmetric parsers still charge the actual retained payload
-and keep their early rejection before the payload is installed.
+You should not need MODULE_ALIAS() in normal cases. If you need it,
+usually it means your device ID table is wrong (e.g. misses either
+entries or MODULE_DEVICE_TABLE()). MODULE_ALIAS() is not a substitute
+for incomplete ID table.
 
-The common check also covers keyring link accounting and big_key
-updates, which use the same field: a charge that would exceed USHRT_MAX
-bytes now fails instead of wrapping the counter.
 
-v5 is now sent as a separate patch.
+> +MODULE_AUTHOR("Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>");
+> 
 
-Thanks,
-Yuqi
 
+Best regards,
+Krzysztof
