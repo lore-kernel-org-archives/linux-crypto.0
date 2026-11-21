@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795260764;
-	b=tMGceOkmd4h2qx6cQsG6xNOzPdlx3XKrhhDwjYbWBXBgP9PPoh3JXymGQTESN94/eASP
-	 biGD7+D1DU25nweUZUw8UaUMKH+PhUFAQm/EjBwlHFb6Hb39rLDjIYmEXUbnun9yrS/QH
-	 RCngBn9Nj8Uuhf4wLFWyKVxwr7Z0JBZ5m3+gfXlFev/m88FQhTmJ1jJhgiwmulaAcQFwX
-	 azJIlq9VYWHTObZErHaL0Swm89hDoAUkRP1qmH0+eXREajH0glpV1+dW7iUHCAEfMeMhi
-	 u2ye3mdQTa+ATBHyUSJ+V0SmhEA82PS7dUryOY5ainFsGk+nPliUWIVXrQ0L1jRAnhA==
+	t=1795263765;
+	b=qDUi/++KlPvwncmBoRCJHQO0N7I3hZs+VpD5jf5D5EvOJDIhTuiGLqIESgMNO7vnUonN
+	 ZnVLt54Gv25ltEEPiN00Z3AorSyIWx6cDt5zrZQcXTfe1XsNivZL5ZAwJHRKLtdTLtWLf
+	 PNKpnZXhTPasGKvJWXL7oqpfyxMGpPnDYd7iGxTsg+4EdgZIep2v7uz5eog1pM5ZcwI5K
+	 ofqsLz9B07T8/DvkvGmAHvR5F2wi9D4W2yo+CFaLUaWlDH0j9ZpQxijZR6+1YkOshqUj5
+	 LQ3cMYdRVTAINFvU+AsWG4epCWxw92wp1wS+ZEIT0zG50EzUx4488mZUzdTvs93sUEg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795260764;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795263765;
 	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
 	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=udx8SVT7V+liskpAQLw+2t29k/7bmiaKmr8jMYA6QnM=;
-	b=Clpl4tSs/10IdYsUzSaGwOQDf058GCwi6GyHgLjYtfIDBV3w6gbsynLiKbnHfI0AFM4I
-	 VcRoRuZE5P80dBtZYz2+n2dYQ3GG2UHTCLMtC95I/x35xSIAIApXE2OLi1QhOwrF649am
-	 mQU0pFINAu0GwOEXRIq1qXE6hbpFuREfKrHlZcXiYgwskka5ItFe9f527Z0HiqLZx67XT
-	 a9eKH/+zz/7UEFGHAHGvIDC6kG/2nHsEEnbJwY3uBlY0afnjm9ElO8XFMqWzYpCHVzdAT
-	 TvRqG7jSOANMa//jqp+6HLdxA6WjMto+MKjF5UxDhOROcD/a+f+UskP22LOQJP3TPiw==
+	bh=RTZTkBgGTAVOkbRvUJ8jaCPNtuaObH6Md0Cm1SV1BwY=;
+	b=GY5kbc9eVmCV2reaPuWRDOftf22lk+LSa03uqDlzsC4cEb7POwTlUDZt8aw5x1hnfOib
+	 s3vK/k0tzbvAjPaSAMDvr9Y8oubZtALpjh8zsNnpvD0ryzWe47TwKysy3c85BHlwAZBtz
+	 GdT3B6JhDQw5KdKUz4/Eir4GY861uBb6E7JSEFyhIc2lJhyMYSWHoXf6fBdvwVN/ZqJQM
+	 6cBmHqWdvHDZyBNtNA6G1vVjMkU5vMUNxwvPdrGilaAPzckBvIyQOYQvUO/OLdgwmTIbR
+	 4/lfhmX7IVZnPQDl5FbTrFKZmiTPI15lptGuyEu7TNxztGydSdskpdrMzuv1DfcG7Ng==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IxjgJO2J;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ad0glmQJ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB05606A325;
-	Sat, 21 Nov 2026 11:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB575606A320;
+	Sat, 21 Nov 2026 12:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IxjgJO2J
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A2471F000C6;
-	Sat, 21 Nov 2026 11:32:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ad0glmQJ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E201F000C0;
+	Sat, 21 Nov 2026 12:22:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795260764;
-	bh=udx8SVT7V+liskpAQLw+2t29k/7bmiaKmr8jMYA6QnM=;
+	s=k20260515; t=1795263765;
+	bh=RTZTkBgGTAVOkbRvUJ8jaCPNtuaObH6Md0Cm1SV1BwY=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=IxjgJO2JARaXa318wA+5RmQgZb22aIRW76D9ixDXe/vBYQ9SGNddjmzoTteSClmsn
-	 0UbjTTybvvt/+eeGgQdh7bb45vTIhtQTMnrCoVXOGVy3rc4urPMLoD4Tg4N+6blQKU
-	 DvVtaMQ2/vP5r5m2wVE4Q9YJZBnmcaQsWen3cfHY3+5VFEeXVqljNIcs89Wl8zOBe/
-	 uSKFzBXW+Y+I2wx1i7RxxSoYfuDUCbn/xTfF7MP00N9zI4TILqlic3XLxdxencXfB5
-	 r5ixoK2t+CJOwEfwwwyeOglcb95p8dUBv8RzWYg+YoAlcdpFb5o7AnbMvv48fIThbp
-	 LvrX3ArWh+6wg==
-Message-ID: <7818fa09-8f9c-4d42-b746-0ec74ee1aa08@kernel.org>
-Date: Sat, 21 Nov 2026 12:32:34 +0100
+	b=ad0glmQJVjeG757nF6Hnno1fRDNpe2skOm05mcTm5k2ixfRHl62GXCH6R0Ux5ua6Z
+	 8exEcpHP04OkqS2etyBhyRTBKEqqn6Rnk4K1tyNFbE5cECf5ltfjcrzNzkIOv6BDUS
+	 c5hu0k9XXo2FYsHThhxrcdf/XpntR7toORCxzFyVNs4GcfzmhkqD3Dd6Q6eMtVKhUL
+	 vAr7XiOno8JAPN3cnloniGBr2+Ak50LKMiQn5rBZffR20m5kDRAorLtPIKbp5BuoCM
+	 dg9/j3dof+oMp+SI8tyUqwxp5KjdEbVuYIWEb92RjvikG74rL2wpx9YPS3pPrapMWs
+	 cZYO+as3mowmA==
+Message-ID: <9faa6fce-594f-4556-b5ab-6aa73330da8d@kernel.org>
+Date: Sat, 21 Nov 2026 13:22:37 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -52,8 +52,8 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 2/4] soc: qcom: add core driver for the Qualcomm
- Crypto Engine
+Subject: Re: [PATCH v12 3/4] arm64: defconfig: update the Qualcomm Crypto
+ Engine entry
 To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
  Thara Gopinath <thara.gopinath@gmail.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
@@ -68,11 +68,9 @@ To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
  <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>
 Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  linux-kernel@vger.kernel.org, brgl@kernel.org,
- linux-arm-kernel@lists.infradead.org,
- Pankaj Patil <pankaj.patil@oss.qualcomm.com>,
- Abel Vesa <abel.vesa@oss.qualcomm.com>
+ linux-arm-kernel@lists.infradead.org
 References: <20261120-qce-fix-self-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com>
- <20261120-qce-fix-self-tests-v12-2-b5a2a44bc5ae@oss.qualcomm.com>
+ <20261120-qce-fix-self-tests-v12-3-b5a2a44bc5ae@oss.qualcomm.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -118,58 +116,22 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261120-qce-fix-self-tests-v12-2-b5a2a44bc5ae@oss.qualcomm.com>
+In-Reply-To: <20261120-qce-fix-self-tests-v12-3-b5a2a44bc5ae@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 20/11/2026 20:34, Bartosz Golaszewski wrote:
-> Add the core driver for the Qualcomm crypto engine. Its task is to bind
-> to the qce DT node, set up runtime PM for interconnect down-scaling and
-> register the auxiliary device using the crypto offloader driver.
+> Most Qualcomm SoCs contain the QCE hardware offloader. The crypto driver
+> for this IP is being split into a smaller core stub that doesn't register
+> the crypto algorithms on its own AND an auxiliary driver than handles
 
-I dislike the "core driver" in the commit msg and subject. It suggests
-there is some core feature or core stuff, but that's not true. You are
-adding STUB driver only to handle Linux RPM things (which have impact on
-interconnects, of course).
+This part is fine...
 
-The Kconfig has it nicely explained, but here I see it as confusing.
+> the crypto part. Update the arm64 defconfig to only build the core part
+> by default and leave the choice of building the crypto part to the user.
 
-> 
-> Tested-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-> Tested-by: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
-> Reviewed-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  drivers/soc/qcom/Kconfig    | 11 ++++++
->  drivers/soc/qcom/Makefile   |  1 +
->  drivers/soc/qcom/qce-core.c | 92 +++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 104 insertions(+)
-> 
-> diff --git a/drivers/soc/qcom/Kconfig b/drivers/soc/qcom/Kconfig
-> index 535c8619197b3e889e536da072ab89d3bb729804..67d54d5211ff21bae77cd8408fa47af630060949 100644
-> --- a/drivers/soc/qcom/Kconfig
-> +++ b/drivers/soc/qcom/Kconfig
-> @@ -121,6 +121,17 @@ config QCOM_PMIC_GLINK
->  	  Say yes here to support USB-C and battery status on modern Qualcomm
->  	  platforms.
->  
-
-...
-
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_DESCRIPTION("Qualcomm crypto engine core driver");
-> +MODULE_ALIAS("platform:" KBUILD_MODNAME);
-
-You should not need MODULE_ALIAS() in normal cases. If you need it,
-usually it means your device ID table is wrong (e.g. misses either
-entries or MODULE_DEVICE_TABLE()). MODULE_ALIAS() is not a substitute
-for incomplete ID table.
-
-
-> +MODULE_AUTHOR("Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>");
-> 
-
+but here you miss answer why. We do want the proper driver, not only the
+stub, no?
 
 Best regards,
 Krzysztof
