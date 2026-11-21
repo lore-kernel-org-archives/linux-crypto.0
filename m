@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795266365;
-	b=P7qk7smkOgfCGIdtwkKcur2C3HoGP/Db18Sp8Cjp5y2QD3rSDD6ktQlSLILwi6w/rCHB
-	 2FlfieHlPTKKfcuOpDLGz/uL4qmWrchTvBgHUmfFyqt3fmAkkrJSoD2lluX/FAxOMK852
-	 o5sBBdO4OcemCM3dvFbvKuE3Icxve2jLO1PdUclSxRyG8bUfeNlqBDTqvf3LQYdtGifLV
-	 HKD8nVlcxpWMGYeZQkv5T7VsAmOIHv8YKd1L+hVPS9ujdaaD7SZsuYfWhhAy5E7I6QqrB
-	 /6MPinm0EypEFAGr/v/UbLKNxcm1carfLjGR2/49MKeJmqESLCqdoWUS0kvuZbjt4Qg==
+	t=1795266469;
+	b=czoGUGLIOyoYapQFgIodnLG3pIvAQ+Ahqc1vMh0DUYmYpnY6hd5z/c/Jv1ESjdTAhwoD
+	 eftV5YY6PYUDuUANRTso0UFaa0doLuEV+EWRv6eXACsnxELWeJrpTeYhskekvJLfUm9MZ
+	 7YnakCLkdYj9JwBLCxav6hULoDaomDbH46Yfen7ZDI5waFNABhDXLW4hh+At7PzALS/32
+	 nr/IlliKcW+h2qSZIy158SWYgTPflJ0bEF35mrSKuEO0jdhPZLTcgPP/IIg1+3a+cblo+
+	 Tbv+69zglYScpyCYGLKFFsMciap26ML+vO5FOtS878aVrWOdX1FiK6fhkh0KU7BdOjw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795266365;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795266469;
 	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
 	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=7rHfx2XAqBmbSywEyiIwBXdgo8NxbqZDE7ZkTit84No=;
-	b=e+mv+aQmls/EgDvCZjIi5sfxX7GCk6C2gOTtr6J6un52xpJZln3KEK4ZbJmjFdFHWdp4
-	 RBVkKmBjMgrr4Y8fF2M8aOuJjwEWxwDovepQD9WemxGARTrzaM7bo++Y8fhipDDBcNr6d
-	 qJjh1Q3liESpQ9ez6HEgxnLUXDqJuqFlwY8KRkh9Ka9JABY7c2F69lIcyxfZQhT+4mW+D
-	 +NTpiTrJD33DS7lt+HdHx7Ssd+DFJbOVjlNpSefT3U2Cb0wTg5LgfPiWJjutM+0DvuyFJ
-	 FR4zNM6lv/gPhrVY/WKcfdpgP9NtZxuF34ZjWKuAgi85c1CQpo7eIHM7xyz2ETrxvvQ==
+	bh=ZHsrEeuUJTn/nBpU7qFv5kbV3qV3zIRMXLLBhUS7gPY=;
+	b=BELzywPIQC4fdvcqdzyHAibuxHxwhX7yFJhVpO4J5cU4IsCTd9QCk6CMasW6sd2V9jEq
+	 60GNrBmI/i7C/LIMnlx5z3X/5DSwa2gaPcvgRSw4RvsaAn8NVEGLzELFGZp9gXbQVSvPB
+	 kPkqIRwDnG/uU4kFYP+gXy6y6LL2BcMg48vVwOUrvyrr9EJVXHiyERSZ9XJmGaZLm5hBW
+	 4LWnhyCAglRHZGh0MeaoFfZLQADJyyZ5dMkpX3Tb0suSeS1FTeGvspBSk8eMzr0zeB+Vf
+	 qurGDOM1pj+rs/jvUfNQf8cvWUviUZPl2aNLQmmW9s2MGK6B3+W0LDLR3/ac9r+Brtw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=V2fyUQwW;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NxnZsxWy;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C5E606A32A;
-	Sat, 21 Nov 2026 13:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD9C606A32A;
+	Sat, 21 Nov 2026 13:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=V2fyUQwW
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27E171F000C0;
-	Sat, 21 Nov 2026 13:05:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NxnZsxWy
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 515F61F0156A;
+	Sat, 21 Nov 2026 13:07:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795266365;
-	bh=7rHfx2XAqBmbSywEyiIwBXdgo8NxbqZDE7ZkTit84No=;
+	s=k20260515; t=1795266469;
+	bh=ZHsrEeuUJTn/nBpU7qFv5kbV3qV3zIRMXLLBhUS7gPY=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=V2fyUQwWqcoCYUdbntUFFnDiAiyD2pNLByernr4+NUcaOy58il+sbgW+Qj4C5YFY3
-	 msz+MfNamx6uq42RRY0b7Ei/6zjpyaU6n5OJ87OdP2E55M00nX8W02Jp00Wk/PzMTe
-	 LQ1DxQnoh96+PLGuh875I1tqudoL6B7zlrvYf7nzgVQvOQd0b3oHrX1WJqfHXoglrQ
-	 MJFiDRLvFlqpyxOPTaERj+vKFeoYwkrZ1YHM4Gj0qoJ4OKMOjeeoZ+5gFbFvk1hZOL
-	 GyOHEBck2GLBnsMNCVUqnJU+UneTTVLp/5tr4bV0M79W/6QptXsQ9ZQAPIsrTuUFLU
-	 +bnc3xKNMbUTA==
-Message-ID: <c26b8002-c246-45cb-bca0-8f596a2a425b@kernel.org>
-Date: Sat, 21 Nov 2026 14:05:57 +0100
+	b=NxnZsxWy8MiENcuEYisCwonh579LZxq7h4ogSoKjretcmEYkzhxWVmMX3lVZqMKbd
+	 NMQ+HP2xibx5W36fDYnQ748ppmYdRTcWP7S6vC/IJuvpJvGdeVbWAnq9OZDm2zY08A
+	 d5R+QwuI4Vb/vSjucKIJ4ads/HrD8ZBFO+1xTPVkodAiCoCpMTFOVTmyubKkwvytum
+	 iVeMe49jL49El2IEntWxT0P/l9cBdpsKy+2/pksTqMNccYfmOMe8YJMB+OxXb9cDKd
+	 /dPBezknKBCh0RYTL+kGeAab9hta0zayh3/eBIq1CzFVlVZG4ChEcf+6sqyxmN/AtB
+	 gTqJv3hPI2FQA==
+Message-ID: <e3d2cca6-056f-4ce1-8701-a2592b18b729@kernel.org>
+Date: Sat, 21 Nov 2026 14:07:40 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -52,7 +52,8 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 1/4] crypto: qce - convert to auxiliary bus
+Subject: Re: [PATCH v12 4/4] arm: multi_v7_defconfig: update the Qualcomm
+ Crypto Engine entry
 To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
  Thara Gopinath <thara.gopinath@gmail.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
@@ -68,9 +69,9 @@ To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
 Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  linux-kernel@vger.kernel.org, brgl@kernel.org,
  linux-arm-kernel@lists.infradead.org,
- Pankaj Patil <pankaj.patil@oss.qualcomm.com>
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 References: <20261120-qce-fix-self-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com>
- <20261120-qce-fix-self-tests-v12-1-b5a2a44bc5ae@oss.qualcomm.com>
+ <20261120-qce-fix-self-tests-v12-4-b5a2a44bc5ae@oss.qualcomm.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -116,18 +117,22 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261120-qce-fix-self-tests-v12-1-b5a2a44bc5ae@oss.qualcomm.com>
+In-Reply-To: <20261120-qce-fix-self-tests-v12-4-b5a2a44bc5ae@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 20/11/2026 20:34, Bartosz Golaszewski wrote:
-> This driver is disabled in arm64 defconfig but one of its
+>  CONFIG_KEYSTONE_NAVIGATOR_QMSS=y
+> @@ -1306,7 +1307,6 @@ CONFIG_CRYPTO_DEV_ATMEL_AES=m
+>  CONFIG_CRYPTO_DEV_ATMEL_TDES=m
+>  CONFIG_CRYPTO_DEV_ATMEL_SHA=m
+>  CONFIG_CRYPTO_DEV_MARVELL_CESA=m
+> -CONFIG_CRYPTO_DEV_QCE=m
 
-That's true for next, but your patch #3 seems to disagree. That's
-confusing. Maybe you meant disabled for arm64 platforms or marked as
-broken? Because anyway defconfig does not matter here - even if drivers
-are not enabled in defconfig (so stay disabled), they should not be
-affected with unbisectable changes.
+I don't understand what is the base here. base-commit from cover letter
+is unknown for my tree.
+
+There is no such code for half a year.
 
 Best regards,
 Krzysztof
