@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795263765;
-	b=qDUi/++KlPvwncmBoRCJHQO0N7I3hZs+VpD5jf5D5EvOJDIhTuiGLqIESgMNO7vnUonN
-	 ZnVLt54Gv25ltEEPiN00Z3AorSyIWx6cDt5zrZQcXTfe1XsNivZL5ZAwJHRKLtdTLtWLf
-	 PNKpnZXhTPasGKvJWXL7oqpfyxMGpPnDYd7iGxTsg+4EdgZIep2v7uz5eog1pM5ZcwI5K
-	 ofqsLz9B07T8/DvkvGmAHvR5F2wi9D4W2yo+CFaLUaWlDH0j9ZpQxijZR6+1YkOshqUj5
-	 LQ3cMYdRVTAINFvU+AsWG4epCWxw92wp1wS+ZEIT0zG50EzUx4488mZUzdTvs93sUEg==
+	t=1795266365;
+	b=P7qk7smkOgfCGIdtwkKcur2C3HoGP/Db18Sp8Cjp5y2QD3rSDD6ktQlSLILwi6w/rCHB
+	 2FlfieHlPTKKfcuOpDLGz/uL4qmWrchTvBgHUmfFyqt3fmAkkrJSoD2lluX/FAxOMK852
+	 o5sBBdO4OcemCM3dvFbvKuE3Icxve2jLO1PdUclSxRyG8bUfeNlqBDTqvf3LQYdtGifLV
+	 HKD8nVlcxpWMGYeZQkv5T7VsAmOIHv8YKd1L+hVPS9ujdaaD7SZsuYfWhhAy5E7I6QqrB
+	 /6MPinm0EypEFAGr/v/UbLKNxcm1carfLjGR2/49MKeJmqESLCqdoWUS0kvuZbjt4Qg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795263765;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795266365;
 	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
 	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
 	 Content-Type:Content-Transfer-Encoding;
-	bh=RTZTkBgGTAVOkbRvUJ8jaCPNtuaObH6Md0Cm1SV1BwY=;
-	b=GY5kbc9eVmCV2reaPuWRDOftf22lk+LSa03uqDlzsC4cEb7POwTlUDZt8aw5x1hnfOib
-	 s3vK/k0tzbvAjPaSAMDvr9Y8oubZtALpjh8zsNnpvD0ryzWe47TwKysy3c85BHlwAZBtz
-	 GdT3B6JhDQw5KdKUz4/Eir4GY861uBb6E7JSEFyhIc2lJhyMYSWHoXf6fBdvwVN/ZqJQM
-	 6cBmHqWdvHDZyBNtNA6G1vVjMkU5vMUNxwvPdrGilaAPzckBvIyQOYQvUO/OLdgwmTIbR
-	 4/lfhmX7IVZnPQDl5FbTrFKZmiTPI15lptGuyEu7TNxztGydSdskpdrMzuv1DfcG7Ng==
+	bh=7rHfx2XAqBmbSywEyiIwBXdgo8NxbqZDE7ZkTit84No=;
+	b=e+mv+aQmls/EgDvCZjIi5sfxX7GCk6C2gOTtr6J6un52xpJZln3KEK4ZbJmjFdFHWdp4
+	 RBVkKmBjMgrr4Y8fF2M8aOuJjwEWxwDovepQD9WemxGARTrzaM7bo++Y8fhipDDBcNr6d
+	 qJjh1Q3liESpQ9ez6HEgxnLUXDqJuqFlwY8KRkh9Ka9JABY7c2F69lIcyxfZQhT+4mW+D
+	 +NTpiTrJD33DS7lt+HdHx7Ssd+DFJbOVjlNpSefT3U2Cb0wTg5LgfPiWJjutM+0DvuyFJ
+	 FR4zNM6lv/gPhrVY/WKcfdpgP9NtZxuF34ZjWKuAgi85c1CQpo7eIHM7xyz2ETrxvvQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ad0glmQJ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=V2fyUQwW;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB575606A320;
-	Sat, 21 Nov 2026 12:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C5E606A32A;
+	Sat, 21 Nov 2026 13:06:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ad0glmQJ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E201F000C0;
-	Sat, 21 Nov 2026 12:22:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=V2fyUQwW
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27E171F000C0;
+	Sat, 21 Nov 2026 13:05:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795263765;
-	bh=RTZTkBgGTAVOkbRvUJ8jaCPNtuaObH6Md0Cm1SV1BwY=;
+	s=k20260515; t=1795266365;
+	bh=7rHfx2XAqBmbSywEyiIwBXdgo8NxbqZDE7ZkTit84No=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=ad0glmQJVjeG757nF6Hnno1fRDNpe2skOm05mcTm5k2ixfRHl62GXCH6R0Ux5ua6Z
-	 8exEcpHP04OkqS2etyBhyRTBKEqqn6Rnk4K1tyNFbE5cECf5ltfjcrzNzkIOv6BDUS
-	 c5hu0k9XXo2FYsHThhxrcdf/XpntR7toORCxzFyVNs4GcfzmhkqD3Dd6Q6eMtVKhUL
-	 vAr7XiOno8JAPN3cnloniGBr2+Ak50LKMiQn5rBZffR20m5kDRAorLtPIKbp5BuoCM
-	 dg9/j3dof+oMp+SI8tyUqwxp5KjdEbVuYIWEb92RjvikG74rL2wpx9YPS3pPrapMWs
-	 cZYO+as3mowmA==
-Message-ID: <9faa6fce-594f-4556-b5ab-6aa73330da8d@kernel.org>
-Date: Sat, 21 Nov 2026 13:22:37 +0100
+	b=V2fyUQwWqcoCYUdbntUFFnDiAiyD2pNLByernr4+NUcaOy58il+sbgW+Qj4C5YFY3
+	 msz+MfNamx6uq42RRY0b7Ei/6zjpyaU6n5OJ87OdP2E55M00nX8W02Jp00Wk/PzMTe
+	 LQ1DxQnoh96+PLGuh875I1tqudoL6B7zlrvYf7nzgVQvOQd0b3oHrX1WJqfHXoglrQ
+	 MJFiDRLvFlqpyxOPTaERj+vKFeoYwkrZ1YHM4Gj0qoJ4OKMOjeeoZ+5gFbFvk1hZOL
+	 GyOHEBck2GLBnsMNCVUqnJU+UneTTVLp/5tr4bV0M79W/6QptXsQ9ZQAPIsrTuUFLU
+	 +bnc3xKNMbUTA==
+Message-ID: <c26b8002-c246-45cb-bca0-8f596a2a425b@kernel.org>
+Date: Sat, 21 Nov 2026 14:05:57 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -52,8 +52,7 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 3/4] arm64: defconfig: update the Qualcomm Crypto
- Engine entry
+Subject: Re: [PATCH v12 1/4] crypto: qce - convert to auxiliary bus
 To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
  Thara Gopinath <thara.gopinath@gmail.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
@@ -68,9 +67,10 @@ To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
  <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>
 Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  linux-kernel@vger.kernel.org, brgl@kernel.org,
- linux-arm-kernel@lists.infradead.org
+ linux-arm-kernel@lists.infradead.org,
+ Pankaj Patil <pankaj.patil@oss.qualcomm.com>
 References: <20261120-qce-fix-self-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com>
- <20261120-qce-fix-self-tests-v12-3-b5a2a44bc5ae@oss.qualcomm.com>
+ <20261120-qce-fix-self-tests-v12-1-b5a2a44bc5ae@oss.qualcomm.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -116,22 +116,18 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20261120-qce-fix-self-tests-v12-3-b5a2a44bc5ae@oss.qualcomm.com>
+In-Reply-To: <20261120-qce-fix-self-tests-v12-1-b5a2a44bc5ae@oss.qualcomm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 20/11/2026 20:34, Bartosz Golaszewski wrote:
-> Most Qualcomm SoCs contain the QCE hardware offloader. The crypto driver
-> for this IP is being split into a smaller core stub that doesn't register
-> the crypto algorithms on its own AND an auxiliary driver than handles
+> This driver is disabled in arm64 defconfig but one of its
 
-This part is fine...
-
-> the crypto part. Update the arm64 defconfig to only build the core part
-> by default and leave the choice of building the crypto part to the user.
-
-but here you miss answer why. We do want the proper driver, not only the
-stub, no?
+That's true for next, but your patch #3 seems to disagree. That's
+confusing. Maybe you meant disabled for arm64 platforms or marked as
+broken? Because anyway defconfig does not matter here - even if drivers
+are not enabled in defconfig (so stay disabled), they should not be
+affected with unbisectable changes.
 
 Best regards,
 Krzysztof
