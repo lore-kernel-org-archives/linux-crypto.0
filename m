@@ -1,54 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795376522;
-	b=FmVv3t+fhXtXxR4Is1KMG/d2r1H/NpxsvYeona/n3WhRWLJ18j9HHyWKSReIvRIoapV9
-	 sjp0i1jCCcq6AE6d8xFBhMAspyWhtNtHSMOdfngTuZJtJtUnFPfIza+I6JtoyHcnOFEKk
-	 q0a0XSTl7LN394tcHd2LUbi397HLFxH8czpBfh5Hv8w6V6x0fz/NPrhQi+3iUbiu5Q6nP
-	 VomvraOT5OiAHYbuQt9FQ5tU/b0uh8jKducBsclakrpWNcHNGmTJSJCMknQAVE9cndYRF
-	 iSPVFlzUfRUQjHmzHgTb4qlwHsmM1SQG+ZJieT3fekbn0o82XM7SZSnRKfu8Pfh4tbQ==
+	t=1795377353;
+	b=zheo1c3N18WZbeGhTWVNCdZtsTLpGnVxT0xn/BAm5EPJoeaELZi465TKTIm9JcsVV5SB
+	 IyEIlYwJwyByje6jlBi0Jze+G/egJAnHuElqs88nkIK2CaDzkRzzbB+LwD3MKE1b7W3D8
+	 36aw/Gq1P+Y12zoVB99A8AvGyFFfsIufqPyxVDxdOzeI2iGeU3B5eiCEKLet74jx5KQ4F
+	 ilrYmPRKwoIIe8E+tc0EnsSQMc1w+qbqYsOJj/mOc+8y0yv7pfrUor6hRSJpTu2Wahwcw
+	 UZR9YUODyabXg2R0lbrUZNJADgRPksrWvq2h6N9zFdMCOd3xuugAEmWMen5ylqorIQQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795376522;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795377353;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=BbPOsx5puKOE6m5zslrdQFiFGMgsU43/M8/IdHqCUX8=;
-	b=o8A/C4BwG3UCRKa8On/u3/SnBNIRpnvh80T0xPqxzA+VwCTNPci6leKxn6eiqVIY84wO
-	 Nuqn6AaN98M0cYcVk7JIJqKqtZr0cpO73Qtbfwv3/E44iDqvDiUlDOPXTU+ZN+qCb/qad
-	 cFqcOZE6h2N6yuRh6mGqVu0921en2r2ppRbwSXR2GnjLSopIZY0jIBU98Uzw8UnSJNlXC
-	 Ycfzp9uvK0hntqoFZFp4s9imr7Rn3YOGqMnvkd7x0ndceJz+e0O2eL9hetTJW1wVUReyI
-	 glbtZWVH3N6SSJPtscJfnUPelEeAQ0Bkaurond1ode8cRljMnbPi/3B3f9R+dVfaTMg==
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To;
+	bh=MPMQu4BCoUDykkFbNt6vtulnjN5wBroFJlnucc4H1vw=;
+	b=Xlbo16rUo9mKc4bUTSWkZ3UOR7EElqEe6aRaDVBBZ3DbDXLqgOBxSaESMrDRN9rZmWse
+	 tGj+J1oRgsu/bAM9AJR1Oqo+dCyPqMOVGVld91l0tpMCcGJYZvxuHWZrdOOQ6gOQRDHlJ
+	 aIVev1ktPW6neAn0U49MXNXty8oYJ1tSzvZDcKnfc5A2A7Jl4q0en9tr3Vbnn0HRuoC1Z
+	 7JQZZf+1iW4S/dXoY3zAk/ZbgSB+GEobrHp8I4yx1PLseLmU3mGxDVPUTo2mOcll6wAK8
+	 FW2+rGbYANrcA3+kcXC/FqmrLUZ9MNlKRHOqXp10jBMum07Bsici651DCRtiqo9JAdg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ip1ptZVs;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jQvoOk4B;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCFD606A31A;
-	Sun, 22 Nov 2026 19:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A847606A31A;
+	Sun, 22 Nov 2026 19:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ip1ptZVs
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A25341F000CA;
-	Sun, 22 Nov 2026 19:42:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jQvoOk4B
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 276B61F000CA;
+	Sun, 22 Nov 2026 19:55:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795376522;
-	bh=BbPOsx5puKOE6m5zslrdQFiFGMgsU43/M8/IdHqCUX8=;
+	s=k20260515; t=1795377353;
+	bh=MPMQu4BCoUDykkFbNt6vtulnjN5wBroFJlnucc4H1vw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ip1ptZVs0S7Rm+qxEHxzARp/LuU83aoWAgkdvkuJEOzIy6R9FOe2bBmLANODDY3sY
-	 +/rI2SOp4JqqKXVQPL39VCtgIrSNBZYnVcQ70k9LSkD+DysAuHnyKxB62d5kCXBYq1
-	 A7znzXTuTHmjCvi6DSYZxE/PBfCrt+ytT0lCG3ApwaldOTI0p57QB3mwNF+KVAl3DQ
-	 XDOxwUIvqKV7tZuMATUuYhRef2TSo7OIQT6rOnKrTXnLVxw+eXjTzaimgIeCjB4vx4
-	 8h1s4GqQkxmz9utz8EzwmOQQ+CCr4cIKuymPgVvNPHF9qvDt0RxHa1zmJDuhSdGQt9
-	 +IFwPoAKhgu+g==
-Date: Sun, 22 Nov 2026 11:42:00 -0800
+	b=jQvoOk4BkS2tZqIzY5OR7rn4UiQNdm7FCXsXIy5M+Kc9W4ZwRSLUjUd0OQZ0UqZ61
+	 42IR6++t0oU4GrCEJlGp8q/5t9ApQkWFID01J36i4A7cMg41d0PayVAgE0aT2c5Rt6
+	 2nMc0u1MoP+v9GmoAUPl0Agjq4iltxGjWmun9WIEvJ+YuIr3WjzCZZcF/6DEJD+I6z
+	 VGL4/BB3lEMWnhf+oYZsIlMGy6CcmrCKq9gQSNXuWo3GQVvTSSBAfRLthcJWW66Yik
+	 coYrGFamHWteT9o0H8D6OAb8nTWqPtoDDBcmt3dJBnOfbHXg07Dzjacs8U/5b4k/aQ
+	 kAptKtb5eshjA==
+Date: Sun, 22 Nov 2026 11:55:51 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Shreesh Adiga <16567adigashreesh@gmail.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>, Sasha Levin <sashal@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>, linux-crypto@vger.kernel.org,
-	llvm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crc: Use uint64_t for the new NEON crc64 fold
- constants
-Message-ID: <20261122194200.GA2122@sol>
-References: <20261122152900.1113961-1-sashal@kernel.org>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/crypto: x86/sha2: Drop one-off implementations for
+ Sandy/Ivy Bridge
+Message-ID: <20261122195551.GB2122@sol>
+References: <20261115080900.216434-1-ebiggers@kernel.org>
+ <20261122113934.48a9ac42@pumpkin>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -58,72 +61,86 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20261122152900.1113961-1-sashal@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20261122113934.48a9ac42@pumpkin>
 
-On Sun, Nov 22, 2026 at 10:29:00AM -0500, Sasha Levin wrote:
-> Commit ff049836f05f ("lib/crc: Don't include <linux/types.h> in NEON intrinsics
-> code") in mainline switched the arrays passed to vld1q_u64() to uint64_t, since
-> u64 and the uint64_t that vld1q_u64() takes are different types on arm64 once
-> <linux/types.h> is gone. The two arrays added by commit ef4102757fdd ("lib/crc:
-> Add 4-way folding in NEON crc64_nvme implementation") still use u64, so the
-> combination fails to build with clang:
+On Sun, Nov 22, 2026 at 11:39:34AM +0000, David Laight wrote:
+> On Sun, 15 Nov 2026 00:09:00 -0800
+> Eric Biggers <ebiggers@kernel.org> wrote:
 > 
->   lib/crc/crc64-neon.c:66:40: error: incompatible pointer types assigning
->   to 'const unsigned long *' from 'const u64 *' (aka 'const unsigned long
->   long *') [-Werror,-Wincompatible-pointer-types]
+> > [ This is proposed to supersede my patch
+> >   "lib/crypto: x86/sha512: Partially roll up sha512_transform_avx()"
+> >   which was starting to clean up one of the files being dropped. ]
+> > 
+> > Currently, the kernel has SSSE3, AVX, and AVX2 implementations of each
+> > of SHA-256 and SHA-512.
+> > 
+> > The AVX implementations of SHA-256 and SHA-512 run only on CPUs that
+> > have AVX but do *not* have AVX2.  These are all the ones I could find:
+> > 
+> >     - Intel Sandy Bridge and Ivy Bridge
+> >     - AMD Bulldozer, Piledriver, Steamroller, Jaguar, and Puma
+> >     - Zhaoxin KX-5000 and KX-6000 (possibly SHA-512 only, as these CPUs
+> >       might be able to run the PHE optimized SHA-256 code)
+> >     - Maybe some oddly configured VMs
+> > 
+> > Oddly enough, this "AVX" code doesn't actually have much to do with AVX.
+> > The only AVX capability it uses is support for 3-operand VEX-coded
+> > instructions, which is unlikely to make a huge difference.
 > 
-> Use uint64_t for them too. This builds with and without ff049836f05f.
+> Especially if they are the only VEX encoded instructions.
+> Switching back and forth is horribly expensive and the change isn't
+> 'sticky' on some later Intel cpu and you get the 'hit' for every
+> instruction.
+> (kernel_fpu_begin() might need a vzeroupper to migitage this.)
 > 
-> Fixes: ef4102757fdd ("lib/crc: Add 4-way folding in NEON crc64_nvme implementation")
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
+> > 
+> > Its actual purpose is mostly unrelated to AVX: it replaces the 'ror'
+> > instruction with 'shld'.  This is entirely to work around a quirk
+> > specific to Sandy Bridge and Ivy Bridge where the 'ror' instruction was
+> > very slow for microarchitectural reasons, and 'shld' worked better.
+> > 
+> > This is documented in the contemporaneous paper "Speeding up SHA-1,
+> > SHA-256 and SHA-512 on the 2nd Generation Intel Core Processors"
+> > (https://ieeexplore.ieee.org/document/6209073).  There, the 'shld'
+> > workaround was claimed to speed up SHA-256 and SHA-512 by about 20% on
+> > Sandy Bridge.
+> > 
+> > However, that was a one-off quirk.  And even the paper itself warns
+> > about using the 'shld' approach on other microarchitectures.
+> > 
+> > On AMD CPUs, and on Intel CPUs after Sandy and Ivy Bridge, the exact
+> > opposite applies: ror is a fast single-cycle and single µop instruction,
+> > while shld is either a slow microcoded or multi-µop instruction.
+> > 
+> > From what I can find, this is true even on the older AMD CPUs mentioned
+> > above that run this code.  Thus this code has likely always been harmful
+> > on AMD.  (I don't have such a CPU available to test, but for what it's
+> > worth, on Zen 5 the AVX SHA-512 code is 58% as fast as the SSSE3 code.
+> > Clearly, the 'shld' hack can be quite slow on CPUs it wasn't meant for.)
 > 
-> crc-next is based on v7.4-rc2 and ff049836f05f went into mainline after
-> rc3, so linux-next will hit this once it merges the two. all-next hit
-> it already.
-> 
-> Tested on arm64: lib/crc/crc64-neon.o builds with clang and gcc on
-> crc-next, and with clang on crc-next merged with mainline 4843f6873f7c.
-> Without this patch the merged tree fails as above.
-> 
->  lib/crc/crc64-neon.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/lib/crc/crc64-neon.c b/lib/crc/crc64-neon.c
-> index 03b46d0abcc41..f36389789fe65 100644
-> --- a/lib/crc/crc64-neon.c
-> +++ b/lib/crc/crc64-neon.c
-> @@ -11,11 +11,11 @@
->  u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
->  
->  /* x^575 mod G, x^511 mod G */
-> -static const u64 fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
-> -					   0x62242240ace5045aULL };
-> +static const uint64_t fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
-> +						0x62242240ace5045aULL };
->  /* x^319 mod G, x^255 mod G */
-> -static const u64 fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
-> -					   0xe1e0bb9d45d7a44cULL };
-> +static const uint64_t fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
-> +						0xe1e0bb9d45d7a44cULL };
->  /* x^191 mod G, x^127 mod G */
->  static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
->  					0x21e9761e252621acULL };
+> I've got a bulldozer (or similar) I can run a test on.
+> I might just to a quick one for shld v ror.
+> I've rewritten my 'rep movs/stos' benchmark and plan to run it on the
+> older cpu I have.
+> (I need to get something newer than an i7-7 and older than a zen5.)
 
-Thanks Sasha.
+Thanks.  If you do want to benchmark it, you can use sha512_kunit with
+CONFIG_CRYPTO_LIB_BENCHMARK=y enabled.
 
-I've dropped "lib/crc: Add 4-way folding in NEON crc64_nvme
-implementation" from crc-next temporarily.
+After that, you could also check the performance with the
+sha512-ssse3-asm.S optimization patchset applied on top of it
+(https://lore.kernel.org/linux-crypto/20261122022030.296468-1-ebiggers@kernel.org/)
 
-Shreesh, could you send a new patch that folds together that patch with
-the two fixups for it?  Then we'd get one clean patch.
+My prediction is that performance on Bulldozer goes up slightly when
+sha512-avx-asm.S is removed (due to sha512-ssse3-asm.S being faster),
+then up slightly more due to the sha512-ssse3-asm.S optimizations.
 
-    lib/crc: Add 4-way folding in NEON crc64_nvme implementation
-    lib/crc: arm: Support partial blocks in NEON crc64_nvme
-    lib/crc: Use uint64_t for the new NEON crc64 fold constants
-
-Thanks!
+(Of course, even if the results are more mixed, both patches seem like
+the clear way to go anyway for other reasons: reducing the code size,
+deleting an entire asm file that we'll no longer have to maintain,
+eliminating the huge on-stack buffer that was never cleared, etc...)
 
 - Eric
