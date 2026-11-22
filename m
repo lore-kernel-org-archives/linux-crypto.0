@@ -1,56 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795361342;
-	b=wLzG7iRQ3yiIzhVFy21kBR/YYc3BPss/l4U/HfwQ0aLl9Sy1TUbeak1rtcwWUKo14o8W
-	 /6OuXcgGG281cv9/Hu2v9hPLHegIqr0+I/YUNVhiTz/lXIJ2pc4ccFhls5xuGJRZiP6vV
-	 Gq6WZQJEtzH03rFtkETv6NUfzXTT/lL1O0DgZ3KrOHyJHcRlFGn4Ly5dXAteCvPcpBGPd
-	 8R9bsqEu72t4LZTINGYU7QwU2XgbFWbVTGF7cUbjtFd+ldxfDQm2dHsTpJOX7wo7zbbgP
-	 MRquOIj9dcP9krFsezWQaTsL/4yDjc/ES7kjhoC3beipipNvaWWja9nUdsDrcnjvHVw==
+	t=1795376522;
+	b=FmVv3t+fhXtXxR4Is1KMG/d2r1H/NpxsvYeona/n3WhRWLJ18j9HHyWKSReIvRIoapV9
+	 sjp0i1jCCcq6AE6d8xFBhMAspyWhtNtHSMOdfngTuZJtJtUnFPfIza+I6JtoyHcnOFEKk
+	 q0a0XSTl7LN394tcHd2LUbi397HLFxH8czpBfh5Hv8w6V6x0fz/NPrhQi+3iUbiu5Q6nP
+	 VomvraOT5OiAHYbuQt9FQ5tU/b0uh8jKducBsclakrpWNcHNGmTJSJCMknQAVE9cndYRF
+	 iSPVFlzUfRUQjHmzHgTb4qlwHsmM1SQG+ZJieT3fekbn0o82XM7SZSnRKfu8Pfh4tbQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795361342;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=9nQxnYz6UO1nf9mlNBh/7UX1qcC/Uwn0p+mA44C2aF0=;
-	b=q0BFeEnxigbTDNFf7OnRu+9YOmnfZ1eqUL73x1g5l41JrAWCPnaE31YWn3ggOxNzhXkF
-	 3fbkGiKAzdwrYDMYJoT9f1K9BhF0AjM+3mXu9ISeFCrbXpmUFe2tqbWCEHCxRj6jEWoxM
-	 pnk0ntsdxgbK3xDkO5d/+4V1ahkYvia6XMR5+p83zGrDZcFNlrGpviaA2JL9k38XdZGW0
-	 ARdT928fB0CxfusruMAwP7W6wvT6nt5kfE0bhCe20H08TkiABOwYtbe87o+ipADaFKjZ9
-	 69h9oR5KHTGiE8r6nuoDl5FcK1JeQSMW4Sb1AdMIGrncZL72fpIsCdLS17m9C5f830g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795376522;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=BbPOsx5puKOE6m5zslrdQFiFGMgsU43/M8/IdHqCUX8=;
+	b=o8A/C4BwG3UCRKa8On/u3/SnBNIRpnvh80T0xPqxzA+VwCTNPci6leKxn6eiqVIY84wO
+	 Nuqn6AaN98M0cYcVk7JIJqKqtZr0cpO73Qtbfwv3/E44iDqvDiUlDOPXTU+ZN+qCb/qad
+	 cFqcOZE6h2N6yuRh6mGqVu0921en2r2ppRbwSXR2GnjLSopIZY0jIBU98Uzw8UnSJNlXC
+	 Ycfzp9uvK0hntqoFZFp4s9imr7Rn3YOGqMnvkd7x0ndceJz+e0O2eL9hetTJW1wVUReyI
+	 glbtZWVH3N6SSJPtscJfnUPelEeAQ0Bkaurond1ode8cRljMnbPi/3B3f9R+dVfaTMg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NMPu4rp8;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ip1ptZVs;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79778606A684;
-	Sun, 22 Nov 2026 15:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCFD606A31A;
+	Sun, 22 Nov 2026 19:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NMPu4rp8
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32D231F000EC;
-	Sun, 22 Nov 2026 15:29:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ip1ptZVs
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A25341F000CA;
+	Sun, 22 Nov 2026 19:42:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795361342;
-	bh=9nQxnYz6UO1nf9mlNBh/7UX1qcC/Uwn0p+mA44C2aF0=;
-	h=From:To:Cc:Subject:Date;
-	b=NMPu4rp8zjewDlvkpylD75SJ9oDVhEKn1UTPVjZqujtU5Z6dAg30GKLvJ4PIaYq93
-	 uzDp8WTcNGkG+m/Xk4DqLWYEY3ebBZhPf/s1rhDDYrUuMuBSbQQ+nefqb6DH2HRtSm
-	 jvCSPA3ndKtq+dIXqcVHVGvka63J9BOuQYoRR2H3d2l6oer0Lqu+nC0TfyBvA8KzqU
-	 d/ZLZFA75MOY9j5cd2EJPZUCymlBYdDmy6ghTGh7OyIbToBR6wBnhyEt4qNi6WsjS9
-	 MH9+mDV4PWcihzPUvwqzii4Qni6HdCeModUux7Dc7xylCoC0SDhAEwylbD5rHK39IE
-	 T7feX07qPm3sA==
-From: Sasha Levin <sashal@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	Shreesh Adiga <16567adigashreesh@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	llvm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] lib/crc: Use uint64_t for the new NEON crc64 fold constants
-Date: Sun, 22 Nov 2026 10:29:00 -0500
-Message-ID: <20261122152900.1113961-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	s=k20260515; t=1795376522;
+	bh=BbPOsx5puKOE6m5zslrdQFiFGMgsU43/M8/IdHqCUX8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=ip1ptZVs0S7Rm+qxEHxzARp/LuU83aoWAgkdvkuJEOzIy6R9FOe2bBmLANODDY3sY
+	 +/rI2SOp4JqqKXVQPL39VCtgIrSNBZYnVcQ70k9LSkD+DysAuHnyKxB62d5kCXBYq1
+	 A7znzXTuTHmjCvi6DSYZxE/PBfCrt+ytT0lCG3ApwaldOTI0p57QB3mwNF+KVAl3DQ
+	 XDOxwUIvqKV7tZuMATUuYhRef2TSo7OIQT6rOnKrTXnLVxw+eXjTzaimgIeCjB4vx4
+	 8h1s4GqQkxmz9utz8EzwmOQQ+CCr4cIKuymPgVvNPHF9qvDt0RxHa1zmJDuhSdGQt9
+	 +IFwPoAKhgu+g==
+Date: Sun, 22 Nov 2026 11:42:00 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Shreesh Adiga <16567adigashreesh@gmail.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Sasha Levin <sashal@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>, linux-crypto@vger.kernel.org,
+	llvm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/crc: Use uint64_t for the new NEON crc64 fold
+ constants
+Message-ID: <20261122194200.GA2122@sol>
+References: <20261122152900.1113961-1-sashal@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,58 +58,72 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261122152900.1113961-1-sashal@kernel.org>
 
-Commit ff049836f05f ("lib/crc: Don't include <linux/types.h> in NEON intrinsics
-code") in mainline switched the arrays passed to vld1q_u64() to uint64_t, since
-u64 and the uint64_t that vld1q_u64() takes are different types on arm64 once
-<linux/types.h> is gone. The two arrays added by commit ef4102757fdd ("lib/crc:
-Add 4-way folding in NEON crc64_nvme implementation") still use u64, so the
-combination fails to build with clang:
+On Sun, Nov 22, 2026 at 10:29:00AM -0500, Sasha Levin wrote:
+> Commit ff049836f05f ("lib/crc: Don't include <linux/types.h> in NEON intrinsics
+> code") in mainline switched the arrays passed to vld1q_u64() to uint64_t, since
+> u64 and the uint64_t that vld1q_u64() takes are different types on arm64 once
+> <linux/types.h> is gone. The two arrays added by commit ef4102757fdd ("lib/crc:
+> Add 4-way folding in NEON crc64_nvme implementation") still use u64, so the
+> combination fails to build with clang:
+> 
+>   lib/crc/crc64-neon.c:66:40: error: incompatible pointer types assigning
+>   to 'const unsigned long *' from 'const u64 *' (aka 'const unsigned long
+>   long *') [-Werror,-Wincompatible-pointer-types]
+> 
+> Use uint64_t for them too. This builds with and without ff049836f05f.
+> 
+> Fixes: ef4102757fdd ("lib/crc: Add 4-way folding in NEON crc64_nvme implementation")
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ---
+> 
+> crc-next is based on v7.4-rc2 and ff049836f05f went into mainline after
+> rc3, so linux-next will hit this once it merges the two. all-next hit
+> it already.
+> 
+> Tested on arm64: lib/crc/crc64-neon.o builds with clang and gcc on
+> crc-next, and with clang on crc-next merged with mainline 4843f6873f7c.
+> Without this patch the merged tree fails as above.
+> 
+>  lib/crc/crc64-neon.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/lib/crc/crc64-neon.c b/lib/crc/crc64-neon.c
+> index 03b46d0abcc41..f36389789fe65 100644
+> --- a/lib/crc/crc64-neon.c
+> +++ b/lib/crc/crc64-neon.c
+> @@ -11,11 +11,11 @@
+>  u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
+>  
+>  /* x^575 mod G, x^511 mod G */
+> -static const u64 fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
+> -					   0x62242240ace5045aULL };
+> +static const uint64_t fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
+> +						0x62242240ace5045aULL };
+>  /* x^319 mod G, x^255 mod G */
+> -static const u64 fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
+> -					   0xe1e0bb9d45d7a44cULL };
+> +static const uint64_t fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
+> +						0xe1e0bb9d45d7a44cULL };
+>  /* x^191 mod G, x^127 mod G */
+>  static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
+>  					0x21e9761e252621acULL };
 
-  lib/crc/crc64-neon.c:66:40: error: incompatible pointer types assigning
-  to 'const unsigned long *' from 'const u64 *' (aka 'const unsigned long
-  long *') [-Werror,-Wincompatible-pointer-types]
+Thanks Sasha.
 
-Use uint64_t for them too. This builds with and without ff049836f05f.
+I've dropped "lib/crc: Add 4-way folding in NEON crc64_nvme
+implementation" from crc-next temporarily.
 
-Fixes: ef4102757fdd ("lib/crc: Add 4-way folding in NEON crc64_nvme implementation")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+Shreesh, could you send a new patch that folds together that patch with
+the two fixups for it?  Then we'd get one clean patch.
 
-crc-next is based on v7.4-rc2 and ff049836f05f went into mainline after
-rc3, so linux-next will hit this once it merges the two. all-next hit
-it already.
+    lib/crc: Add 4-way folding in NEON crc64_nvme implementation
+    lib/crc: arm: Support partial blocks in NEON crc64_nvme
+    lib/crc: Use uint64_t for the new NEON crc64 fold constants
 
-Tested on arm64: lib/crc/crc64-neon.o builds with clang and gcc on
-crc-next, and with clang on crc-next merged with mainline 4843f6873f7c.
-Without this patch the merged tree fails as above.
+Thanks!
 
- lib/crc/crc64-neon.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/lib/crc/crc64-neon.c b/lib/crc/crc64-neon.c
-index 03b46d0abcc41..f36389789fe65 100644
---- a/lib/crc/crc64-neon.c
-+++ b/lib/crc/crc64-neon.c
-@@ -11,11 +11,11 @@
- u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
- 
- /* x^575 mod G, x^511 mod G */
--static const u64 fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
--					   0x62242240ace5045aULL };
-+static const uint64_t fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
-+						0x62242240ace5045aULL };
- /* x^319 mod G, x^255 mod G */
--static const u64 fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
--					   0xe1e0bb9d45d7a44cULL };
-+static const uint64_t fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
-+						0xe1e0bb9d45d7a44cULL };
- /* x^191 mod G, x^127 mod G */
- static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
- 					0x21e9761e252621acULL };
-
-base-commit: ef4102757fdd84b0b6189260780ac5faf132edc7
--- 
-2.53.0
-
+- Eric
