@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795314068;
-	b=X/qwkffO1YP2KiJ1/cn8RTuPPN6NC7u9hkKbEFo7h8mUvYvQdcenaM6UJXVV6E6pXR3Y
-	 Du8/BTR3LKgPpv56ksWM8hz59V4UMtFhh/JGyIUqCWEHgGGWen1c8bYz0bmIeH1l71l4s
-	 Xo0in+Cd+9mQ5HfIuq7V4kogHkXxx5Mlp5QDXAEXlSmGXyyafaLLUaULyczWZFHTdx9OS
-	 oC5hW3degx8ef0wJKGXgDJm+Ld0Ir2sCH7bT89slU1qzIuJSvqmS2LyQlM81u8M6tdZea
-	 Mijo04aID9WHhqQFWj2q+Gjly4N4LVmNfMAv3bgqkkXfpYcjeVeEWjVWK/wbM0NhTEw==
+	t=1795314069;
+	b=eCEkksDTR7slQDTWil4ab43bSASCa1Hu/zuyQXwH3HRxGtvSOuOJTYElnIBChtfbomTo
+	 cO70amde0cWx70IXbDMz7ZvT/ruKsuOa3Jq9jVBb4hcYG9XHZY01mZGCJVrYJ2KCvePcd
+	 QCl/gGkOXsdsjBZgmRCGuOEZyb8Jj0hvT0TejFjF2RktRpfdoBabzgiDV0w+qwnriVVak
+	 P7pl6plCb3JKk0QE2Ylu9n/14yDn9TEdqq0f8UdYBPTyCk9lNZ6Vfx+3pIiXhMwbmoilt
+	 GtEqE2j9kVz5ZFL0R3hquAImjg/AK6R6ZmzpkI47fLpiPxO9TKUyNfn604g+8yHKBag==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795314068;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795314069;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=x3uCkZfep/XcWzpnJuxfJlGGAX/654FBzv6WyHve0e8=;
-	b=D8C3Za7m85BHyeJ7r34thAcwycu//32asDjR+rQvekcl9fYfxLEnDKocUj/5MuIvNoWy
-	 PXCJhwUJl9Y6cmPcgZbpIEqW5VFKiBX3DtH5TfXhPwNZQD9WvJLN7OEHoX3so3+Lj9fHA
-	 QIkP8FbWnE/Oyakau/KntZfaetYWJl9iXHsAtE0o3ovbiAw7DyOPhUuJ27R3KgS2tyGvP
-	 yoVfsGBau8GJ5byXD1GYXbw6+oDKzDfXD0LUCmSnjbzIBbX8KTTpFWKwv2NxD2UCPkuOL
-	 N3dINH17+w/+Mktr5WmA4z4zNf0Ldi0+iP8/NThesROIGWsB5+u2cpd5xk0YkphwHuQ==
+	bh=5JOBrlBdSRnXBHMuFXnL5DQ/Ejw8uLeobXvdT/HZsYY=;
+	b=pRcHRYKbbUJRWxXfqu5JIvLhwU7uRysPPTGC7U269P/jnoZ2mU3jYAQH0H285BLAcqcy
+	 YhmFwLCglQSR6D89OfKLxW1O0ZO0fLw0JgDVtJd2JFIaI4Rh/WrbSFY9LPmfVFQcUInUb
+	 xUyKYJYKJt14vQm3i/VVv0l8utajehxRJUCTujnWw/bTlQaqjC4OhfXP9FpyHLPHPKyr5
+	 Ig3Ns/OXobF4fc3O3kK9hA0UeK46FYqPUS20wtWRb+mEXBrKxfED2NP3kjZTL2CTLvv4Q
+	 5i1UbGcRGKAWxlob6DgDnppycVc9L7FjO+MMRCAhtAhEae9Mk74YVA4xOsBp0VPJCHQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YCtQ2lG4;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BTShoFXg;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF7E606A334
-	for <linux-crypto@vger.kernel.org>; Sun, 22 Nov 2026 02:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5614B606A32A
+	for <linux-crypto@vger.kernel.org>; Sun, 22 Nov 2026 02:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YCtQ2lG4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 663371F000CA;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BTShoFXg
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C101F000C4;
 	Sun, 22 Nov 2026 02:21:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795314068;
-	bh=x3uCkZfep/XcWzpnJuxfJlGGAX/654FBzv6WyHve0e8=;
+	s=k20260515; t=1795314069;
+	bh=5JOBrlBdSRnXBHMuFXnL5DQ/Ejw8uLeobXvdT/HZsYY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=YCtQ2lG4kjkdwMzia/H54mZi4Ilp0BYcSuWnZngMbI+ZswqlDt31GFYsw5IuUOnGG
-	 xEW9Mwsl5cCaM39PVXI+aKIsq/SqlUqm+Buo0JJbdKnwISxFgPGCwARvU4Vg6UIrUU
-	 1YScIMOTxqFLYkReUYYS9mS0ObtH9I1rNH/csc8SA311EToqlPABzX+XitktylAyRe
-	 IlqXIeyCAPUTKYjjD9NtXWzu5NBt/g65fZxIt+b+woVOBtm5Pvug9ibIVcDSbcVbdm
-	 K7qp2atgr+Cup3oPCXsrGRHTU7xngd9xJ5Jg7lNvZzGqEElFdSL/THhVNPVYGW8E6k
-	 NR8xwBODGhsqg==
+	b=BTShoFXg+jhsJHcq6tm+ncfFq6fB7R8ML/zZZ5J4vTl0bD8I/7KBhrOpEk/oyFqrC
+	 xshwpWlZ103oqaYU+oU+8GXWBSpmRRiz6f50240HBvnB6xHuw5hNfvL9o7ln/oQSEm
+	 Fd9NE5e4quDz4WsPYB0BFkWYFFtz5HGlZn+q2dYPVq7+JyMEqagOPYwgzy+ksyM2TR
+	 aXl3ZJpNP5lkLAHGKWPgoQjjX83VYvvZZn1akxgY72L9YBZwpsHRD8cIfSTfzijXhy
+	 L/s5YBrIkRmXV1+A7vsSEk6A3ehfdSespbBq4QQdtSZx4o5I8Es4aY0ti919Ymuitz
+	 KmEh4aQw87WPQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
@@ -46,9 +46,9 @@ Cc: Ard Biesheuvel <ardb@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6/8] lib/crypto: x86/sha512: Keep state in registers across blocks in SSSE3
-Date: Sat, 21 Nov 2026 18:20:28 -0800
-Message-ID: <20261122022030.296468-7-ebiggers@kernel.org>
+Subject: [PATCH 7/8] lib/crypto: x86/sha512: Shorten critical-path additions in SSSE3
+Date: Sat, 21 Nov 2026 18:20:29 -0800
+Message-ID: <20261122022030.296468-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261122022030.296468-1-ebiggers@kernel.org>
 References: <20261122022030.296468-1-ebiggers@kernel.org>
@@ -63,81 +63,104 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In sha512_transform_ssse3(), each iteration of .Lupdateblock updates the
-state in memory using 'add reg, mem' and then immediately reloads all 8
-state words from memory at the top of the next iteration.
+In SHA512_2Sched_2Round_sse, T1 = Ch(e, f, g) + W[t] + K[t] is ready
+well before S1(e) finishes in tmp0, yet 'add tmp0, T1' was executed
+before 'add h_64, T1'.  Swap them so 'add h_64, T1' runs in parallel
+with S1(e), matching SHA512_Round and removing 1 cycle per round from
+the critical path.
 
-Hoist the initial state load before .Lupdateblock, and update the state
-at the end of each block using 'add mem, reg' followed by 'mov reg, mem'
-(via a new 'addm' macro), as sha512-avx2-asm.S, sha256-ssse3-asm.S, and
-sha256-avx2-asm.S already do.
+Similarly, in SHA512_Round, T1 finishes later than both Maj(a, b, c)
+and S0(a).  Add S0(a) into T2 before 'lea (T1, T2), h_64', matching
+SHA512_2Sched_2Round_sse and removing 1 cycle from the T1 -> h_64 path.
 
-This keeps the updated state in registers across blocks, eliminating 8
-loads per additional block and avoiding store-to-load forwarding stalls.
+Note that sha512-avx2-asm.S already structures its additions similarly
+to avoid both of these serial dependencies on the critical path.
+
+Also fix a few comments in the file.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/x86/sha512-ssse3-asm.S | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ lib/crypto/x86/sha512-ssse3-asm.S | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/lib/crypto/x86/sha512-ssse3-asm.S b/lib/crypto/x86/sha512-ssse3-asm.S
-index f96ce3c083ea7..f7dade03c6527 100644
+index f7dade03c6527..62f1f5109f629 100644
 --- a/lib/crypto/x86/sha512-ssse3-asm.S
 +++ b/lib/crypto/x86/sha512-ssse3-asm.S
-@@ -100,6 +100,12 @@ XROR8 =		%xmm15	# XMM_QWORD_ROR8
+@@ -91,10 +91,10 @@ XROR8 =		%xmm15	# XMM_QWORD_ROR8
+ # Useful QWORD "arrays" for simpler memory references
+ # MSG, DIGEST, K_t are arrays
+ 
+-# Input message (arg1)
++# Input message (arg2)
+ #define MSG(i)    8*i(msg)
+ 
+-# Output Digest (arg2)
++# Output Digest (arg1)
+ #define DIGEST(i) 8*i(digest)
+ 
  # SHA Constants (static mem)
- #define K_t(i)    8*i+K512(%rip)
+@@ -134,7 +134,7 @@ XROR8 =		%xmm15	# XMM_QWORD_ROR8
  
-+# Add \mem to \reg, then copy the result back to \mem.
-+.macro addm mem reg
-+	add	\mem, \reg
-+	mov	\reg, \mem
-+.endm
-+
- .macro RotateXW
- 	# Rotate symbols XW0..XW7 left
- 	XWTMP = XW0
-@@ -304,8 +310,6 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	movdqa	XMM_QWORD_BSWAP(%rip), XBSWAP
- 	movdqa	XMM_QWORD_ROR8(%rip), XROR8
+ .macro SHA512_Round rnd
  
--.Lupdateblock:
--
- 	# Load state variables
- 	mov	DIGEST(0), a_64
- 	mov	DIGEST(1), b_64
-@@ -316,6 +320,8 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	mov	DIGEST(6), g_64
- 	mov	DIGEST(7), h_64
+-	# Compute Round %%t
++	# Compute Round \rnd
+ 	.if ((\rnd) % 2) == 0
+ 		movq	XWK, T2
+ 	.else
+@@ -154,7 +154,7 @@ XROR8 =		%xmm15	# XMM_QWORD_ROR8
+ 	mov	a_64, T2          # T2 = a
+ 	add	h_64, T1          # T1 = CH(e,f,g) + W[t] + K[t] + h
+ 	ror	$14, tmp0 # 14    # tmp = ((((e ror23)^e)ror4)^e)ror14 = S1(e)
+-	add	tmp0, T1          # T1 = CH(e,f,g) + W[t] + K[t] + S1(e)
++	add	tmp0, T1          # T1 = CH(e,f,g) + W[t] + K[t] + h + S1(e)
+ 	mov	a_64, tmp0        # tmp = a
+ 	xor	c_64, T2          # T2 = a ^ c
+ 	and	c_64, tmp0        # tmp = a & c
+@@ -166,9 +166,9 @@ XROR8 =		%xmm15	# XMM_QWORD_ROR8
+ 	add	T1, d_64          # e(next_state) = d + T1
+ 	ror	$6, tmp0 # 34     # tmp = ((a ror 5) ^ a) ror 6
+ 	xor	a_64, tmp0        # tmp = (((a ror 5) ^ a) ror 6) ^ a
+-	lea	(T1, T2), h_64    # a(next_state) = T1 + Maj(a,b,c)
+ 	ror	$28, tmp0 # 28    # tmp = ((((a ror5)^a)ror6)^a)ror28 = S0(a)
+-	add	tmp0, h_64        # a(next_state) = T1 + Maj(a,b,c) S0(a)
++	add	tmp0, T2          # T2 = Maj(a,b,c) + S0(a)
++	lea	(T1, T2), h_64    # a(next_state) = T1 + Maj(a,b,c) + S0(a)
+ 	RotateState
+ .endm
  
-+.Lupdateblock:
-+
- 	# Rounds 0 - 13: BSWAP W[0..15] into XW0..XW7 and compute rounds 0..13.
- 	movdqu	MSG(0), XW0
- 	pshufb	XBSWAP, XW0	# BSWAP
-@@ -375,14 +381,14 @@ SYM_FUNC_START(sha512_transform_ssse3)
+@@ -209,8 +209,8 @@ XROR8 =		%xmm15	# XMM_QWORD_ROR8
+ 	xor	e_64, tmp0
+ 	ror	$14, tmp0 # 14
+ 	pshufb	XROR8, %xmm3		    # XMM3 = W[t-15] ror 8
+-	add	tmp0, T1
+ 	add	h_64, T1
++	add	tmp0, T1
+ 	pxor	XW7, %xmm0		    # XMM0 = (W[t-2] >> 42) ^ W[t-2]
+ 	mov	a_64, T2
+ 	xor	c_64, T2
+@@ -254,9 +254,9 @@ XROR8 =		%xmm15	# XMM_QWORD_ROR8
+ 	xor	e_64, tmp0
+ 	pxor	%xmm2, %xmm3		    # XMM3 = s0(W[t-15])
+ 	ror	$14, tmp0 # 14
+-	add	tmp0, T1
+-	psllq	$(64-61), %xmm1		    # XMM1 = ((W[t-2] << 42)^W[t-2])<<3
+ 	add	h_64, T1
++	psllq	$(64-61), %xmm1		    # XMM1 = ((W[t-2] << 42)^W[t-2])<<3
++	add	tmp0, T1
+ 	mov	a_64, T2
+ 	xor	c_64, T2
+ 	and	b_64, T2
+@@ -413,7 +413,7 @@ SYM_FUNC_END(sha512_transform_ssse3)
  
- 	# Update digest
- 	mov	0(%rsp), digest
--	add	a_64, DIGEST(0)
--	add	b_64, DIGEST(1)
--	add	c_64, DIGEST(2)
--	add	d_64, DIGEST(3)
--	add	e_64, DIGEST(4)
--	add	f_64, DIGEST(5)
--	add	g_64, DIGEST(6)
--	add	h_64, DIGEST(7)
-+	addm	DIGEST(0), a_64
-+	addm	DIGEST(1), b_64
-+	addm	DIGEST(2), c_64
-+	addm	DIGEST(3), d_64
-+	addm	DIGEST(4), e_64
-+	addm	DIGEST(5), f_64
-+	addm	DIGEST(6), g_64
-+	addm	DIGEST(7), h_64
+ .section	.rodata.cst16.XMM_QWORD_BSWAP, "aM", @progbits, 16
+ .align 16
+-# Mask for byte-swapping a couple of qwords in an XMM register using (v)pshufb.
++# Mask for byte-swapping a couple of qwords in an XMM register using pshufb.
+ XMM_QWORD_BSWAP:
+ 	.octa 0x08090a0b0c0d0e0f0001020304050607
  
- 	# Decrement msglen, and advance to next message block if needed
- 	add	$16*8, msg
 -- 
 2.56.1
 
