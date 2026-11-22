@@ -1,95 +1,126 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795347579;
-	b=vduzgQH0RscVkgzIZvAVamiSq3lTDINtqYJaBIW45ajqqvOFIVmn9pXqSflXuOYyEgG8
-	 ikJIT7r8lzbHAYJdim4I2+TW9MzucZ2J7gXXhfOU4Q0fLCPEEx7P5secfrQCTXmyiIpJ0
-	 5tRZVk62x2Q/lSQZMBLwe11FXyJTC+/e9evE4+k52BQI8GC0Hf5NfUvYY4k+fcOHh8ygt
-	 ZD1tfwx83m3Q9UDw66QAsSrb0JED0uKEkF7cCWcYOu60kiI4eMTEKRZ52gSltObZPozJP
-	 NZMeOIOgzLJDJJZ2cxCbPnryxwfvYlDzW+oCqEwvFsLJMBPv5liXMebj6sA3f8ncOcw==
+	t=1795347938;
+	b=m3crKOkMRZDaCSG4SYDo5VxQNoSb0Nq+zGjFyeVLT2/Lt+oEdVt55o7TiIU3xtyEFQdt
+	 QGAPKjBInMUf3i+CXCVFxFp65rwS2a6/Wu/U8dm8BgYbgu118uV7qpZ9HzDdEJ1g0NHcp
+	 47X/NKXwAsR0JLppJX4meAgWKof6gplYxc1GBwKwh80GYpFZYKiznzFjZIgDxfADr9Khb
+	 V4vd6fIbXUyPl1JeIsXr4t+RCI+EAw0bpwfo21yVdhw58DyODEIv8EDSGKMaBNr8SzUBo
+	 yI5IB/UDdobgiit0Ghn2h3aeRC46349OswrhHqRkWnG57EIpw/VZLuHor99c19w2Rtw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795347579;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:In-Reply-To:References:X-Mailer:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=WT4yKkDAmncDHMj/7AEWMzPC9QUnbfloQV8RtbZ7Cvs=;
-	b=D/wd1z5mxmz4kl8FUUiMggj4bQS1l15ci625AttN/cvoJek7ZOabPnD6j5wUiiZ4WNou
-	 YGmcTwK/UeqMY/7QSkOQ6rQIx1cTKDPTbhpNhapI/0O01cHif1ObtUaHp8+tB9eDv5MdA
-	 cI0sMtNa4GvZfzu+X18H7nwGNm2D5MXR+bY3YhwDO/2yEZKTRu7I86Ghpeo/DP9zvb7B+
-	 j0zbggM1SvVJ9Vf+A13SR5LffSLYuu2IelvYsIH6NRDrhXMgjBph0mq+oEkdvuCFIP8hF
-	 I4j5cbwEu34/SOajdfzWGasktqN7rY8FfpkIbYRfZmRaTXS3iER8EL8hNya+c38fwDw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795347938;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=cLMcqM1+ID1GgGq+PerrzsvqYkDe3KsyjwqtE/Ytfio=;
+	b=KUnpO4+r9c5mZjgDZWSyQcnD9//TVtxyJvTg31aOdWKdo07+4BbgoUJhBS/5k0/Un+98
+	 vEwR2AdnZvz6PdeAYUucvK6SoChEkN9MMq7ooFz6PqECuxZZ/IQMbPMKr3Gz3sbrLW9/l
+	 o/2Tu+0GVYrl535iXuc3MXL9s+kplovnjA+VqYRZ4xK6EQ5OX4OD8LLkKt1yMO2Y6hNSt
+	 8Iii0S7e81ncxSm1uyaiA2Wu8fGzxd9hmxEDNN0VTUAyCVbCntVMCPLefPYi3+wrcm++t
+	 aB4DpaHVRiKpd5WK/zdJTL0OyWdAFVYdnD670my4JpDEbYSVaZxnHVAxbzcQR3XR1Ng==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SJGi5kR5;
-	arc=none smtp.remote-ip=209.85.128.41
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JBZbk8ZB;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D820606A320
-	for <linux-crypto@vger.kernel.org>; Sun, 22 Nov 2026 11:39:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9D820606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6462E606A33F;
+	Sun, 22 Nov 2026 11:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=SJGi5kR5
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4bb5b8ef642so18825015e9.1
-        for <linux-crypto@vger.kernel.org>; Sun, 22 Nov 2026 03:39:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795347577; x=1795952377; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=WT4yKkDAmncDHMj/7AEWMzPC9QUnbfloQV8RtbZ7Cvs=;
-        b=SJGi5kR5gOJlMddQg0H8jvHUJ/YDmXSJyBAoUsvGf9ERLCMk1DZbJoxZgo7MeuCryb
-         U2c/xKvKUONOenSzX8QGJzGEogXU1iF4tqINWM1WjbOLY5jrZ4KlvzEzrKTWxSbwkcyF
-         /WzbqToCYgtDVE9YYoldCE70ojo4AcNG9ZruXDWZO+TQNEWj+GmwkSMcrfYJx89SvMBt
-         YT77CBL9lJWHnsT+kZAlYqyplQaqMi5gjvY2Y1ycNF0fiXkLEjQRs6uBU59XKt9TZMB0
-         dj5ILAlpFM1eKfjzn8E+8LKGTQASc46B95Ov07/YttpSqn5jiSosV444TNQb+BvU5ZDl
-         Y4SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795347577; x=1795952377;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WT4yKkDAmncDHMj/7AEWMzPC9QUnbfloQV8RtbZ7Cvs=;
-        b=YyiPJE1bJJt/jXhU8VKQ+wulRfiO9sY0lepZedygGi9QmlNvsHvrJIyOsaIa2hVxsI
-         2+cePYKMxyVB6UPZmqjBnxO4ECx1Dh6H/hH51DwTDAOvtKSCrERLQRiKaZf915yYzMPf
-         aRERpTvugZsQCqpC0EX3JkCHW1syjmtM3/JA7DlcGWsMvWKtidGbUwrdeZs9eFCqET9G
-         alrzbiMTbUk93wzMGtE6DRmegLJiRkiaunieh3PeYyTnn34+y2HcyzkFy0gzFG1wGdQD
-         KDxm2abZ7QlvFNAS3J5hcDLZcJ47kGYlExOxOZ21U4L0bmvrdhrdp8xzbUkeiUkF94pt
-         S4bA==
-X-Gm-Message-State: APuU4Z8UEXlF2ma80/v9MaU5tiJH0rZ5DBGQBP6BEQ9lS9te8UVCJmY6
-	EW7xJ54nqL7NwadXuOqdc5dgU9pOos/SVjNzKdsTVm6ZMiIZJ7ksTQ3D
-X-Gm-Gg: AZFdTZcg1wkbDSTgxswQYtUngJDxKIivBRpTdRVJ1bnhDIHGNNexIFTQZAlM5JosKKL
-	vZLATHmSt0XrmaSDWFmx1dxaE8ymL/2LNyZQbcj4U96Lw3gDcnHkTmUpkMNoqqszkhSp0Vbd8tK
-	rLU+mX3RqLZWJN5LB2LLKhGms/2dP5Hx9ceRDq+Vi70skrV961dTcKWilPkPvPhgLK4yoVqAJ1z
-	Rp3T4P9naMIKxwnj6Rqbn3uDXEBGDbnX/81plTT+sve1qV3FmZAVee5XQWS8Ym2d9u4rPSDonTl
-	4NQQQiDZnZVWLEeWU+jTpZeh9IMfxEI75NztkMcYA/gmjOdywjmK6vRwXho8iwSSIaQcQwQy/XX
-	B1JZHBQPh3HrzSWj6p2J8gKWlU61SKy3DQ4BkMRqVj08K3NHwva4O2ktf2wIEdFBdn5FY+NZiDa
-	Y/nx6ra9/K91OZA4+aFHrttTlaOmXRXGffeOKvckskvzh0kQFuFeeJc2i/KYoUGXFLjRriZSwpD
-	HsOA2KzL6Nce1HBHg/okZzE3FZr77rkI2FrsF43eAwmb1+nZjSabtxLFIh0n5AXHgO2eowmyu5G
-	TRiLzTnIfRkBPalJWiPiQtq7YwCD64n1U2i7M2gZHK8Irz8pTqZBaI9Flx3pj7LMhw==
-X-Received: by 2002:a05:600c:8b11:b0:4a1:dda8:eb73 with SMTP id 5b1f17b1804b1-4bb8881c630mr191892155e9.27.1795347576774;
-        Sun, 22 Nov 2026 03:39:36 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb853c9170sm310397175e9.14.2026.11.22.03.39.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2026 03:39:36 -0800 (PST)
-Date: Sun, 22 Nov 2026 11:39:34 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A
- . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: x86/sha2: Drop one-off implementations for
- Sandy/Ivy Bridge
-Message-ID: <20261122113934.48a9ac42@pumpkin>
-In-Reply-To: <20261115080900.216434-1-ebiggers@kernel.org>
-References: <20261115080900.216434-1-ebiggers@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JBZbk8ZB
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3C711F000C0;
+	Sun, 22 Nov 2026 11:45:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795347938;
+	bh=cLMcqM1+ID1GgGq+PerrzsvqYkDe3KsyjwqtE/Ytfio=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=JBZbk8ZBopVc78PPFvWeVTIg2CMujdUlqemdavr/HCyWWlIQmFZkcrGxwSI3F8Lj7
+	 DNLer9OUFPLbOa4J4Swvhd/E17PbHJNYpl75QSvfOs502Qnq+SIVf6x8BaBZgxP/BT
+	 TLhC5kAcmMHclzMqgFcvdBPgsnO0el8R7pGYvxVYVMfFAdpjXa9S5pH5onsvDFitkW
+	 F7xoQFwGUBjexAU1BbMzjGktImA7HZrErJM176ZMcRKXKM7Cl6WdGzAwr72CinZqC4
+	 cUMiH2XukT43gci2XSUdvkVEDyb0hb22fl5gp/8fIaWZ7ym7dU5tWM0l+OzRL/g3Qu
+	 BJv0P33zLAReA==
+Date: Sun, 22 Nov 2026 12:45:16 +0100
+From: Ingo Molnar <mingo@kernel.org>
+To: Juergen Gross <jgross@suse.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+	virtualization@lists.linux.dev, linux-ide@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	kvm@vger.kernel.org, linux-edac@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+	linux-coco@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-mtd@lists.infradead.org,
+	platform-driver-x86@vger.kernel.org,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	David Airlie <airlied@redhat.com>, Helge Deller <deller@gmx.de>,
+	linux-geode@lists.infradead.org,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	James Clark <james.clark@linaro.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Pu Wen <puwen@hygon.cn>, Tony Luck <tony.luck@intel.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Ben Horgan <ben.horgan@arm.com>, Dave Martin <Dave.Martin@arm.com>,
+	James Morse <james.morse@arm.com>, Babu Moger <babu.moger@amd.com>,
+	Drew Fustini <fustini@kernel.org>,
+	Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@kernel.org>, Kiryl Shutsemau <kas@kernel.org>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Len Brown <lenb@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>,
+	Huang Rui <ray.huang@amd.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Perry Yuan <perry.yuan@amd.com>,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Yazen Ghannam <yazen.ghannam@amd.com>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Artem Bityutskiy <artem.bityutskiy@linux.intel.com>,
+	Artem Bityutskiy <dedekind1@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Ashok Raj <ashok.raj.linux@gmail.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+	Xi Pardee <xi.pardee@linux.intel.com>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+	xen-devel@lists.xenproject.org,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: treewide: Re: [PATCH v6 00/12] msr: Drop 32-bit MSR interfaces
+Message-ID: <awLVzKJWWfC3eJsH@gmail.com>
+References: <20261116150208.1572254-1-jgross@suse.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -99,91 +130,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261116150208.1572254-1-jgross@suse.com>
 
-On Sun, 15 Nov 2026 00:09:00 -0800
-Eric Biggers <ebiggers@kernel.org> wrote:
 
-> [ This is proposed to supersede my patch
->   "lib/crypto: x86/sha512: Partially roll up sha512_transform_avx()"
->   which was starting to clean up one of the files being dropped. ]
->=20
-> Currently, the kernel has SSSE3, AVX, and AVX2 implementations of each
-> of SHA-256 and SHA-512.
->=20
-> The AVX implementations of SHA-256 and SHA-512 run only on CPUs that
-> have AVX but do *not* have AVX2.  These are all the ones I could find:
->=20
->     - Intel Sandy Bridge and Ivy Bridge
->     - AMD Bulldozer, Piledriver, Steamroller, Jaguar, and Puma
->     - Zhaoxin KX-5000 and KX-6000 (possibly SHA-512 only, as these CPUs
->       might be able to run the PHE optimized SHA-256 code)
->     - Maybe some oddly configured VMs
->=20
-> Oddly enough, this "AVX" code doesn't actually have much to do with AVX.
-> The only AVX capability it uses is support for 3-operand VEX-coded
-> instructions, which is unlikely to make a huge difference.
+* Juergen Gross <jgross@suse.com> wrote:
 
-Especially if they are the only VEX encoded instructions.
-Switching back and forth is horribly expensive and the change isn't
-'sticky' on some later Intel cpu and you get the 'hit' for every
-instruction.
-(kernel_fpu_begin() might need a vzeroupper to migitage this.)
+> For accessing the MSR registers on the local CPU, there are 2 types of
+> interfaces: the "modern" 64-bit ones (rdmsrq() etc.) and the 32-bit
+> ones (rdmsr() etc.) which are using the upper and lower 32-bit halves
+> of the 64-bit wide MSR register values.
 
->=20
-> Its actual purpose is mostly unrelated to AVX: it replaces the 'ror'
-> instruction with 'shld'.  This is entirely to work around a quirk
-> specific to Sandy Bridge and Ivy Bridge where the 'ror' instruction was
-> very slow for microarchitectural reasons, and 'shld' worked better.
->=20
-> This is documented in the contemporaneous paper "Speeding up SHA-1,
-> SHA-256 and SHA-512 on the 2nd Generation Intel Core Processors"
-> (https://ieeexplore.ieee.org/document/6209073).  There, the 'shld'
-> workaround was claimed to speed up SHA-256 and SHA-512 by about 20% on
-> Sandy Bridge.
->=20
-> However, that was a one-off quirk.  And even the paper itself warns
-> about using the 'shld' approach on other microarchitectures.
->=20
-> On AMD CPUs, and on Intel CPUs after Sandy and Ivy Bridge, the exact
-> opposite applies: ror is a fast single-cycle and single =C2=B5op instruct=
-ion,
-> while shld is either a slow microcoded or multi-=C2=B5op instruction.
->=20
-> From what I can find, this is true even on the older AMD CPUs mentioned
-> above that run this code.  Thus this code has likely always been harmful
-> on AMD.  (I don't have such a CPU available to test, but for what it's
-> worth, on Zen 5 the AVX SHA-512 code is 58% as fast as the SSSE3 code.
-> Clearly, the 'shld' hack can be quite slow on CPUs it wasn't meant for.)
+>  140 files changed, 572 insertions(+), 690 deletions(-)
 
-I've got a bulldozer (or similar) I can run a test on.
-I might just to a quick one for shld v ror.
-I've rewritten my 'rep movs/stos' benchmark and plan to run it on the
-older cpu I have.
-(I need to get something newer than an i7-7 and older than a zen5.)
+So I've applied this to a separate branch/tree under tip:core/msr,
+because I think this series is mature enough and after about a year
+worth of (very patient) iterations by you we've reached the limit of
+what will be picked up by maintainers.
 
-> We generally shouldn't be carrying asm files that are one-offs for
-> single microarchitectures, as it's just not worth it.  This is
-> especially true when the code has been mistakenly targeted to other CPUs
-> on which it is likely harmful, and when it has other issues that would
-> require maintenance, such as excessive loop unrolling and spilling the
-> entire 640-byte SHA-512 message schedule to the stack.  (The SSSE3 code
-> has the same issues, but it's easier to fix it in one place.)
->=20
-> Therefore, let's drop sha256-avx-asm.S and sha512-avx-asm.S.
->=20
-> The CPUs that could have run this code will instead run
-> sha256-ssse3-asm.S and sha512-ssse3-asm.S.  SHA-256 and SHA-512 may get
-> around 20% slower on Sandy and Ivy Bridge, but they likely get
-> significantly faster on AMD CPUs from around the same time (2011-2014).
->=20
-> Everything with AVX2 continues to run the newer code and is entirely
-> unaffected by this cleanup.
->=20
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+The commit with the widest impact is automatically generated
+via a semantic patch:
 
-Seems reasonable to me.
-I doubt anyone really cares - apart from benchmark data points.
+  treewide: Convert rdmsrq() from a macro to an inline function
 
-David
+  139 files changed, 493 insertions(+), 495 deletions(-)
+
+and I'm reasonably certain that whatever merge impact this may have
+on -next can be addressed quickly and in a simple fashion. Let's see
+how this goes.
+
+Thanks,
+
+	Ingo
