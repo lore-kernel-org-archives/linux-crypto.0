@@ -1,65 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795446738;
-	b=5LqQZlLl1omy/J3l2hMt5i+AzPUH69pBaXkvIt00w4sFJgkfcMlsQ/fzpO2HN5yrBwOK
-	 G2KYrGkJvBrRqJQiX+YRsMrJppTx7I3sezf1MR48DcIhlCf/dy/DaJisKKxynpIqottJY
-	 jHq1CbA4V6jDoUSZnV88nMal0eZRcli5SEOX9BOhMBPJawviccF61RuzPBE0q11vYnC3R
-	 sJi5g7jG6yRq5xmY9t86yabKXD+Jpeo5b8uSyRq7QxiQDfapKcBNVRGCdPXGZ657ome/o
-	 MTYDHvdXmjbgZJddn+OPd6CZWRl5mdODJi/VGLpkF3ysPcfhByFohjJ4XyUQdlpKnAg==
+	t=1795447051;
+	b=Syd/SKnOb7Dv2MDpPMc/Ni9FRCehq4tUI6UAO1X9hdDgtzZwlrTLNrNoNYEPYDEQHQWg
+	 Alf2bfLcAbhlEIbYBeUZ5JNlqz1mh4/u5mHiFW9qZe3OfGeJ6Xx1rFK+/bQmfS23Sx4vw
+	 CQklzBRSB1Dvb9kiYjYzeqTwbHEDi3Pvq11JsaSki5/Ke/iSWFsl7j8gs1FGN3hP4ojrS
+	 ym8qeWC0BihUBbnULHavgz+xawdJey//Upe7MpqtxQXsCzJu2MSep43Q7gyfjdIbrhiCz
+	 Tnvwc3QRgLZbXgP6vY5wdUyn3dqoFItsc0jbh45rUQFQ8L4sdVgvVEosP+rkQULOTjg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795446738;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=Y3crQHbdpOlgtQVKmilOb/+IWL0/tt7WDZKDspXm67A=;
-	b=0vnMTicYNh/28o6QS44HbFJa9IYbHDD83rTQe1KU5rbk1fCgUCBzApjPHBhTOhFK+8Az
-	 sEdyEwG5zDrvC3KMGkO9g+EAA90cCeeOOjhmzOwXqe6oi2O1ruXPmiDH2StwUTK8IuEwm
-	 0M2obxKt4mSKBOQXTQtsWLzxOQ/oQfc6mnQLNnYQfVy1R60O87dZwwXdM0pKJ8h1Z/jjE
-	 PbpUB3rP0uK51Dj87iAqWhkvtW9PWS+zhS8EVb4cNv4q3h65/wL62A+GH8j9/qU1YEr8C
-	 cKbjIlUJj7V07LZzNH8afZ1XApNMmVbXDC7mSc/Yet0oXtj3qGqNFIsziGVZbjdtO8Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795447051;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=C5aNcu3GvO5Up90upPaZCZkJZOPRV9A3kJARFId0yVk=;
+	b=ii7cpf6BZZ2FNd2MKAbtkxFvc/TZ2Gvh3KEnvPeL7TW9pbf9Cs/VY8Tyn4jrdEAiurN1
+	 072yxiDxwsWCZRyY4FBSFdsBHX7hfHX0TtyvhI/zt5/w3NAykyKC6E922GYjIGW1fvodI
+	 RXgGRABDBCiNLvnzF8rCwFd0T8xzugsDqavZYuY+6PoIQxtxPon9wwE4zzcpKbmYx/w8X
+	 isnCtOeDnhCukRUWAwKy+V5uby71JscXi8MBcnhCAvyR5+kVt1pPrwZspGSVyxvTzsdqp
+	 vEbzHspcmRbF1YA7xtIBHwGZSB8osZwq6bbyeHr5dG0y7z9dNQXNDUej0HHEW/41HJw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TKofGITs;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bry6XqTM;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235D4606A31E;
-	Mon, 23 Nov 2026 15:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEEF606A31E;
+	Mon, 23 Nov 2026 15:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TKofGITs
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4AD91F000CA;
-	Mon, 23 Nov 2026 15:12:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bry6XqTM
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AE371F000D0;
+	Mon, 23 Nov 2026 15:17:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795446737;
-	bh=Y3crQHbdpOlgtQVKmilOb/+IWL0/tt7WDZKDspXm67A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=TKofGITszN1ewiDEtpVWMrbMfRwWCjDaHNbBen0MkvuNON/yK2SDQB6oS7h0PE5i7
-	 tgeeEjk9sV/5XJ7z3G9kAxf6//s44qhgty+pZrzzDo61M+YdiXd76Le86YxIU2EAX/
-	 HwSbyC1UA0W3Z4zrcXmIfMCafL1OGdpa/rgUknqiYoezjf1Y31SOQxHXpxa6hMZaQ6
-	 UaVkSoFo7/YsqOymnRN90B9ffJ2A/R2G2juLmFoN7GZrDtN6Xkm8Ivv/YTgkknsdGa
-	 jCfUfTf3VAzx6cPLRpi6voTlz17ryusbj9pR39GybniE9OqmDoPYwbl83F/U0wWxyD
-	 2u7Vmxw9WVb1A==
-From: Lee Jones <lee@kernel.org>
-To: lee@kernel.org,
+	s=k20260515; t=1795447050;
+	bh=C5aNcu3GvO5Up90upPaZCZkJZOPRV9A3kJARFId0yVk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=bry6XqTMoBjePbT3l51cOq64wABJspYaYwOmelefOaG7NaZp91VnjTHeaJcw/eQ0t
+	 gok3vzSyO36oFHeY/jb9eXfW2u1q5c6BmL994MbmYK14E4tX0/59Jh3GoZca8YfVj9
+	 Ls5ZQHdQRaEvhwjzXrCmSr4Jy4r8yJFo5MPKoHqhcrGTijUO5ElPq+Y8SJTZTr4Wjy
+	 OToWzwyDRHj38hopu+dTUjnchM1bZB+XadQeI7T4KGI0oY8lkP97Suiu2XJMG2NqgG
+	 lDtT2muHd5qmyAc4d5paPL3PlbM4ytwvoWCoXEFd9GgupuwYq+yL6zNjKj3eCapHzC
+	 h+q2e1XlrW2rQ==
+Date: Mon, 23 Nov 2026 09:17:26 -0600
+From: "Serge Hallyn (AMD)" <sergeh@kernel.org>
+To: Kim Phillips <kim.phillips@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Thorsten Blum <blum@kernel.org>,
-	Nicolas Royer <nicolas@eukrea.com>,
-	Tudor Ambarus <tudor.ambarus@linaro.org>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-Subject: [PATCH 10/10] crypto: atmel-tdes - Update output IV before clearing busy flag
-Date: Mon, 23 Nov 2026 15:10:01 +0000
-Message-ID: <20261123151055.2533735-11-lee@kernel.org>
-X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
-In-Reply-To: <20261123151055.2533735-1-lee@kernel.org>
-References: <20261123151055.2533735-1-lee@kernel.org>
+	"David S . Miller" <davem@davemloft.net>,
+	Rijo Thomas <Rijo-john.Thomas@amd.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sashiko <sashiko-bot@kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: ccp - unwind PSP sub-devices on partial
+ psp_init() failure
+Message-ID: <awRZBnEZxx-PTtT6@shallyn-amd>
+References: <20261116203622.615371-1-kim.phillips@amd.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -69,56 +62,109 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261116203622.615371-1-kim.phillips@amd.com>
 
-In atmel_tdes_finish_req(), dd->flags clears TDES_FLAGS_BUSY without
-holding dd->lock and before calling
-atmel_tdes_set_iv_as_last_ciphertext_block().
+On Mon, Nov 16, 2026 at 02:36:22PM -0600, Kim Phillips wrote:
+> psp_init() initializes sub-devices sequentially but returns immediately
+> on the first failure, leaving earlier sub-devices registered. Its caller
+> psp_dev_init() then sets sp->psp_data = NULL, so the later
+> psp_dev_destroy() on unbind bails out early and never unregisters them.
+> 
+> Non-devm resources such as the /dev/sev and /dev/dbc character devices
+> stay globally visible while their devm-allocated backing structures are
+> freed by the driver core, giving a use-after-free if userspace opens the
+> orphaned device.
+> 
+> Add reverse-order unwind labels to psp_init() so each sub-device is torn
+> down before the error is propagated. Every *_dev_destroy() is already
+> NULL-guarded on its own psp->*_data pointer, so skipped or unreached
+> sub-devices are no-ops.
+> 
+> sp_init() continues to ignore the psp_dev_init() return value on
+> purpose: a PSP failure must not fail the probe, as the CCP can still
+> initialize successfully.
+> 
+> Fixes: 33960acccfbd ("crypto: ccp - add TEE support for Raven Ridge")
+> Reported-by: Sashiko <sashiko-bot@kernel.org>
+> Closes: https://sashiko.dev/#/bug/linux-0de87f0c-0f5a-4dad-8ef1-f49844eb4cce
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Rijo Thomas <Rijo-john.Thomas@amd.com>
+> Cc: Mario Limonciello <mario.limonciello@amd.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
 
-As soon as TDES_FLAGS_BUSY is cleared, a concurrent
-atmel_tdes_handle_queue() caller on another CPU can dequeue the next
-request and overwrite dd->req (as well as modify dd->flags).  When
-atmel_tdes_set_iv_as_last_ciphertext_block() then reads dd->req, it
-overwrites the newly dequeued request's IV with the previous request's
-ciphertext and leaves the completed request's output IV un-updated.
+All looks good, thanks.
 
-Update the output IV before clearing TDES_FLAGS_BUSY, and clear
-TDES_FLAGS_BUSY under dd->lock to serialise flag updates with
-atmel_tdes_handle_queue().
+Reviewed-by: Serge Hallyn (AMD) <sergeh@kernel.org>
 
-Fixes: 61b0dd664fa1 ("crypto: atmel-tdes - Set the IV after {en,de}crypt")
-Closes: https://sashiko.dev/#/bug/linux-d6fd6f42-d6fc-47d0-86d5-f428e2203a64
-Cc: stable@vger.kernel.org
-Signed-off-by: Lee Jones <lee@kernel.org>
----
- drivers/crypto/atmel-tdes.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index c86d06169ab9..392a2a3a8b85 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -504,14 +504,17 @@ static void atmel_tdes_finish_req(struct atmel_tdes_dev *dd, int err)
- {
- 	struct skcipher_request *req = dd->req;
- 	struct atmel_tdes_reqctx *rctx = skcipher_request_ctx(req);
-+	unsigned long flags;
- 
- 	clk_disable_unprepare(dd->iclk);
- 
--	dd->flags &= ~TDES_FLAGS_BUSY;
--
- 	if (!err && (rctx->mode & TDES_FLAGS_OPMODE_MASK) != TDES_FLAGS_ECB)
- 		atmel_tdes_set_iv_as_last_ciphertext_block(dd);
- 
-+	spin_lock_irqsave(&dd->lock, flags);
-+	dd->flags &= ~TDES_FLAGS_BUSY;
-+	spin_unlock_irqrestore(&dd->lock, flags);
-+
- 	skcipher_request_complete(req, err);
- }
- 
--- 
-2.56.1.750.gf70dc682cf-goog
-
+> ---
+> v1: https://lore.kernel.org/linux-crypto/20261021215716.1076732-1-kim.phillips@amd.com/
+> 
+>  drivers/crypto/ccp/psp-dev.c | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> index b14ce51065d5..3d9341c2876d 100644
+> --- a/drivers/crypto/ccp/psp-dev.c
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -207,19 +207,19 @@ static int psp_init(struct psp_device *psp)
+>  	if (!psp_check_tee_support(psp)) {
+>  		ret = tee_dev_init(psp);
+>  		if (ret)
+> -			return ret;
+> +			goto e_sev;
+>  	}
+>  
+>  	if (!psp_check_sfs_support(psp)) {
+>  		ret = sfs_dev_init(psp);
+>  		if (ret)
+> -			return ret;
+> +			goto e_tee;
+>  	}
+>  
+>  	if (psp->vdata->platform_access) {
+>  		ret = platform_access_dev_init(psp);
+>  		if (ret)
+> -			return ret;
+> +			goto e_sfs;
+>  	}
+>  
+>  	/* dbc must come after platform access as it tests the feature */
+> @@ -227,15 +227,28 @@ static int psp_init(struct psp_device *psp)
+>  	    psp->capability.dbc_thru_ext) {
+>  		ret = dbc_dev_init(psp);
+>  		if (ret)
+> -			return ret;
+> +			goto e_platform_access;
+>  	}
+>  
+>  	/* HSTI uses platform access on some systems. */
+>  	ret = psp_init_hsti(psp);
+>  	if (ret)
+> -		return ret;
+> +		goto e_dbc;
+>  
+>  	return 0;
+> +
+> +e_dbc:
+> +	dbc_dev_destroy(psp);
+> +e_platform_access:
+> +	platform_access_dev_destroy(psp);
+> +e_sfs:
+> +	sfs_dev_destroy(psp);
+> +e_tee:
+> +	tee_dev_destroy(psp);
+> +e_sev:
+> +	sev_dev_destroy(psp);
+> +
+> +	return ret;
+>  }
+>  
+>  int psp_dev_init(struct sp_device *sp)
+> 
+> base-commit: 26ca5f34841f0a86d0883664a1c13be89a01d351
+> -- 
+> 2.43.0
+> 
