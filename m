@@ -1,64 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795448274;
-	b=Zy4XzM7hayJ5XCCj8VLPWrAh/9eEkyi1zxAUiWEuYQW2tyEeCS+XTqIQJRBxxPaIClh/
-	 62UT4feTxPvEH6umcLKgGbGd1H+PGRO7DNgUTbbE6GxKUoKzivLj/xd4uwe909rryflok
-	 4lmr28KqgBVQwbWuFTmbl/l7LXn/0Bj7+7ZD/jc4fUrh+84g+SFJtlvunNLEBdpTLfbaN
-	 qPoZDODMajcIY4KSrJTdF8PNi+8zeyomCzzy2jSF2h8/IjM6UtlPUjuc19KNu/r1vKCXz
-	 H4oMF72VJQtCE4HkURUn56mMvfjSMjeEVR1lE/6CjxYtcz9UWdcgwFiI6dc77nmKq0A==
+	t=1795448423;
+	b=i9BUJ2sfuJbhNKvymHeSzYXkZ4Epy0FarBh/Pjpmi3qtNzgCE6g1xyaKsT40QGYEZymh
+	 t3+LsoVrjqZBgKT9SzHJMnP6uMtknyZS7hGanDRqadDC86IZfcpdW9+oM1kkXXiegxQmT
+	 e92hwsrg3uwI8jOPlx1hHH/eHIy5dL7hKRUYglb399yz+btysByQ7jqxUF/UTDw9VGWXV
+	 MEyds1Cl7z8YZt9pQkSxU3B80n4LXpHdBVnvu5BEkPHK1vlnkw7cd3H7vvVMmJwisNoVW
+	 vYsL+0HzmWWzqw5FvjIDrdU5y+Y3zGXe4g3qRch42bYtTVTXDD6EcAM4YEBFuTWfigQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795448274;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=2crCq0yQ/HYHKeHt29ATUUe8VLTaIPIAejwpAipPP1E=;
-	b=MjxAu9l+6MjnhRcjz1GCfrIYwhEgKxHGmPSVbXdgC3cbtgt7dIaXMspTiRdqfKVIhBL5
-	 P+PufdZbo4ztyLuwR/KsgUGCq2AwiQWBi7qeAwm4JqmtN7trhj2ONE+wy3+c035NmExOg
-	 ltLavtJYxOBIrXvP0b48oNM4H4lI9K33Y6Gvuig7qHmATqODHocRcQBoComDUFzDVi8zg
-	 m563R8o4+R0PhrpXrPmOabtAMzA7mrzheP79nV6RU7KAZ5jSf1o6vA2kQsdhE/5xdkV+f
-	 D+vPx0Jsi7gtNEAHGQQLabBn55L8UDeyktepDjWff0xwjvPlKCGn9EQncgvC9TQzjhw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795448423;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:From:Content-Language:Autocrypt:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=ElNb3HbvQvbFQc/bVm38lmjPu+4gNqzUV9N8Fnv5BVI=;
+	b=3xk/JEOylynZkFmligklt5kP4zdjwDJplexl5XQSIErRZj9fIVD0zC2pzpDmYxzThpz3
+	 uVS4RKmT6PjU2HVNPYoTDeRHGZUM2WrSzBkebY7HXy1UOQ01ottTJjmw+DMIF7bjadgxD
+	 HVvYKEvDDXxfROVD9SMQhgs7qqwj+5HDaKsnTYm3oqcCZBFEi/HbrPq8dl5PVzSBj59zM
+	 8UdGNteKqbiUuGdzweNgy8qEyPMSYJr5mV/j6PLNx0KOFMJvaDz/yXjwbx1cb24z21cnt
+	 JMx1Ux/4mZCgp47lcUV8ryuD1xlm9ufUAVdfK8gXJwxRYa1NQ3d5GJleEhoT7rW+DFQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LYCPWwqM;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=o2vTmB0+;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0A9606A31A
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2026 15:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7807606A68B;
+	Mon, 23 Nov 2026 15:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LYCPWwqM
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B671F000C0;
-	Mon, 23 Nov 2026 15:37:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=o2vTmB0+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A886D1F00A00;
+	Mon, 23 Nov 2026 15:40:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795448274;
-	bh=2crCq0yQ/HYHKeHt29ATUUe8VLTaIPIAejwpAipPP1E=;
-	h=From:Subject:Reply-To:To:In-Reply-To:References:Date;
-	b=LYCPWwqM0abaqFXBJPa/FBcORfeBWHLRz/sboObyoDUWcullke27uwL9u7Vj/q8R4
-	 5UYBMTI9U48jG4wIhnAyTz5t2fyjBW0vZzbut6QjDKwyrnPA5u4idvG+2j41TReWws
-	 JQ9xCKNaqgJlAa7lz2McQpCxUAYG7eVaMIOXVFEQ4xwqEzARPqMln1tk4B8AFMBa3W
-	 +u3EOBBb9ahufhYBUGvNSnnsF7TsakTnmewuA1NENBrcLI7SRqo3XgAz64lrxbWjFs
-	 c04gwlzbxbz1JqcpwRKLDUDemjHMMRBkr83NDdKZnTef34Mu8Y4oBYsz8/vvW2OpHu
-	 dJWxI9+Kc1p5w==
-Message-ID: <sashiko-outbox-229585@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 03/10] crypto: nx - Fix bounce buffer copy overflow in
- decompress()
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Lee Jones" <lee@kernel.org>, "Haren Myneni" <haren@us.ibm.com>, "Madhavan
- Srinivasan" <maddy@linux.ibm.com>, "Michael Ellerman" <mpe@ellerman.id.au>, "Nicholas
- Piggin" <npiggin@gmail.com>, =?utf-8?b?Q2hyaXN0b3BoZSBMZXJveSAoQ1MgR1JP?=
- =?utf-8?b?VVAp?= <chleroy@kernel.org>, =?utf-8?b?Uml0ZXNoIEhhcmphbmkg?=
- =?utf-8?b?KElCTSk=?= <ritesh.list@gmail.com>, "Shrikanth Hegde" <sshegde@linux.ibm.com>, "Herbert
- Xu" <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Thorsten
- Blum" <blum@kernel.org>, "Bulent Abali" <abali@us.ibm.com>, "Robert
- Jennings" <rcj@linux.vnet.ibm.com>, "Seth Jennings" <sjenning@linux.vnet.ibm.com>, "Dan
- Streetman" <ddstreet@ieee.org>, linux-crypto@vger.kernel.org
-In-Reply-To: <20261123151055.2533735-4-lee@kernel.org>
-References: <20261123151055.2533735-1-lee@kernel.org>
- <20261123151055.2533735-4-lee@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Nov 2026 15:37:53 +0000
+	s=k20260515; t=1795448423;
+	bh=ElNb3HbvQvbFQc/bVm38lmjPu+4gNqzUV9N8Fnv5BVI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=o2vTmB0+YrsXc0UgqmlFNdABgmJLkx1DWpNB2xbQNRXrOS4NZWu6jJOWlxmf3OVW8
+	 OLQEuSTVqBXOxsOlX2BdW1ZvZXHkylGJesL8rkeTqZ8+rpUedwAa0ZsnxO7bb6vrw5
+	 EYmQRv8ZN0PPSGVOtsdUkujkljkJyDepCo59C/WnmNdpNMxhtxqfPFtcJngsP4Nbl9
+	 dFJV8Pb33m/sOq82VJerREOe5KaSyyEMeGGZt+4L3oMOk+4cPiLNPhnqD2ub6VHkKg
+	 JzpVCfq6b0Cev+rRfdS3qrORhLvBkyNrtDBmP4Iu6P+trhyThDG+9RIawQwvTQ6hRl
+	 bL8+tTi1lAMvg==
+Message-ID: <755ed314-ac9a-45f4-9403-52e7f0754ca1@kernel.org>
+Date: Mon, 23 Nov 2026 16:40:15 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -67,71 +50,96 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 1/4] crypto: qce - convert to auxiliary bus
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+ Thara Gopinath <thara.gopinath@gmail.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Stanimir Varbanov <svarbanov@mm-sol.com>,
+ Eneas U de Queiroz <cotequeiroz@gmail.com>,
+ Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+ Eric Biggers <ebiggers@kernel.org>,
+ Demi Marie Obenour <demiobenour@gmail.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Russell King
+ <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>,
+ linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Pankaj Patil <pankaj.patil@oss.qualcomm.com>
+References: <20261120-qce-fix-self-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com>
+ <20261120-qce-fix-self-tests-v12-1-b5a2a44bc5ae@oss.qualcomm.com>
+ <c26b8002-c246-45cb-bca0-8f596a2a425b@kernel.org>
+ <sfsgrwaj6ichkuafqvrpmql67664x6vyxgz7lwjxhywbf5zc3l@edz4qooziklt>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <sfsgrwaj6ichkuafqvrpmql67664x6vyxgz7lwjxhywbf5zc3l@edz4qooziklt>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found no new issues
-in this patch, but noticed 1 related pre-existing issue it does not
-introduce:
-- [Critical] crypto: nx: out-of-bounds write in compress() [1]
---
+On 23/11/2026 16:29, Bartosz Golaszewski wrote:
+> On Sat, Nov 21, 2026 at 02:05:57PM +0100, Krzysztof Kozlowski wrote:
+>> On 20/11/2026 20:34, Bartosz Golaszewski wrote:
+>>> This driver is disabled in arm64 defconfig but one of its
+>>
+>> That's true for next, but your patch #3 seems to disagree. That's
+>> confusing. Maybe you meant disabled for arm64 platforms or marked as
+>> broken? Because anyway defconfig does not matter here - even if drivers
+>> are not enabled in defconfig (so stay disabled), they should not be
+>> affected with unbisectable changes.
+>>
+> 
+> Keeping this fully bisectable (it is build-time bisectable actually)
+> would mean squashing all 4 patches together. If nobody objects, I can do
+> this of course.
 
-commit 6d00d8097910c1ed1be4ad69177b9d0594c5365b
-Author: Lee Jones <lee@kernel.org>
+That's not the point. The message is just confusing. It is not "disabled
+in arm64 defconfig" according to your next patch...
 
-crypto: nx - Fix bounce buffer copy overflow in decompress()
-
-This commit validates that the decompressed length does not exceed the
-remaining destination buffer capacity before copying from ctx->dbounce
-into p->out in decompress().
-
-> diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-> index b4404a1389621..4f96c2b2397be 100644
-> --- a/drivers/crypto/nx/nx-842.c
-> +++ b/drivers/crypto/nx/nx-842.c
-> @@ -427,8 +427,11 @@ static int decompress(struct nx842_crypto_ctx *ctx,
->  	if (ignore)
->  		pr_debug("ignoring last %x bytes\n", ignore);
-> =20
-> -	if (dst =3D=3D ctx->dbounce)
-> +	if (dst =3D=3D ctx->dbounce) {
-> +		if (dlen > p->oremain)
-> +			return -ENOSPC;
->  		memcpy(p->out, dst, dlen);
-> +	}
-
-[Severity: Critical]
-This problem wasn't introduced by this patch, but can compress() also
-overflow p->out when copying from ctx->dbounce [1]?
-
-When compress() jumps to the nospc fallback to use ctx->dbounce, it sets
-dlen to min(p->oremain, BOUNCE_BUFFER_SIZE) and dskip to 0 without
-subtracting hdrsize:
-
-drivers/crypto/nx/nx-842.c:compress() {
-	...
-	if (dlen < c->minimum) {
-nospc:
-		dst =3D ctx->dbounce;
-		dlen =3D min(p->oremain, BOUNCE_BUFFER_SIZE);
-		dlen =3D round_down(dlen, c->multiple);
-		dskip =3D 0;
-		pr_debug("using comp dbounce buffer, len %x\n", dlen);
-	}
-	...
-	dskip +=3D hdrsize;
-
-	if (dst =3D=3D ctx->dbounce)
-		memcpy(p->out + dskip, dst, dlen);
-	...
-}
-
-After compression completes, dskip is incremented by hdrsize and dlen
-bytes are copied to p->out + dskip.  If the compressed output reaches the
-dlen limit, hdrsize + dlen exceeds p->oremain and memcpy() writes up to
-hdrsize bytes past the end of p->out before update_param() checks the
-remaining space.
-
-[1] https://sashiko.dev/#/bug/linux-f0b43673-8815-4f13-a7d9-658940af36b2
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123151055.2533=
-735-1-lee@kernel.org?part=3D3
+Best regards,
+Krzysztof
