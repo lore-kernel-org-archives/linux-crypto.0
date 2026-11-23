@@ -1,73 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795458658;
-	b=cn6c41CNQ91yrUMFU4C0tcLVtc+omqv+B61wePWt7qxnAHfLrmUhPahCDZCb2jDie96d
-	 vgMC8gg3ONTNjJbMVQ0XXzXLexFyzsfdqMk7Ah+ngoV/DnXfK2M+5lXCY6f954MGw5+qo
-	 KzWDy11Nntp84ip3wSMrJqF2FO5XJGsluf9hFUQ7nhIE92EC5Fy+RGUuPxhhRAstqYPiV
-	 6qrqadz72n4IcewUVXvSwS9TC6fZO80PL+ZHG7e/jh1gjeCyTFHVcD7FyHVDFpaIaA/1K
-	 j1FTsXq2msFAEMAbfoSCOutFspUuIDFQ7GkT+aSUQ3bClp42iH2wNrXw7Cc8OsYkSkg==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795458658;
-	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
-	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type:Content-Transfer-Encoding;
-	bh=8SQDwdiNb9DW7hMA94m7b/5EBoZ4JcTNs36C3UWb6EY=;
-	b=4FBWU0jhwKnpyRYfDxxdTKiYWcbF/rMnsNEdFVXXFp9aAdvogfNv6M97x5QSvBslfNVd
-	 O12pYDFh19ch82bW8HDbk3UOaGpX7uqEUisqiIBI15QkyfmK9YMnpMjJNHYKE/693HvyZ
-	 sUGNj61JdeQJB7moP3I8NrbUGJpk1IdU2sZnTa16hoRX1BpykcwCktEHwK9a88m4kFusW
-	 nqFV0IY1VHjV8+b7R9uxvofyhl1JcKxx/x4Bc+XqQLo2hnm5kcRSbeNO5kIvM3hFcv+yS
-	 AhqcQrcN7iuMPJiXVcLECkf63WbBvfj01Pka1gLpdU0o24mcHCAY4kUej2j8DhHcXRQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gI1lAK4x;
-	arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795459315;
+	b=d+e6hu0KcBtqivegaUjx7so9lwc/Fqp2rYgV8AqH2df5ndpKt1dMZMi5LUkvb8gbHlUm
+	 e/C/Cou0magPvN9ExaKWg0cEsk5hORW1JnUs+3rPUvn5IwWPi78FSUFFpbfaE4wkt5TB9
+	 t/Ty8wsHjRkai4ilCYmXASdeXFmLU1y/7PDeDofzHqI+OARoYKmlOaYyI+TI1eCIOegA2
+	 VXFmDc59itOLNylI2+wlv1iZlOVuS6jZjIs2DrLvGA7G4lBnZykqLG66JndIsVJKhP7Ud
+	 J1R6Sp6DqrRbDsBH3BnWH9ePdkbs3yfD9oYX7J50ObviVC8FvI8cHvgjLmJgtsSQ0sw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795459315;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=HEGGQVuIBFkEhUMA1Ueybmyt4JoPDl4tjH9NOl/AzyM=;
+	b=4MdCOhjP4a4jjEQ7nkrjNGbEfnEG2mwFPbrc9cyD9BKKyfRAWNEETU2OwaIYNT/QOO8k
+	 MwXWaaQ9XAMbzBvm1VTHfOsQe/UARE0bvZpoiFqE5KTPrKMelkwVWFpZzCBlIn9xlmdmF
+	 BT2oAbrL7L97ctLTb6lIraigZuAxkis43hMQzpMS+7vgDGtsPM2PYmU77VBjyD5QfAcXC
+	 azTSzs2rxw7WC7XYMUi8mxFkontl6ZcaFUhaTCf1OrD151+F+2mG819VTbEOTLyAhtVcR
+	 eIbTfZmSE7KP55tocGhLkpxhwZgwJqJN4bhI/ADf3pDBoqpvJFY/7bqCDW/BzXqhuzg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=U1NqD8MW;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F7A606A31A
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2026 18:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBDF606A683;
+	Mon, 23 Nov 2026 18:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gI1lAK4x
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F0F31F000C0;
-	Mon, 23 Nov 2026 18:30:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=U1NqD8MW
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795459314;
+	b=OkxialD/LHBTeP+ofSFD3hVU1/DTDX4w1VbCotDZZH9LOeUQS25MW3EDThZuD4Uy+teg
+	 Sm4jJnnmL36ul7qlYYki8M9bq5r/4GCiGS5gXPtIee8JVcgmcIZ8RW3yIebeGNjn8a59z
+	 flYMcIiW8Kj1V/tKdqjxyfGk4CQLDQG5eRmWmUBcBaiaUs3PVFVC5pcovG0X19Qkd2qn3
+	 P7VutNuo2rWW5F6ed1M+8lI4m2OT46HXxiJs35as2ElYZrlk5JIx8JWailkh/zMUdw9f7
+	 rSBC2aLVWsSnjiye/kjo8DRC/OzDsw2idHNYmmnrZx6xgTQCv8t2qts85kGnaTRSD0Q==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795459314;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=HEGGQVuIBFkEhUMA1Ueybmyt4JoPDl4tjH9NOl/AzyM=;
+	b=TkMNtCbJH611XEBsO2CLHi9sc89yFSHqB1/jkpfZCRkhMGQWMwuxL+cxfHhWcB1wBIX5
+	 7sVOxZoyteEYQ++NnvW/uYquyoqBqy5PvD4p3bORPZSuzvMEfdjR7Chomj6R/UFhD03G/
+	 9xdKgTyT3yVWt3xHiWvzaTsgNAM1mhLw9/Ek9M6elW9SGJ1QfgvmQ1Tma/mwmCW5pCab2
+	 9Bw/mGnOLdYJAA7TL18rNwsdEJsb4YHYBRuHnD0/F2YM2zgy9uEzrSuwjgbxn4/pQG8c/
+	 cY5VhMbIHSDkVzDbeStph1EUVBU8WXe7uXoIIsVOmX6bNGFVzIhIoseZOWaCaXlpp5A==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id 794BE1F000D3;
+	Mon, 23 Nov 2026 18:41:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795458657;
-	bh=8SQDwdiNb9DW7hMA94m7b/5EBoZ4JcTNs36C3UWb6EY=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=gI1lAK4x7kFeNnNpvSFDhtLJPBN+P/vQbSQRpt4SEETp0+QHuviZMx70Pwu+gyrsZ
-	 tdxzN1f6h9gyxXdyU4jMsLXkd61osus9nF2rRyqYtGeHBurIEHuFSoGAeS9GXBuhqw
-	 Roq20ZxBptjSHFMd7dwufaEwRfeJfWSuYbzqAZJUDOKk2sfRxY/rl7kRQqUNNtJue2
-	 L0NxePzh0kGABUjrwxugGS9MM6B7SVT7DLCX18igkgTqBsfYs95/EqkugdgQHfKWwX
-	 auoDLQs8om9hCOAY8iXGQLeb056kPoP/o51Nc9DrJAbHXdBhMwCrfhaS7TPK2K6J6N
-	 Jh1xljbyKfIIw==
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id D646F198004A;
-	Mon, 23 Nov 2026 13:30:54 -0500 (EST)
-Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Mon, 23 Nov 2026 13:30:54 -0500
-X-ME-Sender: <xms:XYYEa2tFTKJv30hVY8m_i4sN36w6PESZJRrrStMlsLBsoPEb7_u3lA>
-    <xme:XYYEa2SECkUSyyXvehzEa6WjFHqMteqLgZDnCS0qfqksb9TvI35bzSe2ZcsEp9xEg
-    i1Jcctco7CRGCpnc-uiIzRgeqxJX4kzuq2QYcaYBao3r0v4Dme05eF9>
-X-ME-Proxy-Cause: dmFkZTFGDkS51yMG+mrXBIJ+M89cfmaqxoDbXH+aR2Svq5j5Ml49pkPjyN408whMEUzhGd
-    Pen33BGFKJVINSu7r8Yus/7ExAbWszwldjvm3qyqt9+ROai+wx27crnfGQakr3JMD3uIHV
-    xzqOdFFnCnNgX4xL3Qgi8CQtHqKnPIxPIGYmSaN64PvXppPdbFzyPfyiXvblcRDK7Uu7PC
-    y4r1zJNugpyb2mrG3QeqiKhyPBJg6fVkC5RZI+vZZowVxaRSgrL1qtRzA+/zuccSsvsNKd
-    95vJv4FPExW9cPyJrnk5MwzAWO/PDDJ/1vUlOYZp97HofaAoar+Z54DJpzPKWtrkNNONf4
-    tD6uxRXcQEpvNMVFRibLqhwu2VSnPMvDyJ3euP6HnFs2nwogXJCzIUQHdkBuAdDulShkmY
-    0Y/VazHk3ZwOryPfUrHID3QyLC8WPyI9EskcxMf1Nj5STu96mLJ4HpwQ0K6DGygo6Ah0f+
-    nSm+4yeLqncE7rAeg8ElNnchQ2I5cSmXWSVV4ubDIPbxSwT9gVyf3eZxKPxoQa7awg9Cxa
-    8Z2MtrTlIdnIIgY2PtHT5JTv5/hNq/Hpv9ZpIkf6RKBOR8CW7HtjytJPkIPSZulDbWhwAa
-    mDogGKbpcc62D14hvA/nYKpotlAMoNNYNYQFV42RKqq3kjz4JaOwOkk6UHHQ
-X-ME-Proxy: <xmx:XoYEa-VjqavadDC83TUXBCq3PIDRvfvIXAQundTSzncBNREn02ekiQ>
-    <xmx:XoYEa4ZUG83oKhfhfkc7tGmK84-GuLGJ6Il4ohMlDDnq4IedG8jJfg>
-    <xmx:XoYEa82WXK-KS3hO1qLODfgfh-W6mpBZ9BLzF6gcwXA-WMV7Hqkt8Q>
-    <xmx:XoYEayixevMR3jRUhQNlSgz9T94WGC7xcwM3s-LYpL3FgaRXorKYZw>
-    <xmx:XoYEa4ZxMm-cD9mWqx3jePhMY3kOCvJ6e4aNwxgnuhJmWH0R3g_u1DB->
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id AA265F8008E; Mon, 23 Nov 2026 13:30:53 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=k20260515; t=1795459314;
+	bh=HEGGQVuIBFkEhUMA1Ueybmyt4JoPDl4tjH9NOl/AzyM=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=U1NqD8MWeXpLIvMNCSAAYU9vcvCE/lsrTKpgm+GcTRM9IIMfJCpi2XLmKNPFh9Urv
+	 vYudcRD+hxZOrXvGJtFrBogeSlrLPzafP5e7DJ8ms+yr3HGez2Pv160uSlUM0fsipv
+	 0PPHoIoM/vd3UU3cWWA6wqzydyw96yEba2eqy1GuuRCgFEbylyaHYT77gFWXpHWw5u
+	 rFvP4v7uE0uoaEfsZDlE+jYPWy7xt2Sh38DortiIlEv6+8+SCWbrQ8nJWKmDoh4/N+
+	 X6GZugg0KtpC2aTzdhKgGwKMJVdXka+mcl/NVMtQOFQz1HWvXzbQ/9LvOHfSceTgXJ
+	 xoFr4Wb22fkLA==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 550364C5D5;
+	Mon, 23 Nov 2026 18:41:35 +0000 (UTC)
+From: Fil Dunsky via B4 Relay <devnull+filipp.dunsky.gmail.com@kernel.org>
+Date: Mon, 23 Nov 2026 21:41:35 +0300
+Subject: [PATCH 2/3] hwrng: Add Cortina Systems CS7542 TRNG driver
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -77,155 +82,245 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Date: Mon, 23 Nov 2026 19:30:33 +0100
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Shreesh Adiga" <16567adigashreesh@gmail.com>,
- "Eric Biggers" <ebiggers@kernel.org>, "Demian Shulhan" <demyansh@gmail.com>
-Cc: linux-crypto@vger.kernel.org
-Message-Id: <708906ea-6b8a-41f2-96eb-b173083b0f34@app.fastmail.com>
-In-Reply-To: <20261123144605.303362-1-16567adigashreesh@gmail.com>
-References: <20261123144605.303362-1-16567adigashreesh@gmail.com>
-Subject: Re: [PATCH v2] lib/crc: Add 4-way folding in NEON crc64_nvme implementation
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261123-b4-cs7542-trng-v1-2-92d9ffcee531@gmail.com>
+References: <20261123-b4-cs7542-trng-v1-0-92d9ffcee531@gmail.com>
+In-Reply-To: <20261123-b4-cs7542-trng-v1-0-92d9ffcee531@gmail.com>
+To: Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795459294; l=6425;
+ i=filipp.dunsky@gmail.com; s=20260930; h=from:subject:message-id;
+ bh=CejmhadnINs86sI3uuQCpiGMjWxvRmque4I7XB53Ot4=;
+ b=/mF0/7U7u87NRBflb7R5E4A221BOZ0XmRS/f0yI/Up5OecriUR3Q4vfEr+r0XZjrrcp1yELoF
+ Pbusqw00garBqjEwA82DrwLB0WgCshIeF1HdjCplyH9jlFaGIiHJtgQ
+X-Developer-Key: i=filipp.dunsky@gmail.com; a=ed25519;
+ pk=JAYP8e2rJ54DHOmhNtXud8rl1igAaAXoOHxtJmVXI1g=
+X-Endpoint-Received: by B4 Relay for filipp.dunsky@gmail.com/20260930 with
+ auth_id=1085
+X-Original-From: Fil Dunsky <filipp.dunsky@gmail.com>
+Reply-To: filipp.dunsky@gmail.com
 Content-Transfer-Encoding: 7bit
 
+From: Fil Dunsky <filipp.dunsky@gmail.com>
+
+Adapt the OpenWrt implementation to use a syscon regmap for the shared
+scratch bit. Bound polling and retain a pending request across
+nonblocking calls instead of entering a blocking poll when wait=false.
+Handle partial output and wipe the temporary data on error paths.
+
+Retain the existing OpenWrt entropy quality setting of 512 for review.
+Hardware output smoke tests do not establish an entropy estimate.
+
+Signed-off-by: Fil Dunsky <filipp.dunsky@gmail.com>
+---
+ drivers/char/hw_random/Kconfig       |  11 +++
+ drivers/char/hw_random/Makefile      |   1 +
+ drivers/char/hw_random/cs75xx-trng.c | 159 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 171 insertions(+)
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index d3108991c..1c6a3f9f8 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -648,6 +648,17 @@ config HW_RANDOM_QCOM
+ 	  To compile this driver as a module, choose M here. The
+ 	  module will be called qcom-rng. If unsure, say N.
+ 
++
++config HW_RANDOM_CS75XX
++	tristate "Cortina Systems CS7542 random number generator"
++	depends on OF && HAS_IOMEM
++	select MFD_SYSCON
++	help
++	  Support the Elliptic random number generator in the CS7542 SoC.
++	  Access the shared global control block through a syscon regmap.
++	  Provide polled reads through the hardware RNG framework.
++	  The module will be named cs75xx-trng.
++
+ endif # HW_RANDOM
+ 
+ config UML_RANDOM
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index 8fce2aa6c..b7b5fdaa7 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -55,3 +55,4 @@ obj-$(CONFIG_HW_RANDOM_ROCKCHIP) += rockchip-rng.o
+ obj-$(CONFIG_HW_RANDOM_JH7110) += jh7110-trng.o
+ obj-$(CONFIG_HW_RANDOM_XILINX) += xilinx-trng.o
+ obj-$(CONFIG_HW_RANDOM_QCOM) += qcom-rng.o
++obj-$(CONFIG_HW_RANDOM_CS75XX)		+= cs75xx-trng.o
+diff --git a/drivers/char/hw_random/cs75xx-trng.c b/drivers/char/hw_random/cs75xx-trng.c
+new file mode 100644
+index 000000000..38a1958df
+--- /dev/null
++++ b/drivers/char/hw_random/cs75xx-trng.c
+@@ -0,0 +1,159 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Cortina CS75xx (Goldengate) true random number generator
++ *
++ * The block is an Elliptic TRNG: control at 0x00, interrupt status at 0x04,
++ * interrupt enable at 0x08 and four data words from 0x10. A new value is
++ * requested with GEN_NEW and is ready when the DONE status bit is set.
++ * The vendor driver also sets bit 5 of the GLOBAL_SCRATCH register before
++ * using the block, so does this one.
++ */
++
++#include <linux/bits.h>
++#include <linux/hw_random.h>
++#include <linux/io.h>
++#include <linux/iopoll.h>
++#include <linux/mfd/syscon.h>
++#include <linux/mod_devicetable.h>
++#include <linux/of.h>
++#include <linux/regmap.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++
++#define TRNG_CTRL		0x00
++#define TRNG_CTRL_GEN_NEW	BIT(0)
++#define TRNG_CTRL_RESEED	BIT(31)
++#define TRNG_IRQ_STAT		0x04
++#define TRNG_IRQ_EN		0x08
++#define TRNG_IRQ_DONE		BIT(27)
++#define TRNG_DATA		0x10
++#define TRNG_WORDS		4
++
++#define GLOBAL_SCRATCH		0xc0
++#define GLOBAL_SCRATCH_TRNG	BIT(5)
++
++#define TRNG_TIMEOUT_US		10000
++
++struct cs75xx_trng {
++	struct hwrng rng;
++	void __iomem *base;
++	struct regmap *global;
++	bool pending;
++};
++
++static int cs75xx_trng_wait(struct cs75xx_trng *t)
++{
++	u32 val;
++	int ret;
++
++	ret = readl_poll_timeout(t->base + TRNG_IRQ_STAT, val,
++				 val & TRNG_IRQ_DONE, 1, TRNG_TIMEOUT_US);
++	writel(TRNG_IRQ_DONE, t->base + TRNG_IRQ_STAT);
++	return ret;
++}
++
++static int cs75xx_trng_init(struct hwrng *rng)
++{
++	struct cs75xx_trng *t = container_of(rng, struct cs75xx_trng, rng);
++	int ret;
++
++	ret = regmap_update_bits(t->global, GLOBAL_SCRATCH,
++				 GLOBAL_SCRATCH_TRNG, GLOBAL_SCRATCH_TRNG);
++	if (ret)
++		return ret;
++	writel(0, t->base + TRNG_IRQ_EN);
++	writel(TRNG_IRQ_DONE, t->base + TRNG_IRQ_STAT);
++	t->pending = false;
++	writel(TRNG_CTRL_RESEED, t->base + TRNG_CTRL);
++	return cs75xx_trng_wait(t);
++}
++
++static int cs75xx_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
++{
++	struct cs75xx_trng *t = container_of(rng, struct cs75xx_trng, rng);
++	u32 data[TRNG_WORDS];
++	size_t done = 0;
++	int i, ret;
++
++	while (done < max) {
++		size_t n = min(max - done, sizeof(data));
++
++		if (!t->pending) {
++			writel(TRNG_IRQ_DONE, t->base + TRNG_IRQ_STAT);
++			writel(TRNG_CTRL_GEN_NEW, t->base + TRNG_CTRL);
++			t->pending = true;
++		}
++
++		if (wait) {
++			ret = cs75xx_trng_wait(t);
++		} else {
++			if (!(readl(t->base + TRNG_IRQ_STAT) & TRNG_IRQ_DONE))
++				break;
++			writel(TRNG_IRQ_DONE, t->base + TRNG_IRQ_STAT);
++			ret = 0;
++		}
++		t->pending = false;
++		if (ret) {
++			memzero_explicit(data, sizeof(data));
++			return done ? done : ret;
++		}
++
++		for (i = 0; i < TRNG_WORDS; i++)
++			data[i] = readl(t->base + TRNG_DATA + 4 * i);
++		memcpy((u8 *)buf + done, data, n);
++		done += n;
++
++		if (!wait)
++			break;
++	}
++
++	memzero_explicit(data, sizeof(data));
++	return done;
++}
++
++static int cs75xx_trng_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct cs75xx_trng *t;
++
++	t = devm_kzalloc(dev, sizeof(*t), GFP_KERNEL);
++	if (!t)
++		return -ENOMEM;
++
++	t->base = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(t->base))
++		return PTR_ERR(t->base);
++
++	t->global = syscon_regmap_lookup_by_phandle(dev->of_node,
++						    "cortina,syscon");
++	if (IS_ERR(t->global))
++		return dev_err_probe(dev, PTR_ERR(t->global),
++				     "cannot get global control regmap\n");
++
++	t->rng.name = dev_name(dev);
++	t->rng.init = cs75xx_trng_init;
++	t->rng.read = cs75xx_trng_read;
++	t->rng.quality = 512;
++
++	return devm_hwrng_register(dev, &t->rng);
++}
++
++static const struct of_device_id cs75xx_trng_of_match[] = {
++	{ .compatible = "cortina,cs7542-trng" },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, cs75xx_trng_of_match);
++
++static struct platform_driver cs75xx_trng_driver = {
++	.probe = cs75xx_trng_probe,
++	.driver = {
++		.name = "cs75xx-trng",
++		.of_match_table = cs75xx_trng_of_match,
++	},
++};
++module_platform_driver(cs75xx_trng_driver);
++
++MODULE_DESCRIPTION("Cortina CS75xx TRNG driver");
++MODULE_LICENSE("GPL");
+
+-- 
+2.53.0
 
 
-On Mon, 23 Nov 2026, at 15:45, Shreesh Adiga wrote:
-> Use 4-way folding in the shared NEON crc64_nvme for AArch64
-> as well as AArch32. This improves performance by about 2x for 512 byte
-> data size on Cortex-X925, as measured with a userspace benchmark.
->
-> Add similar optimizations from x86 implementation like reducing
-> the 4x to 2x and doing a tail (len >= 32) 2x fold as well as partial
-> block handling to process lengths which are not multiple of 16 bytes.
->
-> The partial block handling uses vqtbl1q_u8(), which AArch32 does not
-> provide, so implement it for AArch32 using two vtbl2_u8() lookups, the
-> same emulation used by lib/raid/raid6/arm/recov_neon_inner.c.
->
-> crc64_nvme_neon() therefore accepts any len >= 128 on both
-> architectures. The AArch64 dispatch code now passes the full length, and
-> the AArch32 dispatch code no longer rounds chunks down to a multiple of
-> 16 bytes: each chunk is 4 KiB, or the whole remaining length if less
-> than 4 KiB + 128 bytes remains, so no tail is left for the generic
-> implementation.
->
-> On AArch64, check for PMULL with a static key, and implement the PMULL
-> helpers with inline asm. With the vmull_p64() intrinsics, compilers
-> build the fold constants in general purpose registers with mov/movk and
-> transfer them with fmov/dup, up to 10 instructions per constant pair,
-> instead of loading them from memory.
->
-> Tested for correctness with the CRC KUnit tests under QEMU on both
-> AArch64 and AArch32.
->
-> Signed-off-by: Shreesh Adiga <16567adigashreesh@gmail.com>
-> ---
-> Changes in v2:
-> - Squash in the follow-up requested by Eric: AArch32 partial block
->   support, AArch32 chunking without rounding to 16 bytes, and comments
->   explaining the inline asm and partial block handling.
-> - Use uint64_t for fold_consts_4x_val and fold_consts_2x_val, fixing the
->   build failure reported. Also used uint8_t instead of u8 for
->   consistency for the partial_block array which is loaded by vld1q_u8.
-> - Rebase onto v7.4-rc4
->
-> v1: 
-> https://lore.kernel.org/all/20261118160110.1662470-1-16567adigashreesh@gmail.com/
->
->  lib/crc/arm/crc64-neon.h   |  16 ++++++
->  lib/crc/arm/crc64.h        |   4 +-
->  lib/crc/arm64/crc64-neon.h |  27 +++++++---
->  lib/crc/arm64/crc64.h      |  18 ++++---
->  lib/crc/crc64-neon.c       | 100 ++++++++++++++++++++++++++++++++++---
->  5 files changed, 144 insertions(+), 21 deletions(-)
->
-...
-> diff --git a/lib/crc/crc64-neon.c b/lib/crc/crc64-neon.c
-> index 1267df1310be..313676098dee 100644
-> --- a/lib/crc/crc64-neon.c
-> +++ b/lib/crc/crc64-neon.c
-> @@ -10,6 +10,12 @@
-> 
->  u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
-> 
-> +/* x^575 mod G, x^511 mod G */
-> +static const uint64_t fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
-> +						0x62242240ace5045aULL };
-> +/* x^319 mod G, x^255 mod G */
-> +static const uint64_t fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
-> +						0xe1e0bb9d45d7a44cULL };
->  /* x^191 mod G, x^127 mod G */
->  static const uint64_t fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
->  					     0x21e9761e252621acULL };
-> @@ -17,23 +23,105 @@ static const uint64_t fold_consts_val[2] = { 
-> 0xeadc41fd2ba3d420ULL,
->  static const uint64_t bconsts_val[2] = { 0x27ecfa329aef9f77ULL,
->  					 0x34d926535897936aULL };
-> 
-> +static inline uint64x2_t fold_single_round(uint64x2_t fold, uint64x2_t temp,
-
-Please avoid inline in .c files. If it /must/ be inline, use __always_inline.
-Otherwise, leave it to the compiler.
-
-> +					   uint64x2_t consts)
-> +{
-> +	uint64x2_t temp1 = pmull64(consts, fold);
-> +	uint64x2_t temp2 = pmull64_high(consts, fold);
-> +
-> +	return temp ^ temp1 ^ temp2;
-> +}
-> +
-> +/*
-> + * Fold in the final 1 <= len <= 15 bytes. With A = fold, the remaining
-> + * polynomial is A*x^(8*len) + B. Rewrite it as C1*x^128 + C2, where
-> + * C1 = floor(A / x^(128 - 8*len)) and C2 = (A*x^(8*len) mod x^128) + B,
-> + * then fold C1 into C2. t1 selects the len highest-degree bytes of A to
-> + * form C1; ~t1 selects the remaining bytes to form A*x^(8*len) mod x^128,
-> + * since tbl returns 0 for any index >= 16. The sign of t1 then selects
-> + * which bytes of C2 come from B.
-> + */
-> +static inline uint64x2_t fold_partial_block(uint64x2_t fold, uint64x2_t consts,
-> +					    const u8 *p, size_t len)
-> +{
-> +	static const uint8_t crc_neon_shift_tab[32] = {
-> +		0xff, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa, 0xf9, 0xf8,
-> +		0xf7, 0xf6, 0xf5, 0xf4, 0xf3, 0xf2, 0xf1, 0xf0,
-> +		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-> +		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-> +	};
-> +
-> +	uint8x16_t last16, t1, t2;
-> +	uint64x2_t a, b;
-> +
-> +	last16 = vld1q_u8(p + len - 16);
-> +	t1 = vld1q_u8(crc_neon_shift_tab + len);
-> +	a  = vreinterpretq_u64_u8(vqtbl1q_u8(vreinterpretq_u8_u64(fold), t1));
-> +	t2 = vmvnq_u8(t1);
-> +	t2 = vqtbl1q_u8(vreinterpretq_u8_u64(fold), t2);
-> +	t1 = vreinterpretq_u8_s8(vshrq_n_s8(vreinterpretq_s8_u8(t1), 7));
-> +	b  = vreinterpretq_u64_u8(vbslq_u8(t1, t2, last16));
-> +
-> +	return fold_single_round(a, b, consts);
-
-This is very hard to decipher.
-
-Could we make this
-
-        uint8x16_t last16, f, t1, t2, a, b;
-        int8x16_t mask;                                    
-
-        last16  = vld1q_u8(p + len - 16);
-        f       = vreinterpretq_u8_u64(fold);                  
-        t1      = vld1q_u8(crc_neon_shift_tab + len);
-        a       = vqtbl1q_u8(f, t1);
-        t2      = vqtbl1q_u8(f, ~t1);
-        mask    = vreinterpretq_s8_u8(t1) >> 7;
-        t1      = vreinterpretq_u8_s8(mask);
-        b       = vbslq_u8(t1, t2, last16);
-
-        return fold_single_round(vreinterpretq_u64_u8(a),
-                                 vreinterpretq_u64_u8(b),
-                                 consts);  
-instead?
