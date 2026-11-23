@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795435732;
-	b=W8XN9hotP7SJ6yaCGP220RZkeB2F8Jhnp3yDtkWwVzzzVm5NpZ9EauXRH37mfp8LuqVq
-	 0/XkP87BmlB342PDjunds1cZzWWWq1QWI1PBH6XGSv/0TgBWuYZ256LABYdkerul4YrrM
-	 A4LZQde1LOc8iwBWx+2qINtl8mPoLdzJrs31zneszSOmzDUSXJocPmdkpv6Df8TOxELtC
-	 K7vO8CHcoRFQLANRJKgIKXHfgGI3dcswCVvOOSy/hqUt+dK7U/Hx5sjrZ3/KrLYH7Rr6V
-	 szwDpEfUlUT8yQ+VOC7vAypTwYH0ZJnOlLBgIXsiSlf9j77Hx1B2507SQR28eE+DenQ==
+	t=1795435738;
+	b=oD91+1yU7uY5FiYEVM/yoFofJxChfLPf+biOO2+ZFxcZ3MVAvAsRvv0ie5WXINGPvAEH
+	 9ha6QPm79Jh6JtCJMRWANt9nbQfZDQhjkI3q+w1Y+EFJglclsh8/T9nChAFILhpKfU4Z5
+	 bJfogqkC5aNtlLwpIo/d6KxDoYEVQFm+2F/E9jhXOJS8+3v85r3DRlSFtVs8pVyqdWLVp
+	 F9aygx7y4FtFj6TvH1e3GVTIqfiU2gDXgEqQYudjEkEJfnwoAA4flr0V5ySZs0vjvYAjd
+	 DfY+hj1FMIWDgaRRki0LNowgNqL6fhZdPV97166YvFBj3CsXL2+LoqL1dtT6Ky16gyQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795435732;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795435738;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=/SiwyGPERRZ+wI7IGJpaGAyT67P6/mQY+ZPMOD9UOv8=;
-	b=XJqnMc6bPthawnKZTSWC/Dam9i0p/WOK3Jh6pRUxXrgXSqPlHwAV1etYh71pqGnYsfo1
-	 73c1l0G08yR4hMtx4TeuaaJjdvdt+WFOKBB+ymwRdhxx2W01Huv5hlpCtqrGFLkHyy42f
-	 owm5nnLC1fEFoWkeHO+8ErbDy57h64asvBd5oXu+r8tGxmVQw9+an1bomD3dTDj7+AhfU
-	 /qdEDkiEguxW7WA2/YxDWB3BWns4K5sLTzlVWrTQZhs48iSGoCH3WzkiRT88aFIkbkct+
-	 8kN9DxN4g9ek3dfDxHZNowwOf5xplBrh4r7FwbmNGFOxYPx+TDYGp+mdpgo+tMpRdtg==
+	bh=VRuIav6YHmvsMLh7gooEE44y2XxBVR4YlFmEfHcC8FI=;
+	b=JwDdPKGn6uwIbnKRujucYgdZ5jzIxEveZGd+ZcHOlD54Zte3bEYwKBXiOFJq1PlVxzY7
+	 jBKlE732nSw675OYoz7sMDdFOFRRd7aSIOGHi5QIF/WokRbBMZWvRXpArjw4c6ZF9jhb0
+	 7WQoOB0cxj3FCWXussjhBvK4kVyvWvNa51kvy6FeGg+CPpjiJz1ab7GDc67rvI20LYm9i
+	 QVWrDFbouhjIxe+QSKmWD+ALQKY3JdNaeT0KIxpBGL0LWfaK2/8JAEwKJjsbqNTeKtRzB
+	 pmYVEVKNqqocIml8s9lZ0AvfcOT9aLs7PDZSjUw5Byiy2rgnc8QjF4IjgsjYkWDL0iw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YCnUYlR0;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Cu5iR40U;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F82606A32C;
-	Mon, 23 Nov 2026 12:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B4E606A334;
+	Mon, 23 Nov 2026 12:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YCnUYlR0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB6C1F000EF;
-	Mon, 23 Nov 2026 12:08:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Cu5iR40U
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E9EC1F000D0;
+	Mon, 23 Nov 2026 12:08:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795435731;
-	bh=/SiwyGPERRZ+wI7IGJpaGAyT67P6/mQY+ZPMOD9UOv8=;
+	s=k20260515; t=1795435738;
+	bh=VRuIav6YHmvsMLh7gooEE44y2XxBVR4YlFmEfHcC8FI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YCnUYlR06NIXDwlkMqxoqluJqGGwvJWyF5BytmNeQvqkCwBMflpmZawVrGD6583TA
-	 VvkJWpwZg9AJOQs0jZYfRYZnDOwXQi/mfjpx51kYz2RQn851jLG5fx0YOIs7qI5utw
-	 lskmBmAGTmAfWa6HUCXFltCKYqf05BLYLOOhSRQ8wuhUYANAgcQ8z1Me0hltHfLwBU
-	 c+i1tHdzrUEzUMMP8dgqDx1CCLVlEVq804U3n+BpezSTjSnkwXm7V23EgmC/FvWRl0
-	 zStihzQ1ZcJOOWAo9kE1yvVsIPUL8FHvo667wgP9uTBpNUaLq1tT+zGcOrdQgBivz6
-	 npkH1DPGOGGiw==
-Date: Mon, 23 Nov 2026 13:08:48 +0100
+	b=Cu5iR40UMCTAEJ2wd+p/QNZOSHA0mxj629+dI25oJd65SS6aiEUmMtuSP+EfqBpzw
+	 P4bLrKFTX+y+WWgpS+CeXywKXfqZeHWEzvyA5bfU5ZnxkvF+yZwvF+G0+lnZi0a8c9
+	 tIPT2c6albgAONuFapnuKdUFG9SEC6xbweoTze+swOQyd3lctsBOYmzEacZe9CdUMk
+	 YHIg5fEmkMer30U7Cl+qQNqfsvmpbupBrp0Jfu+IqXUOfj8wp6ISR41AL2a27PuMQu
+	 smXmYbXn9HrsGtjA/oFOXfqLbcRWx1prekSdgW57mJpiqDPNjsGwqlYVgE2by/qhRx
+	 fRE4ldhhSfcJA==
+Date: Mon, 23 Nov 2026 13:08:55 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Stanislav Aleksandrov <lightofmysoul@gmail.com>
 Cc: Bjorn Andersson <andersson@kernel.org>, 
@@ -63,11 +63,11 @@ Cc: Bjorn Andersson <andersson@kernel.org>,
 	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, linux-usb@vger.kernel.org, 
 	linux-phy@lists.infradead.org, linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org, 
 	linux-pm@vger.kernel.org
-Subject: Re: [PATCH v2 09/16] dt-bindings: crypto: qcom,inline-crypto-engine:
- Add Halliday
-Message-ID: <20261123-cherubic-sparkling-mussel-e94df1@quoll>
+Subject: Re: [PATCH v2 10/16] dt-bindings: thermal: qcom-tsens: Document the
+ Halliday Temperature Sensor
+Message-ID: <20261123-calculating-auspicious-terrier-0bf9fa@quoll>
 References: <20261116-halliday-dts-v2-0-2c92438c6c46@gmail.com>
- <20261116-halliday-dts-v2-9-2c92438c6c46@gmail.com>
+ <20261116-halliday-dts-v2-10-2c92438c6c46@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -79,14 +79,14 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20261116-halliday-dts-v2-9-2c92438c6c46@gmail.com>
+In-Reply-To: <20261116-halliday-dts-v2-10-2c92438c6c46@gmail.com>
 
-On Mon, Nov 16, 2026 at 09:26:25PM +0000, Stanislav Aleksandrov wrote:
-> Document the Inline Crypto Engine on the Qualcomm Halliday SoC.
+On Mon, Nov 16, 2026 at 09:26:26PM +0000, Stanislav Aleksandrov wrote:
+> Document the Temperature Sensor (TSENS) on the Qualcomm Halliday SoC.
 > 
 > Signed-off-by: Stanislav Aleksandrov <lightofmysoul@gmail.com>
 > ---
->  Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
+>  Documentation/devicetree/bindings/thermal/qcom-tsens.yaml | 1 +
 >  1 file changed, 1 insertion(+)
 
 Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
