@@ -1,58 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795446718;
-	b=kbAFppQA3tKCPtGkMDkZYyZIvk99OiWwkVSozOZ7deYdGEKNNNXOcqC+fRzYk5DBATDI
-	 96wWnljy7vD2uEb8nNGpQSphlw33Os4/urZwGlxBwqKJ8uLAxj5PKdgqloN4QFN8USAWW
-	 LZPm5QkXldOZW4pr9Lo35PU+RsQ1J2DUD/ZwC7gkuOiIhv7x3yVrVDoxc5IkeCukYbTBE
-	 yZnu+bolc8bLRLDgJSOg+Pks1gkP8YaCHlg6dVTooUNv+LrMK8UV6YJQFcK/xfPAbgiBO
-	 nnaYMFdvzBOUxbYMygkeNcm6/s56S3VvKkJVgcqnlYoWHsd3f7Obs49uDIjZjsBwWUw==
+	t=1795446731;
+	b=1Aa+rTpEvb9VMT+GXm89Tz/0CAkku3J+pu80EKNMMUz7MHhYj9ePh4+35+4n7rF0URub
+	 FevQ9CjcaGjeM7Z7GApArb6habJ1UsOxKkaa0lOhgY7KW/ksG4FJt/tIXklIdaKYs//D9
+	 bIKEYuEqmzIEcdZ3rspYzNHPCS/VjcboxLKOuyvp6DPCijkChu5HPlSV7poLqBzgAW7Do
+	 ga8CURUZbiw8YPTO6DCMmAjKGsB5pSyytaosyb9od2y5RlobyT//xawsfkhZ36OQIyiOa
+	 oaPdJoWK5GzkwSc5aYrkNXdM+FNR8Ix9XPm+92ckDB7p+NOFIgwv3NoCfScsAqs+yYQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795446718;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795446731;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=6643fNZDuUxhCwALNEhgGFYDgNWm1w7VsffiZE74HlA=;
-	b=UnouXkqco7Nr+QGdp+vKyzTNcadGF+he6B6neLzVICUZ4OsIAiK+PENrmxUk/PikE9qY
-	 4PhtQH6knT8JGtYcgJ5tjH3xVPqqSvWjGYy05CEdZqOp33fHlacaU94nTtNcZlAY8EyEh
-	 HQdboAIz3Uia1yermvf0aEbH5bq3dfSGIgx4CFx/ZhvYhT/tTVz032FFj+cTnkZtn1lVG
-	 sVLc+AtWSj9+CoKMujBbL5AsbnBhipCTqnk5lb5jBaWKL4QFigjU/7rDcmFah3A6So5m9
-	 Jh6UbFmW1bzqddmJ/x/kkrKnqAhuRdPepJ6RWWCGS9WhYS1XHdEqGNscynQHf25pUSg==
+	bh=P2XW2sccuUVgo6BwdJvmsjjX7/WXqZl8dRMrcDqHgXg=;
+	b=Ab4+wzrrP459zY1xauNe0dyJUIF3vQ0UeVX3Y6q0mtvl44Ad50gh+KaNlvJ9XV0J0VyI
+	 v7dJ8a/ARzlGabNChRhfSg3tYnz+QiApC1AXVMcixGhTMnzN/BhHCh2MIdpul6FtyNhLE
+	 rmtc0ofOJucpAYMqjl/KOHa198zsq+F+Kx5hPzElzgqCRKX88zPgacGwcWBHVugNY3Fzv
+	 G8S7OdcrVgJxT0FY8Tk4zNUwG37hDxuGwqSaCXL38z5dRTnZC15/hjenSWD9zm9V2B4ET
+	 9lJpflTSdIojbz8CyJJ9eJ0Pntci39H0WBGuXF/G/YmVXknfqZime9SqhyJVgk6iv6g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XX2+g375;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kFtrLImG;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A0D606A683;
-	Mon, 23 Nov 2026 15:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E724606A31F;
+	Mon, 23 Nov 2026 15:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XX2+g375
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C7571F01565;
-	Mon, 23 Nov 2026 15:11:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kFtrLImG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D04A1F000D0;
+	Mon, 23 Nov 2026 15:12:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795446717;
-	bh=6643fNZDuUxhCwALNEhgGFYDgNWm1w7VsffiZE74HlA=;
+	s=k20260515; t=1795446730;
+	bh=P2XW2sccuUVgo6BwdJvmsjjX7/WXqZl8dRMrcDqHgXg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XX2+g375BvGN8E7aMpa/SBTswpN0EJgovGcreVhozXmkAyD+kCWBvDGdDgD3avrdq
-	 uJRlCqrkWzco8xvtjp3ar7FXT7VXp8BmO+2EUmvXwi+4qpt+6XlrhVTGRaU3u6hi0+
-	 kS8nyY4F6aa/yTGZvm8cfN1YtMtPItdAtEkc5W6dxiW0eYBWaSB9oBQcGgCinbOM8O
-	 FH3zhZRpIjn8DDMNF/2uLHsk2Fe+E8Mq2Dz5dlFtICoAvFvAoGWXZ5+3yFVq7ORAFv
-	 3uO2KSDUSll/MZYBsVlG4uRQ85/s1AuW/63yKfTp3BvJ0P/aCCDoLMAKAEfCSYJU3/
-	 Z/Cgiz5rho+Hg==
+	b=kFtrLImGjN5ASXnjgtBGtbUg9JgKlyMhqhiJ3RO6BUkIIxxW002vYHMZ9SHV5QdQY
+	 tlsRMr+XcoKRsJIoxKGPye3GSFTs3a3CpbeLL5yjDhOIhw40lz3O0e0WcpD/D9L0BS
+	 +0E/N0cgp41WLkXfI/CDKZ9GLTO7m4bTnjzkZZ3IAKwlcDyQNz2QlRQCxQ9VVMOdC7
+	 0SPXu9tMRuI5aUimROWZzVc2DXcMJ0JTuJI0SCeZhz9wDce+jJQeV8aPCNkB5B0HMQ
+	 /0TyCIQRQMSMpyhEfYmY1Sy7smXabCIL9DSPyR+tgKRzm3AJSgARpdLG19kMSjoGJQ
+	 2Et9HjUMJwHyg==
 From: Lee Jones <lee@kernel.org>
 To: lee@kernel.org,
-	Antoine Tenart <atenart@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Pascal van Leeuwen <pvanleeuwen@insidesecure.com>,
+	Stanimir Varbanov <svarbanov@mm-sol.com>,
 	linux-crypto@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [PATCH 07/10] crypto: safexcel - Check scatterlist errors before max() for in-place
-Date: Mon, 23 Nov 2026 15:09:58 +0000
-Message-ID: <20261123151055.2533735-8-lee@kernel.org>
+Subject: [PATCH 09/10] crypto: qce - Terminate RX DMA channel if TX preparation fails
+Date: Mon, 23 Nov 2026 15:10:00 +0000
+Message-ID: <20261123151055.2533735-10-lee@kernel.org>
 X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
 In-Reply-To: <20261123151055.2533735-1-lee@kernel.org>
 References: <20261123151055.2533735-1-lee@kernel.org>
@@ -68,51 +68,46 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In safexcel_send_req(), sg_nents_for_len() returns -EINVAL when a
-scatterlist is shorter than the required payload length.  For in-place
-requests (src == dst), the driver combines sreq->nr_src and
-sreq->nr_dst using max() before checking for errors.
+qce_dma_prep_sgs() prepares and submits the rxchan DMA descriptor via
+qce_dma_prep_sg() before preparing the txchan descriptor.  If the
+subsequent txchan preparation fails, qce_dma_prep_sgs() returns an
+error while leaving the submitted rxchan descriptor queued in the DMA
+engine, and callers jump straight to unmapping their scatterlists
+without calling qce_dma_terminate_all().
 
-When an in-place AEAD encryption request provides a scatterlist large
-enough for totlen_src (sreq->nr_src > 0) but too short for the
-appended authentication tag in totlen_dst (sreq->nr_dst == -EINVAL),
-max() selects the positive sreq->nr_src and discards -EINVAL.  The
-driver then maps only the undersized buffer while programming the
-engine token to emit totlen_dst bytes.
+On the next cryptographic request, qce_dma_issue_pending() flushes the
+stale rxchan descriptor against already-unmapped memory.
 
-Check both sreq->nr_src and sreq->nr_dst for negative error values
-before combining them with max().
+Terminate rxchan via dmaengine_terminate_async() when preparing txchan
+fails in qce_dma_prep_sgs().
 
-Fixes: 19b347b32bb1 ("crypto: inside-secure - fix scatter/gather list to descriptor conversion")
-Closes: https://sashiko.dev/#/bug/linux-78f87af5-af5e-439c-bb52-de4c8c53fdee
+Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driver")
+Closes: https://sashiko.dev/#/bug/linux-0b5dbd9f-7869-4856-a8e5-47c2c6e342f1
 Cc: stable@vger.kernel.org
 Signed-off-by: Lee Jones <lee@kernel.org>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ drivers/crypto/qce/dma.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index b031cb9652ec..e7816f6ddeaa 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -736,14 +736,13 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- 	queued = totlen_src;
+diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
+index 68cafd4741ad..726e7fd3421e 100644
+--- a/drivers/crypto/qce/dma.c
++++ b/drivers/crypto/qce/dma.c
+@@ -116,8 +116,12 @@ int qce_dma_prep_sgs(struct qce_dma_data *dma, struct scatterlist *rx_sg,
+ 	if (ret)
+ 		return ret;
  
- 	if (src == dst) {
--		sreq->nr_src = max(sreq->nr_src, sreq->nr_dst);
--		sreq->nr_dst = sreq->nr_src;
--		if (unlikely((totlen_src || totlen_dst) &&
--		    (sreq->nr_src <= 0))) {
-+		if (unlikely(sreq->nr_src < 0 || sreq->nr_dst < 0)) {
- 			dev_err(priv->dev, "In-place buffer not large enough (need %d bytes)!",
- 				max(totlen_src, totlen_dst));
- 			return -EINVAL;
- 		}
-+		sreq->nr_src = max(sreq->nr_src, sreq->nr_dst);
-+		sreq->nr_dst = sreq->nr_src;
- 		if (sreq->nr_src > 0 &&
- 		    !dma_map_sg(priv->dev, src, sreq->nr_src, DMA_BIDIRECTIONAL))
- 			return -EIO;
+-	return qce_dma_prep_sg(txchan, tx_sg, tx_nents, flags, DMA_DEV_TO_MEM,
+-			       cb, cb_param);
++	ret = qce_dma_prep_sg(txchan, tx_sg, tx_nents, flags, DMA_DEV_TO_MEM,
++			      cb, cb_param);
++	if (ret)
++		dmaengine_terminate_async(rxchan);
++
++	return ret;
+ }
+ 
+ void qce_dma_issue_pending(struct qce_dma_data *dma)
 -- 
 2.56.1.750.gf70dc682cf-goog
 
