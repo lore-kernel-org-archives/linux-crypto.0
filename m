@@ -1,58 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795446731;
-	b=1Aa+rTpEvb9VMT+GXm89Tz/0CAkku3J+pu80EKNMMUz7MHhYj9ePh4+35+4n7rF0URub
-	 FevQ9CjcaGjeM7Z7GApArb6habJ1UsOxKkaa0lOhgY7KW/ksG4FJt/tIXklIdaKYs//D9
-	 bIKEYuEqmzIEcdZ3rspYzNHPCS/VjcboxLKOuyvp6DPCijkChu5HPlSV7poLqBzgAW7Do
-	 ga8CURUZbiw8YPTO6DCMmAjKGsB5pSyytaosyb9od2y5RlobyT//xawsfkhZ36OQIyiOa
-	 oaPdJoWK5GzkwSc5aYrkNXdM+FNR8Ix9XPm+92ckDB7p+NOFIgwv3NoCfScsAqs+yYQ==
+	t=1795446738;
+	b=5LqQZlLl1omy/J3l2hMt5i+AzPUH69pBaXkvIt00w4sFJgkfcMlsQ/fzpO2HN5yrBwOK
+	 G2KYrGkJvBrRqJQiX+YRsMrJppTx7I3sezf1MR48DcIhlCf/dy/DaJisKKxynpIqottJY
+	 jHq1CbA4V6jDoUSZnV88nMal0eZRcli5SEOX9BOhMBPJawviccF61RuzPBE0q11vYnC3R
+	 sJi5g7jG6yRq5xmY9t86yabKXD+Jpeo5b8uSyRq7QxiQDfapKcBNVRGCdPXGZ657ome/o
+	 MTYDHvdXmjbgZJddn+OPd6CZWRl5mdODJi/VGLpkF3ysPcfhByFohjJ4XyUQdlpKnAg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795446731;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795446738;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=P2XW2sccuUVgo6BwdJvmsjjX7/WXqZl8dRMrcDqHgXg=;
-	b=Ab4+wzrrP459zY1xauNe0dyJUIF3vQ0UeVX3Y6q0mtvl44Ad50gh+KaNlvJ9XV0J0VyI
-	 v7dJ8a/ARzlGabNChRhfSg3tYnz+QiApC1AXVMcixGhTMnzN/BhHCh2MIdpul6FtyNhLE
-	 rmtc0ofOJucpAYMqjl/KOHa198zsq+F+Kx5hPzElzgqCRKX88zPgacGwcWBHVugNY3Fzv
-	 G8S7OdcrVgJxT0FY8Tk4zNUwG37hDxuGwqSaCXL38z5dRTnZC15/hjenSWD9zm9V2B4ET
-	 9lJpflTSdIojbz8CyJJ9eJ0Pntci39H0WBGuXF/G/YmVXknfqZime9SqhyJVgk6iv6g==
+	bh=Y3crQHbdpOlgtQVKmilOb/+IWL0/tt7WDZKDspXm67A=;
+	b=0vnMTicYNh/28o6QS44HbFJa9IYbHDD83rTQe1KU5rbk1fCgUCBzApjPHBhTOhFK+8Az
+	 sEdyEwG5zDrvC3KMGkO9g+EAA90cCeeOOjhmzOwXqe6oi2O1ruXPmiDH2StwUTK8IuEwm
+	 0M2obxKt4mSKBOQXTQtsWLzxOQ/oQfc6mnQLNnYQfVy1R60O87dZwwXdM0pKJ8h1Z/jjE
+	 PbpUB3rP0uK51Dj87iAqWhkvtW9PWS+zhS8EVb4cNv4q3h65/wL62A+GH8j9/qU1YEr8C
+	 cKbjIlUJj7V07LZzNH8afZ1XApNMmVbXDC7mSc/Yet0oXtj3qGqNFIsziGVZbjdtO8Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kFtrLImG;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TKofGITs;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E724606A31F;
-	Mon, 23 Nov 2026 15:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235D4606A31E;
+	Mon, 23 Nov 2026 15:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kFtrLImG
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D04A1F000D0;
-	Mon, 23 Nov 2026 15:12:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TKofGITs
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4AD91F000CA;
+	Mon, 23 Nov 2026 15:12:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795446730;
-	bh=P2XW2sccuUVgo6BwdJvmsjjX7/WXqZl8dRMrcDqHgXg=;
+	s=k20260515; t=1795446737;
+	bh=Y3crQHbdpOlgtQVKmilOb/+IWL0/tt7WDZKDspXm67A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kFtrLImGjN5ASXnjgtBGtbUg9JgKlyMhqhiJ3RO6BUkIIxxW002vYHMZ9SHV5QdQY
-	 tlsRMr+XcoKRsJIoxKGPye3GSFTs3a3CpbeLL5yjDhOIhw40lz3O0e0WcpD/D9L0BS
-	 +0E/N0cgp41WLkXfI/CDKZ9GLTO7m4bTnjzkZZ3IAKwlcDyQNz2QlRQCxQ9VVMOdC7
-	 0SPXu9tMRuI5aUimROWZzVc2DXcMJ0JTuJI0SCeZhz9wDce+jJQeV8aPCNkB5B0HMQ
-	 /0TyCIQRQMSMpyhEfYmY1Sy7smXabCIL9DSPyR+tgKRzm3AJSgARpdLG19kMSjoGJQ
-	 2Et9HjUMJwHyg==
+	b=TKofGITszN1ewiDEtpVWMrbMfRwWCjDaHNbBen0MkvuNON/yK2SDQB6oS7h0PE5i7
+	 tgeeEjk9sV/5XJ7z3G9kAxf6//s44qhgty+pZrzzDo61M+YdiXd76Le86YxIU2EAX/
+	 HwSbyC1UA0W3Z4zrcXmIfMCafL1OGdpa/rgUknqiYoezjf1Y31SOQxHXpxa6hMZaQ6
+	 UaVkSoFo7/YsqOymnRN90B9ffJ2A/R2G2juLmFoN7GZrDtN6Xkm8Ivv/YTgkknsdGa
+	 jCfUfTf3VAzx6cPLRpi6voTlz17ryusbj9pR39GybniE9OqmDoPYwbl83F/U0wWxyD
+	 2u7Vmxw9WVb1A==
 From: Lee Jones <lee@kernel.org>
 To: lee@kernel.org,
-	Bartosz Golaszewski <brgl@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Stanimir Varbanov <svarbanov@mm-sol.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Thorsten Blum <blum@kernel.org>,
+	Nicolas Royer <nicolas@eukrea.com>,
+	Tudor Ambarus <tudor.ambarus@linaro.org>,
 	linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [PATCH 09/10] crypto: qce - Terminate RX DMA channel if TX preparation fails
-Date: Mon, 23 Nov 2026 15:10:00 +0000
-Message-ID: <20261123151055.2533735-10-lee@kernel.org>
+Subject: [PATCH 10/10] crypto: atmel-tdes - Update output IV before clearing busy flag
+Date: Mon, 23 Nov 2026 15:10:01 +0000
+Message-ID: <20261123151055.2533735-11-lee@kernel.org>
 X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
 In-Reply-To: <20261123151055.2533735-1-lee@kernel.org>
 References: <20261123151055.2533735-1-lee@kernel.org>
@@ -68,46 +72,53 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-qce_dma_prep_sgs() prepares and submits the rxchan DMA descriptor via
-qce_dma_prep_sg() before preparing the txchan descriptor.  If the
-subsequent txchan preparation fails, qce_dma_prep_sgs() returns an
-error while leaving the submitted rxchan descriptor queued in the DMA
-engine, and callers jump straight to unmapping their scatterlists
-without calling qce_dma_terminate_all().
+In atmel_tdes_finish_req(), dd->flags clears TDES_FLAGS_BUSY without
+holding dd->lock and before calling
+atmel_tdes_set_iv_as_last_ciphertext_block().
 
-On the next cryptographic request, qce_dma_issue_pending() flushes the
-stale rxchan descriptor against already-unmapped memory.
+As soon as TDES_FLAGS_BUSY is cleared, a concurrent
+atmel_tdes_handle_queue() caller on another CPU can dequeue the next
+request and overwrite dd->req (as well as modify dd->flags).  When
+atmel_tdes_set_iv_as_last_ciphertext_block() then reads dd->req, it
+overwrites the newly dequeued request's IV with the previous request's
+ciphertext and leaves the completed request's output IV un-updated.
 
-Terminate rxchan via dmaengine_terminate_async() when preparing txchan
-fails in qce_dma_prep_sgs().
+Update the output IV before clearing TDES_FLAGS_BUSY, and clear
+TDES_FLAGS_BUSY under dd->lock to serialise flag updates with
+atmel_tdes_handle_queue().
 
-Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driver")
-Closes: https://sashiko.dev/#/bug/linux-0b5dbd9f-7869-4856-a8e5-47c2c6e342f1
+Fixes: 61b0dd664fa1 ("crypto: atmel-tdes - Set the IV after {en,de}crypt")
+Closes: https://sashiko.dev/#/bug/linux-d6fd6f42-d6fc-47d0-86d5-f428e2203a64
 Cc: stable@vger.kernel.org
 Signed-off-by: Lee Jones <lee@kernel.org>
 ---
- drivers/crypto/qce/dma.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/crypto/atmel-tdes.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
-index 68cafd4741ad..726e7fd3421e 100644
---- a/drivers/crypto/qce/dma.c
-+++ b/drivers/crypto/qce/dma.c
-@@ -116,8 +116,12 @@ int qce_dma_prep_sgs(struct qce_dma_data *dma, struct scatterlist *rx_sg,
- 	if (ret)
- 		return ret;
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index c86d06169ab9..392a2a3a8b85 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -504,14 +504,17 @@ static void atmel_tdes_finish_req(struct atmel_tdes_dev *dd, int err)
+ {
+ 	struct skcipher_request *req = dd->req;
+ 	struct atmel_tdes_reqctx *rctx = skcipher_request_ctx(req);
++	unsigned long flags;
  
--	return qce_dma_prep_sg(txchan, tx_sg, tx_nents, flags, DMA_DEV_TO_MEM,
--			       cb, cb_param);
-+	ret = qce_dma_prep_sg(txchan, tx_sg, tx_nents, flags, DMA_DEV_TO_MEM,
-+			      cb, cb_param);
-+	if (ret)
-+		dmaengine_terminate_async(rxchan);
+ 	clk_disable_unprepare(dd->iclk);
+ 
+-	dd->flags &= ~TDES_FLAGS_BUSY;
+-
+ 	if (!err && (rctx->mode & TDES_FLAGS_OPMODE_MASK) != TDES_FLAGS_ECB)
+ 		atmel_tdes_set_iv_as_last_ciphertext_block(dd);
+ 
++	spin_lock_irqsave(&dd->lock, flags);
++	dd->flags &= ~TDES_FLAGS_BUSY;
++	spin_unlock_irqrestore(&dd->lock, flags);
 +
-+	return ret;
+ 	skcipher_request_complete(req, err);
  }
  
- void qce_dma_issue_pending(struct qce_dma_data *dma)
 -- 
 2.56.1.750.gf70dc682cf-goog
 
