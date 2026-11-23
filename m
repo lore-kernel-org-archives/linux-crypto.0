@@ -1,59 +1,61 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795447156;
-	b=wHe0ArNFQZGaD/b8aPzrnZILE9bdiQWmZhVfqBgOmxC+Htfm2JzC3J4HO/Rrc91p3anc
-	 BvVywgu90SQRELHWgbWm/bGAT2Fy5J1zZEzFmc899fAtuQa8GdZx6esa2QzCjg9tDr13C
-	 gEoZh7uMYTZOtiATfQt7g7+HWBtoeVvG18auONFWvzl6mnEWcyomxNEuOE3gCnOBEBsuP
-	 CLfBoXArEf9Rr2Ttq4F6A4OX/TQ48UNr1I2aJEmdl+we3X7moO9afVNv6ZKYdjmMVGvin
-	 RRbHEE6DU+FsHBn+G2WBHOPJKhJdPT0VfQIGseunMmov192mwZhI6mF1/8QAizl/0LQ==
+	t=1795447773;
+	b=QGZ+vGXCv9vrX4+vj1hTFpa/FkeEUxHorKTXSW1ww9gUUGn8lpns/XeTAG3EaIuLg5qm
+	 b6ldK6LeYuKvkwRB5zmGcO6ro/JuQ2LNL47hLus3xAim/Y16qJ18dcAC7Bz4Wb40EKOnK
+	 oBMO1iHUGrhzQJj+VE3V40cI79m5KGQGPs+i9zrWJeCFpC8F+rHKlOV0VVlzLClIsLrU1
+	 uZ9dCCDFMON0wmwU7oc+Uo/gfzmFe85jDkZpdtPaLFrB0IfMsYpuV//Uk+ZuZ+qsDrdO8
+	 +mK5j/HTyTl0o1eqPuzzGgpTALRy61xyI1F+TYWcJwu+uFPVnl560cMYs6J52Ps6azA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795447156;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=bnR0GRPXHELQrNbzQsdwgxPcGmVpehX4wb/dxh3Lceg=;
-	b=z18eedN72YTVUahblKYCyJEJ4ShJlgXIivqr3Bfs0Jj91YqgKUkgcLDsq4aMjwoQk6OG
-	 eSPW9Q3cpBq5rmcSaudVWoX5IMzc0zEUiGzqhwkK2TmrXWlwGD8OJKzFnWLm7d/mYqL1K
-	 zS77fd+EgDwQJ89CLdu8MDW6m/1JA1ATj4WIO/C1I4/b5FSqGhcB6eFEe9PoxE17nmd2Q
-	 PQNTV1T0Vu7ZgAnDWLtYMJJceyBHQbSqvCXWFfWlZ5M11Ua0oTSX0qPpNBhdtJGCwHIzS
-	 L2PI1oUH64S/jvdAcb2drOfQQZhKrZjGHdX7AhTY86kLtvDLMRtp3kjqZO5zejGVhhQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795447773;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=R020g54OZZm83YeqwM84l5L4106wrL7JprwR9fNpr1w=;
+	b=bYF79yacx7KM84JGzauYDNAhzSrsltrgVaBlcJuBkqlIGcHlRD2IrBgEC6ezxArb3rrX
+	 YQRG1ESg4wOt1BHA2tKQPVKithJzOWIil/SC48MHzB4VszcsGq9lzPdaCEduPSJo7Va47
+	 LfCEYmUynFrDusIEEZJfdlSAr+Fan83N55g9xpfuwqfmGbUCwpqzczgDDEG9sOdB61cXs
+	 +JZ/iIVCXF605aM2ROdTeG6tTujq7uYUIrZ8PJd+cYaOg1PFadMD6sthvsCWQK6T0tIao
+	 ckwckjPtYiVJFSrdgTMExmMt1q+/+WeT8xvD/N3pEk4VU06kDRRs8M5UqvoTBG9ioJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FuhgQugu;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kmRWDqC5;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B9B606A32D
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2026 15:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 61BE4606A330;
+	Mon, 23 Nov 2026 15:29:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FuhgQugu
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC1391F000C0;
-	Mon, 23 Nov 2026 15:19:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kmRWDqC5
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id F262F1F00A00;
+	Mon, 23 Nov 2026 15:29:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795447156;
-	bh=bnR0GRPXHELQrNbzQsdwgxPcGmVpehX4wb/dxh3Lceg=;
-	h=From:Subject:Reply-To:To:In-Reply-To:References:Date;
-	b=FuhgQuguGB2Fz/hE/3cRj93UY/VMwU3jGAkSZO7K783+Mw0OvDZtO4FshES+aP1fn
-	 if6YOv/7UtimWNMmygE6FOdddoo4wADGetPCyDZxO875bEWfvKHGTJ1n/8s+FxRUqN
-	 4/e8jhtAmlJZ8oAgQ2/eTEdEP6sufKlAB1k+av0H1H0mCwOLXZRbCdsicyZjYPg8SC
-	 QkReVwEpY5N8Az+MjKgPTz/E2oVrh2jdOR/Cwa+bw+RvB7a7pzs5KdXrdtia1lCF4B
-	 k0UnzlGA2CQxUVJfTjIuiIHA0ebf98Yq9Umk0ejJNDWEma2GY223jFRZKF8nDeCMPj
-	 q5NszXN/PN3NA==
-Message-ID: <sashiko-outbox-229527@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 06/10] crypto: talitos - Remove duplicate IV unmap in
- AEAD encrypt path
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Lee Jones" <lee@kernel.org>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
- S. Miller" <davem@davemloft.net>, "Paul Louvel" <paul.louvel@bootlin.com>, "Evgeniy
- Polyakov" <johnpol@2ka.mipt.ru>, "Kim Phillips" <kim.phillips@freescale.com>, "Christophe
- Leroy" <chleroy@kernel.org>, linux-crypto@vger.kernel.org
-In-Reply-To: <20261123151055.2533735-7-lee@kernel.org>
-References: <20261123151055.2533735-1-lee@kernel.org>
- <20261123151055.2533735-7-lee@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Nov 2026 15:19:15 +0000
+	s=k20260515; t=1795447772;
+	bh=R020g54OZZm83YeqwM84l5L4106wrL7JprwR9fNpr1w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kmRWDqC5dXQeZvZlh8qlBEYVX2C4qge3Vx5LcqUOzLbGhOXUzSCBBvmBQ3/FYP4QI
+	 9fH4LRaObVabwwJsjL54XiIoxXVtOhguSEki4tToCARmQaLQfLLD1vcvo7v2ptTcAx
+	 W2fwJqLRWgQjOJ+cNomsUK4IZRtamaNcqp63tOvpSgDJKtAUCPqoSUO2A7vCf/TboV
+	 sgGAQC9YQxJ/2pyJ1bBY6CNN9um1SVzoe/jnXHqY5mn37KuwBIU/Dm66uI7NvwCL7a
+	 /DMLgdTEw70bOxRpEWMuDt4RufIOFgiaIuGI+A2LOr+jAbMRMcwhR6LRRaZUKDRl+C
+	 BsbVpXEi+F00Q==
+Date: Mon, 23 Nov 2026 16:29:28 +0100
+From: Bartosz Golaszewski <brgl@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Stanimir Varbanov <svarbanov@mm-sol.com>, 
+	Eneas U de Queiroz <cotequeiroz@gmail.com>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
+	Eric Biggers <ebiggers@kernel.org>, Demi Marie Obenour <demiobenour@gmail.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Russell King <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Pankaj Patil <pankaj.patil@oss.qualcomm.com>
+Subject: Re: [PATCH v12 1/4] crypto: qce - convert to auxiliary bus
+Message-ID: <sfsgrwaj6ichkuafqvrpmql67664x6vyxgz7lwjxhywbf5zc3l@edz4qooziklt>
+References: <20261120-qce-fix-self-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com>
+ <20261120-qce-fix-self-tests-v12-1-b5a2a44bc5ae@oss.qualcomm.com>
+ <c26b8002-c246-45cb-bca0-8f596a2a425b@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -62,65 +64,24 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c26b8002-c246-45cb-bca0-8f596a2a425b@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found no new issues
-in this patch, but noticed 1 related pre-existing issue it does not
-introduce:
-- [Critical] crypto: talitos: DMA address truncation in
-  unmap_single_talitos_ptr() [1]
---
+On Sat, Nov 21, 2026 at 02:05:57PM +0100, Krzysztof Kozlowski wrote:
+> On 20/11/2026 20:34, Bartosz Golaszewski wrote:
+> > This driver is disabled in arm64 defconfig but one of its
+> 
+> That's true for next, but your patch #3 seems to disagree. That's
+> confusing. Maybe you meant disabled for arm64 platforms or marked as
+> broken? Because anyway defconfig does not matter here - even if drivers
+> are not enabled in defconfig (so stay disabled), they should not be
+> affected with unbisectable changes.
+>
 
-commit 7421990fbcd39641bb3ac45651a2ed7bcb79c461
-Author: Lee Jones <lee@kernel.org>
+Keeping this fully bisectable (it is build-time bisectable actually)
+would mean squashing all 4 patches together. If nobody objects, I can do
+this of course.
 
-crypto: talitos - Remove duplicate IV unmap in AEAD encrypt path
-
-This commit removes a duplicate dma_unmap_single() call on edesc->iv_dma in
-ipsec_esp_encrypt_done(), relying on ipsec_esp_unmap() to unmap civ_ptr via
-unmap_single_talitos_ptr().
-
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-> index c7d9ce2905be7..be7a281319450 100644
-> --- a/drivers/crypto/talitos.c
-> +++ b/drivers/crypto/talitos.c
-> @@ -1097,16 +1097,12 @@ static void ipsec_esp_encrypt_done(struct device =
-*dev,
->  				   int err)
->  {
->  	struct aead_request *areq =3D context;
-> -	struct crypto_aead *authenc =3D crypto_aead_reqtfm(areq);
-> -	unsigned int ivsize =3D crypto_aead_ivsize(authenc);
->  	struct talitos_edesc *edesc;
-> =20
->  	edesc =3D container_of(desc, struct talitos_edesc, desc);
-> =20
->  	ipsec_esp_unmap(dev, edesc, areq, true);
-> =20
-> -	dma_unmap_single(dev, edesc->iv_dma, ivsize, DMA_TO_DEVICE);
-
-[Severity: Critical]
-This problem wasn't introduced by this patch, but does
-unmap_single_talitos_ptr() truncate >32-bit DMA addresses [1] when
-ipsec_esp_unmap() unmaps civ_ptr?
-
-While to_talitos_ptr() stores the upper bits of a >32-bit DMA address in
-ptr->eptr on non-SEC1 hardware, unmap_single_talitos_ptr() ignores
-ptr->eptr and only passes the lower 32 bits to dma_unmap_single():
-
-drivers/crypto/talitos.c:unmap_single_talitos_ptr() {
-	struct talitos_private *priv =3D dev_get_drvdata(dev);\
-	bool is_sec1 =3D has_ftr_sec1(priv);
-
-	dma_unmap_single(dev, be32_to_cpu(ptr->ptr),
-			 from_talitos_ptr_len(ptr, is_sec1), dir);
-}
-
-On systems with >4GB physical memory, this leaks the intended IOMMU mapping
-and unmaps an unrelated truncated DMA address, which can cause IOMMU faults
-and memory corruption.
-
-[1] https://sashiko.dev/#/bug/linux-fc697335-3f0d-4823-8b99-a6069def8475
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123151055.2533=
-735-1-lee@kernel.org?part=3D6
+Bart
