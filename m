@@ -1,62 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795446697;
-	b=PnFrvo8v6C4Qe97VrT3tb1FZBGeTJYFNutmnaxwn1iCGa++bnBDv4Jix82DQIvhsTiOn
-	 252aO/3ZJzXgG70cXBcRdD/M3v8uJ8LZAtKinMIzp20HfInw4eACL4+l4jUl1sDAhUEyh
-	 1OQFNtScsS8BiB6oQTmOQmH4PBERAKDjHcBctcCZvP9qTfPLF7BkzulPi2LiQMs+sWd6Y
-	 aJWYgJTn2Y8/D/qV9s1JDm/owAA8NS2/G/vMM9RLsVpqe7Oxa4IIiHNZ126xHGfTgyHps
-	 iDqQ3CsPASH16gXBYHP1ydGtCXd/Ge/TSxoLstgklkGgXthjGzX1gU3tRRuxTlgsPKg==
+	t=1795446704;
+	b=TeiDu0FQgiZ4PVVwVFtBoRfmTLrvs1K+WLvUPx5JMwEZinHkpTLXR6nXP/mXze0NmA+W
+	 AOSn1FwnreykvNR5lf1AK60GCs8tFT6JkxxrV7ZKuLCbltALxvJ0/95lnKg+ST1QLdTY7
+	 +OWsRfCf00rNYbseWOQLIyZUjvdW7j9/B5wdnLqifR2jDILTHZ0wWGYIHOINDprJFEZP5
+	 U7K2OGgfX/GCML4baj0jPDVGX2mIoItgi9Ut6qFDjHMBmpLpHjvNGvulUx6kGrp6mcG/z
+	 jfUgCTU5ce8qb1kqyO8CCvuEPokXDqCpsMKRDH0e9LR7ZZ6RSlic9EoQJjD7FXNTyHQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795446697;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795446704;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=STeVH55BBeBKM6xcTx+69M7sUEKnUAjtUBsUatOVMGw=;
-	b=bNT7CdbpJbcNfA6mdeOEl1gRGOXAPj1UUIG9DajsqDuZowBX7BMoErxLal2L8nz8k7EP
-	 VO62ebH9mjtIakpmviG63sK34Oi8mJXBQKFZk1dPwPGjipAlwDzrFihEzDrBEAEDPJAxn
-	 CjPptvXyWY61Ux2iMhGHMYrQ180+2B5H55vU2Bh/tn/uVNpcpgkecmDL6UOAblloZ82ND
-	 U3cPspJJjTQjw2vANRxSXXFSr3+3b/dWSE61XmPq2l4H1NRlq9jkP6Y1kzQe/ucZ7i0a4
-	 K+wQPImXkpAoTZX0vpGgHWN5Rq5Ojcc8TgXrbeUsFlG6/7VXb36VXUy2McUJN2UnqZA==
+	bh=DfbRQ3HnqUlBbBOkMY4WXnsIOLfqHv92zVcp48pdCgQ=;
+	b=oEaYHt/0I6FX2+2qpd0RtcJATLhv/hDmzcY3P37VGuVpq5Gu9c4RwLmI1GXbxH3g4fUJ
+	 OrLazVOJ9RR+GrDJKxDN7fK8cqJgGmMj+QnuicM/G8W8WuvvNWEKOLAfLriqWJ/5QU0xR
+	 uZrGD4CJbhdKBWdZ3mxcLLx67SBWQ+sj+2+/ocaGI2Y3FBWij/U9HP4TNxiZj6s2SXjbp
+	 b5JRZZkX2vj5aF4NNRK+cVGYVkp+4doVQKkImomRbAC0GwDFqnJi8MShXhCW4H3PdP8zP
+	 pAIMnZvg55vlDbae1X0I67X7xBBjj2fL3ui+f1teeKUiqYe5xWPxhIxqr2v1mlcmAGA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iQuxI9z5;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mBqHRmE9;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87C7606A32C;
-	Mon, 23 Nov 2026 15:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA87606A680;
+	Mon, 23 Nov 2026 15:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iQuxI9z5
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 282D31F000CF;
-	Mon, 23 Nov 2026 15:11:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mBqHRmE9
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3267C1F000E0;
+	Mon, 23 Nov 2026 15:11:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795446697;
-	bh=STeVH55BBeBKM6xcTx+69M7sUEKnUAjtUBsUatOVMGw=;
+	s=k20260515; t=1795446703;
+	bh=DfbRQ3HnqUlBbBOkMY4WXnsIOLfqHv92zVcp48pdCgQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iQuxI9z5WzUZZyvlumpBl7lcu5ipk202NNdsZPnzmCgWGAvZa1ay60Fxq64Rp5KCp
-	 rHfctmjrETxSiuULSIL7i3VOpXh35crvqibh3btRqwuRLzMrSHbul92HPic8ircLfH
-	 bsBKfrFNI6SwINufuwPRKS98uTt0xnRuI8hfm40Khn+C+Od/orlQuiEyBHGUz2RUzQ
-	 R5nMiXWOcIHzT7NwxLinqSHvkCdZYQeJRzl/w1gyX1j7qQsXTtr6mqzkCDfJnRulc7
-	 66NyzfOQZY98dQ23iYtSbhtTGi+T+R3x0cP4LkbwXIyWS31Yiok+k7lUWRtO3iCOt8
-	 74cstbe/A8PZg==
+	b=mBqHRmE9PzpwWkvO333jNUWX4odAsbClveRn9S5M39rtXxX9WqrZXphjd1VD1LhUj
+	 Sf1xfxo5t6oV/t1I6rYc2CKMpyIbuBAoZf0AtkmYh/VuyLYPAAVoFnh1J26MRXWQBD
+	 oCmsOjnQlXMIqp025+cxJgM2BpE+L6vFMJZIfkEXlgMKsn5inI9h4HDdyCsqMb1btT
+	 N8IHyaJViMxmK8SaiF7zv1lW7XWLMv+iefhN1fjLCv8qa2sWrcvffRlhIdqDdZziRv
+	 X4glwRqt0+bFgKzWEbsBJAsudjhusLGGNBrTXL/BB1TzZotDXP9Ej7esyOwd0eXdUw
+	 OThmSloIlcVPA==
 From: Lee Jones <lee@kernel.org>
 To: lee@kernel.org,
-	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Zhiqi Song <songzhiqi1@huawei.com>,
+	Longfang Liu <liulongfang@huawei.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Chen-Yu Tsai <wens@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	bui duc phuc <phucduc.bui@gmail.com>,
+	Weili Qian <qianweili@huawei.com>,
+	Zaibo Xu <xuzaibo@huawei.com>,
+	Meng Yu <yumeng18@huawei.com>,
 	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [PATCH 04/10] crypto: sun8i-ss - Fix scatterlist array overflow for HMAC requests
-Date: Mon, 23 Nov 2026 15:09:55 +0000
-Message-ID: <20261123151055.2533735-5-lee@kernel.org>
+Subject: [PATCH 05/10] crypto: hisilicon/hpre - Fix buffer overflow on odd ECDH input size
+Date: Mon, 23 Nov 2026 15:09:56 +0000
+Message-ID: <20261123151055.2533735-6-lee@kernel.org>
 X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
 In-Reply-To: <20261123151055.2533735-1-lee@kernel.org>
 References: <20261123151055.2533735-1-lee@kernel.org>
@@ -72,58 +70,46 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-sun8i_ss_hash_need_fallback() reserves one hardware scatterlist slot
-out of MAX_SG (8) for the trailing hash padding buffer, allowing up to
-7 input scatterlist entries.
+hpre_ecdh_src_data_init() validates the input public key length using
+ctx->key_sz - (len >> 1) < 0 before copying len bytes into the upper
+half (offset ctx->key_sz << 1) of a (ctx->key_sz << 2)-byte coherent
+DMA buffer.
 
-However, for HMAC requests (tfmctx->keylen > 0), sun8i_ss_hash_run()
-also shifts the mapped source array up by one slot to insert the inner
-pad at index 0 and increments i before writing the trailing padding
-entry at rctx->t_src[i] and rctx->t_dst[i].  When an HMAC request
-contains 7 block-aligned scatterlist entries, i reaches 8 (MAX_SG),
-writing past the end of rctx->t_src and rctx->t_dst, corrupting
-rctx->method and rctx->flow, and indexing out of bounds into ss->flows.
+Because len >> 1 truncates the least significant bit, an odd input
+length of (ctx->key_sz << 1) + 1 (such as 65 bytes for NIST P-256)
+evaluates shift to 0, bypasses the bounds check, and writes one byte
+past the end of the coherent DMA allocation in
+scatterwalk_map_and_copy().  A zero length when ctx->key_sz is unset
+similarly bypasses the check.
 
-Reserve an extra scatterlist slot in sun8i_ss_hash_need_fallback() when
-tfmctx->keylen is non-zero so 7-entry HMAC requests use the software
-fallback.
+Reject zero, odd, or oversized lengths explicitly before computing the
+coordinate offset.
 
-Fixes: 801b7d572c0a ("crypto: sun8i-ss - add hmac(sha1)")
-Closes: https://sashiko.dev/#/bug/linux-93388c71-507c-42fd-9c86-8076b06fc7c0
+Fixes: 05e7b906aa7c ("crypto: hisilicon/hpre - add 'ECDH' algorithm")
+Closes: https://sashiko.dev/#/bug/linux-42c6cdd1-7f7e-4071-bb2f-a4db5935267e
 Cc: stable@vger.kernel.org
 Signed-off-by: Lee Jones <lee@kernel.org>
 ---
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-index 56ba4ff6d5ff..c2e0c6520f84 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-@@ -344,9 +344,11 @@ static int sun8i_ss_run_hash_task(struct sun8i_ss_dev *ss,
- static bool sun8i_ss_hash_need_fallback(struct ahash_request *areq)
- {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-+	struct sun8i_ss_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
- 	struct ahash_alg *alg = crypto_ahash_alg(tfm);
- 	struct sun8i_ss_alg_template *algt;
- 	struct scatterlist *sg;
-+	int max_sg;
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 66a276786a7d..78ae987d338a 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -1484,9 +1484,10 @@ static int hpre_ecdh_src_data_init(struct hpre_asym_request *hpre_req,
+ 	int shift;
  
- 	algt = container_of(alg, struct sun8i_ss_alg_template, alg.hash.base);
+ 	/* Src_data include gx and gy. */
++	if (unlikely(!len || (len & 1) || len > (ctx->key_sz << 1)))
++		return -EINVAL;
++
+ 	shift = ctx->key_sz - (len >> 1);
+-	if (unlikely(shift < 0))
+-		return -EINVAL;
  
-@@ -360,8 +362,9 @@ static bool sun8i_ss_hash_need_fallback(struct ahash_request *areq)
- 		return true;
- 	}
- 
--	/* we need to reserve one SG for the padding one */
--	if (sg_nents(areq->src) > MAX_SG - 1) {
-+	/* Reserve one SG for padding and, for HMAC, one for ipad */
-+	max_sg = tfmctx->keylen ? MAX_SG - 2 : MAX_SG - 1;
-+	if (sg_nents(areq->src) > max_sg) {
- 		algt->stat_fb_sgnum++;
- 		return true;
- 	}
+ 	ptr = dma_alloc_coherent(dev, ctx->key_sz << 2, &dma, gfp);
+ 	if (unlikely(!ptr))
 -- 
 2.56.1.750.gf70dc682cf-goog
 
