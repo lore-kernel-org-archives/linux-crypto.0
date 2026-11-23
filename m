@@ -1,68 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795446690;
-	b=DnafS8Mbv9qKieYlswb/+UCTuBWGhV92TckQHRewt+oTi/2VdwaUbPEqfckxm+iDRBTs
-	 +aJWdq3bH6KYNmNjt/+2rg4Wxbeaoa5gr3smXajQcj3gRN3DnBxhedkEHDRy6SiGMrQFN
-	 1Si4hSULuIpo9+ZnyC1yC5stZ7YvvtXuvPD0st2w7pY2dVA+6bW34lTwh+y2sg3oUeahS
-	 TuhICqwq4wWUtU4BW3GzPW1P4zm9xVuDQJtqPGx+ezzhtITNT9QBiYfo4p9YYQChmG+mp
-	 etupeBfX+vydwmMLTbG/zkg9pZfrjc+vl4NkLkoHb09pNTQ8rvHlN86XZ9kd3hc0nug==
+	t=1795446697;
+	b=PnFrvo8v6C4Qe97VrT3tb1FZBGeTJYFNutmnaxwn1iCGa++bnBDv4Jix82DQIvhsTiOn
+	 252aO/3ZJzXgG70cXBcRdD/M3v8uJ8LZAtKinMIzp20HfInw4eACL4+l4jUl1sDAhUEyh
+	 1OQFNtScsS8BiB6oQTmOQmH4PBERAKDjHcBctcCZvP9qTfPLF7BkzulPi2LiQMs+sWd6Y
+	 aJWYgJTn2Y8/D/qV9s1JDm/owAA8NS2/G/vMM9RLsVpqe7Oxa4IIiHNZ126xHGfTgyHps
+	 iDqQ3CsPASH16gXBYHP1ydGtCXd/Ge/TSxoLstgklkGgXthjGzX1gU3tRRuxTlgsPKg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795446690;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795446697;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=IO+/0E+TAMyUiGRvFqTT6Iz3EJ2AtWO/PWampQ+h9N0=;
-	b=MLyWNqktLhYXE29mLvInMDIJ/L+ZgafIJi8qW8U4icmw4C1mFnQNf4vh8ZxsKRoRciIS
-	 m8sH9VGant3RLEQHq5Jauxy9WLgnSu9hHqqydcn1EN0E1ZQlc1NUpuCC06zfD/sYAqc3D
-	 ktzLD74/xeMsZeHEyFA64fsME1QU6dLbOCHh3wx5tDjgF2i6t/14EsLwUuYiH3a3z5LrN
-	 dUtaPVaYizSvBZfG9aBEuwPKQin3lxgFOP2LP9V1KVpf8D6IB6n/zGBHAu0I9uhmuiGQl
-	 m0FLWpQfJBWeob5nYr4oEiOUe5pgQEnvJ/YGuOs+0aQYs13sL+5P3rEFWdqgRpYmYeQ==
+	bh=STeVH55BBeBKM6xcTx+69M7sUEKnUAjtUBsUatOVMGw=;
+	b=bNT7CdbpJbcNfA6mdeOEl1gRGOXAPj1UUIG9DajsqDuZowBX7BMoErxLal2L8nz8k7EP
+	 VO62ebH9mjtIakpmviG63sK34Oi8mJXBQKFZk1dPwPGjipAlwDzrFihEzDrBEAEDPJAxn
+	 CjPptvXyWY61Ux2iMhGHMYrQ180+2B5H55vU2Bh/tn/uVNpcpgkecmDL6UOAblloZ82ND
+	 U3cPspJJjTQjw2vANRxSXXFSr3+3b/dWSE61XmPq2l4H1NRlq9jkP6Y1kzQe/ucZ7i0a4
+	 K+wQPImXkpAoTZX0vpGgHWN5Rq5Ojcc8TgXrbeUsFlG6/7VXb36VXUy2McUJN2UnqZA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nTRrdDMy;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iQuxI9z5;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B77606A334;
-	Mon, 23 Nov 2026 15:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87C7606A32C;
+	Mon, 23 Nov 2026 15:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nTRrdDMy
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180931F000F2;
-	Mon, 23 Nov 2026 15:11:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iQuxI9z5
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 282D31F000CF;
+	Mon, 23 Nov 2026 15:11:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795446689;
-	bh=IO+/0E+TAMyUiGRvFqTT6Iz3EJ2AtWO/PWampQ+h9N0=;
+	s=k20260515; t=1795446697;
+	bh=STeVH55BBeBKM6xcTx+69M7sUEKnUAjtUBsUatOVMGw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=nTRrdDMyjgv8vyeUaookRwA9cP3oZfnmW7KXMK/QRvONxYZMNcVasWG2N+2tLlBtu
-	 +WO7jjCCxd+jcH0UN7dH5l4hZuMtZ6BuN/3Tr5s/1OWYlLPnqoE7udw387J9aguVIS
-	 EORM9Qi7bTaaKBKv0ZpuGiJyU7LTprWXVQaNbgcA3v65G+TIebVydq9qkyZGnk9Cb9
-	 mW9SA5+RT2xitVJvO1U6K8UhSo9uO1DubcOf2xjdO3WUcKtXv/9M8J7LJ3swv3REJD
-	 +xKtuJmNNW4gsQ9jlto9q/FhjvF+mSsxU4ddUPzgJUwWrgFRKUAbzgO0R57y2QFTjb
-	 VnMn5XCNhvcbg==
+	b=iQuxI9z5WzUZZyvlumpBl7lcu5ipk202NNdsZPnzmCgWGAvZa1ay60Fxq64Rp5KCp
+	 rHfctmjrETxSiuULSIL7i3VOpXh35crvqibh3btRqwuRLzMrSHbul92HPic8ircLfH
+	 bsBKfrFNI6SwINufuwPRKS98uTt0xnRuI8hfm40Khn+C+Od/orlQuiEyBHGUz2RUzQ
+	 R5nMiXWOcIHzT7NwxLinqSHvkCdZYQeJRzl/w1gyX1j7qQsXTtr6mqzkCDfJnRulc7
+	 66NyzfOQZY98dQ23iYtSbhtTGi+T+R3x0cP4LkbwXIyWS31Yiok+k7lUWRtO3iCOt8
+	 74cstbe/A8PZg==
 From: Lee Jones <lee@kernel.org>
 To: lee@kernel.org,
-	Haren Myneni <haren@us.ibm.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Thorsten Blum <blum@kernel.org>,
-	Bulent Abali <abali@us.ibm.com>,
-	Robert Jennings <rcj@linux.vnet.ibm.com>,
-	Seth Jennings <sjenning@linux.vnet.ibm.com>,
-	Dan Streetman <ddstreet@ieee.org>,
-	linuxppc-dev@lists.ozlabs.org,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	bui duc phuc <phucduc.bui@gmail.com>,
 	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [PATCH 03/10] crypto: nx - Fix bounce buffer copy overflow in decompress()
-Date: Mon, 23 Nov 2026 15:09:54 +0000
-Message-ID: <20261123151055.2533735-4-lee@kernel.org>
+Subject: [PATCH 04/10] crypto: sun8i-ss - Fix scatterlist array overflow for HMAC requests
+Date: Mon, 23 Nov 2026 15:09:55 +0000
+Message-ID: <20261123151055.2533735-5-lee@kernel.org>
 X-Mailer: git-send-email 2.56.1.750.gf70dc682cf-goog
 In-Reply-To: <20261123151055.2533735-1-lee@kernel.org>
 References: <20261123151055.2533735-1-lee@kernel.org>
@@ -78,46 +72,58 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-When decompress() falls back to software 842 decompression and the
-remaining destination capacity p->oremain is smaller than required_len,
-it redirects decompression into the bounce buffer ctx->dbounce with
-dlen set to BOUNCE_BUFFER_SIZE.
+sun8i_ss_hash_need_fallback() reserves one hardware scatterlist slot
+out of MAX_SG (8) for the trailing hash padding buffer, allowing up to
+7 input scatterlist entries.
 
-After sw842_decompress() completes and ignore bytes are subtracted,
-decompress() copies dlen bytes from ctx->dbounce into p->out via
-memcpy() before update_param() validates that dlen does not exceed
-p->oremain.  A crafted compressed stream whose decompressed output
-exceeds p->oremain therefore overflows the caller's destination buffer
-by up to BOUNCE_BUFFER_SIZE bytes.
+However, for HMAC requests (tfmctx->keylen > 0), sun8i_ss_hash_run()
+also shifts the mapped source array up by one slot to insert the inner
+pad at index 0 and increments i before writing the trailing padding
+entry at rctx->t_src[i] and rctx->t_dst[i].  When an HMAC request
+contains 7 block-aligned scatterlist entries, i reaches 8 (MAX_SG),
+writing past the end of rctx->t_src and rctx->t_dst, corrupting
+rctx->method and rctx->flow, and indexing out of bounds into ss->flows.
 
-Validate that dlen does not exceed p->oremain and return -ENOSPC before
-copying out of ctx->dbounce.
+Reserve an extra scatterlist slot in sun8i_ss_hash_need_fallback() when
+tfmctx->keylen is non-zero so 7-entry HMAC requests use the software
+fallback.
 
-Fixes: ed70b479c2c0 ("crypto: nx - add hardware 842 crypto comp alg")
-Closes: https://sashiko.dev/#/bug/linux-7309787b-8efe-4919-bb31-c4d9eceb9c0f
+Fixes: 801b7d572c0a ("crypto: sun8i-ss - add hmac(sha1)")
+Closes: https://sashiko.dev/#/bug/linux-93388c71-507c-42fd-9c86-8076b06fc7c0
 Cc: stable@vger.kernel.org
 Signed-off-by: Lee Jones <lee@kernel.org>
 ---
- drivers/crypto/nx/nx-842.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-index b4404a138962..4f96c2b2397b 100644
---- a/drivers/crypto/nx/nx-842.c
-+++ b/drivers/crypto/nx/nx-842.c
-@@ -427,8 +427,11 @@ static int decompress(struct nx842_crypto_ctx *ctx,
- 	if (ignore)
- 		pr_debug("ignoring last %x bytes\n", ignore);
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
+index 56ba4ff6d5ff..c2e0c6520f84 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
+@@ -344,9 +344,11 @@ static int sun8i_ss_run_hash_task(struct sun8i_ss_dev *ss,
+ static bool sun8i_ss_hash_need_fallback(struct ahash_request *areq)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
++	struct sun8i_ss_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+ 	struct ahash_alg *alg = crypto_ahash_alg(tfm);
+ 	struct sun8i_ss_alg_template *algt;
+ 	struct scatterlist *sg;
++	int max_sg;
  
--	if (dst == ctx->dbounce)
-+	if (dst == ctx->dbounce) {
-+		if (dlen > p->oremain)
-+			return -ENOSPC;
- 		memcpy(p->out, dst, dlen);
-+	}
+ 	algt = container_of(alg, struct sun8i_ss_alg_template, alg.hash.base);
  
- 	pr_debug("decompress slen %x padding %x dlen %x ignore %x\n",
- 		 slen, padding, dlen, ignore);
+@@ -360,8 +362,9 @@ static bool sun8i_ss_hash_need_fallback(struct ahash_request *areq)
+ 		return true;
+ 	}
+ 
+-	/* we need to reserve one SG for the padding one */
+-	if (sg_nents(areq->src) > MAX_SG - 1) {
++	/* Reserve one SG for padding and, for HMAC, one for ipad */
++	max_sg = tfmctx->keylen ? MAX_SG - 2 : MAX_SG - 1;
++	if (sg_nents(areq->src) > max_sg) {
+ 		algt->stat_fb_sgnum++;
+ 		return true;
+ 	}
 -- 
 2.56.1.750.gf70dc682cf-goog
 
