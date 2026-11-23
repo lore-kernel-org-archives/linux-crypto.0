@@ -1,62 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795448116;
-	b=bvtLW0jqZDn6qihvOWFgeCX2CQhKwKLzPTHVRzVSiKpLUrZRcPsSebAn6U1z5FgfUJdg
-	 GE1rVtSzb4W+yvvLO8xe0L4dbzsfjkFGGzohBoAfz0n3OUAxH1onQBcvyM08kPIowWwUx
-	 /IM5J50x7orhsXRbDJXY4XNwr1O9QGWa66NMkaYOIUcF74iDB2Wuf54b8R9t8pdKk4tGt
-	 d6x/uT6U3fp8XiGysodMgc35aV0U2jKgN09jYx24x2ylUTIFgPhoYdBFlgNH1iZGwZCUa
-	 W1vZ0CyHvIWoLG83olsvDsMFtpqKM2Wkq3iyxByny5oiA5E+jQH7Xj6Gn+MVmB8kMMw==
+	t=1795448274;
+	b=Zy4XzM7hayJ5XCCj8VLPWrAh/9eEkyi1zxAUiWEuYQW2tyEeCS+XTqIQJRBxxPaIClh/
+	 62UT4feTxPvEH6umcLKgGbGd1H+PGRO7DNgUTbbE6GxKUoKzivLj/xd4uwe909rryflok
+	 4lmr28KqgBVQwbWuFTmbl/l7LXn/0Bj7+7ZD/jc4fUrh+84g+SFJtlvunNLEBdpTLfbaN
+	 qPoZDODMajcIY4KSrJTdF8PNi+8zeyomCzzy2jSF2h8/IjM6UtlPUjuc19KNu/r1vKCXz
+	 H4oMF72VJQtCE4HkURUn56mMvfjSMjeEVR1lE/6CjxYtcz9UWdcgwFiI6dc77nmKq0A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795448116;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=NrKgzfcLZFljaKhwZAHVe0DSjWSfUpDmRRp+D9I8Z5M=;
-	b=clZRXzKaUjWFpAqJYDVaSG9fnTXhVV10Io+E3kw0ob5IOGJ4tDgElWn7eoxWmKRJUi0V
-	 8ICWqMXy6FIMoh4yTIlV9qjq2mgqrXOTrzLdMps6BUZ+o4YfqsZYQD0rnoMkbSSEPcp3B
-	 URAfKOZmSYJ+/nzXJC3z5jnDKeCUhA5JdnZcW/hi014A/4uPLefAFzFJiis2eR2SkilvY
-	 I0PozXJoG6sgWqJ2okwJ+hJYBJi5jXgZ8aovoO2Edi3o4saJoe1Gr+xejOz4hFL67uN6Y
-	 zHZQpbAB884fINjIrE5W530NipbHpRxNgf3n/92XOHyJr6c/FxRoJBzAO/mEybD9NzA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795448274;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=2crCq0yQ/HYHKeHt29ATUUe8VLTaIPIAejwpAipPP1E=;
+	b=MjxAu9l+6MjnhRcjz1GCfrIYwhEgKxHGmPSVbXdgC3cbtgt7dIaXMspTiRdqfKVIhBL5
+	 P+PufdZbo4ztyLuwR/KsgUGCq2AwiQWBi7qeAwm4JqmtN7trhj2ONE+wy3+c035NmExOg
+	 ltLavtJYxOBIrXvP0b48oNM4H4lI9K33Y6Gvuig7qHmATqODHocRcQBoComDUFzDVi8zg
+	 m563R8o4+R0PhrpXrPmOabtAMzA7mrzheP79nV6RU7KAZ5jSf1o6vA2kQsdhE/5xdkV+f
+	 D+vPx0Jsi7gtNEAHGQQLabBn55L8UDeyktepDjWff0xwjvPlKCGn9EQncgvC9TQzjhw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mUg64a7U;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LYCPWwqM;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 3CEAC606A327;
-	Mon, 23 Nov 2026 15:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0A9606A31A
+	for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2026 15:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=mUg64a7U
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 1F8121F000CA;
-	Mon, 23 Nov 2026 15:35:14 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LYCPWwqM
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B671F000C0;
+	Mon, 23 Nov 2026 15:37:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795448115;
-	bh=NrKgzfcLZFljaKhwZAHVe0DSjWSfUpDmRRp+D9I8Z5M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=mUg64a7UkZwIbJ8HajTqlauh9v4J6st9Ev173OIHS3l6CBfz+3ChN12Hg5qDqpM2/
-	 SycAiy/PkMBtodaeZvL6Pjhcq7EXJxBHQOiuLS46gY2Q/HGp7vWd6hHZwdI5DR2Hse
-	 WXkB72nQv59nw7S4RkNHUWEPqgCn/L3VKL4Bx0KlN41su24+LZQywhkpjN5pqxhZta
-	 RrkRA44WZEx/u36m1OBzeu1O+gH54a3KZ6L5IWruRVOH6XEa+Dx5yQ9O3oOsYM6gWE
-	 6cEyhav0eT1A5KPBrrcBTDNZ8FV+ld+UpaMNroNyQWMgiLGoZ66NiyhYOxaxEOZxA5
-	 ouKg7PRjrmn+w==
-Date: Mon, 23 Nov 2026 16:35:12 +0100
-From: Bartosz Golaszewski <brgl@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Stanimir Varbanov <svarbanov@mm-sol.com>, 
-	Eneas U de Queiroz <cotequeiroz@gmail.com>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Demi Marie Obenour <demiobenour@gmail.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Abel Vesa <abelvesa@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH v12 4/4] arm: multi_v7_defconfig: update the Qualcomm
- Crypto Engine entry
-Message-ID: <67x7gbbhew4xkqhy2wpg2pqjges6kbbswlgpuxhcjuzaj5jtm3@aseuedq5zf5z>
-References: <20261120-qce-fix-self-tests-v12-0-b5a2a44bc5ae@oss.qualcomm.com>
- <20261120-qce-fix-self-tests-v12-4-b5a2a44bc5ae@oss.qualcomm.com>
- <e3d2cca6-056f-4ce1-8701-a2592b18b729@kernel.org>
+	s=k20260515; t=1795448274;
+	bh=2crCq0yQ/HYHKeHt29ATUUe8VLTaIPIAejwpAipPP1E=;
+	h=From:Subject:Reply-To:To:In-Reply-To:References:Date;
+	b=LYCPWwqM0abaqFXBJPa/FBcORfeBWHLRz/sboObyoDUWcullke27uwL9u7Vj/q8R4
+	 5UYBMTI9U48jG4wIhnAyTz5t2fyjBW0vZzbut6QjDKwyrnPA5u4idvG+2j41TReWws
+	 JQ9xCKNaqgJlAa7lz2McQpCxUAYG7eVaMIOXVFEQ4xwqEzARPqMln1tk4B8AFMBa3W
+	 +u3EOBBb9ahufhYBUGvNSnnsF7TsakTnmewuA1NENBrcLI7SRqo3XgAz64lrxbWjFs
+	 c04gwlzbxbz1JqcpwRKLDUDemjHMMRBkr83NDdKZnTef34Mu8Y4oBYsz8/vvW2OpHu
+	 dJWxI9+Kc1p5w==
+Message-ID: <sashiko-outbox-229585@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH 03/10] crypto: nx - Fix bounce buffer copy overflow in
+ decompress()
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Lee Jones" <lee@kernel.org>, "Haren Myneni" <haren@us.ibm.com>, "Madhavan
+ Srinivasan" <maddy@linux.ibm.com>, "Michael Ellerman" <mpe@ellerman.id.au>, "Nicholas
+ Piggin" <npiggin@gmail.com>, =?utf-8?b?Q2hyaXN0b3BoZSBMZXJveSAoQ1MgR1JP?=
+ =?utf-8?b?VVAp?= <chleroy@kernel.org>, =?utf-8?b?Uml0ZXNoIEhhcmphbmkg?=
+ =?utf-8?b?KElCTSk=?= <ritesh.list@gmail.com>, "Shrikanth Hegde" <sshegde@linux.ibm.com>, "Herbert
+ Xu" <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Thorsten
+ Blum" <blum@kernel.org>, "Bulent Abali" <abali@us.ibm.com>, "Robert
+ Jennings" <rcj@linux.vnet.ibm.com>, "Seth Jennings" <sjenning@linux.vnet.ibm.com>, "Dan
+ Streetman" <ddstreet@ieee.org>, linux-crypto@vger.kernel.org
+In-Reply-To: <20261123151055.2533735-4-lee@kernel.org>
+References: <20261123151055.2533735-1-lee@kernel.org>
+ <20261123151055.2533735-4-lee@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Nov 2026 15:37:53 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,27 +67,71 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e3d2cca6-056f-4ce1-8701-a2592b18b729@kernel.org>
 
-On Sat, Nov 21, 2026 at 02:07:40PM +0100, Krzysztof Kozlowski wrote:
-> On 20/11/2026 20:34, Bartosz Golaszewski wrote:
-> >  CONFIG_KEYSTONE_NAVIGATOR_QMSS=y
-> > @@ -1306,7 +1307,6 @@ CONFIG_CRYPTO_DEV_ATMEL_AES=m
-> >  CONFIG_CRYPTO_DEV_ATMEL_TDES=m
-> >  CONFIG_CRYPTO_DEV_ATMEL_SHA=m
-> >  CONFIG_CRYPTO_DEV_MARVELL_CESA=m
-> > -CONFIG_CRYPTO_DEV_QCE=m
-> 
-> I don't understand what is the base here. base-commit from cover letter
-> is unknown for my tree.
-> 
-> There is no such code for half a year.
->
+Thank you for your contribution! Sashiko AI review found no new issues
+in this patch, but noticed 1 related pre-existing issue it does not
+introduce:
+- [Critical] crypto: nx: out-of-bounds write in compress() [1]
+--
 
-What? Base commit is just next-20261120, full hash in cover letter is
-909ef7a9a30fa139e69e555e3606680f5cca7726.
+commit 6d00d8097910c1ed1be4ad69177b9d0594c5365b
+Author: Lee Jones <lee@kernel.org>
 
-Bart
+crypto: nx - Fix bounce buffer copy overflow in decompress()
+
+This commit validates that the decompressed length does not exceed the
+remaining destination buffer capacity before copying from ctx->dbounce
+into p->out in decompress().
+
+> diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+> index b4404a1389621..4f96c2b2397be 100644
+> --- a/drivers/crypto/nx/nx-842.c
+> +++ b/drivers/crypto/nx/nx-842.c
+> @@ -427,8 +427,11 @@ static int decompress(struct nx842_crypto_ctx *ctx,
+>  	if (ignore)
+>  		pr_debug("ignoring last %x bytes\n", ignore);
+> =20
+> -	if (dst =3D=3D ctx->dbounce)
+> +	if (dst =3D=3D ctx->dbounce) {
+> +		if (dlen > p->oremain)
+> +			return -ENOSPC;
+>  		memcpy(p->out, dst, dlen);
+> +	}
+
+[Severity: Critical]
+This problem wasn't introduced by this patch, but can compress() also
+overflow p->out when copying from ctx->dbounce [1]?
+
+When compress() jumps to the nospc fallback to use ctx->dbounce, it sets
+dlen to min(p->oremain, BOUNCE_BUFFER_SIZE) and dskip to 0 without
+subtracting hdrsize:
+
+drivers/crypto/nx/nx-842.c:compress() {
+	...
+	if (dlen < c->minimum) {
+nospc:
+		dst =3D ctx->dbounce;
+		dlen =3D min(p->oremain, BOUNCE_BUFFER_SIZE);
+		dlen =3D round_down(dlen, c->multiple);
+		dskip =3D 0;
+		pr_debug("using comp dbounce buffer, len %x\n", dlen);
+	}
+	...
+	dskip +=3D hdrsize;
+
+	if (dst =3D=3D ctx->dbounce)
+		memcpy(p->out + dskip, dst, dlen);
+	...
+}
+
+After compression completes, dskip is incremented by hdrsize and dlen
+bytes are copied to p->out + dskip.  If the compressed output reaches the
+dlen limit, hdrsize + dlen exceeds p->oremain and memcpy() writes up to
+hdrsize bytes past the end of p->out before update_param() checks the
+remaining space.
+
+[1] https://sashiko.dev/#/bug/linux-f0b43673-8815-4f13-a7d9-658940af36b2
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123151055.2533=
+735-1-lee@kernel.org?part=3D3
