@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1795403624;
-	b=ODb0mlpVGekrPek+ABIFaEjg13tWwDLVLHQXqoNUIIQPB4xaDHvWy928JHmO2rz9YV4C
-	 A9j7BqY6zWuZ7E8TD34sFn2mBIQ8lB5LEg3QjFpfATaTKdHPBOMPlZ1GXJTNt785i2UN6
-	 jtFBcSkCpYkVPNuLLzaf9eYhCgsDdX7BSMd4efQZjJahbNRqbvNw5NhFc925XXm724gho
-	 9hVFqHRiFb+h2tH7XW9+sdBM2E/PajngnyRkCZ5yfSg2WMfvKotnaVRYFOtUt9YBLXbbw
-	 LD2nxVnyvD04QG/bciXEKkxMXBoU4lRQpwHqWrzCEmhO/P1EATPyaZJSOwbixanjnPw==
+	b=IvU5fDybPyLKJB/paDDbDUNU6abs0gCP+AphAVDTGpC2WBjSxJNLm7+z+av19xSxNErW
+	 fDpvITnZHA2oJKL70ZMpixKCeUtn0Ghwbq2+McolbKVew+Cd5F15oWCKG2ZnCqof5ZmiE
+	 bMgMzlLcbnzDlqSnbqUbvW57YQQ6IM+oAojH4uMlQpfgJUVrFN5N/m4pJnW6LOyi6kDt6
+	 AlXf561iwf2tfmz7r0ZGGraHGmMhqzxR4Z7hPs1JyD7+npgZ0ojxLjvcqiaLQUrtatwGf
+	 bGZsR60a0QGaWIlhL1b0KnXWPj61OlIl3jFdDjQBL0lWTjOs2w/sHM2xZA0DBnj0OdA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1795403624;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=/xhecgJAhRXiJus1TqrwRJeSjDsfQbNnTdU8Yk7hvM8=;
-	b=msmk8jGjwDvLEoGeL0Py7jO5nGCLooC9OyrBrd/uBpqujzSV4Wi/cQesQ6hH1nNXboDn
-	 XZUHwfMs+1bgD8ddZlaZJHfuNHJ2jSP+mALv3hv9uxrqkHvTyJMQLbGfx2K+ItRyIjfaP
-	 uzkH3gQIgTaaFy2Dn7EOpkcJfEx9pcMafFsHGPAhKKUoQuRpNl/F/iM44OXbn6R/3cMbo
-	 2swjpmoWUzljpZUbhP2C1pFQ98rsIeY0vtPoAC7sKvPavUMApCuVdMOXCoMNwqcrkOtGP
-	 C9akBpFM09J2aVEfAP7EL/KzzPYQZTkhIihtSHKLfAilxnh3FSCiL+81ay33hN+uhEg==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=euir+7KJPxsdy0fA0X97R+6+p9jxMcu/rNBsSTTMVew=;
+	b=t0QbPIH4qQrdV9aD02WuX0KJlhYV/OuwE+9rDGMCjK8OnQDryukJEaPM2N2GZkxh4Qv3
+	 hHkzsNlL3QPo8x5TQay1cWpDLQpFw7Sp2E8/IIqx+tKBz36zfZN85cppy/49dI4h8CB6C
+	 jlTlsZmhQyT+njsEMtz1orFf3zi0PzkDEqI+Jb9mvlL2eVI59q6bQR4ICAcZPptxFsm+U
+	 BqnFv2+vRoj62HK4l/O4iUo+IFs3u76brunIzHLG+2QmyZ/bNbuZGRgdf3XpxAvQTMV9c
+	 1fAfJsDERLgSrXJJpXvtD6Z4CN6qJy6MjxFlfx0yns86WblF6UfIAofOZewSmvDLd7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cMpQO5H5;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XPnotVY3;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E955606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20B7606A320
 	for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2026 03:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cMpQO5H5
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F12501F000C0;
-	Mon, 23 Nov 2026 03:13:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XPnotVY3
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D4D71F000CA;
+	Mon, 23 Nov 2026 03:13:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1795403624;
-	bh=/xhecgJAhRXiJus1TqrwRJeSjDsfQbNnTdU8Yk7hvM8=;
-	h=From:To:Cc:Subject:Date;
-	b=cMpQO5H5qVee1jWY8QDWiPYu/1s9sP6jKZtT3SffMPYJLwQwvyQaH4KkvpQJXQjPo
-	 Dsn7HVvHuM34u7oRNIsblBP4qqEjbAblyotPpsxJbOGOm3re99rmIF0IIiAGckayNT
-	 xmS8oL6aiq2Tlcld6hnV4TbISRK5n9QFYXP5F8z5OjyIyZQhf3As/aTr41BRV7dKTI
-	 +Bgq0RROnSIhExh3QfHgJbbm9hwAKNHtz7jSTZtYx3IeX09a3+H+XHbnSNFJzwFIHL
-	 WqlHZnV9cWD6NesmL0I8RYMFa/gIpgCUI8SPOWKbwfdo++8eNSRFBOAriz6pcogbR7
-	 yzCmtaXrebh2w==
+	bh=euir+7KJPxsdy0fA0X97R+6+p9jxMcu/rNBsSTTMVew=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=XPnotVY3G2QFGdWm5TSvHTFbHPqK4pAVL07rGSzO/dn3njBar6BNjalBtziDFGGO/
+	 kjdLcBNJSbBaGMZzagvd94Dmop0YyfNhAZ/A3mlwVE5ame35yPlF0vSTL9MFzUgSuS
+	 oLuAIS7ro/rd8YpE57ep7AVmn+wQDNE8nUGSXRCzqb1AB/XfZmooXoZRpygo3AQKD5
+	 9qh4ei84gdPk5btI60pzzzUc3FDRjT5FK9dBLm8TJKdCc0qHoJx8lqgZ5AJCPO+f99
+	 9uE7VSObTfL5dkQNd0W/VpL4tI2j9PwLDfax+t9N8gWienV29+17rv6k3ohos12pM6
+	 3pL0TBWeBtoeg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: Ard Biesheuvel <ardb@kernel.org>,
@@ -46,10 +46,12 @@ Cc: Ard Biesheuvel <ardb@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 0/4] lib/crypto: Clean up and optimize sha512-avx2-asm.S
-Date: Sun, 22 Nov 2026 19:13:17 -0800
-Message-ID: <20261123031321.403308-1-ebiggers@kernel.org>
+Subject: [PATCH 1/4] lib/crypto: x86/sha512-avx2: Clean up loading and byte-swapping the data
+Date: Sun, 22 Nov 2026 19:13:18 -0800
+Message-ID: <20261123031321.403308-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.56.1
+In-Reply-To: <20261123031321.403308-1-ebiggers@kernel.org>
+References: <20261123031321.403308-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,30 +63,106 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A refresh for sha512-avx2-asm.S (the SHA-512 implementation that's used
-on all AVX2 capable CPUs), bringing the following small benefits:
+When used on YMM registers, the vpshufb instruction does a shuffle
+independently within each 128-bit lane, using the low 4 bits of each
+byte in the corresponding 128-bit shuffle mask.  Yet,
+sha512_transform_rorx() executed vpshufb using a mask containing indices
+from 0 to 31, as if it expected the shuffle to be across the entire YMM
+register.  That made the code misleading, though still correct.
 
-  - 6% faster SHA-512 on AMD Ryzen 9 9950X (Zen 5) and
-    9% faster SHA-512 on Intel Sapphire Rapids.
+Make the code clearer, eliminate 16 bytes of rodata, and increase
+consistency with other asm files (e.g., AES-GCM) by broadcasting the
+proper 128-bit shuffle mask into both halves of the YMM register.
 
-  - Negative 288 line diffstat.
+Also apply a few related cleanups:
+- Eliminate the unhelpful COPY_YMM_AND_BSWAP and VMOVDQ macros.
+- Rename the register "alias" to YBSWAP to be consistent with the
+  naming convention used elsewhere in this file (and sha512-ssse3-asm.S)
+- Make the data label local.
 
-  - Slight reductions in text and rodata size.
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/x86/sha512-avx2-asm.S | 34 +++++++++++---------------------
+ 1 file changed, 11 insertions(+), 23 deletions(-)
 
-  - Better comments.
-
-Eric Biggers (4):
-  lib/crypto: x86/sha512-avx2: Clean up loading and byte-swapping the
-    data
-  lib/crypto: x86/sha512-avx2: Optimize message schedule
-  lib/crypto: x86/sha512-avx2: Factor out SHA512_Round
-  lib/crypto: x86/sha512-avx2: Optimize SHA512_Round
-
- lib/crypto/x86/sha512-avx2-asm.S | 550 ++++++++-----------------------
- 1 file changed, 131 insertions(+), 419 deletions(-)
-
-
-base-commit: b6a9fa34ce4187cb69d3c588a4bbffc31ce5db8f
+diff --git a/lib/crypto/x86/sha512-avx2-asm.S b/lib/crypto/x86/sha512-avx2-asm.S
+index 2256d51297e18..d5f3c0bcee653 100644
+--- a/lib/crypto/x86/sha512-avx2-asm.S
++++ b/lib/crypto/x86/sha512-avx2-asm.S
+@@ -65,8 +65,7 @@ YTMP2 = %ymm2
+ YTMP3 = %ymm3
+ YTMP4 = %ymm8
+ XFER  = YTMP0
+-
+-BYTE_FLIP_MASK  = %ymm9
++YBSWAP = %ymm9
+ 
+ # 1st arg is %rdi, which is saved to the stack and accessed later via %r12
+ CTX1        = %rdi
+@@ -110,9 +109,6 @@ frame_INPEND = frame_INP + INP_SIZE
+ frame_CTX = frame_INPEND + INPEND_SIZE
+ frame_size = frame_CTX + CTX_SIZE
+ 
+-## assume buffers not aligned
+-#define	VMOVDQ vmovdqu
+-
+ # addm [mem], reg
+ # Add reg to mem using reg-mem add and store
+ .macro addm p1 p2
+@@ -120,13 +116,6 @@ frame_size = frame_CTX + CTX_SIZE
+ 	mov	\p2, \p1
+ .endm
+ 
+-
+-# COPY_YMM_AND_BSWAP ymm, [mem], byte_flip_mask
+-# Load ymm with mem and byte swap each dword
+-.macro COPY_YMM_AND_BSWAP p1 p2 p3
+-	VMOVDQ \p2, \p1
+-	vpshufb \p3, \p1, \p1
+-.endm
+ # rotate_Ys
+ # Rotate values of symbols Y0...Y3
+ .macro rotate_Ys
+@@ -599,16 +588,16 @@ SYM_FUNC_START(sha512_transform_rorx)
+ 	# save %rdi (CTX) before it gets clobbered
+ 	mov	%rdi, frame_CTX(%rsp)
+ 
+-	vmovdqa	PSHUFFLE_BYTE_FLIP_MASK(%rip), BYTE_FLIP_MASK
++	vbroadcasti128	.L_XMM_QWORD_BSWAP(%rip), YBSWAP
+ 
+ .Lloop0:
+ 	lea	K512(%rip), TBL
+ 
+-	## byte swap first 16 dwords
+-	COPY_YMM_AND_BSWAP	Y_0, (INP), BYTE_FLIP_MASK
+-	COPY_YMM_AND_BSWAP	Y_1, 1*32(INP), BYTE_FLIP_MASK
+-	COPY_YMM_AND_BSWAP	Y_2, 2*32(INP), BYTE_FLIP_MASK
+-	COPY_YMM_AND_BSWAP	Y_3, 3*32(INP), BYTE_FLIP_MASK
++	# Load and byte-swap W[0..15]
++.irp i, 0,1,2,3
++	vmovdqu	\i*32(INP), Y_\i
++	vpshufb	YBSWAP, Y_\i, Y_\i
++.endr
+ 
+ 	mov	INP, frame_INP(%rsp)
+ 
+@@ -735,12 +724,11 @@ K512:
+ 	.quad	0x4cc5d4becb3e42b6,0x597f299cfc657e2a
+ 	.quad	0x5fcb6fab3ad6faec,0x6c44198c4a475817
+ 
+-.section	.rodata.cst32.PSHUFFLE_BYTE_FLIP_MASK, "aM", @progbits, 32
+-.align 32
+-# Mask for byte-swapping a couple of qwords in an XMM register using (v)pshufb.
+-PSHUFFLE_BYTE_FLIP_MASK:
++.section	.rodata.cst16.XMM_QWORD_BSWAP, "aM", @progbits, 16
++.align 16
++# Mask for byte-swapping each qword using vpshufb
++.L_XMM_QWORD_BSWAP:
+ 	.octa 0x08090a0b0c0d0e0f0001020304050607
+-	.octa 0x18191a1b1c1d1e1f1011121314151617
+ 
+ .section	.rodata.cst32.MASK_YMM_LO, "aM", @progbits, 32
+ .align 32
 -- 
 2.56.1
 
