@@ -1,73 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795435770;
-	b=XXhLloZaaJBAt9wcFOaSnDiNidoz9X2K1volD3gl8nzH9fgJ3ud3k9Kc9b9sRUCF5DrK
-	 SRNqBoIHASJvLd592zw2yokq7b91toG5rbcgpc7XmhTpOdP2pplsrNjUgm4rtTwgqkfGx
-	 TnfrGfS7ZZVQ87v9YukJcNTpYxzDNVH0Spp7qx9yXoKSbtCgQ6/Ol/4bqmJ8ysg6kWlwh
-	 oc1LFUgoHNEbqyy9i4kUrCdKkqaHIwqgCyRdGXbpEl569oLbPp1t79+X4lM/aSoJmzBq3
-	 naGIRQG8/0KrpPLrXDgbEhIgIhTTTSKPqeKN4SJDHybZ1S3LYlScdxmJISZCAAJ/VJg==
+	t=1795443304;
+	b=VkLjIQVatnOisgk5mLPhKSJwxUTioZ6iUg6izj830pTbR5AKuvuFf2spyaE4edmmbLQ9
+	 bfGGuG23oVvWMzuHPOG3kflHXv/O89IMWwLsix8z7215vhML3sQphBzbXhAJlzdOY5uFP
+	 edkuvIZj93ItaQbeO+Px5tfKj8hMx0rBf7pgq0AbbpkVR0GMwPTWVzAn+zEM7I9N45yWY
+	 9JjfoYZ6CtFqdfyFbQInrGCsV42wkSXoVM5Rs4Gb02TDh/YYRujaFXhwXzVMf5/grBvZf
+	 G9kIsZyHNi7+1781M5KGLCvDZzyx5T0pXfRSGM6KNLtLEnpZaH0jac1MzbJkTCfaxoA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795435770;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795443304;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=EBAlgyArUaIDoaFWbczuSy+qeFGqGHKDwrHB/xbYHXM=;
-	b=To38sXSAfvBcWj2zMr3YjT3s862vzv3l7NyaoaoyFcdux6p76hlN3Agjnx1IyA/sPS+4
-	 gr8nEWpA8KGqbNR0YghKeSig+dIt6a8rvny/hE6KS+WuZFvSU5/BYU2Wh51RVfsu7zdcL
-	 k1EwcKHBnx6esgLWnxG76073u7af6FYEzbC/nXdt6IivQWEqG/pHlJB0P+CpQWOvsUogf
-	 GizDIQ4GqbREOYBNmtdatxH68MhT9WPE7KzOFcdmYKhP40gcp4nErylx/o6nfHJwpr7AU
-	 mAB2OdeleyXEAjy9/aH+moQzLX6+TZAKUQG9klSaC4h6aiqoMT6bWUaVZtxcVcRxj6Q==
+	bh=vMS5GsT+FQIMrcDcIClkix4yuVqpJWj2FVwp1tBqdZA=;
+	b=YrWXvcrno8IrecyF59c7D5RSMDiqisysNss8i/ekYhTiR9ZoO8HIsNTOgEB9wrB0DFp1
+	 lt3fQIOfAX6bX4v0FXsuiBKgebJRsnDGxJIKH9B+6ObGzHGFEhJPY89Sox+ZgfFvSVzMn
+	 eMzPXX6gzFhFE73BKpBNFhOUwp1IZbomkNrsizXPo22vs09nYlVcwKmBfwVgtV741wQ1a
+	 aBFGtUKxcZYEltMQsfJIHuDwkFQ/H3S+llGPyOCpKh2l0npPwOP1Ltf/PgheJDDy/bszL
+	 Ppv8PyD5GVDbxnXhgDvLsqis3z+uZ0ZKZ6/i8UQdMpWjS8R6DWBqUBjSEmOTtXrQliw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="E+6H/6oP";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dKoeBY5r;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75B7606A31A;
-	Mon, 23 Nov 2026 12:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 19634606A331;
+	Mon, 23 Nov 2026 14:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E+6H/6oP
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 296FD1F000D3;
-	Mon, 23 Nov 2026 12:09:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dKoeBY5r
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id BC8631F000C4;
+	Mon, 23 Nov 2026 14:15:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795435770;
-	bh=EBAlgyArUaIDoaFWbczuSy+qeFGqGHKDwrHB/xbYHXM=;
+	s=k20260515; t=1795443303;
+	bh=vMS5GsT+FQIMrcDcIClkix4yuVqpJWj2FVwp1tBqdZA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=E+6H/6oP8nLnOr4iihKZsT5mFLOzHyhwUMzMxmC6pmAe+pt5ais3/kGYPwi8oF5zr
-	 GjAUPCdau77AfYr2a7Mpi/s9QIus/zoxYa14PAqfbidqxzxwPdaC4msn8xdwhGgYbY
-	 nrWqf+M6Mn+OtAJyvAriYXzms38kkQbkOj2aCC5vFExcHvLJrAW61nRLiv+esgmheb
-	 hmdZLQDBBvmHVNc3/BLfmVLqfolD+YZt5NvD63SBFtb0XhEPrhJcH4DKSycDVALgmF
-	 Vepzp38JoPHLXSbuUbw56Yo0Q2S6VCXBAySB6aIOmtu9udEKeBIynyCXinbFCiTHjE
-	 1yVG1ElUOlkmw==
-Date: Mon, 23 Nov 2026 13:09:26 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Stanislav Aleksandrov <lightofmysoul@gmail.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Abel Vesa <abelvesa@kernel.org>, Rob Herring <robh@kernel.org>, 
+	b=dKoeBY5rW4/ez1gkQEIBPsXto3zTNST7Hs3HdUbeUStHoba6+w1E+izU8jVnvbNs2
+	 NxvLViQRf5OBc/LnIxO1n9fvsQpDGeD2PQV/jGWnjBg5tOeP5jQiBkd6mersZmA52/
+	 UsHwDV98N9gC3yEONBBA5lPH7bWA/JkHiamZexhcy9MmRxeILmQ/FYhj/yCMhTRMCC
+	 JzJ8s0pcvf3msUyXP9LH96oqk+TISc0wL1ixY0X7xn/Af55lEQshol+0MFP0EkLpcu
+	 BNDQOQlIkPh0Hon7/omAmIwIMvCLhj4QpT//m3fj0MBDGrQK1QpBiGb/LOzglXxBRu
+	 7HbYnrvwF3+7Q==
+Date: Mon, 23 Nov 2026 15:14:56 +0100
+From: Bartosz Golaszewski <brgl@kernel.org>
+To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
 	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Robert Marko <robimarko@gmail.com>, Guru Das Srinagesh <linux@gurudas.dev>, 
-	Thomas Gleixner <tglx@kernel.org>, Radu Rendec <radu@rendec.net>, Lee Jones <lee@kernel.org>, 
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
-	"Joerg Roedel (AMD)" <joro@8bytes.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Wesley Cheng <wesley.cheng@oss.qualcomm.com>, Vinod Koul <vkoul@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, Bart Van Assche <bvanassche@acm.org>, 
-	Bean Huo <beanhuo@micron.com>, Stanley Jhu <stanleyjhu@google.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	Amit Kucheria <amitk@kernel.org>, Thara Gopinath <thara.gopinath@gmail.com>, 
-	Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>, 
-	Lukasz Luba <lukasz.luba@arm.com>, Georgi Djakov <djakov@kernel.org>, 
-	Sibi Sankar <sibi.sankar@oss.qualcomm.com>, Ulf Hansson <ulfh@kernel.org>, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, mfd@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, linux-usb@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-pm@vger.kernel.org, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH v2 13/16] dt-bindings: arm: qcom,ids: Add SoC ID for
- SXR2250P
-Message-ID: <20261123-pastel-barracuda-of-rain-bce8ac@quoll>
-References: <20261116-halliday-dts-v2-0-2c92438c6c46@gmail.com>
- <20261116-halliday-dts-v2-13-2c92438c6c46@gmail.com>
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Abel Vesa <abelvesa@kernel.org>, Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Wenjia Zhang <wenjia.zhang@oss.qualcomm.com>
+Subject: Re: [PATCH v4 2/2] arm64: dts: qcom: shikra: Correct QCE node
+ configuration
+Message-ID: <x5s55d47l5wi3ai476f57mkwlgsbup33mo4gsgoblaqirqasll@qrer3w2a5xmk>
+References: <20261120-shikra_qce_fix-v4-0-5249e31394ce@oss.qualcomm.com>
+ <20261120-shikra_qce_fix-v4-2-5249e31394ce@oss.qualcomm.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -77,20 +63,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261116-halliday-dts-v2-13-2c92438c6c46@gmail.com>
+In-Reply-To: <20261120-shikra_qce_fix-v4-2-5249e31394ce@oss.qualcomm.com>
 
-On Mon, Nov 16, 2026 at 09:26:29PM +0000, Stanislav Aleksandrov wrote:
-> Add the ID for the Qualcomm SXR2250P (Snapdragon XR2+ Gen 2) SoC.
+On Fri, Nov 20, 2026 at 04:59:53PM +0530, Kuldeep Singh wrote:
+> Shikra QCE requires an explicit core clock, which is missing from the
+> current configuration. Adjust fallback compatible to "qcom,ipq4019-qce"
+> and specify core clock to match updated binding description.
 > 
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> Signed-off-by: Stanislav Aleksandrov <lightofmysoul@gmail.com>
+> Cryptobam is controlled remotely and its clocks are therefore managed by
+> remote crypto subsystem.
+> 
+> Fixes: 099cd05d200b ("arm64: dts: qcom: shikra: Add ICE, TRNG and QCE nodes")
+> Tested-by: Wenjia Zhang <wenjia.zhang@oss.qualcomm.com> #on shikra device
+> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
 > ---
->  include/dt-bindings/arm/qcom,ids.h | 1 +
 
-This should be rebased on my patch removing the IDs.
-
-Best regards,
-Krzysztof
-
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com> 
