@@ -1,89 +1,59 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795445172;
-	b=WmQmN3wJ4baBb/LQ9oqLZfZJAW+8AIwjHCJ6g8Ig01qX4M8MGzYoIMZ5pleDjNdwSUsS
-	 EPhtl38Io16THAkOtlTyqpRg1v7EY/TfvX/drY3k5RiwDwW3h3wUv4AEa/tMGVfx5aEr2
-	 b9Gnd17ol3mkg9PIMkEkS5Sbm9opWsS0efB+tfTaFZaPLxrRqyKKYCRonnevDukKv5BYc
-	 ZMlBRm2P+Rs5igFuoR7zRx4Q89pFPHYrVC8wXFifz7IyQ9BRKY/x4EFMBq9Zd2TfyDcxg
-	 nHsO/aUSWrGWlopm1LjOuisyAm+0ApD7y6fXh27gbidxiVIYylje+at1l9tq7XXYKHw==
+	t=1795445415;
+	b=sSH8l4lJzYfkb8Nf6gt24Kv0P1Auu/NtR43m9AcoKdisjJeCHVExUjQgzja3LEi8X2Km
+	 PvQS55hd0YkR2HAqPatz+MHfdej5gB/UMM/ZUvdwA3UPnwbbYYreNbtgk9FHgzDmC7rcd
+	 HZ2UpfUFxB/Lb8OuN8EZBZSGhLmQsVtGH8OsETCxGxYXnWyCbCBZL14iF6ImOZK6PhNKw
+	 NWPddIJUkHb3ArYDU6QI9CNK4qNmY0XFzK9oyn6Es1tjyRxK2jqSdCTf+PDJ6qzXokl6D
+	 nH2NtZEhaaUvacv2WlJn/llK05LFHHkvyvryI3P5iFHvSSAFpACAzcfGuVH1wBJOYzw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795445172;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=CyKIXgQRwVnOg/5HTSCC1Br3Rokfn72RQpo0wj7cTcQ=;
-	b=QxMJzE1xoaxAAea4IHXnFA00bgHxG919O6fV+UptBpqGSdf2zN6CHxrvShyk5DXSame1
-	 dmwSHHgSgszlwLWQCeyYaDCVOVyZy1lAguhhG2Ka8lzTVrD9zFN98OyStspH8uoeRQplK
-	 L9WD2cwfdlFu5vmcsQudJM/KBipIOsmxUR7a/grB4WTlmi8fEZKZBzDy02nKvl4+R51oM
-	 ShTMrcMkciwACfP2TMUX+bfyXNTskwdNGOhltEwSvpeKDcqMUjgNCdlokzpEULKCPc+LX
-	 kYt6hcncyE+PquOxWOVZ3z2qxN7JgaFYkAAXgw4zhx8qdFaJHZY0AX0aId04+V1axzQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795445415;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=2VYFcyBKXC3yZ4aRuefyjeS6/vKwFOYv0oy6xLnW2HE=;
+	b=q4vSVgWGFZ4SdDAt13LOewPDLl9ACFPAi9epseAGwkWMwdZrKAG6CVHuVtk5M/KBmfEe
+	 Hvsf9KN2cflG1HcQolWxWuXGSm1S4+vtWmIzwF+3reBLW8uHy9W0o9cgVub1HVAjkJDye
+	 aTST2Lk/RF8VZ3n+DkSXUeO3bHGVX66MsymfbyFAMbhkU2gO5KWa7tXrtRG+gwq6oaaED
+	 P9He4JB66YbwQGQLxfAh3/NA95CmGBcA9/ZPuzQjqL0rlCndZGi5e4QFkxmvEc1slXsCB
+	 EF47l+ZD7yT+BIAqOQvd4GFUG4MOqt7wJPuSWbtBGqHChWzkskr48PnHbUwLPuyUgug==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oFtzshci;
-	arc=none smtp.remote-ip=74.125.82.51
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YnJoag5d;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9A6606A31A
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2026 14:46:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CF9A6606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C8E606A31E
+	for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2026 14:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oFtzshci
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-15dd124bbe7so2157255c88.1
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Nov 2026 06:46:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795445171; x=1796049971; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=CyKIXgQRwVnOg/5HTSCC1Br3Rokfn72RQpo0wj7cTcQ=;
-        b=oFtzshciZxQ5faeA/9AVOCD8oXIinEqM8oy2Iim5N5/VUEM8vc+7kguGCnIKwIBq2B
-         KxT9FCMkb0rwLZUNwoc4g5B9ZQahUXmVKFLLWACo7/ESvttyHRimh/cR1ZcNHEYdHtQk
-         oI3AdvWFmKK9LcT3sfHc0ZR063JZCjDwtNAofvv08PRQbw+QzwfcqaoUyZQEDdxQfA/X
-         JcGWeD8xuntlXI1s1YmEZiKUKaXNstx8X+XPyYVD3a/6h8DTrrbtUpp5CXStvyBSXyI9
-         7HIwtCtPGJtzu+GfF6y26wxWxlWu5EgKkTSPgTRJ45OmLelkpg4IoFk+sSfzfh6I68Ud
-         zXSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795445171; x=1796049971;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=CyKIXgQRwVnOg/5HTSCC1Br3Rokfn72RQpo0wj7cTcQ=;
-        b=U62KQiMY7II974/QfiY8KDhSbZ5QAQ+SrJG3nug2Eh8T6sYMt6wWGDh1qF0VGc+rN7
-         ExdTDLQ1v6WOZYGedgkbTjmov+3No8hA+wq+9+Ifqq1hh/4uVzzldAwcnwPGylLfL28B
-         QR1HoNqjBA3m83Wuz6hXhkcWcWyEKPOWXjILSvdFmopGZoc7afmN8gue3Kdm2FvlkPFD
-         u16Xq3cO+at3R9odN+MFYq/nET7e5dFz2jehYC/Szr5NfzlhF90fLlGKq6jf75rk4tOn
-         3hj8OGVOH88qJRmcB339nvvUj/Y9ZpbleJ/w0k6ZiidYm9gfcHf33gi3qF3wWbvkgV/N
-         HXww==
-X-Gm-Message-State: APuU4Z8MnfxyTsiay8Fcsxv62AZ8Lk3QYM5sEwNMHt/F61/kSvcrCVLJ
-	krGfRqwUu2Bx/IpReySCrCSMt+0pQXp+6m7PUNWSKEbJWtuyYiQdis9G
-X-Gm-Gg: AZFdTZdiSdNajmEG6oX1OrzSURjJ9MrraBGPd9+XWW5hudbRPIzaDo/wojQS+JY8dD5
-	52Hv5GZa8CTo9fdqpEkO/TMLh8ZUFkif9N1f5BaisRJfrUdhrvDYH0/3r27LRKM7SnJxG49aZ1L
-	USMPsOGnWgKpx1oIhmwk7O/z0UdKrzWvGuYIiRgPImIwkjgb1Dk8VD4wtzSE31WzX10Kj8TAsmV
-	BStUJc6tVqBRz6YaYcSMQwqMuobGiDu4pf59YN0m6l9jeRtpbt66nbHtSXZXGfPJSgbXZ/LGNPA
-	pJu4Izf+hD8ljuGz1cW5zNbsfMgyym3rRKwL2QA2I27/7f2elvVVIOqT7pKeN0KBkWEIwjD4Zdr
-	7sK4nbF3y572zam+qqDkNIn1HlfELTwzCh8iu24ZzyllfPqGmI+UxKiUdDadjtANGS24SdEeH4D
-	NcxTLjNMQsTZgxB2q+apxSC+s5o2bWEzxhRxN6h7VgbLJ1ZNl0lp4EWJmOsWPczHoVVlH5vPAYc
-	nnIXqAj4TTPCZCno4Q06swDELzm0JXk1zErZxMp1xvHR3rwErn6oSma4v+YRSECZWtnV1gzFMb/
-	DkUfK6q5FpQRtIuGwvoJgd2NyvWZIA==
-X-Received: by 2002:a05:7022:7f04:b0:166:af48:a2ba with SMTP id a92af1059eb24-1b5566fdfc3mr13978613c88.0.1795445170413;
-        Mon, 23 Nov 2026 06:46:10 -0800 (PST)
-Received: from gentoo ([49.204.145.8])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5567e2bd1sm27955627c88.3.2026.11.23.06.46.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Nov 2026 06:46:09 -0800 (PST)
-From: Shreesh Adiga <16567adigashreesh@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Demian Shulhan <demyansh@gmail.com>
-Cc: linux-crypto@vger.kernel.org
-Subject: [PATCH v2] lib/crc: Add 4-way folding in NEON crc64_nvme implementation
-Date: Mon, 23 Nov 2026 20:15:50 +0530
-Message-ID: <20261123144605.303362-1-16567adigashreesh@gmail.com>
-X-Mailer: git-send-email 2.56.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YnJoag5d
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B7321F000C6;
+	Mon, 23 Nov 2026 14:50:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795445415;
+	bh=2VYFcyBKXC3yZ4aRuefyjeS6/vKwFOYv0oy6xLnW2HE=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=YnJoag5dBnmG57jVFt7tUyGes+NixEJk+hqqfdfGddITC66LrrtkgLo4ijI0YXqNr
+	 1QklmX3Mw8/jl+WNXnBiJWMr3Uyk68PYKW4kGa26ThGE6GhFqI7pvvcuBvvxf3I6JN
+	 /HgYbLTqxx7EWJ+JsLQC3Y4SatNekToKBzeMmMC6SapRgHFdhYFWiwcNXB/DSy6muO
+	 2CWAsgrw+7F1d790Zz6xqI9L421Y9Ag3c67rw3v4/7UarqsmXiNLZqmNFR0ZfWOA9f
+	 y3eoW4jY7UM2doLpq6f+Mn8CGB+88ObUeoi1GJogrIRqwCeaYhR/zxxIAeAcT6Gu9k
+	 rcg5/NV69rohA==
+Message-ID: <sashiko-outbox-229443@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v10 2/2] crypto: ti - Add support for HMAC in DTHEv2
+ driver
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "T Pratham" <t-pratham@ti.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
+ S. Miller" <davem@davemloft.net>
+Cc: "Sebin Francis" <sebin.francis@ti.com>, "Manorit Chawdhry" <m-chawdhry@ti.com>, "Vishal
+ Mahaveer" <vishalm@ti.com>, "Praneeth Bajjuri" <praneeth@ti.com>, linux-crypto@vger.kernel.org
+In-Reply-To: <20261123142918.3451969-3-t-pratham@ti.com>
+References: <20261123142918.3451969-1-t-pratham@ti.com>
+ <20261123142918.3451969-3-t-pratham@ti.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 23 Nov 2026 14:50:14 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -92,311 +62,189 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Use 4-way folding in the shared NEON crc64_nvme for AArch64
-as well as AArch32. This improves performance by about 2x for 512 byte
-data size on Cortex-X925, as measured with a userspace benchmark.
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [High] crypto: ti - sleeping crypto_alloc_shash() call in
+  dthe_hash_export()
+- [Low] crypto: ti - redundant fallback setkey and shash alloc in
+  dthe_hmac_setkey()
+--
 
-Add similar optimizations from x86 implementation like reducing
-the 4x to 2x and doing a tail (len >= 32) 2x fold as well as partial
-block handling to process lengths which are not multiple of 16 bytes.
+commit 325575ece1b4fbdd9ca3a408597f30635e4f5362
+Author: T Pratham <t-pratham@ti.com>
 
-The partial block handling uses vqtbl1q_u8(), which AArch32 does not
-provide, so implement it for AArch32 using two vtbl2_u8() lookups, the
-same emulation used by lib/raid/raid6/arm/recov_neon_inner.c.
+crypto: ti - Add support for HMAC in DTHEv2 driver
 
-crc64_nvme_neon() therefore accepts any len >= 128 on both
-architectures. The AArch64 dispatch code now passes the full length, and
-the AArch32 dispatch code no longer rounds chunks down to a multiple of
-16 bytes: each chunk is 4 KiB, or the whole remaining length if less
-than 4 KiB + 128 bytes remains, so no tail is left for the generic
-implementation.
+This commit adds HMAC-SHA512, HMAC-SHA384, HMAC-SHA256, and HMAC-SHA224
+support to the DTHEv2 hashing engine driver.
 
-On AArch64, check for PMULL with a static key, and implement the PMULL
-helpers with inline asm. With the vmull_p64() intrinsics, compilers
-build the fold constants in general purpose registers with mov/movk and
-transfer them with fmov/dup, up to 10 instructions per constant pair,
-instead of loading them from memory.
+> diff --git a/drivers/crypto/ti/dthev2-hash.c b/drivers/crypto/ti/dthev2-h=
+ash.c
+> index ac6119e4e4d68..02ff7a5e6812a 100644
+> --- a/drivers/crypto/ti/dthev2-hash.c
+> +++ b/drivers/crypto/ti/dthev2-hash.c
 
-Tested for correctness with the CRC KUnit tests under QEMU on both
-AArch64 and AArch32.
+[ ... ]
 
-Signed-off-by: Shreesh Adiga <16567adigashreesh@gmail.com>
----
-Changes in v2:
-- Squash in the follow-up requested by Eric: AArch32 partial block
-  support, AArch32 chunking without rounding to 16 bytes, and comments
-  explaining the inline asm and partial block handling.
-- Use uint64_t for fold_consts_4x_val and fold_consts_2x_val, fixing the
-  build failure reported. Also used uint8_t instead of u8 for
-  consistency for the partial_block array which is loaded by vld1q_u8.
-- Rebase onto v7.4-rc4
+> @@ -551,6 +618,53 @@ static const void *dthe_hash_get_init_state(struct d=
+the_tfm_ctx *ctx)
+>  	}
+>  }
+> =20
+> +/*
+> + * Compute the HMAC inner or outer pad state (the intermediate hash stat=
+e after
+> + * processing one block of key XOR pad_byte) and write it to @out. Only =
+the
+> + * first ctx->phash_size bytes are written, which is always the raw hash=
+ state
+> + * at the start of the shash export struct.
+> + */
+> +static int dthe_hmac_compute_pad_state(struct dthe_tfm_ctx *ctx, u8 pad_=
+byte,
+> +				       void *out)
+> +{
+> +	const char *alg_name =3D dthe_hash_get_alg_name(ctx);
+> +	struct crypto_shash *ktfm;
+> +	u8 data[SHA512_BLOCK_SIZE];
+> +	unsigned int ss;
+> +	u8 *state;
+> +	int ret;
+> +
+> +	ktfm =3D crypto_alloc_shash(alg_name, 0, 0);
+> +	if (IS_ERR(ktfm))
+> +		return PTR_ERR(ktfm);
+> +
+> +	ss =3D crypto_shash_statesize(ktfm);
+> +	state =3D kmalloc(ss, GFP_ATOMIC);
+> +	if (!state) {
+> +		crypto_free_shash(ktfm);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	SHASH_DESC_ON_STACK(desc, ktfm);
+> +
+> +	desc->tfm =3D ktfm;
+> +	for (int i =3D 0; i < ctx->keylen; i++)
+> +		data[i] =3D ((u8 *)ctx->key)[i] ^ pad_byte;
+> +
+> +	ret =3D crypto_shash_init(desc) ?:
+> +	      crypto_shash_update(desc, data, ctx->keylen) ?:
+> +	      crypto_shash_export(desc, state);
+> +
+> +	if (!ret)
+> +		memcpy(out, state, ctx->phash_size);
+> +
+> +	memzero_explicit(state, ss);
+> +	kfree(state);
+> +	crypto_free_shash(ktfm);
+> +	memzero_explicit(data, sizeof(data));
+> +	return ret;
+> +}
+> +
+>  static int dthe_hash_export(struct ahash_request *req, void *out)
+>  {
+>  	struct dthe_hash_req_ctx *rctx =3D ahash_request_ctx_dma(req);
+> @@ -561,9 +675,12 @@ static int dthe_hash_export(struct ahash_request *re=
+q, void *out)
+>  		u8 *u8;
+>  		u64 *u64;
+>  	} p =3D { .u8 =3D out };
+> +	int ret =3D 0;
+> =20
+>  	if (dthe_hash_has_flag(rctx, DTHE_HASH_FLAG_PHASH_AVAIL))
+>  		memcpy(out, rctx->phash, ctx->phash_size);
+> +	else if (ctx->keylen > 0)
+> +		ret =3D dthe_hmac_compute_pad_state(ctx, HMAC_IPAD_VALUE, out);
+>  	else
+>  		memcpy(out, dthe_hash_get_init_state(ctx), ctx->phash_size);
 
-v1: https://lore.kernel.org/all/20261118160110.1662470-1-16567adigashreesh@gmail.com/
+[Severity: High]
+Can calling crypto_alloc_shash() in dthe_hmac_compute_pad_state() sleep
+when dthe_hash_export() runs in atomic context?
 
- lib/crc/arm/crc64-neon.h   |  16 ++++++
- lib/crc/arm/crc64.h        |   4 +-
- lib/crc/arm64/crc64-neon.h |  27 +++++++---
- lib/crc/arm64/crc64.h      |  18 ++++---
- lib/crc/crc64-neon.c       | 100 ++++++++++++++++++++++++++++++++++---
- 5 files changed, 144 insertions(+), 21 deletions(-)
+crypto_ahash_export() and crypto_ahash_export_core() may be called from
+softirq or atomic context (as the GFP_ATOMIC allocation of state reflects),
+but crypto_alloc_shash() acquires the sleeping crypto_alg_sem rw_semaphore
+and allocates the transform with GFP_KERNEL.
 
-diff --git a/lib/crc/arm/crc64-neon.h b/lib/crc/arm/crc64-neon.h
-index 645f553220ff..0d0071a92071 100644
---- a/lib/crc/arm/crc64-neon.h
-+++ b/lib/crc/arm/crc64-neon.h
-@@ -32,3 +32,19 @@ static inline uint64x2_t pmull64_hi_lo(uint64x2_t a, uint64x2_t b)
- 
- 	return result;
- }
-+
-+/*
-+ * AArch32 does not provide this intrinsic natively because it does not
-+ * implement the underlying instruction. AArch32 only provides a 64-bit
-+ * wide vtbl.8 instruction, so use that instead.
-+ */
-+static inline uint8x16_t vqtbl1q_u8(uint8x16_t a, uint8x16_t b)
-+{
-+	union {
-+		uint8x16_t	val;
-+		uint8x8x2_t	pair;
-+	} __a = { a };
-+
-+	return vcombine_u8(vtbl2_u8(__a.pair, vget_low_u8(b)),
-+			   vtbl2_u8(__a.pair, vget_high_u8(b)));
-+}
-diff --git a/lib/crc/arm/crc64.h b/lib/crc/arm/crc64.h
-index de274288af61..ce0ffe590596 100644
---- a/lib/crc/arm/crc64.h
-+++ b/lib/crc/arm/crc64.h
-@@ -13,10 +13,10 @@ u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
- 
- static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
- {
--	if (len >= 128 && static_branch_likely(&have_pmull) &&
-+	if (static_branch_likely(&have_pmull) && len >= 128 &&
- 	    likely(may_use_simd())) {
- 		do {
--			size_t chunk = min_t(size_t, len & ~15, SZ_4K);
-+			size_t chunk = (len < SZ_4K + 128) ? len : SZ_4K;
- 
- 			scoped_ksimd()
- 				crc = crc64_nvme_neon(crc, p, chunk);
-diff --git a/lib/crc/arm64/crc64-neon.h b/lib/crc/arm64/crc64-neon.h
-index fcd5b1e6f812..d872f4d4e2e7 100644
---- a/lib/crc/arm64/crc64-neon.h
-+++ b/lib/crc/arm64/crc64-neon.h
-@@ -1,21 +1,34 @@
- // SPDX-License-Identifier: GPL-2.0-only
- 
-+/*
-+ * The PMULL helpers below use inline asm instead of the vmull_p64() and
-+ * vmull_high_p64() intrinsics. vmull_p64() takes poly64_t scalars, so the low
-+ * lanes have to be extracted with vgetq_lane_u64(). For the fold constants,
-+ * compilers fold that extraction into a 64-bit immediate: recent GCC and Clang
-+ * build it in a GPR with mov/movk and transfer it with fmov (Clang also
-+ * rebuilds the high half used by pmull2 with mov/movk and dup), instead of
-+ * loading the constant pair with a single ldr. With asm operating on whole
-+ * vector registers, the constants are loaded from .rodata and pmull reads
-+ * the low lanes in place.
-+ */
-+
- static inline uint64x2_t pmull64(uint64x2_t a, uint64x2_t b)
- {
--	return vreinterpretq_u64_p128(vmull_p64(vgetq_lane_u64(a, 0),
--						vgetq_lane_u64(b, 0)));
-+	uint64x2_t r;
-+
-+	asm("pmull %0.1q, %1.1d, %2.1d" : "=w"(r) : "w" (a), "w" (b));
-+	return r;
- }
- 
- static inline uint64x2_t pmull64_high(uint64x2_t a, uint64x2_t b)
- {
--	poly64x2_t l = vreinterpretq_p64_u64(a);
--	poly64x2_t m = vreinterpretq_p64_u64(b);
-+	uint64x2_t r;
- 
--	return vreinterpretq_u64_p128(vmull_high_p64(l, m));
-+	asm("pmull2 %0.1q, %1.2d, %2.2d" : "=w"(r) : "w" (a), "w" (b));
-+	return r;
- }
- 
- static inline uint64x2_t pmull64_hi_lo(uint64x2_t a, uint64x2_t b)
- {
--	return vreinterpretq_u64_p128(vmull_p64(vgetq_lane_u64(a, 1),
--						vgetq_lane_u64(b, 0)));
-+	return pmull64(vextq_u64(a, a, 1), b);
- }
-diff --git a/lib/crc/arm64/crc64.h b/lib/crc/arm64/crc64.h
-index c7a69e1f3d8f..06dd08a21dd6 100644
---- a/lib/crc/arm64/crc64.h
-+++ b/lib/crc/arm64/crc64.h
-@@ -10,19 +10,25 @@
- 
- u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
- 
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
-+
- #define crc64_be_arch crc64_be_generic
- 
- static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
- {
--	if (len >= 128 && cpu_have_named_feature(PMULL) &&
-+	if (static_branch_likely(&have_pmull) && len >= 128 &&
- 	    likely(may_use_simd())) {
--		size_t chunk = len & ~15;
--
- 		scoped_ksimd()
--			crc = crc64_nvme_neon(crc, p, chunk);
-+			crc = crc64_nvme_neon(crc, p, len);
- 
--		p += chunk;
--		len &= 15;
-+		return crc;
- 	}
- 	return crc64_nvme_generic(crc, p, len);
- }
-+
-+#define crc64_mod_init_arch crc64_mod_init_arch
-+static void crc64_mod_init_arch(void)
-+{
-+	if (cpu_have_named_feature(PMULL))
-+		static_branch_enable(&have_pmull);
-+}
-diff --git a/lib/crc/crc64-neon.c b/lib/crc/crc64-neon.c
-index 1267df1310be..313676098dee 100644
---- a/lib/crc/crc64-neon.c
-+++ b/lib/crc/crc64-neon.c
-@@ -10,6 +10,12 @@
- 
- u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
- 
-+/* x^575 mod G, x^511 mod G */
-+static const uint64_t fold_consts_4x_val[2] = { 0x0c32cdb31e18a84aULL,
-+						0x62242240ace5045aULL };
-+/* x^319 mod G, x^255 mod G */
-+static const uint64_t fold_consts_2x_val[2] = { 0xb0bc2e589204f500ULL,
-+						0xe1e0bb9d45d7a44cULL };
- /* x^191 mod G, x^127 mod G */
- static const uint64_t fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
- 					     0x21e9761e252621acULL };
-@@ -17,23 +23,105 @@ static const uint64_t fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
- static const uint64_t bconsts_val[2] = { 0x27ecfa329aef9f77ULL,
- 					 0x34d926535897936aULL };
- 
-+static inline uint64x2_t fold_single_round(uint64x2_t fold, uint64x2_t temp,
-+					   uint64x2_t consts)
-+{
-+	uint64x2_t temp1 = pmull64(consts, fold);
-+	uint64x2_t temp2 = pmull64_high(consts, fold);
-+
-+	return temp ^ temp1 ^ temp2;
-+}
-+
-+/*
-+ * Fold in the final 1 <= len <= 15 bytes. With A = fold, the remaining
-+ * polynomial is A*x^(8*len) + B. Rewrite it as C1*x^128 + C2, where
-+ * C1 = floor(A / x^(128 - 8*len)) and C2 = (A*x^(8*len) mod x^128) + B,
-+ * then fold C1 into C2. t1 selects the len highest-degree bytes of A to
-+ * form C1; ~t1 selects the remaining bytes to form A*x^(8*len) mod x^128,
-+ * since tbl returns 0 for any index >= 16. The sign of t1 then selects
-+ * which bytes of C2 come from B.
-+ */
-+static inline uint64x2_t fold_partial_block(uint64x2_t fold, uint64x2_t consts,
-+					    const u8 *p, size_t len)
-+{
-+	static const uint8_t crc_neon_shift_tab[32] = {
-+		0xff, 0xfe, 0xfd, 0xfc, 0xfb, 0xfa, 0xf9, 0xf8,
-+		0xf7, 0xf6, 0xf5, 0xf4, 0xf3, 0xf2, 0xf1, 0xf0,
-+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-+	};
-+
-+	uint8x16_t last16, t1, t2;
-+	uint64x2_t a, b;
-+
-+	last16 = vld1q_u8(p + len - 16);
-+	t1 = vld1q_u8(crc_neon_shift_tab + len);
-+	a  = vreinterpretq_u64_u8(vqtbl1q_u8(vreinterpretq_u8_u64(fold), t1));
-+	t2 = vmvnq_u8(t1);
-+	t2 = vqtbl1q_u8(vreinterpretq_u8_u64(fold), t2);
-+	t1 = vreinterpretq_u8_s8(vshrq_n_s8(vreinterpretq_s8_u8(t1), 7));
-+	b  = vreinterpretq_u64_u8(vbslq_u8(t1, t2, last16));
-+
-+	return fold_single_round(a, b, consts);
-+}
-+
- u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len)
- {
-+	/* Assumes len >= 128. */
- 	uint64x2_t fold_consts = vld1q_u64(fold_consts_val);
-+	uint64x2_t fold_consts_4x = vld1q_u64(fold_consts_4x_val);
-+	uint64x2_t fold_consts_2x = vld1q_u64(fold_consts_2x_val);
- 	uint64x2_t v0 = { crc, 0 };
- 	uint64x2_t zero = { };
-+	uint64x2_t v1, v2, v3;
-+
-+	v0 ^= vreinterpretq_u64_u8(vld1q_u8(p));
-+	v1  = vreinterpretq_u64_u8(vld1q_u8(p + 16));
-+	v2  = vreinterpretq_u64_u8(vld1q_u8(p + 32));
-+	v3  = vreinterpretq_u64_u8(vld1q_u8(p + 48));
-+
-+	p += 64;
-+	len -= 64;
-+	do {
-+		uint64x2_t t0 = vreinterpretq_u64_u8(vld1q_u8(p +  0));
-+		uint64x2_t t1 = vreinterpretq_u64_u8(vld1q_u8(p + 16));
-+		uint64x2_t t2 = vreinterpretq_u64_u8(vld1q_u8(p + 32));
-+		uint64x2_t t3 = vreinterpretq_u64_u8(vld1q_u8(p + 48));
- 
--	for (;;) {
--		v0 ^= vreinterpretq_u64_u8(vld1q_u8(p));
-+		v0 = fold_single_round(v0, t0, fold_consts_4x);
-+		v1 = fold_single_round(v1, t1, fold_consts_4x);
-+		v2 = fold_single_round(v2, t2, fold_consts_4x);
-+		v3 = fold_single_round(v3, t3, fold_consts_4x);
-+		p += 64;
-+		len -= 64;
-+	} while (len >= 64);
- 
-+	v0 = fold_single_round(v0, v2, fold_consts_2x);
-+	v1 = fold_single_round(v1, v3, fold_consts_2x);
-+
-+	if (len >= 32) {
-+		uint64x2_t t0 = vreinterpretq_u64_u8(vld1q_u8(p +  0));
-+		uint64x2_t t1 = vreinterpretq_u64_u8(vld1q_u8(p + 16));
-+
-+		v0 = fold_single_round(v0, t0, fold_consts_2x);
-+		v1 = fold_single_round(v1, t1, fold_consts_2x);
-+		p += 32;
-+		len -= 32;
-+	}
-+
-+	v0 = fold_single_round(v0, v1, fold_consts);
-+
-+	if (len >= 16) {
-+		uint64x2_t t0 = vreinterpretq_u64_u8(vld1q_u8(p));
-+
-+		v0 = fold_single_round(v0, t0, fold_consts);
- 		p += 16;
- 		len -= 16;
--		if (len < 16)
--			break;
--
--		v0 = pmull64(fold_consts, v0) ^ pmull64_high(fold_consts, v0);
- 	}
- 
-+	if (len)
-+		v0 = fold_partial_block(v0, fold_consts, p, len);
-+
- 	/* Multiply the 128-bit value by x^64 and reduce it back to 128 bits. */
- 	v0 = vextq_u64(v0, zero, 1) ^ pmull64_hi_lo(fold_consts, v0);
- 
+In addition, computing the inner pad state here appears unnecessary:
+CRYPTO_AHASH_ALG_NO_EXPORT_CORE is set, so exported state is only consumed
+by dthe_hash_import().  Because rctx->flags is exported with
+DTHE_HASH_FLAG_PHASH_AVAIL clear, dthe_hash_dma_start() after import ignores
+rctx->phash and loads ctx->key with DTHE_HASH_MODE_HMAC_KEY_PROCESSING.  The
+on-stack desc in dthe_hmac_compute_pad_state() is also not cleared with
+shash_desc_zero() before returning.
 
-base-commit: b6a9fa34ce4187cb69d3c588a4bbffc31ce5db8f
--- 
-2.56.1
+[ ... ]
 
+> @@ -603,6 +730,53 @@ static int dthe_hash_import(struct ahash_request *re=
+q, const void *in)
+>  	return 0;
+>  }
+> =20
+> +static int dthe_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+> +			    unsigned int keylen)
+> +{
+> +	struct dthe_tfm_ctx *ctx =3D crypto_ahash_ctx(tfm);
+> +	struct crypto_ahash *fb =3D crypto_ahash_fb(tfm);
+> +	const char *hash_alg_name =3D dthe_hash_get_alg_name(ctx);
+> +	unsigned int max_keysize;
+> +
+> +	memzero_explicit(ctx->key, sizeof(ctx->key));
+> +
+> +	switch (ctx->hash_mode) {
+> +	case DTHE_HASH_SHA512:
+> +	case DTHE_HASH_SHA384:
+> +		max_keysize =3D DTHE_HMAC_SHA512_MAX_KEYSIZE;
+> +		break;
+> +	case DTHE_HASH_SHA256:
+> +	case DTHE_HASH_SHA224:
+> +		max_keysize =3D DTHE_HMAC_SHA256_MAX_KEYSIZE;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (keylen > max_keysize) {
+> +		struct crypto_shash *ktfm;
+> +		int err;
+> +
+> +		ktfm =3D crypto_alloc_shash(hash_alg_name, 0, 0);
+> +		if (IS_ERR(ktfm))
+> +			return PTR_ERR(ktfm);
+> +
+> +		SHASH_DESC_ON_STACK(desc, ktfm);
+> +
+> +		desc->tfm =3D ktfm;
+> +		err =3D crypto_shash_digest(desc, key, keylen, (u8 *)ctx->key);
+> +		crypto_free_shash(ktfm);
+> +		if (err)
+> +			return err;
+> +	} else {
+> +		memcpy(ctx->key, key, keylen);
+> +	}
+> +
+> +	ctx->keylen =3D max_keysize;
+> +
+> +	return crypto_ahash_setkey(fb, key, keylen);
+> +}
+
+[Severity: Low]
+Does dthe_hmac_setkey() need to call crypto_ahash_setkey(fb, key, keylen)
+or allocate a crypto_shash transform for long keys?
+
+Because CRYPTO_ALG_NEED_FALLBACK is set, crypto_ahash_setkey() in
+crypto/ahash.c already propagates the key to crypto_ahash_fb(tfm) after
+alg->setkey() succeeds, so calling it here sets the fallback key twice.
+Also, since CRYPTO_SHA256 and CRYPTO_SHA512 are selected in Kconfig and
+<crypto/sha2.h> is included, sha224(), sha256(), sha384(), and sha512() can
+hash keys longer than max_keysize directly without allocating a temporary
+shash transform, and ctx->keylen should be reset to 0 when ctx->key is
+zeroed at the start so a failed setkey does not leave a stale non-zero
+ctx->keylen with an all-zero key.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261123142918.3451=
+969-1-t-pratham@ti.com?part=3D2
