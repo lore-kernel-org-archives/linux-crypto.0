@@ -1,80 +1,79 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795393516;
-	b=xgCRToRUsdefwXlOsaHXzQCLOsBTnsGERc73mFAVgHZi84NTT0903YzCoTTV1bigpV31
-	 TB3b3FY22QFG/+/M7teIU7VhU5cZTPbgzRwD9lgJoKy4teoxoqN/WBn/ZAUmCOEKG3qGu
-	 2ZjBZ1/FVHBQODdhYAa34KcyNC7bdntJuWJwIsY27vvjHvmTsRSIpl+NNWwWb3+JFJZJa
-	 y/YcOe7n0cO105k4IuLIOmpyzLQnYrZ2vPQql0uTXNcWaJ7sx+B8uWjvxysJZ40A1DfxX
-	 QZMp9Ur/0UGi8mROzTGix/FcwtjUo2YBjD3GPF7JuIhWLugboS+Ul6WEiIAzRlCnq7g==
+	t=1795393527;
+	b=Zu7YqyyqdhZ2NwGMahn4l58ULdiKOB2rkcA2mqklLKbakavD9tForkftbCQYkRUIWi5q
+	 eW4P+E+Tkyc+Xp/fQtqIg5LKsWMBNr9e1kTc0+WNpq1OPhfeoAsakQcZKTglebZoTHea5
+	 WEGtUnjYUrU2u1H3yXdVK5CtCdHw/JIyOSvE4UAclBL1Wx20XcVz+6UhXjipXnHm1xJIw
+	 tnj8rj7IOoy8V3stV8Tuz2pyMFXXbPP+zusYM5rqxqBiX5Pm2Zu5d47NiMviQ1eAX0qsG
+	 Ui7RrwlXkl1JsKneVBdTil7J3p8IqnhGanyIqQEj69xkz8XVDRAFiW+EOKSkyTobUCw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795393516;
-	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
-	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To;
-	bh=mNi3Pj05CGsYEOdmgVQU43MsXqlDog8eO7vY1bFFNz8=;
-	b=H3J0IBkF5b9kFJsk+54owKeOzfzkGbTgFeyMaeCbl70FAlUb9R1OUoN6aKiP4vol6eus
-	 KD2QBAIeOP9YxiZBuqbG5mu9/YlAg2tTYoCmSgZH04NQCdGwBIxkt1AWdjc0zm2rLiOkp
-	 znQdCFyMBCAiFQO+lDwImkIYMhuPVL44epqe/Y7+P60WhnQIgJeZTlItBbFer+1Hetgh2
-	 9rubSKEfxyHnkdlM1Sz1kHDAYzTEKe5AdUjMW0TrMfq0mk2SIiyOFhjWlXj3yZ0f7ruHB
-	 gq+3/qsXLZQUAQEjyu+4PwXcBzAXf46c7kzdHA04xhq4jjptPAXOmZfg9xj+B80/XcA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795393527;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=OXn1Mf50jglpquacOWjJ7uVOXz554Aye5yQhvyRBksc=;
+	b=1OkZiJzNSfjUhqsGQ9e20jQJ8bTMJ50+DEF6xdx5QnSff/0wavrClEwlhNn1sNcIrtmY
+	 569q6bMekQTwfoNlzw0Yy2WQwEm/UUaK7DpBTfvRb3k5OUjKQjy+MHLK3NAlAhot7Bd5C
+	 Hj3i0CybAy/eliFOUZvs/GmO/Cy8LGTbLyeXVVr+w1vTfXks43Ce1vjE33eAXdIT69H0+
+	 VMM+NnqiFJKYmDl/CegINTspH/Qy5i3kIQGe8eLbbfrllgUE5vYCT+Q5UHP5FSUckq/3j
+	 vkoFBMyg9zZmhhevjtd/eyY4vCPERgHXOCY8phK4/j0B0X8md09CZ2D/T9h13o3Ih5Q==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=moerukM7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UF+ZLfDS;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744D1606A31A;
-	Mon, 23 Nov 2026 00:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F03606A69B;
+	Mon, 23 Nov 2026 00:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=moerukM7
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UF+ZLfDS
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1795393516;
-	b=vtWm/x6N/8x0ZfaclbI4bNeGNxTadQb70U3zfg0f3/pB5GDJ42pZ+BQKOPwOccfOLT/o
-	 f4DuVchgAvSETj/JnubuWhVE7ZV3bV5f4AWyVaEDBuM32jewelycdNN15q3+hXlCPKoN6
-	 sz2lGAYPpyWk6ENActxbFpGFwagKT2UtttxZGG2ZSzn6NS7oNciibw+i+aOVUhbVTfiGK
-	 jvodzJbia3ZkwcWfbbbnU9L02oSyGfaXsGRHYjZqYt1HqJ6BtUXxvHlkdRUhII2QjAnfB
-	 N3xTHBh8BCkRA2zs6fMCwvIlbrSuImE8L9xtL3pMEabR8vp8M5r9xG5NADHuSch5vNQ==
+	t=1795393527;
+	b=eQSjQPJaZufao/U1Kk8+s9vF8xSH01p6pir6b4M9HC473daNeL+dLH2oj2Mz6emW6U3Z
+	 mhsM+Rarrn+fyG7hXnM0ha89gPg9uy6w0OnKOz3BBJFsmObtHBWzT5c/ZJ1QmEieGxSE0
+	 jc222rv6unE7LRmr/kP58ZK/k28dlG94bL8RVKFeGV83GRCPt6tocuDuVhviM/UxYFF8V
+	 yPukTw3YTkBJuBISEw1UtbFcRebQz/Qr+P6X4Z4LZw3xxS9g/kqEYo3dLKsIbUryba2gd
+	 0Wr24Ntp3YyVUnke5YV968xlb0Hz/70HRKRIhNMhFQr/UyG6I0oWNX8BgQjfBcwdu+w==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1795393516;
-	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
-	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To;
-	bh=mNi3Pj05CGsYEOdmgVQU43MsXqlDog8eO7vY1bFFNz8=;
-	b=UMN0zonV17BlvBrW2r93vG59hPibKG8PV6iRYcu7FIofbW4j+IdF2DuFByce3QfBb6P5
-	 +c3nYhUP0M2GIs97DmYHJzejCItDoSF4cGZEyyUMXfcTqn28MKpsNqdLXTXGjN3iZyKxu
-	 Ia6e60hObol4ltisV8U5mt+zg8/9jBKqy34trMKZxq9c5o9hM7/yPpKRLw3A+LOVZChw3
-	 IBzX+OhDNph6BsHhBqLDzq9iMfPDvgV0cL7+SnTNzV5SDtG4aFx3xJGHeNXgEgkL71VIi
-	 1HJf+kZfv+7jfg08KR0EmNwrryYr9HZKOypsbgSzfOn9P+hYXid2QH+kBjbzXcnUuaQ==
+	c=relaxed/relaxed; t=1795393527;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=OXn1Mf50jglpquacOWjJ7uVOXz554Aye5yQhvyRBksc=;
+	b=TsojS+TltAGLgpMGJpwuWAvm4dhf/knhWi74LmDGKtij/MGd9Gma8lZvy9MCCkLN8jy2
+	 oGWqsE8eAVst0fRGgF37prGpj8b50Q0f4qGZ5FjcCgTeFnpT24jVq0rD2vtwcKHsvkvmv
+	 M8HpplCUorh92Y9uFdaiCMbJQVBE9A3jR0LrMswqA8F1ACW6OLpS6sIZr7fYBX9doWpE0
+	 Can3b/aONIv4Jk4reWqusrOOqsRwAkJDUAZ0eileqK3VD6GInr2KY6kFwcA8BUDhb69nl
+	 F/f+oy7jsnYc1GIbZgNWnjkoB3plbN5+cMAJ/C/HxawRUejlQMPtTxWJmR0kkNSS7Jw==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 403661F000CA;
+	by smtp.kernel.org (Postfix) with ESMTPS id 845B61F000D0;
 	Mon, 23 Nov 2026 00:25:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795393516;
-	bh=mNi3Pj05CGsYEOdmgVQU43MsXqlDog8eO7vY1bFFNz8=;
-	h=From:Subject:Date:To:Cc:Reply-To;
-	b=moerukM74iTxFpwzAPQ0DwYsOpTGrqhe7usGkqMA1+B0GIs9fF3jIfiLL89HMi1qC
-	 onwART7oMOBdPUqHR30Lg4MOpk7bk4Jvkcfo1J2/BXq1gd7P2aWmA80uxxJQB/lX8T
-	 d3COi4xWlyV1/3d3GiiWa4ieeGUIjZ3lDB/1iBkCWt0r/7dXR9V0yLfzlaVltNqqBa
-	 xH+6q7ZvdyUkFLIR8O6bslTJBLoif9u7Ww2hC9fKEhlcst7EgucexbU0SR7xEjptRI
-	 eMPtfUmcru78Igybd78bzKRoKw67TndpMPdixYd4eSzsNFFHSi4ZC1itN4YK7mJ9hs
-	 wwNHuncvQdL3Q==
+	s=k20260515; t=1795393527;
+	bh=OXn1Mf50jglpquacOWjJ7uVOXz554Aye5yQhvyRBksc=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
+	b=UF+ZLfDSI7sOEM/hJPbPo41mzntHf89lJNHelhohLOXfXeQzB3vpB06+EMceSQT4/
+	 ov3PMskEap1XIRKXcyiB04lgQJeWqXTyQEpmpM1AOOUYUorQwWpr0n7nRHyaRFZcx5
+	 V3m27h9V0ePUbFbYlpukVXOx5ihO+jcoXC4nMqN457+JB0ZTxjHfUx+wYAcVy45EtC
+	 A80KLIHGHyYe0allPBK9U2VGNax+BTeoE7OqulGAs0ixjD/iIJWJzpgHOjJp4336h0
+	 MIhpM4ubmvzhT3t85bS0QmAsd+hfRTm1yJrS8YHr5G6qf4i20bE6X/i4ko101CLjOW
+	 CjtN/okVkq6kQ==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id 942A64C251;
-	Mon, 23 Nov 2026 00:25:12 +0000 (UTC)
+	by lkml.kernel.org (Postfix) with ESMTP id 11DE64C25D;
+	Mon, 23 Nov 2026 00:25:13 +0000 (UTC)
 From: Mani Tofigh via B4 Relay <devnull+mt4022.columbia.edu@kernel.org>
-Subject: [PATCH bpf v2 0/4] bpf: Don't spin on rhtab bucket locks with IRQs
- disabled
-Date: Sun, 22 Nov 2026 19:25:11 -0500
-Message-Id: <20261122-bpf-rhtab-irqs-disabled-v2-0-207aedcc2215@columbia.edu>
+Date: Sun, 22 Nov 2026 19:25:15 -0500
+Subject: [PATCH bpf v2 4/4] selftests/bpf: Test rhtab deletes from inside a
+ resize
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -85,12 +84,9 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WNTQ6CMBCFr0Jm7Zi2kgquvIdh0Z9BxiBgC0RDu
- LsFD+DyvXzvewtECkwRLtkCgWaO3HcpqEMGrjHdnZB9yqCE0lKKE9qhxtCMxiKHV0TP0diWPLp
- c59qVJGpSkNZDoJrfu/kGaQTVr4yTfZAbN+eGNRzHPnz2/1nu8N+rWaLEsjjnvtRGFIW7ur6dn
- pbNkfwE1bquX8j9x9XYAAAA
-X-Change-ID: 20261103-bpf-rhtab-irqs-disabled-c4646c9e0fe2
+Message-Id: <20261122-bpf-rhtab-irqs-disabled-v2-4-207aedcc2215@columbia.edu>
+References: <20261122-bpf-rhtab-irqs-disabled-v2-0-207aedcc2215@columbia.edu>
+In-Reply-To: <20261122-bpf-rhtab-irqs-disabled-v2-0-207aedcc2215@columbia.edu>
 To: Alexei Starovoitov <ast@kernel.org>, 
  Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
  Mykyta Yatsenko <yatsenko@meta.com>, 
@@ -106,59 +102,132 @@ Cc: Thomas Graf <tgraf@suug.ch>, Eduard Zingerman <eddyz87@gmail.com>,
  linux-kselftest@vger.kernel.org, tz2294@columbia.edu, 
  Mani Tofigh <mt4022@columbia.edu>
 X-Mailer: b4 0.16.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795393512; l=1885;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795393512; l=3329;
  i=mt4022@columbia.edu; s=20261026; h=from:subject:message-id;
- bh=Cdk7sFLE8Ms1z4MWODP6tHICAcN6MvIKq/Q+cx9TxjA=;
- b=QyYqJhTCgCxEks59roKvMT4SIBstHsjhnIxEryfr9INyqeC5lbUDBSQ6oPuQ4tjfrpB4lRR+z
- oVc1iV/TsnpBD7LzTsVaP0lWipwJWgMeQj752iWKnKn9mJvarl6D5mf
+ bh=9el2Hu//XF7H7n6wCOTuZBRipgte5y1GXzMdDmYtqDk=;
+ b=vBG6LrbpIAr++9Zz215gGlxXCBoIlBOmt54+VaYaziPIIojmkctwADigd28cCzhvBAFxIGn5R
+ ft7lXRJQNcaApubwwaYPqBYXjlwOTZxr2QaBULP9qmfI5k+BbhrfoJc
 X-Developer-Key: i=mt4022@columbia.edu; a=ed25519;
  pk=gljCMQDuxyKPmd5y37CRpEJGSPXDV1MyAnHBhCgXl0I=
 X-Endpoint-Received: by B4 Relay for mt4022@columbia.edu/20261026 with
  auth_id=1322
 X-Original-From: Mani Tofigh <mt4022@columbia.edu>
 Reply-To: mt4022@columbia.edu
+Content-Transfer-Encoding: 7bit
 
-A BPF program with IRQs disabled can run inside a bucket lock's critical
-section on its own CPU, e.g., a kprobe on the hash function the resize
-worker calls with the lock held.  An insert or delete of that bucket
-then spins forever, and a lookup can retry forever.
+From: Mani Tofigh <mt4022@columbia.edu>
 
-v2 follows Alexei's trylock design (patch 1) and Mykyta's lookup change
-(patch 2), turns it on for rhtab (patch 3) and adds a selftest (patch
-4).  The kvmalloc(GFP_ATOMIC) in rhashtable_insert_rehash() is left for
-a follow-up.
+Add a kprobe program on rhashtable_jhash2() that deletes key 7 of a
+resizable hash map whenever the resize worker hashes it there, while
+user space keeps the table growing and shrinking.  The worker holds key
+7's bucket lock at that point, so the delete fails with -EBUSY.  Without
+the fix the CPU spins on that lock forever.
 
-Reproducer: https://github.com/manitofigh/files/blob/main/linux-repros/rhashlock.c
-
+Signed-off-by: Mani Tofigh <mt4022@columbia.edu>
 ---
-Changes in v2:
-- Trylock the bucket lock with IRQs disabled instead of failing every
-  insert and delete (Alexei)
-- Drop bpf_disable_instrumentation() from rhtab (Alexei)
-- Don't retry lookups with IRQs disabled (Mykyta)
-- Add a selftest
-- Link to v1: https://patch.msgid.link/20261103-bpf-rhtab-irqs-disabled-v1-1-9874d96a088c@columbia.edu
+ tools/testing/selftests/bpf/prog_tests/rhash.c   | 34 ++++++++++++++++++++++++
+ tools/testing/selftests/bpf/progs/rhash_resize.c | 34 ++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+)
 
----
-Mani Tofigh (4):
-      rhashtable: Add trylock_irqsoff for callers that can't spin
-      rhashtable: Don't retry trylock_irqsoff lookups with IRQs disabled
-      bpf: Don't spin on rhtab bucket locks with IRQs disabled
-      selftests/bpf: Test rhtab deletes from inside a resize
+diff --git a/tools/testing/selftests/bpf/prog_tests/rhash.c b/tools/testing/selftests/bpf/prog_tests/rhash.c
+index 0641bd5b0a9e..5afe07b32289 100644
+--- a/tools/testing/selftests/bpf/prog_tests/rhash.c
++++ b/tools/testing/selftests/bpf/prog_tests/rhash.c
+@@ -5,6 +5,7 @@
+ #include <stdio.h>
+ #include "rhash.skel.h"
+ #include "bpf_iter_bpf_rhash_map.skel.h"
++#include "rhash_resize.skel.h"
+ #include <linux/bpf.h>
+ #include <linux/perf_event.h>
+ #include <sys/syscall.h>
+@@ -149,6 +150,36 @@ static void rhash_iter_test(void)
+ 	bpf_iter_bpf_rhash_map__destroy(skel);
+ }
+ 
++static void rhash_resize_test(void)
++{
++	struct rhash_resize *skel;
++	int fd, i, n;
++	__u64 val = 0;
++
++	skel = rhash_resize__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "rhash_resize__open_and_load"))
++		return;
++
++	if (!ASSERT_OK(rhash_resize__attach(skel), "rhash_resize__attach"))
++		goto out;
++
++	fd = bpf_map__fd(skel->maps.rhmap);
++	/* let the resize worker run after each half */
++	for (n = 0; n < 5000 && !skel->bss->busy; n++) {
++		for (i = 0; i < 64; i++)
++			bpf_map_update_elem(fd, &i, &val, BPF_ANY);
++		usleep(100);
++		for (i = 0; i < 64; i++)
++			bpf_map_delete_elem(fd, &i);
++		usleep(100);
++	}
++
++	ASSERT_GT(skel->bss->hits, 0, "hits");
++	ASSERT_GT(skel->bss->busy, 0, "busy");
++out:
++	rhash_resize__destroy(skel);
++}
++
+ void test_rhash(void)
+ {
+ 	if (test__start_subtest("test_rhash_lookup_update"))
+@@ -186,4 +217,7 @@ void test_rhash(void)
+ 
+ 	if (test__start_subtest("test_rhash_iter"))
+ 		rhash_iter_test();
++
++	if (test__start_subtest("test_rhash_resize"))
++		rhash_resize_test();
+ }
+diff --git a/tools/testing/selftests/bpf/progs/rhash_resize.c b/tools/testing/selftests/bpf/progs/rhash_resize.c
+new file mode 100644
+index 000000000000..5a1076b30bb0
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/rhash_resize.c
+@@ -0,0 +1,34 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <vmlinux.h>
++#include <errno.h>
++#include <bpf/bpf_helpers.h>
++#include <bpf/bpf_tracing.h>
++
++char _license[] SEC("license") = "GPL";
++
++struct {
++	__uint(type, BPF_MAP_TYPE_RHASH);
++	__uint(map_flags, BPF_F_NO_PREALLOC);
++	__uint(max_entries, 128);
++	__type(key, int);
++	__type(value, long);
++} rhmap SEC(".maps");
++
++int hits;
++int busy;
++
++/* The resize worker calls this with the key's bucket lock held */
++SEC("kprobe/rhashtable_jhash2")
++int BPF_KPROBE(rhash_resize_delete, const void *key, u32 length)
++{
++	int k;
++
++	if (length != 1 || bpf_probe_read_kernel(&k, sizeof(k), key) || k != 7)
++		return 0;
++
++	__sync_fetch_and_add(&hits, 1);
++	if (bpf_map_delete_elem(&rhmap, &k) == -EBUSY)
++		__sync_fetch_and_add(&busy, 1);
++	return 0;
++}
 
- include/linux/rhashtable-types.h                 |  3 ++
- include/linux/rhashtable.h                       | 45 ++++++++++++++++++++++--
- kernel/bpf/hashtab.c                             | 17 ++-------
- lib/rhashtable.c                                 |  9 +++--
- tools/testing/selftests/bpf/prog_tests/rhash.c   | 34 ++++++++++++++++++
- tools/testing/selftests/bpf/progs/rhash_resize.c | 34 ++++++++++++++++++
- 6 files changed, 122 insertions(+), 20 deletions(-)
----
-base-commit: 84afebd853437e44cb71f718be11d90e4c1a59dd
-change-id: 20261103-bpf-rhtab-irqs-disabled-c4646c9e0fe2
-
-Best regards,
---  
-Mani Tofigh <mt4022@columbia.edu>
+-- 
+2.53.0
 
 
