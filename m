@@ -1,69 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.10.208.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795526701;
-	b=AfvXlhFByBtOx71X3wSizkAq6TGa8Dte+SgIdA6mkFsu8TlCLvPdVeQa00e29yvIBV/J
-	 e5xL7oT/s57crS+bTrHtNWlFGKhJ1wH+hvO3+FVw4FBzPEc/5WDKfMS0Dc+nQX3LzTVcN
-	 DPFND0q5tTjWQ/aoJeOKLDucmk2ed7qoiH+S4s6PhfT/FT9ZytLIiWcH3A70SPxzn4W6R
-	 Z7OaKjm9ulemVal7ebLej8t7+OByYubPEGeVxIL0SAxX9oW/75lLv7VUIjTiJ2rBLduu3
-	 Fxc41A0om7UN5z0xnjQdwVKKE7OAdrqpFtO2piK0hWRKJiZTX8VBt8yA7d3YfojsR0Q==
+	t=1795527185;
+	b=XKjLEQp3axflamOBpbnS/qmDu3FIcgyXclD2TNfofLoy53JzU3slWzOkhployhmDvDDW
+	 qSWhWTigG46GNg87Qbk6hrsZtT86rMTYtyiXbkrfsSFN4Eu88vKSj3CEO7ukcX6WYtkb/
+	 9mPlmDC07s0BDO9B2ndhEB3uUtfHuF1XHxIix6VG5hrAUUjmlCRsdjnI5sgimLJMlT/C3
+	 X5T7dNfGfpbQ0tBMK3NtrwN1kAo4gKSpH2jYvHcQy00p6pjPknx5Sq1HQBeayfTi+RyX4
+	 dLAztB88dvfq/B/ml38prmZLsFtt3/0WcUx0DK8tWHBzKDPQtCYMgh2b0kTtkp9ociA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795526701;
-	h=DMARC-Filter:Received:DKIM-Signature:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-Rspamd-Queue-Id;
-	bh=hPrmVEljjzeQEI/FmqGeWmopUmtwltsWl7yaWV09Xrw=;
-	b=Nqfa0nFGpqFA1flFvK9KKaMmXF4s4D59imxeNpUtlHBYBDUWsQwpBmrTyn2Wgk05kCbn
-	 TvpfRc4v0adjO5mBK3IweH3ii9RdHUyx3lcGDttUEVB81rIDhYNnelrSCTNBrR8GoZ+9g
-	 PoWI5F1eIxTun0+SCqTNZlmDOxLICMOLBDh6dEMrVmIhIpvt4fhisylMPn+mJ5A2kdr+g
-	 17UCwz1KPuBBrLbHLaZ12QfJgn2o6WjxqKjYA6kGTVxxBz23GlhzgmbBRtlDZTLxgwSL2
-	 7MucDWh0JHqWcSFHEzRZGNbkXCJQZDENGVmUh0mxoHurvrokhue6Rx6HC6TF7F9W09A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795527185;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=vbfFORKXsBUwqqx+vRWbtjSPw0l/j1sIKSEK8iegjBY=;
+	b=R/WIcghRbTg3D3sxWW51RDdQSqmgNMyh+kpHlGScARQTZgTcnaHYLQpQlWCn9WyvgCeu
+	 KRWhc2LqaUogCxhu0/phSSiloEhR0eKzkq6qnGvehdmFM7wbJQR/P9WGIYq0t84A8uz+M
+	 ZaoJME6PT1Pu1GD+d5vwYk8+E1g2DRTCuOj70XZDPlBeEDEw+Imxeel8rIUlBCMJQVJYI
+	 huQVlvS9CC03X47KXNNHcghjCa3ROe1YbuyUY1tv0FUjPrqxW1vcadXIIbMdO5buFGm6o
+	 cbX00GO8EpVFYUnyo4eFrNxjlAOOIuxDAYUPSSdrG//fvF0yllCVI0Qjpus3wobshOw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=mandelbit.com;
-	spf=pass smtp.mailfrom=mandelbit.com;
-	dkim=pass header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=hxIyBpug;
-	arc=none smtp.remote-ip=195.10.208.52
-Received: from mout-b-203.mailbox.org (mout-b-203.mailbox.org [195.10.208.52])
+	dmarc=pass header.from=protonmail.com;
+	spf=pass smtp.mailfrom=protonmail.com;
+	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=ZtBF83mw;
+	arc=none smtp.remote-ip=185.70.43.16
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73D9606A31E;
-	Tue, 24 Nov 2026 13:24:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D73D9606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mandelbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mandelbit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88034606A6A5
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 13:33:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 88034606A6A5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=mandelbit.com header.i=@mandelbit.com header.a=rsa-sha256 header.s=MBO0001 header.b=hxIyBpug
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-b-203.mailbox.org (Postfix) with ESMTPS id 4jYk7Q2mFvzLmKK;
-	Tue, 24 Nov 2026 14:24:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandelbit.com;
-	s=MBO0001; t=1795526690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=hPrmVEljjzeQEI/FmqGeWmopUmtwltsWl7yaWV09Xrw=;
-	b=hxIyBpugj9UyyXKJni4cCm5WL0cRCOpxCmn0qpQioxmJX6OEBCutkg8jRo84yr79JUW6oD
-	OGhbNbs8/aacaYSne7OVHDHlyh7XJlSKXkM1Y2/OnZm5gF42PugVhSE9kyFHS6r99M3fwp
-	Okbs+QtBovjrmR2VlTVDQYlYqGTF1AOTTbhXgdkhSJJiygw/lSfkSCLfOwrZczid4OgjJn
-	A78nybEfXJB4HhGappJU8nUAlLv9IdyXB8ofF5DJYR150QtNSLJSYAuKYXASWcSIOaMeoK
-	6YxePRLcsNAUdQoFFiEsR3WrcFLeE/bjLV74TR1f7w7uhbLjb+QRwbp9nNTojg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of antonio@mandelbit.com designates 2001:67c:2050:b231:465::202 as permitted sender) smtp.mailfrom=antonio@mandelbit.com
-From: Antonio Quartulli <antonio@mandelbit.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Antonio Quartulli <antonio@mandelbit.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] crypto: pcrypt - Refuse to wrap a pcrypt instance
-Date: Tue, 24 Nov 2026 14:24:41 +0100
-Message-ID: <20261124132443.3666372-1-antonio@mandelbit.com>
-X-Mailer: git-send-email 2.56.1
+	dkim=pass (2048-bit key, unprotected) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=ZtBF83mw
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1795527181; x=1795786381;
+	bh=vbfFORKXsBUwqqx+vRWbtjSPw0l/j1sIKSEK8iegjBY=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=ZtBF83mwxwXW/52lxLjXXm32pdT9y53MDgIhJZVyx+3iE/HAb/vh5VnY5p+VgPjYE
+	 Hb1ANSlodDXOF2FLsh3LegUyPwRS7KuAxllOYUNLi4p0c3Rgz/dupxIhFDuMZXj3d3
+	 Vi/XOw8rqpki/APzfa6bNn81uBZ2cHEA2LofooX8ZzsY+7FI6LVJwUbpUOHblXbu0e
+	 aerrb0V09j5rsicFQ4PG9ALngC+HAsdfzAIjvMTDjQC8p9WVj6uCN0VCylqCe0eidV
+	 swf6s+npKi1iWELIwAwSG4R4/u4bzOtlEDaDg0A0dV2F90vr7mBHcpWw+XThJjJ9pU
+	 9sFT8zAJX7fUA==
+Date: Tue, 24 Nov 2026 13:32:58 +0000
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+From: Ryan Prinz <rc4d5a@protonmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ryan Prinz <rc4d5a@protonmail.com>
+Subject: [PATCH] crypto: qat - fix missing DH public key validation
+Message-ID: <20261124133245.1739232-1-rc4d5a@protonmail.com>
+Feedback-ID: 190731814:user:proton
+X-Pm-Message-ID: 87716131018708394a98b4d7ad3b4712f9aa8542
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -73,50 +61,142 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4jYk7Q2mFvzLmKK
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-A pcrypt instance keeps the cra_name of the algorithm it wraps. When
-pcrypt is requested with a generic inner name, the new instance cannot
-be found by the requested name, so the request is retried and the next
-instance wraps the previous one, now the highest-priority match. Each
-retry adds a nesting level until the driver name overflows.
+qat_dh_compute_value() passes the peer's DH public value into the
+hardware queue without checking it. The only checks on req->src are
+on length (req->src_len > ctx->p_size); never on the value itself.
 
-Nesting pcrypt is pointless, so refuse it.
+crypto/dh.c's dh_is_pubkey_valid() is the generic software check for
+this: it rejects a value outside [2, p-2], but only when FIPS mode
+is enabled, and only for callers using the software implementation.
+QAT's hardware path has no equivalent check in either mode.
 
-Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto parallelization wrapper")
-Cc: stable@vger.kernel.org
-Signed-off-by: Antonio Quartulli <antonio@mandelbit.com>
+QAT registers "dh" at cra_priority 1000, versus the generic software
+implementation's 100, so any caller requesting "dh" gets this
+unvalidated path whenever a QAT device is present and the requested
+modulus size (1536/2048/3072/4096 bits) is one QAT supports;
+qat_dh_set_secret() only falls back to software for sizes outside
+that set.
+
+drivers/nvme/common/auth.c requests "ffdheNNNN(dh)" for NVMe-oF's
+in-band DH-HMAC-CHAP authentication. Three of its five supported
+group sizes, 2048, 3072 and 4096 bits, match QAT's hardware sizes.
+Forcing the derived session key Ks to a known value lets an
+attacker who holds a handshake transcript perform an offline
+brute-force attack against the pre-shared key, which is what the DH
+exchange is documented to protect against on top of plain CHAP.
+
+Fixed by validating the peer-supplied value before it reaches the
+hardware queue, rejecting any value outside [2, p-2].
+
+Fixes: 2acbb8771f6a ("crypto: qat - add param check for DH")
+Signed-off-by: Ryan Prinz <rc4d5a@protonmail.com>
 ---
-Found while enabling pcrypt for rfc7539(chacha20,poly1305) on 6.18: an
-AF_ALG bind of "pcrypt(rfc7539(chacha20,poly1305))" left 11 nested
-instances and failed with -ENAMETOOLONG. On v7.4-rc4 the same happens
-through crypto_user: each CRYPTO_MSG_NEWALG for that name adds a level.
-With this patch only one instance is created.
+No Intel QuickAssist hardware was available to reproduce this.
+Verified by building the modified driver (along with crypto/dh.c and
+crypto/kpp.c) against an unmodified kernel tree on x86_64, confirming
+the module compiles and links cleanly with no new warnings; and
+verifying the range-check arithmetic in a standalone test
+exercising the boundary values 0, 1, 2, p-2, p-1, p and a value
+larger than p, which all produced the expected accept/reject result.
 
- crypto/pcrypt.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+AI Disclosure: An AI assistant was used to assist with the
+analysis and testing. I have verified the vulnerability, the fix, and
+the test results myself and take responsibility for this contribution,
+per Documentation/process/coding-assistants.rst.
 
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 9f372442981e..d2acc64bcee3 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -271,6 +271,15 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
- 		goto err_free_inst;
- 
- 	alg = crypto_spawn_aead_alg(&ctx->spawn);
+ drivers/crypto/intel/qat/qat_common/qat_asym_algs.c | 63 +++++++++++++++++=
++++
+ 1 file changed, 63 insertions(+)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/=
+crypto/intel/qat/qat_common/qat_asym_algs.c
+index 77d59e977472..78f1b949614b 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
+@@ -216,6 +216,63 @@ static unsigned long qat_dh_fn_id(unsigned int len, bo=
+ol g2)
+ =09}
+ }
+
++/* Returns true iff 2 <=3D y <=3D p - 2, given big-endian buffers of p_siz=
+e bytes. */
++static bool qat_dh_pubkey_in_range(const u8 *y, const u8 *p_minus_1,
++=09=09=09=09   unsigned int p_size)
++{
++=09bool is_zero_or_one =3D true;
++=09unsigned int i;
 +
-+	/*
-+	 * A pcrypt instance keeps the cra_name of the algorithm it wraps, so
-+	 * the inner lookup can return an existing pcrypt instance. Do not nest.
-+	 */
-+	err = -EEXIST;
-+	if (strstarts(alg->base.cra_driver_name, "pcrypt("))
-+		goto err_free_inst;
++=09for (i =3D 0; i < p_size - 1; i++) {
++=09=09if (y[i]) {
++=09=09=09is_zero_or_one =3D false;
++=09=09=09break;
++=09=09}
++=09}
 +
- 	err = pcrypt_init_instance(aead_crypto_instance(inst), &alg->base);
- 	if (err)
- 		goto err_free_inst;
--- 
-2.56.1
++=09if (is_zero_or_one && y[p_size - 1] <=3D 1)
++=09=09return false;
++
++=09return memcmp(y, p_minus_1, p_size) < 0;
++}
++
++static int qat_dh_peer_pubkey_valid(struct qat_dh_ctx *ctx,
++=09=09=09=09    struct scatterlist *src,
++=09=09=09=09    unsigned int src_len, gfp_t flags)
++{
++=09unsigned int p_size =3D ctx->p_size;
++=09u8 *p_minus_1, *y;
++=09int i, ret =3D 0;
++
++=09if (!src_len || src_len > p_size)
++=09=09return -EINVAL;
++
++=09y =3D kzalloc(p_size, flags);
++=09if (!y)
++=09=09return -ENOMEM;
++
++=09scatterwalk_map_and_copy(y + (p_size - src_len), src, 0, src_len, 0);
++
++=09p_minus_1 =3D kmemdup(ctx->p, p_size, flags);
++=09if (!p_minus_1) {
++=09=09ret =3D -ENOMEM;
++=09=09goto free_y;
++=09}
++
++=09for (i =3D p_size - 1; i >=3D 0; i--) {
++=09=09if (p_minus_1[i]-- !=3D 0)
++=09=09=09break;
++=09}
++
++=09if (!qat_dh_pubkey_in_range(y, p_minus_1, p_size))
++=09=09ret =3D -EINVAL;
++
++=09kfree_sensitive(p_minus_1);
++free_y:
++=09kfree_sensitive(y);
++=09return ret;
++}
++
+ static int qat_dh_compute_value(struct kpp_request *req)
+ {
+ =09struct crypto_kpp *tfm =3D crypto_kpp_reqtfm(req);
+@@ -241,6 +298,12 @@ static int qat_dh_compute_value(struct kpp_request *re=
+q)
+ =09if (req->src_len > ctx->p_size)
+ =09=09return -EINVAL;
+
++=09if (req->src) {
++=09=09ret =3D qat_dh_peer_pubkey_valid(ctx, req->src, req->src_len, flags)=
+;
++=09=09if (unlikely(ret))
++=09=09=09return ret;
++=09}
++
+ =09memset(msg, '\0', sizeof(*msg));
+ =09ICP_QAT_FW_PKE_HDR_VALID_FLAG_SET(msg->pke_hdr,
+ =09=09=09=09=09  ICP_QAT_FW_COMN_REQ_FLAG_SET);
+--
+2.51.2
 
