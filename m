@@ -1,72 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795518690;
-	b=4Bmi2EbVDQaBdQ3zmfYeDmIIzwFtOyXl5HIN4u+3bYN7Ln0+Q2TBmiFaJ/9Ndm7Hwt9/
-	 2jexV6ev0McULQPWqk/RR7dQJzq69MuIerpwYBngrS3DZzclCOUwIyV5QEJ3NH666LbC3
-	 9od0xr+Fl0u8HXXqnE9Mtty8z5bP6yL14mT+Et2c+hFW9wTZbFJ2N21vmGVQsQXyKCgJk
-	 GN0ZnGFTGdt/oWFirEOzhu0EZWJyaQCiuGySLPrjxmMEroVeerTSTQTfoKapKUj78McI1
-	 4/iXQJiuCCQIMMIDlwkCYcet0FWmBu+NDzblAvMX67MOVAc2y5zcLvJuFy0oo72VmVA==
+	t=1795519764;
+	b=zXsv+ynTOc+0vQ0NcHFsVogklz3ZAti+/eYW0ByQK/FG7XmG1QAvMCqYrA5eVA257c4f
+	 J7nQ2dLetz0w4WIsFDn6KsvbRN3pH2e2GrKSf7J+vv00yo3oztiZKjzAcKmlE15mhD5C6
+	 NDxIZ3o6aAhPPaA/HMGxQhLA5waMWgWWdop8LXxJ4c+Th5VNED3V0rpjkd7+QeXct8Yfw
+	 XQdMIzUPLvNsgrw/TasKgrXrb/Zovkui6suRyrJhaWLbOD3evNhAIUgAgozpUa4qfQx/d
+	 XHxT9pcKPQIvAXNqHreSDcozAWk/y0opF5MFoT9NmGUPRhzVr5pSG6O+Yu7fEMCinyQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795518690;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795519764;
 	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
 	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
 	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
 	 Subject:Content-Type:Content-Transfer-Encoding;
-	bh=NSxrWerDVUD4OAZBVBT8f6aipq0wkqN4/k67VkANLuc=;
-	b=hJnXPsIHw5+LkmbP8EF5tjMiH5ftuT0pojON/SpCJMluSENxGehe4nC9pxNChjG624e7
-	 gn931Rb4GiGW5YZnQdZjVnDcKsvY/K0vFHlXFdJj1CewgQ7fzg9ZEqI6aTfTTlrDtasR/
-	 wURtG9BM9TovhwInErMAk8ltcVz/+SLBx0qAbPB9ckI4DJCeQbPCjslF1AdndZDnq1A1v
-	 JlA7fEqd9iD+APESFU1aNTzR/an7hV0y0V3bgkS5Qk+txHuUTUlQp+vjggYh3qNz1ibI8
-	 wwirRMSCFfjlkTvor8eg+Lx3f/N76Yc++mveXfPLzEPFZzFik0wVUka5FLjhhtimnMA==
+	bh=pXtHtsZoNfv0qMhggWoMh6/Hrs7VJgKYLWO8UN74DcA=;
+	b=JjSdXz6fOObVPpy9wKnVPBB16buIv4byvEuVT6GF0Q0AAr7OkpV9mHeGp4Bb3y3AtNZs
+	 8RT0S9RJTlqN7F9VjJ7l1WR8Oz9UXq3ejOZH6a+WRmH2143Gru8eMPJ1O6EQqg+wHrSFm
+	 9mB/VCNtvr9b285VIHq5LNuuxEiocNpbZ4c66KZg+tIXZZPEazaOUYi0dIv/C3TSjozUj
+	 2pKUfk/D+7voSvX4lgeR8/bPLLayRocw3pSBTQSKV80QAf6Asdltx9ICBaHKMpagxB4Zj
+	 OpVdUYyXnIESp2wFXIxk1P4Z76A6p/+9VMINKuKsIuR+PydEJr3g+Us89JmBUsAY2tg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PjsSqSr9;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bsHD6ivX;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18AEC606A32C
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 11:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3EC606A31E
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 11:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PjsSqSr9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31CB21F000D8;
-	Tue, 24 Nov 2026 11:11:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bsHD6ivX
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00E8C1F000D2;
+	Tue, 24 Nov 2026 11:29:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795518689;
-	bh=NSxrWerDVUD4OAZBVBT8f6aipq0wkqN4/k67VkANLuc=;
+	s=k20260515; t=1795519764;
+	bh=pXtHtsZoNfv0qMhggWoMh6/Hrs7VJgKYLWO8UN74DcA=;
 	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=PjsSqSr9u0NwFamvOlvxXG5jxpGF8/FSmZhX6+Bo6m7HT3SqSUPPVQuLNJksDFNR6
-	 /6HxtlId/Qhw3djIMN8D1FCzkvrI5FZmPjVLhKoF+WCeimYWCJGuks+SW8y8v49XI7
-	 3HuuchP0WFbqun419aD2PLnzJHbgH5GbCba3PKF4KCAWjR5Y1BS5C+ISshY3T/Gbqp
-	 lrxCZ+BLi+QW4xMapcp8tuDJQA9R/MS+vtjoT/MkRmOEzCiGFoCbISwR0WteiipYr4
-	 ZQX0Q/IUP0XuRCQF7RpJLSf/DEVkjZynj15ryWAJ+bT3QBIEpPGecG8ZWfpURO8pmr
-	 KRBqLRHD0RSbw==
+	b=bsHD6ivXuoljUVEDIpzqTvSselInCbK68+8SY1CQtsTtP+tw0ukfh9fvdCagAXygT
+	 /IWEUqpu07w3L8pNktMHF3e3jrd4JFP8noddJrqb+NKuOqm1ZfaDR9h3i/8NjoQ/vq
+	 JJMTc6w9JXrsWoXYeC4IJsCNEyTRKAIdu8OjO2Ml+GG6IaPEBueeNR8vtix/X4txQ1
+	 GVhZpWDgse3gmC1uAeg4AJCnVPy7EmW7rTLxNY/nVSwgQimdSRbeS/pR+mh2wFskbQ
+	 O+/DYGB99PLqjAcf6WDFFxk1SpLl92HLanZAf2bDMBrzr6aaYeJ98ZmIoNVaS+ga1t
+	 /1kwm2Yz+yojA==
 Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfauth.ams.internal (Postfix) with ESMTP id 95AC41980047;
-	Tue, 24 Nov 2026 06:11:27 -0500 (EST)
+	by mailfauth.ams.internal (Postfix) with ESMTP id 4F4FF198003A;
+	Tue, 24 Nov 2026 06:29:22 -0500 (EST)
 Received: from ams-imap-11 ([10.64.2.31])
-  by ams-compute-02.internal (MEProxy); Tue, 24 Nov 2026 06:11:27 -0500
-X-ME-Sender: <xms:33AFa8rjZyxVEuWiZPC8MB_b4jHBfwm9CcaCxHmYDZPQiPt0OOjIrg>
-    <xme:33AFa9dMqkTCvGvwQHbyCq8tx2uAuQDeOsCA_09gfeJUzSvKzzYRBvkseXqFB0q5D
-    gVwfAWb6uFQOdKhoyF6iaOLwyaIDbHBC5LktkG09mqrz1U02XvsH-s>
-X-ME-Proxy-Cause: dmFkZTGOqtGOvzr+VHUOxMo62cqM3udAVEWtGm22R9C85i1IVw07DOw5z2ne0UbiNMh3Xm
-    md+GqwxSY9YeA+u7WrSm1o/Iwt5fVYlNT6Rsxey8TbBpc29g4327/k4zoECWwlgoQjSdP8
-    gevWXgQn+9CGUGzeIn3zuBxRn7KDZk+L2PwRnD7OT/3bUdEK7vnfxBTzZjQzJwnQFHYhdU
-    0OhD1l0I7go5ZfQ/Eb70CrXOhS+RPON65NrktViFQjVmX7U5XBK80Ey6SsPS82P1i03bQi
-    H52PoxI+SFo4ADW0smVxhYLHOR7CwWlEM4uA1cc6XpvSJfXGrkTH+xRnFvi3FojshcoCWK
-    LZTyALPT6f986gSIJOJZC5Z3h6YXK8EFzeqHiLaBcgY0ii/lMVGteLw5ZiKGH8BHPfDSiG
-    qDmOnlTFRrmeniZG2tDvVGB/VhZU384XSPFOh8Kx8sEjMhusaEw4wxyEDPYdeB5uZJZeh6
-    wTiwdDHvVlhMvh2mazuoUxd0PagzOZBCEFOV/qyZU2ahsZfSyEQTNd+usaRK6vEyjiJcY1
-    /pfqhYpVWqty1u9txqVhG08Yl0OJtCO4FPKNYRIy4qexrWTUQ0IeeqdAm8wPo+y7DU+qmJ
-    CP3y9EvNCgqAh40Ac1RX1GdVgabuM1uqFT+xZ4a3+HyxxpLwG+7MC5PKJ7YQ
-X-ME-Proxy: <xmx:33AFa0iKJX7EYL6NBrUcto04R7fH6f2YX17BlD8wYkF-Uror-7evnA>
-    <xmx:33AFa9v-R-kJ0ZhOBjbV3HNtVlAakUHdK5vv2lsD90LAl3lnwh8wfw>
-    <xmx:33AFa6QZOSZ69OLcUhnUoISdnBa4QwHuaSbyxXeAtYbPHS14Qp1aeQ>
-    <xmx:33AFa52i1sBhWrwcDG3QS61ufurCkEBxlXbcHYgdCWILhOWIA3KPgg>
-    <xmx:33AFa3umEnQbsyl_9BqjvsZUmmx2YYQ2NP5n-51r2PaLY_qGQ4tgj_QK>
+  by ams-compute-02.internal (MEProxy); Tue, 24 Nov 2026 06:29:22 -0500
+X-ME-Sender: <xms:EHUFa17Z8x9JKlyqvzHMFh7tHanSVoAy5jUPPJDAExj5Wt2BxINEkA>
+    <xme:EHUFa9vUVHIglVJPsQ2fsnib-WMw0XIZOnLfB2YirSoxt7NSnx9aKZPhv2tSK3Cx4
+    sxeUvspW9c3jvkhGnar2V-uMifpSDqhtL01-ubk2PZyXEL4eSsdB-ZE>
+X-ME-Proxy-Cause: dmFkZTFtfxC8Oas3461N9p3SxIa6xhDg1wMh1Bpd5achPsjmIQ1Nr5xT8yo6b8PY9DvhEn
+    ggzrNs1e8P/xEGpDlpVr4UOhHhgCNrkFHxqk585ggELGYVm9bSwE29Zs5mB2psd4QC6sKi
+    gwCBItyJq4iyihRaGjVRi5TfgE7wxl6Ejo32qRZBxo52+AYUcA8uhXmQag888DxB3AobC/
+    Ck6OUDGjGuBKj1wLJ7N2n+yyRMXpqvyAzU26yWZjbGsYcOeCZjS5a57dMGKJPUiPgHsqus
+    bguB0cMg1DEfM0KIThnkjfzcdLdtTRjvync7Xt2aMT1nCD4h4J12HMWLAn0z5WlnYFOFlb
+    vGkelUyhX1W6N2jl9Zqt4E6KgBld1tbOofzyJhTvb4Y0/i/joMJuNd2nT0w8NOUarvd4Hg
+    slqw5jv3OLLUX30zoHlFe45sPMi7Hlb0P283KeX779bVXJ/gy3V4DKOvKC+hmwWQCCAOB2
+    eptNS8koApbFeTUD/WyW2dBLxa2opLYIRkczOIK9NegK2AU08KVKr8EO8JEIPHcV/brLSi
+    1oFI2j7LXbiKjiGAe8Ru2VdElVPZKmd4SyMwOz5lmo/D4KE9D72F46rgpPBqfgHV3v/CW+
+    tQW9dA3GjbwibeHlcpZ/Uxt/OheQDiGEw32wIBKGAqCbBgVs/FgX2vU7872Q
+X-ME-Proxy: <xmx:EnUFa4voJhpgLa7QuGxfpY_EvotXDRYcxolWUFP5xexEhubrN_8Wnw>
+    <xmx:EnUFa5ImE_lZBjRv0jKMYezE4o6m_nX5_Enr-X4IM2ZgOSVgoSOYcQ>
+    <xmx:EnUFa9nyKbW-pHShQgExEs8G_qRXiHiUsCSmvEWhuBiiLS9q70t_bQ>
+    <xmx:EnUFayLMBMWJlyewqmu0aNv_7UCv7e4g93SosR6lNx_oAiLUfZxkBA>
+    <xmx:EnUFa65FP0T06CmXpFHSKzZU0zbngZBj0AhZvy6O91Kc8Yqr1PA1-l_u>
 Feedback-ID: ice86485a:Fastmail
 Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 40077F80093; Tue, 24 Nov 2026 06:11:27 -0500 (EST)
+	id 83F11F80096; Tue, 24 Nov 2026 06:29:20 -0500 (EST)
 X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,50 +77,50 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Date: Tue, 24 Nov 2026 12:11:06 +0100
+Date: Tue, 24 Nov 2026 12:27:22 +0100
 From: "Ard Biesheuvel" <ardb@kernel.org>
 To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
 Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- linux-arm-kernel@lists.infradead.org,
- "Emanuele Rocca" <emanuele.rocca@arm.com>
-Message-Id: <fda20d6c-34c1-48fe-9c95-c25db12e9d4c@app.fastmail.com>
-In-Reply-To: <20261114204245.67919-1-ebiggers@kernel.org>
-References: <20261114204245.67919-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: arm64/sha3: Use assembler for sha3 instructions
+ "Herbert Xu" <herbert@gondor.apana.org.au>, x86@kernel.org
+Message-Id: <1a78f7c9-59de-4ac4-8adf-aee0538d813c@app.fastmail.com>
+In-Reply-To: <20261122022030.296468-1-ebiggers@kernel.org>
+References: <20261122022030.296468-1-ebiggers@kernel.org>
+Subject: Re: [PATCH 0/8] lib/crypto: De-bloat and optimize sha512-ssse3-asm.S
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
-
-On Sat, 14 Nov 2026, at 21:42, Eric Biggers wrote:
-> All supported assemblers (binutils 2.30 and later, and clang 17.0.1 and
-> later) support the sha3 instructions now.
+On Sun, 22 Nov 2026, at 03:20, Eric Biggers wrote:
+> This series reduces the text size of sha512-ssse3-asm.o by over 10 KB,
+> eliminates an excessively large stack frame that wasn't being zeroized,
+> and implements various additional optimizations.  Many of these
+> optimizations were already being used in other code such as
+> sha512-avx2-asm.o; this older file was just never updated properly.
 >
-> Therefore, drop the use of '.inst' in sha3-ce-core.S and just have the
-> assembler generate the instructions.
+> I don't have access to an x86_64 CPU that lacks AVX2 support, but
+> running this code on a more recent CPU shows a 30% increase in SHA-512
+> throughput.  Since the benefit of the 'shld' hack in sha512-avx-asm.S on
+> Sandy Bridge was allegedly 20%, it's plausible that this more than
+> closes the gap after the removal of that file.  But even if it doesn't,
+> it should be a worthwhile cleanup, especially because of the text and
+> stack size reductions and increased consistency with other files.
 >
-> This requires adding '.arch armv8.2-a+sha3'.  I also tried just
-> '.arch_extension sha3', but that doesn't work with binutils 2.40 and
-> earlier because they consider sha3 to depend on armv8.2-a or later (and
-> this file isn't built with -march=armv8.2-a or later).  This was fixed
-> in binutils 2.41 commit 205e4380c800, but the kernel currently supports
-> binutils 2.30 and later.
+> Patch 1 is an updated version of
+> https://lore.kernel.org/linux-crypto/20261112082839.414786-3-ebiggers@kernel.org/
 >
-> Also prefix the immediate operands to 'xar' with '#', now that they no
-> longer need to be plain numbers to generate an .inst.  This isn't
-> required, but it follows the standard convention for immediates in arm64
-> assembly, including elsewhere in the same file.
->
-> No change in the resulting .text section with either binutils or clang.
->
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->
-> This patch is intended to be taken through libcrypto-next
->
->  lib/crypto/arm64/sha3-ce-core.S | 73 ++++++++++++---------------------
->  1 file changed, 26 insertions(+), 47 deletions(-)
+> Eric Biggers (8):
+>   lib/crypto: x86/sha512: Partially roll up sha512_transform_ssse3()
+>   lib/crypto: x86/sha512: Keep message schedule in XMM registers
+>   lib/crypto: x86/sha512: Keep W[t]+K[t] in %xmm5 instead of stack
+>   lib/crypto: x86/sha512: Keep XMM_QWORD_BSWAP in %xmm14 across blocks
+>   lib/crypto: x86/sha512: Use pshufb for ror64(x, 8) in SSSE3 s0
+>   lib/crypto: x86/sha512: Keep state in registers across blocks in SSSE3
+>   lib/crypto: x86/sha512: Shorten critical-path additions in SSSE3
+>   lib/crypto: x86/sha512: Use local labels for data
 >
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+I gave this a spin on my Sandy Bridge machine, which indeed takes a 20%
+performance hit from removing the AVX version.
+
+These changes regress it by another 3-4%
+
