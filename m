@@ -1,71 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.220
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795505953;
-	b=aNcFOA87th0NADw+BAaa+NcGnaOI4LzpFWBl1PuxdZATMe4C1uismwJLJUj4h6tf5YEM
-	 v2xIM/qtuKmX5pe5nMXb2B9eYJp/5ddMhI5GPFFguhj/QpsGD3eSor1xWm4vhobteKJeq
-	 aLLHPYoF/RFkTYZFialtZd26iXdtDeTq5kFv/C/qSDPHPDtJ0ejZ+K2Aynr78SYIOEX1Z
-	 bGGDGCvuvnwmtQWIei09EWLSNqn06tCYHKWm1LM5222clAXBNYEmWgb0Yp7p9cINvKVuF
-	 d2lOdlxEAoauNlDeooSPt92OSMst6yC9Fs6YwEqglkjlzffRDqp1QJfsd08j3BFIFew==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795505953;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:Subject:To:CC:
-	 References:From:Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Originating-IP:
-	 X-ClientProxiedBy;
-	bh=zcwYIX9noGJ34U9bJlk+mPUn4i8ykxi3zI14C+8G2qg=;
-	b=TiNF9ak4WH/c1ilr+9wzoxWx5YslCSHchB1pnberIgTCWwDwNjaN58tVS6gOWSKCwYGz
-	 cTg/vEDyTm6R+wBZFX2n/HcMbZNDsxDBKOMhBq44RSsDFzsZ805eZkLh5zxbM5pLx8XCr
-	 5wUoxe9mGDxZ39zUui4R92MsyE1sN47RQ2fg3nWIObis/4temsXpZv0jcpIpa9xOMT2k+
-	 /fVkwgddNlxyXXfs8w2FZsnJ6rrfv7e7BVbbcnddlnBlMMeN/RyBzQB+a+Ig2SgQb1v28
-	 4MMM79PYa5n32Yvb+zLpxIC1qZryi7MRy8kP1QkUFyQ3dqE2WzF+h+clqPsuIybhxow==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Fw07X7In;
-	arc=none smtp.remote-ip=113.46.200.220
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795508427;
+	b=mO1Amdvx6Rzv90iRAXvm9ZI5hVPP1YXRt+jT1A6w+wXyVn+JO8x8zZscNRPEtmrbt5R4
+	 9iMSiWLaC7Cg49mnTvUI7Wl/vfn51BPYnWTpC8urIefP/UGgMcTmKqZM9d7/i+Xk9QryX
+	 qBEkmkn/62lBkgxyNWjaHBdHF6UJ6zpcC/AmbWZjFxYvWXDKtDIJyhVFzTL9jVs4Ky2zp
+	 f9TI3UqtiUMj4OIcJSbY33XRNiT6uomwAQUMTcCJUIJ9+l9YQNnAP9a13VCka0GE0G72q
+	 m2dB9jRZuGLMLRgU0cjhAT7CIUbQ/J0GTIGjyOU0rG5xFkdmJAdXCQNjZwRmn35sPHA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795508427;
+	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=vHAwwH0nrw1kWkp/3uuQPolxLVo5Vn3FF3b+N7bJNoo=;
+	b=chcFvWnxVNkowBYdGN5zmKBcuIVn0441WeA7u2Q0bx1y5Z2qMQTplaIfE/P+hzlj011X
+	 TJXu4rNtiRbxHGEqAbLf7FUlFq2aJltdRSrv6ksJ+8Dw5eXhVedVjtNxp+csqo1bWzTIG
+	 NfYVsUgTC7FYBVmp9tKgpZhh3qz4FfHNobuwV4+IqNu2XxISXG6B1SaWHiXLS93oKnx1v
+	 NqFmSeBI3KiP0PBBWzEQlKbKPVapK1gh5lffA5k/ODigVBofj1ReUUv5cfmPYiJ9D/Tsm
+	 zS5a84I7WvFv5xH2/adbVUjQCr+9PQAYUJ28vcXce4siL9Kj1VEzA2WeN6nQ1xQ6kdw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oem4yEc1;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3642606A31E;
+	Tue, 24 Nov 2026 08:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oem4yEc1
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795508427;
+	b=nYuT1h+wPIovyujRPxP3EWJ/4IDwiRWTCh6dJvnp6hQ+OICyCyqHN1O9jzhjczd5hORN
+	 9Ghda3m5TBeA4gD3yPFB1jSXe4oeJLLZ3yvNuzZHiqKExvNCz4ZkM1rHH/L+ZvMkRdxIO
+	 BvlFus+/1xdXIFST9y+122TMruFbDSqUv3lq/WVnRe8AW747nInTysdnYCxpOq38D6Ma/
+	 olhnUDDEj4EmBJOWMwZIZNxmAb7OWfzSFlIWzuUCY+590wh6aqon1jqtQtaS2G8bzmzdO
+	 Va7k+jtz4rq6jgD+jAPeN2vLTICWRzoKFVR4tgAYqHcNEx2nueOnaTNgq8z6mqOL8FQ==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795508427;
+	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=vHAwwH0nrw1kWkp/3uuQPolxLVo5Vn3FF3b+N7bJNoo=;
+	b=hQIJ9tUXsRDME+jZFnHbhbw+oFLkfRB/2IgWzb9TJH3zCB1O8EA5lBbCgIaNE0Ysw1rT
+	 GId3fTql8C8aNQwRru6bIrOfr3mrCp4B0fapr1l8lukLdOczUYopc2WLFEx43AMokuLwM
+	 qNstODrF8jkscIh1s5U4q7Sy+VkdmyZmcmSr04yNOC+LeUQWMiJmZvEWr8FPda5HJds7d
+	 3iqxq+0gwzDKVXZt92LXemKqTULGHWrFN16TWz6W9UJvJpQkEZHgUgrKNNo8QmKgdESOa
+	 w7bea+zXuES6to+ArWgNNGWMiUSZ8VeNvR+12MGQKvgz3sUH+swb1akrJvbHY8CUWqA==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14484606A31E;
-	Tue, 24 Nov 2026 07:39:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 14484606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=Fw07X7In
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=zcwYIX9noGJ34U9bJlk+mPUn4i8ykxi3zI14C+8G2qg=;
-	b=Fw07X7Inkjc4jnSDcQlOaorq3qgBitF0sj4wTow7JidAYA8rJPCNq/FblkRNLW02UhfruEaob
-	afsO+IMGeFzV/7pPXEMEyrMmVNZtn5YYCLWi+jOs/sa8xk8MNapETZ1vPoJXUCrXkei+jHp9s2b
-	RZaPODL8ZPhhWseScDY49jE=
-Received: from mail.maildlp.com (unknown [172.19.162.223])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4jYZRV4t7Tz12LCv;
-	Tue, 24 Nov 2026 15:38:14 +0800 (CST)
-Received: from whupemk100014.china.huawei.com (unknown [7.152.184.20])
-	by mail.maildlp.com (Postfix) with ESMTPS id 70DF640575;
-	Tue, 24 Nov 2026 15:39:03 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- whupemk100014.china.huawei.com (7.152.184.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.56; Tue, 24 Nov 2026 15:39:02 +0800
-Subject: Re: [PATCH 05/10] crypto: hisilicon/hpre - Fix buffer overflow on odd
- ECDH input size
-To: Lee Jones <lee@kernel.org>, Zhiqi Song <songzhiqi1@huawei.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Weili
- Qian <qianweili@huawei.com>, Zaibo Xu <xuzaibo@huawei.com>, Meng Yu
-	<yumeng18@huawei.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <stable@vger.kernel.org>
-References: <20261123151055.2533735-1-lee@kernel.org>
- <20261123151055.2533735-6-lee@kernel.org>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <c468acae-dca2-f132-ced8-fe9911ccc6ee@huawei.com>
-Date: Tue, 24 Nov 2026 15:39:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	by smtp.kernel.org (Postfix) with ESMTPS id 6A0641F000CA;
+	Tue, 24 Nov 2026 08:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795508426;
+	bh=vHAwwH0nrw1kWkp/3uuQPolxLVo5Vn3FF3b+N7bJNoo=;
+	h=From:Subject:Date:To:Cc:Reply-To;
+	b=oem4yEc17cD03osCxkd03IdOaJl52/AFXRqwpi8QHEFGSrHFHuObc5ExsFnGREACS
+	 c3Hbif08Jhnke8u7NOa6Jo+cBvZlG/zMPzWFT0dUUMlYW9e84AicGee01Eg5ijUpRC
+	 njygloo0XXOD8g367mWyubwA85UjlSfZ3/+QoY/+fW5f8wmjqifx9SpkzpH06LiVTh
+	 mCeFzY77J+hfDj9rA055xTQop/rWwizziBvPB938jCudid9dCINkki8ick5z2WjvQ2
+	 x0FxnyyHB1t5bm9xJFWEE6tWGP/VXEs1qbUIZeHWNYHOFl14IlBwZiE/lnGvuDrA7K
+	 DiJz3li5z99Vg==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id C27F44C936;
+	Tue, 24 Nov 2026 08:20:20 +0000 (UTC)
+From: Fil Dunsky via B4 Relay <devnull+filipp.dunsky.gmail.com@kernel.org>
+Subject: [PATCH v2 0/3] hwrng: Add Cortina Systems CS7542 random number
+ generator
+Date: Tue, 24 Nov 2026 11:20:18 +0300
+Message-Id: <20261124-b4-cs7542-trng-v2-0-0192937b44be@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -75,57 +84,99 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-In-Reply-To: <20261123151055.2533735-6-lee@kernel.org>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- whupemk100014.china.huawei.com (7.152.184.20)
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNQQ6CQAxFr0K6toYW0Iwr72FYwNCBGmHMDBIN4
+ e4Crl2+5P33Z4gSVCJckhmCTBrVDyvwIQHbVUMrqM3KwCmfiDjDOkcbz0XOOIahRaqoNo5skxm
+ GdfQM4vS9B2/lj+Orvosdt8pmdBpHHz7740Sb9zc+EaZouDHOWZEio2vbV/o4Wt9DuSzLF42tz
+ Ue+AAAA
+X-Change-ID: 20261123-b4-cs7542-trng-1a1b9f1cd392
+To: Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795508418; l=3072;
+ i=filipp.dunsky@gmail.com; s=20260930; h=from:subject:message-id;
+ bh=cxbkSaTDthKEwcdkWgVbloUCaiiY0AcMv8pFTjp9QIY=;
+ b=53TlVVtccxEE5Rny7rrzitIWySScAbfYdvVN7aGSCRuTe/5xfYgQIYtLG3Y1kv4pLedC+Kun+
+ xn2+1/utxFuCpHLs4nFGqyItpLVt+eLQie7bqurJ7vgqJXOInDPxtSY
+X-Developer-Key: i=filipp.dunsky@gmail.com; a=ed25519;
+ pk=JAYP8e2rJ54DHOmhNtXud8rl1igAaAXoOHxtJmVXI1g=
+X-Endpoint-Received: by B4 Relay for filipp.dunsky@gmail.com/20260930 with
+ auth_id=1085
+X-Original-From: Fil Dunsky <filipp.dunsky@gmail.com>
+Reply-To: filipp.dunsky@gmail.com
 
-On 2026/11/23 23:09, Lee Jones wrote:
-> hpre_ecdh_src_data_init() validates the input public key length using
-> ctx->key_sz - (len >> 1) < 0 before copying len bytes into the upper
-> half (offset ctx->key_sz << 1) of a (ctx->key_sz << 2)-byte coherent
-> DMA buffer.
-> 
-> Because len >> 1 truncates the least significant bit, an odd input
-> length of (ctx->key_sz << 1) + 1 (such as 65 bytes for NIST P-256)
-> evaluates shift to 0, bypasses the bounds check, and writes one byte
-> past the end of the coherent DMA allocation in
-> scatterwalk_map_and_copy().  A zero length when ctx->key_sz is unset
-> similarly bypasses the check.
-> 
-> Reject zero, odd, or oversized lengths explicitly before computing the
-> coordinate offset.
-> 
-> Fixes: 05e7b906aa7c ("crypto: hisilicon/hpre - add 'ECDH' algorithm")
-> Closes: https://sashiko.dev/#/bug/linux-42c6cdd1-7f7e-4071-bb2f-a4db5935267e
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Lee Jones <lee@kernel.org>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_crypto.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-> index 66a276786a7d..78ae987d338a 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-> +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-> @@ -1484,9 +1484,10 @@ static int hpre_ecdh_src_data_init(struct hpre_asym_request *hpre_req,
->  	int shift;
->  
->  	/* Src_data include gx and gy. */
-> +	if (unlikely(!len || (len & 1) || len > (ctx->key_sz << 1)))
-> +		return -EINVAL;
-> +
->  	shift = ctx->key_sz - (len >> 1);
-> -	if (unlikely(shift < 0))
-> -		return -EINVAL;
->
+Add the Elliptic random number generator integrated in the CS7542,
+based on the GPL vendor and OpenWrt implementations. Use a syscon
+regmap for its shared global scratch bit and provide bounded polling,
+nonblocking pending requests and partial output through the hwrng core.
 
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+Hardware ring reseeding is limited to the documented CS7542 A1 path.
+The vendor driver avoids it on A0 for erratum 28891 and substitutes a
+RTC/timer-derived nonce. Reject unsupported revisions using the global
+syscon identification register instead of adopting that workaround.
+The saved Almond+ capture identifies the tested board as CS7542 A1.
 
-Thanks!
-Longfang.
+The binding, driver and MAINTAINERS entry apply to Linux v7.4-rc4
+without the pending CS75xx platform or clock/pinctrl series.
 
->  	ptr = dma_alloc_coherent(dev, ctx->key_sz << 2, &dma, gfp);
->  	if (unlikely(!ptr))
-> 
+The existing OpenWrt entropy quality setting of 512 is retained for
+review. The output smoke tests do not establish an entropy estimate.
+
+The v1 sources passed binding/example checks, ARM built-in and module
+builds and RAM hardware smoke tests on Almond+. The hardware test
+returned EAGAIN for the first nonblocking read, then provided 4096
+bytes without all-zero or repeated-block output.
+
+No additional hardware run is claimed for v2. The generating path on
+A1 is unchanged; revision checks and their error paths were tested
+with the actual C code and mocked resource/regmap/hwrng interfaces.
+Full ARM W=1 built-in and module builds were repeated for v2.
+
+---
+Changes in v2:
+- Drop the redundant linux/mod_devicetable.h include as suggested by
+  Uwe Kleine-König. The existing linux/of.h provides the OF device ID.
+- Restrict hardware reseeding to CS7542 A1 after inspecting the vendor
+  erratum 28891 workaround. Propagate revision-read failures and reject
+  unsupported silicon before registering the hwrng.
+- Describe the hardware revision restriction and identification register
+  in the binding.
+- Link to v1: https://lore.kernel.org/all/20261123-b4-cs7542-trng-v1-0-92d9ffcee531@gmail.com/
+
+To: Fil Dunsky <filipp.dunsky@gmail.com>
+To: Olivia Mackall <olivia@selenic.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Rob Herring <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>
+To: Conor Dooley <conor+dt@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Cc: devicetree@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+Fil Dunsky (3):
+      dt-bindings: rng: Add Cortina Systems CS7542 TRNG
+      hwrng: Add Cortina Systems CS7542 TRNG driver
+      MAINTAINERS: Add Cortina Systems CS7542 TRNG support
+
+ .../bindings/rng/cortina,cs7542-trng.yaml          |  43 +++++
+ MAINTAINERS                                        |   7 +
+ drivers/char/hw_random/Kconfig                     |  11 ++
+ drivers/char/hw_random/Makefile                    |   1 +
+ drivers/char/hw_random/cs75xx-trng.c               | 187 +++++++++++++++++++++
+ 5 files changed, 249 insertions(+)
+---
+base-commit: b6a9fa34ce4187cb69d3c588a4bbffc31ce5db8f
+change-id: 20261123-b4-cs7542-trng-1a1b9f1cd392
+
+Best regards,
+--  
+Fil Dunsky <filipp.dunsky@gmail.com>
+
+
