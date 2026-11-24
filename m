@@ -1,68 +1,82 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795542816;
-	b=WBOV2c9Z1NyiotXjtZIko+jIP516giDco1uz5CzAsV3b76rHpy5dbTZ6XlaFc/uPUv/3
-	 aLWJpWCAIcDL2H5zH7OzLVSQ655qgwfeeoH4SoGFdgREglwHhgCjTZd0/nUu8H6sRqwUw
-	 BDhs+1HNIZR6oRq6lsopX67oOSR0J1vYKfNgaf6l1Sp6V1GrrGP2yj4/mzu84RD5tzQL7
-	 cr+4vT1SET/87zhyHZALUy5iKK7Wqs5bGlBa9gmC7TmeUmNS9EK2sXFTQLleEsANvez+s
-	 vUHPj35LMQ9VAiebuT4b834UXWTZO3FOP/sg86S24sJ4cDKY8z97VgM7fPYNEkKMsEQ==
+	t=1795549259;
+	b=jswa7ryYScv1SkuSHURsyceT0qZqB/m17ftShXTqRi0Z2+G08muS9NIQbQObxiadvwVw
+	 7PdL5/gzymUdrdF1Jty0c8N6U+/Q99Pw0CT4lKos/JkJlj/fuA1Z635DXZiQe9Hf/sfCT
+	 LczoFfh+wBVeefNvNWxIntQTIVBpHRekHXUV60SqKQFNf2swwFL6gt4+1uxyvlYkZqd5x
+	 c6EkyUEV3W3zXL6sKXlw5G3BLu4DTi1hcwdDL+Ve5h62kE+e/rF0dR7XboKxoKtykxWsI
+	 O5JRCxQj7PbYgJhhn3JcYfTPxoGkOO4FmV1afIp5aTho8wWumu0ftJk0CVIT3squU+Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795542816;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=UM8r3RrjmSLVAs4cg3MYCKzmXpYfatwbT/NH7sSmYbU=;
-	b=BEsWWKHOcRHIh0N+ULzCXm8kVbOP77E218kWf857OjiclYms0gajEUJ3kzUlb10Ts8NR
-	 i0yo25LjiHWB7pNQ6TkiekDs+Q2tYVkytXhV2bK6BW7Biv3v4PRwzOG58W7kqfntbPOXy
-	 d/yljVJlEvtNPPZg9TseQjBXJbWPQxif80Dc3+12q4kZxFTWqiYoQtAcFI41XgSMxWTRE
-	 vDQdYdqdedzcpdMaMa4BQw/+UZTEmSBzzskyCb3flbid4/3QwFXE23z5L4RpOW9M8taHU
-	 z94+UFljAEMJ/dwSdfwe7ov3Df/vQyWpP+w3i7YCUjX3ZU85Y6t6Abbw8Z3SBFza1Ng==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795549259;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=LHqHO1EC5Q8lhlO2IQqnJIte+jm6Q9cOy3P7kiBx1qc=;
+	b=uSyYHkMjjrPWZq2yzcE4I2FMMUCZBqxvcAeHeDqNm6bGXPqdNnTdON5bNYZ9nRoKvP7/
+	 57nsahfC7YrBGUKBlbq4D2RLKg8rWx1vg9GDfS7t+lJXMouAOkxpGFBVaYYzKYdoyursL
+	 /Ka68tyePOyPKfYlhneI9aB975PGs3T/6/OQtzHOCx8yX221s9313e88KyHl/VCJafJrU
+	 CK6fIN06jhWt8yr7KSxmVqheFdbHR/P16Jt/Jh4l4yYBXEQxC8t0fk1yn9jnxnfBxw+C2
+	 8tWk93yjDab57jxETpIMqLOlV+V7sNetqVhQeVJIVj7hWWR4YUjymzTr0swUZuWM4Wg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Yp/Wz8Ey";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JLlpaEf2;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 3DC8D606A31E;
-	Tue, 24 Nov 2026 17:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 26365606A31E;
+	Tue, 24 Nov 2026 19:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Yp/Wz8Ey
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id DED4F1F000C0;
-	Tue, 24 Nov 2026 17:53:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JLlpaEf2
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 5E9B71F000C4;
+	Tue, 24 Nov 2026 19:40:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795542815;
-	bh=UM8r3RrjmSLVAs4cg3MYCKzmXpYfatwbT/NH7sSmYbU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Yp/Wz8EyDw8mQFUJN21YmJp0d4VR0WIlM/zUKeSQBzLGvT/8eRoB7ajr84lpPyPkD
-	 lhVgbcJcn85m5CBNpxglcvakFE2ix61YYZas43+Ym0BgZnHirlL5PwBTx9+1rTZWku
-	 15vAC0P8pJjEYGCe+m7jyaQI6mhIzvF1nbdi7qf/NC4gT7CUbVZnMeL2XXJl0HYcAc
-	 0dDOtTxQAleWaApUMILPJj3d07N4WxUf2heyerujXCmKJE+aROeCXlfKvd0ROsCwZO
-	 QU0S1HXxEhhrrPEt9C23stWUd3fVpG+H6Z4LDVB4wmXfvx1xCEaGoN0R+iD1ST0pS3
-	 7CMheNuHIJHgQ==
-Date: Tue, 24 Nov 2026 19:53:31 +0200
+	s=k20260515; t=1795549258;
+	bh=LHqHO1EC5Q8lhlO2IQqnJIte+jm6Q9cOy3P7kiBx1qc=;
+	h=From:To:Cc:Subject:Date;
+	b=JLlpaEf2AGd54aHapY1NyDO/qjlQpABo78wqpM9vOI+EKH2rV9K6SwxrrdayISzI/
+	 1uGpmQUM7qyg0VZYFMQ++r8SmFwwKQTrQqK6UiGPXyJPg2mj39J9Su6WoMFVesjhsl
+	 fNzG03g2jLHPFiQdLB1x3JREZqEF5rM2pr7erw90cXLf6LeXxponWSKTcAwAz0ixl6
+	 VLR/67KJFqMShbcFfSAoT+usBJAirryyl432NIhAAzFdtGi9wfXHREUlmBlmF40sY4
+	 oL5PxpRx0adXAzfKGNqOf80/7dhQoA5Xv/WsUh31a2tuMZhd/KMQuv2bVcA92bhYYh
+	 E9Po2eLdZzi/A==
 From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Florian Bauckholt <florian.bauckholt@cispa.de>
-Cc: Rodolfo Giometti <giometti@enneenne.com>,
-	David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+To: keyrings@vger.kernel.org
+Cc: Jarkko Sakkinen <jarkko@kernel.org>,
+	dm-devel@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	Ahmad Fatoum <a.fatoum@pengutronix.de>,
+	Alasdair Kergon <agk@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	David Gstir <david@sigma-star.at>,
+	David Howells <dhowells@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>, Hui Peng <benquike@gmail.com>,
-	Stefan Berger <stefanb@linux.ibm.com>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Guicai Ma <maguicai@kylinos.cn>
-Subject: Re: [PATCH v2 1/2] KEYS: fix signature length passed to
- KEYCTL_PKEY_VERIFY
-Message-ID: <awXPG9RspYmccps2@kernel.org>
-References: <20261119-keyctl-pkey-fixes-v2-0-9e2d1c7db7ec@cispa.de>
- <20261119-keyctl-pkey-fixes-v2-1-9e2d1c7db7ec@cispa.de>
- <80ded1ae-51a7-46d1-bb67-02b4b06de71b@enneenne.com>
- <av7x53CigERu-cf2@kernel.org>
- <5d833d4c-bf8b-4ffb-a214-126de4403d4e@cispa.de>
- <awXK5NCHf82v7yaj@kernel.org>
- <awXOfwPQUxO2L1M2@kernel.org>
+	David Woodhouse <dwmw2@infradead.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ignat Korchagin <ignat@linux.win>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	James Morris <jmorris@namei.org>,
+	James Prestwood <prestwoj@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Lukas Wunner <lukas@wunner.de>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Paul Moore <paul@paul-moore.com>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Sumit Garg <sumit.garg@kernel.org>
+Subject: [PATCH v2 0/9] KEYS: trusted: asymmetric keys
+Date: Tue, 24 Nov 2026 21:40:34 +0200
+Message-ID: <20261124194043.1651679-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -72,46 +86,116 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <awXOfwPQUxO2L1M2@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 24, 2026 at 07:50:59PM +0200, Jarkko Sakkinen wrote:
-> On Tue, Nov 24, 2026 at 07:35:37PM +0200, Jarkko Sakkinen wrote:
-> > On Tue, Nov 24, 2026 at 04:54:15PM +0100, Florian Bauckholt wrote:
-> > > On 11/19/26 13:56, Jarkko Sakkinen wrote:
-> > > > Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > > 
-> > > Hi,
-> > > 
-> > > I saw that for-next-keys now has 94cd21592349 ("KEYS: Fix asym key
-> > > overflow in keyctl_pkey_verify()") with the same (trivial) patch.
-> > > I'm not sure how this goes, but if you'd like to add some context, a
-> > > link to this thread and these tags can probably be moved over:
-> > > 
-> > > https://lore.kernel.org/all/20261119-keyctl-pkey-fixes-v2-1-9e2d1c7db7ec@cispa.de/
-> > > 
-> > >   Tested-by: Stefan Berger <stefanb@linux.ibm.com>
-> > >   Reviewed-by: Guicai Ma <maguicai@kylinos.cn>
-> > >   Tested-by: Guicai Ma <maguicai@kylinos.cn>
-> > >   Tested-by: Rodolfo Giometti <giometti@enneenne.com>
-> > > 
-> > > Thanks,
-> > > Florian
-> > 
-> > OK, so I pulled that by mistake as I was picking patch for keys 
-> > 1/2; not asymmetric keys.
-> > 
-> > I'll drop it.
-> 
-> I'm confused. The patch set had fixes for to separate subsystems
-> so I picked the one that I should.
-> 
-> I assume it will be picked by someone. If not send a new patch.
+OVERVIEW
+========
 
-I don't have your patch in my for-next-keys branch so perhaps
-it is unsynced.
+Extend  TPM 2.0 trusted keys to load ASN.1 TPMKey [1] asymmetric keys
+(OID_TPMLoadableKey, 2.23.133.10.1.3) and expose keyctl pkey-operations
+directly on key_type_trusted. In addition there are some TPMKey
+interoperability fixes.
 
-I guess I call this done from my side.
+I.e. this my old series with a twist: instead of introducing a separate
+subtype for asymmetric keys, factor out pkey-operations into a separate
+CONFIG_KEYCTL_PKEY-feature, and wire asymmetric operations to
+key_type_trusted.
 
-Br, Jarkko
+This work was originally derived from [3] and is direct offspring of
+[2].
+
+[1] https://www.hansenpartnership.com/draft-bottomley-tpm2-keys.html
+[2] https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
+[3] https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
+
+CHANGES
+=======
+
+v2:
+- lib/asn1_encoder: Remove unreachable !bytes_len branch in
+  asn1_encode_integer_bytes().
+- tpm: Bounds-check ECC coordinates, defer state updates until after
+  validation, and verify subsequent TPM2_RH_NULL primaries against
+  chip->null_key_name in tpm2_parse_create_primary().
+- trusted: Reject trailing or truncated TPM2B bytes in tpm2_key_decode() so
+  tpm2_load_cmd() and tpm2_asym_load() pass the same blob length.
+- trusted: Avoid 32-bit param_size wraparound in tpm2_asym_rsa_decrypt()
+  and tpm2_asym_parse_signature().
+
+VERSIONS
+========
+
+v1: https://lore.kernel.org/keyrings/20261124120044.1481752-1-jarkko@kernel.org/
+
+Cc: dm-devel@lists.linux.dev
+Cc: keyrings@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-integrity@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
+Cc: Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc: Alasdair Kergon <agk@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: David Gstir <david@sigma-star.at>
+Cc: David Howells <dhowells@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ignat Korchagin <ignat@linux.win>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: James Morris <jmorris@namei.org>
+Cc: James Prestwood <prestwoj@gmail.com>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Lukas Wunner <lukas@wunner.de>
+Cc: Mike Snitzer <snitzer@kernel.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>
+Cc: Mimi Zohar <zohar@linux.ibm.com>
+Cc: Paul Moore <paul@paul-moore.com>
+Cc: Peter Huewe <peterhuewe@gmx.de>
+Cc: Randy Dunlap <rdunlap@infradead.org>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Cc: Sumit Garg <sumit.garg@kernel.org>
+
+Jarkko Sakkinen (9):
+  KEYS: trusted: Allow ASN.1 TPM2 sealed data shorter than MIN_KEY_SIZE
+  lib/asn1_encoder: Add asn1_encode_integer_bytes()
+  tpm: Export tpm2_create_primary()
+  tpm: Add persistent hierarchies to tpm2_create_primary()
+  KEYS: trusted: Extend TPMKey support
+  KEYS: Factor out KEYCTL_PKEY
+  KEYS: trusted: Reject zero-length keys in symmetric consumers
+  KEYS: trusted: Factor out TPM2 blob loading
+  KEYS: trusted: Add asymmetric key support for TPM2
+
+ .../security/keys/trusted-encrypted.rst       |   25 +-
+ crypto/af_alg.c                               |    2 +
+ crypto/asymmetric_keys/Kconfig                |    1 +
+ drivers/char/tpm/Kconfig                      |    2 +-
+ drivers/char/tpm/tpm2-sessions.c              |  239 +--
+ drivers/md/dm-crypt.c                         |    2 +-
+ include/keys/trusted-type.h                   |    5 +-
+ include/keys/trusted_tpm.h                    |   16 +-
+ include/linux/asn1_encoder.h                  |    3 +
+ include/linux/tpm.h                           |    2 +
+ include/linux/tpm_command.h                   |   13 +
+ lib/asn1_encoder.c                            |   56 +
+ security/keys/Kconfig                         |    3 +
+ security/keys/Makefile                        |    2 +-
+ .../keys/encrypted-keys/masterkey_trusted.c   |    5 +
+ security/keys/internal.h                      |    2 +-
+ security/keys/keyctl.c                        |    2 +-
+ security/keys/trusted-keys/Kconfig            |   10 +
+ security/keys/trusted-keys/tpm2key.asn1       |   19 +
+ security/keys/trusted-keys/trusted_core.c     |   20 +-
+ security/keys/trusted-keys/trusted_tpm1.c     |   26 +
+ security/keys/trusted-keys/trusted_tpm2.c     | 1339 ++++++++++++++++-
+ 22 files changed, 1585 insertions(+), 209 deletions(-)
+
+--
+2.47.3
+
