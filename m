@@ -1,117 +1,73 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795517677;
-	b=zuINSGk1mUW5/FdaxXiQdstMEdHWTSFqZ8ip72apVNSRUL4SbcTSVE7R8oEMPlpQjxuc
-	 tsTa+lm9dln8KlQ3nneUAyw181nK20L3v3o10sztrhRVh7ahXxd4cswbL58E0Hm78Iq1H
-	 U94Rk66fZQ0q+nsgt7PpHUipnZJ25wBtPJxznzMEe1RIqpqDnoCbX3m3sHiYeqYcS34xg
-	 gLbgdvRaeZUKBIdHYKrB/g16cGN4vKnzbS+jyB01KSAcFqoQwXbh6N/Ea2F5aE1cs4Cr4
-	 C3tMrZdfCF4ypxnUV0R92/ikHJJHB9YO7/9aPuoOFAunSptxEE6PFuEgjOV0DrJB3yA==
+	t=1795517918;
+	b=1oTA4x5mAnFuArWcenMN4KPFbxSEwpiC/Laur7nXuGSc+LG26/cttg3mb73iKy0sG4oW
+	 YTYQEOuin5d8rNf7w2XTiktNesf1DJOlMdbiPDAi9b8WcwtjmsF/3MjxWpTLqEtQzuMQg
+	 toK6/2yzyMGMvgZW6Iq0e9rbBQDs79KbHg5mQ6Gy55QwrIGuBLr4E2Pgb8UC6nLEgJVVD
+	 s+7LRDvH7ck6UvIuKe2vT6i0/2plnqKsizR6/9q/ZaGVJlUQasxoJ9zuQY9ngPmT4Vya3
+	 J2auUxkKTr/6xiHCof509ddCBCqPNoz9JO8oHHCiqzl3sd4efBy+9guIJWuGjKvfLQA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795517677;
-	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
-	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:From:To:Cc:
-	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:X-Proofpoint-Spam-Info:X-Authority-Analysis:
-	 X-Proofpoint-GUID:X-Proofpoint-Spam-Details-Enc:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details;
-	bh=oCq9AyrnUPb6wZIC4i+bwmGWAMp/EZK4G4q8U9q6iSM=;
-	b=BOaCQVcwpRV6/3k5Zlz0de1mwld/YPyVztkAAwgyimCzHJf8+HrxK5BhsH+THaDrttkg
-	 sbD3Yr63zzChXZGgolxLHl0qtS2dja18a5WEXxvfZ3lN5GV3pQLPXQvJ2LUcXWz6GvjIn
-	 Lhl6WxIzBA6YZ+aN8dIba0adVddHfW8N5cKmGSn2KhSj5Hfn07uOmEp+HE2sDnKTqjeI+
-	 2gqv4YoY9tW2aMmgId8fYMwy326J/UDs+BFnbf/Z+fH5PZQ6tOoreD5Puc52VeY4yWzUj
-	 6MMZCX2Y8bqJ4BACEI+7PPH+nEgFkr/jN591R9YsZkW80BNO9VAQVsuUlOWykhoVFhg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795517918;
+	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
+	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
+	 MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type:Content-Transfer-Encoding;
+	bh=telwXPSmHt0TRmghy29HQqKNCR1TzK5o4q7TV7L7srs=;
+	b=y9xuyC/Rn9jFcrzvsY4cPAnxsew/Jk44VwJisTXpv6bwNE10FCN7HatVtgNtKOwcOVB/
+	 mgl024NgUnllsVcYe/JP+nX0gCEa035plBghi9WuI/qFRIBQyXjfTJt/w+EEIzTvx0CdG
+	 FIm1d9zpS6b14Y7frrJU5E/kq5mlZgCkeUvyQ6cCu/rvXC+pfzUaYJa0YRn+7/l0izaRO
+	 VrLhFuKchQFc4NkL1ornw8WkFHn1P8R4Rf0Xnfjf/W0XGjmhY92NpkCB6yNodEFsksVOO
+	 sa77TkO3MMq1Tzca14Pp64L8zSAlsudQZZ/8C+NNWP18jw/MiiD2x0VB5y9guxdqxrg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=oss.qualcomm.com;
-	spf=pass smtp.mailfrom=oss.qualcomm.com;
-	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=bHhleDKg;
-	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=koHXLA40;
-	arc=none smtp.remote-ip=205.220.168.131
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iWx2UYrP;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367CD606A31E
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 10:54:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 367CD606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B260606A31E
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 10:58:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=bHhleDKg;
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=koHXLA40
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AO8JrAP3225364
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 10:54:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=oCq9AyrnUPb6wZIC4i+bwmGWAMp/EZK4G4q
-	8U9q6iSM=; b=bHhleDKgvopeEk/utmfUQ67VrrpLDtyA+GF/1l9oNQoeleg8g8/
-	XPS34JS0Ojf2IN7sX6kCyY2KzMEUG1mbyoPmEsDTYU3ZxK5o7fr7+RnESyNgYSm0
-	kdv75y0XuBjRrHl8PuxYcIjjONueEGdWvLzPJGXANZPMpzZlFVJ4XYUw6LnK01OK
-	dPPmeTn6dk+4oNrWRrD1iN461Db4CeEX2Ff7n3UjV5A8CWfvV65TbiXYKzlqPQrg
-	LzewDcn8nPXw8U4w/oKUF9vJlqbhVnvTv892S/12TkuVno+UFE8cdPK19VmVrYk/
-	FepIqgxQZCUFBhBY9Qw066i8rYOsU5STUPQ==
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j4x8f2nav-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 10:54:36 +0000 (GMT)
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-341eff9e381so7130201eec.1
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 02:54:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1795517676; x=1796122476; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=oCq9AyrnUPb6wZIC4i+bwmGWAMp/EZK4G4q8U9q6iSM=;
-        b=koHXLA40OG+Gwq0Tw5eu7oPIGhpeBZHBp5XIveBtcMHmtZcBOJEIPFbYN4k6HfT3O6
-         qLETKg/eL09R3XGV75Cstw1bd5UfCRcRyo5rXv0XMqZKGPPLYB1sfGjINpWWmzLqVrOm
-         1KrxS8pV8W25OmL5Vwn+v2tEu4oj+nflvm30vpXK06I4az/OKlJ5MmRwBDLugPLKUBHQ
-         EbKOHHm9pu5Y8nMJENQGioc5NsMZX1WVL4Japb7kPVkqFI/pnKgfXHylK/WJlDayI/Ae
-         /q7JHbCllU5jR4nJzohjFaIa7+gxXMiEGRDwe0OmmkAvRsdBJEovLpbk+6uURT8nR9DG
-         CO4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795517676; x=1796122476;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=oCq9AyrnUPb6wZIC4i+bwmGWAMp/EZK4G4q8U9q6iSM=;
-        b=CAnuQY8QqORpFCqDJmUe90Nw96Fb3bwgV7zVNrX2hzO6icC5kiQCTRWmtfuXUYpH7M
-         hdcEgXmpeOtBczcjq+WT4ZsunXRUECIPqLUf8tm2DwxZUbIIhy1v/HT2Dby74knjIPGc
-         Yfc2RcIj+RE83hKD1nezsPtaRfqN9wHPPkcRdX2WszoDDlvCuzH7xEWkJfW19OJvyb6l
-         uMBauCHLXp8ZjjeuoSH8+azlgHJyTANWRJ/NTLOMWiPs9WsZVZP8HWJqOhr7j9ZGx1d6
-         5UjniFypnmzNVnTs55N6v0HTEC1hzRCXAa+fJin0krk275JU0dfB3Uhbw384Jde/XRIi
-         SctQ==
-X-Forwarded-Encrypted: i=1; AL+hErEdGfnbXmezbeZT/NbvaCKBAZutWBu8S3BB8iJ/HGwGeJYHtJQzfixvRnbj+QieQkly7ouIHNjiKMYvwKE=@vger.kernel.org
-X-Gm-Message-State: APuU4Z+bO40dhsv53TCxLGj+qwkt3x7Zr9cCmj8Trri70jMlDHVdWFy3
-	0asE5TusaxCmx6RZgQRflf8uwrGd4yk7VWstJGfWFEkQc0yHutCqLzlpDQvkh6j1eabiEWHz7lx
-	RLKWb1vXQ5+eX8pErI3irYql4hyuIv+JNQyxSYPxf9Jpqd2PLVfng+zbaB3W+Otiqxww=
-X-Gm-Gg: AZFdTZd6Q+DrN1n/E10fb+mHWkRILAZqf7kc3kBQAwVyVbfIt9ncpCCkAQXUPvXOeWH
-	H32y/Ka1NMjGoWphMOLLwIxl+h9QA15+Eb6Wv4D1DHUXn5vw8moGv+M+34nodzkOzSIhjFeB1uf
-	RTIW6rcCsknMaYS5idVzLbjQ652MHtJIXO2NWqjF383v4RUtngl36JohVq7r1qm+h7uAyveRJj3
-	zcNyVsv35lfi95ORgD0FHq2pwc8JJXzbZjVmaGjOVjYp5/F8XuWtddMfhxoAajN3O4/1QHfnmEL
-	gFSLoYxfzTy+Y1gBiqCw87cgsC73SOjWi0kL8/5K5Dnr8S4dhqsL6JdfxRT76fs/mh5o+VhGCkC
-	JJ4YWm3CwMPwZEP+Bry7+NwIqJuyWHkwshhztTrwptC2kRsqe4cZpyChpCZ/UdlM/eZp50x8BkM
-	5Ex4Ew1UmJMvVHS4BhLIOSZZ8UDctt32zjO6eNaNHxX35D8W1cgmNsQdQ=
-X-Received: by 2002:a05:7300:d205:b0:36a:1f8:a56e with SMTP id 5a478bee46e88-3856fe564a1mr14547464eec.23.1795517675924;
-        Tue, 24 Nov 2026 02:54:35 -0800 (PST)
-X-Received: by 2002:a05:7300:d205:b0:36a:1f8:a56e with SMTP id 5a478bee46e88-3856fe564a1mr14547443eec.23.1795517675449;
-        Tue, 24 Nov 2026 02:54:35 -0800 (PST)
-Received: from hu-ymg-blr.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com. [103.229.18.19])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385666e99fdsm55231578eec.5.2026.11.24.02.54.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2026 02:54:35 -0800 (PST)
-From: Yadu M G <yadu.mg@oss.qualcomm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org
-Subject: [PATCH] dt-bindings: crypto: qcom,prng: Document Seca TRNG
-Date: Tue, 24 Nov 2026 16:24:26 +0530
-Message-ID: <b13bc8fa6aac6e9164ce9ad0ab202d0df491331f.1795517666.git.yadu.mg@oss.qualcomm.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=iWx2UYrP
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22BEE1F000CA
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 10:58:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795517917;
+	bh=telwXPSmHt0TRmghy29HQqKNCR1TzK5o4q7TV7L7srs=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject;
+	b=iWx2UYrPf/LLvC0G64VVaqT2RESfdoQBSfAcND7TZ0PqusHlpDx4pDBNfFMInldN1
+	 zJfgfkmOVk8up3vdEJWBjtPW53143Ly2BlbQkMEVHs8cHIyJtUQ+yDTkFZZQ+KpaOU
+	 mHe4QKW9xfUwssvPACsddcHcE2CjXH3dDRrdEugH+TV1E76pU/lxJr+OmIQ1JOsVh2
+	 NfsIdhEi+7xxecB2+lEIa1m0IEhRfrxy3Jz//sizJwHp7rEUW9hkGMnT7mXsdG+v/W
+	 VOpp2Ghj9W2nK2/5i7fhlivo8BfRUqOJGxRLaDFX3aQ+exFT/pgFaDE8/OiVVCMU1T
+	 Zad2932U0dJ8g==
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfauth.ams.internal (Postfix) with ESMTP id 7746E198003A;
+	Tue, 24 Nov 2026 05:58:35 -0500 (EST)
+Received: from ams-imap-11 ([10.64.2.31])
+  by ams-compute-02.internal (MEProxy); Tue, 24 Nov 2026 05:58:35 -0500
+X-ME-Sender: <xms:2W0FazRNDf6o_M2u-bKdhc12lTt2t5BBJrTIrG_TG_nm4LaHdOfezg>
+    <xme:2W0Fa_lqhT4KW6RW9R_DDn4J5s_O5aWNP08Eenfd4hdeUhzf-2NEC0HTNST_HNd8o
+    V1kPZhwjEt9AK3KcJ7M1YKKzONoefFYj7rpTI8ZkyRKw0WWQVx6H6M>
+X-ME-Proxy-Cause: dmFkZTGCX0N6H7KhKgqKQhDlzfItW1w9KNhKDzJbkrMT/DQHgi3aIFzD8P9nPHmX0Emt8h
+    i4I2xheuVqajyk+qZX8plCzSJ0wxYAAiMJEFh25XW4XUG3n5wsOqi9r3e0JUYRIXoUjean
+    t3EW4y/5RlZVBQJY5ltZjP38npZHK1DYyO/KmNVJVQdARf7L+I1vvU+J73Qny0bsOJJ0av
+    OZz/72/I9urF3bYhL2SURnO5dUXDnfA/FSYUjHmWqVm93zifS94TB80d9XaSN73vC0cvMR
+    PT8wt7gLTMrRKmz3WHkbf0M0NV5lVk5Ucp08zuNr9cZZ9Wf3vs91pUWRHaAl4wQ2adEmXd
+    SSm48TedEeT44WAuRaFNGlVP901TbWx7rnQEZ4ER3vQ9JUD3a/9/WJZ8IVj3OH4FE2LQqU
+    TH3ZRXF5jY362zQzDdvMVYWmuHUi6HIzchNQ/BGM27tp9kfxLTEp4mRaUaazOAB1cit8wk
+    14nE8SddSF2KNTNua01FJTio1yh/vjNUuuNnlUja/XS0JdXiqGHLZGa1IFXndTXVunDevT
+    7t8Yjw4wvg3ipADjWP4jIA/trtAQDf8MpDGX/pxfMOUsI8mGKSMxIrPccPyzKZ8kJZcuYj
+    QzgmH0FG8PptXjUzLunQGfC0aQkeCjaAt8OfrpvDlkiikJ8PXUAlqdlGRY6w
+X-ME-Proxy: <xmx:220Fa88RKI-UUo-qWS6Zb0DPrIi1O4kCD4lfgunxAjMliHljn4v72A>
+    <xmx:220Fa7l1EPzB33bbHj6jqx_mE4npqRenvtgmI7uwKCd2aaNYzHSW7g>
+    <xmx:220Fa6XoZLTLrQGjASPO_Jp0wRzw37r425nF3sZbVmhHvo3-zqqmfQ>
+    <xmx:220Fa4F2uIsujqVrZPGGZAnUo7DtzAF4Ari4hlJ0NxYf_5pp7-AZNQ>
+    <xmx:220Fa-cXBIqXa2GcT3oEG1PUqtgfi9sVm5kZMKFP-vWkfTI2_qLyH_2F>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id C2F24F80093; Tue, 24 Nov 2026 05:58:33 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -121,66 +77,221 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI0MDA0MiBTYWx0ZWRfX/uI7qeW16ryy
- G06jfaby4EOGeSxdSK3waVdRW4QAgIxXG3goHwjdHLXHA+iVEFNEpf7qg/f3zQZO8QpKVAWRgvV
- q3L0jlqTuIa1laBZprCK0g8XDJkP0jw=
-X-Authority-Analysis: v=2.4 cv=JbgpPkKV c=1 sm=1 tr=0 ts=6b056cec cx=c_pps
- a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=Ou0eQOY4+eZoSc0qltEV5Q==:17
- a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=YMgV9FUhrdKAYTUUvYB2:22 a=EUspDBNiAAAA:8
- a=lHObh2IfMKzVuqTG74EA:9 a=6Ab_bkdmUrQuMsNx7PHu:22
-X-Proofpoint-GUID: y7Ze6gboc_J6muPHE-DbfPT85hUlJprm
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI0MDA0MiBTYWx0ZWRfX8jjbp851Ns5h
- dpg9X/5GnycqPL0ios7BwIpwhuk6IrJ7H6eVWMu19TmB0YwwXp3Pg/sWNJ0fvuADj3K83fA4Y6T
- ruCBRHQj8ed/pDA9WPRCjGaeLSR6q35qffcZvVg7DdR0eoXjXgedkq6Nj7MmkmefKXNsXx5Z64x
- yBIYQ2SNvV+zoKlmVUL40OgztfefqAl0ROpetZ8O7dHzWyfg+YYEIT2UWw+/89D9PSKZe8wjgIw
- U6c3UYk7lsiYmMzFjAr35Xg8oFnRpqJB7tPNbiCGyrKNvA+MzT95qBeR/51NDtBw6MKYGqjCKrb
- TgcfGWJgxe2GFKhvK91sPaVe7ddIDufaeZXc/RYeKeFiE/TjgtiqEcYMdIyNbEXvvmLAHWQrLc2
- ge20miggO9QOtqe3Bkgxx7fCSF9wR4Ddx2xzS9IZ5sl75QQ/BgSjQV1aEaMGhIzbOac/XtxCEbn
- fde9vx+OVraduusYGdA==
-X-Proofpoint-ORIG-GUID: y7Ze6gboc_J6muPHE-DbfPT85hUlJprm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
- definitions=2026-11-24_01,2026-11-23_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 bulkscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0
- impostorscore=0 suspectscore=0 clxscore=1011 priorityscore=1501 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611240042
+Date: Tue, 24 Nov 2026 11:58:13 +0100
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>
+Message-Id: <2dbbfa1c-14e0-4f32-9de9-940f517a13a9@app.fastmail.com>
+In-Reply-To: <20261124085914.268803-1-ebiggers@kernel.org>
+References: <20261124085914.268803-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] lib/crypto: sm3: De-bloat sm3_block_generic()
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Add qcom,seca-trng compatible string for the True Random Number
-Generator on the Qualcomm Seca SoC.
 
-Signed-off-by: Yadu M G <yadu.mg@oss.qualcomm.com>
----
-The Seca SoC device tree using this compatible will be posted as a
-separate series.
 
-This series was prepared with help from an AI coding assistant
-(Claude). It assisted with review on the device tree, bindings and
-driver (formatting and alignment fixes), rewording commit messages,
-and running the validation steps (checkpatch, dt_binding_check,
-dtbs_check and W=1 builds). All changes were reviewed and tested on the
-Seca Ride board.
----
- Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
- 1 file changed, 1 insertion(+)
+On Tue, 24 Nov 2026, at 09:59, Eric Biggers wrote:
+> sm3_block_generic() previously unrolled all 64 rounds, resulting in
+> 13049 bytes of .text in lib/crypto/sm3.o, plus a 256-byte K[64] round
+> constant table even though all round 0-15 constants are rotations of
+> one value and all round 16-63 constants are rotations of one value.
+>
+> Therefore, roll up rounds 16-63 into 3 iterations of 16 rounds each, and
+> generate the round constants on the fly via rotations.
+>
+> This reduces the .text size of lib/crypto/sm3.o from 13049 bytes to 7843
+> bytes (a 40% reduction) and removes the 256-byte K[] table.  A benchmark
+> of this code showed no significant change in speed.
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  lib/crypto/sm3.c | 143 ++++++++++++++++-------------------------------
+>  1 file changed, 48 insertions(+), 95 deletions(-)
+>
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-index de323969fe64..cec847c52f8e 100644
---- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-@@ -31,6 +31,7 @@ properties:
-               - qcom,sa8255p-trng
-               - qcom,sa8775p-trng
-               - qcom,sc7280-trng
-+              - qcom,seca-trng
-               - qcom,shikra-trng
-               - qcom,sm8450-trng
-               - qcom,sm8550-trng
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-base-commit: 3191063649dbf7c0d0b768e1f3655e4c5fc6edb5
--- 
-2.43.0
-
+> diff --git a/lib/crypto/sm3.c b/lib/crypto/sm3.c
+> index 23059347b4493..42198c724c49a 100644
+> --- a/lib/crypto/sm3.c
+> +++ b/lib/crypto/sm3.c
+> @@ -22,25 +22,6 @@ static const struct sm3_block_state sm3_iv = {
+>  	},
+>  };
+> 
+> -static const u32 ____cacheline_aligned K[64] = {
+> -	0x79cc4519, 0xf3988a32, 0xe7311465, 0xce6228cb,
+> -	0x9cc45197, 0x3988a32f, 0x7311465e, 0xe6228cbc,
+> -	0xcc451979, 0x988a32f3, 0x311465e7, 0x6228cbce,
+> -	0xc451979c, 0x88a32f39, 0x11465e73, 0x228cbce6,
+> -	0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c,
+> -	0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce,
+> -	0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec,
+> -	0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5,
+> -	0x7a879d8a, 0xf50f3b14, 0xea1e7629, 0xd43cec53,
+> -	0xa879d8a7, 0x50f3b14f, 0xa1e7629e, 0x43cec53d,
+> -	0x879d8a7a, 0x0f3b14f5, 0x1e7629ea, 0x3cec53d4,
+> -	0x79d8a7a8, 0xf3b14f50, 0xe7629ea1, 0xcec53d43,
+> -	0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c,
+> -	0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce,
+> -	0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec,
+> -	0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5
+> -};
+> -
+>  /*
+>   * Transform the message X which consists of 16 32-bit-words. See
+>   * GM/T 004-2012 for details.
+> @@ -48,6 +29,7 @@ static const u32 ____cacheline_aligned K[64] = {
+>  #define R(i, a, b, c, d, e, f, g, h, t, w1, w2)			\
+>  	do {							\
+>  		ss1 = rol32((rol32((a), 12) + (e) + (t)), 7);	\
+> +		(t) = rol32((t), 1);				\
+>  		ss2 = ss1 ^ rol32((a), 12);			\
+>  		d += FF ## i(a, b, c) + ss2 + ((w1) ^ (w2));	\
+>  		h += GG ## i(e, f, g) + ss1 + (w1);		\
+> @@ -70,19 +52,20 @@ static const u32 ____cacheline_aligned K[64] = {
+>  /* Message expansion */
+>  #define P0(x) ((x) ^ rol32((x), 9) ^ rol32((x), 17))
+>  #define P1(x) ((x) ^ rol32((x), 15) ^ rol32((x), 23))
+> -#define I(i)  (W[i] = get_unaligned_be32(data + i * 4))
+> -#define W1(i) (W[i & 0x0f])
+> -#define W2(i) (W[i & 0x0f] =				\
+> -		P1(W[i & 0x0f]				\
+> -			^ W[(i-9) & 0x0f]		\
+> -			^ rol32(W[(i-3) & 0x0f], 15))	\
+> -		^ rol32(W[(i-13) & 0x0f], 7)		\
+> -		^ W[(i-6) & 0x0f])
+> +#define I(i)  (W[i] = get_unaligned_be32(data + (i) * 4))
+> +#define W1(i) (W[(i) & 0x0f])
+> +#define W2(i) (W[(i) & 0x0f] =					\
+> +		P1(W[(i) & 0x0f]				\
+> +			^ W[((i) - 9) & 0x0f]			\
+> +			^ rol32(W[((i) - 3) & 0x0f], 15))	\
+> +		^ rol32(W[((i) - 13) & 0x0f], 7)		\
+> +		^ W[((i) - 6) & 0x0f])
+> 
+>  static void sm3_block_generic(struct sm3_block_state *state,
+>  			      const u8 data[SM3_BLOCK_SIZE], u32 W[16])
+>  {
+> -	u32 a, b, c, d, e, f, g, h, ss1, ss2;
+> +	u32 a, b, c, d, e, f, g, h, ss1, ss2, t;
+> +	int i;
+> 
+>  	a = state->h[0];
+>  	b = state->h[1];
+> @@ -93,73 +76,43 @@ static void sm3_block_generic(struct sm3_block_state *state,
+>  	g = state->h[6];
+>  	h = state->h[7];
+> 
+> -	R1(a, b, c, d, e, f, g, h, K[0], I(0), I(4));
+> -	R1(d, a, b, c, h, e, f, g, K[1], I(1), I(5));
+> -	R1(c, d, a, b, g, h, e, f, K[2], I(2), I(6));
+> -	R1(b, c, d, a, f, g, h, e, K[3], I(3), I(7));
+> -	R1(a, b, c, d, e, f, g, h, K[4], W1(4), I(8));
+> -	R1(d, a, b, c, h, e, f, g, K[5], W1(5), I(9));
+> -	R1(c, d, a, b, g, h, e, f, K[6], W1(6), I(10));
+> -	R1(b, c, d, a, f, g, h, e, K[7], W1(7), I(11));
+> -	R1(a, b, c, d, e, f, g, h, K[8], W1(8), I(12));
+> -	R1(d, a, b, c, h, e, f, g, K[9], W1(9), I(13));
+> -	R1(c, d, a, b, g, h, e, f, K[10], W1(10), I(14));
+> -	R1(b, c, d, a, f, g, h, e, K[11], W1(11), I(15));
+> -	R1(a, b, c, d, e, f, g, h, K[12], W1(12), W2(16));
+> -	R1(d, a, b, c, h, e, f, g, K[13], W1(13), W2(17));
+> -	R1(c, d, a, b, g, h, e, f, K[14], W1(14), W2(18));
+> -	R1(b, c, d, a, f, g, h, e, K[15], W1(15), W2(19));
+> -
+> -	R2(a, b, c, d, e, f, g, h, K[16], W1(16), W2(20));
+> -	R2(d, a, b, c, h, e, f, g, K[17], W1(17), W2(21));
+> -	R2(c, d, a, b, g, h, e, f, K[18], W1(18), W2(22));
+> -	R2(b, c, d, a, f, g, h, e, K[19], W1(19), W2(23));
+> -	R2(a, b, c, d, e, f, g, h, K[20], W1(20), W2(24));
+> -	R2(d, a, b, c, h, e, f, g, K[21], W1(21), W2(25));
+> -	R2(c, d, a, b, g, h, e, f, K[22], W1(22), W2(26));
+> -	R2(b, c, d, a, f, g, h, e, K[23], W1(23), W2(27));
+> -	R2(a, b, c, d, e, f, g, h, K[24], W1(24), W2(28));
+> -	R2(d, a, b, c, h, e, f, g, K[25], W1(25), W2(29));
+> -	R2(c, d, a, b, g, h, e, f, K[26], W1(26), W2(30));
+> -	R2(b, c, d, a, f, g, h, e, K[27], W1(27), W2(31));
+> -	R2(a, b, c, d, e, f, g, h, K[28], W1(28), W2(32));
+> -	R2(d, a, b, c, h, e, f, g, K[29], W1(29), W2(33));
+> -	R2(c, d, a, b, g, h, e, f, K[30], W1(30), W2(34));
+> -	R2(b, c, d, a, f, g, h, e, K[31], W1(31), W2(35));
+> -
+> -	R2(a, b, c, d, e, f, g, h, K[32], W1(32), W2(36));
+> -	R2(d, a, b, c, h, e, f, g, K[33], W1(33), W2(37));
+> -	R2(c, d, a, b, g, h, e, f, K[34], W1(34), W2(38));
+> -	R2(b, c, d, a, f, g, h, e, K[35], W1(35), W2(39));
+> -	R2(a, b, c, d, e, f, g, h, K[36], W1(36), W2(40));
+> -	R2(d, a, b, c, h, e, f, g, K[37], W1(37), W2(41));
+> -	R2(c, d, a, b, g, h, e, f, K[38], W1(38), W2(42));
+> -	R2(b, c, d, a, f, g, h, e, K[39], W1(39), W2(43));
+> -	R2(a, b, c, d, e, f, g, h, K[40], W1(40), W2(44));
+> -	R2(d, a, b, c, h, e, f, g, K[41], W1(41), W2(45));
+> -	R2(c, d, a, b, g, h, e, f, K[42], W1(42), W2(46));
+> -	R2(b, c, d, a, f, g, h, e, K[43], W1(43), W2(47));
+> -	R2(a, b, c, d, e, f, g, h, K[44], W1(44), W2(48));
+> -	R2(d, a, b, c, h, e, f, g, K[45], W1(45), W2(49));
+> -	R2(c, d, a, b, g, h, e, f, K[46], W1(46), W2(50));
+> -	R2(b, c, d, a, f, g, h, e, K[47], W1(47), W2(51));
+> -
+> -	R2(a, b, c, d, e, f, g, h, K[48], W1(48), W2(52));
+> -	R2(d, a, b, c, h, e, f, g, K[49], W1(49), W2(53));
+> -	R2(c, d, a, b, g, h, e, f, K[50], W1(50), W2(54));
+> -	R2(b, c, d, a, f, g, h, e, K[51], W1(51), W2(55));
+> -	R2(a, b, c, d, e, f, g, h, K[52], W1(52), W2(56));
+> -	R2(d, a, b, c, h, e, f, g, K[53], W1(53), W2(57));
+> -	R2(c, d, a, b, g, h, e, f, K[54], W1(54), W2(58));
+> -	R2(b, c, d, a, f, g, h, e, K[55], W1(55), W2(59));
+> -	R2(a, b, c, d, e, f, g, h, K[56], W1(56), W2(60));
+> -	R2(d, a, b, c, h, e, f, g, K[57], W1(57), W2(61));
+> -	R2(c, d, a, b, g, h, e, f, K[58], W1(58), W2(62));
+> -	R2(b, c, d, a, f, g, h, e, K[59], W1(59), W2(63));
+> -	R2(a, b, c, d, e, f, g, h, K[60], W1(60), W2(64));
+> -	R2(d, a, b, c, h, e, f, g, K[61], W1(61), W2(65));
+> -	R2(c, d, a, b, g, h, e, f, K[62], W1(62), W2(66));
+> -	R2(b, c, d, a, f, g, h, e, K[63], W1(63), W2(67));
+> +	t = 0x79cc4519;
+> +	R1(a, b, c, d, e, f, g, h, t, I(0), I(4));
+> +	R1(d, a, b, c, h, e, f, g, t, I(1), I(5));
+> +	R1(c, d, a, b, g, h, e, f, t, I(2), I(6));
+> +	R1(b, c, d, a, f, g, h, e, t, I(3), I(7));
+> +	R1(a, b, c, d, e, f, g, h, t, W1(4), I(8));
+> +	R1(d, a, b, c, h, e, f, g, t, W1(5), I(9));
+> +	R1(c, d, a, b, g, h, e, f, t, W1(6), I(10));
+> +	R1(b, c, d, a, f, g, h, e, t, W1(7), I(11));
+> +	R1(a, b, c, d, e, f, g, h, t, W1(8), I(12));
+> +	R1(d, a, b, c, h, e, f, g, t, W1(9), I(13));
+> +	R1(c, d, a, b, g, h, e, f, t, W1(10), I(14));
+> +	R1(b, c, d, a, f, g, h, e, t, W1(11), I(15));
+> +	R1(a, b, c, d, e, f, g, h, t, W1(12), W2(16));
+> +	R1(d, a, b, c, h, e, f, g, t, W1(13), W2(17));
+> +	R1(c, d, a, b, g, h, e, f, t, W1(14), W2(18));
+> +	R1(b, c, d, a, f, g, h, e, t, W1(15), W2(19));
+> +
+> +	t = 0x9d8a7a87;
+> +	for (i = 0; i < 3; i++) {
+> +		R2(a, b, c, d, e, f, g, h, t, W1(0), W2(4));
+> +		R2(d, a, b, c, h, e, f, g, t, W1(1), W2(5));
+> +		R2(c, d, a, b, g, h, e, f, t, W1(2), W2(6));
+> +		R2(b, c, d, a, f, g, h, e, t, W1(3), W2(7));
+> +		R2(a, b, c, d, e, f, g, h, t, W1(4), W2(8));
+> +		R2(d, a, b, c, h, e, f, g, t, W1(5), W2(9));
+> +		R2(c, d, a, b, g, h, e, f, t, W1(6), W2(10));
+> +		R2(b, c, d, a, f, g, h, e, t, W1(7), W2(11));
+> +		R2(a, b, c, d, e, f, g, h, t, W1(8), W2(12));
+> +		R2(d, a, b, c, h, e, f, g, t, W1(9), W2(13));
+> +		R2(c, d, a, b, g, h, e, f, t, W1(10), W2(14));
+> +		R2(b, c, d, a, f, g, h, e, t, W1(11), W2(15));
+> +		R2(a, b, c, d, e, f, g, h, t, W1(12), W2(16));
+> +		R2(d, a, b, c, h, e, f, g, t, W1(13), W2(17));
+> +		R2(c, d, a, b, g, h, e, f, t, W1(14), W2(18));
+> +		R2(b, c, d, a, f, g, h, e, t, W1(15), W2(19));
+> +	}
+> 
+>  	state->h[0] ^= a;
+>  	state->h[1] ^= b;
+>
+> base-commit: 7c5ec98f7bcf658cbc7d0094e4a762f6a9c2f159
+> -- 
+> 2.56.1
