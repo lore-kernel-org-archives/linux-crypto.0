@@ -1,54 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795510782;
-	b=K9CW87lJmp46qjOjEV1h7KGpFnCnkD0rhMywL+QRiZGogU6vWIedHc+Cmba0up3eS73H
-	 1IEXA7sj5cICHhGD/HpYPOgugPk9HZ6W1nRgthB4uD+qlhuyAfBKqTt8ARnAXx6eSl9bp
-	 HDl3h9tSDhjkwNEWj6MWi9pNbWdinZG7Z9AHhkmqNWUxumCwRIhsgf0zowyQytRwa1QMj
-	 IeaKeWHyjCs55XIQtjk6sA4JymRWk578i4nTKaLjE6vVlXLBvAntiUtxojsqRD03EiGO4
-	 WmlBiAatoh7Lh8E1/djrszTekToa48rOHYNsRcP073ay6hMc1XK+saecU/FIVyNFuEA==
+	t=1795512377;
+	b=3+D734ZwapxaWiaYgj5D3EvlONcXQ07Rt5WqjzN5jnIZuulUH8w9QJoPhJx6CSVojerB
+	 N2x/L/BhdM/LXf3SMpZUziD5GD0wboVUoSxBpszF6PQJFFdibWBxzCvHXwgBGyA3IqQzF
+	 7aelfmtOCiyWHVLHfAn+gacW+Ci/M+TqTwf+0IUIbVM5kNzyLbgti5z4rhJCVAHa1QF3r
+	 xotgil5chlkO6lLmKPmAYqZ/dnio67YI66uNtsjwiOFlKXe1jII6692RkOMHtK8lf6jkd
+	 3F6zY8w9SdtnI0Gz5POT6AurEjx1NgQKABRIQt/Q9ulJucwBM/QVdYds0gk+7txva5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795510782;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=tWVHfyDwdqqB2rLurq1LitToQvYUVqA8DYAlwyccAuU=;
-	b=EfrHN1LwEyqlFyO+Ys5QTRXGEouBr1fhUxRuWbIwzZAsqYkH4EGBC5C1TJSeltJ3lzCg
-	 OFI3hRm7vRsK1P4JZsz6Hhl5tPmDmcx88nBTRPTSRZ6wuWE7Au76tQ/wlyO+QRMIPJj0w
-	 nEIndoFQ/KTZPjTuHJJssmR6xwLINOm0KmFzeFjQoqtcBaDbCvJrjXVKIEddNUZgoKmTf
-	 Jz7QTIssYGk/6lZGfqrgZSgqb0ZMFYHeLcnK3On5kNI7BdWKv/u6vRG0lrxS3pyUC1FWK
-	 8FgmMzPZndr/Kh622XyBcmCw2HShUkgL+lL6RiklssoUc1Q9e66kRJaFB69Q4nrzn4g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795512377;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=G0CLjEUR6sieSy108/yuJLLc9UjQ9a2/uILsI8AYOSI=;
+	b=zcv7EIbTiaISghwbzdyewG6zZgY1vbzBB3N6TkDkVxUS0pw2GoaCdbExQ2rVgb6M4cW/
+	 sBYgd7OVeMANzXBe2u2ip27XhiRz/KeSb4jvqNn87sgLlWGKYMEOGk5/TRCcx/8LjTQSZ
+	 FMEeiQu4Q2zYxB9FTUrDdgdsWhuOiB3AtSxqnw4Dlf0Rh+AnpMTn1Rbe+RN42Xqi6Zxgf
+	 hKvBkGkaBl8iV+nqfuHb6Vvav9G6K1bKmNXaEKKsdg+JOhGiw/zD8b9kIrIi3HfKxDnK3
+	 L/8SsXhKAIWrk8uptU0s0Yph+u1O7d+inluf2k5Bz2tjLzro1n91BPAtc9Nk9magpoQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lMtqbulh;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=protonmail.com;
+	spf=pass smtp.mailfrom=protonmail.com;
+	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=mGJ1ZGm+;
+	arc=none smtp.remote-ip=109.224.244.18
+Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D9F606A322
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 08:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C819606A33C
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 09:26:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6C819606A33C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lMtqbulh
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D7711F000D1;
-	Tue, 24 Nov 2026 08:59:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795510781;
-	bh=tWVHfyDwdqqB2rLurq1LitToQvYUVqA8DYAlwyccAuU=;
-	h=From:To:Cc:Subject:Date;
-	b=lMtqbulhxCDsW9pHDeAJu2lAH3Xaa/OVDZgnsg0a3Q0o4UlCmThiqSpkpkQqkAfQx
-	 SBlrKQSKXVVcNLk6wZGJ7Jyovr64quPNPPyWbkRhyJ0oqJbiduiCQJ9091+daoAVk+
-	 qWZbCn1YtkIRNCQcGWHY8K7kb6DPaOqenGPx/DHLvCdyt7IUA4vJD3fLaqPM1ZP/Tm
-	 SAbd2q5rl9J6fNwIhbdKY8HWpOXJxRiQjxSqsROM/UywjYTJf8OSaH6934DohV5OPL
-	 7L718tmRLWwZLy5MAImcY4pFSqfrYKrbItUPeZ1akw0Otk/KyhmGCBcnu/IGls15kk
-	 iJo+9yAM+VcWA==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: sm3: De-bloat sm3_block_generic()
-Date: Tue, 24 Nov 2026 00:59:14 -0800
-Message-ID: <20261124085914.268803-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.1
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=mGJ1ZGm+
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1795512374; x=1795771574;
+	bh=G0CLjEUR6sieSy108/yuJLLc9UjQ9a2/uILsI8AYOSI=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=mGJ1ZGm+bi/lL6JSJNlZiWJ+YuR18bfYiZaM+GB0jRjTFzFhbhrDnwDgdQf+kdLuZ
+	 g8sINL3+UWqUopVlGTfkaAgVryFdaqD8ElaVYAnwKjRl7s270bXaLk173WF1ew+iXC
+	 E8rUDzcJpwr+UUjb4dXNbVG921z5XyCcXHKAPu0TfBQCly0YKTajGTtzBRVcsL/3O0
+	 bBAvdRcoQgeyHCspm+Eo0sGhCcpHWNMCEFFGzelGGpJDzlCUfotasDEf6P+cJ4E22a
+	 Jbgsn6GdZRwK3nItRrZCFSgCtt7SmHPu/+ZIfUkTMVwe7FwQF9eb0n9MhMYwGVItD3
+	 DCo7UcJb7jGPA==
+Date: Tue, 24 Nov 2026 09:26:08 +0000
+To: Zhiqi Song <songzhiqi1@huawei.com>, Longfang Liu <liulongfang@huawei.com>
+From: Ryan Prinz <rc4d5a@protonmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ryan Prinz <rc4d5a@protonmail.com>
+Subject: [PATCH 1/2] crypto: hisilicon/hpre - fix missing DH/ECDH public key validation
+Message-ID: <20261124092546.1712228-1-rc4d5a@protonmail.com>
+Feedback-ID: 190731814:user:proton
+X-Pm-Message-ID: 042cad42560e0a1f58cf3a4a6b35c71adf09f648
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -58,206 +61,303 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-sm3_block_generic() previously unrolled all 64 rounds, resulting in
-13049 bytes of .text in lib/crypto/sm3.o, plus a 256-byte K[64] round
-constant table even though all round 0-15 constants are rotations of
-one value and all round 16-63 constants are rotations of one value.
+hpre_dh_compute_value() and hpre_ecdh_compute_value() pass the peer's
+DH/ECDH public value into the hardware queue without checking it
+first. Neither hpre_hw_data_init() nor hpre_ecdh_src_data_init() do
+any validation; they only format and DMA-map the buffer.
 
-Therefore, roll up rounds 16-63 into 3 iterations of 16 rounds each, and
-generate the round constants on the fly via rotations.
+The generic software implementations this driver falls back to do
+check it: crypto/dh.c's dh_is_pubkey_valid() rejects a DH public value
+outside [2, p-2], and crypto/ecc.c's ecc_is_pubkey_valid_partial()
+rejects an ECDH public point that is zero, out of range, or not on the
+curve. HPRE's hardware-accelerated path is the default/primary path,
+not the fallback, so the DH/ECDH value check is normally skipped
+rather than normally run.
 
-This reduces the .text size of lib/crypto/sm3.o from 13049 bytes to 7843
-bytes (a 40% reduction) and removes the 256-byte K[] table.  A benchmark
-of this code showed no significant change in speed.
+Both algorithms are registered under their generic crypto_kpp names
+("dh", "ecdh-nist-p192/256/384"), so any caller requesting those names
+gets this unvalidated path whenever the hardware is present.
+Two in-tree callers are affected:
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+- drivers/nvme/common/auth.c requests "ffdheNNNN(dh)" for NVMe-oF's
+  in-band DH-HMAC-CHAP authentication, used by both
+  drivers/nvme/host/auth.c and drivers/nvme/target/auth.c. Forcing the
+  derived session key Ks to a known value lets an attacker who holds
+  a handshake transcript perform an offline brute-force attack against
+  the pre-shared key, which is what the DH exchange is documented to
+  protect against on top of plain CHAP. With bidirectional
+  authentication enabled, an attacker can obtain a transcript by
+  connecting to the target directly and requesting it without valid
+  credentials, exposing the target's authentication key
+  (dhchap_ctrl_secret). Cryptographic soundness then relies solely on
+  the strength of the target's key.
+
+- net/bluetooth/smp.c allocates "ecdh-nist-p256" for LE Secure
+  Connections pairing and performs no validation of the remote
+  device's public key before calling compute_shared_secret(); it
+  relies on the crypto_kpp backend. A peer can send an invalid public
+  key and force the resulting DHKey to one of a small number of
+  predictable values in a single pairing attempt.
+
+Fixed by validating the peer-supplied value before it reaches the
+hardware queue, in both compute_value() functions: for DH, rejecting
+any value outside [2, p-2]; for ECDH, reusing ecc_is_pubkey_valid_partial()
+after converting the raw big-endian coordinates HPRE already works
+with into the digit form that function expects.
+
+Sashiko's automated review of this patch also flagged a related,
+pre-existing heap overflow in hpre_ecdh_src_data_init() that this
+patch doesn't touch; it's fixed separately in 2/2 of this series.
+
+Fixes: c8b4b477079d ("crypto: hisilicon - add HiSilicon HPRE accelerator")
+Fixes: 05e7b906aa7c ("crypto: hisilicon/hpre - add 'ECDH' algorithm")
+Signed-off-by: Ryan Prinz <rc4d5a@protonmail.com>
 ---
- lib/crypto/sm3.c | 143 ++++++++++++++++-------------------------------
- 1 file changed, 48 insertions(+), 95 deletions(-)
+v2:
+ - Fixed a bug Sashiko's automated review found: ctx->key_sz is the
+   hardware slot width, not the curve's own coordinate size (HPRE
+   pads P-192's 24-byte coordinates into the 32-byte P-256 slot), so
+   reading ecc_swap_digits() from the start of that padded region
+   shifted every P-192 coordinate and rejected every valid P-192
+   public key, including testmgr's self-test.
+ - Fixed a second bug Sashiko's review found: ecc_alloc_point()
+   allocates with GFP_KERNEL unconditionally, which could sleep in a
+   context where CRYPTO_TFM_REQ_MAY_SLEEP is clear. Switched to a
+   stack-allocated ecc_point via ECC_POINT_INIT(), which removes the
+   allocation (and the sleep question) entirely.
+ - Fixed a third bug found during further review of the above fix:
+   for P-192, the extra bytes between the caller's half-width and the
+   curve's own 24-byte coordinate size were accepted without checking
+   they were zero. A value with non-zero content there is wider than
+   P-192's prime once it reaches the hardware at its full submitted
+   width, which is the out-of-range case this patch fixes. Now
+   rejected unless those extra bytes are zero.
+ - Resent as a new thread rather than a reply to the v1 thread.
 
-diff --git a/lib/crypto/sm3.c b/lib/crypto/sm3.c
-index 23059347b4493..42198c724c49a 100644
---- a/lib/crypto/sm3.c
-+++ b/lib/crypto/sm3.c
-@@ -22,25 +22,6 @@ static const struct sm3_block_state sm3_iv = {
- 	},
- };
- 
--static const u32 ____cacheline_aligned K[64] = {
--	0x79cc4519, 0xf3988a32, 0xe7311465, 0xce6228cb,
--	0x9cc45197, 0x3988a32f, 0x7311465e, 0xe6228cbc,
--	0xcc451979, 0x988a32f3, 0x311465e7, 0x6228cbce,
--	0xc451979c, 0x88a32f39, 0x11465e73, 0x228cbce6,
--	0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c,
--	0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce,
--	0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec,
--	0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5,
--	0x7a879d8a, 0xf50f3b14, 0xea1e7629, 0xd43cec53,
--	0xa879d8a7, 0x50f3b14f, 0xa1e7629e, 0x43cec53d,
--	0x879d8a7a, 0x0f3b14f5, 0x1e7629ea, 0x3cec53d4,
--	0x79d8a7a8, 0xf3b14f50, 0xe7629ea1, 0xcec53d43,
--	0x9d8a7a87, 0x3b14f50f, 0x7629ea1e, 0xec53d43c,
--	0xd8a7a879, 0xb14f50f3, 0x629ea1e7, 0xc53d43ce,
--	0x8a7a879d, 0x14f50f3b, 0x29ea1e76, 0x53d43cec,
--	0xa7a879d8, 0x4f50f3b1, 0x9ea1e762, 0x3d43cec5
--};
--
- /*
-  * Transform the message X which consists of 16 32-bit-words. See
-  * GM/T 004-2012 for details.
-@@ -48,6 +29,7 @@ static const u32 ____cacheline_aligned K[64] = {
- #define R(i, a, b, c, d, e, f, g, h, t, w1, w2)			\
- 	do {							\
- 		ss1 = rol32((rol32((a), 12) + (e) + (t)), 7);	\
-+		(t) = rol32((t), 1);				\
- 		ss2 = ss1 ^ rol32((a), 12);			\
- 		d += FF ## i(a, b, c) + ss2 + ((w1) ^ (w2));	\
- 		h += GG ## i(e, f, g) + ss1 + (w1);		\
-@@ -70,19 +52,20 @@ static const u32 ____cacheline_aligned K[64] = {
- /* Message expansion */
- #define P0(x) ((x) ^ rol32((x), 9) ^ rol32((x), 17))
- #define P1(x) ((x) ^ rol32((x), 15) ^ rol32((x), 23))
--#define I(i)  (W[i] = get_unaligned_be32(data + i * 4))
--#define W1(i) (W[i & 0x0f])
--#define W2(i) (W[i & 0x0f] =				\
--		P1(W[i & 0x0f]				\
--			^ W[(i-9) & 0x0f]		\
--			^ rol32(W[(i-3) & 0x0f], 15))	\
--		^ rol32(W[(i-13) & 0x0f], 7)		\
--		^ W[(i-6) & 0x0f])
-+#define I(i)  (W[i] = get_unaligned_be32(data + (i) * 4))
-+#define W1(i) (W[(i) & 0x0f])
-+#define W2(i) (W[(i) & 0x0f] =					\
-+		P1(W[(i) & 0x0f]				\
-+			^ W[((i) - 9) & 0x0f]			\
-+			^ rol32(W[((i) - 3) & 0x0f], 15))	\
-+		^ rol32(W[((i) - 13) & 0x0f], 7)		\
-+		^ W[((i) - 6) & 0x0f])
- 
- static void sm3_block_generic(struct sm3_block_state *state,
- 			      const u8 data[SM3_BLOCK_SIZE], u32 W[16])
- {
--	u32 a, b, c, d, e, f, g, h, ss1, ss2;
-+	u32 a, b, c, d, e, f, g, h, ss1, ss2, t;
-+	int i;
- 
- 	a = state->h[0];
- 	b = state->h[1];
-@@ -93,73 +76,43 @@ static void sm3_block_generic(struct sm3_block_state *state,
- 	g = state->h[6];
- 	h = state->h[7];
- 
--	R1(a, b, c, d, e, f, g, h, K[0], I(0), I(4));
--	R1(d, a, b, c, h, e, f, g, K[1], I(1), I(5));
--	R1(c, d, a, b, g, h, e, f, K[2], I(2), I(6));
--	R1(b, c, d, a, f, g, h, e, K[3], I(3), I(7));
--	R1(a, b, c, d, e, f, g, h, K[4], W1(4), I(8));
--	R1(d, a, b, c, h, e, f, g, K[5], W1(5), I(9));
--	R1(c, d, a, b, g, h, e, f, K[6], W1(6), I(10));
--	R1(b, c, d, a, f, g, h, e, K[7], W1(7), I(11));
--	R1(a, b, c, d, e, f, g, h, K[8], W1(8), I(12));
--	R1(d, a, b, c, h, e, f, g, K[9], W1(9), I(13));
--	R1(c, d, a, b, g, h, e, f, K[10], W1(10), I(14));
--	R1(b, c, d, a, f, g, h, e, K[11], W1(11), I(15));
--	R1(a, b, c, d, e, f, g, h, K[12], W1(12), W2(16));
--	R1(d, a, b, c, h, e, f, g, K[13], W1(13), W2(17));
--	R1(c, d, a, b, g, h, e, f, K[14], W1(14), W2(18));
--	R1(b, c, d, a, f, g, h, e, K[15], W1(15), W2(19));
--
--	R2(a, b, c, d, e, f, g, h, K[16], W1(16), W2(20));
--	R2(d, a, b, c, h, e, f, g, K[17], W1(17), W2(21));
--	R2(c, d, a, b, g, h, e, f, K[18], W1(18), W2(22));
--	R2(b, c, d, a, f, g, h, e, K[19], W1(19), W2(23));
--	R2(a, b, c, d, e, f, g, h, K[20], W1(20), W2(24));
--	R2(d, a, b, c, h, e, f, g, K[21], W1(21), W2(25));
--	R2(c, d, a, b, g, h, e, f, K[22], W1(22), W2(26));
--	R2(b, c, d, a, f, g, h, e, K[23], W1(23), W2(27));
--	R2(a, b, c, d, e, f, g, h, K[24], W1(24), W2(28));
--	R2(d, a, b, c, h, e, f, g, K[25], W1(25), W2(29));
--	R2(c, d, a, b, g, h, e, f, K[26], W1(26), W2(30));
--	R2(b, c, d, a, f, g, h, e, K[27], W1(27), W2(31));
--	R2(a, b, c, d, e, f, g, h, K[28], W1(28), W2(32));
--	R2(d, a, b, c, h, e, f, g, K[29], W1(29), W2(33));
--	R2(c, d, a, b, g, h, e, f, K[30], W1(30), W2(34));
--	R2(b, c, d, a, f, g, h, e, K[31], W1(31), W2(35));
--
--	R2(a, b, c, d, e, f, g, h, K[32], W1(32), W2(36));
--	R2(d, a, b, c, h, e, f, g, K[33], W1(33), W2(37));
--	R2(c, d, a, b, g, h, e, f, K[34], W1(34), W2(38));
--	R2(b, c, d, a, f, g, h, e, K[35], W1(35), W2(39));
--	R2(a, b, c, d, e, f, g, h, K[36], W1(36), W2(40));
--	R2(d, a, b, c, h, e, f, g, K[37], W1(37), W2(41));
--	R2(c, d, a, b, g, h, e, f, K[38], W1(38), W2(42));
--	R2(b, c, d, a, f, g, h, e, K[39], W1(39), W2(43));
--	R2(a, b, c, d, e, f, g, h, K[40], W1(40), W2(44));
--	R2(d, a, b, c, h, e, f, g, K[41], W1(41), W2(45));
--	R2(c, d, a, b, g, h, e, f, K[42], W1(42), W2(46));
--	R2(b, c, d, a, f, g, h, e, K[43], W1(43), W2(47));
--	R2(a, b, c, d, e, f, g, h, K[44], W1(44), W2(48));
--	R2(d, a, b, c, h, e, f, g, K[45], W1(45), W2(49));
--	R2(c, d, a, b, g, h, e, f, K[46], W1(46), W2(50));
--	R2(b, c, d, a, f, g, h, e, K[47], W1(47), W2(51));
--
--	R2(a, b, c, d, e, f, g, h, K[48], W1(48), W2(52));
--	R2(d, a, b, c, h, e, f, g, K[49], W1(49), W2(53));
--	R2(c, d, a, b, g, h, e, f, K[50], W1(50), W2(54));
--	R2(b, c, d, a, f, g, h, e, K[51], W1(51), W2(55));
--	R2(a, b, c, d, e, f, g, h, K[52], W1(52), W2(56));
--	R2(d, a, b, c, h, e, f, g, K[53], W1(53), W2(57));
--	R2(c, d, a, b, g, h, e, f, K[54], W1(54), W2(58));
--	R2(b, c, d, a, f, g, h, e, K[55], W1(55), W2(59));
--	R2(a, b, c, d, e, f, g, h, K[56], W1(56), W2(60));
--	R2(d, a, b, c, h, e, f, g, K[57], W1(57), W2(61));
--	R2(c, d, a, b, g, h, e, f, K[58], W1(58), W2(62));
--	R2(b, c, d, a, f, g, h, e, K[59], W1(59), W2(63));
--	R2(a, b, c, d, e, f, g, h, K[60], W1(60), W2(64));
--	R2(d, a, b, c, h, e, f, g, K[61], W1(61), W2(65));
--	R2(c, d, a, b, g, h, e, f, K[62], W1(62), W2(66));
--	R2(b, c, d, a, f, g, h, e, K[63], W1(63), W2(67));
-+	t = 0x79cc4519;
-+	R1(a, b, c, d, e, f, g, h, t, I(0), I(4));
-+	R1(d, a, b, c, h, e, f, g, t, I(1), I(5));
-+	R1(c, d, a, b, g, h, e, f, t, I(2), I(6));
-+	R1(b, c, d, a, f, g, h, e, t, I(3), I(7));
-+	R1(a, b, c, d, e, f, g, h, t, W1(4), I(8));
-+	R1(d, a, b, c, h, e, f, g, t, W1(5), I(9));
-+	R1(c, d, a, b, g, h, e, f, t, W1(6), I(10));
-+	R1(b, c, d, a, f, g, h, e, t, W1(7), I(11));
-+	R1(a, b, c, d, e, f, g, h, t, W1(8), I(12));
-+	R1(d, a, b, c, h, e, f, g, t, W1(9), I(13));
-+	R1(c, d, a, b, g, h, e, f, t, W1(10), I(14));
-+	R1(b, c, d, a, f, g, h, e, t, W1(11), I(15));
-+	R1(a, b, c, d, e, f, g, h, t, W1(12), W2(16));
-+	R1(d, a, b, c, h, e, f, g, t, W1(13), W2(17));
-+	R1(c, d, a, b, g, h, e, f, t, W1(14), W2(18));
-+	R1(b, c, d, a, f, g, h, e, t, W1(15), W2(19));
+No HiSilicon HPRE hardware was available to reproduce this. Verified
+by building the modified driver
+(along with crypto/dh.c, crypto/ecc.c, crypto/ecdh.c and crypto/kpp.c)
+against an unmodified kernel tree, confirming the module compiles and
+links cleanly with no new warnings; and separately verifying the new
+DH range check's byte-buffer arithmetic in a standalone test exercising
+the boundary values 0, 1, 2, p-2, p-1 and p, which all produced the
+expected accept/reject result. The ECDH fix reuses
+ecc_is_pubkey_valid_partial() unmodified; a separate standalone test
+confirmed its zero-padding of a shorter-than-full-length coordinate
+produces the same byte layout as hpre_ecdh_src_data_init()'s existing
+shift-based padding. A third standalone test confirmed the
+coordinate-extraction offset correctly accounts for curves whose
+coordinate size differs from the hardware slot width (P-192's 24-byte
+coordinates inside the 32-byte P-256 slot), while P-256 and P-384
+(where the two sizes already match) are unaffected. A fourth
+standalone test confirmed the new gap-byte check rejects a crafted
+P-192 value with a non-zero byte outside its real 24-byte coordinate
+while still accepting both a plain 24-byte encoding and a caller
+zero-padded out to the full 32-byte slot.
+
+AI Disclosure: An AI assistant was used to assist with the
+analysis and testing. I have verified the vulnerability, the fix, and
+the test results myself and take responsibility for this contribution,
+per Documentation/process/coding-assistants.rst.
+
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 144 ++++++++++++++++++++++++=
++++
+ 1 file changed, 144 insertions(+)
+
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/h=
+isilicon/hpre/hpre_crypto.c
+index 66a276786a7d..80666bb71508 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -4,6 +4,7 @@
+ #include <crypto/dh.h>
+ #include <crypto/ecc_curve.h>
+ #include <crypto/ecdh.h>
++#include <crypto/internal/ecc.h>
+ #include <crypto/rng.h>
+ #include <crypto/internal/akcipher.h>
+ #include <crypto/internal/kpp.h>
+@@ -471,6 +472,69 @@ static int hpre_send(struct hpre_ctx *ctx, struct hpre=
+_sqe *msg)
+ =09return ret;
+ }
+
++/* Returns true iff 2 <=3D y <=3D p - 2, given big-endian buffers of key_s=
+z bytes. */
++static bool hpre_dh_pubkey_in_range(const u8 *y, const u8 *p_minus_1,
++=09=09=09=09    unsigned int key_sz)
++{
++=09bool is_zero_or_one =3D true;
++=09unsigned int i;
 +
-+	t = 0x9d8a7a87;
-+	for (i = 0; i < 3; i++) {
-+		R2(a, b, c, d, e, f, g, h, t, W1(0), W2(4));
-+		R2(d, a, b, c, h, e, f, g, t, W1(1), W2(5));
-+		R2(c, d, a, b, g, h, e, f, t, W1(2), W2(6));
-+		R2(b, c, d, a, f, g, h, e, t, W1(3), W2(7));
-+		R2(a, b, c, d, e, f, g, h, t, W1(4), W2(8));
-+		R2(d, a, b, c, h, e, f, g, t, W1(5), W2(9));
-+		R2(c, d, a, b, g, h, e, f, t, W1(6), W2(10));
-+		R2(b, c, d, a, f, g, h, e, t, W1(7), W2(11));
-+		R2(a, b, c, d, e, f, g, h, t, W1(8), W2(12));
-+		R2(d, a, b, c, h, e, f, g, t, W1(9), W2(13));
-+		R2(c, d, a, b, g, h, e, f, t, W1(10), W2(14));
-+		R2(b, c, d, a, f, g, h, e, t, W1(11), W2(15));
-+		R2(a, b, c, d, e, f, g, h, t, W1(12), W2(16));
-+		R2(d, a, b, c, h, e, f, g, t, W1(13), W2(17));
-+		R2(c, d, a, b, g, h, e, f, t, W1(14), W2(18));
-+		R2(b, c, d, a, f, g, h, e, t, W1(15), W2(19));
-+	}
- 
- 	state->h[0] ^= a;
- 	state->h[1] ^= b;
++=09for (i =3D 0; i < key_sz - 1; i++) {
++=09=09if (y[i]) {
++=09=09=09is_zero_or_one =3D false;
++=09=09=09break;
++=09=09}
++=09}
++
++=09if (is_zero_or_one && y[key_sz - 1] <=3D 1)
++=09=09return false;
++
++=09return memcmp(y, p_minus_1, key_sz) < 0;
++}
++
++static int hpre_dh_peer_pubkey_valid(struct hpre_ctx *ctx,
++=09=09=09=09     struct scatterlist *src,
++=09=09=09=09     unsigned int src_len, gfp_t gfp)
++{
++=09unsigned int key_sz =3D ctx->key_sz;
++=09u8 *p_minus_1, *y;
++=09size_t copied;
++=09int i, ret =3D 0;
++
++=09if (!src_len || src_len > key_sz)
++=09=09return -EINVAL;
++
++=09y =3D kzalloc(key_sz, gfp);
++=09if (!y)
++=09=09return -ENOMEM;
++
++=09copied =3D sg_copy_to_buffer(src, sg_nents_for_len(src, src_len),
++=09=09=09=09   y + (key_sz - src_len), src_len);
++=09if (copied !=3D src_len) {
++=09=09ret =3D -EINVAL;
++=09=09goto free_y;
++=09}
++
++=09p_minus_1 =3D kmemdup(ctx->dh.xa_p + key_sz, key_sz, gfp);
++=09if (!p_minus_1) {
++=09=09ret =3D -ENOMEM;
++=09=09goto free_y;
++=09}
++
++=09for (i =3D key_sz - 1; i >=3D 0; i--) {
++=09=09if (p_minus_1[i]-- !=3D 0)
++=09=09=09break;
++=09}
++
++=09if (!hpre_dh_pubkey_in_range(y, p_minus_1, key_sz))
++=09=09ret =3D -EINVAL;
++
++=09kfree(p_minus_1);
++free_y:
++=09kfree(y);
++=09return ret;
++}
++
+ static int hpre_dh_compute_value(struct kpp_request *req)
+ {
+ =09struct crypto_kpp *tfm =3D crypto_kpp_reqtfm(req);
+@@ -485,6 +549,15 @@ static int hpre_dh_compute_value(struct kpp_request *r=
+eq)
+ =09=09return ret;
 
-base-commit: 7c5ec98f7bcf658cbc7d0094e4a762f6a9c2f159
--- 
-2.56.1
+ =09if (req->src) {
++=09=09gfp_t gfp =3D hpre_req->flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
++=09=09=09    GFP_KERNEL : GFP_ATOMIC;
++
++=09=09ret =3D hpre_dh_peer_pubkey_valid(ctx, req->src, req->src_len, gfp);
++=09=09if (unlikely(ret)) {
++=09=09=09dev_err(ctx->dev, "invalid peer public key, ret =3D %d!\n", ret);
++=09=09=09return ret;
++=09=09}
++
+ =09=09ret =3D hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 1);
+ =09=09if (unlikely(ret))
+ =09=09=09goto clear_all;
+@@ -1526,6 +1599,71 @@ static int hpre_ecdh_dst_data_init(struct hpre_asym_=
+request *hpre_req,
+ =09return 0;
+ }
+
++static int hpre_ecdh_peer_pubkey_valid(struct hpre_ctx *ctx,
++=09=09=09=09       struct scatterlist *src,
++=09=09=09=09       unsigned int src_len)
++{
++=09const struct ecc_curve *curve =3D ecc_get_curve(ctx->curve_id);
++=09unsigned int nbytes =3D ctx->key_sz;
++=09unsigned int half =3D src_len >> 1;
++=09u8 coord_buf[2 * ECC_MAX_BYTES] =3D { };
++=09u64 x[ECC_MAX_DIGITS], y[ECC_MAX_DIGITS];
++=09struct ecc_point pk;
++=09unsigned int cbytes;
++=09size_t copied;
++
++=09if (!curve)
++=09=09return -EINVAL;
++
++=09/* ctx->key_sz is the hardware slot width, not the curve's own
++=09 * coordinate size: HPRE pads P-192 (24-byte coordinates) out to
++=09 * the wider 32-byte P-256 slot.
++=09 */
++=09cbytes =3D curve->g.ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
++=09if (cbytes > nbytes)
++=09=09return -EINVAL;
++
++=09/*
++=09 * Src_data is gx and gy concatenated, each zero-padded up to
++=09 * nbytes, matching the convention hpre_ecdh_src_data_init() uses
++=09 * for the hardware submission path.
++=09 */
++=09if (!half || half > nbytes || 2 * nbytes > sizeof(coord_buf))
++=09=09return -EINVAL;
++
++=09copied =3D sg_pcopy_to_buffer(src, sg_nents_for_len(src, src_len),
++=09=09=09=09    coord_buf + (nbytes - half), half, 0);
++=09if (copied !=3D half)
++=09=09return -EINVAL;
++
++=09copied =3D sg_pcopy_to_buffer(src, sg_nents_for_len(src, src_len),
++=09=09=09=09    coord_buf + nbytes + (nbytes - half),
++=09=09=09=09    half, half);
++=09if (copied !=3D half)
++=09=09return -EINVAL;
++
++=09/*
++=09 * If half is wider than the curve's own coordinate size (only
++=09 * possible for P-192 inside the wider P-256 slot), the extra
++=09 * leading bytes of each half must be zero, or this isn't a
++=09 * value this curve can represent.
++=09 */
++=09if (half > cbytes &&
++=09    (memchr_inv(coord_buf + (nbytes - half), 0, half - cbytes) ||
++=09     memchr_inv(coord_buf + nbytes + (nbytes - half), 0, half - cbytes)=
+))
++=09=09return -EINVAL;
++
++=09/*
++=09 * Extract each coordinate's cbytes-wide value from the end of
++=09 * its nbytes-wide zero-padded region.
++=09 */
++=09ecc_swap_digits(coord_buf + (nbytes - cbytes), x, curve->g.ndigits);
++=09ecc_swap_digits(coord_buf + nbytes + (nbytes - cbytes), y, curve->g.ndi=
+gits);
++=09pk =3D ECC_POINT_INIT(x, y, curve->g.ndigits);
++
++=09return ecc_is_pubkey_valid_partial(curve, &pk);
++}
++
+ static int hpre_ecdh_compute_value(struct kpp_request *req)
+ {
+ =09struct crypto_kpp *tfm =3D crypto_kpp_reqtfm(req);
+@@ -1543,6 +1681,12 @@ static int hpre_ecdh_compute_value(struct kpp_reques=
+t *req)
+ =09}
+
+ =09if (req->src) {
++=09=09ret =3D hpre_ecdh_peer_pubkey_valid(ctx, req->src, req->src_len);
++=09=09if (unlikely(ret)) {
++=09=09=09dev_err(dev, "invalid peer public key, ret =3D %d!\n", ret);
++=09=09=09return ret;
++=09=09}
++
+ =09=09ret =3D hpre_ecdh_src_data_init(hpre_req, req->src, req->src_len);
+ =09=09if (unlikely(ret)) {
+ =09=09=09dev_err(dev, "failed to init src data, ret =3D %d!\n", ret);
+--
+2.51.2
 
