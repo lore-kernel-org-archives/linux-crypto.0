@@ -1,55 +1,73 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795530195;
-	b=jnsec0zHK0NIELjpt54QC+ZnsUQpDeU6sPaaHy74nyIgnqS0f2YfY5w+6/jltUBx+rr8
-	 G4zTNdWdHl1/hY8v7bZhlXnGvUGzYVq/2mFiSK/M8sAJSEziwC1BPQ5zFH+X4sxy5/JYb
-	 tHpB6Bv5BtpO+T0i5egs3s0b+GiuzZYIwqKVIyFwbPp9p8Z7VSPITlro8FirgZDDXwizP
-	 zhfUtBSfTzrJ27+mTRVQN06FtPqbrVOAVomqN9uG1VBYVQ8YtZrE0WwySRWOy1lppbcSF
-	 pkL5wxUBx8RDgYluJhOQ+IwG0Lq97KtmIVI4oEnEmflLbzBt7dNiQXRKwYeNTOUwZ2g==
+	t=1795532963;
+	b=MTT5tTv0rrRVeW4dOXB8E7LgPBa6PVxoN5Y0DpDOVpSDRJ+oN9pR/HsehJbPKHZuoCcf
+	 RVBdwFIcOBqe4NOQ3EEN3mkbN8OHAqo0/PuLxxs3idu0B5Rl2CR97jfp6Rh43fVyED3u9
+	 3Q11jP41NX/vJZFgI9Lp2cGU0mSOXQsdVDKV2pv0oiqTiUZGmrh0oigJZLsA/pBPcPoOO
+	 AWpP+AG3iqQzhRml1hCzJpZD0H1Rv+TPRfnwe1XOfsH016DcSmqUpqiTCq08z5XpXQ04O
+	 g+HqFE48BuYvoxMUmyZaDeW3AMhwHmhe8WXSg0dfroOecZ/BqCQ4Tk83j6y7vGPMeJA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795530195;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=5gVToo1FpGaDFr+bXbxhuK3a+Dpx7/ZsW9WcCC4lSnA=;
-	b=ZQjXt9dPv5SG8/ncrteyyefDjjKdCsY1ds52O6zmx1rGb3LERgcQUetBLA1Q+oWUX6/Z
-	 UUBjE7dSEfqooDpmddj57kfOkMYvHMbbf7CsNtrkS+82jJdQAzQCW/4M2wFu/4r+XX0V3
-	 CDaITY9nSLXo4TtQWmbsx5vLkZp+jAa+jppkNJego+nClza6FJOqRFJD1B/R6kNaFKVTQ
-	 qc5H0g5ailMUMnY/GEjJiQRhPEJ048GBysQTDHJguBElcn6Ysr6AeHV0azlLy4QxAgIXV
-	 qreX73kWvixqWTl1Ur08dW/K9kbjvAWqc2NisD54kHaIMKvO16p9REOQj1/yTqgAFvw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795532963;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=K+IekPDE+jkqEoJ25TetgowrP8a4LUWhHnBuiLXn8A8=;
+	b=D/ZQuH8RJb5ohZPVopFV6q1o+rlMLEWwXsjgY8PPSBC8YQsnnNthgHkBgZH1xymVO5+A
+	 wOQsYEuDGfsnNZH4IkQVO/D8QRQOZ2FR/tm4AsmfByjRyjSxf5XUAd6S2qSAtdh9au5dO
+	 L4H62+JNEH1T9yFam9BFtnOx16uKOELHA2oxAZTLAp0lMTmR0Rdmwd3px0rEQ7iSUdXZ1
+	 pjtkslSLI6cxtgSIfswPF/xNH7BhNe3kf7Flds3VmRePn5jtKtZfLnZPoziHOaoJbktHG
+	 c0ku1P5TgENr6lt/Mit5V1beeCjoF219CVN6SM3P2yjm5eUHpwiM+A8Fxt+LVbLz53g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=InzuOnOq;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AxiV7WZS;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE08606A31E
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 14:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 3ED24606A321;
+	Tue, 24 Nov 2026 15:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=InzuOnOq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 553F61F000CA;
-	Tue, 24 Nov 2026 14:23:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AxiV7WZS
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 36FD81F000D4;
+	Tue, 24 Nov 2026 15:09:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795530194;
-	bh=5gVToo1FpGaDFr+bXbxhuK3a+Dpx7/ZsW9WcCC4lSnA=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=InzuOnOqTq55rAKeJzxtthi3dM/mFzu7JHKDAO7wW5YPnDq7r0PYwy+lWW6Zhdy+2
-	 VcpwxSgdnDtpHedDGzBIjTBX7jCudsxnFdBI+WYkSAWdASeFmDZ8/6uOyfRFtYlD8q
-	 ChBDHqvlgW6VhvoIJM2EbCjeqROJz90T3c5haZS05k0MNe4v6sNlDmBMYFAqBH+Hef
-	 bRN0HtJn8PhO40KoMn7OElbr4FEg6ymNVvPaxxipE/eXKB5ivtB1zt+UeBCZJq/RqN
-	 ZuStgI6nhBGqJ0q6lMCn/w76BBQmf11YwITl6XWa6x6zGEDf0hB73URor0+7mA/ELz
-	 SNQlHhWonkd8Q==
-Message-ID: <sashiko-outbox-231332@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v2] crypto: qat - fix missing DH public key validation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Ryan Prinz" <rc4d5a@protonmail.com>, "Giovanni Cabiddu" <giovanni.cabiddu@intel.com>
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com, linux-crypto@vger.kernel.org
-In-Reply-To: <20261124141238.1743680-1-rc4d5a@protonmail.com>
-References: <20261124141238.1743680-1-rc4d5a@protonmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Nov 2026 14:23:13 +0000
+	s=k20260515; t=1795532962;
+	bh=K+IekPDE+jkqEoJ25TetgowrP8a4LUWhHnBuiLXn8A8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=AxiV7WZSd4PJ6njfHxHjci8C4W3rlHZiStM2FsIJxUt9/7C+Ank9ouOae768ogJKt
+	 +S54ua88UepNEkPBO6qjzgCWCZWeSY7Nr1RNSJqOcNds+Ygoe+HJyxY11VPr0ZLXxk
+	 iaYHYERsCjcwthMRREuWi033qD+cFkVBdv3YAl5YuA6D6WGV+a3YtT6hT9u5hLYoA8
+	 02P71nq4V8c8pfqRkWRA5AXuZdmYn/SbEgClf0uNzk3s1IfiIu7l0hhXIe/KlG+hbA
+	 Oj+FZwYYVRWGv5aCyggVQaFSCQHBF64t+o1e+Quhe9huy6dUrx1Rwf5Cj1zg3Ygmba
+	 3b0AD2lJpQAyg==
+Date: Tue, 24 Nov 2026 17:09:18 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: sashiko-reviews@lists.linux.dev
+Cc: keyrings@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
+	Alasdair Kergon <agk@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ignat Korchagin <ignat@linux.win>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	James Morris <jmorris@namei.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Corbet <corbet@lwn.net>, Lukas Wunner <lukas@wunner.de>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Mimi Zohar <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	James Prestwood <prestwoj@gmail.com>
+Subject: Re: [PATCH 9/9] KEYS: trusted: Add asymmetric key support for TPM2
+Message-ID: <awWonunbfilZrzQV@kernel.org>
+References: <20261124120044.1481752-1-jarkko@kernel.org>
+ <20261124120044.1481752-10-jarkko@kernel.org>
+ <sashiko-outbox-231131@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -58,139 +76,27 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <sashiko-outbox-231131@kernel.org>
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [Low] crypto: qat - duplicate buffer allocation and copy in
-  qat_dh_compute_value()
---
+On Tue, Nov 24, 2026 at 12:25:44PM +0000, sashiko-bot@kernel.org wrote:
+> Thank you for your contribution! Sashiko AI review found 2 potential
+> issues to consider:
+> - [Medium] KEYS: trusted: 32-bit param_size overflow in
+>   tpm2_asym_rsa_decrypt()
 
-commit 64e695c4154aabd945fc196f5f802b7fe41f7873
-Author: Ryan Prinz <rc4d5a@protonmail.com>
+I've now learned that sometimes people expect you to fix these before
+they will review, or they get upset if you fix them and iterate the
+series. Someone will be rip their trousers whatever you do.
 
-crypto: qat - fix missing DH public key validation
+Or then, some gets pissed when some random bot gives feedback pm
+the next day.
 
-This commit adds range validation for peer-supplied Diffie-Hellman public
-keys in qat_dh_compute_value() so values outside [2, p - 2] are rejected
-before reaching the QAT hardware queue.
+Since this is the worst of the worst I'll mark it down and let's
+consider it addressed.
 
-> diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/driver=
-s/crypto/intel/qat/qat_common/qat_asym_algs.c
-> index 77d59e977472d..78f1b949614b9 100644
-> --- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-> +++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-> @@ -216,6 +216,63 @@ static unsigned long qat_dh_fn_id(unsigned int len, =
-bool g2)
->  	}
->  }
-> =20
-> +/* Returns true iff 2 <=3D y <=3D p - 2, given big-endian buffers of p_s=
-ize bytes. */
-> +static bool qat_dh_pubkey_in_range(const u8 *y, const u8 *p_minus_1,
-> +				   unsigned int p_size)
-> +{
-> +	bool is_zero_or_one =3D true;
-> +	unsigned int i;
-> +
-> +	for (i =3D 0; i < p_size - 1; i++) {
-> +		if (y[i]) {
-> +			is_zero_or_one =3D false;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (is_zero_or_one && y[p_size - 1] <=3D 1)
-> +		return false;
-> +
-> +	return memcmp(y, p_minus_1, p_size) < 0;
-> +}
-> +
-> +static int qat_dh_peer_pubkey_valid(struct qat_dh_ctx *ctx,
-> +				    struct scatterlist *src,
-> +				    unsigned int src_len, gfp_t flags)
-> +{
-> +	unsigned int p_size =3D ctx->p_size;
-> +	u8 *p_minus_1, *y;
-> +	int i, ret =3D 0;
-> +
-> +	if (!src_len || src_len > p_size)
-> +		return -EINVAL;
-> +
-> +	y =3D kzalloc(p_size, flags);
-> +	if (!y)
-> +		return -ENOMEM;
-> +
-> +	scatterwalk_map_and_copy(y + (p_size - src_len), src, 0, src_len, 0);
-> +
-> +	p_minus_1 =3D kmemdup(ctx->p, p_size, flags);
-> +	if (!p_minus_1) {
-> +		ret =3D -ENOMEM;
-> +		goto free_y;
-> +	}
-> +
-> +	for (i =3D p_size - 1; i >=3D 0; i--) {
-> +		if (p_minus_1[i]-- !=3D 0)
-> +			break;
-> +	}
-> +
-> +	if (!qat_dh_pubkey_in_range(y, p_minus_1, p_size))
-> +		ret =3D -EINVAL;
-> +
-> +	kfree_sensitive(p_minus_1);
-> +free_y:
-> +	kfree_sensitive(y);
-> +	return ret;
-> +}
-> +
->  static int qat_dh_compute_value(struct kpp_request *req)
->  {
->  	struct crypto_kpp *tfm =3D crypto_kpp_reqtfm(req);
-> @@ -241,6 +298,12 @@ static int qat_dh_compute_value(struct kpp_request *=
-req)
->  	if (req->src_len > ctx->p_size)
->  		return -EINVAL;
-> =20
-> +	if (req->src) {
-> +		ret =3D qat_dh_peer_pubkey_valid(ctx, req->src, req->src_len, flags);
-> +		if (unlikely(ret))
-> +			return ret;
-> +	}
-> +
+I like Sashiko but don't know how to dance the dance.
 
-[Severity: Low]
-This isn't a bug, but qat_dh_peer_pubkey_valid() duplicates the buffer
-preparation that qat_dh_compute_value() already performs right before
-dma_map_single():
-
-drivers/crypto/intel/qat/qat_common/qat_asym_algs.c:qat_dh_compute_value() {
-	...
-	if (req->src) {
-		if (sg_is_last(req->src) && req->src_len =3D=3D ctx->p_size) {
-			qat_req->src_align =3D NULL;
-			vaddr =3D sg_virt(req->src);
-		} else {
-			int shift =3D ctx->p_size - req->src_len;
-
-			qat_req->src_align =3D kzalloc(ctx->p_size, flags);
-			if (unlikely(!qat_req->src_align))
-				return ret;
-
-			scatterwalk_map_and_copy(qat_req->src_align + shift,
-						 req->src, 0, req->src_len, 0);
-
-			vaddr =3D qat_req->src_align;
-		}
-	...
-}
-
-On every shared-secret request, qat_dh_peer_pubkey_valid() re-checks
-src_len > p_size, allocates y and p_minus_1, copies req->src with
-scatterwalk_map_and_copy(), and zeroes and frees both buffers via
-kfree_sensitive().  Validating vaddr right before dma_map_single() (and
-comparing against ctx->p without a per-request kmemdup()) would check the
-exact buffer mapped for DMA while avoiding the duplicate scatterlist copy
-and extra GFP_ATOMIC allocations when CRYPTO_TFM_REQ_MAY_SLEEP is clear.
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261124141238.1743=
-680-1-rc4d5a@protonmail.com?part=3D1
+Br, Jarkko
