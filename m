@@ -1,58 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.16
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795649371;
-	b=J496pQOsMUGRTrzFdm0vP50aUUEfUAyaan0fXex4ORzbnUJVEQX0u1c32+4Ta+TQexTu
-	 GujK5Mv1CaoEwA7U2h+j+JbPkxLg7dpWNcL2FMH8Twwtdz77UEEeCGvG9kt8ZItB1IrZp
-	 OyIgyGWvmdbdrdDa7BTOPRSD80zqHkP205rHPjpnwMJFtvXwU5sZ5CWZ6i/ohuF2el4Hd
-	 Cd0KAAP/z2GFj9ggJT/wj0KvWPwE2PIVmezXlPuxNhmZpP8WJG+DKUR25yBfrOTP/fYJh
-	 X/Kek3c3Vhuznv47MZKpqlZF4VbTXciis3O31ESyjF0uGXHF0IOhbWvqMFL+Rb87JaQ==
+	t=1795649490;
+	b=203J3/rn2Ktytds7Td8Ltw/95pBkiSxOq2O7Ii6sEe/+cRaXh5qxylBaToGL8u7+hNMj
+	 g6adNQlCjnrkmUQ5LIedhaGpzfcQ6uesdWd6V6TonJwdzIbBkfQ2I5JpP8EmGHKApC64k
+	 ZG/fTU4/PF0VlPrYvNpZ2MrZpGJUMropY/WY2ugUY8G+5rsq2WhDzhyQ2GU97lN3vHpRL
+	 papxdyKecY4UP8HgdYoSj6IzTmSU4vR+dlnS7aYmBrEhg/ua+ZUbjBQjKsH+qVntDXFhe
+	 4EuN0L8Qu4yPy9GCbfE70JfGf2GDlJt5ecW/bIud9hZOFNjD+CWrrnrQtJHTO5M3piw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795649371;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=C+uz+utGmI/T6WiqsI5K9gY2PcFELU4kFQOl3At4YBk=;
-	b=qS2vjOlHuLlsrFRKfAigMotoNGJUv5X0tmav6YvETYoVex6rhDbSqsOWh6tvQR7tmjs9
-	 ZWJM9v1j2KR53RdjTsSnUpEe1ucx7HBEb3pP1qzgKxzTQlqH+A0Hh4SlTMqiy6RDKvfg3
-	 MZgrkGX3nn62Eir94EcXa5xgLH+fA6SjWLXeWSNzUkBrPVseZiPNyyk/2VztN5pJrQ36A
-	 2MtVgk6Enhbf5fpdY4uAZkwNc85NbbkAkkNd1Lb/O/9qPrX3QVwBRQjbGzTxAg3OElcOG
-	 hUJtBH97vXi9AGFv6TNFWe9YxnBrSSZxc2fqiaJHeVotFQAZY7xXFfh7/4g9A25etig==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795649490;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=M9jt0xTLUvSAurUgZtDu7qTIVwa69OLXA/tldQ3fCNs=;
+	b=WI2GE3ji0yK/c0ZFTdK4R0CU4Zgm5UozftwzGBLwaSp0hpcDTLOjLZWBqUAvXf2At8px
+	 vzauZrzMRCCCJALUJTmUfjvgWPPpyDcXeRaBsMjWyRRVT/a6iYHVQA2fKUgIVmtkKbEj6
+	 Sxrw9uwGgUrLuE6npt09EAi5VjiUAfcYqqoQGkDLZihhfQZU9lp87HxjSeoknvdjh22OP
+	 Pkx0fBqj1OB3y1QsPhlMXfl1MQ0NwCykwMZ+HdVuO6nwHJbjqXeBpgkAbNIpcbnKbfBlo
+	 nO4SiAHP2PttnQ5SRFr2CFfmgN0/i3HYIv7+ZNQGrg0o2DmM/w7h3r8rM4aS/2JNq6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LWyyuGBq;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=protonmail.com;
+	spf=pass smtp.mailfrom=protonmail.com;
+	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=rF1YZ84Q;
+	arc=none smtp.remote-ip=109.224.244.16
+Received: from mail-24416.protonmail.ch (mail-24416.protonmail.ch [109.224.244.16])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23F4606A31E
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 23:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BA2606A334;
+	Wed, 25 Nov 2026 23:31:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91BA2606A334
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LWyyuGBq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CEE1F000C6;
-	Wed, 25 Nov 2026 23:29:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795649370;
-	bh=C+uz+utGmI/T6WiqsI5K9gY2PcFELU4kFQOl3At4YBk=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=LWyyuGBqx4wy3sxMIL5BYC6ZsSVgqRYpcy0x2P2BEN/a67sEWH0fV4gX5/miIQzNc
-	 6Ux8N4pPsiBj9RQPWoJE2zT7dMnQCVADfzVGFgApGWjiYXHQTpYf8ZJUqL0/mCtMcN
-	 0h3ULqJOoq67DwyncELTlaL3yAui/aZBueImeWLuTrLDKNBDXR0KmyLbc/xH7fKX6F
-	 YIQ9wa5KCMCuA5G6C8oVRrgOzTaW55s0F9ZtnruCfl4OupSLKm8aNjvm5/Fx/lj1OO
-	 YYuff5pYchTUbKaTdnrfespjDxeEcvh+rfzY8cpR71c+T9k9j5Hgl7ZMKZpBKzzL7L
-	 sjr6dhtDHRWGw==
-Message-ID: <sashiko-outbox-234403@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v4] crypto: hisilicon/hpre - fix missing DH/ECDH public
- key validation
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Ryan Prinz" <rc4d5a@protonmail.com>, "Zhiqi Song" <songzhiqi1@huawei.com>, "Longfang
- Liu" <liulongfang@huawei.com>
-Cc: "Giovanni Cabiddu" <giovanni.cabiddu@intel.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David
- S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
-In-Reply-To: <20261125231929.1857637-1-rc4d5a@protonmail.com>
-References: <20261125231929.1857637-1-rc4d5a@protonmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 23:29:29 +0000
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=rF1YZ84Q
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1795649487; x=1795908687;
+	bh=M9jt0xTLUvSAurUgZtDu7qTIVwa69OLXA/tldQ3fCNs=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=rF1YZ84QxtSvcYgqwzgjRChz2ITRlqguSUKaSr/v7VyI0yjTBGXxcR8CVmxYCc2kw
+	 Z/CxV2ZtaY0d5Yy4k5PupjYDbnYg0PSxddtqulCkWQkjQ8FyOuE6vLyF/xCk06vec+
+	 BzhfqR9PjpxWIHrif33jTNGfnY0FaXNqniANcS6pnH41dIgNHtV8ERH02P5mb3VXz2
+	 JVizQKAKE2GySP+0XP9TZyN2pzz/MEQNrkVbCYFk5zMLm2/gnpo7gZ8O5ZTiC5QdUi
+	 P+25dm3P+T9GxHFXL62/dGeKw4IOpvAhJ1I+x/os2nGZZ4TtlrlHToTxNsw1pE+XcM
+	 lacrNDD+MXlpg==
+Date: Wed, 25 Nov 2026 23:31:22 +0000
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+From: rc4d5a <rc4d5a@protonmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: qat - fix missing DH public key validation
+Message-ID: <tT7gYh4kIL-ei963TMmmwD3a-gwm-4tv7Nc3eWTXtQLblkGFFYUOhkOWBXsB-t5yckRFpCGbXHzhlYyCJVDMau43TzIQkS_jc1G_MoCtwn0=@protonmail.com>
+In-Reply-To: <awcjJ8/jvscOuCLl@gcabiddu-mobl.ger.corp.intel.com>
+References: <20261124141238.1743680-1-rc4d5a@protonmail.com> <awcjJ8/jvscOuCLl@gcabiddu-mobl.ger.corp.intel.com>
+Feedback-ID: 190731814:user:proton
+X-Pm-Message-ID: 19ebbeea2f28ca6b6a58ee4cb4e5cf57138020d1
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -61,83 +63,60 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [High] crypto: hisilicon/hpre - call to undeclared
-  crypto_dh_pubkey_in_range()
---
+I agree, fixed and sent as a separate patch, "crypto: dh - add shared DH pu=
+blic key range check", exporting crypto_dh_pubkey_in_range() from crypto/dh=
+_helper.c and declaring it in dh.h. The QAT fix is now v3 and HPRE's is now=
+ v4, both calling that instead of carrying their own copy of the same range=
+ check. Each driver still does its own zero-padding and (p - 1) computation=
+, since that part depends on how each already has the data; only the actual=
+ comparison was duplicated, so that's the part that moved.
 
-commit 68d806f8478204295fe2a1e07880933e7ec78e7e
-Author: Ryan Prinz <rc4d5a@protonmail.com>
+The generic software "dh" implementation (crypto/dh.c) had the same
+gap: dh_is_pubkey_valid() returned 0 immediately whenever fips_enabled was =
+false, so a non-FIPS kernel never checked the peer's value there either. Se=
+nt a separate patch for that too, "crypto: dh - fix missing DH public key v=
+alidation on non-FIPS kernels": it tightens the existing range check from y=
+ < p to y <=3D p - 2 (the y < p shortcut relied on the FIPS-only y^q mod p =
+test to reject p - 1) and runs it before the FIPS gate instead of behind it=
+, so it's a complete check on its own regardless of mode. The y^q mod p che=
+ck stays FIPS-only, unchanged.
 
-crypto: hisilicon/hpre - fix missing DH/ECDH public key validation
+Thanks,
+Ryan
 
-This commit validates peer-supplied DH and ECDH public keys in
-hpre_dh_compute_value() and hpre_ecdh_compute_value() before submitting
-them to the hardware queue.
 
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto=
-/hisilicon/hpre/hpre_crypto.c
-> index 66a276786a7d0..7355e5bd94cef 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-> +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-> @@ -4,6 +4,7 @@
->  #include <crypto/dh.h>
->  #include <crypto/ecc_curve.h>
->  #include <crypto/ecdh.h>
-> +#include <crypto/internal/ecc.h>
->  #include <crypto/rng.h>
->  #include <crypto/internal/akcipher.h>
->  #include <crypto/internal/kpp.h>
-> @@ -471,6 +472,49 @@ static int hpre_send(struct hpre_ctx *ctx, struct hp=
-re_sqe *msg)
->  	return ret;
->  }
-> =20
-> +static int hpre_dh_peer_pubkey_valid(struct hpre_ctx *ctx,
-> +				     struct scatterlist *src,
-> +				     unsigned int src_len, gfp_t gfp)
-> +{
-> +	unsigned int key_sz =3D ctx->key_sz;
-> +	u8 *p_minus_1, *y;
-> +	size_t copied;
-> +	int i, ret =3D 0;
-> +
-> +	if (!src_len || src_len > key_sz)
-> +		return -EINVAL;
-> +
-> +	y =3D kzalloc(key_sz, gfp);
-> +	if (!y)
-> +		return -ENOMEM;
-> +
-> +	copied =3D sg_copy_to_buffer(src, sg_nents_for_len(src, src_len),
-> +				   y + (key_sz - src_len), src_len);
-> +	if (copied !=3D src_len) {
-> +		ret =3D -EINVAL;
-> +		goto free_y;
-> +	}
-> +
-> +	p_minus_1 =3D kmemdup(ctx->dh.xa_p + key_sz, key_sz, gfp);
-> +	if (!p_minus_1) {
-> +		ret =3D -ENOMEM;
-> +		goto free_y;
-> +	}
-> +
-> +	for (i =3D key_sz - 1; i >=3D 0; i--) {
-> +		if (p_minus_1[i]-- !=3D 0)
-> +			break;
-> +	}
-> +
-> +	if (!crypto_dh_pubkey_in_range(y, p_minus_1, key_sz))
-> +		ret =3D -EINVAL;
 
-[Severity: High]
-Does this break the build when CONFIG_CRYPTO_DEV_HISI_HPRE is enabled?
-crypto_dh_pubkey_in_range() is neither declared in include/crypto/dh.h nor
-defined anywhere in the tree, causing hpre_crypto.c to fail to compile due
-to an implicit function declaration.
+On Wednesday, November 25th, 2026 at 7:04 PM, Giovanni Cabiddu <giovanni.ca=
+biddu@intel.com> wrote:
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125231929.1857=
-637-1-rc4d5a@protonmail.com?part=3D1
+> On Tue, Nov 24, 2026 at 02:12:54PM +0000, Ryan Prinz wrote:
+> > qat_dh_compute_value() passes the peer's DH public value into the
+> > hardware queue without checking it. The only checks on req->src are
+> > on length (req->src_len > ctx->p_size); never on the value itself.
+> >
+> > crypto/dh.c's dh_is_pubkey_valid() is the generic software check for
+> > this: it rejects a value outside [2, p-2], but only when FIPS mode
+> > is enabled, and only for callers using the software implementation.
+> > QAT's hardware path has no equivalent check in either mode.
+> >
+> > QAT registers "dh" at cra_priority 1000, versus the generic software
+> > implementation's 100, so any caller requesting "dh" gets this
+> > unvalidated path whenever a QAT device is present and the requested
+> > modulus size (1536/2048/3072/4096 bits) is one QAT supports;
+> > qat_dh_set_secret() only falls back to software for sizes outside
+> > that set.
+> Would it make sense to have a provider-independent check for the public
+> key in crypto/dh_helper.c instead?
+>=20
+> This way, software DH, QAT and HiSilicon HPRE, which all register "dh",
+> could use the same check (regardless of FIPS mode).
+>=20
+> Thanks,
+>=20
+> --
+> Giovanni
+> 
