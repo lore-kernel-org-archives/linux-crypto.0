@@ -1,79 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=119.15.109.137
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795637677;
-	b=TZcCrVSuKXiuiJmde84LNX2rMJzsfUU5EbQnOb8z3uk1G4jwv3Oilw6EwvxpcAI/vCSU
-	 u4PBRib9qyeD30FdyomTAdDg2RrsbFv8J5EM2gkRSwDH7ZVnX5KG1ZCUyNut4tdHgKmhr
-	 2wcm0EesMP9ZdpG1g/RazViwZpqf3Q6Swrc0AsxLqMcXwVGBvdn06kxpCaLkdUTIGGHnZ
-	 iu9Z4M+V9TLxVRfLruIr1eX4w7wqlqSjizeER+rfTJEujm2gYSSSHxl/xCc5t4wsz+z6C
-	 /o7ncy7hEeKqpGmH5mfQW9GIlxKeKVLlgyjc0XjWswup8NQmZOF7kubfjea4NB3tT2A==
+	t=1795640741;
+	b=VcQPeIuhJC00Ya/bEYyQnCiD33xxAEq/JpzkttqpLlNnDuwNmx6JbkWg8Cn7gE0UNpQ3
+	 5h7anNNcxq5o9mYJ/Qg4BIk2Y7Ru40pkLIXRcgg1uFfxWVFXVN3yD7XjhAK8M6nvvAVLG
+	 dPeff5jcgR/iS48XVDgl9UM9f+o3FOfiQLR7UaD/he3FAkuPWPJDLthY3XdC7pfGjtKzS
+	 vtpUUn7BaiyWlb3pysWY3T44/RvhHmHyo00RwhOKa0rzo8BAziBftLWBEsO6PDdBOYFtt
+	 WYwnRB/EDGGlXXcN+qlf9mACKRlF0bzwG9ktFbguToX/NrtWQopOCE8sUARKFb05L2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795637677;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=QmQfwt6Ao0oG0qFdwA911c4z+gOEP8sH0/exU2tcrOE=;
-	b=csIGagLTeTiwKtOIkfbOKPOMU5z17+ZjqCj4C2Y6NjbtVS31vwxySQviYhk96yhl/RF5
-	 Vq8T1fJSaYouRvmrL7cYveSenZBE9TcoNyWSCYaYFVWg8VT7FKVetbN8AhW3E1+UMQ161
-	 ABGq3Y9pH73z+36Uyg2GKF64+hRwZwRI1knMc9QW6aZXNYo1u6Rx6CFsRQJI9nhRpKAR+
-	 i18AJuZjzgKgekHm70fTjeoSH/xIVnJcRTQBRPooTBG+rpfKyMxmCh2oSPAhYgKj/Z/4f
-	 5ZV5RLJYkvRyBXxNvclNE7IrubLkC5SdeVdv3dWdzYOAeEDz/gmBjBco9mT41NtKCgA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795640741;
+	h=DMARC-Filter:Received:DKIM-Signature:X-GPT-Reason:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=+7MuY/6UP2Bsh775A7XrC/mnlab/U/JJYl8O0EaI6UA=;
+	b=5LCLoXq1EMQ+zymDEA2+pfTiHoXcNnWDvQDQ+tSdhUquZX3q+nTKn+oi9OfVIzB9DNLj
+	 Ag1pE09latIGJHk9fgh/djynOoby8EhwECpW/QqnzbVp4aI3GenKGdbqXirooetE7Ix1Z
+	 nvT/zrMtXW1oXcsYaLU9wNqPVOxZR+tmMPLs5U8YWud0xh8xsczIYz6Wq3a1a6+GXK+MX
+	 mwYAWv4piwUmWwyfg22GIQ9kvhwjnEWwGF+lu1nDD7vlzdMAI02+Cf22q6f8pzclwDyKY
+	 YWQNdaUu4zElU0EPUHI/jqwfe4vgzabrSl7z/TYqII82dZMSMFQe8U/AzzICdsj9gwQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FII90fcL;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=d-silva.org;
+	spf=pass smtp.mailfrom=d-silva.org;
+	dkim=pass header.d=d-silva.org header.i=@d-silva.org header.a=rsa-sha256 header.s=2025a header.b=j02+UmPS;
+	arc=none smtp.remote-ip=119.15.109.137
+Received: from www.nmnhosting.com (watt.d-silva.org [119.15.109.137])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id EA79F606A31E;
-	Wed, 25 Nov 2026 20:14:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0303606A321;
+	Wed, 25 Nov 2026 21:05:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A0303606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=d-silva.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=d-silva.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FII90fcL
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id D4FDF1F000C6;
-	Wed, 25 Nov 2026 20:14:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795637676;
-	bh=QmQfwt6Ao0oG0qFdwA911c4z+gOEP8sH0/exU2tcrOE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=FII90fcLVF6+25/KHTpjKsEXg7XMRoWzVdYNoZjz7uXXy8m+fUEPO6mY4cUxCt8YD
-	 Y/ua0rQf+PLUDD3/PuHRZGDOL7G+hkCSXN7YT+V77Gyf+4MWyKl/chIrrSbdOeiiSP
-	 1+Y2LHu+YPB7DBOJtWctj9EJ4jh/CQzev3Bgw8o3/bSYgX7CfUijHyxSlTVWpFVIdL
-	 tebRpkjzIDDxdZ7FygCi/EHK91196ZiPcu5yo+JpeZkuHvgQBGS+QUtLwSLaPQcLps
-	 sRW8g+JBhQr59ZL4CR55XtZnBTeOHJngegBYKIeMnw9doaoppfAgh9h35IH/dL4VJw
-	 KHuIhYLAZPKAg==
-Date: Wed, 25 Nov 2026 22:14:32 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: keyrings@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
-	Ahmad Fatoum <a.fatoum@pengutronix.de>,
-	Alasdair Kergon <agk@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	David Gstir <david@sigma-star.at>,
-	David Howells <dhowells@redhat.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ignat Korchagin <ignat@linux.win>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	James Morris <jmorris@namei.org>,
-	James Prestwood <prestwoj@gmail.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
-	Lukas Wunner <lukas@wunner.de>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Mimi Zohar <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>,
-	Peter Huewe <peterhuewe@gmx.de>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Sumit Garg <sumit.garg@kernel.org>
-Subject: Re: [PATCH v3 8/9] KEYS: trusted: Factor out TPM2 blob loading
-Message-ID: <awdBqM-gTfnsRKyL@kernel.org>
-References: <20261125180616.1854753-1-jarkko@kernel.org>
- <20261125180616.1854753-9-jarkko@kernel.org>
- <sashiko-outbox-233944@kernel.org>
- <awcxDq7TrNmzFxjl@kernel.org>
+	dkim=pass (2048-bit key) header.d=d-silva.org header.i=@d-silva.org header.a=rsa-sha256 header.s=2025a header.b=j02+UmPS
+Received: from Hawking.lan (hawking.lan [10.0.1.4])
+	by www.nmnhosting.com (Postfix) with ESMTP id 4203E4C89A;
+	Thu, 26 Nov 2026 08:05:32 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=d-silva.org; s=2025a;
+	t=1795640732;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+7MuY/6UP2Bsh775A7XrC/mnlab/U/JJYl8O0EaI6UA=;
+	b=j02+UmPSaqgpY9N9yYLyP5D4k9ACgdBnURpGXfJ2NTjIMMmsDjOSOhn0nvp7N3scF20geo
+	d6biDUYWKWaSA3oOOpJSOlXppJYfguRIR7qwORiOKcWeR2n6b7T+eRd3zaIyYAxKnRVYry
+	xNR/6z4/a3p9QSRPJG0Edt1KdF9wE4T6llSiBl9bMxPqApBFpHUxFk1jzar5HwoQM5GwQz
+	uPBUeNP2epTo/YTunxSNwey2bgA3flRNN9bl8chnLuBsvOq5AgtEHS0AX16FuMaj9K6xuo
+	YNTHQHtHo8NjR1Xc/q6YXV4/tfMYI+saS7f0SHKefS+iE6gT+WYZLz1kEevYQA==
+X-GPT-Reason: legitimate; this is a technical software patch submission
+	(Linux kernel style) matching the sender's personal domain
+	(alastair@d-silva.org) and the recipient's personal domain
+	(alastair@d-silva.org); the content is highly specific to hardware
+	driver development (Allwinner A733 TRNG support) rather than marketing
+	or a scam; there are no URLs, sense of urgency, or requests for sensitive
+	information; and the message-ID is consistent with the sender's
+	domain.
+From: Alastair D'Silva <alastair@d-silva.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>
+Cc: linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Alastair D'Silva <alastair@d-silva.org>
+Subject: [PATCH 0/4] hwrng: sun55i-ce: Add Allwinner A733 CE v5 TRNG support
+Date: Thu, 26 Nov 2026 08:05:28 +1100
+Message-ID: <20261125210532.695823-1-alastair@d-silva.org>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -83,134 +83,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="h+DSvvEnG69Dw/wf"
-Content-Disposition: inline
-In-Reply-To: <awcxDq7TrNmzFxjl@kernel.org>
+Content-Transfer-Encoding: 8bit
 
+This series adds True Random Number Generator (TRNG) support for the
+Allwinner Crypto Engine v5 on A523 and A733 SoCs, and enables it on the
+Xunlong OrangePi 4 Pro.
 
---h+DSvvEnG69Dw/wf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Dependencies:
+Patches 3 and 4 depend on the OrangePi 4 Pro bringup series:
+  [PATCH 0/3] arm64: dts: allwinner: Add Xunlong OrangePi 4 Pro support
+  Message-ID: <20261125124407.4098345-1-alastair@d-silva.org>
 
-On Wed, Nov 25, 2026 at 09:03:46PM +0200, Jarkko Sakkinen wrote:
-> On Wed, Nov 25, 2026 at 06:16:23PM +0000, sashiko-bot@kernel.org wrote:
-> > [Severity: Low]
-> > This isn't a bug, but the commit message only mentions factoring out
-> > tpm2_key_decode(), tpm2_load_blob(), and tpm2_buf_append_key_auth(),
-> > without explaining why this refactoring is needed (to prepare for
-> > asymmetric key support in the following patch).  It also omits adding
-> > payload->private and trusted_payload_free() in the core trusted keys code,
-> > as well as the new public_len < 8 bounds check before reading pub + 4 in
-> > tpm2_load_cmd().
-> 
-> I agree with this and his has higher severity than "low" because patch
-> needs to be split as a consequence.
+Tested on Xunlong OrangePi 4 Pro (/dev/hwrng).
 
-I.e.,  this is the split change.
+Alastair D'Silva (4):
+  dt-bindings: crypto: Add Allwinner A523/A733 Crypto Engine
+  hwrng: sun55i-ce - Add Allwinner CE v5 TRNG driver
+  arm64: dts: allwinner: sun60i-a733: Add Crypto Engine node
+  arm64: dts: allwinner: sun60i-a733-orangepi-4-pro: Enable Crypto
+    Engine
 
-Br, Jarkko
+ .../crypto/allwinner,sun55i-a523-crypto.yaml  |  68 ++++
+ MAINTAINERS                                   |   7 +
+ .../allwinner/sun60i-a733-orangepi-4-pro.dts  |   4 +
+ .../arm64/boot/dts/allwinner/sun60i-a733.dtsi |  12 +
+ drivers/char/hw_random/Kconfig                |  13 +
+ drivers/char/hw_random/Makefile               |   1 +
+ drivers/char/hw_random/sun55i-ce-trng.c       | 377 ++++++++++++++++++
+ 7 files changed, 482 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/allwinner,sun55i-a523-crypto.yaml
+ create mode 100644 drivers/char/hw_random/sun55i-ce-trng.c
 
---h+DSvvEnG69Dw/wf
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-KEYS-trusted-Add-private-backend-data-to-trusted_key.patch"
-
-From 38d63947966fce0d3f6cc3274c4720b07fd5e791 Mon Sep 17 00:00:00 2001
-From: Jarkko Sakkinen <jarkko@kernel.org>
-Date: Tue, 24 Nov 2026 13:03:29 +0200
-Subject: [PATCH] KEYS: trusted: Add private backend data to
- trusted_key_payload
-
-Add a backend-private pointer to struct trusted_key_payload and free it
-sensitively via trusted_payload_free() on teardown and error paths. This
-prepares for asymmetric TPM2 keys, which retain backend key metadata
-across runtime pkey operations instead of unsealing a raw key at load
-time.
-
-Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
----
- include/keys/trusted-type.h               |  1 +
- security/keys/trusted-keys/trusted_core.c | 18 +++++++++++++-----
- 2 files changed, 14 insertions(+), 5 deletions(-)
-
-diff --git a/include/keys/trusted-type.h b/include/keys/trusted-type.h
-index 3db61b57cf73..790ffabb0d18 100644
---- a/include/keys/trusted-type.h
-+++ b/include/keys/trusted-type.h
-@@ -33,6 +33,7 @@ struct trusted_key_payload {
- 	unsigned int blob_len;
- 	unsigned char migratable;
- 	unsigned char old_format;
-+	void *private;
- 	unsigned char key[MAX_KEY_SIZE + 1];
- 	unsigned char blob[MAX_BLOB_SIZE];
- };
-diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
-index 3721980ed83a..b8f980da606d 100644
---- a/security/keys/trusted-keys/trusted_core.c
-+++ b/security/keys/trusted-keys/trusted_core.c
-@@ -149,6 +149,14 @@ static struct trusted_key_payload *trusted_payload_alloc(struct key *key)
- 	return p;
- }
- 
-+static void trusted_payload_free(struct trusted_key_payload *p)
-+{
-+	if (!p)
-+		return;
-+	kfree_sensitive(p->private);
-+	kfree_sensitive(p);
-+}
-+
- /*
-  * trusted_instantiate - create a new trusted key
-  *
-@@ -223,7 +231,7 @@ static int trusted_instantiate(struct key *key,
- 	if (!ret)
- 		rcu_assign_keypointer(key, payload);
- 	else
--		kfree_sensitive(payload);
-+		trusted_payload_free(payload);
- 	return ret;
- }
- 
-@@ -232,7 +240,7 @@ static void trusted_rcu_free(struct rcu_head *rcu)
- 	struct trusted_key_payload *p;
- 
- 	p = container_of(rcu, struct trusted_key_payload, rcu);
--	kfree_sensitive(p);
-+	trusted_payload_free(p);
- }
- 
- /*
-@@ -269,7 +277,7 @@ static int trusted_update(struct key *key, struct key_preparsed_payload *prep)
- 	ret = datablob_parse(&datablob, new_p);
- 	if (ret != Opt_update) {
- 		ret = -EINVAL;
--		kfree_sensitive(new_p);
-+		trusted_payload_free(new_p);
- 		goto out;
- 	}
- 
-@@ -283,7 +291,7 @@ static int trusted_update(struct key *key, struct key_preparsed_payload *prep)
- 	ret = static_call(trusted_key_seal)(new_p, datablob);
- 	if (ret < 0) {
- 		pr_info("key_seal failed (%d)\n", ret);
--		kfree_sensitive(new_p);
-+		trusted_payload_free(new_p);
- 		goto out;
- 	}
- 
-@@ -322,7 +330,7 @@ static long trusted_read(const struct key *key, char *buffer,
-  */
- static void trusted_destroy(struct key *key)
- {
--	kfree_sensitive(key->payload.data[0]);
-+	trusted_payload_free(key->payload.data[0]);
- }
- 
- struct key_type key_type_trusted = {
 -- 
-2.47.3
+2.53.0
 
-
---h+DSvvEnG69Dw/wf--
