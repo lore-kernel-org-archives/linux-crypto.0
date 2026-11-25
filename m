@@ -1,70 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.15
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795594867;
-	b=0SKwkCgSkvHv+Gt+2C4MMfVdOZ7pkua3bK+h3Pwaoc78Fui7OCoOrEVjqrMw+HBkxK8l
-	 /dxrE9A3vvJo/u9lmykbpTO57A1M06Ax4RUJjcIe5ppmpMeyD/PGQznuIhHAfT+QBJhZ+
-	 IHG5PKosaa6GxByD/sAmcMtsX/g1X0exzs9Qq7N7rOiJruISXMm1Ee/XX2EgY3pfJNonL
-	 OPfPot144ZR+niQGuy/vquEvmlMYz2EfwN3L9WDiHY3FIQaT6sh4uegf6Jy3VlpDsAdmm
-	 qBswl2BVFsGZlPQEG3qmwE8UxmnhmjA7YLluihplRztDAXNLHAmggbVvyrkc0iNaJgA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795594867;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-ZohoMailClient;
-	bh=7WgrRTlfNplaG0KIoL2QZuOhxkVxnuaykkwfTzH0Qo4=;
-	b=AgHAZC+7ZKtcSf10If8k6dpl3wQ31ZJUiRLvPM55PhcJf1pPewRorHX8p+DXdTGP5sKE
-	 Yk4C0vOUEALg6sa+ufYnOf4RM7njTkEBjc1hJfybTNsoxwLsukJn8xDfe67Jk/d1DZwqa
-	 kq45OVQ3MnP2Q4NApJRfDk5DzuDlVxCiyF9KVKlkyIjDZrIkJBI7x8VXtWy/uibAQfJML
-	 7i/ocf0cqZKyY8nFtTQAFGj0Tt5b5Y315xvrm+OUkq7O1Bt0CUJJMwdYLP3KS/QHi7Gze
-	 CCj9MUIZzTMVc59nKB3sxpjOwkrUy9X0h5s4MMV7SA+68vp+X2ZBw9syQk+uGqLjZrA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=laveeshbansal.com;
-	spf=pass smtp.mailfrom=laveeshbansal.com;
-	dkim=pass header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=Fdy1V4G2;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.180.15
-Received: from sender6-op-o15.zoho.com (sender6-op-o15.zoho.com [165.173.180.15])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795596055;
+	b=H0pRA3EIAuiyPEOPlbvS/G5pbGFU/bt18e4MeV0aB5ZmatiUunWEzWMeU82fLicelqe3
+	 VES0fozyAJzf/spyLlCiErGBTSbGNI4+lUZDUBLpqIwsXfOdNDeBdhokbysKlvUPH5GDG
+	 ce4P2XqAKk6kYm/Cg9qCMDCuwL+9mDMQTZWivPSDKV/AW2/cSrhMRUSLT4lpZW32s8EfP
+	 O28nfk9n8rH1WMl/h+7bqfj/qPxf/Tc7XfFO+W+/Bfg08Wfn/hCv3XEgmia2EZGzWHzVM
+	 QodcVX4APC8wm1uQ6mGU81665yaO2lHRKsnFuPnk/rCp3vzSM8703tJZaZfnm/xUdoQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795596055;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=dYsFcUK8+jsj7NvG+f903DGBWyTaFCEj4VNhYRMj1Ts=;
+	b=q66YJZ3bjpJqn9lI/qgmesto8+86jagTJScJKjvUUl8/JmAeYWLromovcB2eGkhdO6kc
+	 IlI9xIuWF1dtWfq6K0SYsftx9kEbHzVWYHkK6w9n1yNbkVlo5XBHjBVfTc4Ae1snKuSrT
+	 b1NYLGXX7uPj9/2pMDBqWHDI3MUa968neDVEJZbVBh8uATWup6xAeIBa5TqhPGbT3HtQZ
+	 gcAbfsjEcMwFqNt7DBVCPLOg10o/V4AfG7OWmyVosJxn2y1/ysDxVFAsk8vi5CVzopVX/
+	 AGhZIF4ksEleDDvHhiKCVPsY3V+V2Y5cJjIynxsjP3auFRSnNPCUMPYQlKqyFT3Hwag==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=oVTZiYBC;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08DE606A333;
-	Wed, 25 Nov 2026 08:21:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F08DE606A333
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A460606A69C;
+	Wed, 25 Nov 2026 08:40:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7A460606A69C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=Fdy1V4G2
-ARC-Seal: i=1; a=rsa-sha256; t=1795594850; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=HaCv45zGfIFSwef5XCKPMVa4ihwxLlklvsi+f0iObqtaqLlMaWeRyR7jIcLJTwSQTO3/9P/dcL8wHr5d7BTlChHQmKZGPD3X7mtd0WVsfJEkF5aSfhdodmNYHL4Z2Gc6phMZo/ifG0YhGI2bfpIL3Xikw/FL54sdyIpWucAswhs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1795594850; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=7WgrRTlfNplaG0KIoL2QZuOhxkVxnuaykkwfTzH0Qo4=; 
-	b=OA/FCdUwPlk+XCHDKBbU+HeIVKFyqIKzUGWPFk43+ESZTezWZpivD9kBMOZsEr/f4zgLIGg5TLYY5eEgM1g2PbUn6cdEDa58tTeOX00SHhr7nu8zCkJW+O1EOCWnrfGEwlF2UNQCRenKaSyCP5eL5xySoT0mhyg1Cz1E26ImpBs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=laveeshbansal.com;
-	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
-	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
-DKIM-Signature: a=rsa-sha256; b=Fdy1V4G2HguZdxRwK7LZ1EA/JSaOqRZtjLFvdMJfPB9t15/hSz7DCoU6MZ7NeIEJZ297skj1vqTSZ+g9oWc0o9ViBNlKHz65HfSbN9z7hU7lrtqFqDM+U2y3z+/n5YEMlg2ESONFjE9oazs3pGobB8Y22r9kXXZ0wzhJlBx8020=; c=relaxed/relaxed; s=zoho; d=laveeshbansal.com; v=1; bh=7WgrRTlfNplaG0KIoL2QZuOhxkVxnuaykkwfTzH0Qo4=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
-Received: by smtp.zohomail.com with SMTPS id 17955948481371018.7221762782647;
-	Wed, 25 Nov 2026 00:20:48 -0800 (PST)
-From: Laveesh Bansal <laveeshb@laveeshbansal.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com,
-	linux-block@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] blk-crypto: use a NOIO scope while holding profile->lock
-Date: Wed, 25 Nov 2026 00:20:34 -0800
-Message-ID: <20261125082034.78219-1-laveeshb@laveeshbansal.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20261125014454.GA2461@sol>
-References: <20261125014454.GA2461@sol>
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=oVTZiYBC
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=dYsFcUK8+jsj7NvG+f903DGBWyTaFCEj4VNhYRMj1Ts=; 
+	b=oVTZiYBCgZc8JC08TT5kespwNby2k9ZUVlXQ4WERhVgTj2JpXDjezNg282p+5J9l2Eld9dCZjCT
+	5pm3gqOdof2K/Pys0suDySqz82z4xFaEvuO0WjCH+Kr2318xipOh77qkGnA4efDUURjQv0bzV7mOm
+	AKXNdiJfbf8eQnJaAvI96WY0vCrELboFkqEqTn4crF2aQVaY1l1JeUMcTVviXMjs9womPqajC02ZA
+	YG9ZTzqKz4DGhiW5vpLVobmBy3HkmDkqOMl84B3XzabkFVSXO4whbtOV/1ahLu7WVIwJBGXVP9hC8
+	JBjWuOvsec/lLSTp7WxYqqyrkXaHId2I/fcw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xW8YR-00000001lAN-2nk4;
+	Wed, 25 Nov 2026 16:40:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 25 Nov 2026 16:40:39 +0800
+Date: Wed, 25 Nov 2026 16:40:39 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Cc: sashiko-reviews@lists.linux.dev, hannes@cmpxchg.org, yosry@kernel.org,
+	nphamcs@gmail.com, chengming.zhou@linux.dev,
+	akpm@linux-foundation.org, linux-mm@kvack.org, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, rientjes@google.com,
+	willy@infradead.org, senozhatsky@chromium.org
+Subject: Re: [PATCH v3 3/8] crypto: acomp - Add trivial segmentation wrapper.
+Message-ID: <awafBxDtUoIQW9iR@gondor.apana.org.au>
+References: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
+ <20261106072412.7909-4-kanchanapsridhar2026@gmail.com>
+ <sashiko-outbox-202709@kernel.org>
+ <CACpmpodxjJ3ZQt4xOsWfWQNjgMtPzKx0oGMy+mJTU1wxVWdMUw@mail.gmail.com>
+ <awQCFZSSng2LLGnX@gondor.apana.org.au>
+ <CACpmpocCqenTNv62dGoeSLP2zs-AXJYhXM-tj2cytm4zQTj1cA@mail.gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -74,15 +72,31 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACpmpocCqenTNv62dGoeSLP2zs-AXJYhXM-tj2cytm4zQTj1cA@mail.gmail.com>
 
-Hi Eric
+On Mon, Nov 23, 2026 at 01:56:19PM -0800, Kanchana P. Sridhar wrote:
+>
+> diff --git a/crypto/acompress.c b/crypto/acompress.c
+> index df9e42f519c3..f0ff821b3560 100644
+> --- a/crypto/acompress.c
+> +++ b/crypto/acompress.c
+> @@ -247,7 +247,7 @@ static int acomp_reqchain_finish(struct acomp_req
+> *req, int err)
+>         acomp_reqchain_virt(req);
+>         acomp_restore_req(req);
+> 
+> -       if (req->unit_size)
+> +       if (req->unit_size && !acomp_request_dst_isvirt(req))
+>                 req->dst->length = unlikely(err) ? err : req->dlen;
 
-Thanks for the review. v3 returns the flags from blk_crypto_hw_enter(),
-rewords the comment and drops the version from the stable tag:
+I think this should return -EINVAL in the sense that using a
+virtual address with unit_size cannot be supported as it makes
+no sense at the API level.
 
-https://lore.kernel.org/r/20261125081417.77674-1-laveeshb@laveeshbansal.com
-
-Thanks
-Laveesh
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
