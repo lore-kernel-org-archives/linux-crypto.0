@@ -1,55 +1,110 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795581150;
-	b=vc7MZPrhzIQzL7J2+8yhyjxkrWc4ghGCz3a+ADin+dcpwn2XlU0parwYjNXeYJnvQ66K
-	 g4x4hURCytNTQBbagrZzIolhO6dPFBgrwZpQLQKzuR9GDdvBjkb2XuBmLJzLy4mmMTxwH
-	 LS8yeIo/wn2HQyHw4hDUiYWtmx3zycBO/5pXzyXnyP7F4B27v+u0g7vUAD/1mvR2AsaLr
-	 DP92D5YiC1YMkbqUEAH5KBVHsJ/mpcFtMX2KsywI16fessFtvdMJLCeOy0pyHZkOO9mHO
-	 D9UIOWJz3rFD6arFVtSjMNp/0fODo0H4s/s7OFyA6V/YzfwfIPebLu8LVWe96T0gmZw==
+	t=1795584673;
+	b=B+UGIPcdse9xMj3KjOjNpANVCDKOw4XYLPehyoutOnOb6nT/9dpPgNSOQ1EhRmXfiIUl
+	 jX3VHJHwzWOQf14TCPzldvTEqQTjJ6zGQofdaDWup+pjsO7u4uXLES/Huu3LUeHyZCCcx
+	 y/YTAW/OrTHcqoDVfEpkTf/7t9mF+k38bQK5rAJM+h5Lt6kjtbSpnlBVjEhyPKoj7xXcH
+	 Z7apJlUuiHiDcdHUM0b2pmiNxF6VOwvQK5TDuqY5Ag9fA2V1zRyJsG4eRvBkFdIeVzWI9
+	 9+fM2TDZId/+ZqmOtXS8e2YFoAhINDs7/s0C6AeiM2mSc2c8oOPUvWn7d95mzCYABhQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795581150;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=Mg3TrRz553/lUUn8Q+mmiUj5bIi4dS0hcxCVNVQnLeI=;
-	b=SPm9geze8j8mVUIdtsTJ+9z9L/+uZDQAYHzlAt5P2FyYfSHb5GL5+1oKhPucNUCs+mEB
-	 tlioXgbi4hRF5MPBQOPXFKgJIvwkhaoe2A9TQpS5KknN+ZczuSmLtDmDdlb53opjWVkeU
-	 5nhoaRJtkH+vXg7qlwQlIaPItOseVjNKIkMkH2Bbj0Bf78QOVF1RrsXBeOySPctCCnuPq
-	 kbFGJWT6Wgu5NPt0s2oGaobtVSJK2pgYeQkc9MN/oLmg8Yn7rSln9SxIVzGn/ETirxCAz
-	 jD+tJAKfVgMTeA2P4g60QklS0wNKAhDpUmHJzpe/0z179GLNrVY+buDu514aWETU/CA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795584673;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:From:To:Cc:References:
+	 Content-Language:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 X-Proofpoint-Spam-Details-Enc:X-Authority-Analysis:X-Proofpoint-GUID:
+	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Spam-Info:
+	 X-Proofpoint-Virus-Version:X-Proofpoint-Spam-Details;
+	bh=eIAhBu5Bmeq0m//pVVYoXwX5xWDaT5pLP0CDoa8Q3NI=;
+	b=Q/D7CKrP7mIOHCKTBE71ZoFOOe70JHOXkUlGvF4Ljdl2HQqN8nHx1JspSCM7qRfD8Hqm
+	 /PbfZZgJfa9wlIKCpKr3rujWseyPgnbcz1sUPdyyUjb+gCOO4FzPYYB+eT3H6dBl8LD1R
+	 6RzmLMNOJZFAlmpujUgchmoURZB4FcgVPQRL/HE6rSPoHx0LkpdtYRNcvOUJpqIyf1lEV
+	 QusucLqZ/FYhbkekk8rok5A5XXEWWVzP1CpPQrUdZHtQH4C4N5cTHXduSb39FKQXFlLB1
+	 H6qXTOpm3KBVXvOHYEddsd9aWYDpMjk6VhOlL51Qhb6iHxpYa1gKgyucsnejdhqJoGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mee4vhat;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b="MEIdCMK/";
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=Zn+qX8o8;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E8D606A321
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 04:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D958E606A31E
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 05:31:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D958E606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mee4vhat
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B69E21F000C6;
-	Wed, 25 Nov 2026 04:32:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795581150;
-	bh=Mg3TrRz553/lUUn8Q+mmiUj5bIi4dS0hcxCVNVQnLeI=;
-	h=From:To:Cc:Subject:Date;
-	b=Mee4vhat5Y7Rt4K+GG5XtW+qMm7iuJvL64+ytDvOt6bs6Vut1jUyyvjRvJ1VcwTpc
-	 mmHG+pHDZs2QWxqGx84i/uvxwynKBASyBZr6yRT2j3YpsaZblzERsvbCXU3gpKtkBu
-	 mHQm8IHBjLlyyx0mZDjKiX6d8PbkRKNcO96dm2MgiVobsQGjXopfznLEb9g1a5v+/W
-	 EHmDEiRCb0kQNJZ8ABIV15a9Ubd4knR40HROqSlUF0KGe3TIC7N1RIgJqsgUJTl/qs
-	 3f06SouSyQVlGxGa/Gp12N4PBiv6FtinV0zTtMrJCaC8g/jbEkNCSVMbXJllo8aFfE
-	 XLWrtL7HZH9Tg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	x86@kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: x86/sha512-ssse3: Roll up rounds and reduce stack usage
-Date: Tue, 24 Nov 2026 20:31:59 -0800
-Message-ID: <20261125043159.192004-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.56.1
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=MEIdCMK/;
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=Zn+qX8o8
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6AP2As3R3974100
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 05:31:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	eIAhBu5Bmeq0m//pVVYoXwX5xWDaT5pLP0CDoa8Q3NI=; b=MEIdCMK/LuwkdpNR
+	93/yWb4TDT0kAnXFt/vUOMBUYgatoskzQlslxdeF4IrVukwHLxB/eXSEYnERiSqa
+	xuHc/9NsyTf1vjDwS1B3bSsb2HOEdycYrMscWTk0i9XYG6uGcsN076kwgfp6REoS
+	D6Qit8k47rVADKbX6R0KMP/Vr1+ZVSBOkBjbyd8kZCRv7kShCGFxhVzp9grCim1F
+	V1+kf35DEd8tWwJRp4GUe/IGj/Li1uYrox7P1sK3RL52CbWW1AFnhYy+fRjUEUdh
+	L8Hemk6cEWwgL0iueBe/HxvxhGPwMJnWTV3an6kZ+a7qr9EtfMZMsWyrNaN2Qnuu
+	y1TUKQ==
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j5n6rrw9j-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 05:31:11 +0000 (GMT)
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3b42ebf632cso3798550a91.2
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Nov 2026 21:31:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1795584671; x=1796189471; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=eIAhBu5Bmeq0m//pVVYoXwX5xWDaT5pLP0CDoa8Q3NI=;
+        b=Zn+qX8o8ljDRGcebLRYsy585B8hV1Q/agiRR568uBQJnTJnYfCFGr/7E3GvuWZpKyD
+         jA4cbStfA8o7EuZw1FeJ+ymRBfwV0Ij6ZPVlUviLId5Yk9g9GlhOveqgyQHR5QJoc/fM
+         kIf+f5LZNY1tXZF+eDm+Ql04MFaTRm/F+9LvVyz2Jv4sGypgPAYj4xZFTw8j5Qa9h7Cs
+         GT4pTF6pC2nbLef9lpQWcGiWMlta2NlPXHpLkcs/LnV3YlbrgTOHzryY85/fBwveBH2Y
+         tmOXmujNNKoDNiJ71LWqDDwbRfDl4Z5L6HzFL4l/GgapADpT1Iz1kCZ5+cYPggKYhZsZ
+         5qmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795584671; x=1796189471;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=eIAhBu5Bmeq0m//pVVYoXwX5xWDaT5pLP0CDoa8Q3NI=;
+        b=FNd1fFv2NJV/i6eC6x8jv7VKMfwoy03PAJkpKPFiziABsdRqtWoMRsOSA/E1qbSL3e
+         cgstMAvEJrJ0+Ius7yMnLSwt0H5QEzbMtqBYIjNhcsRy9e/TlgT3j/H+o0HuPu3gsVWF
+         MF7h61c56XqfPhDmcAM1UeLVAp7ST00bKR4E5dTDowQeUXhV8F3zHycy4zoCpBQEcOsT
+         tQWdRPrmZO0plBaxK3vRwg+RJYkg10d+PBuZccz06hSU7s+SKuC1NF3u+QEE/bPd/Bak
+         U4WJu83jZkLOzAlbsxbVNervOsweRZ7i9Qfze3XsHS+mu9NLwT8taq9P2u2YqTnlkZGj
+         U7uA==
+X-Forwarded-Encrypted: i=1; AL+hErHeVYMniKEO9wzdOJ4bEbpAfRSmhSQ/BGiR84JGwGCPESD13lg7aBiuJWzwW+3hgqAYAZtCbvOzofMVcns=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/P2JO5WUfrPzSGMfOOo6vRlgupQZRXxYhgcKIEcjOvMSe3YE2O
+	yVUguATbB0AAWFNR42CmFglMyt4etM4e0PForCymCfhjcMbAbUrcKg+xWPBZDw7c0Vwpw/P28LH
+	IjOdByYWLOUlSPE2lUzczM8FJXGwRVJRmZj3+EpUU0whrkyn8nRh0tlYdaTKCokbs+HA=
+X-Gm-Gg: AZFdTZegbyIfwMbP+JRge6VrMp0Z42LwbCB83c2bVXNCAdd8xqABrdXwS8lHF+SQSsw
+	tdsimBFtsS//RhvfJ3OieJ21RhwkXW0GjX66oVOkgdQDAfI1uPTJBgEnaa02BHMtlTuVeCunOL4
+	rEPS/Fzz9yJbQ7CymBgbnLG8JwJT8vCoBEpDx0Uy3v+g7ruQ8AT5UyfskmsoUhuLw9srxq6SZ8N
+	vwi/euk233ZV+MuzmnJZNe43chB+a2Oi3wldKH2uCBbqN3zWnpRwOZ+b2iSs2cpTOKRe4UnEVlu
+	7ahaT5OdSpVLX3oDSNwWisFVLanMqws0bJA3LL8w0eCwXE/b5AWFrZeEzmGIn5XDIhEmPfpTFLw
+	1Qln1jKMp4hsxSEBYecpVUpTC6ZfGQdga/Sa9fNnQmYLWLYFHfbAjsG8EGpqDMrWl0M5OUxaUwt
+	mVqdbp
+X-Received: by 2002:a17:90b:180b:b0:3b4:1336:4f53 with SMTP id 98e67ed59e1d1-3b41c7d5c11mr14553294a91.1.1795584671014;
+        Tue, 24 Nov 2026 21:31:11 -0800 (PST)
+X-Received: by 2002:a17:90b:180b:b0:3b4:1336:4f53 with SMTP id 98e67ed59e1d1-3b41c7d5c11mr14553265a91.1.1795584670520;
+        Tue, 24 Nov 2026 21:31:10 -0800 (PST)
+Received: from [10.218.31.125] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b405d135e9sm28528572a91.4.2026.11.24.21.31.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Nov 2026 21:31:10 -0800 (PST)
+Message-ID: <45453937-5fce-42c7-ac1f-66aa94dec646@oss.qualcomm.com>
+Date: Wed, 25 Nov 2026 11:01:03 +0530
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -59,312 +114,97 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/2] Shikra: Fix qce configuration
+From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+        Wenjia Zhang <wenjia.zhang@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>, Abel Vesa <abelvesa@kernel.org>
+References: <20261116-shikra_qce_fix-v3-0-9ae31470ef48@oss.qualcomm.com>
+ <f3ee6297-fb83-4b1c-b083-f3b15fa082b5@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <f3ee6297-fb83-4b1c-b083-f3b15fa082b5@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI1MDAyMSBTYWx0ZWRfX70Gv3VPit7Oh
+ FjCqPbL8IX6pHag4G15hFsWUzY0dDdSShyDhrP2xBQOeb95JFqjR1fT8NOPUaGFUOFikejPlPxr
+ 13jdmbAVH0lQertxWG/PHW+qjOXrEWCe8QmLQ3eO1aS0rFG/99gzM3KEthDBvwAkokLclnZqgFG
+ on20/U86IHy94PJsbt0DZidgD5ZncUp7IoxzoHCZRltTg6o9bTMINNiws5fcENfnGo2VjhYlMH8
+ hkRuMAudaMHeBEc/tc1Tm68fmDBw7Il2mAd67hgwhsN35hhTx8T8ZTysajuPCh5C9zUPsrp1WMY
+ dbGz8tHQUf04Vx7hBq6tVVfYM/fKhjY7mYFFdSkzdnW3H3BF0DYjyMfP/DdFUX4EY9vfjhHAIni
+ pYEg5zCpZkK0g98MQSicw30GMubQzdC/oSXUDkK/vQW4Jw0z7Wkse1Ok2uemW/5BgOJFKvQLY/o
+ 1LRWgsvpu7b7su13Xdg==
+X-Authority-Analysis: v=2.4 cv=Voa2kO2n c=1 sm=1 tr=0 ts=6b06729f cx=c_pps
+ a=vVfyC5vLCtgYJKYeQD43oA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
+ a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=jYJX1yTOf0vTYKAZykEA:9 a=QEXdDO2ut3YA:10
+ a=rl5im9kqc5Lf4LNbBjHf:22
+X-Proofpoint-GUID: hLcAEkfVd-vJAxHTchrncDAYnQfJB7a7
+X-Proofpoint-ORIG-GUID: hLcAEkfVd-vJAxHTchrncDAYnQfJB7a7
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI1MDAyMSBTYWx0ZWRfX5axTNY8TolP2
+ FtWxR7961D8adFcAUzJfOrJ6hVMD8Ry0b3BRnoxuIsPl7cfNDnkGjuJ+GXGKGAxkRW1YFyVxR3K
+ qVlulv9e5kTdUTH3jd0CUkdC7dVwnP8=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-25_01,2026-11-23_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 malwarescore=0 clxscore=1015 bulkscore=0 lowpriorityscore=0
+ adultscore=0 spamscore=0 priorityscore=1501 suspectscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611250021
 
-Currently, sha512_transform_ssse3() unrolls all 80 SHA-512 rounds,
-producing 13.4 KB of text.  It also stores all 80 message schedule words
-in a 640-byte stack buffer, which wasn't being zeroized on exit either.
+On 24-11-2026 13:55, Kuldeep Singh wrote:
+> On 16-11-2026 14:29, Kuldeep Singh wrote:
+>> Herbert/Bjorn,
+>> This patch series fixes QCE on Shikra and targetted for v7.4.
+>> Shikra crypto qce binding was consumed in v7.3 but DTS node got merged
+>> in v7.4-rc1. It's important to merge this fix in v7.4 to avoid breaking
+>> backward compatibility.
+>> This series updates shikra fallback compatible and hence, both patches
+>> should go from same tree to pass make dtbs_check otherwise patches from
+>> individual tree will break dtbs_check checker. If dtbs_checker is not
+>> blocker, then patches can go from individual tree.
+>>
+>> Bjorn, will you be able to pick both?
+>>
+>> The patch series fix description as follows:
+>> Shikra require explicit clock which is omitted with current binding
+>> description.
+>> Also, one more reason to update shikra-QCE is, clk-smd-rpm was doing proxy
+>> voting and crypto was consuming it. With proxy vote removal, qce need to
+>> vote for it's own clocks explicitly which is already being done for
+>> agatti target. Adapt same mechanism to Shikra QCE too.
+>>
+>> Validations:
+>> - Qce probe and kcapi_convenience.sh tests.
+>> - Correct clk_summary output as prepare_count and enable_count are 0.
+>>
+>> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+> 
+> Hi Bjorn/Konrad, Can you please review and comment for this series?
+> It's important for QCE to vote for it's own clocks as dropping proxy
+> clock voting(patch in review) will result in QCE issues further.
+> This series fixes that.
 
-Shrink both of these to more reasonable sizes (4.7 KB of text, and a
-136-byte stack buffer that's zeroized on exit) by doing rounds 14
-through 77 in a loop that does 4 iterations of 16 rounds each, and by
-using a circular buffer to hold the message schedule words.
+I mistakenly replied to v3 instead of v4[1].
+Kindly review v4 for latest.
 
-The circular buffer works well because each message schedule word in
-SHA-512 is computed only from words in the last 16 words.  The number of
-rounds per iteration is set to 16 to match the circular buffer size.
-(It's also a multiple of 8, which is how often the state cycles around.)
+[1]
+https://lore.kernel.org/linux-arm-msm/20261120-shikra_qce_fix-v4-0-5249e31394ce@oss.qualcomm.com/
 
-The message schedule could also be stored in XMM registers, but that
-approach was found to add additional overhead on older CPUs.
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
-
-This is an alternative to the series
-https://lore.kernel.org/linux-crypto/20261122022030.296468-1-ebiggers@kernel.org/
-It does 16 rounds per iteration instead of 8, and it replaces the huge
-on-stack buffer with a circular buffer instead of with XMM registers.
-This hopefully avoids any measurable regression on older CPUs, while
-still achieving the two main cleanups.
-
- lib/crypto/x86/sha512-ssse3-asm.S | 157 +++++++++++++++++-------------
- 1 file changed, 92 insertions(+), 65 deletions(-)
-
-diff --git a/lib/crypto/x86/sha512-ssse3-asm.S b/lib/crypto/x86/sha512-ssse3-asm.S
-index 1a37b7a735cf9..d6e87bb6173c9 100644
---- a/lib/crypto/x86/sha512-ssse3-asm.S
-+++ b/lib/crypto/x86/sha512-ssse3-asm.S
-@@ -2,6 +2,7 @@
- # Implement fast SHA-512 with SSSE3 instructions. (x86_64)
- #
- # Copyright (C) 2013 Intel Corporation.
-+# Copyright 2026 Google LLC
- #
- # Authors:
- #     James Guilford <james.guilford@intel.com>
-@@ -69,15 +70,20 @@ f_64 =		%r14
- g_64 =		%r15
- h_64 =		%rbx
- tmp0 =		%rax
-+# Used in the rounds 14-77 loop, while digest and msglen are spilled
-+kptr =		%rdi	# Pointer to K512[t] for the current 16-round iteration
-+loop_cnt =	%edx	# Remaining 16-round iterations in .Lsched_loop
- 
- # Local variables (stack frame)
- 
--W_SIZE = 80*8
-+W_SIZE = 17*8		# 16-QWORD circular buffer + 1 duplicate of W_t(0)
- WK_SIZE = 2*8
- 
--frame_W = 0
--frame_WK = frame_W + W_SIZE
--frame_size = frame_WK + WK_SIZE
-+frame_WK = 0
-+frame_W = frame_WK + WK_SIZE
-+frame_digest = frame_W + W_SIZE
-+frame_msglen = frame_digest + 8
-+frame_size = frame_msglen + 8
- 
- # Useful QWORD "arrays" for simpler memory references
- # MSG, DIGEST, K_t, W_t are arrays
-@@ -92,11 +98,11 @@ frame_size = frame_WK + WK_SIZE
- # SHA Constants (static mem)
- #define K_t(i)    8*i+K512(%rip)
- 
--# Message Schedule (stack frame)
--#define W_t(i)    8*i+frame_W(%rsp)
-+# Message Schedule circular buffer (stack frame)
-+#define W_t(i)    8*(i)+frame_W(%rsp)
- 
- # W[t]+K[t] (stack frame)
--#define WK_2(i)   8*((i%2))+frame_WK(%rsp)
-+#define WK_2(i)   8*(((i)%2))+frame_WK(%rsp)
- 
- .macro RotateState
- 	# Rotate symbols a..h right
-@@ -121,8 +127,7 @@ frame_size = frame_WK + WK_SIZE
- 	and	e_64, T1          # T1 = (f ^ g) & e
- 	xor	e_64, tmp0        # tmp = (e ror 23) ^ e
- 	xor	g_64, T1          # T1 = ((f ^ g) & e) ^ g = CH(e,f,g)
--	idx = \rnd
--	add	WK_2(idx), T1     # W[t] + K[t] from message scheduler
-+	add	WK_2(\rnd), T1    # W[t] + K[t] from message scheduler
- 	ror	$4, tmp0  # 18    # tmp = ((e ror 23) ^ e) ror 4
- 	xor	e_64, tmp0        # tmp = (((e ror 23) ^ e) ror 4) ^ e
- 	mov	a_64, T2          # T2 = a
-@@ -146,37 +151,35 @@ frame_size = frame_WK + WK_SIZE
- 	RotateState
- .endm
- 
--.macro SHA512_2Sched_2Round_sse rnd
-+.macro SHA512_2Sched_2Round_sse idx
- 
- 	# Compute rounds t-2 and t-1
- 	# Compute message schedule QWORDS t and t+1
-+	# \idx is t mod 16 and must be even.
- 
- 	#   Two rounds are computed based on the values for K[t-2]+W[t-2] and
- 	# K[t-1]+W[t-1] which were previously stored at WK_2 by the message
- 	# scheduler.
--	#   The two new schedule QWORDS are stored at [W_t(%%t)] and [W_t(%%t+1)].
--	# They are then added to their respective SHA512 constants at
--	# [K_t(%%t)] and [K_t(%%t+1)] and stored at dqword [WK_2(%%t)]
--	#   For brievity, the comments following vectored instructions only refer to
-+	#   The two new schedule QWORDS are stored in the 16-QWORD circular
-+	# buffer at W_t(\idx) and W_t(\idx + 1).  When \idx == 0, W[t] is also
-+	# mirrored at W_t(16) so that odd-indexed wrap-around loads at W_t(15)
-+	# read {W_t(15), W_t(0)} with a single unaligned load.
-+	#   They are then added to their respective SHA512 constants at
-+	# (8*\idx)(kptr) and (8*\idx + 8)(kptr) and stored at dqword WK_2(0).
-+	#   For brevity, the comments following vectored instructions only refer to
- 	# the first of a pair of QWORDS.
- 	# Eg. XMM2=W[t-2] really means XMM2={W[t-2]|W[t-1]}
- 	#   The computation of the message schedule and the rounds are tightly
- 	# stitched to take advantage of instruction-level parallelism.
--	# For clarity, integer instructions (for the rounds calculation) are indented
--	# by one tab. Vectored instructions (for the message scheduler) are indented
--	# by two tabs.
- 
- 	mov	f_64, T1
--	idx = \rnd -2
--	movdqa	W_t(idx), %xmm2		    # XMM2 = W[t-2]
-+	movdqa	W_t((\idx - 2) & 15), %xmm2 # XMM2 = W[t-2]
- 	xor	g_64, T1
- 	and	e_64, T1
- 	movdqa	%xmm2, %xmm0	            # XMM0 = W[t-2]
- 	xor	g_64, T1
--	idx = \rnd
--	add	WK_2(idx), T1
--	idx = \rnd - 15
--	movdqu	W_t(idx), %xmm5		    # XMM5 = W[t-15]
-+	add	WK_2(0), T1
-+	movdqu	W_t((\idx - 15) & 15), %xmm5 # XMM5 = W[t-15]
- 	mov	e_64, tmp0
- 	ror	$23, tmp0 # 41
- 	movdqa	%xmm5, %xmm3	            # XMM3 = W[t-15]
-@@ -219,8 +222,7 @@ frame_size = frame_WK + WK_SIZE
- 	and	e_64, T1
- 	xor	g_64, T1
- 	psllq	$(64-19)-(64-61) , %xmm1    # XMM1 = W[t-2] << 42
--	idx = \rnd + 1
--	add	WK_2(idx), T1
-+	add	WK_2(1), T1
- 	mov	e_64, tmp0
- 	psllq	$(64-1)-(64-8), %xmm4	    # XMM4 = W[t-15] << 7
- 	ror	$23, tmp0 # 41
-@@ -240,24 +242,24 @@ frame_size = frame_WK + WK_SIZE
- 	pxor	%xmm1, %xmm0		    # XMM0 = s1(W[t-2])
- 	mov	a_64, tmp0
- 	and	c_64, tmp0
--	idx = \rnd - 7
--	movdqu	W_t(idx), %xmm1		    # XMM1 = W[t-7]
-+	movdqu	W_t((\idx - 7) & 15), %xmm1 # XMM1 = W[t-7]
- 	xor	tmp0, T2
- 	pxor	%xmm4, %xmm3                # XMM3 = s0(W[t-15])
- 	mov	a_64, tmp0
- 	paddq	%xmm3, %xmm0		    # XMM0 = s1(W[t-2]) + s0(W[t-15])
- 	ror	$5, tmp0 # 39
--	idx =\rnd-16
--	paddq	W_t(idx), %xmm0		    # XMM0 = s1(W[t-2]) + s0(W[t-15]) + W[t-16]
-+	paddq	W_t(\idx), %xmm0	    # XMM0 = s1(W[t-2]) + s0(W[t-15]) + W[t-16]
- 	xor	a_64, tmp0
--	paddq	%xmm1, %xmm0	            # XMM0 = s1(W[t-2]) + W[t-7] + s0(W[t-15]) + W[t-16]
-+	paddq	%xmm1, %xmm0		    # XMM0 = s1(W[t-2]) + W[t-7] + s0(W[t-15]) + W[t-16]
- 	ror	$6, tmp0 # 34
--	movdqa	%xmm0, W_t(\rnd)	    # Store scheduled qwords
-+	movdqa	%xmm0, W_t(\idx)	    # Store scheduled qwords
-+	.if \idx == 0
-+	movq	%xmm0, W_t(16)		    # Mirror W[t] for wrap-around loads at W_t(15)
-+	.endif
- 	xor	a_64, tmp0
--	paddq	K_t(\rnd), %xmm0	    # Compute W[t]+K[t]
-+	paddq	(8*\idx)(kptr), %xmm0	    # Compute W[t]+K[t]
- 	ror	$28, tmp0 # 28
--	idx = \rnd
--	movdqa	%xmm0, WK_2(idx)	    # Store W[t]+K[t] for next rounds
-+	movdqa	%xmm0, WK_2(0)		    # Store W[t]+K[t] for next rounds
- 	add	tmp0, T2
- 	add	T1, d_64
- 	lea	(T1, T2), h_64
-@@ -289,9 +291,13 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	sub	$frame_size, %rsp
- 	and	$~(0x20 - 1), %rsp
- 
-+	# Spill digest and msglen to free up %rdi and %rdx for kptr and loop_cnt.
-+	mov	digest, frame_digest(%rsp)
-+	mov	msglen, frame_msglen(%rsp)
-+
- .Lupdateblock:
- 
--# Load state variables
-+	# Load state variables
- 	mov	DIGEST(0), a_64
- 	mov	DIGEST(1), b_64
- 	mov	DIGEST(2), c_64
-@@ -301,39 +307,52 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 	mov	DIGEST(6), g_64
- 	mov	DIGEST(7), h_64
- 
--	t = 0
--	.rept 80/2 + 1
--	# (80 rounds) / (2 rounds/iteration) + (1 iteration)
--	# +1 iteration because the scheduler leads hashing by 1 iteration
--		.if t < 2
--			# BSWAP 2 QWORDS
--			movdqa	XMM_QWORD_BSWAP(%rip), %xmm1
--			movdqu	MSG(t), %xmm0
--			pshufb	%xmm1, %xmm0	# BSWAP
--			movdqa	%xmm0, W_t(t)	# Store Scheduled Pair
--			paddq	K_t(t), %xmm0	# Compute W[t]+K[t]
--			movdqa	%xmm0, WK_2(t)	# Store into WK for rounds
--		.elseif t < 16
--			# BSWAP 2 QWORDS# Compute 2 Rounds
--			movdqu	MSG(t), %xmm0
--			pshufb	%xmm1, %xmm0	# BSWAP
--			SHA512_Round t-2	# Round t-2
--			movdqa	%xmm0, W_t(t)	# Store Scheduled Pair
--			paddq	K_t(t), %xmm0	# Compute W[t]+K[t]
--			SHA512_Round t-1	# Round t-1
--			movdqa	%xmm0, WK_2(t)	# Store W[t]+K[t] into WK
--		.elseif t < 79
--			# Schedule 2 QWORDS# Compute 2 Rounds
--			SHA512_2Sched_2Round_sse t
--		.else
--			# Compute 2 Rounds
--			SHA512_Round t-2
--			SHA512_Round t-1
--		.endif
-+	# Rounds 0 - 13: BSWAP W[0..15] into W_t(0..15) and compute rounds 0..13.
-+	movdqa	XMM_QWORD_BSWAP(%rip), %xmm1
-+	movdqu	MSG(0), %xmm0
-+	pshufb	%xmm1, %xmm0	# BSWAP
-+	movdqa	%xmm0, W_t(0)	# Store Scheduled Pair
-+	paddq	K_t(0), %xmm0	# Compute W[t]+K[t]
-+	movdqa	%xmm0, WK_2(0)	# Store into WK for rounds
-+	t = 2
-+	.rept 7
-+		movdqu	MSG(t), %xmm0
-+		pshufb	%xmm1, %xmm0	# BSWAP
-+		SHA512_Round (t-2)	# Round t-2
-+		movdqa	%xmm0, W_t(t)	# Store Scheduled Pair
-+		paddq	K_t(t), %xmm0	# Compute W[t]+K[t]
-+		SHA512_Round (t-1)	# Round t-1
-+		movdqa	%xmm0, WK_2(t)	# Store W[t]+K[t] into WK
- 		t = t+2
- 	.endr
- 
-+	# Rounds 14 - 77: Schedule W[16..79] and compute rounds 14..77,
-+	# rolled into 4 iterations of 16 rounds each using the 16-QWORD
-+	# circular stack buffer W_t(0..15) (plus mirror W_t(16) = W_t(0)).
-+	lea	K512+16*8(%rip), kptr
-+	mov	$4, loop_cnt
-+
-+.align 16
-+.Lsched_loop:
-+	SHA512_2Sched_2Round_sse 0
-+	SHA512_2Sched_2Round_sse 2
-+	SHA512_2Sched_2Round_sse 4
-+	SHA512_2Sched_2Round_sse 6
-+	SHA512_2Sched_2Round_sse 8
-+	SHA512_2Sched_2Round_sse 10
-+	SHA512_2Sched_2Round_sse 12
-+	SHA512_2Sched_2Round_sse 14
-+
-+	add	$16*8, kptr
-+	dec	loop_cnt
-+	jnz	.Lsched_loop
-+
-+	# Rounds 78 - 79
-+	SHA512_Round 78
-+	SHA512_Round 79
-+
- 	# Update digest
-+	mov	frame_digest(%rsp), digest
- 	add	a_64, DIGEST(0)
- 	add	b_64, DIGEST(1)
- 	add	c_64, DIGEST(2)
-@@ -345,9 +364,17 @@ SYM_FUNC_START(sha512_transform_ssse3)
- 
- 	# Advance to next message block
- 	add	$16*8, msg
--	dec	msglen
-+	decq	frame_msglen(%rsp)
- 	jnz	.Lupdateblock
- 
-+	# Zeroize frame_WK and frame_W before returning.
-+	pxor	%xmm0, %xmm0
-+	movdqa	%xmm0, WK_2(0)
-+	.irp i, 0,2,4,6,8,10,12,14
-+		movdqa	%xmm0, W_t(\i)
-+	.endr
-+	movq	%xmm0, W_t(16)
-+
- 	# Deallocate Stack Space
- 	lea	-40(%rbp), %rsp
- 
-
-base-commit: 545e1d3be5c67dc538d973fb8eec6cc9aa929ce5
 -- 
-2.56.1
+Regards
+Kuldeep
 
