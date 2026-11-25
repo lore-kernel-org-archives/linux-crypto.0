@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795629997;
-	b=TehqoLbjOkKau5gikWiiMNJmXpQiFXwVJrMF7iRS9z9cP6mU9MOJ7KVV6mdARgNACrcp
-	 08GORUeUmHp8XK9f/9/JpT+xxGi7LTMTuGoaqk4UF8K5lqbEw1EDYS4lk/ZZnDcmo66BD
-	 Ro9EJ+KB3HpCQkDV+7RxcgvjtQQ4jpUtcHbyk6OYpsvFUJNzOP0uagGII+DmS3V5wfVSl
-	 Y6TN66ZXxjdzYGuWw4jdWSmS2IGbzziM8ICyBaOfne1bdgDFoZns5UPKIxSCFKRoC6rmL
-	 9HQ7nj39ApLBHaHbMxmZLGfd26NNsKwZOsfHGN+NuLSuM3j4Epc2O+wOdyfghx72Twg==
+	t=1795629993;
+	b=tAE6OKAZTGNgj17j320zyXlFx+0lhVpI9SgpPpr17cJBtRL8g2d6GS53IwZay4haDvft
+	 i5X9GsFkDqwVV1Kcs2ijJOEL8r0rLs0AucJHa2Q3lX7uBPWKEHykCag7bKaejKM7aFHXJ
+	 nbrVyKxTknSZCWY3kPYVuMbH4/j112ly0cSYqr0Iz2kQ8HahkdnVMw3wiMQPDA6EKsLzE
+	 g9XDymtHPMOePykMdt6Huqtg/A+Lm3USbIa5cf036O6v2Lv4fKiY58WhnVjLrPYu++NcI
+	 ZhWXyPEHOTCYw7PZvj5FbVKPva7vBVRxA7/dSTJhrLb2rwBW3B6ukJcZHTGgqqLoJXg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795629997;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795629993;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=cHcAa/C2aDJiaYitw3R3G9ckGSrrPYAAeiF+dTOf9H8=;
-	b=LzEskCA9zzwwRuC+DAlB7iPZjy1knRPzX3kedI0sg8F6hMOtbyKVQJSkwS4PB3qOcqpA
-	 gTz+M9uZFrM0A9MOx5qfv44MOdNivSoP+2aThTAbmADmlrtP1TDaEhIo3GEMyToMEju0j
-	 OQX9HiXMxZLauBHbuFZYY6WVp3FhX7O2FGeNKSmsSAk8XiYENTfXikmSUUoc45e8Lnh/1
-	 QQAUnBjfherRURNRA6/3uhj/VsIEvBLAHqYjmomOYe+ga9Ug6fyue/gpHVcQVaKKWWn5p
-	 sAW040vE00O4w7OpOpDRN13Jd3G7dObLoPc1IL37PBVSv/ljJmVd5umTy9Y2gy+p8Ig==
+	bh=U00yWHIo8HhrdyFuKMDRdBiL8d54KG7YlSUEsh2C5MM=;
+	b=WHP+fzdJNolBS8vSq4ONiFfx/bt8UOKBBrbNQi5C0gzJqYknaEHoUtCupaG3KmI2aacn
+	 MAIM2bsmOgQ61ZsQFjMBx3dpxgvjpfnkDPt25HR6t2fiwsVhbiAMjnqU5l7oF0A/4fpyT
+	 1GxNd0s9s6tkxLq9ZE9AdLjSpg4yNrWtps7a9Fc9vDvOEk5JUYPpPzYhigMXtlfa6cE0s
+	 vNhahNtekGK2dURCAdW+6o5XzwIL1TNdh/XVcDgeMgRLPUMVhTV/P37p7azhun1xa8kCB
+	 0mrq4NB6Y4g+HJRk79h65mkgx4IcC2C9s2vGLcTieibICZ2n1Pnqxktxo7G9faYQFnw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PQ53WAY4;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SzJaPlqJ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id C03EC606A321;
-	Wed, 25 Nov 2026 18:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 1FCE2606A31E;
+	Wed, 25 Nov 2026 18:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PQ53WAY4
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id B5E401F00AD3;
-	Wed, 25 Nov 2026 18:06:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SzJaPlqJ
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 3E3F71F00A3E;
+	Wed, 25 Nov 2026 18:06:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795629997;
-	bh=cHcAa/C2aDJiaYitw3R3G9ckGSrrPYAAeiF+dTOf9H8=;
+	s=k20260515; t=1795629993;
+	bh=U00yWHIo8HhrdyFuKMDRdBiL8d54KG7YlSUEsh2C5MM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PQ53WAY4QItRazvn2GqJ8q5keDNCJBXteVpYurtL63teVWfa5UkQcbKeCwRVl/CvS
-	 n9ocu0DY3eNH6WRvIZJ7lsGknS1u1PzF7liMgtmriAF1m83PlJ6DSweW6D6FzlkXOA
-	 KidNRMv6pH9gmwNdLI6hjQrp2J+WFSqnbPogfnRHTrJX+42x0acqS7cDB1qoQqDF1p
-	 wHtUU/IiU/n8356bsJ9cy/jqKg2ZuBHEKFu0dxdJl5v9G7XlNgm3Us2U1Zarl7dlha
-	 bzPNgUO/81OuYv4bf2Lw9A27NRCkKlUB6aUNQghBGEcr+BtJmcQnmLNwqgpCHTtRB6
-	 yuDIqEIPy3CLA==
+	b=SzJaPlqJ0DMwNK1s6wL3Pkh568FjgSIq0691VFOmewOFIDORl9wUV04BtlYS60a7/
+	 mWivwg/9pA0xq+MoYzyaP24iHOAlXE1/YRbpPdwrybKyV8GH5rlvGV5gjSO/4TVDNF
+	 fVaF75ksLGuVHnE9HTUX1h1e5QzxWuummGvaAUg6F6GzW8AE5z7PcPxxNN7pA0G4Yi
+	 ShgfC8FAAWnbUV951C7RX1xr8Ch56ZwZKnqdHGApP4YOs2TZqSZvgIHGWvT8WzYAMO
+	 /AcZrqpO8pOqm/n/XmVTjftPrfWeb87YAJv0Z4JZJjcrxIKsg8Kk+EaY24F7mXBlRh
+	 xkaEfCG6QHcxA==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: keyrings@vger.kernel.org
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -75,9 +75,9 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	"Serge E. Hallyn" <serge@hallyn.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
-Subject: [PATCH v3 2/9] KEYS: trusted: Allow ASN.1 TPM2 sealed data shorter than MIN_KEY_SIZE
-Date: Wed, 25 Nov 2026 20:06:08 +0200
-Message-ID: <20261125180616.1854753-3-jarkko@kernel.org>
+Subject: [PATCH v3 1/9] KEYS: Factor out opt-in KEYCTL_PKEY
+Date: Wed, 25 Nov 2026 20:06:07 +0200
+Message-ID: <20261125180616.1854753-2-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261125180616.1854753-1-jarkko@kernel.org>
 References: <20261125180616.1854753-1-jarkko@kernel.org>
@@ -92,48 +92,80 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-tpm2_unseal_cmd() rejects unsealed payloads shorter than MIN_KEY_SIZE (32
-bytes) with -EFAULT even when loading an ASN.1 TPMKey (OID_TPMSealedData,
-2.23.133.10.1.5) blob.
+Factor out CONFIG_KEYCTL_PKEY from CONFIG_ASYMMETRIC_KEY_TYPE as an
+off-by-default option so that systems that only need asymmetric keys for
+in-kernel signature verification can choose not expose KEYCTL_PKEY_*
+operations, and other key types can use them without pulling in
+crypto/asymmetric_keys.
 
-While kernel-generated trusted keys ("new <keylen>") and legacy old_format
-blobs are at least 32 bytes long, external TPM2 tools allow sealing any
-non-empty payload up to 128 bytes.
-
-Keep MIN_KEY_SIZE for legacy old_format blobs and accept 1..MAX_KEY_SIZE
-bytes for ASN.1 TPMKey sealed blobs.
-
+Suggested-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- security/keys/trusted-keys/trusted_tpm2.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ security/keys/Kconfig    | 9 +++++++++
+ security/keys/Makefile   | 2 +-
+ security/keys/internal.h | 2 +-
+ security/keys/keyctl.c   | 2 +-
+ 4 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/trusted-keys/trusted_tpm2.c
-index 30188a0ec676..8c62342b2588 100644
---- a/security/keys/trusted-keys/trusted_tpm2.c
-+++ b/security/keys/trusted-keys/trusted_tpm2.c
-@@ -499,7 +499,7 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 	struct trusted_key_tpm *private = options->private;
- 	struct tpm_header *head;
- 	struct tpm_buf *buf __free(kfree) = NULL;
--	u16 data_len;
-+	unsigned int data_len;
- 	int offset;
- 	u8 *data;
- 	int rc;
-@@ -559,9 +559,11 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 	rc = tpm_buf_check_hmac_response(chip, buf, rc);
+diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+index 3f64d60d0f8a..75cc4043ca64 100644
+--- a/security/keys/Kconfig
++++ b/security/keys/Kconfig
+@@ -22,6 +22,15 @@ menuconfig KEYS
  
- 	if (!rc) {
-+		unsigned int min_len = payload->old_format ? MIN_KEY_SIZE : 1;
+ if KEYS
+ 
++config KEYCTL_PKEY
++	bool "Public-key operations on retained keys"
++	help
++	  This option provides support for querying, encrypting, decrypting,
++	  signing, and verifying signatures via keyctl using public or
++	  asymmetric keys retained in the kernel.
 +
- 		data_len = be16_to_cpup(
- 			(__be16 *)&buf->data[TPM_HEADER_SIZE + 4]);
--		if (data_len < MIN_KEY_SIZE ||  data_len > MAX_KEY_SIZE)
-+		if (data_len < min_len || data_len > MAX_KEY_SIZE)
- 			return -EFAULT;
++	  If you are unsure as to whether this is required, answer N.
++
+ config KEYS_REQUEST_CACHE
+ 	bool "Enable temporary caching of the last request_key() result"
+ 	help
+diff --git a/security/keys/Makefile b/security/keys/Makefile
+index 5f40807f05b3..aafd28f7ee2f 100644
+--- a/security/keys/Makefile
++++ b/security/keys/Makefile
+@@ -22,7 +22,7 @@ obj-$(CONFIG_PROC_FS) += proc.o
+ obj-$(CONFIG_SYSCTL) += sysctl.o
+ obj-$(CONFIG_PERSISTENT_KEYRINGS) += persistent.o
+ obj-$(CONFIG_KEY_DH_OPERATIONS) += dh.o
+-obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += keyctl_pkey.o
++obj-$(CONFIG_KEYCTL_PKEY) += keyctl_pkey.o
  
- 		if (tpm_buf_length(buf) < TPM_HEADER_SIZE + 6 + data_len)
+ #
+ # Key types
+diff --git a/security/keys/internal.h b/security/keys/internal.h
+index c452d71cce03..28c6cd942c59 100644
+--- a/security/keys/internal.h
++++ b/security/keys/internal.h
+@@ -314,7 +314,7 @@ static inline long compat_keyctl_dh_compute(
+ #endif
+ #endif
+ 
+-#ifdef CONFIG_ASYMMETRIC_KEY_TYPE
++#ifdef CONFIG_KEYCTL_PKEY
+ extern long keyctl_pkey_query(key_serial_t,
+ 			      const char __user *,
+ 			      struct keyctl_pkey_query __user *);
+diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
+index d6b10fd67627..417bba539bb1 100644
+--- a/security/keys/keyctl.c
++++ b/security/keys/keyctl.c
+@@ -28,7 +28,7 @@ static const unsigned char keyrings_capabilities[2] = {
+ 	[0] = (KEYCTL_CAPS0_CAPABILITIES |
+ 	       (IS_ENABLED(CONFIG_PERSISTENT_KEYRINGS)	? KEYCTL_CAPS0_PERSISTENT_KEYRINGS : 0) |
+ 	       (IS_ENABLED(CONFIG_KEY_DH_OPERATIONS)	? KEYCTL_CAPS0_DIFFIE_HELLMAN : 0) |
+-	       (IS_ENABLED(CONFIG_ASYMMETRIC_KEY_TYPE)	? KEYCTL_CAPS0_PUBLIC_KEY : 0) |
++	       (IS_ENABLED(CONFIG_KEYCTL_PKEY)		? KEYCTL_CAPS0_PUBLIC_KEY : 0) |
+ 	       (IS_ENABLED(CONFIG_BIG_KEYS)		? KEYCTL_CAPS0_BIG_KEY : 0) |
+ 	       KEYCTL_CAPS0_INVALIDATE |
+ 	       KEYCTL_CAPS0_RESTRICT_KEYRING |
 -- 
 2.47.3
 
