@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795629989;
-	b=sY81MHrdJ2UvspfO7Ov87nXCyqij0Y8KPpuF8neTi4gHZlyFuW1TpWbtuzsJzrAChCgy
-	 Y8ynoztbpkTcM8gkxHG3iV/tWjGOzB0YGiwz9/E/+sqH5kP4XQo+oDPvRs4pJkrNLbk+U
-	 YEXA9pxFgas/JH/LTaQr+i8FSjuRdt61BKQ5tceOEUMDmtcQF9cm8i7dqn+KA3H8PtiwR
-	 j7mWHLXU7PL8I53R13kHqRrL0SondzAI57LH3x0xd3/luuSZA1+LT5qvEhN7nT4aG0epp
-	 bzvOXjn6CBt20hM4YaYhztShyNYb3hmZPemBWHU3fs6M2mjW6Kw5lyry+fXnCqs+yGg==
+	t=1795629997;
+	b=TehqoLbjOkKau5gikWiiMNJmXpQiFXwVJrMF7iRS9z9cP6mU9MOJ7KVV6mdARgNACrcp
+	 08GORUeUmHp8XK9f/9/JpT+xxGi7LTMTuGoaqk4UF8K5lqbEw1EDYS4lk/ZZnDcmo66BD
+	 Ro9EJ+KB3HpCQkDV+7RxcgvjtQQ4jpUtcHbyk6OYpsvFUJNzOP0uagGII+DmS3V5wfVSl
+	 Y6TN66ZXxjdzYGuWw4jdWSmS2IGbzziM8ICyBaOfne1bdgDFoZns5UPKIxSCFKRoC6rmL
+	 9HQ7nj39ApLBHaHbMxmZLGfd26NNsKwZOsfHGN+NuLSuM3j4Epc2O+wOdyfghx72Twg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795629989;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795629997;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=vwVW9YYt52UiA2UrUYRcnOGpfUWCz+wNtn31rCLdqFI=;
-	b=D5okhRcwNq3o7dTpVPl4NvFxYYajxXHcg2whabO01poH/piQo+FPs1QokaNGTTJFELQE
-	 G46qgurx3AFn14E+3Y9Toc3yWt8ruafb8J1v20yugvBuWEvnPgCkmWPo00vXXYJejly6A
-	 nJWCWtI4m+L33Fzi19m/XtB6fBQcFaD2tSFVQIBnggFc77u0pT6/KAqxT+hGv082h5xoT
-	 nsZycQUrwn+G0s+Omc7Px8b0f6eSBzrDJkFXvWzavKMaCebyIsB3+VBtUVP3H0hkcH7qG
-	 bq2PHsTBwQw89/4SF7lwZSTXlGYdj4g4/SfFdd6/1My1Bq5reHJ9Sno7cj9qm8SX7Qg==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=cHcAa/C2aDJiaYitw3R3G9ckGSrrPYAAeiF+dTOf9H8=;
+	b=LzEskCA9zzwwRuC+DAlB7iPZjy1knRPzX3kedI0sg8F6hMOtbyKVQJSkwS4PB3qOcqpA
+	 gTz+M9uZFrM0A9MOx5qfv44MOdNivSoP+2aThTAbmADmlrtP1TDaEhIo3GEMyToMEju0j
+	 OQX9HiXMxZLauBHbuFZYY6WVp3FhX7O2FGeNKSmsSAk8XiYENTfXikmSUUoc45e8Lnh/1
+	 QQAUnBjfherRURNRA6/3uhj/VsIEvBLAHqYjmomOYe+ga9Ug6fyue/gpHVcQVaKKWWn5p
+	 sAW040vE00O4w7OpOpDRN13Jd3G7dObLoPc1IL37PBVSv/ljJmVd5umTy9Y2gy+p8Ig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dvLsqJg7;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PQ53WAY4;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 9AED5606A32C;
-	Wed, 25 Nov 2026 18:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id C03EC606A321;
+	Wed, 25 Nov 2026 18:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dvLsqJg7
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 7DF011F000D8;
-	Wed, 25 Nov 2026 18:06:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PQ53WAY4
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id B5E401F00AD3;
+	Wed, 25 Nov 2026 18:06:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795629989;
-	bh=vwVW9YYt52UiA2UrUYRcnOGpfUWCz+wNtn31rCLdqFI=;
-	h=From:To:Cc:Subject:Date;
-	b=dvLsqJg73toqPo0JCwKO5eJMco5MqUX3xpeeKN1JNRHYm5qAoXjaNrEkqBYKxxpoW
-	 TwN9wfxMVbTQWwgny92HNmGs1UN3epIx8rSqPfxUOTutiuywAix/arXzHfTHbWIb0+
-	 MEBPc1JwFvirC0CwP9OpY59WXyOf/6KjBOgm+vB05WD2Wm60nfvp240y8EJzI/o2kP
-	 +6UONVFj8voG9q/lOVvpNVh2oUNALlb+Zls3I/eZhgSP8as407R/Wgk3BOpK3gqVPB
-	 4TLPncSNJFagiTT0LLYSashWMdkV4DjBOcWJ10PT6CWs3U7eXnySX1b+AFIMguI9rS
-	 hwduqdbq/R+Rg==
+	s=k20260515; t=1795629997;
+	bh=cHcAa/C2aDJiaYitw3R3G9ckGSrrPYAAeiF+dTOf9H8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=PQ53WAY4QItRazvn2GqJ8q5keDNCJBXteVpYurtL63teVWfa5UkQcbKeCwRVl/CvS
+	 n9ocu0DY3eNH6WRvIZJ7lsGknS1u1PzF7liMgtmriAF1m83PlJ6DSweW6D6FzlkXOA
+	 KidNRMv6pH9gmwNdLI6hjQrp2J+WFSqnbPogfnRHTrJX+42x0acqS7cDB1qoQqDF1p
+	 wHtUU/IiU/n8356bsJ9cy/jqKg2ZuBHEKFu0dxdJl5v9G7XlNgm3Us2U1Zarl7dlha
+	 bzPNgUO/81OuYv4bf2Lw9A27NRCkKlUB6aUNQghBGEcr+BtJmcQnmLNwqgpCHTtRB6
+	 yuDIqEIPy3CLA==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: keyrings@vger.kernel.org
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -75,10 +75,12 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	"Serge E. Hallyn" <serge@hallyn.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
-Subject: [PATCH v3 0/9] KEYS: trusted: asymmetric keys
-Date: Wed, 25 Nov 2026 20:06:06 +0200
-Message-ID: <20261125180616.1854753-1-jarkko@kernel.org>
+Subject: [PATCH v3 2/9] KEYS: trusted: Allow ASN.1 TPM2 sealed data shorter than MIN_KEY_SIZE
+Date: Wed, 25 Nov 2026 20:06:08 +0200
+Message-ID: <20261125180616.1854753-3-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261125180616.1854753-1-jarkko@kernel.org>
+References: <20261125180616.1854753-1-jarkko@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -90,127 +92,48 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-OVERVIEW
-========
+tpm2_unseal_cmd() rejects unsealed payloads shorter than MIN_KEY_SIZE (32
+bytes) with -EFAULT even when loading an ASN.1 TPMKey (OID_TPMSealedData,
+2.23.133.10.1.5) blob.
 
-Extend TPM 2.0 trusted keys to load ASN.1 TPMKey [1] asymmetric keys
-(OID_TPMLoadableKey, 2.23.133.10.1.3) and expose keyctl pkey-operations
-directly on key_type_trusted. In addition there are some TPMKey
-interoperability fixes.
+While kernel-generated trusted keys ("new <keylen>") and legacy old_format
+blobs are at least 32 bytes long, external TPM2 tools allow sealing any
+non-empty payload up to 128 bytes.
 
-I.e. this my old series with a twist: instead of introducing a separate
-subtype for asymmetric keys, factor out pkey-operations into a separate
-CONFIG_KEYCTL_PKEY-feature, and wire asymmetric operations to
-key_type_trusted.
+Keep MIN_KEY_SIZE for legacy old_format blobs and accept 1..MAX_KEY_SIZE
+bytes for ASN.1 TPMKey sealed blobs.
 
-This work was originally derived from [3] and is direct offspring of
-[2].
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+---
+ security/keys/trusted-keys/trusted_tpm2.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-[1] https://www.hansenpartnership.com/draft-bottomley-tpm2-keys.html
-[2] https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
-[3] https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
-
-CHANGES
-=======
-
-v3:
-- KEYS: Move CONFIG_KEYCTL_PKEY factoring to the beginning of the series
-  and make it an off-by-default prompt instead of selecting it from
-  CONFIG_ASYMMETRIC_KEY_TYPE.
-- trusted: Make CONFIG_TRUSTED_KEYS_ASYMMETRIC depend on
-  CONFIG_KEYCTL_PKEY instead of selecting it.
-- trusted: Use unsigned int instead of u16 for data_len and min_len in
-  tpm2_unseal_cmd().
-- asn1: The reason for not supporting implicit tags was that it follows
-  what other functions do in asn1_encoder.c, and is that way coherent.
-
-v2:
-- lib/asn1_encoder: Remove unreachable !bytes_len branch in
-  asn1_encode_integer_bytes().
-- tpm: Bounds-check ECC coordinates, defer state updates until after
-  validation, and verify subsequent TPM2_RH_NULL primaries against
-  chip->null_key_name in tpm2_parse_create_primary().
-- trusted: Reject trailing or truncated TPM2B bytes in tpm2_key_decode() so
-  tpm2_load_cmd() and tpm2_asym_load() pass the same blob length.
-- trusted: Avoid 32-bit param_size wraparound in tpm2_asym_rsa_decrypt()
-  and tpm2_asym_parse_signature().
-
-VERSIONS
-========
-
-v2: https://lore.kernel.org/keyrings/20261124194043.1651679-1-jarkko@kernel.org/
-v1: https://lore.kernel.org/keyrings/20261124120044.1481752-1-jarkko@kernel.org/
-
-Cc: dm-devel@lists.linux.dev
-Cc: keyrings@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-doc@vger.kernel.org
-Cc: linux-integrity@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
-Cc: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: Alasdair Kergon <agk@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Benjamin Marzinski <bmarzins@redhat.com>
-Cc: David Gstir <david@sigma-star.at>
-Cc: David Howells <dhowells@redhat.com>
-Cc: David Laight <david.laight.linux@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ignat Korchagin <ignat@linux.win>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: James Morris <jmorris@namei.org>
-Cc: James Prestwood <prestwoj@gmail.com>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Lukas Wunner <lukas@wunner.de>
-Cc: Mike Snitzer <snitzer@kernel.org>
-Cc: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Mimi Zohar <zohar@linux.ibm.com>
-Cc: Paul Moore <paul@paul-moore.com>
-Cc: Peter Huewe <peterhuewe@gmx.de>
-Cc: Randy Dunlap <rdunlap@infradead.org>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Cc: Sumit Garg <sumit.garg@kernel.org>
-
-Jarkko Sakkinen (9):
-  KEYS: Factor out opt-in KEYCTL_PKEY
-  KEYS: trusted: Allow ASN.1 TPM2 sealed data shorter than MIN_KEY_SIZE
-  lib/asn1_encoder: Add asn1_encode_integer_bytes()
-  tpm: Export tpm2_create_primary()
-  tpm: Add persistent hierarchies to tpm2_create_primary()
-  KEYS: trusted: Extend TPMKey support
-  KEYS: trusted: Reject zero-length keys in symmetric consumers
-  KEYS: trusted: Factor out TPM2 blob loading
-  KEYS: trusted: Add asymmetric key support for TPM2
-
- .../security/keys/trusted-encrypted.rst       |   25 +-
- crypto/af_alg.c                               |    2 +
- drivers/char/tpm/Kconfig                      |    2 +-
- drivers/char/tpm/tpm2-sessions.c              |  239 +--
- drivers/md/dm-crypt.c                         |    2 +-
- include/keys/trusted-type.h                   |    5 +-
- include/keys/trusted_tpm.h                    |   16 +-
- include/linux/asn1_encoder.h                  |    3 +
- include/linux/tpm.h                           |    2 +
- include/linux/tpm_command.h                   |   13 +
- lib/asn1_encoder.c                            |   56 +
- security/keys/Kconfig                         |    9 +
- security/keys/Makefile                        |    2 +-
- .../keys/encrypted-keys/masterkey_trusted.c   |    5 +
- security/keys/internal.h                      |    2 +-
- security/keys/keyctl.c                        |    2 +-
- security/keys/trusted-keys/Kconfig            |   10 +
- security/keys/trusted-keys/tpm2key.asn1       |   19 +
- security/keys/trusted-keys/trusted_core.c     |   20 +-
- security/keys/trusted-keys/trusted_tpm1.c     |   26 +
- security/keys/trusted-keys/trusted_tpm2.c     | 1341 +++++++++++++++--
- 21 files changed, 1591 insertions(+), 210 deletions(-)
-
---
+diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/trusted-keys/trusted_tpm2.c
+index 30188a0ec676..8c62342b2588 100644
+--- a/security/keys/trusted-keys/trusted_tpm2.c
++++ b/security/keys/trusted-keys/trusted_tpm2.c
+@@ -499,7 +499,7 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
+ 	struct trusted_key_tpm *private = options->private;
+ 	struct tpm_header *head;
+ 	struct tpm_buf *buf __free(kfree) = NULL;
+-	u16 data_len;
++	unsigned int data_len;
+ 	int offset;
+ 	u8 *data;
+ 	int rc;
+@@ -559,9 +559,11 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
+ 	rc = tpm_buf_check_hmac_response(chip, buf, rc);
+ 
+ 	if (!rc) {
++		unsigned int min_len = payload->old_format ? MIN_KEY_SIZE : 1;
++
+ 		data_len = be16_to_cpup(
+ 			(__be16 *)&buf->data[TPM_HEADER_SIZE + 4]);
+-		if (data_len < MIN_KEY_SIZE ||  data_len > MAX_KEY_SIZE)
++		if (data_len < min_len || data_len > MAX_KEY_SIZE)
+ 			return -EFAULT;
+ 
+ 		if (tpm_buf_length(buf) < TPM_HEADER_SIZE + 6 + data_len)
+-- 
 2.47.3
 
