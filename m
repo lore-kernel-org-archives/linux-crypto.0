@@ -1,57 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.29
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795648821;
-	b=VbJNETyfSkgkSaMfoj+7YYc0AUIZbNPxgSZA1HpdFFP2bGOn1yUL6zCgzRaJWXGZDfjr
-	 o9QRREJJBsQAiT9v2Xm8MFcSl6xp6zxPfMmVR4wKCXpUdNgyvLFbUoAYTQVkbRikTdn68
-	 1ni0eCI8509WOscSUrwO2LCdz2BIX0TjDimiMzm8aLoswfEunJQZ8J0jeQ3iHEnYta4k2
-	 YypFlJWQV1hx0x180lZf99jjFKIbzUoAsslJwiXpZ6FaDn5opx3hM+DHzqCBcxeyctJ/1
-	 b6srVPVtFlFmjbI7eTGZ8is5Mx3ku3WZQ9IePQo3R2fyDDIAyGLQuuv/QQDzqbTkszA==
+	t=1795649203;
+	b=s4TedN60kaE+40Yjv216MwX43YweN5M4DIMXEkARXpDXl6Cm8O9E/lt/yvnxw/cNozQV
+	 Nu+rWCxsuMlyiUGxoHE6fgKLl9ayhEvE+KzALnd4k431/3/F1waCyijHAoKsqhqiQ57gH
+	 lj9K476xWJLGFVh6BuxYeeC9BQaTzw1RSm0chtv3VIVsoyQ4jSF+2o22wwQ4e8dRn2s/N
+	 POEQfpYRASLVZNhGar6A3WEGc4IKq9WeyhgH2ZiEfd2kFbn/lUOsznO96sf2dVJTcs9xB
+	 qXQU11MpHg6YI7IKCH7rH7jgPf9eEbB6byTSlu50ikw8UAGxlZgeg+xunDVbTUmrceA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795648821;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=xa5TxEwMSu/tHhTRii+AZOVjx00nlbMu+ZgWqbet4C4=;
-	b=lw9o39n5oF9+1pA0iwCtKcxdg7hlc93kzLp/AF4QJMhiKVdDsZCDqgPMGvv5dR5QKMR7
-	 8X2FmeRn/Ay1qu36FhSBL6F3tq55zzwdvbynUw8oCB+FJoE378oVH8FSmjAfx6Hpu1ka1
-	 KJUryADUE6hsUKIh8Cu3JlKVOK/xloYMh0sPP3v/pcZUO3f+wKjUwlm4wbyt+cThd6/jf
-	 uJIN4tyrjVcIefdN9B2JyCFgnqjO6rpbhEoYJR4B6GLIYy4WHfFSoWjjxqrl2ybY5aT9s
-	 wRcJkm6AshGnmpH5a/y5lkVvHOIgkZp8/8yY27cAsOk8asYrJ92ELQZSlQxkVcnGg2A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795649203;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=SokZVg1bMNHMNI7vkTIp/8GwWgTgMUHfQcEaNlaEVds=;
+	b=Ds9IX767ZjM+z4/m76gfzcRv1fAUg8Y3tJZq5ATeL0cw0EXljIZjW6smWDBWiEZvzSJd
+	 gCgX70k8ZauMs3fcAmx8GxUitzoEovWi95BuIT+acWi3bYbRHTXVzF9aM5mzmWe4xpvUv
+	 ryPzQ1RooHn7DF8gt/AzdmBj1NWghP8KI8W0bTlHgpuAcHJtBDrWjzeWEZ2w6VPO7xn1h
+	 blahDQqPGjyZWkCylbaQ/b9V9g4yn4uMmOSfUkzE1zhAy9QGl30DyaEMJEY7u744JIi/u
+	 k+VzTz/CENHWAgnTHGaX9NiN1P+OG33ida2bspZBaIL19CD8CPmeeNgUI5RcnhcMvjg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=protonmail.com;
-	spf=pass smtp.mailfrom=protonmail.com;
-	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=V0Sk4CKS;
-	arc=none smtp.remote-ip=79.135.106.29
-Received: from mail-10629.protonmail.ch (mail-10629.protonmail.ch [79.135.106.29])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dleBgMN5;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5A3606A321
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 23:20:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CC5A3606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0B5606A323
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 23:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=V0Sk4CKS
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1795648818; x=1795908018;
-	bh=xa5TxEwMSu/tHhTRii+AZOVjx00nlbMu+ZgWqbet4C4=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=V0Sk4CKSOg3l3HGKIeA0DMJUMapOoqVbZgqSbH8XiusI5ReR4wo69+7jpGfeJIab1
-	 /yXVN537+U+VvT6zU24PcjwK5jQLDmEdvuYV+3T64dWPZfLFMCQrCPcGVCrrkJfkzu
-	 1xB7QlMvnucsa8RbwUgZ8d027Ym77HavDw+At1wPenO6UJupq4tuSChy3SPfke7GA1
-	 +/ThNj4XqIAxdzdXGqH84zYEXbXR6LAWCF3o6UjQRuHdwiKIQc9JoIV4wVG2kTi/4H
-	 x5gesA06OxlwdY4ogcwex8Kg5hUvE4tApPxBNgKPF5YGWy41/jBOvbtXDJXM2FDQxb
-	 o8E8kglyvYscw==
-Date: Wed, 25 Nov 2026 23:20:13 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-From: Ryan Prinz <rc4d5a@protonmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ryan Prinz <rc4d5a@protonmail.com>
-Subject: [PATCH] crypto: dh - fix missing DH public key validation on non-FIPS kernels
-Message-ID: <20261125231954.1857828-1-rc4d5a@protonmail.com>
-Feedback-ID: 190731814:user:proton
-X-Pm-Message-ID: f00976f35fe7f67c4fc029525008f206445447dc
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dleBgMN5
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44C0A1F000CF;
+	Wed, 25 Nov 2026 23:26:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795649202;
+	bh=SokZVg1bMNHMNI7vkTIp/8GwWgTgMUHfQcEaNlaEVds=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=dleBgMN53KVmlid6xSA0naijoZsgDJgI0lyApdFWPpSkwve8mgwAVy7JLb6fc15iw
+	 ZQwxZ9JfkP7iqo1a4BGheGCT0ak1Yt9XnIL8xkrFiGe9vbQYFCJR35qq5TzlY3SBWL
+	 Ofaw+SGT1SiAPG0Zmb4AF9HpkWpm1NarpGzAq4OFa185mDJbIlgDIPSl06TPrFWosr
+	 WCa12w/pYRxDlIFPLrsflrwjRDs6lC5/ZgrV6fzFCSn+91am+7qXFWJCwZ1d6kxEid
+	 vAqEc6L1/09Ny98YRXI4S5qCY/cT6pGTLiz/oYFLsCYHZdKHgMU0CQSUYqU5XxWEtt
+	 16CxAAEta+6lA==
+Message-ID: <sashiko-outbox-234394@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v3] crypto: qat - fix missing DH public key validation
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Ryan Prinz" <rc4d5a@protonmail.com>, "Giovanni Cabiddu" <giovanni.cabiddu@intel.com>
+Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com, linux-crypto@vger.kernel.org
+In-Reply-To: <20261125231859.1857450-1-rc4d5a@protonmail.com>
+References: <20261125231859.1857450-1-rc4d5a@protonmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Nov 2026 23:26:41 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,125 +58,123 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-dh_is_pubkey_valid() returns 0 immediately when fips_enabled is
-false, so on a non-FIPS kernel dh_compute_value() never checks the
-peer's public value at all before using it to derive the shared
-secret.
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [High] crypto: qat - build failure from undeclared
+  crypto_dh_pubkey_in_range()
+- [Low] crypto: qat - duplicate buffer allocation and copy in
+  qat_dh_compute_value()
+--
 
-That gating was added in the Fixes: commit because the function's
-own range check (2 <=3D y <=3D p - 2) used to take a shortcut: it tested
-y < p instead of y < p - 1, relying on the y^q mod p test further
-down to reject y =3D=3D p - 1. That test only runs in FIPS mode, so the
-range check alone wasn't safe to run unconditionally, and gating the
-whole function was the simplest way to keep the two consistent.
+commit 0140ee9c1bcbef53ad898f6e8736ea350a10f33a
+Author: Ryan Prinz <rc4d5a@protonmail.com>
 
-drivers/nvme/common/auth.c requests "ffdheNNNN(dh)" for NVMe-oF's
-in-band DH-HMAC-CHAP authentication, used by both
-drivers/nvme/host/auth.c and drivers/nvme/target/auth.c. Forcing the
-derived session key Ks to a known value lets an attacker who holds a
-handshake transcript perform an offline brute-force attack against
-the pre-shared key, which is what the DH exchange is documented to
-protect against on top of plain CHAP. With bidirectional
-authentication enabled, an attacker can obtain a transcript by
-connecting to the target directly and requesting it without valid
-credentials, exposing the target's authentication key
-(dhchap_ctrl_secret).
+crypto: qat - fix missing DH public key validation
 
-Fixed by computing p - 2 directly and checking against that instead
-of the y < p shortcut, so the range check is a complete partial
-validation (SP800-56A section 5.6.2.3.2) on its own and can run
-before the FIPS gate rather than behind it. The y^q mod p check
-(SP800-56A section 5.6.2.3.1's additional step for safe-prime groups)
-is unchanged and stays FIPS-only.
+This commit adds range validation for peer Diffie-Hellman public keys in
+qat_dh_compute_value() before submitting requests to the QAT hardware
+queue.
 
-Fixes: f66a211e8c5d ("crypto: dh - Make public key test FIPS-only")
-Signed-off-by: Ryan Prinz <rc4d5a@protonmail.com>
----
-Verified by building crypto/dh.o directly, confirming it compiles
-cleanly with no new warnings or errors.
+> diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/driver=
+s/crypto/intel/qat/qat_common/qat_asym_algs.c
+> index 77d59e977472d..e7532c66404d8 100644
+> --- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
+> +++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
+> @@ -216,6 +216,43 @@ static unsigned long qat_dh_fn_id(unsigned int len, =
+bool g2)
+>  	}
+>  }
+> =20
+> +static int qat_dh_peer_pubkey_valid(struct qat_dh_ctx *ctx,
+> +				    struct scatterlist *src,
+> +				    unsigned int src_len, gfp_t flags)
+> +{
+> +	unsigned int p_size =3D ctx->p_size;
+> +	u8 *p_minus_1, *y;
+> +	int i, ret =3D 0;
+> +
+> +	if (!src_len || src_len > p_size)
+> +		return -EINVAL;
+> +
+> +	y =3D kzalloc(p_size, flags);
+> +	if (!y)
+> +		return -ENOMEM;
+> +
+> +	scatterwalk_map_and_copy(y + (p_size - src_len), src, 0, src_len, 0);
+> +
+> +	p_minus_1 =3D kmemdup(ctx->p, p_size, flags);
+> +	if (!p_minus_1) {
+> +		ret =3D -ENOMEM;
+> +		goto free_y;
+> +	}
+> +
+> +	for (i =3D p_size - 1; i >=3D 0; i--) {
+> +		if (p_minus_1[i]-- !=3D 0)
+> +			break;
+> +	}
+> +
+> +	if (!crypto_dh_pubkey_in_range(y, p_minus_1, p_size))
+> +		ret =3D -EINVAL;
 
-Also verified step 1 itself under AddressSanitizer/UBSan outside the
-kernel, by building lib/crypto/mpi/'s arithmetic files standalone and
-running the new code against mpi_sub_ui()/mpi_cmp_ui()/mpi_cmp().
-Using p and b_public from crypto/testmgr.h's dh_tv_template[], y =3D 0,
-1, 2, p-2, p-1, p, and p+1 all produced the expected accept/reject
-result.
+[Severity: High]
+Does this break the build when CONFIG_CRYPTO_DEV_QAT is enabled?
+crypto_dh_pubkey_in_range() is not declared in include/crypto/dh.h or
+defined anywhere in this tree, because the prerequisite commit
+"crypto: dh - add shared DH public key range check" noted in the patch
+commentary is missing.
 
-AI Disclosure: An AI assistant was used to assist with the
-analysis and testing. I have verified the vulnerability, the fix, and
-the test results myself and take responsibility for this contribution,
-per Documentation/process/coding-assistants.rst.
+> +
+> +	kfree_sensitive(p_minus_1);
+> +free_y:
+> +	kfree_sensitive(y);
+> +	return ret;
+> +}
+> +
+>  static int qat_dh_compute_value(struct kpp_request *req)
+>  {
+>  	struct crypto_kpp *tfm =3D crypto_kpp_reqtfm(req);
+> @@ -241,6 +278,12 @@ static int qat_dh_compute_value(struct kpp_request *=
+req)
+>  	if (req->src_len > ctx->p_size)
+>  		return -EINVAL;
+> =20
+> +	if (req->src) {
+> +		ret =3D qat_dh_peer_pubkey_valid(ctx, req->src, req->src_len, flags);
+> +		if (unlikely(ret))
+> +			return ret;
+> +	}
 
- crypto/dh.c | 40 +++++++++++++++++++++++++---------------
- 1 file changed, 25 insertions(+), 15 deletions(-)
+[Severity: Low]
+This isn't a bug, but qat_dh_peer_pubkey_valid() re-checks
+src_len > p_size, allocates y, and copies req->src via
+scatterwalk_map_and_copy(), even though qat_dh_compute_value() already
+produces a contiguous zero-padded ctx->p_size buffer in vaddr right
+before dma_map_single():
 
-diff --git a/crypto/dh.c b/crypto/dh.c
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -97,34 +97,44 @@
- /*
-  * SP800-56A public key verification:
-  *
-- * * For the safe-prime groups in FIPS mode, Q can be computed
-- *   trivially from P and a full validation according to SP800-56A
-- *   section 5.6.2.3.1 is performed.
-+ * * Step 1, the partial validation from SP800-56A section 5.6.2.3.2
-+ *   (2 <=3D y <=3D p - 2), is performed unconditionally, regardless of
-+ *   FIPS mode.
-  *
-- * * For all other sets of group parameters, only a partial validation
-- *   according to SP800-56A section 5.6.2.3.2 is performed.
-+ * * For the safe-prime groups in FIPS mode, Q can be computed
-+ *   trivially from P, so step 2, completing the full validation
-+ *   according to SP800-56A section 5.6.2.3.1, is also performed.
-  */
- static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
- {
--=09MPI val, q;
-+=09MPI val, q, p_minus_2;
- =09int ret;
+drivers/crypto/intel/qat/qat_common/qat_asym_algs.c:qat_dh_compute_value() {
+	...
+		if (sg_is_last(req->src) && req->src_len =3D=3D ctx->p_size) {
+			qat_req->src_align =3D NULL;
+			vaddr =3D sg_virt(req->src);
+		} else {
+			int shift =3D ctx->p_size - req->src_len;
 
--=09if (!fips_enabled)
--=09=09return 0;
--
- =09if (unlikely(!ctx->p))
- =09=09return -EINVAL;
+			qat_req->src_align =3D kzalloc(ctx->p_size, flags);
+			if (unlikely(!qat_req->src_align))
+				return ret;
 
- =09/*
- =09 * Step 1: Verify that 2 <=3D y <=3D p - 2.
- =09 *
--=09 * The upper limit check is actually y < p instead of y < p - 1
--=09 * in order to save one mpi_sub_ui() invocation here. Note that
--=09 * p - 1 is the non-trivial element of the subgroup of order 2 and
--=09 * thus, the check on y^q below would fail if y =3D=3D p - 1.
-+=09 * Unlike step 2 below, this has to hold regardless of FIPS mode, so
-+=09 * the upper limit is p - 2 itself rather than the old y < p
-+=09 * shortcut, which relied on step 2 to reject p - 1 and only runs
-+=09 * in FIPS mode.
- =09 */
--=09if (mpi_cmp_ui(y, 1) < 1 || mpi_cmp(y, ctx->p) >=3D 0)
--=09=09return -EINVAL;
-+=09p_minus_2 =3D mpi_alloc(0);
-+=09if (!p_minus_2)
-+=09=09return -ENOMEM;
-+
-+=09ret =3D mpi_sub_ui(p_minus_2, ctx->p, 2);
-+=09if (!ret && (mpi_cmp_ui(y, 2) < 0 || mpi_cmp(y, p_minus_2) > 0))
-+=09=09ret =3D -EINVAL;
-+
-+=09mpi_free(p_minus_2);
-+=09if (ret)
-+=09=09return ret;
-+
-+=09if (!fips_enabled)
-+=09=09return 0;
+			scatterwalk_map_and_copy(qat_req->src_align + shift,
+						 req->src, 0, req->src_len, 0);
 
- =09/*
- =09 * Step 2: Verify that 1 =3D y^q mod p
+			vaddr =3D qat_req->src_align;
+		}
+	...
+}
+
+Validating vaddr there would avoid allocating a second buffer and copying
+req->src twice on every request.
+
 --=20
-2.51.2
-
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125231859.1857=
+450-1-rc4d5a@protonmail.com?part=3D1
