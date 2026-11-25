@@ -1,137 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.48
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795629877;
-	b=uwhk7z0+YbvWeKUPms+Egs/zLcSDxWl1u2XlD69Z5IXorEfM7tqMdwwBikPYaP9ZmdtY
-	 oNv6inYIWbGH84ajIT7BLkl/38L5Nu6NH9GWmURPwbUYgso9Pm1iKhBt78LV8v0oBXhv8
-	 l4N+1BoZkraD7qU+4SyqohiqWtmvG2EaVVWIoOUfYcFVSn2sdk1MLa1qh05jmQToUydpr
-	 E0gOeC+aJitHQmrSgJ5tuuB6z9bRzn2e9m7xwZJvxrQ0XLlKvKoBcdL9fAWZGHq4bJcEC
-	 v08zuqwiCWGBmJGw4mqJct3KhsJGtRnXSpu7Vo+Bi3SNnOlB9hB42z8OxfcWVx4d2/w==
+	t=1795629966;
+	b=XpOni08AAEx8yeqp0TI2xto1gkRW1pgGD7v+GUkzJKbBCMCGt7AeSpXKoNJa8EwmS9kz
+	 Eos/vOAnzgdBygt5fuX1COrI+Yc7Jck90bzEvI8wFaWfqr/SQmw7R0/SM3/kkmB2lLFO3
+	 /krCKhi/RN76L37QNhRFgkeOMPT5q0hnH3wTfVSvOwDSTd90NVpFkgb8V7pf3ZjDf22J9
+	 GFFj5SQFUvIBo05VkJbnrwq82XgNI7P/BdxT58/sddy2ftTSrgmz6V1Oo1txky/9q/9QD
+	 /o9pTkhO0kfDbJ1ZwpUUl+U+mZFe6APocul6jf9+SU1s3sQlslAdIfDq/6UdDQ3bE6A==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795629877;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Received:
-	 Received:DKIM-Signature:Received:Received:Date:From:To:CC:Subject:
-	 Message-ID:References:Content-Type:Content-Disposition:In-Reply-To:
-	 Organization:X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-Exchange-RoutingPolicyChecked:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
-	 X-MS-Exchange-CrossTenant-UserPrincipalName:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
-	bh=r3hr56IexS1zJmyvSXMyvQX2Cfopu0kAlK1GpejC6jk=;
-	b=3CbXXwdouNmtpYEtIjyQkBb6wnV6S6hJIjdqABhYpKJ6U5wXSxYIKK0g1PIv2psPTev0
-	 0njP6ENj25K6lo8tDvtnZP27MzpRtYtpBeoCcg7pfbi1GM3wIANOGu33unmlvJ2WC2Vvr
-	 G7ZmapTL/u4Lkn8yDFqfksyL8j9h56rn9QcV7yDF16M/S6qyTnP4hmpMAftt1HgSPi7iS
-	 q9NlSqpF0CkoM+v5OsAHtige1xtbkEZpVolVmm5IbVumPY72U2FsMELVZ3mfdhI+r/wCe
-	 Es7crzw7tiscHqv+mphviuO+PgaSecOd761QMYyGO0h19E7y/Sq01BpmXH9WPsHdWDg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795629966;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=s0yGO0nle6dWsSssSP9hU9J70E3ycwEl+Dc20fwXM0A=;
+	b=O/8h0u+yebCajs2sWdXFqFYwTRHvBAbq4dYIMDJackLiMhgDCdl+WXudu+7dnKKeCMzY
+	 GR3RvOUCFXe9UOiiPHjOr5nMwu6DqclcGsW3mKTPq6arZZEx58FPcxpy9n/AGFpZdizeS
+	 Sx9XU11aOuao46nT9XHUex18Z/gz+HDYXz3hbl2ahXcRmr+wmg4Zof1v8Y85hXphjoQUP
+	 psmalZqfNcTl7J4KIRArGndVV7lvMX58PL1TJ4EXC8BO3p7TvHOSKzkJedc3qkG0P0oso
+	 00M09iNWBYJ70ZfxTIiBcvYDwJUkAEgZD9lot4vZX9Q58Dl1PIv2qFWlaULHMaDsUzA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=jS4oaAy8;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=selector1 header.b=d44ofl8+;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=192.198.163.12
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0rDEbnNB;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.167.48
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13531606A323;
-	Wed, 25 Nov 2026 18:04:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 13531606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37960606A321
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 18:06:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 37960606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=jS4oaAy8;
-	dkim=pass (1024-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=selector1 header.b=d44ofl8+
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1795629877; x=1827165877;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=+hOvjffpQO4WrTGGCaxTkLpK/crteDlokC2Zj2D89CE=;
-  b=jS4oaAy81+w6fNxOVDAdB1jc7oVi4tC/0qhA5yhcSkNZs+ldriUgvlJV
-   kUxTbFkD5j8KqBXSXI8x+YBfb60/CDfRaNblylL2hjvqwoMJJAxRu5tQg
-   mfWntD7zFt2dYjnbaO4+oU/Ynq+k9z1BV0Mq8F082l/xGXQAK46PzR6cE
-   x036Kmh1OfroC3H4/HHoc95imciAHgFh5v2aBPm6wWk+zirkB4N+Z4sca
-   U+jZ2uO6NyZTReMBbNHUIr8LOnO5s21w5z5z3nEEN9a+LLkQK6P+aH+W8
-   Uqaanlg8U9X/BUUWXUrnu8POEgxFJDBQ8wEVonFJ9NJnWzqIf41jQtOd7
-   w==;
-X-CSE-ConnectionGUID: QzgSzJVXRNy8jZ/84hlThg==
-X-CSE-MsgGUID: RIvCSvmNRWezUdT4KpV08w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11977"; a="4412320"
-X-IronPort-AV: E=Sophos;i="6.27,233,1787036400"; 
-   d="scan'208";a="4412320"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2026 10:04:37 -0800
-X-CSE-ConnectionGUID: Eg6jvPHjSCKFE4TITRDb5A==
-X-CSE-MsgGUID: tGYfyU+/Q2m+Z8f0nRCy+A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,233,1787036400"; 
-   d="scan'208";a="11937127"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2026 10:04:37 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.57; Wed, 25 Nov 2026 10:04:35 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.57 via Frontend Transport; Wed, 25 Nov 2026 10:04:35 -0800
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.35) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.57; Wed, 25 Nov 2026 10:04:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MrqvedbrKkUNqp3BZ9hR82PmByf+wMNtWKCghRIV4OOtDu0RHDimhOEDIRXzAiL9kDkDVwYjdeRJAyrDITfleCYRKlaIkDvViZMHMGmILdtaytV0pa3s/49M7WKXPhjLvnqDUJTtoWmfMn1C9GfLFMFK834mQiqbbGyECvy/t+ZIxx1ckusNz/Ot5TK4XYMR3/s5LtDglfcnZB0TiGaqlR+gioBmP4lNxl7IBI9uwOsQrsqSfC17wLW+47XdcH2B2HBiHrt4jeHFFscEhemHrBaXyxnIAD19fiFy4x8o1tQDglPJUGA0Lm2WRqnxiAsBng7YCOhiGYG1EBHOiFdPZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r3hr56IexS1zJmyvSXMyvQX2Cfopu0kAlK1GpejC6jk=;
- b=h8KadwgqMlS60Dvsf0+lDBE6i1bqxdLgp65HlxO7sPx/pj9PUf8A6ekmQ/FJH6Y4eGTdLWBqD+2r/G5JtyCX4ru8LGTQTJ0LzHqIlG0bV4w1COULWwZ45UjdB8wGrJmjQuANl4my8Bf4wM+XAdVSzN4xrkBc3F5yzwQ6uaJFmCj/JjYoGyPkaNgTlx7PAm2izOhln2IbdP/ozt3dw+Hf4hwYgWQhl6Cf5oVzoMzPYlSzs3EZ3xEx2HYR8Qr7MB8g8Hnpxu87pnA3kHpK4CATASKRGaEOI1/10fM61CnbZPMVNy7S94Qgvhcq18UkjCwPERVQzkVEv7nPOUScXSjJRA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r3hr56IexS1zJmyvSXMyvQX2Cfopu0kAlK1GpejC6jk=;
- b=d44ofl8+93GcvudCbP+bCA7mq0e9scPuxHPH+uroeUjQ5XDv4c/VRWswELeWqrDNf3M4pClcrllgz/DRInXoGSZMQxn1eqQqlYoqbRerPEN0lr+PM0JImmq5cCfvL8v2izwHrNc67GmgtAWVOCW85hFa2O7h562zAtTVcX4rP58=
-Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH4PR11MB742795.namprd11.prod.outlook.com
- (2603:10b6:610:517::15) by IA1PR11MB7388.namprd11.prod.outlook.com
- (2603:10b6:208:420::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.662.5; Wed, 25 Nov
- 2026 18:04:30 +0000
-Received: from CH4PR11MB742795.namprd11.prod.outlook.com
- ([fe80::4bf1:7579:c9da:77d5]) by CH4PR11MB742795.namprd11.prod.outlook.com
- ([fe80::4bf1:7579:c9da:77d5%5]) with mapi id 15.21.0662.001; Wed, 25 Nov 2026
- 18:04:30 +0000
-Date: Wed, 25 Nov 2026 18:04:23 +0000
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: Ryan Prinz <rc4d5a@protonmail.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
-	<davem@davemloft.net>, <qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] crypto: qat - fix missing DH public key validation
-Message-ID: <awcjJ8/jvscOuCLl@gcabiddu-mobl.ger.corp.intel.com>
-References: <20261124141238.1743680-1-rc4d5a@protonmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261124141238.1743680-1-rc4d5a@protonmail.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DUZPR01CA0137.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4bc::10) To CH4PR11MB742795.namprd11.prod.outlook.com
- (2603:10b6:610:517::15)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=0rDEbnNB
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5c158c4c15fso7501203e87.1
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 10:06:05 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795629964; cv=none;
+        d=google.com; s=arc-20260327;
+        b=qRGlXAIJQK/XjG48HLqxALwpGmgmF5fmqp3PhMMVy2TbNK0mPj+1LXDlM05uHWNJTF
+         +Bzyv1foohW0V7cx9JYzcBYiSmD/MhqKRBTYXnokO7lFfBYapLcfGodZmnyewp3Lfo/X
+         gG2jBtvOxja2YJq8l9Jg8da5rklMTZ0cEqNpFt/tZVy1nQ8yYwdLc7K5yfctfx2f5feI
+         gm9zDhn1IxGOLaQ7yjPhXpPUxG7E11Z76BbsJdBl1ZrQyVOF8ydUhi4121yGLxAwpwcj
+         B+2ENITAhTHUjvEFQH+m2S4F7IpsSRHpkyvcwcssnvmFQ4wvy9qaLkKI5k9WO5g/FwUR
+         YrLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=s0yGO0nle6dWsSssSP9hU9J70E3ycwEl+Dc20fwXM0A=;
+        fh=TVGj9MJ/XUlciusID+cRqPd3cikmwiDD61oDOrUJjl4=;
+        b=LMF/WT5YmODcisHOKt2dayh5clqUsZv+vJWoXwOW9myB6lJtIpaKY3rsZqu2vmx8+k
+         flJ4m/vf1nFDkoZ6NjHMTskebScSFkyjiowjWY7w47siMODS64dgNajBwqhf4/+xk3Iw
+         Hdk2Bqtgahh0tKsrqm8MEeT74jgFV1SceA1nStr0VOAdaYYjFvWWyRlVUJFXyP5NYXVn
+         CD+DSbq/cLYh93GrXI3Sw0OMCVKFeiBatgndvTASVE0LB0DsYUunUiSd0n2+cjT3WZ8e
+         5lmPv+G1WOHgg2RwSOX97l8D58CwBeZrz8+1B2ZC31WwnhZ0JkZIGeslb8kHuNogi/bT
+         Fp8Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795629964; x=1796234764; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=s0yGO0nle6dWsSssSP9hU9J70E3ycwEl+Dc20fwXM0A=;
+        b=0rDEbnNB2GJRsgUy6lUv/ntf0plwID5UbAeFHTUjOREZCwLw7zEg/DoGYO7NP2BX5w
+         RfD1UG6MXcNgcwM8335YZFlxSusZNj6H1NIersHvTvZ8zgQJP5VdPbVMO4SiogkR9ISb
+         AvlhBK3iDSMbek0uLdgeXC/8u5OY8v+Oui5AfSeEVNdo6Vs+OnDhu/MSr2Nrmj7qmui2
+         3ehNL9HUU8Ki1r+cz1V8u3iEcf1kLbi5CZMuCLBts9vn5UCbiTO9Ntu2M9HxXSzrrqJw
+         2xE+sFwHgONnSwG8B9NeQYziQ5j2f+mN+Spc9IsGbjSz5VRlLwfo2aGSe4kIyRKspCm7
+         +ZlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795629964; x=1796234764;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=s0yGO0nle6dWsSssSP9hU9J70E3ycwEl+Dc20fwXM0A=;
+        b=TcExw9f4ClOHrl8lO0pxEHCfy3TX2t9zA+JhB+I04Fj4h+QsoDiCiCTQ8bWtENL0n9
+         mtcZrFYn7hF9NJGSt1dR+RRj+LEezR3TPpy49HeBkEHFB1N/dyPrOrRoTUbEdm2M+vdU
+         qpOME/W31ZRSdCY63oXvFYtcGOpzXtEoLyi0sC4qdRbsbl75qRgCnYSOnYa+2ggcoe3n
+         XJ2Ym3mQJnyV0ELCO+UWOAyEmc82/DcUrC0cj6cImWkEDnC7ggoLwoMl+0H7RSrlazRo
+         hqqp3Zm3YIhKMzQ40TZSHRJrKUbUr7JGGBjEOw0fOVtL4oO21fcJSRP4l+V4aYOY6Tmc
+         n4FQ==
+X-Forwarded-Encrypted: i=1; AL+hErFSHi7eApkdEa7drrAHn/rUX5XwLGyPl9ofr/mc4fi0rUWyaWpt3dCFqHxV8I5fkz4GOvOS3UafcTvYR6U=@vger.kernel.org
+X-Gm-Message-State: APuU4Z/3vlJcfj59xa38WTDTmr9AvIGZ0ZVRKxsfab4JwHLtIz1nmy9o
+	e2zP01qkMffAnqKnyZMeFGOwVf0fx9NNBQIgABDXNaCu5mc9En3Hm9gWYFzXRgoFsuVfFLtXF03
+	K/QtSVAFtVRMspaFc0L3C/K9xNxDYii3Lnu5iNZ0=
+X-Gm-Gg: AZFdTZfWeZDEeK77o7ncFs31j/SJkCgmcoababmQaPBihfO/YUXXPRYVogBrr8tZOJ+
+	QSBO3GLJBpF8bDeIDNxm4cifq/3OJo0a1nvz1nI813jLhm7i33YehhFB5vIO2GEDgRp/fzgGLsO
+	W/2uhmNnk3kWuIH0fK2e5BnrNcSHZ2dxmWzckJuMLIFdpQw9Jy14n1HnSWWU2oRpvh00EQhwNaC
+	8xzz5NKJy6QLJii/HDc2Bzo1tbIf4hcVStVjOcSwK1CQ8lebGf6uH7WNvtIJGYzP92J1Shau2cl
+	T5FS+/kFPR/Ng5MylEYam4z+95S2bspnJXApXsEAE6jPIYzp65mSJmaZAg/8r6u5FrSpHY3l+bq
+	jhZtWoQCVhGiqFox2ImYma1NtaOisTCFHwbo8
+X-Received: by 2002:a05:6512:33d1:b0:5c1:4aa3:cf96 with SMTP id
+ 2adb3069b0e04-5c1bc86cfdcmr4235686e87.14.1795629963996; Wed, 25 Nov 2026
+ 10:06:03 -0800 (PST)
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -141,81 +104,167 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH4PR11MB742795:EE_|IA1PR11MB7388:EE_
-X-MS-Office365-Filtering-Correlation-Id: f47cdf2a-ced1-4779-c1cf-08df4b1e8d54
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|23010399003|1800799024|376014|10067099003|261022075727099003|22082099003|18002099003|56012099006|11063799006;
-X-Microsoft-Antispam-Message-Info: Ea8HGfwsHEW8iVajhhvOt0Wvri71gh+K7Nl1v+aulLaZiwyH4fNjlrKIwkI6hem8MAw6PLmJYuGcHOcl4H1cEr7mRkagv4YjsmV6v64rskAAQNIu8EOnnW/MPFEcWZTqhDEVF7Zj/RKvvu0x1rojAd+fVShviPZY07LXgoa+GDH4y9YZnqAZ23CwrMtFW9OpRFoATM6KNqbuNZjvg/l4/M+UAjYWtwY0WW5oBZTrFojuwr/qV6q5K3OyHWCohblHNt9aFR+FACaaHdTttxP1XEWSa/0EBt+/jskBeYtVfhGprRUprXlGl5lytPOuCXEVWT0Y1Z5yes+7RFe1W5SoVZ1IvAztQ99yDuktLGYgpAqjNkP+kpzTGA8/KfnpKVgFcNY4XCEIp5l09qA9QmuHroptJQnvrUjOrywOXfDdBsn4FL+bDXlXesHbXAb3DloQeHLe3irI4fVM60g3rKDbgJjSdkcVy7dSuBzIoVPH7t/hOPb8sNp7zb7cC/JDYMf0z6RAUIrlCF2G1oifvuxfmtwitbUcCakC8JPZLiAZMjfXNPiAQwOVeP9RCHab1vLRUThjMQO+o66+VjzJQvoaagwBcYLryfeDrzGxbieKZ9YOwL/kgDvfzhxX4324yqoRJLHidvrFVqY4iyxAB7AtOY2+aPzU79xApEczFmK9Wk0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH4PR11MB742795.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(1800799024)(376014)(10067099003)(261022075727099003)(22082099003)(18002099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tJPvkeG8n8HqGQDCu2aNwVIy+PhTH1IHUKnFTkY6rIxmORSC3dGh8AFrGl9V?=
- =?us-ascii?Q?T77Pa/+frl8Jypz3f3EzVXLPmt3Y9MWMdTUsC1s+FdGpCqq+sAGfzRl4EXRa?=
- =?us-ascii?Q?/Npl0hR9P0KafJVOWMmiMe8Nkni8XmbAseLBU3mkr+6bFqav548/A5hIMMFp?=
- =?us-ascii?Q?JOzZRW9h557g+pKZAzWNmrp+lKpLSgOhgja1WkRVkAiFoZqyYEDX8S7SJatj?=
- =?us-ascii?Q?DvKWhYEt6Y46Q+EImAW4/fNEUspM8++O5kfex8rd0Jr7Gy7mkS+FTw0arGLL?=
- =?us-ascii?Q?4tEJWXRNGXByqThx1D2ckIZXDEgIJMh7wDUfR350FljVLUWhfiyBCK7l+SPl?=
- =?us-ascii?Q?/xN2Kk6DkAVFTibad5R07EU4z8LIhEF5RXNUJZLPyaiF0kcFCwyTcyi1xePW?=
- =?us-ascii?Q?zuzYv2TzoJAjFRkgiqNqduf2b4W2OQQFaFkp7rtx4kWNpXLa9PSJoP1RkrL6?=
- =?us-ascii?Q?Ik5SnNTnHp/wG3el6rj37M6JF+ha1LgWWtZRq4e8tZL6Z0eSFgVfTkkBQfwt?=
- =?us-ascii?Q?b60Ta304nKB/BGVnGfB7KqSMJICepikcsL+A1fzT9SqSR7pfimg/kP+XGcfS?=
- =?us-ascii?Q?MgaRSN35o7hlupZaJRcLf6PuKlkmazj8MIOp4/SIPQMaxcR8wGjZ7DgVSGb9?=
- =?us-ascii?Q?hjZhpsLQZLhosK5v9rWdwlGLcPmKZxI1nTCPg7ML+XC+PaA3gq/cPUhDSrd/?=
- =?us-ascii?Q?CwQgT2soM6JkUH0Iq4A0SRIkTyWl23APyihKMInBElgFR+XAtlS1NYWtBmDT?=
- =?us-ascii?Q?xZBDDgo20mVR0a/ElpLahIdV0/mEZDBcFVyzH+0WtmJRsmvc0vFfjZ9/u9EO?=
- =?us-ascii?Q?q72vkSsfNLboqfXy8z6X4oLcyBI1q3In5UziaplT4Yc0iYZVSHfZ+T+OBDF5?=
- =?us-ascii?Q?VVS/nZLE1CjRuEPsOsPEYw0hShEaPWa+NGYYqm102BIq5+MtJl7RFAGeUxb7?=
- =?us-ascii?Q?4CBuusKEkMRQKlIntL4WuEJn3YNKm+Ro+Sd4Eua5rWhSbBfwSbozAvFQMJYS?=
- =?us-ascii?Q?TJoyKFa6ouVNrUCKhxNp9dkRs1BJQohWoOPX3xQYI6BxFmddncnABSV8X7gE?=
- =?us-ascii?Q?88CRm78tKy+OvvC7t+uuzS1N3/chmc/x20L9nTzHWkvdRP9rX5NmXLWYf8l4?=
- =?us-ascii?Q?vqdIuuzST/GEEUCMLua9yU6KPZO4w0aK3W3hKIIxz/Ldfe52U/frsrZUY9+T?=
- =?us-ascii?Q?ecVk9jYvOb8Kxjqwi2+ZNuLaZSobYiIiCZI3Z0ELoE4IId+m5gAGf1DxqD9d?=
- =?us-ascii?Q?N2GGrI4DR0o9K/OhgTrjc7Fli0nEGqwkPB0ciOpdRO+xOYuUqtDISxCpTp29?=
- =?us-ascii?Q?U9Zr2ivQ8yD8rfqA0P6Y24/SZ3/o9/Y4l5BFReHjxcpvPY3SeqL2WNKyGAXH?=
- =?us-ascii?Q?AIdh/VqSB0WESOCpdkdAfuMG8R9rtC4eVeTuyVVjUrlGaJjDxeNX93Nf9n3n?=
- =?us-ascii?Q?GbaPzUotzv94yA6DsCAy+Cg9AxIZN9sorCVJejgP4ensiqFk+BJDx9PQobvo?=
- =?us-ascii?Q?co3rEmraWGtLVOxEGCl4rcVGvbms6KDZHbNlEnb3IEZCAUL4jqbc1NpLHPg/?=
- =?us-ascii?Q?zhQCFtJmd19MfeZEKkp1QicgMvo0j+MojdQPKchR6xrXAb6YK/z9pj6pnvw0?=
- =?us-ascii?Q?ocOmFPQLZmu9VLOAQLLiYwjWBPwTZkGIXyb5PIavsP46SchG3yjFamfprTeP?=
- =?us-ascii?Q?Uzg/tQVNQCqXCslgMhllJel1IDafaC+zc3619kauMlGynMt05VwiAHrY/zuM?=
- =?us-ascii?Q?e5woXPa8jg9bWLLuYF8In8c8/5AI9Ww=3D?=
-X-Exchange-RoutingPolicyChecked: OPrcZVsN29GR6s3JiKJhmfhvMpOlG9sPN2TUmk+m55ZWl/wKzphnuNF/rh9f1LJlZC7wDrrJHmj1F5uRaZj8SKSPOJDqS0RMpNi9lsDb/WCTkkDWfPnqw4aFNdruXj+31ZkO05GGltZfwpeTQI8s49Gxz3JNgd59PukbTNnODl0+mHvqPgbOksjXF1AVxfzrg/8cgylB+K8mIIDr6aYrHLbbm5SYCUJJ5gxNoZa+OhxfCxPUcRfNLrsWxtRBxrKodNoanK/V2W4xWTXiXN6IwteaiHp9NT5hBWhDYrAnihBsleZVSo6Cx15XeiRPO1De0gmfZGtiBxrAMJBZ3GW7TA==
-X-MS-Exchange-CrossTenant-Network-Message-Id: f47cdf2a-ced1-4779-c1cf-08df4b1e8d54
-X-MS-Exchange-CrossTenant-AuthSource: CH4PR11MB742795.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2026 18:04:30.3258
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Msw3F/QsKj9OpWydgHQS6HYlg2xWk3RkI+KhTuSU+wIFUxJtUMaXq0vblrw2BaeN/Yo7cJcNLclVEUKsbE94xze1+xLlJjPELCGLzJFwss0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7388
-X-OriginatorOrg: intel.com
+References: <20261120041906.5785-1-kanchanapsridhar2026@gmail.com>
+ <CAKEwX=MLrDn55wmVKKba5=PcU+qFpkEbMmN2SjGTfTBiFKX8cw@mail.gmail.com>
+ <awXr6iHBR54wBB05@google.com> <CACpmpodH3UUDLEze8=5v8LWgKnZWQVrQBhzSGJFY-PwEYmHEzQ@mail.gmail.com>
+ <awYsDfYqrS2ldOTw@google.com> <CACpmpofsU3f=PVQF4moe6n=_qit1ZGyo4FMjyM-sVgumfyN0iw@mail.gmail.com>
+ <awZt7P_p-GNZ3A2i@google.com> <CACpmpod_87WY_PcOsNmPZvFzmJyBtCpyvvq1a_BqmZgGmO1e5A@mail.gmail.com>
+ <awcK9oNDbc1QFJr6@google.com>
+In-Reply-To: <awcK9oNDbc1QFJr6@google.com>
+From: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Date: Wed, 25 Nov 2026 10:05:51 -0800
+X-Gm-Features: Aa3M54rQYU3bIxvHpI5Dlfnhm6qCWUiCqJ7E9nlnUc215LhQmCibH9zYugGNAEE
+Message-ID: <CACpmpoenPZ_SqhxL70r8q09WBfrnqvPu3H+F8Tz3nVwO=rvUTw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/8] Batched zswap_store() framework with compression batching
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: Nhat Pham <nphamcs@gmail.com>, hannes@cmpxchg.org, chengming.zhou@linux.dev, 
+	akpm@linux-foundation.org, linux-mm@kvack.org, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rientjes@google.com, willy@infradead.org, 
+	senozhatsky@chromium.org, 
+	"Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 24, 2026 at 02:12:54PM +0000, Ryan Prinz wrote:
-> qat_dh_compute_value() passes the peer's DH public value into the
-> hardware queue without checking it. The only checks on req->src are
-> on length (req->src_len > ctx->p_size); never on the value itself.
-> 
-> crypto/dh.c's dh_is_pubkey_valid() is the generic software check for
-> this: it rejects a value outside [2, p-2], but only when FIPS mode
-> is enabled, and only for callers using the software implementation.
-> QAT's hardware path has no equivalent check in either mode.
-> 
-> QAT registers "dh" at cra_priority 1000, versus the generic software
-> implementation's 100, so any caller requesting "dh" gets this
-> unvalidated path whenever a QAT device is present and the requested
-> modulus size (1536/2048/3072/4096 bits) is one QAT supports;
-> qat_dh_set_secret() only falls back to software for sizes outside
-> that set.
-Would it make sense to have a provider-independent check for the public
-key in crypto/dh_helper.c instead?
+On Wed, Nov 25, 2026 at 8:31=E2=80=AFAM Yosry Ahmed <yosry@kernel.org> wrot=
+e:
+>
+> [..]
+> > > write_s would be calculated averaging the time in the ".. bytes / ..
+> > > usecs" lines, and free_s by averaging the time from the ".. usecs to =
+free
+> > > memory" lines.
+> > >
+> > > In this run:
+> > > write_s =3D 37.31 s
+> > > free_s =3D 23.39 s
+> > >
+> > > With your patches, I got:
+> > > write_s =3D 37.03 s
+> > > free_s =3D 18.86 s
+> >
+> > I am not sure how useful it is to apply user-space gettimeofday()
+> > results that time many higher level C code API, as an indicator of
+> > zswap_store() performance.
+>
+> It is useful to see where the time is being spent, and it is consistent
+> with the perf profiles.
+>
+> [..]
+> > > You can see that the cycles spent on zswap_store() are almost the sam=
+e,
+> > > and the cycle reduction happens in zswap_invalidate().
+> >
+> > The cycles spent in zswap_store() should be normalized to the # of
+> > zswpout events that these CPU cycles represent, for this to be a
+> > reliable measure of latency improvement. There could be an increase in
+> > reclaimed folios for any number of reasons, all of which are not
+> > necessarily due to performance-improvement/degradation of
+> > zswap_store() itself. IOW, more work for less latency per unit of work
+> > is not always indicative of a performance degradation in this case.
+> >
+> > A realistic scenario would be that with zswap_store() becoming more
+> > efficient, the 30 allocating threads cause more memory.high breaches,
+> > that causes more zswpout..
+> > This would cause more CPU cycles in zswap_store(), but the fact
+> > remains that zswap_store() efficiency has improved due to batching.
+>
+> The zswpout number is almost identical: 45,796,107 vs 45,796,089.
 
-This way, software DH, QAT and HiSilicon HPRE, which all register "dh",
-could use the same check (regardless of FIPS mode).
+Can you also share these vmstat/zswap stats for this run (baseline and
+with patches):
 
-Thanks,
+ pswpin
+ pswpout
+ thp_swpout
+ thp_swpout_fallback
+ zswpin
+ zswpout
+ zswpwb
+ pgmajfault
+ 2048kB-alloc
+ 2048kB-zswpout
+ 2048kB-swpout
+ 2048kB-swpout-fallback
+ zswap_pool_total_size
+ zswap_pool_limit_hit
+ zswap_written_back_pages
 
--- 
-Giovanni
+Thanks.
+
+>
+> [..]
+> > > > > If we want to address lock contention in zsmalloc freeing we shou=
+ld address it as
+> > > > > such, not by batching compression.
+> > > >
+> > > > Lock contention in zsmalloc seems like an independent optimization
+> > > > that is good to solve. What I don't see is a way of explaining the
+> > > > gains in this series based on zs_free() lock contention, and hence
+> > > > drawing a questionable conclusion that this series does not optimiz=
+e
+> > > > zswap_store(), and further that batch compression is not attributin=
+g
+> > > > to the gains. I have provided ~10 reasons as to why the combined
+> > > > zswap_store_pages() batching and zswap_compress() batching improves
+> > > > zswap_store() performance in [2].
+> > >
+> > > See above. I think the performance improvement is a side effect of
+> > > calling zs_store() in rapid succession for pages in the same folio, a=
+nd
+> > > more pages in the same folio ending up in the same zspage. As I
+> > > previously mentioned, this happens because all pages in usemem end up=
+ in
+> > > the same size class.
+> > >
+> > > The right thing to do would be optimize the zs_free() path. I am look=
+ing
+> > > into batching zswap entries freeing, which I believe is the right pat=
+h
+> > > to optimize given those results.
+> >
+> > If I can restate what you are suggesting, and please correct me if I am=
+ wrong:
+> >
+> > 1) [Data needed]: Normalized zswap_store() CPU cycles to # of zswpout
+> > vmstat events in baseline and patched.
+> >
+> > 2) [Data needed]:  Normalized zs_free() CPU cycles to # of calls to zs_=
+free().
+> >
+> > 3) If (2) confirms that zs_free() has become faster, then that is a
+> > beneficial side effect of batching, per your analysis above.
+>
+> The number of zswap_store() and zs_free() calls is almost the same. So
+> storing doesn't get faster, freeing does.
+>
+> > 4) Why are you suggesting that *instead* of acknowledging the
+> > beneficial side-effects of zswap store/compress batching, you would
+> > want to find another way to improve zs_free() latency by batching of
+> > zswap entries freeing? I would imagine both need to happen. The zspage
+> > locality side-effect isn't a contra-indicator to zswap compress
+> > batching.
+>
+> 1. It is unlikely for realistic workloads to have folio where all pages
+> compress to the same class.
+>
+> 2. Even if it happens in practice, we'd optimizing the wrong thing.
+> Consecutive calls to zs_store() landing in the same zspage is an
+> implementation detail of zsmalloc, and if it is something we want to
+> enforce, we can do so in the correct layer (e.g. by adding per-CPU
+> partial zspages like SLUB). The gains also depend on how different
+> threads race, and the effect of cache locality on the specific CPU.
+>
+> You are basically proposing optimizing zs_free() for this scenario by
+> batching zs_store() calls in hopes of landing compressed pages from a
+> folio in the same zspage so that freeing gets faster. That's definitely
+> not the way to do it.
+>
+> If the zsmalloc class lock is a bottleneck on the freeing side, we
+> should address that problem directly.
+>
+> > I will run some experiments to quantify zswap_store() improvements
+> > better, with compress batching.
+>
+> Feel free to, but we have been going back-and-forth on this a lot, and I
+> am trying to make it clear that your time is better spent elsewhere.
