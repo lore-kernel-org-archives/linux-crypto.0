@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795630586;
-	b=2b5IWSe6amoCGunvUYPvwzUa9GcoUFGbgQJo6C7XxN2bzS0Qc4nno4CwW6Uz2VquBgD3
-	 jsPkuO8mCB7CPk5yiL42q6kjieoM0NozN8lHWRd+zNi6mThwCgNXSpVTgEApSNkFqBy+W
-	 3Slie4nfsPlwD3lut1gF4EJKlMPdZvZ/qXet5OuzAIs+xzGkzpttzj+wTHG2XdFnerx0d
-	 r2w+Z4PJczAt1W+YXIXkqzHftQmzBEew3vIYwuBwAuhxBR1Q8Qg8qtN9AlzJ8z7PmwCAF
-	 72z0TmAWYV4Er+1VNtwLeZEVKhvzDP9GWBFxCmJuWOl/1p665DkkgKI7QrYOxHcCNZw==
+	t=1795630971;
+	b=SwQsT+LiAtAPv6s2XYhX2ch3Qqq5/q3fG2ab+n0OJuxXhkG81jaGH6b0npNagrY0TyR+
+	 2O47DT4dtUx1I3DoMssXjLK4CT4aDSEhjundjC4fiR0wWeELcPkxwGeIm8TpCKJVupfTX
+	 WbsaUv86xJ16vxU4z6NkBMCk4ZkoNjDU5JstF+bFhxrI5nzqArFMfWT4GfEr3yMmekwsH
+	 zzY94nnQpxQxEY1x4i/WwAU0qhLrvgt9UET+f5H8PL698JA06HYXfjCcDmYbAFYCmWypF
+	 6dTwEm5s4wd4KoQGsVY5rZIpGhMA4vUpuDt+5nvSAGeDZvz2bH+yp1J+5ThLKDG0c4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795630586;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795630971;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=ItE++LU8TqRI5uK7Gs6LAsm2atS10aLNL14Kugvc9Uw=;
-	b=h4kgIOA7rL4z2pA1i+onQQzk3u+wfEvHmH8XBZ3ZALydxZF0DSIsL9qPh0MV2QR6qa/c
-	 TOHBjG1eADEg9qBXrEJHRX7f4Xm7lZ2eQ8UUCkbu2fnFLmv+hmglmEO5cbYBeeWPig5XI
-	 +PBq88K0o7nnWGKVZPTPAuBuQU43+NA7y4o5oil3lYIs0PI79E6zP1B5mrY7r5Jv2hok2
-	 Bgl/T96rrZfYC/7l+dtS7vlHhXozr7sPT0hK1xZ3shPkAwekCEUzkwJSc49snNrvDzz/r
-	 OdvyyTRUDC5rYR0/oZBCFWKzoLG9FrtTYex6tZNjJvkO32fEuAfq3aweRLQy40oWOHQ==
+	bh=wn7BSSA8/p+YXYHhitmjH8m+fQEFTnO81AlhTtuLU5Y=;
+	b=BF2/CaQtXxtfv+m1rwtjST6ehcJuV+WkLyKFGunz8SuQjDwdc/1lIN+Wb07WN0JBnrfP
+	 FpxagvUG4JaTi/T7rdKq4iSi70f0lwa8Fpic4VSART0XaAFQmHp3HKsIOT0WQ9/w/y9tA
+	 WHD26bh6+CoL8WmqaALoJTBl9RKjmNnTX95COap71eLAI/1UukKEc59mVqgOexGm1b1fl
+	 Drx5qYE6t30gWfNXpi6EBVaEArdG4/uxxfQNtHGohGq9qkb1zn07pFNobRhNEAjm70sle
+	 BKFoa+o5UXm5MDJigSRUksplE4Q4eqX6QJlu92OdbSu5tT3VfgEQcQ6a5MjVL8YzrHw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nJ6Bjuz3;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="kNi/gIg9";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D5E606A337;
-	Wed, 25 Nov 2026 18:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBF5606A323;
+	Wed, 25 Nov 2026 18:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nJ6Bjuz3
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F90A1F000C0;
-	Wed, 25 Nov 2026 18:16:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kNi/gIg9
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21DB31F000C0;
+	Wed, 25 Nov 2026 18:22:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795630585;
-	bh=ItE++LU8TqRI5uK7Gs6LAsm2atS10aLNL14Kugvc9Uw=;
+	s=k20260515; t=1795630971;
+	bh=wn7BSSA8/p+YXYHhitmjH8m+fQEFTnO81AlhTtuLU5Y=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=nJ6Bjuz3fmmoHjdiLDCMLyP1UOstkuqTbgO8ivNdvSKr9k78qx2vRf0hA05DS70jk
-	 p9RzNOIg3GbFM8BFfZLo1xur4Zu+1ho9gIfDHjEDvX4aBVPTLVWnCn3HETEDHRUrYA
-	 I6fxzfOrOWKy5IjbJxpmELKaYW/50kVHCDqOryiVLF5gGXyQ2amixbI2HWMOSuUx5q
-	 oOwhayZFSAsplJHdEF2/NuVZpN4ClFX3GjWSMQzs5tPeOKrvBlDiSVEcDccg+bIz8z
-	 L+chIqaYI0ceCWqH0B4X9HAlyTH1GI/NjcYpEutzTYVCBJrxch10D3P//R+VaY5+bW
-	 1ifNxyL9uus0w==
-Message-ID: <sashiko-outbox-233944@kernel.org>
+	b=kNi/gIg9IdtW8Te0fr8ZxQI/q/CRQ5IoPixdgYLm9zyL9CRDd58oRoO19uHG2iVrZ
+	 Ic55oO80pUPZLa2VgxQjCpSBDe6dSwu3L0YN6z9tIxxwlQm1S9XjCfV03xXnq46oZa
+	 jtiebGDzj3WLaNs2QkZ2UCJGXnfSWSpmHX2d0B4IiPyTt5qfGX7ab+GKZ2czJvhV4y
+	 XwFtgGqyZ2b/vuHcsZE/qABbuz+S/1UU+g/gnjHdX9H3inGj5XA9EMsilYbdzJQIyv
+	 PTMvqWUM4pExss83vnU6S+KWl/tVcuXiKklU0WgJ0JS90viHzVQmcsK7xXkUsswQKQ
+	 cG9DuhJBrfsyw==
+Message-ID: <sashiko-outbox-233977@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v3 8/9] KEYS: trusted: Factor out TPM2 blob loading
+Subject: Re: [PATCH v3 1/9] KEYS: Factor out opt-in KEYCTL_PKEY
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jarkko Sakkinen" <jarkko@kernel.org>, keyrings@vger.kernel.org
 Cc: dm-devel@lists.linux.dev, linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org, "Ahmad
@@ -58,12 +58,12 @@ Cc: dm-devel@lists.linux.dev, linux-crypto@vger.kernel.org, linux-security-modul
  Moore" <paul@paul-moore.com>, "Peter Huewe" <peterhuewe@gmx.de>, "Randy
  Dunlap" <rdunlap@infradead.org>, "Serge E. Hallyn" <serge@hallyn.com>, "Shuah
  Khan" <skhan@linuxfoundation.org>, "Sumit Garg" <sumit.garg@kernel.org>
-In-Reply-To: <20261125180616.1854753-9-jarkko@kernel.org>
+In-Reply-To: <20261125180616.1854753-2-jarkko@kernel.org>
 References: <20261125180616.1854753-1-jarkko@kernel.org>
- <20261125180616.1854753-9-jarkko@kernel.org>
+ <20261125180616.1854753-2-jarkko@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Nov 2026 18:16:23 +0000
+Date: Wed, 25 Nov 2026 18:22:49 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -75,84 +75,75 @@ Precedence: list
 
 Thank you for your contribution! Sashiko AI review found 1 potential
 issue to consider:
-- [Low] KEYS: trusted: changelog omits payload->private and
-  tpm2_load_cmd() check
+- [Medium] keys: TURRIS_SIGNING_KEY Kconfig options still depend on
+  ASYMMETRIC_KEY_TYPE
 --
 
-commit 94f02a37d277c89d23fb05c1b5c6ea51d598832f
+commit f2c536390b5f9f7464b1b59aadb07824b873665b
 Author: Jarkko Sakkinen <jarkko@kernel.org>
 
-> KEYS: trusted: Factor out TPM2 blob loading
->
-> Factor out TPM2 blob loading:
->
-> 1. tpm2_key_decode() from trusted_key_options.
-> 2. tpm2_load_blob() and tpm2_buf_append_key_auth() from tpm2_load_cmd()
->    and tpm2_unseal_cmd().
->
-> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+KEYS: Factor out opt-in KEYCTL_PKEY
 
-> diff --git a/include/keys/trusted-type.h b/include/keys/trusted-type.h
-> index 3db61b57cf73d..790ffabb0d184 100644
-> --- a/include/keys/trusted-type.h
-> +++ b/include/keys/trusted-type.h
-> @@ -33,6 +33,7 @@ struct trusted_key_payload {
->  	unsigned int blob_len;
->  	unsigned char migratable;
->  	unsigned char old_format;
-> +	void *private;
->  	unsigned char key[MAX_KEY_SIZE + 1];
->  	unsigned char blob[MAX_BLOB_SIZE];
->  };
-> diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/tr=
-usted-keys/trusted_core.c
-> index 3721980ed83af..b8f980da606d1 100644
-> --- a/security/keys/trusted-keys/trusted_core.c
-> +++ b/security/keys/trusted-keys/trusted_core.c
-> @@ -149,6 +149,14 @@ static struct trusted_key_payload *trusted_payload_a=
-lloc(struct key *key)
->  	return p;
->  }
+This commit separates CONFIG_KEYCTL_PKEY from CONFIG_ASYMMETRIC_KEY_TYPE
+as an off-by-default option controlling compilation of keyctl_pkey.o.
+
+> diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+> index 3f64d60d0f8a6..75cc4043ca642 100644
+> --- a/security/keys/Kconfig
+> +++ b/security/keys/Kconfig
+> @@ -22,6 +22,15 @@ menuconfig KEYS
 > =20
-> +static void trusted_payload_free(struct trusted_key_payload *p)
-> +{
-> +	if (!p)
-> +		return;
-> +	kfree_sensitive(p->private);
-> +	kfree_sensitive(p);
-> +}
-> +
-
-[ ... ]
-
-> diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/tr=
-usted-keys/trusted_tpm2.c
-> index 0a81608844ff6..231062fd17b6b 100644
-> --- a/security/keys/trusted-keys/trusted_tpm2.c
-> +++ b/security/keys/trusted-keys/trusted_tpm2.c
-
-[ ... ]
-
-> @@ -527,6 +595,9 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
->  	if (private_len + 2 + public_len + 2 > blob_len)
->  		return -E2BIG;
+>  if KEYS
 > =20
-> +	if (public_len < 8)
-> +		return -EINVAL;
+> +config KEYCTL_PKEY
+> +	bool "Public-key operations on retained keys"
+> +	help
+> +	  This option provides support for querying, encrypting, decrypting,
+> +	  signing, and verifying signatures via keyctl using public or
+> +	  asymmetric keys retained in the kernel.
 > +
->  	pub =3D blob + 2 + private_len + 2;
->  	/* key attributes are always at offset 4 */
->  	attrs =3D get_unaligned_be32(pub + 4);
+> +	  If you are unsure as to whether this is required, answer N.
+> +
+>  config KEYS_REQUEST_CACHE
+>  	bool "Enable temporary caching of the last request_key() result"
+>  	help
+> diff --git a/security/keys/Makefile b/security/keys/Makefile
+> index 5f40807f05b3d..aafd28f7ee2fe 100644
+> --- a/security/keys/Makefile
+> +++ b/security/keys/Makefile
+> @@ -22,7 +22,7 @@ obj-$(CONFIG_PROC_FS) +=3D proc.o
+>  obj-$(CONFIG_SYSCTL) +=3D sysctl.o
+>  obj-$(CONFIG_PERSISTENT_KEYRINGS) +=3D persistent.o
+>  obj-$(CONFIG_KEY_DH_OPERATIONS) +=3D dh.o
+> -obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) +=3D keyctl_pkey.o
+> +obj-$(CONFIG_KEYCTL_PKEY) +=3D keyctl_pkey.o
 
-[Severity: Low]
-This isn't a bug, but the commit message only mentions factoring out
-tpm2_key_decode(), tpm2_load_blob(), and tpm2_buf_append_key_auth(),
-without explaining why this refactoring is needed (to prepare for
-asymmetric key support in the following patch).  It also omits adding
-payload->private and trusted_payload_free() in the core trusted keys code,
-as well as the new public_len < 8 bounds check before reading pub + 4 in
-tpm2_load_cmd().
+[Severity: Medium]
+Should TURRIS_SIGNING_KEY, TURRIS_OMNIA_MCU_KEYCTL and
+TURRIS_MOX_RWTM_KEYCTL be updated to depend on KEYCTL_PKEY instead of
+ASYMMETRIC_KEY_TYPE?
+
+turris_signing_key_type implements .asym_query and .asym_eds_op for
+keyctl_pkey.c without using crypto/asymmetric_keys:
+
+drivers/platform/cznic/Kconfig:
+config TURRIS_OMNIA_MCU_KEYCTL
+	bool "Turris Omnia MCU ECDSA message signing"
+	default y
+	depends on KEYS
+	depends on ASYMMETRIC_KEY_TYPE
+...
+config TURRIS_SIGNING_KEY
+	tristate
+	depends on KEYS
+	depends on ASYMMETRIC_KEY_TYPE
+
+With CONFIG_ASYMMETRIC_KEY_TYPE=3Dy and CONFIG_KEYCTL_PKEY=3Dn (the new
+default), those drivers still default to y and register hardware signing
+keys whose KEYCTL_PKEY_QUERY and KEYCTL_PKEY_SIGN calls now fail with
+-EOPNOTSUPP.  Conversely, CONFIG_KEYCTL_PKEY=3Dy with
+CONFIG_ASYMMETRIC_KEY_TYPE=3Dn cannot enable them at all.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261125180616.1854=
-753-1-jarkko@kernel.org?part=3D8
+753-1-jarkko@kernel.org?part=3D1
