@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795629993;
-	b=tAE6OKAZTGNgj17j320zyXlFx+0lhVpI9SgpPpr17cJBtRL8g2d6GS53IwZay4haDvft
-	 i5X9GsFkDqwVV1Kcs2ijJOEL8r0rLs0AucJHa2Q3lX7uBPWKEHykCag7bKaejKM7aFHXJ
-	 nbrVyKxTknSZCWY3kPYVuMbH4/j112ly0cSYqr0Iz2kQ8HahkdnVMw3wiMQPDA6EKsLzE
-	 g9XDymtHPMOePykMdt6Huqtg/A+Lm3USbIa5cf036O6v2Lv4fKiY58WhnVjLrPYu++NcI
-	 ZhWXyPEHOTCYw7PZvj5FbVKPva7vBVRxA7/dSTJhrLb2rwBW3B6ukJcZHTGgqqLoJXg==
+	t=1795630002;
+	b=khxwnfpWVtAD9CI1tXBLTjd5WUbTTEAU1nB8gad209sXzsAuxPBGfUll9Apa6z+hskTJ
+	 3uX4zzuBQmcbIw6lYkAuWGJHLfT+hfp1/DubskTqSY7Akcw9z9CY9Ai4SnUGqZvw0vUVB
+	 sQOw/a6PWE4oSNeTWXDl+SkJU3FOzs+uBgomQeuiTOqiYbfIuNDfG7VQLru6j5N26sDHt
+	 3vvQOcP/ocX42rUwxh0rme+gxQoDWziBVQNcfKpWsRZKGPXE4dwDOECphIPpZR/M9UMU9
+	 dBoelpO4xL+0Fc9AkVItwXmByUWVYUsAMX+yEHEtbpgNG7U/+HCn9/QIeqUWNHrIlcw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795629993;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795630002;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=U00yWHIo8HhrdyFuKMDRdBiL8d54KG7YlSUEsh2C5MM=;
-	b=WHP+fzdJNolBS8vSq4ONiFfx/bt8UOKBBrbNQi5C0gzJqYknaEHoUtCupaG3KmI2aacn
-	 MAIM2bsmOgQ61ZsQFjMBx3dpxgvjpfnkDPt25HR6t2fiwsVhbiAMjnqU5l7oF0A/4fpyT
-	 1GxNd0s9s6tkxLq9ZE9AdLjSpg4yNrWtps7a9Fc9vDvOEk5JUYPpPzYhigMXtlfa6cE0s
-	 vNhahNtekGK2dURCAdW+6o5XzwIL1TNdh/XVcDgeMgRLPUMVhTV/P37p7azhun1xa8kCB
-	 0mrq4NB6Y4g+HJRk79h65mkgx4IcC2C9s2vGLcTieibICZ2n1Pnqxktxo7G9faYQFnw==
+	bh=r7fclzzKOWMyf7ywe58Ae38O43mUtx+8bhUvqry9F/k=;
+	b=tLlaUq+z5k5uHWpOhgSrphOgptZ3LueCtbe2A5Wo7CfGPzDv+0S/t6UdBuAe4RgwZGqD
+	 tvi0pn4fY9BmLuZgRO+tuqHEjrjGlLUEJzspecSJ1T+WIjvnHh3gEWsZlAi8OreDZVP/2
+	 s8NRteHkJaZ1R+gLi8dG7M2frtj/MgXsxoK7MUn+X+5luRRZnYgb5XoeW68/Is3rAL9a1
+	 Uw8HKQW3l5mF84b3KvolvMoUI6gxlCnlXTCFEAbNBpvx4D4ReI5De8Eqw8Cd38l0dbtqb
+	 0pD5ho528STeHeUO5EeG/z6RU790oxZ9BqGPt+gs3CxhXf7DbOXVGi0U8z0xjegK6NQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SzJaPlqJ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G+CcQnhm;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 1FCE2606A31E;
-	Wed, 25 Nov 2026 18:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 4B177606A680;
+	Wed, 25 Nov 2026 18:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SzJaPlqJ
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 3E3F71F00A3E;
-	Wed, 25 Nov 2026 18:06:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=G+CcQnhm
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 1E72A1F000CA;
+	Wed, 25 Nov 2026 18:06:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795629993;
-	bh=U00yWHIo8HhrdyFuKMDRdBiL8d54KG7YlSUEsh2C5MM=;
+	s=k20260515; t=1795630001;
+	bh=r7fclzzKOWMyf7ywe58Ae38O43mUtx+8bhUvqry9F/k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=SzJaPlqJ0DMwNK1s6wL3Pkh568FjgSIq0691VFOmewOFIDORl9wUV04BtlYS60a7/
-	 mWivwg/9pA0xq+MoYzyaP24iHOAlXE1/YRbpPdwrybKyV8GH5rlvGV5gjSO/4TVDNF
-	 fVaF75ksLGuVHnE9HTUX1h1e5QzxWuummGvaAUg6F6GzW8AE5z7PcPxxNN7pA0G4Yi
-	 ShgfC8FAAWnbUV951C7RX1xr8Ch56ZwZKnqdHGApP4YOs2TZqSZvgIHGWvT8WzYAMO
-	 /AcZrqpO8pOqm/n/XmVTjftPrfWeb87YAJv0Z4JZJjcrxIKsg8Kk+EaY24F7mXBlRh
-	 xkaEfCG6QHcxA==
+	b=G+CcQnhm1M6hFURQ7/NuimNTYQB5+0aM1YZeCH3BYww/ojEjMpBexcihlGfLHZSsg
+	 U+kyjfPn/xOpmYUeGvN4jQEWKyo8HSvbAaorNrVDUxPKAUkulgrQFoOdwD0gWlpRZf
+	 h6RpSUcS/VgkeaS+mLp8lS1MUJ0NGpwQVPJF8xJlm0NHrgxlebTmD09Zs9A+o+8CMr
+	 /r29JZ2GMYvFkv/50wHigiEYqrfY8plmZYw/wyATYMFwBCOZ+GIb+/q2PiZQ/lzVeX
+	 P15uaIjYPPAFjXb5o1XXtjlf/nXF87wiI9diajEPjBF2SAQEE+9UmjSo9hcxQQDzP4
+	 V5GMRXCFjfWBQ==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: keyrings@vger.kernel.org
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -75,9 +75,9 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	"Serge E. Hallyn" <serge@hallyn.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
-Subject: [PATCH v3 1/9] KEYS: Factor out opt-in KEYCTL_PKEY
-Date: Wed, 25 Nov 2026 20:06:07 +0200
-Message-ID: <20261125180616.1854753-2-jarkko@kernel.org>
+Subject: [PATCH v3 3/9] lib/asn1_encoder: Add asn1_encode_integer_bytes()
+Date: Wed, 25 Nov 2026 20:06:09 +0200
+Message-ID: <20261125180616.1854753-4-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261125180616.1854753-1-jarkko@kernel.org>
 References: <20261125180616.1854753-1-jarkko@kernel.org>
@@ -92,80 +92,103 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Factor out CONFIG_KEYCTL_PKEY from CONFIG_ASYMMETRIC_KEY_TYPE as an
-off-by-default option so that systems that only need asymmetric keys for
-in-kernel signature verification can choose not expose KEYCTL_PKEY_*
-operations, and other key types can use them without pulling in
-crypto/asymmetric_keys.
+Add a helper encoding a positive integer from a byte array in big-endian
+format.
 
-Suggested-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- security/keys/Kconfig    | 9 +++++++++
- security/keys/Makefile   | 2 +-
- security/keys/internal.h | 2 +-
- security/keys/keyctl.c   | 2 +-
- 4 files changed, 12 insertions(+), 3 deletions(-)
+ include/linux/asn1_encoder.h |  3 ++
+ lib/asn1_encoder.c           | 56 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
 
-diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-index 3f64d60d0f8a..75cc4043ca64 100644
---- a/security/keys/Kconfig
-+++ b/security/keys/Kconfig
-@@ -22,6 +22,15 @@ menuconfig KEYS
+diff --git a/include/linux/asn1_encoder.h b/include/linux/asn1_encoder.h
+index d17484dffb74..e206bd425854 100644
+--- a/include/linux/asn1_encoder.h
++++ b/include/linux/asn1_encoder.h
+@@ -12,6 +12,9 @@ unsigned char *
+ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
+ 		    s64 integer);
+ unsigned char *
++asn1_encode_integer_bytes(unsigned char *data, const unsigned char *end_data,
++			  const unsigned char *integer, u32 integer_len);
++unsigned char *
+ asn1_encode_oid(unsigned char *data, const unsigned char *end_data,
+ 		u32 oid[], int oid_len);
+ unsigned char *
+diff --git a/lib/asn1_encoder.c b/lib/asn1_encoder.c
+index 92f35aae13b1..8fea70dc0846 100644
+--- a/lib/asn1_encoder.c
++++ b/lib/asn1_encoder.c
+@@ -10,6 +10,8 @@
+ #include <linux/string.h>
+ #include <linux/module.h>
  
- if KEYS
- 
-+config KEYCTL_PKEY
-+	bool "Public-key operations on retained keys"
-+	help
-+	  This option provides support for querying, encrypting, decrypting,
-+	  signing, and verifying signatures via keyctl using public or
-+	  asymmetric keys retained in the kernel.
++static int asn1_encode_length(unsigned char **data, int *data_len, int len);
 +
-+	  If you are unsure as to whether this is required, answer N.
+ /**
+  * asn1_encode_integer() - encode positive integer to ASN.1
+  * @data:	pointer to the pointer to the data
+@@ -85,6 +87,60 @@ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
+ }
+ EXPORT_SYMBOL_GPL(asn1_encode_integer);
+ 
++/**
++ * asn1_encode_integer_bytes() - encode positive integer bytes to ASN.1
++ * @data:		pointer to the pointer to the data
++ * @end_data:		end of data pointer, points one beyond last usable byte in @data
++ * @bytes:		integer bytes
++ * @bytes_len:		amount of bytes
++ *
++ * Encode a positive integer from a byte array in big-endian format. Strip
++ * leading zeros.
++ */
++unsigned char *
++asn1_encode_integer_bytes(unsigned char *data, const unsigned char *end_data,
++			  const unsigned char *bytes, u32 bytes_len)
++{
++	int data_len = end_data - data;
++	bool add_pad;
++	int ret;
 +
- config KEYS_REQUEST_CACHE
- 	bool "Enable temporary caching of the last request_key() result"
- 	help
-diff --git a/security/keys/Makefile b/security/keys/Makefile
-index 5f40807f05b3..aafd28f7ee2f 100644
---- a/security/keys/Makefile
-+++ b/security/keys/Makefile
-@@ -22,7 +22,7 @@ obj-$(CONFIG_PROC_FS) += proc.o
- obj-$(CONFIG_SYSCTL) += sysctl.o
- obj-$(CONFIG_PERSISTENT_KEYRINGS) += persistent.o
- obj-$(CONFIG_KEY_DH_OPERATIONS) += dh.o
--obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += keyctl_pkey.o
-+obj-$(CONFIG_KEYCTL_PKEY) += keyctl_pkey.o
- 
- #
- # Key types
-diff --git a/security/keys/internal.h b/security/keys/internal.h
-index c452d71cce03..28c6cd942c59 100644
---- a/security/keys/internal.h
-+++ b/security/keys/internal.h
-@@ -314,7 +314,7 @@ static inline long compat_keyctl_dh_compute(
- #endif
- #endif
- 
--#ifdef CONFIG_ASYMMETRIC_KEY_TYPE
-+#ifdef CONFIG_KEYCTL_PKEY
- extern long keyctl_pkey_query(key_serial_t,
- 			      const char __user *,
- 			      struct keyctl_pkey_query __user *);
-diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
-index d6b10fd67627..417bba539bb1 100644
---- a/security/keys/keyctl.c
-+++ b/security/keys/keyctl.c
-@@ -28,7 +28,7 @@ static const unsigned char keyrings_capabilities[2] = {
- 	[0] = (KEYCTL_CAPS0_CAPABILITIES |
- 	       (IS_ENABLED(CONFIG_PERSISTENT_KEYRINGS)	? KEYCTL_CAPS0_PERSISTENT_KEYRINGS : 0) |
- 	       (IS_ENABLED(CONFIG_KEY_DH_OPERATIONS)	? KEYCTL_CAPS0_DIFFIE_HELLMAN : 0) |
--	       (IS_ENABLED(CONFIG_ASYMMETRIC_KEY_TYPE)	? KEYCTL_CAPS0_PUBLIC_KEY : 0) |
-+	       (IS_ENABLED(CONFIG_KEYCTL_PKEY)		? KEYCTL_CAPS0_PUBLIC_KEY : 0) |
- 	       (IS_ENABLED(CONFIG_BIG_KEYS)		? KEYCTL_CAPS0_BIG_KEY : 0) |
- 	       KEYCTL_CAPS0_INVALIDATE |
- 	       KEYCTL_CAPS0_RESTRICT_KEYRING |
++	if (IS_ERR(data))
++		return data;
++
++	if (!bytes || !bytes_len)
++		return ERR_PTR(-EINVAL);
++
++	/* Strip leading zeros: */
++	while (bytes_len > 1 && bytes[0] == 0) {
++		bytes++;
++		bytes_len--;
++	}
++
++	add_pad = bytes[0] & 0x80;
++
++	if (data_len < 2)
++		return ERR_PTR(-EINVAL);
++
++	*(data++) = _tag(UNIV, PRIM, INT);
++	data_len--;
++
++	ret = asn1_encode_length(&data, &data_len, bytes_len + add_pad);
++	if (ret)
++		return ERR_PTR(ret);
++
++	if (data_len < bytes_len + add_pad)
++		return ERR_PTR(-EINVAL);
++
++	if (add_pad)
++		*(data++) = 0;
++
++	memcpy(data, bytes, bytes_len);
++	data += bytes_len;
++	return data;
++}
++EXPORT_SYMBOL_GPL(asn1_encode_integer_bytes);
++
+ /* calculate the base 128 digit values setting the top bit of the first octet */
+ static int asn1_encode_oid_digit(unsigned char **_data, int *data_len, u32 oid)
+ {
 -- 
 2.47.3
 
