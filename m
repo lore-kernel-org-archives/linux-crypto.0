@@ -1,57 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.17
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795648698;
-	b=UK7siCrihugjNCc2mz5vN6D/phTFrKKzIgR3wenqQtYpn3I7k/4VCL3oF4+VKl5m5DSj
-	 vMBJN4KFE4/yqWAkXidyROOYpKVjzHTUP/4rENJ7dZiNCcHCj2WKPtGHyRdF0FZa7kTp4
-	 43OrI4vFqE/8hOpmKVnyHGFa0/dh+w1/YzuBjhAecM1sx3b6RFVjuCkh/9nP1D9MG3vEA
-	 5RV94JRYuKa3wYb4rj03MbWANewegLlagV3RydOoG56duHvqhdxm7xOmdsnl7F6Pnbh1a
-	 A8yaLs7DJgG/uCvghsLAflXfPt/SIYhFp8FsUPsygcBk52K8yM3SSkXnN6DlmwZuQCw==
+	t=1795648737;
+	b=dBx4mzAGWt0OigMP6WDF8UiIhK7wFUpo44d17SzfxzGPLwPpEVHh2cbrh2KTpKt2hm3x
+	 0adaeSbrQkz47Mm3DFJ1DJ2R4bQZBcdXmJ2mR/kbiP9ebA8MNKbLHhb9gZq7fG+umh37m
+	 yykdnMNQ7Xde4k9StcT+BtOMezdCGQcCB21m6ROB9G4qybX1+b+hosiYjXKzjeDDUEIdm
+	 AYWZgTs52B8cxCFWoSOBamaRg187Xnp4fLPOE++Of7r6AW/bbEDOnp+k4Pdb205LC+2Q9
+	 UvaAoxNh21bx/5ULNf7+efNBJOC0iv8F2co0EUCv+Tbl4z2gz2pfHWDpgY/VwlPe6Dw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795648698;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795648737;
 	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
 	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=qwo3J2Ed9L49OeSmosBwhswUwxqHKh4UChRvEyZrMSo=;
-	b=4IMhqTTHNUFIGLY/L0waA0fiAR5XisjGtriFVlhiCnZdapP1IQQVntxUKNSAti4kAeHp
-	 AUcPu9HPv2GHeKbydqu5LWFiDFv3CYaAovqW2NXr1kpZkK/t1Of00p2w7mYUuTsAYj0Yv
-	 1T5ZciZ5Zlf7pz2+yHxU/ydfLOvJE6i6FRdGNm5G+yuGPGcM2SLUWusamyOHmmynx2yZd
-	 hL4edAiND2xVoeUL6Go3ABcyVps1GVizlKp8CJBtPzmDcNdENcDbcINq5HWQdjJnLIIOK
-	 QJd4fX1BJvQdHl1qpQdW7VawFe0xPdYtzefMB7zcpQcU2cRq8UYuFPLG3YFIRNzG6Qg==
+	bh=YWWKvDKRDn1hHUowo2at1VmbK3immV9LxoHiyGmdb+c=;
+	b=BYmgXjEwQQGYolBl3pu3sqw8Pr/8R34zLVI+GBySN84F8tAha04M1bzhlODQljc9wCyQ
+	 msLgKNVdlB8cXPWHaOKGwy2TVUbO/ZLPnT2vJe9oeBGRXl7VuCBEzY3b0USkSVTdch0xZ
+	 QxdSwHfWehlmPGyBRqYEMAxpedOwL5FGCNpeXotGpUtpiLCuNgZuIpWD0rWPt3Pv3DL4n
+	 cUBrT4Td8EeI3JCtRy7K0fImJ3HXDzbGAbVv29FF9abZltFKI7BpsJw69dFDA6B/3EpR9
+	 naJeXLN8XaMoUe4NBAmWizUcIrK3amVdmnYXN2B1l5Y4l+wN6vdrVFDViSQrzC3LGUA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=protonmail.com;
 	spf=pass smtp.mailfrom=protonmail.com;
-	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=w34EWhj4;
-	arc=none smtp.remote-ip=185.70.43.22
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=DVqfc+LJ;
+	arc=none smtp.remote-ip=109.224.244.17
+Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B1F606A321
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 23:18:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F0B1F606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123DD606A321
+	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 23:18:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 123DD606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=w34EWhj4
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=DVqfc+LJ
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1795648694; x=1795907894;
-	bh=qwo3J2Ed9L49OeSmosBwhswUwxqHKh4UChRvEyZrMSo=;
+	s=protonmail3; t=1795648729; x=1795907929;
+	bh=YWWKvDKRDn1hHUowo2at1VmbK3immV9LxoHiyGmdb+c=;
 	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
 	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=w34EWhj4wU6gkSi2HDa7QgSm+niy4dkABvCsgvkWn8DrDd5ZgkDvHmQ4H4adNaQxi
-	 ixblHiOu7zmGGYo7ElcwRXkG/6YFwYKNBIW1jF1vDKiR8lUQjXAptTwR9XB6A20lke
-	 yuT6R5Dn7F9QgMdse2zW4LAhSz83Ymc+1xkxLLovEEzB3LfVgunERFx4avRJPVwnJd
-	 mwVfe0gsdyr1RUoljX/ixWRR2g7fUJgHcgbv/0WC/wRiGSG2CSZ/d1VepdHLpEr42+
-	 Rmhhhyd5rN4ISJJHKulOjATtjd8oC7+EM9Kq3POZ2hNjBXKrBlV9ugafYk/u5bAIdc
-	 RpjonMEIEV6OQ==
-Date: Wed, 25 Nov 2026 23:18:08 +0000
-To: Thorsten Blum <blum@kernel.org>
+	b=DVqfc+LJQLHNj73WRDjy5ay/WFUh79BHwYwf0R/xgKBloYMTRLHhAGCCnCMR4QDJX
+	 RPnpKlAshqyzyw3zj/dM3TW8yC8JfbR4wDNm8RQOaEyuzKjFP7yEsa0jfwEK9RzVgy
+	 KuGTLk6fqCobmKfiR2fbupApcasZqVpOJRcpaN55bu/bpSvhRbL+31hrQ31VjotbBh
+	 myLOwvb1qIbD13T/2/CQOqNdkQfnmDHblxQUk1AmzulOJ8BbhqPxjvYDF1Kyg7rSdU
+	 MUJ59E7i3LyskV4CCLHlPgp33vktzvXwKyfqAbK/Dk/+2DcsNQlxL81BE4Wkv3zM+J
+	 cx5tD3muPLmUw==
+Date: Wed, 25 Nov 2026 23:18:43 +0000
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 From: Ryan Prinz <rc4d5a@protonmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ryan Prinz <rc4d5a@protonmail.com>
-Subject: [PATCH] crypto: atmel-ecc - fix missing ECDH public key validation
-Message-ID: <20261125231745.1857056-1-rc4d5a@protonmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, Zhiqi Song <songzhiqi1@huawei.com>, Longfang Liu <liulongfang@huawei.com>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ryan Prinz <rc4d5a@protonmail.com>
+Subject: [PATCH] crypto: dh - add shared DH public key range check
+Message-ID: <20261125231825.1857253-1-rc4d5a@protonmail.com>
 Feedback-ID: 190731814:user:proton
-X-Pm-Message-ID: d88ec8045df0efa8e9b1cfae8d246d3001ae9382
+X-Pm-Message-ID: fa848d53e2077f708d61559a1ec3e8e5ae28a36d
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,144 +64,110 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-atmel_ecdh_compute_shared_secret() passes the peer's ECDH public point
-into the ATECC508A/608A/608B secure element over I2C without checking
-it first. The only check on req->src is on length
-(req->src_len !=3D ATMEL_ECC_PUBKEY_SIZE); the coordinates themselves are
-never validated before atmel_i2c_init_ecdh_cmd() hands them to the
-device.
+Add a shared helper for the DH public key range check from SP800-56A
+rev3 5.6.2.3.2 (2 <=3D y <=3D p - 2), operating on raw big-endian buffers.
+Any "dh" backend can call this instead of carrying its own copy.
 
-crypto/ecc.c's ecc_is_pubkey_valid_partial() is the generic software
-check for this operation: it rejects a point that is zero, out of
-range, or not on the curve. crypto/ecdh.c's compute_shared_secret()
-calls it before computing the shared secret. This driver's hardware
-path has no equivalent check.
+Zero-padding the peer's value and computing p - 1 stay the caller's
+job, since that depends on how each backend already has the data;
+only the comparison itself lives here.
 
-Both the generic implementation and this driver register under the
-same crypto_kpp name, "ecdh-nist-p256". This driver registers at
-cra_priority 300 (ATMEL_ECC_PRIORITY) versus the generic
-implementation's 100, so any caller requesting "ecdh-nist-p256" gets
-this unvalidated path whenever an Atmel/Microchip ECC device is bound.
-
-net/bluetooth/smp.c allocates "ecdh-nist-p256" for LE Secure
-Connections pairing and performs no validation of the remote device's
-public key itself; it relies on the crypto_kpp backend
-(net/bluetooth/ecdh_helper.c's compute_ecdh_secret() converts the
-wire-format coordinates to the big-endian layout this backend expects,
-but does not check their validity). Unlike this driver's HPRE
-counterpart, nothing else in that path currently blocks the call from
-reaching the unvalidated code: on a device with an Atmel/Microchip
-secure element bound as its ECDH backend, a BLE peer can send an
-invalid public key during pairing and force the resulting DHKey to
-one of a small number of predictable values in a single pairing
-attempt.
-
-I don't have access to this hardware, so I checked whether the device
-itself might reject an invalid point instead. The ATECC608A-TFLXTLS
-datasheet (Microchip DS40002138A) documents the ECDH command (opcode
-0x43) as combining the stored private key with the input X and Y
-coordinates directly; its description includes no on-curve or range
-check. The datasheet also lists "Public Key Validation Support" as a
-device feature, but that refers to the Verify command's Validate and
-ValidateExternal modes (see application note AN8932, "ATECC508A
-Public Key Validation"), which validate a public key already written
-to a device slot against a certificate chain before trusting it for
-future signature verification. That is a provisioning-time operation
-on a persistently stored key, unrelated to the ephemeral peer public
-key passed as live input data to the ECDH command.
-
-Fixed by validating the peer-supplied point before it reaches the I2C
-command, reusing ecc_is_pubkey_valid_partial() the same way the
-already-submitted HPRE fix does.
-
-Fixes: 11105693fa05 ("crypto: atmel-ecc - introduce Microchip / Atmel ECC d=
-river")
 Signed-off-by: Ryan Prinz <rc4d5a@protonmail.com>
 ---
-No Atmel/Microchip ECC hardware was available to reproduce this.
-Verified by applying this patch to an unmodified kernel tree and
-building drivers/crypto/atmel-ecc.o directly (make drivers/crypto/
-atmel-ecc.o), confirming it compiles cleanly with no new warnings or
-errors. The point validation reuses ecc_is_pubkey_valid_partial()
-unmodified. I traced net/bluetooth/ecdh_helper.c's
-compute_ecdh_secret() to confirm the src buffer it submits is
-big-endian X (32 bytes) || big-endian Y (32 bytes) -- the same layout
-crypto/ecc.c's own generic compute_shared_secret() expects and the
-same layout atmel_i2c_init_ecdh_cmd() already consumes directly -- so
-this driver's new validation step reads the same bytes the same way.
-I could not test against the actual secure element; the datasheet
-citation above is the basis for believing the device does not perform
-this check itself.
+Verified by building crypto/dh_helper.o directly, confirming it
+compiles cleanly with no new warnings or errors. Also verified with a
+standalone build of the function under AddressSanitizer/UBSan,
+exercising y =3D 0, 1, 2, p-2, p-1, p, a value larger than p, and an
+ordinary interior value, each at both a multi-byte and a single-byte
+p_size, plus p_size =3D 0 itself. All cases produced the expected
+accept/reject result with no sanitizer reports.
 
 AI Disclosure: An AI assistant was used to assist with the
-analysis and testing. I have verified the vulnerability, the fix, and
-the test results myself and take responsibility for this contribution,
-per Documentation/process/coding-assistants.rst.
+analysis and testing. I have verified the fix and the test results
+myself and take responsibility for this contribution, per
+Documentation/process/coding-assistants.rst.
 
- drivers/crypto/atmel-ecc.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ crypto/dh_helper.c     | 32 ++++++++++++++++++++++++++++++++
+ include/crypto/dh.h    | 22 ++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -19,7 +19,9 @@
- #include <linux/slab.h>
- #include <linux/workqueue.h>
- #include <crypto/internal/kpp.h>
-+#include <crypto/ecc_curve.h>
- #include <crypto/ecdh.h>
-+#include <crypto/internal/ecc.h>
- #include <crypto/kpp.h>
- #include "atmel-i2c.h"
-
-@@ -146,6 +148,34 @@ static int atmel_ecdh_generate_public_key(struct kpp_r=
-equest *req)
+diff --git a/crypto/dh_helper.c b/crypto/dh_helper.c
+--- a/crypto/dh_helper.c
++++ b/crypto/dh_helper.c
+@@ -91,6 +91,38 @@ int crypto_dh_encode_key(char *buf, unsigned int len, co=
+nst struct dh *params)
  =09return 0;
  }
 
-+static int atmel_ecdh_peer_pubkey_valid(struct scatterlist *src,
-+=09=09=09=09=09unsigned int src_len)
++/*
++ * Partial public key validation check from SP800-56A rev3 section
++ * 5.6.2.3.2: a DH public value is invalid unless 2 <=3D y <=3D p - 2.
++ * Does not depend on FIPS mode.
++ *
++ * @y and @p_minus_1 must both already be exactly @p_size bytes,
++ * big-endian; callers are responsible for zero-extending a shorter
++ * public value before calling this function.
++ */
++bool crypto_dh_pubkey_in_range(const u8 *y, const u8 *p_minus_1,
++=09=09=09       unsigned int p_size)
 +{
-+=09const struct ecc_curve *curve =3D ecc_get_curve(ECC_CURVE_NIST_P256);
-+=09u8 pubkey_buf[ATMEL_ECC_PUBKEY_SIZE];
-+=09u64 x[ECC_CURVE_NIST_P256_DIGITS], y[ECC_CURVE_NIST_P256_DIGITS];
-+=09struct ecc_point pk;
-+=09size_t copied;
++=09bool is_zero_or_one =3D true;
++=09unsigned int i;
 +
-+=09if (!curve)
-+=09=09return -EINVAL;
++=09if (!p_size)
++=09=09return false;
 +
-+=09if (src_len !=3D ATMEL_ECC_PUBKEY_SIZE)
-+=09=09return -EINVAL;
++=09for (i =3D 0; i < p_size - 1; i++) {
++=09=09if (y[i]) {
++=09=09=09is_zero_or_one =3D false;
++=09=09=09break;
++=09=09}
++=09}
 +
-+=09copied =3D sg_copy_to_buffer(src, sg_nents_for_len(src, src_len),
-+=09=09=09=09   pubkey_buf, src_len);
-+=09if (copied !=3D src_len)
-+=09=09return -EINVAL;
++=09if (is_zero_or_one && y[p_size - 1] <=3D 1)
++=09=09return false;
 +
-+=09ecc_swap_digits(pubkey_buf, x, ECC_CURVE_NIST_P256_DIGITS);
-+=09ecc_swap_digits(pubkey_buf + ATMEL_ECC_NIST_P256_N_SIZE, y,
-+=09=09=09ECC_CURVE_NIST_P256_DIGITS);
-+=09pk =3D ECC_POINT_INIT(x, y, ECC_CURVE_NIST_P256_DIGITS);
-+
-+=09return ecc_is_pubkey_valid_partial(curve, &pk);
++=09return memcmp(y, p_minus_1, p_size) < 0;
 +}
++EXPORT_SYMBOL_GPL(crypto_dh_pubkey_in_range);
 +
- static int atmel_ecdh_compute_shared_secret(struct kpp_request *req)
+ int crypto_dh_decode_key(const char *buf, unsigned int len, struct dh *par=
+ams)
  {
- =09struct crypto_kpp *tfm =3D crypto_kpp_reqtfm(req);
-@@ -166,6 +196,10 @@ static int atmel_ecdh_compute_shared_secret(struct kpp=
-_request *req)
- =09if (req->src_len !=3D ATMEL_ECC_PUBKEY_SIZE)
- =09=09return -EINVAL;
+ =09int err;
+diff --git a/include/crypto/dh.h b/include/crypto/dh.h
+--- a/include/crypto/dh.h
++++ b/include/crypto/dh.h
+@@ -95,4 +95,26 @@ int crypto_dh_decode_key(const char *buf, unsigned int l=
+en, struct dh *params)
+ int __crypto_dh_decode_key(const char *buf, unsigned int len,
+ =09=09=09   struct dh *params);
 
-+=09ret =3D atmel_ecdh_peer_pubkey_valid(req->src, req->src_len);
-+=09if (ret)
-+=09=09return ret;
++/**
++ * crypto_dh_pubkey_in_range() - range-check a DH public value
++ * @y:=09=09Big-endian public value to check, zero-padded to @p_size
++ *=09=09bytes by the caller
++ * @p_minus_1:=09Big-endian (p - 1) for the same group as @y, @p_size byte=
+s
++ * @p_size:=09Size of both @y and @p_minus_1 in bytes
++ *
++ * This is the partial public key validation check from SP800-56A rev3
++ * section 5.6.2.3.2: a DH public value is invalid unless 2 <=3D y <=3D p =
+- 2.
++ * It does not depend on FIPS mode and is meant to be used by any backend
++ * that implements the "dh" kpp algorithm, hardware or software, so the
++ * check does not have to be reimplemented per backend.
++ *
++ * Both buffers must already be exactly @p_size bytes; callers are
++ * responsible for zero-extending a shorter public value before calling
++ * this function.
++ *
++ * Return: true if 2 <=3D y <=3D p - 2, false otherwise.
++ */
++bool crypto_dh_pubkey_in_range(const u8 *y, const u8 *p_minus_1,
++=09=09=09       unsigned int p_size);
 +
- =09gfp =3D (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ? GFP_KERNEL :
- =09=09=09=09=09=09=09     GFP_ATOMIC;
-
+ #endif
 --=20
 2.51.2
 
