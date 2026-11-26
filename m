@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795726275;
-	b=il8RMsG8SzGrrpr3e2EiMl13WAW6mqpxgq1z/avGcoNAys3ggusmLPkLJUkX+Gq5gZG/
-	 Ddh50D6fYB5gYZxMHHf6qxEJe1AaG7Xq7PXm1NvJ911NEDbzViaxCzHVmPNiIx0X5LIKW
-	 R8X4dOxGGz/vGTvYPBU84NTP8y838kLaq42cKHw5s7986keP42S4HmlB9zcph+sp1swCw
-	 9ib3/EpBx+wfgHMN/rG1F5Lwq4VU8JZzEbcMPOw6PDLKQkzXaYxpACmRQvXo2c43YbgG3
-	 c6fbSJbIH5aFKb1aoWCbhR2n7dgHHzVC34Vi6agJxmP0BSSRfZitTKqPRzAxg2x+n1A==
+	t=1795726279;
+	b=e0ehVaAgkB28H48G6CO2QR7id8jDlvMd2yLWhBtvaHXrL1dKdUTo7BEO1nM2BTdoppQY
+	 VgEuAymHrG3QTH+0ZMpgWwaDAQqGKz64N/6wDHz6VenOHfoBpHZBLpIs5X3hToA2XnQC9
+	 MrKI4UzmzKv38nNv+GTxTaqZjzb/FB+sBUdHRxSMqoS5o45oiuNIgTW64P7nzbFQAlJXo
+	 +2pwj2KyLm4KALfehlnfB+kfZ9nX0tc0861bcEt+J/nsoEuScrNtR9zpBelR591zoIaIy
+	 zbx+XtrYnIGjdnX5Cq1Z7QCsQgGfmfwfjF5ae5GU5dt5vY62i93PLNUFc62FKOkbiEA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795726275;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795726279;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=hA+f6mNsTc9W51csUC2q9wjtv1U7ByYW5lCg1cGqWvg=;
-	b=Cb089wmA+lmNISb9QZEX1OHioTQhQBOYaxwPBx6PFte1gp1XFJWUP5Br8mMWx8pqzyCg
-	 ZOtB5Ik3I+5Q+OzUW2np68ScOpPlsOBCIAVHcJgB9ICv4ZhVHLxU7pZ/imItfPLkiBUF8
-	 qchBPbR2qumzmnNDjrUqHeE4AKzP66GLnOIRcsFvBvSGNg4jEkPBt9p7KLmOV+dDcaF+k
-	 FBnhe/wE3eSrh3qQ3P5NtnZKXIPb3WpUClFY5LAcWqX7djvQh+YV4yf+i3mHQPuop9M/I
-	 cvQOrmz6MCEKG26PZ2xjPXupNqFR779h4WlGWtkPi6xr1tPVUSp1JFomdQHxqdgKQqA==
+	bh=xAoZssdEGReXpW+fiyeccugaPyEheAlcfEk5nmlrLac=;
+	b=dX9LoitcBZI4vHWQH1GZ5R8GEm0NZPz1lCH4Fxe7ymHJFFIlL2bAAsrm7ksHzpRjgRw+
+	 QoyPXZZ8NG0orGaTbduvGEeF63xzeie8PsHBCYnTXYE9EbAWkRfXYC5oS5vY/DQkRtOBd
+	 7pwe9vRI1V5XlgpaTDr+W7AIBP9inKCs4DO5CRY8qMC/7RzF2tWSvuvC6K1dTDz/hdOOu
+	 P8Bj/wkYi3LW0DZ7u4w8bu0k/UMRBKad0+bPVmMj0lmPrtls6cVvU6EhntUGY0nckTg2l
+	 0uSOUvkZoNiryKIqB5Cpc3UzjLhDSoebgUCt+C8oVQgYRE4qJCc9J9puNMpg2zsr11A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=C2V0wC0l;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="WkK/V8+d";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id A3FE9606A337;
-	Thu, 26 Nov 2026 20:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 5F9D7606A33C;
+	Thu, 26 Nov 2026 20:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=C2V0wC0l
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 8BD1C1F0089A;
-	Thu, 26 Nov 2026 20:51:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WkK/V8+d
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 4D4441F00893;
+	Thu, 26 Nov 2026 20:51:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795726275;
-	bh=hA+f6mNsTc9W51csUC2q9wjtv1U7ByYW5lCg1cGqWvg=;
+	s=k20260515; t=1795726279;
+	bh=xAoZssdEGReXpW+fiyeccugaPyEheAlcfEk5nmlrLac=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=C2V0wC0l/YN5fmIXMarw2FEV5iHvzPd4E7o0SZM8Af7LlZ1dUyxpwAt9D3SyYZ+px
-	 05jUWrefMHrUZv+7VRw9n2+iFh2hBwL5JEKcUKwMBBPwZT+rSfXNlND4STKI0U9IqQ
-	 C+zYyEgp0Pd1O3Duji3jQPyt3oku8MOwAYLpX4yLTDcVSb+NPddAgZuqZTsHP31aAu
-	 tXcas7DT7jNv42BYisyvS0tk7AvhYFvvFK0SipzfXB4LU+A9BvYonw4JV5/d6JhmEy
-	 ad7+eJIvNHQkdloya4KaRUHLujpvazp47grYbhdPS+Mj8f3dgFEI3MEWq+0dQ+rcoF
-	 meijcogmMxN4Q==
+	b=WkK/V8+dueXLBEkkoWesDAREjnXstJ/FCDwYLMVJpSlOx3BlQ0I7EhE8TU/nd4LJ9
+	 UX1HFC0zjNLfdobcNdbhKRKtzAVgRDOGrzVfTQnmv4aZarwA0MLOk1gCFNyC1je/IS
+	 U9H+TAU1mKblYtyIxJqy31TBpepeOiMqH93DSkhpjVkejodZH4Ifxf4zSDQWYcBKy8
+	 HJvcP3J2143jirbGKjF6qYsTHVrK67sG6+fcUwsK6OYHEX1I1BaX4UtubpooOzDwC8
+	 6JB/91ZVFRdKH3+0nO9MI4Fasu1PDyAc2yT+upZo+4F+VzSVX9mQWiWdAmBnJ8spnU
+	 v/ooefqNa7kRw==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: keyrings@vger.kernel.org
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -76,9 +76,9 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	"Serge E. Hallyn" <serge@hallyn.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
-Subject: [PATCH v4 08/11] KEYS: trusted: Reject zero-length keys in symmetric consumers
-Date: Thu, 26 Nov 2026 22:50:18 +0200
-Message-ID: <20261126205021.2200819-9-jarkko@kernel.org>
+Subject: [PATCH v4 09/11] KEYS: trusted: Add private backend data to trusted_key_payload
+Date: Thu, 26 Nov 2026 22:50:19 +0200
+Message-ID: <20261126205021.2200819-10-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261126205021.2200819-1-jarkko@kernel.org>
 References: <20261126205021.2200819-1-jarkko@kernel.org>
@@ -93,73 +93,94 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Asymmetric trusted keys will not carry a raw symmetric key payload
-(key_len == 0). Reject zero-length trusted keys in encrypted-keys,
-af_alg, dm-crypt, and trusted_update() resealing.
+Add a backend-private pointer to struct trusted_key_payload and free it
+sensitively via trusted_payload_free() on teardown and error paths. This
+prepares for asymmetric TPM2 keys, which retain backend key metadata
+across runtime pkey operations instead of unsealing a raw key at load
+time.
 
 Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- crypto/af_alg.c                                  | 2 ++
- drivers/md/dm-crypt.c                            | 2 +-
- security/keys/encrypted-keys/masterkey_trusted.c | 5 +++++
- security/keys/trusted-keys/trusted_core.c        | 2 +-
- 4 files changed, 9 insertions(+), 2 deletions(-)
+ include/keys/trusted-type.h               |  1 +
+ security/keys/trusted-keys/trusted_core.c | 18 +++++++++++++-----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index ab84c4488a15..133cb88e3c12 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -323,6 +323,8 @@ static const u8 *key_data_ptr_trusted(const struct key *key,
- 	if (IS_ERR_OR_NULL(tkp))
- 		return ERR_PTR(-EKEYREVOKED);
- 
-+	if (!tkp->key_len)
-+		return ERR_PTR(-EINVAL);
- 	*datalen = tkp->key_len;
- 
- 	return tkp->key;
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 02038a9cd21d..1e034c747d39 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -2492,7 +2492,7 @@ static int set_key_trusted(struct crypt_config *cc, struct key *key)
- 	if (!tkp)
- 		return -EKEYREVOKED;
- 
--	if (cc->key_size != tkp->key_len)
-+	if (!tkp->key_len || cc->key_size != tkp->key_len)
- 		return -EINVAL;
- 
- 	memcpy(cc->key, tkp->key, cc->key_size);
-diff --git a/security/keys/encrypted-keys/masterkey_trusted.c b/security/keys/encrypted-keys/masterkey_trusted.c
-index e6d22ce77e98..8c6e6bdd8ef7 100644
---- a/security/keys/encrypted-keys/masterkey_trusted.c
-+++ b/security/keys/encrypted-keys/masterkey_trusted.c
-@@ -36,6 +36,11 @@ struct key *request_trusted_key(const char *trusted_desc,
- 
- 	down_read(&tkey->sem);
- 	tpayload = tkey->payload.data[0];
-+	if (!tpayload->key_len) {
-+		up_read(&tkey->sem);
-+		key_put(tkey);
-+		return ERR_PTR(-EINVAL);
-+	}
- 	*master_key = tpayload->key;
- 	*master_keylen = tpayload->key_len;
- error:
+diff --git a/include/keys/trusted-type.h b/include/keys/trusted-type.h
+index 3db61b57cf73..790ffabb0d18 100644
+--- a/include/keys/trusted-type.h
++++ b/include/keys/trusted-type.h
+@@ -33,6 +33,7 @@ struct trusted_key_payload {
+ 	unsigned int blob_len;
+ 	unsigned char migratable;
+ 	unsigned char old_format;
++	void *private;
+ 	unsigned char key[MAX_KEY_SIZE + 1];
+ 	unsigned char blob[MAX_BLOB_SIZE];
+ };
 diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
-index 27756fc906b9..665b2c37734b 100644
+index 665b2c37734b..1db6497ba297 100644
 --- a/security/keys/trusted-keys/trusted_core.c
 +++ b/security/keys/trusted-keys/trusted_core.c
-@@ -249,7 +249,7 @@ static int trusted_update(struct key *key, struct key_preparsed_payload *prep)
- 	if (key_is_negative(key))
- 		return -ENOKEY;
- 	p = key->payload.data[0];
--	if (!p->migratable)
-+	if (!p->migratable || !p->key_len)
- 		return -EPERM;
- 	if (datalen == 0 || datalen > 32767 || !prep->data)
- 		return -EINVAL;
+@@ -149,6 +149,14 @@ static struct trusted_key_payload *trusted_payload_alloc(struct key *key)
+ 	return p;
+ }
+ 
++static void trusted_payload_free(struct trusted_key_payload *p)
++{
++	if (!p)
++		return;
++	kfree_sensitive(p->private);
++	kfree_sensitive(p);
++}
++
+ /*
+  * trusted_instantiate - create a new trusted key
+  *
+@@ -223,7 +231,7 @@ static int trusted_instantiate(struct key *key,
+ 	if (!ret)
+ 		rcu_assign_keypointer(key, payload);
+ 	else
+-		kfree_sensitive(payload);
++		trusted_payload_free(payload);
+ 	return ret;
+ }
+ 
+@@ -232,7 +240,7 @@ static void trusted_rcu_free(struct rcu_head *rcu)
+ 	struct trusted_key_payload *p;
+ 
+ 	p = container_of(rcu, struct trusted_key_payload, rcu);
+-	kfree_sensitive(p);
++	trusted_payload_free(p);
+ }
+ 
+ /*
+@@ -269,7 +277,7 @@ static int trusted_update(struct key *key, struct key_preparsed_payload *prep)
+ 	ret = datablob_parse(&datablob, new_p);
+ 	if (ret != Opt_update) {
+ 		ret = -EINVAL;
+-		kfree_sensitive(new_p);
++		trusted_payload_free(new_p);
+ 		goto out;
+ 	}
+ 
+@@ -283,7 +291,7 @@ static int trusted_update(struct key *key, struct key_preparsed_payload *prep)
+ 	ret = static_call(trusted_key_seal)(new_p, datablob);
+ 	if (ret < 0) {
+ 		pr_info("key_seal failed (%d)\n", ret);
+-		kfree_sensitive(new_p);
++		trusted_payload_free(new_p);
+ 		goto out;
+ 	}
+ 
+@@ -322,7 +330,7 @@ static long trusted_read(const struct key *key, char *buffer,
+  */
+ static void trusted_destroy(struct key *key)
+ {
+-	kfree_sensitive(key->payload.data[0]);
++	trusted_payload_free(key->payload.data[0]);
+ }
+ 
+ struct key_type key_type_trusted = {
 -- 
 2.47.3
 
