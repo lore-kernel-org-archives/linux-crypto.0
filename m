@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795722324;
-	b=vybdbycQIoNO1NyDgwmXhJy+en1o5MUGGEOud0zJJUYcNlyhifEScf8z/Jf2sYG/tIvo
-	 hAUXk59rcBYmbqYoHNDDVIpK9+xc8j6tm1xtYyryk7/TqQE0VvnVGo56sZQRqi7mo8hsL
-	 7LTGC8G2biuyHSxfsGbGUWS5KP7y4LolSGkDtEChaIYKfyEZaAbyIajG9Oz9GqJD8q5ia
-	 KXsTKqr7Yz020KdoCOKzPuv/XVQfNrp1pkfLjg+9qpESdzy9+IIiyoDLoXNFk/hF7rA/G
-	 Sr/TjciooR1lMrmTpmoeGc3UnyxLWEI/iG1x0fmBZ/5BlXkNPFD2lp8IgVSt3am3vJA==
+	t=1795722529;
+	b=Ns2JfaIybM/IGf5BHzk0t0M12ZTGk8OwprWQ0opQB/8VdtLOmQBy3jLYsxhKRFhZhhbY
+	 SjAMDa84RrqMSfVeklI7ubQosBGj9Fu2idYJVSc+c27JrO+O29ZA0A97Qt6hP3xyp19qw
+	 oD+UOQiWyFlupfC5E65UNHHUJ2ZpIrM8OybY7VAQpvZEwebZZElnVYdVtkinUL/hv4yLK
+	 EG9A10NcMtV6M1ongiIbwLM0ODN5rc240iZkKo8UPBjCZx9zcjOg0iEjFqju+86KBB1CW
+	 ayHvFXc/nGhbhCX5Z8X3c1xjyRM9ZEXIREXUp5POjL8SnT0ITConabOJ+fr75UwZoMQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795722324;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795722529;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=QpSJK/iai0Uu6QRIbjzX2UqSB9VVD6gv6H14Jvr8nGQ=;
-	b=qGK6ykPm+sJgpGJ5REddRBARf+ZafWQDH9xKg5ODN1DgAJJ3rVnCk4wBzX+KysjjPmX0
-	 Xy8JdfCq5fIcLTrqayh0QLTPAO6XOG+BgBLqkza+gbD1liJN1Cgku0icnZRhWFUtq4O8s
-	 y97B6uuatO8A4qVorNmGFzjQeaqY5FsN0BmmwA1B3Jc39nD70l+DIVlORKCpGB1AwrZvT
-	 NVucx4j/f8XYCmdu8v08NcNvwxV4FRyX4GTsOTlSTOLBf9XMOHe5UyC32IwlcEWsQx7Ef
-	 W4h7XLvCtwhA6V5GqT355UvBUluhkdIUMs5L5v/XwsSzg4ar5aFyL3ck8mIJvQaDdgg==
+	bh=cXHtkSGqYTHMGfEbz2hkNOCAQRnLJiBWoIsvMJU6LJ4=;
+	b=tLqT6qVEmrFNE3FLxfvFzmq23st8P+Atc28Dva2ZhCPDWBHOlsZqCrydJF3jms3vKsP3
+	 Ew9CoJW8NmhB56uPk3fKayw5OqGlScuvOG6uT9KDEy7pB3EHEEuhcRuH2hE9wxQiL7tCA
+	 G327UB9zKH4r7pS3kb9eBjAdKg6fkECYC7DnZ9XNQj80KoEh6iINKNbhBOrqMvEGWRBP8
+	 jtoFz+ZUgE4PwChMWR5OONvggu8gJLxxqExN90QayWgxuuw2krsZIZFd2F+JexW8UE89K
+	 lBAw1S3+ZmN5J0cXeXDJ51ycbm+I8kVIiYYEKFEF0cZ3O6Fejln3Bej3dMIwSz+xifQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jpkGIwmH;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lIOry1Ex;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D109E606A31C;
-	Thu, 26 Nov 2026 19:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3124A606A32F;
+	Thu, 26 Nov 2026 19:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jpkGIwmH
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCD981F000C4;
-	Thu, 26 Nov 2026 19:45:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lIOry1Ex
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D57F1F000C6;
+	Thu, 26 Nov 2026 19:48:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795722324;
-	bh=QpSJK/iai0Uu6QRIbjzX2UqSB9VVD6gv6H14Jvr8nGQ=;
+	s=k20260515; t=1795722528;
+	bh=cXHtkSGqYTHMGfEbz2hkNOCAQRnLJiBWoIsvMJU6LJ4=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=jpkGIwmHrzPKByPi0Cp/tbAQLbBGNO7rzREbKe/9V4poAZaSfx6GYRnbWYtQFXcjT
-	 4wrn5NtVOuqr7egTe0G+gnq6zlZvxmum513takVOnD6z9H3PmdVrA6Jim6QUmzxQo+
-	 lmD3L8IpttJCx9skAAScBmZ9YwetJpuVLaHQAENYENHvvaCXffBZCSCjAl4fQLLx2V
-	 4sgAK455znta9bOdgs2pMy5GMgFMLPqjOhihCQkbD+KVJiKLv+Cwhjk0uPItApjxo0
-	 krRmHMuQTxpveXYI+s8AGmHkoS45IfxObW/yuR35U2eR34iZoXyDMZdHEj2WjhZ7JP
-	 Nz/4tzD9H+OxA==
-Message-ID: <sashiko-outbox-236117@kernel.org>
+	b=lIOry1Ex2Z9eaH9FjKoNMZVFLDZKbX9be2fAq6azcwsFS0fDSQ6QTahaJ32GGv2Qw
+	 Us9CX/wUdk+makl5WAY1dGdJ8ikeoEU4R1w8puC2uO5COizKteuR8OX8K9ix2EOPqA
+	 YC4+sVDkvaYEnADeBtxuVcUmsj3Br3EPMxJbaE2FEsnZCkyJ+s2addHFBF4q1ZPTg5
+	 2JFqa0+kuG/nzbcy0haBCA3jYGmxX0bMrNjMrMS2R3yyKbOd86MIaA9qowPtu2XGYy
+	 QxEK73av+LWBbtuIgn6QLAP1FgbDuWWDbf1qAK6nMDLGayou9tx1opLfAx2MrdYJTk
+	 Y/mE2ZtUWwg+A==
+Message-ID: <sashiko-outbox-236121@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v13 11/25] crypto: amlogic - Process more than MAXDESCS
- descriptors
+Subject: Re: [PATCH v13 12/25] crypto: amlogic - Avoid kzalloc in engine
+ thread
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jose Nieto" <jnieto.alaber@gmail.com>, "Corentin Labbe" <clabbe@baylibre.com>, "Herbert
  Xu" <herbert@gondor.apana.org.au>
@@ -50,12 +50,12 @@ Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org, devicetree@
  Armstrong" <neil.armstrong@linaro.org>, "Martin Blumenstingl" <martin.blumenstingl@googlemail.com>, "Krzysztof
  Kozlowski" <krzk+dt@kernel.org>, "Rob Herring" <robh@kernel.org>, "Conor
  Dooley" <conor+dt@kernel.org>, "Alexey Romanov" <romanov.alexey2000@gmail.com>
-In-Reply-To: <20261126193241.1471372-12-jnieto.alaber@gmail.com>
+In-Reply-To: <20261126193241.1471372-13-jnieto.alaber@gmail.com>
 References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
- <20261126193241.1471372-12-jnieto.alaber@gmail.com>
+ <20261126193241.1471372-13-jnieto.alaber@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Nov 2026 19:45:23 +0000
+Date: Thu, 26 Nov 2026 19:48:47 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,195 +65,239 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 2 potential
+Thank you for your contribution! Sashiko AI review found 5 potential
 issues to consider:
-- [High] crypto: amlogic: unmapped IV and out-of-bounds keyiv DMA length
-  in meson_cipher()
-- [High] crypto: amlogic: bad sg_virt() offset and DMA sync in
-  meson_kick_hardware()
+- [High] crypto: amlogic: shared TFM keyiv buffer races across
+  concurrent requests
+- [Medium] crypto: amlogic: unsynced DMA write and duplicate IV copy in
+  meson_cipher()
+- [Medium] crypto: amlogic: out-of-bounds keyiv DMA descriptors in
+  meson_cipher()
+- [Low] crypto: amlogic: unused DMA reqsize padding in
+  meson_cipher_init()
+- [Low] crypto: amlogic: stale trailing key bytes on re-key in
+  meson_aes_setkey()
 --
 
-commit 685ee7508ec6e6946361c6c3e2f5421b6188d69b
+commit 228a0fe250c8671b89954b4f55b91bfb1b59975f
 Author: Alexey Romanov <romanov.alexey2000@gmail.com>
 
-crypto: amlogic - Process more than MAXDESCS descriptors
+crypto: amlogic - Avoid kzalloc in engine thread
 
-This commit reworks descriptor setup in the Amlogic GXL crypto driver to
-process requests requiring more than MAXDESC descriptors in batches and
-makes the number of key/IV setup descriptors configurable via platform
-data.
+This commit replaces the per-request kzalloc() key/IV buffer in meson_ciphe=
+r()
+and the dynamically allocated key in struct meson_cipher_tfm_ctx with a
+fixed-size keyiv array in the transform context, and switches transform and
+request context accessors to their DMA-aligned variants.
 
 > diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto=
 /amlogic/amlogic-gxl-cipher.c
-> index c17ce5cc70a87..cb6b959bb1f96 100644
+> index cb6b959bb1f96..df42940f1112a 100644
 > --- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
 > +++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
 [ ... ]
-> @@ -76,6 +82,213 @@ static int meson_cipher_do_fallback(struct skcipher_r=
-equest *areq)
+> @@ -147,17 +146,17 @@ static void meson_setup_keyiv_descs(struct cipher_c=
+tx *ctx)
+>  	struct skcipher_alg *alg =3D crypto_skcipher_alg(tfm);
+>  	struct meson_alg_template *algt =3D container_of(alg,
+>  		struct meson_alg_template, alg.skcipher.base);
+> -	struct meson_cipher_tfm_ctx *op =3D crypto_skcipher_ctx(tfm);
+> +	struct meson_cipher_tfm_ctx *op =3D crypto_skcipher_ctx_dma(tfm);
+>  	struct meson_dev *mc =3D op->mc;
+>  	unsigned int ivsize =3D crypto_skcipher_ivsize(tfm);
+>  	unsigned int blockmode =3D algt->blockmode;
+>  	int i;
+> =20
+>  	if (ctx->tloffset)
+>  		return;
+> =20
+>  	if (blockmode =3D=3D DESC_OPMODE_CBC) {
+> -		memcpy(ctx->bkeyiv + AES_MAX_KEY_SIZE, ctx->areq->iv, ivsize);
+> +		memcpy(op->keyiv + AES_MAX_KEY_SIZE, ctx->areq->iv, ivsize);
+>  		dma_sync_single_for_device(mc->dev, ctx->keyiv.addr,
+>  					   ctx->keyiv.len, DMA_TO_DEVICE);
+>  	}
+
+[Severity: Medium]
+Does meson_setup_keyiv_descs() modify the DMA-mapped op->keyiv buffer
+without calling dma_sync_single_for_cpu() first, while also duplicating the
+initial IV copy and DMA sync already performed in meson_cipher()?
+
+In meson_cipher(), CBC requests copy areq->iv into op->keyiv and call
+dma_map_single(..., DMA_TO_DEVICE), transferring buffer ownership to the
+device before entering the loop with ctx.tloffset =3D=3D 0.  On the first l=
+oop
+iteration, meson_setup_keyiv_descs() immediately repeats that memcpy() and
+flushes the cache a second time via dma_sync_single_for_device(), and on
+every batch it writes to the mapped buffer from the CPU without a preceding
+dma_sync_single_for_cpu() call.
+
 [ ... ]
-> +static void meson_setup_keyiv_descs(struct cipher_ctx *ctx)
-> +{
-> +	struct meson_cipher_req_ctx *rctx =3D skcipher_request_ctx(ctx->areq);
-> +	struct crypto_skcipher *tfm =3D crypto_skcipher_reqtfm(ctx->areq);
-> +	struct skcipher_alg *alg =3D crypto_skcipher_alg(tfm);
-> +	struct meson_alg_template *algt =3D container_of(alg,
-> +		struct meson_alg_template, alg.skcipher.base);
-> +	struct meson_cipher_tfm_ctx *op =3D crypto_skcipher_ctx(tfm);
-> +	struct meson_dev *mc =3D op->mc;
-> +	unsigned int ivsize =3D crypto_skcipher_ivsize(tfm);
-> +	unsigned int blockmode =3D algt->blockmode;
-> +	int i;
-> +
-> +	if (ctx->tloffset)
-> +		return;
-> +
-> +	if (blockmode =3D=3D DESC_OPMODE_CBC) {
-> +		memcpy(ctx->bkeyiv + AES_MAX_KEY_SIZE, ctx->areq->iv, ivsize);
-> +		dma_sync_single_for_device(mc->dev, ctx->keyiv.addr,
-> +					   ctx->keyiv.len, DMA_TO_DEVICE);
+> @@ -320,21 +320,21 @@ static int meson_cipher(struct skcipher_request *ar=
+eq)
+>  	mc->chanlist[rctx->flow].stat_req++;
+>  #endif
+> =20
+> -	ctx.bkeyiv =3D kzalloc(48, GFP_KERNEL | GFP_DMA);
+> -	if (!ctx.bkeyiv)
+> -		return -ENOMEM;
+> -
+> -	memcpy(ctx.bkeyiv, op->key, op->keylen);
+>  	ctx.keyiv.len =3D op->keylen;
+>  	if (ctx.keyiv.len =3D=3D AES_KEYSIZE_192)
+>  		ctx.keyiv.len =3D AES_MAX_KEY_SIZE;
+> =20
+> -	ctx.keyiv.addr =3D dma_map_single(mc->dev, ctx.bkeyiv, ctx.keyiv.len,
+> +	if (algt->blockmode =3D=3D DESC_OPMODE_CBC) {
+> +		memcpy(op->keyiv + AES_MAX_KEY_SIZE, areq->iv, ivsize);
+> +		ctx.keyiv.len =3D AES_MAX_KEY_SIZE + ivsize;
 > +	}
 > +
-> +	for (i =3D 0; i < mc->pdata->setup_desc_cnt; i++) {
-> +		struct meson_desc *desc =3D
-> +			&mc->chanlist[rctx->flow].tl[ctx->tloffset];
-> +		int offset =3D i * 16;
+> +	ctx.keyiv.addr =3D dma_map_single(mc->dev, op->keyiv, ctx.keyiv.len,
+>  					DMA_TO_DEVICE);
+
+[Severity: Medium]
+Does setting ctx.keyiv.len to 48 in CBC mode cause meson_setup_keyiv_descs()
+to program key/IV DMA descriptors that read past the end of op->keyiv?
+
+meson_setup_keyiv_descs() loops mc->pdata->setup_desc_cnt (3) times at
+16-byte offsets (0, 16, 32) and sets each descriptor's length in t_status to
+ctx->keyiv.len:
+
+drivers/crypto/amlogic/amlogic-gxl-cipher.c:meson_setup_keyiv_descs() {
+	...
+	for (i =3D 0; i < mc->pdata->setup_desc_cnt; i++) {
+		struct meson_desc *desc =3D
+			&mc->chanlist[rctx->flow].tl[ctx->tloffset];
+		int offset =3D i * 16;
+
+		desc->t_src =3D cpu_to_le32(ctx->keyiv.addr + offset);
+		desc->t_dst =3D cpu_to_le32(offset);
+		desc->t_status =3D cpu_to_le32(DESC_OWN | DESC_MODE_KEY | ctx->keyiv.len);
+
+		ctx->tloffset++;
+	}
+}
+
+With ctx.keyiv.len increased to 48 for CBC (and 16 or 32 for ECB, where
+dma_map_single() only maps ctx.keyiv.len bytes), the descriptors at offsets
+16 and 32 instruct the DMA engine to read up to 32 bytes past the end of the
+48-byte op->keyiv buffer and its DMA mapping.
+
+[ ... ]
+> @@ -425,40 +422,37 @@ static int meson_skencrypt(struct skcipher_request =
+*areq)
+> =20
+>  static int meson_cipher_init(struct crypto_tfm *tfm)
+>  {
+[ ... ]
+> -	crypto_skcipher_set_reqsize(sktfm, sizeof(struct meson_cipher_req_ctx) +
+> +	crypto_skcipher_set_reqsize_dma(sktfm, sizeof(struct meson_cipher_req_c=
+tx) +
+>  				    crypto_skcipher_reqsize(op->fallback_tfm));
+> =20
+>  	return 0;
+>  }
+
+[Severity: Low]
+Is crypto_skcipher_set_reqsize_dma() needed here when struct
+meson_cipher_req_ctx holds no DMA buffers and all callers still access it
+via skcipher_request_ctx()?  Unless the per-request DMA buffer is moved into
+struct meson_cipher_req_ctx and accessed with skcipher_request_ctx_dma(),
+this adds unused DMA alignment padding to every request allocation.
+
+>  static void meson_cipher_exit(struct crypto_tfm *tfm)
+>  {
+> -	struct meson_cipher_tfm_ctx *op =3D crypto_tfm_ctx(tfm);
+> +	struct meson_cipher_tfm_ctx *op =3D crypto_tfm_ctx_dma(tfm);
+> =20
+> -	kfree_sensitive(op->key);
+>  	crypto_free_skcipher(op->fallback_tfm);
+>  }
+> =20
+>  static int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>  			    unsigned int keylen)
+>  {
+> -	struct meson_cipher_tfm_ctx *op =3D crypto_skcipher_ctx(tfm);
+> +	struct meson_cipher_tfm_ctx *op =3D crypto_skcipher_ctx_dma(tfm);
+>  	struct meson_dev *mc =3D op->mc;
+> =20
+>  	switch (keylen) {
+> @@ -477,11 +473,9 @@ static int meson_aes_setkey(struct crypto_skcipher *=
+tfm, const u8 *key,
+>  		dev_dbg(mc->dev, "ERROR: Invalid keylen %u\n", keylen);
+>  		return -EINVAL;
+>  	}
+> -	kfree_sensitive(op->key);
 > +
-> +		desc->t_src =3D cpu_to_le32(ctx->keyiv.addr + offset);
-> +		desc->t_dst =3D cpu_to_le32(offset);
-> +		desc->t_status =3D cpu_to_le32(DESC_OWN | DESC_MODE_KEY | ctx->keyiv.l=
-en);
-> +
-> +		ctx->tloffset++;
-> +	}
-> +}
+> +	memcpy(op->keyiv, key, keylen);
+>  	op->keylen =3D keylen;
+
+[Severity: Low]
+Can re-keying an existing transform with a shorter key leave stale key bytes
+in op->keyiv?
+
+Previously, meson_cipher() allocated a zeroed 48-byte buffer on each reques=
+t.
+Because op->keyiv is now only zeroed once in meson_cipher_init(), re-keying=
+ a
+transform from AES-256 to AES-192 or AES-128 leaves the old key's trailing
+bytes in op->keyiv[keylen..AES_MAX_KEY_SIZE - 1], which are then DMA-mapped
+and sent to the hardware when ctx.keyiv.len is padded to AES_MAX_KEY_SIZE.
+
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl.h b/drivers/crypto/amlogi=
+c/amlogic-gxl.h
+> index 6797b44905d3e..c401cbbadaa34 100644
+> --- a/drivers/crypto/amlogic/amlogic-gxl.h
+> +++ b/drivers/crypto/amlogic/amlogic-gxl.h
+> @@ -125,14 +125,14 @@ struct meson_cipher_req_ctx {
+> =20
+>  /*
+>   * struct meson_cipher_tfm_ctx - context for a skcipher TFM
+> - * @key:		pointer to key data
+> + * @keyiv:		key data
+>   * @keylen:		len of the key
+>   * @keymode:		The keymode(type and size of key) associated with this TFM
+>   * @mc:			pointer to the private data of driver handling this TFM
+>   * @fallback_tfm:	pointer to the fallback TFM
+>   */
+>  struct meson_cipher_tfm_ctx {
+> -	u32 *key;
+> +	u8 keyiv[AES_MAX_KEY_SIZE + AES_BLOCK_SIZE];
+>  	u32 keylen;
+>  	u32 keymode;
+>  	struct meson_dev *mc;
 
 [Severity: High]
-Does meson_setup_keyiv_descs() leave the CBC IV unmapped and program an
-out-of-bounds DMA length on each key/IV descriptor?
+Can moving the mutable key/IV DMA buffer into struct meson_cipher_tfm_ctx
+cause a data race and CBC data corruption when two requests share a transfo=
+rm?
 
-In meson_cipher(), ctx.keyiv.len is set to 16 (AES-128) or 32
-(AES-192/256) and passed to dma_map_single(), so bytes 32..47 of the
-48-byte ctx->bkeyiv buffer where the CBC IV is copied are never mapped or
-flushed by dma_sync_single_for_device().  In addition, each of the
-setup_desc_cnt descriptors at offset =3D i * 16 sets its transfer length to
-ctx->keyiv.len instead of 16, causing hardware DMA to read past the DMA
-mapping and past the end of ctx->bkeyiv.
+A single struct crypto_skcipher transform is shared across concurrent
+requests, and meson_skencrypt() / meson_skdecrypt() dispatch requests
+round-robin across mc->flow_cnt (2) crypto_engine worker threads via
+meson_get_engine_number():
 
-A later patch in this series, commit "crypto: amlogic - Avoid kzalloc in
-engine thread", sets ctx.keyiv.len to AES_MAX_KEY_SIZE + ivsize (48) for
-CBC, but meson_setup_keyiv_descs() still encodes ctx->keyiv.len instead of
-16 in each descriptor.
+flow 0 kworker                    flow 1 kworker
+meson_cipher(req1)
+  memcpy(op->keyiv + 32,
+         req1->iv, 16)
+  dma_map_single(..., op->keyiv,
+                 ...)
+                                  meson_cipher(req2)
+                                    memcpy(op->keyiv + 32,
+                                           req2->iv, 16)  <-- overwrites IV
+                                    dma_map_single(..., op->keyiv, ...)
+  meson_kick_hardware()
+    meson_dma_start()             <-- DMA reads req2's IV for req1
+  dma_unmap_single(...)           <-- unmaps while flow 1 DMA is active
 
-> +
-> +static bool meson_setup_data_descs(struct cipher_ctx *ctx)
-> +{
-[ ... ]
-> +	todo =3D min(ctx->cryptlen, maxlen);
-> +	todo =3D min(todo, ctx->cryptlen);
-> +	todo =3D min(todo, sg_dma_len(ctx->src_sg) - ctx->src_offset);
-> +	todo =3D min(todo, sg_dma_len(ctx->dst_sg) - ctx->dst_offset);
-> +
-> +	desc->t_src =3D cpu_to_le32(sg_dma_address(ctx->src_sg) + ctx->src_offs=
-et);
-> +	desc->t_dst =3D cpu_to_le32(sg_dma_address(ctx->dst_sg) + ctx->dst_offs=
-et);
-> +
-> +	ctx->cryptlen -=3D todo;
-> +	ctx->src_offset +=3D todo;
-> +	ctx->dst_offset +=3D todo;
-[ ... ]
-> +}
-> +
-> +static int meson_kick_hardware(struct cipher_ctx *ctx)
-> +{
-> +	struct meson_cipher_req_ctx *rctx =3D skcipher_request_ctx(ctx->areq);
-> +	struct crypto_skcipher *tfm =3D crypto_skcipher_reqtfm(ctx->areq);
-> +	struct meson_cipher_tfm_ctx *op =3D crypto_skcipher_ctx(tfm);
-> +	struct skcipher_alg *alg =3D crypto_skcipher_alg(tfm);
-> +	struct meson_alg_template *algt =3D container_of(alg,
-> +						       struct meson_alg_template,
-> +						       alg.skcipher.base);
-> +	struct meson_dev *mc =3D op->mc;
-> +	unsigned int ivsize =3D crypto_skcipher_ivsize(tfm);
-> +	unsigned int blockmode =3D algt->blockmode;
-> +	enum dma_data_direction new_iv_dir;
-> +	struct scatterlist *sg_head;
-> +	void *new_iv;
-> +	int err;
-> +
-> +	if (blockmode =3D=3D DESC_OPMODE_CBC) {
-> +		struct scatterlist *sg_current;
-> +		unsigned int offset;
-> +
-> +		if (rctx->op_dir =3D=3D MESON_ENCRYPT) {
-> +			sg_current =3D ctx->dst_sg;
-> +			sg_head =3D ctx->areq->dst;
-> +			offset =3D ctx->dst_offset;
-> +			new_iv_dir =3D DMA_FROM_DEVICE;
-> +		} else {
-> +			sg_current =3D ctx->src_sg;
-> +			sg_head =3D ctx->areq->src;
-> +			offset =3D ctx->src_offset;
-> +			new_iv_dir =3D DMA_TO_DEVICE;
-> +		}
-> +
-> +		if (ctx->areq->src =3D=3D ctx->areq->dst)
-> +			new_iv_dir =3D DMA_BIDIRECTIONAL;
-> +
-> +		offset -=3D ivsize;
-> +		new_iv =3D sg_virt(sg_current) + offset;
-> +	}
-> +
-> +	if (blockmode =3D=3D DESC_OPMODE_CBC &&
-> +	    rctx->op_dir =3D=3D MESON_DECRYPT) {
-> +		dma_sync_sg_for_cpu(mc->dev, sg_head,
-> +				    sg_nents(sg_head), new_iv_dir);
-> +		memcpy(ctx->areq->iv, new_iv, ivsize);
-> +	}
-> +
-> +	reinit_completion(&mc->chanlist[rctx->flow].complete);
-> +	meson_dma_start(mc, rctx->flow);
-> +	err =3D wait_for_completion_interruptible_timeout(&mc->chanlist[rctx->f=
-low].complete,
-> +							msecs_to_jiffies(500));
-> +	if (err =3D=3D 0) {
-> +		dev_err(mc->dev, "DMA timeout for flow %d\n", rctx->flow);
-> +		return -EINVAL;
-> +	} else if (err < 0) {
-> +		dev_err(mc->dev, "Waiting for DMA completion is failed (%d)\n", err);
-> +		return err;
-> +	}
-> +
-> +	if (blockmode =3D=3D DESC_OPMODE_CBC &&
-> +	    rctx->op_dir =3D=3D MESON_ENCRYPT) {
-> +		dma_sync_sg_for_cpu(mc->dev, sg_head,
-> +				    sg_nents(sg_head), new_iv_dir);
-> +		memcpy(ctx->areq->iv, new_iv, ivsize);
-> +	}
-> +
-> +	ctx->tloffset =3D 0;
-> +
-> +	return 0;
-> +}
-
-[Severity: High]
-Can sg_virt(sg_current) + offset read out of bounds when dma_map_sg()
-coalesces scatterlist entries?
-
-ctx->src_offset and ctx->dst_offset track offsets within the coalesced DMA
-segment of length sg_dma_len(sg_current), whereas sg_virt(sg_current) only
-maps the single uncoalesced page buffer of length sg_current->length.
-When dma_map_sg() merges contiguous entries, offset can exceed
-sg_current->length (or index the wrong entry), reading past the end of
-sg_current's virtual buffer.
-
-Also, meson_kick_hardware() calls dma_sync_sg_for_cpu() over the entire
-scatterlist on every batch without calling dma_sync_sg_for_device() to
-hand ownership back to the device before meson_dma_start() runs (including
-on in-place CBC decrypt and multi-batch CBC encrypt), and walks
-sg_nents(sg_head) on every batch.
+In addition, op->keyiv is not padded to a cacheline boundary inside struct
+meson_cipher_tfm_ctx, so it shares a cacheline with keylen, keymode, mc, and
+fallback_tfm during streaming DMA mappings.  Should the per-request key/IV
+DMA buffer live in struct meson_cipher_req_ctx (accessed via
+skcipher_request_ctx_dma()) instead of the shared transform context?
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261126193241.1471=
-372-1-jnieto.alaber@gmail.com?part=3D11
+372-1-jnieto.alaber@gmail.com?part=3D12
