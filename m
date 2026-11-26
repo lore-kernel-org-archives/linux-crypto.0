@@ -1,79 +1,70 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795660722;
-	b=EBW67E2l7jlz0YyjEkxhdKTLq7XP6Ulxtg6ixI5M8R3m0dpCGfHrHQFtWmtOxX26O3Hw
-	 1u5qrsMCxEGnLo1I012VqSH+YfYykylm8p7Qcn1qpx/K5KBd2dRWZFMU4wtb/Dzxvl6Mf
-	 D89H5EXAr8VV+RNJKW/KybG3vjLD0FU5YX42CfM20DgeBCPsNcZoO+RMPbwlCe9Mxwu5k
-	 il0nFRNFyqN6Qtj+Li6VZg/caGK2W954zQDPa9tsNq1ojy1F3dBPJHeozc6YkriiDU6om
-	 p+tC0WJKElOJUIIPnmYOh8EsGn2eOWVv2n4mS6xRWJKEuhnYJFu2HnGAZoVRI8Y7LkA==
+	t=1795671687;
+	b=pQ3TQSFdR0xV0I7uAfjZ9ZLYXjIrbUlczAMN/jcFAAXDMFXrJMlODGqZ+5QjvwXzR48R
+	 za/bee1uUK7spNHNPZb7x9waRjgNcJoModTxBeQM/WTnAvAuWR3ix0ybD0SfKsFmxhEBq
+	 9ZqGweRlCYGaxixQlqf4vu97m5GaGG/48UOUt6F4kq2EiwMNCv1+oxjwyE0dXPXEb/76X
+	 CKFKGGYXrcFIbkhZATRH92HTkJstxt/wRXyojlJQK8y7sbux68es0MpBtNoksgEfpk/XS
+	 RfyEL+eikfTGLfXIeIsFJRQADnaK3eL/lN6z4i3ef5ndQcv5VE2m2s1wttnAhR3Mlag==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795660722;
-	h=Received:DKIM-Signature:To:Cc:Subject:From:In-Reply-To:Message-ID:
-	 References:Date:MIME-Version:Content-Type;
-	bh=FrsA9VM2RRDYw3dIWHPlcPU2Tzr0ACPscINTsZ3wYKU=;
-	b=WWMIasQGqN79o41MA1tXSiyHnwKxIHRBBEJn4KeH6a/X6eZVTFauFEQKdCwFrw1+2ZDr
-	 YSEf+Tf87qJs44tTna9Fpy8dAqpYmUuEFx8bWK7+4/JroIrJ3swNkrXDN+8zffwmiewNe
-	 UIPkCtAacP2ctc15Jld8SN0DPdo2Q51RLBzJDIkniaGV+DBGokBnL662U4GSZFelRah1E
-	 s0XO1Ufq65pN4bIwgYSAUY7Ockt3WqXVo/414cLtd9mfFMflIWrxHm5EDrWh57hmOA3TE
-	 04ghyoFogXcsjJhhCwWzvAuVJvj2Cz0jQZwHout0TeNA0Z0jFjUwyVwnbHHeEECSAvg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795671687;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=lB5Z2jAXM1MCahZXaWDYMLFa+FaZwYx21kct5EFKyxs=;
+	b=UjIM+1dNa0hw8eFQNU4w4EimRbgFlwV03SeM3GxCvWtGv3RFEMgrGoYN8RR4w/67UrT/
+	 /Vg63goTyBc1SPfwt/GsBGxXqIyYd4b1gxS8uPTEiGq55jzjOmvDFauU3nMiorEAbrQbK
+	 /CQ0okw4TjrGJ+Df2FZqxwIsR4LpkSsiIbHCiIH0FZ3M3EfYNv0g6A8BUw1F06tfKs1zw
+	 pwE3CG2ALOQtyROhvq2ZL58IiHCBr4glhOcnn+jVFZfijwkmQmaWgd8WiYwpjZXLVqQLn
+	 kmQnTo7dcAfFFIeh61oahhDj8KyBOfwiFl34zDgHtxUeOFuZ769CmCqpq2+jkP+DmdA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bQ0PGikm;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=IG6kP8Z7;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5E2606A31E;
-	Thu, 26 Nov 2026 02:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A137D606A323;
+	Thu, 26 Nov 2026 05:41:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A137D606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bQ0PGikm
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69E091F000C4;
-	Thu, 26 Nov 2026 02:38:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795660721;
-	bh=FrsA9VM2RRDYw3dIWHPlcPU2Tzr0ACPscINTsZ3wYKU=;
-	h=To:Cc:Subject:From:In-Reply-To:References:Date;
-	b=bQ0PGikmMVpCXzr2+ogQGCzmWiJsDojV8YuLw94SOoEP+6af4SDkg1Hz05ayFBKaU
-	 T2Kkn6ace5P/sBOVer3k6SEGH0Ev/B4bIxNUbkMzLaVWTX2m84EjwxigZ9zr7C5ta3
-	 Io/6ySL6xk7/Wb0+RLCQabC0jimBgxFCnQtIxULviz7f7YZ0WX+nGUMUl+NqjmIh09
-	 S4gN31qaEurmnHa5pYbcSItay35YwpXukelvdSK/KB8u3jxbJ51CUjMQpidqSu7hwC
-	 vP12nZVTa+DWYWW3MwC5TGg10y40os0eK+YRpCmXvbizboj6O+CuHCfcEKzmPUCQZF
-	 gIUMuxcOfUvVg==
-To: Stanislav Aleksandrov <lightofmysoul@gmail.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,  Konrad Dybcio
- <konradybcio@kernel.org>,  Abel Vesa <abelvesa@kernel.org>,  Rob Herring
- <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>,  Robert Marko <robimarko@gmail.com>,  Guru
- Das Srinagesh <linux@gurudas.dev>,  Thomas Gleixner <tglx@kernel.org>,
-  Radu Rendec <radu@rendec.net>,  Will Deacon <will@kernel.org>,  Robin
- Murphy <robin.murphy@arm.com>,  "Joerg Roedel (AMD)" <joro@8bytes.org>,
-  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,  Wesley Cheng
- <wesley.cheng@oss.qualcomm.com>,  Vinod Koul <vkoul@kernel.org>,  Neil
- Armstrong <neil.armstrong@linaro.org>,  Manivannan Sadhasivam
- <mani@kernel.org>,  Alim Akhtar <alim.akhtar@samsung.com>,  Bart Van
- Assche <bvanassche@acm.org>,  Bean Huo <beanhuo@micron.com>,  Stanley Jhu
- <stanleyjhu@google.com>,  Herbert Xu <herbert@gondor.apana.org.au>,
-  "David S. Miller" <davem@davemloft.net>,  "Rafael J. Wysocki"
- <rafael@kernel.org>,  Viresh Kumar <viresh.kumar@linaro.org>,  Amit
- Kucheria <amitk@kernel.org>,  Thara Gopinath <thara.gopinath@gmail.com>,
-  Daniel Lezcano <daniel.lezcano@kernel.org>,  Zhang Rui
- <rui.zhang@intel.com>,  Lukasz Luba <lukasz.luba@arm.com>,  Georgi Djakov
- <djakov@kernel.org>,  Sibi Sankar <sibi.sankar@oss.qualcomm.com>,  Ulf
- Hansson <ulfh@kernel.org>,  linux-arm-msm@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-arm-kernel@lists.infradead.org,  iommu@lists.linux.dev,
-  linux-usb@vger.kernel.org,  linux-phy@lists.infradead.org,
-  linux-scsi@vger.kernel.org,  linux-crypto@vger.kernel.org,
-  linux-pm@vger.kernel.org,  Krzysztof Kozlowski
- <krzysztof.kozlowski@oss.qualcomm.com>
-Subject: Re: [PATCH v3 07/14] dt-bindings: ufs: qcom,sc7180-ufshc: Add
- Halliday UFS
-From: "Martin K. Petersen" <mkp@kernel.org>
-In-Reply-To: <20261125-halliday-dts-v3-7-5c8311c0b70b@gmail.com>
-Message-ID: <yq1tsl4jp07.fsf@mail.kernel.org>
-References: <20261125-halliday-dts-v3-0-5c8311c0b70b@gmail.com>
-	<20261125-halliday-dts-v3-7-5c8311c0b70b@gmail.com>
-Date: Wed, 25 Nov 2026 21:38:40 -0500
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=IG6kP8Z7
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=lB5Z2jAXM1MCahZXaWDYMLFa+FaZwYx21kct5EFKyxs=; 
+	b=IG6kP8Z78B1+GAs3HdVj0OF7xN4BFXwTmMwOoZcez01WeFEZrA/tC5S6hHti9gLbezGKIBVG3rh
+	cjAjMgwZ6UQi+6LcVu54fAAj5TOVTlN0TaeHvc3HaSFPFCSEHcU8DxsBne9pH6bVJBnVpLi5Q7EG7
+	XosjJVl6tpkFHAR3DWL6yMSzrWQYZlf6Wa9YWeeoJluJNuck52OmcXzm/gee0+69R8qo5C2n2YlRE
+	WyHtFm5yaTaEl+EMM1LI98g6wpdjLWBLcWQiUQkOOpIyVvh6qREeXna87cgGs+O3b4saRMJoso9cB
+	somkNjo75RQeIyP7bTDkZY85jL2HTOh07+7Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xWSEQ-000000029BE-1eI1;
+	Thu, 26 Nov 2026 13:41:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Nov 2026 13:41:18 +0800
+Date: Thu, 26 Nov 2026 13:41:18 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
+Cc: sashiko-reviews@lists.linux.dev, hannes@cmpxchg.org, yosry@kernel.org,
+	nphamcs@gmail.com, chengming.zhou@linux.dev,
+	akpm@linux-foundation.org, linux-mm@kvack.org, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, rientjes@google.com,
+	willy@infradead.org, senozhatsky@chromium.org
+Subject: Re: [PATCH v3 3/8] crypto: acomp - Add trivial segmentation wrapper.
+Message-ID: <awfGfqMK8FfrMNvz@gondor.apana.org.au>
+References: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
+ <20261106072412.7909-4-kanchanapsridhar2026@gmail.com>
+ <sashiko-outbox-202709@kernel.org>
+ <CACpmpodxjJ3ZQt4xOsWfWQNjgMtPzKx0oGMy+mJTU1wxVWdMUw@mail.gmail.com>
+ <awQCFZSSng2LLGnX@gondor.apana.org.au>
+ <CACpmpocCqenTNv62dGoeSLP2zs-AXJYhXM-tj2cytm4zQTj1cA@mail.gmail.com>
+ <awafBxDtUoIQW9iR@gondor.apana.org.au>
+ <CACpmpocWW7pWGYiF==DupmZDB0-jETu32C3-9NYY8nssKcDm-g@mail.gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -83,14 +74,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACpmpocWW7pWGYiF==DupmZDB0-jETu32C3-9NYY8nssKcDm-g@mail.gmail.com>
 
+On Wed, Nov 25, 2026 at 11:08:20AM -0800, Kanchana P. Sridhar wrote:
+>
+> -       if (unlikely(req->unit_size && req->slen > req->unit_size))
+> +       if (unlikely(req->unit_size && acomp_request_dst_isvirt(req)))
+> +               return -EINVAL;
 
-Stanislav,
+This looks good.
 
-> Document the UFS host controller on the Qualcomm Halliday SoC.
+> +       if (unlikely(req->unit_size &&
+> +                       ((comp && req->slen > req->unit_size) ||
+> +                        (!comp && req->dlen > req->unit_size))))
 
-Applied to 7.5/scsi-staging, thanks!
+For decompression, shouldn't it just fail unconditionally since
+we do not support batching for it?
 
+Also how about moving these API guards into the top-level compression
+and decompression functions instead of in the shared path.
+
+Thanks,
 -- 
-Martin K. Petersen
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
