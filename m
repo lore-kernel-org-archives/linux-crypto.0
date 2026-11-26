@@ -1,60 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.123
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795650211;
-	b=guc3bWreY8bk8fHbGs1Kq6GW8Nb9Cueb6Iohjw9xgRpmVllYo1ymPJm2aVd3F1FuyCZd
-	 L+E3iE/GwlEku0KSuno2q1nnL9DHN1gFfpATYfkOewr5mQeINrm/8gbDeqsy3OSB/Ctmf
-	 POoq2ObBW+2Rw7Zbm0Otpa5zjQqao4QVUzlf8kHyi/pEga9jK2AjNMKx0OIDghNoIGxL9
-	 9M6oRaiugOUrEqDa07X6Xu69jc7HfMa24fJDKvgg949Ka3uZdMTBpVLlM1QEJ3EJftNVB
-	 hngY2BukGBwfp1Yq1J3zjFyAfie3Ax29+sN+N3rbvHxeJrgSixoWZAll3uoIgDQAcgA==
+	t=1795660722;
+	b=EBW67E2l7jlz0YyjEkxhdKTLq7XP6Ulxtg6ixI5M8R3m0dpCGfHrHQFtWmtOxX26O3Hw
+	 1u5qrsMCxEGnLo1I012VqSH+YfYykylm8p7Qcn1qpx/K5KBd2dRWZFMU4wtb/Dzxvl6Mf
+	 D89H5EXAr8VV+RNJKW/KybG3vjLD0FU5YX42CfM20DgeBCPsNcZoO+RMPbwlCe9Mxwu5k
+	 il0nFRNFyqN6Qtj+Li6VZg/caGK2W954zQDPa9tsNq1ojy1F3dBPJHeozc6YkriiDU6om
+	 p+tC0WJKElOJUIIPnmYOh8EsGn2eOWVv2n4mS6xRWJKEuhnYJFu2HnGAZoVRI8Y7LkA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795650211;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=oKSnt8gA2Fy+R/UYvUgzl3Tn/GEe05bs1oSii6h9IUM=;
-	b=DtkRyFDXH1S/nX2D+ETI/w1CgV1p04mwDNRv6XDXKiY/wP1nY7D1nElBw2y1wOMhHOG5
-	 hz+kbZckQX/t67jMzfr6osPXI+fzv5mMqq89aru1CLQ7mZXkopSy31O+xK9AWWwz2mI9I
-	 K23p1Iyrw6a1kcOp6SZCAkRZ3huxTZ0y4ApyIsci4IWFwYmk+cbJP2XYsnvu26zrZj7av
-	 VGj+9G9HmIjVBbTEY0FJi9WeetTfRZcveZOjhro30jcmTxUziexw7PehVbduCNH64+d7z
-	 YNODzUGH8yZWj3pcX/rl+sG07qqlCsoVQlHmbTCKIpUelytwa8vzUy9sR5hSQNQh2pQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795660722;
+	h=Received:DKIM-Signature:To:Cc:Subject:From:In-Reply-To:Message-ID:
+	 References:Date:MIME-Version:Content-Type;
+	bh=FrsA9VM2RRDYw3dIWHPlcPU2Tzr0ACPscINTsZ3wYKU=;
+	b=WWMIasQGqN79o41MA1tXSiyHnwKxIHRBBEJn4KeH6a/X6eZVTFauFEQKdCwFrw1+2ZDr
+	 YSEf+Tf87qJs44tTna9Fpy8dAqpYmUuEFx8bWK7+4/JroIrJ3swNkrXDN+8zffwmiewNe
+	 UIPkCtAacP2ctc15Jld8SN0DPdo2Q51RLBzJDIkniaGV+DBGokBnL662U4GSZFelRah1E
+	 s0XO1Ufq65pN4bIwgYSAUY7Ockt3WqXVo/414cLtd9mfFMflIWrxHm5EDrWh57hmOA3TE
+	 04ghyoFogXcsjJhhCwWzvAuVJvj2Cz0jQZwHout0TeNA0Z0jFjUwyVwnbHHeEECSAvg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=protonmail.com;
-	spf=pass smtp.mailfrom=protonmail.com;
-	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=IvllxDAl;
-	arc=none smtp.remote-ip=109.224.244.123
-Received: from mail-244123.protonmail.ch (mail-244123.protonmail.ch [109.224.244.123])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bQ0PGikm;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61628606A321
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Nov 2026 23:43:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 61628606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5E2606A31E;
+	Thu, 26 Nov 2026 02:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=IvllxDAl
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1795650209; x=1795909409;
-	bh=oKSnt8gA2Fy+R/UYvUgzl3Tn/GEe05bs1oSii6h9IUM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=IvllxDAlLoCqOpxVVj2YInn/EAQH+B2+Ze1U4B8jpnrovnETxgFcKK7LQc+Juyl5e
-	 18jT4kesNk76YyoznORIQM2iIBMfejlg5fmQTExSHQa9Kx+YIxgiPUjNED9WHLSaqn
-	 hsnE28mmCpnyTjrK86mZmRmI7Ut1DOMInYW9rBecfXQj0cuI5t/VpxPqHbqZ0oDeF9
-	 lsqb5wEJkcVl8BNQTEo05SKSfXVdk42BmJ18tOGTDOqzd7+l5T9UQHR4K0RoGqQ13C
-	 TJPvATvmPo57EKdzVzBqmSeRWxZTmUddcU4Is1IAZozPRs/5EZyLjdBOb5p+rueYi6
-	 IYvziNGbS+eIQ==
-Date: Wed, 25 Nov 2026 23:43:23 +0000
-To: Zhiqi Song <songzhiqi1@huawei.com>, Longfang Liu <liulongfang@huawei.com>
-From: Ryan Prinz <rc4d5a@protonmail.com>
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] crypto: hisilicon/hpre - fix missing DH/ECDH public key validation
-Message-ID: <20261125234311.1860032-1-rc4d5a@protonmail.com>
-In-Reply-To: <20261125231929.1857637-1-rc4d5a@protonmail.com>
-References: <20261125231929.1857637-1-rc4d5a@protonmail.com>
-Feedback-ID: 190731814:user:proton
-X-Pm-Message-ID: a7b2ec0eb878d7b75eb8e3b555084c0faea4f59e
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bQ0PGikm
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69E091F000C4;
+	Thu, 26 Nov 2026 02:38:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795660721;
+	bh=FrsA9VM2RRDYw3dIWHPlcPU2Tzr0ACPscINTsZ3wYKU=;
+	h=To:Cc:Subject:From:In-Reply-To:References:Date;
+	b=bQ0PGikmMVpCXzr2+ogQGCzmWiJsDojV8YuLw94SOoEP+6af4SDkg1Hz05ayFBKaU
+	 T2Kkn6ace5P/sBOVer3k6SEGH0Ev/B4bIxNUbkMzLaVWTX2m84EjwxigZ9zr7C5ta3
+	 Io/6ySL6xk7/Wb0+RLCQabC0jimBgxFCnQtIxULviz7f7YZ0WX+nGUMUl+NqjmIh09
+	 S4gN31qaEurmnHa5pYbcSItay35YwpXukelvdSK/KB8u3jxbJ51CUjMQpidqSu7hwC
+	 vP12nZVTa+DWYWW3MwC5TGg10y40os0eK+YRpCmXvbizboj6O+CuHCfcEKzmPUCQZF
+	 gIUMuxcOfUvVg==
+To: Stanislav Aleksandrov <lightofmysoul@gmail.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,  Konrad Dybcio
+ <konradybcio@kernel.org>,  Abel Vesa <abelvesa@kernel.org>,  Rob Herring
+ <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>,  Robert Marko <robimarko@gmail.com>,  Guru
+ Das Srinagesh <linux@gurudas.dev>,  Thomas Gleixner <tglx@kernel.org>,
+  Radu Rendec <radu@rendec.net>,  Will Deacon <will@kernel.org>,  Robin
+ Murphy <robin.murphy@arm.com>,  "Joerg Roedel (AMD)" <joro@8bytes.org>,
+  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,  Wesley Cheng
+ <wesley.cheng@oss.qualcomm.com>,  Vinod Koul <vkoul@kernel.org>,  Neil
+ Armstrong <neil.armstrong@linaro.org>,  Manivannan Sadhasivam
+ <mani@kernel.org>,  Alim Akhtar <alim.akhtar@samsung.com>,  Bart Van
+ Assche <bvanassche@acm.org>,  Bean Huo <beanhuo@micron.com>,  Stanley Jhu
+ <stanleyjhu@google.com>,  Herbert Xu <herbert@gondor.apana.org.au>,
+  "David S. Miller" <davem@davemloft.net>,  "Rafael J. Wysocki"
+ <rafael@kernel.org>,  Viresh Kumar <viresh.kumar@linaro.org>,  Amit
+ Kucheria <amitk@kernel.org>,  Thara Gopinath <thara.gopinath@gmail.com>,
+  Daniel Lezcano <daniel.lezcano@kernel.org>,  Zhang Rui
+ <rui.zhang@intel.com>,  Lukasz Luba <lukasz.luba@arm.com>,  Georgi Djakov
+ <djakov@kernel.org>,  Sibi Sankar <sibi.sankar@oss.qualcomm.com>,  Ulf
+ Hansson <ulfh@kernel.org>,  linux-arm-msm@vger.kernel.org,
+  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-arm-kernel@lists.infradead.org,  iommu@lists.linux.dev,
+  linux-usb@vger.kernel.org,  linux-phy@lists.infradead.org,
+  linux-scsi@vger.kernel.org,  linux-crypto@vger.kernel.org,
+  linux-pm@vger.kernel.org,  Krzysztof Kozlowski
+ <krzysztof.kozlowski@oss.qualcomm.com>
+Subject: Re: [PATCH v3 07/14] dt-bindings: ufs: qcom,sc7180-ufshc: Add
+ Halliday UFS
+From: "Martin K. Petersen" <mkp@kernel.org>
+In-Reply-To: <20261125-halliday-dts-v3-7-5c8311c0b70b@gmail.com>
+Message-ID: <yq1tsl4jp07.fsf@mail.kernel.org>
+References: <20261125-halliday-dts-v3-0-5c8311c0b70b@gmail.com>
+	<20261125-halliday-dts-v3-7-5c8311c0b70b@gmail.com>
+Date: Wed, 25 Nov 2026 21:38:40 -0500
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,21 +83,14 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-Confirmed -- this is expected, and the fix isn't a code change.
 
-This patch depends on a separately-sent patch, "crypto: dh - add
-shared DH public key range check" (Message-ID
-<20261125231825.1857253-1-rc4d5a@protonmail.com>), which adds
-crypto_dh_pubkey_in_range() to crypto/dh_helper.c and declares it in
-dh.h. That patch needs to be applied first; this one was never meant
-to build on its own without it, which is exactly the build failure
-reported above.
+Stanislav,
 
-Apologies for not making that dependency something the build tooling
-could see -- the commit message notes it in prose, but that doesn't
-help an automated check applying this patch in isolation. I'll send
-any future multi-patch dependency as a linked series instead.
+> Document the UFS host controller on the Qualcomm Halliday SoC.
 
+Applied to 7.5/scsi-staging, thanks!
+
+-- 
+Martin K. Petersen
