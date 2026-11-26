@@ -1,70 +1,70 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.126.103.232
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795671687;
-	b=pQ3TQSFdR0xV0I7uAfjZ9ZLYXjIrbUlczAMN/jcFAAXDMFXrJMlODGqZ+5QjvwXzR48R
-	 za/bee1uUK7spNHNPZb7x9waRjgNcJoModTxBeQM/WTnAvAuWR3ix0ybD0SfKsFmxhEBq
-	 9ZqGweRlCYGaxixQlqf4vu97m5GaGG/48UOUt6F4kq2EiwMNCv1+oxjwyE0dXPXEb/76X
-	 CKFKGGYXrcFIbkhZATRH92HTkJstxt/wRXyojlJQK8y7sbux68es0MpBtNoksgEfpk/XS
-	 RfyEL+eikfTGLfXIeIsFJRQADnaK3eL/lN6z4i3ef5ndQcv5VE2m2s1wttnAhR3Mlag==
+	t=1795672361;
+	b=RhHlyZ465eKUyFUwlhM2e8VcsuUbop3Ywo5G3GjpJaaaDxx6Y7wIuMFgDpB5wY+7SShW
+	 TesKNspEZHVS9p4iRHJXi9KroTWrpDrRv6QmA0z6TL67y1gI/aCO8BaU85/l+LD3W5tVj
+	 huBaSOBEdEWqjmDRW6DFtVXuTdfWAGp8lps5869DNQ2bWlqtRrN9MoJDARBgYG2PHyHla
+	 pkx6v2PTDOnj6Iwpzd4Eov3j8cuFywGhN/bnTJ2gYoTFQc6NY2J4Ilt9OrFpXe/Kec1Bq
+	 tBTHR8Q1F0kB1hyiOZRsOHsBkldF5hY0HdTdjb9s69Si7FPFsbZLA2+j1wuwwzg02FQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795671687;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=lB5Z2jAXM1MCahZXaWDYMLFa+FaZwYx21kct5EFKyxs=;
-	b=UjIM+1dNa0hw8eFQNU4w4EimRbgFlwV03SeM3GxCvWtGv3RFEMgrGoYN8RR4w/67UrT/
-	 /Vg63goTyBc1SPfwt/GsBGxXqIyYd4b1gxS8uPTEiGq55jzjOmvDFauU3nMiorEAbrQbK
-	 /CQ0okw4TjrGJ+Df2FZqxwIsR4LpkSsiIbHCiIH0FZ3M3EfYNv0g6A8BUw1F06tfKs1zw
-	 pwE3CG2ALOQtyROhvq2ZL58IiHCBr4glhOcnn+jVFZfijwkmQmaWgd8WiYwpjZXLVqQLn
-	 kmQnTo7dcAfFFIeh61oahhDj8KyBOfwiFl34zDgHtxUeOFuZ769CmCqpq2+jkP+DmdA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795672361;
+	h=DMARC-Filter:X-UUID:X-CID-P-RULE:X-CID-O-INFO:X-CID-INFO:X-CID-META:
+	 X-CID-BVR:X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:X-User:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=CFaZma3mmwOAj/ONk5ovm1SzEDO2bKB9PlgCIBdiEXw=;
+	b=2bibH4Re1cPzXrTCxWxOdtzsCQW0BV6m4rUNy8N1HhUsf/nAywyrJfslk8kouwya6NY+
+	 VeqYO90sCtHzzmr5wI3z6B4VLsFn1sDxWz7ybm49aO535zDG5YxQErQll1UiuCuBdi5jg
+	 whgZ3fYBh/85L10/oNqMA1r/c7rVWkRHLtxcdeeCyUz4BVlMB7Kw/2GPI6tUOzhiH0e9Y
+	 dp2srU8t8RB/pSb5VnMVtiLA792DBVi1vCPNyvD1LbhrolM8u8Z16+1jb/HVN/++A50X5
+	 1FJmCtQdEhBQ4x30GlyvHY8EYtH3maNWexI5qPLGzw7p4xXFGDiEsuwEhzhvd3pATgg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gondor.apana.org.au;
-	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=IG6kP8Z7;
-	arc=none smtp.remote-ip=180.181.231.80
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	dmarc=none header.from=kylinos.cn;
+	spf=pass smtp.mailfrom=kylinos.cn;
+	arc=none smtp.remote-ip=124.126.103.232
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A137D606A323;
-	Thu, 26 Nov 2026 05:41:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A137D606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=IG6kP8Z7
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=lB5Z2jAXM1MCahZXaWDYMLFa+FaZwYx21kct5EFKyxs=; 
-	b=IG6kP8Z78B1+GAs3HdVj0OF7xN4BFXwTmMwOoZcez01WeFEZrA/tC5S6hHti9gLbezGKIBVG3rh
-	cjAjMgwZ6UQi+6LcVu54fAAj5TOVTlN0TaeHvc3HaSFPFCSEHcU8DxsBne9pH6bVJBnVpLi5Q7EG7
-	XosjJVl6tpkFHAR3DWL6yMSzrWQYZlf6Wa9YWeeoJluJNuck52OmcXzm/gee0+69R8qo5C2n2YlRE
-	WyHtFm5yaTaEl+EMM1LI98g6wpdjLWBLcWQiUQkOOpIyVvh6qREeXna87cgGs+O3b4saRMJoso9cB
-	somkNjo75RQeIyP7bTDkZY85jL2HTOh07+7Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xWSEQ-000000029BE-1eI1;
-	Thu, 26 Nov 2026 13:41:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Nov 2026 13:41:18 +0800
-Date: Thu, 26 Nov 2026 13:41:18 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Kanchana P. Sridhar" <kanchanapsridhar2026@gmail.com>
-Cc: sashiko-reviews@lists.linux.dev, hannes@cmpxchg.org, yosry@kernel.org,
-	nphamcs@gmail.com, chengming.zhou@linux.dev,
-	akpm@linux-foundation.org, linux-mm@kvack.org, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, rientjes@google.com,
-	willy@infradead.org, senozhatsky@chromium.org
-Subject: Re: [PATCH v3 3/8] crypto: acomp - Add trivial segmentation wrapper.
-Message-ID: <awfGfqMK8FfrMNvz@gondor.apana.org.au>
-References: <20261106072412.7909-1-kanchanapsridhar2026@gmail.com>
- <20261106072412.7909-4-kanchanapsridhar2026@gmail.com>
- <sashiko-outbox-202709@kernel.org>
- <CACpmpodxjJ3ZQt4xOsWfWQNjgMtPzKx0oGMy+mJTU1wxVWdMUw@mail.gmail.com>
- <awQCFZSSng2LLGnX@gondor.apana.org.au>
- <CACpmpocCqenTNv62dGoeSLP2zs-AXJYhXM-tj2cytm4zQTj1cA@mail.gmail.com>
- <awafBxDtUoIQW9iR@gondor.apana.org.au>
- <CACpmpocWW7pWGYiF==DupmZDB0-jETu32C3-9NYY8nssKcDm-g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8505606A333;
+	Thu, 26 Nov 2026 05:52:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E8505606A333
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 8e4b8a2ae95d11f19a56ed5b684f684d-20261126
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:6566d9bd-2e1b-4b0b-b36d-2f4361e02936,IP:10,
+	URL:0,TC:0,Content:-5,EDM:0,RT:4,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:9
+X-CID-INFO: VERSION:1.3.19,REQID:6566d9bd-2e1b-4b0b-b36d-2f4361e02936,IP:10,UR
+	L:0,TC:0,Content:-5,EDM:0,RT:4,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:9
+X-CID-META: VersionHash:7db8b62,CLOUDID:951e568b2bd4836ee53eaa652bff1852,BulkI
+	D:261126135229MOXB8ZWL,BulkQuantity:0,SF:17|19|66|78|81|82|83|102|127|153|
+	850|865|898,TC:nil,Content:0|15|50|99,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,B
+	ulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR
+	:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 8e4b8a2ae95d11f19a56ed5b684f684d-20261126
+X-User: maguicai@kylinos.cn
+Received: from localhost.localdomain [(36.106.123.207)] by mailgw.kylinos.cn
+	(envelope-from <maguicai@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 53493332; Thu, 26 Nov 2026 13:52:25 +0800
+From: Guicai Ma <maguicai@kylinos.cn>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: af_alg - Fix data-race in af_alg_wait_for_data() and af_alg_wait_for_wmem()
+Date: Thu, 26 Nov 2026 00:52:22 -0500
+Message-ID: <20261126055222.2070179-1-maguicai@kylinos.cn>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261118154815.607879-1-maguicai@kylinos.cn>
+References: <20261118154815.607879-1-maguicai@kylinos.cn>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -74,30 +74,15 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACpmpocWW7pWGYiF==DupmZDB0-jETu32C3-9NYY8nssKcDm-g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 25, 2026 at 11:08:20AM -0800, Kanchana P. Sridhar wrote:
->
-> -       if (unlikely(req->unit_size && req->slen > req->unit_size))
-> +       if (unlikely(req->unit_size && acomp_request_dst_isvirt(req)))
-> +               return -EINVAL;
+Hi Herbert,
 
-This looks good.
+Ping on this patch.  It still applies cleanly to cryptodev master
+(04cd6899aaae) and mainline (40212b29a6f7).
 
-> +       if (unlikely(req->unit_size &&
-> +                       ((comp && req->slen > req->unit_size) ||
-> +                        (!comp && req->dlen > req->unit_size))))
-
-For decompression, shouldn't it just fail unconditionally since
-we do not support batching for it?
-
-Also how about moving these API guards into the top-level compression
-and decompression functions instead of in the shared path.
+If you would like anything changed, let me know.
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Guicai Ma
