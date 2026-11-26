@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795722904;
-	b=ExsQXcBgGHqJfvP1mPuEjchhS8FjSjb6jgCRtwmfXtxIHmZJATykAt1SmdbRFncXokVG
-	 te97OvDvFKZvUEx1M9CYSxD0uUnDpfbEksRIi2XITUxppyVFSf+yJOvjNtHLeE22mvCRe
-	 gSSmlu21OxFzPoa08E7r4zJyVYHsPo6lan7gUXLVEEGs9Kdhugw6yCvwfcWYE5hs7euIt
-	 Vc297/34SAB5GqayajAiRiojBSFiWny1IsJ2GE2ykv7XzOBiuidmY915lo3SG7IzRv30s
-	 LaqI2hs4LR+6/Vz47DjPTdIGFyKCurm6h9jfEm6UrF5DGddmaFKkq8cWW/Yd+Xgi/Ow==
+	t=1795722997;
+	b=2hcsWT5TyFf68MQMzjEaeTbOcHglPG5gOo3w1S78tmDXhH/32jhBRG+aDZsR/TdVMCMy
+	 /ImxeEUWVyLsWxGQFNwhoMAW1sCvBQUdSGXfINzc0b/oueC2TKVN7epHXdetXgZwiiqY0
+	 s3ULVayiwjjR/kSGE2rNT9xLCnhdVKyKZ3Oc+nCH6HiX7IePeXdy8YaOTJL56Vp+jwQCs
+	 8/dEAqSRz29oKKS6riVlpsCtbNdH9iq9ydukf/G2kWr5/4PVRUtBCjV16o97CyhyYA1xz
+	 dbpDGR8OHb5E+qaHqmsueRY/WDNVN2XqsSi09fkAdqO2vpMpusVgFgpVS8vTXTIwolg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795722904;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795722997;
 	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
 	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=OTLReDXIQ9w1vGBEAoyOL0h+q14QC0GH0MQlClgxmUI=;
-	b=afTL4hkFAllpxqWivbvK6LF9cwWDS282DKl9sh+v5I8Bh1MxhPYR1tTCoT3kib3muKpm
-	 R5gk6+u2NRqSernXVaLtpyGC8T//hJD0repgrTRoErlgN+IsBTU9piJ+nFznERNDdxgMB
-	 O2OAppYzBh2BnBHefLkWN+zwURsfxhAuDvV3UVOS5gRtX37oXk6CXxzBOoXcQreNlG01Q
-	 slHWcmQq3lD3Jukv3Hlk06fFqaF9Y/QqznL5/LzGMnNutc0+9tXR7ofGutaYgXPq1r9yU
-	 szJSQR9ZSxTk/Uu5jn5VFwR82jiMme4oxWBoqU0sSF+J9x2PZhhT4VQI1Ozn72kOGeQ==
+	bh=4E+cZDLd4RaIePBoRaVSM6a6mIbVj3DXOB0tO8phPHY=;
+	b=BfvzTZT1P3ghrvh5HxCWEhX7Yqp0zRKAEm9yk0noJd84v9CRnxX5IBfpDbmodRBsqDap
+	 Wonl67xjp6+9agyYQLrSTJAt6fveIpadu0uwZP9fXPdFsb4aqRtiAtHG2sgAAuxVSVIGc
+	 0WoNaP3UEACOj7r6VqhVStBpQaEZP1b4I3xvJogaNRbytEI9wTNL1XxsEDFTzL4xXwHLJ
+	 8LyeZuzVCO6Rhy43HpPifzPmo75aTMzjHDRYlegzub+mNNPQC8aTGguLyuUslIEp4cpbj
+	 Hs1EYIBKzeJEWkgVYlRpLAKi7RdtgeiUlxI5dZCr7iMmxciMy+RghK9weJtgV/JVjQw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=f5CSNN+J;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gT4M2sP3;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E98606A31C;
-	Thu, 26 Nov 2026 19:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AAB606A31E;
+	Thu, 26 Nov 2026 19:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=f5CSNN+J
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFD6F1F000C0;
-	Thu, 26 Nov 2026 19:55:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gT4M2sP3
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DBE61F000CA;
+	Thu, 26 Nov 2026 19:56:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795722904;
-	bh=OTLReDXIQ9w1vGBEAoyOL0h+q14QC0GH0MQlClgxmUI=;
+	s=k20260515; t=1795722996;
+	bh=4E+cZDLd4RaIePBoRaVSM6a6mIbVj3DXOB0tO8phPHY=;
 	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=f5CSNN+J1CuKSJE6FR3mgNbqWlMfsbitNyxv43Q3YzDjGQAtIqLzyc1/2iMYp/mzV
-	 YzeUGyD5b5FKY3Axzp7+i1ZZzdn4PYKhU7xZpFuN7nSkvS5/MGjR+iQ69QTKDU4CWC
-	 ON3L2tag94BSMvM+ZEpeWCvQVQ4V3y2oVjzsNneFDbH3fekr7eGdxMJdFbG2B2YbCn
-	 ZXT/LdmRTHa8Ae6K/NHesnDb2bAVfUsPCt3symh7HCIyJHV/ofHS5vTQHD/k8hThV5
-	 dElsr9B10kdt0L2XrC3LcI6GlwsRPoko7s3l5uQydnUs3aZqpGGINXfWDSnq36mDDV
-	 4icYmFxQsu6Rw==
-Message-ID: <sashiko-outbox-236129@kernel.org>
+	b=gT4M2sP3cqg4XHdPH2fHuiceyunoS+EDuef2a6dhqLAO5uGvHUAwv9WLTZBcd+obG
+	 J+8lEfejxfD8W+Z8rQevGZmh9Qtc0sO+IpmS15FDwTmnDcGAkwqujYrHLEk2vfSdWf
+	 saRH6xyV9oDN9up+C0AY6USLYkQuzUKnXSGdvSbusr61MpRvpOqVvvLRoECBiEI94n
+	 AhiwSjLxdD+ij71Bze3Lp3Laid2itrR+rWsWLV4i9uAKJVJwADAF1gRyKPf4hxP8SX
+	 HlfmLc7++CzU6MPt3CItcVwf+YTm7gx+cnEdKbQzN794M35kCMiFBZ8tsEmh9OZ+kP
+	 8WbMC35sDITkg==
+Message-ID: <sashiko-outbox-236131@kernel.org>
 From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v13 15/25] crypto: amlogic - Add support for G12-series
+Subject: Re: [PATCH v13 13/25] crypto: amlogic - Introduce hasher
 Reply-To: sashiko-reviews@lists.linux.dev
 To: "Jose Nieto" <jnieto.alaber@gmail.com>, "Corentin Labbe" <clabbe@baylibre.com>, "Herbert
  Xu" <herbert@gondor.apana.org.au>
@@ -49,12 +49,12 @@ Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org, devicetree@
  Armstrong" <neil.armstrong@linaro.org>, "Martin Blumenstingl" <martin.blumenstingl@googlemail.com>, "Krzysztof
  Kozlowski" <krzk+dt@kernel.org>, "Rob Herring" <robh@kernel.org>, "Conor
  Dooley" <conor+dt@kernel.org>, "Alexey Romanov" <romanov.alexey2000@gmail.com>
-In-Reply-To: <20261126193241.1471372-16-jnieto.alaber@gmail.com>
+In-Reply-To: <20261126193241.1471372-14-jnieto.alaber@gmail.com>
 References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
- <20261126193241.1471372-16-jnieto.alaber@gmail.com>
+ <20261126193241.1471372-14-jnieto.alaber@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Nov 2026 19:55:03 +0000
+Date: Thu, 26 Nov 2026 19:56:35 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,270 +64,350 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 
-Thank you for your contribution! Sashiko AI review found 6 potential
+Thank you for your contribution! Sashiko AI review found 9 potential
 issues to consider:
-- [High] crypto: amlogic: 0-byte SHA DMA desc and double complete in
-  hasher request
-- [High] crypto: amlogic: OOB DMA length and shared keyiv race in
-  meson_cipher()
-- [Medium] crypto: amlogic: debugfs leak and UAF on error_hasher in
-  meson_crypto_probe()
-- [Medium] crypto: amlogic: unregister of failed alg in
-  meson_register_algs() rollback
-- [Medium] crypto: amlogic: partial_addr DMA leak on
-  meson_kick_hardware() timeout
-- [Medium] crypto: amlogic: engine/DMA leak and early IRQ in
-  meson_allocate_chanlist()
+- [High] crypto: amlogic: 0-byte SHA DMA descriptor in
+  meson_hasher_do_one_request()
+- [High] crypto: amlogic: double completion on error in
+  meson_hasher_do_one_request()
+- [High] crypto: amlogic: invalid src DMA map on final in
+  meson_hasher_req_map()
+- [High] crypto: amlogic: unaligned DMA request ctx via
+  ahash_request_ctx()
+- [Medium] crypto: amlogic: debugfs leak and UAF on
+  meson_hasher_register() error
+- [Medium] crypto: amlogic: leaked partial_addr DMA mapping in
+  meson_kick_hardware()
+- [Medium] crypto: amlogic: meson_register_algs() unregisters failed
+  ahash algorithm
+- [Medium] crypto: amlogic: partial buffer DMA mapping leak in
+  meson_kick_hardware()
+- [Medium] crypto: amlogic: sg_virt() indexed by sg_dma_len() in
+  amlogic-gxl-hasher
 --
 
-commit df12ec18bc93360a5cdf078f04efac1cfd6bdee7
+commit 8f2023eba0fbe0a55f65e0dd07dde281e4bf36f0
 Author: Alexey Romanov <romanov.alexey2000@gmail.com>
 
-crypto: amlogic - Add support for G12-series
+crypto: amlogic - Introduce hasher
 
-This commit adds platform data and the "amlogic,g12a-crypto" device tree
-compatible entry to support the Amlogic G12-series crypto engine, including
-hardware hasher support.
+This commit adds asynchronous hardware SHA1, SHA224, and SHA256 support to
+the Amlogic GXL crypto driver.
 
 > diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/a=
 mlogic/amlogic-gxl-core.c
-> index f530e238812eb..0fb0da20e06b2 100644
+> index 0e17105520dfb..9676b86a50891 100644
 > --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
 > +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-> @@ -282,11 +282,23 @@ static const struct meson_pdata meson_gxl_pdata =3D=
- {
->  	.support_192bit_key =3D true,
->  };
+[ ... ]
+> @@ -172,6 +175,15 @@ int meson_register_algs(struct meson_dev *mc, struct=
+ meson_alg_template *algs,
+>  				return err;
+>  			}
+>  			break;
+> +		case CRYPTO_ALG_TYPE_AHASH:
+> +			err =3D crypto_engine_register_ahash(&algs[i].alg.ahash);
+> +			if (err) {
+> +				dev_err(mc->dev, "Fail to register %s\n",
+> +					algs[i].alg.ahash.base.halg.base.cra_name);
+> +				meson_unregister_algs(mc, algs, count);
+> +				return err;
+> +			}
+> +			break;
+>  		}
+>  	}
 > =20
-> +static const struct meson_pdata meson_g12a_pdata =3D {
-> +	.descs_reg =3D 0x0,
-> +	.status_reg =3D 0x8,
-> +	.setup_desc_cnt =3D 1,
-> +	.hasher_supported =3D true,
-
-[Severity: High]
-Can enabling hasher_supported emit a bogus 0-length DMA descriptor from
-physical address 0 during non-block-aligned update() requests, and double
-complete failed hash requests?
-
-In meson_hasher_do_one_request(), meson_setup_state_descs() writes a state
-descriptor and increments ctx.tloffset before checking whether the
-remaining bytes are shorter than blocksize and only buffered into
-rctx->partial.  The same state is reached when a single update() contains
-one or more full blocks followed by a sub-block tail, because the full
-block increments ctx.tloffset without setting DESC_LAST (as ctx->nbytes is
-still non-zero).  Once the trailing bytes are copied into rctx->partial,
-ctx.nbytes and ctx.todo are both 0 while ctx.tloffset is non-zero, so
-execution falls through to meson_setup_data_descs() and
-meson_kick_hardware() with ctx.src_addr =3D=3D 0 and ctx.todo =3D=3D 0:
-
-drivers/crypto/amlogic/amlogic-gxl-hasher.c:meson_hasher_do_one_request() {
-    ...
-		meson_setup_state_descs(&ctx);
-
-		if (rctx->partial_size && rctx->partial_size < blocksize) {
-			ret =3D meson_fill_partial_buffer(&ctx, len);
-			if (ret)
-				goto fail;
-		} else if (len && len < blocksize) {
-			memcpy(rctx->partial, sg_virt(ctx.src_sg) + ctx.src_offset, len);
-
-			rctx->partial_size =3D len;
-			ctx.nbytes -=3D len;
-			ctx.src_offset +=3D len;
-		}
-    ...
-		if (!ctx.todo && !rctx->final_req && !ctx.tloffset)
-			continue;
-
-		if (meson_setup_data_descs(&ctx)) {
-			ret =3D meson_kick_hardware(&ctx);
-    ...
-}
-
-Also in the hasher path:
-- on final() requests (rctx->final_req =3D=3D true), meson_hasher_do_one_re=
-quest()
-  forces ctx.nbytes =3D 0, but meson_hasher_req_map() and
-  meson_hasher_req_unmap() only check !req->nbytes instead of
-  (!req->nbytes || rctx->final_req), and the loop reads
-  sg_dma_len(ctx.src_sg) whenever req->src is non-NULL even when
-  req->nbytes =3D=3D 0 and req->src was never DMA-mapped.
-- at the end of meson_hasher_do_one_request(), returning a negative ret
-  after calling crypto_finalize_hash_request(engine, req, ret) causes
-  crypto_pump_requests() to call crypto_request_complete() a second time
-  on the same request; do_one_request callbacks must return 0 after
-  finalizing the request.
+> @@ -190,6 +202,9 @@ void meson_unregister_algs(struct meson_dev *mc, stru=
+ct meson_alg_template *algs
+>  		case CRYPTO_ALG_TYPE_SKCIPHER:
+>  			crypto_engine_unregister_skcipher(&algs[i].alg.skcipher);
+>  			break;
+> +		case CRYPTO_ALG_TYPE_AHASH:
+> +			crypto_engine_unregister_ahash(&algs[i].alg.ahash);
+> +			break;
+>  		}
+>  	}
+>  }
 
 [Severity: Medium]
-Does meson_crypto_probe() leak mc->dbgfs_dir and leave a dangling mc
-pointer in debugfs if meson_hasher_register() fails?
+Does meson_register_algs() unregister the entry that just failed to
+register?
 
-With hasher_supported set to true, meson_hasher_register() registers the
-ahash algorithms and can now fail and jump to error_hasher.
-meson_crypto_probe() creates the "gxl-crypto" debugfs directory and "stats"
-file (with mc as seq->private) before calling meson_hasher_register(), but
-the error_hasher unwind path does not call
-debugfs_remove_recursive(mc->dbgfs_dir):
+meson_register_algs() sets algs[i].mc =3D mc at the start of each loop
+iteration, and meson_unregister_algs() unregisters every entry with a
+non-NULL algs[i].mc without clearing it.  If
+crypto_engine_register_ahash() fails, meson_unregister_algs() calls
+crypto_engine_unregister_ahash() on the unregistered algs[i], which can
+trigger a NULL pointer dereference in list_del_init(&alg->cra_list) or a
+WARN() in crypto_unregister_alg().
 
-drivers/crypto/amlogic/amlogic-gxl-core.c:meson_crypto_probe() {
-    ...
-	err =3D meson_hasher_register(mc);
-	if (err)
-		goto error_hasher;
-
-	return 0;
-
-error_hasher:
-	meson_cipher_unregister(mc);
-error_alg:
-	meson_free_chanlist(mc, mc->flow_cnt - 1);
-	return err;
-}
-
-When probe fails, devres frees mc while /sys/kernel/debug/gxl-crypto/stats
-remains registered, causing a use-after-free in meson_debugfs_show() if the
-file is read.
-
-[Severity: Medium]
-Does meson_kick_hardware() leak the rctx->partial_addr DMA mapping when
-wait_for_completion_timeout() times out?
-
-meson_fill_partial_buffer() maps rctx->partial via dma_map_single() and
-sets rctx->partial_mapped =3D true.  If wait_for_completion_timeout() retur=
-ns
-0 in meson_kick_hardware(), it returns -EINVAL before reaching the
-dma_unmap_single() block for rctx->partial_addr, and the fail label in
-meson_hasher_do_one_request() only unmaps req->src and ctx.state_addr:
-
-drivers/crypto/amlogic/amlogic-gxl-hasher.c:meson_kick_hardware() {
-    ...
-	if (ret =3D=3D 0) {
-		dev_err(mc->dev, "DMA timeout for flow %d\n", rctx->flow);
-		return -EINVAL;
-	}
-    ...
-	if (rctx->partial_mapped) {
-		dma_unmap_single(mc->dev, rctx->partial_addr,
-				 rctx->partial_size, DMA_TO_DEVICE);
-		rctx->partial_mapped =3D false;
-	}
-    ...
-}
-
-> +	.support_192bit_key =3D false,
-> +};
+> @@ -227,13 +242,20 @@ static int meson_crypto_probe(struct platform_devic=
+e *pdev)
+> =20
+>  		dbgfs_dir =3D debugfs_create_dir("gxl-crypto", NULL);
+>  		debugfs_create_file("stats", 0444, dbgfs_dir, mc, &meson_debugfs_fops);
+> -
+>  #ifdef CONFIG_CRYPTO_DEV_AMLOGIC_GXL_DEBUG
+>  		mc->dbgfs_dir =3D dbgfs_dir;
+>  #endif
+>  	}
+> =20
+> +	err =3D meson_hasher_register(mc);
+> +	if (err)
+> +		goto error_hasher;
 > +
->  static const struct of_device_id meson_crypto_of_match_table[] =3D {
->  	{
->  		.compatible =3D "amlogic,gxl-crypto",
->  		.data =3D &meson_gxl_pdata,
->  	},
-> +	{
-> +		.compatible =3D "amlogic,g12a-crypto",
-> +		.data =3D &meson_g12a_pdata,
-> +	},
+>  	return 0;
+> +
+> +error_hasher:
+> +	meson_cipher_unregister(mc);
+> +
+>  error_flow:
+>  	meson_free_chanlist(mc, mc->flow_cnt - 1);
+>  	return err;
+
+[Severity: Medium]
+Does error_hasher leak mc->dbgfs_dir when meson_hasher_register() fails?
+Leaving the "gxl-crypto" debugfs directory and "stats" file registered
+blocks subsequent probes from creating the directory and leaves a dangling
+pointer to the devm-freed struct meson_dev in the file's private data,
+causing a use-after-free in meson_debugfs_show() if the file is read.
+
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl-hasher.c b/drivers/crypto=
+/amlogic/amlogic-gxl-hasher.c
+> new file mode 100644
+> index 0000000000000..c83739ec34566
+> --- /dev/null
+> +++ b/drivers/crypto/amlogic/amlogic-gxl-hasher.c
+[ ... ]
+> +static int meson_hasher_req_map(struct ahash_request *req)
+> +{
+> +	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(req);
+> +	struct meson_hasher_tfm_ctx *tctx =3D crypto_ahash_ctx_dma(tfm);
+> +	struct meson_dev *mc =3D tctx->mc;
+> +	int ret;
+> +
+> +	if (!req->nbytes)
+> +		return 0;
+> +
+> +	ret =3D dma_map_sg(mc->dev, req->src, sg_nents(req->src), DMA_TO_DEVICE=
+);
+> +	if (!ret) {
+> +		dev_err(mc->dev, "Cannot DMA MAP request data\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void meson_hasher_req_unmap(struct ahash_request *req)
+> +{
+> +	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(req);
+> +	struct meson_hasher_tfm_ctx *tctx =3D crypto_ahash_ctx_dma(tfm);
+> +	struct meson_dev *mc =3D tctx->mc;
+> +
+> +	if (!req->nbytes)
+> +		return;
+> +
+> +	dma_unmap_sg(mc->dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
+> +}
 
 [Severity: High]
-Can concurrent CBC requests on the same transform corrupt each other's IV
-and DMA mapping through op->keyiv, and does meson_setup_keyiv_descs() read
-past the end of op->keyiv when setup_desc_cnt > 1?
+Should meson_hasher_req_map(), meson_hasher_req_unmap(), and
+meson_hasher_do_one_request() skip touching req->src when rctx->final_req
+is set?
 
-op->keyiv lives in struct meson_cipher_tfm_ctx (per-TFM) rather than
-struct meson_cipher_req_ctx (per-request), while meson_skencrypt() and
-meson_skdecrypt() dispatch requests across mc->flow_cnt crypto_engine
-threads via meson_get_engine_number().  Concurrent CBC requests sharing a
-TFM overwrite op->keyiv + AES_MAX_KEY_SIZE with their own areq->iv and race
-on dma_map_single(), dma_sync_single_for_device(), and dma_unmap_single()
-in meson_cipher() and meson_setup_keyiv_descs().
+In the ahash API, .final() only finalizes the hash state into req->result,
+and callers such as ahash_def_finup_finish1() invoke .final(req) after
+.update(req) without zeroing req->nbytes.  Although
+meson_hasher_do_one_request() sets ctx.nbytes =3D 0 when rctx->final_req is
+true, it still sets ctx.src_sg =3D req->src (dereferenced via
+sg_dma_len(ctx.src_sg)) and calls meson_hasher_req_map() and
+meson_hasher_req_unmap(), which check !req->nbytes and DMA-map req->src.
+If the caller freed or cleared req->src after .update() completed without
+zeroing req->nbytes, sg_nents(req->src) and sg_dma_len(ctx.src_sg) will
+dereference an invalid or NULL scatterlist pointer.
 
-In addition, meson_setup_keyiv_descs() programs every descriptor in the
-setup_desc_cnt loop with the full ctx->keyiv.len instead of the 16-byte
-chunk length at offset =3D i * 16:
+[ ... ]
 
-drivers/crypto/amlogic/amlogic-gxl-cipher.c:meson_setup_keyiv_descs() {
-    ...
-	for (i =3D 0; i < mc->pdata->setup_desc_cnt; i++) {
-		struct meson_desc *desc =3D
-			&mc->chanlist[rctx->flow].tl[ctx->tloffset];
-		int offset =3D i * 16;
-
-		desc->t_src =3D cpu_to_le32(ctx->keyiv.addr + offset);
-		desc->t_dst =3D cpu_to_le32(offset);
-		desc->t_status =3D cpu_to_le32(DESC_OWN | DESC_MODE_KEY | ctx->keyiv.len);
-
-		ctx->tloffset++;
-	}
-}
-
-When setup_desc_cnt is 3 (GXL), descriptors i =3D 1 and i =3D 2 read up to
-offset 32 + 48 =3D 80 bytes in CBC mode, 32 bytes past the 48-byte op->keyiv
-buffer and outside its DMA mapping.
-
-[Severity: Medium]
-Does meson_register_algs() attempt to unregister the algorithm that just
-failed to register on its error path?
-
-meson_register_algs() sets algs[i].mc =3D mc before calling
-crypto_engine_register_skcipher() or crypto_engine_register_ahash().  If
-registration fails for entry i, it calls meson_unregister_algs() without
-clearing algs[i].mc first:
-
-drivers/crypto/amlogic/amlogic-gxl-core.c:meson_register_algs() {
-    ...
-	for (i =3D 0; i < count; i++) {
-		algs[i].mc =3D mc;
-		switch (algs[i].type) {
-		case CRYPTO_ALG_TYPE_SKCIPHER:
-			err =3D crypto_engine_register_skcipher(&algs[i].alg.skcipher);
-			if (err) {
-				dev_err(mc->dev, "Fail to register %s\n",
-					algs[i].alg.skcipher.base.base.cra_name);
-				meson_unregister_algs(mc, algs, count);
-				return err;
-			}
-			break;
-    ...
-}
-
-Because meson_unregister_algs() unregisters every entry with a non-NULL
-algs[i].mc (and also never resets algs[i].mc =3D NULL afterward), it calls
-crypto_engine_unregister_skcipher() or crypto_engine_unregister_ahash() on
-the entry that failed registration, triggering a WARN() in
-crypto_unregister_alg().
+> +static int meson_kick_hardware(struct hasher_ctx *ctx)
+> +{
+> +	struct ahash_request *req =3D ahash_request_cast(ctx->areq);
+> +	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(req);
+> +	struct meson_hasher_req_ctx *rctx =3D ahash_request_ctx(req);
+> +	struct meson_hasher_tfm_ctx *tctx =3D crypto_ahash_ctx_dma(tfm);
+> +	struct meson_dev *mc =3D tctx->mc;
+> +	struct meson_flow *flow =3D &mc->chanlist[rctx->flow];
+> +	int ret;
+> +
+> +	reinit_completion(&flow->complete);
+> +	meson_dma_start(mc, rctx->flow);
+> +
+> +	ret =3D wait_for_completion_timeout(&flow->complete,
+> +					  msecs_to_jiffies(500));
+> +	if (ret =3D=3D 0) {
+> +		dev_err(mc->dev, "DMA timeout for flow %d\n", rctx->flow);
+> +		return -EINVAL;
+> +	} else if (ret < 0) {
+> +		dev_err(mc->dev, "Waiting for DMA completion is failed (%d)\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	if (rctx->partial_mapped) {
+> +		dma_unmap_single(mc->dev, rctx->partial_addr,
+> +				 rctx->partial_size,
+> +				 DMA_TO_DEVICE);
+> +		rctx->partial_size =3D 0;
+> +		rctx->partial_mapped =3D false;
+> +	}
 
 [Severity: Medium]
-Does meson_allocate_chanlist() leak already-started crypto_engine threads
-and coherent DMA buffers if requesting an IRQ fails on channel i > 0, and
-can an early IRQ fire before init_completion()?
+Does returning early on wait_for_completion_timeout() failure here leak the
+rctx->partial_addr DMA mapping when rctx->partial_mapped is true?
 
-In meson_allocate_chanlist(), if platform_get_irq() or devm_request_irq()
-fails on iteration i > 0, the function returns directly instead of
-unwinding channels 0 .. i - 1 via meson_free_chanlist(), leaking their
-running crypto_engine kthreads and dma_alloc_coherent() descriptor rings.
-In the same loop, devm_request_irq() is called before
-init_completion(&mc->chanlist[i].complete), so an interrupt arriving right
-after registration calls complete() in meson_irq_handler() on an
-uninitialized completion:
+[ ... ]
 
-drivers/crypto/amlogic/amlogic-gxl-core.c:meson_allocate_chanlist() {
-    ...
-	for (i =3D 0; i < mc->flow_cnt; i++) {
-		mc->chanlist[i].irq =3D platform_get_irq(pdev, i);
-		if (mc->chanlist[i].irq < 0)
-			return mc->chanlist[i].irq;
+> +	for (;;) {
+> +		unsigned int len =3D ctx.src_sg ?
+> +			min(sg_dma_len(ctx.src_sg) - ctx.src_offset, ctx.nbytes) : 0;
+> +
+> +		ctx.src_addr =3D 0;
+> +		ctx.todo =3D 0;
+> +
+> +		if (!rctx->final_req && !ctx.nbytes)
+> +			break;
+> +
+> +		meson_setup_state_descs(&ctx);
+> +
+> +		if (rctx->partial_size && rctx->partial_size < blocksize) {
+> +			ret =3D meson_fill_partial_buffer(&ctx, len);
+> +			if (ret)
+> +				goto fail;
+> +		} else if (len && len < blocksize) {
+> +			memcpy(rctx->partial, sg_virt(ctx.src_sg) + ctx.src_offset, len);
 
-		err =3D devm_request_irq(mc->dev, mc->chanlist[i].irq,
-				       meson_irq_handler, 0, "aml-crypto", mc);
-		if (err < 0) {
-			dev_err(mc->dev, "Cannot request IRQ for flow %d\n", i);
-			return err;
-		}
+[Severity: Medium]
+Can indexing sg_virt(ctx.src_sg) by ctx.src_offset read out of bounds when
+dma_map_sg() merges scatterlist entries?
 
-		init_completion(&mc->chanlist[i].complete);
-    ...
-}
+len and the sg_next() advance condition use sg_dma_len(ctx.src_sg), which
+can exceed ctx.src_sg->length when dma_map_sg() coalesces adjacent
+segments.  If a trailing partial block falls after the first scatterlist
+entry in a coalesced DMA segment, ctx.src_offset advances past
+ctx.src_sg->length and memcpy() in both meson_hasher_do_one_request() and
+meson_fill_partial_buffer() reads past the end of ctx.src_sg's virtual
+buffer instead of the next scatterlist entry.
+
+> +
+> +			rctx->partial_size =3D len;
+> +			ctx.nbytes -=3D len;
+> +			ctx.src_offset +=3D len;
+> +		} else if (len) {
+> +			ctx.src_addr =3D sg_dma_address(ctx.src_sg) + ctx.src_offset;
+> +			ctx.todo =3D min(rounddown(DESC_MAXLEN, blocksize),
+> +				       rounddown(len, blocksize));
+> +			ctx.nbytes -=3D ctx.todo;
+> +			ctx.src_offset +=3D ctx.todo;
+> +		}
+> +
+> +		if (ctx.src_sg && ctx.src_offset =3D=3D sg_dma_len(ctx.src_sg)) {
+> +			ctx.src_offset =3D 0;
+> +			ctx.src_sg =3D sg_next(ctx.src_sg);
+> +		}
+> +
+> +		if (!ctx.todo && ctx.nbytes)
+> +			continue;
+> +
+> +		if (!ctx.todo && !rctx->final_req && !ctx.tloffset)
+> +			continue;
+> +
+> +		if (meson_setup_data_descs(&ctx)) {
+> +			ret =3D meson_kick_hardware(&ctx);
+> +			if (ret)
+> +				goto fail;
+> +		}
+> +	}
+
+[Severity: High]
+Does a non-final update that ends with a partial block (< blocksize bytes)
+program and kick a 0-length SHA DMA descriptor with t_src =3D 0?
+
+This happens in two ways.  First, meson_setup_state_descs() runs at the
+top of the loop before checking whether a full block is ready; on any
+non-initial update (rctx->begin_req =3D=3D false), it writes the state setup
+descriptors and sets ctx.tloffset to setup_desc_cnt.  Second, when an
+update has full blocks followed by trailing sub-block bytes (e.g. 74
+bytes), meson_setup_data_descs() only sets DESC_LAST when !ctx->nbytes,
+ctx->tloffset =3D=3D MAXDESC, or rctx->partial_mapped, so the full-block
+descriptor leaves ctx.tloffset > 0 without kicking hardware.  On the
+iteration that buffers the trailing sub-block bytes into rctx->partial,
+ctx.nbytes becomes 0 while ctx.todo is 0 and ctx.tloffset > 0, so both
+continue guards are bypassed and meson_setup_data_descs() emits a bogus
+0-byte descriptor at physical address 0 and kicks the DMA engine.
+
+> +
+> +fail:
+> +	meson_hasher_req_unmap(req);
+> +
+> +fail_map_req:
+> +	dma_unmap_single(mc->dev, ctx.state_addr, sizeof(rctx->state),
+> +			 DMA_BIDIRECTIONAL);
+
+[Severity: Medium]
+Should the fail cleanup path also unmap rctx->partial_addr when
+rctx->partial_mapped is true?  If meson_kick_hardware() fails after
+meson_fill_partial_buffer() mapped rctx->partial, this unwind path only
+unmaps req->src and ctx.state_addr, leaking the streaming DMA mapping for
+rctx->partial.
+
+> +
+> +fail_map_single:
+> +	if (final_req && ret =3D=3D 0)
+> +		memcpy(req->result, rctx->state, digest_size);
+> +
+> +	local_bh_disable();
+> +	crypto_finalize_hash_request(engine, req, ret);
+> +	local_bh_enable();
+> +
+> +	return ret;
+> +}
+
+[Severity: High]
+Does returning a negative ret after crypto_finalize_hash_request() complete
+the request twice on error?
+
+crypto_finalize_hash_request() completes req, and when do_one_request()
+returns a negative error code to crypto_pump_requests(), crypto_engine
+calls crypto_request_complete(async_req, ret) a second time, causing a
+double completion and potential use-after-free if the caller freed the
+request on the first completion.  meson_handle_cipher_request() returns 0
+after finalizing the request.
+
+[ ... ]
+
+> +static int meson_hasher_init(struct crypto_tfm *tfm)
+> +{
+> +	struct meson_hasher_tfm_ctx *tctx =3D crypto_tfm_ctx_dma(tfm);
+> +	struct crypto_ahash *atfm =3D __crypto_ahash_cast(tfm);
+> +	struct hash_alg_common *alg =3D crypto_hash_alg_common(atfm);
+> +	struct meson_alg_template *algt =3D container_of(alg,
+> +		struct meson_alg_template, alg.ahash.base.halg);
+> +
+> +	crypto_ahash_set_reqsize_dma(atfm, crypto_ahash_statesize(atfm));
+
+[Severity: High]
+meson_hasher_init() reserves DMA alignment padding via
+crypto_ahash_set_reqsize_dma(), but every request callback in this file
+retrieves rctx with ahash_request_ctx(req) instead of
+ahash_request_ctx_dma(req), and struct meson_hasher_req_ctx uses
+____cacheline_aligned (64 bytes on arm64) rather than ARCH_DMA_MINALIGN
+(128 bytes on arm64).
+
+Because ahash_request_ctx(req) is only aligned to CRYPTO_MINALIGN (8 bytes
+on arm64), rctx->state (mapped with DMA_BIDIRECTIONAL) and rctx->partial
+are not cacheline-aligned and share DMA cachelines with adjacent struct
+ahash_request and struct meson_hasher_req_ctx fields, which can corrupt
+those fields on DMA cache invalidation.
 
 --=20
 Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261126193241.1471=
-372-1-jnieto.alaber@gmail.com?part=3D15
+372-1-jnieto.alaber@gmail.com?part=3D13
