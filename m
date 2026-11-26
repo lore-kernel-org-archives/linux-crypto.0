@@ -1,49 +1,50 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795726886;
-	b=1SK9yoOFmC6uYg3dE60+/t7UZ5yFJfS5xpddTLHECrQ4YS/8mF+7DhfRFJwk72alvkwM
-	 0bX4wKOgtl4KiUTj2UEYxVz9WG6bQoJ0EUIrZIRIE1sJkXizablKpIAADVdF7O9cP4ROi
-	 gLTyf/ES/jFlG5lGOS0X9mu4gNAOW9bvQaljoIgmzU7uYZn1DxJXV8p3plz2exWlxgbK7
-	 GGUTUnpGy1hnNCnQD1SHPRrAcdF7AHUIzXSCe3mctMGqcgEx3pzgtUXhrQ6YOvpPoiUS2
-	 uHF4Uubu0yGp1HCBl7V3/uHjYaX9WT0zfW5HezDXdKR/36hoPP1eV0SZ2njeeJCuZmg==
+	t=1795729732;
+	b=wqiRTa4om9CVVs6F1yTBYjB7Ju9yhU++SpNchrxY2uXeTrZlBG87+dcdB2WLyUVl+gj6
+	 8xyUzplTHs234a9qdxvjPbhVF//bMlYOUoWR6wFq0nHDkBGl56KVIEVXJJKSI6RbKAQSl
+	 kUKP0CtlnUq23f6dBw/2wLBR8Mlk2QgZgBHd00hIbAp//gfJqI+LrFDWA+rBb4/rD/c8W
+	 +2Wk5mDco7xVbzv9kNB/a+MdvqvFVVifjw169OQWdZqFf8sM1Yu5ASAU3w9bUr121zMlJ
+	 Z5ln1IVuRV7+Z2BNXw8NXmh3fhuN0NFxP1wepXSPpJfQpp+DC1wPDLDPIYTJtEuAlKg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795726886;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795729732;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=2PDYyeUwnj6Av3J+sN96MY6jXwEzqAUTZ4EhuMvBT3Y=;
-	b=1PZjhINB2abpgibqjXwr8JCk/w4v4m3qbEwv5nn9wHkakmCLym4Tw4Yo7cnZLJeRBkwt
-	 Dcp5KEF1ELFiRp13FTwDMjH6mkcSGn/hgOq8d1zpobM0OJSO1Q3SVGhx+7hGaPFFEiZjP
-	 CrWKiALzp4WKBxfzw0R8mrh7kHD/Sw4YK54LgmtVi4kUqXnRJMRxCjrAb/6VlLSB6sXK2
-	 H6sUz8CTk3h+EH/7B2VcxGyBQewoGJlygw/7HAoVOhEARVa8LbcKuvrN0n9Uf643MmkT1
-	 6xBlS87/bAhjfsBfe5zOipk5XPYmKFu+X9ZIpxorlaz4cyw677izBjgAbSqxE915scQ==
+	bh=tL0KPYsNWllSt9PJYMsgt65v9WSv0udE9SrH0WwMrhs=;
+	b=oV5i8FARgxuqbg5iTGEi287l1pNns8y8n/F6lNRrJjzQ3SKpZi3Z+lBxpLjOygETDbGj
+	 Pi12/2x5cwc7u+nok2gnlo8XLZi5jwBWLZaa29OUIbYY94TfiKLeIwtdR+Vgn+djksoj9
+	 wTdG3Mnx/jR0b/3Wa98t5pUncOIdlXnmllUc4EMHbeZO4o+jj6OxSLxI6qB5OeF8EhHbr
+	 fbTY2Y44aGsaIlRTTHmrfHR0offFLtqEl06A8S2Ax+frpP2cVbMar+v2TVuMK8je1nIRp
+	 yFvAXvZuxNRTHeK9d/GS3ciqhDfsRJYaYan8iKiC8C/44a5cck3kgzwudoaywyhppjQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jilE55Yv;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RAkCes5D;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id EA619606A31C;
-	Thu, 26 Nov 2026 21:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 387ED606A31C;
+	Thu, 26 Nov 2026 21:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jilE55Yv
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 14D411F000C1;
-	Thu, 26 Nov 2026 21:01:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RAkCes5D
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 062E61F000C1;
+	Thu, 26 Nov 2026 21:48:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795726885;
-	bh=2PDYyeUwnj6Av3J+sN96MY6jXwEzqAUTZ4EhuMvBT3Y=;
+	s=k20260515; t=1795729731;
+	bh=tL0KPYsNWllSt9PJYMsgt65v9WSv0udE9SrH0WwMrhs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jilE55YvAq1XkaWp4+W4IKFMT21gKHPEvPdTNFmeG+NtyavadMFUJZ1VP3s4ENUZM
-	 MPDfFArKRmVfNOXieX8Jg/5Ar9hYRh52Vhej+/INgPjOMtY1DnlmjMLrNV8HU0n6aU
-	 ZiAqOrQe53k9wRXZX56CP3S3Ohc6Mkozu/QubIrRhqsZAjjsXPwesRXXEY+OOMXHwK
-	 IhsTC+jynF++RzSJ49BPFBtx63EJxNnS4BCM45KT7IbMjAsFnEZxNz9MLptvktSKFS
-	 HfS/5Vg7HrLRx8tPYXS4P/z1HtRoFMdJk6EaT3fQW9gmrd/yMsC7MLdctlv032foe2
-	 gJ+a9nLHDeWJg==
-Date: Thu, 26 Nov 2026 23:01:21 +0200
+	b=RAkCes5DFSaAtw4DkHNa8po00T3CUA9LuNiAo7vxqx9pEWdnOVaFVjE5FDiDAWzuq
+	 /7OfC8Aa3YgB58YCdjYP6l5FLtnE0HcV7R2GiMYpHkVxcjPaQZqJXcCz/NISRo+zuN
+	 8MnDhrjj4oen6sua/XKyG6mCS2smispXGRHDzO1uNG04VR42CZcH4eDajgpKAFetiW
+	 zqKyrFHx9BRGKmX0hP/zl5OsYVYqaN+nUdTT/VrzersyJzfeOjLT57fxKtg2E9GveK
+	 fnsecNa01LfwD/pPPHMEEa+MyvCmKC+gubI3XAMwjd9Xcgd/hr8T52oqmJ0W6lWcoi
+	 LxuDTKFE+mdqg==
+Date: Thu, 26 Nov 2026 23:48:48 +0200
 From: Jarkko Sakkinen <jarkko@kernel.org>
-To: sashiko-reviews@lists.linux.dev
-Cc: keyrings@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org,
+To: keyrings@vger.kernel.org
+Cc: dm-devel@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
 	Ahmad Fatoum <a.fatoum@pengutronix.de>,
 	Alasdair Kergon <agk@redhat.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
@@ -70,12 +71,11 @@ Cc: keyrings@vger.kernel.org, dm-devel@lists.linux.dev,
 	"Serge E. Hallyn" <serge@hallyn.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
-Subject: Re: [PATCH v4 03/11] KEYS: trusted: Validate public_len before
- reading key attributes
-Message-ID: <awieIblDHu4iF4Wl@kernel.org>
+Subject: Re: [PATCH v4 11/11] KEYS: trusted: Add asymmetric key support for
+ TPM2
+Message-ID: <awipQFkjoBSEXnLh@kernel.org>
 References: <20261126205021.2200819-1-jarkko@kernel.org>
- <20261126205021.2200819-4-jarkko@kernel.org>
- <sashiko-outbox-236180@kernel.org>
+ <20261126205021.2200819-12-jarkko@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -87,24 +87,28 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <sashiko-outbox-236180@kernel.org>
+In-Reply-To: <20261126205021.2200819-12-jarkko@kernel.org>
 
-> > KEYS: trusted: Validate public_len before reading key attributes
-> >
-> > tpm2_load_cmd() reads the 32-bit objectAttributes field at pub + 4
-> > without checking that public_len is at least 8 bytes. Reject blobs with
-> > public_len < 8 before dereferencing pub + 4.
-> >
-> > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+On Thu, Nov 26, 2026 at 10:50:21PM +0200, Jarkko Sakkinen wrote:
+> Extend the TPM 2.0 trusted key backend to load OID_TPMLoadableKey
+> (2.23.133.10.1.3) RSA (2048/3072/4096) and ECC (NIST P-256/P-384/P-521)
+> keys and expose query, sign, verify, and RSA encrypt/decrypt operations
+> through key_type_trusted.
 > 
-> [Severity: Low]
-> The unvalidated get_unaligned_be32(pub + 4) read in tpm2_load_cmd() was
-> introduced by commit e5fb5d2c5a03 ("security: keys: trusted: Make sealed
-> key properly interoperable").  Should the commit message include:
+> The feature is controlled by CONFIG_TRUSTED_KEYS_ASYMMETRIC, which
+> defaults to y when CONFIG_TRUSTED_KEYS_TPM is enabled.
 > 
->   Fixes: e5fb5d2c5a03 ("security: keys: trusted: Make sealed key properly interoperable")
+> Co-developed-by: James Prestwood <prestwoj@gmail.com>
+> Signed-off-by: James Prestwood <prestwoj@gmail.com>
+> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-Yeah, I think so, and it can be detached from the patch set, if it
-receives reviewed-by tag.
+By rebasing this on top of these patches, I could drop tpm2_read*()
+from this and use tpm_buf_read_*():
+
+https://lore.kernel.org/keyrings/20261115233156.1485238-1-jarkko@kernel.org/
+
+See, also:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/log/?h=tpm2-asymmetric
 
 Br, Jarkko
