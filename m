@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795726252;
-	b=4l4LbNll4M3ehzDcTiYFaePLDWvHj7N/9LyCoK2+Czdl+2atIpegmxed1g7XC2kNoFEU
-	 NP1BnlRwXKM7IHGFzCURN/dzeWzBpXU9ZFShcgvbElos96yiWjrd3B5QwZGVa49Qm4Rug
-	 iGffmSf8yIc3GMPU0L291Y6wEGbzItWOwxUIFDfcvJwS5xlD0xRufRxofIuSPgiburhM0
-	 ckqhihNoE8346WriRv3BJ5smYKKRQ2tHYRSSgA5di3wvau7iJvbZjeDrOdf6ZBLXi7ODD
-	 8cstw1IBY7hq+fDw8lpDLIK2lg7RXVvgXiHPN75mGa6P6lV6RFN2k47Wh7SOX5/15mg==
+	t=1795726256;
+	b=TgzzyrebE32mztOdzPttBR97FFpWet0edeBBLSwcCiwXsA8CAbVJq5Ngq44h6/iKMRTW
+	 zbj5oCCMplu+iC0PTKc66C2b+m4yKAWo7IUZ6wKskn6qJi3k/zBmBado2hX6Y/BV3c1Im
+	 s2KD7+HUex27ZFJqOtP+9er+v59cZy7TGbwg8t40s9GVkW2JxeRv0hmjNF5s1XRvhPH6j
+	 nQ5FvvqjIL/QNw1Zlhjtc8HEvalO1/vnLZ+oL32yuGJbjm4obje8hRYoAlKgncqjo+Sp/
+	 xJYmnBE/61tBq74VRf2acZOi0ziLPJHCQXokouRV26SiOPa/LYqRZ9JIGM6M3jGobGA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795726252;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795726256;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=cHcAa/C2aDJiaYitw3R3G9ckGSrrPYAAeiF+dTOf9H8=;
-	b=tvrE1O4tBvDvmSsz1e3ZlLm3kvqihEPpunB1PF/RGZ1O9yKCBjdSwqpq4mPSbHHksFZA
-	 TV1V2WgbIP+UcAxpUXnKZ9CO4ZpzgHhz/viSzBn/m0IOBEtLEgbbFqg9mzHb2LiP4SPNM
-	 VlMCluurzqTn5xObUeWSOijslnd0Cgb68qDqslFHR/4K6yGZn6cNUpe3viVlxKMgR+B3F
-	 JMSi8R/LgCs8OrtYnhdRIUVPrbdxxEw4sYiEGoRrHiAiIDtPPpHZSXM0ddeLi6G6M84ip
-	 +NtTxP9fOknYNpqWo97UneZ7+4UIbYJzUeE527iKhgrILaLV57D8RDmt56hXV/lUicw==
+	bh=MCCeXGn8Or2Im1/w9TyBLehiPST7Mfk6qFmTWhVBMBQ=;
+	b=w9YXcB5AZqfZeMcWQGSTDbZfuZQzIMZscay+ngksQ6pNSzkIkaF1PYZWyzQCtb1d1ddX
+	 +/LvD8DXQNK3WfGiiCc44T2h6c1V86ljItgXY1JAYfe5u3nK+jKEtIqXbdR1S5P5sqvQy
+	 iHMX7wMS7f0ox3jsAOksrULetYTpE7r8mRL1Ok2j6XTZR/+VFY0XWFlUpU3k/54ej9AbP
+	 0LnhoAGGg0jhSBFI4UMMtn+ZZGpO0Q4OX8tmzXsSA8pplY4xrq/QvOnlde0OXsI76meim
+	 sj1bAFyvuPr0FvB/BPqEeC5iVvGPVBby8QfBl51K6NxB10xSO5MkPTzOU9A19Ig3ZnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GHmEoUF6;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ddx5xPJP;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id A5DFF606A31C;
-	Thu, 26 Nov 2026 20:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 7ECE7606A329;
+	Thu, 26 Nov 2026 20:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GHmEoUF6
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 929221F00893;
-	Thu, 26 Nov 2026 20:50:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ddx5xPJP
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 5F1681F0089C;
+	Thu, 26 Nov 2026 20:50:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795726252;
-	bh=cHcAa/C2aDJiaYitw3R3G9ckGSrrPYAAeiF+dTOf9H8=;
+	s=k20260515; t=1795726256;
+	bh=MCCeXGn8Or2Im1/w9TyBLehiPST7Mfk6qFmTWhVBMBQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=GHmEoUF6suROAaHu1BKzkV2kSXEmQU3+n2rOWxJgyctXfW4tkk5suivAX57ran+MZ
-	 nz79uK9K09equHaJCgbI3EdTmhj0l0nQ4dKMLf1Qw7S6fwc9em1leBRnaS3utidNBh
-	 HoEJVw8YeFPturZZR3Qk58WmqTbt0mje6sXTwRzcgJb/+ZbhSadrXM5E3ttTyial8W
-	 ySDFCOXtKvEJxByOH3OP7OMV83xzsVqzugvHECZekVQsliQeCLU+HuH4fZBMVEBDul
-	 CIX9A8vITr3fAdTSMau0AKwcvcD+RBJGAlzABlOLk0dMUe2vhiyk9k0Ok0dl7rd61T
-	 nzIofVruIJ5bQ==
+	b=ddx5xPJPcO4IwOL1kejTXhEgAMUtSjmWEH/k/uLy4bkcNJSKUygFbMfdVggRGSAkH
+	 hECxUdQjQOlEZVrF7KfyCaNupAkQ9r9hEQyPuRB2Yv75uvO8xu1OV1id9ntKvoVDsQ
+	 yr9iMA95lteGhvDOQlEOgcL1EHWcgM4WkkcRVm5vn7xDMwLd0VNNk6Q4x6JGAw0roV
+	 6VPT4scK4SwjGxfORYTqQk3+rGQqwpNVBqlj8VNpOUq5oiOCwu9O7DHmoT4WBKs6KP
+	 vvq4KBxa20vVjCf3U/lZC9UxF7a135gIvIRB3CTDR8DXhFIBWHFVg0BGB/v5+CVjxx
+	 k8HfkApmq7aPw==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: keyrings@vger.kernel.org
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -76,9 +76,9 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	"Serge E. Hallyn" <serge@hallyn.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
-Subject: [PATCH v4 02/11] KEYS: trusted: Allow ASN.1 TPM2 sealed data shorter than MIN_KEY_SIZE
-Date: Thu, 26 Nov 2026 22:50:12 +0200
-Message-ID: <20261126205021.2200819-3-jarkko@kernel.org>
+Subject: [PATCH v4 03/11] KEYS: trusted: Validate public_len before reading key attributes
+Date: Thu, 26 Nov 2026 22:50:13 +0200
+Message-ID: <20261126205021.2200819-4-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261126205021.2200819-1-jarkko@kernel.org>
 References: <20261126205021.2200819-1-jarkko@kernel.org>
@@ -93,48 +93,29 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-tpm2_unseal_cmd() rejects unsealed payloads shorter than MIN_KEY_SIZE (32
-bytes) with -EFAULT even when loading an ASN.1 TPMKey (OID_TPMSealedData,
-2.23.133.10.1.5) blob.
-
-While kernel-generated trusted keys ("new <keylen>") and legacy old_format
-blobs are at least 32 bytes long, external TPM2 tools allow sealing any
-non-empty payload up to 128 bytes.
-
-Keep MIN_KEY_SIZE for legacy old_format blobs and accept 1..MAX_KEY_SIZE
-bytes for ASN.1 TPMKey sealed blobs.
+tpm2_load_cmd() reads the 32-bit objectAttributes field at pub + 4
+without checking that public_len is at least 8 bytes. Reject blobs with
+public_len < 8 before dereferencing pub + 4.
 
 Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- security/keys/trusted-keys/trusted_tpm2.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ security/keys/trusted-keys/trusted_tpm2.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/trusted-keys/trusted_tpm2.c
-index 30188a0ec676..8c62342b2588 100644
+index 8c62342b2588..d2c74ef8844b 100644
 --- a/security/keys/trusted-keys/trusted_tpm2.c
 +++ b/security/keys/trusted-keys/trusted_tpm2.c
-@@ -499,7 +499,7 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 	struct trusted_key_tpm *private = options->private;
- 	struct tpm_header *head;
- 	struct tpm_buf *buf __free(kfree) = NULL;
--	u16 data_len;
-+	unsigned int data_len;
- 	int offset;
- 	u8 *data;
- 	int rc;
-@@ -559,9 +559,11 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 	rc = tpm_buf_check_hmac_response(chip, buf, rc);
+@@ -425,6 +425,9 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
+ 	if (private_len + 2 + public_len + 2 > blob_len)
+ 		return -E2BIG;
  
- 	if (!rc) {
-+		unsigned int min_len = payload->old_format ? MIN_KEY_SIZE : 1;
++	if (public_len < 8)
++		return -EINVAL;
 +
- 		data_len = be16_to_cpup(
- 			(__be16 *)&buf->data[TPM_HEADER_SIZE + 4]);
--		if (data_len < MIN_KEY_SIZE ||  data_len > MAX_KEY_SIZE)
-+		if (data_len < min_len || data_len > MAX_KEY_SIZE)
- 			return -EFAULT;
- 
- 		if (tpm_buf_length(buf) < TPM_HEADER_SIZE + 6 + data_len)
+ 	pub = blob + 2 + private_len + 2;
+ 	/* key attributes are always at offset 4 */
+ 	attrs = get_unaligned_be32(pub + 4);
 -- 
 2.47.3
 
