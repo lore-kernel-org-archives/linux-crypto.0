@@ -1,101 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795721623;
-	b=DG2Ck6PfjC73qPwJLIm2VOJtW+Xql2Gz1G3fOKBDsnAHMvZ2hPeLbQgamWHBok2sSoYZ
-	 8ghy4xZ+X07kzqRN+OOKc/Ze+FH/kSOJC7tW75489W1Drxeeo9ifwk+erKwOcY5LJQbm0
-	 brJ6BiCleX2QlUSae5JZ+bFta2ogTlUmyJkeCrfP8GxCiMtKJr3CauOr6ohsQ75bsjVGY
-	 cMbqV6q3z7Pyj5XUshOMgZwk0z/FlrhvMzj+9jP2NJzIt7c+2HyvObLfIa4U3OKxMvlEp
-	 atyf3lkvQ4hPX5W3RvW3A38qyBveGZyT47sXGDuBWh9Hm/Sre7Pfub9GEsaMd8E8w2g==
+	t=1795722100;
+	b=T5L0lhXXGy9Ez0NZztcqBZ4xX5pp6vEY/7cqcYlgM9h2OGbPLs/JupIjlfa/82Cpi/6Z
+	 MpOx/gxFP3mGrRIn8ZMw1ktU/BO/XGVZLYjZ4p/2YSOXA4/aBZZb0PEg9mrO3uvRO1tT0
+	 vd3Nf5tJpIKgasg5dS6xq7AP7Gjvc4OFyT6jEbYQKAwEpp8sVRTY3XN+Jr7sjtmtVOAk6
+	 lyqGFLX7SJa4bePi5niwr57jYIs+DQ3C+40QcHAzsX6JVOSevBWlDL/CBSh6q1w+j8pIF
+	 y33ujk1bHVvzd5Sp/X80Nv7/EYzk83B7LA1UChHZmOIbNkBKPFLyohhx8N4bD27BvIA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795721623;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=l0FqxSdSkWVcKj6JvNw9SG+fnKtmoC4+i5Y2izvcenk=;
-	b=OdFRzXBNOAWcweVI1/F+xhbKywh/X5vYKWVwDVMW/q7pCXzyTnuvvk6KKoZmtKI/xlB8
-	 92E3A2niseHWfVhbBd23924QdKVNV0tWJ3VqDvn8BVPr7ybPZfd8AGcMEmXXi0VpTnb95
-	 pdHjasVn4M3JJ6XxxzFxpoQEjgCYpF9j5gb3e6UzCByIE6UAdHbEwHhNc2WoS9Bc9D1PP
-	 mMS/l/nS5P5SAeh54OgTijRu36pOtMtyORIclmmuIP3bBvo/04uQsYU3/cuU6Es7I2NSM
-	 DkfbgDUS9EDXkOxGSOde8MDDDzmf/y4OQFuB+iktWLOEJBuPFTuwptd7wSuMjrTnylg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795722100;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=1bzMSOb08TutL6tdk9EvyHWnytggQnUyUPgR7/5Ax1g=;
+	b=WbLYLdMzuLQgUIZdIjVrBBvKnwUtg3VxEseX05RCdmU0oG97hSAbdW8glRKZ4gmxXW9e
+	 C9yTYEIJdqp0BnslOR0QuRJbVPVEpATkTNZPaLPkcttyp6rU0uZT4d8etwBzZeVmIYSMO
+	 82iVR7K23gYyYpe+JehT4KPfao2etZ2c8fZX90vKxxBw6egbX4uqebPpq69wheZJhaZFd
+	 2KKvJFAzUOUTGhN2K8s0Drj38NiGiOoPP2DSC7F5cLQvih+s/FA0Lk4eypcq86n6U4Xbz
+	 3qqr7PTryV4+RfuR3P5FboxGiyW8YBNX10M7UqgAQfiHRR/RWHhtNKfDX5+ymBPlyHg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=acvmjd2p;
-	arc=none smtp.remote-ip=209.85.128.52
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RJyHOeUI;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60C4606A32A
-	for <linux-crypto@vger.kernel.org>; Thu, 26 Nov 2026 19:33:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D60C4606A32A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D5C606A321;
+	Thu, 26 Nov 2026 19:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=acvmjd2p
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a9a8d6cea8so95245445e9.1
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Nov 2026 11:33:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795721621; x=1796326421; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=l0FqxSdSkWVcKj6JvNw9SG+fnKtmoC4+i5Y2izvcenk=;
-        b=acvmjd2peWYeLhtuO2XQIlBR76TzBn9iONnK/GG4N50fLUHZZc409BWcVvz1asIvOb
-         eNMWBmBfLw2llSoh9xeXSIzcDWuh2hKI8TY03kOmumbj+qufnooNeLkYximBimxw6+wT
-         66SAPDQwiooia/dI/YYv90u7e+Xa+F2GHeWdcp9Y2kW9zCFGXuqOosLkVmKLDKh4X/ev
-         61nk12qBQ2Bn6z5/JQef2JNWDfiQfghzajwoiyj3Hw4Ha1VtPVqOF/rxOUkZKYVXT1l+
-         2kfyxT5vNpAoHSFNBu1smOwxgemLl0p845nfTd9SYGW27yYoyMhPMQgr0iTpT5fTib9x
-         IdwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795721621; x=1796326421;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=l0FqxSdSkWVcKj6JvNw9SG+fnKtmoC4+i5Y2izvcenk=;
-        b=J75ujLJpETodtIBPN4irZENusn0noRsdN6HmdHpIbGJcexatQa5H3eBonQeD1TT2RN
-         D0+CfrsjsirCpMByO0zSR2xj6dIZRVPA1jymaU7ETxlbFyNoXAtFrwFnznsBtzWK25eF
-         Ps1YorOat0TqF30dd+vlUKU4kMGnMGsHE6XqQPSb1PeoZuVHf6aGY2tzxk9/lOOB5XNW
-         Wc3jVSd5fxVsq/WxaCkVDRADwdCmR0gJb25wxZMMACF8egYf+lrAxrqWXpU2wTI0oNii
-         +cMpxIaer84aobon4hZ3Z7Qx4xwI4sgPacSWu2f3XwoO+iyqAGKiHoJ/DQ/9zpyYWN3x
-         fldQ==
-X-Gm-Message-State: APuU4Z+x24ncTUBf809fLKu9gOavP4uCjH2uKZBlu9izYiyBxHly5aMV
-	S+EPeRYfqy7XJZmbgPXIBlLb51nEGRsgypXCc0HyK95CcT6LA/Tuvabt
-X-Gm-Gg: AZFdTZeWNMU2GPh8GzOZy2i/zAN81zwziSqeeu+xIbiN+jVZgz09NGbrQejTRUBJICO
-	n5ah1NLxRbI93dJYt52KPN6iRxtAVYGD3i29DBeypL5AEpSsQViAfDUcbnlDoT3rgegfrkhPQyH
-	xJ6esAESa0SAtNeVPiQojO7Uo8qrVoVd8CdOaLYX9oAiGuR1W1VDkit5KIVrUBtIm4sW+ONLI6t
-	UDYUXDKtjdSA5rFhWitkLJeYOg/y4zNPCZvKm8rAX9M3Z5dQPoOyIzNGXVXpu/xB4n37IkC5884
-	2Qhc/X8LHN8eCwNB0wwn33LsGRMYwl5DCzcfUTB93mWKBraslOBn3Nzga2incQ+/m8aoXtXWTqI
-	qj5xGcnQT1HIvGxUVf9EHjQCCezW+40s8XKyC0suC6vQYCmvDQVcQlLz0yv6VIa+TY9jFQIF+9S
-	+CCafbdPK5OHb4K+BLMz17mMGcqxtrWzSet4eEUczpmsv/XzUEyDQINecpky4LqQ/S5ZYKsoudV
-	k7gTYFCwjlOgGsnF9hPPEFOt8IWNzRSNRaImA9hYvCGuSQP9leRDzbhG/ncjFWxqUOb8RksQj7a
-	bhfYXrLyDbzP8gORqYXsLRQ4ywRteO1ouB4vZnUEPJGb1Q==
-X-Received: by 2002:a05:600c:4f81:b0:4bb:5e8c:13bc with SMTP id 5b1f17b1804b1-4bb88805902mr425835985e9.7.1795721621193;
-        Thu, 26 Nov 2026 11:33:41 -0800 (PST)
-Received: from localhost.localdomain ([79.117.198.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906cdcc1sm368287675e9.2.2026.11.26.11.33.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2026 11:33:40 -0800 (PST)
-From: Jose Nieto <jnieto.alaber@gmail.com>
-To: Corentin Labbe <clabbe@baylibre.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexey Romanov <romanov.alexey2000@gmail.com>
-Subject: [PATCH v13 25/25] arm64: dts: amlogic: axg: add crypto node
-Date: Thu, 26 Nov 2026 20:32:41 +0100
-Message-ID: <20261126193241.1471372-26-jnieto.alaber@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RJyHOeUI
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F172F1F000C4;
+	Thu, 26 Nov 2026 19:41:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795722099;
+	bh=1bzMSOb08TutL6tdk9EvyHWnytggQnUyUPgR7/5Ax1g=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=RJyHOeUIEeC4Opp8QFsV81f+qYjsAvLPwI7+bGk4iDFoCIPxc6iCPch6snp1d2RYt
+	 FUzcUO52Bh7g+JNthXYMfRJKM+IOcbiiOBsDtQ8nItU2lnebtUr/Rm9GvTQ1a8Zb1d
+	 QWowuURkwHLhaUqH4pWaId8JlZ+Y/Ff5UN1yoLWBBtGc3FNLpbpiEqrQyq1rmU7KCa
+	 D24DI3gWB4edqqaqIp4ldOFHBRvalQHG1euu8xG6TFEEkh+De8yfDn2TAQ7lo7nKJk
+	 I9Lg5rDnJQY/s6MaGp1cWG5k0nEcc/uw/ESk+HKTmEXyXrc78C2J5HZvxRtfQ33axG
+	 msYvFVxcEesNA==
+Message-ID: <sashiko-outbox-236105@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v13 09/25] crypto: amlogic - Move algs definition and
+ cipher API to cipher.c
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Jose Nieto" <jnieto.alaber@gmail.com>, "Corentin Labbe" <clabbe@baylibre.com>, "Herbert
+ Xu" <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org, devicetree@vger.kernel.org, "Neil
+ Armstrong" <neil.armstrong@linaro.org>, "Martin Blumenstingl" <martin.blumenstingl@googlemail.com>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Rob Herring" <robh@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, "Alexey Romanov" <romanov.alexey2000@gmail.com>
+In-Reply-To: <20261126193241.1471372-10-jnieto.alaber@gmail.com>
 References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
+ <20261126193241.1471372-10-jnieto.alaber@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Nov 2026 19:41:38 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -104,38 +64,138 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Alexey Romanov <romanov.alexey2000@gmail.com>
+Thank you for your contribution! Sashiko AI review found 2 potential
+issues to consider:
+- [Medium] crypto: amlogic - unregistering failed alg in
+  meson_register_algs()
+- [Low] crypto: amlogic - meson_handle_cipher_request() left non-static
+--
 
-This patch adds a crypto node declaration. With the
-Amlogic crypto driver we can use HW implementation
-of SHA1/224/256 and AES algo.
+commit 08352ca67e625f03f4ad6f02c380a0279142c7e8
+Author: Alexey Romanov <romanov.alexey2000@gmail.com>
 
-Signed-off-by: Alexey Romanov <romanov.alexey2000@gmail.com>
----
- arch/arm64/boot/dts/amlogic/meson-axg.dtsi | 7 +++++++
- 1 file changed, 7 insertions(+)
+crypto: amlogic - Move algs definition and cipher API to cipher.c
 
-diff --git a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
-index 5b8ef98f6d03..e755a019b384 100644
---- a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
-+++ b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
-@@ -321,6 +321,13 @@ ethmac: ethernet@ff3f0000 {
- 			status = "disabled";
- 		};
- 
-+		crypto: crypto@ff63e000 {
-+			compatible = "amlogic,axg-crypto";
-+			reg = <0x0 0xff63e000 0x0 0x48>;
-+			interrupts = <GIC_SPI 180 IRQ_TYPE_EDGE_RISING>;
-+			clocks = <&clkc CLKID_CLK81>;
-+		};
-+
- 		pcie_phy: phy@ff644000 {
- 			compatible = "amlogic,axg-pcie-phy";
- 			reg = <0x0 0xff644000 0x0 0x1c>;
--- 
-2.47.3
+This commit moves the skcipher algorithm templates and cipher callbacks
+from amlogic-gxl-core.c to amlogic-gxl-cipher.c and exposes registration
+and debugfs helpers.
 
+[ ... ]
+
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/a=
+mlogic/amlogic-gxl-core.c
+> index 81d0e8731ab16..68d394e90f660 100644
+> --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
+> +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+
+[ ... ]
+
+> @@ -227,19 +155,20 @@ static int meson_allocate_chanlist(struct meson_dev=
+ *mc)
+>  	return err;
+>  }
+> =20
+> -static int meson_register_algs(struct meson_dev *mc)
+> +int meson_register_algs(struct meson_dev *mc, struct meson_alg_template =
+*algs,
+> +			unsigned int count)
+>  {
+>  	int err, i;
+> =20
+> -	for (i =3D 0; i < ARRAY_SIZE(mc_algs); i++) {
+> -		mc_algs[i].mc =3D mc;
+> -		switch (mc_algs[i].type) {
+> +	for (i =3D 0; i < count; i++) {
+> +		algs[i].mc =3D mc;
+> +		switch (algs[i].type) {
+>  		case CRYPTO_ALG_TYPE_SKCIPHER:
+> -			err =3D crypto_engine_register_skcipher(&mc_algs[i].alg.skcipher);
+> +			err =3D crypto_engine_register_skcipher(&algs[i].alg.skcipher);
+>  			if (err) {
+>  				dev_err(mc->dev, "Fail to register %s\n",
+> -					mc_algs[i].alg.skcipher.base.base.cra_name);
+> -				mc_algs[i].mc =3D NULL;
+> +					algs[i].alg.skcipher.base.base.cra_name);
+> +				meson_unregister_algs(mc, algs, count);
+>  				return err;
+>  			}
+>  			break;
+> @@ -249,16 +178,17 @@ static int meson_register_algs(struct meson_dev *mc)
+>  	return 0;
+>  }
+> =20
+> -static void meson_unregister_algs(struct meson_dev *mc)
+> +void meson_unregister_algs(struct meson_dev *mc, struct meson_alg_templa=
+te *algs,
+> +			   unsigned int count)
+>  {
+>  	int i;
+> =20
+> -	for (i =3D 0; i < ARRAY_SIZE(mc_algs); i++) {
+> -		if (!mc_algs[i].mc)
+> +	for (i =3D 0; i < count; i++) {
+> +		if (!algs[i].mc)
+>  			continue;
+> -		switch (mc_algs[i].type) {
+> +		switch (algs[i].type) {
+>  		case CRYPTO_ALG_TYPE_SKCIPHER:
+> -			crypto_engine_unregister_skcipher(&mc_algs[i].alg.skcipher);
+> +			crypto_engine_unregister_skcipher(&algs[i].alg.skcipher);
+>  			break;
+>  		}
+>  	}
+
+[Severity: Medium]
+Does meson_register_algs() end up calling
+crypto_engine_unregister_skcipher() on the algorithm whose registration
+just failed?
+
+algs[i].mc is set to mc before crypto_engine_register_skcipher(), and the
+error path no longer clears algs[i].mc =3D NULL before calling
+meson_unregister_algs().  Because meson_unregister_algs() unregisters
+every entry with a non-NULL algs[i].mc, it unregisters the failed entry
+at index i, whose zero-initialized cra_list causes a NULL pointer
+dereference in crypto_remove_alg() -> list_del_init(&alg->cra_list).
+meson_unregister_algs() also leaves algs[i].mc non-NULL after
+unregistering, so a failure on a later probe attempt would try to
+unregister entries that were already unregistered.
+
+[ ... ]
+
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl.h b/drivers/crypto/amlogi=
+c/amlogic-gxl.h
+> index cf07c5fbc5bf5..608ce75f027a3 100644
+> --- a/drivers/crypto/amlogic/amlogic-gxl.h
+> +++ b/drivers/crypto/amlogic/amlogic-gxl.h
+> @@ -161,10 +161,12 @@ int meson_get_engine_number(struct meson_dev *mc);
+> =20
+>  void meson_dma_start(struct meson_dev *mc, int flow);
+> =20
+> -int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+> -		     unsigned int keylen);
+> -int meson_cipher_init(struct crypto_tfm *tfm);
+> -void meson_cipher_exit(struct crypto_tfm *tfm);
+> -int meson_skdecrypt(struct skcipher_request *areq);
+> -int meson_skencrypt(struct skcipher_request *areq);
+> +int meson_register_algs(struct meson_dev *mc, struct meson_alg_template =
+*algs,
+> +			unsigned int count);
+> +void meson_unregister_algs(struct meson_dev *mc, struct meson_alg_templa=
+te *algs,
+> +			   unsigned int count);
+> +
+> +int meson_cipher_register(struct meson_dev *mc);
+> +void meson_cipher_unregister(struct meson_dev *mc);
+> +void meson_cipher_debugfs_show(struct seq_file *seq, void *v);
+>  int meson_handle_cipher_request(struct crypto_engine *engine, void *areq=
+);
+
+[Severity: Low]
+This isn't a bug, but since algs[] moved to amlogic-gxl-cipher.c,
+meson_handle_cipher_request() is now only referenced in that file and can
+also be made static and dropped from amlogic-gxl.h.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261126193241.1471=
+372-1-jnieto.alaber@gmail.com?part=3D9
