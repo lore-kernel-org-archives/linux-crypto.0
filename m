@@ -1,82 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.49
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795780913;
-	b=dukgINXyJamiR3oUXT1xKd1gA1gYW9b/LIFL/Hd6BBJ4I42ae6BRMcCfIyXtu100+gpC
-	 68SUxGOoPEjXVzgsNV8GqXExSYGHRCLDs8d514B0sSEEgkasaGtIrVnkcL48J4IUZRgIE
-	 2PvUzc1IF1VvMiIsdxUkTU/lSJVyQlsjtbyuYbF7GWVIgXE9DLSzHZ/a2sIAX81hXiVjz
-	 e9H+pCDo/9vXUOZRFiH3v7L0qGMCuXagwdENqy2Zq/j/25gxf+IJNrYhZ9qT9UjMRjJHp
-	 tF8gdnHRUUIPze9I/E8Y9n5B8ujXPxwdKqdVFbOTfrS7H+KuLCIJtZ4IypkX2iXo9KQ==
+	t=1795780914;
+	b=mkhDOXOQregcLlZLoFZPSjPUvnS2brY7IvCsAXafClBmaPLdGa/CsYK/ZNDQD/K712BF
+	 EN1VhsIWG4ABkBJmq+Y8EMDhy3tV+LN+/yj7jI8FsnmoN0LudlnXyMmppBz0QtaL90u/L
+	 B2N+4Vbp/tPBso83X0M5Ii7N/F+YAaj8DtAN7JIGf+VjHhvFrr+NZsK9LOOjFp/jVXpI4
+	 2MFdV549NjkogD7k1sKAW4+TGJIZkwz1ptfZX680J3dJwt8XTbQvqTsqD+rWpcmId3VpA
+	 lpjvWmJvCljIG9ZtHr9YlpukFRSeEE3ttdEl1bvzFWf88ObrNsfUdSA8/8GJLiwfOkw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795780913;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795780914;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=JDAQR0t8kY5iGUVaxptzIa8OAS8vI1YyQp0Tt2BgYTk=;
-	b=L+eLakBLnmYaqHUZYCD7RcAqp5IaVwXeSpYNyNhF3cjovVyF0RWfJ0EWE9U2UYx/a0eO
-	 h5UfcEARq5azmc5PMXfUebwkH89gJS45+DQW5I61W7k4v5T+1IbYwDFCY8B3qTUKsQu/X
-	 7+8CAjB5G9qjl2SPct2ir7Ulmu9TqTO23Dm7egIUfIjhWAgsFI83S6J1++RCnpva3jaTx
-	 /QB6gn8EGaYmCh1N/67PptG4e2ycTNHWxpXYEjOCMU2KEM1oCuXoiWqXygepWSB+bgFv2
-	 EbJA8Ks20RaD8TBm8G9hjdKhdNlUkquDe1fJrW5X00B+CM2BjT0Jzqj9dYmhROQQ0rA==
+	bh=6o5PkBcDr5mo9vn6AHRcwo7DgEVc20BXfKxW4pDcM60=;
+	b=rhhXk5jRNa+WNXzd/emHMWhc+UeiTIGlbM3qosymrdCrG3dvRDoU0d1TugGKRNEqliNu
+	 B5M/pQdJD9lhiWX9H8udD4mJJkl2zcJUts/wbsqpOECPWLl9PR+4T5I1aA9G9ApnN0ibW
+	 gxP+3bXQzqjfnBXnBN2FZHSUWV/CxtfWCd4RfnK6Bg9eL7PSMKBTztPcjBxttaAuXYRqQ
+	 JBSxSPhLDC/jPDcqIwC1LXKKZPUTSEwLltUlxaaK62ZhH0Sg3XA95arDg7Uqt3WjoK7Im
+	 4eAQbID8/iChuCauqMDFFsCQRNBMBuLmc1+JMhFtZib0+y5AE7UOGFTgEfXimxzqk2Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="MhU/aln5";
-	arc=none smtp.remote-ip=209.85.128.50
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Gpj0Umx2;
+	arc=none smtp.remote-ip=209.85.128.49
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90311606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4B4606A321
 	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:01:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 90311606A31C
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AB4B4606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=MhU/aln5
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4bb5b8ef642so69871175e9.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Gpj0Umx2
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4bb70074ab2so85073595e9.0
         for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:01:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20260707; t=1795780912; x=1796385712; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=JDAQR0t8kY5iGUVaxptzIa8OAS8vI1YyQp0Tt2BgYTk=;
-        b=MhU/aln5bkzzPoOpWT6PO2DzPhAB/DGmijpQK1gmrUbqek6TRSglVXYCUNFvPAA9s3
-         70+G04C+G2VoY4Aj4xngUOwDSuaWWfd/awcP5TWH1/R/XhEbnVXXd130Elltwudl2SmE
-         /52XFo7gkw0NBtYUvgjgeMaB7LlKNzTIWgsd0F4y1rVF+V/Ne4v4ybtuZalv9SnE3qgE
-         OUH+6YvqL8bfaIplc45veKr/NkPktYwrBFF45aWjzfRtXGB+ObwLIBOz3GhDnOHdUxOn
-         OhJtKsVNLdBTgUWNqghWfsxY2R1wV7mqBbQJTezCjlNmLCZsqG6rJ6g/5wHI3AxxI6eN
-         IeiQ==
+        bh=6o5PkBcDr5mo9vn6AHRcwo7DgEVc20BXfKxW4pDcM60=;
+        b=Gpj0Umx2YLwWJkWNmDrHGQXxLwihpUYAsiMnavVczRdVnVoXqYnAH0EBh8kWODq2Jx
+         LfDg/lh8AkQNSIP35Sc02EXjPZhW8zAEh97dUpLh8nrSTblEiw22ixL+pteUPl2Obtui
+         FIYUEEqJCqq4b5CJYUJ5mNKP2ewnvmXXbVpaUO9M64QT1nUy0Dtv6b2kBOu8pMFTpGrR
+         2HXmgYMv9T/4OqtzRsqQ9Yc4zJ2AIZ/6hzpj2O8Xn4WIwNQJbKkvt8Jnnwqu0JE7uvag
+         sQOuawLqCymS3YySXf4lrA8t1ALfBR6Fubgz0/JG8r8ZYfRNtA1y0TL+TemtrNCBthNv
+         G64w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1795780912; x=1796385712;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JDAQR0t8kY5iGUVaxptzIa8OAS8vI1YyQp0Tt2BgYTk=;
-        b=eCfZxxIyerDhsavJ2WQNcgxeGShbvW5SoRMf6Nn2Ib15mB3FjKnBOZx/5G6LcVS6Hv
-         ugily1orsCoJI0t2C5nVdpAbdZ7Snlt8cmPnCDVfBqy5pErzQJEpTEOdH6iI22g27ne8
-         mHqZZIA4yNKIaK5FdHywOmiA/Rbiu92MXQ4e1Wpm6qsoEBhtbTnSz+5Bha1HQatzOmPn
-         MuYmdCA1OYx84rdh2HFBhepqxyE/FKwdH+aVai40ufWXpkXWhJKt01naBd0tcM82eXEs
-         7InQXWnAX3l196zlrzJI9enekXU2W4b4HOZItIXSZDNT2r9wYNv8OSi76jHJ2Wi48q8A
-         yydw==
-X-Gm-Message-State: APuU4Z853QoRuTquQ6xoKRHLQnNyK/jkg8wrK9vQtpmy+571TTl3jeSD
-	Reao2MGZW5KTxf7wacii4GL7L/MtSqqQqKYaSqp12p9ntawi539VAey5tJVeh79R0sA=
-X-Gm-Gg: AZFdTZflPFcFmQ9ko9Yki6Lo7681/Jp0q8a/VjKAH4lI1AYSDnfaOKIH6iwcNv9IvZ8
-	SI25eUbd3s0z7IE2L8VBsTws23lsG0qbuceie7c5Ve7MDLzLIXZNagcRSjf1aho2jyyZaWyEGxv
-	1dHJ2H7bGBbmNfmr0iLjrWRXxWDDyzKZuB2jxtUhs9EaLjpFPQ5372/FCWwqiu9s8hXlRCrNFFw
-	yD+UwZSV22VBnimywCrz9JFSw8vfLj7w3GeaFqx00n8YVOT7/RLLa5sWljSObHCIK6C1CZybMl4
-	pJjeXkz52xydURXtv0qfrskh4ePGl6vJTb5UTrgMog6Ju75uuiPMwxe+a3ol0odlBk83h7Ybium
-	UWfUKgdgZ2pOmL/1CIq6xj/DjlWiWd8A28QtFZQzA364G2Q3aO8WDY75jUZX5UmTqXjg2gBECXm
-	/fTFkyuNoT5itd0EOK6Lo31hMRJansZQM+Yg+cI9NIaeZ7r5Z7NfRVDglLrLi55OCURhRybtNdl
-	eSFT5ljQyvJT02pO6wWeFHghAS7firsjOZtkR+Qu7wmEbgRdbd5YIaQLc+he/VfFVOZpuecauHY
-	5MHSVVRPRBJ9ldZ9pcLsXj11ffhBSKuckQOaQKNKLdK4ve8=
-X-Received: by 2002:a05:600c:5303:b0:4a2:1a:a11d with SMTP id 5b1f17b1804b1-4bb88785d24mr475302715e9.0.1795780910582;
-        Fri, 27 Nov 2026 04:01:50 -0800 (PST)
+        bh=6o5PkBcDr5mo9vn6AHRcwo7DgEVc20BXfKxW4pDcM60=;
+        b=IBCwNkQFIBnGX7dzXfBehxGv8BEM30+v61xyR+aVVHUNW2mm/QO8lAi6furK8IVNNe
+         BBbOfp6TvNRhmvAXzJXbWRDWwVryy9texC4LDvHeFp6xwSzOF3o3YDvPNpe8PDjD7blg
+         Mz83Wv49njbCHr1txASQIcGtTjdfC6WeYVTByWNwcH/v73OE959oVFcZMu8P/gNBKEmg
+         VE5X8vkRtOTZlX4yBfJUYhtUwOvmgC+8q61+5unOGX6VZTo0boXsGou94sZBEkEBdm55
+         zn/Dcgm424cHEdH2LDLwjBwkkfGEhq6uaiiXIZWxRFePLRkN8xH9QHc5jAjm3eb6CxHQ
+         dV5w==
+X-Gm-Message-State: APuU4Z9Od3fersOvlignA6bhA8WmDPmqZ8QOS4qrjCx2Q0LkYklYKXK4
+	Z4UBGVPv7iJGw/VP7keQkZZh9/hkNBjgBblW4UonCHECm6W9eZxkpQQn
+X-Gm-Gg: AZFdTZfNbmbLxXWSxEDxa2YK9RUHKixVrsJ5jFLtOqKwCGLRYmqm36HEmNtZa1U39w4
+	qDifd03QqpBNJGDOdSMvTNAfVvdnSmbEnQ/SH3nflxKIUG1t4GYK8JmQxTV3VtW6pnIF0fNEPxk
+	Y2UL9ThbmBeKSfvIXYsTKxcA8rc1YC1jZJSTfRpacVumTT9wig6P4I8CPGD7gDVURpeUIy1WsWY
+	EgObFqPIcEwLsMEpZxBhdfA++GHAjpjZq/4aVVzba5bVx+C9nGKlaIB/uCOnouUZJP+lR2OmCna
+	mqsb73gtZlIWoaMbFz326lkITC9kIfCaQXvut4NiI6a+TwDhs3hiepFrMmjjnkQXtuEqm47CXA9
+	Kwhve1P1XS4DF2d7hRGvCaAQ83q7/zqbw3Xf4lPW1xSUWK40DXkCGXmizFUZRtrM9w1RzsSxMgp
+	09LgeItGHOvJlWZsgq7ZhiNoQxFyZkaGpjHSRG3UdlzKGYFFdLBbS3fi/jskBHsa8t4LM2qOkqV
+	T4bXvRTg1CGMfjsuhR90z26cHCVTJyvejP/up3ZNEORQ2mqD9HPcIccsPySauMCQMQvZzRCL488
+	v92FbUDx1dOE1lDmKGt/myKWh/SwM5A/2r3VYPHF3FIVW3NE
+X-Received: by 2002:a05:600c:a0b:b0:4b7:6a8b:9df2 with SMTP id 5b1f17b1804b1-4bb8882432bmr483859845e9.25.1795780911905;
+        Fri, 27 Nov 2026 04:01:51 -0800 (PST)
 Received: from localhost.localdomain ([79.117.198.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.01.49
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.01.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 04:01:50 -0800 (PST)
+        Fri, 27 Nov 2026 04:01:51 -0800 (PST)
 From: Jose Nieto <jnieto.alaber@gmail.com>
 To: Corentin Labbe <clabbe@baylibre.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -89,10 +89,10 @@ Cc: linux-crypto@vger.kernel.org,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Rob Herring <robh@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Alexey Romanov <romanov.alexey2000@gmail.com>
-Subject: [PATCH v14 17/30] crypto: amlogic - Add support for A1-series
-Date: Fri, 27 Nov 2026 13:00:50 +0100
-Message-ID: <20261127120103.1532882-18-jnieto.alaber@gmail.com>
+	Jose Nieto <jnieto.alaber@gmail.com>
+Subject: [PATCH v14 18/30] crypto: amlogic: g12: drop CRYPTO_ALG_ALLOCATES_MEMORY
+Date: Fri, 27 Nov 2026 13:00:51 +0100
+Message-ID: <20261127120103.1532882-19-jnieto.alaber@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127120103.1532882-1-jnieto.alaber@gmail.com>
 References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
@@ -108,50 +108,41 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Alexey Romanov <romanov.alexey2000@gmail.com>
+The driver queues requests to a crypto_engine kthread and does not
+allocate memory per request, so CRYPTO_ALG_ALLOCATES_MEMORY is stale.
 
-This platform data also can be used for S4 as fallback.
-Tested via tcrypt module and with custom tests.
+dm-crypt allocates its skcipher with a mask that excludes
+implementations carrying CRYPTO_ALG_ALLOCATES_MEMORY, which prevented
+the hardware cipher from being selected.  Dropping the flag lets
+dm-crypt bind to the engine.
 
-Signed-off-by: Alexey Romanov <romanov.alexey2000@gmail.com>
+Signed-off-by: Jose Nieto <jnieto.alaber@gmail.com>
 ---
- drivers/crypto/amlogic/amlogic-gxl-core.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 08d89db14788..3a6bac10bb04 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -298,6 +298,14 @@ static const struct meson_pdata meson_axg_pdata = {
- 	.support_192bit_key = true,
- };
- 
-+static const struct meson_pdata meson_a1_pdata = {
-+	.descs_reg = 0x0,
-+	.status_reg = 0x8,
-+	.setup_desc_cnt = 1,
-+	.hasher_supported = true,
-+	.support_192bit_key = false,
-+};
-+
- static const struct of_device_id meson_crypto_of_match_table[] = {
- 	{
- 		.compatible = "amlogic,gxl-crypto",
-@@ -311,6 +319,14 @@ static const struct of_device_id meson_crypto_of_match_table[] = {
- 		.compatible = "amlogic,axg-crypto",
- 		.data = &meson_axg_pdata,
- 	},
-+	{
-+		.compatible = "amlogic,a1-crypto",
-+		.data = &meson_a1_pdata,
-+	},
-+	{
-+		.compatible = "amlogic,s4-crypto",
-+		.data = &meson_a1_pdata,
-+	},
- 	{},
- };
- MODULE_DEVICE_TABLE(of, meson_crypto_of_match_table);
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+index 6070ee6b488e..72892fdcd55d 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+@@ -498,7 +498,7 @@ static struct meson_alg_template algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_ASYNC |
+ 				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
+@@ -526,7 +526,7 @@ static struct meson_alg_template algs[] = {
+ 			.cra_priority = 400,
+ 			.cra_blocksize = AES_BLOCK_SIZE,
+ 			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER |
+-				CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
++				CRYPTO_ALG_ASYNC |
+ 				CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_module = THIS_MODULE,
+ 			.cra_alignmask = 0xf,
 -- 
 2.47.3
 
