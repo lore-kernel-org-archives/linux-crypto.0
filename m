@@ -1,82 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795780929;
-	b=I9ARSreRO1GC9KXFydCAZOmyJMixvhFBt1Jr6b6AuwLa3RstZhxPWCFLctr6yVHdhJrI
-	 GdmCzG7IJiTIn1ZRY/+mn5p1gZa4mptfoUHZJ5qvdXAkWjb/gdKLQsdzGtqIseLbl8JHb
-	 kypi24nyGP+JSso7dUYopVLzXiftHrwl50rlchJiycWv0GUJTQyJgEX1JEhX9zTIDkH0c
-	 RV9OWw1CjOJCwMs5nig1YLt9gQXQatHVBsLXY5V9syLXdKz07zC6Zhl+rrYoBov3kaDAJ
-	 3nWF/+XvxhQL46H7DpmQ3EyrEh0uja2/g58SQpAGyI9lW0ekoQTHb76y6FInrS49Orw==
+	t=1795780931;
+	b=utB0NfilF6EssWD7XNIxinsXygMg/TDEWlrmW9ah1cqYHg8nKbsTq7X4gLSxAqL/bBP5
+	 OKq8ehRI8RVXO4CLgLvMjbEyfMUmPxx7yxrj01r7YAPIhWp2kWfGI+QxwZORm9ELPMvmN
+	 SEblSq0m2kPWlp4g532uecwLk+TPhfvIaox/Iy1Qz9GQB+N/Iz0uBvPgH7syzxMRkpJi5
+	 paomXi1/7qO+rIfsVYJVdFvPZ/CDx+0XxJbDkuf8eu4BpaX/wB7S38Wfhtyu27WoJ51a4
+	 usK/z6DOW0Mmjupe3gqmnr8Bi6rwtVL4vY5k2QMVenIYpkMiv2EA+XAsIybEkfcI6+A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795780929;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795780931;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=X5YVvV6vHMcU5kHSKr3HyFQG5tHJwE0SH4iS9jSSmfI=;
-	b=F5VlOGZPcQGqaA+k+VunBzrPIGf1RiqQlP498VD8lFBtAYS5dSAKmYFQkVOIs4LzJwTZ
-	 ciJcd/4ddgy2jt76cQfhDF1baePGYe9B6txMMYUi44hC08/aJ4rAcX5umBMdPmHEIYsFA
-	 OlOLDLyeV00yny0UlGoKk0m/KI9kU8l+IN6jkL+j4ep+gGv3fx0S9z8zVN2Mdp7yBGhXB
-	 SsxrsJiBuANUtPEKih7nFVqE+y1pY4mZSBuYZNv8prrBD/U89JbNWJguqgpUFAWACtg5J
-	 hiKR62ipgVM0/yRP9+vDg9nLjM9iI6LWf+K1JXdwy75CILgnGWhABEVw9VSAZdAWPRQ==
+	bh=ideFtYn4ffgnnNVgM+MGgEFjn8Xh17mg6POE0V0VRbw=;
+	b=Cm4dqWzN/HWygLpJwkNIaQ5eX0QfLh3BF9xV4WDayxxK2KXKKPGeJi0/tvbh1peCaLv4
+	 OjcswIKz6TD+V7B9t2xQEGpadIp5awPAeOritVQe+AB/DX0h9P+iSuDa02WjszJgULpQo
+	 fuSKO8qCEG9QUDVpF7FG003Y818A0kQWCm9QxbO5El1EqfOT60TYSaFwOpbQuc2MMW5DB
+	 zHZqEIfnNU2CsyEhyrGnBVO8VhTZKUpqcIw0T9FT17bhC0yEozlLPVl8XqnSkF9GjlyN5
+	 +rwUMwu7zyxaVWSpVVhI9j0owamfP+1X+BlS0/oVnQlZ4hmZbjGqJ5bXZHhpOhDmsyg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=BNTGZnLi;
-	arc=none smtp.remote-ip=209.85.221.53
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yzEswMY2;
+	arc=none smtp.remote-ip=209.85.128.52
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49014606A321
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:02:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 49014606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE59606A31E
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:02:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ADE59606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=BNTGZnLi
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-497614c95f0so4574053f8f.1
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:02:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yzEswMY2
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a2153c8525so65053665e9.3
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:02:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795780928; x=1796385728; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795780929; x=1796385729; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=X5YVvV6vHMcU5kHSKr3HyFQG5tHJwE0SH4iS9jSSmfI=;
-        b=BNTGZnLi+nuoqEAUzLgrNo7Oy9isPiKJMMljUrMwoCTuau7ce6UNgXegXzXBs0iorK
-         lnWHfVnP97mIv+91kT3kK/dvWxjNRO70eR+zZQRR31DgBtuH7tmhOq93LwA9p6pUHtVh
-         RrCqjHLvyt9HIP+N5M0huvUSZl+PNf5pANw2O6SFIuthC5bwFNM0CwM2krpfSLf9iv7A
-         GhaewoB/n4iWHosBwojXM9brEgDA6MdElr4cfnKSrKTzLWuB5qrm2CZ8JxTSaniy0Ld0
-         rTAbu0eIie/fYeoou0PruDtvkHMhn7QQ8WfYKC+UqP/OKg5aymmtUKHWY/8I4m3ccW57
-         N7Eg==
+        bh=ideFtYn4ffgnnNVgM+MGgEFjn8Xh17mg6POE0V0VRbw=;
+        b=yzEswMY25Uf78QOCaVLO4IO2jI+aZlMVeeaqulC4HiHD89RBFE+VNyjD/Ghcq9oDRD
+         s2B/MubFzSbiggtet4AHREwbsG+cOtB7n2xRKn284CPHIa0WgXi59xjpwAGJlviQswrK
+         8RUmgf3T9fu94ggPUN/FvXwISQWRar60eoIXDyZ7YVKl6dsIDTG81pu3mgUefBMy3Ttc
+         s9uOoKPHZdqBypwHUZPacrbC7+vPmI6XlSEZneGSxqNTsTLZ5poBgR424QTl6Ruxxc6a
+         esUbKQ9He6CvDDS2WhHPa3TaXK9fG/bvN6Rk/4HCHF0WiMqrxP1IzSNfx3KPsLFeRMK5
+         yI7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795780928; x=1796385728;
+        d=1e100.net; s=20260707; t=1795780929; x=1796385729;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=X5YVvV6vHMcU5kHSKr3HyFQG5tHJwE0SH4iS9jSSmfI=;
-        b=r2nMMGNNEkXrSiG6ZlED7sLaEPIRp+1ocyIsPY47+x2//uowKZoca1SplsaIA84/3q
-         jazBd2qDW86EJW6x1EzMI9MvNykAiiOflr+FRCakyrSHPNk8L5TDyK//Sf+gu1mkCUNe
-         Ut4doryDS1mSEmLFxA+lvofJNyvMFpmJjGfdxkELJQSGibcueZV1DsITt/1RpgR0J+BK
-         X3C19A4kXYVL0P6yU4gTXYChAVwQU86hFiKNZs89RyW94RKaTJqy9wnx3kmWxYNp2a8R
-         KKFMSHa9jZfyhEP0+vzrB0GvBJ8avD4ztCLrB09ROCw+yY29xxCC+YMYwcjQcvoQSh3W
-         vTyQ==
-X-Gm-Message-State: APuU4Z9N7KupjOznifqAkRzJ5InRykWkWL55x8Kk7V94DV1vbF/8I+H1
-	Trhiuw2hK+CzC5PvF+Xe01BOFfQJfUGTBkKWdUGW5BcxLez3hs/ZI4PK
-X-Gm-Gg: AZFdTZdu+XhQ822aHwGCHBuMCst89LPsW3I+xqujgnXrnfPx9e1UYQ2jGCiHuj37o84
-	2SuRd1ZGu+DDDSdscoFR+tIRRE3sGLz94rxWKDCHlWNOrPD1//r2wmCPOg/tCNMTBfVbbmyckYZ
-	5ufBhWvUJeL3O/tk+vIOzTSw68gqwbMi5zXpHh8sqyuJw/5bodqmRv6NHv074BrGz31X12zbKPX
-	P8DmEowzSKSZun7IY48jJW3KU6+HSWk/kUrYKJIdAjwqXY/hwP6x0H95ZoIU0iNMaSxc6qvITMd
-	xQYUc1DhXplm+WiJlQTz8MLj3e8oh72/QJinphLyDqvUFVlwpjs93PXvm4CBJgMDBgPy4EWRK9+
-	p5Y/xok9lC5f8E8/Mcl/cXp+s2hXv+vPPRNW1FxgqVywTq49eUMB1lPx2meoIaEr4tPdeBE2zPn
-	LW3M0JTg248dhlnQCZHx/wPHxEmnthFMDqcNzaSHDxE+ufwdNvgnlayxgIAQe5oVi1Q6hrIrLS9
-	vLU6HAksTwglBX0BhuJbMSjlfGw/+m9j5rttAJ95mdB43XGjeuZev1Kciy3Ap3iknn4yYEacELf
-	KWsiZG9qvQWkKLPNA8d2iAETSz6cx1/1szhp5JH4yZgtciM=
-X-Received: by 2002:a05:600c:848a:b0:4a1:fbd2:f689 with SMTP id 5b1f17b1804b1-4bb8880993amr464473645e9.7.1795780927493;
-        Fri, 27 Nov 2026 04:02:07 -0800 (PST)
+        bh=ideFtYn4ffgnnNVgM+MGgEFjn8Xh17mg6POE0V0VRbw=;
+        b=PCZu6WJxuYp5cOq0kZ+OsgABxwm/VB3ctvpoRww9it4XUeC0gGb84aImTnrvYCsN4X
+         8A1ZzGAmQ5jPhibJVx+VTtgUm63m/B0wxTDax43G9F9KCaoOBvLiA8dOO/1bBTWmCpYF
+         O3FLwG0GiJS9yizWfrW28Wv8FcMAJzNQtEN7dlK1JojArHN+wKKp9+L6YEMXAZvOBcPN
+         1N+Q26aPV7ARV0EqIybjkSyeWlMy1mUcoTkqBeGK/W/IH/kcQ0PdagvprkRB7UNOuVkz
+         zeXMB8V+1QqCxnP5hwOiW/MtxTQl/6OelBq+WSp9kj6CU/R1q/cMSFg7P2SUPSnnm5VU
+         PyRQ==
+X-Gm-Message-State: APuU4Z+CBpmq1RuceS2MdH0gI5r7Y10K0nj/hq27vK50sPqOifTfC1TE
+	6D6HiJVC/gsKEiiaht1vx8ZNSE5JhQlwvsr7AFORV9yHQuBLX05sO0eG
+X-Gm-Gg: AZFdTZfoH8/AtYiSZ7YRslHAxgl+ZRogp54h2tcqKaDbPHvzbrh28lmFto68zfI7Xlc
+	O5O/ypvNSGgD03iV1G20w0hFWNM9yDkd5Cz7PrvgW17QJ9zfXVrmBlTK2RPfhkIh/XREW9VS7ez
+	9EMIdf2uJBSSgQho+tdswByDylVQFwrxBZPERa75pWhrsNzwXlu6dtneOokPDQu99aAob//Gyxm
+	k8oTA6+ZzP8/TpOCLIl2zcMPFulKH9WJujPPzyAf57CxCejG2dY8EMIygVHtxYOaQxrehqcjGpi
+	GrYlUoLGjeMKmO7smn86gq907VAH8rnRzopcYAWd7GWu0Mo0dQJcqAvo/8c2gJ4FMfzOctjImLT
+	9P9UlkarArA5U6o8Tan53xUQ1PfV3ZJHQzPTs6itkAjdYzvokQ/EqRGdPX0tHYgi9Vvs0kYK/6k
+	56gchk2SJ1PWUeoZypDJTsYc9FLj319kqXAmLFIf2GBMcd790HN+xAQEiIi4Iqfv/kbtnmZduYn
+	64Xs45pKx9BM5GixICvF2UqV0ixM+0kz9Xt0JnY45S5/76/V5YkGSX12X7GCtqRY4K0A/h2MEOP
+	ms1qk/2sfjGf7bMhhzRcT8Pj5xClDOISYjUpZgfCqCoNBcc=
+X-Received: by 2002:a05:600c:c8c:b0:4b7:6942:39bd with SMTP id 5b1f17b1804b1-4bb88820e06mr485025885e9.26.1795780928793;
+        Fri, 27 Nov 2026 04:02:08 -0800 (PST)
 Received: from localhost.localdomain ([79.117.198.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.02.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.02.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 04:02:06 -0800 (PST)
+        Fri, 27 Nov 2026 04:02:08 -0800 (PST)
 From: Jose Nieto <jnieto.alaber@gmail.com>
 To: Corentin Labbe <clabbe@baylibre.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -90,9 +90,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Rob Herring <robh@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Jose Nieto <jnieto.alaber@gmail.com>
-Subject: [PATCH v14 27/30] crypto: amlogic: fix probe and algorithm registration error paths
-Date: Fri, 27 Nov 2026 13:01:00 +0100
-Message-ID: <20261127120103.1532882-28-jnieto.alaber@gmail.com>
+Subject: [PATCH v14 28/30] crypto: amlogic: fix setup descriptor lengths and CBC IV copy
+Date: Fri, 27 Nov 2026 13:01:01 +0100
+Message-ID: <20261127120103.1532882-29-jnieto.alaber@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127120103.1532882-1-jnieto.alaber@gmail.com>
 References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
@@ -108,75 +108,80 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix error-path issues found during review:
+Fix the key/IV and SHA state setup descriptors and drop a duplicated CBC IV
+copy, found during review:
 
-  - meson_allocate_chanlist(): propagate a negative platform_irq_count()
-    (e.g. -EPROBE_DEFER) instead of replacing it with -ENODEV, and unwind
-    the
-    channels already allocated when getting or requesting an IRQ fails.
-  - meson_register_algs(): clear algs[i].mc before calling
-    meson_unregister_algs(), so the entry that just failed to register is
-    not
-    unregistered again.
+  - meson_setup_keyiv_descs(): program the per-descriptor length as
+    keyiv.len / setup_desc_cnt instead of the full keyiv.len, so SoCs with
+    more than one setup descriptor do not read past the key/IV buffer.
+  - meson_setup_state_descs(): use MESON_SHA_BUFFER_SIZE / setup_desc_cnt
+    for
+    the same reason.
+  - Drop the CBC IV memcpy() + dma_sync_single_for_device() in
+    meson_setup_keyiv_descs(); the IV is already copied and the buffer
+    mapped
+    once in meson_cipher().
 
 Signed-off-by: Jose Nieto <jnieto.alaber@gmail.com>
 ---
- drivers/crypto/amlogic/amlogic-gxl-core.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c | 15 +++------------
+ drivers/crypto/amlogic/amlogic-gxl-hasher.c |  3 ++-
+ 2 files changed, 5 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 8ce3f6640753..c11d7d8250ea 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -106,7 +106,9 @@ static int meson_allocate_chanlist(struct meson_dev *mc)
- 	int i, err;
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+index c11ccbaf920d..10815ffe3313 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+@@ -147,24 +147,13 @@ static void meson_setup_keyiv_descs(struct cipher_ctx *ctx)
+ {
+ 	struct meson_cipher_req_ctx *rctx = skcipher_request_ctx(ctx->areq);
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(ctx->areq);
+-	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+-	struct meson_alg_template *algt = container_of(alg,
+-		struct meson_alg_template, alg.skcipher.base);
+ 	struct meson_cipher_tfm_ctx *op = crypto_skcipher_ctx_dma(tfm);
+ 	struct meson_dev *mc = op->mc;
+-	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
+-	unsigned int blockmode = algt->blockmode;
+ 	int i;
  
- 	mc->flow_cnt = platform_irq_count(pdev);
--	if (mc->flow_cnt <= 0) {
-+	if (mc->flow_cnt < 0)
-+		return mc->flow_cnt;
-+	if (mc->flow_cnt == 0) {
- 		dev_err(mc->dev, "No IRQs defined\n");
- 		return -ENODEV;
+ 	if (ctx->tloffset)
+ 		return;
+ 
+-	if (blockmode == DESC_OPMODE_CBC) {
+-		memcpy(op->keyiv + AES_MAX_KEY_SIZE, ctx->areq->iv, ivsize);
+-		dma_sync_single_for_device(mc->dev, ctx->keyiv.addr,
+-					   ctx->keyiv.len, DMA_TO_DEVICE);
+-	}
+-
+ 	for (i = 0; i < mc->pdata->setup_desc_cnt; i++) {
+ 		struct meson_desc *desc =
+ 			&mc->chanlist[rctx->flow].tl[ctx->tloffset];
+@@ -172,7 +161,9 @@ static void meson_setup_keyiv_descs(struct cipher_ctx *ctx)
+ 
+ 		desc->t_src = cpu_to_le32(ctx->keyiv.addr + offset);
+ 		desc->t_dst = cpu_to_le32(offset);
+-		desc->t_status = cpu_to_le32(DESC_OWN | DESC_MODE_KEY | ctx->keyiv.len);
++		desc->t_status = cpu_to_le32(DESC_OWN | DESC_MODE_KEY |
++					     ctx->keyiv.len /
++					     mc->pdata->setup_desc_cnt);
+ 
+ 		ctx->tloffset++;
  	}
-@@ -117,14 +119,18 @@ static int meson_allocate_chanlist(struct meson_dev *mc)
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-hasher.c b/drivers/crypto/amlogic/amlogic-gxl-hasher.c
+index 978cdcd8a4f9..710dd413bd51 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-hasher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-hasher.c
+@@ -253,7 +253,8 @@ static void meson_setup_state_descs(struct hasher_ctx *ctx)
+ 		desc = &mc->chanlist[rctx->flow].tl[ctx->tloffset];
+ 		desc->t_src = cpu_to_le32(ctx->state_addr + offset);
+ 		desc->t_dst = cpu_to_le32(offset);
+-		desc->t_status = cpu_to_le32(MESON_SHA_BUFFER_SIZE |
++		desc->t_status = cpu_to_le32(MESON_SHA_BUFFER_SIZE /
++					     mc->pdata->setup_desc_cnt |
+ 					     DESC_MODE_KEY | DESC_OWN);
  
- 	for (i = 0; i < mc->flow_cnt; i++) {
- 		mc->chanlist[i].irq = platform_get_irq(pdev, i);
--		if (mc->chanlist[i].irq < 0)
--			return mc->chanlist[i].irq;
-+		if (mc->chanlist[i].irq < 0) {
-+			err = mc->chanlist[i].irq;
-+			i--;
-+			goto error_engine;
-+		}
- 
- 		err = devm_request_irq(mc->dev, mc->chanlist[i].irq,
- 				       meson_irq_handler, 0, "aml-crypto", mc);
- 		if (err < 0) {
- 			dev_err(mc->dev, "Cannot request IRQ for flow %d\n", i);
--			return err;
-+			i--;
-+			goto error_engine;
- 		}
- 
- 		init_completion(&mc->chanlist[i].complete);
-@@ -169,6 +175,7 @@ int meson_register_algs(struct meson_dev *mc, struct meson_alg_template *algs,
- 			if (err) {
- 				dev_err(mc->dev, "Fail to register %s\n",
- 					algs[i].alg.skcipher.base.base.cra_name);
-+				algs[i].mc = NULL;
- 				meson_unregister_algs(mc, algs, count);
- 				return err;
- 			}
-@@ -178,6 +185,7 @@ int meson_register_algs(struct meson_dev *mc, struct meson_alg_template *algs,
- 			if (err) {
- 				dev_err(mc->dev, "Fail to register %s\n",
- 					algs[i].alg.ahash.base.halg.base.cra_name);
-+				algs[i].mc = NULL;
- 				meson_unregister_algs(mc, algs, count);
- 				return err;
- 			}
+ 		ctx->tloffset++;
 -- 
 2.47.3
 
