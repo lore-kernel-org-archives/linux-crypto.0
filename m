@@ -1,82 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.54
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795780874;
-	b=sRUtl2YFeGiaIVk/7W31GQg8p/BfdXRRFJHnxF0LDzmjifGFiP8BVsme0yJsGVfl922T
-	 BPv0QWBqIBd93425PtAuG/IOmxVjnUB8bvS1szDrsNPUqn+oaGmugmpM/f3JeiO+iRxRk
-	 YeSIoBA8PWI02PNbN8AnFV+f2D6Eok0pRR5fxmuImnWrS1WtlG0RAmAV+9g+lc4g4nmEx
-	 LZr49ckpLydcDcsYAlI3feKkHxlFXk5RElg7T0JAzlBB3vt12FKdfsYl1nLiu+ELQeslb
-	 XLMebXZPSbYnpzTTvAy6gPJafv8vRF/g3d033WbSNeGG5ieUAA1jmVDVBg5S/jwpWfg==
+	t=1795780875;
+	b=dFr/Pw9QnD9paUvFUrpAl+QuS3YOauH+dI+/dH45PQnIsbMinMNpSIDfnRP5dMJ7nN6S
+	 Jd4zm/ShpWEaBCb575uwwJeI7IpX5W0L0meicMW2iD+0p7Uvn5IFf0dPTQcVYyGRSACwb
+	 ZkvjiH2OecpdX5wr37Rt6VqummYwsbFLtQG7ZmcEJxhG7RE15iHM+crgiE9qUcmRy86kV
+	 +pfN2U4q/Q+iLW9CiCyhmJXjRsnYyfeVSpxf6Lge2ntCQH1SWQ+AoEzPbd0GxQDOBCvbi
+	 Un+zl/oMvFuajMA6FxaH6qdSThNsVQdYiGPwgVclV8iQ3MkrDHEZo5+P55X/yGOsWWw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795780874;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795780875;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=qdrFFlZr1wr6XK2UP+CUx9GD+axY9UPnNDp3yG1ITws=;
-	b=fStXQXn9OmuTYhYcePSPT7Ac6M116QJFXcOyzBMnwCui7WoKf13/KMFPJIe5RWu/u9Qq
-	 QkSoMzJIzPwbPJp1B0htzqxZbM6DkGkoko0sH1+XUFx1fLHaqrcxpSZ4VySGQhXGMNZOF
-	 SldbI39p8LpClcuJJWFuoOxMcOy9i/6uFJiZ5uWq1AaA2FCuoCAsvYG74ptbzpGSm7aG2
-	 FqFOk6/XgSjimh+Tw0DTl17fM940auDpf2t4m2b99Ff+b/dcCdMm9lDDeFPqQQUJ6ORi+
-	 cycs453TNbiiVyO57cQD/fhsRjhZoYk56Zyu9qdKKkulrpF/S6/+quh3DquiRaGt6Gg==
+	bh=yslwO1t9MXGHf6kGSQvi8Jsla7lrMGXHDb1MA6K0JGE=;
+	b=sfmGNlN1WF1OGwdEbNcvO/nkVZm35c1rqjkmf6WeWFXjIFK94xTjEi8iWlksxovo8G90
+	 aZQLt0eUcWFUM4rmGqLI8aGlMO0VDH+uwQvFsiDfOHREZ+nPGdLFH4LEc9WxvWzbRGtoO
+	 xxDQqSnXx2HuhwfEZFkEelDonx1kgJu9TOsnSX0dE3tfmzNIpaBrgcvzdGiScsteTWUWR
+	 C5GkBWbOCQFHCfawdWEerDJRa8musoUvOkqyVqvFLPco/jsSq29sYU7bP+/ZGs4kV0faf
+	 1DKCRO+/+DQkI6p6O5mskkFfIJKPNEHdsWpdK/P2+x8q1d8S5GrR7NkNJExGro4xstA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZrhBSsxA;
-	arc=none smtp.remote-ip=209.85.128.52
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=foK5S8ED;
+	arc=none smtp.remote-ip=209.85.221.54
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F545606A31C
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:01:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F545606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785E4606A31C
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:01:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 785E4606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZrhBSsxA
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4bb5b8ef642so69866105e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:01:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=foK5S8ED
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4a68190a2a7so6802101f8f.1
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:01:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795780871; x=1796385671; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795780874; x=1796385674; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=qdrFFlZr1wr6XK2UP+CUx9GD+axY9UPnNDp3yG1ITws=;
-        b=ZrhBSsxA9TmxODqx2oG3o8BLWXL0DUBgbiWp0ohzIyWE3mVyt8801pQNfp0epUwm82
-         wTJuYbitpgqsODU651dqu/97lnZ8c7zwCdp4XYm5IGprlzeeKhM90MIXeEpLAlp6VFUh
-         IiK6HcPstuAqz0hXgy6mzMOHsSGKyuHEmZiUqz7hFvlCRUXxGQb/xJVXfKU2Qb6nUtL0
-         CSCSR7ICkJQiFzJ8YMPWAlnLJLngsXDEEZGVKbiZG8ahIFPClPVIMXpao4fZ2dEul3gL
-         MfqrdSgzSQGfBAMkb+zhEZEHKudU9bT2qT8P3pb3zErEbvY1GShjn88saaP9qHVD2rM7
-         Rx4A==
+        bh=yslwO1t9MXGHf6kGSQvi8Jsla7lrMGXHDb1MA6K0JGE=;
+        b=foK5S8EDypCGyYz7Ln78+2iClqhaLe/Na41jXLaL7NmCrKavI8avv37Nrx4FXbMZgW
+         RzJ3QWsNgv8Jw+6L1+A5BEyRcPirg+/vM6/vA0TK8FolAnaRNKaJ7WILBmteUPQ1QOHP
+         wnf9J6Dk9kXRpsULzWw1ewxN73D3Wcs4nbzSEiqeA8Oif2n03z3HRL/xGKkD2MLjynZ/
+         aGoN4GaHw1T+DFC0gNut7hUKgWtJTyACFb1UcVhaTsO1xVwnV3/hb58PeJfkjBGM9vsK
+         uo7EHLquiqguELo683LllLtZQxlw1+WkminR/amubTC2/QSXcOq/WWpenf50pbfIb7xV
+         W51A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795780871; x=1796385671;
+        d=1e100.net; s=20260707; t=1795780874; x=1796385674;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=qdrFFlZr1wr6XK2UP+CUx9GD+axY9UPnNDp3yG1ITws=;
-        b=RUN6Ru876lKoaH3rsvPWOHusao7FH0w1/0HYsRQVy/8MPJYrAnyaN1CFt45rszqExH
-         z4E3HNXLJhSBH+4TTpFuDzKao7mlHSkJC0/KAbtx5wFL9f/A4/vV072TAaRMT+JWnKoo
-         eCm/V3bnkOVFaBjCWpv6LJEqhOa2UFckp5eq4f6mTk5xFu+byPyXeUGpWVNQPzyboQgo
-         kNceJIx8eoAk4V0U4e5LKindM3EXkYzitafKF2PdMwipjh2nSrVjiW+kq97Yqf+AQSOl
-         Wc2BJlsv1dwZDMFNUUFz/dT01Yc5GpPNqqBM3RVpbfCCN8aduGRX7clyLfGXFLPsdwCD
-         Zmiw==
-X-Gm-Message-State: APuU4Z9HoMBQ1H1UJ3IvX8k9m0TcSKjQdTi2sQLo7QMiEH5yTcjo0MRp
-	c2pIb2WuHPbT3sYDEmWJ0Y2k20/rOc+bWI/Dfz0cd760dawojMRLHs8R
-X-Gm-Gg: AZFdTZeB+iHDoxBDd4yJgxZyf+HN8S6us+ijTL/sZ1xVyr0UMT11qMKr8goArywvgtL
-	QmgfsBfAm0f+MwijYGsAZrW84VitZpcT57N3wRt4yYKtlw1xDaqTGfIYytteE5JucfWFb4Z9bHb
-	AEMwd6Q9O1kZS6Kn8HAmlHMaJKQtCR0K0Cgo0yCr7Nnw+PwhVWsPDIC0utMlwXmyfsW+3v+NLzx
-	Zm3majINAiONOLiiPE+mgo/EDwVHCxKN139HqsVCS4wNOMsJnl+kMa4EY4SX8QksUvMiKm5T2Ab
-	298G2sxZ5yUnwJz24wZi6Rr46WS7zDwzyNTkn60pf7p6lWE3NZjbStbN5t/op2kWHfrWMXYNMay
-	sfK6WXkukX/V63h/7E/dMNGlLR2e5HWHGTYx1bs8nU9e4ppRQDMGFs+bo/teuMk8mTth010G57B
-	oNTtC1giObSoZV3nwicS1c4hfokMfwwF7yNwdQ7mK+uUzCKwEyX/YAicCjNnluDvteEtNn4gsaK
-	y8lIZvp9HmgnH3EL7N1CPmYXiLy0bOHzBJp10W0jlJNagRJJ+6+vBpZI/v8FWMZ0l4V5LMmB5Mb
-	CTdpeNEF9tSwC5Rl9u9tKdJ0cdCUeZtEWK4AJz8rMyKpCDw2
-X-Received: by 2002:a05:600c:3e1a:b0:4bb:6814:7391 with SMTP id 5b1f17b1804b1-4bb8881921cmr485415525e9.25.1795780871097;
-        Fri, 27 Nov 2026 04:01:11 -0800 (PST)
+        bh=yslwO1t9MXGHf6kGSQvi8Jsla7lrMGXHDb1MA6K0JGE=;
+        b=blcW7MiKn0grdiNZ5d8fM8BY18uSy0O6pZqzskIa4TxSUDeRriNIEPsEVdwr5LXI6W
+         NmTdwgi+Z6ANOCPbwrcr8zWYkEXGNrPN7Ca0sY1JnVlPpdM8eRsQR1BK/IDHbGpyAQql
+         /T6jB0Dys6O7yk8zut2E5vOiDotnkSYgtGQzwDvXhLyn2Nhzk7ADueZU1xuulcGlIlb4
+         GU6wlQ/y0xc+jvVucW4JZU8U/Y2rC/zA8ZYts08DBoGqcLKUIrQcdzLwrImEJ44OJ+2M
+         DeQdZUpD2s5TSqbLbI5QKdKXqXQxoI1X1s43LUxJeCW+3V9w+1inANOx9MYUSkz6pgCv
+         orVg==
+X-Gm-Message-State: APuU4Z/9MHGZ9jEF+ryneO+9Bv/Gqvi0rxeS4uvPwC6UWiksnLad+/o3
+	McBi0kMZqEXrBRTkl5ZPwQPMoP3PvC4zCpk/8U8a/VuaC/qzU0DoWHbm
+X-Gm-Gg: AZFdTZf5m5jnhTxgbaX12WFVb7ADtu2qtH4xdRwW/kIwVeJlQOADiYw3m6d15H62pKG
+	3xXAIfYC8n2BafzD3p5IjsmQzCyRIx38pHE1JlzE+XrUAwnmg+ZPGcqGsoWriD1jQyoxojxwBYe
+	8MrBEChLkmBLIMRhNvjKqc0Gg027HAOTxcRg74rSsT54xqI6eqVMbiAdZf5nyl/NLUGPRi1dPuj
+	S1ntk5kUk85msVAnmAhIrsOFhlIuMInquwgujfNBoLfRw8WAXyVoVLipfrViyNEiBZJS1UoYeHt
+	mhecxU7kyQHUXZbUPh/ShnEhuMictdZ8anuftrK4s4gNWr/U7PAMtE2Yi8wPqIizY5X0fK31pT1
+	eW6PjmF7KdiQ9+1MqsrFHW2sSiR6ollsggvIE3nzOLTGZR3JUCkFau3VqsSv556orhhBkaxj8OK
+	oRhNX/RH3ymsg489HvAvdWAO/8H6GPuC6lvgkpIVaBDrh7v3TCswjlVAJi7wfd+4jbbDQsrHfLY
+	aE32H1ZzY+VDqdFHkzxsQJvzbhwBuQm7gkg+3JpEhlpOTvp+bQeqGIdhoR8vyxwE909ZcqwmywK
+	ICkTjQqYfN6B1F4uqfyxtQ4lmMO0cQ7KblLJh69bTbaBXg8=
+X-Received: by 2002:a05:600c:8486:b0:4ac:aae6:6401 with SMTP id 5b1f17b1804b1-4bb8880606fmr497694375e9.12.1795780873562;
+        Fri, 27 Nov 2026 04:01:13 -0800 (PST)
 Received: from localhost.localdomain ([79.117.198.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.01.09
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.01.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 04:01:10 -0800 (PST)
+        Fri, 27 Nov 2026 04:01:11 -0800 (PST)
 From: Jose Nieto <jnieto.alaber@gmail.com>
 To: Corentin Labbe <clabbe@baylibre.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -89,13 +89,14 @@ Cc: linux-crypto@vger.kernel.org,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Rob Herring <robh@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Jose Nieto <jnieto.alaber@gmail.com>
-Subject: [PATCH v14 00/30] crypto: amlogic: add support for G12/AXG/A1/S4 and misc fixes
-Date: Fri, 27 Nov 2026 13:00:33 +0100
-Message-ID: <20261127120103.1532882-1-jnieto.alaber@gmail.com>
+	Alexey Romanov <romanov.alexey2000@gmail.com>
+Subject: [PATCH v14 01/30] dt-bindings: crypto: amlogic,gxl-crypto: correct clk and interrupt lines
+Date: Fri, 27 Nov 2026 13:00:34 +0100
+Message-ID: <20261127120103.1532882-2-jnieto.alaber@gmail.com>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
+In-Reply-To: <20261127120103.1532882-1-jnieto.alaber@gmail.com>
 References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
+ <20261127120103.1532882-1-jnieto.alaber@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -107,87 +108,60 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is v14 of the Amlogic crypto driver series originally posted by
-Alexey Romanov.  It rebases the series onto linux-next (next-20261123) and
-adds, on top of the original patches, the fixes required for the current
-tree and a few corrections raised during review.
+From: Alexey Romanov <romanov.alexey2000@gmail.com>
 
-The original 22 patches by Alexey Romanov are kept untouched (authorship
-and Signed-off-by preserved).  On top of them:
+GXL and newer SoC's uses the DMA engine (not blkmv) for crypto HW.
+Crypto HW doesn't actually use the blkmv clk. At RTL level, crypto
+engine is hard-wired to a clk81 (CLKID_CLK81). Drop clock-names
+field from schema: name "blkmv" is invalid and "clk81" is confusing
+and sounds like something global.
 
-  - the fixes that landed in the driver since v12 are preserved (IRQ
-    handler return value and fallthrough, devm clock management, DMA SG
-    unmap on the cipher error path, probe cleanup, devm_kmalloc_obj
-    conversion);
-  - three patches add what is needed for the current code (drop
-    CRYPTO_ALG_ALLOCATES_MEMORY so dm-crypt can select the hardware engine,
-    the ahash ->digest one-shot path, and a small cleanup);
-  - five patches fix issues found in review: probe/registration error
-    paths, key/IV and SHA setup descriptor lengths (plus a duplicated CBC
-    IV copy), the redundant A1 platform data, the A1/S4 crypto clock, and
-    the binding property order.
+Also, GXL crypto IP isn't connected to the second interrupt line.
+This binding is useless, there are no users of this line.
+We must remove it from dt-bindings.
 
-Testing on Khadas VIM3 (A311D / G12B), booted with a linux-next kernel
-built from this series:
-  - the crypto self-tests (known-answer tests) pass for ecb/cbc(aes) and
-    sha1/224/256;
-  - dm-crypt with aes-cbc-plain runs on top of cbc-aes-gxl and the
-    driver's request counter accounts for the I/O.
+Fixes: 7f7d115dfb51 ("dt-bindings: crypto: Add DT bindings documentation for amlogic-crypto")
+Signed-off-by: Alexey Romanov <romanov.alexey2000@gmail.com>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+---
+ .../devicetree/bindings/crypto/amlogic,gxl-crypto.yaml | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-Thanks,
-Jose
-
-Alexey Romanov (22):
-  dt-bindings: crypto: amlogic,gxl-crypto: correct clk and interrupt
-    lines
-  dt-bindings: crypto: amlogic,gxl-crypto: support new SoC's
-  crypto: amlogic - Don't hardcode IRQ count
-  crypto: amlogic - Add platform data
-  crypto: amlogic - Remove clock input
-  crypto: amlogic - Add MMIO helpers
-  crypto: amlogic - Move get_engine_number()
-  crypto: amlogic - Drop status field from meson_flow
-  crypto: amlogic - Move algs definition and cipher API to cipher.c
-  crypto: amlogic - Cleanup defines
-  crypto: amlogic - Process more than MAXDESCS descriptors
-  crypto: amlogic - Avoid kzalloc in engine thread
-  crypto: amlogic - Introduce hasher
-  crypto: amlogic - Use fallback for 192-bit keys
-  crypto: amlogic - Add support for G12-series
-  crypto: amlogic - Add support for AXG-series
-  crypto: amlogic - Add support for A1-series
-  arm64: dts: amlogic: gxl: correct crypto node definition
-  arm64: dts: amlogic: a1: add crypto node
-  arm64: dts: amlogic: s4: add crypto node
-  arm64: dts: amlogic: g12: add crypto node
-  arm64: dts: amlogic: axg: add crypto node
-
-Jose Nieto (8):
-  crypto: amlogic: g12: drop CRYPTO_ALG_ALLOCATES_MEMORY
-  crypto: amlogic: hasher: add one-shot digest path
-  crypto: amlogic: drop unused field and stale includes
-  dt-bindings: crypto: amlogic,gxl-crypto: keep standard property order
-  crypto: amlogic: fix probe and algorithm registration error paths
-  crypto: amlogic: fix setup descriptor lengths and CBC IV copy
-  crypto: amlogic: drop redundant A1 platform data
-  arm64: dts: amlogic: use the system clock for A1/S4 crypto
-
- .../bindings/crypto/amlogic,gxl-crypto.yaml   |  38 +-
- arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |   8 +
- arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   7 +
- .../boot/dts/amlogic/meson-g12-common.dtsi    |   7 +
- arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    |   6 +-
- arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |   7 +
- drivers/crypto/amlogic/Makefile               |   2 +-
- drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 596 ++++++++++++------
- drivers/crypto/amlogic/amlogic-gxl-core.c     | 279 ++++----
- drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 511 +++++++++++++++
- drivers/crypto/amlogic/amlogic-gxl.h          | 120 +++-
- 11 files changed, 1201 insertions(+), 380 deletions(-)
- create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
-
-
-base-commit: 3191063649dbf7c0d0b768e1f3655e4c5fc6edb5
+diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+index 948e11ebe4ee..fdc39797a2a9 100644
+--- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
++++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+@@ -20,20 +20,15 @@ properties:
+   interrupts:
+     items:
+       - description: Interrupt for flow 0
+-      - description: Interrupt for flow 1
+ 
+   clocks:
+     maxItems: 1
+ 
+-  clock-names:
+-    const: blkmv
+-
+ required:
+   - compatible
+   - reg
+   - interrupts
+   - clocks
+-  - clock-names
+ 
+ additionalProperties: false
+ 
+@@ -46,7 +41,6 @@ examples:
+     crypto: crypto-engine@c883e000 {
+         compatible = "amlogic,gxl-crypto";
+         reg = <0xc883e000 0x36>;
+-        interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>, <GIC_SPI 189 IRQ_TYPE_EDGE_RISING>;
+-        clocks = <&clkc CLKID_BLKMV>;
+-        clock-names = "blkmv";
++        interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>;
++        clocks = <&clkc CLKID_CLK81>;
+     };
 -- 
 2.47.3
 
