@@ -1,95 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795752271;
-	b=yMO3Tj9Rg255cDo+fjDNt9CPEXs022W870sGRKhXC1v/n14bjapm5S/T8EXL2nI5IACA
-	 OMVBIjPyAuBoF4waR/VEiRYgGpFrZbfSN7j596hf5lIatcaJis3kZzkdPI/zspao5zOVt
-	 /d9N7AWbuD/itEyXYnkXIu7PhrN7BB1+y6rSSGsvzX+H8bmCbils8zVabKaUNDoOqAE/f
-	 A28vbQUKeddktg16J++ckEu/XId6Sz/sFTPs+23G1+X2Q+/obQr9KyAVzmHfJJbzfuYLb
-	 i8MLyGmwtawPfrOqemzcxMVJUSPWS9WggB9du4ox1V2l+Onq95wjVozu0bh+UXcsrcg==
+	t=1795752274;
+	b=o+0VM9FLpvfUZk00twbclt/EFwnrQhV0saAZc26otRFiZ9kIu7JEErZTemHWNHhBTYYb
+	 az9a7VXv/zarHyaNH2h3U+oGmRe8lFn+TPFlVuxDdGB8I4QenZNFECosFIPUGCiwJYY22
+	 GH+jg+wDrhe9Wz5JrHaxjhBwGx2DhvnSygBEUqQYyJP7C8bhxNAg5jxA/xH5Rt8mJSv9K
+	 5gBuGVxQNAq7gafN8yrPqbXwo1AIC6xpqcGdZB1c76IJ+Ps5JLwdk6Uj4j5IvFs+/6/GS
+	 E2F9+lntbVl89ILCPOrGTlr4oDPTboNpbvagBIeunDaMAk+r353W5ZHoxpmcogdbRGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795752271;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795752274;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=v9W2gMejQa4ruYwRadXL7m8rwrpY1sGDNVmUPiT9nBQ=;
-	b=mxJt0tQsFmyyJea3AEwJOKQJWtfDTRDSYvhv0BwhHJgeRxQQrnXxf5nRkg0fwWQ0bRiy
-	 MbTZ5S0vbHJgi4ea0o0/IaVrVM44Fz4CS2uLdXBWZxkzqMjV+K3z+yNF9Jpx+PX7WCdTQ
-	 TOgLtYviqCkYJeMvs/pSTT8JqmNt0I7GLUjJo9j/mxEc+t1souk02Rtnx5ayaGgdZJtMX
-	 i/52S90f66KYFydi9CDHi2JUfLDlMTiI1KZ7eFTLSe8rQXnxTScUAdxsIS8k6rtlZ1VFu
-	 kxv4hqOWfDfTifcH0fF/uKOmjWDWShXNdjgRiIa/GQwH3hObZV0OTXn0q9hkknYLtpg==
+	bh=bjFZEkx7eeY7bqPzAbqCKatK0hc/idmgxkzT4Zy9IdI=;
+	b=3OY/vn/lQZMOhw77gKQ/kzrLFL2fhuIZ3UdqMGPdnM/6MClsLo6CEH6TvNajJm7dkOfd
+	 tESSoHZW+anLC1/aSFauIHrELy6n5nYVyVKZi/4YxylV1sWvxUIYVIlOi65+1RBgijmCC
+	 2LGRbBa5q6WSDGRLIZHL+2OOXYs9THvaaDcdY51UPOhzHQPiYwbB4ERVW1GBgn2Ihm7wv
+	 w8wCgxhKjY/+1WT7ErG/PRDByTDnI7SRPrqCQ9VURDyNvXnbM4+jjPOV7P8I8Wf6nsU8B
+	 iXlupwUFyHBHz2aeScIsoeXhZuJ9rS/Zz/9lI3+O3BQB0vebRqnup9WcOy5ASLZWnGA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wgv7zUk9;
-	arc=none smtp.remote-ip=209.85.216.51
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=OlyqYVYC;
+	arc=none smtp.remote-ip=209.85.214.178
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CE7606A31C
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:04:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83CE7606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB02C606A32A
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:04:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AB02C606A32A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wgv7zUk9
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3b520f1604fso390018a91.2
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Nov 2026 20:04:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=OlyqYVYC
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2f06ff94acfso34200315ad.0
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Nov 2026 20:04:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795752271; x=1796357071; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795752273; x=1796357073; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=v9W2gMejQa4ruYwRadXL7m8rwrpY1sGDNVmUPiT9nBQ=;
-        b=wgv7zUk9r7TVElCtooNO8NdZH2wqN50UPXtheUgf8EI1CxfY8SJg5eLNgh/7LLhrFb
-         YcRrvOYgmvl9F5bRPRjsDvGG0jT1s3fZ1f33JOq3Xmz/jHZznoykafxvQveoQYoiqp/V
-         3hgMp3a5Y8wit3ThIbX66H0G/M2iJKV2qIygoPksUEL+MjH5F2fsuFbDKzKNAbk818EZ
-         rQ8YxzCftbFery/wjkHxfToJZz5KLGt43OC7iTYXyievXhGabL8wu5+ckF9232dJifrb
-         qv98I2Y2jQw7CaeaQuF0fWND+yKuRng5tqT1Ds9jEH3pMHIiQsbnY/OHvQVQSzrc7Gcy
-         fZfg==
+        bh=bjFZEkx7eeY7bqPzAbqCKatK0hc/idmgxkzT4Zy9IdI=;
+        b=OlyqYVYC4iScWoQlkcCY5rzd3MuW+wpe+RrknPDAq/yjmibUf6A8RVw00vpwDD2jzi
+         Xg/t6YnGEvzwz2qMlDm0z8zVOLDIJ+Zw8upelACoOhUrhK6Nc752Vy+vKUHFZv2Hd/GQ
+         7AOtTjHO4EkNgc4wuhexZ29moaLCZQiG1K25zh3THb+FP6xKNKKWmnEeSwO6JUOXdNkD
+         PQuqn9rNfhbVTfgkeRtkrqZsV0V2ZhnSfqBly7tkORFnsh/IhA6OykhUZNKqtGs4Vuru
+         g9ROvx8ngWkuVir7TwYehzu0d1aFp/PnKyc2bkqq5vTxbcbq5uR7IpNq8NuJjLiYxWwY
+         CaBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795752271; x=1796357071;
+        d=1e100.net; s=20260707; t=1795752273; x=1796357073;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=v9W2gMejQa4ruYwRadXL7m8rwrpY1sGDNVmUPiT9nBQ=;
-        b=MBqN3ENpHLxFu+/uYGIn5t0i8YrGqjzd9OHksf9xW0KZlAteXNbq3o1hitXJgr7mRe
-         3jcipM0pVyUnv3ugsiyAPd6DNBKQDT5GfWTq7NOuEMvMc4/n/07jPfti4v04J1zGa3G6
-         eVHfKUrPcWmGjl4Je0+oVS8L69LZDWabmr4lmuouMGSvMhgnvblEtC2P0qVIfY0+ZyyG
-         p7tbfCfpUS/7DFiZznqYHfPyzG32m/FZAsHYmNgzhYhZod3U4ihPN0760H2chwEecU3c
-         fBVRg/mGlYtm0Wpkvajae9QP6iEHeXTI3GWj8P01ABNMniC9bi757dj5THav4mNLXtZv
-         9bXQ==
-X-Gm-Message-State: APuU4Z+eirAAGLj9LHbNf9dlu9TAENnSLZgz6TsRVnVMe+PWEa4RXd5J
-	3ZCVMWyNa8tcVHkqiKe+ZmowLDxLHAqzH317bQ6bSgSiywFRFIOZBP58QfjMUA==
-X-Gm-Gg: AZFdTZdhTBMRn0GkEqyQj06rLtcqA5rTGks2C49ND2xa0G9zVTpQTn/47te4wCPXgX2
-	7QLgaBa0SfdnWCilgkkMFYPXgoup2rP+DL7jfpgDtJW/b2WJbqIBowpzsNnFSyVOO8dBSP7sJhP
-	vcRbdiOskd0l7BPXv8DsRpwQj0ttCPATVeLy9ZdRDTZlTqrxQDKJPIDOVdM3S+fe9/qggEiyNmm
-	mQAQQrPRQ2iI+0ea3IcFY9v19eAk2Pid5QtAwVYLk0f/ULO7obY/g2UJiJFAgoUVq+g5VwZ3RK4
-	RUEqhD+WaR05ZFFNnFuskQWzdszk6hwq0ZSP+sXP6vG8/hDG1glp4u7/VOc6Tox1AHf2RG1ZOEC
-	lJSiI2xy9A8LvRKSxnMTj+dgUMWF60KvpncP71tKpPeFxPd0gp3tWvTypTEPxpF6QD9/22ywRM9
-	zsoeQusWf1x40izxbjxRAllE8K9RSz/xZ1iN8zKfRfFusb8Ht5zGwSi35T4AsWo6dzgtS/BRP38
-	GY49GL2T9du3LxrJOPE2ASbg93IQDLaJ6QpLiYdbQ+Wl2ZWWRzu1sYczUo2suvGHgV+LwB/UTGL
-	Q5eFQkCMfo0dQiEbczhOTdweHuoT7ZCov8YEvq7hAjdWZwX/EMbVn5/0j8HOl89/fED4/Lr5Jd0
-	K4QuNrPOsfMJKvjnQ2BEsX6CbOEOy0SZpd9IhAFQ2YugYOdYodsiIs4d3b6vCttwgaz88S4tqJk
-	95wQ==
-X-Received: by 2002:a17:90a:e70c:b0:3b1:ba59:56a1 with SMTP id 98e67ed59e1d1-3b41c939b8cmr21039920a91.39.1795752270766;
-        Thu, 26 Nov 2026 20:04:30 -0800 (PST)
+        bh=bjFZEkx7eeY7bqPzAbqCKatK0hc/idmgxkzT4Zy9IdI=;
+        b=0zfvnQ9+N3jDP4LgIeIr+wt14qYm/j7f6sc6TsDKsx1oF10q9g/nd4n3q91QbGjm2s
+         xIjHi5CTMgOSKI7XoTHqAidfs4Yf2SapweQBMb4foSgLmSz1LOmX7xJN+AT1B2GoTS/l
+         NBLwpjrdWYuUJRmL4CVHR8DdY8tEglcAmLgWGNI9klWf/m9lG+mTVfFeNp4Uzo8FS86z
+         td6uea2ZNoVryZlZo4NmtUOkbMeJWFXjfDXCvWqJWiU6PCjxOPIZcM56Fgc9DZv57EiV
+         +tnlcybCBu02BqF9F/5xiZ7ObskGqKvFrjwOTd7xu8F/FhQR6hDXofz8RaA5IHqipL3d
+         wHRA==
+X-Gm-Message-State: APuU4Z9QORRoE42VXl0NpIJ3xWNWoxAhCyXk43daIQeiPxwaCsTNtNG3
+	3p6fWjIHRg4w+xKPdrof1SJgAujDxeR0cBwBPDIP7R/2tNzZXnZz2lGwsfQjUQ==
+X-Gm-Gg: AZFdTZeLtnYCevvzgUxzLnGI22SQWDwEEkq7RGBFs4mp98M3PAzBCkM2kzrkN78iHMP
+	eKB5KJ/BT64lZ7L9BYxKuNQ8TnU/EMn2//Al/JqP/0977086J/G3vKyCftY3o9edIUEi7kc9Rm5
+	qMTTi8s/YjlFe9IInA9qTOEj8xFR4YU3/SWKgSt6JkmPTpEWlEe/kVgR8EvTLpPFUTlFa3DBQto
+	k9KmdEWjoSaeWz647hBHdvHV1AIFUXFAaPxnA5Yajs++QpzICOfcQTGBwqtd+fMODU8FFw7tsNg
+	C2ztQkmftydBRkXkTVDoU4wbUUF9ocU0/cKeGvOtb+TcuAzzExR4EqRPve9hXaCJoHJGuZPjBU7
+	kY6KiCA8kyPQZKjXW7AU3Dhcc24ImvzaFyt5eDcnPwNnp2MfTFYEh86t0F4nB9sMIOBr178YDyy
+	7q3gtBewBT0Uv0q8axNH0G9Fqczi1Fa4RYEGjabI4bqnE81w77wpkr1ArHtvkPqTM9Iu1HD7TEA
+	hx9LV2yISg8MFTJM4lzMw71r1+3TFlr7eVcD0o3BsU1uEi3rzzLCIcl6F50PwavrHRJeFo3GDBb
+	Zepat/VWm/tPBhTDvMLcwB9QSTfsck3116pnzlPIRgiwLRW+RdLInIKwVg9PeFNmZijRqijD+Mf
+	Tg3ZHxHGOqC2qxAKcWd9iGwPmsMB3BidghXUUqiBT20FnUOsU4ZuaYZDaO5inaf0/c243YpujQ0
+	BP2Q==
+X-Received: by 2002:a17:90b:1e4f:b0:3b5:35eb:5e88 with SMTP id 98e67ed59e1d1-3b535eb5fadmr923029a91.27.1795752272918;
+        Thu, 26 Nov 2026 20:04:32 -0800 (PST)
 Received: from ryzen.lan ([2601:644:8000:37f::e34])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b457a58d04sm15090652a91.0.2026.11.26.20.04.28
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b457a58d04sm15090652a91.0.2026.11.26.20.04.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2026 20:04:30 -0800 (PST)
+        Thu, 26 Nov 2026 20:04:31 -0800 (PST)
 From: Rosen Penev <rosenp@gmail.com>
 To: linux-crypto@vger.kernel.org
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	James Hsiao <jhsiao@amcc.com>,
 	Rosen Penev <rosenp@gmail.com>,
-	Christian Lamparter <chunkeey@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/8] crypto: amcc - fix missing DMA memory barriers in descriptor handling
-Date: Thu, 26 Nov 2026 20:04:17 -0800
-Message-ID: <20261127040423.1023233-3-rosenp@gmail.com>
+	Christian Lamparter <chunkeey@gmail.com>
+Subject: [PATCH 3/8] crypto: amcc - allocate all algorithm wrappers before registering
+Date: Thu, 26 Nov 2026 20:04:18 -0800
+Message-ID: <20261127040423.1023233-4-rosenp@gmail.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261127040423.1023233-1-rosenp@gmail.com>
 References: <20261127040423.1023233-1-rosenp@gmail.com>
@@ -104,107 +103,79 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The descriptor ring lives in coherent memory that the engine scans on
-its own, and PD_CTL_HOST_READY in pd_ctl is the ownership handover; the
-INT_DESCR_RD writes are only a doorbell. crypto4xx_build_pd() sets
-HOST_READY before writing pd_ctl_len, and nothing orders the descriptor
-and SA writes before it, so the engine can fetch a descriptor with a
-stale length. The wmb() before the doorbell does not help, since
-HOST_READY is already visible by then.
+crypto4xx_register_alg() allocates a wrapper and registers it, one
+algorithm at a time. If an allocation fails partway, it returns
+-ENOMEM with the earlier algorithms still registered. The probe error
+path does not unregister them, but devres frees the device context and
+descriptor rings they point to. The next request on one of them,
+typically its own self-test, is a use-after-free. With an allocation
+failure injected at the third algorithm on an APM82181:
 
-Write pd_ctl_len first, then dma_wmb(), then HOST_READY.
+  crypto4xx 400180000.crypto: probe with driver crypto4xx failed with error -12
+  BUG: Unable to handle kernel data access on write at 0xe4fbd028
+  NIP [e4f9bb4c] crypto4xx_build_pd+0x174/0x83c [crypto4xx]
+  [c188b7b0] [e4f9c888] crypto4xx_ctr_crypt+0xc8/0x188 [crypto4xx]
+  [c188b9e0] [c035f098] test_skcipher_vec_cfg+0x3bc/0x890
 
-The completion handler takes an entry as finished when it is marked
-PD_ENTRY_INUSE and pd_ctl has PE_DONE set and HOST_READY clear. Because
-the entry state is written after HOST_READY, an engine that finishes
-quickly can complete a request whose entry the handler then skips as
-not in use, and nothing completes it until the next interrupt. Marking
-the entry in use earlier is not enough on its own: pd_ctl is never
-cleared when an entry is recycled, so it still holds PE_DONE from its
-previous use, and the handler would complete the half-built request.
-Clear pd_ctl when the entry is taken, mark it in use before HOST_READY,
-and pair the two with smp_wmb()/smp_rmb().
+Unregistering the algorithms on that path is not safe either: with
+self-tests enabled, a test that started on registration may still hold
+the algorithm and have requests on the engine.
 
-On the completion side, crypto4xx_pd_done() reads the descriptor and
-result data right after the PE_DONE check with no barrier in between.
-Add a dma_rmb() after the check.
+Allocate every wrapper first and only then register, so an allocation
+failure leaves nothing registered.
 
 Fixes: 049359d65527 ("crypto: amcc - Add crypt4xx driver")
-Cc: stable@vger.kernel.org
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/crypto/amcc/crypto4xx_core.c | 42 ++++++++++++++++++++--------
- 1 file changed, 31 insertions(+), 11 deletions(-)
+ drivers/crypto/amcc/crypto4xx_core.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 7a1ababd9198..e28e836c4f35 100644
+index e28e836c4f35..6131fd6c0607 100644
 --- a/drivers/crypto/amcc/crypto4xx_core.c
 +++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -767,6 +767,12 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
- 	spin_unlock_irqrestore(&dev->core_dev->lock, flags);
+@@ -982,15 +982,32 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
+ 				  struct crypto4xx_alg_common *crypto_alg,
+ 				  int array_size)
+ {
+-	struct crypto4xx_alg *alg;
++	struct crypto4xx_alg **algs, *alg;
+ 	int i;
+ 	int rc = 0;
  
- 	pd = &dev->pdr[pd_entry];
 +	/*
-+	 * pd_ctl still holds PE_DONE from this entry's previous use. Clear
-+	 * it before the entry is marked in use below, or the completion
-+	 * handler would take the half-built descriptor as finished.
++	 * Allocate every wrapper before registering anything: a registered
++	 * algorithm may already have its self-test running on the engine,
++	 * so it cannot simply be unregistered again if a later allocation
++	 * fails.
 +	 */
-+	WRITE_ONCE(pd->pd_ctl.w, 0);
- 	pd->sa_len = sa_len;
++	algs = kzalloc_objs(*algs, array_size);
++	if (!algs)
++		return -ENOMEM;
++
+ 	for (i = 0; i < array_size; i++) {
+-		alg = kzalloc_obj(struct crypto4xx_alg);
+-		if (!alg)
++		algs[i] = kzalloc_obj(*algs[i]);
++		if (!algs[i]) {
++			while (i--)
++				kfree(algs[i]);
++			kfree(algs);
+ 			return -ENOMEM;
++		}
++	}
  
- 	pd_uinfo = &dev->pdr_uinfo[pd_entry];
-@@ -876,11 +882,21 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
- 		}
++	for (i = 0; i < array_size; i++) {
++		alg = algs[i];
+ 		alg->alg = crypto_alg[i];
+ 		alg->dev = sec_dev;
+ 
+@@ -1010,6 +1027,7 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
+ 			list_add_tail(&alg->entry, &sec_dev->alg_list);
  	}
  
-+	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
-+	/* Pairs with smp_rmb() in crypto4xx_bh_tasklet_cb(). */
-+	smp_wmb();
-+	WRITE_ONCE(pd_uinfo->state,
-+		   PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0));
-+
-+	/*
-+	 * The engine may fetch the descriptor as soon as it sees
-+	 * PD_CTL_HOST_READY, without waiting for the doorbell below, so
-+	 * the descriptor and SA must be visible to it first.
-+	 */
-+	dma_wmb();
- 	pd->pd_ctl.w = PD_CTL_HOST_READY |
- 		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
- 			PD_CTL_HASH_FINAL : 0);
--	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
--	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
- 
- 	wmb();
- 	/* write any value to push engine to read a pd */
-@@ -1027,16 +1043,20 @@ static void crypto4xx_bh_tasklet_cb(unsigned long data)
- 	do {
- 		pd_uinfo = &core_dev->dev->pdr_uinfo[tail];
- 		pd = &core_dev->dev->pdr[tail];
--		if ((pd_uinfo->state & PD_ENTRY_INUSE) &&
--		     ((READ_ONCE(pd->pd_ctl.w) &
--		       (PD_CTL_PE_DONE | PD_CTL_HOST_READY)) ==
--		       PD_CTL_PE_DONE)) {
--			crypto4xx_pd_done(core_dev->dev, tail);
--			tail = crypto4xx_put_pd_to_pdr(core_dev->dev, tail);
--		} else {
--			/* if tail not done, break */
-+		if (!(READ_ONCE(pd_uinfo->state) & PD_ENTRY_INUSE))
- 			break;
--		}
-+		/*
-+		 * Pairs with smp_wmb() in crypto4xx_build_pd(): an in-use
-+		 * entry has its stale PE_DONE cleared.
-+		 */
-+		smp_rmb();
-+		if ((READ_ONCE(pd->pd_ctl.w) &
-+		     (PD_CTL_PE_DONE | PD_CTL_HOST_READY)) != PD_CTL_PE_DONE)
-+			break;
-+		/* Read the results only after seeing PE_DONE. */
-+		dma_rmb();
-+		crypto4xx_pd_done(core_dev->dev, tail);
-+		tail = crypto4xx_put_pd_to_pdr(core_dev->dev, tail);
- 	} while (head != tail);
++	kfree(algs);
+ 	return 0;
  }
  
 -- 
