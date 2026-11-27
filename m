@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795758998;
-	b=HUUooYIkNQhRxJnhsHtwUM3K5bUok3RxotbLAsZpOxLIOhsTgqbcGo3ymJnqQX/e8wWR
-	 sHC2pcB4ya3A76t1cR+yHH6to7FVJnSlC2MU0hfnl7Kee+EIt7p7fs+wUl7aNvQ0auvVR
-	 /M8D1iotySlB/gym4ih5G0hWz/y2jXXFGJM+QvH5ofn1QbshZRO6cSDRYZTw2TsY8mSln
-	 QGJPE7MWvIcW/Yc3O/FpatvsMeKzf1ndq7eH+9pL99e5QNiLfZOP4ZyM93wQGqLa47Tar
-	 jIpldYA8VTCPtuGiAc2dOICHlc/57RkZIvwH+Px7hweb2QJILPcqNd9+k4zewg7Luzw==
+	t=1795759003;
+	b=Ae+61gUJpiVeR4n2JiZ1rWUzLLtnwEduVS7mzKMmI07aY0V2eD3YrZOyxeiIQFNdfAlE
+	 MhnsQLeZLLnCBbgJSzOu4iVOSbT2Hv4nqyhb41hq4Mmljl5xiSK7d+XR+fOuKsd6X8h9P
+	 mty8bgjlIQCzlwynAkbUybkx5fWJev0IHtUQ5PJRBXkEPDzayk72B+Ok1gB7WBKk2hzUF
+	 iazXCftF0Lr3VdpMX7Qy95NMoVNwFXxx+XbMaF2bF0P5v/nqSxsBH/5uadOKJ3hxot3iP
+	 GB+7dnzvMARrfHziFRMJ268Vs5NyOtOjNT9l+drmv6hK082chbG7bn8bBCZ4zyZITBA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795758998;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795759003;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=X/IxXSPHyI5BomDwMgbK0BSrFRKLMzUE7IWClFzPgIk=;
-	b=kpQRH3lM7kAtXGrJaPG0r++17ztOWvMH0q3UwdINupl2E0Qmdud7jNOUOqI7dYxCVEvk
-	 huLHZYedha5rCDZY9rgC1Bd0yeso3bMwVhKQ3rZsC8MPxlU5OAkfN58q3ZpNEBqyLKV4i
-	 q8g7WO26N78FAYpjuUNtWuz0AF5Px72cY1B3NoDxLLcQhBwgRS9Y5xqT1NH1j0W3V0PTu
-	 jH6049nb+QtWaBxz5a/3oq9Dm2nhaVb3G8G7BE0vHHNsvBjRTBLZFMPYUJeityA1zXVCc
-	 wKoqw1EoJUu90x0wxcnEE2gnootrY/FVJU/LLN7DJ+2igcBJNYRg18+UougniBhH9HA==
+	bh=AtF2qzZ7rmkoXnzCfZofK9OEr6911X+e742q2Z3bW2A=;
+	b=xF4jmknaScG5f7uYsDHwqMcm1ItIm4+WGgvy3edxbxynKkOPnDnEIk7rknVCsTxey70X
+	 /bMb8h+EepWzlMgbdL6cNRop0CN1LInqJ+o1nkWHpteDZtcNHh+pHs4OVXNK9GqbkkzPw
+	 ws9v2u+/ACDFVud17ZDJ/DzC8ljoXXi0ayDp2JhtiT7DhtH7/oa12rcxHEjsYvz+/K/IK
+	 BV2+WjSq357+53rLn0r/NlfPjSzPrts4TnLcjtvP8BEH9Ai80qDOgFse9EyX+oEWqTgD6
+	 vg44EEOG3jFOA48JELI3plmWfFa2p7wd1ZEPzow6pH+qfI3QGk582LGkLqykkxwjd+Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GbXis3Dg;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e8xCN6Nw;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 837BB606A31E;
-	Fri, 27 Nov 2026 05:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 3BB93606A31C;
+	Fri, 27 Nov 2026 05:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GbXis3Dg
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 9931E1F00A15;
-	Fri, 27 Nov 2026 05:56:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=e8xCN6Nw
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id B4BCB1F00899;
+	Fri, 27 Nov 2026 05:56:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795758998;
-	bh=X/IxXSPHyI5BomDwMgbK0BSrFRKLMzUE7IWClFzPgIk=;
+	s=k20260515; t=1795759002;
+	bh=AtF2qzZ7rmkoXnzCfZofK9OEr6911X+e742q2Z3bW2A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=GbXis3Dg5kkiudP1r/nuVx4Bhwt7dqwHHntKI0HHalTmO6xiLlanoVCuJk8hrbo5h
-	 NK1l51S5wDOEPjPArj/2SxrBtZgTcQs3qBpQsZzDZfVyEMcNdVO8u3T6VdvhKo/V+4
-	 3qOQ32mDJYzXaFKzKnVem755WyG9OB6Q74sbEorSM5HnF0/XNOh/E/e0ncuJivrtSu
-	 3fQJMdB4wWtEHHYzZo3lPIZ+zRYMda6fm8e4PEwXO4khEwItQknj9ow7dMS41Idcxr
-	 HeCVKTsotiFbESgdCcssCsGKQt222n8vwNnpA6GU7U24lG7YCOXkc10ijG59Az2dbg
-	 oAZtcosBr0zKQ==
+	b=e8xCN6NwG+mDksjutVBFeXcuzUCUkkSqXLBc8YNi1Qy3c4L/dqxluRxiGCd6rvAEZ
+	 h5YiY652muoXtNkjlwdAwML9BjeYt60R4s/8veoYFLVPbdszr1cKJcwm9E1WipjuC8
+	 CERWrILyyMXBWw83mfQPPzPG+ltiZjESwAjdzFuiiYoPEfAlqKrTuZECueSn8/fZUj
+	 vB2Z4x+Tpx+6wcWKy8piOSlgknjpOxgPdVzhSdAMyYhMF5BMJaBKDuxrLbbnYRmGL7
+	 06jkpdRtawdpmWTPhviMlBwbi9/Tk+HB3Y/9rMFRP9AjHDHemt1nLT0oDDHBB/X849
+	 2FbydJqJbN+FA==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: keyrings@vger.kernel.org
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -77,9 +77,9 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	"Serge E. Hallyn" <serge@hallyn.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
-Subject: [PATCH v5 06/17] tpm2-sessions: Re-orchestrate tpm2_read_public() use
-Date: Fri, 27 Nov 2026 07:55:51 +0200
-Message-ID: <20261127055602.2357884-7-jarkko@kernel.org>
+Subject: [PATCH v5 07/17] tpm-buf: Make tpm_buf_read*() fallible
+Date: Fri, 27 Nov 2026 07:55:52 +0200
+Message-ID: <20261127055602.2357884-8-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127055602.2357884-1-jarkko@kernel.org>
 References: <20261127055602.2357884-1-jarkko@kernel.org>
@@ -94,397 +94,574 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move TPM handle name resolution out of tpm_buf_append_name(), so that
-callers resolve object names explicitly before constructing HMAC-protected
-commands:
-
-1. Export tpm2_read_public(), so that trusted_tpm2 can resolve handle
-   names, and store non-object handles in big-endian byte order matching
-   the TPM 2.0 handle Name definition.
-2. Call tpm2_read_public() explicitly in tpm2_seal_trusted(),
-   tpm2_load_cmd(), and tpm2_unseal_cmd() before starting the auth
-   session, and pass the pre-resolved name and size to
-   tpm_buf_append_name().
-3. Rework tpm_buf_append_name() and tpm_buf_fill_hmac_session() to use
-   the caller-supplied name and size directly.
-
-This reduces fallible exits from tpm2_buf_append_name().
+Make tpm_buf_read_u8(), tpm_buf_read_u16() and tpm_buf_read_u32() flows
+unambiguous, and fallible by writing the updated offset to @offset.
 
 Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- drivers/char/tpm/tpm2-cmd.c               |   9 +-
- drivers/char/tpm/tpm2-sessions.c          | 122 +++++++---------------
- include/linux/tpm.h                       |  10 +-
- security/keys/trusted-keys/trusted_tpm2.c |  33 +++++-
- 4 files changed, 84 insertions(+), 90 deletions(-)
+ drivers/char/tpm/tpm-buf.c                |  56 ++++---
+ drivers/char/tpm/tpm2-sessions.c          | 188 ++++++++++++++++------
+ include/linux/tpm_buf.h                   |   6 +-
+ security/keys/trusted-keys/trusted_tpm2.c |  10 +-
+ 4 files changed, 178 insertions(+), 82 deletions(-)
 
-diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
-index d58c306f7d93..c5b66f470287 100644
---- a/drivers/char/tpm/tpm2-cmd.c
-+++ b/drivers/char/tpm/tpm2-cmd.c
-@@ -194,11 +194,12 @@ int tpm2_pcr_extend(struct tpm_chip *chip, u32 pcr_idx,
- 	tpm_buf_reset(buf, TPM2_ST_SESSIONS, TPM2_CC_PCR_EXTEND);
+diff --git a/drivers/char/tpm/tpm-buf.c b/drivers/char/tpm/tpm-buf.c
+index 233e81d3f149..a2d79b3a9385 100644
+--- a/drivers/char/tpm/tpm-buf.c
++++ b/drivers/char/tpm/tpm-buf.c
+@@ -204,39 +204,35 @@ void tpm_buf_append_handle(struct tpm_buf *buf, u32 handle)
+  * @offset:	offset within the buffer
+  * @count:	the number of bytes to read
+  * @output:	the output buffer
++ *
++ * Return: true on success, and @offset is advanced by @count bytes, or false
++ * if the read would cross the end of the buffer.
+  */
+-static void tpm_buf_read(struct tpm_buf *buf, off_t *offset, size_t count, void *output)
++static bool tpm_buf_read(struct tpm_buf *buf, off_t *offset, size_t count, void *output)
+ {
+ 	off_t next_offset;
  
- 	if (!disable_pcr_integrity) {
--		rc = tpm_buf_append_name(chip, buf, pcr_idx, NULL);
--		if (rc) {
--			tpm2_end_auth_session(chip);
-+		__be32 pcr_idx_be = cpu_to_be32(pcr_idx);
-+
-+		rc = tpm_buf_append_name(chip, buf, pcr_idx,
-+					 (u8 *)&pcr_idx_be, sizeof(pcr_idx_be));
-+		if (rc)
- 			return rc;
--		}
- 		tpm_buf_append_hmac_session(chip, buf, 0, NULL, 0);
- 	} else {
- 		tpm_buf_append_handle(buf, pcr_idx);
-diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
-index 94c11135beb3..fa107719b4f9 100644
---- a/drivers/char/tpm/tpm2-sessions.c
-+++ b/drivers/char/tpm/tpm2-sessions.c
-@@ -136,8 +136,8 @@ struct tpm2_auth {
- 	 * handle, but they are part of the session by name, which
- 	 * we must compute and remember
- 	 */
--	u32 name_h[AUTH_MAX_NAMES];
- 	u8 name[AUTH_MAX_NAMES][TPM2_MAX_NAME_SIZE];
-+	u16 name_size_tbl[AUTH_MAX_NAMES];
- };
+-	if (buf->flags & TPM_BUF_INVALID)
+-		return;
+-
+ 	next_offset = *offset + count;
+-	if (next_offset > buf->length) {
+-		WARN(1, "tpm_buf: read out of boundary\n");
+-		buf->flags |= TPM_BUF_INVALID;
+-		return;
+-	}
++	if (next_offset > buf->length)
++		return false;
  
- #ifdef CONFIG_TCG_TPM2_HMAC
-@@ -163,7 +163,17 @@ static int name_size(const u8 *name)
- 	}
+ 	memcpy(output, &buf->data[*offset], count);
+ 	*offset = next_offset;
++	return true;
  }
  
--static int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name)
-+/**
-+ * tpm2_read_public() - Resolve TPM name for a handle
-+ * @chip:	TPM chip to use.
-+ * @handle:	TPM handle.
-+ * @name:	Buffer for returning the name blob. Must have a capacity of at
-+ *		least %TPM2_MAX_NAME_SIZE bytes.
-+ *
-+ * Return: Size of the TPM handle name on success, or a negative errno when
-+ * TPM2_ReadPublic fails.
-+ */
-+int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name)
+ /**
+  * tpm_buf_read_u8() - Read 8-bit word from a TPM buffer
+  * @buf:	&tpm_buf instance
+  * @offset:	offset within the buffer
++ * @value:	returns the 8-bit word
+  *
+- * Return: next 8-bit word
++ * Return: true on success, and @offset is advanced, or false if the read
++ * would cross the end of the buffer.
+  */
+-u8 tpm_buf_read_u8(struct tpm_buf *buf, off_t *offset)
++bool tpm_buf_read_u8(struct tpm_buf *buf, off_t *offset, u8 *value)
  {
- 	u32 mso = tpm2_handle_mso(handle);
+-	u8 value = 0;
+-
+-	tpm_buf_read(buf, offset, sizeof(value), &value);
+-
+-	return value;
++	return tpm_buf_read(buf, offset, sizeof(*value), value);
+ }
+ EXPORT_SYMBOL_GPL(tpm_buf_read_u8);
+ 
+@@ -244,16 +240,20 @@ EXPORT_SYMBOL_GPL(tpm_buf_read_u8);
+  * tpm_buf_read_u16() - Read 16-bit word from a TPM buffer
+  * @buf:	&tpm_buf instance
+  * @offset:	offset within the buffer
++ * @value:	returns the 16-bit word
+  *
+- * Return: next 16-bit word
++ * Return: true on success, and @offset is advanced, or false if the read
++ * would cross the end of the buffer.
+  */
+-u16 tpm_buf_read_u16(struct tpm_buf *buf, off_t *offset)
++bool tpm_buf_read_u16(struct tpm_buf *buf, off_t *offset, u16 *value)
+ {
+-	u16 value = 0;
++	__be16 value_be;
+ 
+-	tpm_buf_read(buf, offset, sizeof(value), &value);
++	if (!tpm_buf_read(buf, offset, sizeof(value_be), &value_be))
++		return false;
+ 
+-	return be16_to_cpu(value);
++	*value = be16_to_cpu(value_be);
++	return true;
+ }
+ EXPORT_SYMBOL_GPL(tpm_buf_read_u16);
+ 
+@@ -261,16 +261,20 @@ EXPORT_SYMBOL_GPL(tpm_buf_read_u16);
+  * tpm_buf_read_u32() - Read 32-bit word from a TPM buffer
+  * @buf:	&tpm_buf instance
+  * @offset:	offset within the buffer
++ * @value:	returns the 32-bit word
+  *
+- * Return: next 32-bit word
++ * Return: true on success, and @offset is advanced, or false if the read
++ * would cross the end of the buffer.
+  */
+-u32 tpm_buf_read_u32(struct tpm_buf *buf, off_t *offset)
++bool tpm_buf_read_u32(struct tpm_buf *buf, off_t *offset, u32 *value)
+ {
+-	u32 value = 0;
++	__be32 value_be;
+ 
+-	tpm_buf_read(buf, offset, sizeof(value), &value);
++	if (!tpm_buf_read(buf, offset, sizeof(value_be), &value_be))
++		return false;
+ 
+-	return be32_to_cpu(value);
++	*value = be32_to_cpu(value_be);
++	return true;
+ }
+ EXPORT_SYMBOL_GPL(tpm_buf_read_u32);
+ 
+diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
+index fa107719b4f9..185bae525519 100644
+--- a/drivers/char/tpm/tpm2-sessions.c
++++ b/drivers/char/tpm/tpm2-sessions.c
+@@ -179,6 +179,7 @@ int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name)
  	off_t offset = TPM_HEADER_SIZE;
-@@ -172,7 +182,7 @@ static int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name)
+ 	struct tpm_buf *buf __free(kfree) = NULL;
+ 	int rc, name_size_alg;
++	u16 size;
  
  	if (mso != TPM2_MSO_PERSISTENT && mso != TPM2_MSO_VOLATILE &&
  	    mso != TPM2_MSO_NVRAM) {
--		memcpy(name, &handle, sizeof(u32));
-+		put_unaligned_be32(handle, name);
- 		return sizeof(u32);
- 	}
- 
-@@ -189,7 +199,8 @@ static int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name)
+@@ -199,8 +200,10 @@ int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name)
  		return tpm_ret_to_err(rc);
  
  	/* Skip TPMT_PUBLIC: */
--	offset += tpm_buf_read_u16(buf, &offset);
-+	rc = tpm_buf_read_u16(buf, &offset);
-+	offset += rc;
+-	rc = tpm_buf_read_u16(buf, &offset);
+-	offset += rc;
++	if (!tpm_buf_read_u16(buf, &offset, &size))
++		return -EIO;
++
++	offset += size;
  
  	/*
  	 * Ensure space for the length field of TPM2B_NAME and hashAlg field of
-@@ -212,39 +223,34 @@ static int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name)
- 	memcpy(name, &buf->data[offset], rc);
+@@ -209,18 +212,20 @@ int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name)
+ 	if (offset + 4 > tpm_buf_length(buf))
+ 		return -EIO;
+ 
+-	rc = tpm_buf_read_u16(buf, &offset);
++	if (!tpm_buf_read_u16(buf, &offset, &size))
++		return -EIO;
++
+ 	name_size_alg = name_size(&buf->data[offset]);
+ 	if (name_size_alg < 0)
+ 		return name_size_alg;
+ 
+-	if (rc != name_size_alg)
++	if (size != name_size_alg)
+ 		return -EIO;
+ 
+-	if (offset + rc > tpm_buf_length(buf))
++	if (offset + size > tpm_buf_length(buf))
+ 		return -EIO;
+ 
+-	memcpy(name, &buf->data[offset], rc);
++	memcpy(name, &buf->data[offset], size);
  	return name_size_alg;
  }
-+EXPORT_SYMBOL_GPL(tpm2_read_public);
- #endif /* CONFIG_TCG_TPM2_HMAC */
+ EXPORT_SYMBOL_GPL(tpm2_read_public);
+@@ -618,21 +623,41 @@ int tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
+ 	handles = (attrs >> TPM2_CC_ATTR_CHANDLES) & GENMASK(2, 0);
+ 	offset_s += handles * sizeof(u32);
  
- /**
-- * tpm_buf_append_name() - add a handle area to the buffer
-- * @chip: the TPM chip structure
-- * @buf: The buffer to be appended
-- * @handle: The handle to be appended
-- * @name: The name of the handle (may be NULL)
-+ * tpm_buf_append_name() - Append a handle and store TPM name
-+ * @chip:	TPM chip to use.
-+ * @buf:	TPM buffer containing the TPM command in-transit.
-+ * @handle:	TPM handle to be appended.
-+ * @name:	TPM name of the handle.
-+ * @name_size:	Size of the TPM name.
-  *
-  * In order to compute session HMACs, we need to know the names of the
-- * objects pointed to by the handles.  For most objects, this is simply
-- * the actual 4 byte handle or an empty buf (in these cases @name
-- * should be NULL) but for volatile objects, permanent objects and NV
-- * areas, the name is defined as the hash (according to the name
-- * algorithm which should be set to sha256) of the public area to
-- * which the two byte algorithm id has been appended.  For these
-- * objects, the @name pointer should point to this.  If a name is
-- * required but @name is NULL, then TPM2_ReadPublic() will be called
-- * on the handle to obtain the name.
-+ * objects pointed to by the handles. For permanent and PCR handles this is
-+ * the 4-byte big-endian handle; for volatile objects, persistent objects
-+ * and NV areas this is the name resolved with tpm2_read_public().
-  *
-  * As with most tpm_buf operations, success is assumed because failure
-  * will be caused by an incorrect programming model and indicated by a
-  * kernel message.
-  *
-- * Ends the authorization session on failure.
-+ * Return: 0 on success, or -EIO when the authorization area state is
-+ * malformed.
-  */
- int tpm_buf_append_name(struct tpm_chip *chip, struct tpm_buf *buf,
--			u32 handle, u8 *name)
-+			u32 handle, u8 *name, u16 name_size)
- {
- #ifdef CONFIG_TCG_TPM2_HMAC
--	enum tpm2_mso_type mso = tpm2_handle_mso(handle);
- 	struct tpm2_auth *auth;
--	u16 name_size_alg;
- 	int slot;
- 	int ret;
- #endif
-@@ -263,45 +269,26 @@ int tpm_buf_append_name(struct tpm_chip *chip, struct tpm_buf *buf,
- 	}
- 	auth = chip->auth;
- 	if (auth->session != tpm_buf_length(buf)) {
--		dev_err(&chip->dev, "session state malformed");
-+		dev_err(&chip->dev, "session state malformed\n");
+-	val = tpm_buf_read_u32(buf, &offset_s);
++	if (!tpm_buf_read_u32(buf, &offset_s, &val)) {
 +		ret = -EIO;
 +		goto err;
 +	}
-+	if (name_size > TPM2_MAX_NAME_SIZE) {
-+		dev_err(&chip->dev, "name too long: %u\n", name_size);
- 		ret = -EIO;
- 		goto err;
- 	}
- 	tpm_buf_append_u32(buf, handle);
- 	auth->session += 4;
--
--	if (mso == TPM2_MSO_PERSISTENT ||
--	    mso == TPM2_MSO_VOLATILE ||
--	    mso == TPM2_MSO_NVRAM) {
--		if (!name) {
--			ret = tpm2_read_public(chip, handle, auth->name[slot]);
--		} else {
--			ret = name_size(name);
--		}
--
--		if (ret < 0)
--			goto err;
--
--		name_size_alg = ret;
--	} else {
--		if (name) {
--			dev_err(&chip->dev, "handle 0x%08x does not use a name\n",
--				handle);
--			ret = -EIO;
--			goto err;
--		}
--	}
--
--	auth->name_h[slot] = handle;
--	if (name)
--		memcpy(auth->name[slot], name, name_size_alg);
-+	memcpy(auth->name[slot], name, name_size);
-+	auth->name_size_tbl[slot] = name_size;
- #endif
- 	return 0;
- 
- #ifdef CONFIG_TCG_TPM2_HMAC
- err:
- 	tpm2_end_auth_session(chip);
--	return tpm_ret_to_err(ret);
-+	return ret;
- #endif
- }
- EXPORT_SYMBOL_GPL(tpm_buf_append_name);
-@@ -629,22 +616,8 @@ int tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
- 	attrs = chip->cc_attrs_tbl[i];
- 
- 	handles = (attrs >> TPM2_CC_ATTR_CHANDLES) & GENMASK(2, 0);
-+	offset_s += handles * sizeof(u32);
- 
--	/*
--	 * just check the names, it's easy to make mistakes.  This
--	 * would happen if someone added a handle via
--	 * tpm_buf_append_u32() instead of tpm_buf_append_name()
--	 */
--	for (i = 0; i < handles; i++) {
--		u32 handle = tpm_buf_read_u32(buf, &offset_s);
--
--		if (auth->name_h[i] != handle) {
--			dev_err(&chip->dev, "invalid handle 0x%08x\n", handle);
--			ret = -EIO;
--			goto err;
--		}
--	}
--	/* point offset_s to the start of the sessions */
- 	val = tpm_buf_read_u32(buf, &offset_s);
++
  	/* point offset_p to the start of the parameters */
  	offset_p = offset_s + val;
-@@ -705,23 +678,8 @@ int tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
- 	/* ordinal is already BE */
- 	sha256_update(&sctx, (u8 *)&head->ordinal, sizeof(head->ordinal));
- 	/* add the handle names */
--	for (i = 0; i < handles; i++) {
--		enum tpm2_mso_type mso = tpm2_handle_mso(auth->name_h[i]);
--
--		if (mso == TPM2_MSO_PERSISTENT ||
--		    mso == TPM2_MSO_VOLATILE ||
--		    mso == TPM2_MSO_NVRAM) {
--			ret = name_size(auth->name[i]);
--			if (ret < 0)
--				goto err;
--
--			sha256_update(&sctx, auth->name[i], ret);
--		} else {
--			__be32 h = cpu_to_be32(auth->name_h[i]);
--
--			sha256_update(&sctx, (u8 *)&h, 4);
--		}
--	}
-+	for (i = 0; i < handles; i++)
-+		sha256_update(&sctx, auth->name[i], auth->name_size_tbl[i]);
- 	if (offset_s != tpm_buf_length(buf))
- 		sha256_update(&sctx, &buf->data[offset_s],
- 			      tpm_buf_length(buf) - offset_s);
-diff --git a/include/linux/tpm.h b/include/linux/tpm.h
-index 2eb17e1ccd58..042f36600db1 100644
---- a/include/linux/tpm.h
-+++ b/include/linux/tpm.h
-@@ -301,7 +301,7 @@ static inline struct tpm2_auth *tpm2_chip_auth(struct tpm_chip *chip)
- }
+ 	for (i = 1; offset_s < offset_p; i++) {
+-		u32 handle = tpm_buf_read_u32(buf, &offset_s);
++		u32 handle;
+ 		u16 len;
+ 		u8 a;
  
- int tpm_buf_append_name(struct tpm_chip *chip, struct tpm_buf *buf,
--			u32 handle, u8 *name);
-+			u32 handle, u8 *name, u16 name_size);
- void tpm_buf_append_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf,
- 				 u8 attributes, u8 *passphrase,
- 				 int passphraselen);
-@@ -315,6 +315,7 @@ int tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf);
- int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
- 				int rc);
- void tpm2_end_auth_session(struct tpm_chip *chip);
-+int tpm2_read_public(struct tpm_chip *chip, u32 handle, void *name);
- #else
- #include <linux/unaligned.h>
- 
-@@ -338,6 +339,13 @@ static inline int tpm_buf_check_hmac_response(struct tpm_chip *chip,
- {
- 	return rc;
- }
++		if (!tpm_buf_read_u32(buf, &offset_s, &handle)) {
++			ret = -EIO;
++			goto err;
++		}
 +
-+static inline int tpm2_read_public(struct tpm_chip *chip, u32 handle,
-+				   void *name)
-+{
-+	put_unaligned_be32(handle, name);
-+	return sizeof(u32);
-+}
- #endif	/* CONFIG_TCG_TPM2_HMAC */
+ 		/* nonce (already in auth) */
+-		len = tpm_buf_read_u16(buf, &offset_s);
++		if (!tpm_buf_read_u16(buf, &offset_s, &len)) {
++			ret = -EIO;
++			goto err;
++		}
++
+ 		offset_s += len;
+ 
+-		a = tpm_buf_read_u8(buf, &offset_s);
++		if (!tpm_buf_read_u8(buf, &offset_s, &a)) {
++			ret = -EIO;
++			goto err;
++		}
++
++		if (!tpm_buf_read_u16(buf, &offset_s, &len)) {
++			ret = -EIO;
++			goto err;
++		}
+ 
+-		len = tpm_buf_read_u16(buf, &offset_s);
+ 		if (handle == auth->handle && auth->attrs == a) {
+ 			hmac = &buf->data[offset_s];
+ 			/*
+@@ -665,7 +690,11 @@ int tpm_buf_fill_hmac_session(struct tpm_chip *chip, struct tpm_buf *buf)
+ 			  auth->tpm_nonce, AES_KEY_BYTES + AES_BLOCK_SIZE,
+ 			  auth->scratch);
+ 
+-		len = tpm_buf_read_u16(buf, &offset_p);
++		if (!tpm_buf_read_u16(buf, &offset_p, &len)) {
++			ret = -EIO;
++			goto err;
++		}
++
+ 		aes_prepareenckey(&auth->aes_key, auth->scratch, AES_KEY_BYTES);
+ 		aescfb_encrypt(&auth->aes_key, &buf->data[offset_p],
+ 			       &buf->data[offset_p], len,
+@@ -740,7 +769,10 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
+ 	struct sha256_ctx sctx;
+ 	struct hmac_sha256_ctx hctx;
+ 	u16 tag = be16_to_cpu(head->tag);
+-	int parm_len, len, i, handles;
++	u32 parm_len;
++	int i, handles;
++	u8 session_attrs;
++	u16 len;
+ 
+ 	if (!auth)
+ 		return rc;
+@@ -770,26 +802,38 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
+ 
+ 	/* point to area beyond handles */
+ 	offset_s = TPM_HEADER_SIZE + handles * 4;
+-	parm_len = tpm_buf_read_u32(buf, &offset_s);
++	if (!tpm_buf_read_u32(buf, &offset_s, &parm_len))
++		goto out;
++
+ 	offset_p = offset_s;
+ 	offset_s += parm_len;
+ 	/* skip over any sessions before ours */
+ 	for (i = 0; i < auth->session - 1; i++) {
+-		len = tpm_buf_read_u16(buf, &offset_s);
++		if (!tpm_buf_read_u16(buf, &offset_s, &len))
++			goto out;
++
+ 		offset_s += len + 1;
+-		len = tpm_buf_read_u16(buf, &offset_s);
++		if (!tpm_buf_read_u16(buf, &offset_s, &len))
++			goto out;
++
+ 		offset_s += len;
+ 	}
+ 	/* TPM nonce */
+-	len = tpm_buf_read_u16(buf, &offset_s);
++	if (!tpm_buf_read_u16(buf, &offset_s, &len))
++		goto out;
++
+ 	if (offset_s + len > tpm_buf_length(buf))
+ 		goto out;
+ 	if (len != SHA256_DIGEST_SIZE)
+ 		goto out;
+ 	memcpy(auth->tpm_nonce, &buf->data[offset_s], len);
+ 	offset_s += len;
+-	attrs = tpm_buf_read_u8(buf, &offset_s);
+-	len = tpm_buf_read_u16(buf, &offset_s);
++	if (!tpm_buf_read_u8(buf, &offset_s, &session_attrs))
++		goto out;
++
++	if (!tpm_buf_read_u16(buf, &offset_s, &len))
++		goto out;
++
+ 	if (offset_s + len != tpm_buf_length(buf))
+ 		goto out;
+ 	if (len != SHA256_DIGEST_SIZE)
+@@ -831,8 +875,8 @@ int tpm_buf_check_hmac_response(struct tpm_chip *chip, struct tpm_buf *buf,
+ 			  auth->our_nonce, AES_KEY_BYTES + AES_BLOCK_SIZE,
+ 			  auth->scratch);
+ 
+-		len = tpm_buf_read_u16(buf, &offset_p);
+-		if (offset_p + len > tpm_buf_length(buf)) {
++		if (!tpm_buf_read_u16(buf, &offset_p, &len) ||
++		    offset_p + len > tpm_buf_length(buf)) {
+ 			rc = -EINVAL;
+ 			goto out;
+ 		}
+@@ -888,7 +932,7 @@ static int tpm2_parse_start_auth_session(struct tpm2_auth *auth,
+ 	struct tpm_header *head = (struct tpm_header *)buf->data;
+ 	u32 tot_len = be32_to_cpu(head->length);
+ 	off_t offset = TPM_HEADER_SIZE;
+-	u32 val;
++	u16 val;
+ 
+ 	/* we're starting after the header so adjust the length */
+ 	tot_len -= TPM_HEADER_SIZE;
+@@ -897,8 +941,12 @@ static int tpm2_parse_start_auth_session(struct tpm2_auth *auth,
+ 	if (tot_len != 4 + 2 + sizeof(auth->tpm_nonce))
+ 		return -EINVAL;
+ 
+-	auth->handle = tpm_buf_read_u32(buf, &offset);
+-	val = tpm_buf_read_u16(buf, &offset);
++	if (!tpm_buf_read_u32(buf, &offset, &auth->handle))
++		return -EIO;
++
++	if (!tpm_buf_read_u16(buf, &offset, &val))
++		return -EIO;
++
+ 	if (val != sizeof(auth->tpm_nonce))
+ 		return -EINVAL;
+ 	memcpy(auth->tpm_nonce, &buf->data[offset], sizeof(auth->tpm_nonce));
+@@ -1070,15 +1118,20 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
+ 	off_t offset_r = TPM_HEADER_SIZE, offset_t;
+ 	u16 len = TPM_HEADER_SIZE;
+ 	u32 total_len = be32_to_cpu(head->length);
+-	u32 val, param_len, keyhandle;
++	u32 val32, param_len, keyhandle;
++	u16 val;
++
++	if (!tpm_buf_read_u32(buf, &offset_r, &keyhandle))
++		return -EIO;
+ 
+-	keyhandle = tpm_buf_read_u32(buf, &offset_r);
+ 	if (handle)
+ 		*handle = keyhandle;
+ 	else
+ 		tpm2_flush_context(chip, keyhandle);
+ 
+-	param_len = tpm_buf_read_u32(buf, &offset_r);
++	if (!tpm_buf_read_u32(buf, &offset_r, &param_len))
++		return -EIO;
++
+ 	/*
+ 	 * param_len doesn't include the header, but all the other
+ 	 * lengths and offsets do, so add it to parm len to make
+@@ -1088,7 +1141,10 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
+ 
+ 	if (param_len + 8 > total_len)
+ 		return -EINVAL;
+-	len = tpm_buf_read_u16(buf, &offset_r);
++
++	if (!tpm_buf_read_u16(buf, &offset_r, &len))
++		return -EIO;
++
+ 	offset_t = offset_r;
+ 	if (offset_r + len > tpm_buf_length(buf))
+ 		return -EINVAL;
+@@ -1102,64 +1158,88 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
+ 	}
+ 
+ 	/* validate the public key */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
+ 
+ 	/* key type (must be what we asked for) */
+ 	if (val != TPM_ALG_ECC)
+ 		return -EINVAL;
+-	val = tpm_buf_read_u16(buf, &offset_t);
++
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
+ 
+ 	/* name algorithm */
+ 	if (val != TPM_ALG_SHA256)
+ 		return -EINVAL;
+-	val = tpm_buf_read_u32(buf, &offset_t);
++
++	if (!tpm_buf_read_u32(buf, &offset_t, &val32))
++		return -EIO;
+ 
+ 	/* object properties */
+-	if (val != TPM2_OA_NULL_KEY)
++	if (val32 != TPM2_OA_NULL_KEY)
+ 		return -EINVAL;
+ 
+ 	/* auth policy (empty) */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != 0)
+ 		return -EINVAL;
+ 
+ 	/* symmetric key parameters */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != TPM_ALG_AES)
+ 		return -EINVAL;
+ 
+ 	/* symmetric key length */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != AES_KEY_BITS)
+ 		return -EINVAL;
+ 
+ 	/* symmetric encryption scheme */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != TPM_ALG_CFB)
+ 		return -EINVAL;
+ 
+ 	/* signing scheme */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != TPM_ALG_NULL)
+ 		return -EINVAL;
+ 
+ 	/* ECC Curve */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != TPM2_ECC_NIST_P256)
+ 		return -EINVAL;
+ 
+ 	/* KDF Scheme */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != TPM_ALG_NULL)
+ 		return -EINVAL;
+ 
+ 	/* extract public key (x and y points) */
+-	val = tpm_buf_read_u16(buf, &offset_t);
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != EC_PT_SZ)
+ 		return -EINVAL;
+ 	memcpy(chip->null_ec_key_x, &buf->data[offset_t], val);
+ 	offset_t += val;
+-	val = tpm_buf_read_u16(buf, &offset_t);
++
++	if (!tpm_buf_read_u16(buf, &offset_t, &val))
++		return -EIO;
++
+ 	if (val != EC_PT_SZ)
+ 		return -EINVAL;
+ 	memcpy(chip->null_ec_key_y, &buf->data[offset_t], val);
+@@ -1175,30 +1255,40 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
+ 		return -EINVAL;
+ 
+ 	/* creation data (skip) */
+-	len = tpm_buf_read_u16(buf, &offset_r);
++	if (!tpm_buf_read_u16(buf, &offset_r, &len))
++		return -EIO;
++
+ 	offset_r += len;
+ 	if (offset_r > param_len)
+ 		return -EINVAL;
+ 
+ 	/* creation digest (must be sha256) */
+-	len = tpm_buf_read_u16(buf, &offset_r);
++	if (!tpm_buf_read_u16(buf, &offset_r, &len))
++		return -EIO;
++
+ 	offset_r += len;
+ 	if (len != SHA256_DIGEST_SIZE || offset_r > param_len)
+ 		return -EINVAL;
+ 
+ 	/* TPMT_TK_CREATION follows */
+ 	/* tag, must be TPM_ST_CREATION (0x8021) */
+-	val = tpm_buf_read_u16(buf, &offset_r);
++	if (!tpm_buf_read_u16(buf, &offset_r, &val))
++		return -EIO;
++
+ 	if (val != TPM2_ST_CREATION || offset_r > param_len)
+ 		return -EINVAL;
+ 
+ 	/* hierarchy */
+-	val = tpm_buf_read_u32(buf, &offset_r);
+-	if (val != hierarchy || offset_r > param_len)
++	if (!tpm_buf_read_u32(buf, &offset_r, &val32))
++		return -EIO;
++
++	if (val32 != hierarchy || offset_r > param_len)
+ 		return -EINVAL;
+ 
+ 	/* the ticket digest HMAC (might not be sha256) */
+-	len = tpm_buf_read_u16(buf, &offset_r);
++	if (!tpm_buf_read_u16(buf, &offset_r, &len))
++		return -EIO;
++
+ 	offset_r += len;
+ 	if (offset_r > param_len)
+ 		return -EINVAL;
+@@ -1207,7 +1297,9 @@ static int tpm2_parse_create_primary(struct tpm_chip *chip, struct tpm_buf *buf,
+ 	 * finally we have the name, which is a sha256 digest plus a 2
+ 	 * byte algorithm type
+ 	 */
+-	len = tpm_buf_read_u16(buf, &offset_r);
++	if (!tpm_buf_read_u16(buf, &offset_r, &len))
++		return -EIO;
++
+ 	if (offset_r + len != param_len + 8)
+ 		return -EINVAL;
+ 	if (len != SHA256_DIGEST_SIZE + 2)
+diff --git a/include/linux/tpm_buf.h b/include/linux/tpm_buf.h
+index f8c105d8b8bf..d0f4c1c3ee2d 100644
+--- a/include/linux/tpm_buf.h
++++ b/include/linux/tpm_buf.h
+@@ -52,9 +52,9 @@ void tpm_buf_append(struct tpm_buf *buf, const u8 *new_data, u16 new_length);
+ void tpm_buf_append_u8(struct tpm_buf *buf, const u8 value);
+ void tpm_buf_append_u16(struct tpm_buf *buf, const u16 value);
+ void tpm_buf_append_u32(struct tpm_buf *buf, const u32 value);
+-u8 tpm_buf_read_u8(struct tpm_buf *buf, off_t *offset);
+-u16 tpm_buf_read_u16(struct tpm_buf *buf, off_t *offset);
+-u32 tpm_buf_read_u32(struct tpm_buf *buf, off_t *offset);
++bool tpm_buf_read_u8(struct tpm_buf *buf, off_t *offset, u8 *value);
++bool tpm_buf_read_u16(struct tpm_buf *buf, off_t *offset, u16 *value);
++bool tpm_buf_read_u32(struct tpm_buf *buf, off_t *offset, u32 *value);
+ void tpm_buf_append_handle(struct tpm_buf *buf, u32 handle);
  
  #endif
 diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/trusted-keys/trusted_tpm2.c
-index 32d90a1f8357..575b488a4f78 100644
+index 575b488a4f78..e20e54203b83 100644
 --- a/security/keys/trusted-keys/trusted_tpm2.c
 +++ b/security/keys/trusted-keys/trusted_tpm2.c
-@@ -211,9 +211,11 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- 		      struct trusted_key_options *options)
- {
- 	struct trusted_key_tpm *private = options->private;
-+	u8 parent_name[TPM2_MAX_NAME_SIZE];
- 	off_t offset = TPM_HEADER_SIZE;
- 	struct tpm_buf *buf __free(kfree) = NULL;
+@@ -217,6 +217,7 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
  	struct tpm_buf *sized __free(kfree) = NULL;
-+	u16 parent_name_size;
+ 	u16 parent_name_size;
  	int blob_len = 0;
++	u32 size;
  	int hash;
  	u32 flags;
-@@ -230,6 +232,12 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- 	if (rc)
- 		return rc;
- 
-+	rc = tpm2_read_public(chip, private->keyhandle, parent_name);
-+	if (rc < 0)
-+		goto out_put;
-+
-+	parent_name_size = rc;
-+
- 	rc = tpm2_start_auth_session(chip);
- 	if (rc)
- 		goto out_put;
-@@ -253,7 +261,8 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- 
- 	tpm_buf_init_sized(sized, TPM_BUFSIZE);
- 
--	rc = tpm_buf_append_name(chip, buf, private->keyhandle, NULL);
-+	rc = tpm_buf_append_name(chip, buf, private->keyhandle, parent_name,
-+				 parent_name_size);
+ 	int rc;
+@@ -323,18 +324,17 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
  	if (rc)
  		goto out;
  
-@@ -358,7 +367,9 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
- {
- 	u8 *blob_ref __free(kfree) = NULL;
- 	struct trusted_key_tpm *private = options->private;
-+	u8 parent_name[TPM2_MAX_NAME_SIZE];
- 	struct tpm_buf *buf __free(kfree) = NULL;
-+	u16 parent_name_size;
- 	unsigned int private_len;
- 	unsigned int public_len;
- 	unsigned int blob_len;
-@@ -412,6 +423,12 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
- 	if (blob_len > payload->blob_len)
- 		return -E2BIG;
+-	blob_len = tpm_buf_read_u32(buf, &offset);
+-	if (buf->flags & TPM_BUF_INVALID) {
+-		rc = -E2BIG;
++	if (!tpm_buf_read_u32(buf, &offset, &size)) {
++		rc = -EIO;
+ 		goto out;
+ 	}
  
-+	rc = tpm2_read_public(chip, private->keyhandle, parent_name);
-+	if (rc < 0)
-+		return rc;
-+
-+	parent_name_size = rc;
-+
- 	rc = tpm2_start_auth_session(chip);
- 	if (rc)
- 		return rc;
-@@ -425,7 +442,8 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
- 	tpm_buf_init(buf, TPM_BUFSIZE);
- 	tpm_buf_reset(buf, TPM2_ST_SESSIONS, TPM2_CC_LOAD);
+-	if (buf->length - offset < blob_len) {
++	if (buf->length - offset < size) {
+ 		rc = -EFAULT;
+ 		goto out;
+ 	}
  
--	rc = tpm_buf_append_name(chip, buf, private->keyhandle, NULL);
-+	rc = tpm_buf_append_name(chip, buf, private->keyhandle, parent_name,
-+				 parent_name_size);
- 	if (rc)
- 		return rc;
- 
-@@ -470,11 +488,19 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 			   u32 blob_handle)
- {
- 	struct trusted_key_tpm *private = options->private;
-+	u8 blob_name[TPM2_MAX_NAME_SIZE];
- 	struct tpm_buf *buf __free(kfree) = NULL;
-+	u16 blob_name_size;
- 	u16 data_len;
- 	u8 *data;
- 	int rc;
- 
-+	rc = tpm2_read_public(chip, blob_handle, blob_name);
-+	if (rc < 0)
-+		return rc;
-+
-+	blob_name_size = rc;
-+
- 	rc = tpm2_start_auth_session(chip);
- 	if (rc)
- 		return rc;
-@@ -488,7 +514,8 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 	tpm_buf_init(buf, TPM_BUFSIZE);
- 	tpm_buf_reset(buf, TPM2_ST_SESSIONS, TPM2_CC_UNSEAL);
- 
--	rc = tpm_buf_append_name(chip, buf, blob_handle, NULL);
-+	rc = tpm_buf_append_name(chip, buf, blob_handle, blob_name,
-+				 blob_name_size);
- 	if (rc)
- 		return rc;
+-	blob_len = tpm2_key_encode(payload, options, &buf->data[offset], blob_len);
++	blob_len = tpm2_key_encode(payload, options, &buf->data[offset], size);
+ 	if (blob_len < 0)
+ 		rc = blob_len;
  
 -- 
 2.47.3
