@@ -1,92 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795753137;
-	b=vw/RJmeGP27bytF+FRIINLGC+hxdYvgQkdQbtoe67HaOzkfai8zzcczAM3DKg0kbp3pC
-	 E4sJux9ZsyQrgIFmFPvpUFk4XpqGwA+k3eoXuyutqQVsT52Qi9ovjiQMYreeQhXTV5SXG
-	 8AI4+kn5Wy/Kgfg+J84SuEeWx1CXk6A5UeNBXDVj/Y4K3Q0rRipVzzoNf8rIYl4CNxWrM
-	 caN28LVVqEszQtJ/2DVxVb25S2WrJJRxuEkDC5PkhGeonlyJLQRlJ+b6Lm/JwWZiVhPcf
-	 tvNnUEaM7iDKMaRZSobQv3VgaPZMF2JieoYruCHkv2W5wkWVTnF0gdJHD9PPrOsTUzg==
+	t=1795753585;
+	b=zsj83DfO9THl766xgo1EH31OdleZbXcKnYqwljElJDMtAoR/ijBRGXk3oJ8SNorhlTpa
+	 iMGFjqd/Cu8T/F7tR68Mz5XKj/OFwnNrAuLC0QnkkY21lMFv+jORFqXGATHFm5pE1DXMP
+	 f0VWQqZH3v5uNFYuMe03DhV8CQFfWEiVXuSlmUI/DoO6mUGVuZ1k1VyNR+vkQPo78NQiX
+	 sabZasKKHsu8lG0Ty2wXrKkfgAVP4noKtmWG19Zd8DmKLw2if/0Mzbi27gqECv2LfRLJc
+	 syXPsb5crAHVDgJOZ4XNf5akYcCNu6bItA/kaEMb0urP1kqlTtUBwHb05bOp7Ogu1PA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795753137;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=93YINut3KE5OztbS+NDPfxjifdfR77qYaLTwskp1sjA=;
-	b=zRDsu8sQQ2heRXYNJdPyy5nQ2owrysd1fF1dQMjjJWiwMN3/t2oJ7VTdz5ceQjh5Uv/z
-	 GDI4GNhQpLgHvonw2E8PZyKfRNSqsx83If/Rfe6mXlQTblwRo1/xXoppOnOZ274XX86Uv
-	 R4a7XgtbxauyQA1usH/HQ3LwSlQDSW6mpvv+O7dbo6cD5pWLWMWsojja7yBBPY1CAuO6W
-	 8Lv/KBoE6DKRHLFOlT6ZrFiuSXjZx4P031gPi1gWDAtCHkXUkW/2XUXfJF3bjffjQBPPu
-	 KEJrogRkEWXYGjOHaj7JVGIWQ2yaxAaszf9+G1ThHHt7wlUDculggzXsfirbNmLf5Jw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795753585;
+	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
+	 Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To;
+	bh=wroQkwyUmImSby60FSSEA23WGTsljWCUGSUqmlr+5fs=;
+	b=QtjmF6AWiQlfy6STKTv5+U9yzVfTORJhXiWkvKC8dMHdNPJoqdmE7g88rIhNfUBFryJN
+	 t1ZBfz1xaAnWIi/+HCAkWQxS85vfBnJNrwWJpb+4SuTakNLZb8j15FFb6xRGsrxXNWWQ9
+	 e2DOov0grkRA/qAoXqUDI6auMYlvoK/3Mkypp4o2xMhEhAqHTUPvFEcBCPZ0VTJgKsZCT
+	 wmL0gQVA/0wkVAP7WyNxjpv5nBcj2nll6mHeXdpbin1t9iJytKUV8qpW/nvd2uqend6a4
+	 bw4ekUu+0Ak4v01fEBnrSxehLN05kaJyGeFzBAeXcwQX5W5jeJ60B+n9f4cH237xdlg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=KZIamYWu;
-	arc=none smtp.remote-ip=209.85.215.182
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=gondor.apana.org.au;
+	spf=pass smtp.mailfrom=gondor.apana.org.au;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=T+aOBZEX;
+	arc=none smtp.remote-ip=180.181.231.80
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13475606A31C
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:18:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 13475606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC9A606A31E;
+	Fri, 27 Nov 2026 04:26:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8BC9A606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=KZIamYWu
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cde5a7d7849so3333955a12.0
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Nov 2026 20:18:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795753136; x=1796357936; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=93YINut3KE5OztbS+NDPfxjifdfR77qYaLTwskp1sjA=;
-        b=KZIamYWudgLOaRsKoqqyDFI8ih6B/PwA45hiEyepNUmZ0Y8HlIe/rhfBjb7D8KUbWY
-         fFuYxERH3zxGt0ZoDOi8NUzEmzLsMcttanbdG4P8Z+WnPQtgBF3fDbzbDg50Upl4XYTq
-         y64ktzqAl3fqKpTZja93M2PobdoXDX0XgOkH/7grUKWf/sJFaMEG7N1BT16XNRPDnbAz
-         6vdzGTiEN7su9ZgThwVOS2RGckGREbia60tiduJxWnSoiF/Igf1ObK83gO2OhEJReSCW
-         C07J45Xm8yu7LaGBsGwumChXHegUmLsXEBbDd+ec2++CL/rIVgqPWYVZHhZ86u84SdGY
-         2S2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795753136; x=1796357936;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=93YINut3KE5OztbS+NDPfxjifdfR77qYaLTwskp1sjA=;
-        b=WC1QcfpPYQekuYsVvZFMuINgrwTghvZd6UitDvAzvpOgqPb8P+9kjBuAI1q9r1I8X7
-         EFUqrcmUw2Az67zL9jghlDs4ciHzcoFqjSCnqZXuGDAd2dCw0qpDXTJPCI4s2P1JA7Rl
-         B/kGYYQ4VpfjObx39zfA9y7xDZA55+psZdGxiPu2Bryb0ZfQ1dctgkfHlK/MPMRJIUPp
-         Kl0/exBZG3VRT9MuSsulXlVXWiL9tL4b3LsGwg2oSXg5PYtz9eCRjO8GfJQnbLRY5nR6
-         NYxpuZaKIS4Jpf5ZXA3Ghq1mawZ7qIuPR20Y+Gv0PXjhU2OYbeyoRykR0tKFwmWzVDpj
-         AzyQ==
-X-Gm-Message-State: APuU4Z/mx5v8rGCf5xc96TshQRkMLWeq9jW4nT+YIpJXdZJDGWh7XhyZ
-	1pC3AH+AsVbdvMVY3RYLpWrqgGdyVqS1qqpgEb4PNvtFJfNh5GQ2JDWU
-X-Gm-Gg: AZFdTZcQlNd8zELr3SvnxNYfqmjHnBwwG6FzFto6q+pxKpmvOO931ddqmuBkbX83Bw3
-	P7NZGyQJ7OtbtcrkfIS+YxAZK7ZbYKijs4ptZHsg9wWaPjqYt+tagK0Q+XM/Xn4aNhshAEgdbrU
-	z4RyPJMkxqV9TLVdQyXwtXt2HZsjBTcUVgZ3pdeIHLXLbrnYCZ2PBetzSbCQifqub70xEKys8LX
-	R4S5MCeq+wWk0SNs43HaGGJcJWNgSlEjP8zkV6KRzELUaTnJ8K4eu1YI8DUvnVdX8/AB+7CIa4P
-	le4SqRkAWWfjgGN6Mb1rNjS3tSP2f5AoeMpOt7UBZJzF1lKIlj/4UqsJ9nW98dyuZImkf2ciryf
-	0ilh7v5myoYQ6+q46C2Eypz41ieRJKYobRTkFD9fMWhFgU047D2juQkL0hvNsjxB+rf5WNj8046
-	df37f49ftlWNFcWTSLQMnks6dYRfRkdc+gVkcjGZcB5XNctbFB+2P3BsZw+S6X5zIn9vXuFLhRm
-	kqsa0GA+ZrhyggMpRalwrov78kboMhQ+lEJ8KpXNWH8q2uecUZbGjKOPXIOZYnaTQs3MG5hZEtG
-	t0NfMvEEwVH6gjR95dSq0W/tJzZmnE9aZW2CLL6AwanXJVofyw==
-X-Received: by 2002:a17:90a:e705:b0:3ab:1b1c:8a70 with SMTP id 98e67ed59e1d1-3b41c938d83mr20435234a91.38.1795753136343;
-        Thu, 26 Nov 2026 20:18:56 -0800 (PST)
-Received: from fedora.tailc1fb0a.ts.net ([172.219.65.15])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b41ad46ef5sm36000501a91.8.2026.11.26.20.18.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2026 20:18:56 -0800 (PST)
-From: Artem Novak <artem122novak@gmail.com>
-To: ebiggers@kernel.org,
-	Jason@zx2c4.com,
-	ardb@kernel.org,
-	stian@itx.no
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Artem Novak <artem122novak@gmail.com>
-Subject: [PATCH] crypto: sparc: remove trailing whitespace from AES assembly
-Date: Thu, 26 Nov 2026 22:18:53 -0600
-Message-ID: <20261127041853.127855-1-artem122novak@gmail.com>
-X-Mailer: git-send-email 2.56.1
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=T+aOBZEX
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=wroQkwyUmImSby60FSSEA23WGTsljWCUGSUqmlr+5fs=; 
+	b=T+aOBZEX6uzmlDxlpiKDB9TunL9hzXwiHnKJ1On1QOse0ZeS/h3+Wb+Qgqb7EoVtcaQa/jbi9rR
+	0FFPOw3G5FfEuNYwz4rBR/oIsIplpf76eoqHuvJw2NckcqnjLNNYRO/tEnF9bT8D3ooCjHyl3mira
+	eDHz6AY1Geefx5nSl+Qrx68RxA/E86hQ3chi/oHU/UnMZ6sQq9S9pTvGrvC3VosQkM+e5ELB5VpGj
+	AWsEw0uYYsbniJvHhAQE5RK5AsJHVkNKPGcewZUGROL4sWi8bnn1Wo2CXpTHwKcIHDuEWWUhjWQ60
+	kv6SvYjF41mSKwKfT7Q2pv5XjhHi/GCAHjiw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1xWnXH-00000002Utb-1xXi;
+	Fri, 27 Nov 2026 12:26:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 12:26:11 +0800
+Date: Fri, 27 Nov 2026 12:26:11 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Guicai Ma <maguicai@kylinos.cn>
+Cc: "David S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: af_alg - Fix data-race in af_alg_wait_for_data()
+ and af_alg_wait_for_wmem()
+Message-ID: <awkGY8QdvNxzTVHG@gondor.apana.org.au>
+References: <20261118154815.607879-1-maguicai@kylinos.cn>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -96,29 +65,70 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261118154815.607879-1-maguicai@kylinos.cn>
 
-Remove the trailing tab after the key expansion label in
-aes_asm.S.
+On Wed, Nov 18, 2026 at 10:48:15AM -0500, Guicai Ma wrote:
+> KCSAN reported a data-race between af_alg_sendmsg() and
+> af_alg_wait_for_data():
+> 
+>   BUG: KCSAN: data-race in af_alg_sendmsg / af_alg_wait_for_data
+> 
+>   write to 0xffff8eec18118fa4 of 1 bytes by task 17152 on cpu 17:
+>    af_alg_sendmsg+0x1c7/0xfa0 crypto/af_alg.c:949
+>    skcipher_sendmsg+0x78/0x90 crypto/algif_skcipher.c:47
+>    ...
+> 
+>   read to 0xffff8eec18118fa4 of 1 bytes by task 17143 on cpu 1:
+>    af_alg_wait_for_data+0x1f9/0x3c0 crypto/af_alg.c:854
+>    _skcipher_recvmsg+0x52f/0x720 crypto/algif_skcipher.c:65
+>    ...
+> 
+>   value changed: 0x13 -> 0x1b
+> 
+> Both af_alg_wait_for_data() and af_alg_wait_for_wmem() are called with
+> the socket lock held and use sk_wait_event() to wait for the condition.
+> However, sk_wait_event() calls release_sock() before evaluating the
+> condition expression for the first time, which reads ctx->init,
+> ctx->more, and ctx->used without the socket lock. Meanwhile,
+> af_alg_sendmsg() acquires the socket lock and modifies ctx->write (which
+> shares the same 1-byte bitfield as ctx->more and ctx->init), as well as
+> ctx->init, ctx->more, and ctx->used.
+> 
+> Unlike TCP/UDP sockets, af_alg updates these context fields only in
+> process context under lock_sock(sk). Since add_wait_queue() with
+> woken_wake_function is already done while holding the socket lock, check
+> the wait condition under lock_sock(sk) before calling release_sock(sk)
+> and wait_woken(), avoiding the lockless read entirely.
+> 
+> Fixes: 2d97591ef43d ("crypto: af_alg - consolidation of duplicate code")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Guicai Ma <maguicai@kylinos.cn>
+> ---
+> Testing:
+> Verified with a concurrent AF_ALG skcipher (ecb(aes)) send/recv stress
+> test under CONFIG_KCSAN=y (QEMU arm64, 8 vCPUs, 60s per run, ~470k rounds):
+> - Baseline (6.6.156): 51 af_alg KCSAN data-race reports (both the 1-byte
+>   bitfield race and the 8-byte ctx->used race).
+> - Patched (6.6.156, 2 runs): 0 af_alg KCSAN reports; roundtrip
+>   functional check passed and unrelated KCSAN reports remained active.
+> - Upstream (20eef29b7c84, arm64 defconfig + KCSAN): compile-tested
+>   crypto/af_alg.o, crypto/algif_skcipher.o, and crypto/algif_aead.o
+>   with W=1 cleanly (0 warnings/errors).
+> 
+>  crypto/af_alg.c | 22 ++++++++++++----------
+>  1 file changed, 12 insertions(+), 10 deletions(-)
 
-Signed-off-by: Artem Novak <artem122novak@gmail.com>
----
- lib/crypto/sparc/aes_asm.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This looks like a false-positive because sk_wait_event evaluates
+__condition twice, once without locks before the wait and once with
+locks.
 
-diff --git a/lib/crypto/sparc/aes_asm.S b/lib/crypto/sparc/aes_asm.S
-index fd90b129972f..0ddf181f342e 100644
---- a/lib/crypto/sparc/aes_asm.S
-+++ b/lib/crypto/sparc/aes_asm.S
-@@ -293,7 +293,7 @@ ENTRY(aes_sparc64_key_expand)
- 	ba,pt	%xcc, 80f
- 	 std	%f58, [%o1 + 0xc8]
- 
--1:	
-+1:
- 	/* 192-bit key expansion */
- 	ld	[%o0 + 0x10], %f4
- 	ld	[%o0 + 0x14], %f5
+It's the evaluation within locks that is final so everything should
+be correct.
+
+Thanks,
 -- 
-2.56.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
