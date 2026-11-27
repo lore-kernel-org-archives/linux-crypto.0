@@ -1,60 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795756401;
-	b=St8GzKqOtquceRh7gGdFhkJY2VlwnZV5p83oWRjGYw9VS0irH6jNu6qsuAGOUgiuv/QW
-	 yea7NZtLZeIN7fneD3n6rciKMbGRPIYLB2dc+/aC+EFK+hbH7W4KG3NX+Tthi9iIy04Or
-	 mvQCbMLx1AZTgTuW0bqEAICv0iAeA7fJzHWUrOHjprvEzUDRD1LiUgWc1IZgKLUdfzUIQ
-	 U20toSc2mPweAYqBmA1t7sDkZXxzWMaRUNYId6dvBcm3ZTEvjOCQTO9sfMVoxfJKuiu8I
-	 LBfGoyqnsfXGzMoisQ+8g2Qj/5TO3xJOEs8DlVxVTnSpm01WghTHlwxQ3FMoLsG8iqg==
+	t=1795756491;
+	b=Yjqa97PTPa/hG/UkUKiv0yBjgVnCTtYm3SO261Kvz+9QTB3yPbf5Rp9HuM+aZXHAFae2
+	 wJfsqB9qjPHqpX5wTgJduZYevAkxNB/W7bzR1BxJXa2QMuAsfhjOc5PhRxDTEudpL+B6G
+	 DoNalu7JMBnNlhWWxRq/yYpW7/04kdpFakFXg8yM3tfEXzXb43wzIsWd7Av52kvkZPcDW
+	 Cv+PeNzASfIBfsTYZ9LKKV18k/O3wz7aEgtTuHIdzax6dIysWg0REqEWISbTfs6hleZQY
+	 ttTeP8u0tE5QLcRLV2QDg/iqS+oQ54HKHsLM+Zw+BJUwSv70NM4B0flXD1767RO6AcA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795756401;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795756491;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=FKXTvjxtdne1GDyeDT5Y46eZbfmMTtdejd1xb6K/bPE=;
-	b=hML5yOd8i3Nw3gg/ZfaBmS4rX6nSe74ZbYIOEAno0p/G7i3JEKsYGAVp89DDx4ZMmUkZ
-	 FM4c7IBQaMaPuz1SEBMVcQvd/0NmwiQAmDwLLOo4Gc8aeZEwrfHAG5GUUs1zm5EEp2mwS
-	 0Fp13+kSUFPH0at3GjJpov0HFcIgAUka4qkr2y23fpwblY15+eYLApjy0tfuYIi/XZe1q
-	 OSWx3ob+lpAq4NNd55f+2BaMVvXo2V7p+R+IMUP3bDD4cWv3CJBO5r05lrL5SUpYDHYPy
-	 PfHy9Vz324T+WPtDLdHi7jTNQk/qJXVJVEIiZqK+Qaabw7A4c+m8w0rqxVMr8nXdOLA==
+	bh=omQSExyjblpav3jdjGrCL54hGkIUAafVlLZHRvTCxIw=;
+	b=pkD5yto9VxNWT4mGb+D303bUWtosBO5OXLgRVBD/bsDCY2iopj+j7gQUrdT1QDSeFwn+
+	 HWyg7guVcSvKLUFJbh+0djASXQ5OMIVP8osj9Hcje+SNMa9Rf5hvCKqbEE8UGto18xV55
+	 397avrhKCVshFb/alIfThuoXYjC3pDOacF+uAXkCObw/uyhetXo5Ti16kerLibUMyoryD
+	 kZLd2RrMQILy6Vcrn5CBFquy4SMFvBhOPpA+pEZDpH5slFvgrrYPaKj/lZzEQ6RSu0Dy8
+	 74o9zXY5wVnmTgbhwK6JSfK5G86Zw8CnIJh8RC24NJuJSkTgzbyOKg/19Gb9mLY2rEQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=PA2GCZib;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=TC+TnxjH;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40096606A31C;
-	Fri, 27 Nov 2026 05:13:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 40096606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB18B606A31E
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 05:14:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB18B606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=PA2GCZib
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=TC+TnxjH
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=FKXTvjxtdne1GDyeDT5Y46eZbfmMTtdejd1xb6K/bPE=; 
-	b=PA2GCZibCNOfazFzNuoa/mhXnkwO5Ua9Ch+KYNd76zjVPA4yGs31PHzAnw3WGvxQKekDr0iOha2
-	b1Lz/p53KVGna6vh5mkL/8iVWtvwWqpj3J1kh75+HWNXNxFtV8y9VBTMvqUgYTSCdvwC3UH+aXMNU
-	VxoEFdqnCvAJ0Op1U2Qz13qvD4K6evHYnJK13idc5RC9d8zcbQwlP8vk27yEnqcdti2jx+ki+yGK6
-	96HEiK9jrUFoDI7Z2Le0ivIxS/qRzetArsVA0ipk3axZsDApVLgvpZJpe2NGuxcXMJ19x4jinXEtd
-	TOWFD0u8m7nWgxWRk8F/dEyrYheBWeO6wRrg==;
+	from:content-type:reply-to; bh=omQSExyjblpav3jdjGrCL54hGkIUAafVlLZHRvTCxIw=; 
+	b=TC+TnxjHOk3bx+n88WLjfL9gx++EL0mE3TRstLmuiiT46ASdJXaM1RE/c1bfLGoiXJ3czmIyM0J
+	AiwSgl9yYUlYPHC668FXh0rKrTOHrYiKumgwq9VZrv1kVl6da2C49VIqwt/zwkk2acg2ol2CueWaX
+	KnrM8arPlvN+ABiMb0RylOwcLKAAt4ihC9tFGuqKDyOKvNaHs4z0gCDc3bDP5gHK2Ibm8eocL8Z1C
+	AOAXUlS/GGt2DmiCNUYGU31uJtHnCM2VGNMwwP23V1aufqfBB1PBhGhU4v2J2CxuuBPOM3xPg/Z5f
+	D5Ziignw6LuI62FF4I+XR+80l9HCE+CNVR+w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xWoGq-00000002VV6-2h7x;
-	Fri, 27 Nov 2026 13:13:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:13:16 +0800
-Date: Fri, 27 Nov 2026 13:13:16 +0800
+	id 1xWoII-00000002VVF-2pSM;
+	Fri, 27 Nov 2026 13:14:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:14:46 +0800
+Date: Fri, 27 Nov 2026 13:14:46 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Haoxiang Li <haoxiang_li2024@163.com>
-Cc: schalla@marvell.com, bbhushan2@marvell.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] crypto: marvell/cesa - Fix hash DMA buffer cleanup
-Message-ID: <awkRbH_mH0NCGFzd@gondor.apana.org.au>
-References: <20261118075636.2152451-1-haoxiang_li2024@163.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Haoxiang Li <haoxiang_li2024@163.com>
+Subject: Re: [PATCH] crypto: hifn_795x - Remove the hifn_795x driver
+Message-ID: <awkRxg6r38x0xSYg@gondor.apana.org.au>
+References: <20261119033926.17527-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -66,44 +65,61 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261118075636.2152451-1-haoxiang_li2024@163.com>
+In-Reply-To: <20261119033926.17527-1-ebiggers@kernel.org>
 
-On Wed, Nov 18, 2026 at 03:56:33PM +0800, Haoxiang Li wrote:
-> This series fixes DMA cache and padding buffer leaks in the CESA hash
-> request error paths.
+On Wed, Nov 18, 2026 at 07:39:26PM -0800, Eric Biggers wrote:
+> Remove the hifn_795x driver, for many reasons:
 > 
-> The DMA cache is not released when request preparation fails. Padding
-> cleanup can also be skipped because request type detection depends on a
-> TDMA chain that has already been cleared. In addition, final requests
-> rejected by the queue leave their padding allocated.
+> - It supported only obsolete, early 2000s PCI chips; only legacy
+>   algorithms (DES, 3DES, AES in ECB and CBC modes); and only
+>   !ARCH_DMA_ADDR_T_64BIT kernels (e.g., no 64-bit or PAE/LPAE kernels).
 > 
-> The patches address these cleanup paths and clear the DMA cache pointer
-> after freeing it to prevent stale-pointer reuse.
+> - The last commit tested on hardware was in 2008.  Every commit since
+>   then has been an API migration, cleanup, build fix, or static checker
+>   fix.  It's clear that no one actually uses it.
 > 
-> Testing:
-> - ARM compile testing of hash.o for each intermediate revision, using
->   Clang with W=1 and KCFLAGS=-Werror.
-> - Userspace mock tests of extracted driver functions covering allocation
->   failures, queue rejection, backlog acceptance, completion cleanup,
->   retries and non-DMA requests.
+> - The only defconfig that enables it is ppc6xx_defconfig, which is a
+>   big-endian platform where the driver is completely broken (as it has
+>   an undeclared little-endian assumption).
 > 
-> The mock tests, which is assisted by codex, validate resource lifetimes
-> with DMA pools and hardware interfaces mocked. No hardware testing was performed.
+> - It has a large number of bugs, and there's no chance that it passes
+>   the crypto self-tests.  For example:
 > 
-> Haoxiang Li (3):
->   crypto: marvell/cesa - Fix DMA cache leaks on hash setup errors
->   crypto: marvell/cesa - Fix padding cleanup on hash setup errors
->   crypto: marvell/cesa - Free hash padding when queueing fails
+>     - Streaming DMA mappings are never unmapped.  Every crypto operation
+>       leaks DMA mappings.  Pages can be leaked on error as well.
 > 
->  drivers/crypto/marvell/cesa/hash.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+>     - Scatterlists are walked using raw pointer arithmetic, breaking
+>       chained scatterlists.  The scatterlist element coalescing logic is
+>       also buggy and can generate corrupted destination DMA descriptors.
 > 
+>     - It BUG()s if passed more than PAGE_SIZE of misaligned data.
 > 
-> base-commit: 666539eecdf4db623f5e3c3e55cf9f2dfad24aa4
-> -- 
-> 2.25.1
+>     - hifn_rng_data_present() has inverted logic: it reports data as
+>       being ready before the required delay has elapsed.
+> 
+>     - ecb(aes) and cbc(aes) fail to validate the AES key length.
+> 
+>     - cbc(des3_ede) considers the IV to be 24 bytes rather than 8.
+> 
+>     - DES weak key checks are run on AES keys.
+> 
+>     - All algorithms fail to reject non-block-multiple lengths.
+> 
+>     - All CBC algorithms fail to return the next IV.
+> 
+> And of course, AI tools can easily find these issues in this unused and
+> untested code, resulting in pointless fixes.  Just remove it instead.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  arch/powerpc/configs/ppc6xx_defconfig |    2 -
+>  drivers/crypto/Kconfig                |   17 -
+>  drivers/crypto/Makefile               |    1 -
+>  drivers/crypto/hifn_795x.c            | 2560 -------------------------
+>  4 files changed, 2580 deletions(-)
+>  delete mode 100644 drivers/crypto/hifn_795x.c
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
