@@ -1,52 +1,80 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795807580;
-	b=H+L0fQt4mV4PoPEOnstI7m/s2+v1gjOJ8yXlY9dd1ZqTTQDFN7PezWkoRC008qQQE2wy
-	 Rm6s9rH7LWTuZTYWOVw1GfJevNgL4v7MdwApzwMXxhBUtOprvuVKLzOSdqYZ+f3O8dfZ7
-	 5/p/ziARik0oMJ7nsU6Fy4zMx4S2Uac/EWciRpKRLSdOHzLVPDsrft0iBia9O9VBGGE/Z
-	 4D2e/2L4zbMad7jEZQQ4vyn13Fx1H99NOIKPc+9CUKkMqaDILlK+mf5V7S2AhtOVjbckr
-	 eHMTYHzobcY8/eCcAqwCRQspTCeQtq0Gs54pJYvZmvMqNFeqO8Toje7eg7bULCj/vtw==
+	t=1795807896;
+	b=Bpo17JD+026T7U9+mUVyyUrvJN758oFtyJZV5ptnLCxPMg2V00Q8uHxWKJMwJV5cHab4
+	 7EDRl5G0aGiBsSnnhSiTi2fUnd/qPqTfBGh+SGezqK76sp9ZoWsmVVG/k0QC1DY+0mOv8
+	 qhUV1wWnmSkVB+961uBEPO8jvTQfDKXzKtKFB+nFZM8EP0Gm3YsNpRglIV1zevlSin2Lr
+	 Li6q0KMHVWuMr6LuGFlG8BXF55CYtV+LQffTD7liprRrdQsvsmVWqil/Xbf69us5HmbIc
+	 +RfSanPatndjXr6461dE+rZ8WzpdeI5U7ubeTYnHAjsSQIbikepVequZNoW5pp4C1pg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795807580;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795807896;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=ele7JgtIlV4YiyJkB0/OiVDz32EYWvMiES6IIPAQJ/Q=;
-	b=HJ5yw8HyG5o4TjOVpHiPrkUhLQOdnsOyZyFiG89rfieXLZ6Ee4L0ukHWRJXvy3ZC9OLS
-	 ecz9psY+qgHB0RBr79LHo8dQc6J8gD6aHs8EqnLMJySMz2eDPwuxkwOlqkBBK+3BcGHFt
-	 yTWNPa7feJ86ndeJAkWPAK8xoDm6Tp/+uwHd6S+yJzG9Lm7gPCCzxu4OLXVnG+rNz6maL
-	 q1WNkjHMmZaCgIHf+nyoAFDqgSCpiX1myfw+twfw0yrYvn7VdUftWZK6x5E1iQzISe3uH
-	 eDlxPvrFYcEG0OnqlfupmVR97uwmrkB5i1XspbJQ4ECpgaGiIhaJJlhuUBFrHFughAw==
+	bh=FHm7smnuLcPbXOnsOL9bzFTWbe21BP4HbT3iZXqu3Z4=;
+	b=rsEPe2ebT/THFixc6vMaGT5ZNoOwwuIFZcxPVCSjRY+tw9ddwTWW7wKIO92S0CbNeyjh
+	 Tfk81YN4quBNHmQXesxoyQrbWFzDLvJWDlS6LL7aRRa8PoyOJS9ai3loYPOCTzPLsx22Q
+	 b3uHaIKc4F4b1d4gc40ES+qi8kKxYmQ+O503Gpu3yPDAxmdK+ku/onmBakWc1IGS6NFWz
+	 Yr0fHart2wAa6Byhwv+fwWVotNxhpH4pkP+OLk3GuhzhqcHpRL0auMfysqoW5WYoBl+8E
+	 hJrqxfvOgONR5xqimMqWx/eZDFoCPzriVuZWDV3LSoHLPI3FAwhV1whlmAsyL+IA6kw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=M0IBurfW;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hmfHF8HW;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2DB606A31C;
-	Fri, 27 Nov 2026 19:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDFA606A31C;
+	Fri, 27 Nov 2026 19:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=M0IBurfW
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 425531F00897;
-	Fri, 27 Nov 2026 19:26:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hmfHF8HW
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADF6B1F00893;
+	Fri, 27 Nov 2026 19:31:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795807579;
-	bh=ele7JgtIlV4YiyJkB0/OiVDz32EYWvMiES6IIPAQJ/Q=;
+	s=k20260515; t=1795807896;
+	bh=FHm7smnuLcPbXOnsOL9bzFTWbe21BP4HbT3iZXqu3Z4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=M0IBurfWZj3WIJLLQUBUumvelapE2vCyMPYOSzVgO+yUhb75weykCiD104oqXgz9I
-	 zVep6uECn6C5v1IzZAoxp0Audo7S3AWWbY5OHXzyxr2W+cYyyMrmw/UrdJdDzXoRn+
-	 qh7PPZXWDSCKYjfs9yajObLIYbPKtfu7nC924kFFlzwobwxUMO19IAAsfioDU9vQhc
-	 by3lNAj11kW5r5/1TnyMV7rvgeUkzeM4Vs/hBO9V/mWoYDCZRI/d0DEfrsnSDcfK2J
-	 qYuLzAwzpb5QpRV+gdzv3dUb+xzVn8CmsmE8xtFV47VG03WDucfZ3ZktWBQEcjOr9W
-	 cP44PRYM1PS+w==
-Date: Fri, 27 Nov 2026 11:26:16 -0800
+	b=hmfHF8HWqGe9fllK3m+JO8EXWm/LlKZRc9dNB9YqTNuggAx0G8a+Jj92V8Br5uMBM
+	 4GbLWKMkZX56Q9MNagn3luHmpx8DRomhIUaccCA5bYwVDNW7H3I0fIP3X2DiCXVke1
+	 feG0pkah19v53e+ijbWKvejGyFD7stt1D7yIlVpTqkC7iGpNLbdXVqm2PZhPFufYWI
+	 hr3LVPJhflalZ9baVdkgJ7CY0JgGdrJWiWBrTok18WJ4tTr24i9TJdLp9mcWeKNl2G
+	 +5du+ascO34JTp+ITfMPe5cpMVHQMsGSZOSfSp5DLq2b8kw3xOdAs98HkY4Jysh8zQ
+	 MLxSpvwVm0dLQ==
+Date: Fri, 27 Nov 2026 11:31:33 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Vedant Dave <vedantdave354@gmail.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crc: Fix kernel-doc for crc32init_le_generic
-Message-ID: <20261127192616.GD8300@quark>
-References: <20261127081001.327898-1-vedantdave354@gmail.com>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: keyrings@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	Ahmad Fatoum <a.fatoum@pengutronix.de>,
+	Alasdair Kergon <agk@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	David Gstir <david@sigma-star.at>,
+	David Howells <dhowells@redhat.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ignat Korchagin <ignat@linux.win>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	James Morris <jmorris@namei.org>,
+	James Prestwood <prestwoj@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
+	Jonathan McDowell <noodles@meta.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Mimi Zohar <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Sumit Garg <sumit.garg@kernel.org>
+Subject: Re: [PATCH v5 00/17] KEYS: trusted: asymmetric keys
+Message-ID: <20261127193133.GE8300@quark>
+References: <20261127055602.2357884-1-jarkko@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -58,34 +86,36 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261127081001.327898-1-vedantdave354@gmail.com>
+In-Reply-To: <20261127055602.2357884-1-jarkko@kernel.org>
 
-On Fri, Nov 27, 2026 at 01:40:01PM +0530, Vedant Dave wrote:
-> kernel-doc -none -Wall lib/crc/gen_crc32table.c reports:
+On Fri, Nov 27, 2026 at 07:55:45AM +0200, Jarkko Sakkinen wrote:
+> OVERVIEW
+> ========
 > 
->   function parameter 'polynomial' not described in 'crc32init_le_generic'
->   function parameter 'tab' not described in 'crc32init_le_generic'
->   expecting prototype for crc32init_le(). Prototype was for
->   crc32init_le_generic() instead
+> Extend TPM 2.0 trusted keys to load ASN.1 TPMKey [1] asymmetric keys
+> (OID_TPMLoadableKey, 2.23.133.10.1.3) and expose keyctl pkey-operations
+> directly on key_type_trusted. In addition there are some TPMKey
+> interoperability fixes.
 > 
-> The kernel-doc comment is named crc32init_le() but sits above
-> crc32init_le_generic(), and it does not describe the @polynomial and
-> @tab parameters. Rename the comment to match the function and
-> document both parameters.
+> I.e. this my old series with a twist: instead of introducing a separate
+> subtype for asymmetric keys, factor out pkey-operations into a separate
+> CONFIG_KEYCTL_PKEY-feature, and wire asymmetric operations to
+> key_type_trusted.
 > 
-> Comment-only change with no functional difference. After the change,
-> kernel-doc reports no warnings for this file.
+> This work was originally derived from [3], is direct offspring of [2],
+> and folds in the prerequisite tpm2-sessions and tpm-buf cleanups from
+> [4].
 > 
-> An AI coding assistant helped draft this change. I reviewed it and
-> understand it.
-> 
-> Signed-off-by: Vedant Dave <vedantdave354@gmail.com>
-> ---
->  lib/crc/gen_crc32table.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> [1] https://www.hansenpartnership.com/draft-bottomley-tpm2-keys.html
+> [2] https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
+> [3] https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
+> [4] https://lore.kernel.org/linux-integrity/20261116005105.1573016-1-jarkko@kernel.org/
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
+Could you describe the motivation for these changes here?  And also
+include more context directly, for people who aren't already familiar
+with all the earlier patches linked to above.
 
-Thanks,
+Also, this series is missing a base-commit, and I don't know how to
+apply it for review.
 
 - Eric
