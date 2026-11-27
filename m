@@ -1,65 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795756607;
-	b=jBpoYsaXiN7iT2D1LCOKNAVBrSJVt0UV6Z0z0owiJo41XUjw1/2jMPmT23nzO80CKLVR
-	 SihXUfMzny3ZmWSxNs6wOdeuGdPMiWBCFpxzm3GuX86D+9MthhBmawWuEXi33XTRgLdrL
-	 q8058+Sddw6H7B+i/b8+sesDWMRur2j1n7zV1FSoTMd52FdkvN8Xk/wXOZ0t0qLPBVp3J
-	 omA8stV8lDQmSkECLV+AAnwfuKgjt36EjCEhdyINeTnCStjQzyq+Pt8GQpnKTQQoNcuvj
-	 uyqLG576LNaq3oGeCkLKe77HjNgi5nKbA5M8Moi4Hr/gCXj9XoEyZOnUHW0DOwzFF2g==
+	t=1795756605;
+	b=MFDXG5KpmqwhKJK57IoJrVnx+xsNVuDawyns2Z4NNygsRXioO0rrQ+ydcQ11jxdsQCAy
+	 6ADvz09JsL8k82kKlCYNSYfcWhS2+GqSytEvajLtJxh8mRtjARqPRCXDldXyBO1cFzMut
+	 eJXdseM0+2gUIbJ1D8xr8SrQRP+fBSS1oJYw2gtTuhAL8turhWjsax4W7j7ceHAVHDa5X
+	 Mf2uWYFlQIDL2dOrs9cYOaaTv5a3Z+2mu1UVuSqiDX2zguE/zBqwN/gSVrHlOFdGIG8Hj
+	 td6WtzBfNzjt+4MsNGpo8AQT+LvvxX+E+M5vtqMgy6cBrdcHa+TOSg6w76JvXIqo42A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795756607;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795756605;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=65LcxIH/izNEZhF/8SUgg0Mx2oByVHkrhxL4YzMRCD0=;
-	b=m1yKApho5L3k0X/rP6CLFTy8KmfKwrBmNJOuJBXT0xtK5DV3O/lvxAtiPSNWmvPm2KES
-	 OKSiEl2UeJ7LtoWQ1wbj4pbtvLoA5jHwqnRhyG6uNiwhEuIgsKXrfUTxP7pku5fiLUZ5z
-	 P9h40T+o7bRele7daN5UpjUfka7UTO7rrpjAmXbY+FvACIClQDVj1ld+4qWNJUpkgbmWO
-	 Zi3UMhsA/d6LWOwgoZqM5Uu9vGVLWAbbelW9rdiFckgYq3TwfRftSNUPzCNAcKCF+IEJM
-	 WgShESKH+C6Iu+2JbR/Z2hexYYxnejcvLWMqwfZydWt7EQ0iVakS+d/ficXUXlfQPIw==
+	bh=1KCeidIU1Kme/yUIbfVqd55sbVEcgjU99vnNkDGVpGA=;
+	b=bHPx/zUOM2zt3dE00gOo9tbh3LcfrB4A59+hHE3zQ4V9Zg1Gwh7/2/RkcYFtrQ0Hz1b4
+	 GkZxq8hLhb1IRRz+Ntvh8Xd1rmoJMkLPL+V8T6lD+U0ARzx26sw+OqABm6v6T8HmpxPdf
+	 Hsbo6tnSG2xKRQX9LeYrwaSj+7lU/G8LAw1MzCBrbCnPAs3Yt0SbPbVOvqd/ts9pNNgvm
+	 AyDRYHgWnktwJI/3VHAOsqsAsq5uZ4+YQD1bP26tRSVSzey7VaSWLDDWfvzZFXBVn/UVW
+	 Z/dyr3PF72Rks2qDB9NTeVhgV7exMdzw4f65df3eRtYZyxo0oyO12vuPBV/IaaSwc4w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=dYWGcQsG;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=KBxKSn9s;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00FD606A32F;
-	Fri, 27 Nov 2026 05:16:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B00FD606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139D8606A31C;
+	Fri, 27 Nov 2026 05:16:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 139D8606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=dYWGcQsG
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=KBxKSn9s
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=65LcxIH/izNEZhF/8SUgg0Mx2oByVHkrhxL4YzMRCD0=; 
-	b=dYWGcQsGQOgIdn3Uf3ipJDEDgrRB2RgiTFcShUVK4T9KKtxdVrrwJjN18+1rYd9sXjzLDIWacVG
-	dWdkPxYB0HnYq91/km9i228kPwmD1MMdd1WPLal8clKHXDzoogGXxb1VZ0WjtbTyQwCtcCefYK+Xu
-	imGvBvX4OhfV8k8N1gDzyVACBcfjqkQ5jLp0whspO+PvO+pLa4LkhfwZzuDEh5P8QffrGuEJLe08D
-	ECQf0yBS7skIrucdMxB8VW0u9CC4zIZCH5zBqnbOqR21qv4j78fKtjUePnsMpPSxGFZXLOwul4nGm
-	xsQfKsWOZ98GSfQM+9Fwp8amgPOJn6BUU7jQ==;
+	from:content-type:reply-to; bh=1KCeidIU1Kme/yUIbfVqd55sbVEcgjU99vnNkDGVpGA=; 
+	b=KBxKSn9shk0DUOL4quOwSiya0Z3Iyi2JwuAGrsaLZcn/xzeut8iiwORRSCBFQaN9+lhjLmZR7qq
+	qh7AOyhrtqQbXqJz016mBtspLt+L2EDfRs65yCj5l1DHjWjBk7+A7xsYu2egzvKF8lXagqpK2/QkX
+	UpvCBhIZR6s+RZ6KJXCBlyBPD7OUNiQ1fG+GXD+3kmvKc2FwPXey+BjfKjp6a6FSZPjv3ZZxpnxWV
+	tlrkfS0iLs3AfQ76b28xfDfR/QCtcCKN+hbZeRmRoGmk6XpJNeIkzyy7mL0yMJIMWjeuyCnY++oQB
+	m0v1/plhvofjfkl0Kat72OnpjUDeNsTu/AWQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xWoJx-00000002VXA-3CQy;
-	Fri, 27 Nov 2026 13:16:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:16:29 +0800
-Date: Fri, 27 Nov 2026 13:16:29 +0800
+	id 1xWoK8-00000002VXL-1mFj;
+	Fri, 27 Nov 2026 13:16:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:16:40 +0800
+Date: Fri, 27 Nov 2026 13:16:40 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Changwei Zou <changwei.zou@canonical.com>
-Cc: sahil.malhotra@nxp.com, davem@davemloft.net, horia.geanta@nxp.com,
-	pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
-	jeffbarnes@linux.microsoft.com, stephane.debusne@cynove.com,
-	iuliana.prodan@nxp.com, martin.kepplinger-novakovic@ginzinger.com,
-	lukas@wunner.de, sahil.malhotra@oss.nxp.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 0/2] crypto: caam - Fix RSA error-path unmap and
- unaligned dst buffers
-Message-ID: <awkSLXIuw-2b4Msi@gondor.apana.org.au>
-References: <20261120123732.1200685-1-changwei.zou@canonical.com>
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, robh@kernel.org, krzk@kernel.org,
+	conor+dt@kernel.org, ruud.derwig@gf.com, rbannerm@synopsys.com,
+	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
+	navami.telsang@vayavyalabs.com, bhoomikak@vayavyalabs.com,
+	nazim.khan@vayavyalabs.com
+Subject: Re: [PATCH v31 0/4] crypto: spacc - Add SPAcc Crypto Driver
+Message-ID: <awkSOCWwb9D_-64c@gondor.apana.org.au>
+References: <20261120131404.976959-1-pavitrakumarm@vayavyalabs.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -71,106 +70,214 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261120123732.1200685-1-changwei.zou@canonical.com>
+In-Reply-To: <20261120131404.976959-1-pavitrakumarm@vayavyalabs.com>
 
-On Fri, Nov 20, 2026 at 11:37:30PM +1100, Changwei Zou wrote:
-> This series fixes two issues in the rsa-caam driver.
+On Fri, Nov 20, 2026 at 06:44:00PM +0530, Pavitrakumar Managutte wrote:
+> Add the driver for SPAcc(Security Protocol Accelerator), which is a
+> crypto acceleration IP from Synopsys. The SPAcc supports multiple ciphers,
+> hashes and AEAD algorithms with various modes. The driver currently supports
+> below
 > 
-> Patch 1 fixes wrong unmap operations where rsa_pub_unmap() was called
-> regardless of the key type.
+> hash:
+> - cmac(sm4)
+> - xcbc(sm4)
+> - hmac(md5)
+> - md5
+> - hmac(sha1)
+> - sha1
+> - sha224
+> - sha256
+> - sha384
+> - sha512
+> - hmac(sha224)
+> - hmac(sha256)
+> - hmac(sha384)
+> - hmac(sha512)
+> - sha3-224
+> - sha3-256
+> - sha3-384
+> - sha3-512
 > 
-> Patch 2 adds a bounce buffer to handle unaligned RSA destination
-> buffers on DMA-incoherent hardware such as i.MX8, fixing intermittent
-> -EKEYREJECTED errors when loading signed kernel modules.
+> changelog:
+>   v1->v2 changes:
+>     - Added local_bh_disable() and local_bh_enable() for the below calls.
+>       a. for ciphers skcipher_request_complete()
+>       b. for aead aead_request_complete()
+>       c. for hash ahash_request_complete()
+>     - dt-bindings updates
+>       a. removed snps,vspacc-priority and made it into config option
+>       b. renamed snps,spacc-wdtimer to snps,spacc-internal-counter
+>       c. Added description to all properties
+>     - Updated corresponding dt-binding changes to code
 > 
-> AI assistance disclosure (per Documentation/process/generated-content.rst):
-> the OpenCode agent (claude-sonnet-4.6) was used to help analyse the code
-> paths, draft parts of the changes and the changelogs.
+>   v2->v3 changes:
+>     - cra_init and cra_exit replaced with init_tfm and exit_tfm for hashes.
+>     - removed mutex_lock/unlock for spacc_skcipher_fallback call
+>     - dt-bindings updates
+>      a. updated SOC related information
+>      b. renamed compatible string as per SOC
+>    - Updated corresponding dt-binding changes to code
 > 
-> Changes in v8:
-> - Patch 2: Add Fixes: 8c419778ab57 ("crypto: caam - add support for RSA
->   algorithm").
+>   v3->v4 changes:
+>    - removed snps,vspacc-id from the dt-bindings
+>    - removed mutex_lock from ciphers
+>    - replaced magic numbers with macros
+>    - removed sw_fb variable from struct mode_tab and associated code from the
+>      hashes
+>    - polling code is replaced by wait_event_interruptible
 > 
-> Changes in v7:
-> - Rebase onto the current tree; v6 no longer applied after the upstream
->   caam_rsa_set_priv_key_form() changes (a91d9346a70b, 828c3b265b6d). No
->   code changes.
-> - Drop the non-standard "Assisted-by:" trailer from both patches; it is
->   not a recognised trailer (and fails checkpatch), and the AI assistance
->   is disclosed in this cover letter instead.
-> - Pick up Reviewed-by from Sahil Malhotra on both patches.
+>   v4->v5 changes:
+>    - Updated to register with the crypto-engine
+>    - Used semaphore to manage SPAcc device hardware context pool
+>    - This patchset supports Hashes only
+>    - Dropping the support for Ciphers and AEADs in this patchset
+>    - Added Reviewed-by tag on the Device tree patch since it was reviewed on
+>      v4 patch by Krzysztof Kozlowski and Rob Herring (Arm)
 > 
-> Changes in v6:
-> - Patch 1: Factor the priv_form switch into rsa_priv_unmap(), shared by
->   rsa_priv_f_done() and rsa_pdb_unmap(), removing the duplicated switch.
-> - Patch 2: Hoist req_ctx to function scope in set_rsa_priv_f{1,2,3}_pdb(),
->   removing the duplicate block-local declarations in the src/dst branches.
+>   v5->v6 changes:
+>    - Removed CRYPTO_DEV_SPACC_CIPHER and CRYPTO_DEV_SPACC_AEAD Kconfig options,
+>      since the cipher and aead support is not part of this patchset
+>    - Dropped spacc_skcipher.o and spacc_aead.o from Makefile to fix build errors
+>      reported by kernel test robot
+>    - Added Reported-by and Closes tags as suggested
 > 
-> Changes in v5:
-> - Patch 1: Factor the public/FORM1/FORM2/FORM3 error-path unmap dispatch
->   into rsa_pdb_unmap(), so akcipher_do_one_req() and akcipher_enqueue_req()
->   no longer open-code it twice (Sahil).
-> - Patch 2: Do not overwrite the caller's req->dst. Use req_ctx->fixup_dst
->   for the DMA side (mirroring fixup_src) and drop the orig_dst/restore
->   logic (Sahil). Expand the commit message to identify the caller that
->   hands in the misaligned dst (rsassa_pkcs1_verify() /
->   crypto_akcipher_sync_prep()) and why the DMA API does not bounce it.
+>   v6->v7 changes:
+>    - Fixed build error reported by Kernel test robot
+>    - Added Reported-by and Closes tags as suggested
 > 
-> Changes in v4:
-> - Patch 2: Describe the bounce scatterlist with the aligned allocation
->   size (ALIGN(dst_len, dma_get_cache_alignment())) instead of the
->   possibly-unaligned dst_len. Otherwise, on
->   CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC systems, dma_map_sg() evaluates
->   sg->length and can treat the already aligned bounce buffer as
->   unaligned, bouncing it again via swiotlb or failing with -ENOMEM.
+>   v7->v8 changes:
+>    - Fixed misleading comment: Clarified that only HMAC key pre-processing
+>      is done in software, while the actual HMAC operation is performed by
+>      hardware
+>    - Simplified do_shash() function signature by removing unused parameters
+>    - Updated all do_shash() call sites to use new simplified signature
+>    - Fixed commit message formatting by adding "crypto: spacc - <subject>" to
+>      all patches
+>    - used __free() for scope based resource management
 > 
-> Changes in v3:
-> - Patch 1: Dispatch the error-path unmap on the operation (the completion
->   callback rsa_pub_done vs rsa_priv_f_done) instead of key->d, so the
->   unmap always matches the map.
-> - Patch 2: Bound the bounce-buffer copy-back to the RSA output size
->   (key->n_sz) instead of the full dst_len, so the trailing capacity of
->   the caller's destination buffer is left untouched; add Tested-by from
->   Stephane Debusne.
+>   v8->v9 changes:
+>    - Updated the software fallback implementation to use HASH_FBREQ_ON_STACK
+>    - Corrected dynamic allocation of statesize and reqsize in init_tfm
+>    - Fixed synchronization issues in the digest request
 > 
-> Changes in v2:
-> - Patch 1: Add Fixes: tag; pick up Reviewed-by from Sahil Malhotra.
-> - Patch 2: Move the !bounce_buf check out of do_rsa_bounce_buf() into
->   the caller rsa_bounce_buf_done() so the helper is only entered when a
->   bounce buffer actually exists; add Reported-by/Closes and Tested-by
->   from Martin Kepplinger-Novakovic.
+>   v9->v10 changes:
+>    - Fixed unused variable warning
 > 
-> Link to v7:
-> https://lore.kernel.org/linux-crypto/20261120110525.1170175-1-changwei.zou@canonical.com/
+>   v10->v11 changes:
+>    - Removed the redundant crypto_alloc_ahash in the init_tfm function
+>    - Removed the redundant crypto_free_ahash in exit_tfm function
+>    - Removed the redundant crypto_ahash_setkey call in setkey function
 > 
-> Link to v6:
-> https://lore.kernel.org/linux-crypto/20261114060032.872141-1-changwei.zou@canonical.com/
+>   v11->v12 changes:
+>    - Removed do_shash() and switched to lib/crypto API in spacc_hash_setkey
+>    - Dropped support for SM3 algorithm
+>    - Improved multi-device safety by encapsulating handling within priv
+>    - Added memzero_explicit() in sensitive paths
+>    - Minor code cleanups and style fixes
+>    - Algorithm registration cleanups
 > 
-> Link to v5:
-> https://lore.kernel.org/linux-crypto/20261113113650.63038-1-changwei.zou@canonical.com/
+>   v12->v13 changes:
+>    - Removed all the sleep function from setkey function
+>    - Added shash implemntation for aes algorthims
 > 
-> Link to v4:
-> https://lore.kernel.org/linux-crypto/20261111230221.40297-1-changwei.zou@canonical.com/
+>   v13->v14 changes:
+>    -Added fixes based on the reports by Sashiko
+>    -Removed the spacc_is_mode_keysize_supported call from do_one_request
 > 
-> Link to v3:
-> https://lore.kernel.org/linux-crypto/20261020025426.955531-1-changwei.zou@canonical.com/
+>   v14->v15 changes:
+>    -Added fixes based on the reports by Sashiko on 19/jun/2026
+>    -Fixed styling in the Kconfig
 > 
-> Link to v2:
-> https://lore.kernel.org/linux-crypto/20261004210200.290119-1-changwei.zou@canonical.com/
+>   v15->v16 changes:
+>    -Added fixes based on the reports by Sashiko
 > 
-> Link to v1:
-> https://lore.kernel.org/linux-crypto/20260821045555.806471-1-changwei.zou@canonical.com/
+>   v16->v17 changes:
+>    -Added fixes based on the reports by Sashiko
 > 
-> Changwei Zou (2):
->   crypto: caam - Fix wrong unmap operations
->   crypto: caam - Use bounce buffer for unaligned RSA destination buffers
+>   v17->v18 changes:
+>    -Added fixes based on the reports by Sashiko
 > 
->  drivers/crypto/caam/caampkc.c | 177 ++++++++++++++++++++++++++--------
->  drivers/crypto/caam/caampkc.h |   7 ++
->  2 files changed, 142 insertions(+), 42 deletions(-)
+>   v18->v19 changes:
+>    -Added fixes based on the reports by Sashiko
 > 
-> -- 
-> 2.43.0
+>   v19->v20 changes:
+>    -Added fixes based on the reports by Sashiko
+> 
+>   v20->v21 changes:
+>    -Added fixes based on the reports by Sashiko
+> 
+>   v21->v22 changes:
+>    -Added fixes based on the reports by Sashiko
+> 
+>   v22->v23 changes:
+>    -Added fixes based on the reports by Sashiko
+> 
+>   v23->v24 changes:
+>    -Added fixes based on the reports by Sashiko
+> 
+>   v24->v25 changes:
+>    -Added fixes based on the reports by Sashiko
+> 
+>   v25->v26 changes:
+>    -Added fixes based on the reports by Sashiko
+>    -Removed the additional fallback
+>    -Added the CRYPTO_AHASH_ALG_BLOCK_ONLY flag to the cra_flags
+>    -Minor code cleanups and style fixes
+> 
+>   v26->v27 changes:
+>    -Added fixes based on the reports by Sashiko
+> 
+>   v27->v28 changes:
+>    -Added fixes based on the reports by Sashiko
+> 
+>   v28->v29 changes:
+>    - Resent with patch 2/4 regenerated; v28 2/4 had a corrupt hunk
+>      header and failed to apply. No functional changes from v28.
+> 
+>   v29->v30 changes:
+>     -Added fixes based on the reports by Sashiko
+> 
+>   v30->v31 changes:
+>     -Added fixe based on the reports by Sashiko
+> 
+> Pavitrakumar Managutte (4):
+>   dt-bindings: crypto: Document support for SPAcc
+>   crypto: spacc - Add SPAcc ahash support
+>   crypto: spacc - add spacc autodetect support
+>   crypto: spacc - Add SPAcc Kconfig and Makefile
+> 
+>  .../bindings/crypto/snps,dwc-spacc.yaml       |   50 +
+>  drivers/crypto/Kconfig                        |    1 +
+>  drivers/crypto/Makefile                       |    1 +
+>  drivers/crypto/dwc-spacc/Kconfig              |   64 +
+>  drivers/crypto/dwc-spacc/Makefile             |    7 +
+>  drivers/crypto/dwc-spacc/spacc_ahash.c        |  806 ++++++
+>  drivers/crypto/dwc-spacc/spacc_core.c         | 2407 +++++++++++++++++
+>  drivers/crypto/dwc-spacc/spacc_core.h         |  861 ++++++
+>  drivers/crypto/dwc-spacc/spacc_device.c       |  340 +++
+>  drivers/crypto/dwc-spacc/spacc_device.h       |  178 ++
+>  drivers/crypto/dwc-spacc/spacc_hal.c          |  349 +++
+>  drivers/crypto/dwc-spacc/spacc_hal.h          |  113 +
+>  drivers/crypto/dwc-spacc/spacc_interrupt.c    |  365 +++
+>  drivers/crypto/dwc-spacc/spacc_manager.c      |  641 +++++
+>  14 files changed, 6183 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+>  create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+>  create mode 100644 drivers/crypto/dwc-spacc/Makefile
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+> 
+> 
+> base-commit: 04cd6899aaaeeab82afb97e58eb8619fde35b47d
+> --
+> 2.25.1
 
 All applied.  Thanks.
 -- 
