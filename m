@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.174
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795752280;
-	b=bx13MXZgIkqmuaeXcGhwnfs3s3nwImZB9T7gqrN34G8O3RdXy2HNyK1HVI9qe+M9etv7
-	 yCioZII7po5hdg0GTBGPNrWWXkKfQjFFMaMbzbazBYqszSIKn+Lw1C+edYvrLaOzUNvzY
-	 E5Z/QIoptiKBVhQqki3URUcFrD53SVkNrP4GZwwgnWVopBu2+UqWUX65KGk+LFkD3vxGp
-	 lrGDlLAVgCkHLtCkgb7KVZxbOokZxhpu4cXO6+11h2UGvQsmMaPvHdfJO2urUjvU2dxVR
-	 qremLdzcXCNyR6t6V/gHIHHLULygVeEIzMnAaMqqHlYH1KIIucQuHkYPbb8N4ZCrIcw==
+	t=1795752282;
+	b=0gWljiwxJTbiE1jlcYohB1KLTV00WKdoE6Ux7sAxmR+va/qD9yj0H7UR7iqlU+QYlkFj
+	 FGwSErK0EVM/8tIyusuRoVo7Ug5xufkhk3GF2TEhg+ZyA+2c5r4GFfHbetX8U5xbS4oDV
+	 ZpZeEOyZHoJ82o0YJL03hgCWWSYC2vo4NLnF2hc2MLm1A5hK69e3+k31LcwARSKDqFvEO
+	 zjc3n2At/cY+cektetq7nHn1bIT+A5VkMETe2ce/4aN+SlC8NV+++xmtTNMS1o3wekqiX
+	 BokIaCP1uCv2RsBfCwAFdHasg37E+7ez2HojOIB/tlCa2H/U5buA7jARtOlj90X2yCQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795752280;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795752282;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=0YWmiWhjNHjpD3tirbV+FoDaUJT2r9bLvjlZdG98TSc=;
-	b=LM29lBaD6qMInU8/Td/+mVuzSqdRiF8AsyHsDF3aWuV88515fEY/g8pTgMHmj81oBLOs
-	 Bl73MD0HA9hVfdUMk7Lq3hdNjdoB9ZoxZWm0BHmlSVzoF4R/zhrWyv4JDCpqxiBFTtAme
-	 DziOse6u9u67g3gg49Vf7ZQsZ9EfRgkaQzf8ybLR0876DboRXy2T8VQ7qm5ANDGBulSLN
-	 4MspXIt4oUQXuhcpUlztlOQvBNE474ZbkHy/v9ITBOduW1YVjrvUtYIUUmT7uqtvT494x
-	 NruXlMl+U0qYEBBH8/cJSkkwq4P8EGQpLMQ15/3vHiohjlKLTQzk9+qIYtEhcndY13w==
+	bh=5iz2xhznaAm+hKwrtltzMwrPAKmj1lljaoJiLwWoVUc=;
+	b=Ti5uXN/pHHn9ASiYcke9PxJoS7doYNnXANj9AOwjFuu+jBdsMljKMr3vk09SzA4lMDFz
+	 ajSxU8c+c0n6TWYK+YT3YlncLc6ktHoKyQrguTAUjbtdS7Qv/mBG7QDVxn+mNXHXg+QHq
+	 rgfpf+3N1VNvo75ntYQ8RBwuCnhvM4s+ILjc5+1r8lUevsuSdkf3KxUYSy8Gd1WNBQIem
+	 /gQZJ2G+8+oVsFOnOx0a+e0Uw4ATgY2Pz4lQSegC+zM5nZyP1OhIOMYWN1kTmESTaQtrH
+	 YvtIwjOmr0o96vC3qNSpgb2tyjHWLykpMmHY/zoPjX6wSEhJSrM7cn9INdJNv6Y6svw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=CpzL3puJ;
-	arc=none smtp.remote-ip=209.85.216.48
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NMEsIsZO;
+	arc=none smtp.remote-ip=209.85.215.174
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC3D606A31E
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:04:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DEC3D606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7922606A321
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:04:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C7922606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=CpzL3puJ
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3b43d30822fso4049523a91.3
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Nov 2026 20:04:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NMEsIsZO
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-cddc597d062so4583044a12.3
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Nov 2026 20:04:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795752279; x=1796357079; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795752281; x=1796357081; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=0YWmiWhjNHjpD3tirbV+FoDaUJT2r9bLvjlZdG98TSc=;
-        b=CpzL3puJ5Wc58dYfpNNFmFFLSQFHgs7BPrzV/GoQLbwKa8HDq8HJC//w97UMP7LTw3
-         4p/E0p/3huKzgFd/vYlm4XiIKLlkIhwTfq+P7//XNSUCJ68OkWSFeZiqUykMgLR5jbHW
-         ubo87BCMpbLzCgy0fGv9fwXOrwTpiHTmYy0vHMIfGXUUv2TvC7oDagRyMck34XPVXToI
-         aouzA5F96M52dxSqOqMb6MzV9PX0N7LEi9dNleNxSIbBpNWrCgPbPbXJIAysJNrdPK3R
-         UvzoQNDW+DmtdJxqLOyAmpbYoHXIjG2Svr73n9o7Aqxk8/PE38KeRhBejPeZL12KAo4W
-         XLVw==
+        bh=5iz2xhznaAm+hKwrtltzMwrPAKmj1lljaoJiLwWoVUc=;
+        b=NMEsIsZOoXtmq8SIwpYCwiafBwE6gpa6ZXsRZe/pnuJEN1xHN8TOp/hKNXFMgQvfxW
+         QLCft4GpkKZLs0VoG27pAt50DLOqKfwsRjX8aI/HVipr5xOSDb2VH78DDz1xTXRZLwoQ
+         0U1pDde/naDDDC+4CJ1iWGgn0tVCy5ky7ldGn1kOj/Ommzdsm7gvytNJnaPDyT1vdZkW
+         lge01LLbK6AemE3l6mvM9mW+rva+23q5w0eCEgn759xIeR126FV+Qi9U+o1WybRdslqn
+         bmvrG01iizswkH1dUDagaZSuZG4+O28DrZOGjKziDu7pqdofE2e0kza0MlPO7/tGEftj
+         XKuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795752279; x=1796357079;
+        d=1e100.net; s=20260707; t=1795752281; x=1796357081;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=0YWmiWhjNHjpD3tirbV+FoDaUJT2r9bLvjlZdG98TSc=;
-        b=I3paAkOLYgg2aKHnHz3EKioxQQCgk6EJS3EfaCf8qUnL0B9JaMhVNmu0h+41q+wXhV
-         6SsCAUAZfxQ32EBQP5iZI4gTFSlO0dkgGUcICfAnQqVEAV+Tsn7bjZDtW/W66UvRCmE5
-         8wbCBgYrT8/cx7JKdsKl6vXXthA3F1B2CQpCxJ5PMAPrjRF4dlWn5zIsCPWmwSttt79Q
-         vCMP6ZN+L/gkmX5TV4ALTi5r+UUJLWO99n5TrovkAyxdaUcouxf9RoXiLjZHjlNaJMUD
-         Mz8zIvwDuJOcdSw3Yus8ugv9/eQnn1Vi/yd2hqoUYb6yT8tkC8Qkkia37FmNafp2Z/l4
-         Rv7g==
-X-Gm-Message-State: APuU4Z+p6/rz1fcaHTvKCvcIXy3MF/6QYGt0kLOubbf8M0DrCmzgS9Qk
-	uI8r6yZ6nOLxvVa+l4GRFivnYgJJ3d3YlvKjZh2YRCVpWRJBqxmKGhzRDoXrNA==
-X-Gm-Gg: AZFdTZcEnU5nh11YRk2rXVYUh7zQNanspmOhjaMTuTsfnFYoM4NnnRjurJugwH5q9NM
-	FNtlMZn4bonw7Fs3kuwVY2zgjdMMOH1EhxJu352JZyuUYw5wYpuFM3Ugk2bHMpSBhRfT0pFCiBi
-	9QhGfeWdgNeJZh80SWYgXpOV0Jq151XBjn/6lnQWTtstrKWmAaPZJyStsYj2+M7qn3DHP+5Rte6
-	2HIPuMFsdB5Px8b2+rgrgzeJsW9AooBthAyeC45xOfhGEVDjQjhcNhiyRHnDNx9rvLGJL6YSC2A
-	yti3ODdI6dfjS3nVIvkWR7ahHEqJ63fsS+17dHxw1BuDl78fzVH9BnLncZRwRuZhlmndZo2EoAU
-	R8p2JVI+7CKhID2C25GMI1n/dSh+MxI4FD91UfsLlYnEkUQtoGTWIN0ce/g2K8IV0w6L2HX1h9/
-	2W4BISYq1TFkoXAc1w468DZ4qZ0thVYzmLQye/ChyZPz55MERnc1FeatEWdPeHl15klBmyXE8oQ
-	gyNZ9QVJIllUI9CpbmuZ/ivOa5+L7vPA7zgAF1CvQM3LEUJSfKJX9PY3XRgBnTwjwtP+KlGfxYq
-	I8n/pCLAb4yssZ8ewuZDR7lZ3T+hmbRjPX3r5ql3k1kwaChvjblJ+CEZyy0ubWIg5zZgecx3s5P
-	ZLq7wyR/Sz0qRY7qXYKLE0EFMyjuOomTeebys0jeSoQwu/BzkO/nCp+G+Lz2380wgS9EC582Abg
-	bkKQ==
-X-Received: by 2002:a17:90b:3d4d:b0:3b0:a511:fb75 with SMTP id 98e67ed59e1d1-3b41c95b149mr22273912a91.40.1795752279171;
-        Thu, 26 Nov 2026 20:04:39 -0800 (PST)
+        bh=5iz2xhznaAm+hKwrtltzMwrPAKmj1lljaoJiLwWoVUc=;
+        b=JcfzBZo0e9LEPKpkQHzhWGXaQob+ePBzdfa8ANS2ix/FLMjDaaBRDBNmI6xAMT3ib3
+         OEnQDICWuofjzDku3NilPkIidl5iRtF2ibZV3DxwVWki4hM6HITxPQIsQeLC4MlKl5i8
+         4JPsbq3jXIvQuoJzLHvzevuTQ4K35byAjC5r9SbBwM6vlO2VM4Gou4S+0jUeadzdjVxv
+         DYF/V9s+r2aILmWtPCx8NqkSAcpld8u3VzFIOTirczV+HP0pXYms/99PfFJ2DTd7Bc7k
+         rQkPOswwAgPo988+vgHrgRoWn4OveA1bVLozImbaCmbS7UcMgAW4asAs9/0TXD8qh/Oj
+         2TpQ==
+X-Gm-Message-State: APuU4Z/ZB6D10OqBaCXFTTvXhKJQ0gmmz8i1MKdSwiVR9entiTvJQOQF
+	Vn8eIrZSCRoqy7ypLKSuhG9kvFs+Y9gmegra17jlCLp2nvEGISdEdjIlNRdYEQ==
+X-Gm-Gg: AZFdTZePHfNR8I1RqPn9z8MqP73j+z2OnV9KFPpe1qd2E76bwL6zwEXrElW2kExSRJP
+	l03FqdjIQ4OVA7NkuYn8Huix5oOHZhKVOA2ul1Mzw3wKTAdqx59z8O781dDuhMIM0CC147smuhD
+	qzHS3xIZb4wrluhUi5Ol902DHQDFgB5i7jbDl6+yaR5Wd1LuCNxwgq9stH/RX3PMhLT880eZ6p7
+	Fd36fQLDfZ8VNUmVw2CzCuH7BDODvr3iedEYU4Jnv1lC2uhyaAkP+N6NGXVWAz3jz+3CRpHnhPv
+	5HQvVQbh0skRkbTb+GUoBmTiUNeeNCVzb2ra4RwWw/4zP0KPYy6ojTRI28Xb0YPrchLNaTvknSE
+	P6VhqId+au8Dd+8Igex3I9i5E3Dkq1asBxRfaqIp0V8SOMJljhY0nzUDddvqwX2VJ5e78OLXcvG
+	3DGpMhwy9fg6dxmiE/OW12IutMukbiKNC2XhIXhU/XliWfu5FDYcGmJfRRskiGAGPQw/xAnlL5K
+	VKHh/eLX4zd2DCQeXogBvznbd/aJfqodYFXp6ruyQcl8TxtwmIeNxTtrbEm4NKH5x2/0438NnMe
+	pAIY/vQlDlIGx2tizut9vzLYIZ828IQsdBUiOx8hOZ8HshxPYnEriqXmxe3cFhwAc4HBi5auh94
+	iMzuZeYQa9Q1zkH65tRnOCVtBiNNsYGn725p7T4j9Vc/7wwWSH2pHw85dByrthyT4rGEYi+FbtE
+	ZfBQ==
+X-Received: by 2002:a17:90a:d2cf:b0:3b4:1714:5bfc with SMTP id 98e67ed59e1d1-3b41c9b9dc1mr23166479a91.61.1795752281266;
+        Thu, 26 Nov 2026 20:04:41 -0800 (PST)
 Received: from ryzen.lan ([2601:644:8000:37f::e34])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b457a58d04sm15090652a91.0.2026.11.26.20.04.37
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b457a58d04sm15090652a91.0.2026.11.26.20.04.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2026 20:04:37 -0800 (PST)
+        Thu, 26 Nov 2026 20:04:39 -0800 (PST)
 From: Rosen Penev <rosenp@gmail.com>
 To: linux-crypto@vger.kernel.org
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -86,9 +86,9 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	James Hsiao <jhsiao@amcc.com>,
 	Rosen Penev <rosenp@gmail.com>,
 	Christian Lamparter <chunkeey@gmail.com>
-Subject: [PATCH 7/8] crypto: amcc - fix the inverted AEAD error ratelimit
-Date: Thu, 26 Nov 2026 20:04:22 -0800
-Message-ID: <20261127040423.1023233-8-rosenp@gmail.com>
+Subject: [PATCH 8/8] crypto: amcc - wipe the SA key material when freeing it
+Date: Thu, 26 Nov 2026 20:04:23 -0800
+Message-ID: <20261127040423.1023233-9-rosenp@gmail.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261127040423.1023233-1-rosenp@gmail.com>
 References: <20261127040423.1023233-1-rosenp@gmail.com>
@@ -103,79 +103,35 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-crypto4xx_aead_done() prints the engine's error status only when
-!__ratelimit() is true, but __ratelimit() returns non-zero when a
-message may be printed. The errors are therefore dropped while the
-rate is low and printed only once messages are being suppressed.
+The inbound and outbound SAs of a transform hold the AES key, and for
+GCM the hash key derived from it, but crypto4xx_free_sa() releases
+them with plain kfree(). The key stays in freed memory both on rekey
+and when the transform is destroyed.
 
-Report the status with one dev_err_ratelimited() call instead, which
-also names the device, and drop the driver's own ratelimit state.
+Free them with kfree_sensitive() instead.
 
-Fixes: a0aae821ba3d ("crypto: crypto4xx - prepare for AEAD support")
+Fixes: 049359d65527 ("crypto: amcc - Add crypt4xx driver")
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/crypto/amcc/crypto4xx_core.c | 20 +++++++-------------
- drivers/crypto/amcc/crypto4xx_core.h |  2 --
- 2 files changed, 7 insertions(+), 15 deletions(-)
+ drivers/crypto/amcc/crypto4xx_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 4c1b76f28de0..8b070b7edcb6 100644
+index 8b070b7edcb6..bb078b524994 100644
 --- a/drivers/crypto/amcc/crypto4xx_core.c
 +++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -588,18 +588,13 @@ static void crypto4xx_aead_done(struct crypto4xx_device *dev,
- 	crypto4xx_ret_sg_desc(dev, pd_uinfo);
+@@ -150,9 +150,9 @@ int crypto4xx_alloc_sa(struct crypto4xx_ctx *ctx, u32 size)
  
- 	if (pd->pd_ctl.bf.status & 0xff) {
--		if (!__ratelimit(&dev->aead_ratelimit)) {
--			if (pd->pd_ctl.bf.status & 2)
--				pr_err("pad fail error\n");
--			if (pd->pd_ctl.bf.status & 4)
--				pr_err("seqnum fail\n");
--			if (pd->pd_ctl.bf.status & 8)
--				pr_err("error _notify\n");
--			pr_err("aead return err status = 0x%02x\n",
--				pd->pd_ctl.bf.status & 0xff);
--			pr_err("pd pad_ctl = 0x%08x\n",
--				pd->pd_ctl.bf.pd_pad_ctl);
--		}
-+		dev_err_ratelimited(dev->core_dev->device,
-+				    "aead error status 0x%02x%s%s%s, pad_ctl 0x%08x\n",
-+				    pd->pd_ctl.bf.status & 0xff,
-+				    pd->pd_ctl.bf.status & 2 ? " (pad fail)" : "",
-+				    pd->pd_ctl.bf.status & 4 ? " (seqnum fail)" : "",
-+				    pd->pd_ctl.bf.status & 8 ? " (error notify)" : "",
-+				    pd->pd_ctl.bf.pd_pad_ctl);
- 		err = -EINVAL;
- 	}
- 
-@@ -1352,7 +1347,6 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 	core_dev->device = dev;
- 	spin_lock_init(&core_dev->lock);
- 	INIT_LIST_HEAD(&core_dev->dev->alg_list);
--	ratelimit_default_init(&core_dev->dev->aead_ratelimit);
- 	rc = crypto4xx_build_sdr(core_dev->dev);
- 	if (rc)
- 		goto err_build_sdr;
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index cdd40bb7d254..a8da46f5a44f 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -13,7 +13,6 @@
- #ifndef __CRYPTO4XX_CORE_H__
- #define __CRYPTO4XX_CORE_H__
- 
--#include <linux/ratelimit.h>
- #include <linux/scatterlist.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/skcipher.h>
-@@ -100,7 +99,6 @@ struct crypto4xx_device {
- 	struct pd_uinfo *pdr_uinfo;
- 	struct list_head alg_list;	/* List of algorithm supported
- 					by this device */
--	struct ratelimit_state aead_ratelimit;
- 	bool is_revb;
- };
- 
+ void crypto4xx_free_sa(struct crypto4xx_ctx *ctx)
+ {
+-	kfree(ctx->sa_in);
++	kfree_sensitive(ctx->sa_in);
+ 	ctx->sa_in = NULL;
+-	kfree(ctx->sa_out);
++	kfree_sensitive(ctx->sa_out);
+ 	ctx->sa_out = NULL;
+ 	ctx->sa_len = 0;
+ }
 -- 
 2.56.1
 
