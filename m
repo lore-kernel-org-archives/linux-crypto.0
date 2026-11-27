@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795759007;
-	b=5LvGpF/BGuYxEt5MJhCRx5RETesBSZlJ1JIWXyfO9ya+r6K4QayfFXTQCY1Zs4kvNj8u
-	 u8bdnUEMGzHH5adACOvO9ebafdX0ABmzhn8oCTen9k46Ne0wz0xLkllgYMoNKOfpkTd8V
-	 DCATHWyh9LbZjP+s26FkDZWBXCZa0+TYKosG0VfviFhiOOxcJ0QAnZ85EmfgGSLakSz9n
-	 zR0PHeiE173Lkumz0sk4oCe3uDE8kMXA+kipsB7B3KO2Cd97JUrWcJFUupyZXNjI3tXMa
-	 MQeAWjyiE5DTv5vNLAHkujqMns8nYNgCzQ97s/kYD1u6EZixAtghIhhRaJTZtSTod5w==
+	t=1795759011;
+	b=llMwtWrd9vlQeF0ZtEwvhg+SjS1PRG44e0svut6Ld73H4tILsZHfD8BqQba2VezGQUCv
+	 ayy3cyWnNzUxkp2vLSB2kDJbf4KRy07toGCy3O8P2QvolaIdt93WrgSjk2u+3EmRIsL1D
+	 43cIA1Hp8I2NsHB9huEnZeDRojmw1dLeAqzByaxu+g+b1c3VXheoavB6bsprqdyyhImjz
+	 I8BttAHzpLgyBwmfJRdqPbtEmZwKRkS9a/c5ceij9saOOijP5RuTSDKl8cL3fB8Ip+1UE
+	 iPgR7axCI0WdMnBRpmELdu1fdd9g+kXdxM0Sm/Go7T4mRJ58TE2BMkqoo/XQyl9r8wQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795759007;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795759011;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=0C1J3Yo4LK3xrHtS9mw2s3inRXtAeEdwhOFOurWOo4Y=;
-	b=CplmNTXz+ht74gpOyZ8qA7WQmU6wdIXB9Zi0JIFiM7wqBubhfOPoNw+G9vtcEdpMP9eQ
-	 GZLe+HCkRw2lKHbtCMdM/7pRE0NyC4iOBrdlem0AzChWLm05gBhhsWb8JqeDLg+kZKHFZ
-	 UOjGKtOP/rf/voNoR4HP6oF+So9P+0j7y5xATakEHH1T7HbA7NHNwyciir7j1uCApou06
-	 qbHnn/ArooXWb778JHpPcq+SsB8vdFyKAFXO2WHvQSGKYZWuYPX01QMTYE4eiw/6qsjaX
-	 ag+01sspnu9nbP5WenZrkOF771Ixge9CBoWJ8TFHmaBbGItVwHGsAcYvBOmkF0+vG8A==
+	bh=r7fclzzKOWMyf7ywe58Ae38O43mUtx+8bhUvqry9F/k=;
+	b=PSMlnEwJgeKBIDbOl0Su8c47dCcaWjugvGvTLWKHzccuS2dp9Byy0YziElpGTRVi79bo
+	 owYwzbpdLbskQ4KSPTZrBbgYkoTCi1HpZVcmuFechwilsjbbdtGJCNqzGIuzKiTIOBQhy
+	 BQgxtU+GLWYTDamlB5YvQbFnOvJ4fB1XfIOq/tWSBeJmSo5fl5VWWC9hBZCVqa1cuRnYD
+	 kwC/2ya1egYBROWA0e4mToVR/0E6DDE5Qb2n65C6C7r44v/JlbE3rUiOmXhwwpk1NJQGe
+	 0imdfAF/5wVAva5QPDc4DZwtgGcjVhHp7/H7PBo++Kf/vfn5tNl7jQZb++KD6dQFKJQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GTyO+mWU;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AcFo3mxs;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id BAF18606A324;
-	Fri, 27 Nov 2026 05:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id C1A78606A32D;
+	Fri, 27 Nov 2026 05:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=GTyO+mWU
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id EAECD1F00923;
-	Fri, 27 Nov 2026 05:56:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AcFo3mxs
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 95E8F1F00897;
+	Fri, 27 Nov 2026 05:56:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795759006;
-	bh=0C1J3Yo4LK3xrHtS9mw2s3inRXtAeEdwhOFOurWOo4Y=;
+	s=k20260515; t=1795759011;
+	bh=r7fclzzKOWMyf7ywe58Ae38O43mUtx+8bhUvqry9F/k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=GTyO+mWUJE0rprMsntD41sYQhVENuJtqd9O9x6/eDam7sO/KN0j50UhaBWdcKRtn5
-	 5vZzo6PKHkOKGRZcyJH4CrESyulrV/OzCbtfDrEjJlp+dIP35vJ3LKfCwT5eYrzu/Y
-	 pjxWN2rbf63LvgXfkZNvUPGRzEv/TufNaUiZmB1AS7c891H0nsdkayS2F5xkOqhR3a
-	 wMFSgBxpdHRc0S2SRTb5/ewK9DRkjCpyYQWwXEIpwvbD0a9UfTVNZmzSBkh/p4aT6v
-	 hSMO96JOA0yB/4areiX80txzOrDrtpPUbK0zXemPktDbubLqtScCBTvh+cVN4AE6r0
-	 RHF8y4AOLSZJA==
+	b=AcFo3mxssOPvH/hMEppeMYGWtOaW/mGrnjDw0W76iKn2nPH40QzVX1topHn/F3f7r
+	 +gbFuMBZs7MrAcAgJAm3etRRUr+R7dYFxnARcTQZhv/dH0KvWLXeBnXCtOTpFtkof2
+	 N4YR1gPtQjq0ztOwVi71xeWPWEqnBD0UwvXs6nX5+JD/GB7DH83TxcMB1eF4Zbkm+z
+	 vM+xTSH0IBe9SHpAhMYM4xk0yTHu1ryTc+IBz4h5/zQKhNVocMRdfW1548ZjEdaTqi
+	 sJ+846MZZjxAipd4MMvql8xIopU3enBSo3RhomqdOX44IRL9uyk2MoVtc8ZTKp+tva
+	 Kyj1/UNW01joA==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: keyrings@vger.kernel.org
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -77,9 +77,9 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	"Serge E. Hallyn" <serge@hallyn.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
-Subject: [PATCH v5 08/17] KEYS: trusted: Allow ASN.1 TPM2 sealed data shorter than MIN_KEY_SIZE
-Date: Fri, 27 Nov 2026 07:55:53 +0200
-Message-ID: <20261127055602.2357884-9-jarkko@kernel.org>
+Subject: [PATCH v5 09/17] lib/asn1_encoder: Add asn1_encode_integer_bytes()
+Date: Fri, 27 Nov 2026 07:55:54 +0200
+Message-ID: <20261127055602.2357884-10-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127055602.2357884-1-jarkko@kernel.org>
 References: <20261127055602.2357884-1-jarkko@kernel.org>
@@ -94,49 +94,103 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-tpm2_unseal_cmd() rejects unsealed payloads shorter than MIN_KEY_SIZE (32
-bytes) with -EFAULT even when loading an ASN.1 TPMKey (OID_TPMSealedData,
-2.23.133.10.1.5) blob.
-
-While kernel-generated trusted keys ("new <keylen>") and legacy old_format
-blobs are at least 32 bytes long, external TPM2 tools allow sealing any
-non-empty payload up to 128 bytes.
-
-Keep MIN_KEY_SIZE for legacy old_format blobs and accept 1..MAX_KEY_SIZE
-bytes for ASN.1 TPMKey sealed blobs.
+Add a helper encoding a positive integer from a byte array in big-endian
+format.
 
 Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- security/keys/trusted-keys/trusted_tpm2.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ include/linux/asn1_encoder.h |  3 ++
+ lib/asn1_encoder.c           | 56 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
 
-diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/trusted-keys/trusted_tpm2.c
-index e20e54203b83..6b4cd07176cb 100644
---- a/security/keys/trusted-keys/trusted_tpm2.c
-+++ b/security/keys/trusted-keys/trusted_tpm2.c
-@@ -490,8 +490,8 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 	struct trusted_key_tpm *private = options->private;
- 	u8 blob_name[TPM2_MAX_NAME_SIZE];
- 	struct tpm_buf *buf __free(kfree) = NULL;
-+	unsigned int data_len;
- 	u16 blob_name_size;
--	u16 data_len;
- 	u8 *data;
- 	int rc;
+diff --git a/include/linux/asn1_encoder.h b/include/linux/asn1_encoder.h
+index d17484dffb74..e206bd425854 100644
+--- a/include/linux/asn1_encoder.h
++++ b/include/linux/asn1_encoder.h
+@@ -12,6 +12,9 @@ unsigned char *
+ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
+ 		    s64 integer);
+ unsigned char *
++asn1_encode_integer_bytes(unsigned char *data, const unsigned char *end_data,
++			  const unsigned char *integer, u32 integer_len);
++unsigned char *
+ asn1_encode_oid(unsigned char *data, const unsigned char *end_data,
+ 		u32 oid[], int oid_len);
+ unsigned char *
+diff --git a/lib/asn1_encoder.c b/lib/asn1_encoder.c
+index 92f35aae13b1..8fea70dc0846 100644
+--- a/lib/asn1_encoder.c
++++ b/lib/asn1_encoder.c
+@@ -10,6 +10,8 @@
+ #include <linux/string.h>
+ #include <linux/module.h>
  
-@@ -555,9 +555,11 @@ static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 	rc = tpm_buf_check_hmac_response(chip, buf, rc);
- 
- 	if (!rc) {
-+		unsigned int min_len = payload->old_format ? MIN_KEY_SIZE : 1;
++static int asn1_encode_length(unsigned char **data, int *data_len, int len);
 +
- 		data_len = be16_to_cpup(
- 			(__be16 *)&buf->data[TPM_HEADER_SIZE + 4]);
--		if (data_len < MIN_KEY_SIZE ||  data_len > MAX_KEY_SIZE)
-+		if (data_len < min_len || data_len > MAX_KEY_SIZE)
- 			return -EFAULT;
+ /**
+  * asn1_encode_integer() - encode positive integer to ASN.1
+  * @data:	pointer to the pointer to the data
+@@ -85,6 +87,60 @@ asn1_encode_integer(unsigned char *data, const unsigned char *end_data,
+ }
+ EXPORT_SYMBOL_GPL(asn1_encode_integer);
  
- 		if (tpm_buf_length(buf) < TPM_HEADER_SIZE + 6 + data_len)
++/**
++ * asn1_encode_integer_bytes() - encode positive integer bytes to ASN.1
++ * @data:		pointer to the pointer to the data
++ * @end_data:		end of data pointer, points one beyond last usable byte in @data
++ * @bytes:		integer bytes
++ * @bytes_len:		amount of bytes
++ *
++ * Encode a positive integer from a byte array in big-endian format. Strip
++ * leading zeros.
++ */
++unsigned char *
++asn1_encode_integer_bytes(unsigned char *data, const unsigned char *end_data,
++			  const unsigned char *bytes, u32 bytes_len)
++{
++	int data_len = end_data - data;
++	bool add_pad;
++	int ret;
++
++	if (IS_ERR(data))
++		return data;
++
++	if (!bytes || !bytes_len)
++		return ERR_PTR(-EINVAL);
++
++	/* Strip leading zeros: */
++	while (bytes_len > 1 && bytes[0] == 0) {
++		bytes++;
++		bytes_len--;
++	}
++
++	add_pad = bytes[0] & 0x80;
++
++	if (data_len < 2)
++		return ERR_PTR(-EINVAL);
++
++	*(data++) = _tag(UNIV, PRIM, INT);
++	data_len--;
++
++	ret = asn1_encode_length(&data, &data_len, bytes_len + add_pad);
++	if (ret)
++		return ERR_PTR(ret);
++
++	if (data_len < bytes_len + add_pad)
++		return ERR_PTR(-EINVAL);
++
++	if (add_pad)
++		*(data++) = 0;
++
++	memcpy(data, bytes, bytes_len);
++	data += bytes_len;
++	return data;
++}
++EXPORT_SYMBOL_GPL(asn1_encode_integer_bytes);
++
+ /* calculate the base 128 digit values setting the top bit of the first octet */
+ static int asn1_encode_oid_digit(unsigned char **_data, int *data_len, u32 oid)
+ {
 -- 
 2.47.3
 
