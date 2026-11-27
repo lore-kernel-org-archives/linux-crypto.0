@@ -1,82 +1,82 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795780917;
-	b=gzIkOZvT6068UBqB+vT/fTHFWPzdyshM5UuRgI8jVf9B8zbHRVtK0LqunyJ/8nETayoL
-	 wSDXRtM1M6JhPBgNKU1smTGwui6Q8EvQDtXVP70fuY32l5vySEvHiUBbYQZ3zKGpmL8Ax
-	 /EfrEVw4qskTY3TOyi/w8UWhE0DMTPVS8GZmizYC6bGuRRzhCFMYUjMJp8v1xj1N3gAYJ
-	 m0toar1/oyuWJvv1GK13h5ouz+samsO5I62gmJ+qvcQc/Ts/MtZJcwUa69XTK3PLS8QX6
-	 Bo48+VbVCI8f/zesdRhtlWW5zHskw9w0i3cW5Uh42Bp6FumIU/qnc7Ue+7SWAtLIobQ==
+	t=1795780918;
+	b=hFo4z/4xdCm09pKgTIYeupUay8FI2dzFumEup68D0XtgM7FkAa8XMOhRqUJfjQrS7URG
+	 2fET+I1OcQT4nAL/xxQ0fmyiwVV/5oNt5blj4iei70K0Iz1LMVZez2jscC3TsCucgg5Ca
+	 s7KjNgcTI5LEiciSdr/1SrRcbDWEoeK9DnS6SGrt0Dk/3seTMLQkJ6hB0STc2AR4pDG3r
+	 zHqCfO+xO+KzDiDgiy7uh+4+nnlbRQogOlMRGm2nK6DfG+xHahY9WUUma8woIW+/mwdZh
+	 flDsynQpztT6+QlvuL+YHSgxFbgH5voa0+FHiLj51gYogLhX5k2s9gBAdpe2wNPlbtw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795780917;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795780918;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=H6JuaHlgOFaTRvm4ik6+FqVcECQ77XVTUFxb5teXNtM=;
-	b=YYa4+2YkYKa8pbsRYuMewGB33bZl32FXpq7mghi1m15TLpXP8nResfDVi5dcLA2OLwt9
-	 T5+NZhoM347V/T2I8RcDOXa5U5ENbhBa1BB4CtEGQs7IVyiP21iPj8e1J5x7g6pvERq5K
-	 SmTzy1XZakqfTWh/aagjmHL0Dg66wQT0rATd9VEZWLfC01IFdQ8AY1fvHwPK4z+M/bWap
-	 Y3jMSI5EBfxf6NOXt2Stii0E6Kj/1T3PlynoOj4DRgfjUD6l5qyyJ0XNSIX2yC9QPPFj+
-	 Zc1NThQN+G9q3E7Dvx1/w9GJBTJ+3hDTtdGeoUcQW3JTSP9z2RJ6XczGlvyyKd48GIQ==
+	bh=cyu2YD+0JiTqu9p5NWdi6X2hohcRvSGgQozAHaYtXMQ=;
+	b=PCbCatbgDlf84rTbLn1Hw8Q6QF+MSomWIL57A5vFVQgl5nQelitLsSHniw8eUaktTqnF
+	 VrWYq9Q7MirUBRnIFGxkOMEUNpoNEI6PMZiAEhvmqpOzi6FtbkdQMrtj5Muw9mgz1QK2B
+	 lsdYPgZSKcxNam048eROoePxcasz6WA83WaymqkGD+kFUIt1BiL80lrRCz2IpcyoUA6as
+	 JQ+jpHXPEkQ1PwGi5+ONd2IGsBSlekfzArCW4inRWaGFZQOx1tgOlpGv/hpecDh4Ehxnh
+	 EaQ6rZvY2VdwgQb5IIA7W46eGpwo2J517nx7cBTxgD7H8/mHQYxog1DSXWrtqXAUXaw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rvezEVeP;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AL1VGL0h;
 	arc=none smtp.remote-ip=209.85.128.48
 Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB155606A31C
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:01:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BB155606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C09606A31C
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:01:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E8C09606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=rvezEVeP
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4bb55cda775so49688175e9.0
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:01:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=AL1VGL0h
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4bba60271d7so24930165e9.2
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:01:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795780915; x=1796385715; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795780916; x=1796385716; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=H6JuaHlgOFaTRvm4ik6+FqVcECQ77XVTUFxb5teXNtM=;
-        b=rvezEVePSWgqG1fmVnf+JOhFq/PFr9tnnD7HkDU0tqdSbXoUmjQeUQB44qGRNwMqWf
-         hrRLMpLkEKgQ+tzCUtUj2CLMY/Zy3rGTDge1q4gm4p4Va0gFYgAhUZZWKyp7v3pvlXv3
-         8tO4Z7KozGU9zAXAggPpRPfT+D9oVdMWyPmObg4RmTjKAs9yolWjOzJNDvZ3WoNq7zzv
-         aJ56tlaiK+7FWGsEP5ttH+4Rq+ntH3j6nnNpFT1zFbSJK0dImalZwn+O7WocwpHY4D66
-         h7V1QbJYdGSkVuLR4eh8ToGwDa3a+i8hhZv4uGSPgJ2PWxy5YanClyKBgTnQSLLWXBS5
-         keXQ==
+        bh=cyu2YD+0JiTqu9p5NWdi6X2hohcRvSGgQozAHaYtXMQ=;
+        b=AL1VGL0hkPX75OCRXg0YznDdFMteUJOh/tMaD9S/64LQWYS2a+CpWhanRLTSpmft3l
+         y6TaTfqMPYKe9XZOnZi3Mlq6DFqOfHDRvFXNJd9Ki9DmXbr/tqnUmEeUbomO+gh8fQXy
+         TjOv8xBZSGb1Lzn40oRgWXFEMJUYCjEI4JxCsWnVWjUkqGf0WKB5Bio5++/gygZpBAvP
+         MwWFHkc5ODtyrjNCMbSjUfbXv37gxDjCAVxYj1Xvm1kvJHPga5ktCi0aTw8uzkEc9UPC
+         Cc+Y3pOctpK5xpjvcLO2DZ1npPGy5nGvfIo/emnZB4qhWcqI0BPR1C8UPAw0DyTlKpFy
+         OBEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795780915; x=1796385715;
+        d=1e100.net; s=20260707; t=1795780916; x=1796385716;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=H6JuaHlgOFaTRvm4ik6+FqVcECQ77XVTUFxb5teXNtM=;
-        b=JsgK9VkMRZ9mrJkuvpw9e3G7tjcCqW2DsALXK3hY/AGG1h9sB/IurlEUQk0PdQwj+M
-         TKTyx4+7pkJW+2QW6KfQ5QstP0YwFndw7m5Iy3ZZcvm6Gh1zpRDx8hhS1MLpkT7vrNxo
-         H/50+Rk0/I0OVBkEih8POR35vkqCMONhgjU6wWXW3dGEDFGyMMTNNTL71HPzZPyy30CX
-         PiLobpSZOYsrlZHgK5QdOv1ifGiN+f/ouvAn0c5GzI/nZ4Sz41hGiOnJpFeSMQi+lYLP
-         q1pCwTEbe0JfQZ4KD1BkzwBBidO95d3M4RobUGmrcLHOPA0cQmueIunS+otIAU/LkhjL
-         0e0A==
-X-Gm-Message-State: APuU4Z8awG/6kRlfFS4Hc8z+PuSKpUM7DKGY0hLCOlCFTVtdtwxoj8x5
-	0dVybwA+Wli7Ma9PcESPW/9H1IQhcHeFpKa/1O7D4TuXR6demsluPkIS
-X-Gm-Gg: AZFdTZfjNDztpmgE7Jw57bs6xFlsukaWpmA6Gi02seAoSnVh3MmbgAxqjKkRxszZ1CG
-	BNMo0GsjQjJrdTQlose9tU+xkzdLedfk+1drQBR45c07QHtygirs/XxBk43j6flmrzdNPnnaCwT
-	xP5kXJ6gEF6OVgk461dfzmy6pvAM41V6/0yzEzzBP+5QIP8ig26uadG+DCLFaZ41xXLw9I70Lnx
-	fDvQLS79WV8LE1smKYL9NcjFh4Txf0xFZkuDa5HMQUn/6zQ0kPUzzUit0AfqelMID480jap3w7D
-	zy7gUQSSyG+sj3xvcVKJVFwDjD2L1zX6uhrGGoClz3VN4JXnCNo8gtxETh+4HxqYBj26BlThwvP
-	R4sKB0+2CC4M5F5EdlR129P5Ew34fCGd0aXaazcYzkkHG5dDwk7o/enPy+jxRPiLT8wBnNEO2Tt
-	i2dPT+9ORegmSdnFrXpcuBXLXDLZ/hJT/wmkT5xQ17sg1W4xZPsUiAlXarmxANr4dwZFue9QEbd
-	997xHmDCVXAbmWk+EPYiJ0sbXJPQ6W3bwjDyom+qwcz77iB4Zm0D4cugcOd99BzXePAWseud55m
-	wp2+z8GUw6gC70Py3kxuqid/I9yUNV1Rk9OaDb2HqneEDwE=
-X-Received: by 2002:a05:600c:5303:b0:4ba:4928:8aec with SMTP id 5b1f17b1804b1-4bb88807d7cmr456893495e9.9.1795780914919;
-        Fri, 27 Nov 2026 04:01:54 -0800 (PST)
+        bh=cyu2YD+0JiTqu9p5NWdi6X2hohcRvSGgQozAHaYtXMQ=;
+        b=PePEtpWTXdDY4FjogXPcy4U+ZmQoC9Iwzo8woeyIol965FUVtqhvkCQKaY5sJ5ILVN
+         riA7vkXgjmnqrc/FPuUZb+0d3bjHydO8MwqWgLcGJEHS0o+0KFAEWRLj5gS7DoFdMmwM
+         8f5f/8jeVjFlp3AL5nWZ1RuHXj+mw5D2s2nCxXKY4SmuuS8UILr8cimVKiSLNDl/xLPC
+         Ed7Du8kDVX0zt7IXEWuOhRlisWxYEtTUJn434vPRLgxFvxecVRmARRxkmDpEKyGiMyEp
+         F/HGmPap01Fj8u1QdXerIA6PyllLoTo4nnqOHErQLOPlN+xpr8zMEfQBJuI4TQaP2UNg
+         P6tw==
+X-Gm-Message-State: APuU4Z+WYlt3GtRa3Uw+vrGyECDBEuw5VNuyzYqru9tKQ/468IHyC3Ad
+	fXFZMVae925B1ED/7VMMiZfrBx64X06l8BlJsl7eS7J8/H1194eTOAqT
+X-Gm-Gg: AZFdTZeUYJwMWtkZpPuSBYzD3U3k64+wQvB+t5MzKHI4GS2nkysKc3pvsReBg9KIIsM
+	8L9pgdAKo8xqzd1sbbGGOncR9+pzuvB2/GLUzz7WAIuJxhmqrQXfYPePUL6aycE9JYjcchUKTuf
+	ywhK3qtbN/lXgUTLLQQLP+VwciFGKqP4HxHsc/SWDvbV2Hdkug3Phox2Qu2uF4FdbweR0CJGkSa
+	yfGhxwUnVVacRf4HrVKibZFuN4Ky9k06kApxRmZlscI6mPE0lY8gN7De2bg14FzDjh6xNZ6cRQP
+	nRGsZjmRfFPP28zDbif+LeIHPfnVRXYjtO4WqpUUtWGoRZiOMi1fjy+tdeELuavgkpvVmlNBylc
+	92JyZrzaatb4/w4HYQ1NpmRbtr3+tOmwvkKfBkXKC8ZH7Nh1KvIui0wrb5djPYrWL7moqkQl8I/
+	iu2E8qLROKE1xhTKC+FX03WFQc5veRJ1Hq2pETcFiX3eAKAGTTKO9PI4+y9GezWgVIVtVRPJKoF
+	cX89IsQUu0xgpt634QVhV4UonBnNml3V2+pUZUfzKekQ9xPYtV20TWzNgkVUP2MFyfw6k2HC/1L
+	i7mLXYLS8jcFG0kGItWnV+Dgjt5k7E7KZCbdDEXFiW+8fpQ=
+X-Received: by 2002:a05:600c:848d:b0:4bb:6687:5386 with SMTP id 5b1f17b1804b1-4bb8880c7f1mr517059715e9.19.1795780916248;
+        Fri, 27 Nov 2026 04:01:56 -0800 (PST)
 Received: from localhost.localdomain ([79.117.198.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.01.52
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.01.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 04:01:52 -0800 (PST)
+        Fri, 27 Nov 2026 04:01:55 -0800 (PST)
 From: Jose Nieto <jnieto.alaber@gmail.com>
 To: Corentin Labbe <clabbe@baylibre.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -90,9 +90,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Rob Herring <robh@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Jose Nieto <jnieto.alaber@gmail.com>
-Subject: [PATCH v14 19/30] crypto: amlogic: hasher: add one-shot digest path
-Date: Fri, 27 Nov 2026 13:00:52 +0100
-Message-ID: <20261127120103.1532882-20-jnieto.alaber@gmail.com>
+Subject: [PATCH v14 20/30] crypto: amlogic: drop unused field and stale includes
+Date: Fri, 27 Nov 2026 13:00:53 +0100
+Message-ID: <20261127120103.1532882-21-jnieto.alaber@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261127120103.1532882-1-jnieto.alaber@gmail.com>
 References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
@@ -108,159 +108,95 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement the ahash ->digest callback so one-shot SHA requests are sent
-as a single engine transfer instead of the init/update/final sequence,
-and skip the spurious trailing block for digest requests.
-
-Also unregister the hasher on device removal and lower the "hasher not
-supported" message to dev_dbg.
+Remove the unused meson_flow.keylen field, drop unused includes in the
+cipher and core files, and fix stale kernel-doc field names.
 
 Signed-off-by: Jose Nieto <jnieto.alaber@gmail.com>
 ---
- drivers/crypto/amlogic/amlogic-gxl-core.c   |  9 ++++---
- drivers/crypto/amlogic/amlogic-gxl-hasher.c | 29 +++++++++++++++++++--
- drivers/crypto/amlogic/amlogic-gxl.h        |  5 +++-
- 3 files changed, 36 insertions(+), 7 deletions(-)
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c |  3 ---
+ drivers/crypto/amlogic/amlogic-gxl-core.c   |  2 --
+ drivers/crypto/amlogic/amlogic-gxl.h        | 10 +++-------
+ 3 files changed, 3 insertions(+), 12 deletions(-)
 
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+index 72892fdcd55d..c11ccbaf920d 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+@@ -9,9 +9,6 @@
+  */
+ 
+ #include <linux/crypto.h>
+-#include <linux/delay.h>
+-#include <linux/io.h>
+-#include <crypto/scatterwalk.h>
+ #include <linux/scatterlist.h>
+ #include <linux/dma-mapping.h>
+ #include <crypto/internal/skcipher.h>
 diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 3a6bac10bb04..38b9645386ae 100644
+index 38b9645386ae..8ce3f6640753 100644
 --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
 +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -237,6 +237,10 @@ static int meson_crypto_probe(struct platform_device *pdev)
- 	if (err)
- 		goto error_flow;
+@@ -19,9 +19,7 @@
+ #include <linux/of.h>
+ #include <linux/of_device.h>
+ #include <linux/platform_device.h>
+-#include <crypto/internal/skcipher.h>
+ #include <crypto/internal/hash.h>
+-#include <linux/dma-mapping.h>
  
-+	err = meson_hasher_register(mc);
-+	if (err)
-+		goto error_hasher;
-+
- 	if (IS_ENABLED(CONFIG_CRYPTO_DEV_AMLOGIC_GXL_DEBUG)) {
- 		struct dentry *dbgfs_dir;
- 
-@@ -247,10 +251,6 @@ static int meson_crypto_probe(struct platform_device *pdev)
- #endif
- 	}
- 
--	err = meson_hasher_register(mc);
--	if (err)
--		goto error_hasher;
--
- 	return 0;
- 
- error_hasher:
-@@ -269,6 +269,7 @@ static void meson_crypto_remove(struct platform_device *pdev)
- 	debugfs_remove_recursive(mc->dbgfs_dir);
- #endif
- 
-+	meson_hasher_unregister(mc);
- 	meson_cipher_unregister(mc);
- 
- 	meson_free_chanlist(mc, mc->flow_cnt - 1);
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-hasher.c b/drivers/crypto/amlogic/amlogic-gxl-hasher.c
-index c83739ec3456..978cdcd8a4f9 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-hasher.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-hasher.c
-@@ -51,6 +51,25 @@ static int meson_sha_final(struct ahash_request *req)
- 	return crypto_transfer_hash_request_to_engine(engine, req);
- }
- 
-+static int meson_sha_digest(struct ahash_request *req)
-+{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct meson_hasher_tfm_ctx *tctx = crypto_ahash_ctx_dma(tfm);
-+	struct meson_hasher_req_ctx *rctx = ahash_request_ctx(req);
-+	struct crypto_engine *engine;
-+
-+	memset(rctx, 0, sizeof(struct meson_hasher_req_ctx));
-+
-+	rctx->flow = meson_get_engine_number(tctx->mc);
-+	rctx->begin_req = true;
-+	rctx->final_req = true;
-+	rctx->digest_req = true;
-+
-+	engine = tctx->mc->chanlist[rctx->flow].engine;
-+
-+	return crypto_transfer_hash_request_to_engine(engine, req);
-+}
-+
- static int meson_hasher_req_map(struct ahash_request *req)
- {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-@@ -251,7 +270,7 @@ static int meson_hasher_do_one_request(struct crypto_engine *engine, void *areq)
- 	struct hasher_ctx ctx = {
- 		.tloffset = 0,
- 		.src_offset = 0,
--		.nbytes = rctx->final_req ? 0 : req->nbytes,
-+		.nbytes = (rctx->final_req && !rctx->digest_req) ? 0 : req->nbytes,
- 		.src_sg = req->src,
- 		.areq = areq,
- 	};
-@@ -310,6 +329,9 @@ static int meson_hasher_do_one_request(struct crypto_engine *engine, void *areq)
- 		if (!ctx.todo && ctx.nbytes)
- 			continue;
- 
-+		if (!ctx.todo && rctx->final_req && rctx->partial_size)
-+			continue;
-+
- 		if (!ctx.todo && !rctx->final_req && !ctx.tloffset)
- 			continue;
- 
-@@ -393,6 +415,7 @@ static struct meson_alg_template mc_algs[] = {
- 		.init = meson_sha_init,
- 		.update = meson_sha_update,
- 		.final = meson_sha_final,
-+		.digest = meson_sha_digest,
- 		.export = meson_hasher_export,
- 		.import = meson_hasher_import,
- 	},
-@@ -421,6 +444,7 @@ static struct meson_alg_template mc_algs[] = {
- 		.init = meson_sha_init,
- 		.update = meson_sha_update,
- 		.final = meson_sha_final,
-+		.digest = meson_sha_digest,
- 		.export = meson_hasher_export,
- 		.import = meson_hasher_import,
- 	},
-@@ -449,6 +473,7 @@ static struct meson_alg_template mc_algs[] = {
- 		.init = meson_sha_init,
- 		.update = meson_sha_update,
- 		.final = meson_sha_final,
-+		.digest = meson_sha_digest,
- 		.export = meson_hasher_export,
- 		.import = meson_hasher_import,
- 	},
-@@ -463,7 +488,7 @@ int meson_hasher_register(struct meson_dev *mc)
- 	int i;
- 
- 	if (!mc->pdata->hasher_supported) {
--		pr_info("amlogic-gxl-hasher: hasher not supported at current platform");
-+		dev_dbg(mc->dev, "hasher is not supported on this platform\n");
- 		return 0;
- 	}
+ #include "amlogic-gxl.h"
  
 diff --git a/drivers/crypto/amlogic/amlogic-gxl.h b/drivers/crypto/amlogic/amlogic-gxl.h
-index a44290fcf3a0..3f1ce6c05558 100644
+index 3f1ce6c05558..9c3df0d162b9 100644
 --- a/drivers/crypto/amlogic/amlogic-gxl.h
 +++ b/drivers/crypto/amlogic/amlogic-gxl.h
-@@ -161,7 +161,9 @@ struct meson_cipher_tfm_ctx {
-  * @partial_size:	size of the partial buffer
-  * @partial_addr:	physical address of partial buffer
-  * @partial_mapped:	indicates is partial buffer currently mapped or not
-- * @flags:		request flags (for example, is this final req or not)
-+ * @begin_req:		indicates this is the first request
-+ * @final_req:		indicates this is the final request
-+ * @digest_req:		indicates a one-shot digest request
-  * @flow:		the flow to use for this request
+@@ -69,18 +69,16 @@ struct meson_desc {
+ /*
+  * struct meson_flow - Information used by each flow
+  * @engine:	ptr to the crypto_engine for this flow
+- * @keylen:	keylen for this flow operation
+  * @complete:	completion for the current task on this flow
+  * @irq:	IRQ number for amlogic-crypto
+  * @t_phy:	Physical address of task
+- * @tl:		pointer to the current ce_task for this flow
++ * @tl:		pointer to the current descriptor for this flow
+  * @stat_req:	number of request done by this flow
   */
- struct meson_hasher_req_ctx {
-@@ -173,6 +175,7 @@ struct meson_hasher_req_ctx {
+ struct meson_flow {
+ 	struct crypto_engine *engine;
+ 	struct completion complete;
+ 	int irq;
+-	unsigned int keylen;
+ 	dma_addr_t t_phy;
+ 	struct meson_desc *tl;
+ #ifdef CONFIG_CRYPTO_DEV_AMLOGIC_GXL_DEBUG
+@@ -90,8 +88,8 @@ struct meson_flow {
  
- 	bool begin_req;
- 	bool final_req;
-+	bool digest_req;
- 	int flow;
- };
+ /*
+  * struct meson_pdata - SoC series dependent data.
+- * @reg_descs:	offset to descriptors register
+- * @reg_status:	offset to status register
++ * @descs_reg:	offset to descriptors register
++ * @status_reg:	offset to status register
+  * @setup_desc_cnt:	number of setup descriptor to configure.
+  * @hasher_supported:	indecates whether hasher is supported.
+  * @support_192bit_key:	indicates whether platform support AES 192-bit key
+@@ -112,7 +110,6 @@ struct meson_pdata {
+  * @flow:	flow to use in next request
+  * @flow_cnt:	flow count for amlogic-crypto
+  * @dbgfs_dir:	Debugfs dentry for statistic directory
+- * @dbgfs_stats: Debugfs dentry for statistic counters
+  */
+ struct meson_dev {
+ 	void __iomem *base;
+@@ -181,7 +178,6 @@ struct meson_hasher_req_ctx {
  
+ /*
+  * struct meson_hasher_tfm_ctx - context for a hasher TFM
+- * @enginectx:		crypto_engine used by this TFM
+  * @mc:			pointer to the private data of driver handling this TFM
+  */
+ struct meson_hasher_tfm_ctx {
 -- 
 2.47.3
 
