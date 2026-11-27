@@ -1,54 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795806291;
-	b=NARiIdPWm56IM6GCyzh1T7vC4EuGd+5G0fNFfFqP+yLTCRSbOLMUs0PR2JX4hQIF0QOZ
-	 HdAzfNlR61R7z975QUjUr61wZOCTD2ZrO2xN21aUs/EKWm2bCHVyycRLwUjqiq5X8pP3R
-	 /lh4tvISAjUcrOZuLL068yJQbzY7UbuvWsaD7YUf2ba0+j8lnPSGQAMEQNSPZ2VCeqXqp
-	 e39iGnaCvO+UC9M7SzfxeClmRxKi061hELyIq2G8z4k/tsmYDlo9EEEpVhoM8DE6sjbCL
-	 2+vL4HG1ew1FWHx/aQmxWb3RmwLnjuOCgOEImvkV3mFuejG2ZemlxxkpJbkSP0Oy4kw==
+	t=1795806496;
+	b=JSnu5tfDHDUYxXeX3ubPdTrPXglXSc0iCHzegyZHHiDJaLWboCDu/BX5ZeihfwEvm+Ri
+	 hCO6tfKJCwgOFP148mJtpA7s8rOSHzPXVjWTZnkQeQvuk1uym/iY7shynz2ia0CP9Y9Ev
+	 ZxIJB01iKUd9nnb93GkfjlyyQTy9u0af+q14LJnf9YBrDUbWsL21I4twLJDW7NFJPsuw1
+	 jE9IQtrQbDlTPlt9kML/aPvm4bq7ewUvpFa/pGcxEO2e3cM5G6qHFIMToeOJRLR+lmPEq
+	 r7bZZDi4K7wjOXQsE8lFtEf5ofQeItK/7CCnbyVRRY4WwXzi+/0mQ7EyD2awambwAIQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795806291;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795806496;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=1T/hxa1T0OQ5L4RB3hNQ93dAwWEtUDesGp/ezdZTtNU=;
-	b=et6TOTd4nRJqmS9zpoLgbKAb3Rbe+jd6g39jAi9cx+Upa8JcgB2K/SbvdcOH9YiXOu44
-	 Y4lBAXOIk7KiyB/jyFfy9f6vyWJaeCBquap/J+kWJPR1KTeEcqZdcM/H/k1Croz28Isjh
-	 dmK46dlR9iq+zXb91uCJEwLnSVix1NywrWty7s2DcIznE+W+aw1Rf4rbuksc6mCQAXkdJ
-	 zcxSUFvfRkPHRjl7SDI7s2IExoQKcNBcrwlbm+3nqLKrOwyVA3K32JwwqAltYJheumUtM
-	 sogakfhY43q1TcHZiXcyQ6mykvopwGl05FGGvD55NQwJ8qelIGKMbedpwR+u4fzmq6Q==
+	bh=U3mQaDsF5KmCfpDZ9ggijBF36k70G7KWFW1BZAQojeY=;
+	b=Y5n9Hxl5EkdTUo27ZzUcx6ASfjpGIZSUdK/ohaRJ1fRMqPFaQrcCIwPsAi1o9KuML20s
+	 +JvuB7X3u4nOhDqBgDgYCqdSA239F85LD3Mt3smdFNZYCg64S5uRfzRMi//voYjz4mgiL
+	 1c1z3pIVKvHf6h/QHMZTE25mZige9HAEXD9UrKk9XTpS03QofEkS0rYsFrWGjrwFQMD6I
+	 k21C2V+heigfY/QezDbHkPrm4C4omaN4wNRMtzjBtvgoQEpyVXm9FBfQGTnN3wbvblA0X
+	 YM3ov4IHksFV9cUPJX+scEPYjVlLpwjfl3gVpPIvdnaOXGNJ7O9NXP6vxv5Iko8iC8A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oERaHfLk;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HZYC63nq;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90C3606A31C
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 19:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB861606A31E
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 19:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oERaHfLk
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E13A1F00898;
-	Fri, 27 Nov 2026 19:04:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HZYC63nq
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DEF31F00897;
+	Fri, 27 Nov 2026 19:08:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795806291;
-	bh=1T/hxa1T0OQ5L4RB3hNQ93dAwWEtUDesGp/ezdZTtNU=;
+	s=k20260515; t=1795806495;
+	bh=U3mQaDsF5KmCfpDZ9ggijBF36k70G7KWFW1BZAQojeY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oERaHfLkF4vLo0sy6Tfor+l6DUTcCV+1tmBrrFpezL1NMB/u9qSAyBBRmvR3XEON4
-	 f10t08JDMkw0gD03bZ4JaJQVSAGo9IvoortxzWJkrdHOj7Qcb7SAxf5FUT4CFPNvzl
-	 QFwexGH1i7Xn8sgIDQH11qBXZIhtjsxpNoH3vOYJfwQCwDVUSUko9SQs5k8S0wIrJB
-	 HTbM9AHcAFhQawheC3g8zB4wmChhFQ94UYvdPBxGTuFN/IGwRTVyhFeFwPOB7KWY/t
-	 QnrShAe4TI5/eUIDfD7y5tgeMpAIezHqTRJN9784baJRGhRu6DUSWt1UoeQl9/dDIz
-	 70IPI+ZiAyeww==
-Date: Fri, 27 Nov 2026 11:04:48 -0800
+	b=HZYC63nqLCjdoR+tjHIGnTjBWn6baeS/NeyI9nVHLJHCovMU6koQGgrJzYe8mCLaW
+	 IvDFGjyNvJ+DH5pe16rC1s3toWzAq9gLL/CL97A/xtNQzvpY0H4FDSov/a4Gf6+8Ck
+	 NFUfdYD7KjaPAvVfvZQiBnfN875f7Us2zx0mi3ioE28Naa7Ooqgji0qYj4Ur3IBs89
+	 /dxM3s6sXLX/6hhg7KRa74PIwmryBropUsHs3jw13d+PXEb0TvKsNA0DuX1WO878T8
+	 Y3FCwaDcajaNZ2ogI/rx9F1o4PTIm4G7Dq0spevCzDGP9Z8j+Bk9nKFsBWHSVLQg+Y
+	 fRCzy12I882oA==
+Date: Fri, 27 Nov 2026 11:08:12 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org
-Subject: Re: [PATCH] lib/crypto: x86/sha512-ssse3: Roll up rounds and reduce
- stack usage
-Message-ID: <20261127190448.GA8300@quark>
-References: <20261125043159.192004-1-ebiggers@kernel.org>
+To: Qingfang Deng <qingfang.deng@linux.dev>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] lib/crypto: arm64/ghash: Aggregate 4 blocks per loop
+Message-ID: <20261127190812.GB8300@quark>
+References: <20261123095409.2518-1-qingfang.deng@linux.dev>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,39 +61,46 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261125043159.192004-1-ebiggers@kernel.org>
+In-Reply-To: <20261123095409.2518-1-qingfang.deng@linux.dev>
 
-On Tue, Nov 24, 2026 at 08:31:59PM -0800, Eric Biggers wrote:
-> Currently, sha512_transform_ssse3() unrolls all 80 SHA-512 rounds,
-> producing 13.4 KB of text.  It also stores all 80 message schedule words
-> in a 640-byte stack buffer, which wasn't being zeroized on exit either.
+On Mon, Nov 23, 2026 at 05:53:55PM +0800, Qingfang Deng wrote:
+> The byte-PMULL GHASH implementation reconstructs and reduces a field
+> product for every input block. Aggregate four blocks using precomputed
+> powers of the hash key, which the ARM64 CE version already uses:
 > 
-> Shrink both of these to more reasonable sizes (4.7 KB of text, and a
-> 136-byte stack buffer that's zeroized on exit) by doing rounds 14
-> through 77 in a loop that does 4 iterations of 16 rounds each, and by
-> using a circular buffer to hold the message schedule words.
+>   (Y ^ X1) * H^4 ^ X2 * H^3 ^ X3 * H^2 ^ X4 * H
 > 
-> The circular buffer works well because each message schedule word in
-> SHA-512 is computed only from words in the last 16 words.  The number of
-> rounds per iteration is set to 16 to match the circular buffer size.
-> (It's also a multiple of 8, which is how often the state cycles around.)
+> Split each polynomial multiplication into 32-bit Karatsuba products,
+> pair them in SIMD lanes and accumulate them before reconstruction.
+> Reconstruct three 128-bit products and perform one Montgomery reduction
+> for the group. Use three byte PMULL instructions with 0xc2 for reduction
+> modulo x^128 + x^127 + x^126 + x^121 + 1.
 > 
-> The message schedule could also be stored in XMM registers, but that
-> approach was found to add additional overhead on older CPUs.
+> Retain the low and high halves of H^4 through H, and their XORs, in
+> x4-x15. Use x16-x17 to construct the inner 32-bit cross operands while
+> independent SIMD products retire. Prepare each next key operand in
+> v9-v11. This avoids an expanded table of key rotations and needs no
+> register spills. Use the existing single-block pmull_ghash_update_p8
+> helper for tails.
 > 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
+> Compare the single-block and this four-block path in the same userspace
+> harness on a Cortex-A53 at 1.2 GHz. Median throughput in Gbit/s:
 > 
-> This is an alternative to the series
-> https://lore.kernel.org/linux-crypto/20261122022030.296468-1-ebiggers@kernel.org/
-> It does 16 rounds per iteration instead of 8, and it replaces the huge
-> on-stack buffer with a circular buffer instead of with XMM registers.
-> This hopefully avoids any measurable regression on older CPUs, while
-> still achieving the two main cleanups.
+>   Bytes   Baseline   4-block
+>      16   0.850016   0.844973
+>      64   1.015665   1.723762
+>    1440   1.081407   1.968001
+>   16384   1.085286   2.032019
+>   65536   1.083460   2.025681
 > 
->  lib/crypto/x86/sha512-ssse3-asm.S | 157 +++++++++++++++++-------------
->  1 file changed, 92 insertions(+), 65 deletions(-)
+> The four-block loop uses 296 instructions, and reaches about 0.980
+> instructions per cycle in 64 KiB measurements on Cortex-A53.
+> 
+> Assisted-by: LLM
+> Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
+Thanks.  I'd like to wait a bit before taking this, since this will
+likely change when the arm64 AES-GCM code is migrated into lib/crypto/.
+I am doing x86 first, but I'll look at arm64 afterwards.
 
 - Eric
