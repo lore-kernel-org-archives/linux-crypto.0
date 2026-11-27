@@ -1,59 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795756491;
-	b=Yjqa97PTPa/hG/UkUKiv0yBjgVnCTtYm3SO261Kvz+9QTB3yPbf5Rp9HuM+aZXHAFae2
-	 wJfsqB9qjPHqpX5wTgJduZYevAkxNB/W7bzR1BxJXa2QMuAsfhjOc5PhRxDTEudpL+B6G
-	 DoNalu7JMBnNlhWWxRq/yYpW7/04kdpFakFXg8yM3tfEXzXb43wzIsWd7Av52kvkZPcDW
-	 Cv+PeNzASfIBfsTYZ9LKKV18k/O3wz7aEgtTuHIdzax6dIysWg0REqEWISbTfs6hleZQY
-	 ttTeP8u0tE5QLcRLV2QDg/iqS+oQ54HKHsLM+Zw+BJUwSv70NM4B0flXD1767RO6AcA==
+	t=1795756535;
+	b=NTYLnOZEOevgWSsS4Bx7NK3w53uUENnmgRMWb45ehZ6gtcqKJumkRPiQSHfECGpCB4NA
+	 qt646GNg1ZUiSHLkpGp8wjgXxOfoJIAjm9MINnRP4TnxUzgNTucd3ypT7CDrspqsyH71N
+	 60OyHulZpuc0FZqoyNtU8Vvo3Ci5wNZCqftrTMSdEt8WMVZADHfcsQaT98Q8LZpaOxGol
+	 mtgkTuk01eF2jKix2fPsYJ6UG3EFV0blITCEYvLcu1ovKVsbdmUvsl4iXZ8Ta8tUz0UJQ
+	 TfrSUQ9Khhz0gGSaApp6WelkNHC1HkvCUtRuV4nZ30Z1kpdEpvVo8WU/9pHiJhYj84A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795756491;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795756535;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=omQSExyjblpav3jdjGrCL54hGkIUAafVlLZHRvTCxIw=;
-	b=pkD5yto9VxNWT4mGb+D303bUWtosBO5OXLgRVBD/bsDCY2iopj+j7gQUrdT1QDSeFwn+
-	 HWyg7guVcSvKLUFJbh+0djASXQ5OMIVP8osj9Hcje+SNMa9Rf5hvCKqbEE8UGto18xV55
-	 397avrhKCVshFb/alIfThuoXYjC3pDOacF+uAXkCObw/uyhetXo5Ti16kerLibUMyoryD
-	 kZLd2RrMQILy6Vcrn5CBFquy4SMFvBhOPpA+pEZDpH5slFvgrrYPaKj/lZzEQ6RSu0Dy8
-	 74o9zXY5wVnmTgbhwK6JSfK5G86Zw8CnIJh8RC24NJuJSkTgzbyOKg/19Gb9mLY2rEQ==
+	bh=vSQw0tXm6EOBMEdw8HTkWdIkd+IFqukqq1+LECzKtek=;
+	b=AYYmopk7uEcTQ1qjKsiPFxXC8YDCMAEHiPlK6HDXT9hjthfUQuZnf5mUgtkPGHD8CT2g
+	 KciHHu5+BTycHzEE/OCn7Q4XD58hFhDi08cJCSAmXE5mAO0zDPqaNQFzu0lC+powCYx6g
+	 ZVtdCGW5h4QQ/AQZs3HnimgrsYiLG2/Y0onNrP4aCvaqfmE8Ua21txvodnjB0liaChwk1
+	 dx1FIkGY//PmbHmKm6eMtuHl6b2KGg5xkEhXQPDpUTChchbepHdmf0fi50NCmgmnLWUCd
+	 8C3XBTOdzcCwE0UK9REbyHjyIw49SH1rWhbsN68Lc8MaKhvP5hN6OdcvVkBSF1UTnJw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=TC+TnxjH;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=bJ8XuwB9;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB18B606A31E
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 05:14:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CB18B606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4895A606A31C;
+	Fri, 27 Nov 2026 05:15:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4895A606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=TC+TnxjH
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=bJ8XuwB9
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=omQSExyjblpav3jdjGrCL54hGkIUAafVlLZHRvTCxIw=; 
-	b=TC+TnxjHOk3bx+n88WLjfL9gx++EL0mE3TRstLmuiiT46ASdJXaM1RE/c1bfLGoiXJ3czmIyM0J
-	AiwSgl9yYUlYPHC668FXh0rKrTOHrYiKumgwq9VZrv1kVl6da2C49VIqwt/zwkk2acg2ol2CueWaX
-	KnrM8arPlvN+ABiMb0RylOwcLKAAt4ihC9tFGuqKDyOKvNaHs4z0gCDc3bDP5gHK2Ibm8eocL8Z1C
-	AOAXUlS/GGt2DmiCNUYGU31uJtHnCM2VGNMwwP23V1aufqfBB1PBhGhU4v2J2CxuuBPOM3xPg/Z5f
-	D5Ziignw6LuI62FF4I+XR+80l9HCE+CNVR+w==;
+	from:content-type:reply-to; bh=vSQw0tXm6EOBMEdw8HTkWdIkd+IFqukqq1+LECzKtek=; 
+	b=bJ8XuwB92RigT5KWxwn4TkU7SRThrvWvSF89w8wkMAm/BknRJnB2jktc0xxGTHp0fyAOxRH6COL
+	GVwclTp0Jn1v9ovcIWacKDOUbfkQuY0n/rcOw+L+BlpOOU1TMYsdlwaYCVqM56LVqvWHneT8kmjyz
+	I3QsmWyX0a+IqRpvqTLqzG81VXXOnLOOtm/XyIBmNQdnY9lW3malbD9yWi/kO3syw7x3oCZqioHhc
+	QkNSrtpodewVrXpYhOApRzKNv0j6kdn14jUUa34/H3fqIffkYH3SqIfbvHC26JCbSJSPE6iIgUqEx
+	kgBI72wF1x268y9j/QjBSgoaUcq3Wp6FoJIg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xWoII-00000002VVF-2pSM;
-	Fri, 27 Nov 2026 13:14:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:14:46 +0800
-Date: Fri, 27 Nov 2026 13:14:46 +0800
+	id 1xWoJ1-00000002VVk-0ICQ;
+	Fri, 27 Nov 2026 13:15:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:15:31 +0800
+Date: Fri, 27 Nov 2026 13:15:31 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Haoxiang Li <haoxiang_li2024@163.com>
-Subject: Re: [PATCH] crypto: hifn_795x - Remove the hifn_795x driver
-Message-ID: <awkRxg6r38x0xSYg@gondor.apana.org.au>
-References: <20261119033926.17527-1-ebiggers@kernel.org>
+To: Sebastian Krzyszkowiak <sebastian.krzyszkowiak@puri.sm>
+Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Sahil Malhotra <sahil.malhotra@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>, kernel@puri.sm,
+	linux-crypto@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: caam - handle empty message in ahash_finup_first
+Message-ID: <awkR86kDmeYENeva@gondor.apana.org.au>
+References: <20261120-caam-empty-v1-1-d82106209428@puri.sm>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -65,59 +69,45 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261119033926.17527-1-ebiggers@kernel.org>
+In-Reply-To: <20261120-caam-empty-v1-1-d82106209428@puri.sm>
 
-On Wed, Nov 18, 2026 at 07:39:26PM -0800, Eric Biggers wrote:
-> Remove the hifn_795x driver, for many reasons:
+On Fri, Nov 20, 2026 at 12:59:57AM +0100, Sebastian Krzyszkowiak wrote:
+> Since commit 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in API"),
+> crypto_ahash_final calls crypto_ahash_finup with req->nbytes == 0.
+> This leads to an oops on an empty message to hash when ahash_edesc_add_src
+> calls sg_dma_address(req->src) if the caller passes NULL as req->src:
 > 
-> - It supported only obsolete, early 2000s PCI chips; only legacy
->   algorithms (DES, 3DES, AES in ECB and CBC modes); and only
->   !ARCH_DMA_ADDR_T_64BIT kernels (e.g., no 64-bit or PAE/LPAE kernels).
+>     Unable to handle kernel NULL pointer dereference at virtual
+>     address 0000000000000010
+>     Call trace:
+>      ahash_edesc_add_src+0x40/0x390 (P)
+>      ahash_digest+0xcc/0x250
+>      ahash_finup_first+0x18/0x30
+>      ahash_finup+0x24/0x38
+>      ahash_do_req_chain+0xc0/0x1b0
+>      crypto_ahash_finup+0x168/0x200
+>      hash_recvmsg+0xb0/0x1f0 [algif_hash]
 > 
-> - The last commit tested on hardware was in 2008.  Every commit since
->   then has been an API migration, cleanup, build fix, or static checker
->   fix.  It's clear that no one actually uses it.
+> It can be reproduced on i.MX 8M Quad with the following Python snippet:
 > 
-> - The only defconfig that enables it is ppc6xx_defconfig, which is a
->   big-endian platform where the driver is completely broken (as it has
->   an undeclared little-endian assumption).
+>     import socket
+>     s = socket.socket(socket.AF_ALG, socket.SOCK_SEQPACKET, 0)
+>     s.bind(("hash", "sha256"))
+>     op, _ = s.accept()
+>     print(op.recv(32).hex())
 > 
-> - It has a large number of bugs, and there's no chance that it passes
->   the crypto self-tests.  For example:
+> The oops was observed being triggered by iwd.
 > 
->     - Streaming DMA mappings are never unmapped.  Every crypto operation
->       leaks DMA mappings.  Pages can be leaked on error as well.
+> ahash_finup_first runs only when nothing has been hashed yet, so handle
+> the empty-message case by routing it to ahash_final_no_ctx.
 > 
->     - Scatterlists are walked using raw pointer arithmetic, breaking
->       chained scatterlists.  The scatterlist element coalescing logic is
->       also buggy and can generate corrupted destination DMA descriptors.
-> 
->     - It BUG()s if passed more than PAGE_SIZE of misaligned data.
-> 
->     - hifn_rng_data_present() has inverted logic: it reports data as
->       being ready before the required delay has elapsed.
-> 
->     - ecb(aes) and cbc(aes) fail to validate the AES key length.
-> 
->     - cbc(des3_ede) considers the IV to be 24 bytes rather than 8.
-> 
->     - DES weak key checks are run on AES keys.
-> 
->     - All algorithms fail to reject non-block-multiple lengths.
-> 
->     - All CBC algorithms fail to return the next IV.
-> 
-> And of course, AI tools can easily find these issues in this unused and
-> untested code, resulting in pointless fixes.  Just remove it instead.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> Fixes: 9d7a0ab1c753 ("crypto: ahash - Handle partial blocks in API")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sebastian Krzyszkowiak <sebastian.krzyszkowiak@puri.sm>
 > ---
->  arch/powerpc/configs/ppc6xx_defconfig |    2 -
->  drivers/crypto/Kconfig                |   17 -
->  drivers/crypto/Makefile               |    1 -
->  drivers/crypto/hifn_795x.c            | 2560 -------------------------
->  4 files changed, 2580 deletions(-)
->  delete mode 100644 drivers/crypto/hifn_795x.c
+>  drivers/crypto/caam/caamalg_qi2.c | 3 +++
+>  drivers/crypto/caam/caamhash.c    | 3 +++
+>  2 files changed, 6 insertions(+)
 
 Patch applied.  Thanks.
 -- 
