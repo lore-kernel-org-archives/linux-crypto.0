@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795807896;
-	b=Bpo17JD+026T7U9+mUVyyUrvJN758oFtyJZV5ptnLCxPMg2V00Q8uHxWKJMwJV5cHab4
-	 7EDRl5G0aGiBsSnnhSiTi2fUnd/qPqTfBGh+SGezqK76sp9ZoWsmVVG/k0QC1DY+0mOv8
-	 qhUV1wWnmSkVB+961uBEPO8jvTQfDKXzKtKFB+nFZM8EP0Gm3YsNpRglIV1zevlSin2Lr
-	 Li6q0KMHVWuMr6LuGFlG8BXF55CYtV+LQffTD7liprRrdQsvsmVWqil/Xbf69us5HmbIc
-	 +RfSanPatndjXr6461dE+rZ8WzpdeI5U7ubeTYnHAjsSQIbikepVequZNoW5pp4C1pg==
+	t=1795812243;
+	b=yg+K8F7Y0qJZQlpgbOmVH9GmrsOXlrr/iDCPHWhVJkXpeDrM87zEsxmUuVDj0d8N9fe1
+	 9AJYGSxN8cozSuwht9JX8Rc/Yx6r9UHOx1a1DdYVJ2zsu48UKIAsLUGj/7BfHMMr+S2JX
+	 N6SqKu+cArVhe5aZnRZ8RhGlp+drly0vU19pF5RMBoZ6fjw/dEGVZQdK9NnhZRVq+oGC0
+	 aON5DHCIF6rk+WM5SLk+4lVJVGZ3yJ6PHXwA6cq2J+UHiG6lhu9wqZtudMyH2mgI8czc6
+	 An7GoW1GbrvAgij+79/ea9IbxDs9L1I4rRcQsiKc+nOw2PnaywnfLu7z8CpMh8z5ykA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795807896;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795812243;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=FHm7smnuLcPbXOnsOL9bzFTWbe21BP4HbT3iZXqu3Z4=;
-	b=rsEPe2ebT/THFixc6vMaGT5ZNoOwwuIFZcxPVCSjRY+tw9ddwTWW7wKIO92S0CbNeyjh
-	 Tfk81YN4quBNHmQXesxoyQrbWFzDLvJWDlS6LL7aRRa8PoyOJS9ai3loYPOCTzPLsx22Q
-	 b3uHaIKc4F4b1d4gc40ES+qi8kKxYmQ+O503Gpu3yPDAxmdK+ku/onmBakWc1IGS6NFWz
-	 Yr0fHart2wAa6Byhwv+fwWVotNxhpH4pkP+OLk3GuhzhqcHpRL0auMfysqoW5WYoBl+8E
-	 hJrqxfvOgONR5xqimMqWx/eZDFoCPzriVuZWDV3LSoHLPI3FAwhV1whlmAsyL+IA6kw==
+	bh=ZBHkKQincwwB272MrdNqAk8PnfXID8CFl6lizGEkOSc=;
+	b=QK+/liET9W4fpkwu306nFA4MB22senB3msNvezB0j1ErEffkb8hEHt7A2cFzvpk6FvUY
+	 mh9YzoF3MXm1lVZZFQqXxEZQHgQClMtnO+Zuc/KoOUgPx31j5mPOXsgXDLcNMlO/7dwLt
+	 3RvXLrpBlz5dAbHrj5nZ2UQT1k4VXpiYkUfXpqE1fUGzURf4RRrN4oYA83Pdak9xrZNlF
+	 o94dLxVouhWA1ckkHBEfwLBVXBoxj5wothsBesuLZf2odl/IFq6f3bOKJWfs4Zj25tD2F
+	 n+YCWe9rEPtsBiZgHzp3fJ/E10nW6HJtja4WVUH6+VjAQLJb/sjycmlkB+Zcx5j8U4g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hmfHF8HW;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FX6Eud+x;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDFA606A31C;
-	Fri, 27 Nov 2026 19:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 7F7C5606A31C;
+	Fri, 27 Nov 2026 20:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hmfHF8HW
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADF6B1F00893;
-	Fri, 27 Nov 2026 19:31:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FX6Eud+x
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 8E0611F00897;
+	Fri, 27 Nov 2026 20:44:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795807896;
-	bh=FHm7smnuLcPbXOnsOL9bzFTWbe21BP4HbT3iZXqu3Z4=;
+	s=k20260515; t=1795812243;
+	bh=ZBHkKQincwwB272MrdNqAk8PnfXID8CFl6lizGEkOSc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hmfHF8HWqGe9fllK3m+JO8EXWm/LlKZRc9dNB9YqTNuggAx0G8a+Jj92V8Br5uMBM
-	 4GbLWKMkZX56Q9MNagn3luHmpx8DRomhIUaccCA5bYwVDNW7H3I0fIP3X2DiCXVke1
-	 feG0pkah19v53e+ijbWKvejGyFD7stt1D7yIlVpTqkC7iGpNLbdXVqm2PZhPFufYWI
-	 hr3LVPJhflalZ9baVdkgJ7CY0JgGdrJWiWBrTok18WJ4tTr24i9TJdLp9mcWeKNl2G
-	 +5du+ascO34JTp+ITfMPe5cpMVHQMsGSZOSfSp5DLq2b8kw3xOdAs98HkY4Jysh8zQ
-	 MLxSpvwVm0dLQ==
-Date: Fri, 27 Nov 2026 11:31:33 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Jarkko Sakkinen <jarkko@kernel.org>
+	b=FX6Eud+x4+J1YgI2GxXH6bhpsoOPDPbHKjKgzvmwL2uRtf+rl+aMF3Zcbl1+pY3rb
+	 4h1awcWBTTsiNpH5gB/i9EPZ2iXMZkQ1AMvirq1k11xGlRtDLuEHPO1QxHSOcnfW5U
+	 +eEbPHkD047zlQGpo8Rbu3XnctIR7uhaVFLAjSoM9CGTl0fq+je/4WKHDaDYx+obfz
+	 1VmiY7EzSu2xuCAiPLXAOrCMlcq8o50q4+ZMe1+djt3riYyyFDKQOfM9P4Y94Q/JMn
+	 xXzuG5OrbRp/lpanG7u84TK1QFj34aZT3SyfnyT03GK1bupzpkFuPPhPoI1H9mEdoV
+	 4ACu+QJO0Uuqg==
+Date: Fri, 27 Nov 2026 22:43:59 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
 Cc: keyrings@vger.kernel.org, dm-devel@lists.linux.dev,
 	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -73,8 +73,9 @@ Cc: keyrings@vger.kernel.org, dm-devel@lists.linux.dev,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Sumit Garg <sumit.garg@kernel.org>
 Subject: Re: [PATCH v5 00/17] KEYS: trusted: asymmetric keys
-Message-ID: <20261127193133.GE8300@quark>
+Message-ID: <awnrj-s1qL0Bw0nI@kernel.org>
 References: <20261127055602.2357884-1-jarkko@kernel.org>
+ <20261127193133.GE8300@quark>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -86,36 +87,80 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261127055602.2357884-1-jarkko@kernel.org>
+In-Reply-To: <20261127193133.GE8300@quark>
 
-On Fri, Nov 27, 2026 at 07:55:45AM +0200, Jarkko Sakkinen wrote:
-> OVERVIEW
-> ========
+On Fri, Nov 27, 2026 at 11:31:33AM -0800, Eric Biggers wrote:
+> On Fri, Nov 27, 2026 at 07:55:45AM +0200, Jarkko Sakkinen wrote:
+> > OVERVIEW
+> > ========
+> > 
+> > Extend TPM 2.0 trusted keys to load ASN.1 TPMKey [1] asymmetric keys
+> > (OID_TPMLoadableKey, 2.23.133.10.1.3) and expose keyctl pkey-operations
+> > directly on key_type_trusted. In addition there are some TPMKey
+> > interoperability fixes.
+> > 
+> > I.e. this my old series with a twist: instead of introducing a separate
+> > subtype for asymmetric keys, factor out pkey-operations into a separate
+> > CONFIG_KEYCTL_PKEY-feature, and wire asymmetric operations to
+> > key_type_trusted.
+> > 
+> > This work was originally derived from [3], is direct offspring of [2],
+> > and folds in the prerequisite tpm2-sessions and tpm-buf cleanups from
+> > [4].
+> > 
+> > [1] https://www.hansenpartnership.com/draft-bottomley-tpm2-keys.html
+> > [2] https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
+> > [3] https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
+> > [4] https://lore.kernel.org/linux-integrity/20261116005105.1573016-1-jarkko@kernel.org/
 > 
-> Extend TPM 2.0 trusted keys to load ASN.1 TPMKey [1] asymmetric keys
-> (OID_TPMLoadableKey, 2.23.133.10.1.3) and expose keyctl pkey-operations
-> directly on key_type_trusted. In addition there are some TPMKey
-> interoperability fixes.
+> Could you describe the motivation for these changes here?  And also
+> include more context directly, for people who aren't already familiar
+> with all the earlier patches linked to above.
 > 
-> I.e. this my old series with a twist: instead of introducing a separate
-> subtype for asymmetric keys, factor out pkey-operations into a separate
-> CONFIG_KEYCTL_PKEY-feature, and wire asymmetric operations to
-> key_type_trusted.
-> 
-> This work was originally derived from [3], is direct offspring of [2],
-> and folds in the prerequisite tpm2-sessions and tpm-buf cleanups from
-> [4].
-> 
-> [1] https://www.hansenpartnership.com/draft-bottomley-tpm2-keys.html
-> [2] https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
-> [3] https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
-> [4] https://lore.kernel.org/linux-integrity/20261116005105.1573016-1-jarkko@kernel.org/
+> Also, this series is missing a base-commit, and I don't know how to
+> apply it for review.
 
-Could you describe the motivation for these changes here?  And also
-include more context directly, for people who aren't already familiar
-with all the earlier patches linked to above.
+Sure, I'll do that if this moves forward.
 
-Also, this series is missing a base-commit, and I don't know how to
-apply it for review.
+The feature allows to provision an external key so that private portion
+is secured by TPM, and used for e.g., signing and authentication. One
+example of a program that might use this is iwd.
 
-- Eric
+First, a parent is needed.
+
+0x40000001 (Owner) primary following TCG H-2 ECC P-256 template:
+
+	tpm2_createprimary -C o -g sha256 -G ecc256:null:aes128cfb \
+      		-a "fixedtpm|fixedparent|sensitivedataorigin|userwithauth|noda|restricted|decrypt" \
+      		-c primary.ctx
+
+    	tpm2_import -C primary.ctx -G ecc -i key.pem -u key.pub -r key.priv
+    	tpm2_encodeobject -C primary.ctx -u key.pub -r key.priv -o key.tpm.pem
+    	tpm2_flushcontext primary.ctx
+	
+Alternatively, a persistent handle can be used. This follows TPMKey
+specification recommendations.
+
+Then external key can be imported an used as follows:
+
+	openssl ecparam -name prime256v1 -genkey -noout -out key.pem
+    	openssl pkey -in key.pem -pubout -out pub.pem
+ 	openssl asn1parse -in key.tpm.pem -out key.tpm.der -noout
+    	HEX=$(xxd -p -c 0 key.tpm.der)
+    	TPM_KEY=$(keyctl add trusted tpm-key "load $HEX" @u)
+    	keyctl pkey_query "$TPM_KEY" 0 enc=x962 hash=sha256
+
+	echo "secret sauce" > plain.txt
+	openssl dgst -sha256 -binary -out plain.sha256 plain.txt
+	keyctl pkey_sign "$TPM_KEY" 0 plain.sha256 enc=x962 hash=sha256 > plain.sig
+
+> 
+> - Eric
+
+Another document that is source for what should be supported is:
+
+https://datatracker.ietf.org/doc/draft-woodhouse-cert-best-practice/
+
+Althought, I'm not sure how relevant this is anymore.
+
+Br, Jarkko
