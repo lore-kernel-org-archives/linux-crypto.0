@@ -1,69 +1,64 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795754847;
-	b=VJgmGWPsYjEEAXgYSfajC0z7VI/JhcZe4Z/8tk+wQ9sI/OgqveyEt698IwqD73W0Ek+F
-	 lMRnU8Q6KuqKwk0Ct6p51xM3XQDXy1HZjzW2nsX4Dd/Y8S95hXnqz6JzTbjB3CAjgSfZ4
-	 8YxRMTKdSvDswXQTgKCO6d4++FSedKR3MrP7pNQ9+ZknP/k1Ydl+m9932XjIBmiAybz6p
-	 d7NieXVNzmGWijfy2fBKH2W/7j3cPo4H00Z2gfRP921W7cIl4ziAlVsOQ6mNMzFY9UY1l
-	 xaW5f41qfryuDOvXZhpsdxxnwalM8ZuwX3M1/UmOqPbFs1C2gW6dh3s8B32I7Tq6/Ag==
+	t=1795756109;
+	b=pDAS9tuSJfyD2B7CKZVvuSyNALXpS0Ey7frr/w+s/gE2G+S541bRZEMv5GnWbJ8cX4ou
+	 9mWLhrjjGvffMrubHamMwp7A82mnhcX+xSjoGcOezZZ9ZfIwlgjjyItCr7eiVy6KE4xz/
+	 jiQSuovyhxd8JMI4dsd66KbXZts4wqGXFJs24bowUPW/Lcyh2oNAyECKBLn6rTdfnlBAe
+	 mfvjwck250uBAz2baSeWIzZ41H6fP/6d6BvhBUblfc8SR4u1+GEfQEHqxlPvB0MC2Qsod
+	 eZTbfr5c89lFeN5X8Zji+kRRQjRm0kuWEwsggpfcnhYB+XTGZkoUdAu9ByH7f6m/aEg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795754847;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795756109;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=cLk6wMlnDdE3g4ZXcc50MUMtekz7+zCR2k+er2JNUzc=;
-	b=U0xfg2yG+R8Rn6MF7GtlJMVBUy9IiA3Ehklnly+sn9nf/psPa3NZL13tM1bdlQCJdYE7
-	 Z6IA4kOAHAa/3DuxlQ+oWUQAkL4GWYhdmGeaU/lHzRpX0UA8fRZvdDa8l/wIHPOcV3Xcr
-	 Vn0IdJM6NyyUo7nf4Kqt/igTDE5IgxAlI41S2Fq272VzZx20JmlzGE8fuJLwXlnjOMZp/
-	 dSkggF0I0UgF+uyjqMeGSYTgugbyj3TQRvdmBYzoUTJFmjCuWxYAxkwAKA77U+nCA/Spe
-	 CX+7gQdunAjr3VJwNV/CzghQ+9pS2wTmG5sGCRgYqrFegWxNlSJAFYSXDiKp4Yag1QQ==
+	bh=UKR5FaDeokUtzqpD6yvK+6cnIUfybqlAH/9fh9CVSIs=;
+	b=xiR09YrXFSyJY7iZ0oqoQfCIMFy6SzWRlihxs21SdXEBl6/T2cWOMUV/LzqBWyDhYSJW
+	 31gzWTLDnrN+cGIjiLhPI+601mFeJgtqIhVIsW6BzfW2sMP70Oa4I7ln2uGBLg9vCR7n3
+	 9uwkjKnBZzeaF/768SRn7/1qd3n13HeNgL8xUtNVJoNLyvvwwae0Fdd1b+s/KsASSYpAK
+	 GHhXJRb3zzauvwfCxuQpMIDKS5yU0xZ/CQaoOtninMGHNKuDRMYrSSMCFjNO3v2eh6hQg
+	 dbogSV15wzAwyY08QxUvQ4vGuNpcwY+IunL9s80OxZCGruvhgbmOwrd8EeZN2L4xJvw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=i83K4lDS;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=cveQXNjG;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA197606A32F;
-	Fri, 27 Nov 2026 04:47:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DA197606A32F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A14B606A31C;
+	Fri, 27 Nov 2026 05:08:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4A14B606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=i83K4lDS
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=cveQXNjG
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=cLk6wMlnDdE3g4ZXcc50MUMtekz7+zCR2k+er2JNUzc=; 
-	b=i83K4lDSWMooFqiBxnncDmx78GZ/PzPOZJAqpV4wgyKlGS/tzOldIl990PmZM+MrsFv1f0R7GWT
-	M2VYgDwPh9lDA1l1Ze+wVll83vVC892+4lbdlQWPo7i2XUqumFRZY+Y1KvC73Uy9SM0LQ+mJDm7Gg
-	uecgOyjpAwpOotCjIg6YzZxZ/FEhDfp4nJlIJmzPn/WzxIF75EVjEXn72mdh6G1g+r0FDlHQZV38l
-	rR1uE93FhI25kINoqFIhXtPHrXAYwETl1LEjmuoO5+90fWBs8fSAJuX5+cqrRCBznoofYqt5RdYat
-	erYdybmUDOXZUhrAU1mHv10PCn8NnUIaq0cQ==;
+	from:content-type:reply-to; bh=UKR5FaDeokUtzqpD6yvK+6cnIUfybqlAH/9fh9CVSIs=; 
+	b=cveQXNjGlW9sKbl8G/O1LrJFlFqXbrpgZFAXhpZPO2DeabLdiVyXKjlBXLlpfdIMlqFargGxRW/
+	nzCDoc7P/gPELWKyPIKKbBjjq/iHEDyZNCMQoJCyvIRveTC8O13YnJu1dKPayXppyQMmclAFvZhrT
+	tMyI7l2OyHsFaH+n9ojhu9Ub/El8hrUze4IKReOLNL3mSikPmIJqKMJo7MKIl+M/YY1XwieT4+Ht5
+	qSPCmAjwvPOklOfWzxfJA0mSeVhNSiKnULuOVe2H+KIsq7/18xvk/L0O4Q1fFZkernvB+/64xNWAv
+	fgL+SbesWn1w0f9Y8SxpcEBfRP+eD/NOjXYw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xWnrY-00000002VG0-2kCJ;
-	Fri, 27 Nov 2026 12:47:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 12:47:08 +0800
-Date: Fri, 27 Nov 2026 12:47:08 +0800
+	id 1xWoC6-00000002VRj-14yk;
+	Fri, 27 Nov 2026 13:08:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:08:22 +0800
+Date: Fri, 27 Nov 2026 13:08:22 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: hang.suan.wang@altera.com
-Cc: Dinh Nguyen <dinguyen@kernel.org>, linux-kernel@vger.kernel.org,
-	Olivia Mackall <olivia@selenic.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Frank Li <Frank.Li@nxp.com>,
-	Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>,
-	linux-crypto@vger.kernel.org,
-	muhammad.nazim.amirul.nazle.asmade@altera.com,
-	tze.yee.ng@altera.com, chee.nouk.phoon@altera.com,
-	genevieve.chan@altera.com, adrian.ho.yin.ng@altera.com
-Subject: Re: [PATCH v1 0/2] Add FCS Random Number Generator (RNG) driver
-Message-ID: <awkLTH9XLvWLBjdJ@gondor.apana.org.au>
-References: <cover.1795167624.git.hang.suan.wang@altera.com>
+To: "Pratik R. Sampat" <prsampat@amd.com>
+Cc: mcgrof@kernel.org, russ.weight@linux.dev, dakr@kernel.org,
+	ashish.kalra@amd.com, thomas.lendacky@amd.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	gregkh@linuxfoundation.org, rafael@kernel.org, chao.gao@intel.com,
+	aik@amd.com, tycho@kernel.org, nikunj@amd.com, michael.roth@amd.com,
+	shansinha@google.com
+Subject: Re: [Patch v6 0/7] Implement SNP live firmware update support
+Message-ID: <awkQRptZv79Gsurn@gondor.apana.org.au>
+References: <cover.1794531772.git.prsampat@amd.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -75,112 +70,190 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1795167624.git.hang.suan.wang@altera.com>
+In-Reply-To: <cover.1794531772.git.prsampat@amd.com>
 
-On Fri, Nov 20, 2026 at 01:51:31AM -0800, hang.suan.wang@altera.com wrote:
-> From: Hang Suan Wang <hang.suan.wang@altera.com>
+On Fri, Nov 13, 2026 at 05:31:53PM +0000, Pratik R. Sampat wrote:
+> Introducing support for live update on AMD SEV-SNP platforms via
+> DOWNLOAD_FIRMWARE_EX.
 > 
-> This series adds a hw_random front-end for the random-number service of
-> the Altera SoCFPGA Crypto Service (FCS).
+> This patchset is an extension of the RFC patchset from Tycho
+> Andersen.
 > 
-> The driver owns no session or service-layer state: every request goes
-> through the FCS core, which serializes access to the SDM crypto session
-> and forwards it to the SDM through ATF.
+> This series also fronts firmware_loader patches from Dan Williams[1]
+> which majorly cleans up refcount issues so that registering the upload
+> interface no longer pins the module. Without which having live firmware
+> update will cause failure to reload the ccp module as well as break
+> kexec.
 > 
-> The SDM is the hardware security controller in Altera SoCFPGA devices. Host
-> software reaches it through the existing stratix10-svc mailbox, which uses
-> Arm Trusted Firmware SIP SMC calls.
+> Patches based on cryptodev-2.6
 > 
-> The Agilex FPGA series generator is an SP 800-90A compliant DRNG hardware
-> block in the SDM, in particular, Agilex 7 is SP 800-90A compliant DRBG
-> generation flow and is seeded with the TRNG hardware block.
+> v6:
+> * Since "crypto: ccp - Make usage of sev_cmd_mutex more granular" is
+>   merged, __sev_do_snp_platform_status() takes sev_cmd_mutex itself, so
+>   calling it from snp_get_platform_data() with the mutex held would
+>   deadlock. Instead, stage the SNP_PLATFORM_STATUS output through a page
+>   from __snp_alloc_firmware_pages() and issue the command directly, the
+>   same way as SNP_FEATURE_INFO.
+> * Refresh the cached platform data before re-initializing the legacy
+>   platform, under the same hold of sev_cmd_mutex as the update
+>   itself - Sashiko
+>   This ensures that:
+>     * __sev_platform_init_locked() logs the new firmware version rather
+>       than the stale pre-update one.
+>     * There is no unlocked window in which concurrent callers can see
+>       stale platform data, or in which a legacy guest launch can move
+>       the platform to WORKING before the refresh caches that state,
+>       which would make every later legacy SEV INIT fail.
 > 
-> Unlike existing hw_random drivers, this RNG produces data only while an
-> SDM crypto session is open (for example, via FCS_IOC_OPEN_SESSION on
-> /dev/socfpga-fcs). The session belongs to the file that opened it, not
-> to this driver. With no session open, socfpga_fcs_core_engine() returns
-> -ENOTCONN and the error is passed through unchanged: read() on
-> /dev/hwrng fails with that error, and the hw_random entropy thread treats
-> it as a transient failure and retries. The open and close session ioctl
-> was added in the previous series:
-> https://lore.kernel.org/all/179492434088.3111216.6016447945055810112.b4-ty@kernel.org/
+> v5: https://lore.kernel.org/linux-crypto/cover.1792599491.git.prsampat@amd.com/
+> * Collected reviewed-by tags
+> * Keep the original firmware error when rollback fails - Tycho, Shantanu
 > 
-> The ATF accepts only a non-zero, 4-byte-aligned length, from 4 bytes up
-> to 4080 bytes per request.
+> Responding to Sashiko comments:
+> * Does __snp_alloc_firmware_pages leak the allocated page on error?
+>    - This isn't a transient firmware error. rmp_mark_pages_firmware()
+>      issues RMPUPDATE, and a failure there indicates an inconsistent
+>      RMP. Any pages already converted are reclaimed or placed on the
+>      SNP leaked pages list, so not freeing is the conservative choice
+>      and used by all the other callers.
 > 
-> hwrng.quality is left at 0. The hw_random core documents 0 as the maximum
-> (1024 bits of entropy per 1024 bits of input), and with the default
-> quality of 1024 that is the value applied at registration. That matches
-> a conditioned SP 800-90A DRNG, so the driver does not publish a separate
-> estimate.
+> * Can reading *feat_info here trigger a host crash?:
+>   - No.  Reclaim is only needed before the page is written by the host or
+>   returned to the allocator, which __snp_free_firmware_pages() takes care
+>   of after the read. tio_status page reading does the same
 > 
-> The series is organized as follows:
-> Patch 1 (prerequisite) extends the stratix10-svc service layer with the
-> FCS command codes and matching SIP SMC function IDs.
+> v4: https://lore.kernel.org/linux-crypto/cover.1792014060.git.prsampat@amd.com/
+> * Collected reviewed-by tags
+> * Cleanup snp_alloc_firmware_pages() error handing - Tom
+> * Cleanups to comments and code formatting - Tom
+> * Change dev prints to ratelimited - Tom
+> * Add comment about releasing sev_release_firmware_buffers() - Tom
+> * Add FW_UPLOAD and FW_LOADER to CRYPTO_DEV_SP_PSP config and clean
+>   up #ifdef-erry - Shantanu
+> * On failure of sev_get_api_version() return an error only if PSP
+>   failed in all other cases DLFW_EX succeeded - Shantanu
+> * Free TMR if we were already in UNINIT too - Local Sashiko instance
 > 
-> Patch 2 adds the RNG driver: socfpga-fcs-rng hw_random driver. Add
-> FCS_DEV_RANDOM_NUMBER_GEN_EXT in the FCS core. The socfpga-fcs-rng child
-> device registered by the FCS driver. Also, add MAINTAINERS entry for
-> this new driver.
+> Responding to Sashiko review:
+> * Possible RMP violation when live fireware update races with
+>   snp_get_platform_data()
+>   - Both the dlfw_ex and snp_get_platform_data() are called within a
+>     mutex guard so feat_info can only be accessed once it is no longer
+>     in the firmware owned state and the mutex is dropped.
+> * Register-unregister failure
+>   - The ccp PCI driver probes synchronously, so psp_master is set
+>     before sev_pci_init() runs. The uploader follows the same lifecycle
+>     as the rest of the SEV/SNP initialization, including the TSM and
+>     verify-mitigation interfaces. The unregister in sev_dev_destroy()
+>     is needed so the upload device doesn't outlive sev.
 > 
-> Testing:
-> Built for arm64 (defconfig + CONFIG_HW_RANDOM_SOCFPGA_FCS=m).
-> Tested on an Agilex 5 SoC FPGA board
-> root@testsocfpga# ./fcs_client -R dbg.bin -j 64 && hexdump -C dbg.bin
-> 00000000 15 fc 77 a9 86 17 0b b5 91 b3 db ce a9 39 48 f1 |..w..........9H.|
-> 00000010 65 00 80 9a 63 b8 1e 99 df 56 6f b4 ef 66 73 f9 |e...c....Vo..fs.|
-> 00000020 91 66 c6 94 94 38 f1 9f cd 3a c7 6e b1 63 1d e2 |.f...8...:.n.c..|
-> 00000030 03 ec 29 01 4f 27 4a de e7 7e 67 95 c2 44 e7 04 |..).O'J..~g..D..|
-> 00000040
+> v3: https://lore.kernel.org/linux-crypto/cover.1791212077.git.prsampat@amd.com/
+> * Print psp return codes along with driver returns for easier
+>   parsing - Shantanu
+> * Clean up error codes to map the right firmware/driver error condition
+>   to the firmware error codes. - Shantanu
+> * Report -ETIMEOUT case by checking for psp_dead after DLFW_EX command
+>   is called instead of reporting unknown error - Shantanu
+> * __sev_do_snp_platform_status() call can race and incorrect cached platform
+>   states may be supplied. Guard the call under a mutex - Sashiko
+> * firmware unregister can race when called from sev_dev_destroy() or
+>   sev_pci_exit(). Guard the call under a mutex - Sashiko
 > 
-> Set timeout to 1000s for operation: rngtest
-> cat /dev/hwrng | rngtest -c 2000 2>&1
-> rngtest 6.17
-> Copyright (c) 2004 by Henrique de Moraes Holschuh
-> This is free software; see the source for copying conditions. There is NO 
-> warranty;
-> not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+> v2: https://lore.kernel.org/lkml/cover.1789749016.git.prsampat@amd.com/
+> * In snp_get_platform_data() use snp_[alloc|free]_firmware_page() to
+>   transition pages to and from firmware-owned state, instead of
+>   open-coding rmp_mark_pages_firmware()/snp_reclaim_pages() around the
+>   SNP_FEATURE_INFO command - Tom, Sashiko
+> * Claim sev->fwl atomically with xchg() in unregister_sev_fw_uploader()
+>   so a concurrent module removal and sysfs unbind cannot both reach
+>   firmware_upload_unregister() - Sashiko
 > 
-> 	rngtest: starting FIPS tests...
-> 	rngtest: bits received from input: 40000032
-> 	rngtest: FIPS 140-2 successes: 1998
-> 	rngtest: FIPS 140-2 failures: 2
-> 	rngtest: FIPS 140-2(2001-10-10) Monobit: 0
-> 	rngtest: FIPS 140-2(2001-10-10) Poker: 0
-> 	rngtest: FIPS 140-2(2001-10-10) Runs: 1
-> 	rngtest: FIPS 140-2(2001-10-10) Long run: 1
-> 	rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> 	rngtest: input channel speed: (min=495.429; avg=52178.721; 
-> 								   max=10000000000.000)bits/s
-> 	rngtest: FIPS tests speed: (min=47.329; avg=70.926; max=91.699)Mibits/s
-> 	rngtest: Program run time: 807497698 microseconds
+> Responding to other Sashiko comments:
+> * __sev_release_firmware_buffers() called with panic=true can cause
+>   deadlock as another stopped CPU might currently hold zone->lock or
+>   other page allocator locks.
+>         - I think having a panic param within __snp_free_firmware_pages
+>           which checks and returns before __free_pages() should resolve
+>           this issue. Since this is a pre-existing issue not relevant
+>           to this patchset, plan to send this as a seperate patch
+> * The sev_download_firmware_ex() function is called with the lock held
+>   and performs a GFP_KERNEL allocation.  Since GFP_KERNEL can trigger
+>   direct memory reclaim, could this invoke SEV page reclaim operations
+>   that attempt to acquire the already-held sev_cmd_mutex, resulting in
+>   a deadlocked state?
+>         - GFP_KERNEL may perform direct MM reclaim, but SNP page
+>           reclamation is not registered as an MM shrinker or normal
+>           page-reclaim callback. snp_reclaim_pages() acquires
+>           sev_cmd_mutex only when explicitly called with locked=false
+> * "If snp_reclaim_cmd_buf() fails and returns early, the code skips
+>   resetting sev->cmd_buf_active and sev->cmd_buf_backup_active.
+>   Will this permanently leak the bounce buffer slots and result in
+>   future -EBUSY failures?"
+>         - Since the command buffer may still be firmware owned, I think
+>           declaring psp_dead = true is the way to ensure we do not make
+>           it available for reuse after a failed reclaim. Pre-existing
+>           issue, plan to send this as a seperate patch
 > 
-> ---
-> Hang Suan Wang (2):
->   firmware: stratix10-svc: add FCS random-number command for Agilex 5
->   hwrng: socfpga-fcs - Add FCS random number generator driver
+> v1: https://lore.kernel.org/linux-crypto/cover.1789059391.git.prsampat@amd.com/
+>  * firmware-loader patches are rebased as-is and only incorporates
+>    fixes for minor build issues
+>  * Dropped crypto/ccp: Hoist kernel part of SNP_PLATFORM_STATUS as that
+>    patch has been merged since
+>  * Dropped crypto/ccp: Reclaim command buffer when the PSP dies and
+>    subsequent handling since firmware quirk is now resolved and need not be
+>    handled in the OS
+>  * Use guard(mutex) for the locked region, which the split makes
+>    possible since sev_get_api_version() acquires sev_cmd_mutex - Maxwell
+>  * Added a patch factoring out the TMR and INIT_EX teardown, so the update
+>    path and __sev_firmware_shutdown() share it - Shantanu
+>  * Skip the re-init when the PSP is dead, not just when a rollback is
+>    outstanding - Shantanu
+>  * Re-initialize the platform before refreshing the cached status -
+>    Shantanu
+>  * Split the monolithic .write into a locked update helper, an error
+>    translation helper, and a thin .write that refreshes the cached status
+>    once the lock is dropped and clean up various allocations
+>  * Convert rollback required and reinit required globals to reside in
+>    sev_dev struct to avoid carrying over states if manually reloaded
 > 
->  MAINTAINERS                                   |   1 +
->  drivers/char/hw_random/Kconfig                |  12 ++
->  drivers/char/hw_random/Makefile               |   1 +
->  drivers/char/hw_random/socfpga-fcs-rng.c      | 133 ++++++++++++++++++
->  drivers/firmware/socfpga-fcs-core.c           |  71 +++++++---
->  drivers/firmware/socfpga-fcs.c                |  33 +++++
->  drivers/firmware/stratix10-svc.c              |   8 ++
->  include/linux/firmware/intel/socfpga-fcs.h    |  23 ++-
->  include/linux/firmware/intel/stratix10-smc.h  |  46 ++++++
->  .../firmware/intel/stratix10-svc-client.h     |   1 +
->  10 files changed, 300 insertions(+), 29 deletions(-)
->  create mode 100644 drivers/char/hw_random/socfpga-fcs-rng.c
+> RFC: https://lore.kernel.org/all/20260430160716.1120553-1-tycho@kernel.org/
+> 
+> [1]: https://lore.kernel.org/lkml/20260331214726.903274-2-dan.j.williams@intel.com/
+> 
+> Dan Williams (3):
+>   firmware_loader: Stop pinning modules on registration
+>   firmware_loader: Stop pinning parent device per workqueue invocation
+>   treewide: firmware_loader: Drop the unused @module argument
+> 
+> Pratik R. Sampat (4):
+>   crypto: ccp - Factor out the release of the SEV firmware buffers
+>   crypto: ccp - Allow SNP platform data to be queried after SNP INIT
+>   crypto: ccp - Register with fw_uploader and always fail
+>   crypto: ccp - Implement SNP Download Firmware EX
+> 
+>  .../driver-api/firmware/fw_upload.rst         |   2 +-
+>  drivers/base/firmware_loader/sysfs_upload.c   |  50 +-
+>  drivers/base/firmware_loader/sysfs_upload.h   |   1 -
+>  drivers/crypto/ccp/Kconfig                    |   2 +
+>  drivers/crypto/ccp/sev-dev.c                  | 454 ++++++++++++++++--
+>  drivers/crypto/ccp/sev-dev.h                  |   4 +
+>  drivers/cxl/core/memdev.c                     |   4 +-
+>  drivers/firmware/microchip/mpfs-auto-update.c |   2 +-
+>  drivers/fpga/intel-m10-bmc-sec-update.c       |   4 +-
+>  drivers/greybus/gb-beagleplay.c               |   2 +-
+>  drivers/iio/frequency/ad9910.c                |   2 +-
+>  drivers/media/i2c/thp7312.c                   |   2 +-
+>  drivers/net/pse-pd/pd692x0.c                  |   4 +-
+>  drivers/virt/coco/tdx-host/tdx-host.c         |   4 +-
+>  include/linux/firmware.h                      |  15 +-
+>  include/linux/psp-sev.h                       |  19 +
+>  lib/test_firmware.c                           |   3 +-
+>  17 files changed, 482 insertions(+), 92 deletions(-)
 > 
 > -- 
-> 2.43.7
+> 2.43.0
 
-Sashiko failed to apply your patches.  Please rebase and resubmit;
-
-https://sashiko.dev/#/patchset/cover.1795167624.git.hang.suan.wang%40altera.com
-
-Thanks,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
