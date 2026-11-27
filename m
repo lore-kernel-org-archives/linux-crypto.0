@@ -1,70 +1,82 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795760800;
-	b=JXyUHNw3bNCbnq3sx5PamlddZNZ+w6e0JO6b8+D0Ytsuvt3kLJAxCPdeYSslqWVbbP7Q
-	 TDnBzVTz88dyODhozdqOVQMOQlblzPKCgXM+D8iMJfLpmwuKJMrLM5ZeFXsUtxW/3KLeq
-	 SRj2gk2pgTWwf7Ym72+wB+Wq6RlBP/SiufwaSohqeBC7bxpzGgaCMOAybMlEpNTaK0NUy
-	 PUDJnlPBVs7TssbTLy0DnlG3dYXJ0bJbIEIFvZMUjFitH0GELyuYKSmLbKea//oFF8RXN
-	 gu7nnklGLmC2bV53MI2eeGA7TZone6LG6VX3exAp2vDYgt4fYS2I7ryUbNiyTrfxQNw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795760800;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:X-ZohoMailClient;
-	bh=bCNn9r8VG4aa0r4Am+eSfDy/QqMZMCKrbKXiHll/bkU=;
-	b=E/CjVHqSjax6FIhUmI52ts6VXfOiexYoQxnwnxzXr01+mCRGxk4uBg2AJOqKsTUu2tMY
-	 8dks4cL5yYSzKbqVJlv7PouJOc/L8ghQtZ4bDXBf4GNGqZyoY0RkdJ+sqd7hn2QWP5Cah
-	 BNexw484BQz81LnGGAjG6JKUaHnZXMWW0D+wgxBw0bK+S+1dTkUpmwlzuO0gACQklAznp
-	 q3xe6hV2W72quiYK/T2J/OgejEjN0ok0fSfJuWw8wuLFqRKA4xNEX1Zs6KUDwAGAomhER
-	 PKLzIncxKhe4PF0fli3b667fNk0giCHej3XHbDiM81gmT9GGw4UTqXwIAD9YrjInsRQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=none header.from=laveeshbansal.com;
-	spf=pass smtp.mailfrom=laveeshbansal.com;
-	dkim=pass header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=TiQ3U15R;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=165.173.182.15
-Received: from sender5-op-o15.zoho.com (sender5-op-o15.zoho.com [165.173.182.15])
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795762122;
+	b=wUgYoYYi6w8iXwAzRKkW4lzZ+zinHeip4Fy3YErn+vX/loJuRd+IevuLoXQxRCggX/55
+	 U3eGDCbSvjCZ4a7/aSPPEetvinLsHinjWuh+h7vXZCSpt2Trtp8zLo1kvPUhmlhKGlvdz
+	 GEofM9Xjr8nsQVb54ZyI1cu4XGG6KqBGG/Mw66OP/5XJSHl7UE05R1i1ETBMBXJ0DG5l5
+	 xtLo0IKlFZl8+QeHZ1OCAxjIku8vUqTz2H47ooJRTtY74hTWenx1LufVakSpB9t8iTSek
+	 9LHcjrRh/stCBt3duWi9sQUUPjhbwiOiyhK306EXSXvkxElHFk5dkC1hj0ntUrByHfw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795762122;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=D2qAvffQz1/Kmxq2R231WWzgGRVz04WJrtHpdL6qOoA=;
+	b=5chvar1Vx1iXUIWYw32pFN0CKbTgQHak/CHK7fWaFvV3dOppwo1DepFhLxe7OB95CZk6
+	 ytlTTB/eCvJvL3d1VWJr+G2Xfvi9mYAZHKdBIw5tmU8T9ThqV/f2xiZMMDF8y4Dm6ADRf
+	 9pX54PknM491HjUy2+eIdt6SzU60OhW6wi63xFRZNqCyoaCX0E5nqZJuj1qXF4isVhKkv
+	 gb27DizTEbAXYkWbf4xAMjqW0EQVEkB+5o+Ol6uhjjaAUoq2IEZOT7l8RMaC7DdQS5R97
+	 fvBdJd0UWi/xq4Ue9bAbDWp+j5KtDxeZeJQ2GXpHdzPmUWD3QYE7qoI1RhHodpLvuTA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=V41pLXPv;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F04606A31C;
-	Fri, 27 Nov 2026 06:26:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 01F04606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=laveeshbansal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=laveeshbansal.com
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id CA902606A323;
+	Fri, 27 Nov 2026 06:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=laveeshbansal.com header.i=@laveeshbansal.com header.a=rsa-sha256 header.s=zoho header.b=TiQ3U15R
-ARC-Seal: i=1; a=rsa-sha256; t=1795760783; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Iq8+3O6SVynT2p7WX05aK+b7q9YoMkkRNFV3sfhmUDfefXMc9GdZKVzfp/G0qBb1pOMuqmV/5+IHeRerNmIZm5po6BzF/fMCCOhdyI3qgjiPB4wkQDxMYUV+sHdKFHroRNu3ak2OD32zXAtp151sSQvwnJgECfySt0Zo1vmy6+Y=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1795760783; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=bCNn9r8VG4aa0r4Am+eSfDy/QqMZMCKrbKXiHll/bkU=; 
-	b=jJlsb++oCttRggNA3bAp3KJoKJ1RkFzyGC50RoUTVTkfejfzP9YOJTUtyWcUATRbLTPS37mCMA479lREhVRYJpOuhpsqUP7iLn6GRW0yVnlTHE1IK1FnKZn1gqLWc6gtN9d0dNg3gLz5yCKHXlyQ3UPFzpYswkr1XcYIoZVH/k4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=laveeshbansal.com;
-	spf=pass  smtp.mailfrom=laveeshb@laveeshbansal.com;
-	dmarc=pass header.from=<laveeshb@laveeshbansal.com>
-DKIM-Signature: a=rsa-sha256; b=TiQ3U15RQrizMzkNM3/UKGIzpdsVJHRMduzq6A5gQoelzNgKqo8ooAwP+xzJq5kblOfAfid1MiquAAU9ljG7zIJZT1EH54+nKavCqm0BIEdy6FfPeGk6yRjCfsLl3WW0eZ1ofQgZMGdhKvFcpUpDkQlLUl8xClgnQanoHNLTCwM=; c=relaxed/relaxed; s=zoho; d=laveeshbansal.com; v=1; bh=bCNn9r8VG4aa0r4Am+eSfDy/QqMZMCKrbKXiHll/bkU=; h=Content-Description:Content-ID:Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:List-Subscribe:List-Post:List-Owner:List-Id:List-Archive:List-Help:List-Unsubscribe:MIME-Version:Message-ID:Resent-Sender:Resent-Cc:Resent-Date:Resent-To:Reply-To:Resent-Message-ID:Resent-From:Sender:Subject:To:Date:From:Message-Id:Reply-To:Subject:To:Cc;
-Received: by smtp.zohomail.com with SMTPS id 1795760780464754.4038009804824;
-	Thu, 26 Nov 2026 22:26:20 -0800 (PST)
-From: Laveesh Bansal <laveeshb@laveeshbansal.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=V41pLXPv
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 6362B1F00897;
+	Fri, 27 Nov 2026 06:48:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795762122;
+	bh=D2qAvffQz1/Kmxq2R231WWzgGRVz04WJrtHpdL6qOoA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=V41pLXPvWT6oPTKTANy9bd9W4sNgLSL+0i5tp/MR1tMtCmOFp0DO9rnlY0D7oe6Rd
+	 /p9O0pctXPxCKz6vB8sw36rTYwcjiY3I1wpHJZXlGKL1e6odFl93Pm8Oij+zz2iYjV
+	 vfDYN4hMkQfIEqhFKoSHexzAN7vjI4Dvy1196UXc9tPVBYWEnJI//51smoO6sd0huz
+	 Wb8NF4Clb4BOC+GUY6ZI2wUdj6W/oMYbV3F6aAzIyZc98DR88EE8s34U13LFq3B+OS
+	 wBMfwkHep26ELC67urdD+x76WHLjeRaXuNC9VzDZJuzE7hiuhHFF9qD9fIdNvv6gEQ
+	 22w29sWexd2Ow==
+Date: Fri, 27 Nov 2026 08:48:38 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: keyrings@vger.kernel.org
+Cc: dm-devel@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org,
+	Ahmad Fatoum <a.fatoum@pengutronix.de>,
+	Alasdair Kergon <agk@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	David Gstir <david@sigma-star.at>,
+	David Howells <dhowells@redhat.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Woodhouse <dwmw2@infradead.org>,
 	Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com,
-	linux-block@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] blk-crypto: use a NOIO scope while holding profile->lock
-Date: Thu, 26 Nov 2026 22:26:17 -0800
-Message-ID: <20261127062617.29510-1-laveeshb@laveeshbansal.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20261125053308.GA20407@lst.de>
-References: <20261125053308.GA20407@lst.de>
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ignat Korchagin <ignat@linux.win>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	James Morris <jmorris@namei.org>,
+	James Prestwood <prestwoj@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
+	Jonathan McDowell <noodles@meta.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Mimi Zohar <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Sumit Garg <sumit.garg@kernel.org>
+Subject: Re: [PATCH v5 17/17] KEYS: trusted: Add asymmetric key support for
+ TPM2
+Message-ID: <awknxh-Q0eHKt2ZY@kernel.org>
+References: <20261127055602.2357884-1-jarkko@kernel.org>
+ <20261127055602.2357884-18-jarkko@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -74,21 +86,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261127055602.2357884-18-jarkko@kernel.org>
 
-Hi Christoph
+On Fri, Nov 27, 2026 at 07:56:02AM +0200, Jarkko Sakkinen wrote:
+> Extend the TPM 2.0 trusted key backend to load OID_TPMLoadableKey
+> (2.23.133.10.1.3) RSA (2048/3072/4096) and ECC (NIST P-256/P-384/P-521)
+> keys and wire query, sign, verify, and RSA encrypt/decrypt operations to
+> trusted_key_tpm_ops.
+> 
+> Select HAVE_TRUSTED_KEYS_ASYMMETRIC when CONFIG_TRUSTED_KEYS_TPM is
+> enabled.
+> 
+> Co-developed-by: James Prestwood <prestwoj@gmail.com>
+> Signed-off-by: James Prestwood <prestwoj@gmail.com>
+> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-I sent v3 to address Eric's comments on v2.
+This should be in fairly safe grounds because the patch has been
+manually written (with TCG specs), both TPM2 protocol and ASN.1
+shenanigans, and reviewed and tested countless of times (over the
+years).
 
-blk_crypto_hw_enter() now returns the saved flags and
-blk_crypto_hw_exit() takes them, instead of keeping them in the profile.
-The comment is reworded and the version is gone from the stable tag:
+Further, it has pretty much passed all Sashiko reviews so far, and
+thus this patch likely is not all that wrong.
 
-https://lore.kernel.org/r/20261125081417.77674-1-laveeshb@laveeshbansal.com
-
-I did not carry over your Reviewed-by since the code changed. If you
-are ok with v3, please re-add it.
-
-Thanks
-Laveesh
+Br, Jarkko
