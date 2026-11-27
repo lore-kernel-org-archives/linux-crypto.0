@@ -1,63 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=180.181.231.80
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795756645;
-	b=Ns4vHriPgkrm33JZzykTHidMEM/PGticHhmcIXwk+miLWsm8wAOU0hTlySvLkOC47uYT
-	 5UV5+tg5P/VhsYbgUy31yhayRFyJfMQ1OKVVKcxs6YKfpMyUTRyneamHIxix3AvtOWi3+
-	 uSHHa/EywNTf1zGWra1geYQf/xtHNgd8Ho1BnZz2v95wfzaLQVcMWCcICls5DfQQtlfis
-	 M4Thhwos0gUFksllKY96WxMmUxYuO+q7hjNZdBg5KDlJyNH3POLU7XmTeVqYFka6kJ1+c
-	 y6OVYN5JFlCQmiIeTjxTB8tNTHcph9s13WwG+Rq9/SpK5R4jGHe/H06qaqiVct6JT7Q==
+	t=1795756658;
+	b=DkVuL1i5q+tY+fsIrozytyF0GPayKtBreNAZ6VbH0nzxvU8NDxkWEuLHFYTY3fQ+q+VZ
+	 tFWScI+wU/JO6ukEfx9hjdjWTeB/8BdKJTJ4cRR0U/Jj/jzeujreS3XpciO9HPWU/LJGk
+	 qd0LWa8AXytXfJnNIexqK7/5YYa9Wd+1zFqaUvAO4WavgD80UGOHL3/za6D3A5K/PcFro
+	 enRljMo6Vqp9zv0ap/gU8WlFFXgvJ+8WJN3Q+HWNoP9kM8J47WUTTEj5jd0jckvaV0OJ5
+	 QYfdrQTJ9mURyfykbWAj0/An8C53merpz8K0f9G/lVw57Yv/nBDVNzVeJDHbERbqmEA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795756645;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795756658;
 	h=DMARC-Filter:DKIM-Signature:Received:Received:Date:From:To:Cc:
 	 Subject:Message-ID:References:MIME-Version:Content-Type:
 	 Content-Disposition:In-Reply-To;
-	bh=F395mWU0cbEoWGheGRHm0cHWazZCK9J26O8abSd/6Og=;
-	b=Z+E1wkgK0QmgsJo4+uSy/kcnmAjGKvxla4YYbrigQyvRtXOJHoxIqvra0PmjTbTw4RZ+
-	 Q3gfUJKlUaNYbokl/KBXGU39a9kqCR9ZZOEMhYn8I/jNfnL6ieZpQziZUe2w98+EoXNtO
-	 n1So3zETK88nwtHz1//73MrIJnRXoHOAZp3jtDMOW9AKPVnNqqfrCwIXI61d8PkIZzmU3
-	 wYY2i3/ef+q72uCFl3Qfe+PCcOMzorsr1D4GA0XfCx7+Rm+N0Z7ekE2dCHaUFV1AVjMsU
-	 JaT5l9ey5FMfqN8mkHM1V75mHXtJPncV3fSup4LiuQy3PTwaQbeyRb2Ojpzu0Zl6lRg==
+	bh=p34+E36hlMLMURBldXXi/frkJoE/rDtT0dfPvmlongc=;
+	b=rCg3xQG9II23JmcBPO8QMBkbIKIblG06vxV93UBAkkYNg3yVBq+dS7PrZFYckrd/ORRb
+	 Us5TfnosRjXpgRTV6jHL8BQTAosCkLDDiT3ntDqjudDAKNDc3x+YRqYfividM2c1HMzg4
+	 V9qa/Ph4l8XrIq9szhy2A59iCy2CBAlLFSI+Fr4wUh12h+7KAdbK87puEBoAwAUXYW0uj
+	 GZXPzU+cAeu6iTAXUiZT/vsgMuKzK7bWv6XGU/iRrIPewvI2Oh00L0H0tlWjZnKvOwCoy
+	 sYsbyuvkvwKQl4HjPwLIXYuPWsWb7Dx+pcWa8Hu0+dzQQGcxRQ1RRcncbjNCkZu1ElQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gondor.apana.org.au;
 	spf=pass smtp.mailfrom=gondor.apana.org.au;
-	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=KXlGvOGQ;
+	dkim=pass header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=bAnQ8QkS;
 	arc=none smtp.remote-ip=180.181.231.80
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021D5606A31C;
-	Fri, 27 Nov 2026 05:17:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 021D5606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0987606A31E
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 05:17:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E0987606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=KXlGvOGQ
+	dkim=pass (2048-bit key, unprotected) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.a=rsa-sha256 header.s=h01 header.b=bAnQ8QkS
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=F395mWU0cbEoWGheGRHm0cHWazZCK9J26O8abSd/6Og=; 
-	b=KXlGvOGQfmG5uzdq3Djo1QuIDeg/qKeYTElU4gxsds4MxA5gbhm29imgZsKrSVxa632aMFbSprt
-	i8Fp7r8zhw4FxsyDnrPA4B3hc2lJtN7NL2CDxtLvAhi6YOnVajz/aW5TuEBetS0W+wN7+YhPFn3Rl
-	v8/0906RINqrgsgzz+AGbwv1MjKmnn3wYFlzD2neLpIun3ilSA/ch+LmLrhB10o4g1K/cG/S5DMKw
-	v1LmljOhWkx9CnpLnlf8qa8KJwoIUrJCzbpdkVQvIKDDzqzwW0ncXqABqRzF0p/UKZrc3+y9yU11j
-	E5ByiDCyl7jNMzkixDKPokTzVIRzdCQAcliQ==;
+	from:content-type:reply-to; bh=p34+E36hlMLMURBldXXi/frkJoE/rDtT0dfPvmlongc=; 
+	b=bAnQ8QkSlBghyDS4ZZ0Am6+yLXzofBMF6HKrTiLLXvPAV9cRJ7IoYrB1OyQcpGDPgHvugfch7dU
+	H3PJxhAZPNLnFXWTTjYb/HP61c4XBBOz5z9kEcSFt9dOl+nzCFFgsbsxUBKrKgGMO0kgMD/+XU5hl
+	QfQZA5RoPVjnf4WkJEYyfdxUSsOAB/1WLsM2NRrm4cids6Nz87S+PXDwID9ke5vd4mQlX7ozQaaHj
+	Jg2HqmhjCXNy6PIzrHnYB2pv0JHhbgoVhyEE2WeVoL1CGVj7j1Urm+GX19ZCGUFwYQ0I6wHA7UoCG
+	Gf3mNVshRZ5ImId45TBXcQFCBjw2dlUr/Wsw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1xWoKn-00000002Vb3-1M39;
-	Fri, 27 Nov 2026 13:17:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:17:21 +0800
-Date: Fri, 27 Nov 2026 13:17:21 +0800
+	id 1xWoL0-00000002VbA-0E9v;
+	Fri, 27 Nov 2026 13:17:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Nov 2026 13:17:34 +0800
+Date: Fri, 27 Nov 2026 13:17:34 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: dormancygrace@gmail.com
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: eip93 - return request validation errors
- synchronously
-Message-ID: <awkSYfvaBfY7sQe2@gondor.apana.org.au>
-References: <20261120-eip93-sync-errors-v1-1-1a83ae607181@gmail.com>
+To: Avi Weiss <thnkslprpt@gmail.com>
+Cc: tgraf@suug.ch, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] rhashtable: Fix safe iterator cursor substitution
+Message-ID: <awkSbjrutzGRgchw@gondor.apana.org.au>
+References: <20261121072454.27804-2-thnkslprpt@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -69,31 +65,36 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261120-eip93-sync-errors-v1-1-1a83ae607181@gmail.com>
+In-Reply-To: <20261121072454.27804-2-thnkslprpt@gmail.com>
 
-On Fri, Nov 20, 2026 at 07:37:18PM +0000, Gleb Pesin via B4 Relay wrote:
-> From: Gleb Pesin <dormancygrace@gmail.com>
+On Sat, Nov 21, 2026 at 09:24:55AM +0200, Avi Weiss wrote:
+> rht_for_each_entry_safe() uses next as both a macro parameter and the
+> rhash_head member name. Passing a cursor with another name substitutes
+> that name into pos->next, producing a nonexistent struct member and a
+> compilation failure.
 > 
-> The skcipher and AEAD paths validate requests before submitting them
-> to the hardware. On validation failure they invoke the completion
-> callback and return the same error. Callers handle that return value
-> as a synchronous failure and can complete the request a second time.
+> Rename the cursor parameter to _next to preserve the pos->next member
+> accesses regardless of the caller's variable name.
 > 
-> Return the validation error directly in both paths. Keep completion
-> callbacks in the hardware result handlers.
-> 
-> Codex (gpt-6.2-sol) assisted with comparing the two paths, preparing the
-> change and writing the changelog. The corresponding OpenWrt 6.18.64
-> driver object was cross-compiled on MIPS.
-> 
-> Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
-> Reported-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Closes: https://lore.kernel.org/linux-crypto/aXxmIuU9PKJiDs7n@gondor.apana.org.au/
-> Signed-off-by: Gleb Pesin <dormancygrace@gmail.com>
+> Fixes: 88d6ed15acff ("rhashtable: Convert bucket iterators to take table and index")
+> Signed-off-by: Avi Weiss <thnkslprpt@gmail.com>
 > ---
->  drivers/crypto/inside-secure/eip93/eip93-aead.c   | 4 +---
->  drivers/crypto/inside-secure/eip93/eip93-cipher.c | 4 +---
->  2 files changed, 2 insertions(+), 6 deletions(-)
+> 
+> Alternative approaches considered:
+> - Use a differently named cursor parameter such as next_node. This is
+>   equivalent in behavior; _next keeps the change smaller.
+> - Remove the unused macro. That avoids the broken expansion but also
+>   removes an existing interface potentially used outside the tree.
+> 
+> Validation:
+> - Original macro: next compiles; saved, tmp and next_entry fail.
+> - Corrected macro: all four names compile in the isolated source probe.
+> - The original next expansion is byte-identical after the correction.
+> - No in-tree expanding consumer was found in the tested base revision.
+> - Full kernel Kbuild, runtime and external consumers were not tested.
+> 
+>  include/linux/rhashtable.h | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
 Patch applied.  Thanks.
 -- 
