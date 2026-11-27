@@ -1,49 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795774365;
-	b=zNz3pRTWzuKP6XXNHWFigUltg/dQEgajXIRZ0eNI5gc+DfcFWOEHE1G861S3FjCiMW+3
-	 3fUiKvEpeeGIKOo3tfHvrA3eX1v+Lcjkm1w6cn8k551gvvz00eev1u9Al0Bu8hYK9b9K4
-	 h/EpsutSIFqpJlwUOtFUTk/pgzTFH57ywWEBPJFVaAjQglcErOgVbuwpCNIpfQJtWLCI3
-	 0aXyOg6OaAH4UKpVTdK84nMm5hLqDdLeP2ggqFxRHgupm8zCylmCXZrwwVG2pCrj/7vGX
-	 QyPneWmie2G21zkGHLGJ9nF5RTXtiYxjJPWat4T/wNMSzfLtHqzhh9UyL6ebfy0orZQ==
+	t=1795780874;
+	b=sRUtl2YFeGiaIVk/7W31GQg8p/BfdXRRFJHnxF0LDzmjifGFiP8BVsme0yJsGVfl922T
+	 BPv0QWBqIBd93425PtAuG/IOmxVjnUB8bvS1szDrsNPUqn+oaGmugmpM/f3JeiO+iRxRk
+	 YeSIoBA8PWI02PNbN8AnFV+f2D6Eok0pRR5fxmuImnWrS1WtlG0RAmAV+9g+lc4g4nmEx
+	 LZr49ckpLydcDcsYAlI3feKkHxlFXk5RElg7T0JAzlBB3vt12FKdfsYl1nLiu+ELQeslb
+	 XLMebXZPSbYnpzTTvAy6gPJafv8vRF/g3d033WbSNeGG5ieUAA1jmVDVBg5S/jwpWfg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795774365;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:Content-Language:
-	 From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=v1/2YqpCnIwSCbwLLDUxkqgFBM6zZChxPmbs8wgtA+k=;
-	b=Dem3dZcv2HAzvCyfyLex3Um4RzMbFng4qChein6+uqG4PHiz+eXSePoaJJ3gfKmg++wN
-	 tHe3mlZh1z9TMvfONAIa5upVaqDeUTKx5RKFKLvsfU+7jQrB9LUtx3OoFknA2sQpEhmhv
-	 hc4aJ28kG/YRRFYMaHuF/GVX+ojfV44RmCe7yekONeEweh5b6eQ0mqpwVfIbUfOz9kwzb
-	 zV+/7Y2RvgnXA1/DsGJ6TWRqK37vLxO1MiJ68dtRkrvzFCuVKJg2IKc6rxpYgmi+/wWKL
-	 +RGWJ4IQ36umj2WJn+rqiVAQOrZcq7gG6d6GY9zomRUK5eUhS/bcXzkpLgpFflOQgmQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795780874;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=qdrFFlZr1wr6XK2UP+CUx9GD+axY9UPnNDp3yG1ITws=;
+	b=fStXQXn9OmuTYhYcePSPT7Ac6M116QJFXcOyzBMnwCui7WoKf13/KMFPJIe5RWu/u9Qq
+	 QkSoMzJIzPwbPJp1B0htzqxZbM6DkGkoko0sH1+XUFx1fLHaqrcxpSZ4VySGQhXGMNZOF
+	 SldbI39p8LpClcuJJWFuoOxMcOy9i/6uFJiZ5uWq1AaA2FCuoCAsvYG74ptbzpGSm7aG2
+	 FqFOk6/XgSjimh+Tw0DTl17fM940auDpf2t4m2b99Ff+b/dcCdMm9lDDeFPqQQUJ6ORi+
+	 cycs453TNbiiVyO57cQD/fhsRjhZoYk56Zyu9qdKKkulrpF/S6/+quh3DquiRaGt6Gg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=arm.com;
-	spf=pass smtp.mailfrom=arm.com;
-	dkim=pass header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=fBSmtxPJ;
-	arc=none smtp.remote-ip=217.140.110.172
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB600606A31E;
-	Fri, 27 Nov 2026 10:12:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EB600606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZrhBSsxA;
+	arc=none smtp.remote-ip=209.85.128.52
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F545606A31C
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:01:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1F545606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.a=rsa-sha256 header.s=foss header.b=fBSmtxPJ
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 383C81758;
-	Fri, 27 Nov 2026 02:12:35 -0800 (PST)
-Received: from [10.33.50.35] (e142021.arm.com [10.33.50.35])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B6FB3F86C;
-	Fri, 27 Nov 2026 02:12:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1795774358; bh=c0/6aFDfGtHa/8JQkzEFzcPkvj+Wr26/24s6cKwSZCQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fBSmtxPJFJbeboQw9s+OXlHilp+OaovcEU5LIl1/Cw+DtoGBkQnd0nqKd7/SaZl1y
-	 j1hOmIWQGJa+hcR/AtcXt6RKNRg0+L+9h6G2E4MG2+42VOynwL/NvBRH8/hUCqDnrS
-	 a/yTDaH5tcedXgKOZyL4ilJHfyP8zJUH1/TpaZRc=
-Message-ID: <194329c7-45d0-4493-af07-f972694c075e@arm.com>
-Date: Fri, 27 Nov 2026 10:12:32 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=ZrhBSsxA
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4bb5b8ef642so69866105e9.1
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:01:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795780871; x=1796385671; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=qdrFFlZr1wr6XK2UP+CUx9GD+axY9UPnNDp3yG1ITws=;
+        b=ZrhBSsxA9TmxODqx2oG3o8BLWXL0DUBgbiWp0ohzIyWE3mVyt8801pQNfp0epUwm82
+         wTJuYbitpgqsODU651dqu/97lnZ8c7zwCdp4XYm5IGprlzeeKhM90MIXeEpLAlp6VFUh
+         IiK6HcPstuAqz0hXgy6mzMOHsSGKyuHEmZiUqz7hFvlCRUXxGQb/xJVXfKU2Qb6nUtL0
+         CSCSR7ICkJQiFzJ8YMPWAlnLJLngsXDEEZGVKbiZG8ahIFPClPVIMXpao4fZ2dEul3gL
+         MfqrdSgzSQGfBAMkb+zhEZEHKudU9bT2qT8P3pb3zErEbvY1GShjn88saaP9qHVD2rM7
+         Rx4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795780871; x=1796385671;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=qdrFFlZr1wr6XK2UP+CUx9GD+axY9UPnNDp3yG1ITws=;
+        b=RUN6Ru876lKoaH3rsvPWOHusao7FH0w1/0HYsRQVy/8MPJYrAnyaN1CFt45rszqExH
+         z4E3HNXLJhSBH+4TTpFuDzKao7mlHSkJC0/KAbtx5wFL9f/A4/vV072TAaRMT+JWnKoo
+         eCm/V3bnkOVFaBjCWpv6LJEqhOa2UFckp5eq4f6mTk5xFu+byPyXeUGpWVNQPzyboQgo
+         kNceJIx8eoAk4V0U4e5LKindM3EXkYzitafKF2PdMwipjh2nSrVjiW+kq97Yqf+AQSOl
+         Wc2BJlsv1dwZDMFNUUFz/dT01Yc5GpPNqqBM3RVpbfCCN8aduGRX7clyLfGXFLPsdwCD
+         Zmiw==
+X-Gm-Message-State: APuU4Z9HoMBQ1H1UJ3IvX8k9m0TcSKjQdTi2sQLo7QMiEH5yTcjo0MRp
+	c2pIb2WuHPbT3sYDEmWJ0Y2k20/rOc+bWI/Dfz0cd760dawojMRLHs8R
+X-Gm-Gg: AZFdTZeB+iHDoxBDd4yJgxZyf+HN8S6us+ijTL/sZ1xVyr0UMT11qMKr8goArywvgtL
+	QmgfsBfAm0f+MwijYGsAZrW84VitZpcT57N3wRt4yYKtlw1xDaqTGfIYytteE5JucfWFb4Z9bHb
+	AEMwd6Q9O1kZS6Kn8HAmlHMaJKQtCR0K0Cgo0yCr7Nnw+PwhVWsPDIC0utMlwXmyfsW+3v+NLzx
+	Zm3majINAiONOLiiPE+mgo/EDwVHCxKN139HqsVCS4wNOMsJnl+kMa4EY4SX8QksUvMiKm5T2Ab
+	298G2sxZ5yUnwJz24wZi6Rr46WS7zDwzyNTkn60pf7p6lWE3NZjbStbN5t/op2kWHfrWMXYNMay
+	sfK6WXkukX/V63h/7E/dMNGlLR2e5HWHGTYx1bs8nU9e4ppRQDMGFs+bo/teuMk8mTth010G57B
+	oNTtC1giObSoZV3nwicS1c4hfokMfwwF7yNwdQ7mK+uUzCKwEyX/YAicCjNnluDvteEtNn4gsaK
+	y8lIZvp9HmgnH3EL7N1CPmYXiLy0bOHzBJp10W0jlJNagRJJ+6+vBpZI/v8FWMZ0l4V5LMmB5Mb
+	CTdpeNEF9tSwC5Rl9u9tKdJ0cdCUeZtEWK4AJz8rMyKpCDw2
+X-Received: by 2002:a05:600c:3e1a:b0:4bb:6814:7391 with SMTP id 5b1f17b1804b1-4bb8881921cmr485415525e9.25.1795780871097;
+        Fri, 27 Nov 2026 04:01:11 -0800 (PST)
+Received: from localhost.localdomain ([79.117.198.103])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.01.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Nov 2026 04:01:10 -0800 (PST)
+From: Jose Nieto <jnieto.alaber@gmail.com>
+To: Corentin Labbe <clabbe@baylibre.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org,
+	linux-amlogic@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jose Nieto <jnieto.alaber@gmail.com>
+Subject: [PATCH v14 00/30] crypto: amlogic: add support for G12/AXG/A1/S4 and misc fixes
+Date: Fri, 27 Nov 2026 13:00:33 +0100
+Message-ID: <20261127120103.1532882-1-jnieto.alaber@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
+References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -53,68 +105,89 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/4] hwrng: sun55i-ce: Add Allwinner A733 CE v5 TRNG
- support
-To: Alastair D'Silva <alastair@d-silva.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>, Olivia Mackall
- <olivia@selenic.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Chen-Yu Tsai <wens@kernel.org>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20261125210532.695823-1-alastair@d-silva.org>
-Content-Language: en-GB
-From: Andre Przywara <andre.przywara@arm.com>
-In-Reply-To: <20261125210532.695823-1-alastair@d-silva.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+This is v14 of the Amlogic crypto driver series originally posted by
+Alexey Romanov.  It rebases the series onto linux-next (next-20261123) and
+adds, on top of the original patches, the fixes required for the current
+tree and a few corrections raised during review.
 
-On 11/25/26 22:05, Alastair D'Silva wrote:
-> This series adds True Random Number Generator (TRNG) support for the
-> Allwinner Crypto Engine v5 on A523 and A733 SoCs, and enables it on the
+The original 22 patches by Alexey Romanov are kept untouched (authorship
+and Signed-off-by preserved).  On top of them:
 
-so while I agree that the TRNG part is probably the most practical 
-functionality of the crypto engine IP, the encryption/decryption parts 
-are still there, and we have a driver for the older IP. And because the 
-functionality shares all of the registers and probably most of the 
-descriptor generating code, and Linux is really after code sharing, I 
-think we want the driver to live in drivers/crypto, next to the existing 
-sun8i-ce code, if not becoming part of it.
+  - the fixes that landed in the driver since v12 are preserved (IRQ
+    handler return value and fallthrough, devm clock management, DMA SG
+    unmap on the cipher error path, probe cleanup, devm_kmalloc_obj
+    conversion);
+  - three patches add what is needed for the current code (drop
+    CRYPTO_ALG_ALLOCATES_MEMORY so dm-crypt can select the hardware engine,
+    the ahash ->digest one-shot path, and a small cleanup);
+  - five patches fix issues found in review: probe/registration error
+    paths, key/IV and SHA setup descriptor lengths (plus a duplicated CBC
+    IV copy), the redundant A1 platform data, the A1/S4 crypto clock, and
+    the binding property order.
 
-Cheers,
-Andre
-> Xunlong OrangePi 4 Pro.
-> 
-> Dependencies:
-> Patches 3 and 4 depend on the OrangePi 4 Pro bringup series:
->    [PATCH 0/3] arm64: dts: allwinner: Add Xunlong OrangePi 4 Pro support
->    Message-ID: <20261125124407.4098345-1-alastair@d-silva.org>
-> 
-> Tested on Xunlong OrangePi 4 Pro (/dev/hwrng).
-> 
-> Alastair D'Silva (4):
->    dt-bindings: crypto: Add Allwinner A523/A733 Crypto Engine
->    hwrng: sun55i-ce - Add Allwinner CE v5 TRNG driver
->    arm64: dts: allwinner: sun60i-a733: Add Crypto Engine node
->    arm64: dts: allwinner: sun60i-a733-orangepi-4-pro: Enable Crypto
->      Engine
-> 
->   .../crypto/allwinner,sun55i-a523-crypto.yaml  |  68 ++++
->   MAINTAINERS                                   |   7 +
->   .../allwinner/sun60i-a733-orangepi-4-pro.dts  |   4 +
->   .../arm64/boot/dts/allwinner/sun60i-a733.dtsi |  12 +
->   drivers/char/hw_random/Kconfig                |  13 +
->   drivers/char/hw_random/Makefile               |   1 +
->   drivers/char/hw_random/sun55i-ce-trng.c       | 377 ++++++++++++++++++
->   7 files changed, 482 insertions(+)
->   create mode 100644 Documentation/devicetree/bindings/crypto/allwinner,sun55i-a523-crypto.yaml
->   create mode 100644 drivers/char/hw_random/sun55i-ce-trng.c
-> 
+Testing on Khadas VIM3 (A311D / G12B), booted with a linux-next kernel
+built from this series:
+  - the crypto self-tests (known-answer tests) pass for ecb/cbc(aes) and
+    sha1/224/256;
+  - dm-crypt with aes-cbc-plain runs on top of cbc-aes-gxl and the
+    driver's request counter accounts for the I/O.
+
+Thanks,
+Jose
+
+Alexey Romanov (22):
+  dt-bindings: crypto: amlogic,gxl-crypto: correct clk and interrupt
+    lines
+  dt-bindings: crypto: amlogic,gxl-crypto: support new SoC's
+  crypto: amlogic - Don't hardcode IRQ count
+  crypto: amlogic - Add platform data
+  crypto: amlogic - Remove clock input
+  crypto: amlogic - Add MMIO helpers
+  crypto: amlogic - Move get_engine_number()
+  crypto: amlogic - Drop status field from meson_flow
+  crypto: amlogic - Move algs definition and cipher API to cipher.c
+  crypto: amlogic - Cleanup defines
+  crypto: amlogic - Process more than MAXDESCS descriptors
+  crypto: amlogic - Avoid kzalloc in engine thread
+  crypto: amlogic - Introduce hasher
+  crypto: amlogic - Use fallback for 192-bit keys
+  crypto: amlogic - Add support for G12-series
+  crypto: amlogic - Add support for AXG-series
+  crypto: amlogic - Add support for A1-series
+  arm64: dts: amlogic: gxl: correct crypto node definition
+  arm64: dts: amlogic: a1: add crypto node
+  arm64: dts: amlogic: s4: add crypto node
+  arm64: dts: amlogic: g12: add crypto node
+  arm64: dts: amlogic: axg: add crypto node
+
+Jose Nieto (8):
+  crypto: amlogic: g12: drop CRYPTO_ALG_ALLOCATES_MEMORY
+  crypto: amlogic: hasher: add one-shot digest path
+  crypto: amlogic: drop unused field and stale includes
+  dt-bindings: crypto: amlogic,gxl-crypto: keep standard property order
+  crypto: amlogic: fix probe and algorithm registration error paths
+  crypto: amlogic: fix setup descriptor lengths and CBC IV copy
+  crypto: amlogic: drop redundant A1 platform data
+  arm64: dts: amlogic: use the system clock for A1/S4 crypto
+
+ .../bindings/crypto/amlogic,gxl-crypto.yaml   |  38 +-
+ arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |   8 +
+ arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   7 +
+ .../boot/dts/amlogic/meson-g12-common.dtsi    |   7 +
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    |   6 +-
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |   7 +
+ drivers/crypto/amlogic/Makefile               |   2 +-
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 596 ++++++++++++------
+ drivers/crypto/amlogic/amlogic-gxl-core.c     | 279 ++++----
+ drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 511 +++++++++++++++
+ drivers/crypto/amlogic/amlogic-gxl.h          | 120 +++-
+ 11 files changed, 1201 insertions(+), 380 deletions(-)
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+
+
+base-commit: 3191063649dbf7c0d0b768e1f3655e4c5fc6edb5
+-- 
+2.47.3
 
