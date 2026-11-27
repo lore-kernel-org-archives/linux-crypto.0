@@ -1,61 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=205.220.168.131
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795783166;
-	b=k6h+jh9db/4qUvYTXXIhxQvEd+YSQr2lht2L2qQhFCxa2IhDLaB8Hs2BmdcXBBRwVbfE
-	 oJda5ceHN5Yvu1z9iZBWtdtinFpzh4TBYzRQlNaevOnSl7uLogjPpvbbmnfL+meA+Uqj0
-	 jPkIXNvBGIx+wLk9GuCEXd6i7UV6gvoUUACVR4xqIBlXvzQxLhSNBz/c4QKB7/x/NMRId
-	 fbKTxe60B/pbXS8rYm07XAm72Ha0/8KkUbbkv2WZmgSBbg0WtJbpx2OEoALfHqb2Iv4Fw
-	 Hxg9kcwmXS1g99zNSeWx9i7lVV/ixlJf/rVmiHPGYgrwvLJ31pzA52D7SD7VzhpVKdg==
+	t=1795787929;
+	b=Y50bAZrYNjScZoBpzSw169FbDwOLLKFLJ1zsxi0aANKw4F5BSZ5UQGHItaH/QBINJELg
+	 PG2ar5BXODIYSkvyLnPSS4XAiDae13lu9y+JBBwOq8w1mreUs5DjCyU7/3RccpVRK9sXV
+	 Lq03+M3wV8JZP3QJ4+WSuVvcwLHKRlsXmVtTSRIC3GY07FbDK1JOfR0wBcDzO12yWFxZA
+	 386MoCldUSFnY1rbTllakFgB9UXFldfyj3fUQGQWF8Ibkxy51PxStbEF0fBNjO3KmL4LW
+	 NTX7aFUFueJw2+x02LhtqBFu4FJ+ydS1OHXLOc8lCYtGgCLSM2QDd5SvGSvHno8IqWg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795783166;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=zGOzGkQJasjL8g7nW4a5pg7vqqj6rpi22iN+G03CzJ4=;
-	b=h5U5v4b5hqIaJcxMckjU+R8+Uoa4SZk9y4HWZb0Jos/V3UZoWWVCqoyCfzucZoLAVbOe
-	 ulcw6F23dNwnlzWeJFAq+V5xaqHkY/O29P6V6Y/L+ksIMMWxKZH5f0ugBKfgyDa5NnRd8
-	 CPuIFIMH4g3Mg0xbk138kC1ExiW+9N1O7jqc3zdw5ox3v+VlYY/6ZrOA+BZPN/uPaT5Al
-	 FY+y/ekVjdDZbCkY3KjT6pg3VScVsnSlH04U52PabsrIN2L5Ntm1SArb6eSdfIVAf/LFj
-	 JxpW9B9iKJqLXicUKTIKfIGIpn67hhfXlHt5vLZJjck/EyaoY8TFmL4u4j05BhQ/bbg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795787929;
+	h=DMARC-Filter:Received:DKIM-Signature:Received:Received:
+	 DKIM-Signature:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:X-Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Proofpoint-GUID:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-Spam-Info:X-Proofpoint-Spam-Details-Enc:
+	 X-Authority-Analysis:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details;
+	bh=1v7qWyLIaLArgF+vLRv6x7RBzzWwcYRuKaCCg84dQ9A=;
+	b=NXUGXH2Xxu77L8yD4w8jaeIdXQpdP1SdTxsIVcJ4CyOb2LWHkjZiJ+Up8DvYtLZx+PX9
+	 1P3BIPrUz+7kPArjOUz8Xks33sLZbZGFldjJVfF23G4zXHcAX2AKCerdcPv/Lna1TuxXC
+	 bpt1AzzcB5IBg6hqgl+2DJP4/BtZqWqZbh1mqg+OsRgiv1y5NSik8Dr0TQlnN7cv8Tn94
+	 g2ZvQapEB2UNQGSMdu35CUwnJZzFNDiy8gIVwwCxoiYiUz3W09e/4C/bw1qkza00GoKC0
+	 9+xSjzBbYxTxIee2sH5UZxsehAWU0RSiTLuaLZgLtW45wyykwg1mWv2YTU/+R+S88RA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PcJ0J24q;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=oss.qualcomm.com;
+	spf=pass smtp.mailfrom=oss.qualcomm.com;
+	dkim=pass header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=TOjcsKcu;
+	dkim=pass header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=FORsxwKQ;
+	arc=none smtp.remote-ip=205.220.168.131
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595FF606A31C;
-	Fri, 27 Nov 2026 12:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD56606A31F
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 13:58:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2AD56606A31F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PcJ0J24q
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E3581F0089B;
-	Fri, 27 Nov 2026 12:39:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795783165;
-	bh=zGOzGkQJasjL8g7nW4a5pg7vqqj6rpi22iN+G03CzJ4=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=PcJ0J24qhrqBoCt16UCQKJHp/ejS0qaKnOaiwZ4ZBN3jCA97oV9QHZTy7DQgq5lHV
-	 v4XtiGyWSYS+GolOXsJVpYQ6BdSd/R35TkcpfAXOuszgqywYVgt2bF8MTeDU6u7WNZ
-	 ut4bEkQB2hZl1hc9opSyUtr3kkR3sldp8ax3rDNKvZL+L6P3bKhvTeRei5lVAgNOC6
-	 u3/iCjwKsfymmEKYXtmnZyUUELJRQXZSFsUhne31NturjtPzEhAnBNvGzQgQUhuJ9w
-	 AB7dITJz+0TXY9NmEz8Rb2RtFxcPoRGdGcKGESYZ+ztssfJgWiOZvsL2iDHLshbRb5
-	 cV2zX34USNWAQ==
-Message-ID: <sashiko-outbox-237422@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH v14 25/30] arm64: dts: amlogic: axg: add crypto node
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Jose Nieto" <jnieto.alaber@gmail.com>, "Corentin Labbe" <clabbe@baylibre.com>, "Herbert
- Xu" <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org, devicetree@vger.kernel.org, "Neil
- Armstrong" <neil.armstrong@linaro.org>, "Martin Blumenstingl" <martin.blumenstingl@googlemail.com>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Rob Herring" <robh@kernel.org>, "Conor
- Dooley" <conor+dt@kernel.org>, "Alexey Romanov" <romanov.alexey2000@gmail.com>
-In-Reply-To: <20261127120103.1532882-26-jnieto.alaber@gmail.com>
-References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
- <20261127120103.1532882-1-jnieto.alaber@gmail.com>
- <20261127120103.1532882-26-jnieto.alaber@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Nov 2026 12:39:24 +0000
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.a=rsa-sha256 header.s=qcppdkim1 header.b=TOjcsKcu;
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.a=rsa-sha256 header.s=google header.b=FORsxwKQ
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6ARDtugi674129
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 13:58:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	1v7qWyLIaLArgF+vLRv6x7RBzzWwcYRuKaCCg84dQ9A=; b=TOjcsKcuDkQqhKEM
+	pY+66B0jBD0y+w2WuxCnqNyxwYqmtuMoZrTl0cJPLd/mTTklLplbhyMHb4TC5Wtq
+	Ji2Qk2dzyLEh2cMIRuDPdYHqZpE/N6fX61D4TPWfBAqekwTKIPscpXnW+mrJEX1g
+	T67dFtRLf4IjNGcPXVhIvoHFM1MztDlxyVpCMHvcXvYw2hHwPLywFmqnznbL2nOM
+	sz22SEUOUEnjiVdwNO2bgpnoMVFCLggMv5jNCcGehEEubP3PBl+8lUty7whgbc4y
+	8od1uEnUK+wQdjbAqIyVdpYI0rzoM6UghTNlC4hv0RttWqdHeAoj6pqD+rHn22WG
+	zHDzIQ==
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com [209.85.221.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4j6u49b9ng-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 13:58:47 +0000 (GMT)
+Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-5edc82ecc78so345987e0c.3
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 05:58:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1795787926; x=1796392726; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=1v7qWyLIaLArgF+vLRv6x7RBzzWwcYRuKaCCg84dQ9A=;
+        b=FORsxwKQO9IHATmRZuwnt/wzNKkR76nev4Im041FDN08XKsqjU4h+VVpkDoGm21N+f
+         /oeDWC7HpwU5XAoQlfBoTZucLYqP2da14CrW2L7LXHltK8zA6hgd3FYjFMBJlh7gJTB+
+         iD8G6N06MrZc/leeTgaSqm4ZRHGiVGyc5hvVqtkhQ6fAsP6PylP1sFZdxlR6y/biVyvP
+         6suhILDhV7T7nlzNeWh9Z9G2sijUqJBTrC7KBxzn3QJYNhf6maSKO2w+9AfKYUiOWpje
+         Gc72E6kLMJgBTCsCygQSVhizKDh/Je5Hnx9bL55FUerD2pHWiPV3arEFgvFuAb+dBxTF
+         OYXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795787926; x=1796392726;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=1v7qWyLIaLArgF+vLRv6x7RBzzWwcYRuKaCCg84dQ9A=;
+        b=E/E7xKYL+PHHcqfxUMaZEs/jnymL+c+d6kzWQLAAbR7i6mPoxGToCrauHYu+Gp66Jk
+         0fe9OFBcWVkk9FUmQKOzW/3W6DAU2svS40nXu5wx3afgta1Q4U/zAp72Yg4EovRK2VxE
+         uyEDOR+ABt+GhwefGxsL1aZXnee6CV+q+TxFkkuQhdXgXrDgjeP0SnfUqNov2TbwmuZJ
+         H1uHpCrUx2/w7TqVpaVLe7akytsyhnnasGSNOAq+S5x9W4/+KJ0/KivPu3GU1vojOpt+
+         LndKns9r56oaxNCrxW/F/qym2mCeQldj7VcCfbQVPclBsiZjxpOd5WKswIjeA88LXQ64
+         ncgQ==
+X-Forwarded-Encrypted: i=1; AL+hErFqPvNJcPVkErbBMBUgVcRogSjdR6eUqNHZziDpbZKHTKzNUFDXOy4uR8wZLIqRy0sFy7q0bmg2J/ODkLo=@vger.kernel.org
+X-Gm-Message-State: APuU4Z9Gqyjx85cWbY7mxRRrLnyZm7HDLpQQspnmbhD1otKLOTs/zOMd
+	zLBg/qyHVA+yL1XdVs4Fl/Gp1UF4G1DxWUaRvA9o0ZjF92dYBNhBYIeAJfW/QFduPGOWwrX8Egb
+	iyMnkpAn6JSxNwIkqdcn5Bx1mdI7GpIweH9vzMQpZjsS5ypdfXEkcjZhnnRKzZq778yU=
+X-Gm-Gg: AZFdTZeVVHZT7v1hYYLD5X4OkWL8VayB8DipvwPBqhwHGuxh6ffNTe4X9xVrC6bEf/I
+	c2KGp4LsszNI1P4381kc9GX3kStvBIwBi1Y7+pWrlGE6PJYH7SZb+Mn3MYnLQnaIlB5vczWP3ud
+	2JPeoC5a66DarhsKEqXjCXA/rIarflAQYIXHuuHde6ENZA5MgPwwa00V38sabPHY8pDHHoBmv52
+	pzhlKcaV6EFgZ0bvL5kyjcUFLnotBClRx6LDCHnJ0+IELlj66GhlHw3NFmn35bKQ5bPk7gpHKXs
+	bwAs0VLjaf8cZ8++pKE354wsRLR4G9CMlTKvPa5hV54cfcNTT3CqHpLRXRNFPawNloxSXn9aYAQ
+	wc/B9I0kTGls+JlqWUbR6sdq0Nv8O/e2pbM+nOZ4pzyH6WROQR/Gc9Vznj3VJmggl8wHCjbo=
+X-Received: by 2002:a05:6122:c2c2:10b0:5ec:b706:37e0 with SMTP id 71dfb90a1353d-5ee8ae3e277mr16434832e0c.1.1795787926274;
+        Fri, 27 Nov 2026 05:58:46 -0800 (PST)
+X-Received: by 2002:a05:6122:c2c2:10b0:5ec:b706:37e0 with SMTP id 71dfb90a1353d-5ee8ae3e277mr16434775e0c.1.1795787925770;
+        Fri, 27 Nov 2026 05:58:45 -0800 (PST)
+Received: from [192.168.226.72] ([178.235.128.140])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6ba37109b55sm10578803a12.32.2026.11.27.05.58.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Nov 2026 05:58:45 -0800 (PST)
+Message-ID: <87280d80-9047-405b-8dcc-11276d34d2dd@oss.qualcomm.com>
+Date: Fri, 27 Nov 2026 14:58:40 +0100
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,206 +114,88 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 14/14] arm64: dts: qcom: Add Samsung Galaxy XR
+To: Stanislav Aleksandrov <lightofmysoul@gmail.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Abel Vesa <abelvesa@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Robert Marko <robimarko@gmail.com>,
+        Guru Das Srinagesh <linux@gurudas.dev>,
+        Thomas Gleixner <tglx@kernel.org>, Radu Rendec <radu@rendec.net>,
+        Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+        "Joerg Roedel (AMD)" <joro@8bytes.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wesley Cheng <wesley.cheng@oss.qualcomm.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Bart Van Assche <bvanassche@acm.org>, Bean Huo <beanhuo@micron.com>,
+        Stanley Jhu <stanleyjhu@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Daniel Lezcano <daniel.lezcano@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+        Georgi Djakov <djakov@kernel.org>,
+        Sibi Sankar <sibi.sankar@oss.qualcomm.com>,
+        Ulf Hansson <ulfh@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        iommu@lists.linux.dev, linux-usb@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-scsi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org
+References: <20261125-halliday-dts-v3-0-5c8311c0b70b@gmail.com>
+ <20261125-halliday-dts-v3-14-5c8311c0b70b@gmail.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20261125-halliday-dts-v3-14-5c8311c0b70b@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: H8TFJvCgoxD1UQGKdQSz3Yt2n33-wGgg
+X-Proofpoint-ORIG-GUID: H8TFJvCgoxD1UQGKdQSz3Yt2n33-wGgg
+X-Proofpoint-Spam-Info: AW1haW4tMjYxMTI3MDA1NSBTYWx0ZWRfX24YgeMv1mErk
+ A6+v2N5geWwhB7PVHIYMAFoFMWepSTLsbqDRwA9TcWpZet+Q+I2JKxNuO3AfJKBLjUZ+ehzmPK2
+ PzPoIoP+jXWrT04E7Xv+X91XovwPrkw=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYxMTI3MDA1NSBTYWx0ZWRfX8aJ5YxSH73ZN
+ RNXKrXOi3AzNqMpiUEtHxnd3Gt5tXlK51Al/gtXq6jxTAPG8H9UF/whLQpBWdSRsWSUFeFZpG59
+ P4dFG6ZofoohhZChk3iLLXNQR6yql/qmRQxL2xlfBTdvW6ICThnu8Xqi9RDJvzyjJm3ueic0NIO
+ hK32ADO6MOoy2OcOgIYVXJaQ9RMEkRHV9AVq1YGdCr2XzIh2C6lFlD3B6fq+1b0fz5H+WoA8Wyz
+ OOSmwX+1tCty4LDDjyWdG/yHVE2ZuncU+pM667H2Ml3Qm81xbopc2x+2A/s1iG0CTP7VgBKFJBD
+ zZxHhErQT849Ug8oLe4tYRA8Nmlzv8QSmEOSIzxj5dcIsww82kQ6slva710i44qtqPD2XH6dpRz
+ s+zEMvriAtEN/v+ipncSl3++sHPLSwxei5B3BSiX7iAt+jXLEA1LreAu9ZiII0fC/PdYIRbhGTh
+ c8LbagB1ZC3N0w/lIKw==
+X-Authority-Analysis: v=2.4 cv=A875rKWG c=1 sm=1 tr=0 ts=6b098c97 cx=c_pps
+ a=JIY1xp/sjQ9K5JH4t62bdg==:117 a=PRfkaYvzSr8QmIIGAkY2Sg==:17
+ a=IkcTkHD0fZMA:10 a=zJRp6_cAMcgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=pGLkceISAAAA:8 a=EUspDBNiAAAA:8 a=pIfNyjNAQl_vEFP8Sf4A:9 a=QEXdDO2ut3YA:10
+ a=tNoRWFLymzeba-QzToBc:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.138,FMLib:17.12.100.49
+ definitions=2026-11-27_02,2026-11-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0
+ priorityscore=1501 adultscore=0 clxscore=1015 suspectscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2611040001 definitions=main-2611270055
 
-Thank you for your contribution! Sashiko AI review found 5 potential
-issues to consider:
-- [High] crypto: amlogic: spurious 0-byte DMA desc in
-  meson_hasher_do_one_request()
-- [High] crypto: amlogic: double completion in
-  meson_hasher_do_one_request()
-- [High] crypto: amlogic: unaligned DMA ctx via ahash_request_ctx() in
-  hasher
-- [High] crypto: amlogic: broken key/IV setup descriptors in
-  meson_setup_keyiv_descs()
-- [Medium] crypto: amlogic: leaked partial_addr DMA map in
-  meson_kick_hardware()
---
+On 11/25/26 4:43 AM, Stanislav Aleksandrov wrote:
+> Add the device tree for the Samsung Galaxy XR headset, which is based on
+> the Qualcomm Halliday SoC (SXR2250P).
+> 
+> Supported so far: the PMICs and their regulators, the power and volume
+> down keys, USB in high-speed peripheral mode and UFS storage.
+> 
+> Signed-off-by: Stanislav Aleksandrov <lightofmysoul@gmail.com>
+> ---
 
-commit fb4b4c7512312719a7e889c4b297d41920184b0d
-Author: Alexey Romanov <romanov.alexey2000@gmail.com>
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-arm64: dts: amlogic: axg: add crypto node
-
-This commit adds the amlogic,axg-crypto devicetree node to meson-axg.dtsi
-to enable hardware SHA and AES acceleration on Amlogic AXG SoCs.
-
-> diff --git a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi b/arch/arm64/boot=
-/dts/amlogic/meson-axg.dtsi
-> index 5b8ef98f6d03b..e755a019b384b 100644
-> --- a/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
-> +++ b/arch/arm64/boot/dts/amlogic/meson-axg.dtsi
-> @@ -321,6 +321,13 @@ ethmac: ethernet@ff3f0000 {
->  			status =3D "disabled";
->  		};
-> =20
-> +		crypto: crypto@ff63e000 {
-> +			compatible =3D "amlogic,axg-crypto";
-> +			reg =3D <0x0 0xff63e000 0x0 0x48>;
-> +			interrupts =3D <GIC_SPI 180 IRQ_TYPE_EDGE_RISING>;
-> +			clocks =3D <&clkc CLKID_CLK81>;
-> +		};
-> +
->  		pcie_phy: phy@ff644000 {
->  			compatible =3D "amlogic,axg-pcie-phy";
->  			reg =3D <0x0 0xff644000 0x0 0x1c>;
-
-[Severity: High]
-Can meson_hasher_do_one_request() emit a spurious 0-byte DMA descriptor at
-physical address 0 during non-final incremental SHA updates?
-
-drivers/crypto/amlogic/amlogic-gxl-hasher.c:meson_hasher_do_one_request() {
-	...
-		meson_setup_state_descs(&ctx);
-
-		if (rctx->partial_size && rctx->partial_size < blocksize) {
-			ret =3D meson_fill_partial_buffer(&ctx, len);
-			if (ret)
-				goto fail;
-		} else if (len && len < blocksize) {
-			memcpy(rctx->partial, sg_virt(ctx.src_sg) + ctx.src_offset, len);
-
-			rctx->partial_size =3D len;
-			ctx.nbytes -=3D len;
-			ctx.src_offset +=3D len;
-		}
-	...
-		if (!ctx.todo && ctx.nbytes)
-			continue;
-
-		if (!ctx.todo && rctx->final_req && rctx->partial_size)
-			continue;
-
-		if (!ctx.todo && !rctx->final_req && !ctx.tloffset)
-			continue;
-
-		if (meson_setup_data_descs(&ctx)) {
-			ret =3D meson_kick_hardware(&ctx);
-			if (ret)
-				goto fail;
-		}
-	...
-}
-
-On a non-final meson_sha_update() whose length exceeds one 64-byte block
-but is not block-aligned (for example, 100 bytes), the first iteration
-queues a 64-byte descriptor into flow->tl[0] (incrementing ctx.tloffset to
-1) without setting DESC_LAST, and the second iteration copies the trailing
-36 bytes into rctx->partial with ctx.todo =3D=3D 0, ctx.src_addr =3D=3D 0, =
-and
-ctx.nbytes =3D=3D 0.  None of the three continue guards match because
-ctx.tloffset is non-zero, so meson_setup_data_descs() and
-meson_kick_hardware() append and execute a 0-length descriptor with
-t_src =3D 0 and DESC_LAST, corrupting the intermediate hardware hash state.
-The same happens on any later sub-block update after rctx->begin_req is
-false, because meson_setup_state_descs() increments ctx.tloffset before
-the trailing bytes are buffered in rctx->partial.
-
-[Severity: Medium]
-Does meson_kick_hardware() leak the rctx->partial_addr DMA mapping when
-wait_for_completion_timeout() times out or fails?
-
-drivers/crypto/amlogic/amlogic-gxl-hasher.c:meson_kick_hardware() {
-	...
-	ret =3D wait_for_completion_timeout(&flow->complete,
-					  msecs_to_jiffies(500));
-	if (ret =3D=3D 0) {
-		dev_err(mc->dev, "DMA timeout for flow %d\n", rctx->flow);
-		return -EINVAL;
-	} else if (ret < 0) {
-		dev_err(mc->dev, "Waiting for DMA completion is failed (%d)\n", ret);
-		return ret;
-	}
-
-	if (rctx->partial_mapped) {
-		dma_unmap_single(mc->dev, rctx->partial_addr,
-				 rctx->partial_size,
-				 DMA_TO_DEVICE);
-		rctx->partial_size =3D 0;
-		rctx->partial_mapped =3D false;
-	}
-	...
-}
-
-When meson_fill_partial_buffer() maps rctx->partial via dma_map_single()
-and wait_for_completion_timeout() returns 0 or a negative error in
-meson_kick_hardware(), the early return skips unmapping
-rctx->partial_addr, and the fail path in meson_hasher_do_one_request()
-only unmaps req->src and ctx.state_addr.
-
-[Severity: High]
-Does meson_hasher_do_one_request() complete the ahash_request twice when
-it returns a negative error code?
-
-drivers/crypto/amlogic/amlogic-gxl-hasher.c:meson_hasher_do_one_request() {
-	...
-	local_bh_disable();
-	crypto_finalize_hash_request(engine, req, ret);
-	local_bh_enable();
-
-	return ret;
-}
-
-crypto_finalize_hash_request() already completes req with ret, and in
-crypto_pump_requests() any negative return from do_one_request() jumps to
-req_err_1 and calls crypto_request_complete() a second time on the same
-request, which can trigger a use-after-free if the completion callback
-frees the request.  Like meson_handle_cipher_request() in
-amlogic-gxl-cipher.c, meson_hasher_do_one_request() should return 0 after
-calling crypto_finalize_hash_request().
-
-[Severity: High]
-Should the hasher driver obtain struct meson_hasher_req_ctx via
-ahash_request_ctx_dma(req) instead of ahash_request_ctx(req)?
-
-drivers/crypto/amlogic/amlogic-gxl-hasher.c:meson_hasher_do_one_request() {
-	...
-	struct meson_hasher_req_ctx *rctx =3D ahash_request_ctx(req);
-	...
-}
-
-meson_hasher_init() calls crypto_ahash_set_reqsize_dma() to reserve
-DMA-alignment padding, but meson_hasher_do_one_request() and the other
-hasher helpers call ahash_request_ctx(req), which is only 8-byte aligned
-rather than aligned to ARCH_DMA_MINALIGN.  DMA-mapping rctx->state
-(DMA_BIDIRECTIONAL) and rctx->partial (DMA_TO_DEVICE) can then share cache
-lines with neighboring struct ahash_request fields and corrupt request
-metadata or digest state during non-coherent DMA cache maintenance.
-
-[Severity: High]
-Does enabling the AXG crypto node with meson_axg_pdata (where
-setup_desc_cnt is 3) break AES-ECB and multi-batch AES-CBC key/IV setup in
-meson_setup_keyiv_descs()?
-
-drivers/crypto/amlogic/amlogic-gxl-cipher.c:meson_setup_keyiv_descs() {
-	...
-	for (i =3D 0; i < mc->pdata->setup_desc_cnt; i++) {
-		struct meson_desc *desc =3D
-			&mc->chanlist[rctx->flow].tl[ctx->tloffset];
-		int offset =3D i * 16;
-
-		desc->t_src =3D cpu_to_le32(ctx->keyiv.addr + offset);
-		desc->t_dst =3D cpu_to_le32(offset);
-		desc->t_status =3D cpu_to_le32(DESC_OWN | DESC_MODE_KEY | ctx->keyiv.len);
-
-		ctx->tloffset++;
-	}
-	...
-}
-
-In ECB mode, meson_cipher() maps only 16 bytes (AES-128) or 32 bytes
-(AES-192/256) into ctx.keyiv.addr, but meson_setup_keyiv_descs() always
-emits 3 descriptors at offsets 0, 16, and 32 reading past the DMA mapping;
-even with commit "crypto: amlogic: fix setup descriptor lengths and CBC IV
-copy" dividing ctx->keyiv.len by setup_desc_cnt, integer division yields 5
-or 10 bytes per descriptor instead of 16 in ECB mode while still reading
-past the mapped buffer.  That earlier commit also drops the CBC IV update
-and dma_sync_single_for_device() from meson_setup_keyiv_descs(), so
-multi-batch CBC requests spanning more than MAXDESC descriptors reuse the
-initial IV on subsequent batches instead of the updated chaining IV in
-areq->iv.  In addition, op->keyiv is stored in per-TFM context rather than
-per-request context without synchronization across concurrent CBC requests
-or zeroization in meson_cipher_exit().
-
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261127120103.1532=
-882-1-jnieto.alaber@gmail.com?part=3D25
+Konrad
