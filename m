@@ -1,53 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795804813;
-	b=LRZxc6go+v97iYXFFQvVmRZDE9V5K2m8rYCE0AhjBsjVLZzReA8KeRu3oA9x/7TqUqxr
-	 HbtBor3DkXTGJNQpt+uBw3LCRyOlfDgqUiQPy+CfXCBEuteN/xFDQkT7sfc907MwIl1aC
-	 1pTFqCBte9FlSygWotRRa0bp5wZ3sK+w5XPx8qihmr0ewq4LLxlt/EywnkU3yTHJ9DtDc
-	 I4dF7GGEurdOlvYwDia7Tr/VksgkmRl3w8JiP6IpxoLX3ee5PNmUHXbEtXrD0Y0gjZY6j
-	 nIzuUXMcD25VNrtmQshL2rfU+T5DVzAxd8So+dyPUJD/PgS8Pe5I1tPDDKCGDaurVVQ==
+	t=1795805049;
+	b=MRO31RaFNe0dWdgszzBYGb3UDm7hJG5Aexf8xAIAZClTJgVRRD+Xc10GTXiMjktZIW/E
+	 jdcRvp+7Gp1reogJR9tzAmX8EWeOaRPbJm6HeS2J3rqXPUGFeJN0MW/gv/ozruuNyIGsH
+	 7hDrVctzJHkFyj0QONC+HMvTn1bFbIi2oNOBtr7uz0xhZHDajThE+Ksdm64xYrXov3AkU
+	 d0japrTjUvsbHzc8YtKKONfqlVEPG+UooluSmWRXAdJ4+m0TQ1PcYsMugVD0oYrb/d1qk
+	 /4gAN8Sk+1qYnAb528gk+DG4084nSHn7tjSAjgwSOSp1jd8Rq+HK26ozHj/7erDOKfw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795804813;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795805049;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=wdGvFgJwtqkDQ7r6P6Md8ySNN9pb8YID66pcM6026GA=;
-	b=uOzg05DCbve70nZFStawWAkKWkz0wTZ1nWOISLaPdBT0R35IqryjR1MYo7O9WKTxL9rl
-	 s5bWTRbxMo5COuh4gyRyN33YBSq9PJGlkM2z/Xvc2JXjJeSiDQuSfA2TD6t9LC4DcxRDT
-	 JATVS2NEoBblDVUXTsrTG7CmGKLaQDYI8lrV6pY1YAQzdz9wIM+VsXOKBOIfm3/5Fqdtp
-	 OspBUppCVEKqHv6PFAVWGEngWfsxaTXyIz9QQYa9xPYBJz2WTeCs211eQ6EY7vDCWU6Dk
-	 cwwu3BYIfLnGOWLtPhhJX4ITGvlg6n1mvulwFlFKdu3faF2f57fCcslWY1nlc6qLxDg==
+	bh=Rp4rYzgNw4nX+/vzYMGQGnQfPxDPdmfvj69vauWPj9s=;
+	b=N6x+YobHdPMkjsPsLTb/qYriyWnqXuqFaQOsWFHoFWFhssrO+AbjqRbAa2BZjPO7BCdd
+	 YykETeBL7ON9LQxBJuegmRWkAFSAkz1AVkRcDG6LavVCI5ZlwgE+/GONOGg1cBoE0tDFj
+	 VUfaiVrgV+UvRERIVuDLs4wKi9Q6TVgRgGNp19pLODBncRmMb96To9Oa6vs+h/SNdYFX1
+	 5ML1+QvhGC5fJr1G4KM1+gHtOb+HL0Otxe45ELM+0b3CmM8gWFEvbCwnRW3wk1j389PFN
+	 2o71vpG2tiIwDqt4887l49CzLvJTiXYi81iFsyRIDaVashl3T1nlrvC4H80Sk3HAh7A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="H1G9M/sD";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Aymk3lD6;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CE7606A31C;
-	Fri, 27 Nov 2026 18:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2CD606A31C
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 18:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=H1G9M/sD
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C18F1F00897;
-	Fri, 27 Nov 2026 18:40:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Aymk3lD6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E047E1F000C1;
+	Fri, 27 Nov 2026 18:44:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795804812;
-	bh=wdGvFgJwtqkDQ7r6P6Md8ySNN9pb8YID66pcM6026GA=;
+	s=k20260515; t=1795805049;
+	bh=Rp4rYzgNw4nX+/vzYMGQGnQfPxDPdmfvj69vauWPj9s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=H1G9M/sDkjtsCesN2pPzFS5qOp3FJqQMaxltvDHtxG7BE5vEDyhdq4EZCdxy9AmGf
-	 n4euCJE4TL3bdeTeJX3lVUkO68wfh5LHsKjXjUcPIcAgxbxHYNrOwKSAXv1LJhbeRp
-	 iMvQlkY6SAy7O84mhPJ1DkQejg11drIDDHL9xUFkvLY9RkKo4yNAdDjHhTJBtLzthm
-	 w/MDWpqpFxWhhd1flUzWTHcxZDahJxa3Q7wqOXcOnNLXU9nyifcdudcQfzBeCnV0gL
-	 3GLMZ++csHaKneIkCFVoqA363xmnNFtHv+6llddQ2CHB7AYGN7idFK+8JLzScrdURc
-	 OQqDTdwV1wD2g==
-Date: Fri, 27 Nov 2026 10:40:10 -0800
+	b=Aymk3lD6KrVQfZ7YdjagR4QVkLTXlYODihx9tEdLxiHDZH9PcY/XIkbJWZ/FEnRvu
+	 9yvstuaBhMNsd2wKprg6/NTMNVzyYxaaHvR0MBqI30R8RZ6cXlOl0hMESb4IJTe7PU
+	 YhvmXeVGQgxP/Pac/CpeUsx5U45sByrAHUXGs3v9vj9cvaogGhbUn3GMRM+ivTpZDt
+	 wyeLyjKbM8SvacoayC8HHS8XbY5aHozEfExm0e83qvl3fxaCOhVnJfWxOBsI6LBzzx
+	 a9O+OcQmOxifxAszHzbIc8U6jLGYZeZObNMUeXJdAlbeFTe5xgfb8BRHghKqvBI/N3
+	 lQUdAQ7DLH16g==
+Date: Fri, 27 Nov 2026 10:44:07 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Artem Novak <artem122novak@gmail.com>
-Cc: Jason@zx2c4.com, ardb@kernel.org, stian@itx.no,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: sparc: remove trailing whitespace from AES
- assembly
-Message-ID: <20261127184010.GA1974@quark>
-References: <20261127041853.127855-1-artem122novak@gmail.com>
+To: Laveesh Bansal <laveeshb@laveeshbansal.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: adiantum - Eliminate slab memory allocation in
+ setkey
+Message-ID: <20261127184407.GB1974@quark>
+References: <20261125013553.94480-1-ebiggers@kernel.org>
+ <20261127015345.33904-1-laveeshb@laveeshbansal.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -59,34 +59,70 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261127041853.127855-1-artem122novak@gmail.com>
+In-Reply-To: <20261127015345.33904-1-laveeshb@laveeshbansal.com>
 
-On Thu, Nov 26, 2026 at 10:18:53PM -0600, Artem Novak wrote:
-> Remove the trailing tab after the key expansion label in
-> aes_asm.S.
+On Thu, Nov 26, 2026 at 05:53:45PM -0800, Laveesh Bansal wrote:
+> I tested this on x86_64, arm64 and s390x (big-endian, emulated in QEMU) --
+> all on top of mainline c44104f3642d.
 > 
-> Signed-off-by: Artem Novak <artem122novak@gmail.com>
-> ---
->  lib/crypto/sparc/aes_asm.S | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On Tue, Nov 24, 2026 at 05:35:53PM -0800, Eric Biggers wrote:
+> > +	memmove(tctx->nh_key,
+> > +		&tctx->derived_keys[BLOCKCIPHER_KEY_SIZE +
+> > +				    2 * POLY1305_BLOCK_SIZE],
+> > +		NH_KEY_BYTES);
 > 
-> diff --git a/lib/crypto/sparc/aes_asm.S b/lib/crypto/sparc/aes_asm.S
-> index fd90b129972f..0ddf181f342e 100644
-> --- a/lib/crypto/sparc/aes_asm.S
-> +++ b/lib/crypto/sparc/aes_asm.S
-> @@ -293,7 +293,7 @@ ENTRY(aes_sparc64_key_expand)
->  	ba,pt	%xcc, 80f
->  	 std	%f58, [%o1 + 0xc8]
->  
-> -1:	
-> +1:
->  	/* 192-bit key expansion */
->  	ld	[%o0 + 0x10], %f4
->  	ld	[%o0 + 0x14], %f5
-> -- 
+> I checked that this gives the same ciphertext as before. On each machine
+> I compared it with and without the patch using 400 seeded random keys,
+> tweaks and plaintexts for each of adiantum(xchacha12,aes) and
+> adiantum(xchacha20,aes), including re-keying one tfm against a fresh one.
+> The digests were identical with and without the patch, and the same on
+> all three machines. I saw no round trip or re-key mismatches.
+> 
+> > +	SYNC_SKCIPHER_REQUEST_ON_STACK(
+> > +		req, (struct crypto_sync_skcipher *)tctx->streamcipher);
+> 
+> I measured the stack cost. With -fstack-usage, the frame of
+> adiantum_setkey() grows from 64 to 640 bytes on arm64 (gcc 13.3.0; 96 to
+> 896 with KASAN) and from 72 to 872 bytes on x86_64 with KASAN (gcc
+> 15.2.0), under the 2048 byte frame warning limit.
+> 
+> I also ran the stack tracer on arm64 (KASAN, 32 KiB stacks,
+> with v3 of my blk-crypto patch also applied:
+> https://lore.kernel.org/all/20261125081417.77674-1-laveeshb@laveeshbansal.com/)
+> under the f2fs/adiantum workload with memory pressure.
+> The deepest stack at any adiantum, chacha or blk-crypto function was
+> 7784 bytes, going through adiantum_setkey() via inode eviction in
+> reclaim. That was one run and I did not run the tracer on x86_64.
+> 
+> I think this is an acceptable trade. The old kzalloc() could enter direct
+> reclaim from setkey, and an allocation in the same fallback I/O path (the
+> bio encryption) used about 4 KiB of stack in reclaim in the same
+> workload. The new frame adds 576 to 800 bytes, mostly the on-stack
+> request (a fixed 384 bytes plus header).
+> 
+> A couple of other results:
+> 
+> - The lockdep cycle from the blk-crypto report is gone with this patch.
+>   In my f2fs/adiantum workload under memory pressure the base kernel hit
+>   it in all 3 runs on arm64, and lockdep recorded the &profile->lock to
+>   fs_reclaim dependency. With only this patch I got none and lockdep no
+>   longer recorded that dependency. I also got none with
+>   CRYPTO_SELFTESTS_FULL.
+>   On x86_64 the base hit the cycle in all runs - 6 across 2 hosts.
+>   With only this patch I got none,
+>   and also none with v3 of my patch on top. I saw no hung task or
+>   KASAN reports in any of the runs with the patch.
+> 
+> - CRYPTO_SELFTESTS: I did not get any failures, with and without
+>   CRYPTO_SELFTESTS_FULL. The WARN_ON in
+>   adiantum_init_tfm() did not fire in any of my runs.
+> 
+> Tested-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
 
-I don't think a single trivial whitespace cleanup like this is worth a
-commit.  (And the trailing tab here isn't new, either; it's inherited
-from the original code from 2012.)
+Thanks.  Later we should shrink the required stack space by switching
+from crypto_skcipher to the ChaCha library.
+(SYNC_SKCIPHER_REQUEST_ON_STACK() uses way more stack space than
+needed.)  But that would be a separate cleanup, and the stack usage from
+SYNC_SKCIPHER_REQUEST_ON_STACK() is tolerable for now.
 
 - Eric
