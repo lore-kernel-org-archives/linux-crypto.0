@@ -1,102 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795780934;
-	b=lW5QtsOT8eRAT+Ybs8nBMVeXcBm+uyPXPxMAE+OTeC1to86z+VPcM9kAdYKTdwxDvbrO
-	 LOQkvMyhMv3GXDayL1W34tH8x5lxSPSH/kD4GZ9X0RItEAWS3b9ZDAmE5Td2puuzTr3Ca
-	 aVSDqRTCyuop5tRXJ27EGkgdyAyrBlh1BLDorROTtEMEcWf3Y+KCVs8+SNJHE8ELbSQ6a
-	 BsTcY9TNiDBrdIeoeR32pxCjTHykQxGBt2386QInW5d1PviM3Xz4rAMNkTwpBsbprDal1
-	 mEf6GIVCz320xN7g7HcTOdQR3NraecVqCBI4OGzX7Qt5Vo1BRxJH/rHBfB43cBDTj9A==
+	t=1795781512;
+	b=y08q/1/i+FRRCgYbkcO8l4V4sukOhBZZuM78DjD2PGpMGnnXLNhxwpnv3OK4oSOYkf1J
+	 K4gsWX5X9ln1lfy4fmyHqn6Zf9pfQR+/g15Bo8UDlMg3fDskXveQhHQIR3Mk2LeqBHdOH
+	 Orj2dwE3dDWKqTG3HamNTuhwWxHPheLi651Pz2LRV9qnFrtiEh/TFiZsaPRa5n1M3prsu
+	 4DV+5RnPLCOHPtYT0PXFJcicqGV5BXcz/4At1dBEMGPdKYS7/9oEe/6fvLGumtDJ/npcx
+	 EiGp7FD987cNXDJ/5hpjSru9M7/ZkRm+U8FZT9Q8D78KpRVX3xF3gIO2ttpWH3vfd4Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795780934;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=Gs/a4DDZkULpkfxaE5kGJ7kgjNQPkZBpTJ4KeEOsPSI=;
-	b=adbnh+iQRSQxjM+CPaFdhibu7DRzLal7XaQrBVvWVBbDvG9EOMsT702v6Gf1fhNGceIu
-	 9LISAwrW1qKx9J6eYGKWpRZv6ozP5qJl+2zQ6LcwqY8lBYrPynSTU0cz2vi0EdOqCm3EO
-	 lA3x1rDfYxoZwrwSAcv91di2LcIkFFWcUCFQBLmP0Mv9gaOr7VQPyXrPK+f1CZiMO20T6
-	 LP4LBB/Pf/v2z4nP1sXSP1rwqnGpGYr/BZ5Xb2Ct9bFZQtySlJTCRSqGLGcUECPWBXXRf
-	 XbTMLW8z9OaQTpNGrtgxnP7RENITO0Lemxj1v0OvSNI4C1Z3RJSWUCoSAYgJDCR9Z4g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795781512;
+	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
+	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
+	bh=U2UKqho7RiqZPSkkcPut/1/ppKVpudTdBMODtt9mKNk=;
+	b=EzJ0TGo4IPlPETZoco75TEXxzFYKkBK111/PChsF7ZOlO3HXnzfJs9IxAKS6SVKPQwsh
+	 1KMoG7Y/m/kfj2fuueq659K2xEh90HeBmqjFx1Z7Cw4AOHc3ak4Ek+7jyAkVGSxkp2mdZ
+	 IrQUQ0i8GGGRDLDyAhn0IfdmLQ93fcsqQT9AwfJqPinpr2AwxU3GYI6UsK9oXx1iffy2k
+	 mRzaexVN5APljYlp/ICCRL78GC5h5al7e0rptya1E7EBB04wk7jP2WpVkk/6Akoxh2b/Z
+	 QmyRNiSw22BOG2A07wBnBZJBqteAkSyKx6y/qS/Fa7KeqlgQ86GbRpfGiRFQwsPkgtg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=TEeSDaBO;
-	arc=none smtp.remote-ip=209.85.128.51
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SxYJjrQC;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731CE606A323
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 12:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 731CE606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D850606A31C;
+	Fri, 27 Nov 2026 12:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=TEeSDaBO
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4b467581b98so77312195e9.0
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 04:02:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795780933; x=1796385733; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Gs/a4DDZkULpkfxaE5kGJ7kgjNQPkZBpTJ4KeEOsPSI=;
-        b=TEeSDaBOuKB7e8yLbfTESsaV7uZ329NFIgBiFqGf8GEVWnaNCCJ3QyAPmqvm7pJfHX
-         qSvwSkmG9yl6ntyMUIKHGEA6lxF/z4uRIF09gY8/faM5Cg9BRRfmUF/JR2ldh41oBMW/
-         8HtHwPvpGkcEPWRShgdSDrjfKkXcsnZGtUFEZj8jNuVwu6GDKLNzzXLSJ7su7ClOqp6Y
-         rZ+LdwZijz0cFxXL+kMlcUtsgpNKZb94je+OCcYqGRXrzSI/POxxUqyaSUsw5n0AZ9eK
-         3SFXIqrhJMg9aGTjlOXjjSRynPaq6vh5lvQMofShwVSSVmEhj/51kkCwRo5a51Jz9xCl
-         xrEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795780933; x=1796385733;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Gs/a4DDZkULpkfxaE5kGJ7kgjNQPkZBpTJ4KeEOsPSI=;
-        b=H9tq5Gns0w2Vr0CZCBYD1mVq0bUyrfPSfm/9ffoGDWxHIviPJbTL0cJyfqFBMgq91c
-         edyxlBFuAaPlDWnj5mOPSGbRB86Qr92WljQP+DzPAGzkYLRSJGk1qM9Rx7PMVtNShOTz
-         sTJXtbMrzIQYuUP2xT1iDqLNo7VizpscHSBNhfnu/awjq1u9zgZaCmLLIcdvdltq/Kf3
-         cq43+APgvCKDPTIA8JsNmi/sTvpVZ5/2NpK2cFxHa5hJEda2lfYMAatkC2JBpwwIi71V
-         tlriuiM97S0RjdqzcynLaVm7WNk5cIMTUNlrWKnW1vxSvkfx5bLOnXfXQR6A9jp60/sz
-         8cdw==
-X-Gm-Message-State: APuU4Z8PqIdjBbVyLD8w7qhJm/FlSR4KKUDIFb59XV7QXw8ywjdsMK4F
-	4AwLp40gIi3QDuMxpDFWKm0eEKuVykkVMiAbo9WSUlerUGVtaNJNqNSU
-X-Gm-Gg: AZFdTZcmWKT00S0l0NgFDd8ipNIxOhFGtJpP2o3hcv+IP4/Wz2v5x/+BxN1asFXB6og
-	tajPABeklowYgtUjy6DLInhyXzoM+iVliHN/ePmGfsBycuJcw+Ljg62nFrYT4MBU9htsrv8xTc+
-	t3VdhfF8/xBaQ/8cQiHO1j7iVeOYVVk9TiBBaSZ3N65uvcHioBBt2ap9WRJ3bsz8+ntjTiZH7nr
-	x49XNZVgjpFjPjtM6onE0BV3p66LBW+96NkP3xaInVF+/ILGOH9gieEQQy20/OweOh2LPExbFVg
-	yRvZpXCwUKIxJZJ2+OqICX5Rvtefth9OzxLOCQtL+HrEasf8cwrTCrZnnf5LhJhqiAFT7s3XOPz
-	yI+ROeCPu4R3I1YAHm14DttU2oshFsl/smwRepszbwHVNLzPZOF8toJTv0ocyxDkhj1WIYeOGp6
-	0QRawqISd7VwLn5J0kqqthX8wAdm3U1HnqRNp2trMRukwHm12PcqetVakFJtwCS0+ZCi3gVnRvd
-	wpi9LU9PUP8IZAfMgHZr6jv6NTSWVjHOSdQnNRIOzw3fAJjKDAkE5aJ1XnBoRcEkE7StnyOu8Fb
-	NzUD/jjILSW/VM3s/WEoHgJo/lYueFdMICai8Wh8g1grI7gK
-X-Received: by 2002:a05:600c:3b8a:b0:4a3:59c9:a754 with SMTP id 5b1f17b1804b1-4bb8892da25mr486388005e9.22.1795780932698;
-        Fri, 27 Nov 2026 04:02:12 -0800 (PST)
-Received: from localhost.localdomain ([79.117.198.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb906640a2sm393684565e9.0.2026.11.27.04.02.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 04:02:12 -0800 (PST)
-From: Jose Nieto <jnieto.alaber@gmail.com>
-To: Corentin Labbe <clabbe@baylibre.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jose Nieto <jnieto.alaber@gmail.com>
-Subject: [PATCH v14 30/30] arm64: dts: amlogic: use the system clock for A1/S4 crypto
-Date: Fri, 27 Nov 2026 13:01:03 +0100
-Message-ID: <20261127120103.1532882-31-jnieto.alaber@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261127120103.1532882-1-jnieto.alaber@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=SxYJjrQC
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25C861F0089B;
+	Fri, 27 Nov 2026 12:11:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795781511;
+	bh=U2UKqho7RiqZPSkkcPut/1/ppKVpudTdBMODtt9mKNk=;
+	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
+	b=SxYJjrQCoXn8jKpccGPJV92RABj6dtqWFrQ+kJnGiCfY0XOjMjtJSgws8GZXXDA/A
+	 bAW4mMITA5O0Y6A5PUke3SL9+twwjt83hNafHGIWXt8jp6T3wwy96ZE45oTPvuOcbJ
+	 6CnS27JzH/XecIX0kzp9fujcqV29vwZlWw8SKR9ycL67FCXHmr4eLgvIoe3KWGX6Wc
+	 uf57GL5l5OJ2rVAX1bdHPVDgvfW5V+ovSlUeSDieDqW/DoVjwoOOXi37N/co2Yui1/
+	 IQmKI2tfk1WDUtbPyHemX+6U72wEkVSuVRak8sY0Tj+1PPNoe8F7jOLbQvaKAnhh14
+	 LueO+DMUR4w+w==
+Message-ID: <sashiko-outbox-237327@kernel.org>
+From: sashiko-bot@kernel.org
+Subject: Re: [PATCH v14 03/30] crypto: amlogic - Don't hardcode IRQ count
+Reply-To: sashiko-reviews@lists.linux.dev
+To: "Jose Nieto" <jnieto.alaber@gmail.com>, "Corentin Labbe" <clabbe@baylibre.com>, "Herbert
+ Xu" <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org, devicetree@vger.kernel.org, "Neil
+ Armstrong" <neil.armstrong@linaro.org>, "Martin Blumenstingl" <martin.blumenstingl@googlemail.com>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Rob Herring" <robh@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, "Alexey Romanov" <romanov.alexey2000@gmail.com>
+In-Reply-To: <20261127120103.1532882-4-jnieto.alaber@gmail.com>
 References: <20261126193241.1471372-1-jnieto.alaber@gmail.com>
  <20261127120103.1532882-1-jnieto.alaber@gmail.com>
+ <20261127120103.1532882-4-jnieto.alaber@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 27 Nov 2026 12:11:50 +0000
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -105,70 +64,75 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-The A1 and S4 crypto engines are clocked by the SoC system bus clock
-provided
-by the peripheral clock controller.  Use <&clkc_periphs CLKID_SYS> and drop
-the synthetic 64/166 MHz clk81 fixed-clock nodes.
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue to consider:
+- [Medium] crypto: amlogic - IRQ requested before init_completion() in
+  probe
+--
 
-Signed-off-by: Jose Nieto <jnieto.alaber@gmail.com>
----
- arch/arm64/boot/dts/amlogic/meson-a1.dtsi | 8 +-------
- arch/arm64/boot/dts/amlogic/meson-s4.dtsi | 8 +-------
- 2 files changed, 2 insertions(+), 14 deletions(-)
+commit b42c58d2650be1044e0fec0a7ef8758413b304b6
+Author: Alexey Romanov <romanov.alexey2000@gmail.com>
 
-diff --git a/arch/arm64/boot/dts/amlogic/meson-a1.dtsi b/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
-index 396260b7b398..1b064c556c68 100644
---- a/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
-+++ b/arch/arm64/boot/dts/amlogic/meson-a1.dtsi
-@@ -691,7 +691,7 @@ crypto: crypto@6000 {
- 				compatible = "amlogic,a1-crypto";
- 				reg = <0x0 0x6000 0x0 0x48>;
- 				interrupts = <GIC_SPI 120 IRQ_TYPE_EDGE_RISING>;
--				clocks = <&clk81>;
-+				clocks = <&clkc_periphs CLKID_SYS>;
- 				power-domains = <&pwrc PWRC_DMA_ID>;
- 			};
- 		};
-@@ -775,10 +775,4 @@ xtal: xtal-clk {
- 		clock-output-names = "xtal";
- 		#clock-cells = <0>;
- 	};
--
--	clk81: clk81 {
--		compatible = "fixed-clock";
--		#clock-cells = <0>;
--		clock-frequency = <64000000>;
--	};
- };
-diff --git a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
-index de173f40e15e..c004ab7bbdfd 100644
---- a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
-+++ b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
-@@ -71,12 +71,6 @@ xtal: xtal-clk {
- 		#clock-cells = <0>;
- 	};
- 
--	clk81: clk81 {
--		compatible = "fixed-clock";
--		#clock-cells = <0>;
--		clock-frequency = <166000000>;
--	};
--
- 	firmware {
- 		sm: secure-monitor {
- 			compatible = "amlogic,meson-gxbb-sm";
-@@ -631,7 +625,7 @@ crypto: crypto@440400 {
- 				compatible = "amlogic,s4-crypto", "amlogic,a1-crypto";
- 				reg = <0x0 0x440400 0x0 0x48>;
- 				interrupts = <GIC_SPI 24 IRQ_TYPE_EDGE_RISING>;
--				clocks = <&clk81>;
-+				clocks = <&clkc_periphs CLKID_SYS>;
- 			};
- 
- 			gpio_intc: interrupt-controller@4080 {
--- 
-2.47.3
+crypto: amlogic - Don't hardcode IRQ count
 
+This commit replaces the hardcoded MAXFLOW constant with a dynamic flow
+count queried via platform_irq_count() and moves per-flow IRQ registration
+into meson_allocate_chanlist().
+
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/a=
+mlogic/amlogic-gxl-core.c
+> index 48dbdf4520348..b6933be39a377 100644
+> --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
+> +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+
+[ ... ]
+
+> @@ -154,13 +154,31 @@ static void meson_free_chanlist(struct meson_dev *m=
+c, int i)
+>   */
+>  static int meson_allocate_chanlist(struct meson_dev *mc)
+>  {
+> +	struct platform_device *pdev =3D to_platform_device(mc->dev);
+>  	int i, err;
+> =20
+> -	mc->chanlist =3D devm_kzalloc_objs(mc->dev, struct meson_flow, MAXFLOW);
+> +	mc->flow_cnt =3D platform_irq_count(pdev);
+> +	if (mc->flow_cnt <=3D 0) {
+> +		dev_err(mc->dev, "No IRQs defined\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	mc->chanlist =3D devm_kzalloc_objs(mc->dev, struct meson_flow, mc->flow=
+_cnt);
+>  	if (!mc->chanlist)
+>  		return -ENOMEM;
+> =20
+> -	for (i =3D 0; i < MAXFLOW; i++) {
+> +	for (i =3D 0; i < mc->flow_cnt; i++) {
+> +		mc->chanlist[i].irq =3D platform_get_irq(pdev, i);
+> +		if (mc->chanlist[i].irq < 0)
+> +			return mc->chanlist[i].irq;
+> +
+> +		err =3D devm_request_irq(mc->dev, mc->chanlist[i].irq,
+> +				       meson_irq_handler, 0, "aml-crypto", mc);
+> +		if (err < 0) {
+> +			dev_err(mc->dev, "Cannot request IRQ for flow %d\n", i);
+> +			return err;
+> +		}
+> +
+>  		init_completion(&mc->chanlist[i].complete);
+
+[Severity: Medium]
+Can meson_irq_handler() fire before init_completion() initializes
+mc->chanlist[i].complete?
+
+Moving devm_request_irq() ahead of init_completion() enables the IRQ
+while mc->chanlist[i].complete is still zero-filled, so a pending
+interrupt with a non-zero flow status register will call complete() on an
+uninitialized swait_queue_head and dereference a NULL task_list.next
+pointer.
+
+--=20
+Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261127120103.1532=
+882-1-jnieto.alaber@gmail.com?part=3D3
