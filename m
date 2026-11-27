@@ -1,58 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795805294;
-	b=OxpIgAspnxJc7NpUUKNs7EWWY9wTHwMKOFi4Qkn+eEjTdvanqZE8cjvaWGfe5TYJJ837
-	 CuCZ2GUWuxeSeHXPwdP3OfNzYOP+0pfkHA7+56EZArB1PoJjJPGkbtcVSbrOh2QONDhej
-	 IMzxOAfQtxFzWWt9f2ckVUmPQfUqMS6zhgS9NR7jHdzZC7H4Mv9b128KXM7zasgitLuD9
-	 kGpTOgDd573REqPMnhK4ph/WSgwT8ZTeDhrNjvR4vD7RKxlAi/3nZqKOHoaKdf+h7kPl0
-	 ZWtmZ2hxUIeAscYhM15kxGpIqtt3RV89d94X9EoYyY2vfEjovaiv9VI36W9htzRQoOQ==
+	t=1795806291;
+	b=NARiIdPWm56IM6GCyzh1T7vC4EuGd+5G0fNFfFqP+yLTCRSbOLMUs0PR2JX4hQIF0QOZ
+	 HdAzfNlR61R7z975QUjUr61wZOCTD2ZrO2xN21aUs/EKWm2bCHVyycRLwUjqiq5X8pP3R
+	 /lh4tvISAjUcrOZuLL068yJQbzY7UbuvWsaD7YUf2ba0+j8lnPSGQAMEQNSPZ2VCeqXqp
+	 e39iGnaCvO+UC9M7SzfxeClmRxKi061hELyIq2G8z4k/tsmYDlo9EEEpVhoM8DE6sjbCL
+	 2+vL4HG1ew1FWHx/aQmxWb3RmwLnjuOCgOEImvkV3mFuejG2ZemlxxkpJbkSP0Oy4kw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795805294;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795806291;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=kTWfwLU9AK6CypFMW27FabInezsO4qPOmYZqmCY8gzk=;
-	b=cQwLGy+cDdNhstdCNtPRcuAsDRsOMa/8V5kqNy0e8DV1OJQGR0F62VwZutprvwF7Hepu
-	 CivMr9O9HneCNQgCapc0aVUStXiNvNwW0sGmsXdqEN63tTItb53N7CLX8Hq0KM/0WjXr0
-	 G/NCIpr3k6vHQ/VM/y8SZmvqb9zThhL1kclhmK4diCA3QqL6UzL6+QcGBwAgBmBp6dv2N
-	 sSczhDybwKW7hNgZBpmFs4TTmyedCaz2XITM+jk0Gf+ufi6OCL9pqWtAZsPpx+Vh7E4I/
-	 NezZColMzEJoicYEizAA3P+bJ3EbgbsU5C0XWMgBgfXqm+8kXFNGA34kmFyTIcVZ4XA==
+	bh=1T/hxa1T0OQ5L4RB3hNQ93dAwWEtUDesGp/ezdZTtNU=;
+	b=et6TOTd4nRJqmS9zpoLgbKAb3Rbe+jd6g39jAi9cx+Upa8JcgB2K/SbvdcOH9YiXOu44
+	 Y4lBAXOIk7KiyB/jyFfy9f6vyWJaeCBquap/J+kWJPR1KTeEcqZdcM/H/k1Croz28Isjh
+	 dmK46dlR9iq+zXb91uCJEwLnSVix1NywrWty7s2DcIznE+W+aw1Rf4rbuksc6mCQAXkdJ
+	 zcxSUFvfRkPHRjl7SDI7s2IExoQKcNBcrwlbm+3nqLKrOwyVA3K32JwwqAltYJheumUtM
+	 sogakfhY43q1TcHZiXcyQ6mykvopwGl05FGGvD55NQwJ8qelIGKMbedpwR+u4fzmq6Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RQDG1jY3;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oERaHfLk;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEB4606A31C;
-	Fri, 27 Nov 2026 18:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90C3606A31C
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 19:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=RQDG1jY3
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98EA81F0089A;
-	Fri, 27 Nov 2026 18:48:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oERaHfLk
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E13A1F00898;
+	Fri, 27 Nov 2026 19:04:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795805294;
-	bh=kTWfwLU9AK6CypFMW27FabInezsO4qPOmYZqmCY8gzk=;
+	s=k20260515; t=1795806291;
+	bh=1T/hxa1T0OQ5L4RB3hNQ93dAwWEtUDesGp/ezdZTtNU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=RQDG1jY3KRmCfeLg/3+43yn0523AOmfpBepgIF+hHdw2zdHKqvTNN91SZVu3I6YzP
-	 CRvLyJfFDbxlmZ9s5IvhBXVJPZ57m3wu8fIqE2BpEmW8DS6hz/w/zlb8eA5+xan9BM
-	 z0juE95k+S0Q+uPUXtWCL/lu6KckkbcKRJ77qtNTrHp4DHwX3RMVlfuLWHZIPUH5Fp
-	 Xs5R4SWilSG1tnUm3jBvfqQ+U4HLHfI4rFRZbxDzK9QnnqUL+SDcuD0hWS/4LLUvQb
-	 9IAQZGkI19cxmbmnPJiMNfDo58kZnU68ep7drZem52tZ07boy0TwZxfqlTjkc9zsr4
-	 hiP7BEGw8vYnA==
-Date: Fri, 27 Nov 2026 10:48:12 -0800
+	b=oERaHfLkF4vLo0sy6Tfor+l6DUTcCV+1tmBrrFpezL1NMB/u9qSAyBBRmvR3XEON4
+	 f10t08JDMkw0gD03bZ4JaJQVSAGo9IvoortxzWJkrdHOj7Qcb7SAxf5FUT4CFPNvzl
+	 QFwexGH1i7Xn8sgIDQH11qBXZIhtjsxpNoH3vOYJfwQCwDVUSUko9SQs5k8S0wIrJB
+	 HTbM9AHcAFhQawheC3g8zB4wmChhFQ94UYvdPBxGTuFN/IGwRTVyhFeFwPOB7KWY/t
+	 QnrShAe4TI5/eUIDfD7y5tgeMpAIezHqTRJN9784baJRGhRu6DUSWt1UoeQl9/dDIz
+	 70IPI+ZiAyeww==
+Date: Fri, 27 Nov 2026 11:04:48 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Laveesh Bansal <laveeshb@laveeshbansal.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com,
-	linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] blk-crypto: use a NOIO scope while holding
- profile->lock
-Message-ID: <20261127184812.GC1974@quark>
-References: <20261125081417.77674-1-laveeshb@laveeshbansal.com>
+To: linux-crypto@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org
+Subject: Re: [PATCH] lib/crypto: x86/sha512-ssse3: Roll up rounds and reduce
+ stack usage
+Message-ID: <20261127190448.GA8300@quark>
+References: <20261125043159.192004-1-ebiggers@kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,30 +60,39 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20261125081417.77674-1-laveeshb@laveeshbansal.com>
+In-Reply-To: <20261125043159.192004-1-ebiggers@kernel.org>
 
-On Wed, Nov 25, 2026 at 12:14:17AM -0800, Laveesh Bansal wrote:
-> Setting a key in blk-crypto-fallback can deadlock on profile->lock.
-> blk_crypto_get_keyslot() holds it across keyslot_program, whose setkey
-> allocates with GFP_KERNEL (Adiantum); direct reclaim can evict an fscrypt
-> inode, and blk_crypto_evict_key() then takes profile->lock again. syzbot
-> reports it as an fs_reclaim vs profile->lock cycle. Since
-> commit 5acc6f649a68 ("fscrypt: Always use blk-crypto for contents on
-> block-based filesystems") hitting it no longer needs -o inlinecrypt.
+On Tue, Nov 24, 2026 at 08:31:59PM -0800, Eric Biggers wrote:
+> Currently, sha512_transform_ssse3() unrolls all 80 SHA-512 rounds,
+> producing 13.4 KB of text.  It also stores all 80 message schedule words
+> in a 640-byte stack buffer, which wasn't being zeroized on exit either.
 > 
-> Enter a NOIO scope in blk_crypto_hw_enter() and leave it in
-> blk_crypto_hw_exit(), so allocations made under the lock, by the
-> fallback or a hardware driver, can't recurse into I/O or fs reclaim.
-> blk_crypto_reprogram_all_keys() takes the lock directly, so it gets the
-> same scope.
+> Shrink both of these to more reasonable sizes (4.7 KB of text, and a
+> 136-byte stack buffer that's zeroized on exit) by doing rounds 14
+> through 77 in a loop that does 4 iterations of 16 rounds each, and by
+> using a circular buffer to hold the message schedule words.
 > 
-> Fixes: 488f6682c832 ("block: blk-crypto-fallback for Inline Encryption")
-> Cc: stable@vger.kernel.org
-> Reported-by: syzbot+20d60aafd9a0d1f2a380@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/r/6a9b25c3.b5d4176b.238c3e.0004.GAE@google.com
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
+> The circular buffer works well because each message schedule word in
+> SHA-512 is computed only from words in the last 16 words.  The number of
+> rounds per iteration is set to 16 to match the circular buffer size.
+> (It's also a multiple of 8, which is how often the state cycles around.)
+> 
+> The message schedule could also be stored in XMM registers, but that
+> approach was found to add additional overhead on older CPUs.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+> 
+> This is an alternative to the series
+> https://lore.kernel.org/linux-crypto/20261122022030.296468-1-ebiggers@kernel.org/
+> It does 16 rounds per iteration instead of 8, and it replaces the huge
+> on-stack buffer with a circular buffer instead of with XMM registers.
+> This hopefully avoids any measurable regression on older CPUs, while
+> still achieving the two main cleanups.
+> 
+>  lib/crypto/x86/sha512-ssse3-asm.S | 157 +++++++++++++++++-------------
+>  1 file changed, 92 insertions(+), 65 deletions(-)
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
 - Eric
