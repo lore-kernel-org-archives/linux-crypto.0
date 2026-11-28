@@ -1,61 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795841537;
-	b=WVoKlQjCrI0Z5ac0HMvt6P5YGXnJtzMqYNXoE8Ct+WIFmRyp5xvS7nwZHuQdHVSahu4K
-	 0pDdWzBJw78DGvdbCb7ZFXW5MSnypXZNkJdqr0QnEeN7CYtK22Dgec7CSDZBRSEkDhPuV
-	 cUHPr9qMaVrk88gtwZ/O6Pdd3iEMHTzNuOYwET3zidVpJLx6WPBC1/dszJ1aa2R+OfZRi
-	 gC40uyW3+eCr3X+g5IJr6G9Od7oz3Wh9isw3dEWMV2GJuAG17rx8JbOsOlRNJxpAsvTTe
-	 9IizkmN4wbwsvcLKm/r8eYVqyezVkhqsldZSRi99XAnWxUoGEbiraDF7thVGJdgJj8g==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795841537;
-	h=Received:DKIM-Signature:Message-ID:From:Subject:Reply-To:To:Cc:
-	 In-Reply-To:References:Content-Type:Content-Transfer-Encoding:Date;
-	bh=Vj9dT2EUBDfRXnL8b/O6b5BnEnZcAlx9DkgJmVXD4fI=;
-	b=Xww5+35QluLJvyReg6dmaFMlgVwZkWqnLJpQ5LCBP6EaaeGqpICdUxxJHMigrEylVtow
-	 qTbGsljVwql4bSBl0S9gCga5IQwS8CeRIzhoHlxbJRt8aBbFpIDUEPIaiJ2iyrAbUWRof
-	 8UT3GJq7ehUIYlJs6oF+ATqpdP7kapaURJnuPIW/lsGz3wVCCops1LiGcpNPkgBLC/Fdj
-	 o1L/ENxGzLEija3RxYt4VTF9TRVGQfDGLPYuxzXy+LDusEUbUyYY0AfVj/A2pKg3SloJn
-	 lq4Rk/jmquhM1r3FEmbEM2k6gC/B6FhKYUj8m48922XxAt/hCm0MNOunF2d4Iu/svaw==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m7onyYVG;
-	arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795845284;
+	b=dUfxuo8wQMU1FVc7Pu+NeeiEwdFIQ0EKTTHOLo1d347DQd+aSmXsBq7PZCwfx5ydA1Yp
+	 6NSFWZdBd4mey5LW+fTsPe4BdnpRWZqFIJz5TK5zvP5X9lshyrB4qfyHm792Nu3qhjpjA
+	 whOkDHBW4xeTE0X2BaRi10KOlbQ9h0V2Qhfsh0uCrySKTbdLWyWErZV24RwhQYoiHeQbL
+	 iexD8HvUzXDNsJGdnrFutIu6jRJ29kTKigSzbTfICRRLDe8vZkSMW+zQkCT42FIdRtdlW
+	 Q5EdBMZtXbIoak0/Wy5frzyItB2+Fu813LiRKO8Cj0wuMrDtU72oHmYUg4gGoSPUK1w==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795845284;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=k9hyQlz7QKllm/FLrW3PvzuomC4Hv1dQAnHOylFtZe8=;
+	b=shvtNi14rwQpIgj+lepyNS4uJKzOBwdnopTuwLCWOwR9FXyCukKXa5NpTWIVLRRariwd
+	 F2Ujx4aGG5kLQ36EhdBLX1D3o6mC85pYpBGQLECAGYOeE6ZqPt3W18hTcH18ERPBU5zIK
+	 Kahj7qdRgQ9EQ+fC3qSEq4+hbRDXAMXYWqPMvIF7L82a0kE4jGZfPNO6yBxOC328YfEAN
+	 eC9HuerBYk7VCnp280tUf4Rxqb7op5WmfyF7P60iN03o9yv8i+Hba34fOxUftOWI6nS/4
+	 xaBjjXZ6K3fQgjHom3e23OZWVHrh0OTybWkLSePWs28IAlzlfkoI0FJKondOvA6Eytw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bhkMau43;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA9F606A31C
-	for <linux-crypto@vger.kernel.org>; Sat, 28 Nov 2026 04:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0808606A31C;
+	Sat, 28 Nov 2026 05:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m7onyYVG
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 630201F00893;
-	Sat, 28 Nov 2026 04:52:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bhkMau43
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795845283;
+	b=T6XfIx4SqrZyMfIgvrpHezTcBUcqUCHxbQeraOrRPpWqJW3p9GqafdXFlncXaRrv+EJi
+	 G0hbrtTb8v0a4x0Wy554ixxLsGaWGrHFVE/UaTlqpe4tA7yeptjfamY7rz/CKUo82hJXH
+	 4qoMbHifetpvky58xwclnc8CMq/YnLgOK47wQ+guwP38Vk9IjgzHFNZ/i9NiLzLW+NZ30
+	 hiFYoQt5kwzzayOfrRYL/xy9OiCnY2OLHy1M0a30ZG2wh5xyAhtAEqA6VlcBfcbBzWpCs
+	 9liOr399SZ/XCgcW5OKTcNv89qfBj0PCX+kINSpXM29+Yq9tb5/JUlmOYOXO9yGw1aw==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795845283;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:X-Mailer:
+	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To:Content-Transfer-Encoding;
+	bh=k9hyQlz7QKllm/FLrW3PvzuomC4Hv1dQAnHOylFtZe8=;
+	b=prygffPSx330ViXw0BV/MusW4K03NYyQJ3nZU3LoiNWeamBK4eQjrCXLA4ZaOtrhe4Ob
+	 lgcPfmWoX2Wn0cIN3+8OToYjDuXMBurLeYLAZ9bSkTsrYwjx25cNmDIVm5BeWzpwp1Aho
+	 Txhjes2J4maXBB1rehpwxALVZ7ePXERw9Ad+UFVN4Zhuyh07LT5ZekyKTUDUfDP5zCEB1
+	 cNxOxgPYK92UiZyca3eSkBgYyIKBrDmKkInKrAtiHrtB9KhjI47VzBDXzNHqJ9+f5WJu0
+	 DQU03BtejB2jVdcqnBmhSUf0xo9lrFy34xVk9mDOWwDyJDbTvxJfQC7byvnT1TwBsuw==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id 033391F00893;
+	Sat, 28 Nov 2026 05:54:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795841536;
-	bh=Vj9dT2EUBDfRXnL8b/O6b5BnEnZcAlx9DkgJmVXD4fI=;
-	h=From:Subject:Reply-To:To:Cc:In-Reply-To:References:Date;
-	b=m7onyYVGmtwmOaLgjhDZ77bEm0fQ3q0Rt+jMC3I1y2eRBhBnxlVN+skY5q+RST5o6
-	 JAG83a3pmgqHzyk+nro7WvVqI1r1MMXeEsllSGvwGAVEGBUTOCUQGMaxXe1wQy8Wau
-	 WnOZRAz/HYaosPd8gi9vnHSUFp4+sOP8jT4yjaXU0/qR0j0J4m5W3kB1NGIpzY9b2v
-	 yz9PDdBNUppVMa5vQ1/tYluiTPVHWOTOBj8YJ7Ree4w0WVxRtK5q5XuTf3nKrtIwpi
-	 8+MoGjuz5E4aPZxUjKRytxMyJKy2yQGoEAMGpe1df4CD6vhzIc3vAtke/9JX/AEyXj
-	 +D6I6MYm41y8g==
-Message-ID: <sashiko-outbox-238463@kernel.org>
-From: sashiko-bot@kernel.org
-Subject: Re: [PATCH 8/8] crypto: cesa - finish long hashes on the non-TDMA
- path
-Reply-To: sashiko-reviews@lists.linux.dev
-To: "Rosen Penev" <rosenp@gmail.com>, linux-crypto@vger.kernel.org, "Herbert
- Xu" <herbert@gondor.apana.org.au>
-Cc: "Srujana Challa" <schalla@marvell.com>, "Bharat Bhushan" <bbhushan2@marvell.com>, "David
- S. Miller" <davem@davemloft.net>, "Arnaud Ebalard" <arno@natisbad.org>, "Boris
- Brezillon" <bbrezillon@kernel.org>, "Russell King" <rmk+kernel@arm.linux.org.uk>, "Romain
- Perier" <romain.perier@free-electrons.com>
-In-Reply-To: <20261128044050.722617-9-rosenp@gmail.com>
-References: <20261128044050.722617-1-rosenp@gmail.com>
- <20261128044050.722617-9-rosenp@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 28 Nov 2026 04:52:16 +0000
+	s=k20260515; t=1795845283;
+	bh=k9hyQlz7QKllm/FLrW3PvzuomC4Hv1dQAnHOylFtZe8=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=bhkMau43tSgdYJI6gt/xQYzSiO+i4rbCOGxkVK1kzxeHJ6AGse+Yb4UUFG1SSvdDO
+	 7qZyYYJX31ozxRrmcACds5LSMUy4x1pL+V2YrggRZTA2kyMDyB0AMyw8ch55euCvm4
+	 E8hAguoCpR/HmEh+/7NG/eLjZbxkPDuLZ/uY3WlWZhbmTglnvZGLg/t3IsMi/ymZP5
+	 iPd4rswIXUihjxHVZsP/xyDFAjsrshP7zphle9jrd6S4e4MaQdalYfMZjt6jpT7Cip
+	 XLdWvHaPq77Z4GZUKBJjOtV3+3dPwBl/S3u7svhR8hHI1/Nxj2s+eWe54B4BJSdXrg
+	 6ehaQRjIdqKLQ==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 88CCC4DFD5;
+	Sat, 28 Nov 2026 05:54:35 +0000 (UTC)
+From: Wesley Atwell via B4 Relay <devnull+atwellwea.gmail.com@kernel.org>
+Date: Fri, 27 Nov 2026 22:54:25 -0700
+Subject: [PATCH] crypto: mldsa - report correct sizes for keyctl
+ verification
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -64,94 +82,162 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20261127-mldsa-keyctl-sizing-v1-1-9ff5b4345cce@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAA/x3MUQ6CMAwA0Ks0/V4TNtHprmL8GKNAI0yyEqMQ7
+ k70HeBtqFyEFQNsWPgtKq+MAawBTEPMPZO0GABd5S7WOk/T2GqkJ3/TMpLKKrmn2l+dr89d5U8
+ 3NIBz4U4+//X+MIBNVKamxJyG3zVFXbjgvh+G5AiGfgAAAA==
+X-Change-ID: 20261127-mldsa-keyctl-sizing-4782745f0739
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: keyrings@vger.kernel.org, Ignat Korchagin <ignat@linux.win>, 
+ linux-crypto@vger.kernel.org, Jarkko Sakkinen <jarkko@kernel.org>, 
+ David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795845276; l=5264;
+ i=atwellwea@gmail.com; s=20261127; h=from:subject:message-id;
+ bh=gL5uvRWcy+UhykJUrDnQWcxJi/24PYvJiGeIvNoXXiI=;
+ b=N4f3cOr95LqB3YnzdstBIM62Pm1jix+3fnK5e4DQwNFWYeU82FtNa+2gJdFEqujjPKvciAQCQ
+ LrQSkDits5fACnw4TyE/NHJr/q+l3Jsui9P09KdcdPWKNWhv3m3IyIX
+X-Developer-Key: i=atwellwea@gmail.com; a=ed25519;
+ pk=Buny5Y3000rYoA3OYcxvjG5W3dpuSWh28lf8IVDjANo=
+X-Endpoint-Received: by B4 Relay for atwellwea@gmail.com/20261127 with
+ auth_id=1671
+X-Original-From: Wesley Atwell <atwellwea@gmail.com>
+Reply-To: atwellwea@gmail.com
+Content-Transfer-Encoding: 7bit
 
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue to consider:
-- [High] crypto: cesa: buffer overflow on creq->cache in
-  mv_cesa_ahash_std_step()
---
+From: Wesley Atwell <atwellwea@gmail.com>
 
-commit 819442c312cc2cf884cbbf9084155d8ab97dd609
-Author: Rosen Penev <rosenp@gmail.com>
+A user can import an ML-DSA X.509 public certificate into a session
+keyring and verify a detached signature with keyctl pkey_verify. Pure
+ML-DSA verifies the raw message with hash=none. The ML-DSA key_size
+callback returns the public-key length in bytes, although crypto_sig
+requires key size in bits. The generic digest_size fallback then
+divides that value by eight, so an ML-DSA-44 query reports a 1312-bit
+key and a 164-byte maximum input. keyctl rejects longer valid messages
+before calling the verifier.
 
-crypto: cesa - finish long hashes on the non-TDMA path
+In a Fedora keyutils guest, verification of a valid signature over a
+164-byte message succeeded, while verification of valid signatures
+over 165-byte and 1 KiB messages failed with -EINVAL. OpenSSL
+verified all three signatures. This affects direct keyctl verification;
+it does not establish a failure in module or PKCS#7 verification.
 
-This commit fixes hash finalization on the non-TDMA path for messages of
-64 KiB or more by entering the manual padding block whenever the last
-request's source data is consumed, carrying partial blocks across steps,
-and tracking final step emission via sreq->final_issued.
+Keep public-key length checking in bytes and report crypto_sig key_size
+in bits. In software_key_query(), report U16_MAX as the ML-DSA
+max_data_size instead of deriving that raw-message limit from
+crypto_sig_digestsize(). keyctl's max_data_size is a 16-bit field, and
+pure ML-DSA verifies the full message rather than a fixed-size digest.
+This allows keyctl to pass messages up to the largest size its query
+interface can represent.
 
-> diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/=
-cesa/hash.c
-> index b51315cd01dfa..5e867e688ffa5 100644
-> --- a/drivers/crypto/marvell/cesa/hash.c
-> +++ b/drivers/crypto/marvell/cesa/hash.c
-[ ... ]
-> @@ -221,16 +222,17 @@ static void mv_cesa_ahash_std_step(struct ahash_req=
-uest *req)
-> =20
->  	frag_mode =3D mv_cesa_get_op_cfg(op) & CESA_SA_DESC_CFG_FRAG_MSK;
-> =20
-> -	if (creq->last_req && sreq->offset =3D=3D req->nbytes &&
-> -	    creq->len <=3D CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
-> +	/* All data of the last request is in SRAM: finish the hash. */
-> +	final =3D creq->last_req && sreq->offset =3D=3D req->nbytes;
-> +
-> +	if (final && creq->len <=3D CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
->  		if (frag_mode =3D=3D CESA_SA_DESC_CFG_FIRST_FRAG)
->  			frag_mode =3D CESA_SA_DESC_CFG_NOT_FRAG;
->  		else if (frag_mode =3D=3D CESA_SA_DESC_CFG_MID_FRAG)
->  			frag_mode =3D CESA_SA_DESC_CFG_LAST_FRAG;
->  	}
-> =20
-> -	if (frag_mode =3D=3D CESA_SA_DESC_CFG_NOT_FRAG ||
-> -	    frag_mode =3D=3D CESA_SA_DESC_CFG_LAST_FRAG) {
-> +	if (final) {
->  		if (len &&
->  		    creq->len <=3D CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
->  			mv_cesa_set_mac_op_total_len(op, creq->len);
-> @@ -238,8 +240,13 @@ static void mv_cesa_ahash_std_step(struct ahash_requ=
-est *req)
->  			int trailerlen =3D mv_cesa_ahash_pad_len(creq) + 8;
-> =20
->  			if (len + trailerlen > CESA_SA_SRAM_PAYLOAD_SIZE) {
-> -				len &=3D CESA_HASH_BLOCK_SIZE_MSK;
-> -				new_cache_ptr =3D 64 - trailerlen;
-> +				/*
-> +				 * No room for the padding: hash the whole
-> +				 * blocks now and carry the partial one over
-> +				 * to the next step, which adds the padding.
-> +				 */
-> +				new_cache_ptr =3D len & CESA_HASH_BLOCK_SIZE_MSK;
-> +				len &=3D ~CESA_HASH_BLOCK_SIZE_MSK;
->  				if (engine->pool)
->  					memcpy(creq->cache,
->  					       engine->sram_pool +
-> @@ -262,15 +269,20 @@ static void mv_cesa_ahash_std_step(struct ahash_req=
-uest *req)
->  						    CESA_SA_DATA_SRAM_OFFSET,
->  						    creq->cache, i);
->  				len +=3D i;
-> +				sreq->final_issued =3D true;
->  			}
+The post-fix keyutils guest verified 4 KiB inputs with all three
+ML-DSA strengths, accepted 65535 bytes for ML-DSA-44, and rejected
+65536 bytes at the keyctl interface boundary.
 
-[Severity: High]
-Can mv_cesa_ahash_pad_req(creq, creq->cache) overflow creq->cache[] when
-creq->len > CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX and (creq->len & 63) >=3D 56?
+OpenAI Codex identified the key-size unit mismatch during source
+review, prepared the keyutils/QEMU reproducer, generated the signed
+fixtures, and proposed the two-file change. The unmodified and changed
+kernels were tested with Fedora keyctl as UID 65534 using signatures
+independently verified by OpenSSL.
 
-Previously, the manual padding branch was only reachable when len =3D=3D 0
-and creq->len <=3D 0xffff, which only occurred on block-aligned lengths
-where padlen + 8 is 64 bytes.  Now that long hashes enter this branch for
-any remainder, a message with (creq->len & 63) in 56..63 has a padlen of
-57..64 bytes, so mv_cesa_ahash_pad_req() writes 65..72 bytes (padlen plus
-the 8-byte bit length) into creq->cache[CESA_MAX_HASH_BLOCK_SIZE], which
-is only 64 bytes.
+Fixes: d3b6dd90e23e ("crypto: Add ML-DSA crypto_sig support")
+Signed-off-by: Wesley Atwell <atwellwea@gmail.com>
+---
+ crypto/asymmetric_keys/public_key.c | 18 ++++++++++++++----
+ crypto/mldsa.c                      |  9 +++++++--
+ 2 files changed, 21 insertions(+), 6 deletions(-)
 
-That overwrites the adjacent creq->cache_ptr and creq->len fields in
-struct mv_cesa_ahash_req, and the subsequent memcpy() of i bytes reads
-past creq->cache[] (triggering a FORTIFY_SOURCE panic when engine->pool
-is used).
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index d71747d93..03f4593c9 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -15,6 +15,7 @@
+ #include <linux/asn1.h>
+ #include <linux/err.h>
+ #include <linux/kernel.h>
++#include <linux/limits.h>
+ #include <linux/module.h>
+ #include <linux/seq_file.h>
+ #include <linux/slab.h>
+@@ -58,6 +59,13 @@ static void public_key_destroy(void *payload0, void *payload3)
+ 	public_key_signature_free(payload3);
+ }
+ 
++static bool public_key_is_mldsa(const struct public_key *pkey)
++{
++	return strcmp(pkey->pkey_algo, "mldsa44") == 0 ||
++	       strcmp(pkey->pkey_algo, "mldsa65") == 0 ||
++	       strcmp(pkey->pkey_algo, "mldsa87") == 0;
++}
++
+ /*
+  * Given a public_key, and an encoding and hash_algo to be used for signing
+  * and/or verification with that key, determine the name of the corresponding
+@@ -142,9 +150,7 @@ software_key_determine_akcipher(const struct public_key *pkey,
+ 		if (strcmp(hash_algo, "streebog256") != 0 &&
+ 		    strcmp(hash_algo, "streebog512") != 0)
+ 			return -EINVAL;
+-	} else if (strcmp(pkey->pkey_algo, "mldsa44") == 0 ||
+-		   strcmp(pkey->pkey_algo, "mldsa65") == 0 ||
+-		   strcmp(pkey->pkey_algo, "mldsa87") == 0) {
++	} else if (public_key_is_mldsa(pkey)) {
+ 		if (strcmp(encoding, "raw") != 0)
+ 			return -EINVAL;
+ 		if (!hash_algo)
+@@ -217,7 +223,11 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 		len = crypto_sig_keysize(sig);
+ 		info->key_size = len;
+ 		info->max_sig_size = crypto_sig_maxsize(sig);
+-		info->max_data_size = crypto_sig_digestsize(sig);
++		/* Pure ML-DSA verifies raw messages, not fixed-size digests. */
++		if (public_key_is_mldsa(pkey))
++			info->max_data_size = U16_MAX;
++		else
++			info->max_data_size = crypto_sig_digestsize(sig);
+ 
+ 		info->supported_ops = KEYCTL_SUPPORTS_VERIFY;
+ 		if (pkey->key_is_private)
+diff --git a/crypto/mldsa.c b/crypto/mldsa.c
+index d8de082cc..4753940d4 100644
+--- a/crypto/mldsa.c
++++ b/crypto/mldsa.c
+@@ -36,7 +36,7 @@ static int crypto_mldsa_verify(struct crypto_sig *tfm,
+ 			    ctx->pk, ctx->pk_len);
+ }
+ 
+-static unsigned int crypto_mldsa_key_size(struct crypto_sig *tfm)
++static unsigned int crypto_mldsa_public_key_len(struct crypto_sig *tfm)
+ {
+ 	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
+ 
+@@ -53,11 +53,16 @@ static unsigned int crypto_mldsa_key_size(struct crypto_sig *tfm)
+ 	}
+ }
+ 
++static unsigned int crypto_mldsa_key_size(struct crypto_sig *tfm)
++{
++	return crypto_mldsa_public_key_len(tfm) * BITS_PER_BYTE;
++}
++
+ static int crypto_mldsa_set_pub_key(struct crypto_sig *tfm,
+ 				    const void *key, unsigned int keylen)
+ {
+ 	struct crypto_mldsa_ctx *ctx = crypto_sig_ctx(tfm);
+-	unsigned int expected_len = crypto_mldsa_key_size(tfm);
++	unsigned int expected_len = crypto_mldsa_public_key_len(tfm);
+ 
+ 	if (keylen != expected_len)
+ 		return -EINVAL;
 
---=20
-Sashiko AI review =C2=B7 https://sashiko.dev/#/patchset/20261128044050.7226=
-17-1-rosenp@gmail.com?part=3D8
+---
+base-commit: 9fb9278d13dca54ce7ecd3254c7df8839e59f03d
+change-id: 20261127-mldsa-keyctl-sizing-4782745f0739
+
+Best regards,
+-- 
+Wesley Atwell <atwellwea@gmail.com>
+
+
