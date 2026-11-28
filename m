@@ -1,56 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795886729;
-	b=IRnG0+TVh2tSAPwac6gM7YNLPcvKzhXeBuAAam2U5+ZS8RArGKHIdBRPiEDLQSvqwgHA
-	 e8qrAsNQra+7zBvidUXvj3RjgbWLXuReitcz5RI17JbD/8HMu4+K67v+8Ka59Nuvl/H5R
-	 FcmFDKmxh0/H8EIXxaaVazd62UCcybpUJISrf3hj2EQ1c2n5FdzSmCaohea2GM6DIvqMz
-	 s8c3/f468koAXtOzOH761Da647TJDOk080QH4kygxp7FNvbuWMXrCstUCAXcxIa0ynUr3
-	 7Cvt5Rv8MUK5q7BVBK1bSYO9abBl3AEsrI6ivSCPij2UClKHkRaz5/nuqv2/cH9E6NQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795886729;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=GoINvI2p3H/uspH9CroxM8NPViIp5LkoZHRvOZM5sZg=;
-	b=OGOM6P5xjbVsn0n8fnB38U/r0xBhMuBMJvcdCDeudfdMj/z5Iug0Lo+cYpcThyjg14E3
-	 3vWF/7o8OIaPVEy5bP/xvAeUiuqQNF1gkScCtTPZZudPFwZ2NLUtXku4NBGDYRWewLujP
-	 EVwAoavulIBWVUx5hWsKUXJJ9ZGBKurD8rMxljJ6SeQMvjH7rfqRq6g/1X8c10WysKcep
-	 /XCCqEAlsI3aZfk4uSwsFNRweUbRAUBXnZUWYXRQtwxbve+DcbZPeyhDxJ3Ta0FmfIKCZ
-	 DN0dj40ZgivTJ4zcbUiZ1xjrpr1/TGcBjcrhKY6lPKdXlL8EsAjhrOTxAjbTR1uylAQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hAepRGn1;
-	arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795887511;
+	b=GiOxDjL3oa3FlNMOgglSoTXzspvppzZnVKgeG93dJh1KAtbaWvsqC6GvmehBktZ6biLW
+	 OLGc1YwdhwmCxL5YlaeRQxR1Sx6qI72pZDUdJQzoldwHT6hpj66XEdWmAOo0/kbKd+Hxi
+	 vFrlqWewBAfaczKkhkgg3CRvpnuqkFk9U7PERiqn6HFbFm7483Hpe3fxVCjWXHHJ4KmAK
+	 R1eWbOE+wM+PLXMgMclrQ91TpizY6ku41mV4Kvwf/SmRBpwsjdYhr5jvSEg51++bdBZg8
+	 9Crdo6tocitOjgKOK4RCSKQk2LdcZLlv7txjawxHveVwyZDI8OH79j7VbhIZDsHxuvg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795887511;
+	h=Received:DKIM-Signature:Received:From:Subject:Date:Message-Id:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=2QSYgDfusuB2rdXJL0kHHsJQctEFPxLWlTsaODx6am4=;
+	b=LJlib0CA6gyqacLiD/SVCFNjtGHbGaY7xIgBahUD4XnjOBie94pw5llMzb1NuN0iAQ4s
+	 GZlrTgLhuWgpKQDxt0yYiW63/1TFMh8vkar6Xuf3TvxkNyLicArfAlJjjVkN450Jx+2wq
+	 rNvsx9XJHgg6/lkJp5hmg06/GmZTYfJfZ8KT8+hlBx0xeVGx8VTBNrfqiXZ+5U8DG2roQ
+	 0x3F/Xpz2CK+/yEddx51B2ZZifCnlVZt9Ry2UxVBp1vyIByBhOmIJedN6BiDXkYmE8L9o
+	 PuGyWm81yrE69A8qrBfxfFEPugukLElA4Ndtg2cj13PuFagyOIY6h4XYaCUEK10yv0A==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HApiETv5;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81800606A31C;
-	Sat, 28 Nov 2026 17:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F77606A31C;
+	Sat, 28 Nov 2026 17:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hAepRGn1
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B42FA1F00897;
-	Sat, 28 Nov 2026 17:25:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HApiETv5
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1795887511;
+	b=XduGGabG7ftdzlJKYOFMkxp/Qq7C9hsp16gw4qxepjqUSsoE/2TurMe6RYOvxMYVtq5s
+	 ZEb8GlLUHsUaLJtknmKdSozD3V0rqRkyaSw8dfv8ThyyF7/PXeyfn/a65WpFoB1lP35DP
+	 AGXmXIeVJuZ4SCaS0ng7ELvdEuAaBhqj07hYpeorhsJLBt8e7tVpLPKWb/HbSWqWsELSJ
+	 rVWsKCpiwbJrD12e30Yj6/0rqXEGHJl1V9aLiVtVIny1GmxQWPR4DclNT3CUDgJvT64uk
+	 g+YvfPPqLBVJ4+iW6ezPLnQXszgxelGuADJAlcVeQlIBowK3StP5M5Hg8li7Vod+GGA==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1795887511;
+	h=DKIM-Signature:Received:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-B4-Tracking:X-Change-ID:To:
+	 Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=2QSYgDfusuB2rdXJL0kHHsJQctEFPxLWlTsaODx6am4=;
+	b=J8mP0I+7m1rT4S8qgtSuHnjrtWsWvw8dhP/XtMlWZyqbKhBl2p9YZOR9Gq3cNMcgpYNA
+	 iBWIIiWfL2D7ilpN00BqQ0YmNftYcAJr4nN/9p/CFtxXKRAN6YJRa3z19++TT0KUMddDP
+	 8qdiBtX5a3UQym6bu4WtlZnMwgdBmzxzNu9L+fE6vsZ/YAl2+husV2VfdEz1R34k/NX1k
+	 7DJR/qHNTp2eudF54wVGuBQAq7Ww7+keuLimE4VzB2rx2N3tgOM3OAYU533PkXuzLLpGY
+	 1JJ1qVsITEOcYH2grbbhgkuvszAR9WGiUnK/MCjcg51kfObA/qfDNaOPB2XVoRN3kfw==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.kernel.org (Postfix) with ESMTPS id DA3ED1F00893;
+	Sat, 28 Nov 2026 17:38:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795886729;
-	bh=GoINvI2p3H/uspH9CroxM8NPViIp5LkoZHRvOZM5sZg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hAepRGn1NtpgBwNVWLU0g+iiLrjKtBMWv/8z9D7zmFtuW9srlgaEoB+zHKo7j9Xyf
-	 UfPLV5fdl7Q4kNTLgZ807VquHXvjgryXgAOI6ilYV7dHPMe7gFkAyFcZ3XL0N3jT5Z
-	 mruVW4VNbZciiHo4gb6m+RmzyKmoTbzqmKZTXMXZ+IYNRpg16QpGHo4Y1zy7i9zRgm
-	 i/JnRQnv65YDKUaHDd5wRvP6KBENDFaMALj6TfhMjNwQyzauMnh1gmA5oF2BdJQMN6
-	 N8yJH0SWWwAngvHKIZVD1F3UrDaQraAd2gHl0muRct5wN/pEy7r/XiOYuuL2/dg5gM
-	 LNDv6jGkepmxQ==
-Date: Sat, 28 Nov 2026 18:25:24 +0100
-From: Thorsten Blum <blum@kernel.org>
-To: Ryan Prinz <rc4d5a@protonmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] crypto: atmel-ecc - fix missing ECDH public key
- validation
-Message-ID: <awsOhD7tlH1YZPdr@kernel.org>
-References: <20261125231745.1857056-1-rc4d5a@protonmail.com>
- <awouRON5Mgq6pbhf@kernel.org>
- <20261128084418.2057984-1-rc4d5a@protonmail.com>
+	s=k20260515; t=1795887511;
+	bh=2QSYgDfusuB2rdXJL0kHHsJQctEFPxLWlTsaODx6am4=;
+	h=From:Subject:Date:To:Cc:Reply-To;
+	b=HApiETv5kaEh9kJZuAALrVYVZJhAaoeLtpkiKdI4fFiXIePtScJPLIknJEVQcu7WA
+	 nouGRlL280SSJA/5RRQN8ax12asZAzWQZv9uJHhEkspirAulyhUkmU7S1Am2o5d6Uz
+	 d7rE5pwj8wkomXVcIUosFnk6OnuKhAqyv0hJoxmrpsHzgAwzeiC/04oDyWV3yHRyEQ
+	 x23ZbIiUkJae5Ttih6mVmGNBzGcaDU6a4yP55+d1MgzzAAwv7kq6E0y5FvoibiqNTj
+	 A1YS6uSw3c/Z5/y4RrUxu7bgUpOvJAYPDTLcXCeg+b5jWmaxjnuuQBY0+M4NBl3EAV
+	 ZbtjJb4vMkLxA==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id 6F49F4E1BE;
+	Sat, 28 Nov 2026 17:38:28 +0000 (UTC)
+From: Arun Iyengar via B4 Relay <devnull+aiyengar1990.gmail.com@kernel.org>
+Subject: [PATCH v2 0/3] crypto: ecc - Fix P-521 public key generation
+Date: Sat, 28 Nov 2026 17:38:27 +0000
+Message-Id: <20261128-ecc-p521-small-scalars-v2-0-0648f492bca4@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -60,83 +83,70 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261128084418.2057984-1-rc4d5a@protonmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WNQQ6CMBBFr0Jm7Zi2KBBX3sOwaIcCNYWSDhIN4
+ e4WPIDLl7z//gpso7MMt2yFaBfHLowJ1CkD6vXYWXRNYlBCFVLKC1oinK5KIg/ae2TSXkfGQsi
+ mqSpBlTGQxlO0rXsf4Uf9Y36Zp6V5r+1G73gO8XM8L3L3/p4sEgWWJhmtKAuT5/du0M6fKQxQb
+ 9v2Bf76RWHOAAAA
+X-Change-ID: 20261114-ecc-p521-small-scalars-601dd880c8bb
+To: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>, 
+ Stefan Berger <stefanb@linux.ibm.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Jarkko Sakkinen <jarkko@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Erwin Pawliczek <pawliczekerwin@gmail.com>, 
+ Laveesh Bansal <laveeshb@laveeshbansal.com>, 
+ Arun Iyengar <aiyengar1990@gmail.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795887508; l=1493;
+ i=aiyengar1990@gmail.com; s=20261110; h=from:subject:message-id;
+ bh=4QpzPaJjDpMKCRNZSFtiQ93lkyKG0Q3bS0kfTB4aQN4=;
+ b=VFcL6HPjxSwGe5+T1DESuutSYUnD7Ll+XRHx9ZAgIWks2Db2gRzlMEdedkNJ/xnbfu8rH2zWQ
+ nsfGmnvgGVIC2QlbeFkAXn88wev2H+YExsqC9e+LwjbVdRg68PtFuYw
+X-Developer-Key: i=aiyengar1990@gmail.com; a=ed25519;
+ pk=zXpRgUTrhaFe6jLyPqbBy3ccfkj04w0g2690Wv3mg+0=
+X-Endpoint-Received: by B4 Relay for aiyengar1990@gmail.com/20261110 with
+ auth_id=1480
+X-Original-From: Arun Iyengar <aiyengar1990@gmail.com>
+Reply-To: aiyengar1990@gmail.com
 
-Hi Ryan,
+Two P-521 fixes for crypto/ecc.c and a KUnit test. Patch 1 keeps the
+random initial Z from commit cd65eaf17841 below 2^521: with 576 bits,
+every P-521 ecc_make_pub_key() call fails with -EAGAIN. Patch 2 fixes
+the scalar multiplication for scalars below about 2^259.5. Patch 3,
+suggested by Laveesh Bansal, tests P-521 key generation. No in-tree
+caller is affected yet.
 
-This should probably have been submitted as v2, not v3, but let's
-continue with v4.
+This series was developed with Claude (Anthropic) as a coding assistant:
+it wrote the code and the commit messages. I reviewed it and tested it
+as described in each patch.
 
-Please post each revision as a new thread to the list and not as a reply
-to a review.
+---
+Changes in v2:
+- Add Tested-by from Laveesh Bansal to patches 1 and 2.
+- Patch 2: note that k = n now runs the ladder on 2n.
+- New patch 3: KUnit test for P-521 key generation.
+- Link to v1: https://patch.msgid.link/20261114-ecc-p521-small-scalars-v1-0-7b114f076b33@gmail.com
 
-On Sat, Nov 28, 2026 at 08:46:06AM +0000, Ryan Prinz wrote:
-> atmel_ecdh_compute_shared_secret() passes the peer's ECDH public point
-> to the ATECC508A/608A/608B secure element without validating it; only
-> req->src_len is checked.
+---
+Arun Iyengar (3):
+      crypto: ecc - Keep the random initial Z below 2^521 on P-521
+      crypto: ecc - Fix P-521 scalar multiplication for small scalars
+      crypto: ecc - Add KUnit test for P-521 public key generation
 
-Please clarify that this refers to software validation, as the device
-may perform its own hardware validation.
+ crypto/Kconfig    | 11 +++++++
+ crypto/Makefile   |  1 +
+ crypto/ecc.c      | 31 +++++++++++-------
+ crypto/ecc_test.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 125 insertions(+), 12 deletions(-)
+---
+base-commit: 9fb9278d13dca54ce7ecd3254c7df8839e59f03d
+change-id: 20261114-ecc-p521-small-scalars-601dd880c8bb
 
-> Add the same check to this driver's path, before the point reaches the
-> I2C command, reusing ecc_is_pubkey_valid_partial().
+Best regards,
+--  
+Arun Iyengar <aiyengar1990@gmail.com>
 
-Which same check? Somebody reading this later in the git history will
-have no idea what you're referring to without the context of earlier
-revisions.
 
-[...]
-
->  drivers/crypto/atmel-ecc.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
-> 
-> diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-> --- a/drivers/crypto/atmel-ecc.c
-> +++ b/drivers/crypto/atmel-ecc.c
-> @@ -19,7 +19,9 @@
->  #include <linux/slab.h>
->  #include <linux/workqueue.h>
->  #include <crypto/internal/kpp.h>
-> +#include <crypto/ecc_curve.h>
->  #include <crypto/ecdh.h>
-> +#include <crypto/internal/ecc.h>
-
-Please keep the crypto includes in alphabetical order.
-
->  #include <crypto/kpp.h>
->  #include "atmel-i2c.h"
-> 
-> @@ -146,6 +148,34 @@ static int atmel_ecdh_generate_public_key(struct kpp_request *req)
->  	return 0;
->  }
-> 
-> +static int atmel_ecdh_peer_pubkey_valid(struct scatterlist *src,
-> +					unsigned int src_len)
-> +{
-> +	const struct ecc_curve *curve = ecc_get_curve(ECC_CURVE_NIST_P256);
-> +	u8 pubkey_buf[ATMEL_ECC_PUBKEY_SIZE];
-> +	u64 x[ECC_CURVE_NIST_P256_DIGITS], y[ECC_CURVE_NIST_P256_DIGITS];
-> +	struct ecc_point pk;
-> +	size_t copied;
-> +
-> +	if (!curve)
-> +		return -EINVAL;
-
-This check can be dropped as ecc_get_curve(ECC_CURVE_NIST_P256) always
-returns a valid pointer.
-
-> +	if (src_len != ATMEL_ECC_PUBKEY_SIZE)
-> +		return -EINVAL;
-
-The caller already checks the length, so this check is also redundant.
-
-> +	copied = sg_copy_to_buffer(src, sg_nents_for_len(src, src_len),
-> +				   pubkey_buf, src_len);
-
-Could we validate work_data->cmd.data after atmel_i2c_init_ecdh_cmd()
-and before enqueueing? That would avoid an extra copy.
-
-Thanks,
-Thorsten
