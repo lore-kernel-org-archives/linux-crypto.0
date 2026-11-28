@@ -1,82 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795840853;
-	b=aNbdITYMoeW1hYWEDt8QjZSU3kxhRJ5+u8BnsjW70efG7Vtm0XoRDLygjHwZnk4ekBUV
-	 23Tc7etv4UbIcpc3vZJCyTdW+ek35URsChoj55f4rYT2ZEFP/3DxdE5JNlsOnW+JVgTjF
-	 JyZ8cGKl12DRZKPFgdVc7MAbxizVG+2BExbpVtqkBwEjd56Mlk9KEEUyAsHsp6z4d99sS
-	 RYXLKCv2oVegkuxmYdQ3mG5nLP8UG4Qv7Ow1Eor7S0BwolRVPmnmOY9LtGqeHBf/MyOYP
-	 GHmrLD2HThync42/JEwAS2t7d3ZX9hejHCLnBJzgxV0EsVj9ie5tAP4ZJpEM1r04/Kw==
+	t=1795840855;
+	b=YMyHfnkv97gPuEGfKInVhRHD9PC3Z0Kd0noGrAmMdXS6TCO8kgc3LhqBumvyzhMdNiKB
+	 tulwe0Zyft2WTGF2428EzlwPMjyq/4Q/9nHK7rrJQIT5orZ37oQperOYKqNnB1po36Y6H
+	 MmU64kwTyWDs1aYNiO8H/7QHOCOT0zqxyqhYAjRrKgnt3QFWQPnTij4v8eh6vkPTcpxkV
+	 If1JvEf5HmwREixQ29TWgKvvo9FIuORnySWAFC7uUQ6pc6e7kaLaiH9z3p2dKAOJVE9NG
+	 ESUx/kNmiaQYeJ0aOxG8oSBY2sEX7v0lWMkiUwEZ/vpJ+uKcGE9wnEbgvSKuPlUvUVg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795840853;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795840855;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=LdGZmQWmpmdHwSWO6lkYlpHZbQKn6tbj5FKdxpXXdtY=;
-	b=OEYd6CCZ4BoY2OP02FpaFUSGU9XhFxG8KNtz44FSD758L4mF5MJu0eFGnvE08O8ZhPnV
-	 hm+Dx4N4cnpgPENVtVTf79s/vWeAzzW8WaAWuOXCdoe609hcwCIi0d1oOuBdleIkmZV5s
-	 KG8p8FSToKlWvWClmuR3N3P5Hdq+3MGCjU/CjJ7dcO8WSk8RdsvtEBJ7U3mhjoOqTzRvP
-	 wzvKoNM/4Qdrx7bTaN1HOfApMcUMNx0eVeAQBnpqosV55S8pYk3EqzMjrWq9X2jUdbdR/
-	 LfJCeqd5gSZIqGnGNkOVET0y0cBWOrbkPTTmRYchGCcVUDic7D6/JsNJ1t/sAHifuYw==
+	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=44Vt/f/9Eidg4LLHAGiZfANvWFFz8txu28uEAmthn6o=;
+	b=1DCcSnvunpZ1C2o6D4NiIu/KzX7fjlaklwI135tR+VqBelR6NkvpeaC+z0IiASmE25Xy
+	 loF4mFujV4yLySVCsHmpTaPjfXzSXWVqso/palzQVKPaFwvX/htAbAzSPpMTgDUnTlRuC
+	 JuGudFiLk4Wrt2y5Z2RobZGeStXUfUiQE/GnnabtBDo48zJqBl9sPH+BrVU/P6APtOk28
+	 YOV8qEQztyv10LZDj1aYVFzEJwCzDqyIvGzj7TLzln1sDVPUewXHK58T5l7wHRRjPBkhY
+	 V5IceXiV6vddf4U7zvx/1UJFitaEfl1t+t9zayx5/GelnK9mh/ksmqsKVwBEZafLoPQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=U1DhWB9i;
-	arc=none smtp.remote-ip=209.85.215.173
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="p/AILqY/";
+	arc=none smtp.remote-ip=209.85.215.169
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7443D606A31C
-	for <linux-crypto@vger.kernel.org>; Sat, 28 Nov 2026 04:40:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7443D606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFA0606A324
+	for <linux-crypto@vger.kernel.org>; Sat, 28 Nov 2026 04:40:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CDFA0606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=U1DhWB9i
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-cde7e8abf9cso3301557a12.0
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 20:40:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p/AILqY/
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cde827b7b95so2926141a12.0
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 20:40:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795840853; x=1796445653; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=LdGZmQWmpmdHwSWO6lkYlpHZbQKn6tbj5FKdxpXXdtY=;
-        b=U1DhWB9iKFR4QaR9NRROyMOa5YpuJfQL/+PabJixgkWeq5trKKZETb+Ym/+DGi6hCp
-         KIEbdvDnXG3dwLjmW8nBvvX6M6rfp7rTje23jA0Gn40WXGB7crlztova6wAiFBfne7B0
-         E2PMN3J9JtoTUbaMndQxhpuA/xrLPPoSxUWP5Zmv/Rm/6ChHaLfRQshz2i1+ilRZBHVK
-         JKUn/P6YxcAtg8gst+1LAtT1BstsHswmyA6rELqz3/Ep16qESjWa1tHtc5a/6tVjYh25
-         lo7Ffqz5CXKdj1uwTxiD/wmg/xlti5W1KkCOv6FoumaJBDK0PZ+VZmgglY1dP4KPdFMX
-         E2Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795840853; x=1796445653;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20260707; t=1795840854; x=1796445654; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=LdGZmQWmpmdHwSWO6lkYlpHZbQKn6tbj5FKdxpXXdtY=;
-        b=Mh+rR3laK9M3mWPhGwDaTCv1ZsBPeOuCSJmK1Bfjcfsq7vibUbYad2PDmNO4dqb2Xw
-         LDgMig/MxTi1ojyGfYtglc3SYuzSBPYf6+HVqwhMaPJ2clUnHPA4f1gClPcnAZniy3FU
-         HsnLYPgpFgICJPIUm7oLxkcSapwa0+cL0xDsVfnb7hwukEcOgYYKWtziMfY2+e3D+i72
-         7A0teXIwdUxY2SzfCKKm16TUd0FqnzF1iaY/S8AGRpKzy6gM1DTBn9SOYtzs/8wfKHBW
-         7Hw32q4vcebPLtiLqbwYYsP0VyX55xFa0cb8MJP4JQORL5mUeu7XjymfWm/7dnwAQ6I5
-         sswQ==
-X-Gm-Message-State: APuU4Z9msZYA87HCdpCEar2nZTWIDYfpfiTk6aW7vMVrlIXvX4spCGTU
-	/FnlycR3KH38AmdS8cDCe3LWeMIhUZHEtybO13A7WKDb+XYyWpqYedZakbKxGA==
-X-Gm-Gg: AZFdTZfL8Pe5v2rqwvQCJR771+fjccaxfPg8T5GtUwfBnupdwtCqBK5ZPp8QK97NttH
-	b9zhX4CTpEv+N7oPK2ICKxBJGnscOIYH+XIdTG93f9i71LJiWFCXpkcmhiHQAXpQbMTugMd3xKC
-	eQPovocS7CduruNcOAK+g0+66UhpwBu4VQkk7+aUBU0jlH5fT7kwUpmzon/D84q8jF/7OoLLfTb
-	xBWLO3+LlnhBUCwG/BVGu54bCjwccZoWLl3ki2B+BcrRY3ea3mtThux2m6nHoYGCADR96gHckou
-	6ZaYHqFMEL22Z7Z84KWHP1W0duAomDzeCf4F9eCLOh9N/9YcYBTuvCeYbV6b0jmgVy1EwAKGxGs
-	ZLPXdkLqKLzR5uZCQN1fidPPICMH41fHauuom2KC7kOqh0NRnCO+c7iKiDMi5tBAT45UMmTJrDJ
-	L03a8mgdoFkLS1Ubf8cX3zU/74sAWT0+fwguvicUYGd5KclJjiLW/7m8W9moQqbpf2vDM91Nwp6
-	owuRzPHRUcq31vfJnXig74MdfwTfR8XL412ELBPFdH2c3FNfu4mH9mvDh4Xnlr5qS7YGB5nD+b0
-	LxZLg8IYRqABkY/M+bXJTSLETtK4eFCRzrQfbmLDbMjNXdSHaiECzx/e6zQGypwmwHIEkPLWrDt
-	Qx6uhC1gAI+bDInkUlJDiF6l99NldIrOa+N9wTThHHWttYPxjTMs7oNu71j9Glp5BN1HDM1iRqA
-	y6kg==
-X-Received: by 2002:a17:90b:3148:b0:3b3:cab4:5060 with SMTP id 98e67ed59e1d1-3b41c8ffa9fmr27250393a91.17.1795840852700;
-        Fri, 27 Nov 2026 20:40:52 -0800 (PST)
+        bh=44Vt/f/9Eidg4LLHAGiZfANvWFFz8txu28uEAmthn6o=;
+        b=p/AILqY/OIBgnnXGmjW6+BbVfMlZ0LGIKESGWM7artY+c6Ooo0TKByuZ37Sk1tSOcz
+         jdO1l9YpvmRQIT11jSnbuJu4MP84LQbrKa9IE61PEm2MW/TgA/IXNByHK5xal6pGz4j1
+         voCL6CcyjAnLweLrvC1h0Sz+QE4+QgaF90fctw5DIDiAAiu/n2mu7nDluHKVD2beIxfW
+         GL/Uk0G0/SchSC4X1YYrcCWXxVPHieCoFAKS6NYW7RT4GR66o0NDdOcHZlzkYlO1MBoX
+         Tv4lewkJHN85bQvtaxQEO2VYtrPp0tNdIvSKRUSE+uoi4/Cu21i7c29YiuYOyfvgyffb
+         IBZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795840854; x=1796445654;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=44Vt/f/9Eidg4LLHAGiZfANvWFFz8txu28uEAmthn6o=;
+        b=C9s9Iga1gBTPSWO6wKjqhg7N4xP53fzLyrSoAno+uJk0ueWB5OYM02ZAXU+x9kXtlp
+         mk65U7wnaMDoYbwxSdKJ1XeuQ7mdxy2WQoJ2gl9M7db1mK3NXuaWbUGNa5H5wqZ93QkG
+         pGjVm25MIUgFSQWYmIzDr5m14rVowsko3AZzIursYavIMj6DG3Vzh58lcvLSJJz9k5Lo
+         A1R2bHaEWC9eAlD254hrPjlpyQzp3Pgv+VLJNm7wvNrW3lP5t17IxbMhBdWAFa4cq6GR
+         /74Gf5dasW2tPEZRRegdnlJzBMQiGcrH3k9JC9ljKuXCXZjD/uBTXhHEyPxgsiZpgGrT
+         ksnQ==
+X-Gm-Message-State: APuU4Z81/TEJS7ulz4drCEfhguvTrUKiInRElFkTFOwTxFDyjOqRHgpw
+	5nhpcLFiJ4Zfr8smH+R/tQRrEDEiJO3tLWqqYP227Sl608mIyVOtsHTd5GNRRg==
+X-Gm-Gg: AZFdTZebT6vjh5sYCWNOR6aWg0LdezCIaC+lPnIV/smNcSU75Nf6TwJ5Ow0Tc1PxeH6
+	SrB3x32P+kcZXZ1skesNIk/KwEZoawQY2jCWD4L6c2dtuMj9Gw2QvCMsX3OfFVEzCk+SaX/qPRf
+	DLCNwdTMNIg8xqIZZiNaINSCFYmGlVfO+K2GJODtOMxCJAt1S5xZguBmYsMaqc+QqGlvgg4HU6U
+	wZ+VQk3VK2Fv2CenQumL5/kv/Z9sVjhqFe2XjGNBSG8yAt1jN96m9/24OEFiDmlgjOYdo+hDAPQ
+	fqjUW8ExvSPER0m7b0f5NTb3+g1aVYh9jJf4gF/JrDxRvY73oNmy+2/udqTRulVQ2crDxMUEpMd
+	zdsfmEZr75hMawOUwcIpT+bJMK8/O1BY6DRqr+j2zWPbZ5sMT/KPMGGalWTNvAC/JpHEEIVLdyc
+	rDNXNWgmfMuxyX60cYmddEV/auqGoxSxWoIWNdqrkdN+2NJ+cjkA52ibIdmICoUx5m7P6qxvPC8
+	bP4GqHFETfAGcAO4quqq0mIppvaSWDHdCyqMmNmjuRuTL7A4gtaBg1HaTfpDOMTD9ib1blKXssg
+	6oDUMnYhKKufQ5im2twU5HtsR1EoBw2TUH8eqTysTZyU1iWLh0W9Rs0thgi7kGVIz/Cbnir0gkS
+	neKmerzOjMe1T3xW5ikozKl42+zFRq9JcRPgh5fWtgKcFFYxj/4tTf22rdr9vQgpH6X/5gclTIx
+	xG4A==
+X-Received: by 2002:a17:90b:3810:b0:3b1:bee2:223d with SMTP id 98e67ed59e1d1-3b41c9bc27emr25837489a91.53.1795840854021;
+        Fri, 27 Nov 2026 20:40:54 -0800 (PST)
 Received: from ryzen.lan ([2601:644:8000:37f::e34])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b41abb1b66sm42716729a91.1.2026.11.27.20.40.51
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b41abb1b66sm42716729a91.1.2026.11.27.20.40.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 20:40:52 -0800 (PST)
+        Fri, 27 Nov 2026 20:40:53 -0800 (PST)
 From: Rosen Penev <rosenp@gmail.com>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -87,11 +89,14 @@ Cc: Srujana Challa <schalla@marvell.com>,
 	Arnaud Ebalard <arno@natisbad.org>,
 	Boris Brezillon <bbrezillon@kernel.org>,
 	Russell King <rmk+kernel@arm.linux.org.uk>,
-	Romain Perier <romain.perier@free-electrons.com>
-Subject: [PATCH 0/8] crypto: cesa - fixes for the Marvell CESA driver
-Date: Fri, 27 Nov 2026 20:40:42 -0800
-Message-ID: <20261128044050.722617-1-rosenp@gmail.com>
+	Romain Perier <romain.perier@free-electrons.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/8] crypto: cesa - clear the IRQ affinity hint before freeing the IRQ
+Date: Fri, 27 Nov 2026 20:40:43 -0800
+Message-ID: <20261128044050.722617-2-rosenp@gmail.com>
 X-Mailer: git-send-email 2.56.1
+In-Reply-To: <20261128044050.722617-1-rosenp@gmail.com>
+References: <20261128044050.722617-1-rosenp@gmail.com>
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -103,81 +108,61 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-These fix bugs in the Marvell CESA driver, found while reviewing and
-testing it on an Armada 385 (Linksys WRT3200ACM).
+Commit 8dc981ba2fad ("crypto: cesa - remove irq_set_affinity_hint")
+dropped the calls that cleared the affinity hint on probe failure and
+removal, on the grounds that the IRQs are devm managed. devm only calls
+free_irq(), which does not clear the hint, and __free_irq() hits its
+WARN_ON_ONCE(desc->affinity_hint) when it finds one still set. So
+unbinding the device, or a probe that fails after the first engine's
+IRQ has been requested, triggers that warning.
 
-Patch 1 clears the IRQ affinity hint before devm frees the IRQs. Since
-commit 8dc981ba2fad the hint is left set, and __free_irq() warns about
-it on removal or when probe fails after the first engine's IRQ.
+Clear the hint from a devm action registered right after the IRQ, so it
+runs before devm frees the IRQ. Switch to irq_set_affinity_and_hint(),
+which is what the deprecated irq_set_affinity_hint() wraps.
 
-Patch 2 suppresses the bind attributes. Transforms only hold a reference
-on the module, so unbinding the device through sysfs freed its state
-under transforms that were still in use, and corrupted the reference
-counts of the static algorithms for a later rebind.
+Fixes: 8dc981ba2fad ("crypto: cesa - remove irq_set_affinity_hint")
+Cc: stable@vger.kernel.org
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/crypto/marvell/cesa/cesa.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-Patches 3 and 4 fix hashes that the driver pads by hand: messages whose
-total length does not fit the engine's 16-bit length field, and, for
-HMAC, also any final operation with no data left (any update()/final()
-over a block-aligned length, or an empty message). Patch 3 stops the
-padding from overwriting the last SRAM-sized chunk of a message before
-it is hashed. Patch 4 makes the padding count the HMAC ipad block and
-finishes the HMAC outer hash in software, which the engine does not do
-for such messages.
-
-Patches 5 to 8 fix the path used by engines without TDMA (Orion). CBC
-requests longer than the SRAM payload restarted from the request IV at
-every step, and hashes were wrong whenever they took more than one
-step: the hand-made padding landed in the wrong place, updates could
-step an empty operation, and hashes of 64 KiB or more were never padded.
-
-The hash algorithms are still disabled by commit e845d2399a00
-("crypto: marvell/cesa - Disable hash algorithms"). The concurrent
-failures that led to it come from a DMA pool double free, which commit
-23073a888ba1 ("crypto: marvell/cesa - Fix DMA cache leaks on hash setup
-errors") fixed as a side effect: reverting just its req->cache = NULL
-brings back wrong digests within milliseconds under parallel load,
-followed by a lockup. With that commit and this series, I will send a
-patch to re-enable them separately, along with a few cleanups.
-
-Testing was done on the WRT3200ACM with the driver from this series
-built as an out-of-tree module for its OpenWrt 6.12 kernel. The kernel's
-crypto self-tests are disabled there, so a test module compared every
-result against the software implementations: up to 8 threads, random
-lengths up to 140000 bytes, scatterlist splits, in-place and separate
-buffers, update/final/finup/export/import sequences and random HMAC
-keys. The non-TDMA path was tested by disabling TDMA in a test build.
-Before the series, about 0.5% of HMACs were wrong single threaded, and
-about 1 in 4000 hashes with lengths up to 140000 bytes; without TDMA,
-77% of CBC results and most hashes over 1920 bytes were wrong, and a 4
-thread run hung. With the series, about 750000 requests over both paths
-gave no wrong result. With patch 2 the bind attributes are gone and the
-module cannot be unloaded while a transform exists; unload/reload cycles
-gave no warnings.
-
-An AI coding assistant (Claude Code, Claude Opus 5.5) was used to review
-the driver, find the bugs, write the fixes and the test module, run the
-tests on the WRT3200ACM, and draft the commit messages and this cover
-letter.
-
-Rosen Penev (8):
-  crypto: cesa - clear the IRQ affinity hint before freeing the IRQ
-  crypto: cesa - do not allow unbinding the device
-  crypto: cesa - hash the last full SRAM chunk before the padding
-  crypto: cesa - finish the HMAC outer hash when padding by hand
-  crypto: cesa - keep the chained IV on the non-TDMA cipher path
-  crypto: cesa - put the non-TDMA hash padding behind the data
-  crypto: cesa - do not step empty hash operations on the non-TDMA path
-  crypto: cesa - finish long hashes on the non-TDMA path
-
- drivers/crypto/marvell/Kconfig       |   3 +
- drivers/crypto/marvell/cesa/cesa.c   |  19 ++-
- drivers/crypto/marvell/cesa/cesa.h   |  12 ++
- drivers/crypto/marvell/cesa/cipher.c |   8 +-
- drivers/crypto/marvell/cesa/hash.c   | 168 ++++++++++++++++++++++++---
- 5 files changed, 190 insertions(+), 20 deletions(-)
-
-
-base-commit: 9fb9278d13dca54ce7ecd3254c7df8839e59f03d
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 564b09773507..ac4fe783735b 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -415,6 +415,13 @@ static void mv_cesa_release_sram(void *data)
+ 				   cesa->sram_size, DMA_BIDIRECTIONAL, 0);
+ }
+ 
++static void mv_cesa_clear_affinity_hint(void *data)
++{
++	struct mv_cesa_engine *engine = data;
++
++	irq_update_affinity_hint(engine->irq, NULL);
++}
++
+ static int mv_cesa_probe(struct platform_device *pdev)
+ {
+ 	const struct mv_cesa_caps *caps = &orion_caps;
+@@ -519,7 +526,16 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 
+ 		/* Set affinity */
+ 		cpu = cpumask_local_spread(engine->id, NUMA_NO_NODE);
+-		irq_set_affinity_hint(irq, get_cpu_mask(cpu));
++		irq_set_affinity_and_hint(irq, get_cpu_mask(cpu));
++
++		/*
++		 * free_irq() warns if the hint is still set. Registered after
++		 * the IRQ, so devm clears it before the IRQ is freed.
++		 */
++		ret = devm_add_action_or_reset(dev, mv_cesa_clear_affinity_hint,
++					       engine);
++		if (ret)
++			return ret;
+ 
+ 		crypto_init_queue(&engine->queue, CESA_CRYPTO_DEFAULT_MAX_QLEN);
+ 		atomic_set(&engine->load, 0);
 -- 
 2.56.1
 
