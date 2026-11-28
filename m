@@ -1,79 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795887519;
-	b=d66jx1xNIPD4Jh2KR9BYboUW/kqiC8xE89KfYtQu2bBhjCc1CqWPJibJhsAw5Y01xDjM
-	 p5yMhmLrjBLnAl9lFkr8zVO4dqg7eJCP8VlnfoJCgzYc8KgicWbAKxsMe2rUNZyh+gpNw
-	 BGnNMsllnbPDvRhYPHKz52AjYEJLhQOxvw3Sy0ySj5gf5Rkz6zoIey2CoqAP8rarAnfis
-	 Pi5ygbXrjEBeljlYDf70PT/DGJKvusdPShD7Il8ORwn76+6gLwhthdUEtaMWzPTOHMu/x
-	 5OecXBuPi5UHfOSzGmhoY91IQlgoe+u5IGHxjSHTJNkhIZPdanGooHJrbkflduUVxyA==
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=fail;
+	t=1795887514;
+	b=zvZ/aUUUPjfR0XnHEh54EmQkqKaxVODPA6KfEEtKZ5LOA+YeEmaMshsHMyNA604F1Q05
+	 mLFmoEStYeGq9htRNGFnSgCORrKqfVjSqf6wGJ/LMPP2K+QtnDFIoE6DXPitdJkGjRfeI
+	 +ujMnO+OeqDK38C7dkaZgcvJbcssMFmyWy080o1+Oy5BhieZFPplIN5AGGwzA5Jg3vF0A
+	 /oior0GiuwtCYYU4vdPCGl+/R3RkUFaP+S6MLEeSMay1WY3rHehwcEfs1ZM2VvFafVz8b
+	 pNgD4QSRLP0ZI4Eyvr78kmy4XOeAYTe4c1+udNXD082WAoXj0pHSvvxooP63uFMT0hg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795887519;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795887514;
 	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
 	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=ciV6sH9NIcvxsWqjp+pVh6BX/xpNc7ABW6rb5elVJkE=;
-	b=BrHJ8W/SpQIRribTRJGmTuUA2xyQ20ugN+ZK8I2L/u4NMBSODnZl+zkVRJ9//86lZtQI
-	 VrUaPDKOWd0wXRnwgGo3e8eVKT670gbg2EYUKGE2RZwT2XsS9ywZaH1cnlXhWfgPe2IK9
-	 OkmK2/rp++m4bcZCOx5wpWJ5p38TzmzNBE8gAbGPQLhwkqvHE+p4fxzEXy7eojs7Qu0Ue
-	 WYohFX6rqYsMsFRTQGK0lOpbCHKrQJJpveJ1Ur5d8PVtpwXVJhcz/rLGyBiG7pAUjcGWF
-	 ij+575h2xy8v06S76X3FIn0L9lUs8hOsssRlA1/uMpPqXpJYerdjzxED04nHYJyuoUg==
+	bh=iK7LbYpNKtDbXco8AA09lUFqxVOSNUJqctB9bmvDd6g=;
+	b=4GcqfpDB5zKuVsdjMYwN7qTFMBMy1g6UNXTGDWqFLRMm/0P6IpgEWTh/eZIg1Sxcv/vE
+	 uq5LK5lBlFuB8YcqxdbGUZER9r5yPv5uQaCGs/YtRbdVaBtvi5sx+cowBeBhWhOy6m9uB
+	 YKIPDxFAPRlXILZ6dzHx5SjC5KmZVplzp2hKncD4M8u8kZtZ+80Odu+qqW/wam7ojSH3y
+	 kIJYuwpwaWFHzmJSMYGBHjfYQyli/RfPDIRbROvB7gesDtX1jsGuos0eSVqnovdqOxaxi
+	 dCIevAwHybYRhyRB4S7h5gFd13aDiK31NqpSVgZ9BP3BvCjALpMlP06qI+c69JkIamg==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kxtj6yJ8;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BiHZcbb2;
+	arc=fail smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5AE606A323;
-	Sat, 28 Nov 2026 17:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1567606A324;
+	Sat, 28 Nov 2026 17:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kxtj6yJ8
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BiHZcbb2
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1795887519;
-	b=ETbfKYmEPeuuUYQ8twlHDWRDAFY7tDSgWcRRtHNZkf2vtFX1yyhv087CLNYT18Iuu2XN
-	 SDPfLwY3b5UC42AKT2Yh31XPWwINN4WpPat7tA4B1OLXCFk2oA3e8dS7hK3MR6OV3oaL3
-	 8lXSnO563ldzmlF+sGgf/R8P575ZT0L3webE96WicZ72q9q288EKZwQF9khNZWye27Tch
-	 8bhe2gypZRpeK9Y9Kj8iXdeyTlBuOp8ldf0a7MNsxrn7yEvauK/UsmLgKWLyDdwToKkue
-	 r0CcCJvBTGzCqdjSQ+pCMgPCRlYT9QE/dgr3KB6zsZjZV9miCLedtCHCRdlBujeLVwg==
+	t=1795887514;
+	b=u7yYUIZ9fbTfhF2VijPnGFekwkeLeWVm7xzsrJT84aSmdJ+RPYVuge1pdh4DsKCI+O+m
+	 nMJN3jqKXlOhuT29coJLMvFoa2F24x7mzyLL8LMY09lI6SOZF5aH8zr37v+pCJw3fkCK2
+	 5FjknJ3b43SYPsXAmkNZ/fxJ3CeKDjf2GjjH6IGwnyZtF60o9BLui/bhUnjZPNF/YlI6X
+	 sjGLZn/qd7IcR04TB5JWccDlRB7yUUzCQDnFPCTnZgxhdGbGbWlyyLIMRgv4BPuTp64aD
+	 Ski407toqzRmSPLQ9tTIHsl22efmk2V9aIM2c/C6j0wBS3wS939cfROvV8UPuD3HQuQ==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1795887519;
+	c=relaxed/relaxed; t=1795887514;
 	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
 	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
 	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=ciV6sH9NIcvxsWqjp+pVh6BX/xpNc7ABW6rb5elVJkE=;
-	b=Vzpxy7ocPobLvcYbOp+OyhYGPrt7vYKlm07nLleJqtGhuER2+6MlibBrtodhlaoNim6I
-	 54+F0492/WJDbyER8g1hg0Y0w7aKUTfx9ZgB+9WrUWYq8hELTZAYr72F8k9XMouXhX1M6
-	 kNNaVgh/4q6DJWk77AJDFSyWSRSHqbQrgqTHuraw4gJXYJ2TaRqG6TxhAeHBdk0WcbrM/
-	 baSSnuSvv1YsIM9l3Hie4cRxysORAjWI2bDvuanb694pN53pFWr7hevWtHNoz2wAxSKlB
-	 E2f4/l0UVGDAAewV/H6IS6Q3Mse0+fcxRwWRloIW10AGWI2lQAizczZ1T1wS+MXv0Ww==
+	bh=iK7LbYpNKtDbXco8AA09lUFqxVOSNUJqctB9bmvDd6g=;
+	b=JDzUkaGDHaZgpEmkk5dOtSztwyue2Fdtn3rfA2eTXR/vmD107t+MBIqvhtrnvtKREBcV
+	 vRWAmBo96Mwlja49XBgZcIEtUlrZN2hokV2W83/82HjZfbtCPur+hv1x1S9hTOu8E94YG
+	 Mg/l7aZHJxXOXNvsIdnRo7YFwf0BAlDZPp0EDXAh6b/R4ZSVHX5e3/ntsgUi7dr6qUoU6
+	 bt+MOwiO28PUo7OYaXQv99dhSpUL+XrHh+Z4O76NQjD7ZHLcP0lNDZKmtvm2YSCq35XJ4
+	 AT82I2XImqzXBeoUF4GyXQdaX/hA8rM9IeXVDSYKUU7Pg4OY7KLTqlb5Gl2+BRPjvfQ==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 2FC541F00897;
+	by smtp.kernel.org (Postfix) with ESMTPS id 088D21F000C1;
 	Sat, 28 Nov 2026 17:38:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795887519;
-	bh=ciV6sH9NIcvxsWqjp+pVh6BX/xpNc7ABW6rb5elVJkE=;
+	s=k20260515; t=1795887514;
+	bh=iK7LbYpNKtDbXco8AA09lUFqxVOSNUJqctB9bmvDd6g=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=kxtj6yJ8AmIQ++1mrtVtSajmlOZD8F5aY8CctFpevwUpCEXRrLrDbMkVts94FOfPi
-	 5XcioBY4vbHRCf/IUakrdPI6p68UjA05x6FHh+laODsX/YgjHKavh5Exj91tiygOLY
-	 mnLjWMNq2yA/2i20PI0wKYQ4JliqSf/HOjS+19YCUFUANagIg50mddHOTYISn3nfky
-	 HSxvbMCeA+qLNZUme9Q9ZTq/fUgfdi4ZSR5RN/vV9xEU/JXDrVTJtwSAJKlenxiPzo
-	 bVIYxyqbdChB5vmvSP6pIxtqJjRny0L1+WSiliiwtQElrJAxahdOMcAIEs77bukGUR
-	 Pm3RZr8aNg12g==
+	b=BiHZcbb2+sWFzPi8amDz6TEmtYWbbHC1Dc4MXfjARHYnvN9NjAFkPfbPhdpUJcQ21
+	 d0c1C51huahNK7tZJTkNqACl3ix68Q97qA6jqi2ZZDDQl+zOiOMNj1+Mj51b0YQ4Uc
+	 HTHhBocnq95XK8+Aw8G6yz6T9BnBCwu2rDXIBeW5/juWDVwcgCmwpK9C9nwMaM0iJr
+	 NqDIj9hxV37QPVsY+jDWfE4OQtFkjglT+kzI1XvM4Z2kRZm8ZbhXB76qAPXnIBWaPR
+	 87aI5DCEVE/7vtR+9CcuuW8tTIxgGFMJtcTlULisswuDKYJGgJTrQsjVoplmszj7gk
+	 ufoDM/MhnUx2A==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id B886A4E1C8;
+	by lkml.kernel.org (Postfix) with ESMTP id 924B34E1B2;
 	Sat, 28 Nov 2026 17:38:28 +0000 (UTC)
 From: Arun Iyengar via B4 Relay <devnull+aiyengar1990.gmail.com@kernel.org>
-Date: Sat, 28 Nov 2026 17:38:29 +0000
-Subject: [PATCH v2 2/3] crypto: ecc - Fix P-521 scalar multiplication for
- small scalars
+Date: Sat, 28 Nov 2026 17:38:28 +0000
+Subject: [PATCH v2 1/3] crypto: ecc - Keep the random initial Z below 2^521
+ on P-521
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -84,7 +84,7 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261128-ecc-p521-small-scalars-v2-2-0648f492bca4@gmail.com>
+Message-Id: <20261128-ecc-p521-small-scalars-v2-1-0648f492bca4@gmail.com>
 References: <20261128-ecc-p521-small-scalars-v2-0-0648f492bca4@gmail.com>
 In-Reply-To: <20261128-ecc-p521-small-scalars-v2-0-0648f492bca4@gmail.com>
 To: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>, 
@@ -97,11 +97,11 @@ Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
  Laveesh Bansal <laveeshb@laveeshbansal.com>, 
  Arun Iyengar <aiyengar1990@gmail.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795887508; l=1819;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795887508; l=3022;
  i=aiyengar1990@gmail.com; s=20261110; h=from:subject:message-id;
- bh=8swt0d/3mPiEQ4HYrvtUfhuwkb2hZC6GxX5xty+8q9I=;
- b=K0NDjTHjayXNkwFbSVt+Ok2g4Am830fLLpLyH3wzB16QbCFy/GEQsVuM1U38ZSt7A3t3tSfCZ
- 0HlYQUWLOP/D7i6Il8y2ih30LDfsUpls/rhmkf2RA8CjUGI/vSDsN3d
+ bh=Fk4oHHgTkglLwJ99I/UvAawdd280eMlHqGN6ONo4cE0=;
+ b=j0mAQaWLrgv9m5mMC/UeBcb1TyYmcUlSJs6H5EexOM9+bw6Yz2VCH5vECi3Yb09yL9t3b+WZU
+ ZGwzM6e7ISABp8GKpYE6RfEg/HqKGamSPvAPWwUyRlqgXJviyCgoBe2
 X-Developer-Key: i=aiyengar1990@gmail.com; a=ed25519;
  pk=zXpRgUTrhaFe6jLyPqbBy3ccfkj04w0g2690Wv3mg+0=
 X-Endpoint-Received: by B4 Relay for aiyengar1990@gmail.com/20261110 with
@@ -112,55 +112,86 @@ Content-Transfer-Encoding: 7bit
 
 From: Arun Iyengar <aiyengar1990@gmail.com>
 
-Stefan Berger's commit 114e80437e0e ("crypto: ecc - Add special case
-for NIST P521 in ecc_point_mult") made the ladder run on k + n or
-k + 2n with bit 522 as the top bit.
+Erwin Pawliczek's commit cd65eaf17841 ("crypto: ecc - Randomize the
+initial Z in ecc_make_pub_key()") takes the initial Z from ndigits * 8
+random bytes, as crypto_ecdh_shared_secret() already did. On P-521 that
+is a 576-bit number, but vli_mmod_fast_521() only reduces products of
+numbers below 2^521. With a 576-bit Z, every P-521 ecc_make_pub_key()
+call returns -EAGAIN. There is no in-tree P-521 caller yet.
 
-For k < n that is always k + 2n, and its bit 522 is set only for
-k >= 2^522 - 2n (about 2^259.5). For smaller k the result is
-(k + 2^522) * P instead of k * P.
+Get Z from one helper at both sites that keeps the random bits to the
+curve's bit length. The other curves are unchanged.
 
-Use k + n if its bit 521 is set, else k + 2n, and start the ladder at
-bit 521.
+Tested in UML: P-521 ecc_make_pub_key() now matches a Python reference
+for the tested keys from 2^522 - 2n up to n - 3. Smaller keys are fixed
+by the next patch. The ecdsa-nist-p521 self-tests still pass.
 
-The only in-tree P-521 caller, ecc_is_pubkey_valid_full(), passes
-k = n and gets the same result. Its ladder now runs on 2n instead of
-3n, as on P-192, P-256 and P-384.
-
-Tested in UML against a Python reference for small k, k on both sides
-of 2^522 - 2n and 40 random k. The ecdsa-nist-p521 self-tests still
-pass.
-
-Fixes: 114e80437e0e ("crypto: ecc - Add special case for NIST P521 in ecc_point_mult")
+Fixes: cd65eaf17841 ("crypto: ecc - Randomize the initial Z in ecc_make_pub_key()")
+Cc: Erwin Pawliczek <pawliczekerwin@gmail.com>
 Tested-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
 Signed-off-by: Arun Iyengar <aiyengar1990@gmail.com>
 ---
- crypto/ecc.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ crypto/ecc.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/crypto/ecc.c b/crypto/ecc.c
-index a56a33e4eccb..370c60595fa9 100644
+index 6696bf0d90a6..a56a33e4eccb 100644
 --- a/crypto/ecc.c
 +++ b/crypto/ecc.c
-@@ -1365,11 +1365,14 @@ static void ecc_point_mult(struct ecc_point *result,
+@@ -1609,13 +1609,22 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits,
+ }
+ EXPORT_SYMBOL(ecc_gen_privkey);
  
- 	carry = vli_add(sk[0], scalar, curve->n, ndigits);
- 	vli_add(sk[1], sk[0], curve->n, ndigits);
--	scalar = sk[!carry];
--	if (curve->nbits == 521)	/* NIST P521 */
--		num_bits = curve->nbits + 2;
--	else
-+	if (curve->nbits == 521) {	/* NIST P521 */
-+		/* k + n or k + 2n, whichever has bit 521 as its top bit */
-+		carry = !!vli_test_bit(sk[0], curve->nbits);
-+		num_bits = curve->nbits + 1;
-+	} else {
- 		num_bits = sizeof(u64) * ndigits * 8 + 1;
-+	}
-+	scalar = sk[!carry];
++/* Random initial Z for ecc_point_mult(), below 2^nbits */
++static void ecc_rand_z(const struct ecc_curve *curve, u64 *z,
++		       unsigned int ndigits)
++{
++	get_random_bytes(z, ndigits << ECC_DIGITS_TO_BYTES_SHIFT);
++	/* P-521: the fast reduction only takes products of 521-bit numbers */
++	if (curve->nbits % 64)
++		z[ndigits - 1] &= GENMASK_ULL(curve->nbits % 64 - 1, 0);
++}
++
+ int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+ 		     const u64 *private_key, u64 *public_key)
+ {
+ 	int ret = 0;
+ 	struct ecc_point *pk;
+ 	u64 rand_z[ECC_MAX_DIGITS];
+-	unsigned int nbytes;
+ 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
  
- 	vli_set(rx[1], point->x, ndigits);
- 	vli_set(ry[1], point->y, ndigits);
+ 	if (!private_key || ndigits > ARRAY_SIZE(rand_z)) {
+@@ -1623,9 +1632,7 @@ int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
+ 		goto out;
+ 	}
+ 
+-	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+-
+-	get_random_bytes(rand_z, nbytes);
++	ecc_rand_z(curve, rand_z, ndigits);
+ 
+ 	pk = ecc_alloc_point(ndigits);
+ 	if (!pk) {
+@@ -1719,7 +1726,6 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
+ 	int ret = 0;
+ 	struct ecc_point *product, *pk;
+ 	u64 rand_z[ECC_MAX_DIGITS];
+-	unsigned int nbytes;
+ 	const struct ecc_curve *curve = ecc_get_curve(curve_id);
+ 
+ 	if (!private_key || !public_key || ndigits > ARRAY_SIZE(rand_z)) {
+@@ -1727,9 +1733,7 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
+ 		goto out;
+ 	}
+ 
+-	nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
+-
+-	get_random_bytes(rand_z, nbytes);
++	ecc_rand_z(curve, rand_z, ndigits);
+ 
+ 	pk = ecc_alloc_point(ndigits);
+ 	if (!pk) {
 
 -- 
 2.55.0
