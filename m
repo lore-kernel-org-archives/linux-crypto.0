@@ -1,79 +1,78 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795887524;
-	b=ZUGdu6o20xGEcWel4wBzyCgted6iNKRW3unwfRq9bbOy0O53Sntt7Fdu3cGq7WajtITu
-	 JnRMmfHBuQmbh/0LubeZRTQz8fITfSexMlyzyAfGnrgR7XLPXV6Ry7AXDExmPvDOVelj8
-	 vhgnvO45OT4BbaoNfc8x2uGzjY90wj5zH4+3Grpjt1Z0jCewwGJabynyzRFbTNXlZV2NC
-	 gC+ECW2SRaDQ5Dg3WMawxWeEbmz6Cme51OGy9tuvrlgUQC7V7dfQ97MBaAppRE80DC+UE
-	 XAMj3kW0Sj8UBjKORf3dRwTYHXBMdBkde7cTnWD+1LWWilAEp+D7mlWA1/Hr9sBRfQg==
+	t=1795890704;
+	b=L/DJ4JeDhGlNs1wp/uGNBIwXrxx3MlB4MOSwc273ewDz9xAmslKDZQlnQOR6TrZ0V+u6
+	 F0A2PG+5AQhykKJ6MSUo9IAK7v6dFrmkmCX0TVMvuSOHxnDNN9btoAkx90cSCDq7IQbk3
+	 064L2t9o/Dyi+RJEFDNOXIxbFUJtINo4iuVisEJGv32e9YZ4Dt5G79io7MPKa6DJ47S5o
+	 7A/ZkS7BllqV7YgNSg3Vu8h1cDOMW3wQmK0nMmZs2GlcaomyjWieaXT1E510uxLprrUQP
+	 XVEzc7Rz1BUb+1KIaE4aJvtyCan73BvWF3sqErk4S6L9hMDeWnOK/oWZJmdrWTyw9Rw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795887524;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795890704;
 	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=Ss3ZCTu7XA1ZhYeb6VBo0mrV1uUxDqZ/FutaykT3aRE=;
-	b=zDVrDdKHfyWMJojT0RDixQCqa7mN8cyW+4JV/eIGOYSf9xEQZ5Kg2H23HPCc+TOIPGp0
-	 gCOLXY6xBiJJy6Wk+irabDiK1C/cG4iuc8PtBIp0bn2xvK54NLT/he9+M+upcRrE7K1np
-	 92l2cgXtk9gy215HQm8DcI2Kmn0bE8Z4LhffDffc6VtREOYzeOjbV6c8GRbgVZwwzVO1o
-	 7lTNo191VkEVd/YqoVwCjrJQN7TJx3pZTEXcHJ3Ar9SVUzMb2kT6//Vm3IVdIutuXEbqC
-	 m6xNddjRAdabT+AbGrOkRTuoLcbOLAEeRoqElmc1eXpUY4US3N/ZUdd2/EyIk3agawg==
+	 Content-Type:Content-Transfer-Encoding:Message-Id:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=o1XSm4J5nhqeGBV2G+qWxlAsdEmlCxKoUR4PklRlaSo=;
+	b=vBSFWcMQWs4UXJKh2zYbCHiwjTeVNK/gyF0+8CFZ9V8YDSVdY9RE2Ol5MLwaMtIYk+oF
+	 aREKBSv2M/U76HN7ssb7/IABfTwQpazHwIcK5tf4cEtCfRr2oCF81izT7XOMlucbOL1fa
+	 PJrr3l+4NfiqXD7AEhWfQXNYsXgmlex2GcDGNqXmWPEGVMDffGkx7ZS6Rw/rPpl3qr/2E
+	 SOEJyJi/x5ssWF/ER7bmAu7vC/8KlkG5t98C31pvWDcnybkxrkqcK6U9ods1DpPv/dyJK
+	 a1PVJhWv3UIlDS72mgSIIiPcxJ+MSWxtvNUIbNpJG+gAbfBAilwd1KRoFEob5UaP5Tw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HxeDlk4n;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R4j0j7My;
 	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0ED606A321;
-	Sat, 28 Nov 2026 17:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98126606A321;
+	Sat, 28 Nov 2026 18:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HxeDlk4n
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R4j0j7My
 Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
 ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
-	t=1795887523;
-	b=lpatwG25OCTGX7n/upbpr7+l/Fi2xR3fC3/3hiPW3IcKoB7iaFntGiLBl9iJ+baLRLOb
-	 24Ba6mgQADehcbubtriK7NTA1HUPxDJgwKZpggWetoISDSY+WKB2hqYUkytNNtkhNWDgX
-	 52epalF8ndpjRtwvsXiE+EMYk2qKBoZUZyCkE6NtqmY6qExlCXGK6LniR9rDQuHJTkQX2
-	 N4gvfpnClzQwNa2I4dnEbu//31RHRDtReBWuWFsPU8HQIwXPc5+JYT1u01nGr4VHv62Fi
-	 p1o4WRnGL4u0TTgj0+APCCuMUXH4n0cdO44kXa0yKBpiPplpw97EjAtjOxw9WyLz9OQ==
+	t=1795890704;
+	b=NNLzSFmHnxNPTybX5bQWBxAsxQLjdLwen2ufi0WOGpRBquBd8TvodoYk/QxeGu/Z1hk+
+	 cDvga95y0GSFmt8ntjvb1k602RRITaAjVkQPfumm+T9z5bLjLS4HXmausbdWyVKaw5OrI
+	 QymxIZjdeOP0w+sEdfWUWLbz4PKEikK19t+yXFcNdZspXZYRDe7Audk0g9UE0laI83FkR
+	 cd7c12RBkQA9A9GUsoUftNZdgZArQTXPY/9gzM2d6mLzWNV9gbWJsvpiqpDMtLrfFjeXy
+	 Kediiach5sI/ZyOFDWsTsiQUJOyGwrRj7TGWtcxrJyg52fwUDAWubeyPI213ddaCw6Q==
 ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
-	c=relaxed/relaxed; t=1795887523;
+	c=relaxed/relaxed; t=1795890704;
 	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
-	 Message-Id:References:In-Reply-To:To:Cc:X-Mailer:
-	 X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
-	 X-Original-From:Reply-To:Content-Transfer-Encoding;
-	bh=Ss3ZCTu7XA1ZhYeb6VBo0mrV1uUxDqZ/FutaykT3aRE=;
-	b=0uPCyc79NpsvdCWBK+BjYva7ER1T+UQj9srzr1vhzD/lT8pnVikT/6BGjr6UK1JetPR+
-	 1MU1jxcuHLzkDuQMKC/r9kLdi0VQpim/AwwcBmdNux+mPcnKj1GIXsWjX5Rl17UEpnPOJ
-	 eRNARj43cIhLfHXaS6qVx2YOP28daH+Cq4EAkz0EtRfPSLYxRrP5sC13iBEr8HEE6+E7g
-	 biyvZw28EkL613K+4oQoaLNrgjwVMUlTOLAXnl+Ua7rEI8QlTC2zZ76nPgcOEXKlhCp92
-	 Cmg7yYyDoFFcjIzYNb0DV4oUV3pojXpE4XhkSj2ls0bjVcspJu2GEt438kQEGKtLPhw==
+	 Content-Transfer-Encoding:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=o1XSm4J5nhqeGBV2G+qWxlAsdEmlCxKoUR4PklRlaSo=;
+	b=OQziN7il/SYS3wV98pMJo6gkg+A0A3+t/4+9x7xJ/qRzQAEeRxdkuVN/xNpp/sSRX3hA
+	 sKTLAV7z5YUpTfPyXTslhWipB7zAyEhg6vKi+aTK5da7SNx7ZzKDYz7UU7Mxgp8DdWWEa
+	 JNi6tIYwkJ5X1g19XPJe1d+dMAfa4HI40ajJkRsA90DaCafrW+slQKNSZ0bwFf3UtTNeB
+	 dkXASRGFRbPLi3LD9InC6C6CRtSrbCTYHjhK/lWrlOJk/YEYazgg1CaPxYKtXQHnixCAH
+	 Oy8Gj8X1EWwmBPNC3vCi/aUd+eM7tVn/kve49a0+Jsw/U/E8pHBQz7whMmK9+O3Wcgw==
 ARC-Authentication-Results: i=1; smtp.kernel.org; 
 	arc=none smtp.remote-ip=100.80.115.77
 Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.kernel.org (Postfix) with ESMTPS id 55F571F00898;
-	Sat, 28 Nov 2026 17:38:29 +0000 (UTC)
+	by smtp.kernel.org (Postfix) with ESMTPS id E60C51F000C1;
+	Sat, 28 Nov 2026 18:31:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795887523;
-	bh=Ss3ZCTu7XA1ZhYeb6VBo0mrV1uUxDqZ/FutaykT3aRE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To;
-	b=HxeDlk4nCXErRkCwqzkR/6Bj0wUzru4USE6xvrNmiIJWsigF93tT+tgIWTKuDdw9e
-	 UfZLHbM5C5nba8Bej/Ab61cwAA90jDhzXKlVu0RgskKuDmSfUSuOT6hrCWuijfO7VP
-	 2KT1+o1fAAOhSkODJ7csephtXZ3JeZD85eGW/2ghBDe46mmkC1Bs2bTB6aEhovnoUS
-	 qgk8iLn8R4IwmUqtSddr4t5dXLY9cx19d0dWGKilHIXyFvc1hokhCUyPAkOn/9B82Q
-	 6/fX3oSUZydv1wDQOQFZd4etprwtlISq1Mlxpa0rsLkLoRI1VDkCidWhTE8m21Uu8l
-	 WTPNb4VFBytcw==
+	s=k20260515; t=1795890704;
+	bh=o1XSm4J5nhqeGBV2G+qWxlAsdEmlCxKoUR4PklRlaSo=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=R4j0j7MyA8GmY2z6zLA2e/xm9A5jT2ao5ln5U3lE5vp5/apvtT6/3OGzd9h686k48
+	 /x8w93jWigNNL1BaVeXT1j+rp4Hq1MjnyNi9wm0iD4K0j5IgYw0DhDbo0nDwlQMdf3
+	 KGWM+t7YuEmN/B/q3Mux9ldjYpopiz9xfWymsbrAMR9lf95FSMtpaTCHaAUEOC4Eqm
+	 nUDhdAbETxUmJZqBKB6sjb16pNBfCp0iD491HodFe0IivDUjiw6f74XbLlXKJ+6JeY
+	 qGRG5NnLg8QuJS/Ht0G/t4kahHOkxCmk0W1NGXw15/q2w1fypnVJnKJGGd5A3dUdPT
+	 nfJ7hEDrwTyCw==
 Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
-	by lkml.kernel.org (Postfix) with ESMTP id DF0B94E1CC;
-	Sat, 28 Nov 2026 17:38:28 +0000 (UTC)
-From: Arun Iyengar via B4 Relay <devnull+aiyengar1990.gmail.com@kernel.org>
-Date: Sat, 28 Nov 2026 17:38:30 +0000
-Subject: [PATCH v2 3/3] crypto: ecc - Add KUnit test for P-521 public key
- generation
+	by lkml.kernel.org (Postfix) with ESMTP id 71F754E1D4;
+	Sat, 28 Nov 2026 18:31:43 +0000 (UTC)
+From: Dickson Wu via B4 Relay <devnull+dickson.wu.certik.com@kernel.org>
+Date: Sat, 28 Nov 2026 18:23:46 +0000
+Subject: [PATCH 6.12.y] crypto: nx - fix nx_crypto_ctx_exit argument
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Post: <mailto:linux-crypto@vger.kernel.org>
@@ -84,182 +83,120 @@ List-Owner: <mailto:linux-crypto+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <20261128-ecc-p521-small-scalars-v2-3-0648f492bca4@gmail.com>
-References: <20261128-ecc-p521-small-scalars-v2-0-0648f492bca4@gmail.com>
-In-Reply-To: <20261128-ecc-p521-small-scalars-v2-0-0648f492bca4@gmail.com>
-To: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>, 
- Stefan Berger <stefanb@linux.ibm.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, 
- Jarkko Sakkinen <jarkko@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Erwin Pawliczek <pawliczekerwin@gmail.com>, 
- Laveesh Bansal <laveeshb@laveeshbansal.com>, 
- Arun Iyengar <aiyengar1990@gmail.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1795887508; l=5021;
- i=aiyengar1990@gmail.com; s=20261110; h=from:subject:message-id;
- bh=9RQyvQkr/A2WLGr5xZoUEE44IbUDVhuj+Vnj7i9lKK0=;
- b=OfKJSsgXE0SDU/iPWggNaFSXdPSAnJhYBOMfEqEncW3eg9oLg9HqRQc/gvo4KHDxiyKYcdfm9
- +PE3+HEuM/1CkmDNTTb14VC43pKTRyOSb272FFafyWmmGuB+tvgonu4
-X-Developer-Key: i=aiyengar1990@gmail.com; a=ed25519;
- pk=zXpRgUTrhaFe6jLyPqbBy3ccfkj04w0g2690Wv3mg+0=
-X-Endpoint-Received: by B4 Relay for aiyengar1990@gmail.com/20261110 with
- auth_id=1480
-X-Original-From: Arun Iyengar <aiyengar1990@gmail.com>
-Reply-To: aiyengar1990@gmail.com
 Content-Transfer-Encoding: 7bit
+Message-Id: <20261128-nx-612-v1-1-7610a67512f3@certik.com>
+X-B4-Tracking: v=1; b=H4sIADEcC2sC/yWMQQrCMBAAv1L27Faz6lb8inhI0tVGJJFslUrp3
+ 03scYZhZlDJQRTOzQxZPkFDigXMpgE/2HgXDH1hoB2xMXTCOCEbQhahjln2x0MHJX5luYXpP7o
+ At4baL1xXr2/3ED/WSy2dVUGXbfRDVSqxH1N6YvXb9Q7L8gORPdlmmQAAAA==
+X-Change-ID: 20261128-nx-612-6ee2766e3547
+To: stable@vger.kernel.org
+Cc: Sam James <sam@gentoo.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+ Eric Biggers <ebiggers@kernel.org>, leitao@debian.org, 
+ Nayna Jain <nayna@linux.ibm.com>, 
+ Paulo Flabiano Smorigo <pfsmorigo@gmail.com>, linux-crypto@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org
+X-Mailer: b4 0.16.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1795890225; l=3358;
+ i=dickson.wu@certik.com; s=dickson-b4; h=from:subject:message-id;
+ bh=aB4HR+znA9D6EQ8XLQLZ4whL3VZ/EVrQCTXfZ2ow9oc=;
+ b=P640s0WQ+DNkyjd7te2JL8BcjfeBU5hCvfXQ9A5yBTz3enPCx7ZTLjTzhXk5blYaJa8wZNTZe
+ gi2JUsneFSiCJjsSkyLQgBvdWUM0Y6sxFGIzhC9JACWfzcin90VNiM+
+X-Developer-Key: i=dickson.wu@certik.com; a=ed25519;
+ pk=fxH7FS4FdojeJSGLJzgKdfO51Rvr4EW30yinj2mc1vg=
+X-Endpoint-Received: by B4 Relay for dickson.wu@certik.com/dickson-b4 with
+ auth_id=1647
+X-Original-From: Dickson Wu <dickson.wu@certik.com>
+Reply-To: dickson.wu@certik.com
 
-From: Arun Iyengar <aiyengar1990@gmail.com>
+From: Sam James <sam@gentoo.org>
 
-Nothing tests ecc_make_pub_key() on P-521. Add a KUnit test that
-compares the public keys for k = 2, 2^259 and n - 3 with known values.
-It fails without the previous two patches.
+commit 4e67f504ee9ded15e256b64f4fde150e917381d7 upstream.
 
-Suggested-by: Laveesh Bansal <laveeshb@laveeshbansal.com>
-Signed-off-by: Arun Iyengar <aiyengar1990@gmail.com>
+nx_crypto_ctx_shash_exit calls nx_crypto_ctx_exit with crypto_shash_ctx(...)
+but crypto_shash_ctx gives a nx_crypto_ctx *, not a crypto_tfm *.
+
+Fix the type in nx_crypto_ctx_exit and drop the bogus crypto_tfm_ctx
+call.
+
+This fixes the following oops:
+
+  BUG: Unable to handle kernel data access at 0xc0403effffffffc8
+  Faulting instruction address: 0xc000000000396cb4
+  Oops: Kernel access of bad area, sig: 11 [#15]
+  Call Trace:
+   nx_crypto_ctx_shash_exit+0x24/0x60
+   crypto_shash_exit_tfm+0x28/0x40
+   crypto_destroy_tfm+0x98/0x140
+   crypto_exit_ahash_using_shash+0x20/0x40
+   crypto_destroy_tfm+0x98/0x140
+   hash_release+0x1c/0x30
+   alg_sock_destruct+0x38/0x60
+   __sk_destruct+0x48/0x2b0
+   af_alg_release+0x58/0xb0
+   __sock_release+0x68/0x150
+   sock_close+0x20/0x40
+   __fput+0x110/0x3a0
+   sys_close+0x48/0xa0
+   system_call_exception+0x140/0x2d0
+   system_call_common+0xf4/0x258
+
+.. which came from hardlink(1) opportunistically using AF_ALG.
+
+The same problem exists with nx_crypto_ctx_skcipher_exit getting a context
+it wasn't expecting, but apparently nobody hit that for years.
+
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: stable@vger.kernel.org
+Fixes: bfd9efddf990 ("crypto: nx - convert AES-ECB to skcipher API")
+Fixes: 9420e628e7d8 ("crypto: nx - Use API partial block handling")
+Acked-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+Reported-by: Calvin Buckley <calvin@cmpct.info>
+Tested-by: Calvin Buckley <calvin@cmpct.info>
+Suggested-by: Brad Spengler <brad.spengler@opensrcsec.com>
+Signed-off-by: Sam James <sam@gentoo.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+[ adapted to 6.12.y: pass the skcipher tfm to the legacy exit helper ]
+Signed-off-by: Dickson Wu <dickson.wu@certik.com>
 ---
- crypto/Kconfig    | 11 +++++++
- crypto/Makefile   |  1 +
- crypto/ecc_test.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 106 insertions(+)
+This one never made it to 6.12.y. The shash half of the upstream fix
+doesn't apply here, since 6.12 predates 9420e628e7d8, but the skcipher
+half does: nx_crypto_ctx_skcipher_exit() still passes the skcipher ctx
+where nx_crypto_ctx_exit() expects a crypto_tfm. The backport passes
+crypto_skcipher_tfm(tfm), so the exit finds the same nx_crypto_ctx
+that the aes_*_init() helpers set up through crypto_skcipher_ctx().
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 6682ac091b38..a4c8632ef4f4 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -296,6 +296,17 @@ config CRYPTO_DH_RFC7919_GROUPS
- config CRYPTO_ECC
- 	tristate
- 
-+config CRYPTO_ECC_KUNIT_TEST
-+	tristate "KUnit tests for ECC public key generation" if !KUNIT_ALL_TESTS
-+	depends on KUNIT && CRYPTO_ECC
-+	default KUNIT_ALL_TESTS
-+	help
-+	  Enable KUnit tests for ecc_make_pub_key().  The tests generate
-+	  NIST P-521 public keys for small, mid-sized and large private
-+	  keys and compare them with known values.
-+
-+	  If unsure, say N.
-+
- config CRYPTO_ECDH
- 	tristate "ECDH (Elliptic Curve Diffie-Hellman)"
- 	select CRYPTO_ECC
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 42a4a0d5a466..32a3d3e7fd8e 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -167,6 +167,7 @@ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
- obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
- obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
- obj-$(CONFIG_CRYPTO_ECC) += ecc.o
-+obj-$(CONFIG_CRYPTO_ECC_KUNIT_TEST) += ecc_test.o
- obj-$(CONFIG_CRYPTO_ESSIV) += essiv.o
- 
- # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=124949
-diff --git a/crypto/ecc_test.c b/crypto/ecc_test.c
-new file mode 100644
-index 000000000000..cf6522b7eea4
---- /dev/null
-+++ b/crypto/ecc_test.c
-@@ -0,0 +1,94 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KUnit tests for ecc_make_pub_key() on NIST P-521.
-+ *
-+ * The expected points were computed with a Python reference and checked
-+ * against OpenSSL.
-+ */
-+#include <kunit/test.h>
-+#include <linux/module.h>
-+#include <crypto/ecdh.h>
-+#include <crypto/internal/ecc.h>
-+
-+#define P521_DIGITS	ECC_CURVE_NIST_P521_DIGITS
-+
-+struct ecc_p521_vec {
-+	const char *desc;
-+	u64 k[P521_DIGITS];
-+	u64 x[P521_DIGITS];
-+	u64 y[P521_DIGITS];
-+};
-+
-+static const struct ecc_p521_vec ecc_p521_vecs[] = {
-+	{
-+		.desc = "k = 2",
-+		.k = { 2 },
-+		.x = { 0xf43e3933ba6d783dull, 0xcf2fa364d60fd967ull,
-+			0xaa104a3a35c5af41ull, 0xb3b204da6ef55507ull,
-+			0x2c6e5505d769be97ull, 0x7403279b1ccc0635ull,
-+			0x2fcb288148c28274ull, 0x3c219024277e7e68ull, 0x43ull },
-+		.y = { 0x1be356d661f41b02ull, 0xeafcbe95edc0f4f7ull,
-+			0x93937fa99a3248f4ull, 0xb3e377de9f251f6bull,
-+			0xab21a29906c42dbbull, 0xc6b5107c4da97740ull,
-+			0xa7f3eceeeed3f0b5ull, 0xbb8cc7f86db26700ull, 0xf4ull },
-+	},
-+	{
-+		.desc = "k = 2^259",
-+		.k = { [4] = 0x8ull },
-+		.x = { 0xdfbfa8c0b9f59031ull, 0x683df70ba5e17023ull,
-+			0x07958fdc42ce28b7ull, 0xb8965b5bc6d4dc78ull,
-+			0x78441b9a6e4b4290ull, 0x3909e659ea4b4aa1ull,
-+			0x9c8f59c629b6cd62ull, 0xf400a01919a026ccull, 0xcfull },
-+		.y = { 0x09844edef77fa34full, 0x9da8cdc495b4acfaull,
-+			0x5bb762074d52835bull, 0xc39505e29c0584e1ull,
-+			0x4c9a0f296c4f318eull, 0xdd1a8f417d87f206ull,
-+			0x423805cd95ec312cull, 0x21639f519304343eull, 0x92ull },
-+	},
-+	{
-+		.desc = "k = n - 3",
-+		.k = { 0xbb6fb71e91386406ull, 0x3bb5c9b8899c47aeull,
-+			0x7fcc0148f709a5d0ull, 0x51868783bf2f966bull,
-+			0xfffffffffffffffaull, 0xffffffffffffffffull,
-+			0xffffffffffffffffull, 0xffffffffffffffffull,
-+			0x1ffull },
-+		.x = { 0xa5919d2ede37ad7dull, 0xaeb490862c32ea05ull,
-+			0x1da6bd16b59fe21bull, 0xad3f164a3a483205ull,
-+			0xe5ad7a112d7a8dd1ull, 0xb52a6e5b123d9ab9ull,
-+			0xd91d6a64b5959479ull, 0x3d352443de29195dull,
-+			0x1a7ull },
-+		.y = { 0xa0a7735e11793f1aull, 0x0efa36436c5a6fbdull,
-+			0xd2a5312e213c38f3ull, 0xd1d22b30723a8a4full,
-+			0x2d0754e05caa3113ull, 0x0eaa8057d562fce8ull,
-+			0x686079393547eb0dull, 0x64fc4682059d2226ull, 0xc1ull },
-+	},
-+};
-+
-+KUNIT_ARRAY_PARAM_DESC(ecc_p521, ecc_p521_vecs, desc);
-+
-+static void ecc_p521_make_pub_key(struct kunit *test)
-+{
-+	const struct ecc_p521_vec *v = test->param_value;
-+	u64 pub[2 * P521_DIGITS], x[P521_DIGITS], y[P521_DIGITS];
-+
-+	KUNIT_ASSERT_EQ(test, ecc_make_pub_key(ECC_CURVE_NIST_P521, P521_DIGITS,
-+					       v->k, pub), 0);
-+	ecc_swap_digits(pub, x, P521_DIGITS);
-+	ecc_swap_digits(&pub[P521_DIGITS], y, P521_DIGITS);
-+	KUNIT_EXPECT_MEMEQ(test, x, v->x, sizeof(x));
-+	KUNIT_EXPECT_MEMEQ(test, y, v->y, sizeof(y));
-+}
-+
-+static struct kunit_case ecc_test_cases[] = {
-+	KUNIT_CASE_PARAM(ecc_p521_make_pub_key, ecc_p521_gen_params),
-+	{}
-+};
-+
-+static struct kunit_suite ecc_test_suite = {
-+	.name = "ecc",
-+	.test_cases = ecc_test_cases,
-+};
-+
-+kunit_test_suite(ecc_test_suite);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("KUnit tests for ECC public key generation");
+Tested on 6.12 (e2e4b92c2b2a): big-endian ppc64 pSeries W=1
+cross-build of drivers/crypto/nx, base vs patched, no new warnings.
+Build-only - I don't have NX hardware, so nothing ran.
 
--- 
-2.55.0
+The backport and the test runs were prepared with AI coding tools
+(OpenAI Codex agents, with review by Claude). I went over the result
+before signing off.
+---
+ drivers/crypto/nx/nx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index 010e87d9da36..e9186ff33945 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -756,7 +756,7 @@ void nx_crypto_ctx_exit(struct crypto_tfm *tfm)
+ 
+ void nx_crypto_ctx_skcipher_exit(struct crypto_skcipher *tfm)
+ {
+-	nx_crypto_ctx_exit(crypto_skcipher_ctx(tfm));
++	nx_crypto_ctx_exit(crypto_skcipher_tfm(tfm));
+ }
+ 
+ void nx_crypto_ctx_aead_exit(struct crypto_aead *tfm)
+
+---
+base-commit: e2e4b92c2b2a3ae78423cb343951cb5d2241b405
+change-id: 20261128-nx-612-6ee2766e3547
+
+Best regards,
+--  
+Dickson Wu <dickson.wu@certik.com>
 
 
