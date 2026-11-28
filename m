@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795840862;
-	b=xgGdgi0Y6JteX93keCOzaUQ4NE+idRXJsDnxPsbqzlU5s8/gCUlOjHBH3bUuM9ILgo8G
-	 8LWHlA7SYnsG3HTTXnSC/KtBSU8mmGBmiezXhszu5EuWHuGo8Cn72JzrjYxplrQSM9oG+
-	 22/mjqviuxcZY70b8HA72HG2H8tteAM0aKyp3QWbx904ToW8E+oqDNw+PTYEhs2yTWMW1
-	 HUIs/hxqoCn+SRyUaSTG+45Flhw1Y9elt2fpQ2Mbz1vUvZlZvrB45zyWqJpuggfxCr1vE
-	 BOrURMZz1g/usZcdSa8rnRO3NueS/LXwlIJ5JExENPHjsOXzQIgIj4+7zpbb8/NhISw==
+	t=1795840864;
+	b=EBaPReVI1zM5eQ41b5rT8D5KKolUnP4IQ7cHPI35paEmhIAJEgENx5xEeI+DjczZJlg8
+	 A2fAEgzRA7jUoeXJREsdkFddqYQOpx4XkYFCWlxvG0rZpzQeZCK+CVijxYnT18drzW02T
+	 84qXTT9T6+E3cxgg0DVJo3+R9rSM6ok1sFeIkE+aW+PVjTsk5Wde2hQ86bkoNDRVPrHuP
+	 FqsXb6lXn/zyXZHmWTNKU7c4yPWwMIrQNX7FokmFPCCAatX4jdH+mN8OLrR09mbKayLOf
+	 MeJ7ZxW8p5spVjtsr4xbTD+lfbKqRfzpb2MG4WS1LbhnPIBvMXwI+Ofs/eHqnckOdxw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795840862;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795840864;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=G1zg7oDnPMMLPkGbaldczgRDAJIrfK55owtXYdnhz5Y=;
-	b=cKebdjXh5TdeDaRqChPw6EN+ySwrlQLb/SmaXGgP5Bp+WG3YZ5vRv2NEHj3bLcvOM72F
-	 3g450LmFTVeSyomk8fnjb6IgyGcK6TGDU5DDNnQefXRgzbv9QDIlA3RadEkKDQikmNCty
-	 3cwx9rlKh8mbmXnBdnj6q0CcbLVzms/tNMM0Zo1GStb5T21UYAxEQMuRKa5bps3VAp9tV
-	 JtzonQs8nFLq0EeGOHtduOirKrwZFif+u68QZOzQmTpFfwe92rKH1JmN0wUPxrMHw/Dcs
-	 QN8b0K1kJ5MZXjGW+QUUo1bvGAB2vAT2jLVw4blg3s8g4FikOWsp4fV9SC4APZESqdg==
+	bh=Nv4bBI2nQTnAQa7VVyNNtpM5P6KUCDHBGIEl1IvOK2c=;
+	b=UdYpxZS3kD0fpOEAdHD/GERmT/mpJfjpqUPrrs9PE+ky9pXpj1xNjlRUfZu/e35Xx7cs
+	 5O+/3sS5YoXoJo/yqUDKrEAWhXXJ6xHYjN9SiuTfnYxmmECjtI8WUgebnKYLAarbMfNsN
+	 qpz1SyIqVmMF1cuZtJRoKKUwtlQog1wGPAh1og+WEOcw13DDKMQKSfHoLfaSqkGkkxj5r
+	 R1fME6pFBhmMU4JTUbZT9ykNXtIa9tHYlJ6zVG1u9WY5+R/OKboI8QJtXgSsWRuXYWesm
+	 uhF98v7SlQGP7/3FaNplENH0m43HQpXiiiJ0DgFGwa0kYbkuZN1yw7WXFf/hYTzuV4Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GxlrDgtb;
-	arc=none smtp.remote-ip=209.85.216.43
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WMJTReRx;
+	arc=none smtp.remote-ip=209.85.216.46
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239B3606A31C
-	for <linux-crypto@vger.kernel.org>; Sat, 28 Nov 2026 04:41:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 239B3606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CEA0606A31F
+	for <linux-crypto@vger.kernel.org>; Sat, 28 Nov 2026 04:41:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8CEA0606A31F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=GxlrDgtb
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3b3e85baf7cso5054217a91.0
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 20:41:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WMJTReRx
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-3b4021b572dso5358526a91.2
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Nov 2026 20:41:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795840861; x=1796445661; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1795840863; x=1796445663; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=G1zg7oDnPMMLPkGbaldczgRDAJIrfK55owtXYdnhz5Y=;
-        b=GxlrDgtb14O81jpISTbcaVBRGDgmTfQsDcs1AaRKdxWl7mp/t7TLGt7vVQRIfVryDk
-         aPHHldiBeXC6T/JVb0pHAARynaGMetwoyzWzEXZ1BuFYCKs3Xan+aKA/RIby3K6fvjtT
-         RxN4X65YbR2fXqgmopcRoMmmJ1dNrNF2P3S4pzbqWLmWU95G8NCP5aQhLOTtPOEIT+mi
-         wWSG65nBFxK6zWgQVxU1pnFrH74Az1KvVFPap34dAzD2ifcOElqkowyBZsGgMXa0nE3h
-         VS6KBERQyFY29ztrAEKECdQCl+1RHVNeuS8o8F2KvwuVYR4gWRGqbvj+yWu5OTkhIsKP
-         JuAw==
+        bh=Nv4bBI2nQTnAQa7VVyNNtpM5P6KUCDHBGIEl1IvOK2c=;
+        b=WMJTReRxElg6TswQ28vwxVENY4/pSeEcf2VP5WDOd7q/uBCt2o6Fe+xX6MMlY5467h
+         dWoqhju+SnCv/AQCDfi8nlzfOdHFvH0zPJicaH6ozh2iqZdV3OooEuwB/MbhGskyynyt
+         4GDVeDdOCdYQ8d0dpOzWyQh0Cx4e6uQcnGPhQAKvhPs/PzPqpHsJTks+Jy9innDT5bG+
+         EMHyhTVvyYb6jshOSu5LeWoHqHDRMwkHZVL1eMx2S/3VDe7ASnfFXbq9wEO5Z3xDeYps
+         UCRKUlWZHchYRltALhqP9cDbaYyffdp7+W5Q05kq/QmcxNE3kVPI3UuEAJKqmU7qKrg2
+         kpmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795840861; x=1796445661;
+        d=1e100.net; s=20260707; t=1795840863; x=1796445663;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=G1zg7oDnPMMLPkGbaldczgRDAJIrfK55owtXYdnhz5Y=;
-        b=uSG0KsjQOzF/pcBjFQrIITsVEUhc70lwUWQb4/jEVnvluLjOd1P2la17IxU+hfH4g0
-         36UObjYpDUtu1RCSPxutAtTk3qZzPb5YQNBGN730YhGXi9mcHju51qsJGs69XRpizKSD
-         rIcXU+MgPpEeoAh3Hpt1yEDgOJ9hGQD5nlQ1EcLVER4w/fvu1r5GD7xkYAwQivmY/f4W
-         p8uhXg6nswoonpmtlNRt/qa0uSN1MCmldJlCkfDPBCkdz0R6LPF9nssmQHVrMZPl1Rg4
-         wR7QvSKCdYyjYZAPGzagDCDWEU8pCFVmtv1jaczC5Q3qO7/aHKdDxWvxmPz8U7Oj4pZD
-         D2QQ==
-X-Gm-Message-State: APuU4Z8O4XEi0h6GFawPfkna3+dFYBDmg0ZDciWeYVRbMVS5gxSq7WLM
-	4hWYhlAmAmcyoqZKRxnwOghf9CGnTBLM4TXbFG80e5WSEozLK2DG65l4qdu8mA==
-X-Gm-Gg: AZFdTZcpiwa0MS6ER9JY2g2cn0/JoANJ7Lr6GOEm3jkuDq8MwXooH93QX0n1V350W5j
-	bI4p97YT6m1UlX8zhKXKApi8UKzr+vlN3DDfEte9058o+eNPkDQw5dyfjlzMi15hNGStGfiVuqE
-	t4bta+cJwOL8lJKTDfWa9TgJDI8fwjXccVn9eP6nYHA7UjPAM1i7fc8YA3SXX8pPURyQy29Mryh
-	Ew3XyrbcgpG85ucq+HCRb2srFhRKVgAxhVFbmcl+5cYDi96Q81DAN1lQZ4NbX+atJ7T+KpczU9o
-	OXghxunB3Er04xI45sEu4awwplXISni7glXZoBbFeoTTYvE3v15l8oZFcOgVrL+IP87QPWuJWKe
-	UhZH/LtMP7OYoVh3c3D8PgRFDEHvuN8pVgLmTluUNha9l/hrjhk88P9TaKR8Hqno5a/uLJmsgjh
-	OToCFPbq3CPnqC1WMUQ/AfjB8TYYiYZmofIG9i7/ywvDX8EMOCbB1mVsxfimIjq3zSnzlcC4RbO
-	b7TOcilT60RFK9kAq8/D+TJSJi2w/7+AxsWAkGGvsRSrVTdFUS2sEOj4/xA/suvbMaEnu0sqUls
-	N3nQUu3pQZGwIR+qUvEneh/p5D5Tywi0qsDH6z2rCskX+W85euztJm7zu39rbZxBDEjXM9WtSn0
-	UZE0lt/OmqW1hVYyqQmDBw1DbsT03B35kUzpOoQ37IOLQpUwiEqiyqcq+pyRPxVWdpioF/hlfaK
-	9knw==
-X-Received: by 2002:a17:90b:390c:b0:3a7:9e3d:b3 with SMTP id 98e67ed59e1d1-3b41c9beafamr24728083a91.66.1795840861545;
-        Fri, 27 Nov 2026 20:41:01 -0800 (PST)
+        bh=Nv4bBI2nQTnAQa7VVyNNtpM5P6KUCDHBGIEl1IvOK2c=;
+        b=iqHKFadjfT1UQ/ZhdEbc96iWuKmERFQ3w1ZZLmL3s7RNSkBkV6dQVUlRqb6nSnCeIo
+         IvyC4iKyGvS9g3mOkZb2GF3mHc15S8ObGayl+RvBoRezvMtxZis1xp76Gh4TVjed+Fqv
+         ZeUvijSS8+OP9h+BarIEgSuBU4zEXuvrbZ4RgLsxULO0EQCZCrcQN1+XSfuZ7sBi/WfV
+         8oplawbbuUr4GQ+7ew9OHS9kHtJeeFpZJFfMU5UjSQKKg87VNImxCK6pab8FBMWpmsLJ
+         KMduqMMnlMmOIdJzgdPah0zHuWhptAsF1jyIdApIL8aS4jxUHkHmxyG+ZvpBU5Mz0DY9
+         6Iag==
+X-Gm-Message-State: APuU4Z+vUOHNCzZ1rYdOI064yRJYtgmuyw3/Y88le+e6ov8hrFoYAD0e
+	JlKGgKscfbuBUr48YVyQzxFLMcLJV8u2480CQLhetv5LRjJ1LSkvWz2DAOQfyQ==
+X-Gm-Gg: AZFdTZeEsZOMC0wzMLH7l+OfACXx4VIRCZs85p6yiMmKiLfTLU11M1Hs5Zj2RGNXwsY
+	H23gzbsNaRtu+7c5gyjfqVNDQ+CqWj4B9xg1HgS3pxAtj+xxkQ5Huycd8OjD+4JVMsKUMn/STH8
+	O+kFIHflWIWcshhE6vauwnTvul8b44qBE0yZxqXpj0LUtYEnNoEMaHGm8E/K60mgmLJ0Uy/vUOV
+	5GN8aS2Ql9Eb92FPJ2qMgbUV3/QyMzGrsL9Z4PEsLfPhkO5z9JF6BZrLameSy6lVkqYkrBxCQz6
+	84oF+IWVEZ9E7+kULrmgKJplyUyUOxObsGh4GYm7zHPjxRmH0nncB1KlylT+uY3K9u3d/6ZVxqG
+	hyaVrontXg6alvZ2X2LEvY1XcFx5a/BvMd+QWETTJ8//RfqgG5KvC/v3JXdXvgpWAqXY2pRV8S8
+	g/qYDqUDV1wm9t6zQV26JqvesTKvn3K5gEtcyZt98TLIQ3zoewkVweafw3HyxbVgEZXpB0AcUVI
+	YBWYYLEc/KdOOQKu7kYjk8sMvJvSIprPSl3n7Iw4O3GttZTBIiI3XNrEj4nidIGL+teDoJr79UW
+	h6iistSj8m1yaPdfQqSrDvNVueRn7VfFl0phxtaFQymUHz5lHO/7u+WSwTKJYMJwOX09Xo0G8FL
+	3Kko3iVSyd4CyqTp2gzCX9O9OizhbsB6qo9f3vr3vWghVAuaQOe77IFmXKiLqtkxcB5rHIaI6Cw
+	gNTaiROzLfIH4lGfcy0VaJ66s=
+X-Received: by 2002:a17:90b:3f0e:b0:3b3:bf8f:9cce with SMTP id 98e67ed59e1d1-3b41c905c98mr26228875a91.35.1795840862811;
+        Fri, 27 Nov 2026 20:41:02 -0800 (PST)
 Received: from ryzen.lan ([2601:644:8000:37f::e34])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b41abb1b66sm42716729a91.1.2026.11.27.20.41.00
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b41abb1b66sm42716729a91.1.2026.11.27.20.41.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Nov 2026 20:41:01 -0800 (PST)
+        Fri, 27 Nov 2026 20:41:02 -0800 (PST)
 From: Rosen Penev <rosenp@gmail.com>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -91,9 +91,9 @@ Cc: Srujana Challa <schalla@marvell.com>,
 	Russell King <rmk+kernel@arm.linux.org.uk>,
 	Romain Perier <romain.perier@free-electrons.com>,
 	stable@vger.kernel.org
-Subject: [PATCH 6/8] crypto: cesa - put the non-TDMA hash padding behind the data
-Date: Fri, 27 Nov 2026 20:40:48 -0800
-Message-ID: <20261128044050.722617-7-rosenp@gmail.com>
+Subject: [PATCH 7/8] crypto: cesa - do not step empty hash operations on the non-TDMA path
+Date: Fri, 27 Nov 2026 20:40:49 -0800
+Message-ID: <20261128044050.722617-8-rosenp@gmail.com>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261128044050.722617-1-rosenp@gmail.com>
 References: <20261128044050.722617-1-rosenp@gmail.com>
@@ -108,42 +108,55 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit e62291c1d9f4 ("crypto: marvell/cesa - Fix sparse warnings")
-changed mv_cesa_ahash_std_step() to build the hash padding in the cache
-and copy it to SRAM, instead of building it in place right behind the
-data. The length is advanced before the copy, so the padding lands one
-padding length too far, and the engine hashes as many bytes of stale
-SRAM in its place.
+On engines without TDMA (Orion), mv_cesa_ahash_std_step() trims each
+step of a non-final update to whole blocks and leaves the partial tail
+for the next request. mv_cesa_ahash_std_process() asks for another step
+as long as source bytes are left, so when an update fills its last
+SRAM-sized step exactly and fewer than a block's worth of bytes remain,
+it steps once more: that step trims its data to nothing and starts a
+zero-length MAC operation, which corrupts the hash state. Multi-part
+hashes whose update ends that way are wrong, one-shot digests are not
+affected.
 
-Copy the padding first, then account for it.
+Once less than a block is left on a non-final request, complete it and
+leave the remaining bytes to the cache, as for the last step.
 
-Fixes: e62291c1d9f4 ("crypto: marvell/cesa - Fix sparse warnings")
+Fixes: f63601fd616a ("crypto: marvell/cesa - add a new driver for Marvell's CESA")
 Cc: stable@vger.kernel.org
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/crypto/marvell/cesa/hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/marvell/cesa/hash.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
-index f6894ed7c1cc..6fcd78427b71 100644
+index 6fcd78427b71..b51315cd01df 100644
 --- a/drivers/crypto/marvell/cesa/hash.c
 +++ b/drivers/crypto/marvell/cesa/hash.c
-@@ -253,7 +253,6 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
- 						      new_cache_ptr);
- 			} else {
- 				i = mv_cesa_ahash_pad_req(creq, creq->cache);
--				len += i;
- 				if (engine->pool)
- 					memcpy(engine->sram_pool + len +
- 					       CESA_SA_DATA_SRAM_OFFSET,
-@@ -262,6 +261,7 @@ static void mv_cesa_ahash_std_step(struct ahash_request *req)
- 					memcpy_toio(engine->sram + len +
- 						    CESA_SA_DATA_SRAM_OFFSET,
- 						    creq->cache, i);
-+				len += i;
- 			}
+@@ -297,10 +297,23 @@ static int mv_cesa_ahash_std_process(struct ahash_request *req, u32 status)
+ {
+ 	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+ 	struct mv_cesa_ahash_std_req *sreq = &creq->req.std;
++	unsigned int left;
  
- 			if (frag_mode == CESA_SA_DESC_CFG_LAST_FRAG)
+-	if (sreq->offset < (req->nbytes - creq->cache_ptr))
++	if (creq->last_req) {
++		if (sreq->offset < (req->nbytes - creq->cache_ptr))
++			return -EINPROGRESS;
++		return 0;
++	}
++
++	/*
++	 * Less than a block left: keep it in the cache for the next request
++	 * rather than stepping a zero-length operation.
++	 */
++	left = req->nbytes - sreq->offset;
++	if (left >= CESA_MAX_HASH_BLOCK_SIZE)
+ 		return -EINPROGRESS;
+ 
++	creq->cache_ptr = left;
+ 	return 0;
+ }
+ 
 -- 
 2.56.1
 
